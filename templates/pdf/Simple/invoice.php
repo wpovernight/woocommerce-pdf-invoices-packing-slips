@@ -93,7 +93,7 @@
 						<tr>
 							<td class="no-borders">&nbsp;</td>
 							<th class="description"><?php echo $total['label']; ?></th>
-							<td class="price"></span><?php echo $total['value']; ?></td>
+							<td class="price"><?php echo $total['value']; ?></td>
 						</tr>
 						<?php endforeach; ?>
 					</tfoot>
