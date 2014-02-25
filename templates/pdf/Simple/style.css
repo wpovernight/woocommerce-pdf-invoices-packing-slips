@@ -1,0 +1,232 @@
+/* Main Body */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/yYRnAC2KygoXnEC8IdU0gQLUuEpTyoUstqEm5AMlJo4.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/k3k702ZOKiLJc3WVjuplzMDdSZkkecOE1hvV7ZHvhyU.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: normal;
+  src: local('Open Sans Italic'), local('OpenSans-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/O4NhV7_qs9r9seTo7fnsVCZ2oysoEQEeKwjgmXLRnTc.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: bold;
+  src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/PRmiXeptR36kaC0GEAetxrQhS7CD3GIaelOwHPAPh9w.ttf) format('truetype');
+}
+
+@page {
+	margin-top: 1cm;
+	margin-bottom: 0.5cm;
+	margin-left: 2cm;
+	margin-right: 2cm;
+}
+body {
+	background: #fff;
+	color: #000;
+	margin: 0cm;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 9pt;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-size: 10pt;
+	font-weight: bold;
+	margin: 0;
+}
+
+ol,
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+li,
+ul {
+	margin-bottom: 0.75em;
+}
+
+p {
+	margin: 0;
+	padding: 0;
+}
+
+p + p {
+	margin-top: 1.25em;
+}
+
+/* Basic Table Styling */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	page-break-inside: always;
+}
+
+th, td {
+	vertical-align: top;
+}
+
+table.container {
+	width:100%;
+	border: 0;
+}
+
+tr.no-borders, td.no-borders {
+	border: 0 !important;
+	border-top: 0 !important;
+	border-bottom: 0 !important;
+	padding: 0 !important;
+	width: auto;
+}
+
+span.force-width-you {
+	display: block;
+}
+
+/* Header */
+td.header img {
+	max-height: 3cm;
+	width: auto;
+}
+
+td.header {
+	font-size: 16pt;
+	font-weight: 700;
+}
+
+td.header, td.shop-info {
+	margin-bottom: 10mm !important;
+}
+
+td.shop-info {
+	width: 40%;
+}
+/* Recipient & order information */
+.document-type-label {
+	text-transform: uppercase;
+}
+
+.order-date-label,
+.order-number-label,
+.order-payment-label {
+	width: 3cm;
+	display: inline-block;
+}
+
+/* Order details */
+
+table.order-details {
+	width:100%;
+	margin-top: 1cm;
+	margin-bottom: 1cm;
+}
+
+.quantity-label,
+.price-label {
+	width: 20%;
+}
+
+.order-details tr {
+	page-break-inside: always;
+	page-break-after: auto;	
+}
+
+.order-details td,
+th {
+	border-bottom: 1px #ccc solid;
+	padding: 0.375em;
+}
+
+.order-details th {
+	font-weight: bold;
+	text-align: left;
+}
+
+.order-details thead th {
+	color: white;
+	background-color: black;
+	border-color: black;
+}
+
+.order-details .description img {
+	width: 1.5cm;
+	height: auto;
+}
+
+table.product, table.product td {
+	margin: 0;
+	border: 0;
+	padding: 0;
+}
+
+table.product td.product-image {
+	padding-right: 10px;
+}
+
+
+dl {
+	margin: 4px 0;
+}
+
+dt, dd, dd p {
+	display: inline;
+	font-size: 7pt;
+}
+
+dd {
+	margin-left: 5px;
+}
+
+dd:after {
+	content: "\A";
+	white-space: pre;
+}
+
+/* Totals */
+table.totals {
+	width: 100%;
+	margin-top: 5mm;
+}
+
+table.totals th, table.totals td {
+	border: 0;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+table.totals th.description,
+table.totals td.price {
+	width: 20%;
+}
+
+table.totals tr:last-child td, table.totals tr:last-child th {
+	border-top: 2px solid #000;
+	border-bottom: 2px solid #000;
+	font-weight: bold;
+}
+
+/* Footer Imprint */
+#footer {
+	position: absolute;
+	bottom: 0px;
+	left: 0;
+	right: 0;
+	height: 2cm;
+	text-align: center;
+	border-top: 0.1mm solid gray;
+	margin-bottom: 0;
+	padding-top: 2mm;
+}

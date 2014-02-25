@@ -1,0 +1,66 @@
+#woocommerce-delivery-notes-box .inside {
+	text-align: left;
+	position: relative;
+}
+#woocommerce-delivery-notes-box .inside ul {
+	overflow: hidden;
+	margin: 0px;
+}
+#woocommerce-delivery-notes-box .inside ul li {
+	float: left;
+	margin: 3px;
+}
+#woocommerce-delivery-notes-box .inside img.loading {
+	position: absolute;
+	right: 7px;
+	top: 0px;
+}
+#woocommerce-delivery-notes-box .inside img.loading,
+.type-shop_order .column-order_actions img.loading {
+	display: none;
+	vertical-align: middle;
+}
+.type-shop_order .column-order_actions img.loading {
+	float: left;
+	margin-top: 3px;
+}
+.type-shop_order .column-order_actions .print-preview-button span {
+	display:  none;
+}
+#company-logo-placeholder {
+	display: block;
+}
+#company-logo-placeholder.loading {
+	background-image: url("../../../../wp-admin/images/wpspin_light.gif");
+	background-repeat: no-repeat; 
+	height: 20px;
+}
+#company-logo-placeholder img {
+	cursor: pointer;
+}
+
+.type-shop_order .column-order_actions a.button.wpo_wcpdf {
+	padding: 0 2px;
+}
+
+.type-shop_order .column-order_actions a.button.wpo_wcpdf img {
+	width: 16px;
+}
+
+.widefat .column-pdf_invoice_number {
+	width: 110px;
+}
+
+/* Settings page styles */
+#img-header_logo {
+	max-height: 200px;
+	width: auto;
+}
+
+span.wpo-warning {
+	display: inline-block;
+	border: 1px solid red;
+	border-left: 4px solid red;
+	padding: 5px 15px;
+	background-color: white;
+}

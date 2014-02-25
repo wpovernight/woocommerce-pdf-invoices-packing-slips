@@ -1,0 +1,290 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
+"POT-Creation-Date: 2014-01-23 12:32+0100\n"
+"PO-Revision-Date: 2014-01-29 15:09+0100\n"
+"Last-Translator: joesalty <joesalty77@gmail.com>\n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.3\n"
+"X-Poedit-Basepath: ../\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
+"X-Poedit-Language: Hungarian\n"
+"X-Poedit-Country: HUNGARY\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: woocommerce-pdf-invoices-packingslips.php:96
+#, php-format
+msgid "WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be installed & activated!"
+msgstr "WooCommerce PDF Invoices & Packing Slipsnek szüksége van az telepített és bekapcsolt %sWooCommerce%s pluginra."
+
+#: woocommerce-pdf-invoices-packingslips.php:183
+#: woocommerce-pdf-invoices-packingslips.php:219
+msgid "N/A"
+msgstr "N/A"
+
+#: woocommerce-pdf-invoices-packingslips.php:320
+msgid "Subtotal"
+msgstr "Részösszeg"
+
+#: woocommerce-pdf-invoices-packingslips.php:338
+msgid "Shipping"
+msgstr "Szállítás"
+
+#: woocommerce-pdf-invoices-packingslips.php:353
+msgid "Discount"
+msgstr "Kedvezmény"
+
+#: woocommerce-pdf-invoices-packingslips.php:418
+msgid "Total ex. VAT"
+msgstr "Végösszeg ÁFA nélkül"
+
+#: woocommerce-pdf-invoices-packingslips.php:421
+msgid "Total"
+msgstr "Végösszeg"
+
+#: includes/class-wcpdf-export.php:98
+#: includes/class-wcpdf-export.php:103
+#: includes/class-wcpdf-export.php:108
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Önnek nincs megfelelő jogosultsága az oldal eléréséhez."
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:115
+#: includes/class-wcpdf-export.php:175
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "számla"
+msgstr[1] "számlák"
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:117
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "szállítólevél"
+msgstr[1] "szállítólevelek"
+
+#: includes/class-wcpdf-settings.php:36
+#: includes/class-wcpdf-settings.php:37
+#: includes/class-wcpdf-writepanels.php:115
+#: includes/class-wcpdf-writepanels.php:116
+msgid "PDF Invoices"
+msgstr "PDF számlák"
+
+#: includes/class-wcpdf-settings.php:60
+msgid "Settings"
+msgstr "Beállítások"
+
+#: includes/class-wcpdf-settings.php:75
+msgid "..."
+msgstr "..."
+
+#: includes/class-wcpdf-settings.php:86
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF számlák"
+
+#: includes/class-wcpdf-settings.php:88
+msgid "General"
+msgstr "Általános"
+
+#: includes/class-wcpdf-settings.php:89
+msgid "Template"
+msgstr "Sablon"
+
+#: includes/class-wcpdf-settings.php:97
+#, php-format
+msgid "Looking for more advanced templates? Check out the Premium PDF Invoice & Packing Slips templates at %s."
+msgstr "Fejlettebb sablonokat keres? Nézze meg a Premium PDF Invoice & Packing Slips sablonokat a %s-on. "
+
+#: includes/class-wcpdf-settings.php:151
+msgid "General settings"
+msgstr "Általános beállítások"
+
+#: includes/class-wcpdf-settings.php:158
+msgid "How do you want to view the PDF?"
+msgstr "Hogy kívánja megtekinteni a PDF-et?"
+
+#: includes/class-wcpdf-settings.php:166
+msgid "Download the PDF"
+msgstr "PDF letöltése"
+
+#: includes/class-wcpdf-settings.php:167
+msgid "Open the PDF in a new browser tab/window"
+msgstr "Nyissa meg a PDF-et egy új böngésző ablakban/tabon"
+
+#: includes/class-wcpdf-settings.php:177
+msgid "Email invoice (attach to order confirmation or invoice email)"
+msgstr "Számla küldése emailban (csatolja a rendelési vagy a teljesítési igazoláshoz)"
+
+#: includes/class-wcpdf-settings.php:184
+#, php-format
+msgid "It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices."
+msgstr "Az átmeneti könyvtár (<code>%s</code>)nem írható, kérem ellenőrizze a könyvtár jogosultságokat!  A könyvtárra való írási jog nélkül a bővítmény nem tudja elküldeni a számlát!"
+
+#: includes/class-wcpdf-settings.php:206
+msgid "PDF Template settings"
+msgstr "PDF sablon beállítások"
+
+#: includes/class-wcpdf-settings.php:213
+msgid "Choose a template"
+msgstr "Válasszon sablont"
+
+#: includes/class-wcpdf-settings.php:221
+msgid "Want to use your own template? Copy all the files from <code>woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/</code> to <code>yourtheme/woocommerce/pdf/yourtemplate/</code> to customize them"
+msgstr "Saját sablont szeretne használni? Másolja az összes fájlt a <code>woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/</code> könyvtárból a <code>yourtheme/woocommerce/pdf/yourtemplate/</code> könyvtárba a módosításhoz."
+
+#: includes/class-wcpdf-settings.php:227
+msgid "Paper size"
+msgstr "Papír méret"
+
+#: includes/class-wcpdf-settings.php:235
+msgid "A4"
+msgstr "A4"
+
+#: includes/class-wcpdf-settings.php:236
+msgid "Letter"
+msgstr "Letter"
+
+#: includes/class-wcpdf-settings.php:243
+msgid "Shop header/logo"
+msgstr "Bolt fejléc/logó"
+
+#: includes/class-wcpdf-settings.php:250
+msgid "Select or upload your invoice header/logo"
+msgstr "Válasszon ki vagy töltsön fel egy fjlécet/logót"
+
+#: includes/class-wcpdf-settings.php:251
+msgid "Set image"
+msgstr "Kép hozzáadása"
+
+#: includes/class-wcpdf-settings.php:252
+msgid "Remove image"
+msgstr "Kép eltávolítása"
+
+#: includes/class-wcpdf-settings.php:259
+msgid "Shop Name"
+msgstr "Bolt neve"
+
+#: includes/class-wcpdf-settings.php:272
+msgid "Shop Address"
+msgstr "Bolt címe"
+
+#: includes/class-wcpdf-settings.php:304
+msgid "Footer: terms & conditions, policies, etc."
+msgstr "Lábléc: szerződési feltételek, rendelkezések, stb."
+
+#: includes/class-wcpdf-settings.php:320
+msgid "Extra template fields"
+msgstr "Extra sablon mezők"
+
+#: includes/class-wcpdf-settings.php:327
+msgid "Extra field 1"
+msgstr "Extra mező 1"
+
+#: includes/class-wcpdf-settings.php:336
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr "Ez a lábléc oszlop 1 a <i>Modern (Premium)</i> sablonban."
+
+#: includes/class-wcpdf-settings.php:342
+msgid "Extra field 2"
+msgstr "Extra mező 2"
+
+#: includes/class-wcpdf-settings.php:351
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr "Ez a lábléc oszlop 2 a <i>Modern (Premium)</i> sablonban."
+
+#: includes/class-wcpdf-settings.php:357
+msgid "Extra field 3"
+msgstr "Extra mező 3"
+
+#: includes/class-wcpdf-settings.php:366
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr "Ez a lábléc oszlop 3 a <i>Modern (Premium)</i> sablonban."
+
+#: includes/class-wcpdf-settings.php:579
+msgid "Image resolution"
+msgstr "Kép felbontás"
+
+#: includes/class-wcpdf-settings.php:609
+msgid "These are used for the (optional) footer columns in the <em>Modern (Premium)</em> template, but can also be used for other elements in your custom template"
+msgstr "Ezek a lábléc (opcionális) oszlopok a <em>Modern (Premium)</em> sablonban használatosak, de használhatja más elemeknek is az egyéni sablonjában. "
+
+#: includes/class-wcpdf-writepanels.php:81
+msgid "Create PDF"
+msgstr "PDF létrehozása"
+
+#: includes/class-wcpdf-writepanels.php:87
+msgid "Download invoice (PDF)"
+msgstr "Számla letöltése (PDF)"
+
+#: includes/class-wcpdf-writepanels.php:100
+msgid "PDF invoice"
+msgstr "PDF számla"
+
+#: includes/class-wcpdf-writepanels.php:101
+msgid "PDF Packing Slip"
+msgstr "PDF szállítólevél"
+
+#: includes/class-wcpdf-writepanels.php:117
+#: includes/class-wcpdf-writepanels.php:118
+msgid "PDF Packing Slips"
+msgstr "PDF szállítólevelet"
+
+#: templates/pdf/Simple/invoice.php:9
+#: templates/pdf/Simple/invoice.php:21
+msgid "Invoice"
+msgstr "Számla"
+
+#: templates/pdf/Simple/invoice.php:30
+#: templates/pdf/Simple/packing-slip.php:30
+msgid "Order Date:"
+msgstr "Rendelés dátuma:"
+
+#: templates/pdf/Simple/invoice.php:32
+#: templates/pdf/Simple/packing-slip.php:32
+msgid "Order Number:"
+msgstr "Rendelési szám:"
+
+#: templates/pdf/Simple/invoice.php:34
+msgid "Payment Method:"
+msgstr "Fizetési mód"
+
+#: templates/pdf/Simple/invoice.php:47
+#: templates/pdf/Simple/packing-slip.php:45
+msgid "Product"
+msgstr "Termék"
+
+#: templates/pdf/Simple/invoice.php:48
+#: templates/pdf/Simple/packing-slip.php:46
+msgid "Quantity"
+msgstr "Mennyiség"
+
+#: templates/pdf/Simple/invoice.php:49
+msgid "Price"
+msgstr "Ár"
+
+#: templates/pdf/Simple/invoice.php:57
+#: templates/pdf/Simple/packing-slip.php:54
+msgid "SKU:"
+msgstr "SKU:"
+
+#: templates/pdf/Simple/invoice.php:58
+#: templates/pdf/Simple/packing-slip.php:55
+msgid "Weight:"
+msgstr "Súly:"
+
+#: templates/pdf/Simple/invoice.php:91
+#: templates/pdf/Simple/packing-slip.php:69
+msgid "Customer Notes"
+msgstr "Vásárlói megjegyzések"
+
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+msgid "Packing Slip"
+msgstr "Szállítólevél"
+

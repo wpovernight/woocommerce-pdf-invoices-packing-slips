@@ -1,0 +1,403 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
+"POT-Creation-Date: 2014-02-17 22:02+0100\n"
+"PO-Revision-Date: 2014-02-19 02:07+0200\n"
+"Last-Translator: Oleg Komarovskyi <komarovski21@gmail.com>\n"
+"Language-Team: WP Overnight <support@wpovernight.com>\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.4\n"
+"X-Poedit-Basepath: ../\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/class-wcpdf-export.php:138 includes/class-wcpdf-export.php:143
+#: includes/class-wcpdf-export.php:148 includes/class-wcpdf-export.php:159
+#: includes/class-wcpdf-export.php:172
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Вы не имеете достаточно прав для доступа к этой странице."
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:180 includes/class-wcpdf-export.php:262
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "накладная"
+msgstr[1] "накладные"
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:182
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "Счет-Фактура"
+msgstr[1] "Счета-Фактуры"
+
+#: includes/class-wcpdf-settings.php:36 includes/class-wcpdf-settings.php:37
+#: includes/class-wcpdf-writepanels.php:131
+#: includes/class-wcpdf-writepanels.php:132
+msgid "PDF Invoices"
+msgstr "PDF Накладные"
+
+#: includes/class-wcpdf-settings.php:60
+msgid "Settings"
+msgstr "Настройки"
+
+#: includes/class-wcpdf-settings.php:86
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF Накладные"
+
+#: includes/class-wcpdf-settings.php:88
+msgid "General"
+msgstr "Основное"
+
+#: includes/class-wcpdf-settings.php:89
+msgid "Template"
+msgstr "Шаблон"
+
+#: includes/class-wcpdf-settings.php:98
+#, php-format
+msgid ""
+"Looking for more advanced templates? Check out the Premium PDF Invoice & "
+"Packing Slips templates at %s."
+msgstr ""
+"Ищите дополнительные шаблоны? Посмотрите премиум шаблоны от PDF Накладные и "
+"Счет-Фактуры на %s."
+
+#: includes/class-wcpdf-settings.php:99
+#, php-format
+msgid "For custom templates, contact us at %s."
+msgstr "По поводу индивидуальных шаблонов, свяжитесь с нами %s."
+
+#: includes/class-wcpdf-settings.php:153
+msgid "General settings"
+msgstr "Основные настройки"
+
+#: includes/class-wcpdf-settings.php:160
+msgid "How do you want to view the PDF?"
+msgstr "Как вы хотите просмотреть PDF?"
+
+#: includes/class-wcpdf-settings.php:168
+msgid "Download the PDF"
+msgstr "Скачать PDF"
+
+#: includes/class-wcpdf-settings.php:169
+msgid "Open the PDF in a new browser tab/window"
+msgstr "Открыть PDF в новой вкладке/окне браузера"
+
+#: includes/class-wcpdf-settings.php:179
+msgid "Attach invoice to:"
+msgstr "Прикрепить накладную к:"
+
+#: includes/class-wcpdf-settings.php:187
+msgid "Admin New Order email"
+msgstr "Email-у нового заказа админа"
+
+#: includes/class-wcpdf-settings.php:188
+msgid "Customer Processing Order email"
+msgstr "Email-у заказа клиента в обработке"
+
+#: includes/class-wcpdf-settings.php:189
+msgid "Customer Completed Order email"
+msgstr "Email-у завершенного заказа клиента"
+
+#: includes/class-wcpdf-settings.php:190
+msgid "Customer Invoice email"
+msgstr "Email-у накладной клиента"
+
+#: includes/class-wcpdf-settings.php:192
+#, php-format
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+"Похоже временная папка (<code>%s</code>) запрещена для записи, проверьте "
+"доступ к папке. Без доступа записи к данной папки, плагин не сможет отсылать "
+"накладные по Email."
+
+#: includes/class-wcpdf-settings.php:224
+msgid "PDF Template settings"
+msgstr "PDF Настройки шаблона"
+
+#: includes/class-wcpdf-settings.php:231
+msgid "Choose a template"
+msgstr "Выберите шаблон"
+
+#: includes/class-wcpdf-settings.php:239
+msgid ""
+"Want to use your own template? Copy all the files from <code>woocommerce-pdf-"
+"invoices-packing-slips/templates/pdf/Simple/</code> to <code>yourtheme/"
+"woocommerce/pdf/yourtemplate/</code> to customize them"
+msgstr ""
+"Хотите свой собственный шаблон? Скопируйте файлы с папки <code>woocommerce-"
+"pdf-invoices-packing-slips/templates/pdf/Simple/</code> в <code>ваша_тема/"
+"woocommerce/pdf/название_шаблона/</code> и настройте по своему усмотрению."
+
+#: includes/class-wcpdf-settings.php:245
+msgid "Paper size"
+msgstr "Размер бумаги"
+
+#: includes/class-wcpdf-settings.php:253
+msgid "A4"
+msgstr "A4"
+
+#: includes/class-wcpdf-settings.php:254
+msgid "Letter"
+msgstr "Письмо"
+
+#: includes/class-wcpdf-settings.php:261
+msgid "Shop header/logo"
+msgstr "Логотип в шапке документа"
+
+#: includes/class-wcpdf-settings.php:268
+msgid "Select or upload your invoice header/logo"
+msgstr "Выберите чтобы загрузить шапку/логотип для накладной"
+
+#: includes/class-wcpdf-settings.php:269
+msgid "Set image"
+msgstr "Установить изображение"
+
+#: includes/class-wcpdf-settings.php:270
+msgid "Remove image"
+msgstr "Удалить изображение"
+
+#: includes/class-wcpdf-settings.php:277
+msgid "Shop Name"
+msgstr "Название магазина"
+
+#: includes/class-wcpdf-settings.php:290
+msgid "Shop Address"
+msgstr "Адрес магазина"
+
+#: includes/class-wcpdf-settings.php:322
+msgid "Footer: terms & conditions, policies, etc."
+msgstr "Подвал: термины, условия, политика и тд."
+
+#: includes/class-wcpdf-settings.php:337
+msgid "Number to display on invoice"
+msgstr "Номер для отображения в накладной"
+
+#: includes/class-wcpdf-settings.php:345
+msgid "WooCommerce order number"
+msgstr "WooCommerce номер заказа"
+
+#: includes/class-wcpdf-settings.php:346
+msgid "Built-in sequential invoice number"
+msgstr "Встроенный секвенсор номеров накладной"
+
+#: includes/class-wcpdf-settings.php:348
+msgid ""
+"If you are using the WooCommerce Sequential Order Numbers plugin, select the "
+"WooCommerce order number"
+msgstr ""
+"Если вы используете WooCommerce Sequential Order Numbers плагин, выберите "
+"WooCommerce номер заказа"
+
+#: includes/class-wcpdf-settings.php:354
+msgid "Next invoice number (without prefix/suffix etc.)"
+msgstr "Следующий номер накладной (без префикса/суффикса и тд.)"
+
+#: includes/class-wcpdf-settings.php:362
+msgid ""
+"This is the number that will be used on the next invoice that is created. By "
+"default, numbering starts from the WooCommerce Order Number of the first "
+"invoice that is created and increases for every new invoice. Note that if "
+"you override this and set it lower than the highest (PDF) invoice number, "
+"this could create double invoice numbers!<br/>Check the <a href=\"http://"
+"wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/faq/\" target="
+"\"_blank\">FAQ</a> for instructions on how to format the invoice number."
+msgstr ""
+"Это номер, который будет использоваться для следующей созданной накладной. "
+"По умолчанию, нумерация начинается с первой созданной накладной основываясь "
+"на WooCommerce номере заказа, дальше число увеличивается с каждой новой "
+"накладной. Заметьте, если вы перезаписываете это поле и устанавливаете "
+"значение ниже чем самый большой номер (PDF) накладной, это может привести к "
+"созданию дублированной накладной!<br/>Смотрите <a href=\"http://wordpress."
+"org/plugins/woocommerce-pdf-invoices-packing-slips/faq/\" target=\"_blank"
+"\">FAQ</a>, чтобы узнать как форматировать номер накладной."
+
+#: includes/class-wcpdf-settings.php:369
+msgid "Date to display on invoice"
+msgstr "Дата для отображения в накладной"
+
+#: includes/class-wcpdf-settings.php:377
+msgid "Order date"
+msgstr "Дата заказа"
+
+#: includes/class-wcpdf-settings.php:378
+msgid "Invoice date"
+msgstr "Дата накладной"
+
+#: includes/class-wcpdf-settings.php:386
+msgid "Extra template fields"
+msgstr "Дополнительные поля шаблона"
+
+#: includes/class-wcpdf-settings.php:393
+msgid "Extra field 1"
+msgstr "Дополнительное поле 1"
+
+#: includes/class-wcpdf-settings.php:402
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr "Это колонка 1 в подвале документа для <i>Modern (Premium)</i> шаблонов"
+
+#: includes/class-wcpdf-settings.php:408
+msgid "Extra field 2"
+msgstr "Дополнительное поле 2"
+
+#: includes/class-wcpdf-settings.php:417
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr "Это колонка 2 в подвале документа для <i>Modern (Premium)</i> шаблонов"
+
+#: includes/class-wcpdf-settings.php:423
+msgid "Extra field 3"
+msgstr "Дополнительное поле 3"
+
+#: includes/class-wcpdf-settings.php:432
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr "Это колонка 3 в подвале документа для <i>Modern (Premium)</i> шаблонов"
+
+#: includes/class-wcpdf-settings.php:689
+msgid "Image resolution"
+msgstr "Разрешение изображения"
+
+#: includes/class-wcpdf-settings.php:719
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
+msgstr ""
+"Этот блок используется (опционально) в колонках подвала документа для "
+"<em>Modern (Premium)</em> шаблонов, но вы также можете использовать этот "
+"блок для вывода в индивидуальном шаблоне."
+
+#: includes/class-wcpdf-writepanels.php:92
+msgid "Create PDF"
+msgstr "Создать PDF"
+
+#: includes/class-wcpdf-writepanels.php:101
+msgid "Download invoice (PDF)"
+msgstr "Скачать накладную (PDF)"
+
+#: includes/class-wcpdf-writepanels.php:115
+msgid "PDF invoice"
+msgstr "PDF Накладная"
+
+#: includes/class-wcpdf-writepanels.php:116
+msgid "PDF Packing Slip"
+msgstr "PDF Счет-Фактура"
+
+#: includes/class-wcpdf-writepanels.php:133
+#: includes/class-wcpdf-writepanels.php:134
+msgid "PDF Packing Slips"
+msgstr "PDF Счета-Фактуры"
+
+#: includes/class-wcpdf-writepanels.php:145
+msgid "PDF Invoice Number"
+msgstr "PDF Номер накладной"
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
+msgid "Invoice"
+msgstr "Накладная"
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+msgid "Packing Slip"
+msgstr "Счет-Фактура"
+
+#: templates/pdf/Simple/invoice.php:37
+msgid "Invoice Date:"
+msgstr "Дата накладной"
+
+#: templates/pdf/Simple/invoice.php:40
+#: templates/pdf/Simple/packing-slip.php:30
+msgid "Order Date:"
+msgstr "Дата заказа:"
+
+#: templates/pdf/Simple/invoice.php:46
+msgid "Invoice Number:"
+msgstr "Номер накладной:"
+
+#: templates/pdf/Simple/invoice.php:49
+#: templates/pdf/Simple/packing-slip.php:32
+msgid "Order Number:"
+msgstr "Номер заказа:"
+
+#: templates/pdf/Simple/invoice.php:56
+msgid "Payment Method:"
+msgstr "Метод оплаты:"
+
+#: templates/pdf/Simple/invoice.php:69
+#: templates/pdf/Simple/packing-slip.php:45
+msgid "Product"
+msgstr "Товар"
+
+#: templates/pdf/Simple/invoice.php:70
+#: templates/pdf/Simple/packing-slip.php:46
+msgid "Quantity"
+msgstr "Количество"
+
+#: templates/pdf/Simple/invoice.php:71
+msgid "Price"
+msgstr "Цена"
+
+#: templates/pdf/Simple/invoice.php:79
+#: templates/pdf/Simple/packing-slip.php:54
+msgid "SKU:"
+msgstr "ИТП:"
+
+#: templates/pdf/Simple/invoice.php:80
+#: templates/pdf/Simple/packing-slip.php:55
+msgid "Weight:"
+msgstr "Вес:"
+
+#: templates/pdf/Simple/invoice.php:113
+#: templates/pdf/Simple/packing-slip.php:69
+msgid "Customer Notes"
+msgstr "Примечания клиента"
+
+#: woocommerce-pdf-invoices-packingslips.php:96
+#, php-format
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
+"installed & activated!"
+msgstr ""
+"Чтобы установить и активировать WooCommerce PDF Накладные и Счет-Фактуры "
+"нужно наличие плагина %sWooCommerce%s!"
+
+#: woocommerce-pdf-invoices-packingslips.php:191
+#: woocommerce-pdf-invoices-packingslips.php:227
+msgid "N/A"
+msgstr "N/A"
+
+#: woocommerce-pdf-invoices-packingslips.php:359
+msgid "Subtotal"
+msgstr "Промежуточный итог"
+
+#: woocommerce-pdf-invoices-packingslips.php:381
+msgid "Shipping"
+msgstr "Доставка"
+
+#: woocommerce-pdf-invoices-packingslips.php:400
+msgid "Discount"
+msgstr "Скидка"
+
+#: woocommerce-pdf-invoices-packingslips.php:469
+msgid "Total ex. VAT"
+msgstr "Всего отл. НДС"
+
+#: woocommerce-pdf-invoices-packingslips.php:472
+msgid "Total"
+msgstr "Итого"
+
+#~ msgid "..."
+#~ msgstr "..."
+
+#~ msgid "Email invoice (attach to order confirmation or invoice email)"
+#~ msgstr ""
+#~ "Отослать накладную по Email (прикрепить к заказу или к Email-у накладной)"

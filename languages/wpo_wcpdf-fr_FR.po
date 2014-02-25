@@ -1,0 +1,311 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
+"POT-Creation-Date: 2014-01-23 12:32+0100\n"
+"PO-Revision-Date: 2014-01-23 16:31+0100\n"
+"Last-Translator: \n"
+"Language-Team: WP Overnight <support@wpovernight.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.3\n"
+"X-Poedit-Basepath: ../\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
+"Language: fr\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: woocommerce-pdf-invoices-packingslips.php:96
+#, php-format
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
+"installed & activated!"
+msgstr ""
+"WooCommerce PDF Invoices & Packing Slips requiert %sWooCommerce%s pour être "
+"installé et activé!"
+
+#: woocommerce-pdf-invoices-packingslips.php:183
+#: woocommerce-pdf-invoices-packingslips.php:219
+msgid "N/A"
+msgstr "N/A"
+
+#: woocommerce-pdf-invoices-packingslips.php:320
+msgid "Subtotal"
+msgstr "Sous-total"
+
+#: woocommerce-pdf-invoices-packingslips.php:338
+msgid "Shipping"
+msgstr "Livraison"
+
+#: woocommerce-pdf-invoices-packingslips.php:353
+msgid "Discount"
+msgstr "Remise"
+
+#: woocommerce-pdf-invoices-packingslips.php:418
+msgid "Total ex. VAT"
+msgstr "Total H.T."
+
+#: woocommerce-pdf-invoices-packingslips.php:421
+msgid "Total"
+msgstr "Total TTC"
+
+#: includes/class-wcpdf-export.php:98 includes/class-wcpdf-export.php:103
+#: includes/class-wcpdf-export.php:108
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Vous n'avez pas les permissions nécessaires pour accéder à cette page."
+
+#: includes/class-wcpdf-export.php:115 includes/class-wcpdf-export.php:175
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "facture"
+msgstr[1] "factures"
+
+#: includes/class-wcpdf-export.php:117
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "bon-de-livraison"
+msgstr[1] "bons-de-livraison"
+
+#: includes/class-wcpdf-settings.php:36 includes/class-wcpdf-settings.php:37
+#: includes/class-wcpdf-writepanels.php:115
+#: includes/class-wcpdf-writepanels.php:116
+msgid "PDF Invoices"
+msgstr "Générer les factures au format PDF"
+
+#: includes/class-wcpdf-settings.php:60
+msgid "Settings"
+msgstr "Paramètres"
+
+#: includes/class-wcpdf-settings.php:75
+msgid "..."
+msgstr "..."
+
+#: includes/class-wcpdf-settings.php:86
+msgid "WooCommerce PDF Invoices"
+msgstr "Factures PDF WooCommerce"
+
+#: includes/class-wcpdf-settings.php:88
+msgid "General"
+msgstr "Général"
+
+#: includes/class-wcpdf-settings.php:89
+msgid "Template"
+msgstr "Modèle"
+
+#: includes/class-wcpdf-settings.php:97
+#, php-format
+msgid ""
+"Looking for more advanced templates? Check out the Premium PDF Invoice & "
+"Packing Slips templates at %s."
+msgstr ""
+"Vous cherchez des modèles plus avancés ? Jetez un oeil aux modèles Premium "
+"PDF Invoice & Packing Slips sur %s."
+
+#: includes/class-wcpdf-settings.php:151
+msgid "General settings"
+msgstr "Paramètres généraux"
+
+#: includes/class-wcpdf-settings.php:158
+msgid "How do you want to view the PDF?"
+msgstr "Comment voulez-vous voir le PDF?"
+
+#: includes/class-wcpdf-settings.php:166
+msgid "Download the PDF"
+msgstr "Télécharger le PDF"
+
+#: includes/class-wcpdf-settings.php:167
+msgid "Open the PDF in a new browser tab/window"
+msgstr ""
+"Ouvrir le PDF dans un nouvel onglet/une nouvelle fenêtre du navigateur."
+
+#: includes/class-wcpdf-settings.php:177
+msgid "Email invoice (attach to order confirmation or invoice email)"
+msgstr ""
+"Envoyer les factures par e-mail (jointes aux e-mails de confirmation ou de "
+"facturation)"
+
+#: includes/class-wcpdf-settings.php:184
+#, php-format
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+"Le dossier temporaire (<code>%s</code>) ne semble pas modifiable, vérifiez "
+"vos permissions pour ce dossier! Sans l'autorisation d'écriture dans ce "
+"dossier, le plugin ne pourra pas envoyer les factures par e-mail."
+
+#: includes/class-wcpdf-settings.php:206
+msgid "PDF Template settings"
+msgstr "Paramètres des modèles PDF"
+
+#: includes/class-wcpdf-settings.php:213
+msgid "Choose a template"
+msgstr "Sélectionnez un modèle"
+
+#: includes/class-wcpdf-settings.php:221
+msgid ""
+"Want to use your own template? Copy all the files from <code>woocommerce-pdf-"
+"invoices-packing-slips/templates/pdf/Simple/</code> to <code>yourtheme/"
+"woocommerce/pdf/yourtemplate/</code> to customize them"
+msgstr ""
+"Vous voulez utiliser votre propre modèle? Copiez tous les fichiers de "
+"<code>woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/</code> "
+"dans <code>yourtheme/woocommerce/pdf/votremodele/</code> pour le "
+"personnaliser"
+
+#: includes/class-wcpdf-settings.php:227
+msgid "Paper size"
+msgstr "Taille du papier"
+
+#: includes/class-wcpdf-settings.php:235
+msgid "A4"
+msgstr "A4"
+
+#: includes/class-wcpdf-settings.php:236
+msgid "Letter"
+msgstr "Lettre"
+
+#: includes/class-wcpdf-settings.php:243
+msgid "Shop header/logo"
+msgstr "En-tête de la boutique/logo"
+
+#: includes/class-wcpdf-settings.php:250
+msgid "Select or upload your invoice header/logo"
+msgstr "Sélectionnez ou chargez votre en-tête/logo de facture"
+
+#: includes/class-wcpdf-settings.php:251
+msgid "Set image"
+msgstr "Choisir une autre image"
+
+#: includes/class-wcpdf-settings.php:252
+msgid "Remove image"
+msgstr "Supprimer l'image"
+
+#: includes/class-wcpdf-settings.php:259
+msgid "Shop Name"
+msgstr "Nom de la boutique"
+
+#: includes/class-wcpdf-settings.php:272
+msgid "Shop Address"
+msgstr "Adresse de la boutique"
+
+#: includes/class-wcpdf-settings.php:304
+msgid "Footer: terms & conditions, policies, etc."
+msgstr "Pied de page : conditions générales de ventes, etc."
+
+#: includes/class-wcpdf-settings.php:320
+msgid "Extra template fields"
+msgstr "Champs supplémentaires du modèle"
+
+#: includes/class-wcpdf-settings.php:327
+msgid "Extra field 1"
+msgstr "Champ supplémentaire 1"
+
+#: includes/class-wcpdf-settings.php:336
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr "Correspond à la colonne 1 dans le modèle <i>Modern (Premium)</i>"
+
+#: includes/class-wcpdf-settings.php:342
+msgid "Extra field 2"
+msgstr "Champ supplémentaire 2"
+
+#: includes/class-wcpdf-settings.php:351
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr "Correspond à la colonne 2 dans le modèle <i>Modern (Premium)</i>"
+
+#: includes/class-wcpdf-settings.php:357
+msgid "Extra field 3"
+msgstr "Champ supplémentaire 3"
+
+#: includes/class-wcpdf-settings.php:366
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr "Correspond à la colonne 3 dans le modèle <i>Modern (Premium)</i>"
+
+#: includes/class-wcpdf-settings.php:579
+msgid "Image resolution"
+msgstr "Résolution de l'image"
+
+#: includes/class-wcpdf-settings.php:609
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
+msgstr ""
+"Ceux-ci sont utilisés pour les colonnes de pied de page (optionnelles) dans "
+"le modèle <em>Modern (Premium)</em>, mais ils peuvent aussi être utilisés "
+"pour d'autres éléments dans votre modèle personnalisé."
+
+#: includes/class-wcpdf-writepanels.php:81
+msgid "Create PDF"
+msgstr "Créer un PDF"
+
+#: includes/class-wcpdf-writepanels.php:87
+msgid "Download invoice (PDF)"
+msgstr "Télécharger la facture (PDF)"
+
+#: includes/class-wcpdf-writepanels.php:100
+msgid "PDF invoice"
+msgstr "Générer la facture au format PDF"
+
+#: includes/class-wcpdf-writepanels.php:101
+msgid "PDF Packing Slip"
+msgstr "Générer le bon de livraison au format PDF"
+
+#: includes/class-wcpdf-writepanels.php:117
+#: includes/class-wcpdf-writepanels.php:118
+msgid "PDF Packing Slips"
+msgstr "Générer les bons de livraison au format PDF"
+
+#: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
+msgid "Invoice"
+msgstr "Facture"
+
+#: templates/pdf/Simple/invoice.php:30
+#: templates/pdf/Simple/packing-slip.php:30
+msgid "Order Date:"
+msgstr "Date de commande:"
+
+#: templates/pdf/Simple/invoice.php:32
+#: templates/pdf/Simple/packing-slip.php:32
+msgid "Order Number:"
+msgstr "Numéro de commande:"
+
+#: templates/pdf/Simple/invoice.php:34
+msgid "Payment Method:"
+msgstr "Méthode de paiement"
+
+#: templates/pdf/Simple/invoice.php:47
+#: templates/pdf/Simple/packing-slip.php:45
+msgid "Product"
+msgstr "Produits"
+
+#: templates/pdf/Simple/invoice.php:48
+#: templates/pdf/Simple/packing-slip.php:46
+msgid "Quantity"
+msgstr "Quantité"
+
+#: templates/pdf/Simple/invoice.php:49
+msgid "Price"
+msgstr "Prix"
+
+#: templates/pdf/Simple/invoice.php:57
+#: templates/pdf/Simple/packing-slip.php:54
+msgid "SKU:"
+msgstr "SKU:"
+
+#: templates/pdf/Simple/invoice.php:58
+#: templates/pdf/Simple/packing-slip.php:55
+msgid "Weight:"
+msgstr "Poids:"
+
+#: templates/pdf/Simple/invoice.php:91
+#: templates/pdf/Simple/packing-slip.php:69
+msgid "Customer Notes"
+msgstr "Notes du Client"
+
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+msgid "Packing Slip"
+msgstr "Bon de livraison"
