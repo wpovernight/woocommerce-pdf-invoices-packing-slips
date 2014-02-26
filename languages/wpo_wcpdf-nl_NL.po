@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-24 11:58+0100\n"
-"PO-Revision-Date: 2014-02-24 11:59+0100\n"
+"POT-Creation-Date: 2014-02-26 09:12+0100\n"
+"PO-Revision-Date: 2014-02-26 09:19+0100\n"
 "Last-Translator: Ewout Fernhout <chocolade@extrapuur.nl>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nl_NL\n"
@@ -367,17 +367,21 @@ msgstr "Hoeveelheid"
 msgid "Price"
 msgstr "Prijs"
 
-#: templates/pdf/Simple/invoice.php:79
+#: templates/pdf/Simple/invoice.php:77
+msgid "Description"
+msgstr "Omschrijving"
+
+#: templates/pdf/Simple/invoice.php:80
 #: templates/pdf/Simple/packing-slip.php:54
 msgid "SKU:"
 msgstr "SKU:"
 
-#: templates/pdf/Simple/invoice.php:80
+#: templates/pdf/Simple/invoice.php:81
 #: templates/pdf/Simple/packing-slip.php:55
 msgid "Weight:"
 msgstr "Gewicht:"
 
-#: templates/pdf/Simple/invoice.php:113
+#: templates/pdf/Simple/invoice.php:114
 #: templates/pdf/Simple/packing-slip.php:69
 msgid "Customer Notes"
 msgstr "Opmerking klant:"
@@ -396,23 +400,35 @@ msgstr ""
 msgid "N/A"
 msgstr "N/A"
 
-#: woocommerce-pdf-invoices-packingslips.php:359
+#: woocommerce-pdf-invoices-packingslips.php:249
+msgid "Payment method"
+msgstr "Betaalmethode"
+
+#: woocommerce-pdf-invoices-packingslips.php:260
+msgid "Shipping method"
+msgstr "Verzendmethode"
+
+#: woocommerce-pdf-invoices-packingslips.php:360
 msgid "Subtotal"
 msgstr "Subtotaal"
 
-#: woocommerce-pdf-invoices-packingslips.php:381
+#: woocommerce-pdf-invoices-packingslips.php:382
 msgid "Shipping"
 msgstr "Verzendkosten"
 
-#: woocommerce-pdf-invoices-packingslips.php:400
+#: woocommerce-pdf-invoices-packingslips.php:401
 msgid "Discount"
 msgstr "Korting"
 
-#: woocommerce-pdf-invoices-packingslips.php:469
+#: woocommerce-pdf-invoices-packingslips.php:439
+msgid "VAT"
+msgstr "BTW"
+
+#: woocommerce-pdf-invoices-packingslips.php:471
 msgid "Total ex. VAT"
 msgstr "Totaal excl. BTW"
 
-#: woocommerce-pdf-invoices-packingslips.php:472
+#: woocommerce-pdf-invoices-packingslips.php:474
 msgid "Total"
 msgstr "Totaal"
 
@@ -423,23 +439,11 @@ msgstr "Totaal"
 #~ msgid "SKU"
 #~ msgstr "Artikelnummer"
 
-#~ msgid "Description"
-#~ msgstr "Omschrijving"
-
-#~ msgid "VAT"
-#~ msgstr "BTW"
-
 #~ msgid "Order number"
 #~ msgstr "Factuurnummer"
 
 #~ msgid "Date"
 #~ msgstr "Datum"
-
-#~ msgid "Shipping method"
-#~ msgstr "Verzendmethode"
-
-#~ msgid "Payment method"
-#~ msgstr "Betaalmethode"
 
 #~ msgid "Email"
 #~ msgstr "Email"

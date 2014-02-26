@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
-"POT-Creation-Date: 2014-02-19 15:39+0100\n"
-"PO-Revision-Date: 2014-02-19 15:39+0100\n"
+"POT-Creation-Date: 2014-02-26 09:12+0100\n"
+"PO-Revision-Date: 2014-02-26 09:12+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: en_US\n"
@@ -16,29 +16,29 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/class-wcpdf-export.php:138 includes/class-wcpdf-export.php:143
-#: includes/class-wcpdf-export.php:148 includes/class-wcpdf-export.php:159
-#: includes/class-wcpdf-export.php:172
+#: includes/class-wcpdf-export.php:142 includes/class-wcpdf-export.php:147
+#: includes/class-wcpdf-export.php:152 includes/class-wcpdf-export.php:163
+#: includes/class-wcpdf-export.php:176
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 # This is a filename (prefix). do not use spaces or special characters!
-#: includes/class-wcpdf-export.php:180 includes/class-wcpdf-export.php:262
+#: includes/class-wcpdf-export.php:197 includes/class-wcpdf-export.php:268
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] ""
 msgstr[1] ""
 
 # This is a filename (prefix). do not use spaces or special characters!
-#: includes/class-wcpdf-export.php:182
+#: includes/class-wcpdf-export.php:199
 msgid "packing-slip"
 msgid_plural "packing-slips"
 msgstr[0] ""
 msgstr[1] ""
 
 #: includes/class-wcpdf-settings.php:36 includes/class-wcpdf-settings.php:37
-#: includes/class-wcpdf-writepanels.php:172
 #: includes/class-wcpdf-writepanels.php:173
+#: includes/class-wcpdf-writepanels.php:174
 msgid "PDF Invoices"
 msgstr ""
 
@@ -273,25 +273,25 @@ msgstr ""
 msgid "Create PDF"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:142
+#: includes/class-wcpdf-writepanels.php:143
 msgid "Download invoice (PDF)"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:156
+#: includes/class-wcpdf-writepanels.php:157
 msgid "PDF invoice"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:157
+#: includes/class-wcpdf-writepanels.php:158
 msgid "PDF Packing Slip"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:174
 #: includes/class-wcpdf-writepanels.php:175
+#: includes/class-wcpdf-writepanels.php:176
 msgid "PDF Packing Slips"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:186
-msgid "PDF Invoice Number"
+#: includes/class-wcpdf-writepanels.php:187
+msgid "PDF Invoice Number (unformatted!)"
 msgstr ""
 
 #: templates/pdf/Simple/html-document-wrapper.php:6
@@ -341,17 +341,21 @@ msgstr ""
 msgid "Price"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:79
+#: templates/pdf/Simple/invoice.php:77
+msgid "Description"
+msgstr ""
+
+#: templates/pdf/Simple/invoice.php:80
 #: templates/pdf/Simple/packing-slip.php:54
 msgid "SKU:"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:80
+#: templates/pdf/Simple/invoice.php:81
 #: templates/pdf/Simple/packing-slip.php:55
 msgid "Weight:"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:113
+#: templates/pdf/Simple/invoice.php:114
 #: templates/pdf/Simple/packing-slip.php:69
 msgid "Customer Notes"
 msgstr ""
@@ -368,22 +372,34 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:359
+#: woocommerce-pdf-invoices-packingslips.php:249
+msgid "Payment method"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:260
+msgid "Shipping method"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:360
 msgid "Subtotal"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:381
+#: woocommerce-pdf-invoices-packingslips.php:382
 msgid "Shipping"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:400
+#: woocommerce-pdf-invoices-packingslips.php:401
 msgid "Discount"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:469
+#: woocommerce-pdf-invoices-packingslips.php:439
+msgid "VAT"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:471
 msgid "Total ex. VAT"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:472
+#: woocommerce-pdf-invoices-packingslips.php:474
 msgid "Total"
 msgstr ""
