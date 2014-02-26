@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 3.8.1 and WooCommerce 2.1
-Stable tag: 1.2.6
+Stable tag: 1.2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -149,16 +149,19 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
+= 1.2.7 =
+* Translations: POT, DE & NL updated
+* Fix: Removed stray span tag in totals table
+
 = 1.2.6 =
-* Tweak: Spanish translation update (thanks prepu!)
+* Translations: Spanish update (thanks prepu!)
 * Fix: More advanced checks to determine if a customer can download the invoice (including a status filter)
 
 = 1.2.5 =
 * Feature: Optional Invoice Number column for the orders listing
 * Feature: Better support for international characters
-* Feature: Added Russian & Ukrainian translation (thanks Oleg!)
-* Tweak: Updated Spanish (Thanks Manuel!) and Dutch translations
-* Tweak: Updated POT file
+* Translations: Added Russian & Ukrainian translation (thanks Oleg!)
+* Translations: Updated Spanish (Thanks Manuel!) and Dutch translations & POT file
 * Tweak: Memory limit notice
 * Tweak: Filename name now includes invoice number (when configured in the settings)
 
