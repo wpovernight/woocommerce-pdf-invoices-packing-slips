@@ -218,6 +218,10 @@ table.totals tr:last-child td, table.totals tr:last-child th {
 	font-weight: bold;
 }
 
+table.totals td.price span:first-child {
+	display: block;
+}
+
 /* Footer Imprint */
 #footer {
 	position: absolute;
