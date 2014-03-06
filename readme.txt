@@ -136,6 +136,25 @@ function wpo_wcpdf_myaccount_allowed_order_statuses( $allowed_statuses ) {
 }
 `
 
+= How can I get a copy of the invoice emailed to the shop manager? =
+The easiest way to do this is to just tick the 'new order' box. However, this also means that an invoice will be created for all new orders, also the ones that are never completed.
+
+Alternatively you can get a (BCC) copy of the completed order email by placing the following filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings)
+Modify the name & email address to your own preferences, 
+
+`
+add_filter( 'woocommerce_email_headers', 'mycustom_headers_filter_function', 10, 2);
+
+function mycustom_headers_filter_function( $headers, $object ) { 
+	if ($object == 'customer_completed_order') { 
+		$headers .= 'BCC: Your name <your@email.com>' . "\r\n"; //just repeat this line again to insert another email address in BCC
+	}
+
+	return $headers; 
+}
+`
+
+
 = Fatal error: Allowed memory size of ######## bytes exhausted (tried to allocate ### bytes) =
 
 This usually only happens on batch actions. PDF creation is a memory intensive job, especially if it includes several pages with images. Go to WooCommerce > System Status to check your WP Memory Limit. We recommend setting it to 128mb or more.
