@@ -476,11 +476,15 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * @return string $tax_rates imploded list of tax rates
 		 */
 		public function get_tax_rate( $tax_class, $line_total, $line_tax ) {
-			if (empty($tax_class))
-				$tax_class = 'standard';
-
 			if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
 				// WC 2.1 or newer is used
+				if ( $line_tax == 0 ) {
+					return '-'; // no need to determine tax rate...
+				}
+
+				// if (empty($tax_class))
+				// $tax_class = 'standard';// does not appear to work anymore - get_rates does accept an empty tax_class though!
+				
 				$tax = new WC_Tax();
 				$taxes = $tax->get_rates( $tax_class );
 
@@ -488,8 +492,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$tax_rates[$tax['label']] = round( $tax['rate'], 2 ).'%';
 				}
 
-				if (empty($tax_rates))
-					$tax_rates = (array) '-';
+				if (empty($tax_rates)) {
+					// one last try: manually calculate
+					if ( $line_total != 0) {
+						$tax_rates = round( ($line_tax / $line_total)*100, 1 ).'%';
+					} else {
+						$tax_rates = (array) '-';
+					}
+				}
 
 				$tax_rates = implode(' ,', $tax_rates );
 			} else {
