@@ -461,10 +461,10 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				
 				if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
 					// WC 2.1 or newer is used
-					$total_unformatted = $this->export->order->get_order_total();
+					$total_unformatted = $this->export->order->get_total();
 				} else {
 					// Backwards compatibility
-					$total_unformatted = $this->export->order->get_total();
+					$total_unformatted = $this->export->order->get_order_total();
 				}
 
 				$total = woocommerce_price( ( $total_unformatted - $total_tax ) );
