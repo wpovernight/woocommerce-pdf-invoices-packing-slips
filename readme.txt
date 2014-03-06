@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 3.8.1 and WooCommerce 2.1
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -148,6 +148,12 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.2.9 =
+* Fix: bug where 'standard' tax class would not display in some cases
+* Fix: bug that caused the totals to jump for some font sizes
+* Fix: WC2.1 deprecated totals function
+* Fix: If multiple taxes were set up with the same name, only one would display (Simple template was not affected)
 
 = 1.2.8 =
 * Template: Body line-height defined to prevent character jumping with italic texts
