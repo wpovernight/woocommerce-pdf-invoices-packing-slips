@@ -51,7 +51,7 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 = How do I create my own custom template? =
 
-Copy the files from `woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/` to `yourtheme/woocommerce/pdf/yourtemplate` and customize them there. The new template will shop up as 'yourtemplate' (the folder name) in the settings panel.
+Copy the files from `wp-content/plugins/woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/` to `wp-content/themes/yourtheme/woocommerce/pdf/yourtemplate` and customize them there. The new template will shop up as 'yourtemplate' (the folder name) in the settings panel.
 
 = Where can I find more templates? =
 
