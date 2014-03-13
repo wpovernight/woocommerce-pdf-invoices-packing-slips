@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-02-26 09:12+0100\n"
-"PO-Revision-Date: 2014-02-26 09:27+0100\n"
+"PO-Revision-Date: 2014-03-13 10:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: de_DE\n"
@@ -290,7 +290,7 @@ msgstr "PDF Erzeugen"
 
 #: includes/class-wcpdf-writepanels.php:143
 msgid "Download invoice (PDF)"
-msgstr "PDF Rechnung runterlaten"
+msgstr "PDF Rechnung runterladen"
 
 #: includes/class-wcpdf-writepanels.php:157
 msgid "PDF invoice"
