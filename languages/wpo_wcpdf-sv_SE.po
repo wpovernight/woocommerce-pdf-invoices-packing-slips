@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-02-26 09:12+0100\n"
-"PO-Revision-Date: 2014-03-11 13:56+0100\n"
-"Last-Translator: Ewout Fernhout <chocolade@extrapuur.nl>\n"
+"PO-Revision-Date: 2014-03-12 08:27+0100\n"
+"Last-Translator: Fredrik Rudin <fredrik.rudin@outlook.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nl_NL\n"
 "MIME-Version: 1.0\n"
@@ -34,14 +34,14 @@ msgstr[1] "fakturor"
 #: includes/class-wcpdf-export.php:199
 msgid "packing-slip"
 msgid_plural "packing-slips"
-msgstr[0] "packsedel"
-msgstr[1] "packsedlar"
+msgstr[0] "följesedel"
+msgstr[1] "följesedlarna"
 
 #: includes/class-wcpdf-settings.php:36 includes/class-wcpdf-settings.php:37
 #: includes/class-wcpdf-writepanels.php:173
 #: includes/class-wcpdf-writepanels.php:174
 msgid "PDF Invoices"
-msgstr "PDF Fakturor"
+msgstr "E-fakturor"
 
 #: includes/class-wcpdf-settings.php:60
 msgid "Settings"
@@ -49,11 +49,11 @@ msgstr "Inställningar"
 
 #: includes/class-wcpdf-settings.php:86
 msgid "WooCommerce PDF Invoices"
-msgstr "WooCommerce PDF Fakturor"
+msgstr "WooCommerce E-fakturor"
 
 #: includes/class-wcpdf-settings.php:88
 msgid "General"
-msgstr "Allmän"
+msgstr "Allmänt"
 
 #: includes/class-wcpdf-settings.php:89
 msgid "Template"
@@ -66,9 +66,9 @@ msgid ""
 "least 64MB (128MB for optimal performance). See: <a href=\"%s\">Increasing "
 "memory allocated to PHP</a>"
 msgstr ""
-"Ditt WP minne är inställt på %s - Vi rekommenderar att minst ha 64MB (128MB "
-"för bästa funktionallitet). Se: <a href=\"%s\">Increasing memory allocated "
-"to PHP</a>"
+"Din WP minnesgräns är inställt på %s - Vi rekommenderar att minst ha 64MB "
+"(128MB för bästa funktionallitet). Se: <a href=\"%s\">Increasing memory "
+"allocated to PHP</a>"
 
 #: includes/class-wcpdf-settings.php:106
 #, php-format
@@ -76,8 +76,7 @@ msgid ""
 "Looking for more advanced templates? Check out the Premium PDF Invoice & "
 "Packing Slips templates at %s."
 msgstr ""
-"Letar du efter mer avancerade mallar? Kolla in våra premium PDF Faktura & "
-"Packlistor mallar på %s."
+"Letar du efter mer avancerade mallar? Kolla in våra premium mallar på %s."
 
 #: includes/class-wcpdf-settings.php:107
 #, php-format
@@ -90,11 +89,11 @@ msgstr "Allmäna inställningar"
 
 #: includes/class-wcpdf-settings.php:168
 msgid "How do you want to view the PDF?"
-msgstr "Hur vill du kolla på din PDF?"
+msgstr "Hur vill du visa din PDF?"
 
 #: includes/class-wcpdf-settings.php:176
 msgid "Download the PDF"
-msgstr "Ladda ner din PDF"
+msgstr "Ladda ner PDF"
 
 #: includes/class-wcpdf-settings.php:177
 msgid "Open the PDF in a new browser tab/window"
@@ -102,23 +101,23 @@ msgstr "Öppna PDF i en ny tabb/fönster"
 
 #: includes/class-wcpdf-settings.php:187
 msgid "Attach invoice to:"
-msgstr "Fäst faktura på:"
+msgstr "Skicka faktura med:"
 
 #: includes/class-wcpdf-settings.php:195
 msgid "Admin New Order email"
-msgstr "Admin Ny order email"
+msgstr "Ny order admin epost"
 
 #: includes/class-wcpdf-settings.php:196
 msgid "Customer Processing Order email"
-msgstr "Kund berarbetningsorder email"
+msgstr "Kundorder berarbetas epost"
 
 #: includes/class-wcpdf-settings.php:197
 msgid "Customer Completed Order email"
-msgstr "Kund färdig order email"
+msgstr "Kundorder färdig epost"
 
 #: includes/class-wcpdf-settings.php:198
 msgid "Customer Invoice email"
-msgstr "Kund faktura email"
+msgstr "Kundfaktura epost"
 
 #: includes/class-wcpdf-settings.php:200
 #, php-format
@@ -133,11 +132,11 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:206
 msgid "Enable invoice number column in the orders list"
-msgstr "Aktivera fakturanummer i kolumen från orderlistan."
+msgstr "Aktivera fakturanummer i orderlistan."
 
 #: includes/class-wcpdf-settings.php:245
 msgid "PDF Template settings"
-msgstr "PDF mall inställningar"
+msgstr "PDF-mall inställningar"
 
 #: includes/class-wcpdf-settings.php:252
 msgid "Choose a template"
@@ -155,7 +154,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:266
 msgid "Paper size"
-msgstr "Pappers storlek"
+msgstr "Pappersstorlek"
 
 #: includes/class-wcpdf-settings.php:274
 msgid "A4"
@@ -191,7 +190,7 @@ msgstr "Shop adress"
 
 #: includes/class-wcpdf-settings.php:343
 msgid "Footer: terms & conditions, policies, etc."
-msgstr "Fot: villkor, policy, osv."
+msgstr "Sidfot: villkor, policy, osv."
 
 #: includes/class-wcpdf-settings.php:358
 msgid "Number to display on invoice"
@@ -250,7 +249,7 @@ msgstr "Fakturadatum"
 
 #: includes/class-wcpdf-settings.php:407
 msgid "Extra template fields"
-msgstr "Extra mall fält"
+msgstr "Extra mallfält"
 
 #: includes/class-wcpdf-settings.php:414
 msgid "Extra field 1"
@@ -278,7 +277,7 @@ msgstr "Kolumn nummer 3 i footer <i>Modern (Premium)</i> mallen"
 
 #: includes/class-wcpdf-settings.php:710
 msgid "Image resolution"
-msgstr "Bild upplösning"
+msgstr "Bildupplösning"
 
 #: includes/class-wcpdf-settings.php:740
 msgid ""
@@ -300,24 +299,24 @@ msgstr "Skapa PDF"
 
 #: includes/class-wcpdf-writepanels.php:143
 msgid "Download invoice (PDF)"
-msgstr "Ladda ner faktura(PDF)"
+msgstr "Ladda ner E-faktura"
 
 #: includes/class-wcpdf-writepanels.php:157
 msgid "PDF invoice"
-msgstr "PDF faktura"
+msgstr "E-faktura"
 
 #: includes/class-wcpdf-writepanels.php:158
 msgid "PDF Packing Slip"
-msgstr "PDF Packningslista"
+msgstr "följesedel (PDF)"
 
 #: includes/class-wcpdf-writepanels.php:175
 #: includes/class-wcpdf-writepanels.php:176
 msgid "PDF Packing Slips"
-msgstr "PDF Packningslistor"
+msgstr "följesedlar (PDF)"
 
 #: includes/class-wcpdf-writepanels.php:187
 msgid "PDF Invoice Number (unformatted!)"
-msgstr "PDF Fakturanummer (oformaterat!)"
+msgstr "E-fakturanummer (oformaterat!)"
 
 #: templates/pdf/Simple/html-document-wrapper.php:6
 #: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
@@ -328,7 +327,7 @@ msgstr "Faktura"
 #: templates/pdf/Simple/packing-slip.php:9
 #: templates/pdf/Simple/packing-slip.php:21
 msgid "Packing Slip"
-msgstr "Packningslista"
+msgstr "Följesedel"
 
 #: templates/pdf/Simple/invoice.php:37
 msgid "Invoice Date:"
@@ -360,7 +359,7 @@ msgstr "Produkt"
 #: templates/pdf/Simple/invoice.php:70
 #: templates/pdf/Simple/packing-slip.php:46
 msgid "Quantity"
-msgstr "antal"
+msgstr "Antal"
 
 #: templates/pdf/Simple/invoice.php:71
 msgid "Price"
