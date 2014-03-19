@@ -488,6 +488,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				$tax = new WC_Tax();
 				$taxes = $tax->get_rates( $tax_class );
 
+				$tax_rates = array();
+
 				foreach ($taxes as $tax) {
 					$tax_rates[$tax['label']] = round( $tax['rate'], 2 ).'%';
 				}
@@ -497,7 +499,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					if ( $line_total != 0) {
 						$tax_rates = round( ($line_tax / $line_total)*100, 1 ).'%';
 					} else {
-						$tax_rates = (array) '-';
+						$tax_rates = '-';
 					}
 				}
 
