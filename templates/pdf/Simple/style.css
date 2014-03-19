@@ -68,6 +68,11 @@ p + p {
 	margin-top: 1.25em;
 }
 
+a { 
+	border-bottom: 1px solid; 
+	text-decoration: none; 
+}
+
 /* Basic Table Styling */
 table {
 	border-collapse: collapse;
