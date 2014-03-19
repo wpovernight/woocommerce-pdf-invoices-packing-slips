@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 3.8.1 and WooCommerce 2.1
-Stable tag: 1.2.11
+Stable tag: 1.2.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -167,6 +167,10 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.2.12 =
+* Fix: warning for tax implode
+* Fix: hyperlink underline (was more like a strikethrough)
 
 = 1.2.11 =
 * Translations: Fixed German spelling error
