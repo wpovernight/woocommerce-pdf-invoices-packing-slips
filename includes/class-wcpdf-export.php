@@ -236,14 +236,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		/**
 		 * Attach invoice to completed order or customer invoice email
 		 */
-		public function attach_pdf_to_email ( $attachments, $status , $order ) {
-			if (!isset($this->general_settings['email_pdf']))
+		public function attach_pdf_to_email ( $attachments, $status, $order ) {
+			if (!isset($this->general_settings['email_pdf']) || !isset( $status ) ) {
 				return;
+			}
 
 			// clear temp folder (from http://stackoverflow.com/a/13468943/1446634)
 			$tmp_path = WooCommerce_PDF_Invoices::$plugin_path . 'tmp/';
 			array_map('unlink', ( glob( $tmp_path.'*' ) ? glob( $tmp_path.'*' ) : array() ) );
-
 
 			// Relevant (default) statuses:
 			// new_order
@@ -260,7 +260,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 			}
 
-			if( isset( $status ) && in_array ( $status, $allowed_statuses ) ) {
+			if ( !( apply_filters('wpo_wcpdf_custom_email_condition', true, $order, $status ) ) ) {
+				// use this filter to add an extra condition - return false to disable the PDF attachment
+				return;
+			}
+
+			if( in_array( $status, $allowed_statuses ) ) {
 				// create pdf data
 				$invoice = $this->get_pdf( 'invoice', (array) $order->id );
 
