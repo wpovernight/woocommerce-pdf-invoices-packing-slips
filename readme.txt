@@ -168,8 +168,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
-= 1.2.12 =
+= 1.2.13 =
+* Feature: added filter for custom email attachment condition (wpo_wcpdf_custom_email_condition)
 * Fix: warning for tax implode
+
+= 1.2.12 =
 * Fix: hyperlink underline (was more like a strikethrough)
 
 = 1.2.11 =
