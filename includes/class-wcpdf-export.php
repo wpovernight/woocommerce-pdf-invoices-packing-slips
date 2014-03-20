@@ -331,7 +331,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function get_template( $file ) {
 			ob_start();
-		    if (file_exists($file)) {
+			if (file_exists($file)) {
 				include($file);
 			}
 			return ob_get_clean();
@@ -389,7 +389,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$data['meta'] = $meta->display( false, true );
 
 					// Pass complete item array
-	                $data['item'] = $item;
+					$data['item'] = $item;
 					
 					// Create the product to display more info
 					$data['product'] = null;
@@ -531,15 +531,15 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			return;
 		}
 
-	    /**
-	     * Returns the main product image ID
+		/**
+		 * Returns the main product image ID
 		 * Adapted from the WC_Product class
-	     *
-	     * @access public
-	     * @return string
-	     */
-	    public function get_thumbnail_id ( $product_id ) {
-	    	global $woocommerce;
+		 *
+		 * @access public
+		 * @return string
+		 */
+		public function get_thumbnail_id ( $product_id ) {
+			global $woocommerce;
 	
 			if ( has_post_thumbnail( $product_id ) ) {
 				$thumbnail_id = get_post_thumbnail_id ( $product_id );
@@ -550,7 +550,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 	
 			return $thumbnail_id;
-	    }
+		}
 		
 	}
 
