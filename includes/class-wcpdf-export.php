@@ -502,9 +502,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				if (empty($tax_rates)) {
 					// one last try: manually calculate
 					if ( $line_total != 0) {
-						$tax_rates = round( ($line_tax / $line_total)*100, 1 ).'%';
+						$tax_rates[] = round( ($line_tax / $line_total)*100, 1 ).'%';
 					} else {
-						$tax_rates = '-';
+						$tax_rates[] = '-';
 					}
 				}
 
