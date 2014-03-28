@@ -108,7 +108,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 						</div>
 
 					<?php } ?>
+					<?php } 
 
+					if ( $active_tab=='status' ) {
+						$this->status_page();
+					} else {
+					?>
 					<form method="post" action="options.php">
 						<?php
 							switch ($active_tab) {
@@ -133,6 +138,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 	
 				</div>
 	
+			<?php
+		}
+
+		public function status_page() {
+			?>
+			<?php include('dompdf-status.php'); ?>
 			<?php
 		}
 		
