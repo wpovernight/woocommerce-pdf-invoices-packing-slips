@@ -278,6 +278,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				$attachments[] = $pdf_path;
 			}
 
+			do_action( 'wpo_wcpdf_email_attachment', $pdf_path );
+
 			return $attachments;
 		}
 
