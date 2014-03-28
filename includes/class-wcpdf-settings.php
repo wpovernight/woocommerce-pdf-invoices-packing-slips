@@ -98,15 +98,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 						<a href="?page=wpo_wcpdf_options_page&tab=status" class="nav-tab <?php echo (($active_tab == 'status') ? 'nav-tab-active' : ''); ?>"><?php _e('Status','wpo_wcpdf'); ?></a>
 					</h2>
 
-					<?php do_action( 'wpo_wcpdf_before_settings_page', $active_tab ); ?>
-
-					<?php
-						$memory = function_exists('wc_let_to_num')?wc_let_to_num( WP_MEMORY_LIMIT ):woocommerce_let_to_num( WP_MEMORY_LIMIT );
-
-						if ( $memory < 67108864 ) {
-							echo '<div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-top: 15px; background-color: #eee;">' . sprintf( __( 'Your WP Memory Limit is currently set to %s - We recommend setting it to at least 64MB (128MB for optimal performance). See: <a href="%s">Increasing memory allocated to PHP</a>', 'wpo_wcpdf' ), size_format( $memory ), 'http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP' ) . '</div>';
-						}
-					?>					
+					<?php do_action( 'wpo_wcpdf_before_settings_page', $active_tab ); ?>				
 
 					<?php if (!class_exists('WooCommerce_PDF_IPS_Templates')) {
 						$template_link = '<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/" target="_blank">wpovernight.com</a>';
