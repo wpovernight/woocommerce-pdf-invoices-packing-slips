@@ -53,6 +53,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					die('Template not found! Check if the following file exists: <pre>'.$template.'</pre><br/>');
 				}
 
+				// Set the invoice number
+				$this->set_invoice_number( $order_id );
+
 				$output_html[$order_id] = $this->get_template($template);
 
 				// store meta to be able to check if an invoice for an order has been created already
@@ -283,8 +286,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			return $attachments;
 		}
 
-		public function get_invoice_number( $order_id ) {
-			// get invoice number from post meta
+		public function set_invoice_number( $order_id ) {
+			// first check: get invoice number from post meta
 			$invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true );
 
 			// add invoice number if it doesn't exist
@@ -307,6 +310,16 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				$template_settings['next_invoice_number'] = $this->template_settings['next_invoice_number'] = $invoice_number+1;
 				update_option( 'wpo_wcpdf_template_settings', $template_settings );
 			}
+
+			// store invoice_number in class object
+			$this->invoice_number = $invoice_number;
+
+			return $invoice_number;
+		}
+
+		public function get_invoice_number( $order_id ) {
+			// get invoice number from post meta
+			$invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true );
 
 			return apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $this->order->get_order_number(), $this->order->id, date_i18n( get_option( 'date_format' ), strtotime( $this->order->order_date ) ) );
 		}
@@ -364,7 +377,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					// Set the id
 					$data['product_id'] = $item['product_id'];
 					$data['variation_id'] = $item['variation_id'];
-										
+
 					// Set item name
 					$data['name'] = $item['name'];
 					
