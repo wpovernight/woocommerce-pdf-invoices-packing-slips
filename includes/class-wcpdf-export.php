@@ -384,18 +384,21 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					// Set item quantity
 					$data['quantity'] = $item['qty'];
 
-					// Set the line total (=before discount)
+					// Set the line total (=after discount)
 					$data['line_total'] = $this->wc_price( $item['line_total'] );
+					$data['single_line_total'] = $this->wc_price( $item['line_total'] / $item['qty'] );
 					$data['line_tax'] = $this->wc_price( $item['line_tax'] );
+					$data['single_line_tax'] = $this->wc_price( $item['line_tax'] / $item['qty'] );
 					$data['tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'] );
 					
-					// Set the line subtotal
+					// Set the line subtotal (=before discount)
 					$data['line_subtotal'] = $this->wc_price( $item['line_subtotal'] );
 					$data['line_subtotal_tax'] = $this->wc_price( $item['line_subtotal_tax'] );
 					$data['ex_price'] = $this->get_formatted_item_price ( $item, 'total', 'excl' );
 					$data['price'] = $this->get_formatted_item_price ( $item, 'total' );
 
 					// Calculate the single price with the same rules as the formatted line subtotal (!)
+					// = before discount
 					$data['ex_single_price'] = $this->get_formatted_item_price ( $item, 'single', 'excl' );
 					$data['single_price'] = $this->get_formatted_item_price ( $item, 'single' );
 					
