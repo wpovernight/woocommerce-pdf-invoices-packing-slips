@@ -392,21 +392,37 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		/**
 		 * Return/show the total discount
 		 */
-		public function get_order_discount() {
-			$cart_discount = $this->export->order->get_cart_discount_to_display(); //before tax
-			$order_discount = $this->export->order->get_order_discount_to_display(); //after tax
-			$total_discount = $this->export->order->get_total_discount(); //combined
+		public function get_order_discount( $type = 'total' ) {
+			switch ($type) {
+				case 'cart':
+					// Cart Discount – pre-tax discounts.
+					$discount_value = $this->export->order->get_cart_discount();
+					break;
+				case 'order':
+					// Order Discount – post-tax discounts.
+					$discount_value = $this->export->order->get_order_discount();
+					break;
+				case 'total':
+					// Total Discount – Cart & Order Discounts combined
+					$discount_value = $this->export->order->get_total_discount();
+					break;
+				default:
+					// Total Discount – Cart & Order Discounts combined
+					$discount_value = $this->export->order->get_total_discount();
+					break;
+			}
 
 			$discount = array (
 				'label'	=> __('Discount', 'wpo_wcpdf'),
-				'value'	=> woocommerce_price($total_discount),
+				'value'	=> $this->export->wc_price($discount_value),
 			);
 
-			if ( $total_discount > 0 )
+			if ( $discount_value > 0 ) {
 				return apply_filters( 'wpo_wcpdf_order_discount', $discount );
+			}
 		}
-		public function order_discount() {
-			$discount = $this->get_order_discount();
+		public function order_discount( $type = 'total' ) {
+			$discount = $this->get_order_discount( $type );
 			echo $discount['value'];
 		}
 
