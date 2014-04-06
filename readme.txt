@@ -168,6 +168,13 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
+= 1.3.0 =
+* Feature: Added 'status' panel for better problem diagnosis
+* Feature: Order & Cart, & total discounts can now be called separately with order_discount()
+* Tweak: split create & get invoice number calls to prevent slow database calls from causing number skipping
+* Translations: Added Romanian (Thanks Leonardo!)
+* Translations: Added Slovak (Thanks Oleg!)
+
 = 1.2.13 =
 * Feature: added filter for custom email attachment condition (wpo_wcpdf_custom_email_condition)
 * Fix: warning for tax implode

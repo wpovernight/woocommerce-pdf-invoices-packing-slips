@@ -103,8 +103,7 @@
 
 		</tr>
 	</tfoot>
-</table><!-- order-details -->		
-
+</table><!-- order-details -->
 
 <table class="notes container">
 	<tr>
