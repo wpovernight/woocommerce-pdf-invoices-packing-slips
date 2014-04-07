@@ -395,19 +395,19 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function get_order_discount( $type = 'total' ) {
 			switch ($type) {
 				case 'cart':
-					// Cart Discount – pre-tax discounts.
+					// Cart Discount - pre-tax discounts.
 					$discount_value = $this->export->order->get_cart_discount();
 					break;
 				case 'order':
-					// Order Discount – post-tax discounts.
+					// Order Discount - post-tax discounts.
 					$discount_value = $this->export->order->get_order_discount();
 					break;
 				case 'total':
-					// Total Discount – Cart & Order Discounts combined
+					// Total Discount - Cart & Order Discounts combined
 					$discount_value = $this->export->order->get_total_discount();
 					break;
 				default:
-					// Total Discount – Cart & Order Discounts combined
+					// Total Discount - Cart & Order Discounts combined
 					$discount_value = $this->export->order->get_total_discount();
 					break;
 			}
