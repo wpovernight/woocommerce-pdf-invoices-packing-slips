@@ -82,7 +82,7 @@
 				</dl>
 			</td>
 			<td class="quantity"><?php echo $item['quantity']; ?></td>
-			<td class="price"><?php echo $item['price']; ?></td>
+			<td class="price"><?php echo $item['order_price']; ?></td>
 		</tr><?php endforeach; endif; ?>
 	</tbody>
 	<tfoot>

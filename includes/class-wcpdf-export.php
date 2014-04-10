@@ -396,6 +396,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$data['line_subtotal_tax'] = $this->wc_price( $item['line_subtotal_tax'] );
 					$data['ex_price'] = $this->get_formatted_item_price ( $item, 'total', 'excl' );
 					$data['price'] = $this->get_formatted_item_price ( $item, 'total' );
+					$data['order_price'] = $this->order->get_formatted_line_subtotal( $item ); // formatted according to WC settings
 
 					// Calculate the single price with the same rules as the formatted line subtotal (!)
 					// = before discount
