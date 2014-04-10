@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 3.8.1 and WooCommerce 2.1
-Stable tag: 1.2.13
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,7 +18,7 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 * Automatically attach invoice PDF to order confirmation email
 * Users can download their invoices from the My Account page
 * Sequential invoice numbers (fully customizable with filters, see the [FAQ](http://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/faq/))
-* **Available in: Dutch, English, French, German, Hungarian, Italian, Russian, Spanish & Ukrainian**
+* **Available in: Dutch, English, French, German, Hungarian, Italian, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
 
 = Fully customizable =
 In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS based templates that allow for customization & full control over the PDF output.
