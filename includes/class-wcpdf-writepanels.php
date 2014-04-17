@@ -181,10 +181,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		}
 
 		/**
-		 * Add actions to menu
+		 * Add box to edit invoice number to order details page
 		 */
 		public function edit_invoice_number($order) {
-			woocommerce_wp_text_input( array( 'id' => '_wcpdf_invoice_number', 'label' => __( 'PDF Invoice Number (unformatted!)', 'wpo_wcpdf' ) ) );
+			$invoice_exists = get_post_meta( $order->id, '_wcpdf_invoice_exists', true );
+			if (!empty($invoice_exists)) {
+				woocommerce_wp_text_input( array( 'id' => '_wcpdf_invoice_number', 'label' => __( 'PDF Invoice Number (unformatted!)', 'wpo_wcpdf' ) ) );
+			}
 		}
 
 		/**
@@ -192,7 +195,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 */
 		public function save_invoice_number($post_id) {
 			global $post_type;
-			if( $post_type == 'shop_order' ) {
+			if( $post_type == 'shop_order' && isset($_POST['_wcpdf_invoice_number'])) {
 				update_post_meta( $post_id, '_wcpdf_invoice_number', stripslashes( $_POST['_wcpdf_invoice_number'] ));
 			}
 		}

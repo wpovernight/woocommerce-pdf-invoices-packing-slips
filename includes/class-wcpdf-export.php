@@ -314,6 +314,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// store invoice_number in class object
 			$this->invoice_number = $invoice_number;
 
+			// store invoice number in _POST superglobal to prevent the number from being cleared in a save action
+			// (http://wordpress.org/support/topic/customer-invoice-selection-from-order-detail-page-doesnt-record-invoice-id?replies=1)
+			$_POST['_wcpdf_invoice_number'] = $invoice_number;
+
 			return $invoice_number;
 		}
 
