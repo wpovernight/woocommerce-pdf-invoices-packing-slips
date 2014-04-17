@@ -2,15 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips v1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-17 22:02+0100\n"
-"PO-Revision-Date: 2014-04-16 19:55+0100\n"
+"POT-Creation-Date: 2014-04-17 11:03+0100\n"
+"PO-Revision-Date: 2014-04-17 11:03+0100\n"
 "Last-Translator: Oleg Komarovskyi <komarovski21@gmail.com>\n"
 "Language-Team: KubiQ <7kubiq7@gmail.com>\n"
+"Language: sk_SK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 1 : (n>=2 && n<=4) ? 2 : 0;\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Poedit 1.6.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
@@ -27,7 +28,6 @@ msgstr "Nemáte dostatočné oprávnenia na prístup k tejto stránke."
 
 #  This is a filename (prefix). do not use spaces or special characters!
 # @ wpo_wcpdf
-#. gettext fix: identical singular and plural forms found, that may be ambiguous! Please check the code!
 #: includes/class-wcpdf-export.php:200 includes/class-wcpdf-export.php:276
 msgid "invoice"
 msgid_plural "invoices"
@@ -57,11 +57,6 @@ msgid "Settings"
 msgstr "Nastavenia"
 
 # @ wpo_wcpdf
-#: includes/class-wcpdf-settings.php:92
-msgid "WooCommerce PDF Invoices"
-msgstr "WooCommerce PDF faktúry"
-
-# @ wpo_wcpdf
 #: includes/class-wcpdf-settings.php:82
 msgid "General"
 msgstr "Všeobecné"
@@ -70,6 +65,16 @@ msgstr "Všeobecné"
 #: includes/class-wcpdf-settings.php:83
 msgid "Template"
 msgstr "Šablóna"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings.php:92
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF faktúry"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings.php:98
+msgid "Status"
+msgstr "Stav"
 
 # @ wpo_wcpdf
 #: includes/class-wcpdf-settings.php:109
@@ -145,6 +150,11 @@ msgstr ""
 "priečinku, nebude možné odosielať faktúry e-mailom."
 
 # @ wpo_wcpdf
+#: includes/class-wcpdf-settings.php:210
+msgid "Enable invoice number column in the orders list"
+msgstr "Zobraziť stĺpec s číslom faktúry v objednávkach"
+
+# @ wpo_wcpdf
 #: includes/class-wcpdf-settings.php:249
 msgid "PDF Template settings"
 msgstr "Nastavenia PDF šablón"
@@ -178,7 +188,7 @@ msgstr "A4"
 # @ wpo_wcpdf
 #: includes/class-wcpdf-settings.php:279
 msgid "Letter"
-msgstr "List"
+msgstr "Letter"
 
 # @ wpo_wcpdf
 #: includes/class-wcpdf-settings.php:286
@@ -321,13 +331,18 @@ msgstr "Rozlíšenie obrázka"
 # @ wpo_wcpdf
 #: includes/class-wcpdf-settings.php:744
 msgid ""
-"These are used for the (optional) footer columns in the <em>Modern (Premium)"
-"</em> template, but can also be used for other elements in your custom "
-"template"
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
 msgstr ""
 "Tieto nastavenia sú použité ako voliteľné časti pätičky v šablóne <em>Modern "
 "(Premium)</em>, ale môžu byť využité aj ako iné prvky vo Vašej vlastnej "
 "šablóne"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-writepanels.php:102
+msgid "Invoice Number"
+msgstr "Číslo faktúry"
 
 # @ wpo_wcpdf
 #: includes/class-wcpdf-writepanels.php:133
@@ -340,15 +355,11 @@ msgid "Download invoice (PDF)"
 msgstr "Stiahnuť faktúru (PDF)"
 
 # @ wpo_wcpdf
-#: includes/class-wcpdf-writepanels.php:81
-#: includes/class-wcpdf-writepanels.php:82
 #: includes/class-wcpdf-writepanels.php:157
 msgid "PDF invoice"
 msgstr "PDF faktúra"
 
 # @ wpo_wcpdf
-#: includes/class-wcpdf-writepanels.php:84
-#: includes/class-wcpdf-writepanels.php:85
 #: includes/class-wcpdf-writepanels.php:158
 msgid "PDF Packing Slip"
 msgstr "PDF dodací list"
@@ -358,6 +369,11 @@ msgstr "PDF dodací list"
 #: includes/class-wcpdf-writepanels.php:176
 msgid "PDF Packing Slips"
 msgstr "PDF dodacie listy"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-writepanels.php:189
+msgid "PDF Invoice Number (unformatted!)"
+msgstr "Číslo faktúry (mimo formátovania!)"
 
 # @ wpo_wcpdf
 #: templates/pdf/Simple/html-document-wrapper.php:6
@@ -417,6 +433,11 @@ msgid "Price"
 msgstr "Cena"
 
 # @ wpo_wcpdf
+#: templates/pdf/Simple/invoice.php:77
+msgid "Description"
+msgstr "Popis"
+
+# @ wpo_wcpdf
 #: templates/pdf/Simple/invoice.php:80
 #: templates/pdf/Simple/packing-slip.php:54
 msgid "SKU:"
@@ -451,6 +472,16 @@ msgid "N/A"
 msgstr "N/A"
 
 # @ wpo_wcpdf
+#: woocommerce-pdf-invoices-packingslips.php:249
+msgid "Payment method"
+msgstr "Spôsob platby"
+
+# @ wpo_wcpdf
+#: woocommerce-pdf-invoices-packingslips.php:260
+msgid "Shipping method"
+msgstr "Doprava"
+
+# @ wpo_wcpdf
 #: woocommerce-pdf-invoices-packingslips.php:360
 msgid "Subtotal"
 msgstr "Medzisúčet"
@@ -465,6 +496,11 @@ msgstr "Doprava"
 msgid "Discount"
 msgstr "Zľava"
 
+# @ wpo_wcpdf
+#: woocommerce-pdf-invoices-packingslips.php:455
+msgid "VAT"
+msgstr "DPH"
+
 # @ default
 #: woocommerce-pdf-invoices-packingslips.php:487
 msgid "Total ex. VAT"
@@ -474,48 +510,3 @@ msgstr "Spolu bez DPH"
 #: woocommerce-pdf-invoices-packingslips.php:490
 msgid "Total"
 msgstr "Spolu"
-
-# @ wpo_wcpdf
-#: includes/class-wcpdf-settings.php:98
-msgid "Status"
-msgstr "Stav"
-
-# @ wpo_wcpdf
-#: includes/class-wcpdf-settings.php:210
-msgid "Enable invoice number column in the orders list"
-msgstr "Zobraziť stĺpec s číslom faktúry v objednávkach"
-
-# @ wpo_wcpdf
-#: includes/class-wcpdf-writepanels.php:102
-msgid "Invoice Number"
-msgstr "Číslo faktúry"
-
-# @ wpo_wcpdf
-#: includes/class-wcpdf-writepanels.php:157
-msgid "PDF Invoice"
-msgstr "PDF faktúra"
-
-# @ wpo_wcpdf
-#: includes/class-wcpdf-writepanels.php:187
-msgid "PDF Invoice Number (unformatted!)"
-msgstr "Číslo faktúry"
-
-# @ wpo_wcpdf
-#: templates/pdf/Simple/invoice.php:77
-msgid "Description"
-msgstr "Popis"
-
-# @ wpo_wcpdf
-#: woocommerce-pdf-invoices-packingslips.php:249
-msgid "Payment method"
-msgstr "Spôsob platby"
-
-# @ wpo_wcpdf
-#: woocommerce-pdf-invoices-packingslips.php:260
-msgid "Shipping method"
-msgstr "Doprava"
-
-# @ wpo_wcpdf
-#: woocommerce-pdf-invoices-packingslips.php:455
-msgid "VAT"
-msgstr "DPH"
