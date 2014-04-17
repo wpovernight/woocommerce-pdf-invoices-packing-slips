@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 3.8.1 and WooCommerce 2.1
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -167,6 +167,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.3.1 =
+* Fix: invoice number was cleared when Order Actions were being used when an invoice number was not set
+* Translations: Updated Slovak (Thanks Jozef!)
+* Translations: Added Czech (Thanks CubiQ!)
 
 = 1.3.0 =
 * Feature: Added 'status' panel for better problem diagnosis
