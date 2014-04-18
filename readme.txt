@@ -18,7 +18,7 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 * Automatically attach invoice PDF to order confirmation email
 * Users can download their invoices from the My Account page
 * Sequential invoice numbers (fully customizable with filters, see the [FAQ](http://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/faq/))
-* **Available in: Dutch, English, French, German, Hungarian, Italian, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
+* **Available in: Czech, Dutch, English, French, German, Hungarian, Italian, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
 
 = Fully customizable =
 In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS based templates that allow for customization & full control over the PDF output.
