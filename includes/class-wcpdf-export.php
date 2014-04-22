@@ -295,9 +295,18 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				$next_invoice_number = $this->template_settings['next_invoice_number'];
 
 				if ( empty($next_invoice_number) ) {
-					// First time! Use order number as starting point.
+					// First time! We start numbering from order_number or order_id
+					
+					// Check if $order_number is an integer
 					$order_number = ltrim($this->order->get_order_number(), '#');
-					$invoice_number = $order_number;
+					if ( ctype_digit( (string)$order_number ) ) {
+						// order_number == integer: use as starting point.
+						$invoice_number = $order_number;
+					} else {
+						// fallback: use order_id as starting point.
+						$invoice_number = $order_id;
+					}
+
 				} else {
 					$invoice_number = $next_invoice_number;
 				}
