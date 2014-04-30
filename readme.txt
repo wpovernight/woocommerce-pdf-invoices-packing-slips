@@ -72,7 +72,7 @@ This plugin is translation ready, which means that you can translate it using st
 
 = How to I add a prefix, suffix or offset to the invoice number? =
 
-You can do this via a filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings).
+You can do this via a filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings). **Important!** If you use characters like "/", "\", "&", etc., this will break the filenames, as these are illegal filename characters. You can fix this by creating a separate filename filter (see below).
 
 `
 add_filter( 'wpo_wcpdf_invoice_number', 'wpo_wcpdf_invoice_number', 10, 4 );
