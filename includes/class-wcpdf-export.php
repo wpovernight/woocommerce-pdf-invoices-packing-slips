@@ -254,7 +254,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// customer_processing_order
 			// customer_completed_order
 
-			$allowed_statuses = array_keys( $this->general_settings['email_pdf'] );
+			$allowed_statuses = apply_filters( 'wpo_wcpdf_email_allowed_statuses', array_keys( $this->general_settings['email_pdf'] ) );
 			
 			foreach ($allowed_statuses as $key => $order_status) {
 				// convert 'lazy' status name
