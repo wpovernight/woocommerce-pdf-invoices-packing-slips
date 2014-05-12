@@ -59,6 +59,10 @@ Copy the files from `wp-content/plugins/woocommerce-pdf-invoices-packing-slips/t
 
 Go to [wpovernight.com](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/) to checkout more templates! These include templates with more tax details and product thumbnails. Need a custom templates? Contact us at support@wpovernight.com for more information.
 
+= Can I contribute to the code? =
+You're more than welcome! This plugin is hosted on github, where you can post issues or make pull requests.
+https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips
+
 = My language is not included, how can I contribute? =
 
 This plugin is translation ready, which means that you can translate it using standard WordPress methods.
