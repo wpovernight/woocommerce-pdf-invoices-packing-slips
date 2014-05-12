@@ -35,6 +35,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ));
 			add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3);
+
+			// check if an invoice number filter has already been registered, if not, use settings
+			if ( !has_filter( 'wpo_wcpdf_invoice_number' ) ) {
+				add_filter( 'wpo_wcpdf_invoice_number', array( $this, 'format_invoice_number' ), 20, 4 );
+			}
+
 		}
 		
 		/**
@@ -211,6 +217,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			$filename = apply_filters( 'wpo_wcpdf_bulk_filename', $filename, $order_ids, $template_name, $template_type );
+
+			// sanitize filename!
+			$filename = sanitize_file_name( $filename );
 	
 			// Get output setting
 			$output_mode = isset($this->general_settings['download_display'])?$this->general_settings['download_display']:'';
@@ -276,6 +285,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				$pdf_filename_prefix = __( 'invoice', 'wpo_wcpdf' );
 				$pdf_filename = $pdf_filename_prefix . '-' . $display_number . '.pdf';
 				$pdf_filename = apply_filters( 'wpo_wcpdf_attachment_filename', $pdf_filename, $display_number, $order->id );
+
+				// sanitize filename!
+				$pdf_filename = sanitize_file_name( $pdf_filename );
+
 				$pdf_path = $tmp_path . $pdf_filename;
 				file_put_contents ( $pdf_path, $invoice );
 				$attachments[] = $pdf_path;
@@ -335,6 +348,33 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true );
 
 			return apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $this->order->get_order_number(), $this->order->id, date_i18n( get_option( 'date_format' ), strtotime( $this->order->order_date ) ) );
+		}
+
+		public function format_invoice_number( $invoice_number, $order_number, $order_id, $order_date ) {
+			// get format settings
+			$order_year = date_i18n( 'Y', strtotime( $order_date ) );
+			$order_month = date_i18n( 'm', strtotime( $order_date ) );
+
+			
+			$formats['prefix'] = $this->template_settings['invoice_number_formatting_prefix'];
+			$formats['suffix'] = $this->template_settings['invoice_number_formatting_suffix'];
+			$formats['padding'] = $this->template_settings['invoice_number_formatting_padding'];
+
+			// Replacements
+			foreach ($formats as $key => $value) {
+				$value = str_replace('[order_year]', $order_year, $value);
+				$value = str_replace('[order_month]', $order_month, $value);
+				$formats[$key] = $value;
+			}
+
+			// Padding - minimum of 3 for safety
+			if ( ctype_digit( (string)$formats['padding'] ) && $formats['padding'] > 3 ) {
+				$invoice_number = sprintf('%0'.$formats['padding'].'d', $invoice_number);
+			}
+
+			$formatted_invoice_number = $formats['prefix'] . $invoice_number . $formats['suffix'] ;
+
+			return $formatted_invoice_number;
 		}
 
 		public function get_display_number( $order_id ) {
