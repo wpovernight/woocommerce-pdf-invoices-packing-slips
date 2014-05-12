@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-26 09:12+0100\n"
-"PO-Revision-Date: 2014-02-26 09:19+0100\n"
+"POT-Creation-Date: 2014-05-12 22:11+0100\n"
+"PO-Revision-Date: 2014-05-12 22:13+0100\n"
 "Last-Translator: Ewout Fernhout <chocolade@extrapuur.nl>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nl_NL\n"
@@ -19,19 +19,19 @@ msgstr ""
 "X-Generator: Poedit 1.6.4\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/class-wcpdf-export.php:142 includes/class-wcpdf-export.php:147
-#: includes/class-wcpdf-export.php:152 includes/class-wcpdf-export.php:163
-#: includes/class-wcpdf-export.php:176
+#: includes/class-wcpdf-export.php:151 includes/class-wcpdf-export.php:156
+#: includes/class-wcpdf-export.php:161 includes/class-wcpdf-export.php:172
+#: includes/class-wcpdf-export.php:185
 msgid "You do not have sufficient permissions to access this page."
 msgstr "Je hebt onvoldoende rechten voor deze pagina."
 
-#: includes/class-wcpdf-export.php:197 includes/class-wcpdf-export.php:268
+#: includes/class-wcpdf-export.php:206 includes/class-wcpdf-export.php:285
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] "factuur"
 msgstr[1] "facturen"
 
-#: includes/class-wcpdf-export.php:199
+#: includes/class-wcpdf-export.php:208
 msgid "packing-slip"
 msgid_plural "packing-slips"
 msgstr[0] "pakbon"
@@ -47,30 +47,31 @@ msgstr "PDF facturen"
 msgid "Settings"
 msgstr "Instellingen"
 
-#: includes/class-wcpdf-settings.php:86
-msgid "WooCommerce PDF Invoices"
-msgstr "WooCommerce PDF Facturen"
-
-#: includes/class-wcpdf-settings.php:88
+#: includes/class-wcpdf-settings.php:82
 msgid "General"
 msgstr "Algemeen"
 
-#: includes/class-wcpdf-settings.php:89
+#: includes/class-wcpdf-settings.php:83
 msgid "Template"
 msgstr "Template"
 
-#: includes/class-wcpdf-settings.php:96
+#: includes/class-wcpdf-settings.php:92
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF Facturen"
+
+#: includes/class-wcpdf-settings.php:98
+msgid "Status"
+msgstr "Status"
+
+#: includes/class-wcpdf-settings.php:109
 #, php-format
 msgid ""
-"Your WP Memory Limit is currently set to %s - We recommend setting it to at "
-"least 64MB (128MB for optimal performance). See: <a href=\"%s\">Increasing "
-"memory allocated to PHP</a>"
+"Upload all invoices automatically to your dropbox!<br/>Check out the %s "
+"extension."
 msgstr ""
-"Uw WordPress geheugenlimiet is momenteel ingesteld op %s - We adviseren om "
-"deze in te stellen op tenminste 64MB (128MB voor de beste performance). Zie: "
-"<a href=\"%s\">Increasing memory allocated to PHP</a>"
+"Upload alle facturen automatisch naar je Dropbox!<br/>Bekijk de %s extensie."
 
-#: includes/class-wcpdf-settings.php:106
+#: includes/class-wcpdf-settings.php:119
 #, php-format
 msgid ""
 "Looking for more advanced templates? Check out the Premium PDF Invoice & "
@@ -79,48 +80,48 @@ msgstr ""
 "Op zoek naar geavanceerdere sjablonen? Bekijk de Premium PDF Invoice & "
 "Packing Slips sjablonen op %s."
 
-#: includes/class-wcpdf-settings.php:107
+#: includes/class-wcpdf-settings.php:120
 #, php-format
 msgid "For custom templates, contact us at %s."
 msgstr "Neem voor custom templates contact met ons op via %s"
 
-#: includes/class-wcpdf-settings.php:161
+#: includes/class-wcpdf-settings.php:175
 msgid "General settings"
 msgstr "Algemene instellingen"
 
-#: includes/class-wcpdf-settings.php:168
+#: includes/class-wcpdf-settings.php:182
 msgid "How do you want to view the PDF?"
 msgstr "Hoe wil je de PDF bekijken?"
 
-#: includes/class-wcpdf-settings.php:176
+#: includes/class-wcpdf-settings.php:190
 msgid "Download the PDF"
 msgstr "Download de PDF"
 
-#: includes/class-wcpdf-settings.php:177
+#: includes/class-wcpdf-settings.php:191
 msgid "Open the PDF in a new browser tab/window"
 msgstr "Open de PDF in een nieuwe browser tab/venster"
 
-#: includes/class-wcpdf-settings.php:187
+#: includes/class-wcpdf-settings.php:201
 msgid "Attach invoice to:"
 msgstr "Factuur als bijlage toevoegen aan:"
 
-#: includes/class-wcpdf-settings.php:195
+#: includes/class-wcpdf-settings.php:209
 msgid "Admin New Order email"
 msgstr "Nieuwe bestelling admin email"
 
-#: includes/class-wcpdf-settings.php:196
+#: includes/class-wcpdf-settings.php:210
 msgid "Customer Processing Order email"
 msgstr "Bestelling in verwerking klant email"
 
-#: includes/class-wcpdf-settings.php:197
+#: includes/class-wcpdf-settings.php:211
 msgid "Customer Completed Order email"
 msgstr "Bestelling voltooid klant email"
 
-#: includes/class-wcpdf-settings.php:198
+#: includes/class-wcpdf-settings.php:212
 msgid "Customer Invoice email"
 msgstr "Klant factuur email"
 
-#: includes/class-wcpdf-settings.php:200
+#: includes/class-wcpdf-settings.php:214
 #, php-format
 msgid ""
 "It looks like the temp folder (<code>%s</code>) is not writable, check the "
@@ -131,19 +132,19 @@ msgstr ""
 "controleer de rechten op deze folder! Zonder schrijfrechten kan de plugin "
 "geen facturen emailen."
 
-#: includes/class-wcpdf-settings.php:206
+#: includes/class-wcpdf-settings.php:220
 msgid "Enable invoice number column in the orders list"
 msgstr "Schakel factuurnummer kolom in het bestellingen overzicht in"
 
-#: includes/class-wcpdf-settings.php:245
+#: includes/class-wcpdf-settings.php:259
 msgid "PDF Template settings"
 msgstr "PDF Template instellingen"
 
-#: includes/class-wcpdf-settings.php:252
+#: includes/class-wcpdf-settings.php:266
 msgid "Choose a template"
 msgstr "Kies een template"
 
-#: includes/class-wcpdf-settings.php:260
+#: includes/class-wcpdf-settings.php:274
 msgid ""
 "Want to use your own template? Copy all the files from <code>woocommerce-pdf-"
 "invoices-packing-slips/templates/pdf/Simple/</code> to <code>yourtheme/"
@@ -154,59 +155,59 @@ msgstr ""
 "naar <code>jouwtheme/woocommerce/pdf/jouwtemplate/</code> en pas ze aan naar "
 "je wensen."
 
-#: includes/class-wcpdf-settings.php:266
+#: includes/class-wcpdf-settings.php:280
 msgid "Paper size"
 msgstr "Papier formaat"
 
-#: includes/class-wcpdf-settings.php:274
+#: includes/class-wcpdf-settings.php:288
 msgid "A4"
 msgstr "A4"
 
-#: includes/class-wcpdf-settings.php:275
+#: includes/class-wcpdf-settings.php:289
 msgid "Letter"
 msgstr "Letter (US)"
 
-#: includes/class-wcpdf-settings.php:282
+#: includes/class-wcpdf-settings.php:296
 msgid "Shop header/logo"
 msgstr "Shop header/logo"
 
-#: includes/class-wcpdf-settings.php:289
+#: includes/class-wcpdf-settings.php:303
 msgid "Select or upload your invoice header/logo"
 msgstr "Selecteer of upload je factuur header/logo"
 
-#: includes/class-wcpdf-settings.php:290
+#: includes/class-wcpdf-settings.php:304
 msgid "Set image"
 msgstr "Stel afbeelding in"
 
-#: includes/class-wcpdf-settings.php:291
+#: includes/class-wcpdf-settings.php:305
 msgid "Remove image"
 msgstr "Verwijder afbeelding"
 
-#: includes/class-wcpdf-settings.php:298
+#: includes/class-wcpdf-settings.php:312
 msgid "Shop Name"
 msgstr "Shop Naam"
 
-#: includes/class-wcpdf-settings.php:311
+#: includes/class-wcpdf-settings.php:325
 msgid "Shop Address"
 msgstr "Shop Adres"
 
-#: includes/class-wcpdf-settings.php:343
+#: includes/class-wcpdf-settings.php:357
 msgid "Footer: terms & conditions, policies, etc."
 msgstr "Voettekst: algemene voorwaarden, retourenbeleid, etc."
 
-#: includes/class-wcpdf-settings.php:358
+#: includes/class-wcpdf-settings.php:372
 msgid "Number to display on invoice"
 msgstr "Nummer op de factuur"
 
-#: includes/class-wcpdf-settings.php:366
+#: includes/class-wcpdf-settings.php:380
 msgid "WooCommerce order number"
 msgstr "WooCommerce ordernummer"
 
-#: includes/class-wcpdf-settings.php:367
+#: includes/class-wcpdf-settings.php:381
 msgid "Built-in sequential invoice number"
 msgstr "Ingebouwde sequentiële factuurnummers"
 
-#: includes/class-wcpdf-settings.php:369
+#: includes/class-wcpdf-settings.php:383
 msgid ""
 "If you are using the WooCommerce Sequential Order Numbers plugin, select the "
 "WooCommerce order number"
@@ -214,74 +215,108 @@ msgstr ""
 "Als je de WooCommerce Sequential Order Numbers plugin gebruikt, selecteer "
 "dan WooCommerce ordernummer"
 
-#: includes/class-wcpdf-settings.php:375
+#: includes/class-wcpdf-settings.php:389
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr "Volgende factuurnummer (zonder voorvoegsel/achtervoegsel etc.)"
 
-#: includes/class-wcpdf-settings.php:383
+#: includes/class-wcpdf-settings.php:397
 msgid ""
 "This is the number that will be used on the next invoice that is created. By "
 "default, numbering starts from the WooCommerce Order Number of the first "
 "invoice that is created and increases for every new invoice. Note that if "
 "you override this and set it lower than the highest (PDF) invoice number, "
-"this could create double invoice numbers!<br/>Check the <a href=\"http://"
-"wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/faq/\" target="
-"\"_blank\">FAQ</a> for instructions on how to format the invoice number."
+"this could create double invoice numbers!"
 msgstr ""
 "Dit is het nummer dat gebruikt zal worden op de eerstvolgende factuur. "
 "Standaard begint het nummeren vanaf het WooCommerce ordernummer van de "
 "eerste factuur die wordt aangemaakt, en wordt opgehoogd voor iedere nieuwe "
 "factuur. Let op, als je dit nummer aanpast en op een lager nummer dan het "
 "hoogste huidige (PDF) factuurnummer zet, kan dit dubbele factuurnummers tot "
-"gevolg hebben!. <br/>Bekijk de <a href=\"http://wordpress.org/plugins/"
-"woocommerce-pdf-invoices-packing-slips/faq/\" target=\"_blank\">FAQ</a> voor "
-"instructies om de weergave van het factuurnummer aan te passen."
+"gevolg hebben!"
 
-#: includes/class-wcpdf-settings.php:390
+#: includes/class-wcpdf-settings.php:403
+msgid "Invoice number format"
+msgstr "Factuurnummer format"
+
+#: includes/class-wcpdf-settings.php:412
+msgid "Prefix"
+msgstr "Voorvoegsel"
+
+#: includes/class-wcpdf-settings.php:414
+msgid ""
+"to use the order year and/or month, use [order_year] or [order_month] "
+"respectively"
+msgstr ""
+"gebruik [order_year] of [order_month] om het order jaar en/of maand te weer "
+"te geven"
+
+#: includes/class-wcpdf-settings.php:417
+msgid "Suffix"
+msgstr "Achtervoegsel"
+
+#: includes/class-wcpdf-settings.php:422
+msgid "Padding"
+msgstr "Vulling"
+
+#: includes/class-wcpdf-settings.php:424
+msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
+msgstr ""
+"voer hier het aantal cijfers in - vul hier \"6\" in om 42 als 000042 weer te "
+"geven"
+
+#: includes/class-wcpdf-settings.php:427
+msgid ""
+"note: if you have already created a custom invoice number format with a "
+"filter, the above settings will be ignored"
+msgstr ""
+"let op: als je al een format voor een factuurnummer hebt gemaakt met een "
+"filter, worden de bovenstaande instellingen genegeerd"
+
+#: includes/class-wcpdf-settings.php:435
 msgid "Date to display on invoice"
 msgstr "Datum op de factuur"
 
-#: includes/class-wcpdf-settings.php:398
+#: includes/class-wcpdf-settings.php:443
 msgid "Order date"
 msgstr "Orderdatum"
 
-#: includes/class-wcpdf-settings.php:399
+#: includes/class-wcpdf-settings.php:444
 msgid "Invoice date"
 msgstr "Factuurdatum"
 
-#: includes/class-wcpdf-settings.php:407
+#: includes/class-wcpdf-settings.php:452
 msgid "Extra template fields"
 msgstr "Extra templatevelden"
 
-#: includes/class-wcpdf-settings.php:414
+#: includes/class-wcpdf-settings.php:459
 msgid "Extra field 1"
 msgstr "Extra veld 1"
 
-#: includes/class-wcpdf-settings.php:423
+#: includes/class-wcpdf-settings.php:468
 msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
 msgstr "Dit is voettekst kolom 1 in het <i>Modern (Premium)</i> template"
 
-#: includes/class-wcpdf-settings.php:429
+#: includes/class-wcpdf-settings.php:474
 msgid "Extra field 2"
 msgstr "Extra veld 2"
 
-#: includes/class-wcpdf-settings.php:438
+#: includes/class-wcpdf-settings.php:483
 msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
 msgstr "Dit is voettekst kolom 2 in het <i>Modern (Premium)</i> template"
 
-#: includes/class-wcpdf-settings.php:444
+#: includes/class-wcpdf-settings.php:489
 msgid "Extra field 3"
 msgstr "Extra veld 3"
 
-#: includes/class-wcpdf-settings.php:453
+#: includes/class-wcpdf-settings.php:498
 msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
 msgstr "Dit is voettekst kolom 3 in het <i>Modern (Premium)</i> template"
 
-#: includes/class-wcpdf-settings.php:710
+#: includes/class-wcpdf-settings.php:755
 msgid "Image resolution"
 msgstr "Afbeeldings resolutie"
 
-#: includes/class-wcpdf-settings.php:740
+#: includes/class-wcpdf-settings.php:822
 msgid ""
 "These are used for the (optional) footer columns in the <em>Modern "
 "(Premium)</em> template, but can also be used for other elements in your "
@@ -316,7 +351,7 @@ msgstr "PDF Pakbon"
 msgid "PDF Packing Slips"
 msgstr "PDF Pakbonnen"
 
-#: includes/class-wcpdf-writepanels.php:187
+#: includes/class-wcpdf-writepanels.php:189
 msgid "PDF Invoice Number (unformatted!)"
 msgstr "PDF Factuurnummer (zonder formatting!)"
 
@@ -381,7 +416,7 @@ msgstr "SKU:"
 msgid "Weight:"
 msgstr "Gewicht:"
 
-#: templates/pdf/Simple/invoice.php:114
+#: templates/pdf/Simple/invoice.php:113
 #: templates/pdf/Simple/packing-slip.php:69
 msgid "Customer Notes"
 msgstr "Opmerking klant:"
@@ -416,21 +451,30 @@ msgstr "Subtotaal"
 msgid "Shipping"
 msgstr "Verzendkosten"
 
-#: woocommerce-pdf-invoices-packingslips.php:401
+#: woocommerce-pdf-invoices-packingslips.php:416
 msgid "Discount"
 msgstr "Korting"
 
-#: woocommerce-pdf-invoices-packingslips.php:439
+#: woocommerce-pdf-invoices-packingslips.php:455
 msgid "VAT"
 msgstr "BTW"
 
-#: woocommerce-pdf-invoices-packingslips.php:471
+#: woocommerce-pdf-invoices-packingslips.php:487
 msgid "Total ex. VAT"
 msgstr "Totaal excl. BTW"
 
-#: woocommerce-pdf-invoices-packingslips.php:474
+#: woocommerce-pdf-invoices-packingslips.php:490
 msgid "Total"
 msgstr "Totaal"
+
+#~ msgid ""
+#~ "Your WP Memory Limit is currently set to %s - We recommend setting it to "
+#~ "at least 64MB (128MB for optimal performance). See: <a href=\"%s"
+#~ "\">Increasing memory allocated to PHP</a>"
+#~ msgstr ""
+#~ "Uw WordPress geheugenlimiet is momenteel ingesteld op %s - We adviseren "
+#~ "om deze in te stellen op tenminste 64MB (128MB voor de beste "
+#~ "performance). Zie: <a href=\"%s\">Increasing memory allocated to PHP</a>"
 
 #~ msgid "Email invoice (attach to order confirmation or invoice email)"
 #~ msgstr ""
