@@ -356,9 +356,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$order_month = date_i18n( 'm', strtotime( $order_date ) );
 
 			
-			$formats['prefix'] = $this->template_settings['invoice_number_formatting_prefix'];
-			$formats['suffix'] = $this->template_settings['invoice_number_formatting_suffix'];
-			$formats['padding'] = $this->template_settings['invoice_number_formatting_padding'];
+			$formats['prefix'] = isset($this->template_settings['invoice_number_formatting_prefix'])?$this->template_settings['invoice_number_formatting_prefix']:'';
+			$formats['suffix'] = isset($this->template_settings['invoice_number_formatting_suffix'])?$this->template_settings['invoice_number_formatting_suffix']:'';
+			$formats['padding'] = isset($this->template_settings['invoice_number_formatting_padding'])?$this->template_settings['invoice_number_formatting_padding']:'';
 
 			// Replacements
 			foreach ($formats as $key => $value) {
