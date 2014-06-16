@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 3.9.1 and WooCommerce 2.1
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,16 +14,18 @@ Create, print & automatically email PDF invoices & packing slips for WooCommerce
 This WooCommerce extension automatically adds a PDF invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
-* Export invoices or packing slips to PDF (individually or in bulk)
 * Automatically attach invoice PDF to order confirmation email
+* Download the PDF invoice / packing slip from the order admin page
+* Generate bulk PDF invoices / packings slips
+* **Fully customizable** HTML/CSS invoice templates
 * Users can download their invoices from the My Account page
-* Sequential invoice numbers (fully customizable with filters, see the [FAQ](http://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/faq/))
-* **Available in: Czech, Dutch, English, French, German, Hungarian, Italian, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
+* Sequential invoice numbers - with custom formatting
+* **Available in: Czech, Dutch, English, French, German, Hungarian, Italian, Polish, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
 
 Upload all invoices automatically to dropbox with our [WooCommerce PDF Invoices & Packing Slips to Dropbox](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/) extension!
 
 = Fully customizable =
-In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS based templates that allow for customization & full control over the PDF output.
+In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS based templates that allow for customization & full control over the PDF output. Copy the templates to your theme folder and you don't have to worry that your customizations will be overwritten when you update the plugin.
 
 * Insert customer header image/logo
 * Modify shop data / footer / disclaimer etc. on the invoices & packing slips
@@ -157,6 +159,10 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.4.1 =
+* Translations: Added Polish (Thanks Mike!)
+* Fix: Invoice number formatting notices in debug mode
 
 = 1.4.0 =
 * NEW Feature: Invoice numbers can now be given a prefix, suffix or padding on the settings page!
