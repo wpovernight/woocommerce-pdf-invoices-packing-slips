@@ -1,0 +1,504 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
+"POT-Creation-Date: 2014-05-12 22:15+0100\n"
+"PO-Revision-Date: 2014-05-17 11:38+0100\n"
+"Last-Translator: Michał Dybczak <michal.dybczak@gmail.com>\n"
+"Language-Team: WP Overnight <support@wpovernight.com>\n"
+"Language: pl_PL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.5\n"
+"X-Poedit-Basepath: ../\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/class-wcpdf-export.php:151 includes/class-wcpdf-export.php:156
+#: includes/class-wcpdf-export.php:161 includes/class-wcpdf-export.php:172
+#: includes/class-wcpdf-export.php:185
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Nie masz wystarczającyh praw dostępu do tej strony."
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:206 includes/class-wcpdf-export.php:285
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "Zamówienie"
+msgstr[1] "Zamówienia"
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:208
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "Dowód wysyłki"
+msgstr[1] "Dowody wysyłki"
+
+#: includes/class-wcpdf-settings.php:36 includes/class-wcpdf-settings.php:37
+#: includes/class-wcpdf-writepanels.php:173
+#: includes/class-wcpdf-writepanels.php:174
+msgid "PDF Invoices"
+msgstr "Zamówienie do PDF"
+
+#: includes/class-wcpdf-settings.php:60
+msgid "Settings"
+msgstr "Ustawienia"
+
+#: includes/class-wcpdf-settings.php:82
+msgid "General"
+msgstr "Ogólne"
+
+#: includes/class-wcpdf-settings.php:83
+msgid "Template"
+msgstr "Szablon"
+
+#: includes/class-wcpdf-settings.php:92
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce Zmówienie PDF"
+
+#: includes/class-wcpdf-settings.php:98
+msgid "Status"
+msgstr "Status"
+
+#: includes/class-wcpdf-settings.php:109
+#, php-format
+msgid ""
+"Upload all invoices automatically to your dropbox!<br/>Check out the %s "
+"extension."
+msgstr ""
+"Załaduj wszystkie zamówienia PDF automatycznie do twojego dropbox'a! <br/> "
+"Sprawdź wtyczkę %s."
+
+#: includes/class-wcpdf-settings.php:119
+#, php-format
+msgid ""
+"Looking for more advanced templates? Check out the Premium PDF Invoice & "
+"Packing Slips templates at %s."
+msgstr ""
+"Szukasz bardziej zaawansowanych szablonów? Odwiedź Premium PDF Invoice & "
+"Packing Slips Templates na  %s."
+
+#: includes/class-wcpdf-settings.php:120
+#, php-format
+msgid "For custom templates, contact us at %s."
+msgstr "Jeśli potrzebujesz własnych szablonów, skantaktuj się z nami na  %s."
+
+#: includes/class-wcpdf-settings.php:175
+msgid "General settings"
+msgstr "Ustawienia ogólne"
+
+#: includes/class-wcpdf-settings.php:182
+msgid "How do you want to view the PDF?"
+msgstr "Jak ma być pokazany PDF?"
+
+#: includes/class-wcpdf-settings.php:190
+msgid "Download the PDF"
+msgstr "Ściągnij PDF"
+
+#: includes/class-wcpdf-settings.php:191
+msgid "Open the PDF in a new browser tab/window"
+msgstr "PDF w nowej zakładce/okienku przeglądarki"
+
+#: includes/class-wcpdf-settings.php:201
+msgid "Attach invoice to:"
+msgstr "Dołacz zamówienie do:"
+
+#: includes/class-wcpdf-settings.php:209
+msgid "Admin New Order email"
+msgstr "Email do administratora o nowym zamówieniu"
+
+#: includes/class-wcpdf-settings.php:210
+msgid "Customer Processing Order email"
+msgstr "Email do klienta o przetwarzaniu zamówienia"
+
+#: includes/class-wcpdf-settings.php:211
+msgid "Customer Completed Order email"
+msgstr "Email do klienta o zakończeniu zamówienia"
+
+#: includes/class-wcpdf-settings.php:212
+msgid "Customer Invoice email"
+msgstr "Email z zamówieniem dla klienta"
+
+#: includes/class-wcpdf-settings.php:214
+#, php-format
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+"Folder tymczasowy (<code>%s</code>) nie może być zapisany, proszę sprawdzić "
+"atrybuty tego folderu. Bez prawa do zapisu E-Maile czy zamówienia nie mogą "
+"być wysłane."
+
+#: includes/class-wcpdf-settings.php:220
+msgid "Enable invoice number column in the orders list"
+msgstr "Włącz numer zamówień w kolumnie zamówień"
+
+#: includes/class-wcpdf-settings.php:259
+msgid "PDF Template settings"
+msgstr "Ustawienia szablonu PDF"
+
+#: includes/class-wcpdf-settings.php:266
+msgid "Choose a template"
+msgstr "Wybierz szablon"
+
+#: includes/class-wcpdf-settings.php:274
+msgid ""
+"Want to use your own template? Copy all the files from <code>woocommerce-pdf-"
+"invoices-packing-slips/templates/pdf/Simple/</code> to <code>yourtheme/"
+"woocommerce/pdf/yourtemplate/</code> to customize them"
+msgstr ""
+"Chcesz użyć własnego szablonu? Skopiuj wszystkie pliki z <code>woocommerce-"
+"pdf-invoices-packing-slips/templates/pdf/Simple/</code> do "
+"<code>twój_szablon_strony/woocommerce/pdf/twój_szablon_PDF/</code> i dopasuj "
+"je."
+
+#: includes/class-wcpdf-settings.php:280
+msgid "Paper size"
+msgstr "Rozmiar wydruku"
+
+#: includes/class-wcpdf-settings.php:288
+msgid "A4"
+msgstr "A4"
+
+#: includes/class-wcpdf-settings.php:289
+msgid "Letter"
+msgstr "List"
+
+#: includes/class-wcpdf-settings.php:296
+msgid "Shop header/logo"
+msgstr "Logo/nagłówek"
+
+#: includes/class-wcpdf-settings.php:303
+msgid "Select or upload your invoice header/logo"
+msgstr "Wybierz albo załaduj logo/nagłówek zamówienia"
+
+#: includes/class-wcpdf-settings.php:304
+msgid "Set image"
+msgstr "Wybierz obraz"
+
+#: includes/class-wcpdf-settings.php:305
+msgid "Remove image"
+msgstr "Usuń logo"
+
+#: includes/class-wcpdf-settings.php:312
+msgid "Shop Name"
+msgstr "Nazwa sklepu"
+
+#: includes/class-wcpdf-settings.php:325
+msgid "Shop Address"
+msgstr "Adres sklepu"
+
+#: includes/class-wcpdf-settings.php:357
+msgid "Footer: terms & conditions, policies, etc."
+msgstr "Stopka: ogólne postanowienia, itp."
+
+#: includes/class-wcpdf-settings.php:372
+msgid "Number to display on invoice"
+msgstr "Numer wyświetlany na zamówieniu"
+
+#: includes/class-wcpdf-settings.php:380
+msgid "WooCommerce order number"
+msgstr "Numer zamówienia WooCommerce"
+
+#: includes/class-wcpdf-settings.php:381
+msgid "Built-in sequential invoice number"
+msgstr "Wbudowany mechanizm nadawania numerów zamówieniom"
+
+#: includes/class-wcpdf-settings.php:383
+msgid ""
+"If you are using the WooCommerce Sequential Order Numbers plugin, select the "
+"WooCommerce order number"
+msgstr ""
+"Jeśli używasz WooCommerce Sequential Order Numbers plugin, wybierz numer "
+"zamówienia WooCommerce"
+
+#: includes/class-wcpdf-settings.php:389
+msgid "Next invoice number (without prefix/suffix etc.)"
+msgstr "Następny numer zamówienia (bez prefiksu/sufiksu itd.)"
+
+#: includes/class-wcpdf-settings.php:397
+msgid ""
+"This is the number that will be used on the next invoice that is created. By "
+"default, numbering starts from the WooCommerce Order Number of the first "
+"invoice that is created and increases for every new invoice. Note that if "
+"you override this and set it lower than the highest (PDF) invoice number, "
+"this could create double invoice numbers!"
+msgstr ""
+"To jest numer, który będzie użyty na następnym zamówieniu. Domyślnie numer "
+"startowy jest brany z zamówienia pierwszego zamówienia WooCommerce i który "
+"zwiększa się z każdym nowym zamówieniam. Zwróć uwagę, że jeśli nadpiszesz to "
+"i usawisz numer niższy niż najwyższy numer zamówienia (PDF), to może "
+"zdublować numery zamówień!"
+
+#: includes/class-wcpdf-settings.php:403
+msgid "Invoice number format"
+msgstr "Format zamówienia"
+
+# Jakie dokumenty należy dołączać do zamówień wysyłanych do klientów sklepu internetowego?
+# Zgodnie z art. 9 ust. 3 ustawy z dnia 2 marca 2000 r. o ochronie niektórych praw konsumentów sklep internetowy zobowiązany jest do potwierdzenia konsumentowi na piśmie, najpóźniej w momencie rozpoczęcia spełniania świadczenia, informacji o:
+# 1) imieniu i nazwisku (nazwie), adresie zamieszkania (siedziby) przedsiębiorcy oraz organie, który zarejestrował działalność gospodarczą przedsiębiorcy, a także numerze, pod którym przedsiębiorca został zarejestrowany;
+# 2) istotnych właściwościach świadczenia i jego przedmiotu;
+# 3) cenie lub wynagrodzeniu obejmujących wszystkie ich składniki, a w szczególności cła i podatki;
+# 4) zasadach zapłaty ceny lub wynagrodzenia;
+# 5) kosztach oraz terminie i sposobie dostawy;
+# 6) prawie odstąpienia od umowy w terminie 10 dni, ze wskazaniem wyjątków, o których mowa w art. 10 ust. 3 ww. ustawy;
+# 7) kosztach wynikających z korzystania ze środków porozumiewania się na odległość, jeżeli są one skalkulowane inaczej niż wedle normalnej taryfy;
+# 8) terminie, w jakim oferta lub informacja o cenie albo wynagrodzeniu mają charakter wiążący;
+# 9) minimalnym okresie, na jaki ma być zawarta umowa o świadczenia ciągłe lub okresowe;
+# 10) miejscu i sposobie składania reklamacji;
+# 11) prawie wypowiedzenia umowy, o którym mowa w art. 8 ust. 3 ww. ustawy. Ponadto, w przesyłce powinno znajdować się potwierdzenie zakupu (faktura lub paragon), stosownie do ustaleń w zamówieniu.
+# Zmiany, jakie wniesie Dyrektywa o prawach konsumentów, która zostanie wprowadzona 13 czerwca 2014 r.
+# *) Zgodnie z art. 8 ust. 1 dyrektywy 2011/83 przedsiębiorca udziela informacji przewidzianych w art. 6 ust. 1 ww. dyrektywy lub udostępnia te informacje konsumentowi w sposób odpowiadający wykorzystywanym środkom porozumiewania się na odległość, w prostym i zrozumiałym języku. Jeżeli informacje te dostarczane są na trwałym nośniku, muszą być czytelne. Dotyczy to następujących informacji:
+# a) główne cechy towarów lub usług w zakresie, w jakim jest to właściwe dla danego środka przekazu oraz dla towarów lub usług;
+# b) dane identyfikujące przedsiębiorcę, na przykład firma przedsiębiorcy;
+# c) pełny adres pocztowy, pod którym przedsiębiorca prowadzi przedsiębiorstwo, numer telefonu i faksu przedsiębiorcy oraz jego adres e-mail, o ile jest dostępny, aby umożliwić konsumentowi szybkie skontaktowanie się z przedsiębiorcą i skuteczne porozumiewanie się z nim oraz, w przypadku gdy ma to zastosowanie, pełny adres pocztowy i dane identyfikujące przedsiębiorcę, w imieniu którego działa;
+# d) pełny adres pocztowy miejsca prowadzenia działalności przedsiębiorcy, jeżeli różni się od adresu podanego zgodnie z lit. c), a w przypadku gdy ma to zastosowanie – pełny adres pocztowy przedsiębiorcy, w imieniu którego działa, pod który to adres konsument może kierować wszelkie reklamacje;
+# e) łączna cena towarów lub usług wraz z podatkami lub, w przypadku gdy charakter towarów lub usług nie pozwala w sposób racjonalny na wcześniejsze obliczenie ceny – sposób, w jaki ma być obliczana cena, jak również, w przypadku gdy ma to zastosowanie, wszystkie dodatkowe opłaty za transport, dostarczenie lub usługi pocztowe lub jakiekolwiek inne koszty lub, w przypadku gdy nie można wcześniej w sposób racjonalny obliczyć tych opłat – informacja o możliwości powstania konieczności uiszczenia takich dodatkowych opłat, w przypadku umowy zawartej na czas nieoznaczony lub umowy obejmującej prenumeratę łączna cena zawiera łączne koszty na dany okres objęty rozliczeniem; w przypadku gdy takie umowy przewidują stałą stawkę, łączna cena oznacza również łączne miesięczne koszty; w przypadku gdy nie można wcześniej w sposób racjonalny obliczyć łącznych kosztów, przedstawia się sposób, w jaki cena ma być obliczana;
+# f) koszt korzystania ze środka porozumiewania się na odległość w celu zawarcia umowy, w przypadku gdy koszt ten jest obliczany w sposób inny niż na podstawie taryfy podstawowej;
+# g) warunki płatności, dostarczenia, wykonania, termin, w jakim przedsiębiorca zobowiązuje się do dostarczenia towarów lub świadczenia usług oraz, w przypadku gdy ma to zastosowanie, stosowane przez przedsiębiorcę procedury rozpatrywania reklamacji;
+# h) w przypadku gdy istnieje prawo do odstąpienia od umowy – warunki, terminy oraz procedury korzystania z tego prawa zgodnie z art. 11 ust. 1, a także wzór formularza odstąpienia od umowy zawarty w załączniku I część B;
+# i) w przypadku gdy ma to zastosowanie – informacja, że konsument będzie musiał ponieść koszty zwrotu towarów, jeśli odstąpi od umowy, oraz – w odniesieniu do umów zawieranych na odległość, koszty zwrotu towarów, jeżeli towary ze względu na swój charakter nie mogą zostać w zwykłym trybie odesłane pocztą;
+# j) informacja, że – jeśli konsument wykona prawo do odstąpienia od umowy po zgłoszeniu żądania zgodnie z art. 7 ust. 3 lub art. 8 ust. 8, jest zobowiązany do zapłacenia przedsiębiorcy uzasadnionych kosztów zgodnie z art. 14 ust. 3;
+# k) w przypadku gdy prawo do odstąpienia od umowy nie jest przewidziane zgodnie z art. 16 – informacja, że konsument nie będzie miał prawa do odstąpienia od umowy lub, w przypadku gdy ma to zastosowanie, okoliczności, w których konsument traci swoje prawo do odstąpienia od umowy;
+# l) przypomnienie o istnieniu prawnego obowiązku zapewnienia zgodności towarów z umową;
+# m) w przypadku gdy ma to zastosowanie – istnienie i warunki obsługi posprzedażnej konsumenta i usług posprzedażnych oraz gwarancji handlowej;
+# n) istnienie stosownych kodeksów postępowania zdefiniowanych w art. 2 lit. f) dyrektywy 2005/29/WE oraz, w przypadku gdy ma to zastosowanie – informacja, w jaki sposób można uzyskać egzemplarze tych kodeksów;
+# o) w przypadku gdy ma to zastosowanie – czas trwania umowy lub, jeżeli umowa jest zawarta na czas nieoznaczony lub jeśli ma ulegać automatycznemu przedłużeniu, warunki rozwiązania umowy;
+# p) w przypadku gdy ma to zastosowanie – minimalny czas trwania zobowiązań konsumenta wynikających z umowy;
+# q) w przypadku gdy ma to zastosowanie – istnienie oraz warunki kaucji lub innych gwarancji finansowych, które mają być wpłacone lub dostarczone przez konsumenta na żądanie przedsiębiorcy;
+# r) w przypadku gdy ma to zastosowanie – funkcjonalność treści cyfrowych, w tym również mające zastosowanie techniczne środki ich ochrony;
+# s) w przypadku gdy ma to zastosowanie – każda mająca znaczenie interoperacyjność treści cyfrowych ze sprzętem komputerowym i oprogramowaniem, o którym przedsiębiorca wie lub, racjonalnie oczekując, powinien był wiedzieć;
+# t) w przypadku gdy ma to zastosowanie – możliwość skorzystania z pozasądowych mechanizmów rozpatrywania reklamacji i dochodzenia roszczeń, którym podlega przedsiębiorca, oraz możliwości dostępu do tych procedur.
+#: includes/class-wcpdf-settings.php:412
+msgid "Prefix"
+msgstr "Prefiks"
+
+#: includes/class-wcpdf-settings.php:414
+msgid ""
+"to use the order year and/or month, use [order_year] or [order_month] "
+"respectively"
+msgstr ""
+"żeby użyć roku i/albo miesiąca zamówienia, użyj odpowiednio [order_year] "
+"albo [order_month]"
+
+#: includes/class-wcpdf-settings.php:417
+msgid "Suffix"
+msgstr "Sufiks"
+
+#: includes/class-wcpdf-settings.php:422
+msgid "Padding"
+msgstr "Padding"
+
+#: includes/class-wcpdf-settings.php:424
+msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
+msgstr "wpisz tutaj liczbę cyfr - wpisz \"6\" żeby wyświetlić 42 jako 000042"
+
+#: includes/class-wcpdf-settings.php:427
+msgid ""
+"note: if you have already created a custom invoice number format with a "
+"filter, the above settings will be ignored"
+msgstr ""
+"Uwaga: Jeśli już stworzyłeś własny format zamówienia z filtrem, powyższe "
+"ustawienia będą zignorowane."
+
+#: includes/class-wcpdf-settings.php:435
+msgid "Date to display on invoice"
+msgstr "Data wyświetlana na zamówieniu"
+
+#: includes/class-wcpdf-settings.php:443
+msgid "Order date"
+msgstr "Data zamówienia"
+
+#: includes/class-wcpdf-settings.php:444
+msgid "Invoice date"
+msgstr "Data rachunku"
+
+#: includes/class-wcpdf-settings.php:452
+msgid "Extra template fields"
+msgstr "Dodatkowe pola szablonu"
+
+#: includes/class-wcpdf-settings.php:459
+msgid "Extra field 1"
+msgstr "Dodatkowe pole 1"
+
+#: includes/class-wcpdf-settings.php:468
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr "To jest kolumna 1 w szablonie <i>Modern (Premium)</i>"
+
+#: includes/class-wcpdf-settings.php:474
+msgid "Extra field 2"
+msgstr "Dodatkowe pole 2"
+
+#: includes/class-wcpdf-settings.php:483
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr "To jest kolumna 2 w szablonie <i>Modern (Premium)</i>"
+
+#: includes/class-wcpdf-settings.php:489
+msgid "Extra field 3"
+msgstr "Dodatkowe pole 3"
+
+#: includes/class-wcpdf-settings.php:498
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr "To jest kolumna 3 w szablonie <i>Modern (Premium)</i>"
+
+#: includes/class-wcpdf-settings.php:755
+msgid "Image resolution"
+msgstr "Rozdzielczość obrazka"
+
+#: includes/class-wcpdf-settings.php:822
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
+msgstr ""
+"Te pola zostaną użyte (opcjonalnie) dla stopki szaplonu <em>Modern "
+"(Premium)</em>,mogą jedna być też użyte dla innych elementów własnego "
+"szablonu."
+
+#: includes/class-wcpdf-writepanels.php:102
+msgid "Invoice Number"
+msgstr "Numer zamówienia"
+
+#: includes/class-wcpdf-writepanels.php:133
+msgid "Create PDF"
+msgstr "Stwórz PDF"
+
+#: includes/class-wcpdf-writepanels.php:143
+msgid "Download invoice (PDF)"
+msgstr "Podsumowanie zamówienia (PDF)"
+
+#: includes/class-wcpdf-writepanels.php:157
+msgid "PDF invoice"
+msgstr "PDF Zamówienie"
+
+#: includes/class-wcpdf-writepanels.php:158
+msgid "PDF Packing Slip"
+msgstr "PDF Zawartość paczki"
+
+#: includes/class-wcpdf-writepanels.php:175
+#: includes/class-wcpdf-writepanels.php:176
+msgid "PDF Packing Slips"
+msgstr "PDF Zawartość paczek"
+
+#: includes/class-wcpdf-writepanels.php:189
+msgid "PDF Invoice Number (unformatted!)"
+msgstr "Numer zamówienia PDF (niesformatowany)"
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
+msgid "Invoice"
+msgstr "Podsumowanie zamówienia:"
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+msgid "Packing Slip"
+msgstr "Zawartość paczki"
+
+#: templates/pdf/Simple/invoice.php:37
+msgid "Invoice Date:"
+msgstr "Data rachunku:"
+
+#: templates/pdf/Simple/invoice.php:40
+#: templates/pdf/Simple/packing-slip.php:30
+msgid "Order Date:"
+msgstr "Data zamówienia:"
+
+#: templates/pdf/Simple/invoice.php:46
+msgid "Invoice Number:"
+msgstr "Zamówienie nr:"
+
+#: templates/pdf/Simple/invoice.php:49
+#: templates/pdf/Simple/packing-slip.php:32
+msgid "Order Number:"
+msgstr "Zamówienie nr:"
+
+#: templates/pdf/Simple/invoice.php:56
+msgid "Payment Method:"
+msgstr "Metoda płatności:"
+
+#: templates/pdf/Simple/invoice.php:69
+#: templates/pdf/Simple/packing-slip.php:45
+msgid "Product"
+msgstr "Produkt"
+
+#: templates/pdf/Simple/invoice.php:70
+#: templates/pdf/Simple/packing-slip.php:46
+msgid "Quantity"
+msgstr "Ilość"
+
+#: templates/pdf/Simple/invoice.php:71
+msgid "Price"
+msgstr "Cena"
+
+#: templates/pdf/Simple/invoice.php:77
+msgid "Description"
+msgstr "Opis"
+
+#: templates/pdf/Simple/invoice.php:80
+#: templates/pdf/Simple/packing-slip.php:54
+msgid "SKU:"
+msgstr "Kod:"
+
+#: templates/pdf/Simple/invoice.php:81
+#: templates/pdf/Simple/packing-slip.php:55
+msgid "Weight:"
+msgstr "Waga:"
+
+#: templates/pdf/Simple/invoice.php:113
+#: templates/pdf/Simple/packing-slip.php:69
+msgid "Customer Notes"
+msgstr "Notatki dla klienta"
+
+#: woocommerce-pdf-invoices-packingslips.php:96
+#, php-format
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
+"installed & activated!"
+msgstr "WooCommerce PDF Invoices & Packing Slips potrzebuje %sWooCommerce%s !"
+
+#: woocommerce-pdf-invoices-packingslips.php:191
+#: woocommerce-pdf-invoices-packingslips.php:227
+msgid "N/A"
+msgstr "nie dotyczy"
+
+#: woocommerce-pdf-invoices-packingslips.php:249
+msgid "Payment method"
+msgstr "Metoda płatności"
+
+#: woocommerce-pdf-invoices-packingslips.php:260
+msgid "Shipping method"
+msgstr "Rodzaj wysyłki"
+
+#: woocommerce-pdf-invoices-packingslips.php:360
+msgid "Subtotal"
+msgstr "Suma produktów"
+
+#: woocommerce-pdf-invoices-packingslips.php:382
+msgid "Shipping"
+msgstr "Wysyłka"
+
+#: woocommerce-pdf-invoices-packingslips.php:416
+msgid "Discount"
+msgstr "Rabat"
+
+#: woocommerce-pdf-invoices-packingslips.php:455
+msgid "VAT"
+msgstr "VAT"
+
+#: woocommerce-pdf-invoices-packingslips.php:487
+msgid "Total ex. VAT"
+msgstr "Suma bez Vat (netto)"
+
+#: woocommerce-pdf-invoices-packingslips.php:490
+msgid "Total"
+msgstr "Suma"
+
+#~ msgid "..."
+#~ msgstr "..."
+
+#~ msgid "Email invoice (attach to order confirmation or invoice email)"
+#~ msgstr "Email-Rechnung (als Anhang zur Bestätigungsmail)"
