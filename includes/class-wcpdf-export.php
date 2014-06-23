@@ -438,10 +438,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$data['quantity'] = $item['qty'];
 
 					// Set the line total (=after discount)
+					$quantity_divider = ( $item['qty'] == 0 ) ? 1 : $item['qty']; // prevent division by zero
 					$data['line_total'] = $this->wc_price( $item['line_total'] );
-					$data['single_line_total'] = $this->wc_price( $item['line_total'] / $item['qty'] );
+					$data['single_line_total'] = $this->wc_price( $item['line_total'] / $quantity_divider );
 					$data['line_tax'] = $this->wc_price( $item['line_tax'] );
-					$data['single_line_tax'] = $this->wc_price( $item['line_tax'] / $item['qty'] );
+					$data['single_line_tax'] = $this->wc_price( $item['line_tax'] / $quantity_divider );
 					$data['tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'] );
 					
 					// Set the line subtotal (=before discount)
@@ -518,7 +519,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function get_formatted_item_price ( $item, $type, $tax_display = '' ) {
 			$item_price = 0;
-			$divider = ($type == 'single')?$item['qty']:1; //divide by 1 if $type is not 'single' (thus 'total')
+			$divider = ($type == 'single' && $item['qty'] != 0 )?$item['qty']:1; //divide by 1 if $type is not 'single' (thus 'total')
 
 			if ( ! isset( $item['line_subtotal'] ) || ! isset( $item['line_subtotal_tax'] ) ) 
 				return;
