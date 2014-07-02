@@ -137,7 +137,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id . '&my-account'), 'generate_wpo_wcpdf' );
 
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
-			if (get_post_meta($order->id,'_wcpdf_invoice_exists',true) || get_post_meta($order->id,'_wcpdf_invoice_number',true) || in_array($order->status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+			if ( get_post_meta($order->id,'_wcpdf_invoice_exists',true) || in_array($order->status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
 				$actions['invoice'] = array(
 					'url'  => $pdf_url,
 					'name' => __( 'Download invoice (PDF)', 'wpo_wcpdf' )

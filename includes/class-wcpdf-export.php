@@ -60,7 +60,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 
 				// Set the invoice number
-				$this->set_invoice_number( $order_id );
+				if ( $template_type == 'invoice' ) {
+					$this->set_invoice_number( $order_id );
+				}
 
 				$output_html[$order_id] = $this->get_template($template);
 
@@ -212,7 +214,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			if ( count($order_ids) > 1 ) {
 				$filename = $template_name . '-' . date('Y-m-d') . '.pdf'; // 'invoices-2020-11-11.pdf'
 			} else {
-				$display_number = $this->get_display_number( $order_ids[0] );
+				$this->order = new WC_Order ( $order_ids[0] );
+				$display_number = $template_type == 'invoice' ? $this->get_display_number( $order_ids[0] ) : ltrim($this->order->get_order_number(), '#');
 				$filename = $template_name . '-' . $display_number . '.pdf'; // 'packing-slip-123456.pdf'
 			}
 
