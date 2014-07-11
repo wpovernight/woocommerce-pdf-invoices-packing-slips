@@ -140,7 +140,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			if ( get_post_meta($order->id,'_wcpdf_invoice_exists',true) || in_array($order->status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
 				$actions['invoice'] = array(
 					'url'  => $pdf_url,
-					'name' => __( 'Download invoice (PDF)', 'wpo_wcpdf' )
+					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', __( 'Download invoice (PDF)', 'wpo_wcpdf' ) )
 				);				
 			}
 
