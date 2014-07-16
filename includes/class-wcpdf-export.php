@@ -116,7 +116,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$paper_size = apply_filters( 'wpo_wcpdf_paper_format', $this->template_settings['paper_size'], $template_type );
 			$paper_orientation = apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $template_type);
 
-			require_once( WooCommerce_PDF_Invoices::$plugin_path . "lib/dompdf/dompdf_config.inc.php" );  
+			if ( !class_exists('DOMPDF') ) {
+				// extra check to avoid clashes with other plugins using DOMPDF
+				// This could have unwanted side-effects when the version that's already
+				// loaded is different, and it could also miss fonts etc, but it's better
+				// than not checking...
+				require_once( WooCommerce_PDF_Invoices::$plugin_path . "lib/dompdf/dompdf_config.inc.php" );
+			}
+
 			$dompdf = new DOMPDF();
 			$dompdf->load_html($this->process_template( $template_type, $order_ids ));
 			$dompdf->set_paper( $paper_size, $paper_orientation );
