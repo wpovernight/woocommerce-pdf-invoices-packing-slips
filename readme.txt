@@ -86,7 +86,7 @@ Then place the following snippet where you would like the custom field to appear
 <?php $wpo_wcpdf->custom_field('custom_fieldname', 'Custom field:'); ?>
 `
 
-Where you replace 'custom_fieldname' with the name of the field you want to display, and 'Custom field' with the label. The plugin only displays the field when it contains data. If you also want to display the label when the field is empty, you can pass a third parameter, like thos:
+Where you replace 'custom_fieldname' with the name of the field you want to display, and 'Custom field' with the label. The plugin only displays the field when it contains data. If you also want to display the label when the field is empty, you can pass a third parameter (true), like this:
 
 `
 <?php $wpo_wcpdf->custom_field('custom_fieldname', 'Custom field:',  true); ?>
