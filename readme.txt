@@ -78,6 +78,20 @@ This plugin is translation ready, which means that you can translate it using st
 7. Enter the translations. invoice and packing-slip now have two translation fields, single & plural. Note that this is a filename, so replace spaces with a - just to be sure!
 8. Save as `wpo_wcpdf-xx_XX.po`, where you replace xx_XX with your language code & country code suffix (da_DK, pl_PL, de_DE etc.)
 
+= How can I display custom fields in the invoice or packing slip? =
+First, you need to create a custom template following instructions from the first item in this FAQ.
+Then place the following snippet where you would like the custom field to appear:
+
+`
+<?php $wpo_wcpdf->custom_field('custom_fieldname', 'Custom field:'); ?>
+`
+
+Where you replace 'custom_fieldname' with the name of the field you want to display, and 'Custom field' with the label. The plugin only displays the field when it contains data. If you also want to display the label when the field is empty, you can pass a third parameter, like thos:
+
+`
+<?php $wpo_wcpdf->custom_field('custom_fieldname', 'Custom field:',  true); ?>
+`
+
 = How do can I modify the pdf filename? =
 
 You can do this via a filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings).
