@@ -235,15 +235,15 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		/**
 		 * Return/Show a custom field
 		 */		
-		public function custom_field( $field_name, $field_label = '', $display_colon = true, $display_empty = false ) {
+		public function custom_field( $field_name, $field_label = '', $display_empty = false ) {
 			$custom_field = get_post_meta($this->export->order->id,$field_name,true);
 			if (!empty($field_label)){
-				// add a colon and/or a trailing space to the label
-				$field_label .= $display_colon ? ': ': ' ';
+				// add a a trailing space to the label
+				$field_label .= ' ';
 			}
 
-			if (!empty($custom_field) || $display_empty == true) {
-				echo $field_label . ' ' . $custom_field;
+			if (!empty($custom_field) || $display_empty) {
+				echo $field_label . $custom_field;
 			}
 		}
 	
