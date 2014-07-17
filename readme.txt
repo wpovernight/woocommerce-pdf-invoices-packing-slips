@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 3.9.1 and WooCommerce 2.1
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -173,6 +173,12 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.4.3 =
+* Feature: Added function to call custom fields more easily (see FAQ)
+* Feature: Change the my account button text via a filter (wpo_wcpdf_myaccount_button_text)
+* Translations: Added Danish (Thanks Mads!)
+* Tweak: only load PDF engine if it's not already loaded by another plugin
 
 = 1.4.2 =
 * Fix: Don't create invoice number when exporting packing slips
