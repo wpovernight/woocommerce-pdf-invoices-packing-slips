@@ -231,6 +231,21 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function shipping_address() {
 			echo $this->get_shipping_address();
 		}
+
+		/**
+		 * Return/Show a custom field
+		 */		
+		public function custom_field( $field_name, $field_label = '', $display_colon = true, $display_empty = false ) {
+			$custom_field = get_post_meta($this->export->order->id,$field_name,true);
+			if (!empty($field_label)){
+				// add a colon and/or a trailing space to the label
+				$field_label .= $display_colon ? ': ': ' ';
+			}
+
+			if (!empty($custom_field) || $display_empty == true) {
+				echo $field_label . ' ' . $custom_field;
+			}
+		}
 	
 		/**
 		 * Return/Show the current date
