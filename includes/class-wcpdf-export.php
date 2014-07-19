@@ -482,7 +482,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					// Checking fo existance, thanks to MDesigner0 
 					if(!empty($product)) {
 						// Set the thumbnail id
-						$data['thumbnail_id'] = $this->get_thumbnail_id( $product->id );
+						$data['thumbnail_id'] = $this->get_thumbnail_id( $product );
 
 						// Set the thumbnail server path
 						$data['thumbnail_path'] = get_attached_file( $data['thumbnail_id'] );
@@ -621,12 +621,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * @access public
 		 * @return string
 		 */
-		public function get_thumbnail_id ( $product_id ) {
+		public function get_thumbnail_id ( $product ) {
 			global $woocommerce;
 	
-			if ( has_post_thumbnail( $product_id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $product_id );
-			} elseif ( ( $parent_id = wp_get_post_parent_id( $product_id ) ) && has_post_thumbnail( $product_id ) ) {
+	    	if ( $product->variation_id && has_post_thumbnail( $product->variation_id ) ) {
+				$thumbnail_id = get_post_thumbnail_id ( $product->variation_id );
+			} elseif ( has_post_thumbnail( $product->id ) ) {
+				$thumbnail_id = get_post_thumbnail_id ( $product->id );
+			} elseif ( ( $parent_id = wp_get_post_parent_id( $product->id ) ) && has_post_thumbnail( $product->id ) ) {
 				$thumbnail_id = get_post_thumbnail_id ( $parent_id );
 			} else {
 				$thumbnail_id = $woocommerce->plugin_url() . '/assets/images/placeholder.png';
