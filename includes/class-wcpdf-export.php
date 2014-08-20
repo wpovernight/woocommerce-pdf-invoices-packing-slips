@@ -33,6 +33,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			$this->template_path = isset( $this->template_settings['template_path'] )?$this->template_settings['template_path']:'';
 
+			// backwards compatible template path (1.4.4+ uses relative paths instead of absolute)
+			if (strpos($this->template_path, ABSPATH) == false) {
+				// add site base path, double check it exists!
+				if ( file_exists( ABSPATH . $this->template_path ) ) {
+					$this->template_path = ABSPATH . $this->template_path;
+				}
+			}
+
 			add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ));
 			add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3);
 

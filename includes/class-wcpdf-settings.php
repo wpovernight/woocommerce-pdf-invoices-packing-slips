@@ -877,7 +877,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				
 				foreach ($dirs as $dir) {
 					if ( file_exists($dir."/invoice.php") && file_exists($dir."/packing-slip.php"))
-						$installed_templates[$dir] = basename($dir);
+						// we're stripping abspath to make the plugin settings more portable
+						$installed_templates[ str_replace( ABSPATH, '', $dir )] = basename($dir);
 				}
 			}
 
