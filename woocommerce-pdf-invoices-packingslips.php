@@ -243,7 +243,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			}
 
 			if (!empty($custom_field) || $display_empty) {
-				echo $field_label . $custom_field;
+				echo $field_label . nl2br ($custom_field);
 			}
 		}
 	
