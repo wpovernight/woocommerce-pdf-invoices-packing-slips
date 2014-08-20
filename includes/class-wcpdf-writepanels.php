@@ -18,7 +18,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
 			add_action( 'admin_print_scripts', array( $this, 'add_scripts' ) );
 			add_action( 'admin_print_styles', array( $this, 'add_styles' ) );
-			add_action( 'admin_footer-edit.php', array(&$this, 'bulk_actions') );
+			add_action( 'admin_footer', array(&$this, 'bulk_actions') );
 
 			add_action( 'woocommerce_admin_order_data_after_order_details', array(&$this, 'edit_invoice_number') );
 			add_action( 'save_post', array( &$this,'save_invoice_number' ) );
