@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-05-12 22:15+0100\n"
-"PO-Revision-Date: 2014-05-12 22:15+0100\n"
+"PO-Revision-Date: 2014-08-29 14:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: de_DE\n"
@@ -443,11 +443,11 @@ msgstr "Rabatt"
 
 #: woocommerce-pdf-invoices-packingslips.php:455
 msgid "VAT"
-msgstr "MwSt"
+msgstr "MwSt."
 
 #: woocommerce-pdf-invoices-packingslips.php:487
 msgid "Total ex. VAT"
-msgstr "Gesamtsumme ohne MwSt"
+msgstr "Gesamtsumme ohne MwSt."
 
 #: woocommerce-pdf-invoices-packingslips.php:490
 msgid "Total"
