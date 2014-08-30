@@ -468,11 +468,16 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_order_taxes() {
 			$tax_label = __( 'VAT', 'wpo_wcpdf' ); // register alternate label translation
+			$tax_rate_ids = $this->export->get_tax_rate_ids();
 			if ($this->export->order->get_taxes()) {
 				foreach ( $this->export->order->get_taxes() as $key => $tax ) {
 					$taxes[ $key ] = array(
-						'label' => isset( $tax[ 'label' ] ) ? $tax[ 'label' ] : $tax[ 'name' ],
-						'value'	=> woocommerce_price( ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] ) )
+						'label'					=> isset( $tax[ 'label' ] ) ? $tax[ 'label' ] : $tax[ 'name' ],
+						'value'					=> woocommerce_price( ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] ) ),
+						'rate_id'				=> $tax['rate_id'],
+						'tax_amount'			=> $tax['tax_amount'],
+						'shipping_tax_amount'	=> $tax['shipping_tax_amount'],
+						'rate'					=> isset( $tax_rate_ids[ $tax['rate_id'] ] ) ? (float) $tax_rate_ids[$tax['rate_id']]['tax_rate'] : '',
 					);
 				}
 				

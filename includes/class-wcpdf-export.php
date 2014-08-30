@@ -613,6 +613,37 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		/**
+		 * Returns the percentage rate (float) for a given tax rate ID.
+		 * @param  int    $rate_id  woocommerce tax rate id
+		 * @return float  $rate     percentage rate
+		 */
+		public function get_tax_rate_by_id( $rate_id ) {
+			global $wpdb;
+			$rate = $wpdb->get_var( $wpdb->prepare( "SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d;", $rate_id ) );
+			return (float) $rate;
+		}
+
+		/**
+		 * Returns a an array with rate_id => tax rate data (array) of all tax rates in woocommerce
+		 * @return array  $tax_rate_ids  keyed by id
+		 */
+		public function get_tax_rate_ids() {
+			global $wpdb;
+			$rates = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates" );
+
+			$tax_rate_ids = array();
+			foreach ($rates as $rate) {
+				// var_dump($rate->tax_rate_id);
+				// die($rate);
+				$rate_id = $rate->tax_rate_id;
+				unset($rate->tax_rate_id);
+				$tax_rate_ids[$rate_id] = (array) $rate;
+			}
+
+			return $tax_rate_ids;
+		}
+
+		/**
 		 * Get order custom field
 		 */
 		public function get_order_field( $field ) {
