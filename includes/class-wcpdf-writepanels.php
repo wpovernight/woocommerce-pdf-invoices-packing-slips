@@ -21,7 +21,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			add_action( 'admin_footer', array(&$this, 'bulk_actions') );
 
 			add_action( 'woocommerce_admin_order_data_after_order_details', array(&$this, 'edit_invoice_number') );
-			add_action( 'save_post', array( &$this,'save_invoice_number' ) );
+			add_action( 'save_post', array( &$this,'save_invoice_number_date' ) );
 
 			$this->general_settings = get_option('wpo_wcpdf_general_settings');
 			$this->template_settings = get_option('wpo_wcpdf_template_settings');
@@ -127,12 +127,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		}
 
 		/**
-		 * Add the meta box on the single order page
+		 * Display download link on My Account page
 		 */
-		public function add_box() {
-			add_meta_box( 'wpo_wcpdf-box', __( 'Create PDF', 'wpo_wcpdf' ), array( $this, 'create_box_content' ), 'shop_order', 'side', 'default' );
-		}
-
 		public function my_account_pdf_link( $actions, $order ) {
 			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id . '&my-account'), 'generate_wpo_wcpdf' );
 
@@ -145,6 +141,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			}
 
 			return $actions;
+		}
+
+		/**
+		 * Add the meta box on the single order page
+		 */
+		public function add_box() {
+			add_meta_box( 'wpo_wcpdf-box', __( 'Create PDF', 'wpo_wcpdf' ), array( $this, 'create_box_content' ), 'shop_order', 'side', 'default' );
 		}
 
 		/**
@@ -187,16 +190,30 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			$invoice_exists = get_post_meta( $order->id, '_wcpdf_invoice_exists', true );
 			if (!empty($invoice_exists)) {
 				woocommerce_wp_text_input( array( 'id' => '_wcpdf_invoice_number', 'label' => __( 'PDF Invoice Number (unformatted!)', 'wpo_wcpdf' ) ) );
+				$invoice_date = get_post_meta($order->id,'_wcpdf_invoice_date',true);
+				?>bla
+				<p class="form-field form-field-wide"><label for="wcpdf_invoice_date"><?php _e( 'Invoice date:', 'woocommerce' ) ?></label>
+					<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" value="<?php echo date_i18n( 'Y-m-d', strtotime( $invoice_date ) ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="text" class="hour" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" value="<?php echo date_i18n( 'H', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />:<input type="text" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" value="<?php echo date_i18n( 'i', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />
+				</p>
+				<?php				
 			}
 		}
 
 		/**
 		 * Save invoice number
 		 */
-		public function save_invoice_number($post_id) {
+		public function save_invoice_number_date($post_id) {
 			global $post_type;
-			if( $post_type == 'shop_order' && isset($_POST['_wcpdf_invoice_number'])) {
-				update_post_meta( $post_id, '_wcpdf_invoice_number', stripslashes( $_POST['_wcpdf_invoice_number'] ));
+			if( $post_type == 'shop_order' ) {
+				if ( isset($_POST['_wcpdf_invoice_number']) ) {
+					update_post_meta( $post_id, '_wcpdf_invoice_number', stripslashes( $_POST['_wcpdf_invoice_number'] ));
+				}
+				if ( isset($_POST['wcpdf_invoice_date']) ) {
+					$invoice_date = strtotime( $_POST['wcpdf_invoice_date'] . ' ' . (int) $_POST['wcpdf_invoice_date_hour'] . ':' . (int) $_POST['wcpdf_invoice_date_minute'] . ':00' );
+					$invoice_date = date_i18n( 'Y-m-d H:i:s', $invoice_date );
+					update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );				
+				}
+
 			}
 		}
 	}
