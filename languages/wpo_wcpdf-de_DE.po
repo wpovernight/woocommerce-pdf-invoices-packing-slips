@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-05-12 22:15+0100\n"
-"PO-Revision-Date: 2014-08-29 14:06+0100\n"
+"PO-Revision-Date: 2014-08-30 18:39+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: de_DE\n"
@@ -356,7 +356,7 @@ msgstr "Packliste"
 
 #: templates/pdf/Simple/invoice.php:37
 msgid "Invoice Date:"
-msgstr "Rechnungsdatum"
+msgstr "Rechnungsdatum:"
 
 #: templates/pdf/Simple/invoice.php:40
 #: templates/pdf/Simple/packing-slip.php:30
@@ -397,7 +397,7 @@ msgstr "Beschreibung"
 #: templates/pdf/Simple/invoice.php:80
 #: templates/pdf/Simple/packing-slip.php:54
 msgid "SKU:"
-msgstr "SKU:"
+msgstr "Art.-Nr.:"
 
 #: templates/pdf/Simple/invoice.php:81
 #: templates/pdf/Simple/packing-slip.php:55
