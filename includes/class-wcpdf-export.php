@@ -489,21 +489,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					
 					// Checking fo existance, thanks to MDesigner0 
 					if(!empty($product)) {
-						// Set the thumbnail id
+						// Set the thumbnail id DEPRICATED (does not support thumbnail sizes), use thumbnail_path or thumbnail instead
 						$data['thumbnail_id'] = $this->get_thumbnail_id( $product );
 
-						// Set the thumbnail server path
-						$data['thumbnail_path'] = get_attached_file( $data['thumbnail_id'] );
-
 						// Thumbnail (full img tag)
-						if (apply_filters('wpo_wcpdf_use_path', true)) {
-							// load img with server path by default
-							$data['thumbnail'] = sprintf('<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $data['thumbnail_path']);
-						} else {
-							// load img with http url when filtered
-							$data['thumbnail'] = $product->get_image( 'shop_thumbnail', array( 'title' => '' ) );
-						}
-						
+						$data['thumbnail'] = $this->get_thumbnail ( $product );
+
 						// Set the single price (turned off to use more consistent calculated price)
 						// $data['single_price'] = woocommerce_price ( $product->get_price() );
 										
@@ -661,21 +652,44 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * @return string
 		 */
 		public function get_thumbnail_id ( $product ) {
+			// DEPRICATED (does not support thumbnail sizes)
 			global $woocommerce;
-
-			$size = apply_filters( 'wpo_wcpdf_thumbnail_size', 'post-thumbnail' );
 	
 	    	if ( $product->variation_id && has_post_thumbnail( $product->variation_id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $product->variation_id, $size );
+				$thumbnail_id = get_post_thumbnail_id ( $product->variation_id );
 			} elseif ( has_post_thumbnail( $product->id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $product->id, $size );
+				$thumbnail_id = get_post_thumbnail_id ( $product->id );
 			} elseif ( ( $parent_id = wp_get_post_parent_id( $product->id ) ) && has_post_thumbnail( $parent_id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $parent_id, $size );
+				$thumbnail_id = get_post_thumbnail_id ( $parent_id );
 			} else {
 				$thumbnail_id = $woocommerce->plugin_url() . '/assets/images/placeholder.png';
 			}
 	
 			return $thumbnail_id;
+		}
+
+		public function get_thumbnail ( $product ) {
+			// Get default WooCommerce img tag (url/http)
+			$size = apply_filters( 'wpo_wcpdf_thumbnail_size', 'shop_thumbnail' );
+			$thumbnail_img_tag_url = $product->get_image( $size, array( 'title' => '' ) );
+			
+			// Extract the url from img
+			preg_match('/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
+			// convert url to path
+			$thumbnail_path = str_replace( get_site_url() . '/', ABSPATH, array_pop($thumbnail_url));
+
+			// Thumbnail (full img tag)
+			if (apply_filters('wpo_wcpdf_use_path', true)) {
+				// load img with server path by default
+				$thumbnail = sprintf('<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
+			} else {
+				// load img with http url when filtered
+				$thumbnail = $thumbnail_img_tag_url;
+			}
+
+			// die($thumbnail);
+
+			return $thumbnail;
 		}
 		
 	}
