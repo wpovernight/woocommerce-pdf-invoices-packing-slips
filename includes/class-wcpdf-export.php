@@ -662,13 +662,15 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function get_thumbnail_id ( $product ) {
 			global $woocommerce;
+
+			$size = apply_filters( 'wpo_wcpdf_thumbnail_size', 'post-thumbnail' );
 	
 	    	if ( $product->variation_id && has_post_thumbnail( $product->variation_id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $product->variation_id );
+				$thumbnail_id = get_post_thumbnail_id ( $product->variation_id, $size );
 			} elseif ( has_post_thumbnail( $product->id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $product->id );
-			} elseif ( ( $parent_id = wp_get_post_parent_id( $product->id ) ) && has_post_thumbnail( $product->id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $parent_id );
+				$thumbnail_id = get_post_thumbnail_id ( $product->id, $size );
+			} elseif ( ( $parent_id = wp_get_post_parent_id( $product->id ) ) && has_post_thumbnail( $parent_id ) ) {
+				$thumbnail_id = get_post_thumbnail_id ( $parent_id, $size );
 			} else {
 				$thumbnail_id = $woocommerce->plugin_url() . '/assets/images/placeholder.png';
 			}
