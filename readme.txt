@@ -78,6 +78,14 @@ This plugin is translation ready, which means that you can translate it using st
 7. Enter the translations. invoice and packing-slip now have two translation fields, single & plural. Note that this is a filename, so replace spaces with a - just to be sure!
 8. Save as `wpo_wcpdf-xx_XX.po`, where you replace xx_XX with your language code & country code suffix (da_DK, pl_PL, de_DE etc.)
 
+
+= How can I display the HTML/CSS source for debugging/developing templates? =
+Add the following code to your theme's `functions.php`
+`
+add_filter( 'wpo_wcpdf_output_html', '__return_true' );
+add_filter( 'wpo_wcpdf_use_path', '__return_false' );
+`
+
 = How can I display custom fields in the invoice or packing slip? =
 First, you need to create a custom template following instructions from the first item in this FAQ.
 Then place the following snippet where you would like the custom field to appear:
@@ -173,6 +181,14 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.4.4 =
+* Feature: Editable invoice date per order/invoice.
+* Feature: HTML is now allowed in footer and other settings fields.
+* Translations: Updated German (Thanks Nadine!)
+* Fix: template paths are now saved relative to the site base path (ABSPATH) to prevent errors when moving to another server
+* Tweak: Changed bulk action hook for better theme compatibility
+* Tweak: Newlines in custom checkout fields
 
 = 1.4.3 =
 * Feature: Added function to call custom fields more easily (see FAQ)
