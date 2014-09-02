@@ -477,7 +477,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 						'rate_id'				=> $tax['rate_id'],
 						'tax_amount'			=> $tax['tax_amount'],
 						'shipping_tax_amount'	=> $tax['shipping_tax_amount'],
-						'rate'					=> isset( $tax_rate_ids[ $tax['rate_id'] ] ) ? (float) $tax_rate_ids[$tax['rate_id']]['tax_rate'] . '%': '',
+						'rate'					=> isset( $tax_rate_ids[ $tax['rate_id'] ] ) ? ( (float) $tax_rate_ids[$tax['rate_id']]['tax_rate'] ) . ' %': '',
 					);
 				}
 				
