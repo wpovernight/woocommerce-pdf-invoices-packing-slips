@@ -264,7 +264,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			add_settings_field(
 				'template_path',
 				__( 'Choose a template', 'wpo_wcpdf' ),
-				array( &$this, 'select_element_callback' ),
+				array( &$this, 'template_select_element_callback' ),
 				$option,
 				'template_settings',
 				array(
@@ -804,6 +804,50 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			// echo $html;
 		}
 
+
+		/**
+		 * Template select element callback.
+		 *
+		 * @param  array $args Field arguments.
+		 *
+		 * @return string	  Select field.
+		 */
+		public function template_select_element_callback( $args ) {
+			$menu = $args['menu'];
+			$id = $args['id'];
+		
+			$options = get_option( $menu );
+		
+			if ( isset( $options[$id] ) ) {
+				$current = $options[$id];
+			} else {
+				$current = isset( $args['default'] ) ? $args['default'] : '';
+			}
+		
+			$html = sprintf( '<select id="%1$s" name="%2$s[%1$s]">', $id, $menu );
+
+			// backwards compatible template path (1.4.4+ uses relative paths instead of absolute)
+			if (strpos($current, ABSPATH) !== false) {
+				//  check if folder exists, then strip site base path.
+				if ( file_exists( $current ) ) {
+					$current = str_replace( ABSPATH, '', $current );
+				}
+			}
+
+			foreach ( $args['options'] as $key => $label ) {
+				$html .= sprintf( '<option value="%s"%s>%s</option>', $key, selected( $current, $key, false ), $label );
+			}
+	
+			$html .= '</select>';
+		
+			// Displays option description.
+			if ( isset( $args['description'] ) ) {
+				$html .= sprintf( '<p class="description">%s</p>', $args['description'] );
+			}
+		
+			echo $html;
+		
+		}
 
 		/**
 		 * Section null callback.
