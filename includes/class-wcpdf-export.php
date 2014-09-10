@@ -22,7 +22,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function __construct() {					
 			global $woocommerce;
-			$this->order = new WC_Order();
+			$this->order = new WC_Order('');
 			$this->general_settings = get_option('wpo_wcpdf_general_settings');
 			$this->template_settings = get_option('wpo_wcpdf_template_settings');
 
