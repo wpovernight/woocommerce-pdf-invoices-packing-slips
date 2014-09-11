@@ -2,7 +2,7 @@
 Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
-Tested up to: 3.9.2 and WooCommerce 2.1
+Tested up to: 4.0 and WooCommerce 2.2
 Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
