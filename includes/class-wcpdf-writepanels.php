@@ -208,12 +208,20 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				if ( isset($_POST['_wcpdf_invoice_number']) ) {
 					update_post_meta( $post_id, '_wcpdf_invoice_number', stripslashes( $_POST['_wcpdf_invoice_number'] ));
 				}
+
 				if ( isset($_POST['wcpdf_invoice_date']) ) {
-					$invoice_date = strtotime( $_POST['wcpdf_invoice_date'] . ' ' . (int) $_POST['wcpdf_invoice_date_hour'] . ':' . (int) $_POST['wcpdf_invoice_date_minute'] . ':00' );
-					$invoice_date = date_i18n( 'Y-m-d H:i:s', $invoice_date );
-					update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );				
+					if ( empty($_POST['wcpdf_invoice_date']) ) {
+						delete_post_meta( $post_id, '_wcpdf_invoice_date' );
+					} else {
+						$invoice_date = strtotime( $_POST['wcpdf_invoice_date'] . ' ' . (int) $_POST['wcpdf_invoice_date_hour'] . ':' . (int) $_POST['wcpdf_invoice_date_minute'] . ':00' );
+						$invoice_date = date_i18n( 'Y-m-d H:i:s', $invoice_date );
+						update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );						
+					}
 				}
 
+				if ( empty($_POST['wcpdf_invoice_date']) && empty($_POST['wcpdf_invoice_number'])) {
+					delete_post_meta( $post_id, '_wcpdf_invoice_exists' );
+				}
 			}
 		}
 	}
