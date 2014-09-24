@@ -679,7 +679,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$thumbnail_path = str_replace( get_site_url() . '/', ABSPATH, array_pop($thumbnail_url));
 
 			// Thumbnail (full img tag)
-			if (apply_filters('wpo_wcpdf_use_path', true)) {
+			if (apply_filters('wpo_wcpdf_use_path', true) && file_exists($thumbnail_path)) {
 				// load img with server path by default
 				$thumbnail = sprintf('<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
 			} else {
