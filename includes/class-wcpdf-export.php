@@ -208,6 +208,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// Generate the output
 			$template_type = $_GET['template_type'];
 			// die($this->process_template( $template_type, $order_ids )); // or use the filter switch below!
+			
+			do_action( 'wpo_wcpdf_before_pdf', $template_type );
 
 			if (apply_filters('wpo_wcpdf_output_html', false, $template_type)) {
 				// Output html to browser for debug
@@ -217,6 +219,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 		
 			$invoice = $this->get_pdf( $template_type, $order_ids );
+
+			do_action( 'wpo_wcpdf_after_pdf', $template_type );
 
 			// get template name
 			if ($template_type == 'invoice' ) {
