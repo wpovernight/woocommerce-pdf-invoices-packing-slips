@@ -58,8 +58,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$this->template_type = $template_type;
 			$this->order_ids = $order_ids;
 
+			do_action( 'wpo_wcpdf_process_template', $template_type, $order_id );
+
 			$output_html = array();
 			foreach ($order_ids as $order_id) {
+				do_action( 'wpo_wcpdf_process_template_order', $template_type, $order_id );
 				$this->order = new WC_Order( $order_id );
 				$template = $this->template_path . '/' . $template_type . '.php';
 
