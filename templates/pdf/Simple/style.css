@@ -26,7 +26,7 @@
 
 @page {
 	margin-top: 1cm;
-	margin-bottom: 0.5cm;
+	margin-bottom: 3cm;
 	margin-left: 2cm;
 	margin-right: 2cm;
 }
@@ -230,7 +230,7 @@ table.totals td.price span:first-child {
 /* Footer Imprint */
 #footer {
 	position: absolute;
-	bottom: 0px;
+	bottom: -2cm;
 	left: 0;
 	right: 0;
 	height: 2cm;
