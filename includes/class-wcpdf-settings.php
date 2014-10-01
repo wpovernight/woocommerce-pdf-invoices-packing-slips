@@ -14,6 +14,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		public function __construct() {
 			add_action( 'admin_menu', array( &$this, 'menu' ) ); // Add menu.
 			add_action( 'admin_init', array( &$this, 'init_settings' ) ); // Registers settings
+			add_filter( 'option_page_capability_wpo_wcpdf_template_settings', array( &$this, 'settings_capabilities' ) );
+			add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( &$this, 'settings_capabilities' ) );
 			add_action( 'admin_enqueue_scripts', array( &$this, 'load_scripts_styles' ) ); // Load scripts
 			
 			// Add links to WordPress plugins page
@@ -35,11 +37,18 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				$parent_slug,
 				__( 'PDF Invoices', 'wpo_wcpdf' ),
 				__( 'PDF Invoices', 'wpo_wcpdf' ),
-				'manage_options',
+				'manage_woocommerce',
 				'wpo_wcpdf_options_page',
 				array( $this, 'settings_page' )
 			);
 		}
+
+		/**
+		 * Set capability for settings page
+		 */
+		public function settings_capabilities() {
+			return 'manage_woocommerce';
+		}		
 		
 		/**
 		 * Styles for settings page
