@@ -274,6 +274,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Attach invoice to completed order or customer invoice email
 		 */
 		public function attach_pdf_to_email ( $attachments, $status, $order ) {
+			$this->order = $order;
+
 			if (!isset($this->general_settings['email_pdf']) || !isset( $status ) ) {
 				return;
 			}
@@ -282,45 +284,55 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$tmp_path = apply_filters( 'wpo_wcpdf_tmp_path', WooCommerce_PDF_Invoices::$plugin_path . 'tmp/' );
 			array_map('unlink', ( glob( $tmp_path.'*' ) ? glob( $tmp_path.'*' ) : array() ) );
 
-			// Relevant (default) statuses:
-			// new_order
-			// customer_invoice
-			// customer_processing_order
-			// customer_completed_order
+			$documents = array(
+				'invoice'	=>  array(
+					'allowed_statuses'	=> apply_filters( 'wpo_wcpdf_email_allowed_statuses', array_keys( $this->general_settings['email_pdf'] ) ), // Relevant (default) statuses: new_order, customer_invoice, customer_processing_order, customer_completed_order
+				),
+			);
 
-			$allowed_statuses = apply_filters( 'wpo_wcpdf_email_allowed_statuses', array_keys( $this->general_settings['email_pdf'] ) );
-			
-			foreach ($allowed_statuses as $key => $order_status) {
-				// convert 'lazy' status name
-				if ($order_status == 'completed' || $order_status == 'processing') {
-					$allowed_statuses[$key] = "customer_" . $order_status . "_order";
+			$documents = apply_filters('wpo_wcpdf_attach_documents', $documents );
+
+			foreach ($documents as $document => $document_settings ) {
+				$allowed_statuses = $document_settings['allowed_statuses'];
+
+				foreach ($allowed_statuses as $key => $order_status) {
+					// convert 'lazy' status name
+					if ($order_status == 'completed' || $order_status == 'processing') {
+						$allowed_statuses[$key] = "customer_" . $order_status . "_order";
+					}
+				}
+
+				// legacy filter, use wpo_wcpdf_custom_attachment_condition instead!
+				$attach_invoice = apply_filters('wpo_wcpdf_custom_email_condition', true, $order, $status );
+
+				// use this filter to add an extra condition - return false to disable the PDF attachment
+				$attach_document = apply_filters('wpo_wcpdf_custom_attachment_condition', true, $order, $status, $document );
+
+				if( in_array( $status, $allowed_statuses ) && !( ( $document == 'invoice' ) && !$attach_invoice ) && $attach_document ) {
+					// create pdf data
+					$pdf_data = $this->get_pdf( $document, (array) $order->id );
+
+					// compose filename
+					if ( $document == 'invoice' ) {
+						$display_number = $this->get_display_number( $order->id );
+						$pdf_filename_prefix = __( 'invoice', 'wpo_wcpdf' );
+						$pdf_filename = $pdf_filename_prefix . '-' . $display_number . '.pdf';
+						$pdf_filename = apply_filters( 'wpo_wcpdf_attachment_filename', $pdf_filename, $display_number, $order->id );	
+					} else {
+						$pdf_filename = $document_settings['filename'];
+					}
+
+					// sanitize filename!
+					$pdf_filename = sanitize_file_name( $pdf_filename );
+
+					$pdf_path = $tmp_path . $pdf_filename;
+					file_put_contents ( $pdf_path, $pdf_data );
+					$attachments[] = $pdf_path;
+
+					do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document );
 				}
 			}
-
-			if ( !( apply_filters('wpo_wcpdf_custom_email_condition', true, $order, $status ) ) ) {
-				// use this filter to add an extra condition - return false to disable the PDF attachment
-				return;
-			}
-
-			if( in_array( $status, $allowed_statuses ) ) {
-				// create pdf data
-				$invoice = $this->get_pdf( 'invoice', (array) $order->id );
-
-				$display_number = $this->get_display_number( $order->id );
-				$pdf_filename_prefix = __( 'invoice', 'wpo_wcpdf' );
-				$pdf_filename = $pdf_filename_prefix . '-' . $display_number . '.pdf';
-				$pdf_filename = apply_filters( 'wpo_wcpdf_attachment_filename', $pdf_filename, $display_number, $order->id );
-
-				// sanitize filename!
-				$pdf_filename = sanitize_file_name( $pdf_filename );
-
-				$pdf_path = $tmp_path . $pdf_filename;
-				file_put_contents ( $pdf_path, $invoice );
-				$attachments[] = $pdf_path;
-
-				do_action( 'wpo_wcpdf_email_attachment', $pdf_path );
-			}
-
+			
 			return $attachments;
 		}
 
@@ -403,7 +415,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function get_display_number( $order_id ) {
-			if ( !isset($this->order) ) {
+			if ( !isset($this->order->id) ) {
 				$this->order = new WC_Order ( $order_id );
 			}
 
