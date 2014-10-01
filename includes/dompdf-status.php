@@ -146,8 +146,8 @@ $permissions = array(
 	'WCPDF_TEMP_DIR'		=> array (
 			'description'		=> 'Temporary plugin folder',
 			'value'				=> WooCommerce_PDF_Invoices::$plugin_path . 'tmp/',
-			'status'			=> (is_writable(WooCommerce_PDF_Invoices::$plugin_path) ? "ok" : "failed"),			
-			'status_message'	=> (is_writable(WooCommerce_PDF_Invoices::$plugin_path) ? "Writable" : "Not writable"),
+			'status'			=> (is_writable(WooCommerce_PDF_Invoices::$plugin_path . 'tmp/') ? "ok" : "failed"),			
+			'status_message'	=> (is_writable(WooCommerce_PDF_Invoices::$plugin_path . 'tmp/') ? "Writable" : "Not writable"),
 		),
 	);
 
