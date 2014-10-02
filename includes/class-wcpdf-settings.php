@@ -941,7 +941,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			// remove parent doubles
 			$installed_templates = array_unique($installed_templates);
 
-			return $installed_templates;
+			if (empty($installed_templates)) {
+				// fallback to Simple template for servers with glob() disabled
+				$simple_template_path = str_replace( ABSPATH, '', $template_paths['default'] . 'Simple' );
+				$installed_templates[$simple_template_path] = 'Simple';
+			}
+
+			return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
 		}
 	
 	} // end class WooCommerce_PDF_Invoices_Settings
