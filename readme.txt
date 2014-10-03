@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
 Requires at least: 3.5 and WooCommerce 2.0
 Tested up to: 4.0 and WooCommerce 2.2
-Stable tag: 1.4.6
+Stable tag: 1.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,6 +181,17 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.4.7 =
+* Fix: check if image file exists locally, fallback to url if not (CDN compatibility)
+* Fix: make deleting invoice date possible
+* Fix: correct tmp folder check on status page
+* Translations: updated po/mo files
+* Tweak: changed settings capability requirement to `manage_woocommerce` (was: `manage_options`)
+* Tweak: better email attachment function
+* Tweak: prevent footer overlap (Simple template)
+* Tweak: fallback if `glob()` is not allowed on the server
+* Tweak: better custom template instructions (reflects path to actual (child-)theme)
 
 = 1.4.6 =
 * HOTFIX: WooCommerce 2.2 compatibility fix
