@@ -87,14 +87,28 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Add PDF actions to the orders listing
 		 */
 		public function add_listing_actions( $order ) {
-			?>
-			<a href="<?php echo wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ); ?>" class="button tips wpo_wcpdf" target="_blank" alt="<?php esc_attr_e( 'PDF invoice', 'wpo_wcpdf' ); ?>" data-tip="<?php esc_attr_e( 'PDF invoice', 'wpo_wcpdf' ); ?>">
-				<img src="<?php echo WooCommerce_PDF_Invoices::$plugin_url . 'images/invoice.png'; ?>" alt="<?php esc_attr_e( 'PDF invoice', 'wpo_wcpdf' ); ?>" width="16">
-			</a>
-			<a href="<?php echo wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=packing-slip&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ); ?>" class="button tips wpo_wcpdf" target="_blank" alt="<?php esc_attr_e( 'PDF Packing Slip', 'wpo_wcpdf' ); ?>" data-tip="<?php esc_attr_e( 'PDF Packing Slip', 'wpo_wcpdf' ); ?>">
-				<img src="<?php echo WooCommerce_PDF_Invoices::$plugin_url . 'images/packing-slip.png'; ?>" alt="<?php esc_attr_e( 'PDF Packing Slip', 'wpo_wcpdf' ); ?>" width="16">
-			</a>
-			<?php
+			$listing_actions = array(
+				'invoice'		=> array (
+					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
+					'img'		=> WooCommerce_PDF_Invoices::$plugin_url . 'images/invoice.png',
+					'alt'		=> esc_attr__( 'PDF Invoice', 'wpo_wcpdf' ),
+				),
+				'packing-slip'	=> array (
+					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=packing-slip&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
+					'img'		=> WooCommerce_PDF_Invoices::$plugin_url . 'images/packing-slip.png',
+					'alt'		=> esc_attr__( 'PDF Packing Slip', 'wpo_wcpdf' ),
+				),
+			);
+
+			$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );			
+
+			foreach ($listing_actions as $action => $data) {
+				?>
+				<a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $action; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
+					<img src="<?php echo $data['img']; ?>" alt="<?php echo $data['alt']; ?>" width="16">
+				</a>
+				<?php
+			}
 		}
 		
 		/**
