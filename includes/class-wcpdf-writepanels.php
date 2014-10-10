@@ -31,9 +31,6 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				'invoice'		=> __( 'PDF Invoices', 'wpo_wcpdf' ),
 				'packing-slip'	=> __( 'PDF Packing Slips', 'wpo_wcpdf' ),
 			);
-
-			$this->bulk_actions = apply_filters( 'wpo_wcpdf_bulk_actions', $this->bulk_actions );
-
 		}
 
 		/**
@@ -65,7 +62,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 					array(  
 						'ajaxurl'		=> admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
 						'nonce'			=> wp_create_nonce('generate_wpo_wcpdf'),
-						'bulk_actions'	=> array_keys( $this->bulk_actions ),
+						'bulk_actions'	=> array_keys( apply_filters( 'wpo_wcpdf_bulk_actions', $this->bulk_actions ) ),
 					)  
 				);  
 			}
@@ -211,12 +208,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 */
 		public function bulk_actions() {
 			global $post_type;
-
+			$bulk_actions = apply_filters( 'wpo_wcpdf_bulk_actions', $this->bulk_actions );
+			
 			if ( 'shop_order' == $post_type ) {
 				?>
 				<script type="text/javascript">
 				jQuery(document).ready(function() {
-					<?php foreach ($this->bulk_actions as $action => $title) { ?>
+					<?php foreach ($bulk_actions as $action => $title) { ?>
 					jQuery('<option>').val('<?php echo $action; ?>').text('<?php echo $title; ?>').appendTo("select[name='action'], select[name='action2']");
 					<?php }	?>
 				});
