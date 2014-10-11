@@ -181,7 +181,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				'invoice'		=> array (
 					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $post_id ), 'generate_wpo_wcpdf' ),
 					'alt'		=> esc_attr__( 'PDF Invoice', 'wpo_wcpdf' ),
-					'title'		=> __( 'PDF invoice', 'wpo_wcpdf' ),
+					'title'		=> __( 'PDF Invoice', 'wpo_wcpdf' ),
 				),
 				'packing-slip'	=> array (
 					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=packing-slip&order_ids=' . $post_id ), 'generate_wpo_wcpdf' ),
@@ -209,7 +209,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		public function bulk_actions() {
 			global $post_type;
 			$bulk_actions = apply_filters( 'wpo_wcpdf_bulk_actions', $this->bulk_actions );
-			
+
 			if ( 'shop_order' == $post_type ) {
 				?>
 				<script type="text/javascript">
