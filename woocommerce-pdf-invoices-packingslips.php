@@ -33,7 +33,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			self::$plugin_basename = plugin_basename(__FILE__);
 			self::$plugin_url = plugin_dir_url(self::$plugin_basename);
 			self::$plugin_path = trailingslashit(dirname(__FILE__));
-			self::$version = '1.4.7'; 
+			self::$version = '1.4.8'; 
 			
 			// load the localisation & classes
 			add_action( 'plugins_loaded', array( $this, 'translations' ) ); // or use init?
