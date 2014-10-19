@@ -68,7 +68,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				$template = apply_filters( 'wpo_wcpdf_template_file', $template, $template_type );
 
 				if (!file_exists($template)) {
-					die('Template not found! Check if the following file exists: <pre>'.$template.'</pre><br/>');
+					throw new Exception('Template not found! Check if the following file exists: <pre>'.$template.'</pre><br/>');
 				}
 
 				// Set the invoice number
@@ -107,7 +107,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$template_wrapper = $this->template_path . '/html-document-wrapper.php';
 
 			if (!file_exists($template_wrapper)) {
-				die('Template wrapper not found! Check if the following file exists: <pre>'.$template_wrapper.'</pre><br/>');
+				throw new Exception('Template wrapper not found! Check if the following file exists: <pre>'.$template_wrapper.'</pre><br/>');
 			}		
 
 			$complete_document = $this->get_template($template_wrapper);
@@ -159,8 +159,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Get PDF
 		 */
 		public function get_pdf( $template_type, $order_ids ) {
-			$pdf = $this->generate_pdf( $template_type, $order_ids );
-			return $pdf->output();
+			try {
+				$pdf = $this->generate_pdf( $template_type, $order_ids );
+				return $pdf->output();				
+			} catch (Exception $e) {
+				echo $e->getMessage();
+				return false;
+			}
+
 		}
 
 		/**
@@ -222,7 +228,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				die($this->process_template( $template_type, $order_ids ));
 			}
 		
-			$invoice = $this->get_pdf( $template_type, $order_ids );
+			if ( !($invoice = $this->get_pdf( $template_type, $order_ids )) ) {
+				exit;
+			}
 
 			do_action( 'wpo_wcpdf_after_pdf', $template_type );
 
@@ -312,6 +320,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				if( in_array( $status, $allowed_statuses ) && !( ( $document == 'invoice' ) && !$attach_invoice ) && $attach_document ) {
 					// create pdf data
 					$pdf_data = $this->get_pdf( $document, (array) $order->id );
+
+					if ( !$pdf_data ) {
+						// something went wrong
+						break;
+					}
 
 					// compose filename
 					if ( $document == 'invoice' ) {
