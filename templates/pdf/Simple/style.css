@@ -1,27 +1,27 @@
 /* Main Body */
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/yYRnAC2KygoXnEC8IdU0gQLUuEpTyoUstqEm5AMlJo4.ttf) format('truetype');
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: normal;
+	src: local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/yYRnAC2KygoXnEC8IdU0gQLUuEpTyoUstqEm5AMlJo4.ttf) format('truetype');
+}
+	@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: bold;
+	src: local('Open Sans Bold'), local('OpenSans-Bold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/k3k702ZOKiLJc3WVjuplzMDdSZkkecOE1hvV7ZHvhyU.ttf) format('truetype');
 }
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: bold;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/k3k702ZOKiLJc3WVjuplzMDdSZkkecOE1hvV7ZHvhyU.ttf) format('truetype');
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: normal;
+	src: local('Open Sans Italic'), local('OpenSans-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/O4NhV7_qs9r9seTo7fnsVCZ2oysoEQEeKwjgmXLRnTc.ttf) format('truetype');
 }
 @font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: normal;
-  src: local('Open Sans Italic'), local('OpenSans-Italic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/O4NhV7_qs9r9seTo7fnsVCZ2oysoEQEeKwjgmXLRnTc.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: italic;
-  font-weight: bold;
-  src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/PRmiXeptR36kaC0GEAetxrQhS7CD3GIaelOwHPAPh9w.ttf) format('truetype');
+	font-family: 'Open Sans';
+	font-style: italic;
+	font-weight: bold;
+	src: local('Open Sans Bold Italic'), local('OpenSans-BoldItalic'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/PRmiXeptR36kaC0GEAetxrQhS7CD3GIaelOwHPAPh9w.ttf) format('truetype');
 }
 
 @page {
@@ -89,7 +89,8 @@ table.container {
 	border: 0;
 }
 
-tr.no-borders, td.no-borders {
+tr.no-borders,
+td.no-borders {
 	border: 0 !important;
 	border-top: 0 !important;
 	border-bottom: 0 !important;
@@ -112,7 +113,8 @@ td.header {
 	font-weight: 700;
 }
 
-td.header, td.shop-info {
+td.header,
+td.shop-info {
 	margin-bottom: 10mm !important;
 }
 
@@ -150,7 +152,7 @@ table.order-details {
 }
 
 .order-details td,
-th {
+.order-details th {
 	border-bottom: 1px #ccc solid;
 	padding: 0.375em;
 }
@@ -171,7 +173,8 @@ th {
 	height: auto;
 }
 
-table.product, table.product td {
+table.product,
+table.product td {
 	margin: 0;
 	border: 0;
 	padding: 0;
@@ -206,7 +209,8 @@ table.totals {
 	margin-top: 5mm;
 }
 
-table.totals th, table.totals td {
+table.totals th,
+table.totals td {
 	border: 0;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
@@ -217,7 +221,8 @@ table.totals td.price {
 	width: 20%;
 }
 
-table.totals tr:last-child td, table.totals tr:last-child th {
+table.totals tr:last-child td,
+table.totals tr:last-child th {
 	border-top: 2px solid #000;
 	border-bottom: 2px solid #000;
 	font-weight: bold;
