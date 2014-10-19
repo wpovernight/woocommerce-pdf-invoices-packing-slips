@@ -6,7 +6,7 @@
 	<title><?php echo ($wpo_wcpdf->export->template_type == 'invoice')?__( 'Invoice', 'wpo_wcpdf' ):__( 'Packing Slip', 'wpo_wcpdf' ) ?></title>
 	<style><?php $wpo_wcpdf->template_styles(); ?></style>
 </head>
-<body>
+<body class="<?php echo $wpo_wcpdf->export->template_type; ?>">
 <?php echo $wpo_wcpdf->export->output_body; ?>
 </body>
 </html>
