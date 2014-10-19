@@ -442,8 +442,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
-
-
 			add_settings_field(
 				'display_date',
 				__( 'Date to display on invoice', 'wpo_wcpdf' ),
