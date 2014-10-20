@@ -182,6 +182,12 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
+= 1.4.9 =
+* Translations: Added Brazilian Portugese (thanks Victor Debone!)
+* Tweak: Fail more gracefully when there are errors during PDF generation
+* Tweak: added template type class to template output body
+* Tweak: cleaned up Simple template style.css
+
 = 1.4.8 =
 * Translations: Added Finnish (Thanks Sami Mäkelä/Contrast.fi!)
 
