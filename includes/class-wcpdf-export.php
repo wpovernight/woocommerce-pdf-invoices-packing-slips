@@ -285,6 +285,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		public function attach_pdf_to_email ( $attachments, $status, $order ) {
 			$this->order = $order;
 
+			if ($order->post->post_type != 'shop_order') {
+				return; // do not process low stock notifications etc!
+			}
+
 			if (!isset($this->general_settings['email_pdf']) || !isset( $status ) ) {
 				return;
 			}
