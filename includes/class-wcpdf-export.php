@@ -56,7 +56,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function process_template( $template_type, $order_ids ) {
 			$this->template_type = $template_type;
-			$this->order_ids = $order_ids;
+			$order_ids = $this->order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $template_type );
 
 			do_action( 'wpo_wcpdf_process_template', $template_type );
 
