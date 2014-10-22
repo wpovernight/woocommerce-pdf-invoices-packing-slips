@@ -188,11 +188,25 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show billing address
 		 */
 		public function get_billing_address() {
-			$address = $this->export->order->get_formatted_billing_address();
-			if( !$address ) {
+			if ( $address = $this->export->order->get_formatted_billing_address() ) {
+				return apply_filters( 'wpo_wcpdf_billing_address', $address() );
+			}
+
+			if ( !$address && isset( $this->export->order->post->post_parent ) ) {
+				// try parent address
+
+				// temporarily switch order to make all filters / order calls work correctly
+				$current_order = $this->export->order;
+				$this->export->order = new WC_Order( $this->export->order->post->post_parent );
+				$address = apply_filters( 'wpo_wcpdf_billing_address', $this->export->order->get_formatted_billing_address() );
+				// switch back & unset
+				$this->export->order = $current_order;
+				unset($current_order);
+			} else {
 				$address = __('N/A', 'wpo_wcpdf');
 			}
-			return apply_filters( 'wpo_wcpdf_billing_address', $address );
+
+			return $address;
 		}
 		public function billing_address() {
 			echo $this->get_billing_address();
@@ -202,7 +216,14 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show billing email
 		 */
 		public function get_billing_email() {
-			$billing_email =$this->export->order->billing_email;
+			$billing_email = $this->export->order->billing_email;
+
+
+			if ( !$billing_email && isset( $this->export->order->post->post_parent ) ) {
+				// try parent
+				$billing_email = get_post_meta( $this->export->order->post->post_parent, '_billing_email', true );
+			}
+
 			return apply_filters( 'wpo_wcpdf_billing_email', $billing_email );
 		}
 		public function billing_email() {
@@ -213,7 +234,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show billing phone
 		 */
 		public function get_billing_phone() {
-			$billing_phone =$this->export->order->billing_phone;
+			$billing_phone = $this->export->order->billing_phone;
+
+			if ( !$billing_phone && isset( $this->export->order->post->post_parent ) ) {
+				// try parent
+				$billing_phone = get_post_meta( $this->export->order->post->post_parent, '_billing_phone', true );
+			}
+
 			return apply_filters( 'wpo_wcpdf_billing_phone', $billing_phone );
 		}
 		public function billing_phone() {
@@ -224,11 +251,25 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show shipping address
 		 */
 		public function get_shipping_address() {
-			$address = $this->export->order->get_formatted_shipping_address();
-			if( !$address ) {
+			if ( $address = $this->export->order->get_formatted_shipping_address() ) {
+				return apply_filters( 'wpo_wcpdf_shipping_address', $address() );
+			}
+
+			if ( !$address && isset( $this->export->order->post->post_parent ) ) {
+				// try parent address
+
+				// temporarily switch order to make all filters / order calls work correctly
+				$current_order = $this->export->order;
+				$this->export->order = new WC_Order( $this->export->order->post->post_parent );
+				$address = apply_filters( 'wpo_wcpdf_shipping_address', $this->export->order->get_formatted_shipping_address() );
+				// switch back & unset
+				$this->export->order = $current_order;
+				unset($current_order);
+			} else {
 				$address = __('N/A', 'wpo_wcpdf');
 			}
-			return apply_filters( 'wpo_wcpdf_shipping_address', $address );
+
+			return $address;
 		}
 		public function shipping_address() {
 			echo $this->get_shipping_address();
@@ -237,8 +278,18 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		/**
 		 * Return/Show a custom field
 		 */		
-		public function custom_field( $field_name, $field_label = '', $display_empty = false ) {
+		public function get_custom_field( $field_name ) {
 			$custom_field = get_post_meta($this->export->order->id,$field_name,true);
+
+			if ( !$custom_field && isset( $this->export->order->post->post_parent ) ) {
+				// try parent
+				$custom_field = get_post_meta( $this->export->order->post->post_parent, $field_name, true );
+			}
+
+			return apply_filters( 'wpo_wcpdf_billing_email', $billing_email );
+		}
+		public function custom_field( $field_name, $field_label = '', $display_empty = false ) {
+			$custom_field = $this->get_custom_field( $field_name );
 			if (!empty($field_label)){
 				// add a a trailing space to the label
 				$field_label .= ' ';
