@@ -189,7 +189,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_billing_address() {
 			if ( $address = $this->export->order->get_formatted_billing_address() ) {
-				return apply_filters( 'wpo_wcpdf_billing_address', $address() );
+				return apply_filters( 'wpo_wcpdf_billing_address', $address );
 			}
 
 			if ( !$address && isset( $this->export->order->post->post_parent ) ) {
@@ -252,7 +252,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_shipping_address() {
 			if ( $address = $this->export->order->get_formatted_shipping_address() ) {
-				return apply_filters( 'wpo_wcpdf_shipping_address', $address() );
+				return apply_filters( 'wpo_wcpdf_shipping_address', $address );
 			}
 
 			if ( !$address && isset( $this->export->order->post->post_parent ) ) {
