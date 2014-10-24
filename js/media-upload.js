@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
 	// Uploading files
 	var file_frame;
 	 
-	jQuery('.upload_image_button').live('click', function( event ){
+	jQuery('.wpo_upload_image_button').live('click', function( event ){
 
 		// get input field id from data-input_id
 		input_id = '#'+jQuery( this ).data( 'input_id' );
@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
 			} else {
 				// show image & remove button
 				attachment_img = '<img src="'+attachment.url+'" style="display:block" id="img-'+input_id_clean+'"/>';
-				remove_button = '<span class="button remove_image_button" data-input_id="'+input_id_clean+'">'+remove_button_text+'</span>';
+				remove_button = '<span class="button wpo_remove_image_button" data-input_id="'+input_id_clean+'">'+remove_button_text+'</span>';
 				jQuery( input_id ).before(attachment_img+remove_button);
 				
 			}
@@ -57,7 +57,7 @@ jQuery(document).ready(function($) {
 		file_frame.open();
 	});
  
-	jQuery('.remove_image_button').live('click', function( event ){
+	jQuery('.wpo_remove_image_button').live('click', function( event ){
 		
 		
 		// get input field from data-input_id
@@ -67,5 +67,6 @@ jQuery(document).ready(function($) {
 		jQuery( input_id ).val('');
 		jQuery( img_id ).remove();
 		jQuery( this ).remove();
+		jQuery( '.attachment-resolution' ).remove();
 	});		
 });
