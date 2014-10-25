@@ -383,7 +383,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 
 			add_settings_field(
 				'display_date',
-				__( 'Print invoice date', 'wpo_wcpdf' ),
+				__( 'Display invoice date', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
 				'template_settings',
@@ -396,7 +396,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 
 			add_settings_field(
 				'display_number',
-				__( 'Print built-in sequential invoice number', 'wpo_wcpdf' ),
+				__( 'Display built-in sequential invoice number', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
 				'template_settings',
