@@ -379,7 +379,6 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function get_order_number() {
 			// try parent first
 			if ( $this->export->order->post->post_parent > 0 && $this->export->order->post->post_type == 'shop_order_refund' ) {
-				die(print_r($this->export->order));
 				$parent_order = new WC_Order( $this->export->order->post->post_parent );
 				$order_number = $parent_order->get_order_number();
 			} else {
