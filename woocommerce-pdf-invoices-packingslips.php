@@ -377,9 +377,18 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show order number (or invoice number)
 		 */
 		public function get_order_number() {
+			// try parent first
+			if ( isset( $this->export->order->post->post_parent ) && $this->export->order->post->post_type == 'shop_order_refund' ) {
+				die(print_r($this->export->order));
+				$parent_order = new WC_Order( $this->export->order->post->post_parent );
+				$order_number = $parent_order->get_order_number();
+			} else {
+				$order_number = $this->export->order->get_order_number();
+			}
+
 			// Trim the hash to have a clean number but still 
 			// support any filters that were applied before.
-			$order_number = ltrim($this->export->order->get_order_number(), '#');
+			$order_number = ltrim($order_number, '#');
 			return apply_filters( 'wpo_wcpdf_order_number', $order_number);
 		}
 		public function order_number() {
@@ -401,7 +410,14 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show the order date
 		 */
 		public function get_order_date() {
-			$date = date_i18n( get_option( 'date_format' ), strtotime( $this->export->order->order_date ) );
+			if ( isset( $this->export->order->post->post_parent ) ) {
+				$parent_order = new WC_Order( $this->export->order->post->post_parent && $this->export->order->post->post_type == 'shop_order_refund' );
+				$date = $parent_order->order_date;
+			} else {
+				$date = $this->export->order->order_date;
+			}
+
+			$date = date_i18n( get_option( 'date_format' ), strtotime( $date ) );
 			return apply_filters( 'wpo_wcpdf_order_date', $date );
 		}
 		public function order_date() {
