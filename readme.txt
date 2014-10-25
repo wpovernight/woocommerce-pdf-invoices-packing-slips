@@ -100,6 +100,19 @@ Where you replace 'custom_fieldname' with the name of the field you want to disp
 <?php $wpo_wcpdf->custom_field('custom_fieldname', 'Custom field:',  true); ?>
 `
 
+= How can I display order notes in the invoice or packing slip? =
+First, you need to create a custom template following instructions from the first item in this FAQ.
+Then place the following snippet where you would like the order notes to appear:
+
+`
+<?php $wpo_wcpdf->order_notes(); ?>
+`
+
+if you want to display all order notes, including the (private) admin notes, use:
+`
+<?php $wpo_wcpdf->order_notes('all'); ?>
+`
+
 = How do can I modify the pdf filename? =
 
 You can do this via a filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings).
@@ -183,6 +196,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Changelog ==
 
 = 1.4.9 =
+* Feature: Display Customer/Order notes with a simple shorthand (see FAQ)
 * Translations: Added Brazilian Portugese (thanks Victor Debone!)
 * Tweak: Fail more gracefully when there are errors during PDF generation
 * Tweak: added template type class to template output body
