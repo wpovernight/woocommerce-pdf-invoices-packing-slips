@@ -27,32 +27,18 @@
 	<tr>
 		<td>
 			<div class="order-information">
-			<?php
-			$date_setting = isset($wpo_wcpdf->settings->template_settings['display_date'])?$wpo_wcpdf->settings->template_settings['display_date']:'order_date';
-			$number_setting = isset($wpo_wcpdf->settings->template_settings['display_number'])?$wpo_wcpdf->settings->template_settings['display_number']:'order_number';
-
-			// set $display date & label to user setting
-			if ( $date_setting == 'invoice_date' ) {
-				$display_date = $wpo_wcpdf->get_invoice_date();
-				$display_date_label = __( 'Invoice Date:', 'wpo_wcpdf' );
-			} else {
-				$display_date = $wpo_wcpdf->get_order_date();
-				$display_date_label = __( 'Order Date:', 'wpo_wcpdf' );
-			}
-
-			// set $display number & label to user setting
-			if ( $number_setting == 'invoice_number' ) {
-				$display_number = $wpo_wcpdf->get_invoice_number();
-				$display_number_label = __( 'Invoice Number:', 'wpo_wcpdf' );
-			} else {
-				$display_number = $wpo_wcpdf->get_order_number();
-				$display_number_label = __( 'Order Number:', 'wpo_wcpdf' );
-			}
-			?>
-				<span class="order-date-label"><?php echo $display_date_label; ?></span>
-				<span class="order-date"><?php echo $display_date; ?></span><br />
-				<span class="order-number-label"><?php echo $display_number_label; ?></span>
-				<span class="order-number"><?php echo $display_number; ?></span><br />
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['display_number']) && $wpo_wcpdf->settings->template_settings['display_number'] == 'invoice_number') { ?>
+				<span class="order-number-label"><?php _e( 'Invoice Number:', 'wpo_wcpdf' ); ?></span>
+				<span class="order-number"><?php $wpo_wcpdf->invoice_number(); ?></span><br />
+			<?php } ?>
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['display_date']) && $wpo_wcpdf->settings->template_settings['display_date'] == 'invoice_date') { ?>
+				<span class="order-date-label"><?php _e( 'Invoice Date:', 'wpo_wcpdf' ); ?></span>
+				<span class="order-date"><?php $wpo_wcpdf->invoice_date(); ?></span><br />
+			<?php } ?>
+				<span class="order-number-label"><?php _e( 'Order Number:', 'wpo_wcpdf' ); ?></span>
+				<span class="order-number"><?php $wpo_wcpdf->order_number(); ?></span><br />
+				<span class="order-date-label"><?php _e( 'Order Date:', 'wpo_wcpdf' ); ?></span>
+				<span class="order-date"><?php $wpo_wcpdf->order_date(); ?></span><br />
 				<span class="order-payment-label"><?php _e( 'Payment Method:', 'wpo_wcpdf' ); ?></span>
 				<span class="order-payment"><?php $wpo_wcpdf->payment_method(); ?></span><br />
 			</div>
