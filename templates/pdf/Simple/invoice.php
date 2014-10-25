@@ -20,6 +20,7 @@
 			<h3 class="document-type-label">
 			<?php if( $wpo_wcpdf->get_header_logo_id() ) _e( 'Invoice', 'wpo_wcpdf' );	?>
 			</h3>
+			<?php do_action( 'wpo_wcpdf_after_document_label', 'invoice' ); ?>
 		</td>
 		<td>&nbsp;</td>
 	</tr>
