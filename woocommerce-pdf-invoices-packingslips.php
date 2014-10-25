@@ -286,7 +286,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$custom_field = get_post_meta( $this->export->order->post->post_parent, $field_name, true );
 			}
 
-			return apply_filters( 'wpo_wcpdf_billing_email', $billing_email );
+			return apply_filters( 'wpo_wcpdf_billing_custom_field', $custom_field );
 		}
 		public function custom_field( $field_name, $field_label = '', $display_empty = false ) {
 			$custom_field = $this->get_custom_field( $field_name );
