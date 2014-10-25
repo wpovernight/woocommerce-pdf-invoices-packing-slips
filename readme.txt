@@ -196,6 +196,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Changelog ==
 
 = 1.4.9 =
+* Feature: Order number and date are now displayed by default in the Simple template (invoice number and date still optional)
 * Feature: Display Customer/Order notes with a simple shorthand (see FAQ)
 * Translations: Added Brazilian Portugese (thanks Victor Debone!)
 * Tweak: Fail more gracefully when there are errors during PDF generation
