@@ -114,38 +114,19 @@ if you want to display all order notes, including the (private) admin notes, use
 `
 
 = How do can I modify the pdf filename? =
-
 You can do this via a filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings).
 
-For the export filename (from the woocommerce admin or the my account page):
-
+Here's a simple example for putting your shop name in front of the filname.
 `
-add_filter( 'wpo_wcpdf_bulk_filename', 'my_pdf_bulk_filename', 10, 4 );
-function my_pdf_bulk_filename( $filename, $order_ids, $template_name, $template_type ) {
-	global $wpo_wcpdf;
-	if (count($order_ids) == 1) {
-		// single
-		$invoice_number = $wpo_wcpdf->get_invoice_number();
-		$filename = 'myshopname_' . $template_name . '-' . $invoice_number . '.pdf';
-	} else {
-		// multiple invoices/packing slips export
-		// create your own rules/ be creative!
-	}
+add_filter( 'wpo_wcpdf_filename', 'wpo_wcpdf_custom_filename', 10, 4 );
+function wpo_wcpdf_custom_filename( $filename, $template_type, $order_ids, $context ) {
+	// prepend your shopname to the file
+	$new_filename = 'myshopname_' . $filename;
 
 	return $filename;
 }
 `
-
-For the email attachment filename:
-`
-add_filter( 'wpo_wcpdf_attachment_filename', 'my_pdf_attachment_filename', 10, 3 );
-function my_pdf_attachment_filename( $filename, $display_number, $order_id ) {
-	//$display_number is either the order number or invoice number, according to your settings
-	$filename = 'myshopname_invoice-' . $display_number . '.pdf';
-
-	return $filename;
-}
-`
+You can also use the $template_type ('invoice' or 'packing-slip'), $order_ids (single array) or $context ('download' or 'attachment') variables to make more complex rules for the filename.
 
 = Why does the download link not display on the My Account page? =
 To prevent customers from prematurely creating invoices, the default setting is that a customer can only see/download an invoice from an order that already has an invoice - either created automatically for the email attachment, or manually by the shop manager. This means that ultimately the shop mananger determines whether an invoice is available to the customer. If you want to make the invoice available to everyone you can either of the following:
