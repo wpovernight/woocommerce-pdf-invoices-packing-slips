@@ -50,6 +50,8 @@
 	</tr>
 </table><!-- head container -->
 
+<?php do_action( 'wpo_wcpdf_before_order_details', 'invoice' ); ?>
+
 <table class="order-details">
 	<thead>
 		<tr>
@@ -92,6 +94,8 @@
 		</tr>
 	</tfoot>
 </table><!-- order-details -->
+
+<?php do_action( 'wpo_wcpdf_after_order_details', 'invoice' ); ?>
 
 <table class="notes container">
 	<tr>

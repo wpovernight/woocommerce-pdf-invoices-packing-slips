@@ -40,6 +40,8 @@
 	</tr>
 </table><!-- head container -->
 
+<?php do_action( 'wpo_wcpdf_before_order_details', 'packing-slip' ); ?>
+
 <table class="order-details">
 	<thead>
 		<tr>
@@ -61,6 +63,7 @@
 	</tbody>
 </table><!-- order-details -->		
 
+<?php do_action( 'wpo_wcpdf_after_order_details', 'packing-slip' ); ?>
 
 <table class="notes container">
 	<tr>
