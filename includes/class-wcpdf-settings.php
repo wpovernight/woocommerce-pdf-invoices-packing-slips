@@ -786,6 +786,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			$fields = $args['fields'];
 			$options = get_option( $menu );
 
+			echo '<table>';
 			foreach ($fields as $key => $field) {
 				$id = $args['id'] . '_' . $key;
 
@@ -797,10 +798,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 
 				$title = $field['title'];
 				$size = $field['size'];
-				$description = isset( $field['description'] ) ? '<span style="font-style:italic; margin-left:5px;">'.$field['description'].'</span>' : '';
+				$description = isset( $field['description'] ) ? '<span style="font-style:italic;">'.$field['description'].'</span>' : '';
 
-				printf( '<span style="display:inline-block; width: 5em;">%1$s:</span><input type="text" id="%2$s" name="%3$s[%2$s]" value="%4$s" size="%5$s"/>%6$s<br/>', $title, $id, $menu, $current, $size, $description );
+				echo '<tr>';
+				printf( '<td style="padding:0 1em 0 0; ">%1$s:</td><td style="padding:0;"><input type="text" id="%2$s" name="%3$s[%2$s]" value="%4$s" size="%5$s"/></td><td style="padding:0 0 0 1em;">%6$s</td>', $title, $id, $menu, $current, $size, $description );
+				echo '</tr>';
 			}
+			echo '</table>';
+
 		
 			// Displays option description.
 			if ( isset( $args['description'] ) ) {
