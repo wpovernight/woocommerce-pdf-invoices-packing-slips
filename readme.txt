@@ -1,9 +1,9 @@
 === Plugin Name ===
 Contributors: pomegranate
 Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
-Requires at least: 3.5 and WooCommerce 2.0
-Tested up to: 4.0 and WooCommerce 2.2
-Stable tag: 1.4.9
+Requires at least: 3.5
+Tested up to: 4.0
+Stable tag: 1.4.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 * **Fully customizable** HTML/CSS invoice templates
 * Users can download their invoices from the My Account page
 * Sequential invoice numbers - with custom formatting
-* **Available in: Czech, Dutch, English, French, German, Hungarian, Italian, Norwegian, Polish, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
+* **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Polish, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
 
 Upload all invoices automatically to dropbox with our [WooCommerce PDF Invoices & Packing Slips to Dropbox](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/) extension!
 
@@ -33,6 +33,11 @@ In addition to a number of default settings (including a custom header/logo) and
 * Translation ready
 
 == Installation ==
+
+= Minimum Requirements =
+
+* WooCommerce 2.0 or later
+* WordPress 3.5 or later
 
 = Automatic installation =
 Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser. To do an automatic install of WooCommerce PDF Invoices & Packing Slips, log in to your WordPress admin panel, navigate to the Plugins menu and click Add New.
@@ -175,6 +180,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.4.10 =
+* Translations: Updated POT file
+* Translations: Updated Dutch & Norwegian (Thanks Eirik!)
+* Templates: added action hooks for easier customizations (`wpo_wcpdf_before_order_details` & `wpo_wcpdf_after_order_details`)
 
 = 1.4.9 =
 * Feature: Order number and date are now displayed by default in the Simple template (invoice number and date still optional)
