@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
-"POT-Creation-Date: 2014-10-27 09:23+0100\n"
-"PO-Revision-Date: 2014-10-27 09:24+0100\n"
+"POT-Creation-Date: 2014-11-02 09:55+0100\n"
+"PO-Revision-Date: 2014-11-02 09:55+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: en_US\n"
@@ -140,7 +140,7 @@ msgstr ""
 #, php-format
 msgid ""
 "Want to use your own template? Copy all the files from <code>%s</code> to "
-"<code>%s</code> to customize them"
+"your (child) theme in <code>%s</code> to customize them"
 msgstr ""
 
 #: includes/class-wcpdf-settings.php:294
@@ -268,7 +268,7 @@ msgstr ""
 msgid "Image resolution"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:872
+#: includes/class-wcpdf-settings.php:877
 msgid ""
 "These are used for the (optional) footer columns in the <em>Modern "
 "(Premium)</em> template, but can also be used for other elements in your "
@@ -345,40 +345,40 @@ msgstr ""
 msgid "Payment Method:"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:56
-#: templates/pdf/Simple/packing-slip.php:46
+#: templates/pdf/Simple/invoice.php:58
+#: templates/pdf/Simple/packing-slip.php:48
 msgid "Product"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:57
-#: templates/pdf/Simple/packing-slip.php:47
+#: templates/pdf/Simple/invoice.php:59
+#: templates/pdf/Simple/packing-slip.php:49
 msgid "Quantity"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:58
+#: templates/pdf/Simple/invoice.php:60
 msgid "Price"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:64
+#: templates/pdf/Simple/invoice.php:66
 msgid "Description"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:67
+#: templates/pdf/Simple/invoice.php:69
 msgid "SKU"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:68
-#: templates/pdf/Simple/packing-slip.php:55
+#: templates/pdf/Simple/invoice.php:70
+#: templates/pdf/Simple/packing-slip.php:57
 msgid "SKU:"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:69
-#: templates/pdf/Simple/packing-slip.php:56
+#: templates/pdf/Simple/invoice.php:71
+#: templates/pdf/Simple/packing-slip.php:58
 msgid "Weight:"
 msgstr ""
 
-#: templates/pdf/Simple/invoice.php:101
-#: templates/pdf/Simple/packing-slip.php:70
+#: templates/pdf/Simple/invoice.php:105
+#: templates/pdf/Simple/packing-slip.php:73
 msgid "Customer Notes"
 msgstr ""
 
