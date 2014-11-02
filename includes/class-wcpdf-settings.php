@@ -285,7 +285,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					'menu'			=> $option,
 					'id'			=> 'template_path',
 					'options' 		=> $this->find_templates(),
-					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%s</code> to <code>%s</code> to customize them' , 'wpo_wcpdf' ), $plugin_template_path, $theme_template_path),
+					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%s</code> to your (child) theme in <code>%s</code> to customize them' , 'wpo_wcpdf' ), $plugin_template_path, $theme_template_path),
 				)
 			);			
 
