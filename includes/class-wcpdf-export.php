@@ -299,11 +299,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Attach invoice to completed order or customer invoice email
 		 */
 		public function attach_pdf_to_email ( $attachments, $status, $order ) {
-			$this->order = $order;
-
-			if ($order->post->post_type != 'shop_order') {
+			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder' ) ) ) {
 				return; // do not process low stock notifications etc!
 			}
+			$this->order = $order;
 
 			if (!isset($this->general_settings['email_pdf']) || !isset( $status ) ) {
 				return;
