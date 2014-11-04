@@ -2,16 +2,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-09-18 15:08+0100\n"
-"PO-Revision-Date: 2014-09-18 15:08+0100\n"
+"PO-Revision-Date: 2014-11-04 16:11+0100\n"
 "Last-Translator: Michał Dybczak <michal.dybczak@gmail.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: pl_PL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.9\n"
+"X-Generator: Poedit 1.6.8\n"
 "X-Poedit-Basepath: ../\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -23,24 +24,27 @@ msgid "You do not have sufficient permissions to access this page."
 msgstr "Nie masz wystarczającyh praw dostępu do tej strony."
 
 # This is a filename (prefix). do not use spaces or special characters!
+# Additional polish commentary: Ze względu na polskie prawo wtyczka ta nie jest odpowiednia do wystawiania faktur, dlatego "invoice" zamiast słowa "faktura" jest tłumaczone jako "zamówienie".
 #: includes/class-wcpdf-export.php:223 includes/class-wcpdf-export.php:303
 msgid "invoice"
 msgid_plural "invoices"
-msgstr[0] "Zamówienie"
-msgstr[1] "Zamówienia"
+msgstr[0] "zamówienie"
+msgstr[1] "zamówienia"
+msgstr[2] "zamówień"
 
 # This is a filename (prefix). do not use spaces or special characters!
 #: includes/class-wcpdf-export.php:225
 msgid "packing-slip"
 msgid_plural "packing-slips"
-msgstr[0] "Dowód wysyłki"
-msgstr[1] "Dowody wysyłki"
+msgstr[0] "dowód wysyłki"
+msgstr[1] "dowody wysyłki"
+msgstr[2] "dowodów wysyłki"
 
 #: includes/class-wcpdf-settings.php:36 includes/class-wcpdf-settings.php:37
 #: includes/class-wcpdf-writepanels.php:176
 #: includes/class-wcpdf-writepanels.php:177
 msgid "PDF Invoices"
-msgstr "Zamówienie do PDF"
+msgstr "Zamówienie jako  PDF"
 
 #: includes/class-wcpdf-settings.php:60
 msgid "Settings"
@@ -56,7 +60,7 @@ msgstr "Szablon"
 
 #: includes/class-wcpdf-settings.php:92
 msgid "WooCommerce PDF Invoices"
-msgstr "WooCommerce Zmówienie PDF"
+msgstr "WooCommerce Zmówienie jako PDF"
 
 #: includes/class-wcpdf-settings.php:98
 msgid "Status"
@@ -83,7 +87,7 @@ msgstr ""
 #: includes/class-wcpdf-settings.php:120
 #, php-format
 msgid "For custom templates, contact us at %s."
-msgstr "Jeśli potrzebujesz własnych szablonów, skantaktuj się z nami na  %s."
+msgstr "Jeśli potrzebujesz własnych szablonów, skontaktuj się z nami na  %s."
 
 #: includes/class-wcpdf-settings.php:175
 msgid "General settings"
@@ -99,7 +103,7 @@ msgstr "Ściągnij PDF"
 
 #: includes/class-wcpdf-settings.php:191
 msgid "Open the PDF in a new browser tab/window"
-msgstr "PDF w nowej zakładce/okienku przeglądarki"
+msgstr "Otwórz PDF w nowej zakładce/okienku przeglądarki"
 
 #: includes/class-wcpdf-settings.php:201
 msgid "Attach invoice to:"
@@ -129,7 +133,7 @@ msgid ""
 "plugin will not be able to email invoices."
 msgstr ""
 "Folder tymczasowy (<code>%s</code>) nie może być zapisany, proszę sprawdzić "
-"atrybuty tego folderu. Bez prawa do zapisu E-Maile czy zamówienia nie mogą "
+"atrybuty tego folderu. Bez prawa do zapisu E-Maile do zamówienia nie mogą "
 "być wysłane."
 
 #: includes/class-wcpdf-settings.php:220
@@ -167,19 +171,19 @@ msgstr "List"
 
 #: includes/class-wcpdf-settings.php:301
 msgid "Shop header/logo"
-msgstr "Logo/nagłówek"
+msgstr "Nagłówek/logo"
 
 #: includes/class-wcpdf-settings.php:308
 msgid "Select or upload your invoice header/logo"
-msgstr "Wybierz albo załaduj logo/nagłówek zamówienia"
+msgstr "Wybierz albo załaduj nagłówek/logo zamówienia"
 
 #: includes/class-wcpdf-settings.php:309
 msgid "Set image"
-msgstr "Wybierz obraz"
+msgstr "Ustaw obraz"
 
 #: includes/class-wcpdf-settings.php:310
 msgid "Remove image"
-msgstr "Usuń logo"
+msgstr "Usuń obraz"
 
 #: includes/class-wcpdf-settings.php:317
 msgid "Shop Name"
@@ -191,7 +195,7 @@ msgstr "Adres sklepu"
 
 #: includes/class-wcpdf-settings.php:362
 msgid "Footer: terms & conditions, policies, etc."
-msgstr "Stopka: ogólne postanowienia, itp."
+msgstr "Stopka: ogólne postanowienia, regulamin, itp."
 
 #: includes/class-wcpdf-settings.php:377
 msgid "Number to display on invoice"
@@ -227,8 +231,8 @@ msgid ""
 msgstr ""
 "To jest numer, który będzie użyty na następnym zamówieniu. Domyślnie numer "
 "startowy jest brany z zamówienia pierwszego zamówienia WooCommerce i który "
-"zwiększa się z każdym nowym zamówieniam. Zwróć uwagę, że jeśli nadpiszesz to "
-"i usawisz numer niższy niż najwyższy numer zamówienia (PDF), to może "
+"zwiększa się z każdym nowym zamówienia. Zwróć uwagę, że jeśli nadpiszesz to "
+"i ustawisz numer niższy niż najwyższy numer zamówienia (PDF), to może "
 "zdublować numery zamówień!"
 
 #: includes/class-wcpdf-settings.php:408
@@ -352,7 +356,7 @@ msgid ""
 "(Premium)</em> template, but can also be used for other elements in your "
 "custom template"
 msgstr ""
-"Te pola zostaną użyte (opcjonalnie) dla stopki szaplonu <em>Modern "
+"Te pola zostaną użyte (opcjonalnie) dla stopki szablonu <em>Modern "
 "(Premium)</em>,mogą jedna być też użyte dla innych elementów własnego "
 "szablonu."
 
@@ -370,16 +374,16 @@ msgstr "Stwórz PDF"
 
 #: includes/class-wcpdf-writepanels.php:160
 msgid "PDF invoice"
-msgstr "PDF Zamówienie"
+msgstr "Zamówienie-PDF"
 
 #: includes/class-wcpdf-writepanels.php:161
 msgid "PDF Packing Slip"
-msgstr "PDF Zawartość paczki"
+msgstr "Zawartość paczki-PDF"
 
 #: includes/class-wcpdf-writepanels.php:178
 #: includes/class-wcpdf-writepanels.php:179
 msgid "PDF Packing Slips"
-msgstr "PDF Zawartość paczek"
+msgstr "Zawartość paczek-PDF"
 
 #: includes/class-wcpdf-writepanels.php:192
 msgid "PDF Invoice Number (unformatted!)"
@@ -388,20 +392,20 @@ msgstr "Numer zamówienia PDF (niesformatowany)"
 #: includes/class-wcpdf-writepanels.php:195
 #: templates/pdf/Simple/invoice.php:37
 msgid "Invoice Date:"
-msgstr "Data rachunku:"
+msgstr "Data zamówienia:"
 
 #: includes/class-wcpdf-writepanels.php:196
 msgid "h"
-msgstr ""
+msgstr "godz."
 
 #: includes/class-wcpdf-writepanels.php:196
 msgid "m"
-msgstr ""
+msgstr "min."
 
 #: templates/pdf/Simple/html-document-wrapper.php:6
 #: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
 msgid "Invoice"
-msgstr "Podsumowanie zamówienia:"
+msgstr "Zamówienie"
 
 #: templates/pdf/Simple/html-document-wrapper.php:6
 #: templates/pdf/Simple/packing-slip.php:9
@@ -486,7 +490,7 @@ msgstr "Rodzaj wysyłki"
 
 #: woocommerce-pdf-invoices-packingslips.php:375
 msgid "Subtotal"
-msgstr "Suma produktów"
+msgstr "Podsuma produktów"
 
 #: woocommerce-pdf-invoices-packingslips.php:397
 msgid "Shipping"
