@@ -88,12 +88,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				'invoice'		=> array (
 					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
 					'img'		=> WooCommerce_PDF_Invoices::$plugin_url . 'images/invoice.png',
-					'alt'		=> esc_attr__( 'PDF Invoice', 'wpo_wcpdf' ),
+					'alt'		=> __( 'PDF Invoice', 'wpo_wcpdf' ),
 				),
 				'packing-slip'	=> array (
 					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=packing-slip&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
 					'img'		=> WooCommerce_PDF_Invoices::$plugin_url . 'images/packing-slip.png',
-					'alt'		=> esc_attr__( 'PDF Packing Slip', 'wpo_wcpdf' ),
+					'alt'		=> __( 'PDF Packing Slip', 'wpo_wcpdf' ),
 				),
 			);
 
