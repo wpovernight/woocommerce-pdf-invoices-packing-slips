@@ -14,15 +14,19 @@ Create, print & automatically email PDF invoices & packing slips for WooCommerce
 This WooCommerce extension automatically adds a PDF invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
-* Automatically attach invoice PDF to order confirmation email
+* Automatically attach invoice PDF to WooCommerce emails of your choice
 * Download the PDF invoice / packing slip from the order admin page
-* Generate bulk PDF invoices / packings slips
+* Generate PDF invoices / packings slips in bulk
 * **Fully customizable** HTML/CSS invoice templates
-* Users can download their invoices from the My Account page
+* Download invoices from the My Account page
 * Sequential invoice numbers - with custom formatting
 * **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Polish, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
 
-Upload all invoices automatically to dropbox with our [WooCommerce PDF Invoices & Packing Slips to Dropbox](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/) extension!
+In addition to this, we offer several premium extensions:
+
+* Create/email PDF Proforma Invoices, Credit Notes, email Packing Slips & more with [WooCommerce PDF Invoices & Packing Slips Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
+* Upload all invoices automatically to Dropbox with [WooCommerce PDF Invoices & Packing Slips to Dropbox](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-dropbox/)
+* More advanced & stylish templates with [WooCommerce PDF Invoices & Packing Slips Premium Templates](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)
 
 = Fully customizable =
 In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS based templates that allow for customization & full control over the PDF output. Copy the templates to your theme folder and you don't have to worry that your customizations will be overwritten when you update the plugin.
@@ -60,11 +64,14 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 = How do I create my own custom template? =
 
-Copy the files from `wp-content/plugins/woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/` to `wp-content/themes/yourtheme/woocommerce/pdf/yourtemplate` and customize them there. The new template will show up as 'yourtemplate' (the folder name) in the settings panel.
+Copy the files from `wp-content/plugins/woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/` to your (child) theme in `wp-content/themes/yourtheme/woocommerce/pdf/yourtemplate` and customize them there. The new template will show up as 'yourtemplate' (the folder name) in the settings panel.
 
 = Where can I find more templates? =
 
 Go to [wpovernight.com](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/) to checkout more templates! These include templates with more tax details and product thumbnails. Need a custom templates? Contact us at support@wpovernight.com for more information.
+
+= Can I create/send a proforma invoice or a credit note? =
+This is a feature of our Professional extension, which can be found at [wpovernight.com](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
 
 = Can I contribute to the code? =
 You're more than welcome! This plugin is hosted on github, where you can post issues or make pull requests.
@@ -182,9 +189,10 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Changelog ==
 
 = 1.4.10 =
+* Fix: Invoice not attaching
 * Translations: Updated POT file
-* Translations: Updated Dutch & Norwegian (Thanks Eirik!)
-* Templates: added action hooks for easier customizations (`wpo_wcpdf_before_order_details` & `wpo_wcpdf_after_order_details`)
+* Translations: Updated Polish, Brazilian Portugese, Romanian, Russian, Slovak, Spanish & Ukrainian (Many thanks to all the translators!)
+* Templates: added action hooks for easier customizations (`wpo_wcpdf_before_order_details`,  `wpo_wcpdf_after_order_details`, `wpo_wcpdf_invoice_title` & `wpo_wcpdf_packing_slip_title`)
 
 = 1.4.9 =
 * Feature: Order number and date are now displayed by default in the Simple template (invoice number and date still optional)
