@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: pomegranate
-Tags: woocommerce, print, pdf, bulk, packing slips, invoices, delivery notes, invoice, packing slip, export, email
+Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.0
 Stable tag: 1.4.10
