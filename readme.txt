@@ -191,7 +191,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 = 1.4.10 =
 * Fix: Invoice not attaching
 * Translations: Updated POT file
-* Translations: Updated Polish, Brazilian Portugese, Romanian, Russian, Slovak, Spanish & Ukrainian (Many thanks to all the translators!)
+* Translations: Updated Dutch, Norwegian, Polish, Brazilian Portugese, Romanian, Russian, Slovak, Spanish & Ukrainian (Many thanks to all the translators!)
 * Templates: added action hooks for easier customizations (`wpo_wcpdf_before_order_details`,  `wpo_wcpdf_after_order_details`, `wpo_wcpdf_invoice_title` & `wpo_wcpdf_packing_slip_title`)
 
 = 1.4.9 =
