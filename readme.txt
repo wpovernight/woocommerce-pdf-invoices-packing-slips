@@ -128,7 +128,7 @@ function wpo_wcpdf_custom_filename( $filename, $template_type, $order_ids, $cont
 	// prepend your shopname to the file
 	$new_filename = 'myshopname_' . $filename;
 
-	return $filename;
+	return $new_filename;
 }
 `
 You can also use the $template_type ('invoice' or 'packing-slip'), $order_ids (single array) or $context ('download' or 'attachment') variables to make more complex rules for the filename.
