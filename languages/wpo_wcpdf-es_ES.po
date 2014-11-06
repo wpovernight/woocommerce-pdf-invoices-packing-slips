@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-11-04 19:30+0100\n"
-"PO-Revision-Date: 2014-11-04 19:35+0100\n"
+"PO-Revision-Date: 2014-11-06 14:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: es_ES\n"
@@ -57,7 +57,7 @@ msgstr "WooCommerce Facturas PDF"
 
 #: includes/class-wcpdf-settings.php:107
 msgid "Status"
-msgstr "Estado"
+msgstr ""
 
 #: includes/class-wcpdf-settings.php:118
 #, php-format
