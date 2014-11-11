@@ -192,12 +192,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				return apply_filters( 'wpo_wcpdf_billing_address', $address );
 			}
 
-			if ( !$address && $this->export->order->post->post_parent > 0 ) {
+			if ( !$address && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// try parent address
 
 				// temporarily switch order to make all filters / order calls work correctly
 				$current_order = $this->export->order;
-				$this->export->order = new WC_Order( $this->export->order->post->post_parent );
+				$this->export->order = new WC_Order( $parent_order_id );
 				$address = apply_filters( 'wpo_wcpdf_billing_address', $this->export->order->get_formatted_billing_address() );
 				// switch back & unset
 				$this->export->order = $current_order;
@@ -219,9 +219,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			$billing_email = $this->export->order->billing_email;
 
 
-			if ( !$billing_email && $this->export->order->post->post_parent > 0 ) {
+			if ( !$billing_email && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// try parent
-				$billing_email = get_post_meta( $this->export->order->post->post_parent, '_billing_email', true );
+				$billing_email = get_post_meta( $parent_order_id, '_billing_email', true );
 			}
 
 			return apply_filters( 'wpo_wcpdf_billing_email', $billing_email );
@@ -236,9 +236,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function get_billing_phone() {
 			$billing_phone = $this->export->order->billing_phone;
 
-			if ( !$billing_phone && $this->export->order->post->post_parent > 0 ) {
+			if ( !$billing_phone && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// try parent
-				$billing_phone = get_post_meta( $this->export->order->post->post_parent, '_billing_phone', true );
+				$billing_phone = get_post_meta( $parent_order_id, '_billing_phone', true );
 			}
 
 			return apply_filters( 'wpo_wcpdf_billing_phone', $billing_phone );
@@ -255,12 +255,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				return apply_filters( 'wpo_wcpdf_shipping_address', $address );
 			}
 
-			if ( !$address && $this->export->order->post->post_parent > 0 ) {
+			if ( !$address && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// try parent address
 
 				// temporarily switch order to make all filters / order calls work correctly
 				$current_order = $this->export->order;
-				$this->export->order = new WC_Order( $this->export->order->post->post_parent );
+				$this->export->order = new WC_Order( $parent_order_id );
 				$address = apply_filters( 'wpo_wcpdf_shipping_address', $this->export->order->get_formatted_shipping_address() );
 				// switch back & unset
 				$this->export->order = $current_order;
@@ -281,9 +281,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function get_custom_field( $field_name ) {
 			$custom_field = get_post_meta($this->export->order->id,$field_name,true);
 
-			if ( !$custom_field && $this->export->order->post->post_parent > 0 ) {
+			if ( !$custom_field && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// try parent
-				$custom_field = get_post_meta( $this->export->order->post->post_parent, $field_name, true );
+				$custom_field = get_post_meta( $parent_order_id, $field_name, true );
 			}
 
 			return apply_filters( 'wpo_wcpdf_billing_custom_field', $custom_field );
@@ -378,8 +378,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_order_number() {
 			// try parent first
-			if ( $this->export->order->post->post_parent > 0 && $this->export->order->post->post_type == 'shop_order_refund' ) {
-				$parent_order = new WC_Order( $this->export->order->post->post_parent );
+			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
+				$parent_order = new WC_Order( $parent_order_id );
 				$order_number = $parent_order->get_order_number();
 			} else {
 				$order_number = $this->export->order->get_order_number();
@@ -409,8 +409,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show the order date
 		 */
 		public function get_order_date() {
-			if ( $this->export->order->post->post_parent > 0 && $this->export->order->post->post_type == 'shop_order_refund' ) {
-				$parent_order = new WC_Order( $this->export->order->post->post_parent );
+			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
+				$parent_order = new WC_Order( $parent_order_id );
 				$date = $parent_order->order_date;
 			} else {
 				$date = $this->export->order->order_date;
