@@ -188,6 +188,9 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
+= 1.4.11 =
+* Small fix: bulk actions for specific i18n configurations
+
 = 1.4.10 =
 * Fix: Invoice not attaching
 * Translations: Updated POT file
