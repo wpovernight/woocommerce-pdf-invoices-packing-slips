@@ -215,7 +215,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				<script type="text/javascript">
 				jQuery(document).ready(function() {
 					<?php foreach ($bulk_actions as $action => $title) { ?>
-					jQuery('<option>').val('<?php echo $action; ?>').text('<?php echo $title; ?>').appendTo("select[name='action'], select[name='action2']");
+					jQuery('<option>').val('<?php echo $action; ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
 					<?php }	?>
 				});
 				</script>
