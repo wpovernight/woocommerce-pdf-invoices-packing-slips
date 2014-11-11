@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.0
-Stable tag: 1.4.10
+Stable tag: 1.4.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -190,6 +190,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 = 1.4.11 =
 * Small fix: bulk actions for specific i18n configurations
+* Tweak: total row key used as class in Simple template
 
 = 1.4.10 =
 * Fix: Invoice not attaching
