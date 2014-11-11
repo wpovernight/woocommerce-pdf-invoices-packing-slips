@@ -312,15 +312,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$tmp_path = apply_filters( 'wpo_wcpdf_tmp_path', WooCommerce_PDF_Invoices::$plugin_path . 'tmp/' );
 			array_map('unlink', ( glob( $tmp_path.'*' ) ? glob( $tmp_path.'*' ) : array() ) );
 
+			// set allowed statuses for invoices
 			$documents = array(
 				'invoice'	=>  apply_filters( 'wpo_wcpdf_email_allowed_statuses', array_keys( $this->general_settings['email_pdf'] ) ), // Relevant (default) statuses: new_order, customer_invoice, customer_processing_order, customer_completed_order
 			);
-
 			$documents = apply_filters('wpo_wcpdf_attach_documents', $documents );
 			
-
 			foreach ($documents as $template_type => $allowed_statuses ) {
-
 				// convert 'lazy' status name
 				foreach ($allowed_statuses as $key => $order_status) {
 					if ($order_status == 'completed' || $order_status == 'processing') {
@@ -330,17 +328,20 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 				// legacy filter, use wpo_wcpdf_custom_attachment_condition instead!
 				$attach_invoice = apply_filters('wpo_wcpdf_custom_email_condition', true, $order, $status );
+				if ( $template_type == 'invoice' && !$attach_invoice ) {
+					// don't attach invoice, continue with other documents
+					continue;
+				}
 
 				// use this filter to add an extra condition - return false to disable the PDF attachment
 				$attach_document = apply_filters('wpo_wcpdf_custom_attachment_condition', true, $order, $status, $template_type );
-
-				if( in_array( $status, $allowed_statuses ) && !( ( $template_type == 'invoice' ) && !$attach_invoice ) && $attach_document ) {
+				if( in_array( $status, $allowed_statuses ) && $attach_document ) {
 					// create pdf data
 					$pdf_data = $this->get_pdf( $template_type, (array) $order->id );
 
 					if ( !$pdf_data ) {
-						// something went wrong
-						break;
+						// something went wrong, continue trying with other documents
+						continue;
 					}
 
 					// compose filename
