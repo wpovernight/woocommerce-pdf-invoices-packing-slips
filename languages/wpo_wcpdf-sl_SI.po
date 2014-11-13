@@ -1,0 +1,528 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
+"POT-Creation-Date: 2014-11-06 14:51+0100\n"
+"PO-Revision-Date: 2014-11-12 22:54+0100\n"
+"Last-Translator: \n"
+"Language-Team: WP Overnight <support@wpovernight.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.10\n"
+"X-Poedit-Basepath: ../\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
+"Language: sl_SI\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/class-wcpdf-export.php:175 includes/class-wcpdf-export.php:180
+#: includes/class-wcpdf-export.php:185 includes/class-wcpdf-export.php:196
+#: includes/class-wcpdf-export.php:204
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Nimate dovolj pristojnosti za dostop do te strani"
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:263
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "račun"
+msgstr[1] "računa"
+msgstr[2] "računi"
+msgstr[3] "računov"
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:267
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "spremnica"
+msgstr[1] "spremnici"
+msgstr[2] "spremnice"
+msgstr[3] "spremnic"
+
+#: includes/class-wcpdf-settings.php:38 includes/class-wcpdf-settings.php:39
+#: includes/class-wcpdf-writepanels.php:31
+msgid "PDF Invoices"
+msgstr "PDF računi"
+
+#: includes/class-wcpdf-settings.php:69
+msgid "Settings"
+msgstr "Nastavitve"
+
+#: includes/class-wcpdf-settings.php:91
+msgid "General"
+msgstr "Splošno"
+
+#: includes/class-wcpdf-settings.php:92
+msgid "Template"
+msgstr "Predloga"
+
+#: includes/class-wcpdf-settings.php:101
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF računi"
+
+#: includes/class-wcpdf-settings.php:107
+msgid "Status"
+msgstr "Status"
+
+#: includes/class-wcpdf-settings.php:167
+msgid "General settings"
+msgstr "Splošne nastavitve"
+
+#: includes/class-wcpdf-settings.php:174
+msgid "How do you want to view the PDF?"
+msgstr "Kako si želite ogledati PDF?"
+
+#: includes/class-wcpdf-settings.php:182
+msgid "Download the PDF"
+msgstr "Prenesi PDF"
+
+#: includes/class-wcpdf-settings.php:183
+msgid "Open the PDF in a new browser tab/window"
+msgstr "Odpri PDF v novem zavihku/oknu"
+
+#: includes/class-wcpdf-settings.php:193
+msgid "Attach invoice to:"
+msgstr "Priloži račun:"
+
+#: includes/class-wcpdf-settings.php:201
+msgid "Admin New Order email"
+msgstr "Skrbnik - obvestilo o novem naročilu"
+
+#: includes/class-wcpdf-settings.php:202
+msgid "Customer Processing Order email"
+msgstr "Kupec - obvestilo o obdelavi"
+
+#: includes/class-wcpdf-settings.php:203
+msgid "Customer Completed Order email"
+msgstr "Kupec - obvestilo o zaključenem nakupu"
+
+#: includes/class-wcpdf-settings.php:204
+msgid "Customer Invoice email"
+msgstr "Kupec - email z računom"
+
+#: includes/class-wcpdf-settings.php:206
+#, php-format
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+"Izgleda, da v temp direktorij (<code>%s</code>) ni možno zapisovati, "
+"preverite dovoljenja za ta direktorij. Brez možnosti zapisovanja v ta "
+"direktorij, razširitev ne more pošiljati računov na email."
+
+#: includes/class-wcpdf-settings.php:212
+msgid "Enable invoice number column in the orders list"
+msgstr "Omogoči prikaz št. računa na seznamu naročil"
+
+#: includes/class-wcpdf-settings.php:251
+msgid "PDF Template settings"
+msgstr "Nastavitve PDF predloge"
+
+#: includes/class-wcpdf-settings.php:263
+msgid "Choose a template"
+msgstr "Izberite predlogo"
+
+#: includes/class-wcpdf-settings.php:271
+#, php-format
+msgid ""
+"Want to use your own template? Copy all the files from <code>%s</code> to "
+"your (child) theme in <code>%s</code> to customize them"
+msgstr ""
+"Želite uporabiti svojo predlogo? Kopirajte vse datoteke iz <code>%s</code> v "
+"vašo (otroško) temo v <code>%s</code> in jo spremenite po želji"
+
+#: includes/class-wcpdf-settings.php:277
+msgid "Paper size"
+msgstr "Velikost papirja"
+
+#: includes/class-wcpdf-settings.php:285
+msgid "A4"
+msgstr "A4"
+
+#: includes/class-wcpdf-settings.php:286
+msgid "Letter"
+msgstr "Pismo"
+
+#: includes/class-wcpdf-settings.php:293
+msgid "Shop header/logo"
+msgstr "Glava trgovine/logo"
+
+#: includes/class-wcpdf-settings.php:300
+msgid "Select or upload your invoice header/logo"
+msgstr "Izberite ali naložite svojo glavo/logo"
+
+#: includes/class-wcpdf-settings.php:301
+msgid "Set image"
+msgstr "Nastavi sliko"
+
+#: includes/class-wcpdf-settings.php:302
+msgid "Remove image"
+msgstr "Odstrani sliko"
+
+#: includes/class-wcpdf-settings.php:309
+msgid "Shop Name"
+msgstr "Ime trgovine"
+
+#: includes/class-wcpdf-settings.php:322
+msgid "Shop Address"
+msgstr "Naslov trgovine"
+
+#: includes/class-wcpdf-settings.php:354
+msgid "Footer: terms & conditions, policies, etc."
+msgstr "Noga: splošni pogoji, zasebnost, pravice ipd."
+
+#: includes/class-wcpdf-settings.php:369
+msgid "Display invoice date"
+msgstr "Prikaži datum naročila"
+
+#: includes/class-wcpdf-settings.php:382
+msgid "Display built-in sequential invoice number"
+msgstr "Prikaži vdelano sekvenčno številko računa"
+
+#: includes/class-wcpdf-settings.php:395
+msgid "Next invoice number (without prefix/suffix etc.)"
+msgstr "Naslednja številka računa (brez predpone/zapone ipd.)"
+
+#: includes/class-wcpdf-settings.php:403
+msgid ""
+"This is the number that will be used on the next invoice that is created. By "
+"default, numbering starts from the WooCommerce Order Number of the first "
+"invoice that is created and increases for every new invoice. Note that if "
+"you override this and set it lower than the highest (PDF) invoice number, "
+"this could create double invoice numbers!"
+msgstr ""
+"To je število, ki bo uporabljeno pri naslednjem računu, ki bo ustvarjen. "
+"Privzeti je nastavljeno, da WooCommerce prične številčiti pri prvem računu "
+"in le-to povečuje za vsak nov račun. Pazite, če ste to prepisali in jo "
+"nastavili nižjo, kot pa je že izdan račun, lahko pride do podvajanja številk!"
+
+#: includes/class-wcpdf-settings.php:409
+msgid "Invoice number format"
+msgstr "Format številke računa"
+
+#: includes/class-wcpdf-settings.php:418
+msgid "Prefix"
+msgstr "Predpona"
+
+#: includes/class-wcpdf-settings.php:420
+msgid ""
+"to use the order year and/or month, use [order_year] or [order_month] "
+"respectively"
+msgstr ""
+"za uporabo letnice ali meseca, uporabite [order_year] ali [order_month] "
+"posebej."
+
+#: includes/class-wcpdf-settings.php:423
+msgid "Suffix"
+msgstr "Pripona"
+
+#: includes/class-wcpdf-settings.php:428
+msgid "Padding"
+msgstr "Predštevilo"
+
+#: includes/class-wcpdf-settings.php:430
+msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
+msgstr "vnesite število številk - vnesite \"6\" za prikaz 42 kot 000042"
+
+#: includes/class-wcpdf-settings.php:433
+msgid ""
+"note: if you have already created a custom invoice number format with a "
+"filter, the above settings will be ignored"
+msgstr ""
+"pozor: če ste že ustvarili format številke računa po svoji želji z "
+"morebitnim filtrom, bodo zgornje nastavitve ignorirane"
+
+#: includes/class-wcpdf-settings.php:440
+msgid "Extra template fields"
+msgstr "Dodatna polja predloge"
+
+#: includes/class-wcpdf-settings.php:447
+msgid "Extra field 1"
+msgstr "Extra polje 1"
+
+#: includes/class-wcpdf-settings.php:456
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr "To je 1. kolona noge v Moderni predlogi (premium)"
+
+#: includes/class-wcpdf-settings.php:462
+msgid "Extra field 2"
+msgstr "Extra polje 2"
+
+#: includes/class-wcpdf-settings.php:471
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr "To je 2. kolona noge v Moderni predlogi (premium)"
+
+#: includes/class-wcpdf-settings.php:477
+msgid "Extra field 3"
+msgstr "Extra polje 3"
+
+#: includes/class-wcpdf-settings.php:486
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr "To je 3. kolona noge v Moderni predlogi (premium)"
+
+#: includes/class-wcpdf-settings.php:744
+msgid "Image resolution"
+msgstr "Resolucija slike"
+
+#: includes/class-wcpdf-settings.php:860
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
+msgstr ""
+"Ta polja se uporabijo na željo v Moderni predlogi (premium), lahko pa jih "
+"uporabite tudi za druge elemente Vaše predloge po želji."
+
+#: includes/class-wcpdf-writepanels.php:32
+msgid "PDF Packing Slips"
+msgstr "PDF spremnice"
+
+#: includes/class-wcpdf-writepanels.php:91
+#: includes/class-wcpdf-writepanels.php:184
+msgid "PDF Invoice"
+msgstr "PDF račun"
+
+#: includes/class-wcpdf-writepanels.php:96
+#: includes/class-wcpdf-writepanels.php:189
+msgid "PDF Packing Slip"
+msgstr "PDF spremnica"
+
+#: includes/class-wcpdf-writepanels.php:123
+msgid "Invoice Number"
+msgstr "Številka računa"
+
+#: includes/class-wcpdf-writepanels.php:160
+msgid "Download invoice (PDF)"
+msgstr "Račun"
+
+#: includes/class-wcpdf-writepanels.php:171
+msgid "Create PDF"
+msgstr "Ustvari PDF"
+
+#: includes/class-wcpdf-writepanels.php:232
+msgid "PDF Invoice Number (unformatted!)"
+msgstr "PDF številka računa (neformatirana)"
+
+#: includes/class-wcpdf-writepanels.php:235
+#: templates/pdf/Simple/invoice.php:36
+msgid "Invoice Date:"
+msgstr "Datum računa:"
+
+#: includes/class-wcpdf-writepanels.php:236
+msgid "h"
+msgstr "u"
+
+#: includes/class-wcpdf-writepanels.php:236
+msgid "m"
+msgstr "m"
+
+#: includes/wcpdf-extensions.php:15
+msgid "Check out these premium extensions!"
+msgstr "Preverite premium razširitve"
+
+#: includes/wcpdf-extensions.php:16
+msgid "click items to read more"
+msgstr "klikni predmet za več vsebine"
+
+#: includes/wcpdf-extensions.php:23
+msgid "Go Pro: Proforma invoices, credit notes & more!"
+msgstr "Pro verzija: Predračuni, obvestila in še več!"
+
+#: includes/wcpdf-extensions.php:25
+msgid ""
+"Supercharge WooCommerce PDF Invoices & Packing Slips with the following "
+"features:"
+msgstr "Dopolnite WooCommerce PDF Račune in Spremnice s sledečimi funkcijami:"
+
+#: includes/wcpdf-extensions.php:27
+msgid "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
+msgstr "Email/natisni/prenesi <b>PDF Zapiske / Račune</b>"
+
+#: includes/wcpdf-extensions.php:28
+msgid ""
+"Attach a <b>static file</b> (for example a terms & conditions document) to "
+"the WooCommerce emails of your choice."
+msgstr ""
+"Priložite <b>datoteko</b> (npr. pogoje nakupa) v elektornsko sporočilo po "
+"vaši želji."
+
+#: includes/wcpdf-extensions.php:29
+msgid ""
+"Use <b>separate numbering systems</b> and/or format for proforma invoices "
+"and credit notes or utilize the main invoice numbering system"
+msgstr ""
+"Uporabite <b>ločen sistem za številčenje</b> za predračune in opomnike, ali "
+"pa vklopite glavni sistem za številčenje."
+
+#: includes/wcpdf-extensions.php:30
+msgid ""
+"<b>Customize</b> the <b>shipping & billing address</b> format to include "
+"additional custom fields, font sizes etc. without the need to create a "
+"custom template."
+msgstr ""
+"<b>Uredite naslov za dostavo in račun</b> tako, da vključite dodatna polja, "
+"velikost pisave ipd. brez, da ustvarite svojo predlogo."
+
+#: includes/wcpdf-extensions.php:31
+msgid "Use the plugin in multilingual <b>WPML</b> setups"
+msgstr "Uporabite ta plugin v večjezični <b>WPML</b> nastavitvi"
+
+#: includes/wcpdf-extensions.php:33
+msgid "Get WooCommerce PDF Invoices & Packing Slips Professional!"
+msgstr "WooCommerce PDF Računi in Spremnice profesional!"
+
+#: includes/wcpdf-extensions.php:41
+msgid "Upload all invoices automatically to your dropbox"
+msgstr "Avtomatsko naložite vse račune na Dropbox"
+
+#: includes/wcpdf-extensions.php:47
+msgid ""
+"This extension conveniently uploads all the invoices (and other pdf "
+"documents from the professional extension) that are emailed to your "
+"customers to Dropbox. The best way to keep your invoice administration up to "
+"date!"
+msgstr ""
+"Razširitev omogoča da naložite vse račune (ali druge dokumente iz "
+"profesionalne razširitve), ki so poslane vašim strankam, na Dropbox. "
+"Najboljši način za vedno osveženo administracijo!"
+
+#: includes/wcpdf-extensions.php:48
+msgid "Get WooCommerce PDF Invoices & Packing Slips to dropbox!"
+msgstr "WooCommerce PDF Računi in Spremnice na dropbox"
+
+#: includes/wcpdf-extensions.php:62
+msgid "More advanced templates"
+msgstr "Napredne predloge"
+
+#: includes/wcpdf-extensions.php:65
+msgid "Stylish modern invoices & packing slips with product thumbnails!"
+msgstr "Stilsko moderni računi in spremnice z slikami produktov"
+
+#: includes/wcpdf-extensions.php:66
+msgid "More tax details on the invoices!"
+msgstr "DDV podrobnosti na računu!"
+
+#: includes/wcpdf-extensions.php:67
+#, php-format
+msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
+msgstr "Preverite premium PDF Računi in Spremnice predloge pri %s."
+
+#: includes/wcpdf-extensions.php:68
+#, php-format
+msgid "For custom templates, contact us at %s."
+msgstr "Za prirejene predloge nas kontaktirajte na %s"
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
+msgid "Invoice"
+msgstr "Račun"
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+msgid "Packing Slip"
+msgstr "Spremnica"
+
+#: templates/pdf/Simple/invoice.php:32
+msgid "Invoice Number:"
+msgstr "Številka računa:"
+
+#: templates/pdf/Simple/invoice.php:39
+#: templates/pdf/Simple/packing-slip.php:33
+msgid "Order Number:"
+msgstr "Naročilo:"
+
+#: templates/pdf/Simple/invoice.php:41
+#: templates/pdf/Simple/packing-slip.php:31
+msgid "Order Date:"
+msgstr "Datum naročila:"
+
+#: templates/pdf/Simple/invoice.php:43
+msgid "Payment Method:"
+msgstr "Način plačila:"
+
+#: templates/pdf/Simple/invoice.php:58
+#: templates/pdf/Simple/packing-slip.php:48
+msgid "Product"
+msgstr "Aranžma"
+
+#: templates/pdf/Simple/invoice.php:59
+#: templates/pdf/Simple/packing-slip.php:49
+msgid "Quantity"
+msgstr "Količina"
+
+#: templates/pdf/Simple/invoice.php:60
+msgid "Price"
+msgstr "Cena"
+
+#: templates/pdf/Simple/invoice.php:66
+msgid "Description"
+msgstr "Opis"
+
+#: templates/pdf/Simple/invoice.php:69
+msgid "SKU"
+msgstr "SKU:"
+
+#: templates/pdf/Simple/invoice.php:70
+#: templates/pdf/Simple/packing-slip.php:57
+msgid "SKU:"
+msgstr "SKU:"
+
+#: templates/pdf/Simple/invoice.php:71
+#: templates/pdf/Simple/packing-slip.php:58
+msgid "Weight:"
+msgstr "Teža:"
+
+#: templates/pdf/Simple/invoice.php:105
+#: templates/pdf/Simple/packing-slip.php:73
+msgid "Customer Notes"
+msgstr "Sporočilo kupca"
+
+#: woocommerce-pdf-invoices-packingslips.php:98
+#, php-format
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
+"installed & activated!"
+msgstr ""
+"WooCommerce PDF Računi in Spremnice potrebujejo inštaliran ter aktiviran "
+"%sWooCommerce%s!"
+
+#: woocommerce-pdf-invoices-packingslips.php:206
+#: woocommerce-pdf-invoices-packingslips.php:269
+msgid "N/A"
+msgstr "Ni na voljo"
+
+#: woocommerce-pdf-invoices-packingslips.php:358
+msgid "Payment method"
+msgstr "Način plačila"
+
+#: woocommerce-pdf-invoices-packingslips.php:369
+msgid "Shipping method"
+msgstr "Način dostave"
+
+#: woocommerce-pdf-invoices-packingslips.php:484
+msgid "Subtotal"
+msgstr "Skupaj"
+
+#: woocommerce-pdf-invoices-packingslips.php:506
+msgid "Shipping"
+msgstr "Dostava"
+
+#: woocommerce-pdf-invoices-packingslips.php:540
+msgid "Discount"
+msgstr "Popust"
+
+#: woocommerce-pdf-invoices-packingslips.php:579
+msgid "VAT"
+msgstr "DDV"
+
+#: woocommerce-pdf-invoices-packingslips.php:616
+msgid "Total ex. VAT"
+msgstr "Skupaj brez DDV"
+
+#: woocommerce-pdf-invoices-packingslips.php:619
+msgid "Total"
+msgstr "Za plačilo"
