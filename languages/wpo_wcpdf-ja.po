@@ -1,0 +1,453 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
+"POT-Creation-Date: 2014-10-27 09:23+0100\n"
+"PO-Revision-Date: 2014-11-05 14:08+0900\n"
+"Last-Translator: Shohei Tanaka <shohei.tanaka@artisanworkshop.biz>\n"
+"Language-Team: Shohei Tanaka <shohei.tanaka@artisanworkshop.biz>\n"
+"Language: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-Basepath: ../\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/class-wcpdf-export.php:175 includes/class-wcpdf-export.php:180
+#: includes/class-wcpdf-export.php:185 includes/class-wcpdf-export.php:196
+#: includes/class-wcpdf-export.php:204
+msgid "You do not have sufficient permissions to access this page."
+msgstr "このページにアクセスするための十分な権限がありません。"
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:263
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "請求書"
+msgstr[1] "請求書"
+
+# This is a filename (prefix). do not use spaces or special characters!
+#: includes/class-wcpdf-export.php:267
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "納品明細書"
+msgstr[1] "納品明細書"
+
+#: includes/class-wcpdf-settings.php:38 includes/class-wcpdf-settings.php:39
+#: includes/class-wcpdf-writepanels.php:31
+msgid "PDF Invoices"
+msgstr "PDF請求書"
+
+#: includes/class-wcpdf-settings.php:69
+msgid "Settings"
+msgstr "設定"
+
+#: includes/class-wcpdf-settings.php:91
+msgid "General"
+msgstr "一般設定"
+
+#: includes/class-wcpdf-settings.php:92
+msgid "Template"
+msgstr "テンプレート"
+
+#: includes/class-wcpdf-settings.php:101
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF請求書"
+
+#: includes/class-wcpdf-settings.php:107
+msgid "Status"
+msgstr "状況"
+
+#: includes/class-wcpdf-settings.php:118
+#, php-format
+msgid ""
+"Upload all invoices automatically to your dropbox!<br/>Check out the %s "
+"extension."
+msgstr ""
+"自動的に指定したDropBoxに請求書をアップロードします。<br/>%sの拡張プラグイン"
+"をチェックしてみてください。"
+
+#: includes/class-wcpdf-settings.php:128
+#, php-format
+msgid ""
+"Looking for more advanced templates? Check out the Premium PDF Invoice & "
+"Packing Slips templates at %s."
+msgstr ""
+"もっとテンプレートが見たいですか？Premium PDF Invoice & Packing Slips "
+"templatesを%sでチェックしてください。"
+
+#: includes/class-wcpdf-settings.php:129
+#, php-format
+msgid "For custom templates, contact us at %s."
+msgstr ""
+"テンプレートのカスタマイズが必要でしたら、%sに英語でお問い合わせください。"
+
+#: includes/class-wcpdf-settings.php:184
+msgid "General settings"
+msgstr "一般設定"
+
+#: includes/class-wcpdf-settings.php:191
+msgid "How do you want to view the PDF?"
+msgstr "PDFファイルをどのようにして見ますか？"
+
+#: includes/class-wcpdf-settings.php:199
+msgid "Download the PDF"
+msgstr " PDFをダウンロード"
+
+#: includes/class-wcpdf-settings.php:200
+msgid "Open the PDF in a new browser tab/window"
+msgstr "ブラウザーの新しいタブかウインドウを開く"
+
+#: includes/class-wcpdf-settings.php:210
+msgid "Attach invoice to:"
+msgstr "チェックのメールに請求書を付ける"
+
+#: includes/class-wcpdf-settings.php:218
+msgid "Admin New Order email"
+msgstr "管理者の新しい注文メール"
+
+#: includes/class-wcpdf-settings.php:219
+msgid "Customer Processing Order email"
+msgstr "お客様の進行中の注文メール"
+
+#: includes/class-wcpdf-settings.php:220
+msgid "Customer Completed Order email"
+msgstr "お客様の注文完了メール"
+
+#: includes/class-wcpdf-settings.php:221
+msgid "Customer Invoice email"
+msgstr "お客様の請求メール"
+
+#: includes/class-wcpdf-settings.php:223
+#, php-format
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+" (<code>%s</code>) のフォルダが書き込み不可になっているようです。フォルダーの"
+"パーミッションを確認して下さい。このフォルダに書き込みが出来ないと、このプラ"
+"グインは請求書をメールで送ることが出来ません。"
+
+#: includes/class-wcpdf-settings.php:229
+msgid "Enable invoice number column in the orders list"
+msgstr "請求書番号を注文一覧の項目に表示する"
+
+#: includes/class-wcpdf-settings.php:268
+msgid "PDF Template settings"
+msgstr "PDF テンプレート設定"
+
+#: includes/class-wcpdf-settings.php:280
+msgid "Choose a template"
+msgstr "テンプレートを選ぶ"
+
+#: includes/class-wcpdf-settings.php:288
+#, php-format
+msgid ""
+"Want to use your own template? Copy all the files from <code>%s</code> to "
+"<code>%s</code> to customize them"
+msgstr ""
+"もし、ご自身でテンプレートをカスタマイズしたいのなら、<code>%s</code> から "
+"<code>%s</code>へ全てのファイルをコピーしてカスタマイズしてください。"
+
+#: includes/class-wcpdf-settings.php:294
+msgid "Paper size"
+msgstr "印刷用紙サイズ"
+
+#: includes/class-wcpdf-settings.php:302
+msgid "A4"
+msgstr "A4"
+
+#: includes/class-wcpdf-settings.php:303
+msgid "Letter"
+msgstr "レターサイズ"
+
+#: includes/class-wcpdf-settings.php:310
+msgid "Shop header/logo"
+msgstr "店舗ヘッダー／ロゴ"
+
+#: includes/class-wcpdf-settings.php:317
+msgid "Select or upload your invoice header/logo"
+msgstr ""
+"請求書のヘッダー／ロゴに使用するイメージを選ぶかアップロードしてください"
+
+#: includes/class-wcpdf-settings.php:318
+msgid "Set image"
+msgstr "イメージ設定"
+
+#: includes/class-wcpdf-settings.php:319
+msgid "Remove image"
+msgstr "イメージ削除"
+
+#: includes/class-wcpdf-settings.php:326
+msgid "Shop Name"
+msgstr "店舗名"
+
+#: includes/class-wcpdf-settings.php:339
+msgid "Shop Address"
+msgstr "店舗住所"
+
+#: includes/class-wcpdf-settings.php:371
+msgid "Footer: terms & conditions, policies, etc."
+msgstr "フッター : 規約、方針など"
+
+#: includes/class-wcpdf-settings.php:386
+msgid "Display invoice date"
+msgstr "請求日を表示"
+
+#: includes/class-wcpdf-settings.php:399
+msgid "Display built-in sequential invoice number"
+msgstr "請求書番号の連番を表示"
+
+#: includes/class-wcpdf-settings.php:412
+msgid "Next invoice number (without prefix/suffix etc.)"
+msgstr "次の請求書番号（接頭辞や接尾辞など無し）"
+
+#: includes/class-wcpdf-settings.php:420
+msgid ""
+"This is the number that will be used on the next invoice that is created. By "
+"default, numbering starts from the WooCommerce Order Number of the first "
+"invoice that is created and increases for every new invoice. Note that if "
+"you override this and set it lower than the highest (PDF) invoice number, "
+"this could create double invoice numbers!"
+msgstr ""
+"これは、次の請求書が発行される際に使われる請求書番号です。デフォルトでは、最"
+"初に請求書を作ったWooCommerceの注文番号から始まります。この番号の指定の注意点"
+"ですが、現時点の番号より小さくすると請求書番号が重複しますので、注意してくだ"
+"さい。"
+
+#: includes/class-wcpdf-settings.php:426
+msgid "Invoice number format"
+msgstr "請求書番号の形式"
+
+#: includes/class-wcpdf-settings.php:435
+msgid "Prefix"
+msgstr "接頭辞"
+
+#: includes/class-wcpdf-settings.php:437
+msgid ""
+"to use the order year and/or month, use [order_year] or [order_month] "
+"respectively"
+msgstr ""
+"年や月を使いたい場合は[order_year]と[order_month]をそれぞれ使ってください。"
+
+#: includes/class-wcpdf-settings.php:440
+msgid "Suffix"
+msgstr "接尾辞"
+
+#: includes/class-wcpdf-settings.php:445
+msgid "Padding"
+msgstr "桁数"
+
+#: includes/class-wcpdf-settings.php:447
+msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
+msgstr "ここには桁数を入れてください。42の場合は000042と表示されます。"
+
+#: includes/class-wcpdf-settings.php:450
+msgid ""
+"note: if you have already created a custom invoice number format with a "
+"filter, the above settings will be ignored"
+msgstr ""
+"注意 : すでにフィルターを使用してカスタム請求書番号の書式を作成している場合、"
+"上記の設定は無視されます。"
+
+#: includes/class-wcpdf-settings.php:457
+msgid "Extra template fields"
+msgstr "追加項目"
+
+#: includes/class-wcpdf-settings.php:464
+msgid "Extra field 1"
+msgstr "追加項目１"
+
+#: includes/class-wcpdf-settings.php:473
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr ""
+"これはフッターカラム１の<i>Modern (Premium)</i> テンプレートで使います。"
+
+#: includes/class-wcpdf-settings.php:479
+msgid "Extra field 2"
+msgstr "追加項目２"
+
+#: includes/class-wcpdf-settings.php:488
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr ""
+"これはフッターカラム２の<i>Modern (Premium)</i> テンプレートで使います。"
+
+#: includes/class-wcpdf-settings.php:494
+msgid "Extra field 3"
+msgstr "追加項目３"
+
+#: includes/class-wcpdf-settings.php:503
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr ""
+"これはフッターカラム３の<i>Modern (Premium)</i> テンプレートで使います。"
+
+#: includes/class-wcpdf-settings.php:761
+msgid "Image resolution"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:872
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern (Premium)"
+"</em> template, but can also be used for other elements in your custom "
+"template"
+msgstr ""
+"これらは、フッター項目（オプション）の<em>Modern (Premium)</em>テンプレート "
+"で使いますが、カスタムテンプレート内の他の要素のために使用することができま"
+"す。"
+
+#: includes/class-wcpdf-writepanels.php:32
+msgid "PDF Packing Slips"
+msgstr "PDF納品明細書"
+
+#: includes/class-wcpdf-writepanels.php:123
+msgid "Invoice Number"
+msgstr "請求書番号"
+
+#: includes/class-wcpdf-writepanels.php:160
+msgid "Download invoice (PDF)"
+msgstr "ダウンロード請求書(PDF)"
+
+#: includes/class-wcpdf-writepanels.php:171
+msgid "Create PDF"
+msgstr "PDF書類の作成"
+
+#: includes/class-wcpdf-writepanels.php:184
+msgid "PDF Invoice"
+msgstr "PDF請求書"
+
+#: includes/class-wcpdf-writepanels.php:189
+msgid "PDF Packing Slip"
+msgstr "PDF 納品明細票"
+
+#: includes/class-wcpdf-writepanels.php:232
+msgid "PDF Invoice Number (unformatted!)"
+msgstr "PDF 請求書番号(フォーマットされていません)"
+
+#: includes/class-wcpdf-writepanels.php:235
+#: templates/pdf/Simple/invoice.php:36
+msgid "Invoice Date:"
+msgstr "請求日："
+
+#: includes/class-wcpdf-writepanels.php:236
+msgid "h"
+msgstr ""
+
+#: includes/class-wcpdf-writepanels.php:236
+msgid "m"
+msgstr ""
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
+msgid "Invoice"
+msgstr "請求書"
+
+#: templates/pdf/Simple/html-document-wrapper.php:6
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+msgid "Packing Slip"
+msgstr "納品明細書"
+
+#: templates/pdf/Simple/invoice.php:32
+msgid "Invoice Number:"
+msgstr "請求書番号："
+
+#: templates/pdf/Simple/invoice.php:39
+#: templates/pdf/Simple/packing-slip.php:33
+msgid "Order Number:"
+msgstr "注文番号："
+
+#: templates/pdf/Simple/invoice.php:41
+#: templates/pdf/Simple/packing-slip.php:31
+msgid "Order Date:"
+msgstr "注文日："
+
+#: templates/pdf/Simple/invoice.php:43
+msgid "Payment Method:"
+msgstr "支払い方法："
+
+#: templates/pdf/Simple/invoice.php:56
+#: templates/pdf/Simple/packing-slip.php:46
+msgid "Product"
+msgstr "商品"
+
+#: templates/pdf/Simple/invoice.php:57
+#: templates/pdf/Simple/packing-slip.php:47
+msgid "Quantity"
+msgstr "数"
+
+#: templates/pdf/Simple/invoice.php:58
+msgid "Price"
+msgstr "価格"
+
+#: templates/pdf/Simple/invoice.php:64
+msgid "Description"
+msgstr "説明"
+
+#: templates/pdf/Simple/invoice.php:67
+msgid "SKU"
+msgstr "SKU"
+
+#: templates/pdf/Simple/invoice.php:68
+#: templates/pdf/Simple/packing-slip.php:55
+msgid "SKU:"
+msgstr "SKU:"
+
+#: templates/pdf/Simple/invoice.php:69
+#: templates/pdf/Simple/packing-slip.php:56
+msgid "Weight:"
+msgstr "重さ："
+
+#: templates/pdf/Simple/invoice.php:101
+#: templates/pdf/Simple/packing-slip.php:70
+msgid "Customer Notes"
+msgstr "お客様からの注意事項"
+
+#: woocommerce-pdf-invoices-packingslips.php:98
+#, php-format
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
+"installed & activated!"
+msgstr ""
+"WooCommerce PDF Invoices & Packing Slips は%sWooCommerce%sがインストールされ"
+"てアクティブになっていないといけません。"
+
+#: woocommerce-pdf-invoices-packingslips.php:206
+#: woocommerce-pdf-invoices-packingslips.php:269
+msgid "N/A"
+msgstr "N/A"
+
+#: woocommerce-pdf-invoices-packingslips.php:358
+msgid "Payment method"
+msgstr "支払い方法"
+
+#: woocommerce-pdf-invoices-packingslips.php:369
+msgid "Shipping method"
+msgstr "発送方法"
+
+#: woocommerce-pdf-invoices-packingslips.php:484
+msgid "Subtotal"
+msgstr "小計"
+
+#: woocommerce-pdf-invoices-packingslips.php:506
+msgid "Shipping"
+msgstr "配送"
+
+#: woocommerce-pdf-invoices-packingslips.php:540
+msgid "Discount"
+msgstr "値引き"
+
+#: woocommerce-pdf-invoices-packingslips.php:579
+msgid "VAT"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:616
+msgid "Total ex. VAT"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:619
+msgid "Total"
+msgstr "合計"
