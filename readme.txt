@@ -20,7 +20,7 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 * **Fully customizable** HTML/CSS invoice templates
 * Download invoices from the My Account page
 * Sequential invoice numbers - with custom formatting
-* **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Polish, Romanian, Russian, Slovak, Spanish, Swedish & Ukrainian**
+* **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian**
 
 In addition to this, we offer several premium extensions:
 
@@ -91,6 +91,53 @@ This plugin is translation ready, which means that you can translate it using st
 7. Enter the translations. invoice and packing-slip now have two translation fields, single & plural. Note that this is a filename, so replace spaces with a - just to be sure!
 8. Save as `wpo_wcpdf-xx_XX.po`, where you replace xx_XX with your language code & country code suffix (da_DK, pl_PL, de_DE etc.)
 
+= How can I use my own font? =
+Although the plugin supports webfonts, this is somewhat limited and has a lot of caveats, read [this thread](https://wordpress.org/support/topic/webfonts-within-a-custom-template-not-rendering-in-pdf?replies=4#post-5395442) on the forum.
+Some languages (Japanese, Chinese, etc.) are not supported by the default font included with the plugin, in this case a custom font is required.
+The best method is to create a custom template first (see above), then add a `fonts/` folder to that template and use the following code (replace the font names/filenames) to load the font in the style.css from the pdf template:
+`
+<?php global $wpo_wcpdf;?>
+/* Load font */
+@font-face {
+	font-family: 'MyFont';
+	font-style: normal;
+	font-weight: normal;
+	src: local('MyFont'), local('MyFont'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont.ttf) format('truetype');
+}
+@font-face {
+	font-family: 'MyFont';
+	font-style: normal;
+	font-weight: bold;
+	src: local('MyFont Bold'), local('MyFont-Bold'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont-bold.ttf) format('truetype');
+}
+@font-face {
+	font-family: 'MyFont';
+	font-style: italic;
+	font-weight: normal;
+	src: local('MyFont Italic'), local('MyFont-Italic'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont-italic.ttf) format('truetype');
+}
+@font-face {
+	font-family: 'MyFont';
+	font-style: italic;
+	font-weight: bold;
+	src: local('MyFont Bold Italic'), local('MyFont-BoldItalic'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont-bolditalic.ttf) format('truetype');
+}
+`
+then make sure you assign that font family to the body or other elements of the template:
+`
+	font-family: 'MyFont';
+`
+
+Some notes:
+
+* Only TTF fonts are supported.
+* You can't use numeric font weights (like 700 instead of bold)!
+* Avoid spaces or special characters in the font filenames.
+* I have found that not all servers cope well with the font paths. If this is the case with your font, try to put the font in the root of your site and put that in the font url (i.e. `url(http://yoursite.com/fonts/myfont-italic.ttf)` )
+
+Some font links:
+Japanese - http://ipafont.ipa.go.jp/index.html
+Chinese - http://www.study-area.org/apt/firefly-font/
 
 = How can I display the HTML/CSS source for debugging/developing templates? =
 Add the following code to your theme's `functions.php`
