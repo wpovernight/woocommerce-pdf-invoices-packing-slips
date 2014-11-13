@@ -54,6 +54,25 @@ jQuery(document).ready(function() {
 		<?php } ?>
 
 		<?php
+		if (!class_exists('WooCommerce_Ext_PrintOrders')) {
+			?>
+			<li>
+				<?php _e('Automatically send new orders or packing slips to your printer, as soon as the customer orders!', 'wpo_wcpdf')?>
+				<div class="more" style="display:none;">
+				<table>
+					<tr>
+						<td><img src="<?php echo WooCommerce_PDF_Invoices::$plugin_url . 'images/cloud-print.png'; ?>" class="cloud-logo"></td>
+						<td>
+						<?php _e( 'Check out the WooCommerce Automatic Order Printing extension from our partners at Simba Hosting', 'wpo_wcpdf' ); ?><br/>
+						<a href="https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/?affiliates=2" target="_blank"><?php _e("WooCommerce Automatic Order Printing", 'wpo_wcpdf'); ?></a>
+						</td>
+					</tr>
+				</table>
+				</div>
+			</li>
+		<?php } ?>
+
+		<?php
 		if (!class_exists('WooCommerce_PDF_IPS_Templates')) {
 			$template_link = '<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/" target="_blank">wpovernight.com</a>';
 			$email_link = '<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
@@ -69,6 +88,6 @@ jQuery(document).ready(function() {
 				</ul>
 				</div>
 			</li>
-		<?php } ?>		
+		<?php } ?>
 	</ul>
 </div>
