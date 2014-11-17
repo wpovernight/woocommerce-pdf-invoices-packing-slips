@@ -236,6 +236,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
+= 1.4.13 =
+* Translations: Added Slovenian (thanks gregy1403!)
+* Translatiobs: Added Japanese - needs custom font!
+* FAQ: instructions on how to use custom fonts
+
 = 1.4.12 =
 * Fix: issues with post parent objects (WC2.1 and older)
 
