@@ -20,7 +20,7 @@ jQuery(document).ready(function() {
 		if (!class_exists('WooCommerce_PDF_IPS_Pro')) {
 			?>
 			<li>
-				<?php _e('Go Pro: Proforma invoices, credit notes & more!', 'wpo_wcpdf')?>
+				<?php _e('Go Pro: Proforma invoices, credit notes (=refunds) & more!', 'wpo_wcpdf')?>
 				<div class="more" style="display:none;">
 				<?php _e( 'Supercharge WooCommerce PDF Invoices & Packing Slips with the following features:', 'wpo_wcpdf' ); ?>
 				<ul>
