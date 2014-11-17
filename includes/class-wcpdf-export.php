@@ -308,9 +308,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return;
 			}
 
-			// clear temp folder (from http://stackoverflow.com/a/13468943/1446634)
 			$tmp_path = apply_filters( 'wpo_wcpdf_tmp_path', WooCommerce_PDF_Invoices::$plugin_path . 'tmp/' );
-			array_map('unlink', ( glob( $tmp_path.'*' ) ? glob( $tmp_path.'*' ) : array() ) );
+
+			// clear pdf files from temp folder (from http://stackoverflow.com/a/13468943/1446634)
+			array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
 
 			// set allowed statuses for invoices
 			$documents = array(
