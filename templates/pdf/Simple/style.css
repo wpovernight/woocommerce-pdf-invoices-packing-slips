@@ -234,7 +234,7 @@ table.totals td.price span:first-child {
 	bottom: -2cm;
 	left: 0;
 	right: 0;
-	height: 2cm;
+	height: 2cm; /* if you change the footer height, don't forget to change the bottom (=negative height) and the @page margin-bottom as well! */
 	text-align: center;
 	border-top: 0.1mm solid gray;
 	margin-bottom: 0;
