@@ -129,6 +129,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					</form>
 					<?php
 					}
+
 					do_action( 'wpo_wcpdf_after_settings_page', $active_tab ); ?>
 	
 				</div>
@@ -188,6 +189,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			$tmp_path  = WooCommerce_PDF_Invoices::$plugin_path . 'tmp/';
 			$tmp_path_check = !is_writable( $tmp_path );
 
+			$wc_emails = array(
+				'new_order'			=> __( 'Admin New Order email' , 'wpo_wcpdf' ),
+				'processing'		=> __( 'Customer Processing Order email' , 'wpo_wcpdf' ),
+				'completed'			=> __( 'Customer Completed Order email' , 'wpo_wcpdf' ),
+				'customer_invoice'	=> __( 'Customer Invoice email' , 'wpo_wcpdf' ),
+			);
+
 			add_settings_field(
 				'email_pdf',
 				__( 'Attach invoice to:', 'wpo_wcpdf' ),
@@ -197,12 +205,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				array(
 					'menu'			=> $option,
 					'id'			=> 'email_pdf',
-					'options' 		=> array(
-						'new_order'			=> __( 'Admin New Order email' , 'wpo_wcpdf' ),
-						'processing'		=> __( 'Customer Processing Order email' , 'wpo_wcpdf' ),
-						'completed'			=> __( 'Customer Completed Order email' , 'wpo_wcpdf' ),
-						'customer_invoice'	=> __( 'Customer Invoice email' , 'wpo_wcpdf' ),
-					),
+					'options' 		=> apply_filters( 'wpo_wcpdf_wc_emails', $wc_emails ),
 					'description'	=> $tmp_path_check ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'wpo_wcpdf' ), $tmp_path ).'</span>':'',
 				)
 			);
@@ -929,7 +932,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 
 			return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
 		}
-	
+
 	} // end class WooCommerce_PDF_Invoices_Settings
 
 } // end class_exists
