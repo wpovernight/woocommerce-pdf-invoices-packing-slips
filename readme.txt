@@ -237,6 +237,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Changelog ==
 
 = 1.4.13 =
+* Feature: use separate file for all your template specific functions (template-functions.php)
 * Translations: Added Slovenian (thanks gregy1403!)
 * Translatiobs: Added Japanese - needs custom font!
 * FAQ: instructions on how to use custom fonts
