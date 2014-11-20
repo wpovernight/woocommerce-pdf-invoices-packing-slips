@@ -33,7 +33,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			self::$plugin_basename = plugin_basename(__FILE__);
 			self::$plugin_url = plugin_dir_url(self::$plugin_basename);
 			self::$plugin_path = trailingslashit(dirname(__FILE__));
-			self::$version = '1.4.11'; 
+			self::$version = '1.4.12'; 
 			
 			// load the localisation & classes
 			add_action( 'plugins_loaded', array( $this, 'translations' ) ); // or use init?
@@ -516,24 +516,35 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		/**
 		 * Return/show the total discount
 		 */
-		public function get_order_discount( $type = 'total' ) {
-			switch ($type) {
-				case 'cart':
-					// Cart Discount - pre-tax discounts.
-					$discount_value = $this->export->order->get_cart_discount();
-					break;
-				case 'order':
-					// Order Discount - post-tax discounts.
-					$discount_value = $this->export->order->get_order_discount();
-					break;
-				case 'total':
-					// Total Discount - Cart & Order Discounts combined
-					$discount_value = $this->export->order->get_total_discount();
-					break;
-				default:
-					// Total Discount - Cart & Order Discounts combined
-					$discount_value = $this->export->order->get_total_discount();
-					break;
+		public function get_order_discount( $type = 'total', $tax = 'incl' ) {
+			if ( $tax == 'incl' ) {
+				switch ($type) {
+					case 'cart':
+						// Cart Discount - pre-tax discounts.
+						$discount_value = $this->export->order->get_cart_discount();
+						break;
+					case 'order':
+						// Order Discount - post-tax discounts.
+						$discount_value = $this->export->order->get_order_discount();
+						break;
+					case 'total':
+						// Total Discount - Cart & Order Discounts combined
+						$discount_value = $this->export->order->get_total_discount();
+						break;
+					default:
+						// Total Discount - Cart & Order Discounts combined
+						$discount_value = $this->export->order->get_total_discount();
+						break;
+				}
+			} else { // calculate discount excluding tax
+				$discount_value = 0;
+
+				$items = $this->export->order->get_items();;
+				if( sizeof( $items ) > 0 ) {
+					foreach( $items as $item ) {
+						$discount_value += ($item['line_subtotal'] - $item['line_total']);
+					}
+				}
 			}
 
 			$discount = array (
