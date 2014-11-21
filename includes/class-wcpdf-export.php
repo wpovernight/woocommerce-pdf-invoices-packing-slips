@@ -66,8 +66,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			$output_html = array();
 			foreach ($order_ids as $order_id) {
-				do_action( 'wpo_wcpdf_process_template_order', $template_type, $order_id );
 				$this->order = new WC_Order( $order_id );
+				do_action( 'wpo_wcpdf_before_pdf', $template_type );
+				do_action( 'wpo_wcpdf_process_template_order', $template_type, $order_id );
+
 				$template = $this->template_path . '/' . $template_type . '.php';
 				$template = apply_filters( 'wpo_wcpdf_template_file', $template, $template_type );
 
@@ -86,6 +88,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				if ( $template_type == 'invoice' ) {
 					update_post_meta( $order_id, '_wcpdf_invoice_exists', 1 );
 				}
+
+				do_action( 'wpo_wcpdf_after_pdf', $template_type );
 
 				// Wipe post from cache
 				wp_cache_delete( $order_id, 'posts' );
@@ -118,6 +122,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			
 			// clean up special characters
 			$complete_document = utf8_decode(mb_convert_encoding($complete_document, 'HTML-ENTITIES', 'UTF-8'));
+
 
 			return $complete_document;
 		}
@@ -215,8 +220,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$template_type = $_GET['template_type'];
 			// die($this->process_template( $template_type, $order_ids )); // or use the filter switch below!
 			
-			do_action( 'wpo_wcpdf_before_pdf', $template_type );
-
 			if (apply_filters('wpo_wcpdf_output_html', false, $template_type)) {
 				// Output html to browser for debug
 				// NOTE! images will be loaded with the server path by default
@@ -227,8 +230,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			if ( !($invoice = $this->get_pdf( $template_type, $order_ids )) ) {
 				exit;
 			}
-
-			do_action( 'wpo_wcpdf_after_pdf', $template_type );
 
 			$filename = $this->build_filename( $template_type, $order_ids, 'download' );
 
