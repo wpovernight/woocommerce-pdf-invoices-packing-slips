@@ -308,7 +308,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 			$this->order = $order;
 
-			if (!isset($this->general_settings['email_pdf']) || !isset( $status ) ) {
+			if ( !isset( $status ) ) {
 				return;
 			}
 
@@ -318,8 +318,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
 
 			// set allowed statuses for invoices
+			$invoice_allowed = isset($this->general_settings['email_pdf']) ? array_keys( $this->general_settings['email_pdf'] ) : array();
 			$documents = array(
-				'invoice'	=>  apply_filters( 'wpo_wcpdf_email_allowed_statuses', array_keys( $this->general_settings['email_pdf'] ) ), // Relevant (default) statuses: new_order, customer_invoice, customer_processing_order, customer_completed_order
+				'invoice'	=>  apply_filters( 'wpo_wcpdf_email_allowed_statuses', $invoice_allowed ), // Relevant (default) statuses: new_order, customer_invoice, customer_processing_order, customer_completed_order
 			);
 			$documents = apply_filters('wpo_wcpdf_attach_documents', $documents );
 			
