@@ -67,7 +67,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$output_html = array();
 			foreach ($order_ids as $order_id) {
 				$this->order = new WC_Order( $order_id );
-				do_action( 'wpo_wcpdf_before_pdf', $template_type );
 				do_action( 'wpo_wcpdf_process_template_order', $template_type, $order_id );
 
 				$template = $this->template_path . '/' . $template_type . '.php';
@@ -89,7 +88,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					update_post_meta( $order_id, '_wcpdf_invoice_exists', 1 );
 				}
 
-				do_action( 'wpo_wcpdf_after_pdf', $template_type );
 
 				// Wipe post from cache
 				wp_cache_delete( $order_id, 'posts' );
@@ -134,6 +132,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$paper_size = apply_filters( 'wpo_wcpdf_paper_format', $this->template_settings['paper_size'], $template_type );
 			$paper_orientation = apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $template_type);
 
+			do_action( 'wpo_wcpdf_before_pdf', $template_type );
 			if ( !class_exists('DOMPDF') ) {
 				// extra check to avoid clashes with other plugins using DOMPDF
 				// This could have unwanted side-effects when the version that's already
@@ -146,6 +145,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$dompdf->load_html($this->process_template( $template_type, $order_ids ));
 			$dompdf->set_paper( $paper_size, $paper_orientation );
 			$dompdf->render();
+			do_action( 'wpo_wcpdf_after_pdf', $template_type );
 
 			// Try to clean up a bit of memory
 			unset($complete_pdf);
