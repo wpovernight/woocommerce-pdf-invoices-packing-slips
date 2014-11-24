@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-11-19 10:36+0100\n"
-"PO-Revision-Date: 2014-11-24 11:45+0100\n"
+"PO-Revision-Date: 2014-11-24 11:40+0100\n"
 "Last-Translator: Eirik Opsanger <eirik.opsanger@gmail.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nb\n"
@@ -121,7 +121,7 @@ msgid "Choose a template"
 msgstr "Velg din template"
 
 #: includes/class-wcpdf-settings.php:274
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Want to use your own template? Copy all the files from <code>%s</code> to "
 "your (child) theme in <code>%s</code> to customize them"
@@ -171,11 +171,11 @@ msgstr "Footer: Betingelser og Vilkår"
 
 #: includes/class-wcpdf-settings.php:372
 msgid "Display invoice date"
-msgstr "Vise fakturadato"
+msgstr "Vis fakturadato"
 
 #: includes/class-wcpdf-settings.php:385
 msgid "Display built-in sequential invoice number"
-msgstr "Vise sekvensielt fakturanummer"
+msgstr "Vis sekvensielt fakturanummer"
 
 #: includes/class-wcpdf-settings.php:398
 msgid "Next invoice number (without prefix/suffix etc.)"
@@ -278,7 +278,6 @@ msgstr "PDF Pakksedler"
 
 #: includes/class-wcpdf-writepanels.php:91
 #: includes/class-wcpdf-writepanels.php:184
-#, fuzzy
 msgid "PDF Invoice"
 msgstr "PDF-faktura"
 
@@ -373,7 +372,9 @@ msgstr "Få WooCommerce PDF Invoices & Packing Slips Professional!"
 
 #: includes/wcpdf-extensions.php:41
 msgid "Upload all invoices automatically to your dropbox"
-msgstr "Last opp alle fakturaer automatisk til din dropbox"
+msgstr ""
+"Last opp alle fakturaer automatisk til din dropbox! <br/>Sjekk ut %s "
+"utvidelsen."
 
 #: includes/wcpdf-extensions.php:47
 msgid ""
@@ -388,7 +389,7 @@ msgstr ""
 
 #: includes/wcpdf-extensions.php:48
 msgid "Get WooCommerce PDF Invoices & Packing Slips to dropbox!"
-msgstr "Få WooCommerce PDF Invoices & Packing Slips to dropbox!"
+msgstr "Fp WooCommerce PDF Invoices & Packing Slips rett til Dropbox!"
 
 #: includes/wcpdf-extensions.php:60
 msgid ""
@@ -405,27 +406,27 @@ msgstr ""
 "Simba Hosting"
 
 #: includes/wcpdf-extensions.php:67
-#, fuzzy
 msgid "WooCommerce Automatic Order Printing"
-msgstr "WooCommerce ordrenummer"
+msgstr "Automatisk ordreutskrift"
 
 #: includes/wcpdf-extensions.php:81
 msgid "More advanced templates"
-msgstr "Mer avansert templates"
+msgstr "Mer avanserte stiler"
 
 #: includes/wcpdf-extensions.php:84
 msgid "Stylish modern invoices & packing slips with product thumbnails!"
 msgstr "Stilfylle, moderne faktura og pakkelapper med produktbilder!"
 
 #: includes/wcpdf-extensions.php:85
-#, fuzzy
 msgid "More tax details on the invoices!"
-msgstr "Dato som vises på faktura"
+msgstr "Flere detaljer for skatter og avgifter på faktura!"
 
 #: includes/wcpdf-extensions.php:86
 #, php-format
 msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
-msgstr "Sjekk ut  Premium PDF Invoice & Packing Slips templates hos %s."
+msgstr ""
+"Ser du etter en mer avansert template? Sjekk ut  Premium PDF Invoice & "
+"Packing Slips templates hos %s."
 
 #: includes/wcpdf-extensions.php:87
 #, php-format
