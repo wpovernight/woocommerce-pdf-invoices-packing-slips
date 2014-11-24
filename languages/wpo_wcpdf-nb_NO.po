@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-11-19 10:36+0100\n"
-"PO-Revision-Date: 2014-11-19 10:36+0100\n"
+"PO-Revision-Date: 2014-11-24 11:45+0100\n"
 "Last-Translator: Eirik Opsanger <eirik.opsanger@gmail.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nb\n"
@@ -170,14 +170,12 @@ msgid "Footer: terms & conditions, policies, etc."
 msgstr "Footer: Betingelser og Vilkår"
 
 #: includes/class-wcpdf-settings.php:372
-#, fuzzy
 msgid "Display invoice date"
-msgstr "Fakturadato"
+msgstr "Vise fakturadato"
 
 #: includes/class-wcpdf-settings.php:385
-#, fuzzy
 msgid "Display built-in sequential invoice number"
-msgstr "Sekvensielt fakturanummer"
+msgstr "Vise sekvensielt fakturanummer"
 
 #: includes/class-wcpdf-settings.php:398
 msgid "Next invoice number (without prefix/suffix etc.)"
@@ -320,37 +318,41 @@ msgstr "m"
 
 #: includes/wcpdf-extensions.php:15
 msgid "Check out these premium extensions!"
-msgstr ""
+msgstr "Sjekk ut premium-utvidelsene!"
 
 #: includes/wcpdf-extensions.php:16
 msgid "click items to read more"
-msgstr ""
+msgstr "klikk for å lese mer"
 
 #: includes/wcpdf-extensions.php:23
 msgid "Go Pro: Proforma invoices, credit notes (=refunds) & more!"
-msgstr ""
+msgstr "Go Pro: Proforma faktura, kreditnota (=tilbakebetaling) & mer!"
 
 #: includes/wcpdf-extensions.php:25
 msgid ""
 "Supercharge WooCommerce PDF Invoices & Packing Slips with the following "
 "features:"
-msgstr ""
+msgstr "Få WooCommerce PDF Invoices & Packing Slips med følgende funksjoner:"
 
 #: includes/wcpdf-extensions.php:27
 msgid "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
-msgstr ""
+msgstr "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
 
 #: includes/wcpdf-extensions.php:28
 msgid ""
 "Attach a <b>static file</b> (for example a terms & conditions document) to "
 "the WooCommerce emails of your choice."
 msgstr ""
+"Legg ved en <b>statisk file</b> (f.eks. vilkår) til WooCommerce-epostene du "
+"ønsker."
 
 #: includes/wcpdf-extensions.php:29
 msgid ""
 "Use <b>separate numbering systems</b> and/or format for proforma invoices "
 "and credit notes or utilize the main invoice numbering system"
 msgstr ""
+"Bruk <b>separate nummersystem</b> og/eller format på proforma faktura og "
+"kreditnota, eller utnytt hovedsystemet for fakturanummerering"
 
 #: includes/wcpdf-extensions.php:30
 msgid ""
@@ -358,24 +360,20 @@ msgid ""
 "additional custom fields, font sizes etc. without the need to create a "
 "custom template."
 msgstr ""
+"<b>Skreddersy faktura- og leveringsadresse</b> for å inkludere valgfrie "
+"felter, skriftstørrelse osv. uten å måtte lage en egen template."
 
 #: includes/wcpdf-extensions.php:31
 msgid "Use the plugin in multilingual <b>WPML</b> setups"
-msgstr ""
+msgstr "Bruk pluginen i  multilingual <b>WPML</b> oppsett"
 
 #: includes/wcpdf-extensions.php:33
-#, fuzzy
 msgid "Get WooCommerce PDF Invoices & Packing Slips Professional!"
-msgstr ""
-"WooCommerce PDF Invoices & Packing Slips krever %sWooCommerce%s for å bli "
-"installert og aktivert!"
+msgstr "Få WooCommerce PDF Invoices & Packing Slips Professional!"
 
 #: includes/wcpdf-extensions.php:41
-#, fuzzy
 msgid "Upload all invoices automatically to your dropbox"
-msgstr ""
-"Last opp alle fakturaer automatisk til din dropbox! <br/>Sjekk ut %s "
-"utvidelsen."
+msgstr "Last opp alle fakturaer automatisk til din dropbox"
 
 #: includes/wcpdf-extensions.php:47
 msgid ""
@@ -384,25 +382,27 @@ msgid ""
 "customers to Dropbox. The best way to keep your invoice administration up to "
 "date!"
 msgstr ""
+"Denne utvidelsen laster opp alle fakturaer (og andre pdf-dokumenter fra pro-"
+"versjonen) som blir sendt på epost til deg rett til Dropbox. Dette er den "
+"beste måten å holde adminstreringen ajour!"
 
 #: includes/wcpdf-extensions.php:48
-#, fuzzy
 msgid "Get WooCommerce PDF Invoices & Packing Slips to dropbox!"
-msgstr ""
-"WooCommerce PDF Invoices & Packing Slips krever %sWooCommerce%s for å bli "
-"installert og aktivert!"
+msgstr "Få WooCommerce PDF Invoices & Packing Slips to dropbox!"
 
 #: includes/wcpdf-extensions.php:60
 msgid ""
 "Automatically send new orders or packing slips to your printer, as soon as "
 "the customer orders!"
-msgstr ""
+msgstr "Send pakkelapper automatisk til printeren når det kommer ny ordre!"
 
 #: includes/wcpdf-extensions.php:66
 msgid ""
 "Check out the WooCommerce Automatic Order Printing extension from our "
 "partners at Simba Hosting"
 msgstr ""
+"Sjekk ut WooCommerce Automatic Order Printing utvidelse fra vår partner "
+"Simba Hosting"
 
 #: includes/wcpdf-extensions.php:67
 #, fuzzy
@@ -410,13 +410,12 @@ msgid "WooCommerce Automatic Order Printing"
 msgstr "WooCommerce ordrenummer"
 
 #: includes/wcpdf-extensions.php:81
-#, fuzzy
 msgid "More advanced templates"
-msgstr "Velg din template"
+msgstr "Mer avansert templates"
 
 #: includes/wcpdf-extensions.php:84
 msgid "Stylish modern invoices & packing slips with product thumbnails!"
-msgstr ""
+msgstr "Stilfylle, moderne faktura og pakkelapper med produktbilder!"
 
 #: includes/wcpdf-extensions.php:85
 #, fuzzy
@@ -424,11 +423,9 @@ msgid "More tax details on the invoices!"
 msgstr "Dato som vises på faktura"
 
 #: includes/wcpdf-extensions.php:86
-#, fuzzy, php-format
+#, php-format
 msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
-msgstr ""
-"Ser du etter en mer avansert template? Sjekk ut  Premium PDF Invoice & "
-"Packing Slips templates hos %s."
+msgstr "Sjekk ut  Premium PDF Invoice & Packing Slips templates hos %s."
 
 #: includes/wcpdf-extensions.php:87
 #, php-format
