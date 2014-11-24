@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.0
-Stable tag: 1.4.12
+Stable tag: 1.4.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -239,7 +239,8 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 = 1.4.13 =
 * Feature: use separate file for all your template specific functions (template-functions.php)
 * Translations: Added Slovenian (thanks gregy1403!)
-* Translatiobs: Added Japanese - needs custom font!
+* Translations: Updated Norwegian & Dutch.
+* Translations: Added Japanese - needs custom font!
 * FAQ: instructions on how to use custom fonts
 
 = 1.4.12 =
