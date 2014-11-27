@@ -190,7 +190,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				),
 			);
 
-			$meta_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_actions );
+			$meta_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_actions, $post_id );
 
 			?>
 			<ul class="wpo_wcpdf-actions">
