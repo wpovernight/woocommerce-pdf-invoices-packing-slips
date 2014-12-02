@@ -304,14 +304,17 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Attach invoice to completed order or customer invoice email
 		 */
 		public function attach_pdf_to_email ( $attachments, $status, $order ) {
-			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder' ) ) ) {
-				return; // do not process low stock notifications etc!
+			// check if all variables properly set
+			if ( !is_object( $order ) || !isset( $order->id ) || !isset( $status ) ) {
+				return $attachments;
 			}
-			$this->order = $order;
 
-			if ( !isset( $status ) ) {
-				return;
+			// do not process low stock notifications, user emails etc!
+			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder' ) ) || get_post_type( $order->id ) != 'shop_order' ) {
+				return $attachments; 
 			}
+
+			$this->order = $order;
 
 			$tmp_path = apply_filters( 'wpo_wcpdf_tmp_path', WooCommerce_PDF_Invoices::$plugin_path . 'tmp/' );
 
