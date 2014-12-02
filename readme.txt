@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.0
-Stable tag: 1.4.13
+Stable tag: 1.4.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -235,6 +235,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.4.14 =
+* Fix: fatal error when user registers at checkout (applies to credit notes only)
+* Translations: Updated German (Thanks Dietmar!)
+* Translations: Place your custom translations in wp-content/languages/woocommerce-pdf-invoices-packing-slips/wpo_wcpdf-LOCALE.mo to protect them from being overwritten by plugin updates.
 
 = 1.4.13 =
 * Feature: use separate file for all your template specific functions (template-functions.php)
