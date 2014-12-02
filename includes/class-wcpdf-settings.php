@@ -110,7 +110,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					<?php
 					do_action( 'wpo_wcpdf_before_settings_page', $active_tab );
 
-					if ( !( class_exists('WooCommerce_PDF_IPS_Pro') && class_exists('WooCommerce_PDF_IPS_Dropbox') && class_exists('WooCommerce_PDF_IPS_Templates') ) ) {
+					if ( !( class_exists('WooCommerce_PDF_IPS_Pro') && class_exists('WooCommerce_PDF_IPS_Dropbox') && class_exists('WooCommerce_PDF_IPS_Templates') && class_exists('WooCommerce_Ext_PrintOrders') ) ) {
 						include('wcpdf-extensions.php');
 					}
 
