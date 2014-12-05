@@ -63,6 +63,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				add_filter( 'wpo_wcpdf_use_path', '__return_false' );
 			}
 
+			if ( class_exists('WC_Subscriptions') ) {
+				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'reset_invoice_data' ), 10, 4 );
+			}
+
 		}
 		
 		/**
@@ -427,6 +431,17 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true );
 
 			return apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $this->order->get_order_number(), $this->order->id, $this->order->order_date );
+		}
+
+		/**
+		 * Reset invoice data for WooCommerce subscription renewal orders
+		 * https://wordpress.org/support/topic/subscription-renewal-duplicate-invoice-number?replies=6#post-6138110
+		 */
+		public function reset_invoice_data ( $renewal_order, $original_order, $product_id, $new_order_role ) {
+			// delete invoice number, invoice date & invoice exists meta
+			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_number' );
+			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_date' );
+			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_exists' );
 		}
 
 		public function format_invoice_number( $invoice_number, $order_number, $order_id, $order_date ) {
