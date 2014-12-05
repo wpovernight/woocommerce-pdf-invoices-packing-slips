@@ -140,11 +140,7 @@ Japanese - http://ipafont.ipa.go.jp/index.html
 Chinese - http://www.study-area.org/apt/firefly-font/
 
 = How can I display the HTML/CSS source for debugging/developing templates? =
-Add the following code to your theme's `functions.php`
-`
-add_filter( 'wpo_wcpdf_output_html', '__return_true' );
-add_filter( 'wpo_wcpdf_use_path', '__return_false' );
-`
+There's a setting on the Status tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
 
 = How can I display custom fields in the invoice or packing slip? =
 First, you need to create a custom template following instructions from the first item in this FAQ.
