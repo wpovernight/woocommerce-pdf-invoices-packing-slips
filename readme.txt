@@ -188,6 +188,22 @@ function wpo_wcpdf_custom_filename( $filename, $template_type, $order_ids, $cont
 `
 You can also use the $template_type ('invoice' or 'packing-slip'), $order_ids (single array) or $context ('download' or 'attachment') variables to make more complex rules for the filename.
 
+= How can I add a download link to the invoice on the Thank you page? =
+You can do this with an action in your theme's `functions.php` (Some themes have a "custom functions" area in the settings). Note that due to security restrictions, this will only work for registered/logged in users!
+
+`
+add_filter('woocommerce_thankyou_order_received_text', 'wpo_wcpdf_thank_you_link', 10, 2);
+function wpo_wcpdf_thank_you_link( $text, $order ) {
+	if ( is_user_logged_in() ) {
+		$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id . '&my-account'), 'generate_wpo_wcpdf' );
+		$text .= '<p><a href="'.esc_attr($pdf_url).'">Download a printable invoice / payment confirmation (PDF format)</a></p>';
+	}
+	return $text;
+}
+`
+
+alternatively, you can hook this text to the `woocommerce_thankyou` action, see [this thread](https://wordpress.org/support/topic/suggestion-for-the-faq?replies=5#post-6298810) on the support forum.
+
 = Why does the download link not display on the My Account page? =
 To prevent customers from prematurely creating invoices, the default setting is that a customer can only see/download an invoice from an order that already has an invoice - either created automatically for the email attachment, or manually by the shop manager. This means that ultimately the shop mananger determines whether an invoice is available to the customer. If you want to make the invoice available to everyone you can either of the following:
 
