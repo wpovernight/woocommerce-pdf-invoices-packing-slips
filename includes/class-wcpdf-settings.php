@@ -93,6 +93,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			// add status tab last in row
+			$settings_tabs['debug'] = __('Status','wpo_wcpdf');
+
 			$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'general';
 			?>
 	
@@ -100,11 +103,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					<div class="icon32" id="icon-options-general"><br /></div>
 					<h2><?php _e( 'WooCommerce PDF Invoices', 'wpo_wcpdf' ); ?></h2>
 					<h2 class="nav-tab-wrapper">
-					<?php foreach ($settings_tabs as $tab_slug => $tab_title ) {
-						printf('<a href="?page=wpo_wcpdf_options_page&tab=%1$s" class="nav-tab %2$s">%3$s</a>', $tab_slug, (($active_tab == $tab_slug) ? 'nav-tab-active' : ''), $tab_title);
+					<?php
+					foreach ($settings_tabs as $tab_slug => $tab_title ) {
+						printf('<a href="?page=wpo_wcpdf_options_page&tab=%1$s" class="nav-tab nav-tab-%1$s %2$s">%3$s</a>', $tab_slug, (($active_tab == $tab_slug) ? 'nav-tab-active' : ''), $tab_title);
 					}
 					?>
-						<a href="?page=wpo_wcpdf_options_page&tab=status" class="nav-tab <?php echo (($active_tab == 'status') ? 'nav-tab-active' : ''); ?>"><?php _e('Status','wpo_wcpdf'); ?></a>
 					</h2>
 
 					<?php
@@ -114,9 +117,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 						include('wcpdf-extensions.php');
 					}
 
-					if ( $active_tab=='status' ) {
-						$this->status_page();
-					} else {
 					?>
 					<form method="post" action="options.php">
 						<?php
@@ -128,6 +128,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 	
 					</form>
 					<?php
+
+					if ( $active_tab=='debug' ) {
+						$this->status_page();
 					}
 
 					do_action( 'wpo_wcpdf_after_settings_page', $active_tab ); ?>
@@ -222,7 +225,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
-	
 			// Register settings.
 			register_setting( $option, $option, array( &$this, 'validate_options' ) );
 	
@@ -236,7 +238,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					);
 				update_option( $option, $option_values );
 			}
-	
+
 			/**************************************/
 			/********** TEMPLATE SETTINGS *********/
 			/**************************************/
@@ -519,6 +521,54 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				$option_values['next_invoice_number'] = $next_invoice_number;
 				update_option( $option, $option_values );
 			}
+			/**************************************/
+			/******** DEBUG/STATUS SETTINGS *******/
+			/**************************************/
+	
+			$option = 'wpo_wcpdf_debug_settings';
+		
+			// Create option in wp_options.
+			if ( false == get_option( $option ) ) {
+				add_option( $option );
+			}
+
+			// Section.
+			add_settings_section(
+				'debug_settings',
+				__( 'Debug settings', 'wpo_wcpdf' ),
+				array( &$this, 'debug_section' ),
+				$option
+			);
+
+			add_settings_field(
+				'enable_debug',
+				__( 'Enable debug output', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'debug_settings',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'enable_debug',
+					'description'		=> __( 'Can be used instead of WP_DEBUG', 'wpo_wcpdf' ),
+				)
+			);
+
+			add_settings_field(
+				'html_output',
+				__( 'Output to HTML', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'debug_settings',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'html_output',
+					'description'		=> __( 'Send the template output as HTML to the browser instead of creating a PDF.', 'wpo_wcpdf' ),
+				)
+			);
+
+			// Register settings.
+			register_setting( $option, $option, array( &$this, 'validate_options' ) );
+	
 		}
 
 		/**
@@ -855,7 +905,16 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		}
 		
 		/**
-		 * Section null callback.
+		 * Debug section callback.
+		 *
+		 * @return void.
+		 */
+		public function debug_section() {
+			_e( '<b>Warning!</b> The settings below are meant for debugging/development only. Do not use them on a live website!' , 'wpo_wcpdf' );
+		}
+		
+		/**
+		 * Custom fields section callback.
 		 *
 		 * @return void.
 		 */

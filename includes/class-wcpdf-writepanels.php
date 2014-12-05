@@ -12,6 +12,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Constructor
 		 */
 		public function __construct() {
+			$this->general_settings = get_option('wpo_wcpdf_general_settings');
+			$this->template_settings = get_option('wpo_wcpdf_template_settings');
+
 			add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_number_column' ), 999 );
 			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_number_column_data' ), 2 );
@@ -24,8 +27,6 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			add_action( 'woocommerce_admin_order_data_after_order_details', array(&$this, 'edit_invoice_number') );
 			add_action( 'save_post', array( &$this,'save_invoice_number_date' ) );
 
-			$this->general_settings = get_option('wpo_wcpdf_general_settings');
-			$this->template_settings = get_option('wpo_wcpdf_template_settings');
 
 			$this->bulk_actions = array(
 				'invoice'		=> __( 'PDF Invoices', 'wpo_wcpdf' ),

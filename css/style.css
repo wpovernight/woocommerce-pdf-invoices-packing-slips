@@ -52,6 +52,10 @@
 }
 
 /* Settings page styles */
+.nav-tab-debug {
+	margin-left: 4px;
+}
+
 #img-header_logo {
 	max-height: 200px;
 	width: auto;

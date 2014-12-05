@@ -25,6 +25,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$this->order = new WC_Order('');
 			$this->general_settings = get_option('wpo_wcpdf_general_settings');
 			$this->template_settings = get_option('wpo_wcpdf_template_settings');
+			$this->debug_settings = get_option('wpo_wcpdf_debug_settings');
 
 			$this->template_directory_name = 'pdf';
 			$this->template_base_path = (defined('WC_TEMPLATE_PATH')?WC_TEMPLATE_PATH:$woocommerce->template_url) . $this->template_directory_name . '/';
@@ -51,6 +52,15 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// check if an invoice number filter has already been registered, if not, use settings
 			if ( !has_filter( 'wpo_wcpdf_invoice_number' ) ) {
 				add_filter( 'wpo_wcpdf_invoice_number', array( $this, 'format_invoice_number' ), 20, 4 );
+			}
+
+			if ( isset($this->debug_settings['enable_debug'])) {
+				$this->enable_debug();
+			}
+
+			if ( isset($this->debug_settings['html_output'])) {
+				add_filter( 'wpo_wcpdf_output_html', '__return_true' );
+				add_filter( 'wpo_wcpdf_use_path', '__return_false' );
 			}
 
 		}
@@ -743,6 +753,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			return $thumbnail;
 		}
 		
+		public function enable_debug () {
+			error_reporting( E_ALL );
+			ini_set( 'display_errors', 1 );
+		}
 	}
 
 }
