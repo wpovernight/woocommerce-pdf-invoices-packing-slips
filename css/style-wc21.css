@@ -53,18 +53,3 @@
 .widefat .column-pdf_invoice_number {
 	width: 110px;
 }
-
-/* Settings page styles */
-#img-header_logo {
-	max-height: 200px;
-	width: auto;
-}
-
-span.wpo-warning {
-	display: inline-block;
-	border: 1px solid red;
-	border-left: 4px solid red;
-	padding: 5px 15px;
-	background-color: white;
-}
-
