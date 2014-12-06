@@ -353,7 +353,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$tmp_path = $this->tmp_path . 'attachments/';
 
 			// clear pdf files from temp folder (from http://stackoverflow.com/a/13468943/1446634)
-			// array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
+			array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
 
 			// set allowed statuses for invoices
 			$invoice_allowed = isset($this->general_settings['email_pdf']) ? array_keys( $this->general_settings['email_pdf'] ) : array();
