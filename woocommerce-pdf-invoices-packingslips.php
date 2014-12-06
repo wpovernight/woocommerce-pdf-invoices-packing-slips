@@ -39,6 +39,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			add_action( 'plugins_loaded', array( $this, 'translations' ) ); // or use init?
 			add_action( 'init', array( $this, 'load_classes' ) );
 
+			if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+				add_action( 'wp_loaded', array( $this, 'do_install' ) );
+			}
 		}
 
 		/**
@@ -114,6 +117,51 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		
 			echo $message;
 		}
+
+		/** Lifecycle methods *******************************************************
+		 * Because register_activation_hook only runs when the plugin is manually
+		 * activated by the user, we're checking the current version against the
+		 * version stored in the database
+		****************************************************************************/
+
+		/**
+		 * Handles version checking
+		 */
+		public function do_install() {
+			$version_setting = 'wpo_wcpdf_version';
+			$installed_version = get_option( $version_setting );
+
+			// installed version lower than plugin version?
+			if ( version_compare( $installed_version, self::$version, '<' ) ) {
+
+				if ( ! $installed_version ) {
+					$this->install();
+				} else {
+					$this->upgrade( $installed_version );
+				}
+
+				// new version number
+				update_option( $version_setting, self::$version );
+			}
+		}
+
+
+		/**
+		 * Plugin install method.  Perform any installation tasks here
+		 */
+		protected function install() {
+			// stub
+		}
+
+
+		/**
+		 * Plugin upgrade method.  Perform any required upgrades here
+		 *
+		 * @param string $installed_version the currently installed version
+		 */
+		protected function upgrade( $installed_version ) {
+			// stub
+		}		
 
 		/***********************************************************************/
 		/********************** GENERAL TEMPLATE FUNCTIONS *********************/
