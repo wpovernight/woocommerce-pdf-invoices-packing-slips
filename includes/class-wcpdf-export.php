@@ -27,6 +27,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$this->template_settings = get_option('wpo_wcpdf_template_settings');
 			$this->debug_settings = get_option('wpo_wcpdf_debug_settings');
 
+			// set temporary folders for email attachments and pdf engine
+			$this->tmp_path = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', get_temp_dir() . 'wpo_wcpdf/' ) );
+			if ( !@is_dir( $this->tmp_path ) ) {
+				$this->init_tmp_path();
+			}
+
 			$this->template_directory_name = 'pdf';
 			$this->template_base_path = (defined('WC_TEMPLATE_PATH')?WC_TEMPLATE_PATH:$woocommerce->template_url) . $this->template_directory_name . '/';
 			$this->template_default_base_path = WooCommerce_PDF_Invoices::$plugin_path . 'templates/' . $this->template_directory_name . '/';
@@ -65,6 +71,20 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			if ( class_exists('WC_Subscriptions') ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'reset_invoice_data' ), 10, 4 );
+			}
+
+		}
+
+		public function init_tmp_path () {
+			// create plugin base temp path
+			@mkdir($this->tmp_path);
+
+			// create subfolders & protect
+			$subfolders = array( 'attachments', 'dompdf_font_cache', 'dompdf' );
+			foreach ( $subfolders as $subfolder ) {
+				$path = $this->tmp_path . $subfolder . '/';
+				@mkdir( $path );
+				@file_put_contents( $path . '.htaccess', 'deny from all' );
 			}
 
 		}
@@ -330,10 +350,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			$this->order = $order;
 
-			$tmp_path = apply_filters( 'wpo_wcpdf_tmp_path', WooCommerce_PDF_Invoices::$plugin_path . 'tmp/' );
+			$tmp_path = $this->tmp_path . 'attachments/';
 
 			// clear pdf files from temp folder (from http://stackoverflow.com/a/13468943/1446634)
-			array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
+			// array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
 
 			// set allowed statuses for invoices
 			$invoice_allowed = isset($this->general_settings['email_pdf']) ? array_keys( $this->general_settings['email_pdf'] ) : array();

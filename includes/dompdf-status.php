@@ -119,11 +119,23 @@ if (($gm = extension_loaded("gmagick")) || ($im = extension_loaded("imagick"))) 
 
 <?php
 $permissions = array(
-	'DOMPDF_FONT_DIR'		=> array (
-			'description'		=> 'Directory containing fonts loaded into DOMPDF',
-			'value'				=> DOMPDF_FONT_DIR,
-			'status'			=> (is_writable(DOMPDF_FONT_DIR) ? "ok" : "failed"),			
-			'status_message'	=> (is_writable(DOMPDF_FONT_DIR) ? "Writable" : "Not writable"),
+	'WCPDF_TEMP_DIR'		=> array (
+			'description'		=> 'Central temporary plugin folder',
+			'value'				=> $wpo_wcpdf->export->tmp_path,
+			'status'			=> (is_writable( $wpo_wcpdf->export->tmp_path ) ? "ok" : "failed"),			
+			'status_message'	=> (is_writable( $wpo_wcpdf->export->tmp_path ) ? "Writable" : "Not writable"),
+		),
+	'WCPDF_ATTACHMENT_DIR'		=> array (
+			'description'		=> 'Temporary attachments folder',
+			'value'				=> $wpo_wcpdf->export->tmp_path . 'attachments',
+			'status'			=> (is_writable( $wpo_wcpdf->export->tmp_path . 'attachments' ) ? "ok" : "failed"),			
+			'status_message'	=> (is_writable( $wpo_wcpdf->export->tmp_path . 'attachments' ) ? "Writable" : "Not writable"),
+		),
+	'DOMPDF_TEMP_DIR'		=> array (
+			'description'		=> 'Temporary DOMPDF folder',
+			'value'				=> DOMPDF_TEMP_DIR,
+			'status'			=> (is_writable(DOMPDF_TEMP_DIR) ? "ok" : "failed"),			
+			'status_message'	=> (is_writable(DOMPDF_TEMP_DIR) ? "Writable" : "Not writable"),
 		),
 	'DOMPDF_FONT_CACHE'		=> array (
 			'description'		=> 'Font metrics cache (used mainly by CPDF)',
@@ -131,23 +143,17 @@ $permissions = array(
 			'status'			=> (is_writable(DOMPDF_FONT_CACHE) ? "ok" : "failed"),			
 			'status_message'	=> (is_writable(DOMPDF_FONT_CACHE) ? "Writable" : "Not writable"),
 		),
-	'DOMPDF_TEMP_DIR'		=> array (
-			'description'		=> 'Temporary PDF engine folder',
-			'value'				=> DOMPDF_TEMP_DIR,
-			'status'			=> (is_writable(DOMPDF_TEMP_DIR) ? "ok" : "failed"),			
-			'status_message'	=> (is_writable(DOMPDF_TEMP_DIR) ? "Writable" : "Not writable"),
+	'DOMPDF_FONT_DIR'		=> array (
+			'description'		=> 'DOMPDF fonts folder (needs to be writable for custom/remote fonts)',
+			'value'				=> DOMPDF_FONT_DIR,
+			'status'			=> (is_writable(DOMPDF_FONT_DIR) ? "ok" : "failed"),			
+			'status_message'	=> (is_writable(DOMPDF_FONT_DIR) ? "Writable" : "Not writable"),
 		),
 	'DOMPDF_ENABLE_REMOTE'	=> array (
 			'description'		=> 'Allow remote stylesheets and images',
-			'value'				=> DOMPDF_ENABLE_REMOTE,
+			'value'				=> DOMPDF_ENABLE_REMOTE ? 'true' : 'false',
 			'status'			=> (ini_get("allow_url_fopen")) ? "ok" : "failed",			
 			'status_message'	=> (ini_get("allow_url_fopen")) ? "allow_url_fopen enabled" : "allow_url_fopen disabled",
-		),
-	'WCPDF_TEMP_DIR'		=> array (
-			'description'		=> 'Temporary plugin folder',
-			'value'				=> WooCommerce_PDF_Invoices::$plugin_path . 'tmp/',
-			'status'			=> (is_writable(WooCommerce_PDF_Invoices::$plugin_path . 'tmp/') ? "ok" : "failed"),			
-			'status_message'	=> (is_writable(WooCommerce_PDF_Invoices::$plugin_path . 'tmp/') ? "Writable" : "Not writable"),
 		),
 	);
 
@@ -179,3 +185,18 @@ $permissions = array(
 	<?php } ?>
 
 </table>
+
+<p>
+The central temp folder is <code><?php echo $wpo_wcpdf->export->tmp_path; ?></code>.
+By default, this folder is created in the WordPress temp folder (<code><?php echo get_temp_dir(); ?></code>),
+which can be defined by setting <code>WP_TEMP_DIR</code> in wp-config.php.
+Alternatively, you can control the specific folder for PDF invoices by using the
+<code>wpo_wcpdf_tmp_path</code> filter. Make sure this folder is writable and that the subfolders
+<code>attachments</code>, <code>dompdf</code> and <code>dompdf_font_cache</code> are present
+(these will be created by the plugin if the central temp folder is writable).<br>
+If you also need to move/change the DOMPDF fonts folder, use the <code>wpo_wcpdf_tmp_path</code> filter.
+Copy all the files from the old location to the new location. Make sure that these
+folders get synced upon plugin updates, or you may get behind on font updates/changes! 
+If everything works normally with the default font path (simply create a test PDF),
+there is no need to change the location.
+</p>

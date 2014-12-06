@@ -1,8 +1,9 @@
 <?php 
-//define("DOMPDF_TEMP_DIR", "/tmp");
+global $wpo_wcpdf;
+define("DOMPDF_TEMP_DIR", $wpo_wcpdf->export->tmp_path . 'dompdf');
 //define("DOMPDF_CHROOT", DOMPDF_DIR);
-//define("DOMPDF_FONT_DIR", DOMPDF_DIR."/lib/fonts/");
-//define("DOMPDF_FONT_CACHE", DOMPDF_DIR."/lib/fonts/");
+define("DOMPDF_FONT_DIR", apply_filters( 'wpo_wcpdf_dompdf_font_dir', DOMPDF_DIR."/lib/fonts/" ) ); //needs trailing slash!
+define("DOMPDF_FONT_CACHE", $wpo_wcpdf->export->tmp_path . 'dompdf_font_cache');
 //define("DOMPDF_UNICODE_ENABLED", true);
 //define("DOMPDF_PDF_BACKEND", "PDFLib");
 //define("DOMPDF_DEFAULT_MEDIA_TYPE", "print");
