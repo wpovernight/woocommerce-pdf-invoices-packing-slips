@@ -97,6 +97,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			$settings_tabs['debug'] = __('Status','wpo_wcpdf');
 
 			$active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'general';
+
 			?>
 	
 				<div class="wrap">
@@ -549,7 +550,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				array(
 					'menu'				=> $option,
 					'id'				=> 'enable_debug',
-					'description'		=> __( 'Can be used instead of WP_DEBUG', 'wpo_wcpdf' ),
+					'description'		=> __( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues", 'wpo_wcpdf' ),
 				)
 			);
 
