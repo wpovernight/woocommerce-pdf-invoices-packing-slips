@@ -163,7 +163,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		
 			// Create option in wp_options.
 			if ( false == get_option( $option ) ) {
-				add_option( $option );
+				$this->default_settings( $option );
 			}
 		
 			// Section.
@@ -248,7 +248,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		
 			// Create option in wp_options.
 			if ( false == get_option( $option ) ) {
-				add_option( $option );
+				$this->default_settings( $option );
 			}
 	
 			// Section.
@@ -496,12 +496,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			// Register settings.
 			register_setting( $option, $option, array( &$this, 'validate_options' ) );
 
-			// Register defaults if settings empty
-			$option_values = get_option($option);
-			if ( !isset( $option_values['paper_size'] ) ) {
-				$this->default_settings();
-			}
-
 			// determine highest invoice number if option not set
 			if ( !isset( $option_values['next_invoice_number']) ) {
 				// Based on code from WooCommerce Sequential Order Numbers
@@ -530,7 +524,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		
 			// Create option in wp_options.
 			if ( false == get_option( $option ) ) {
-				add_option( $option );
+				$this->default_settings( $option );
 			}
 
 			// Section.
@@ -575,20 +569,32 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		/**
 		 * Set default settings.
 		 */
-		public function default_settings() {
+		public function default_settings( $option ) {
 			global $wpo_wcpdf;
 
-			$default_general = array(
-				'download_display'	=> 'download',
-			);
+			switch ( $option ) {
+				case 'wpo_wcpdf_general_settings':
+					$default = array(
+						'download_display'	=> 'download',
+					);
+					break;
+				case 'wpo_wcpdf_general_settings':
+					$default = array(
+						'paper_size'		=> 'a4',
+						'template_path'		=> $wpo_wcpdf->export->template_default_base_path . 'Simple',
+					);
+					break;
+				default:
+					$default = '';
+					break;
+			}
 
-			$default_template = array(
-				'paper_size'		=> 'a4',
-				'template_path'		=> $wpo_wcpdf->export->template_default_base_path . 'Simple',
-			);
+			if ( false == get_option( $option ) ) {
+				add_option( $option, $default );
+			} else {
+				update_option( $option, $default );
 
-			update_option( 'wpo_wcpdf_general_settings', $default_general );
-			update_option( 'wpo_wcpdf_template_settings', $default_template );
+			}
 		}
 		
 		// Text element callback.
