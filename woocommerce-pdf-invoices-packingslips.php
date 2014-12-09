@@ -33,13 +33,20 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			self::$plugin_basename = plugin_basename(__FILE__);
 			self::$plugin_url = plugin_dir_url(self::$plugin_basename);
 			self::$plugin_path = trailingslashit(dirname(__FILE__));
-			self::$version = '1.4.14'; 
+			self::$version = '1.4.14';
 			
 			// load the localisation & classes
 			add_action( 'plugins_loaded', array( $this, 'translations' ) ); // or use init?
 			add_action( 'init', array( $this, 'load_classes' ) );
 
+			// run lifecycle methods
 			if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+				// check if upgrading from versionless (1.4.14 and older)
+				if ( get_option('wpo_wcpdf_general_settings') && get_option('wpo_wcpdf_version') === false ) {
+					// tag 'versionless', so that we can apply necessary upgrade settings
+					add_option( 'wpo_wcpdf_version', 'versionless' );
+				}
+
 				add_action( 'wp_loaded', array( $this, 'do_install' ) );
 			}
 		}
@@ -150,7 +157,14 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Plugin install method.  Perform any installation tasks here
 		 */
 		protected function install() {
-			// stub
+			// Create temp folders
+			$tmp_base = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', get_temp_dir() . 'wpo_wcpdf/' ) );
+
+			// check if tmp folder exists => if not, initialize 
+			if ( !@is_dir( $tmp_base ) ) {
+				$this->export->init_tmp( $tmp_base );
+			}
+
 		}
 
 
@@ -160,7 +174,21 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * @param string $installed_version the currently installed version
 		 */
 		protected function upgrade( $installed_version ) {
-			// stub
+			if ( $installed_version == 'versionless') { // versionless = 1.4.14 and older
+				// We're upgrading from an old version, so we're enabling the option to use the plugin tmp folder.
+				// This is not per se the 'best' solution, but the good thing is that nothing is changed ]
+				// and nothing will be broken (that wasn't broken before)
+				$default = array( 'old_tmp' => 1 );
+				update_option( 'wpo_wcpdf_debug_settings', $default );
+			}
+
+			// sync fonts on every upgrade!
+			$debug_settings = get_option( 'wpo_wcpdf_debug_settings' ); // get temp setting
+			if ( isset($this->debug_settings['old_tmp']) ) {
+				$font_path = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', get_temp_dir() . 'wpo_wcpdf/fonts/' ) );
+				$this->export->copy_fonts( $font_path );
+			}
+			
 		}		
 
 		/***********************************************************************/

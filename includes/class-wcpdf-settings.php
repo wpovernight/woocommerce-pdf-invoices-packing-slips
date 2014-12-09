@@ -562,6 +562,19 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			add_settings_field(
+				'old_tmp',
+				__( 'Use old tmp folder', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'debug_settings',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'old_tmp',
+					'description'		=> __( 'Before version 1.5.0 of PDF Invoices, temporary files were stored in the plugin folder. This setting is only intended for backwards compatibility, not recommended on new installs!', 'wpo_wcpdf' ),
+				)
+			);
+
 			// Register settings.
 			register_setting( $option, $option, array( &$this, 'validate_options' ) );
 	
