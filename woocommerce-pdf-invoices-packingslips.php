@@ -544,7 +544,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_woocommerce_totals() {
 			// get totals and remove the semicolon
-			$totals = apply_filters( 'wpo_wcpdf_raw_order_totals', $this->export->order->get_order_item_totals() );
+			$totals = apply_filters( 'wpo_wcpdf_raw_order_totals', $this->export->order->get_order_item_totals(), $this->export->order );
 			
 			// remove the colon for every label
 			foreach ( $totals as $key => $total ) {
@@ -556,7 +556,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$totals[$key]['label'] = $label;
 			}
 	
-			return apply_filters( 'wpo_wcpdf_woocommerce_totals', $totals );
+			return apply_filters( 'wpo_wcpdf_woocommerce_totals', $totals, $this->export->order );
 		}
 		
 		/**
