@@ -237,6 +237,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			$print_script = "<script language=javascript>window.onload = function(){ window.print(); };</script>";
+			// <div style="page-break-before: always;"></div>
 			$page_break = "\n<div style=\"page-break-before: always;\"></div>\n";
 
 
