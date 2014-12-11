@@ -184,7 +184,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
 			// sync fonts on every upgrade!
 			$debug_settings = get_option( 'wpo_wcpdf_debug_settings' ); // get temp setting
-			if ( isset($this->debug_settings['old_tmp']) ) {
+			if ( !isset($this->debug_settings['old_tmp']) ) {
+				// do not copy if old_tmp function active!
 				$font_path = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', get_temp_dir() . 'wpo_wcpdf/fonts/' ) );
 				$this->export->copy_fonts( $font_path );
 			}
