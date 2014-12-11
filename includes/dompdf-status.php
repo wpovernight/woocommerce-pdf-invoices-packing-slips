@@ -52,6 +52,12 @@ $server_configs = array(
 		"result"   => extension_loaded("gmagick") || extension_loaded("imagick"),
 		"fallback" => "Recommended for better performances",
 	),
+	"glob()" => array(
+		"required" => "Required to detect custom templates and to clear the temp folder periodically",
+		"value"    => null,
+		"result"   => function_exists("glob"),
+		"fallback" => "Check php disable_functions",
+	),
 	"WP Memory Limit" => array(
 		"required" => 'Recommended: 64MB (128MB for optimal performance)<br/>See: <a href="http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP">Increasing memory allocated to PHP</a>',
 		"value"    => WP_MEMORY_LIMIT,
