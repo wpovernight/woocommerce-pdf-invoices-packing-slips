@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.0
-Stable tag: 1.4.14
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -248,6 +248,14 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
+= 1.5.0 =
+* Feature: All temporary files are now stored centrally in the WP temp folder.
+* Feature: Debug settings in status panel (output errors & output to HTML)
+* Feature: Compatibility filter for WooCommerce Subscriptions (prevents duplicate invoice numbers)
+* Tweak: Pass order to totals filters
+* Translations: Updated Italian (Thanks Astrid!)
+* FAQ: instructions for placing a link on the thank you page
+
 = 1.4.14 =
 * Fix: fatal error when user registers at checkout (applies to credit notes only)
 * Translations: Updated German (Thanks Dietmar!)
@@ -327,7 +335,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 * Fix: Invoice number formatting notices in debug mode
 
 = 1.4.0 =
-* NEW Feature: Invoice numbers can now be given a prefix, suffix or padding on the settings page!
+* Feature: Invoice numbers can now be given a prefix, suffix or padding on the settings page!
 * Filter: `wpo_wcpdf_email_allowed_statuses` to attach pdf to custom order status emails
 * Tweak: Sequential Order Numbers Pro compatibility
 * Tweak: Filenames are now automatically sanitized to prevent issues with illegal characters
@@ -342,7 +350,6 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 = 1.3.0 =
 * Feature: Added 'status' panel for better problem diagnosis
-* Feature: Order & Cart, & total discounts can now be called separately with order_discount()
 * Tweak: split create & get invoice number calls to prevent slow database calls from causing number skipping
 * Translations: Added Romanian (Thanks Leonardo!)
 * Translations: Added Slovak (Thanks Oleg!)
@@ -448,3 +455,9 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 = 1.0.0 =
 * First release
+
+== Upgrade Notice ==
+
+= 1.5.0 =
+!IMPORTANT! In 1.5+ all temporary files are stored centrally in the WP temp folder. Check the status panel to make sure the temp folders are writable (this feature should fix a lot of issues with the temporary folders/files)
+
