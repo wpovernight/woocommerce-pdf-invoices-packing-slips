@@ -253,7 +253,9 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 * Feature: Debug settings in status panel (output errors & output to HTML)
 * Feature: Compatibility filter for WooCommerce Subscriptions (prevents duplicate invoice numbers)
 * Tweak: Pass order to totals filters
+* Translations: Updated POT
 * Translations: Updated Italian (Thanks Astrid!)
+* Translations: Updated Dutch
 * FAQ: instructions for placing a link on the thank you page
 
 = 1.4.14 =
