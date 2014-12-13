@@ -461,5 +461,4 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Upgrade Notice ==
 
 = 1.5.0 =
-!IMPORTANT! In 1.5+ all temporary files are stored centrally in the WP temp folder. Check the status panel to make sure the temp folders are writable (this feature should fix a lot of issues with the temporary folders/files)
-
+Version 1.5 changes where temporary files are stored - everything is now stored centrally in the WP temp folder. For backwards compatibility, this feature is turned off by default, but we recommend to use the new folders. Check the plugin Status panel for more information!
