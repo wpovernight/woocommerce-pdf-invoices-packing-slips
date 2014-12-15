@@ -249,7 +249,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Changelog ==
 
 = 1.5.0 =
-* Feature: All temporary files are now stored centrally in the WP temp folder.
+* Feature: All temporary files are now stored centrally in the WP uploads folder.
 * Feature: Debug settings in status panel (output errors & output to HTML)
 * Feature: Compatibility filter for WooCommerce Subscriptions (prevents duplicate invoice numbers)
 * Tweak: Pass order to totals filters
@@ -461,4 +461,4 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Upgrade Notice ==
 
 = 1.5.0 =
-Version 1.5 changes where temporary files are stored - everything is now stored centrally in the WP temp folder. For backwards compatibility, this feature is turned off by default, but we recommend to use the new folders. Check the plugin Status panel for more information!
+Version 1.5 changes where temporary files are stored - everything is now stored centrally in the WP uploads folder. For backwards compatibility, this feature is turned off by default, but we recommend to use the new folders. Check the plugin Status panel for more information!
