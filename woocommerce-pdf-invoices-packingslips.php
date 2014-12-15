@@ -154,11 +154,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
 
 		/**
-		 * Plugin install method.  Perform any installation tasks here
+		 * Plugin install method. Perform any installation tasks here
 		 */
 		protected function install() {
 			// Create temp folders
-			$tmp_base = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', get_temp_dir() . 'wpo_wcpdf/' ) );
+			$tmp_base = $this->export->get_tmp_base();
 
 			// check if tmp folder exists => if not, initialize 
 			if ( !@is_dir( $tmp_base ) ) {
@@ -184,9 +184,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
 			// sync fonts on every upgrade!
 			$debug_settings = get_option( 'wpo_wcpdf_debug_settings' ); // get temp setting
+
+			// do not copy if old_tmp function active!
 			if ( !isset($this->debug_settings['old_tmp']) ) {
-				// do not copy if old_tmp function active!
-				$font_path = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', get_temp_dir() . 'wpo_wcpdf/fonts/' ) );
+				$tmp_base = $this->export->get_tmp_base();
+
+				$font_path = $tmp_base . 'fonts/';
 				$this->export->copy_fonts( $font_path );
 			}
 			

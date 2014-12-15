@@ -194,8 +194,8 @@ $permissions = array(
 
 <p>
 The central temp folder (1.5+) is <code><?php echo $wpo_wcpdf->export->tmp_path(); ?></code>.
-By default, this folder is created in the WordPress temp folder (<code><?php echo get_temp_dir(); ?></code>),
-which can be defined by setting <code>WP_TEMP_DIR</code> in wp-config.php.
+By default, this folder is created in the WordPress uploads folder (<code><?php echo wp_upload_dir(); ?></code>),
+which can be defined by setting <code>UPLOADS</code> in wp-config.php.
 Alternatively, you can control the specific folder for PDF invoices by using the
 <code>wpo_wcpdf_tmp_path</code> filter. Make sure this folder is writable and that the
 subfolders <code>attachments</code>, <code>dompdf</code> and <code>fonts</code>

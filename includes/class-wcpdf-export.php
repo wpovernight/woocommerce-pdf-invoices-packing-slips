@@ -87,8 +87,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$this->copy_fonts( $path );
 				}
 
-				// create .htaccess file to protect in case an open webfolder is used!
+				// create .htaccess file and empty index.php to protect in case an open webfolder is used!
 				@file_put_contents( $path . '.htaccess', 'deny from all' );
+				@touch( $path . 'index.php' );
 			}
 
 		}
@@ -138,20 +139,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Return tmp path for different plugin processes
 		 */
 		public function tmp_path ( $type = '' ) {
-			// get_temp_dir() is used as the base temp folder, under which several folders are created
-			// 
-			// get_temp_dir() return value preference is:
-			// * the return value of sys_get_temp_dir(),
-			// * followed by your PHP temporary upload directory,
-			// * followed by WP_CONTENT_DIR,
-			// * before finally defaulting to /tmp/
-			// 
-			// May be overridden by the wpo_wcpdf_tmp_path filter or the WP_TEMP_DIR constant in your wp-config.php file.
-
 			// get temp setting
 			$old_tmp = isset($this->debug_settings['old_tmp']);
 
-			$tmp_base = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', get_temp_dir() . 'wpo_wcpdf/' ) );
+			$tmp_base = $this->get_tmp_base();
 			if (!$old_tmp) {
 				// check if tmp folder exists => if not, initialize 
 				if ( !@is_dir( $tmp_base ) ) {
@@ -195,6 +186,25 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			return $tmp_path;
+		}
+
+		/**
+		 * return the base tmp folder (usually uploads)
+		 */
+		public function get_tmp_base () {
+			// wp_upload_dir() is used to set the base temp folder, under which a
+			// 'wpo_wcpdf' folder and several subfolders are created
+			// 
+			// wp_upload_dir() will:
+			// * default to WP_CONTENT_DIR/uploads
+			// * UNLESS the ‘UPLOADS’ constant is defined in wp-config (http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder)
+			// 
+			// May also be overridden by the wpo_wcpdf_tmp_path filter
+
+			$upload_dir = wp_upload_dir();
+			$upload_base = $upload_dir['basedir'];
+			$tmp_base = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', $upload_base . 'wpo_wcpdf/' ) );
+			return $tmp_base;
 		}
 		
 		/**
