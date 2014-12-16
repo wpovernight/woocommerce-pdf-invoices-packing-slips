@@ -202,7 +202,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// May also be overridden by the wpo_wcpdf_tmp_path filter
 
 			$upload_dir = wp_upload_dir();
-			$upload_base = $upload_dir['basedir'];
+			$upload_base = trailingslashit( $upload_dir['basedir'] );
 			$tmp_base = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', $upload_base . 'wpo_wcpdf/' ) );
 			return $tmp_base;
 		}
