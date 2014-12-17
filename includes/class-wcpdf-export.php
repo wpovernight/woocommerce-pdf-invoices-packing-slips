@@ -727,11 +727,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					
 					}
 
-					$data_list[] = apply_filters( 'wpo_wcpdf_order_item_data', $data );
+					$data_list[] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order );
 				}
 			}
 
-			return apply_filters( 'wpo_wcpdf_order_items_data', $data_list );
+			return apply_filters( 'wpo_wcpdf_order_items_data', $data_list, $this->order );
 		}
 		
 		/**
