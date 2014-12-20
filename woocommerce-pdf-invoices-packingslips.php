@@ -185,7 +185,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			// sync fonts on every upgrade!
 			$debug_settings = get_option( 'wpo_wcpdf_debug_settings' ); // get temp setting
 
-			// do not copy if old_tmp function active!
+			// do not copy if old_tmp function active! (double check for slow databases)
 			if ( !( isset($this->debug_settings['old_tmp']) || $installed_version == 'versionless' ) ) {
 				$tmp_base = $this->export->get_tmp_base();
 
