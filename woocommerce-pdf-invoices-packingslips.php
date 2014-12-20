@@ -191,7 +191,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
 				// check if tmp folder exists => if not, initialize 
 				if ( !@is_dir( $tmp_base ) ) {
-					$this->init_tmp( $tmp_base );
+					$this->export->init_tmp( $tmp_base );
 				}
 
 				$font_path = $tmp_base . 'fonts/';
