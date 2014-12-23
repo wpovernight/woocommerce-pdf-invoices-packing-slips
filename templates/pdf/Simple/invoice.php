@@ -61,7 +61,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $items = $wpo_wcpdf->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item ) : ?><tr>
+		<?php $items = $wpo_wcpdf->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item ) : ?>
+		<tr>
 			<td class="description">
 				<?php $description_label = __( 'Description', 'wpo_wcpdf' ); // registering alternate label translation ?>
 				<span class="item-name"><?php echo $item['name']; ?></span><span class="item-meta"><?php echo $item['meta']; ?></span>
@@ -73,7 +74,8 @@
 			</td>
 			<td class="quantity"><?php echo $item['quantity']; ?></td>
 			<td class="price"><?php echo $item['order_price']; ?></td>
-		</tr><?php endforeach; endif; ?>
+		</tr>
+		<?php endforeach; endif; ?>
 	</tbody>
 	<tfoot>
 		<tr class="no-borders">

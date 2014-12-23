@@ -50,7 +50,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $items = $wpo_wcpdf->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item ) : ?><tr>
+		<?php $items = $wpo_wcpdf->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item ) : ?>
+		<tr>
 			<td class="description">
 				<span class="item-name"><?php echo $item['name']; ?></span><span class="item-meta"><?php echo $item['meta']; ?></span>
 				<dl class="meta">
@@ -59,7 +60,8 @@
 				</dl>
 			</td>
 			<td class="quantity"><?php echo $item['quantity']; ?></td>
-		</tr><?php endforeach; endif; ?>
+		</tr>
+		<?php endforeach; endif; ?>
 	</tbody>
 </table><!-- order-details -->		
 
