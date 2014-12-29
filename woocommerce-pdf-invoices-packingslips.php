@@ -40,7 +40,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			add_action( 'init', array( $this, 'load_classes' ) );
 
 			// run lifecycle methods
-			if ( is_admin() && ! defined( 'DOING_AJAX' ) && $this->is_woocommerce_activated() ) {
+			if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
 				// check if upgrading from versionless (1.4.14 and older)
 				if ( get_option('wpo_wcpdf_general_settings') && get_option('wpo_wcpdf_version') === false ) {
 					// tag 'versionless', so that we can apply necessary upgrade settings
@@ -135,6 +135,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Handles version checking
 		 */
 		public function do_install() {
+			// only install when woocommerce is active
+			if ( !$this->is_woocommerce_activated() ) {
+				return;
+			}
+
 			$version_setting = 'wpo_wcpdf_version';
 			$installed_version = get_option( $version_setting );
 
