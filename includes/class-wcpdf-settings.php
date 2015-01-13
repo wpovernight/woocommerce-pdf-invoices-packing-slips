@@ -953,6 +953,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		public function validate_options( $input ) {
 			// Create our array for storing the validated options.
 			$output = array();
+
+			if (empty($input) || !is_array($input)) {
+				return $input;
+			}
 		
 			// Loop through each of the incoming options.
 			foreach ( $input as $key => $value ) {
