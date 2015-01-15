@@ -799,7 +799,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return $tax_rates;
 			}
 
-			if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
+			if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 && !apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
 				// WC 2.1 or newer is used
 
 				// if (empty($tax_class))
@@ -825,7 +825,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 				$tax_rates = implode(' ,', $tax_rates );
 			} else {
-				// Backwards compatibility: calculate tax from line items
+				// Backwards compatibility/fallback: calculate tax from line items
 				if ( $line_total != 0) {
 					$tax_rates = round( ($line_tax / $line_total)*100, 1 ).' %';
 				} else {
