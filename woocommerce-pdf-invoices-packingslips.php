@@ -608,6 +608,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			$shipping = array (
 				'label'	=> __('Shipping', 'wpo_wcpdf'),
 				'value'	=> $shipping_costs,
+				'tax'	=> $this->export->wc_price( $this->export->order->order_shipping_tax ),
 			);
 			return apply_filters( 'wpo_wcpdf_order_shipping', $shipping );
 		}
@@ -676,10 +677,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 						$fee_price = woocommerce_price( $fee['line_total'] + $fee['line_tax'] );
 					}
 
-
 					$fees[ $id ] = array(
-						'label' => $fee['name'],
-						'value'	=> $fee_price
+						'label' 		=> $fee['name'],
+						'value'			=> $fee_price,
+						'line_total'	=> $this->export->wc_price($fee['line_total']),
+						'line_tax'		=> $this->export->wc_price($fee['line_tax'])
 					);
 				}
 				return $fees;
