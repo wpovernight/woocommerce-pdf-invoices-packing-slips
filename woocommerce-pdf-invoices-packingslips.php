@@ -600,9 +600,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_order_shipping( $tax = 'excl' ) { // set $tax to 'incl' to include tax
 			if ($tax == 'excl' ) {
-				$shipping_costs = woocommerce_price ( $this->export->order->order_shipping );
+				$shipping_costs = $this->export->wc_price( $this->export->order->order_shipping );
 			} else {
-				$shipping_costs = woocommerce_price ( $this->export->order->order_shipping + $this->export->order->order_shipping_tax );
+				$shipping_costs = $this->export->wc_price( $this->export->order->order_shipping + $this->export->order->order_shipping_tax );
 			}
 
 			$shipping = array (
@@ -672,9 +672,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			if ( $wcfees = $this->export->order->get_fees() ) {
 				foreach( $wcfees as $id => $fee ) {
 					if ($tax == 'excl' ) {
-						$fee_price = woocommerce_price( $fee['line_total'] );
+						$fee_price = $this->export->wc_price( $fee['line_total'] );
 					} else {
-						$fee_price = woocommerce_price( $fee['line_total'] + $fee['line_tax'] );
+						$fee_price = $this->export->wc_price( $fee['line_total'] + $fee['line_tax'] );
 					}
 
 					$fees[ $id ] = array(
@@ -698,7 +698,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				foreach ( $this->export->order->get_taxes() as $key => $tax ) {
 					$taxes[ $key ] = array(
 						'label'					=> isset( $tax[ 'label' ] ) ? $tax[ 'label' ] : $tax[ 'name' ],
-						'value'					=> woocommerce_price( ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] ) ),
+						'value'					=> $this->export->wc_price( ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] ) ),
 						'rate_id'				=> $tax['rate_id'],
 						'tax_amount'			=> $tax['tax_amount'],
 						'shipping_tax_amount'	=> $tax['shipping_tax_amount'],
@@ -728,7 +728,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 					$total_unformatted = $this->export->order->get_order_total();
 				}
 
-				$total = woocommerce_price( ( $total_unformatted - $total_tax ) );
+				$total = $this->export->wc_price( ( $total_unformatted - $total_tax ) );
 				$label = __('Total ex. VAT');
 			} else {
 				$total = $this->export->order->get_formatted_order_total();
