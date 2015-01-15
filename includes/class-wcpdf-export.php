@@ -46,7 +46,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				require_once( $this->template_path . '/template-functions.php' );
 			}
 
-			add_action( 'wpo_wcpdf_process_template_order', array($this, 'set_session_customer' ), 10, 2 );
 			add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ));
 			add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3);
 
@@ -817,37 +816,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 			
 			return $tax_rates;
-		}
-
-		/**
-		 * Helper function that enables get_tax_rate() to return the correct rates:
-		 * the get_rates method in WC_Tax works with the user data that is stored in the session,
-		 * so in order to get the correct rates (based on shop base or billing addres, following
-		 * WC settings), we need to set the user session to the customer.
-		 * @param string $template_type
-		 * @param int    $order_id
-		 */
-		public function set_session_customer ( $template_type, $order_id ) {
-			$customer_data = array(
-				'country' 				=> get_post_meta( $order_id, '_billing_country', true),
-				'state' 				=> get_post_meta( $order_id, '_billing_state', true),
-				'postcode' 				=> get_post_meta( $order_id, '_billing_postcode', true),
-				'city'					=> get_post_meta( $order_id, '_billing_city', true),
-				'address' 				=> get_post_meta( $order_id, '_billing_address_1', true),
-				'address_2' 			=> get_post_meta( $order_id, '_billing_address_2', true),
-				'shipping_country' 		=> get_post_meta( $order_id, '_shipping_country', true),
-				'shipping_state' 		=> get_post_meta( $order_id, '_shipping_state', true),
-				'shipping_postcode' 	=> get_post_meta( $order_id, '_shipping_postcode', true),
-				'shipping_city'			=> get_post_meta( $order_id, '_shipping_city', true),
-				'shipping_address'		=> get_post_meta( $order_id, '_shipping_address_1', true),
-				'shipping_address_2'	=> get_post_meta( $order_id, '_shipping_address_2', true),
-				'is_vat_exempt' 		=> false, // since we already checked that line tax is not 0!
-				'calculated_shipping'	=> true
-			);
-
-			WC()->session->set( 'customer', $customer_data);
-
-			return;
 		}
 
 		/**
