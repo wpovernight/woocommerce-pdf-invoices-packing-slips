@@ -779,7 +779,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * @param  string $tax_class tax class slug
 		 * @return string $tax_rates imploded list of tax rates
 		 */
-		public function get_tax_rate( $tax_class, $line_total, $line_tax, $line_tax_data ) {
+		public function get_tax_rate( $tax_class, $line_total, $line_tax, $line_tax_data = '' ) {
 			if ( $line_tax == 0 ) {
 				return '-'; // no need to determine tax rate...
 			}
