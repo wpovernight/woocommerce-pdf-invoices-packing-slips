@@ -514,13 +514,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function get_order_date() {
 			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				$parent_order = new WC_Order( $parent_order_id );
-				$date = $parent_order->order_date;
+				$order_date = $parent_order->order_date;
 			} else {
-				$date = $this->export->order->order_date;
+				$order_date = $this->export->order->order_date;
 			}
 
-			$date = date_i18n( get_option( 'date_format' ), strtotime( $date ) );
-			return apply_filters( 'wpo_wcpdf_order_date', $date );
+			$date = date_i18n( get_option( 'date_format' ), strtotime( $order_date ) );
+			return apply_filters( 'wpo_wcpdf_order_date', $date, $order_date );
 		}
 		public function order_date() {
 			echo $this->get_order_date();
