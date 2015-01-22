@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-12-11 16:50+0100\n"
-"PO-Revision-Date: 2014-12-11 16:55+0100\n"
+"PO-Revision-Date: 2015-01-22 10:45+0100\n"
 "Last-Translator: Ewout Fernhout <chocolade@extrapuur.nl>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nl_NL\n"
@@ -16,7 +16,7 @@ msgstr ""
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
 "X-Poedit-Basepath: ../\n"
 "X-Textdomain-Support: yes\n"
-"X-Generator: Poedit 1.7.1\n"
+"X-Generator: Poedit 1.7.3\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #: includes/class-wcpdf-export.php:326 includes/class-wcpdf-export.php:331
@@ -292,7 +292,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:567
 msgid "Use old tmp folder"
-msgstr "Gebruik de oude tml folder"
+msgstr "Gebruik de oude tmp folder"
 
 #: includes/class-wcpdf-settings.php:574
 msgid ""
