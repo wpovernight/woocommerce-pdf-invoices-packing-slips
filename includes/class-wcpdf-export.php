@@ -656,9 +656,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$data_list = array();
 		
 			if( sizeof( $items ) > 0 ) {
-				foreach ( $items as $item ) {
+				foreach ( $items as $item_id => $item ) {
 					// Array with data for the pdf template
 					$data = array();
+
+					// Set the item_id
+					$data['item_id'] = $item_id;
 					
 					// Set the id
 					$data['product_id'] = $item['product_id'];
