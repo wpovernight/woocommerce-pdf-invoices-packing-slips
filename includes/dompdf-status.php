@@ -163,6 +163,10 @@ $permissions = array(
 		),
 	);
 
+if ( isset($wpo_wcpdf->export->debug_settings['old_tmp']) ) {
+	unset($permissions['WCPDF_TEMP_DIR']);
+}
+
 ?>
 <br />
 <h3 id="system">Permissions</h3>
