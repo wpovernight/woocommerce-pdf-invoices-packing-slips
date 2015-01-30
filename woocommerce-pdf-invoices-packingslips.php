@@ -477,7 +477,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		}
 
 		/**
-		 * Return/Show order number (or invoice number)
+		 * Return/Show order number
 		 */
 		public function get_order_number() {
 			// try parent first
@@ -501,7 +501,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show invoice number 
 		 */
 		public function get_invoice_number() {
-			$invoice_number = $this->export->get_invoice_number( $this->export->order->id );
+			// try parent first
+			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
+				$invoice_number = $this->export->get_invoice_number( $parent_order_id );
+			} else {
+				$invoice_number = $this->export->get_invoice_number( $this->export->order->id );
+			}
+
 			return $invoice_number;
 		}
 		public function invoice_number() {
