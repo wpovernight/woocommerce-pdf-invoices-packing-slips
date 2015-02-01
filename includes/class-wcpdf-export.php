@@ -227,17 +227,26 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				if (!file_exists($template)) {
 					throw new Exception('Template not found! Check if the following file exists: <pre>'.$template.'</pre><br/>');
 				}
+				
+				//set a variable if to increase invoice number or not, and apply a filter to it
+				$increase_invoice_number = ($template_type == 'invoice');
+				$increase_invoice_number = apply_filters('wpo_wcpdf_if_increase_invoice_number', $increase_invoice_number, $this->order);
 
 				// Set the invoice number
-				if ( $template_type == 'invoice' ) {
+				if ( $increase_invoice_number ) {
 					$this->set_invoice_number( $order_id );
 				}
 
 				$output_html[$order_id] = $this->get_template($template);
 
 				// store meta to be able to check if an invoice for an order has been created already
-				if ( $template_type == 'invoice' ) {
+				if ( $increase_invoice_number ) {
 					update_post_meta( $order_id, '_wcpdf_invoice_exists', 1 );
+				} else {
+				// if invoice was generated before and deleted
+					delete_post_meta( $order_id, '_wcpdf_invoice_exists' );
+					delete_post_meta( $order_id, '_wcpdf_invoice_date' );
+					delete_post_meta( $order_id, '_wcpdf_invoice_number' );
 				}
 
 
