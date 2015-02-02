@@ -43,9 +43,20 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 
 				if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
 					// WC 2.1 or newer (MP6) is used: bigger buttons
-					wp_enqueue_style( 'wpo-wcpdf', WooCommerce_PDF_Invoices::$plugin_url . 'css/style-wc21.css' );
+					wp_enqueue_style( $handle, $src, $deps, $ver, $media );
+					wp_enqueue_style(
+						'wpo-wcpdf',
+						WooCommerce_PDF_Invoices::$plugin_url . 'css/style-wc21.css',
+						array(),
+						WooCommerce_PDF_Invoices::$version
+					);
 				} else {
-					wp_enqueue_style( 'wpo-wcpdf', WooCommerce_PDF_Invoices::$plugin_url . 'css/style.css' );
+					wp_enqueue_style(
+						'wpo-wcpdf',
+						WooCommerce_PDF_Invoices::$plugin_url . 'css/style.css',
+						array(),
+						WooCommerce_PDF_Invoices::$version
+					);
 				}
 
 			}
@@ -56,7 +67,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 */
 		public function add_scripts() {
 			if( $this->is_order_edit_page() ) {
-				wp_enqueue_script( 'wpo-wcpdf', WooCommerce_PDF_Invoices::$plugin_url . 'js/script.js', array( 'jquery' ) );
+				wp_enqueue_script(
+					'wpo-wcpdf',
+					WooCommerce_PDF_Invoices::$plugin_url . 'js/script.js',
+					array( 'jquery' ),
+					WooCommerce_PDF_Invoices::$version
+				);
 				wp_localize_script(  
 					'wpo-wcpdf',  
 					'wpo_wcpdf_ajax',  

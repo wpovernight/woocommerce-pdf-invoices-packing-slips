@@ -57,8 +57,19 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			if( $hook != $this->options_page_hook ) 
 				return;
 			
-			wp_enqueue_script( 'wcpdf-upload-js', plugins_url( 'js/media-upload.js' , dirname(__FILE__) ) );
-			wp_enqueue_style( 'wpo-wcpdf', WooCommerce_PDF_Invoices::$plugin_url . 'css/style.css' );
+			wp_enqueue_script(
+				'wcpdf-upload-js',
+				plugins_url( 'js/media-upload.js' , dirname(__FILE__) ),
+				array( 'jquery' ),
+				WooCommerce_PDF_Invoices::$version
+			);
+
+			wp_enqueue_style(
+				'wpo-wcpdf',
+				WooCommerce_PDF_Invoices::$plugin_url . 'css/style.css',
+				array(),
+				WooCommerce_PDF_Invoices::$version
+			);
 			wp_enqueue_media();
 		}
 	
