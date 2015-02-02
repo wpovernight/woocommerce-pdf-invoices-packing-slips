@@ -43,7 +43,6 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 
 				if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
 					// WC 2.1 or newer (MP6) is used: bigger buttons
-					wp_enqueue_style( $handle, $src, $deps, $ver, $media );
 					wp_enqueue_style(
 						'wpo-wcpdf',
 						WooCommerce_PDF_Invoices::$plugin_url . 'css/style-wc21.css',
