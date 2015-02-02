@@ -25,7 +25,8 @@ jQuery(document).ready(function() {
 				<?php _e( 'Supercharge WooCommerce PDF Invoices & Packing Slips with the following features:', 'wpo_wcpdf' ); ?>
 				<ul>
 					<li><?php _e( 'Email/print/download <b>PDF Credit Notes & Proforma invoices</b>', 'wpo_wcpdf' ); ?></li>
-					<li><?php _e( 'Attach a <b>static file</b> (for example a terms & conditions document) to the WooCommerce emails of your choice.', 'wpo_wcpdf' ); ?></li>
+					<li><?php _e( 'Send out a separate <b>notification email</b> with (or without) PDF invoices/packing slips, for example to a drop-shipper or a supplier.', 'wpo_wcpdf' ); ?></li>
+					<li><?php _e( 'Attach <b>up to 3 static files</b> (for example a terms & conditions document) to the WooCommerce emails of your choice.', 'wpo_wcpdf' ); ?></li>
 					<li><?php _e( 'Use <b>separate numbering systems</b> and/or format for proforma invoices and credit notes or utilize the main invoice numbering system', 'wpo_wcpdf' ); ?></li>
 					<li><?php _e( '<b>Customize</b> the <b>shipping & billing address</b> format to include additional custom fields, font sizes etc. without the need to create a custom template.', 'wpo_wcpdf' ); ?></li>
 					<li><?php _e( 'Use the plugin in multilingual <b>WPML</b> setups', 'wpo_wcpdf' ); ?></li>
