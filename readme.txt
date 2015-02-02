@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.1
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -248,6 +248,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
+= 1.5.4 =
+* Tweak: include plugin version in style/script includes
+* Tweak: upload code cleanup
+* Fix: Parent invoice number (for Credit Notes in professional extension)
+
 = 1.5.3 =
 * Feature: add original order date value to order date filter
 * Feature: Work with line_tax_data when available
@@ -475,5 +480,5 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Upgrade Notice ==
 
-= 1.5.3 =
+= 1.5.4 =
 Version 1.5 changes where temporary files are stored - everything is now stored centrally in the WP uploads folder. For backwards compatibility, this feature is turned off by default, but we recommend to use the new folders. Check the plugin Status panel for more information!
