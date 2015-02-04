@@ -339,7 +339,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			
 			// Check if all parameters are set
 			if( empty( $_GET['template_type'] ) || empty( $_GET['order_ids'] ) ) {
-				wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
+				wp_die( __( 'Some of the export parameters are missing.', 'wpo_wcpdf' ) );
 			}
 
 			// Check the user privileges
