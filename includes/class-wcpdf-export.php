@@ -788,7 +788,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// first try the easy wc2.2 way, using line_tax_data
-			if ( !empty( $line_tax_data ) ) {
+			if ( !empty( $line_tax_data ) && isset($line_tax_data['total']) ) {
 				$tax_rates = array();
 
 				$line_taxes = $line_tax_data['total'];
