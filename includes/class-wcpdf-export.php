@@ -35,7 +35,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$this->template_path = isset( $this->template_settings['template_path'] )?$this->template_settings['template_path']:'';
 
 			// backwards compatible template path (1.4.4+ uses relative paths instead of absolute)
-			if (strpos($this->template_path, ABSPATH) === false) {
+			$backslash_abspath = str_replace('/', '\\', ABSPATH);
+			if (strpos($this->template_path, ABSPATH) === false && strpos($this->template_path, $backslash_abspath) === false) {
 				// add site base path, double check it exists!
 				if ( file_exists( ABSPATH . $this->template_path ) ) {
 					$this->template_path = ABSPATH . $this->template_path;
