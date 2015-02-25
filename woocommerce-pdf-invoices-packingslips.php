@@ -213,7 +213,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Output template styles
 		 */
 		public function template_styles() {
-			$css = apply_filters( 'wpo_wcpdf_template_styles', $this->export->template_path. '/' .'style.css' );
+			$css = apply_filters( 'wpo_wcpdf_template_styles_file', $this->export->template_path. '/' .'style.css' );
 
 			ob_start();
 			if (file_exists($css)) {
