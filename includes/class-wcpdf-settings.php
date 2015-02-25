@@ -164,7 +164,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		 */
 		
 		public function init_settings() {
-			global $woocommerce;
+			global $woocommerce, $wpo_wcpdf;
 	
 			/**************************************/
 			/*********** GENERAL SETTINGS *********/
@@ -271,8 +271,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			);
 
 
-			$theme_path = get_stylesheet_directory();
-			$theme_template_path = substr($theme_path, strpos($theme_path, 'wp-content')) . '/woocommerce/pdf/yourtemplate';
+			$theme_path = get_stylesheet_directory() . '/' . $wpo_wcpdf->export->template_base_path;
+			$theme_template_path = substr($theme_path, strpos($theme_path, 'wp-content')) . 'yourtemplate';
 			$plugin_template_path = 'wp-content/plugins/woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple';
 
 			add_settings_field(
