@@ -675,11 +675,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$data['quantity'] = $item['qty'];
 
 					// Set the line total (=after discount)
-					$quantity_divider = ( $item['qty'] == 0 ) ? 1 : $item['qty']; // prevent division by zero
 					$data['line_total'] = $this->wc_price( $item['line_total'] );
-					$data['single_line_total'] = $this->wc_price( $item['line_total'] / $quantity_divider );
+					$data['single_line_total'] = $this->wc_price( $item['line_total'] / max( 1, $item['qty'] ) );
 					$data['line_tax'] = $this->wc_price( $item['line_tax'] );
-					$data['single_line_tax'] = $this->wc_price( $item['line_tax'] / $quantity_divider );
+					$data['single_line_tax'] = $this->wc_price( $item['line_tax'] / max( 1, $item['qty'] ) );
 					
 					$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
 					$data['tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'], $line_tax_data );
