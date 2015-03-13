@@ -291,13 +291,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show billing address
 		 */
 		public function get_billing_address() {
-			if ( $address = $this->export->order->get_formatted_billing_address() ) {
-				return apply_filters( 'wpo_wcpdf_billing_address', $address );
-			}
-
-			if ( !$address && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
-				// try parent address
-
+			// always prefer parent billing address for refunds
+			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// temporarily switch order to make all filters / order calls work correctly
 				$current_order = $this->export->order;
 				$this->export->order = new WC_Order( $parent_order_id );
@@ -305,7 +300,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				// switch back & unset
 				$this->export->order = $current_order;
 				unset($current_order);
+			} elseif ( $address = $this->export->order->get_formatted_billing_address() ) {
+				// regular shop_order
+				$address = apply_filters( 'wpo_wcpdf_billing_address', $address );
 			} else {
+				// no address
 				$address = __('N/A', 'wpo_wcpdf');
 			}
 
@@ -320,7 +319,6 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_billing_email() {
 			$billing_email = $this->export->order->billing_email;
-
 
 			if ( !$billing_email && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// try parent
@@ -354,13 +352,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show shipping address
 		 */
 		public function get_shipping_address() {
-			if ( $address = $this->export->order->get_formatted_shipping_address() ) {
-				return apply_filters( 'wpo_wcpdf_shipping_address', $address );
-			}
-
-			if ( !$address && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
-				// try parent address
-
+			// always prefer parent shipping address for refunds
+			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// temporarily switch order to make all filters / order calls work correctly
 				$current_order = $this->export->order;
 				$this->export->order = new WC_Order( $parent_order_id );
@@ -368,7 +361,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				// switch back & unset
 				$this->export->order = $current_order;
 				unset($current_order);
+			} elseif ( $address = $this->export->order->get_formatted_shipping_address() ) {
+				// regular shop_order
+				$address = apply_filters( 'wpo_wcpdf_shipping_address', $address );
 			} else {
+				// no address
 				$address = __('N/A', 'wpo_wcpdf');
 			}
 
