@@ -188,7 +188,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			add_settings_field(
 				'download_display',
 				__( 'How do you want to view the PDF?', 'wpo_wcpdf' ),
-				array( &$this, 'radio_element_callback' ),
+				array( &$this, 'select_element_callback' ),
 				$option,
 				'general_settings',
 				array(
@@ -225,12 +225,85 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			// Section.
+			add_settings_section(
+				'interface',
+				__( 'Interface', 'wpo_wcpdf' ),
+				array( &$this, 'section_options_callback' ),
+				$option
+			);
+
+			$documents = array(
+				'invoice'		=> __( 'Invoice', 'wpo_wcpdf' ),
+				'packing-slip'	=> __( 'Packing Slip', 'wpo_wcpdf' ),
+			);
+
+			$contexts = array(
+				'orders-list'	=> __( 'Orders list', 'wpo_wcpdf' ),
+				'order-single'	=> __( 'Single order page', 'wpo_wcpdf' ),
+				'my-account'	=> __( 'My Account page', 'wpo_wcpdf' ),
+			);
+
+			add_settings_field(
+				'buttons',
+				__( 'Show download buttons', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_table_callback' ),
+				$option,
+				'interface',
+				array(
+					'menu'		=> $option,
+					'id'		=> 'buttons',
+					'rows' 		=> $contexts,
+					'columns'	=> apply_filters( 'wpo_wcpdf_documents_buttons', $documents ),
+				)
+			);
+
+			// get list of WooCommerce statuses
+			if ( version_compare( WOOCOMMERCE_VERSION, '2.2', '<' ) ) {
+				$statuses = (array) get_terms( 'shop_order_status', array( 'hide_empty' => 0, 'orderby' => 'id' ) );
+				foreach ( $statuses as $status ) {
+					$order_statuses[esc_attr( $status->slug )] = esc_html__( $status->name, 'woocommerce' );
+				}
+			} else {
+				$statuses = wc_get_order_statuses();
+				foreach ( $statuses as $status_slug => $status ) {
+					$status_slug   = 'wc-' === substr( $status_slug, 0, 3 ) ? substr( $status_slug, 3 ) : $status_slug;
+					$order_statuses[$status_slug] = $status;
+				}
+
+			}
+
+			add_settings_field(
+				'my_account_buttons',
+				__( 'Allow My Account invoice download', 'wpo_wcpdf' ),
+				array( &$this, 'select_element_callback' ),
+				$option,
+				'interface',
+				array(
+					'menu'		=> $option,
+					'id'		=> 'my_account_buttons',
+					'options' 		=> array(
+						'available'	=> __( 'Only when an invoice is already created/emailed' , 'wpo_wcpdf' ),
+						'custom'	=> __( 'Only for specific order statuses (define below)' , 'wpo_wcpdf' ),
+						'always'	=> __( 'Always' , 'wpo_wcpdf' ),
+					),
+					'custom'		=> array(
+						'type'		=> 'multiple_checkbox_element_callback',
+						'args'		=> array(
+							'menu'			=> $option,
+							'id'			=> 'my_account_restrict',
+							'options'		=> $order_statuses,
+						),
+					),
+				)
+			);
+
 			add_settings_field(
 				'invoice_number_column',
 				__( 'Enable invoice number column in the orders list', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
-				'general_settings',
+				'interface',
 				array(
 					'menu'			=> $option,
 					'id'			=> 'invoice_number_column',
@@ -728,6 +801,55 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		}
 
 		/**
+		 * Checkbox fields table callback.
+		 *
+		 * @param  array $args Field arguments.
+		 *
+		 * @return string	  Checkbox field.
+		 */
+		public function checkbox_table_callback( $args ) {
+			$menu = $args['menu'];
+			$id = $args['id'];
+
+			$options = get_option( $menu );
+
+			$rows = $args['rows'];
+			$columns = $args['columns'];
+
+			?>
+			<table style="">
+				<tr>
+					<td style="padding:0 10px 5px 0;">&nbsp;</td>
+					<?php foreach ( $columns as $column => $title ) { ?>
+					<td style="padding:0 10px 5px 0;"><?php echo $title; ?></td>
+					<?php } ?>
+				</tr>
+				<tr>
+					<td style="padding: 0;">
+						<?php foreach ($rows as $row) {
+							echo $row.'<br/>';
+						} ?>
+					</td>
+					<?php foreach ( $columns as $column => $title ) { ?>
+					<td style="text-align:center; padding: 0;">
+						<?php foreach ( $rows as $row => $title ) {
+							$current = ( isset( $options[$id.'_'.$column][$row] ) ) ? $options[$id.'_'.$column][$row] : '';
+							$name = sprintf('%1$s[%2$s_%3$s][%4$s]', $menu, $id, $column, $row);
+							printf( '<input type="checkbox" id="%1$s" name="%1$s" value="1"%2$s /><br/>', $name, checked( 1, $current, false ) );
+						} ?>
+					</td>
+					<?php } ?>
+				</tr>
+			</table>
+
+			<?php
+			// Displays option description.
+			if ( isset( $args['description'] ) ) {
+				printf( '<p class="description">%s</p>', $args['description'] );
+			}
+		}
+
+		/**
 		 * Select element callback.
 		 *
 		 * @param  array $args Field arguments.
@@ -746,20 +868,66 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				$current = isset( $args['default'] ) ? $args['default'] : '';
 			}
 		
-			$html = sprintf( '<select id="%1$s" name="%2$s[%1$s]">', $id, $menu );
+			printf( '<select id="%1$s" name="%2$s[%1$s]">', $id, $menu );
 	
 			foreach ( $args['options'] as $key => $label ) {
-				$html .= sprintf( '<option value="%s"%s>%s</option>', $key, selected( $current, $key, false ), $label );
+				printf( '<option value="%s"%s>%s</option>', $key, selected( $current, $key, false ), $label );
 			}
 	
-			$html .= '</select>';
+			echo '</select>';
 		
+
+			if (isset($args['custom'])) {
+				$custom = $args['custom'];
+
+				$custom_id = $id.'_custom';
+
+				printf( '<br/><br/><div id="%s" style="display:none;">', $custom_id );
+
+				switch ($custom['type']) {
+					case 'text_element_callback':
+						$this->text_element_callback( $custom['args'] );
+						break;		
+					case 'multiple_text_element_callback':
+						$this->multiple_text_element_callback( $custom['args'] );
+						break;		
+					case 'multiple_checkbox_element_callback':
+						$this->multiple_checkbox_element_callback( $custom['args'] );
+						break;		
+					default:
+						break;
+				}
+
+				echo '</div>';
+
+				?>
+				<script type="text/javascript">
+				jQuery(document).ready(function($) {
+					function check_<?php echo $id; ?>_custom() {
+						var custom = $('#<?php echo $id; ?>').val();
+						if (custom == 'custom') {
+							$( '#<?php echo $custom_id; ?>').show();
+						} else {
+							$( '#<?php echo $custom_id; ?>').hide();
+						}
+					}
+
+					check_<?php echo $id; ?>_custom();
+
+					$( '#<?php echo $id; ?>' ).change(function() {
+						check_<?php echo $id; ?>_custom();
+					});
+
+				});
+				</script>
+				<?php
+			}
+
 			// Displays option description.
 			if ( isset( $args['description'] ) ) {
-				$html .= sprintf( '<p class="description">%s</p>', $args['description'] );
+				printf( '<p class="description">%s</p>', $args['description'] );
 			}
-		
-			echo $html;
+
 		}
 		
 		/**
