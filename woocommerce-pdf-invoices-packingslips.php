@@ -732,10 +732,10 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				}
 
 				$total = $this->export->wc_price( ( $total_unformatted - $total_tax ) );
-				$label = __('Total ex. VAT');
+				$label = __( 'Total ex. VAT', 'wpo_wcpdf' );
 			} else {
 				$total = $this->export->order->get_formatted_order_total();
-				$label = __('Total');
+				$label = __( 'Total', 'wpo_wcpdf' );
 			}
 			
 			$grand_total = array(
