@@ -463,6 +463,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return $attachments;
 			}
 
+			// WooCommerce Booking compatibility
+			if ( get_post_type( $order->id ) == 'wc_booking' && isset($order->order) ) {
+				// $order is actually a WC_Booking object!
+				$order = $order->order;
+			}
+
 			// do not process low stock notifications, user emails etc!
 			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder' ) ) || get_post_type( $order->id ) != 'shop_order' ) {
 				return $attachments; 
