@@ -210,6 +210,26 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		/***********************************************************************/
 
 		/**
+		 * Get template name from slug
+		 */
+		public function get_template_name ( $template_type ) {
+			switch ( $template_type ) {
+				case 'invoice':
+					$template_name = apply_filters( 'wpo_wcpdf_invoice_title', __( 'Invoice', 'wpo_wcpdf' ) );
+					break;
+				case 'packing-slip':
+					$template_name = apply_filters( 'wpo_wcpdf_packing_slip_title', __( 'Packing Slip', 'wpo_wcpdf' ) );
+					break;
+				default:
+					// try to 'unslug' the name
+					$template_name = ucwords( str_replace( array( '_', '-' ), ' ', $template_type ) );
+					break;
+			}
+
+			return apply_filters( 'wpo_wcpdf_template_name', $template_name, $template_type );
+		}
+
+		/**
 		 * Output template styles
 		 */
 		public function template_styles() {
