@@ -422,23 +422,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					//'description'			=> __( '...', 'wpo_wcpdf' ),
 				)
 			);
-
-			/*
-			add_settings_field(
-				'personal_notes',
-				__( 'Personal notes', 'wpo_wcpdf' ),
-				array( &$this, 'textarea_element_callback' ),
-				$option,
-				'template_settings',
-				array(
-					'menu'			=> $option,
-					'id'			=> 'personal_notes',
-					'width'			=> '72',
-					'height'		=> '4',
-					//'description'			=> __( '...', 'wpo_wcpdf' ),
-				)
-			);
-			 */
 	
 			add_settings_field(
 				'footer',
