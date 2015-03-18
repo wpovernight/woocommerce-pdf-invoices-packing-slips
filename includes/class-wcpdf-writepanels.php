@@ -169,8 +169,30 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		public function my_account_pdf_link( $actions, $order ) {
 			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id . '&my-account'), 'generate_wpo_wcpdf' );
 
+			// check my account button settings
+			if (isset($this->general_settings['my_account_buttons'])) {
+				switch ($this->general_settings['my_account_buttons']) {
+					case 'available':
+						$invoice_allowed = get_post_meta($order->id,'_wcpdf_invoice_exists',true);
+						break;
+					case 'always':
+						$invoice_allowed = true;
+						break;
+					case 'custom':
+						if ( in_array( $order->status, array_keys( $this->general_settings['my_account_restrict'] ) ) ) {
+							$invoice_allowed = true;
+						} else {
+							$invoice_allowed = false;							
+						}
+						break;
+				}
+			} else {
+				// backwards compatibility
+				$invoice_allowed = get_post_meta($order->id,'_wcpdf_invoice_exists',true);
+			}
+
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
-			if ( get_post_meta($order->id,'_wcpdf_invoice_exists',true) || in_array($order->status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+			if ( $invoice_allowed || in_array($order->status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
 				$actions['invoice'] = array(
 					'url'  => $pdf_url,
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', __( 'Download invoice (PDF)', 'wpo_wcpdf' ) )
