@@ -99,19 +99,13 @@
 
 <?php do_action( 'wpo_wcpdf_after_order_details', 'invoice' ); ?>
 
-<table class="notes container">
-	<tr>
-		<td colspan="3">
-			<div class="notes-shipping">
-				<?php if ( $wpo_wcpdf->get_shipping_notes() ) : ?>
-					<h3><?php _e( 'Customer Notes', 'wpo_wcpdf' ); ?></h3>
-					<?php $wpo_wcpdf->shipping_notes(); ?>
-				<?php endif; ?>
-			</div>
-		</td>
-	</tr>
-</table><!-- notes container -->
 
+<div class="notes-shipping">
+	<?php if ( $wpo_wcpdf->get_shipping_notes() ) : ?>
+		<h3><?php _e( 'Customer Notes', 'wpo_wcpdf' ); ?></h3>
+		<?php $wpo_wcpdf->shipping_notes(); ?>
+	<?php endif; ?>
+</div>
 
 <?php if ( $wpo_wcpdf->get_footer() ): ?>
 <div id="footer">
