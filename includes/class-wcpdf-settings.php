@@ -201,7 +201,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 			
-			$tmp_path  = WooCommerce_PDF_Invoices::$plugin_path . 'tmp/';
+			$tmp_path  = $wpo_wcpdf->export->tmp_path( 'attachments' );
 			$tmp_path_check = !is_writable( $tmp_path );
 
 			$wc_emails = array(
