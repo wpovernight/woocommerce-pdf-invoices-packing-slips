@@ -233,30 +233,31 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				$option
 			);
 
-			$documents = array(
-				'invoice'		=> __( 'Invoice', 'wpo_wcpdf' ),
-				'packing-slip'	=> __( 'Packing Slip', 'wpo_wcpdf' ),
-			);
+			// $documents = array(
+			// 	'invoice'		=> __( 'Invoice', 'wpo_wcpdf' ),
+			// 	'packing-slip'	=> __( 'Packing Slip', 'wpo_wcpdf' ),
+			// );
 
-			$contexts = array(
-				'orders-list'	=> __( 'Orders list', 'wpo_wcpdf' ),
-				'order-single'	=> __( 'Single order page', 'wpo_wcpdf' ),
-				'my-account'	=> __( 'My Account page', 'wpo_wcpdf' ),
-			);
+			// $contexts = array(
+			// 	'orders-list'	=> __( 'Orders list', 'wpo_wcpdf' ),
+			// 	'orders-bulk'	=> __( 'Bulk order actions', 'wpo_wcpdf' ),
+			// 	'order-single'	=> __( 'Single order page', 'wpo_wcpdf' ),
+			// 	'my-account'	=> __( 'My Account page', 'wpo_wcpdf' ),
+			// );
 
-			add_settings_field(
-				'buttons',
-				__( 'Show download buttons', 'wpo_wcpdf' ),
-				array( &$this, 'checkbox_table_callback' ),
-				$option,
-				'interface',
-				array(
-					'menu'		=> $option,
-					'id'		=> 'buttons',
-					'rows' 		=> $contexts,
-					'columns'	=> apply_filters( 'wpo_wcpdf_documents_buttons', $documents ),
-				)
-			);
+			// add_settings_field(
+			// 	'buttons',
+			// 	__( 'Show download buttons', 'wpo_wcpdf' ),
+			// 	array( &$this, 'checkbox_table_callback' ),
+			// 	$option,
+			// 	'interface',
+			// 	array(
+			// 		'menu'		=> $option,
+			// 		'id'		=> 'buttons',
+			// 		'rows' 		=> $contexts,
+			// 		'columns'	=> apply_filters( 'wpo_wcpdf_documents_buttons', $documents ),
+			// 	)
+			// );
 
 			// get list of WooCommerce statuses
 			if ( version_compare( WOOCOMMERCE_VERSION, '2.2', '<' ) ) {
