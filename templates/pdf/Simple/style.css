@@ -36,7 +36,7 @@ body {
 	margin: 0cm;
 	font-family: 'Open Sans', sans-serif;
 	font-size: 9pt;
-	line-height: 1em;
+	line-height: 100%; /* fixes inherit dompdf bug */
 }
 
 h1, h2, h3, h4 {
