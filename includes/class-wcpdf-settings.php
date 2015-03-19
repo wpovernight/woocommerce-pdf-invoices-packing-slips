@@ -361,7 +361,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					'options' 		=> $this->find_templates(),
 					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%s</code> to your (child) theme in <code>%s</code> to customize them' , 'wpo_wcpdf' ), $plugin_template_path, $theme_template_path),
 				)
-			);			
+			);
 
 			add_settings_field(
 				'paper_size',
@@ -435,6 +435,33 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					'width'			=> '72',
 					'height'		=> '4',
 					//'description'			=> __( '...', 'wpo_wcpdf' ),
+				)
+			);
+
+			add_settings_field(
+				'invoice_shipping_address',
+				__( 'Shipping address on invoice', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'template_settings',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'invoice_shipping_address',
+					'description'		=> __( 'Display shipping address on invoice if different from billing address', 'wpo_wcpdf' ),
+				)
+			);
+
+
+			add_settings_field(
+				'packing_slip_billing_address',
+				__( 'Billing address on packing slip', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'template_settings',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'packing_slip_billing_address',
+					'description'		=> __( 'Display billing address on packing slip if different from shipping address', 'wpo_wcpdf' ),
 				)
 			);
 
