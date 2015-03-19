@@ -5,7 +5,7 @@
 	font-weight: normal;
 	src: local('Open Sans'), local('OpenSans'), url(http://themes.googleusercontent.com/static/fonts/opensans/v7/yYRnAC2KygoXnEC8IdU0gQLUuEpTyoUstqEm5AMlJo4.ttf) format('truetype');
 }
-	@font-face {
+@font-face {
 	font-family: 'Open Sans';
 	font-style: normal;
 	font-weight: bold;
@@ -36,16 +36,27 @@ body {
 	margin: 0cm;
 	font-family: 'Open Sans', sans-serif;
 	font-size: 9pt;
+	line-height: 1em;
 }
 
-h1,
-h2,
-h3,
-h4 {
-	font-size: 10pt;
+h1, h2, h3, h4 {
 	font-weight: bold;
 	margin: 0;
 }
+
+h1 {
+	font-size: 18pt;
+	margin: 5mm 0;
+}
+
+h2 {
+	font-size: 14pt;
+}
+
+h3, h4 {
+	font-size: 9pt;
+}
+
 
 ol,
 ul {
@@ -78,10 +89,14 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 	page-break-inside: always;
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
 
 th, td {
 	vertical-align: top;
+	text-align: left;
 }
 
 table.container {
@@ -99,6 +114,10 @@ td.no-borders {
 }
 
 /* Header */
+table.head {
+	margin-bottom: 12mm;	
+}
+
 td.header img {
 	max-height: 3cm;
 	width: auto;
@@ -109,36 +128,35 @@ td.header {
 	font-weight: 700;
 }
 
-td.header,
-td.shop-info {
-	margin-bottom: 10mm !important;
-}
-
 td.shop-info {
 	width: 40%;
 }
-/* Recipient & order information */
 .document-type-label {
 	text-transform: uppercase;
 }
 
-.order-date-label,
-.order-number-label,
-.order-payment-label {
-	width: 4cm;
-	display: inline-block;
+/* Recipient addressses & order data */
+table.order-data-addresses {
+	width: 100%;
+	margin-bottom: 10mm;
+}
+
+td.order-data {
+	width: 40%;
+}
+
+td.order-data table th {
+	padding-right: 2mm;
 }
 
 /* Order details */
-
 table.order-details {
 	width:100%;
-	margin-top: 1cm;
-	margin-bottom: 1cm;
+	margin-bottom: 8mm;
 }
 
-.quantity-label,
-.price-label {
+.quantity,
+.price {
 	width: 20%;
 }
 
@@ -164,22 +182,6 @@ table.order-details {
 	border-color: black;
 }
 
-.order-details .description img {
-	width: 1.5cm;
-	height: auto;
-}
-
-table.product,
-table.product td {
-	margin: 0;
-	border: 0;
-	padding: 0;
-}
-
-table.product td.product-image {
-	padding-right: 10px;
-}
-
 
 dl {
 	margin: 4px 0;
@@ -188,6 +190,7 @@ dl {
 dt, dd, dd p {
 	display: inline;
 	font-size: 7pt;
+	line-height: 7pt;
 }
 
 dd {
@@ -199,7 +202,11 @@ dd:after {
 	white-space: pre;
 }
 
-/* Totals */
+/* Notes & Totals */
+.customer-notes {
+	margin-top: 5mm;
+}
+
 table.totals {
 	width: 100%;
 	margin-top: 5mm;
@@ -214,7 +221,7 @@ table.totals td {
 
 table.totals th.description,
 table.totals td.price {
-	width: 20%;
+	width: 50%;
 }
 
 table.totals tr:last-child td,
@@ -222,10 +229,6 @@ table.totals tr:last-child th {
 	border-top: 2px solid #000;
 	border-bottom: 2px solid #000;
 	font-weight: bold;
-}
-
-table.totals td.price span:first-child {
-	display: block;
 }
 
 /* Footer Imprint */

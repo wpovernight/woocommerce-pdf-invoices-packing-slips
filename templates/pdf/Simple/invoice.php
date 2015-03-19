@@ -15,57 +15,76 @@
 			<div class="shop-address"><?php $wpo_wcpdf->shop_address(); ?></div>
 		</td>
 	</tr>
-	<tr>
-		<td>
-			<h3 class="document-type-label">
-			<?php if( $wpo_wcpdf->get_header_logo_id() ) echo apply_filters( 'wpo_wcpdf_invoice_title', __( 'Invoice', 'wpo_wcpdf' ) ); ?>
-			</h3>
-			<?php do_action( 'wpo_wcpdf_after_document_label', 'invoice' ); ?>
-		</td>
-		<td>&nbsp;</td>
-	</tr>
+</table>
 
+<h1 class="document-type-label">
+<?php if( $wpo_wcpdf->get_header_logo_id() ) echo apply_filters( 'wpo_wcpdf_invoice_title', __( 'Invoice', 'wpo_wcpdf' ) ); ?>
+</h1>
+
+<?php do_action( 'wpo_wcpdf_after_document_label', 'invoice' ); ?>
+
+<table class="order-data-addresses">
 	<tr>
-		<td>
-			<div class="order-information">
-			<?php if ( isset($wpo_wcpdf->settings->template_settings['display_number']) && $wpo_wcpdf->settings->template_settings['display_number'] == 'invoice_number') { ?>
-				<span class="order-number-label"><?php _e( 'Invoice Number:', 'wpo_wcpdf' ); ?></span>
-				<span class="order-number"><?php $wpo_wcpdf->invoice_number(); ?></span><br />
-			<?php } ?>
-			<?php if ( isset($wpo_wcpdf->settings->template_settings['display_date']) && $wpo_wcpdf->settings->template_settings['display_date'] == 'invoice_date') { ?>
-				<span class="order-date-label"><?php _e( 'Invoice Date:', 'wpo_wcpdf' ); ?></span>
-				<span class="order-date"><?php $wpo_wcpdf->invoice_date(); ?></span><br />
-			<?php } ?>
-				<span class="order-number-label"><?php _e( 'Order Number:', 'wpo_wcpdf' ); ?></span>
-				<span class="order-number"><?php $wpo_wcpdf->order_number(); ?></span><br />
-				<span class="order-date-label"><?php _e( 'Order Date:', 'wpo_wcpdf' ); ?></span>
-				<span class="order-date"><?php $wpo_wcpdf->order_date(); ?></span><br />
-				<span class="order-payment-label"><?php _e( 'Payment Method:', 'wpo_wcpdf' ); ?></span>
-				<span class="order-payment"><?php $wpo_wcpdf->payment_method(); ?></span><br />
-			</div>
+		<td class="address billing-address">
+			<h3><?php _e( 'Billing Address:', 'wpo_wcpdf' ); ?></h3>
+			<?php $wpo_wcpdf->billing_address(); ?>
 		</td>
-		<td>
-			<div class="recipient-address"><?php $wpo_wcpdf->billing_address(); ?></div>
+		<td class="address shipping-address">
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['invoice_shipping']) && $wpo_wcpdf->get_billing_address() != $wpo_wcpdf->get_shipping_address()) { ?>
+			<h3><?php _e( 'Shipping Address:', 'wpo_wcpdf' ); ?></h3>
+			<?php $wpo_wcpdf->shipping_address(); ?>
+			<?php } ?>
+		</td>
+		<td class="order-data">
+			<table>
+				<?php do_action( 'wpo_wcpdf_before_order_data', 'invoice', $wpo_wcpdf->export->order ); ?>
+				<?php if ( isset($wpo_wcpdf->settings->template_settings['display_number']) && $wpo_wcpdf->settings->template_settings['display_number'] == 'invoice_number') { ?>
+				<tr class="invoice-number">
+					<th><?php _e( 'Invoice Number:', 'wpo_wcpdf' ); ?></th>
+					<td><?php $wpo_wcpdf->invoice_number(); ?></td>
+				</tr>
+				<?php } ?>
+				<?php if ( isset($wpo_wcpdf->settings->template_settings['display_date']) && $wpo_wcpdf->settings->template_settings['display_date'] == 'invoice_date') { ?>
+				<tr class="invoice-date">
+					<th><?php _e( 'Invoice Date:', 'wpo_wcpdf' ); ?></th>
+					<td><?php $wpo_wcpdf->invoice_date(); ?></td>
+				</tr>
+				<?php } ?>
+				<tr class="order-number">
+					<th><?php _e( 'Order Number:', 'wpo_wcpdf' ); ?></th>
+					<td><?php $wpo_wcpdf->order_number(); ?></td>
+				</tr>
+				<tr class="order-date">
+					<th><?php _e( 'Order Date:', 'wpo_wcpdf' ); ?></th>
+					<td><?php $wpo_wcpdf->order_date(); ?></td>
+				</tr>
+				<tr class="payment-method">
+					<th><?php _e( 'Payment Method:', 'wpo_wcpdf' ); ?></th>
+					<td><?php $wpo_wcpdf->payment_method(); ?></td>
+				</tr>
+				<?php do_action( 'wpo_wcpdf_after_order_data', 'invoice', $wpo_wcpdf->export->order ); ?>
+			</table>			
 		</td>
 	</tr>
-</table><!-- head container -->
+</table>
 
-<?php do_action( 'wpo_wcpdf_before_order_details', 'invoice' ); ?>
+<?php do_action( 'wpo_wcpdf_before_order_details', 'invoice', $wpo_wcpdf->export->order ); ?>
 
 <table class="order-details">
 	<thead>
 		<tr>
-			<th class="product-label"><?php _e('Product', 'wpo_wcpdf'); ?></th>
-			<th class="quantity-label"><?php _e('Quantity', 'wpo_wcpdf'); ?></th>
-			<th class="price-label"><?php _e('Price', 'wpo_wcpdf'); ?></th>
+			<th class="product"><?php _e('Product', 'wpo_wcpdf'); ?></th>
+			<th class="quantity"><?php _e('Quantity', 'wpo_wcpdf'); ?></th>
+			<th class="price"><?php _e('Price', 'wpo_wcpdf'); ?></th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php $items = $wpo_wcpdf->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item ) : ?>
 		<tr>
-			<td class="description">
+			<td class="product">
 				<?php $description_label = __( 'Description', 'wpo_wcpdf' ); // registering alternate label translation ?>
-				<span class="item-name"><?php echo $item['name']; ?></span><span class="item-meta"><?php echo $item['meta']; ?></span>
+				<span class="item-name"><?php echo $item['name']; ?></span>
+				<span class="item-meta"><?php echo $item['meta']; ?></span>
 				<dl class="meta">
 					<?php $description_label = __( 'SKU', 'wpo_wcpdf' ); // registering alternate label translation ?>
 					<?php if( !empty( $item['sku'] ) ) : ?><dt><?php _e( 'SKU:', 'wpo_wcpdf' ); ?></dt><dd><?php echo $item['sku']; ?></dd><?php endif; ?>
@@ -79,7 +98,15 @@
 	</tbody>
 	<tfoot>
 		<tr class="no-borders">
-			<td class="no-borders" colspan="3">
+			<td class="no-borders">
+				<div class="customer-notes">
+					<?php if ( $wpo_wcpdf->get_shipping_notes() ) : ?>
+						<h3><?php _e( 'Customer Notes', 'wpo_wcpdf' ); ?></h3>
+						<?php $wpo_wcpdf->shipping_notes(); ?>
+					<?php endif; ?>
+				</div>				
+			</td>
+			<td class="no-borders" colspan="2">
 				<table class="totals">
 					<tfoot>
 						<?php foreach( $wpo_wcpdf->get_woocommerce_totals() as $key => $total ) : ?>
@@ -92,20 +119,14 @@
 					</tfoot>
 				</table>
 			</td>
-
 		</tr>
 	</tfoot>
-</table><!-- order-details -->
+</table>
 
-<?php do_action( 'wpo_wcpdf_after_order_details', 'invoice' ); ?>
+<?php do_action( 'wpo_wcpdf_after_order_details', 'invoice', $wpo_wcpdf->export->order ); ?>
 
 
-<div class="notes-shipping">
-	<?php if ( $wpo_wcpdf->get_shipping_notes() ) : ?>
-		<h3><?php _e( 'Customer Notes', 'wpo_wcpdf' ); ?></h3>
-		<?php $wpo_wcpdf->shipping_notes(); ?>
-	<?php endif; ?>
-</div>
+
 
 <?php if ( $wpo_wcpdf->get_footer() ): ?>
 <div id="footer">
