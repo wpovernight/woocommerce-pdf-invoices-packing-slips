@@ -26,7 +26,7 @@
 <table class="order-data-addresses">
 	<tr>
 		<td class="address shipping-address">
-			<h3><?php _e( 'Shipping Address:', 'wpo_wcpdf' ); ?></h3>
+			<!-- <h3><?php _e( 'Shipping Address:', 'wpo_wcpdf' ); ?></h3> -->
 			<?php $wpo_wcpdf->shipping_address(); ?>
 		</td>
 		<td class="address billing-address">

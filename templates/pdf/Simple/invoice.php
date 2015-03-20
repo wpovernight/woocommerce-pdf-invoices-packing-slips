@@ -26,12 +26,12 @@
 <table class="order-data-addresses">
 	<tr>
 		<td class="address billing-address">
-			<h3><?php _e( 'Billing Address:', 'wpo_wcpdf' ); ?></h3>
+			<!-- <h3><?php _e( 'Billing Address:', 'wpo_wcpdf' ); ?></h3> -->
 			<?php $wpo_wcpdf->billing_address(); ?>
 		</td>
 		<td class="address shipping-address">
 			<?php if ( isset($wpo_wcpdf->settings->template_settings['invoice_shipping_address']) && $wpo_wcpdf->get_billing_address() != $wpo_wcpdf->get_shipping_address()) { ?>
-			<h3><?php _e( 'Shipping Address:', 'wpo_wcpdf' ); ?></h3>
+			<h3><?php _e( 'Ship To:', 'wpo_wcpdf' ); ?></h3>
 			<?php $wpo_wcpdf->shipping_address(); ?>
 			<?php } ?>
 		</td>
