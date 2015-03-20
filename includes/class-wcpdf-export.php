@@ -700,10 +700,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					// = before discount
 					$data['ex_single_price'] = $this->get_formatted_item_price ( $item, 'single', 'excl' );
 					$data['single_price'] = $this->get_formatted_item_price ( $item, 'single' );
-					
-					// Set item meta and replace it when it is empty
-					$meta = new WC_Order_Item_Meta( $item['item_meta'] );	
-					$data['meta'] = $meta->display( false, true );
 
 					// Pass complete item array
 					$data['item'] = $item;
@@ -737,6 +733,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 						$data['product'] = $product;
 					
 					}
+					
+					// Set item meta
+					$meta = new WC_Order_Item_Meta( $item['item_meta'], $product );
+					$data['meta'] = $meta->display( false, true );
 
 					$data_list[$item_id] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order );
 				}
