@@ -45,7 +45,7 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-	font-size: 18pt;
+	font-size: 16pt;
 	margin: 5mm 0;
 }
 
@@ -146,6 +146,7 @@ td.order-data {
 }
 
 td.order-data table th {
+	font-weight: normal;
 	padding-right: 2mm;
 }
 
