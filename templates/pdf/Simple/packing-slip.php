@@ -21,7 +21,7 @@
 <?php if( $wpo_wcpdf->get_header_logo_id() ) echo apply_filters( 'wpo_wcpdf_packing_slip_title', __( 'Packing Slip', 'wpo_wcpdf' ) ); ?>
 </h1>
 
-<?php do_action( 'wpo_wcpdf_after_document_label', 'packing-slip' ); ?>
+<?php do_action( 'wpo_wcpdf_after_document_label', 'packing-slip', $wpo_wcpdf->export->order ); ?>
 
 <table class="order-data-addresses">
 	<tr>
