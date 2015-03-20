@@ -689,8 +689,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					break;
 				case 'wpo_wcpdf_template_settings':
 					$default = array(
-						'paper_size'		=> 'a4',
-						'template_path'		=> $wpo_wcpdf->export->template_default_base_path . 'Simple',
+						'paper_size'				=> 'a4',
+						'template_path'				=> $wpo_wcpdf->export->template_default_base_path . 'Simple',
+						// 'invoice_shipping_address'	=> '1',
 					);
 					break;
 				default:
