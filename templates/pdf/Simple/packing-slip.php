@@ -28,6 +28,12 @@
 		<td class="address shipping-address">
 			<!-- <h3><?php _e( 'Shipping Address:', 'wpo_wcpdf' ); ?></h3> -->
 			<?php $wpo_wcpdf->shipping_address(); ?>
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['packing_slip_email']) ) { ?>
+			<div class="billing-email"><?php $wpo_wcpdf->billing_email(); ?></div>
+			<?php } ?>
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['packing_slip_phone']) ) { ?>
+			<div class="billing-phone"><?php $wpo_wcpdf->billing_phone(); ?></div>
+			<?php } ?>
 		</td>
 		<td class="address billing-address">
 			<?php if ( isset($wpo_wcpdf->settings->template_settings['packing_slip_billing_address']) && $wpo_wcpdf->get_billing_address() != $wpo_wcpdf->get_shipping_address()) { ?>

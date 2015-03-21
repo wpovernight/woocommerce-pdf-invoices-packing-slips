@@ -28,6 +28,12 @@
 		<td class="address billing-address">
 			<!-- <h3><?php _e( 'Billing Address:', 'wpo_wcpdf' ); ?></h3> -->
 			<?php $wpo_wcpdf->billing_address(); ?>
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['invoice_email']) ) { ?>
+			<div class="billing-email"><?php $wpo_wcpdf->billing_email(); ?></div>
+			<?php } ?>
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['invoice_phone']) ) { ?>
+			<div class="billing-phone"><?php $wpo_wcpdf->billing_phone(); ?></div>
+			<?php } ?>
 		</td>
 		<td class="address shipping-address">
 			<?php if ( isset($wpo_wcpdf->settings->template_settings['invoice_shipping_address']) && $wpo_wcpdf->get_billing_address() != $wpo_wcpdf->get_shipping_address()) { ?>

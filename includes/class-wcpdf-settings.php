@@ -438,30 +438,48 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			// Section.
+			add_settings_section(
+				'invoice',
+				__( 'Invoice', 'wpo_wcpdf' ),
+				array( &$this, 'section_options_callback' ),
+				$option
+			);
+
 			add_settings_field(
 				'invoice_shipping_address',
-				__( 'Shipping address on invoice', 'wpo_wcpdf' ),
+				__( 'Display shipping address', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
-				'template_settings',
+				'invoice',
 				array(
 					'menu'				=> $option,
 					'id'				=> 'invoice_shipping_address',
-					'description'		=> __( 'Display shipping address on invoice if different from billing address', 'wpo_wcpdf' ),
+					'description'		=> __( 'Display shipping address on invoice (in addition to the default billing address) if different from billing address', 'wpo_wcpdf' ),
 				)
 			);
 
-
 			add_settings_field(
-				'packing_slip_billing_address',
-				__( 'Billing address on packing slip', 'wpo_wcpdf' ),
+				'invoice_email',
+				__( 'Display email address', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
-				'template_settings',
+				'invoice',
 				array(
 					'menu'				=> $option,
-					'id'				=> 'packing_slip_billing_address',
-					'description'		=> __( 'Display billing address on packing slip if different from shipping address', 'wpo_wcpdf' ),
+					'id'				=> 'invoice_email',
+				)
+			);
+
+			add_settings_field(
+				'invoice_phone',
+				__( 'Display phone number', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'invoice',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'invoice_phone',
 				)
 			);
 
@@ -470,7 +488,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				__( 'Display invoice date', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
-				'template_settings',
+				'invoice',
 				array(
 					'menu'				=> $option,
 					'id'				=> 'display_date',
@@ -483,7 +501,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				__( 'Display built-in sequential invoice number', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
-				'template_settings',
+				'invoice',
 				array(
 					'menu'				=> $option,
 					'id'				=> 'display_number',
@@ -496,7 +514,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				__( 'Next invoice number (without prefix/suffix etc.)', 'wpo_wcpdf' ),
 				array( &$this, 'text_element_callback' ),
 				$option,
-				'template_settings',
+				'invoice',
 				array(
 					'menu'			=> $option,
 					'id'			=> 'next_invoice_number',
@@ -510,7 +528,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				__( 'Invoice number format', 'wpo_wcpdf' ),
 				array( &$this, 'invoice_number_formatting_callback' ),
 				$option,
-				'template_settings',
+				'invoice',
 				array(
 					'menu'					=> $option,
 					'id'					=> 'invoice_number_formatting',
@@ -532,6 +550,51 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 						),
 					),
 					'description'			=> __( 'note: if you have already created a custom invoice number format with a filter, the above settings will be ignored' , 'wpo_wcpdf' ),
+				)
+			);
+
+			// Section.
+			add_settings_section(
+				'packing_slip',
+				__( 'Packing Slip', 'wpo_wcpdf' ),
+				array( &$this, 'section_options_callback' ),
+				$option
+			);
+
+			add_settings_field(
+				'packing_slip_billing_address',
+				__( 'Display billing address', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'packing_slip',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'packing_slip_billing_address',
+					'description'		=> __( 'Display billing address on packing slip (in addition to the default shipping address) if different from shipping address', 'wpo_wcpdf' ),
+				)
+			);
+
+			add_settings_field(
+				'packing_slip_email',
+				__( 'Display email address', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'packing_slip',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'packing_slip_email',
+				)
+			);
+
+			add_settings_field(
+				'packing_slip_phone',
+				__( 'Display phone number', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'packing_slip',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'packing_slip_phone',
 				)
 			);
 
