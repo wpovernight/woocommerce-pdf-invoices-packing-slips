@@ -59,7 +59,7 @@ $server_configs = array(
 		"fallback" => "Check php disable_functions",
 	),
 	"WP Memory Limit" => array(
-		"required" => 'Recommended: 64MB (128MB for optimal performance)<br/>See: <a href="http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP">Increasing memory allocated to PHP</a>',
+		"required" => 'Recommended: 128MB (more for plugin-heavy setups)<br/>See: <a href="http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP">Increasing memory allocated to PHP</a>',
 		"value"    => WP_MEMORY_LIMIT,
 		"result"   => $memory_limit > 67108864,
 	),
