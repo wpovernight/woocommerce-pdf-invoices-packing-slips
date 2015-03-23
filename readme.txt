@@ -233,10 +233,10 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 == Changelog ==
 
 = 1.5.7 =
-* Feature: Setting to show email address & phone number on invoice or packing slip
+* Feature: Setting to show email address & phone number on invoice or packing slip (does not work on custom templates based on previous versions!)
 
 = 1.5.6 =
-* Feature: Setting to show shipping address on invoice
+* Feature: Setting to show shipping address on invoice (does not work on custom templates based on previous versions!)
 * Feature: My Account invoice download setting
 * Feature: several new template actions
 * Tweak: WooCommerce Bookings compatibility
