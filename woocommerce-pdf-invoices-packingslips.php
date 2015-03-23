@@ -64,10 +64,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			 * Frontend/global Locale. Looks in:
 			 *
 			 * 		- WP_LANG_DIR/woocommerce-pdf-invoices-packing-slips/wpo_wcpdf-LOCALE.mo
+			 * 	 	- WP_LANG_DIR/plugins/wpo_wcpdf-LOCALE.mo
 			 * 	 	- woocommerce-pdf-invoices-packing-slips/languages/wpo_wcpdf-LOCALE.mo (which if not found falls back to:)
 			 * 	 	- WP_LANG_DIR/plugins/wpo_wcpdf-LOCALE.mo
 			 */
 			load_textdomain( 'wpo_wcpdf', $dir . 'woocommerce-pdf-invoices-packing-slips/wpo_wcpdf-' . $locale . '.mo' );
+			load_textdomain( 'wpo_wcpdf', $dir . 'plugins/wpo_wcpdf-' . $locale . '.mo' );
 			load_plugin_textdomain( 'wpo_wcpdf', false, dirname( self::$plugin_basename ) . '/languages' );
 		}
 
