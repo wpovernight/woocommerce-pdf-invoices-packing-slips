@@ -146,20 +146,14 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * @param  string $column column slug
 		 */
 		public function invoice_number_column_data( $column ) {
-			global $post, $the_order;
+			global $post, $the_order, $wpo_wcpdf;
 
-			if ( $column == 'pdf_invoice_number' && get_post_meta($the_order->id,'_wcpdf_invoice_number',true) ) {
+			if ( $column == 'pdf_invoice_number' ) {
 				if ( empty( $the_order ) || $the_order->id != $post->ID ) {
 					$the_order = new WC_Order( $post->ID );
 				}
 
-				// collect data for invoice number filter
-				$invoice_number = get_post_meta($the_order->id,'_wcpdf_invoice_number',true);
-				$order_number = $the_order->get_order_number();
-				$order_id = $the_order->id;
-				$order_date = $the_order->order_date;
-
-				echo apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $order_number, $order_id, $order_date );
+				echo $wpo_wcpdf->export->get_invoice_number( $the_order->id );
 			}
 		}
 
