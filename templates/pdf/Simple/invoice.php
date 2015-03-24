@@ -85,7 +85,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $items = $wpo_wcpdf->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item ) : ?>
+		<?php $items = $wpo_wcpdf->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item_id => $item ) : ?>
 		<tr>
 			<td class="product">
 				<?php $description_label = __( 'Description', 'wpo_wcpdf' ); // registering alternate label translation ?>
