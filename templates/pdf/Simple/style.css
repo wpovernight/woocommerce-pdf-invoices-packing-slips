@@ -145,6 +145,14 @@ td.order-data {
 	width: 40%;
 }
 
+.invoice .shipping-address {
+	width: 30%;
+}
+
+.packing-slip .billing-address {
+	width: 30%;
+}
+
 td.order-data table th {
 	font-weight: normal;
 	padding-right: 2mm;
