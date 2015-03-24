@@ -381,11 +381,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				die($this->process_template( $template_type, $order_ids ));
 			}
 		
-			if ( !($invoice = $this->get_pdf( $template_type, $order_ids )) ) {
+			if ( !($pdf = $this->get_pdf( $template_type, $order_ids )) ) {
 				exit;
 			}
 
 			$filename = $this->build_filename( $template_type, $order_ids, 'download' );
+
+			do_action( 'wpo_wcpdf_created_manually', $pdf, $filename );
 
 			// Get output setting
 			$output_mode = isset($this->general_settings['download_display'])?$this->general_settings['download_display']:'';
@@ -406,7 +408,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// output PDF data
-			echo($invoice);
+			echo($pdf);
 
 			exit;
 		}
