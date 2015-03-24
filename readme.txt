@@ -136,6 +136,7 @@ Some notes:
 * I have found that not all servers cope well with the font paths. If this is the case with your font, try to put the font in the root of your site and put that in the font url (i.e. `url(http://yoursite.com/fonts/myfont-italic.ttf)` )
 
 Some font links:
+
 * Japanese - http://ipafont.ipa.go.jp/index.html
 * Chinese - http://www.study-area.org/apt/firefly-font/
 
