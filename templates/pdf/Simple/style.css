@@ -240,6 +240,10 @@ table.totals tr:last-child th {
 	font-weight: bold;
 }
 
+table.totals tr.payment_method {
+	display: none;
+}
+
 /* Footer Imprint */
 #footer {
 	position: absolute;
