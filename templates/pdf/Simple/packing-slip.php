@@ -21,7 +21,7 @@
 <?php if( $wpo_wcpdf->get_header_logo_id() ) echo apply_filters( 'wpo_wcpdf_packing_slip_title', __( 'Packing Slip', 'wpo_wcpdf' ) ); ?>
 </h1>
 
-<?php do_action( 'wpo_wcpdf_after_document_label', 'packing-slip', $wpo_wcpdf->export->order ); ?>
+<?php do_action( 'wpo_wcpdf_after_document_label', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 
 <table class="order-data-addresses">
 	<tr>
@@ -43,7 +43,7 @@
 		</td>
 		<td class="order-data">
 			<table>
-				<?php do_action( 'wpo_wcpdf_before_order_data', 'packing-slip', $wpo_wcpdf->export->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_order_data', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 				<tr class="order-number">
 					<th><?php _e( 'Order Number:', 'wpo_wcpdf' ); ?></th>
 					<td><?php $wpo_wcpdf->order_number(); ?></td>
@@ -56,13 +56,13 @@
 					<th><?php _e( 'Shipping Method:', 'wpo_wcpdf' ); ?></th>
 					<td><?php $wpo_wcpdf->shipping_method(); ?></td>
 				</tr>
-				<?php do_action( 'wpo_wcpdf_after_order_data', 'packing-slip', $wpo_wcpdf->export->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_order_data', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 			</table>			
 		</td>
 	</tr>
 </table>
 
-<?php do_action( 'wpo_wcpdf_before_order_details', 'packing-slip', $wpo_wcpdf->export->order ); ?>
+<?php do_action( 'wpo_wcpdf_before_order_details', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 
 <table class="order-details">
 	<thead>
@@ -77,14 +77,14 @@
 			<td class="product">
 				<?php $description_label = __( 'Description', 'wpo_wcpdf' ); // registering alternate label translation ?>
 				<span class="item-name"><?php echo $item['name']; ?></span>
-				<?php do_action( 'wpo_wcpdf_before_item_meta', 'packing-slip', $item, $wpo_wcpdf->export->order  ); ?>
+				<?php do_action( 'wpo_wcpdf_before_item_meta', $wpo_wcpdf->export->template_type, $item, $wpo_wcpdf->export->order  ); ?>
 				<span class="item-meta"><?php echo $item['meta']; ?></span>
 				<dl class="meta">
 					<?php $description_label = __( 'SKU', 'wpo_wcpdf' ); // registering alternate label translation ?>
 					<?php if( !empty( $item['sku'] ) ) : ?><dt><?php _e( 'SKU:', 'wpo_wcpdf' ); ?></dt><dd><?php echo $item['sku']; ?></dd><?php endif; ?>
 					<?php if( !empty( $item['weight'] ) ) : ?><dt><?php _e( 'Weight:', 'wpo_wcpdf' ); ?></dt><dd><?php echo $item['weight']; ?><?php echo get_option('woocommerce_weight_unit'); ?></dd><?php endif; ?>
 				</dl>
-				<?php do_action( 'wpo_wcpdf_after_item_meta', 'packing-slip', $item, $wpo_wcpdf->export->order  ); ?>
+				<?php do_action( 'wpo_wcpdf_after_item_meta', $wpo_wcpdf->export->template_type, $item, $wpo_wcpdf->export->order  ); ?>
 			</td>
 			<td class="quantity"><?php echo $item['quantity']; ?></td>
 		</tr>
@@ -92,7 +92,7 @@
 	</tbody>
 </table>
 
-<?php do_action( 'wpo_wcpdf_after_order_details', 'packing-slip', $wpo_wcpdf->export->order ); ?>
+<?php do_action( 'wpo_wcpdf_after_order_details', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 
 <div class="customer-notes">
 	<?php if ( $wpo_wcpdf->get_shipping_notes() ) : ?>

@@ -21,7 +21,7 @@
 <?php if( $wpo_wcpdf->get_header_logo_id() ) echo apply_filters( 'wpo_wcpdf_invoice_title', __( 'Invoice', 'wpo_wcpdf' ) ); ?>
 </h1>
 
-<?php do_action( 'wpo_wcpdf_after_document_label', 'invoice', $wpo_wcpdf->export->order ); ?>
+<?php do_action( 'wpo_wcpdf_after_document_label', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 
 <table class="order-data-addresses">
 	<tr>
@@ -43,7 +43,7 @@
 		</td>
 		<td class="order-data">
 			<table>
-				<?php do_action( 'wpo_wcpdf_before_order_data', 'invoice', $wpo_wcpdf->export->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_order_data', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 				<?php if ( isset($wpo_wcpdf->settings->template_settings['display_number']) && $wpo_wcpdf->settings->template_settings['display_number'] == 'invoice_number') { ?>
 				<tr class="invoice-number">
 					<th><?php _e( 'Invoice Number:', 'wpo_wcpdf' ); ?></th>
@@ -68,13 +68,13 @@
 					<th><?php _e( 'Payment Method:', 'wpo_wcpdf' ); ?></th>
 					<td><?php $wpo_wcpdf->payment_method(); ?></td>
 				</tr>
-				<?php do_action( 'wpo_wcpdf_after_order_data', 'invoice', $wpo_wcpdf->export->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_order_data', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 			</table>			
 		</td>
 	</tr>
 </table>
 
-<?php do_action( 'wpo_wcpdf_before_order_details', 'invoice', $wpo_wcpdf->export->order ); ?>
+<?php do_action( 'wpo_wcpdf_before_order_details', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 
 <table class="order-details">
 	<thead>
@@ -90,14 +90,14 @@
 			<td class="product">
 				<?php $description_label = __( 'Description', 'wpo_wcpdf' ); // registering alternate label translation ?>
 				<span class="item-name"><?php echo $item['name']; ?></span>
-				<?php do_action( 'wpo_wcpdf_before_item_meta', 'invoice', $item, $wpo_wcpdf->export->order  ); ?>
+				<?php do_action( 'wpo_wcpdf_before_item_meta', $wpo_wcpdf->export->template_type, $item, $wpo_wcpdf->export->order  ); ?>
 				<span class="item-meta"><?php echo $item['meta']; ?></span>
 				<dl class="meta">
 					<?php $description_label = __( 'SKU', 'wpo_wcpdf' ); // registering alternate label translation ?>
 					<?php if( !empty( $item['sku'] ) ) : ?><dt><?php _e( 'SKU:', 'wpo_wcpdf' ); ?></dt><dd><?php echo $item['sku']; ?></dd><?php endif; ?>
 					<?php if( !empty( $item['weight'] ) ) : ?><dt><?php _e( 'Weight:', 'wpo_wcpdf' ); ?></dt><dd><?php echo $item['weight']; ?><?php echo get_option('woocommerce_weight_unit'); ?></dd><?php endif; ?>
 				</dl>
-				<?php do_action( 'wpo_wcpdf_after_item_meta', 'invoice', $item, $wpo_wcpdf->export->order  ); ?>
+				<?php do_action( 'wpo_wcpdf_after_item_meta', $wpo_wcpdf->export->template_type, $item, $wpo_wcpdf->export->order  ); ?>
 			</td>
 			<td class="quantity"><?php echo $item['quantity']; ?></td>
 			<td class="price"><?php echo $item['order_price']; ?></td>
@@ -131,7 +131,7 @@
 	</tfoot>
 </table>
 
-<?php do_action( 'wpo_wcpdf_after_order_details', 'invoice', $wpo_wcpdf->export->order ); ?>
+<?php do_action( 'wpo_wcpdf_after_order_details', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 
 <?php if ( $wpo_wcpdf->get_footer() ): ?>
 <div id="footer">
