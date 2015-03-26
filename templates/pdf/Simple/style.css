@@ -1,3 +1,4 @@
+<?php global $wpo_wcpdf;?>
 /* Main Body */
 @font-face {
 	font-family: 'Open Sans';
