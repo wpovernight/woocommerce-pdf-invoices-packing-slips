@@ -953,6 +953,18 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			error_reporting( E_ALL );
 			ini_set( 'display_errors', 1 );
 		}
+
+		/**
+		 * Log messages
+		 */
+
+		public function log( $order_id, $message ) {
+			$current_date_time = date("Y-m-d H:i:s");
+			$message = $order_id . ' ' . $current_date_time .' ' .$message ."\n";
+			$file = $this->tmp_path() . 'log.txt';
+
+			file_put_contents($file, $message, FILE_APPEND);
+		}
 	}
 
 }
