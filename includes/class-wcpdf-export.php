@@ -513,7 +513,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 				// use this filter to add an extra condition - return false to disable the PDF attachment
 				$attach_document = apply_filters('wpo_wcpdf_custom_attachment_condition', true, $order, $status, $template_type );
-				if( in_array( $status, $allowed_statuses ) && $attach_document && !isset($this->general_settings['disable_free'])) {
+				if( in_array( $status, $allowed_statuses ) && $attach_document ) {
 					// create pdf data
 					$pdf_data = $this->get_pdf( $template_type, (array) $order->id );
 
