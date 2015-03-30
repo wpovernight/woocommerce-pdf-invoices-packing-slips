@@ -225,6 +225,19 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			add_settings_field(
+				'disable_free',
+				__( 'Disable for free products', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'general_settings',
+				array(
+					'menu'			=> $option,
+					'id'			=> 'disable_free',
+					'description'	=> __( "Disable automatic creation/attachment of invoices when only free products are ordered", 'wpo_wcpdf' ),
+				)
+			);
+
 			// Section.
 			add_settings_section(
 				'interface',
