@@ -590,7 +590,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				} else {
 					$order = new WC_Order( $order_id );
 					$order_number = $order->get_order_number();
-					$order_date = $order->order_date;				
+					$order_date = $order->order_date;
 				}
 
 				return apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $order_number, $order_id, $order_date );
