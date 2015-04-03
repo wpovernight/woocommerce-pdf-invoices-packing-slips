@@ -472,7 +472,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// do not process low stock notifications, user emails etc!
-			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder' ) ) || get_post_type( $order->id ) != 'shop_order' ) {
+			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account' ) ) || get_post_type( $order->id ) != 'shop_order' ) {
 				return $attachments; 
 			}
 
