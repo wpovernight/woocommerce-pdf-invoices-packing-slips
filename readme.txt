@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.1
-Stable tag: 1.5.9
+Stable tag: 1.5.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -232,6 +232,9 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.10 =
+* Fix: Double check to make sure plugin doesn't attach to user emails
 
 = 1.5.9 =
 * Feature: Shorthand function to display product attributes: `$wpo_wcpdf->get_product_attribute( $attribute_name, $product )`
@@ -499,5 +502,5 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Upgrade Notice ==
 
-= 1.5.9 =
+= 1.5.10 =
 Version 1.5 changes where temporary files are stored - everything is now stored centrally in the WP uploads folder. For backwards compatibility, this feature is turned off by default, but we recommend to use the new folders. Check the plugin Status panel for more information!
