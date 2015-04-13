@@ -130,7 +130,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					}
 
 					?>
-					<form method="post" action="options.php">
+					<form method="post" action="options.php" id="wpo-wcpdf-settings">
 						<?php
 							do_action( 'wpo_wcpdf_before_settings', $active_tab );
 							settings_fields( 'wpo_wcpdf_'.$active_tab.'_settings' );
