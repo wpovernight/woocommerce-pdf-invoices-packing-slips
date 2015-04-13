@@ -167,6 +167,9 @@ if ( isset($wpo_wcpdf->export->debug_settings['old_tmp']) ) {
 	unset($permissions['WCPDF_TEMP_DIR']);
 }
 
+$upload_dir = wp_upload_dir();
+$upload_base = trailingslashit( $upload_dir['basedir'] );
+
 ?>
 <br />
 <h3 id="system">Permissions</h3>
@@ -198,14 +201,14 @@ if ( isset($wpo_wcpdf->export->debug_settings['old_tmp']) ) {
 
 <p>
 The central temp folder (1.5+) is <code><?php echo $wpo_wcpdf->export->tmp_path(); ?></code>.
-By default, this folder is created in the WordPress uploads folder (<code><?php echo wp_upload_dir(); ?></code>),
+By default, this folder is created in the WordPress uploads folder (<code><?php echo $upload_base; ?></code>),
 which can be defined by setting <code>UPLOADS</code> in wp-config.php.
 Alternatively, you can control the specific folder for PDF invoices by using the
 <code>wpo_wcpdf_tmp_path</code> filter. Make sure this folder is writable and that the
 subfolders <code>attachments</code>, <code>dompdf</code> and <code>fonts</code>
 are present (these will be created by the plugin if the central temp folder is writable).<br>
 <br>
-If the temporary folders were not automatically created by the plugim, verify that all the font
+If the temporary folders were not automatically created by the plugin, verify that all the font
 files (from <code><?php echo WooCommerce_PDF_Invoices::$plugin_path . "lib/dompdf/lib/fonts/"; ?></code>)
 are copied to the fonts folder.
 Normally, this is fully automated, but if your server has strict security settings, this automated
