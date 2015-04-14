@@ -584,10 +584,14 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function get_product_attribute( $attribute_name, $product ) {
 			// first, check the text attributes
 			$attributes = $product->get_attributes();
+			$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
 			if (array_key_exists( sanitize_title( $attribute_name ), $attributes) ) {
 				$attribute = $product->get_attribute ( $attribute_name );
 				return $attribute;
-			} 
+			} elseif (array_key_exists( sanitize_title( $attribute_key ), $attributes) ) {
+				$attribute = $product->get_attribute ( $attribute_key );
+				return $attribute;
+			}
 
 			// not a text attribute, try attribute taxonomy
 			$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
