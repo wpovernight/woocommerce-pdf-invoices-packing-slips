@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2015-04-21 08:44+0100\n"
-"PO-Revision-Date: 2015-04-21 08:44+0100\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2015-04-22 06:54+0100\n"
+"Last-Translator: Daniel Hedegaard Arp <daniel@eurosite.dk>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: da_DK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.5\n"
+"X-Generator: Poedit 1.7.4\n"
 "X-Poedit-Basepath: ../\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -23,7 +23,7 @@ msgstr "Du har ikke tilstrækkelig tilladelse til at tilgå denne side. "
 
 #: includes/class-wcpdf-export.php:343
 msgid "Some of the export parameters are missing."
-msgstr ""
+msgstr "Nogle af parametrene for eksport mangler."
 
 # This is a filename (prefix). do not use spaces or special characters!
 #: includes/class-wcpdf-export.php:424
@@ -114,33 +114,35 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:232
 msgid "Disable for free products"
-msgstr ""
+msgstr "Deaktiver for gratis produkter"
 
 #: includes/class-wcpdf-settings.php:239
 msgid ""
 "Disable automatic creation/attachment of invoices when only free products "
 "are ordered"
 msgstr ""
+"Deaktiver automatisk oprettelse/fastgørelse af fakturaer, når kun gratis "
+"produkter er bestilt"
 
 #: includes/class-wcpdf-settings.php:246
 msgid "Interface"
-msgstr ""
+msgstr "Grænseflade"
 
 #: includes/class-wcpdf-settings.php:294
 msgid "Allow My Account invoice download"
-msgstr ""
+msgstr "Tillad at downloade faktura via min konto"
 
 #: includes/class-wcpdf-settings.php:302
 msgid "Only when an invoice is already created/emailed"
-msgstr ""
+msgstr "Kun når en faktura allerede er oprettet/sendt på mail"
 
 #: includes/class-wcpdf-settings.php:303
 msgid "Only for specific order statuses (define below)"
-msgstr ""
+msgstr "Kun for specifikke ordre statusser (Definer nedenfor)"
 
 #: includes/class-wcpdf-settings.php:304
 msgid "Always"
-msgstr ""
+msgstr "Altid"
 
 #: includes/class-wcpdf-settings.php:319
 msgid "Enable invoice number column in the orders list"
@@ -160,6 +162,8 @@ msgid ""
 "Want to use your own template? Copy all the files from <code>%s</code> to "
 "your (child) theme in <code>%s</code> to customize them"
 msgstr ""
+"Vil du bruge din egen skabelon? Kopier alle filer fra <code>%s</code> til "
+"din (barn) tema i <code>%s</code> at tilpasse dem."
 
 #: includes/class-wcpdf-settings.php:383
 msgid "Paper size"
@@ -209,29 +213,31 @@ msgstr "Faktura "
 
 #: includes/class-wcpdf-settings.php:466
 msgid "Display shipping address"
-msgstr ""
+msgstr "Vis leveringsadresse"
 
 #: includes/class-wcpdf-settings.php:473
 msgid ""
 "Display shipping address on invoice (in addition to the default billing "
 "address) if different from billing address"
 msgstr ""
+"Vis leveringsadresse på faktura (ud over standard faktureringsadresse) hvis "
+"den er forskellig fra faktureringsadressen"
 
 #: includes/class-wcpdf-settings.php:479 includes/class-wcpdf-settings.php:594
 msgid "Display email address"
-msgstr ""
+msgstr "Vis email adresse"
 
 #: includes/class-wcpdf-settings.php:491 includes/class-wcpdf-settings.php:606
 msgid "Display phone number"
-msgstr ""
+msgstr "Vis telefon nummer"
 
 #: includes/class-wcpdf-settings.php:503
 msgid "Display invoice date"
-msgstr ""
+msgstr "Vis faktura dato"
 
 #: includes/class-wcpdf-settings.php:516
 msgid "Display built-in sequential invoice number"
-msgstr ""
+msgstr "Vis indbygget sekventiel faktura nummer"
 
 #: includes/class-wcpdf-settings.php:529
 msgid "Next invoice number (without prefix/suffix etc.)"
@@ -296,13 +302,15 @@ msgstr "Følgeseddel "
 
 #: includes/class-wcpdf-settings.php:581
 msgid "Display billing address"
-msgstr ""
+msgstr "Vis leveringsadresse"
 
 #: includes/class-wcpdf-settings.php:588
 msgid ""
 "Display billing address on packing slip (in addition to the default shipping "
 "address) if different from shipping address"
 msgstr ""
+"Vis faktureringsadresse på følgeseddel (ud over standard leveringsadresse) "
+"hvis forskellig fra leveringsadresse"
 
 #: includes/class-wcpdf-settings.php:619
 msgid "Extra template fields"
@@ -334,30 +342,33 @@ msgstr "Dette er sidefod kolonne 3 i <i>Modern (Premium)</i> skabelonen "
 
 #: includes/class-wcpdf-settings.php:707
 msgid "Debug settings"
-msgstr ""
+msgstr "debug indstillinger"
 
 #: includes/class-wcpdf-settings.php:714
 msgid "Enable debug output"
-msgstr ""
+msgstr "Aktiver debug output"
 
 #: includes/class-wcpdf-settings.php:721
 msgid ""
 "Enable this option to output plugin errors if you're getting a blank page or "
 "other PDF generation issues"
 msgstr ""
+"Aktivér denne indstilling for  output plugin fejl, hvis du får en blank side "
+"eller andre PDF generations problemstillinger"
 
 #: includes/class-wcpdf-settings.php:727
 msgid "Output to HTML"
-msgstr ""
+msgstr "Output til HTML"
 
 #: includes/class-wcpdf-settings.php:734
 msgid ""
 "Send the template output as HTML to the browser instead of creating a PDF."
 msgstr ""
+"Send skabelonen outputtet som HTML til browseren i stedet for at lave en PDF."
 
 #: includes/class-wcpdf-settings.php:740
 msgid "Use old tmp folder"
-msgstr ""
+msgstr "Brug gammel tmp mappe"
 
 #: includes/class-wcpdf-settings.php:747
 msgid ""
@@ -365,6 +376,9 @@ msgid ""
 "plugin folder. This setting is only intended for backwards compatibility, "
 "not recommended on new installs!"
 msgstr ""
+"Før version 1.5 af PDF fakturaer blev midlertidige filer gemt i plugin "
+"mappen. Denne indstilling er kun beregnet til bagudkompatibilitet, anbefales "
+"ikke på nye installationer!"
 
 #: includes/class-wcpdf-settings.php:1087
 msgid "Image resolution"
@@ -375,6 +389,8 @@ msgid ""
 "<b>Warning!</b> The settings below are meant for debugging/development only. "
 "Do not use them on a live website!"
 msgstr ""
+"<b>Advarsel!</b> Indstillingerne nedenfor er kun beregnet for fejlfinding/"
+"udvikling. Brug dem ikke på et live websted!"
 
 #: includes/class-wcpdf-settings.php:1212
 msgid ""
@@ -390,7 +406,7 @@ msgstr "PDF følgesedler "
 #: includes/class-wcpdf-writepanels.php:107
 #: includes/class-wcpdf-writepanels.php:216
 msgid "PDF Invoice"
-msgstr ""
+msgstr "PDF Faktura"
 
 #: includes/class-wcpdf-writepanels.php:112
 #: includes/class-wcpdf-writepanels.php:221
@@ -420,51 +436,59 @@ msgstr "Fakturadato: "
 
 #: includes/class-wcpdf-writepanels.php:268
 msgid "h"
-msgstr ""
+msgstr "t"
 
 #: includes/class-wcpdf-writepanels.php:268
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: includes/wcpdf-extensions.php:15
 msgid "Check out these premium extensions!"
-msgstr ""
+msgstr "Tjek disse Premium tilføjelser!"
 
 #: includes/wcpdf-extensions.php:16
 msgid "click items to read more"
-msgstr ""
+msgstr "klik på elementer for at læse mere"
 
 #: includes/wcpdf-extensions.php:23
 msgid "Go Pro: Proforma invoices, credit notes (=refunds) & more!"
-msgstr ""
+msgstr "Go Pro: Proforma fakturaer, kreditnotaer (=tilbagebetaling) og mere!"
 
 #: includes/wcpdf-extensions.php:25
 msgid ""
 "Supercharge WooCommerce PDF Invoices & Packing Slips with the following "
 "features:"
 msgstr ""
+"Opgrader WooCommerce PDF-fakturaer & følgesedler med følgende funktioner:"
 
 #: includes/wcpdf-extensions.php:27
 msgid "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
-msgstr ""
+msgstr "E-mail/print/download <b>PDF kreditnotaer & Proforma fakturaer</b>"
 
 #: includes/wcpdf-extensions.php:28
 msgid ""
 "Send out a separate <b>notification email</b> with (or without) PDF invoices/"
 "packing slips, for example to a drop-shipper or a supplier."
 msgstr ""
+"Send en separat <b>e-mail</b> med (eller uden) PDF fakturaer/følgesedler, "
+"for eksempel til en fragtmand eller en leverandør."
 
 #: includes/wcpdf-extensions.php:29
 msgid ""
 "Attach <b>up to 3 static files</b> (for example a terms & conditions "
 "document) to the WooCommerce emails of your choice."
 msgstr ""
+"Vedhæft <b>op til 3 statiske filer</b> (f.eks. en vilkår & betingelser-"
+"dokument) til WooCommerce e-mails efter dit valg."
 
 #: includes/wcpdf-extensions.php:30
 msgid ""
 "Use <b>separate numbering systems</b> and/or format for proforma invoices "
 "and credit notes or utilize the main invoice numbering system"
 msgstr ""
+"Brug et <b>separat nummererings system</b> og/eller format for proforma "
+"fakturaer og kreditnotaer eller anvend de vigtigste faktura nummerering "
+"system"
 
 #: includes/wcpdf-extensions.php:31
 msgid ""
@@ -472,18 +496,21 @@ msgid ""
 "additional custom fields, font sizes etc. without the need to create a "
 "custom template."
 msgstr ""
+"<b>Tilpas</b> <b>levering & fakturerings adresse</b> format til  at medtage "
+"brugerdefinerede felter, skriftstørrelser osv uden at skulle oprette en "
+"brugerdefineret skabelon."
 
 #: includes/wcpdf-extensions.php:32
 msgid "Use the plugin in multilingual <b>WPML</b> setups"
-msgstr ""
+msgstr "Brug dette  plugin i flersprogede <b>WPML</b> opsætninger"
 
 #: includes/wcpdf-extensions.php:34
 msgid "Get WooCommerce PDF Invoices & Packing Slips Professional!"
-msgstr ""
+msgstr "Få WooCommerce PDF-fakturaer & følgesedler Professional!"
 
 #: includes/wcpdf-extensions.php:42
 msgid "Upload all invoices automatically to your dropbox"
-msgstr ""
+msgstr "Upload alle fakturaer automatisk til din Dropbox!"
 
 #: includes/wcpdf-extensions.php:48
 msgid ""
@@ -492,43 +519,50 @@ msgid ""
 "customers to Dropbox. The best way to keep your invoice administration up to "
 "date!"
 msgstr ""
+"Denne udvidelse uploader alle fakturaer (og andre PDF-dokumenter fra den "
+"professionelle udvidelse), der er sendt til din kunder til Dropbox. Den "
+"bedste måde at holde din faktura administration opdateret!"
 
 #: includes/wcpdf-extensions.php:49
 msgid "Get WooCommerce PDF Invoices & Packing Slips to dropbox!"
-msgstr ""
+msgstr "Få WooCommerce PDF Fakturaer & pakkesedler til dropbox!"
 
 #: includes/wcpdf-extensions.php:61
 msgid ""
 "Automatically send new orders or packing slips to your printer, as soon as "
 "the customer orders!"
 msgstr ""
+"Send automatisk nye ordrer eller pakkesedler til din printer, så snart "
+"kunden bestiller!"
 
 #: includes/wcpdf-extensions.php:67
 msgid ""
 "Check out the WooCommerce Automatic Order Printing extension from our "
 "partners at Simba Hosting"
 msgstr ""
+"Tjek WooCommerce Automatisk ordre udskrft udvidelse ud fra vores partnere på "
+"Simba Hosting"
 
 #: includes/wcpdf-extensions.php:68
 msgid "WooCommerce Automatic Order Printing"
-msgstr ""
+msgstr "WooCommerce automatisk ordre udskrift"
 
 #: includes/wcpdf-extensions.php:82
 msgid "More advanced templates"
-msgstr ""
+msgstr "Flere avancerede skabeloner"
 
 #: includes/wcpdf-extensions.php:85
 msgid "Stylish modern invoices & packing slips with product thumbnails!"
-msgstr ""
+msgstr "Stilfuldt moderne fakturaer og følgesedler med produkt- thumbnails!"
 
 #: includes/wcpdf-extensions.php:86
 msgid "More tax details on the invoices!"
-msgstr ""
+msgstr "Flere moms detaljer på fakturaer!"
 
 #: includes/wcpdf-extensions.php:87
 #, php-format
 msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
-msgstr ""
+msgstr "Se Premium PDF faktura & pakkesedler skabeloner på %s."
 
 #: includes/wcpdf-extensions.php:88
 #, php-format
@@ -538,11 +572,11 @@ msgstr "For brugerdefinerede skabeloner, kontakt os på %s."
 #: templates/pdf/Simple/invoice.php:29
 #: templates/pdf/Simple/packing-slip.php:40
 msgid "Billing Address:"
-msgstr ""
+msgstr "Faktureringsadresse"
 
 #: templates/pdf/Simple/invoice.php:40
 msgid "Ship To:"
-msgstr ""
+msgstr "Leveringsadresse:"
 
 #: templates/pdf/Simple/invoice.php:49
 msgid "Invoice Number:"
@@ -603,11 +637,11 @@ msgstr "Kunde bemærkning"
 
 #: templates/pdf/Simple/packing-slip.php:29
 msgid "Shipping Address:"
-msgstr ""
+msgstr "Leveringsadresse"
 
 #: templates/pdf/Simple/packing-slip.php:56
 msgid "Shipping Method:"
-msgstr ""
+msgstr "Leveringsmetode:"
 
 #: woocommerce-pdf-invoices-packingslips.php:123
 #, php-format
