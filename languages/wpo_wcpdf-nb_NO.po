@@ -1,103 +1,106 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
-"POT-Creation-Date: 2014-11-19 10:36+0100\n"
-"PO-Revision-Date: 2014-11-24 11:40+0100\n"
+"POT-Creation-Date: 2015-04-29 09:09+0100\n"
+"PO-Revision-Date: 2015-04-29 09:11+0100\n"
 "Last-Translator: Eirik Opsanger <eirik.opsanger@gmail.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.10\n"
+"X-Generator: Poedit 1.7.5\n"
 "X-Poedit-Basepath: ../\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/class-wcpdf-export.php:175 includes/class-wcpdf-export.php:180
-#: includes/class-wcpdf-export.php:185 includes/class-wcpdf-export.php:196
-#: includes/class-wcpdf-export.php:204
+#: includes/class-wcpdf-export.php:338 includes/class-wcpdf-export.php:348
+#: includes/class-wcpdf-export.php:359 includes/class-wcpdf-export.php:367
 msgid "You do not have sufficient permissions to access this page."
 msgstr "Du har ikke nok rettigheter til denne siden"
 
+#: includes/class-wcpdf-export.php:343
+msgid "Some of the export parameters are missing."
+msgstr ""
+
 # This is a filename (prefix). do not use spaces or special characters!
-#: includes/class-wcpdf-export.php:263
+#: includes/class-wcpdf-export.php:424
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] "Faktura"
 msgstr[1] "Fakturaer"
 
 # This is a filename (prefix). do not use spaces or special characters!
-#: includes/class-wcpdf-export.php:267
+#: includes/class-wcpdf-export.php:428
 msgid "packing-slip"
 msgid_plural "packing-slips"
 msgstr[0] "Pakkseddel"
 msgstr[1] "Pakksedler"
 
 #: includes/class-wcpdf-settings.php:38 includes/class-wcpdf-settings.php:39
-#: includes/class-wcpdf-writepanels.php:31
+#: includes/class-wcpdf-writepanels.php:32
 msgid "PDF Invoices"
 msgstr "PDF-faktura"
 
-#: includes/class-wcpdf-settings.php:69
+#: includes/class-wcpdf-settings.php:80
 msgid "Settings"
 msgstr "Innstillinger"
 
-#: includes/class-wcpdf-settings.php:91
+#: includes/class-wcpdf-settings.php:102
 msgid "General"
 msgstr "Generelt"
 
-#: includes/class-wcpdf-settings.php:92
+#: includes/class-wcpdf-settings.php:103
 msgid "Template"
 msgstr "Template"
 
-#: includes/class-wcpdf-settings.php:101
-msgid "WooCommerce PDF Invoices"
-msgstr "WooCommerce PDF Faktura"
-
-#: includes/class-wcpdf-settings.php:107
+#: includes/class-wcpdf-settings.php:108
 msgid "Status"
 msgstr "Status"
 
-#: includes/class-wcpdf-settings.php:168
+#: includes/class-wcpdf-settings.php:120
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF Faktura"
+
+#: includes/class-wcpdf-settings.php:189
 msgid "General settings"
 msgstr "Generelle innstillinger"
 
-#: includes/class-wcpdf-settings.php:175
+#: includes/class-wcpdf-settings.php:196
 msgid "How do you want to view the PDF?"
 msgstr "Hvordan vil du se PDF`en?"
 
-#: includes/class-wcpdf-settings.php:183
+#: includes/class-wcpdf-settings.php:204
 msgid "Download the PDF"
 msgstr "Last ned PDF`en"
 
-#: includes/class-wcpdf-settings.php:184
+#: includes/class-wcpdf-settings.php:205
 msgid "Open the PDF in a new browser tab/window"
 msgstr "Åpne PDF`en i ett nytt vindu"
 
-#: includes/class-wcpdf-settings.php:193
+#: includes/class-wcpdf-settings.php:214
 msgid "Admin New Order email"
 msgstr "Admins Ny Ordre epost"
 
-#: includes/class-wcpdf-settings.php:194
+#: includes/class-wcpdf-settings.php:215
 msgid "Customer Processing Order email"
 msgstr "Kundens Behandler Ordre epost"
 
-#: includes/class-wcpdf-settings.php:195
+#: includes/class-wcpdf-settings.php:216
 msgid "Customer Completed Order email"
 msgstr "Kundens Fullført Ordre epost"
 
-#: includes/class-wcpdf-settings.php:196
+#: includes/class-wcpdf-settings.php:217
 msgid "Customer Invoice email"
 msgstr "Kundens Faktura epost"
 
-#: includes/class-wcpdf-settings.php:201
+#: includes/class-wcpdf-settings.php:222
 msgid "Attach invoice to:"
 msgstr "Legg ved faktura til:"
 
-#: includes/class-wcpdf-settings.php:209
+#: includes/class-wcpdf-settings.php:230
 #, php-format
 msgid ""
 "It looks like the temp folder (<code>%s</code>) is not writable, check the "
@@ -108,19 +111,49 @@ msgstr ""
 "skrivbar, sjekk rettighetene på denne mappen! Uten skrivetilgang til denne "
 "mappen vil ikke denne plugin kunne sende pdf-faktura."
 
-#: includes/class-wcpdf-settings.php:215
+#: includes/class-wcpdf-settings.php:236
+msgid "Disable for free products"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:243
+msgid ""
+"Disable automatic creation/attachment of invoices when only free products "
+"are ordered"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:250
+msgid "Interface"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:298
+msgid "Allow My Account invoice download"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:306
+msgid "Only when an invoice is already created/emailed"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:307
+msgid "Only for specific order statuses (define below)"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:308
+msgid "Always"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:323
 msgid "Enable invoice number column in the orders list"
 msgstr "Aktiver kolonne for fakturanummer i ordrelisten"
 
-#: includes/class-wcpdf-settings.php:254
+#: includes/class-wcpdf-settings.php:361
 msgid "PDF Template settings"
 msgstr "PDF Template-innstillinger"
 
-#: includes/class-wcpdf-settings.php:266
+#: includes/class-wcpdf-settings.php:373
 msgid "Choose a template"
 msgstr "Velg din template"
 
-#: includes/class-wcpdf-settings.php:274
+#: includes/class-wcpdf-settings.php:381
 #, php-format
 msgid ""
 "Want to use your own template? Copy all the files from <code>%s</code> to "
@@ -129,59 +162,83 @@ msgstr ""
 "Vil du bruke din egen template? Kopier alle filer fra <code>%s</code> til "
 "<code>%s</code>for å endre de."
 
-#: includes/class-wcpdf-settings.php:280
+#: includes/class-wcpdf-settings.php:387
 msgid "Paper size"
 msgstr "Papirstørrelse"
 
-#: includes/class-wcpdf-settings.php:288
+#: includes/class-wcpdf-settings.php:395
 msgid "A4"
 msgstr "A4"
 
-#: includes/class-wcpdf-settings.php:289
+#: includes/class-wcpdf-settings.php:396
 msgid "Letter"
 msgstr "Letter"
 
-#: includes/class-wcpdf-settings.php:296
+#: includes/class-wcpdf-settings.php:403
 msgid "Shop header/logo"
 msgstr "Butikkens header/logo"
 
-#: includes/class-wcpdf-settings.php:303
+#: includes/class-wcpdf-settings.php:410
 msgid "Select or upload your invoice header/logo"
 msgstr "Velg eller last opp din faktura header/logo"
 
-#: includes/class-wcpdf-settings.php:304
+#: includes/class-wcpdf-settings.php:411
 msgid "Set image"
 msgstr "Velg bilde"
 
-#: includes/class-wcpdf-settings.php:305
+#: includes/class-wcpdf-settings.php:412
 msgid "Remove image"
 msgstr "Fjern bilde"
 
-#: includes/class-wcpdf-settings.php:312
+#: includes/class-wcpdf-settings.php:419
 msgid "Shop Name"
 msgstr "Butikkens navn"
 
-#: includes/class-wcpdf-settings.php:325
+#: includes/class-wcpdf-settings.php:432
 msgid "Shop Address"
 msgstr "Butikkens adresse"
 
-#: includes/class-wcpdf-settings.php:357
+#: includes/class-wcpdf-settings.php:447
 msgid "Footer: terms & conditions, policies, etc."
 msgstr "Footer: Betingelser og Vilkår"
 
-#: includes/class-wcpdf-settings.php:372
+#: includes/class-wcpdf-settings.php:463 templates/pdf/Simple/invoice.php:9
+#: templates/pdf/Simple/invoice.php:21
+#: woocommerce-pdf-invoices-packingslips.php:220
+msgid "Invoice"
+msgstr "Faktura"
+
+#: includes/class-wcpdf-settings.php:470
+msgid "Display shipping address"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:477
+msgid ""
+"Display shipping address on invoice (in addition to the default billing "
+"address) if different from billing address"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:483 includes/class-wcpdf-settings.php:598
+msgid "Display email address"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:495 includes/class-wcpdf-settings.php:610
+msgid "Display phone number"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:507
 msgid "Display invoice date"
 msgstr "Vis fakturadato"
 
-#: includes/class-wcpdf-settings.php:385
+#: includes/class-wcpdf-settings.php:520
 msgid "Display built-in sequential invoice number"
 msgstr "Vis sekvensielt fakturanummer"
 
-#: includes/class-wcpdf-settings.php:398
+#: includes/class-wcpdf-settings.php:533
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr "Neste fakturanummer (uten prefix/suffix etc.)"
 
-#: includes/class-wcpdf-settings.php:406
+#: includes/class-wcpdf-settings.php:541
 msgid ""
 "This is the number that will be used on the next invoice that is created. By "
 "default, numbering starts from the WooCommerce Order Number of the first "
@@ -195,15 +252,15 @@ msgstr ""
 "dersom du endrer denne og setter et lavere tall enn høyeste (PDF) "
 "fakturanummer, vil du få flere fakturaer med samme nummer!"
 
-#: includes/class-wcpdf-settings.php:412
+#: includes/class-wcpdf-settings.php:547
 msgid "Invoice number format"
 msgstr "Format på fakturanummer"
 
-#: includes/class-wcpdf-settings.php:421
+#: includes/class-wcpdf-settings.php:556
 msgid "Prefix"
 msgstr "Prefix"
 
-#: includes/class-wcpdf-settings.php:423
+#: includes/class-wcpdf-settings.php:558
 msgid ""
 "to use the order year and/or month, use [order_year] or [order_month] "
 "respectively"
@@ -211,19 +268,19 @@ msgstr ""
 "for å bruke år og/eller måned, kan du bruker [order_year] og/eller "
 "[order_month]"
 
-#: includes/class-wcpdf-settings.php:426
+#: includes/class-wcpdf-settings.php:561
 msgid "Suffix"
 msgstr "Suffix"
 
-#: includes/class-wcpdf-settings.php:431
+#: includes/class-wcpdf-settings.php:566
 msgid "Padding"
 msgstr "Siffer"
 
-#: includes/class-wcpdf-settings.php:433
+#: includes/class-wcpdf-settings.php:568
 msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
 msgstr "skriv antall siffer her - skriv \"6\" for å vise 42 som 000042"
 
-#: includes/class-wcpdf-settings.php:436
+#: includes/class-wcpdf-settings.php:571
 msgid ""
 "note: if you have already created a custom invoice number format with a "
 "filter, the above settings will be ignored"
@@ -231,39 +288,96 @@ msgstr ""
 "merk: hvis du allerede har laget et eget nummerformat for fakuranummer med "
 "et filter, vil innstillingene over bli ignorert"
 
-#: includes/class-wcpdf-settings.php:443
+#: includes/class-wcpdf-settings.php:578
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+#: woocommerce-pdf-invoices-packingslips.php:223
+msgid "Packing Slip"
+msgstr "Pakkseddel"
+
+#: includes/class-wcpdf-settings.php:585
+msgid "Display billing address"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:592
+msgid ""
+"Display billing address on packing slip (in addition to the default shipping "
+"address) if different from shipping address"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:623
 msgid "Extra template fields"
 msgstr "Ekstrafelt"
 
-#: includes/class-wcpdf-settings.php:450
+#: includes/class-wcpdf-settings.php:630
 msgid "Extra field 1"
 msgstr "Ekstrafelt 1"
 
-#: includes/class-wcpdf-settings.php:459
+#: includes/class-wcpdf-settings.php:639
 msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
 msgstr "Dette er fotnote-kolonne 1 i <i>Modern (Premium)</i> template"
 
-#: includes/class-wcpdf-settings.php:465
+#: includes/class-wcpdf-settings.php:645
 msgid "Extra field 2"
 msgstr "Ekstrafelt 2"
 
-#: includes/class-wcpdf-settings.php:474
+#: includes/class-wcpdf-settings.php:654
 msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
 msgstr "Dette er fotnote-kolonne 2 i <i>Modern (Premium)</i> template"
 
-#: includes/class-wcpdf-settings.php:480
+#: includes/class-wcpdf-settings.php:660
 msgid "Extra field 3"
 msgstr "Ekstrafelt 3"
 
-#: includes/class-wcpdf-settings.php:489
+#: includes/class-wcpdf-settings.php:669
 msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
 msgstr "Dette er fotnote-kolonne 3 i <i>Modern (Premium)</i> template"
 
-#: includes/class-wcpdf-settings.php:747
+#: includes/class-wcpdf-settings.php:711
+msgid "Debug settings"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:718
+msgid "Enable debug output"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:725
+msgid ""
+"Enable this option to output plugin errors if you're getting a blank page or "
+"other PDF generation issues"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:731
+msgid "Output to HTML"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:738
+msgid ""
+"Send the template output as HTML to the browser instead of creating a PDF."
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:744
+msgid "Use old tmp folder"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:751
+msgid ""
+"Before version 1.5 of PDF Invoices, temporary files were stored in the "
+"plugin folder. This setting is only intended for backwards compatibility, "
+"not recommended on new installs!"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:1091
 msgid "Image resolution"
 msgstr "Bildeoppløsning"
 
-#: includes/class-wcpdf-settings.php:863
+#: includes/class-wcpdf-settings.php:1207
+msgid ""
+"<b>Warning!</b> The settings below are meant for debugging/development only. "
+"Do not use them on a live website!"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:1216
 msgid ""
 "These are used for the (optional) footer columns in the <em>Modern "
 "(Premium)</em> template, but can also be used for other elements in your "
@@ -272,46 +386,46 @@ msgstr ""
 "Disse brukes for (valgfrie) fotnote-kolonner i <em>Modern (Premium)</em> "
 "template, men kan også brukes for andre elementer i din template"
 
-#: includes/class-wcpdf-writepanels.php:32
+#: includes/class-wcpdf-writepanels.php:33
 msgid "PDF Packing Slips"
 msgstr "PDF Pakksedler"
 
-#: includes/class-wcpdf-writepanels.php:91
-#: includes/class-wcpdf-writepanels.php:184
+#: includes/class-wcpdf-writepanels.php:107
+#: includes/class-wcpdf-writepanels.php:216
 msgid "PDF Invoice"
 msgstr "PDF-faktura"
 
-#: includes/class-wcpdf-writepanels.php:96
-#: includes/class-wcpdf-writepanels.php:189
+#: includes/class-wcpdf-writepanels.php:112
+#: includes/class-wcpdf-writepanels.php:221
 msgid "PDF Packing Slip"
 msgstr "PDF Pakkseddel"
 
-#: includes/class-wcpdf-writepanels.php:123
+#: includes/class-wcpdf-writepanels.php:139
 msgid "Invoice Number"
 msgstr "Fakturanummer"
 
-#: includes/class-wcpdf-writepanels.php:160
+#: includes/class-wcpdf-writepanels.php:192
 msgid "Download invoice (PDF)"
 msgstr "Last ned faktura (PDF)"
 
-#: includes/class-wcpdf-writepanels.php:171
+#: includes/class-wcpdf-writepanels.php:203
 msgid "Create PDF"
 msgstr "Opprett PDF"
 
-#: includes/class-wcpdf-writepanels.php:232
+#: includes/class-wcpdf-writepanels.php:264
 msgid "PDF Invoice Number (unformatted!)"
 msgstr "PDF fakturanummer (uformatert)"
 
-#: includes/class-wcpdf-writepanels.php:235
-#: templates/pdf/Simple/invoice.php:36
+#: includes/class-wcpdf-writepanels.php:267
+#: templates/pdf/Simple/invoice.php:55
 msgid "Invoice Date:"
 msgstr "Fakturadato:"
 
-#: includes/class-wcpdf-writepanels.php:236
+#: includes/class-wcpdf-writepanels.php:268
 msgid "h"
 msgstr "h"
 
-#: includes/class-wcpdf-writepanels.php:236
+#: includes/class-wcpdf-writepanels.php:268
 msgid "m"
 msgstr "m"
 
@@ -339,13 +453,17 @@ msgstr "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
 
 #: includes/wcpdf-extensions.php:28
 msgid ""
-"Attach a <b>static file</b> (for example a terms & conditions document) to "
-"the WooCommerce emails of your choice."
+"Send out a separate <b>notification email</b> with (or without) PDF invoices/"
+"packing slips, for example to a drop-shipper or a supplier."
 msgstr ""
-"Legg ved en <b>statisk file</b> (f.eks. vilkår) til WooCommerce-epostene du "
-"ønsker."
 
 #: includes/wcpdf-extensions.php:29
+msgid ""
+"Attach <b>up to 3 static files</b> (for example a terms & conditions "
+"document) to the WooCommerce emails of your choice."
+msgstr ""
+
+#: includes/wcpdf-extensions.php:30
 msgid ""
 "Use <b>separate numbering systems</b> and/or format for proforma invoices "
 "and credit notes or utilize the main invoice numbering system"
@@ -353,7 +471,7 @@ msgstr ""
 "Bruk <b>separate nummersystem</b> og/eller format på proforma faktura og "
 "kreditnota, eller utnytt hovedsystemet for fakturanummerering"
 
-#: includes/wcpdf-extensions.php:30
+#: includes/wcpdf-extensions.php:31
 msgid ""
 "<b>Customize</b> the <b>shipping & billing address</b> format to include "
 "additional custom fields, font sizes etc. without the need to create a "
@@ -362,21 +480,21 @@ msgstr ""
 "<b>Skreddersy faktura- og leveringsadresse</b> for å inkludere valgfrie "
 "felter, skriftstørrelse osv. uten å måtte lage en egen template."
 
-#: includes/wcpdf-extensions.php:31
+#: includes/wcpdf-extensions.php:32
 msgid "Use the plugin in multilingual <b>WPML</b> setups"
 msgstr "Bruk pluginen i  multilingual <b>WPML</b> oppsett"
 
-#: includes/wcpdf-extensions.php:33
+#: includes/wcpdf-extensions.php:34
 msgid "Get WooCommerce PDF Invoices & Packing Slips Professional!"
 msgstr "Få WooCommerce PDF Invoices & Packing Slips Professional!"
 
-#: includes/wcpdf-extensions.php:41
+#: includes/wcpdf-extensions.php:42
 msgid "Upload all invoices automatically to your dropbox"
 msgstr ""
 "Last opp alle fakturaer automatisk til din dropbox! <br/>Sjekk ut %s "
 "utvidelsen."
 
-#: includes/wcpdf-extensions.php:47
+#: includes/wcpdf-extensions.php:48
 msgid ""
 "This extension conveniently uploads all the invoices (and other pdf "
 "documents from the professional extension) that are emailed to your "
@@ -387,17 +505,17 @@ msgstr ""
 "versjonen) som blir sendt på epost til deg rett til Dropbox. Dette er den "
 "beste måten å holde adminstreringen ajour!"
 
-#: includes/wcpdf-extensions.php:48
+#: includes/wcpdf-extensions.php:49
 msgid "Get WooCommerce PDF Invoices & Packing Slips to dropbox!"
 msgstr "Fp WooCommerce PDF Invoices & Packing Slips rett til Dropbox!"
 
-#: includes/wcpdf-extensions.php:60
+#: includes/wcpdf-extensions.php:61
 msgid ""
 "Automatically send new orders or packing slips to your printer, as soon as "
 "the customer orders!"
 msgstr "Send pakkelapper automatisk til printeren når det kommer ny ordre!"
 
-#: includes/wcpdf-extensions.php:66
+#: includes/wcpdf-extensions.php:67
 msgid ""
 "Check out the WooCommerce Automatic Order Printing extension from our "
 "partners at Simba Hosting"
@@ -405,101 +523,109 @@ msgstr ""
 "Sjekk ut WooCommerce Automatic Order Printing utvidelse fra vår partner "
 "Simba Hosting"
 
-#: includes/wcpdf-extensions.php:67
+#: includes/wcpdf-extensions.php:68
 msgid "WooCommerce Automatic Order Printing"
 msgstr "Automatisk ordreutskrift"
 
-#: includes/wcpdf-extensions.php:81
+#: includes/wcpdf-extensions.php:82
 msgid "More advanced templates"
 msgstr "Mer avanserte stiler"
 
-#: includes/wcpdf-extensions.php:84
+#: includes/wcpdf-extensions.php:85
 msgid "Stylish modern invoices & packing slips with product thumbnails!"
 msgstr "Stilfylle, moderne faktura og pakkelapper med produktbilder!"
 
-#: includes/wcpdf-extensions.php:85
+#: includes/wcpdf-extensions.php:86
 msgid "More tax details on the invoices!"
 msgstr "Flere detaljer for skatter og avgifter på faktura!"
 
-#: includes/wcpdf-extensions.php:86
+#: includes/wcpdf-extensions.php:87
 #, php-format
 msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
 msgstr ""
 "Ser du etter en mer avansert template? Sjekk ut  Premium PDF Invoice & "
 "Packing Slips templates hos %s."
 
-#: includes/wcpdf-extensions.php:87
+#: includes/wcpdf-extensions.php:88
 #, php-format
 msgid "For custom templates, contact us at %s."
 msgstr "For egendefinerte templates, kontakt oss på %s"
 
-#: templates/pdf/Simple/html-document-wrapper.php:6
-#: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
-msgid "Invoice"
-msgstr "Faktura"
+#: templates/pdf/Simple/invoice.php:29
+#: templates/pdf/Simple/packing-slip.php:40
+msgid "Billing Address:"
+msgstr "Fakturaadresse:"
 
-#: templates/pdf/Simple/html-document-wrapper.php:6
-#: templates/pdf/Simple/packing-slip.php:9
-#: templates/pdf/Simple/packing-slip.php:21
-msgid "Packing Slip"
-msgstr "Pakkseddel"
+#: templates/pdf/Simple/invoice.php:40
+msgid "Ship To:"
+msgstr "Send til:"
 
-#: templates/pdf/Simple/invoice.php:32
+#: templates/pdf/Simple/invoice.php:49
 msgid "Invoice Number:"
 msgstr "Fakturanummer:"
 
-#: templates/pdf/Simple/invoice.php:39
-#: templates/pdf/Simple/packing-slip.php:33
+#: templates/pdf/Simple/invoice.php:60
+#: templates/pdf/Simple/packing-slip.php:48
 msgid "Order Number:"
 msgstr "Ordrenummer:"
 
-#: templates/pdf/Simple/invoice.php:41
-#: templates/pdf/Simple/packing-slip.php:31
+#: templates/pdf/Simple/invoice.php:64
+#: templates/pdf/Simple/packing-slip.php:52
 msgid "Order Date:"
 msgstr "Ordredato:"
 
-#: templates/pdf/Simple/invoice.php:43
+#: templates/pdf/Simple/invoice.php:68
 msgid "Payment Method:"
 msgstr "Betlingsmåte:"
 
-#: templates/pdf/Simple/invoice.php:58
-#: templates/pdf/Simple/packing-slip.php:48
+#: templates/pdf/Simple/invoice.php:82
+#: templates/pdf/Simple/packing-slip.php:70
 msgid "Product"
 msgstr "Produkt:"
 
-#: templates/pdf/Simple/invoice.php:59
-#: templates/pdf/Simple/packing-slip.php:49
+#: templates/pdf/Simple/invoice.php:83
+#: templates/pdf/Simple/packing-slip.php:71
 msgid "Quantity"
 msgstr "Antall"
 
-#: templates/pdf/Simple/invoice.php:60
+#: templates/pdf/Simple/invoice.php:84
 msgid "Price"
 msgstr "Pris"
 
-#: templates/pdf/Simple/invoice.php:66
+#: templates/pdf/Simple/invoice.php:91
+#: templates/pdf/Simple/packing-slip.php:78
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: templates/pdf/Simple/invoice.php:69
+#: templates/pdf/Simple/invoice.php:96
+#: templates/pdf/Simple/packing-slip.php:83
 msgid "SKU"
 msgstr "Art.nr"
 
-#: templates/pdf/Simple/invoice.php:70
-#: templates/pdf/Simple/packing-slip.php:57
+#: templates/pdf/Simple/invoice.php:97
+#: templates/pdf/Simple/packing-slip.php:84
 msgid "SKU:"
 msgstr "Art.nr:"
 
-#: templates/pdf/Simple/invoice.php:71
-#: templates/pdf/Simple/packing-slip.php:58
+#: templates/pdf/Simple/invoice.php:98
+#: templates/pdf/Simple/packing-slip.php:85
 msgid "Weight:"
 msgstr "Vekt:"
 
-#: templates/pdf/Simple/invoice.php:105
-#: templates/pdf/Simple/packing-slip.php:73
+#: templates/pdf/Simple/invoice.php:112
+#: templates/pdf/Simple/packing-slip.php:99
 msgid "Customer Notes"
 msgstr "Kundenotat"
 
-#: woocommerce-pdf-invoices-packingslips.php:98
+#: templates/pdf/Simple/packing-slip.php:29
+msgid "Shipping Address:"
+msgstr "Leveringsadress:"
+
+#: templates/pdf/Simple/packing-slip.php:56
+msgid "Shipping Method:"
+msgstr "Leveringsmåte:"
+
+#: woocommerce-pdf-invoices-packingslips.php:123
 #, php-format
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
@@ -508,42 +634,53 @@ msgstr ""
 "WooCommerce PDF Invoices & Packing Slips krever %sWooCommerce%s for å bli "
 "installert og aktivert!"
 
-#: woocommerce-pdf-invoices-packingslips.php:206
-#: woocommerce-pdf-invoices-packingslips.php:269
+#: woocommerce-pdf-invoices-packingslips.php:330
+#: woocommerce-pdf-invoices-packingslips.php:391
 msgid "N/A"
 msgstr "N/A"
 
-#: woocommerce-pdf-invoices-packingslips.php:358
+#: woocommerce-pdf-invoices-packingslips.php:480
 msgid "Payment method"
 msgstr "Betalingsmåte"
 
-#: woocommerce-pdf-invoices-packingslips.php:369
+#: woocommerce-pdf-invoices-packingslips.php:491
 msgid "Shipping method"
 msgstr "Leveringsmåte"
 
-#: woocommerce-pdf-invoices-packingslips.php:484
+#: woocommerce-pdf-invoices-packingslips.php:644
 msgid "Subtotal"
 msgstr "Total"
 
-#: woocommerce-pdf-invoices-packingslips.php:506
+#: woocommerce-pdf-invoices-packingslips.php:666
 msgid "Shipping"
 msgstr "Frakt"
 
-#: woocommerce-pdf-invoices-packingslips.php:540
+#: woocommerce-pdf-invoices-packingslips.php:719
 msgid "Discount"
 msgstr "Avslag"
 
-#: woocommerce-pdf-invoices-packingslips.php:579
+#: woocommerce-pdf-invoices-packingslips.php:759
 msgid "VAT"
 msgstr "MVA"
 
-#: woocommerce-pdf-invoices-packingslips.php:616
+#: woocommerce-pdf-invoices-packingslips.php:760
+msgid "Tax rate"
+msgstr "MVA"
+
+#: woocommerce-pdf-invoices-packingslips.php:797
 msgid "Total ex. VAT"
 msgstr "Totalt eksl. MVA"
 
-#: woocommerce-pdf-invoices-packingslips.php:619
+#: woocommerce-pdf-invoices-packingslips.php:800
 msgid "Total"
 msgstr "Subtotal"
+
+#~ msgid ""
+#~ "Attach a <b>static file</b> (for example a terms & conditions document) "
+#~ "to the WooCommerce emails of your choice."
+#~ msgstr ""
+#~ "Legg ved en <b>statisk file</b> (f.eks. vilkår) til WooCommerce-epostene "
+#~ "du ønsker."
 
 #~ msgid "Number to display on invoice"
 #~ msgstr "Nummer som skal vise på faktura"
