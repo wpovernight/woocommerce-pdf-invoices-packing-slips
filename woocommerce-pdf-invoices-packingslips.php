@@ -327,7 +327,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$address = apply_filters( 'wpo_wcpdf_billing_address', $address );
 			} else {
 				// no address
-				$address = __('N/A', 'wpo_wcpdf');
+				$address = apply_filters( 'wpo_wcpdf_billing_address', __('N/A', 'wpo_wcpdf') );
 			}
 
 			return $address;
@@ -388,7 +388,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$address = apply_filters( 'wpo_wcpdf_shipping_address', $address );
 			} else {
 				// no address
-				$address = __('N/A', 'wpo_wcpdf');
+				$address = apply_filters( 'wpo_wcpdf_shipping_address', __('N/A', 'wpo_wcpdf') );
 			}
 
 			return $address;
