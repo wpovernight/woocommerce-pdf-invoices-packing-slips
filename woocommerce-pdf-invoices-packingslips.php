@@ -681,23 +681,28 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			if ( $tax == 'incl' ) {
 				switch ($type) {
 					case 'cart':
-						// Cart Discount - pre-tax discounts.
+						// Cart Discount - pre-tax discounts. (deprecated in WC2.3)
 						$discount_value = $this->export->order->get_cart_discount();
 						break;
 					case 'order':
-						// Order Discount - post-tax discounts.
+						// Order Discount - post-tax discounts. (deprecated in WC2.3)
 						$discount_value = $this->export->order->get_order_discount();
 						break;
 					case 'total':
-						// Total Discount - Cart & Order Discounts combined
-						// $discount_value = $this->export->order->get_total_discount();
-						$discount_value = 0;
-						$items = $this->export->order->get_items();;
-						if( sizeof( $items ) > 0 ) {
-							foreach( $items as $item ) {
-								$discount_value += ($item['line_subtotal'] + $item['line_subtotal_tax']) - ($item['line_total'] + $item['line_tax']);
+						// Total Discount
+						if ( version_compare( WOOCOMMERCE_VERSION, '2.3' ) >= 0 ) {
+							$discount_value = $this->export->order->get_total_discount( false ); // $ex_tax = false
+						} else {
+							// WC2.2 and older: recalculate to include tax
+							$discount_value = 0;
+							$items = $this->export->order->get_items();;
+							if( sizeof( $items ) > 0 ) {
+								foreach( $items as $item ) {
+									$discount_value += ($item['line_subtotal'] + $item['line_subtotal_tax']) - ($item['line_total'] + $item['line_tax']);
+								}
 							}
 						}
+
 						break;
 					default:
 						// Total Discount - Cart & Order Discounts combined
@@ -705,12 +710,17 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 						break;
 				}
 			} else { // calculate discount excluding tax
-				$discount_value = 0;
+				if ( version_compare( WOOCOMMERCE_VERSION, '2.3' ) >= 0 ) {
+					$discount_value = $this->export->order->get_total_discount( true ); // $ex_tax = true
+				} else {
+					// WC2.2 and older: recalculate to exclude tax
+					$discount_value = 0;
 
-				$items = $this->export->order->get_items();;
-				if( sizeof( $items ) > 0 ) {
-					foreach( $items as $item ) {
-						$discount_value += ($item['line_subtotal'] - $item['line_total']);
+					$items = $this->export->order->get_items();;
+					if( sizeof( $items ) > 0 ) {
+						foreach( $items as $item ) {
+							$discount_value += ($item['line_subtotal'] - $item['line_total']);
+						}
 					}
 				}
 			}
