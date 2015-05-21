@@ -308,6 +308,43 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function shop_address() {
 			echo $this->get_shop_address();
 		}
+
+		/**
+		 * Check if billing address and shipping address are equal
+		 */
+		public function ships_to_different_address() {
+			// always prefer parent address for refunds
+			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
+				// temporarily switch order to make all filters / order calls work correctly
+				$order_meta = get_post_meta( $parent_order_id );
+			} else {
+				$order_meta = get_post_meta( $this->export->order->id );
+			}
+
+			$address_comparison_fields = apply_filters( 'wpo_wcpdf_address_comparison_fields', array(
+				'first_name',
+				'last_name',
+				'company',
+				'address_1',
+				'address_2',
+				'city',
+				'state',
+				'postcode',
+				'country'
+			) );
+			
+			foreach ($address_comparison_fields as $address_field) {
+				$billing_field = isset( $order_meta['_billing_'.$address_field] ) ? $order_meta['_billing_'.$address_field] : '';
+				$shipping_field = isset( $order_meta['_shipping_'.$address_field] ) ? $order_meta['_shipping_'.$address_field] : '';
+				if ( $shipping_field != $billing_field ) {
+					// this address field is different -> ships to different address!
+					return true;
+				}
+			}
+
+			//if we got here, it means the addresses are equal -> doesn't ship to different address!
+			return false;
+		}
 		
 		/**
 		 * Return/Show billing address

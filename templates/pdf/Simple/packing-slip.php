@@ -36,7 +36,7 @@
 			<?php } ?>
 		</td>
 		<td class="address billing-address">
-			<?php if ( isset($wpo_wcpdf->settings->template_settings['packing_slip_billing_address']) && $wpo_wcpdf->get_billing_address() != $wpo_wcpdf->get_shipping_address()) { ?>
+			<?php if ( isset($wpo_wcpdf->settings->template_settings['packing_slip_billing_address']) && $wpo_wcpdf->ships_to_different_address()) { ?>
 			<h3><?php _e( 'Billing Address:', 'wpo_wcpdf' ); ?></h3>
 			<?php $wpo_wcpdf->billing_address(); ?>
 			<?php } ?>
