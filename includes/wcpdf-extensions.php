@@ -74,16 +74,16 @@ jQuery(document).ready(function() {
 		<?php } ?>
 
 		<?php
-		if (!class_exists('WooCommerce_PDF_IPS_Templates')) {
+		if (class_exists('WooCommerce_PDF_IPS_Templates')) {
 			$template_link = '<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/" target="_blank">wpovernight.com</a>';
 			$email_link = '<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
 			?>
 			<li>
-				<?php _e('More advanced templates', 'wpo_wcpdf')?>
+				<?php _e('Advanced, customizable templates', 'wpo_wcpdf')?>
 				<div class="more" style="display:none;">
 				<ul>
-					<li><?php _e( 'Stylish modern invoices & packing slips with product thumbnails!', 'wpo_wcpdf' ); ?></li>
-					<li><?php _e( 'More tax details on the invoices!', 'wpo_wcpdf' ); ?></li>
+					<li><?php _e( 'Completely customize the invoice contents (prices, taxes, thumbnails) to your needs with a drag & drop customizer', 'wpo_wcpdf' ); ?></li>
+					<li><?php _e( 'Two extra stylish premade templates (Modern & Business)', 'wpo_wcpdf' ); ?></li>
 					<li><?php printf( __("Check out the Premium PDF Invoice & Packing Slips templates at %s.", 'wpo_wcpdf'), $template_link );?></li>
 					<li><?php printf( __("For custom templates, contact us at %s.", 'wpo_wcpdf'), $email_link );?></li>
 				</ul>
