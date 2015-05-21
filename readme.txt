@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.1
-Stable tag: 1.5.12
+Stable tag: 1.5.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,6 +62,8 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 3. Activate the plugin from the Plugins menu within the WordPress admin.
 
 == Frequently Asked Questions ==
+
+Make sure to check out [WooCommerce PDF Invoices & Packing Slips documentation](http://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/) on our site - it covers most of the questions below (and more!) in more detail!
 
 = How do I create my own custom template? =
 
@@ -232,6 +234,13 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.13 =
+* Fix: Better address comparison to determine when to display alternate address
+* Tweak: Filter N/A addresses
+* Tweak: Use WooCommerce function for 2.3 discounts
+* Translations: Czech Updated (Thanks Ivo!)
+* Translations: French (minor fixes)
 
 = 1.5.12 =
 * Translations: added Danish, Updated POT & Italian
