@@ -1,54 +1,30 @@
-#woocommerce-delivery-notes-box .inside {
-	text-align: left;
-	position: relative;
-}
-#woocommerce-delivery-notes-box .inside ul {
-	overflow: hidden;
-	margin: 0px;
-}
-#woocommerce-delivery-notes-box .inside ul li {
-	float: left;
-	margin: 3px;
-}
-#woocommerce-delivery-notes-box .inside img.loading {
-	position: absolute;
-	right: 7px;
-	top: 0px;
-}
-#woocommerce-delivery-notes-box .inside img.loading,
-.type-shop_order .column-order_actions img.loading {
-	display: none;
-	vertical-align: middle;
-}
-.type-shop_order .column-order_actions img.loading {
-	float: left;
-	margin-top: 3px;
-}
-.type-shop_order .column-order_actions .print-preview-button span {
-	display:  none;
-}
-#company-logo-placeholder {
-	display: block;
-}
-#company-logo-placeholder.loading {
-	background-image: url("../../../../wp-admin/images/wpspin_light.gif");
-	background-repeat: no-repeat; 
-	height: 20px;
-}
-#company-logo-placeholder img {
-	cursor: pointer;
-}
-
-.type-shop_order .column-order_actions a.button.wpo_wcpdf {
-	padding: 0 2px;
-}
-
+/* Order list buttons: */
 .type-shop_order .column-order_actions a.button.wpo_wcpdf img {
 	width: 16px;
 }
 
 .widefat .column-pdf_invoice_number {
 	width: 110px;
+}
+
+/* Edit Order page: Numbers & dates input box */
+#wpo_wcpdf-data-input-box .handlediv,
+#wpo_wcpdf-data-input-box h3 {
+	display: none;
+}
+
+#wpo_wcpdf-data-input-box h4 {
+	font-size: 14px;
+	line-height: 1.4;
+	margin: 12px 0 0 0;
+}
+
+#wpo_wcpdf-data-input-box p {
+	margin: 0.5em 0;
+}
+
+#wpo_wcpdf-data-input-box .form-field input {
+	width: auto;
 }
 
 /* Settings page styles */

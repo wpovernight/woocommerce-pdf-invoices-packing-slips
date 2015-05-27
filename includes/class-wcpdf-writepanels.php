@@ -18,7 +18,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_number_column' ), 999 );
 			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_number_column_data' ), 2 );
-			add_action( 'add_meta_boxes_shop_order', array( $this, 'add_box' ) );
+			add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
 			add_action( 'admin_print_scripts', array( $this, 'add_scripts' ) );
 			add_action( 'admin_print_styles', array( $this, 'add_styles' ) );
@@ -41,23 +41,30 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			if( $this->is_order_edit_page() ) {
 				wp_enqueue_style( 'thickbox' );
 
+				wp_enqueue_style(
+					'wpo-wcpdf',
+					WooCommerce_PDF_Invoices::$plugin_url . 'css/style.css',
+					array(),
+					WooCommerce_PDF_Invoices::$version
+				);
+
 				if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
 					// WC 2.1 or newer (MP6) is used: bigger buttons
 					wp_enqueue_style(
-						'wpo-wcpdf',
-						WooCommerce_PDF_Invoices::$plugin_url . 'css/style-wc21.css',
+						'wpo-wcpdf-buttons',
+						WooCommerce_PDF_Invoices::$plugin_url . 'css/style-buttons.css',
 						array(),
 						WooCommerce_PDF_Invoices::$version
 					);
 				} else {
+					// legacy WC 2.0 styles
 					wp_enqueue_style(
-						'wpo-wcpdf',
-						WooCommerce_PDF_Invoices::$plugin_url . 'css/style.css',
+						'wpo-wcpdf-buttons',
+						WooCommerce_PDF_Invoices::$plugin_url . 'css/style-buttons-wc20.css',
 						array(),
 						WooCommerce_PDF_Invoices::$version
 					);
 				}
-
 			}
 		}
 		
@@ -199,14 +206,32 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		/**
 		 * Add the meta box on the single order page
 		 */
-		public function add_box() {
-			add_meta_box( 'wpo_wcpdf-box', __( 'Create PDF', 'wpo_wcpdf' ), array( $this, 'create_box_content' ), 'shop_order', 'side', 'default' );
+		public function add_meta_boxes() {
+			// create PDF buttons
+			add_meta_box(
+				'wpo_wcpdf-box',
+				__( 'Create PDF', 'wpo_wcpdf' ),
+				array( $this, 'sidebar_box_content' ),
+				'shop_order',
+				'side',
+				'default'
+			);
+
+			// Invoice number & date
+			add_meta_box(
+				'wpo_wcpdf-data-input-box',
+				__( 'PDF Invoice data', 'wpo_wcpdf' ),
+				array( $this, 'data_input_box_content' ),
+				'shop_order',
+				'normal',
+				'default'
+			);
 		}
 
 		/**
 		 * Create the meta box content on the single order page
 		 */
-		public function create_box_content() {
+		public function sidebar_box_content( $post ) {
 			global $post_id;
 
 			$meta_actions = array(
@@ -236,6 +261,36 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		}
 
 		/**
+		 * Add metabox for invoice number & date
+		 */
+		public function data_input_box_content ( $order ) {
+			$invoice_exists = get_post_meta( $order->ID, '_wcpdf_invoice_exists', true );
+			$invoice_number = get_post_meta($order->ID,'_wcpdf_invoice_number',true);
+			$invoice_date = get_post_meta($order->ID,'_wcpdf_invoice_date',true);
+			
+			?>
+			<h4><?php _e( 'Invoice', 'wpo_wcpdf' ) ?></h4>
+			<p class="form-field _wcpdf_invoice_number_field ">
+				<label for="_wcpdf_invoice_number"><?php _e( 'Invoice Number (unformatted!)', 'wpo_wcpdf' ); ?>:</label>
+				<?php if (!empty($invoice_exists)) : ?>
+				<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number ?>">
+				<?php else : ?>
+				<input type="text" class="short" style="" name="" id="_wcpdf_invoice_number" value="" disabled="disabled" >
+				<?php endif; ?>
+			</p>
+			<p class="form-field form-field-wide">
+				<label for="wcpdf_invoice_date"><?php _e( 'Invoice Date:', 'wpo_wcpdf' ); ?></label>
+				<?php if (!empty($invoice_exists)) : ?>
+				<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" value="<?php echo date_i18n( 'Y-m-d', strtotime( $invoice_date ) ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="text" class="hour" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" value="<?php echo date_i18n( 'H', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />:<input type="text" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" value="<?php echo date_i18n( 'i', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />
+				<?php else : ?>
+				<input type="text" class="date-picker-field" id="wcpdf_invoice_date" maxlength="10" disabled="disabled" >@<input type="text" class="hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" disabled="disabled" />:<input type="text" class="minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" disabled="disabled" />
+				<?php endif; ?>
+
+			</p>
+			<?php
+		}
+
+		/**
 		 * Add actions to menu
 		 */
 		public function bulk_actions() {
@@ -259,16 +314,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Add box to edit invoice number to order details page
 		 */
 		public function edit_invoice_number($order) {
-			$invoice_exists = get_post_meta( $order->id, '_wcpdf_invoice_exists', true );
-			if (!empty($invoice_exists)) {
-				woocommerce_wp_text_input( array( 'id' => '_wcpdf_invoice_number', 'label' => __( 'PDF Invoice Number (unformatted!)', 'wpo_wcpdf' ) ) );
-				$invoice_date = get_post_meta($order->id,'_wcpdf_invoice_date',true);
-				?>
-				<p class="form-field form-field-wide"><label for="wcpdf_invoice_date"><?php _e( 'Invoice Date:', 'wpo_wcpdf' ); ?></label>
-					<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" value="<?php echo date_i18n( 'Y-m-d', strtotime( $invoice_date ) ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="text" class="hour" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" value="<?php echo date_i18n( 'H', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />:<input type="text" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" value="<?php echo date_i18n( 'i', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />
-				</p>
-				<?php				
-			}
+
 		}
 
 		/**

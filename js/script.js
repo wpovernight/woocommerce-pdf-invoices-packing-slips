@@ -17,5 +17,7 @@ jQuery(document).ready(function($) {
 			window.open(url,'_blank');
 		}
 	});
+
+	$('#wpo_wcpdf-data-input-box').insertAfter('#woocommerce-order-data');
 });
 
