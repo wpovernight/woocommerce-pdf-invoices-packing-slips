@@ -263,11 +263,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		/**
 		 * Add metabox for invoice number & date
 		 */
-		public function data_input_box_content ( $order ) {
-			$invoice_exists = get_post_meta( $order->ID, '_wcpdf_invoice_exists', true );
-			$invoice_number = get_post_meta($order->ID,'_wcpdf_invoice_number',true);
-			$invoice_date = get_post_meta($order->ID,'_wcpdf_invoice_date',true);
+		public function data_input_box_content ( $post ) {
+			$invoice_exists = get_post_meta( $post->ID, '_wcpdf_invoice_exists', true );
+			$invoice_number = get_post_meta($post->ID,'_wcpdf_invoice_number',true);
+			$invoice_date = get_post_meta($post->ID,'_wcpdf_invoice_date',true);
 			
+			do_action( 'wpo_wcpdf_meta_box_start', $post->ID );
+
 			?>
 			<h4><?php _e( 'Invoice', 'wpo_wcpdf' ) ?></h4>
 			<p class="form-field _wcpdf_invoice_number_field ">
@@ -285,9 +287,10 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				<?php else : ?>
 				<input type="text" class="date-picker-field" id="wcpdf_invoice_date" maxlength="10" disabled="disabled" >@<input type="text" class="hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" disabled="disabled" />:<input type="text" class="minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" disabled="disabled" />
 				<?php endif; ?>
-
 			</p>
 			<?php
+
+			do_action( 'wpo_wcpdf_meta_box_end', $post->ID );
 		}
 
 		/**
