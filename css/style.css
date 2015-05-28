@@ -7,16 +7,10 @@
 	width: 110px;
 }
 
-/* Edit Order page: Numbers & dates input box */
-#wpo_wcpdf-data-input-box .handlediv,
-#wpo_wcpdf-data-input-box h3 {
-	display: none;
-}
-
 #wpo_wcpdf-data-input-box h4 {
 	font-size: 14px;
 	line-height: 1.4;
-	margin: 12px 0 0 0;
+	margin: 1.5em 0 0 0;
 }
 
 #wpo_wcpdf-data-input-box p {
