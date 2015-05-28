@@ -22,10 +22,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
 			add_action( 'admin_print_scripts', array( $this, 'add_scripts' ) );
 			add_action( 'admin_print_styles', array( $this, 'add_styles' ) );
-			add_action( 'admin_footer', array(&$this, 'bulk_actions') );
+			add_action( 'admin_footer', array( $this, 'bulk_actions' ) );
 
-			add_action( 'woocommerce_admin_order_data_after_order_details', array(&$this, 'edit_invoice_number') );
-			add_action( 'save_post', array( &$this,'save_invoice_number_date' ) );
+			add_action( 'save_post', array( $this,'save_invoice_number_date' ) );
 
 
 			$this->bulk_actions = array(
@@ -314,13 +313,6 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		}
 
 		/**
-		 * Add box to edit invoice number to order details page
-		 */
-		public function edit_invoice_number($order) {
-
-		}
-
-		/**
 		 * Save invoice number
 		 */
 		public function save_invoice_number_date($post_id) {
@@ -336,7 +328,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 					} else {
 						$invoice_date = strtotime( $_POST['wcpdf_invoice_date'] . ' ' . (int) $_POST['wcpdf_invoice_date_hour'] . ':' . (int) $_POST['wcpdf_invoice_date_minute'] . ':00' );
 						$invoice_date = date_i18n( 'Y-m-d H:i:s', $invoice_date );
-						update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );						
+						update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );
 					}
 				}
 
