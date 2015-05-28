@@ -237,6 +237,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 = 1.5.14 =
 * Tweak: Invoice number & date edit fields moved to separate box on order edit page
+* Translations: Updated POT & Dutch
 
 = 1.5.13 =
 * Fix: Better address comparison to determine when to display alternate address

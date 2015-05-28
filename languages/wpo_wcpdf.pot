@@ -1,7 +1,8 @@
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
-"POT-Creation-Date: 2015-04-29 08:58+0100\n"
+"POT-Creation-Date: 2015-05-28 16:09+0100\n"
 "PO-Revision-Date: 2015-04-29 08:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
@@ -9,7 +10,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.5\n"
+"X-Generator: Poedit 1.8\n"
 "X-Poedit-Basepath: ../\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -25,14 +26,12 @@ msgstr ""
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-# This is a filename (prefix). do not use spaces or special characters!
 #: includes/class-wcpdf-export.php:424
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] ""
 msgstr[1] ""
 
-# This is a filename (prefix). do not use spaces or special characters!
 #: includes/class-wcpdf-export.php:428
 msgid "packing-slip"
 msgid_plural "packing-slips"
@@ -40,7 +39,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/class-wcpdf-settings.php:38 includes/class-wcpdf-settings.php:39
-#: includes/class-wcpdf-writepanels.php:32
+#: includes/class-wcpdf-writepanels.php:31
 msgid "PDF Invoices"
 msgstr ""
 
@@ -197,7 +196,8 @@ msgstr ""
 msgid "Footer: terms & conditions, policies, etc."
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:463 templates/pdf/Simple/invoice.php:9
+#: includes/class-wcpdf-settings.php:463
+#: includes/class-wcpdf-writepanels.php:273 templates/pdf/Simple/invoice.php:9
 #: templates/pdf/Simple/invoice.php:21
 #: woocommerce-pdf-invoices-packingslips.php:220
 msgid "Invoice"
@@ -370,46 +370,50 @@ msgid ""
 "custom template"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:33
+#: includes/class-wcpdf-writepanels.php:32
 msgid "PDF Packing Slips"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:107
-#: includes/class-wcpdf-writepanels.php:216
+#: includes/class-wcpdf-writepanels.php:113
+#: includes/class-wcpdf-writepanels.php:240
 msgid "PDF Invoice"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:112
-#: includes/class-wcpdf-writepanels.php:221
+#: includes/class-wcpdf-writepanels.php:118
+#: includes/class-wcpdf-writepanels.php:245
 msgid "PDF Packing Slip"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:139
+#: includes/class-wcpdf-writepanels.php:145
 msgid "Invoice Number"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:192
+#: includes/class-wcpdf-writepanels.php:198
 msgid "Download invoice (PDF)"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:203
+#: includes/class-wcpdf-writepanels.php:212
 msgid "Create PDF"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:264
-msgid "PDF Invoice Number (unformatted!)"
+#: includes/class-wcpdf-writepanels.php:222
+msgid "PDF Invoice data"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:267
+#: includes/class-wcpdf-writepanels.php:275
+msgid "Invoice Number (unformatted!)"
+msgstr ""
+
+#: includes/class-wcpdf-writepanels.php:283
 #: templates/pdf/Simple/invoice.php:55
 msgid "Invoice Date:"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:268
+#: includes/class-wcpdf-writepanels.php:285
 msgid "h"
 msgstr ""
 
-#: includes/class-wcpdf-writepanels.php:268
+#: includes/class-wcpdf-writepanels.php:285
 msgid "m"
 msgstr ""
 
@@ -501,15 +505,17 @@ msgid "WooCommerce Automatic Order Printing"
 msgstr ""
 
 #: includes/wcpdf-extensions.php:82
-msgid "More advanced templates"
+msgid "Advanced, customizable templates"
 msgstr ""
 
 #: includes/wcpdf-extensions.php:85
-msgid "Stylish modern invoices & packing slips with product thumbnails!"
+msgid ""
+"Completely customize the invoice contents (prices, taxes, thumbnails) to "
+"your needs with a drag & drop customizer"
 msgstr ""
 
 #: includes/wcpdf-extensions.php:86
-msgid "More tax details on the invoices!"
+msgid "Two extra stylish premade templates (Modern & Business)"
 msgstr ""
 
 #: includes/wcpdf-extensions.php:87
@@ -603,43 +609,43 @@ msgid ""
 "installed & activated!"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:330
-#: woocommerce-pdf-invoices-packingslips.php:391
+#: woocommerce-pdf-invoices-packingslips.php:367
+#: woocommerce-pdf-invoices-packingslips.php:428
 msgid "N/A"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:480
+#: woocommerce-pdf-invoices-packingslips.php:517
 msgid "Payment method"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:491
+#: woocommerce-pdf-invoices-packingslips.php:528
 msgid "Shipping method"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:644
+#: woocommerce-pdf-invoices-packingslips.php:681
 msgid "Subtotal"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:666
+#: woocommerce-pdf-invoices-packingslips.php:703
 msgid "Shipping"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:719
+#: woocommerce-pdf-invoices-packingslips.php:766
 msgid "Discount"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:759
+#: woocommerce-pdf-invoices-packingslips.php:806
 msgid "VAT"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:760
+#: woocommerce-pdf-invoices-packingslips.php:807
 msgid "Tax rate"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:797
+#: woocommerce-pdf-invoices-packingslips.php:844
 msgid "Total ex. VAT"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:800
+#: woocommerce-pdf-invoices-packingslips.php:847
 msgid "Total"
 msgstr ""

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-29 08:58+0100\n"
-"PO-Revision-Date: 2015-04-29 08:58+0100\n"
+"POT-Creation-Date: 2015-05-28 16:05+0100\n"
+"PO-Revision-Date: 2015-05-28 16:08+0100\n"
 "Last-Translator: Ewout Fernhout <chocolade@extrapuur.nl>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nl_NL\n"
@@ -16,7 +16,7 @@ msgstr ""
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
 "X-Poedit-Basepath: ../\n"
 "X-Textdomain-Support: yes\n"
-"X-Generator: Poedit 1.7.5\n"
+"X-Generator: Poedit 1.8\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #: includes/class-wcpdf-export.php:338 includes/class-wcpdf-export.php:348
@@ -41,7 +41,7 @@ msgstr[0] "pakbon"
 msgstr[1] "pakbonnen"
 
 #: includes/class-wcpdf-settings.php:38 includes/class-wcpdf-settings.php:39
-#: includes/class-wcpdf-writepanels.php:32
+#: includes/class-wcpdf-writepanels.php:31
 msgid "PDF Invoices"
 msgstr "PDF facturen"
 
@@ -205,7 +205,8 @@ msgstr "Shop Adres"
 msgid "Footer: terms & conditions, policies, etc."
 msgstr "Voettekst: algemene voorwaarden, retourenbeleid, etc."
 
-#: includes/class-wcpdf-settings.php:463 templates/pdf/Simple/invoice.php:9
+#: includes/class-wcpdf-settings.php:463
+#: includes/class-wcpdf-writepanels.php:273 templates/pdf/Simple/invoice.php:9
 #: templates/pdf/Simple/invoice.php:21
 #: woocommerce-pdf-invoices-packingslips.php:220
 msgid "Invoice"
@@ -406,46 +407,50 @@ msgstr ""
 "<em>Modern (Premium)</em> template, maar kunnen ook gebruikt worden voor "
 "andere elementen in je eigen custom sjabloon."
 
-#: includes/class-wcpdf-writepanels.php:33
+#: includes/class-wcpdf-writepanels.php:32
 msgid "PDF Packing Slips"
 msgstr "PDF Pakbonnen"
 
-#: includes/class-wcpdf-writepanels.php:107
-#: includes/class-wcpdf-writepanels.php:216
+#: includes/class-wcpdf-writepanels.php:113
+#: includes/class-wcpdf-writepanels.php:240
 msgid "PDF Invoice"
 msgstr "PDF factuur"
 
-#: includes/class-wcpdf-writepanels.php:112
-#: includes/class-wcpdf-writepanels.php:221
+#: includes/class-wcpdf-writepanels.php:118
+#: includes/class-wcpdf-writepanels.php:245
 msgid "PDF Packing Slip"
 msgstr "PDF Pakbon"
 
-#: includes/class-wcpdf-writepanels.php:139
+#: includes/class-wcpdf-writepanels.php:145
 msgid "Invoice Number"
 msgstr "Factuurnummer"
 
-#: includes/class-wcpdf-writepanels.php:192
+#: includes/class-wcpdf-writepanels.php:198
 msgid "Download invoice (PDF)"
 msgstr "Download factuur (PDF)"
 
-#: includes/class-wcpdf-writepanels.php:203
+#: includes/class-wcpdf-writepanels.php:212
 msgid "Create PDF"
 msgstr "Maak PDF"
 
-#: includes/class-wcpdf-writepanels.php:264
-msgid "PDF Invoice Number (unformatted!)"
-msgstr "PDF Factuurnummer (zonder formatting!)"
+#: includes/class-wcpdf-writepanels.php:222
+msgid "PDF Invoice data"
+msgstr "PDF Factuur gegevens"
 
-#: includes/class-wcpdf-writepanels.php:267
+#: includes/class-wcpdf-writepanels.php:275
+msgid "Invoice Number (unformatted!)"
+msgstr "Factuurnummer (zonder formatting!)"
+
+#: includes/class-wcpdf-writepanels.php:283
 #: templates/pdf/Simple/invoice.php:55
 msgid "Invoice Date:"
 msgstr "Factuurdatum:"
 
-#: includes/class-wcpdf-writepanels.php:268
+#: includes/class-wcpdf-writepanels.php:285
 msgid "h"
 msgstr "u"
 
-#: includes/class-wcpdf-writepanels.php:268
+#: includes/class-wcpdf-writepanels.php:285
 msgid "m"
 msgstr "m"
 
@@ -554,16 +559,20 @@ msgid "WooCommerce Automatic Order Printing"
 msgstr "WooCommerce Automatic Order Printing"
 
 #: includes/wcpdf-extensions.php:82
-msgid "More advanced templates"
-msgstr "Geavanceerde templates"
+msgid "Advanced, customizable templates"
+msgstr "Geavanceerde, aanpasbare templates"
 
 #: includes/wcpdf-extensions.php:85
-msgid "Stylish modern invoices & packing slips with product thumbnails!"
-msgstr "Stijlvolle moderne facturen en pakbonnen met productafbeeldingen"
+msgid ""
+"Completely customize the invoice contents (prices, taxes, thumbnails) to "
+"your needs with a drag & drop customizer"
+msgstr ""
+"Past de inhoud van de factuur (prijzen, BTW, thumbnails) volledig naar je "
+"wensen aan met een eenvoudige drag & drop interface"
 
 #: includes/wcpdf-extensions.php:86
-msgid "More tax details on the invoices!"
-msgstr "Meer BTW details op de factuur!"
+msgid "Two extra stylish premade templates (Modern & Business)"
+msgstr "Twee extra stijlvolle voorgeconfigureerde templates (Moden & Business)"
 
 #: includes/wcpdf-extensions.php:87
 #, php-format
@@ -658,46 +667,58 @@ msgstr ""
 "WooCommerce PDF Invoices & Packing Slips vereist dat %sWooCommerce%s is "
 "geïnstalleerd & geactiveerd!"
 
-#: woocommerce-pdf-invoices-packingslips.php:330
-#: woocommerce-pdf-invoices-packingslips.php:391
+#: woocommerce-pdf-invoices-packingslips.php:367
+#: woocommerce-pdf-invoices-packingslips.php:428
 msgid "N/A"
 msgstr "N/A"
 
-#: woocommerce-pdf-invoices-packingslips.php:480
+#: woocommerce-pdf-invoices-packingslips.php:517
 msgid "Payment method"
 msgstr "Betaalmethode"
 
-#: woocommerce-pdf-invoices-packingslips.php:491
+#: woocommerce-pdf-invoices-packingslips.php:528
 msgid "Shipping method"
 msgstr "Verzendmethode"
 
-#: woocommerce-pdf-invoices-packingslips.php:644
+#: woocommerce-pdf-invoices-packingslips.php:681
 msgid "Subtotal"
 msgstr "Subtotaal"
 
-#: woocommerce-pdf-invoices-packingslips.php:666
+#: woocommerce-pdf-invoices-packingslips.php:703
 msgid "Shipping"
 msgstr "Verzendkosten"
 
-#: woocommerce-pdf-invoices-packingslips.php:719
+#: woocommerce-pdf-invoices-packingslips.php:766
 msgid "Discount"
 msgstr "Korting"
 
-#: woocommerce-pdf-invoices-packingslips.php:759
+#: woocommerce-pdf-invoices-packingslips.php:806
 msgid "VAT"
 msgstr "BTW"
 
-#: woocommerce-pdf-invoices-packingslips.php:760
+#: woocommerce-pdf-invoices-packingslips.php:807
 msgid "Tax rate"
 msgstr "BTW tarief"
 
-#: woocommerce-pdf-invoices-packingslips.php:797
+#: woocommerce-pdf-invoices-packingslips.php:844
 msgid "Total ex. VAT"
 msgstr "Totaal excl. BTW"
 
-#: woocommerce-pdf-invoices-packingslips.php:800
+#: woocommerce-pdf-invoices-packingslips.php:847
 msgid "Total"
 msgstr "Totaal"
+
+#~ msgid "PDF Invoice Number (unformatted!)"
+#~ msgstr "PDF Factuurnummer (zonder formatting!)"
+
+#~ msgid "More advanced templates"
+#~ msgstr "Geavanceerde templates"
+
+#~ msgid "Stylish modern invoices & packing slips with product thumbnails!"
+#~ msgstr "Stijlvolle moderne facturen en pakbonnen met productafbeeldingen"
+
+#~ msgid "More tax details on the invoices!"
+#~ msgstr "Meer BTW details op de factuur!"
 
 #~ msgid "Shipping address on invoice"
 #~ msgstr "Verzendadres op factuur"
