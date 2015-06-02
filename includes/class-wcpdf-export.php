@@ -633,8 +633,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				$formats[$key] = $value;
 			}
 
-			// Padding - minimum of 3 for safety
-			if ( ctype_digit( (string)$formats['padding'] ) && $formats['padding'] > 3 ) {
+			// Padding
+			if ( ctype_digit( (string)$formats['padding'] ) ) {
 				$invoice_number = sprintf('%0'.$formats['padding'].'d', $invoice_number);
 			}
 
