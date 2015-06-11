@@ -2,14 +2,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2015-04-29 09:09+0100\n"
-"PO-Revision-Date: 2015-04-29 09:11+0100\n"
+"PO-Revision-Date: 2015-06-11 15:24+0100\n"
 "Last-Translator: Eirik Opsanger <eirik.opsanger@gmail.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.5\n"
+"X-Generator: Poedit 1.8.1\n"
 "X-Poedit-Basepath: ../\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -576,7 +576,7 @@ msgstr "Ordredato:"
 
 #: templates/pdf/Simple/invoice.php:68
 msgid "Payment Method:"
-msgstr "Betlingsmåte:"
+msgstr "Betalingsmåte:"
 
 #: templates/pdf/Simple/invoice.php:82
 #: templates/pdf/Simple/packing-slip.php:70
