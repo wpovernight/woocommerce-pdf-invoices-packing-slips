@@ -1,0 +1,701 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
+"POT-Creation-Date: 2015-06-17 13:27+0200\n"
+"PO-Revision-Date: 2015-06-18 10:22+0200\n"
+"Last-Translator: Tanel Jüris <tanel.juris@marketingsharks.ee>\n"
+"Language-Team: WP Overnight <support@wpovernight.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.1\n"
+"X-Poedit-Basepath: ../\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
+"Language: et\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/class-wcpdf-export.php:338 includes/class-wcpdf-export.php:348
+#: includes/class-wcpdf-export.php:359 includes/class-wcpdf-export.php:367
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Sul ei ole selle lehe vaatamiseks piisavalt õigusi."
+
+#: includes/class-wcpdf-export.php:343
+msgid "Some of the export parameters are missing."
+msgstr "Mõned eksportimise parameetrid on puudu."
+
+#: includes/class-wcpdf-export.php:424
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "arve"
+msgstr[1] "arved"
+
+#: includes/class-wcpdf-export.php:428
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "saateleht"
+msgstr[1] "saatelehed"
+
+#: includes/class-wcpdf-settings.php:38 includes/class-wcpdf-settings.php:39
+#: includes/class-wcpdf-writepanels.php:31
+msgid "PDF Invoices"
+msgstr "PDF Arved"
+
+#: includes/class-wcpdf-settings.php:80
+msgid "Settings"
+msgstr "Sätted"
+
+#: includes/class-wcpdf-settings.php:102
+msgid "General"
+msgstr "Üldine"
+
+#: includes/class-wcpdf-settings.php:103
+msgid "Template"
+msgstr "Mall"
+
+#: includes/class-wcpdf-settings.php:108
+msgid "Status"
+msgstr "Staatus"
+
+#: includes/class-wcpdf-settings.php:120
+msgid "WooCommerce PDF Invoices"
+msgstr "WooCommerce PDF Arved"
+
+#: includes/class-wcpdf-settings.php:189
+msgid "General settings"
+msgstr "Üldised sätted"
+
+#: includes/class-wcpdf-settings.php:196
+msgid "How do you want to view the PDF?"
+msgstr "Kuidas sa soovid PDF-i vaadata?"
+
+#: includes/class-wcpdf-settings.php:204
+msgid "Download the PDF"
+msgstr "Lae PDF alla"
+
+#: includes/class-wcpdf-settings.php:205
+msgid "Open the PDF in a new browser tab/window"
+msgstr "Ava PDF uues veebilehitseja sakis/aknas"
+
+#: includes/class-wcpdf-settings.php:214
+msgid "Admin New Order email"
+msgstr "Halduri \"uus tellimus\" e-kiri"
+
+#: includes/class-wcpdf-settings.php:215
+msgid "Customer Processing Order email"
+msgstr "Kliendi \"tellimus töötluses\" e-kiri"
+
+#: includes/class-wcpdf-settings.php:216
+msgid "Customer Completed Order email"
+msgstr "Kliendi \"tellimus täidetud\" e-kiri"
+
+#: includes/class-wcpdf-settings.php:217
+msgid "Customer Invoice email"
+msgstr "Kliendi \"arve\" e-kiri"
+
+#: includes/class-wcpdf-settings.php:222
+msgid "Attach invoice to:"
+msgstr "Lisa arve järgnevatele:"
+
+#: includes/class-wcpdf-settings.php:230
+#, php-format
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+"Paistab, et ajutine kaust (<code>%s</code) ei ole kirjutatav, kontrolli "
+"selle kausta õiguseid! Ilma kirjutusõigusteta ei saa see plugin arveid saata."
+
+#: includes/class-wcpdf-settings.php:236
+msgid "Disable for free products"
+msgstr "Lülita tasuta toodete puhul välja"
+
+#: includes/class-wcpdf-settings.php:243
+msgid ""
+"Disable automatic creation/attachment of invoices when only free products "
+"are ordered"
+msgstr ""
+"Ära loo ega manusta arveid automaatselt, kui tellimuses on kõik tooted "
+"tasuta."
+
+#: includes/class-wcpdf-settings.php:250
+msgid "Interface"
+msgstr "Liides"
+
+#: includes/class-wcpdf-settings.php:298
+msgid "Allow My Account invoice download"
+msgstr "Luba \"minu konto\" lehel arveid alla laadida"
+
+#: includes/class-wcpdf-settings.php:306
+msgid "Only when an invoice is already created/emailed"
+msgstr "Ainult siis, kui arve on juba loodud/saadetud"
+
+#: includes/class-wcpdf-settings.php:307
+msgid "Only for specific order statuses (define below)"
+msgstr "Ainult kindlate tellimuse staatuste korral (määra allpool)"
+
+#: includes/class-wcpdf-settings.php:308
+msgid "Always"
+msgstr "Alati"
+
+#: includes/class-wcpdf-settings.php:323
+msgid "Enable invoice number column in the orders list"
+msgstr "Näita tellimuste nimekirjas arve numbri tulpa"
+
+#: includes/class-wcpdf-settings.php:361
+msgid "PDF Template settings"
+msgstr "PDF malli sätted"
+
+#: includes/class-wcpdf-settings.php:373
+msgid "Choose a template"
+msgstr "Vali mall"
+
+#: includes/class-wcpdf-settings.php:381
+#, php-format
+msgid ""
+"Want to use your own template? Copy all the files from <code>%s</code> to "
+"your (child) theme in <code>%s</code> to customize them"
+msgstr ""
+"Tahad kasutada enda malli? Kopeeri kõik failid kaustast <code>%s</code> oma "
+"(laps)teema kausta <code>%s</code> kohanduste tegemiseks."
+
+#: includes/class-wcpdf-settings.php:387
+msgid "Paper size"
+msgstr "Paberi suurus"
+
+#: includes/class-wcpdf-settings.php:395
+msgid "A4"
+msgstr "A4"
+
+#: includes/class-wcpdf-settings.php:396
+msgid "Letter"
+msgstr "Ümbrik"
+
+#: includes/class-wcpdf-settings.php:403
+msgid "Shop header/logo"
+msgstr "Poe päis/logo"
+
+#: includes/class-wcpdf-settings.php:410
+msgid "Select or upload your invoice header/logo"
+msgstr "Vali või lae üles oma arve päis/logo"
+
+#: includes/class-wcpdf-settings.php:411
+msgid "Set image"
+msgstr "Määra pilt"
+
+#: includes/class-wcpdf-settings.php:412
+msgid "Remove image"
+msgstr "Eemalda pilt"
+
+#: includes/class-wcpdf-settings.php:419
+msgid "Shop Name"
+msgstr "Poe nimi"
+
+#: includes/class-wcpdf-settings.php:432
+msgid "Shop Address"
+msgstr "Poe aadress"
+
+#: includes/class-wcpdf-settings.php:447
+msgid "Footer: terms & conditions, policies, etc."
+msgstr "Jalus: tingimused, poliisid jne"
+
+#: includes/class-wcpdf-settings.php:463
+#: includes/class-wcpdf-writepanels.php:273 templates/pdf/Simple/invoice.php:9
+#: templates/pdf/Simple/invoice.php:21
+#: woocommerce-pdf-invoices-packingslips.php:220
+msgid "Invoice"
+msgstr "Arve"
+
+#: includes/class-wcpdf-settings.php:470
+msgid "Display shipping address"
+msgstr "Näita tarne aadressi"
+
+#: includes/class-wcpdf-settings.php:477
+msgid ""
+"Display shipping address on invoice (in addition to the default billing "
+"address) if different from billing address"
+msgstr ""
+"Näita arvel tarneaadressi (lisaks vaikimisi näidatavale arveaadressile), kui "
+"see erineb arve aadressist."
+
+#: includes/class-wcpdf-settings.php:483 includes/class-wcpdf-settings.php:598
+msgid "Display email address"
+msgstr "Näita e-posti aadressi"
+
+#: includes/class-wcpdf-settings.php:495 includes/class-wcpdf-settings.php:610
+msgid "Display phone number"
+msgstr "Näita telefoninumbrit"
+
+#: includes/class-wcpdf-settings.php:507
+msgid "Display invoice date"
+msgstr "Näita arve kuupäeva"
+
+#: includes/class-wcpdf-settings.php:520
+msgid "Display built-in sequential invoice number"
+msgstr "Näita sisseehitatud järjestikust arvenumbrit"
+
+#: includes/class-wcpdf-settings.php:533
+msgid "Next invoice number (without prefix/suffix etc.)"
+msgstr "Järgmine arvenumber (ilma ees-/järelliiteta vms)"
+
+#: includes/class-wcpdf-settings.php:541
+msgid ""
+"This is the number that will be used on the next invoice that is created. By "
+"default, numbering starts from the WooCommerce Order Number of the first "
+"invoice that is created and increases for every new invoice. Note that if "
+"you override this and set it lower than the highest (PDF) invoice number, "
+"this could create double invoice numbers!"
+msgstr ""
+"Seda numbrit kasutatakse järgmise arve loomisel. Vaikimisi alustatakse "
+"esimese loodava arve WooCommerce tellimuse numbrist ning suurendatakse seda "
+"iga järgneva arve jaoks. Pane tähele, et kui seda käsitsi väiksemaks muudad, "
+"siis võib esineda korduvaid arvenumbreid!"
+
+#: includes/class-wcpdf-settings.php:547
+msgid "Invoice number format"
+msgstr "Arve numbriformaat"
+
+#: includes/class-wcpdf-settings.php:556
+msgid "Prefix"
+msgstr "Eesliide"
+
+#: includes/class-wcpdf-settings.php:558
+msgid ""
+"to use the order year and/or month, use [order_year] or [order_month] "
+"respectively"
+msgstr ""
+"tellimuse aasta ja/või kuu kasutamiseks on vastavalt [order_year] ning "
+"[order_month]"
+
+#: includes/class-wcpdf-settings.php:561
+msgid "Suffix"
+msgstr "Järelliide"
+
+#: includes/class-wcpdf-settings.php:566
+msgid "Padding"
+msgstr "Polster"
+
+#: includes/class-wcpdf-settings.php:568
+msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
+msgstr ""
+"sisesta siia numbrikohtade arv - näiteks \"6\", et näidata 42 kujul 000042"
+
+#: includes/class-wcpdf-settings.php:571
+msgid ""
+"note: if you have already created a custom invoice number format with a "
+"filter, the above settings will be ignored"
+msgstr ""
+"märkus: kui oled juba loonud enda arvenumbri formaadi filtri abil, "
+"ignoreeritakse ülalolevaid sätteid"
+
+#: includes/class-wcpdf-settings.php:578
+#: templates/pdf/Simple/packing-slip.php:9
+#: templates/pdf/Simple/packing-slip.php:21
+#: woocommerce-pdf-invoices-packingslips.php:223
+msgid "Packing Slip"
+msgstr "Saateleht"
+
+#: includes/class-wcpdf-settings.php:585
+msgid "Display billing address"
+msgstr "Näita arveaadressi"
+
+#: includes/class-wcpdf-settings.php:592
+msgid ""
+"Display billing address on packing slip (in addition to the default shipping "
+"address) if different from shipping address"
+msgstr ""
+"Näita arveaadressi saatelehel (lisaks vaikimisi tarneaadressile), kui see "
+"erineb tarneaadressist"
+
+#: includes/class-wcpdf-settings.php:623
+msgid "Extra template fields"
+msgstr "Malli lisaväljad"
+
+#: includes/class-wcpdf-settings.php:630
+msgid "Extra field 1"
+msgstr "Lisaväli 1"
+
+#: includes/class-wcpdf-settings.php:639
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr "<i>Modern (Preemium)</i> mallis on see jaluse tulp 1"
+
+#: includes/class-wcpdf-settings.php:645
+msgid "Extra field 2"
+msgstr "Lisaväli 2"
+
+#: includes/class-wcpdf-settings.php:654
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr "<i>Modern (Preemium)</i> mallis on see jaluse tulp 2"
+
+#: includes/class-wcpdf-settings.php:660
+msgid "Extra field 3"
+msgstr "Lisaväli 3"
+
+#: includes/class-wcpdf-settings.php:669
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr "<i>Modern (Preemium)</i> mallis on see jaluse tulp 3"
+
+#: includes/class-wcpdf-settings.php:711
+msgid "Debug settings"
+msgstr "Veaotsingu sätted"
+
+#: includes/class-wcpdf-settings.php:718
+msgid "Enable debug output"
+msgstr "Lülita sisse veaotsingu väljund"
+
+#: includes/class-wcpdf-settings.php:725
+msgid ""
+"Enable this option to output plugin errors if you're getting a blank page or "
+"other PDF generation issues"
+msgstr ""
+"Lülita see valik sisse, et väljastada plugina veateateid, kui näed tühja "
+"lehte või PDF genereerimisel esineb mõni muu probleem"
+
+#: includes/class-wcpdf-settings.php:731
+msgid "Output to HTML"
+msgstr "Väljasta HTML kujul"
+
+#: includes/class-wcpdf-settings.php:738
+msgid ""
+"Send the template output as HTML to the browser instead of creating a PDF."
+msgstr ""
+"PDF faili loomise asemel saada malli väljund HTML kujul veebilehitsejasse."
+
+#: includes/class-wcpdf-settings.php:744
+msgid "Use old tmp folder"
+msgstr "Kasuta vana ajutist kausta"
+
+#: includes/class-wcpdf-settings.php:751
+msgid ""
+"Before version 1.5 of PDF Invoices, temporary files were stored in the "
+"plugin folder. This setting is only intended for backwards compatibility, "
+"not recommended on new installs!"
+msgstr ""
+"Enne PDF arvete versiooni 1.5 hoiti ajutisi faile pluginate kaustas. See "
+"säte on mõeldud tagasiulatuva ühilduvuse jaoks, uutele paigaldustele "
+"mittesoovitatav!"
+
+#: includes/class-wcpdf-settings.php:1091
+msgid "Image resolution"
+msgstr "Pildi resolutsioon"
+
+#: includes/class-wcpdf-settings.php:1207
+msgid ""
+"<b>Warning!</b> The settings below are meant for debugging/development only. "
+"Do not use them on a live website!"
+msgstr ""
+"<b>Hoiatus!</b> Allolevad sätted on mõeldud ainult veaotsinguks/arenduseks. "
+"Ära kasuta neid rakenduskeskkonnas!"
+
+#: includes/class-wcpdf-settings.php:1216
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
+msgstr ""
+"Neid kasutatakse <em>Modern (Preemium)</em> mallis (valikuliste) "
+"jalusetulpade jaoks, kuid on kasutatavad ka muude elementide jaoks sinu "
+"kohandatud mallis."
+
+#: includes/class-wcpdf-writepanels.php:32
+msgid "PDF Packing Slips"
+msgstr "PDF saatelehed"
+
+#: includes/class-wcpdf-writepanels.php:113
+#: includes/class-wcpdf-writepanels.php:240
+msgid "PDF Invoice"
+msgstr "PDF arve"
+
+#: includes/class-wcpdf-writepanels.php:118
+#: includes/class-wcpdf-writepanels.php:245
+msgid "PDF Packing Slip"
+msgstr "PDF saateleht"
+
+#: includes/class-wcpdf-writepanels.php:145
+msgid "Invoice Number"
+msgstr "Arve number"
+
+#: includes/class-wcpdf-writepanels.php:198
+msgid "Download invoice (PDF)"
+msgstr "Lae arve alla (PDF)"
+
+#: includes/class-wcpdf-writepanels.php:212
+msgid "Create PDF"
+msgstr "Loo PDF"
+
+#: includes/class-wcpdf-writepanels.php:222
+msgid "PDF Invoice data"
+msgstr "PDF arve andmed"
+
+#: includes/class-wcpdf-writepanels.php:275
+msgid "Invoice Number (unformatted!)"
+msgstr "Arve number (vorminguta)"
+
+#: includes/class-wcpdf-writepanels.php:283
+#: templates/pdf/Simple/invoice.php:55
+msgid "Invoice Date:"
+msgstr "Arve kuupäev:"
+
+#: includes/class-wcpdf-writepanels.php:285
+msgid "h"
+msgstr "h"
+
+#: includes/class-wcpdf-writepanels.php:285
+msgid "m"
+msgstr "m"
+
+#: includes/wcpdf-extensions.php:15
+msgid "Check out these premium extensions!"
+msgstr "Tutvu preemium laiendustega!"
+
+#: includes/wcpdf-extensions.php:16
+msgid "click items to read more"
+msgstr "lisainfo lugemiseks vajuta elemendile"
+
+#: includes/wcpdf-extensions.php:23
+msgid "Go Pro: Proforma invoices, credit notes (=refunds) & more!"
+msgstr ""
+"Hakka profiks: proforma arved, krediidi märkused (=tagasimaksed) & muud!"
+
+#: includes/wcpdf-extensions.php:25
+msgid ""
+"Supercharge WooCommerce PDF Invoices & Packing Slips with the following "
+"features:"
+msgstr ""
+"Lae WooCommerce PDF Invoices & Packing Slips üle järgnevate omadustega:"
+
+#: includes/wcpdf-extensions.php:27
+msgid "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
+msgstr "Emaili/prindi/lae alla <b>PDF Credit Notes & Proforma Invoices</b>"
+
+#: includes/wcpdf-extensions.php:28
+msgid ""
+"Send out a separate <b>notification email</b> with (or without) PDF invoices/"
+"packing slips, for example to a drop-shipper or a supplier."
+msgstr ""
+"Saada eraldi <b>teavituse e-kiri</b> koos (või ilma) PDF arve/saatelehega, "
+"näiteks maaletoojale või varustajale."
+
+#: includes/wcpdf-extensions.php:29
+msgid ""
+"Attach <b>up to 3 static files</b> (for example a terms & conditions "
+"document) to the WooCommerce emails of your choice."
+msgstr ""
+"Manusta <b>kuni 3 staatilist faili</b> (näiteks müügitingimuste document) "
+"enda valitud WooCommerce e-kirjade külge."
+
+#: includes/wcpdf-extensions.php:30
+msgid ""
+"Use <b>separate numbering systems</b> and/or format for proforma invoices "
+"and credit notes or utilize the main invoice numbering system"
+msgstr ""
+"Kasuta <b>eraldi numbreid</b> ja/või formaati proforma arvete ning krediidi "
+"märkuste jaoks või kasuta põhilist arvete numbrisüsteemi."
+
+#: includes/wcpdf-extensions.php:31
+msgid ""
+"<b>Customize</b> the <b>shipping & billing address</b> format to include "
+"additional custom fields, font sizes etc. without the need to create a "
+"custom template."
+msgstr ""
+"<b>Kohanda tarne & arve aadresside</b> formaati lisaväljade, fondisuuruste "
+"ja muu taolisega ilma kohandatud malli loomise vajaduseta."
+
+#: includes/wcpdf-extensions.php:32
+msgid "Use the plugin in multilingual <b>WPML</b> setups"
+msgstr "Kasuta pluginat mitmekeelses <b>WPML</b> keskkonnas"
+
+#: includes/wcpdf-extensions.php:34
+msgid "Get WooCommerce PDF Invoices & Packing Slips Professional!"
+msgstr "Hangi WooCommerce PDF Invoices & Packing Slips Professional!"
+
+#: includes/wcpdf-extensions.php:42
+msgid "Upload all invoices automatically to your dropbox"
+msgstr "Lae kõik arved automaatselt oma dropboxi"
+
+#: includes/wcpdf-extensions.php:48
+msgid ""
+"This extension conveniently uploads all the invoices (and other pdf "
+"documents from the professional extension) that are emailed to your "
+"customers to Dropbox. The best way to keep your invoice administration up to "
+"date!"
+msgstr ""
+"See laiendus laeb kõik kliendile saadetavad arved (ja muud pdf dokumendid "
+"professionaali laiendusest) Dropboxi. Parim viis hoida arvete haldamine "
+"ajakohane!"
+
+#: includes/wcpdf-extensions.php:49
+msgid "Get WooCommerce PDF Invoices & Packing Slips to dropbox!"
+msgstr "Vii WooCommerce PDF Invoices & Packing Slips dropboxi!"
+
+#: includes/wcpdf-extensions.php:61
+msgid ""
+"Automatically send new orders or packing slips to your printer, as soon as "
+"the customer orders!"
+msgstr ""
+"Saada uued tellimused või saatelehed automaatselt printerisse, niipea kui "
+"klient tellib!"
+
+#: includes/wcpdf-extensions.php:67
+msgid ""
+"Check out the WooCommerce Automatic Order Printing extension from our "
+"partners at Simba Hosting"
+msgstr ""
+"Tutvu laiendusega WooCommerce Automatic Order Printing meie partnerfirmalt "
+"Simba Hosting"
+
+#: includes/wcpdf-extensions.php:68
+msgid "WooCommerce Automatic Order Printing"
+msgstr "automaatne WooCommerce tellimuste printimine"
+
+#: includes/wcpdf-extensions.php:82
+msgid "Advanced, customizable templates"
+msgstr "Keerukad, kohandatavad mallid"
+
+#: includes/wcpdf-extensions.php:85
+msgid ""
+"Completely customize the invoice contents (prices, taxes, thumbnails) to "
+"your needs with a drag & drop customizer"
+msgstr ""
+"Kohanda kogu arve sisu (hinnad, maksud, pisipildid) vastavalt oma "
+"vajadustele lohistamismeetodil."
+
+#: includes/wcpdf-extensions.php:86
+msgid "Two extra stylish premade templates (Modern & Business)"
+msgstr "Kaks eriti stiilset valmismalli (Modern & Business)"
+
+#: includes/wcpdf-extensions.php:87
+#, php-format
+msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
+msgstr "Tutvu PDF Invoice & Packing Slips preemium mallidega lehel %s."
+
+#: includes/wcpdf-extensions.php:88
+#, php-format
+msgid "For custom templates, contact us at %s."
+msgstr "Kohandatud mallide jaoks võta meiega ühendust: %s."
+
+#: templates/pdf/Simple/invoice.php:29
+#: templates/pdf/Simple/packing-slip.php:40
+msgid "Billing Address:"
+msgstr "Arve aadress:"
+
+#: templates/pdf/Simple/invoice.php:40
+msgid "Ship To:"
+msgstr "Vastuvõtja:"
+
+#: templates/pdf/Simple/invoice.php:49
+msgid "Invoice Number:"
+msgstr "Arve number:"
+
+#: templates/pdf/Simple/invoice.php:60
+#: templates/pdf/Simple/packing-slip.php:48
+msgid "Order Number:"
+msgstr "Tellimuse number:"
+
+#: templates/pdf/Simple/invoice.php:64
+#: templates/pdf/Simple/packing-slip.php:52
+msgid "Order Date:"
+msgstr "Tellimuse kuupäev"
+
+#: templates/pdf/Simple/invoice.php:68
+msgid "Payment Method:"
+msgstr "Makseviis:"
+
+#: templates/pdf/Simple/invoice.php:82
+#: templates/pdf/Simple/packing-slip.php:70
+msgid "Product"
+msgstr "Toode"
+
+#: templates/pdf/Simple/invoice.php:83
+#: templates/pdf/Simple/packing-slip.php:71
+msgid "Quantity"
+msgstr "Kogus"
+
+#: templates/pdf/Simple/invoice.php:84
+msgid "Price"
+msgstr "Hind"
+
+#: templates/pdf/Simple/invoice.php:91
+#: templates/pdf/Simple/packing-slip.php:78
+msgid "Description"
+msgstr "Kirjeldus"
+
+#: templates/pdf/Simple/invoice.php:96
+#: templates/pdf/Simple/packing-slip.php:83
+msgid "SKU"
+msgstr "Tootekood"
+
+#: templates/pdf/Simple/invoice.php:97
+#: templates/pdf/Simple/packing-slip.php:84
+msgid "SKU:"
+msgstr "Tootekood:"
+
+#: templates/pdf/Simple/invoice.php:98
+#: templates/pdf/Simple/packing-slip.php:85
+msgid "Weight:"
+msgstr "Kaal:"
+
+#: templates/pdf/Simple/invoice.php:112
+#: templates/pdf/Simple/packing-slip.php:99
+msgid "Customer Notes"
+msgstr "Kliendi märkused"
+
+#: templates/pdf/Simple/packing-slip.php:29
+msgid "Shipping Address:"
+msgstr "Tarne aadress:"
+
+#: templates/pdf/Simple/packing-slip.php:56
+msgid "Shipping Method:"
+msgstr "Tarneviis:"
+
+#: woocommerce-pdf-invoices-packingslips.php:123
+#, php-format
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
+"installed & activated!"
+msgstr ""
+"WooCommerce PDF Invoices & Packing Slips vajab, et %sWooCommerce%s oleks "
+"paigaldatud ja aktiveeritud!"
+
+#: woocommerce-pdf-invoices-packingslips.php:367
+#: woocommerce-pdf-invoices-packingslips.php:428
+msgid "N/A"
+msgstr "N/A"
+
+#: woocommerce-pdf-invoices-packingslips.php:517
+msgid "Payment method"
+msgstr "Makseviis"
+
+#: woocommerce-pdf-invoices-packingslips.php:528
+msgid "Shipping method"
+msgstr "Tarneviis"
+
+#: woocommerce-pdf-invoices-packingslips.php:681
+msgid "Subtotal"
+msgstr "Vahesumma"
+
+#: woocommerce-pdf-invoices-packingslips.php:703
+msgid "Shipping"
+msgstr "Tarne"
+
+#: woocommerce-pdf-invoices-packingslips.php:766
+msgid "Discount"
+msgstr "Allahindlus"
+
+#: woocommerce-pdf-invoices-packingslips.php:806
+msgid "VAT"
+msgstr "KM"
+
+#: woocommerce-pdf-invoices-packingslips.php:807
+msgid "Tax rate"
+msgstr "Maksumäär"
+
+#: woocommerce-pdf-invoices-packingslips.php:844
+msgid "Total ex. VAT"
+msgstr "Summa ilma KM-ta"
+
+#: woocommerce-pdf-invoices-packingslips.php:847
+msgid "Total"
+msgstr "Kogusumma"
