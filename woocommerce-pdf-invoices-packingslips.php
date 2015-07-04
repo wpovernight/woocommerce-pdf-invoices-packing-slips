@@ -310,6 +310,39 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		}
 
 		/**
+		 * Return/Show shop/company telephone number if provided
+		 */
+		public function get_shop_telephone() {
+			if (isset($this->settings->template_settings['shop_telephone']))
+				return apply_filters( 'wpo_wcpdf_shop_telephone', wpautop( wptexturize( $this->settings->template_settings['shop_telephone'] ) ) );
+		}
+		public function shop_telephone() {
+			echo $this->get_shop_telephone();
+		}
+
+		/**
+		 * Return/Show shop/company fax number if provided
+		 */
+		public function get_shop_fax() {
+			if (isset($this->settings->template_settings['shop_fax']))
+				return apply_filters( 'wpo_wcpdf_shop_fax', wpautop( wptexturize( $this->settings->template_settings['shop_fax'] ) ) );
+		}
+		public function shop_fax() {
+			echo $this->get_shop_fax();
+		}
+
+		/**
+		 * Return/Show shop/company email if provided
+		 */
+		public function get_shop_email() {
+			if (isset($this->settings->template_settings['shop_email']))
+				return apply_filters( 'wpo_wcpdf_shop_email', wpautop( wptexturize( $this->settings->template_settings['shop_email'] ) ) );
+		}
+		public function shop_email() {
+			echo $this->get_shop_email();
+		}
+
+		/**
 		 * Check if billing address and shipping address are equal
 		 */
 		public function ships_to_different_address() {
@@ -715,6 +748,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/show the total discount
 		 */
 		public function get_order_discount( $type = 'total', $tax = 'incl' ) {
+
 			if ( $tax == 'incl' ) {
 				switch ($type) {
 					case 'cart':

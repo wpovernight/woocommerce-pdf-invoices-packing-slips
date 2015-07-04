@@ -441,6 +441,45 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					//'description'			=> __( '...', 'wpo_wcpdf' ),
 				)
 			);
+
+			add_settings_field(
+				'shop_telephone',
+				__( 'Shop Telephone', 'wpo_wcpdf' ),
+				array( &$this, 'text_element_callback' ),
+				$option,
+				'template_settings',
+				array(
+					'menu'			=> $option,
+					'id'			=> 'shop_telephone',
+					'size'			=> '72',
+				)
+			);
+
+			add_settings_field(
+				'shop_fax',
+				__( 'Shop Fax', 'wpo_wcpdf' ),
+				array( &$this, 'text_element_callback' ),
+				$option,
+				'template_settings',
+				array(
+					'menu'			=> $option,
+					'id'			=> 'shop_fax',
+					'size'			=> '72',
+				)
+			);
+
+			add_settings_field(
+				'shop_email',
+				__( 'Shop Email', 'wpo_wcpdf' ),
+				array( &$this, 'text_element_callback' ),
+				$option,
+				'template_settings',
+				array(
+					'menu'			=> $option,
+					'id'			=> 'shop_email',
+					'size'			=> '72',
+				)
+			);
 	
 			add_settings_field(
 				'footer',
