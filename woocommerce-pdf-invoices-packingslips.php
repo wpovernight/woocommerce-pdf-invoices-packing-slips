@@ -704,7 +704,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				'value'	=> $shipping_costs,
 				'tax'	=> $this->export->wc_price( $this->export->order->order_shipping_tax ),
 			);
-			return apply_filters( 'wpo_wcpdf_order_shipping', $shipping );
+			return apply_filters( 'wpo_wcpdf_order_shipping', $shipping, $tax, $discount );
 		}
 		public function order_shipping( $tax = 'excl' ) {
 			$shipping = $this->get_order_shipping( $tax );
@@ -768,7 +768,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			);
 
 			if ( $discount_value > 0 ) {
-				return apply_filters( 'wpo_wcpdf_order_discount', $discount );
+				return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax );
 			}
 		}
 		public function order_discount( $type = 'total', $tax = 'incl' ) {
@@ -852,7 +852,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				'value'	=> $total,
 			);			
 
-			return apply_filters( 'wpo_wcpdf_order_grand_total', $grand_total );
+			return apply_filters( 'wpo_wcpdf_order_grand_total', $grand_total, $tax );
 		}
 		public function order_grand_total( $tax = 'incl' ) {
 			$grand_total = $this->get_order_grand_total( $tax );
