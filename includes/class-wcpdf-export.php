@@ -547,7 +547,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			// add invoice number if it doesn't exist
 			if ( empty($invoice_number) || !isset($invoice_number) ) {
-				$next_invoice_number = $this->template_settings['next_invoice_number'];
+				$next_invoice_number = apply_filters( 'wpo_wcpdf_next_invoice_number', $this->template_settings['next_invoice_number'], $order_id );
 
 				if ( empty($next_invoice_number) ) {
 					// First time! We start numbering from order_number or order_id
