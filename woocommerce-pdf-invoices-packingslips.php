@@ -682,7 +682,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				'value'	=> $subtotal, 
 			);
 			
-			return apply_filters( 'wpo_wcpdf_order_subtotal', $subtotal );
+			return apply_filters( 'wpo_wcpdf_order_subtotal', $subtotal, $tax, $discount );
 		}
 		public function order_subtotal( $tax = 'excl', $discount = 'incl' ) {
 			$subtotal = $this->get_order_subtotal( $tax, $discount );
@@ -704,7 +704,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				'value'	=> $shipping_costs,
 				'tax'	=> $this->export->wc_price( $this->export->order->order_shipping_tax ),
 			);
-			return apply_filters( 'wpo_wcpdf_order_shipping', $shipping, $tax, $discount );
+			return apply_filters( 'wpo_wcpdf_order_shipping', $shipping, $tax );
 		}
 		public function order_shipping( $tax = 'excl' ) {
 			$shipping = $this->get_order_shipping( $tax );
