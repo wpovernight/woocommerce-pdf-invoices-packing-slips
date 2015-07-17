@@ -339,6 +339,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			}
 		}
 
+		/**
+		 * Add invoice number to order search scope
+		 */
 		public function search_fields ( $custom_fields ) {
 			$search_fields[] = '_wcpdf_invoice_number';
 			$search_fields[] = '_wcpdf_formatted_invoice_number';
