@@ -26,6 +26,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 
 			add_action( 'save_post', array( $this,'save_invoice_number_date' ) );
 
+			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 
 			$this->bulk_actions = array(
 				'invoice'		=> __( 'PDF Invoices', 'wpo_wcpdf' ),
@@ -336,6 +337,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 					delete_post_meta( $post_id, '_wcpdf_invoice_exists' );
 				}
 			}
+		}
+
+		public function search_fields ( $custom_fields ) {
+			$search_fields[] = '_wcpdf_invoice_number';
+			$search_fields[] = '_wcpdf_formatted_invoice_number';
+			return $search_fields;
 		}
 	}
 }
