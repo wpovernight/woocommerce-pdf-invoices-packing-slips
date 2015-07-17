@@ -568,6 +568,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				// die($invoice_number);
 
 				update_post_meta($order_id, '_wcpdf_invoice_number', $invoice_number);
+				update_post_meta($order_id, '_wcpdf_formatted_invoice_number', $this->get_invoice_number( $order_id ) );
 
 				// increase next_order_number
 				$template_settings = apply_filters( 'wpml_unfiltered_admin_string', get_option( 'wpo_wcpdf_template_settings' ), 'wpo_wcpdf_template_settings' );
@@ -612,6 +613,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		public function reset_invoice_data ( $renewal_order, $original_order, $product_id, $new_order_role ) {
 			// delete invoice number, invoice date & invoice exists meta
 			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_number' );
+			delete_post_meta( $renewal_order->id, '_wcpdf_formatted_invoice_number' );
 			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_date' );
 			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_exists' );
 		}
@@ -621,7 +623,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$order_year = date_i18n( 'Y', strtotime( $order_date ) );
 			$order_month = date_i18n( 'm', strtotime( $order_date ) );
 
-			
 			$formats['prefix'] = isset($this->template_settings['invoice_number_formatting_prefix'])?$this->template_settings['invoice_number_formatting_prefix']:'';
 			$formats['suffix'] = isset($this->template_settings['invoice_number_formatting_suffix'])?$this->template_settings['invoice_number_formatting_suffix']:'';
 			$formats['padding'] = isset($this->template_settings['invoice_number_formatting_padding'])?$this->template_settings['invoice_number_formatting_padding']:'';
