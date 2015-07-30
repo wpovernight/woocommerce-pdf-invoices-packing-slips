@@ -192,6 +192,23 @@ table.order-details {
 	border-color: black;
 }
 
+/* product bundles compatibility */
+.order-details tr.bundled-item td.product {
+	padding-left: 5mm;
+}
+
+.order-details tr.product-bundle td,
+.order-details tr.product-bundle th,
+.order-details tr.bundled-item td,
+.order-details tr.bundled-item th {
+	border-bottom: 0;
+}
+
+.order-details tr.bundled-item:last-child td,
+.order-details tr.bundled-item:last-child th {
+	border-bottom: 1px #ccc solid;
+}
+
 
 dl {
 	margin: 4px 0;
