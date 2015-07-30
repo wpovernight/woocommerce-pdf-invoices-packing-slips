@@ -463,8 +463,14 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show order notes
 		 */		
 		public function get_order_notes( $filter = 'customer' ) {
+			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
+				$post_id = $parent_order_id;
+			} else {
+				$post_id = $this->export->order->id;
+			}
+
 			$args = array(
-				'post_id' 	=> $this->export->order->id,
+				'post_id' 	=> $post_id,
 				'approve' 	=> 'approve',
 				'type' 		=> 'order_note'
 			);
