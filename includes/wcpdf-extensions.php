@@ -74,7 +74,7 @@ jQuery(document).ready(function() {
 		<?php } ?>
 
 		<?php
-		if (class_exists('WooCommerce_PDF_IPS_Templates')) {
+		if (!class_exists('WooCommerce_PDF_IPS_Templates')) {
 			$template_link = '<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/" target="_blank">wpovernight.com</a>';
 			$email_link = '<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
 			?>
