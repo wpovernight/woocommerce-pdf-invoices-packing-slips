@@ -179,6 +179,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 					case 'always':
 						$invoice_allowed = true;
 						break;
+					case 'never':
+						$invoice_allowed = false;
+						break;
 					case 'custom':
 						if ( isset( $this->general_settings['my_account_restrict'] ) && in_array( $order->status, array_keys( $this->general_settings['my_account_restrict'] ) ) ) {
 							$invoice_allowed = true;

@@ -306,6 +306,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 						'available'	=> __( 'Only when an invoice is already created/emailed' , 'wpo_wcpdf' ),
 						'custom'	=> __( 'Only for specific order statuses (define below)' , 'wpo_wcpdf' ),
 						'always'	=> __( 'Always' , 'wpo_wcpdf' ),
+						'never'		=> __( 'Never' , 'wpo_wcpdf' ),
 					),
 					'custom'		=> array(
 						'type'		=> 'multiple_checkbox_element_callback',
