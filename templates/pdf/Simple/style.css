@@ -178,6 +178,7 @@ table.order-details {
 .order-details td,
 .order-details th {
 	border-bottom: 1px #ccc solid;
+	border-top: 1px #ccc solid;
 	padding: 0.375em;
 }
 
@@ -198,15 +199,8 @@ table.order-details {
 }
 
 .order-details tr.product-bundle td,
-.order-details tr.product-bundle th,
-.order-details tr.bundled-item td,
-.order-details tr.bundled-item th {
-	border-bottom: 0;
-}
-
-.order-details tr.bundled-item:last-child td,
-.order-details tr.bundled-item:last-child th {
-	border-bottom: 1px #ccc solid;
+.order-details tr.bundled-item td {
+	border: 0;
 }
 
 
