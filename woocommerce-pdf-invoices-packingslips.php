@@ -859,24 +859,24 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/show the order grand total
 		 */
 		public function get_order_grand_total( $tax = 'incl' ) {
+			if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
+				// WC 2.1 or newer is used
+				$total_unformatted = $this->export->order->get_total();
+			} else {
+				// Backwards compatibility
+				$total_unformatted = $this->export->order->get_order_total();
+			}
+
 			if ($tax == 'excl' ) {
 				$total_tax = 0;
 				foreach ( $this->export->order->get_taxes() as $tax ) {
 					$total_tax += ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] );
 				}
-				
-				if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
-					// WC 2.1 or newer is used
-					$total_unformatted = $this->export->order->get_total();
-				} else {
-					// Backwards compatibility
-					$total_unformatted = $this->export->order->get_order_total();
-				}
 
 				$total = $this->export->wc_price( ( $total_unformatted - $total_tax ) );
 				$label = __( 'Total ex. VAT', 'wpo_wcpdf' );
 			} else {
-				$total = $this->export->order->get_formatted_order_total();
+				$total = $this->export->wc_price( ( $total_unformatted ) );
 				$label = __( 'Total', 'wpo_wcpdf' );
 			}
 			
