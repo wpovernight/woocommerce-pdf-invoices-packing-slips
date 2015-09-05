@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-09-18 15:08+0100\n"
-"PO-Revision-Date: 2015-08-15 15:17+0100\n"
+"PO-Revision-Date: 2015-09-05 16:02+0100\n"
 "Last-Translator: Damian Wajer <webmaster@graphcore.pl>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: pl_PL\n"
@@ -24,13 +24,14 @@ msgid "You do not have sufficient permissions to access this page."
 msgstr "Nie masz wystarczającyh praw dostępu do tej strony."
 
 # This is a filename (prefix). do not use spaces or special characters!
-# Additional polish commentary: Ze względu na polskie prawo wtyczka ta nie jest odpowiednia do wystawiania faktur, dlatego "invoice" zamiast słowa "faktura" jest tłumaczone jako "zamówienie".
+# Additional Polish commentary: Ze względu na polskie prawo wtyczka ta nie jest odpowiednia do wystawiania faktur, dlatego "invoice" zamiast słowa "faktura" jest tłumaczone jako "zamówienie".
+# Additional Polish commentary: Adnotacja do powyższego: Dodatkowe pola i własne szablony umożliwiają dostosowanie wtyczki i informacji generowanych na fakturze do własnych potrzeb, dlatego przywrócone zostało prawidłowe tłumaczenie słowa "faktura".
 #: includes/class-wcpdf-export.php:223 includes/class-wcpdf-export.php:303
 msgid "invoice"
 msgid_plural "invoices"
-msgstr[0] "zamówienie"
-msgstr[1] "zamówienia"
-msgstr[2] "zamówień"
+msgstr[0] "faktura"
+msgstr[1] "faktury"
+msgstr[2] "faktur"
 
 # This is a filename (prefix). do not use spaces or special characters!
 #: includes/class-wcpdf-export.php:225
@@ -44,7 +45,7 @@ msgstr[2] "dowodów wysyłki"
 #: includes/class-wcpdf-writepanels.php:176
 #: includes/class-wcpdf-writepanels.php:177
 msgid "PDF Invoices"
-msgstr "Zamówienie jako  PDF"
+msgstr "Faktury PDF"
 
 #: includes/class-wcpdf-settings.php:60
 msgid "Settings"
@@ -60,7 +61,7 @@ msgstr "Szablon"
 
 #: includes/class-wcpdf-settings.php:92
 msgid "WooCommerce PDF Invoices"
-msgstr "WooCommerce Zmówienie jako PDF"
+msgstr "WooCommerce Faktury PDF"
 
 #: includes/class-wcpdf-settings.php:98
 msgid "Status"
@@ -72,7 +73,7 @@ msgid ""
 "Upload all invoices automatically to your dropbox!<br/>Check out the %s "
 "extension."
 msgstr ""
-"Załaduj wszystkie zamówienia PDF automatycznie do twojego dropbox'a! <br/> "
+"Załaduj wszystkie faktury PDF automatycznie do twojego dropbox'a! <br/> "
 "Sprawdź wtyczkę %s."
 
 #: includes/class-wcpdf-settings.php:119
@@ -107,7 +108,7 @@ msgstr "Otwórz PDF w nowej zakładce/okienku przeglądarki"
 
 #: includes/class-wcpdf-settings.php:201
 msgid "Attach invoice to:"
-msgstr "Dołacz zamówienie do:"
+msgstr "Dołącz fakturę do:"
 
 #: includes/class-wcpdf-settings.php:209
 msgid "Admin New Order email"
@@ -123,7 +124,7 @@ msgstr "Email do klienta o zakończeniu zamówienia"
 
 #: includes/class-wcpdf-settings.php:212
 msgid "Customer Invoice email"
-msgstr "Email z zamówieniem dla klienta"
+msgstr "Email do klienta o fakturze"
 
 #: includes/class-wcpdf-settings.php:214
 #, php-format
@@ -138,7 +139,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:220
 msgid "Enable invoice number column in the orders list"
-msgstr "Włącz numer zamówień w kolumnie zamówień"
+msgstr "Włącz numer faktury w kolumnie zamówień"
 
 #: includes/class-wcpdf-settings.php:259
 msgid "PDF Template settings"
@@ -199,7 +200,7 @@ msgstr "Stopka: ogólne postanowienia, regulamin, itp."
 
 #: includes/class-wcpdf-settings.php:377
 msgid "Number to display on invoice"
-msgstr "Numer wyświetlany na zamówieniu"
+msgstr "Numer wyświetlany na fakturze"
 
 #: includes/class-wcpdf-settings.php:385
 msgid "WooCommerce order number"
@@ -207,7 +208,7 @@ msgstr "Numer zamówienia WooCommerce"
 
 #: includes/class-wcpdf-settings.php:386
 msgid "Built-in sequential invoice number"
-msgstr "Wbudowany mechanizm nadawania numerów zamówieniom"
+msgstr "Wbudowany mechanizm nadawania numerów faktur"
 
 #: includes/class-wcpdf-settings.php:388
 msgid ""
@@ -219,7 +220,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:394
 msgid "Next invoice number (without prefix/suffix etc.)"
-msgstr "Następny numer zamówienia (bez prefiksu/sufiksu itd.)"
+msgstr "Następny numer faktury (bez prefiksu/sufiksu itd.)"
 
 #: includes/class-wcpdf-settings.php:402
 msgid ""
@@ -229,15 +230,15 @@ msgid ""
 "you override this and set it lower than the highest (PDF) invoice number, "
 "this could create double invoice numbers!"
 msgstr ""
-"To jest numer, który będzie użyty na następnym zamówieniu. Domyślnie numer "
-"startowy jest brany z zamówienia pierwszego zamówienia WooCommerce i który "
-"zwiększa się z każdym nowym zamówienia. Zwróć uwagę, że jeśli nadpiszesz to "
-"i ustawisz numer niższy niż najwyższy numer zamówienia (PDF), to może "
-"zdublować numery zamówień!"
+"To jest numer, który będzie użyty na następnej fakturze. Domyślnie numer "
+"startowy jest brany z numeru zamówienia WooCommerce dla pierwszej "
+"wygenerowanej faktury i zwiększa się z każdym nowym zamówieniem. Zwróć "
+"uwagę, że jeśli nadpiszesz to i ustawisz numer niższy niż najwyższy numer "
+"faktury (PDF), to może zdublować numery faktur!"
 
 #: includes/class-wcpdf-settings.php:408
 msgid "Invoice number format"
-msgstr "Format zamówienia"
+msgstr "Format numeru faktury"
 
 # Jakie dokumenty należy dołączać do zamówień wysyłanych do klientów sklepu internetowego?
 # Zgodnie z art. 9 ust. 3 ustawy z dnia 2 marca 2000 r. o ochronie niektórych praw konsumentów sklep internetowy zobowiązany jest do potwierdzenia konsumentowi na piśmie, najpóźniej w momencie rozpoczęcia spełniania świadczenia, informacji o:
@@ -308,7 +309,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:440
 msgid "Date to display on invoice"
-msgstr "Data wyświetlana na zamówieniu"
+msgstr "Data do wyświetlenia na fakturze"
 
 #: includes/class-wcpdf-settings.php:448
 msgid "Order date"
@@ -316,7 +317,7 @@ msgstr "Data zamówienia"
 
 #: includes/class-wcpdf-settings.php:449
 msgid "Invoice date"
-msgstr "Data rachunku"
+msgstr "Data faktury"
 
 #: includes/class-wcpdf-settings.php:457
 msgid "Extra template fields"
@@ -362,11 +363,11 @@ msgstr ""
 
 #: includes/class-wcpdf-writepanels.php:102
 msgid "Invoice Number"
-msgstr "Numer zamówienia"
+msgstr "Numer faktury"
 
 #: includes/class-wcpdf-writepanels.php:139
 msgid "Download invoice (PDF)"
-msgstr "Podsumowanie zamówienia (PDF)"
+msgstr "Pobierz fakturę (PDF)"
 
 #: includes/class-wcpdf-writepanels.php:150
 msgid "Create PDF"
@@ -374,7 +375,7 @@ msgstr "Stwórz PDF"
 
 #: includes/class-wcpdf-writepanels.php:160
 msgid "PDF invoice"
-msgstr "Zamówienie-PDF"
+msgstr "Faktura PDF"
 
 #: includes/class-wcpdf-writepanels.php:161
 msgid "PDF Packing Slip"
@@ -387,12 +388,12 @@ msgstr "Zawartość paczek-PDF"
 
 #: includes/class-wcpdf-writepanels.php:192
 msgid "PDF Invoice Number (unformatted!)"
-msgstr "Numer zamówienia PDF (niesformatowany)"
+msgstr "Numer faktury PDF (niesformatowany!)"
 
 #: includes/class-wcpdf-writepanels.php:195
 #: templates/pdf/Simple/invoice.php:37
 msgid "Invoice Date:"
-msgstr "Data zamówienia:"
+msgstr "Data faktury:"
 
 #: includes/class-wcpdf-writepanels.php:196
 msgid "h"
@@ -405,7 +406,7 @@ msgstr "min."
 #: templates/pdf/Simple/html-document-wrapper.php:6
 #: templates/pdf/Simple/invoice.php:9 templates/pdf/Simple/invoice.php:21
 msgid "Invoice"
-msgstr "Zamówienie"
+msgstr "Faktura"
 
 #: templates/pdf/Simple/html-document-wrapper.php:6
 #: templates/pdf/Simple/packing-slip.php:9
