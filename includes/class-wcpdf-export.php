@@ -343,20 +343,20 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			if( empty( $_GET['action'] ) || ! is_user_logged_in() || !check_admin_referer( $_GET['action'] ) ) {
 				wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
 			}
-			
+
 			// Check if all parameters are set
 			if( empty( $_GET['template_type'] ) || empty( $_GET['order_ids'] ) ) {
 				wp_die( __( 'Some of the export parameters are missing.', 'wpo_wcpdf' ) );
 			}
 
-			// Check the user privileges
-			if( !current_user_can( 'manage_woocommerce_orders' ) && !current_user_can( 'edit_shop_orders' ) && !isset( $_GET['my-account'] ) ) {
-				wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
-			}
-
 			$order_ids = (array) explode('x',$_GET['order_ids']);
 			// Process oldest first: reverse $order_ids array
 			$order_ids = array_reverse($order_ids);
+
+			// Check the user privileges
+			if( apply_filters( 'wpo_wcpdf_check_privs', !current_user_can( 'manage_woocommerce_orders' ) && !current_user_can( 'edit_shop_orders' ) && !isset( $_GET['my-account'] ), $order_ids ) ) {
+				wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
+			}
 
 			// User call from my-account page
 			if ( isset( $_GET['my-account'] ) ) {
