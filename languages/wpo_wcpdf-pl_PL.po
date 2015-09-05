@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "POT-Creation-Date: 2014-09-18 15:08+0100\n"
-"PO-Revision-Date: 2015-09-05 16:02+0100\n"
+"PO-Revision-Date: 2015-09-05 16:37+0100\n"
 "Last-Translator: Damian Wajer <webmaster@graphcore.pl>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: pl_PL\n"
@@ -387,8 +387,8 @@ msgid "PDF Packing Slips"
 msgstr "Zawartość paczek-PDF"
 
 #: includes/class-wcpdf-writepanels.php:192
-msgid "PDF Invoice Number (unformatted!)"
-msgstr "Numer faktury PDF (niesformatowany!)"
+msgid "Invoice Number (unformatted!)"
+msgstr "Numer faktury (niesformatowany!)"
 
 #: includes/class-wcpdf-writepanels.php:195
 #: templates/pdf/Simple/invoice.php:37
