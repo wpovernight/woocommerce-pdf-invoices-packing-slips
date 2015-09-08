@@ -74,7 +74,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// qTranslate-X compatibility
-			if ( defined('QTX_VERSION') && version_compare( QTX_VERSION, '3.2', '>' )) {
+			if ( function_exists('qtranxf_useCurrentLanguageIfNotFoundUseDefaultLanguage')) {
 				$this->qtranslatex_filters();
 			}
 		}
