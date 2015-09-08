@@ -69,11 +69,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// WooCommerce Product Bundles compatibility (add row classes)
-
 			if ( class_exists('WC_Bundles') ) {
 				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 3 );
 			}
 
+			// qTranslate-X compatibility
+			if ( defined('QTX_VERSION') && version_compare( QTX_VERSION, '3.2', '>' )) {
+				$this->qtranslatex_filters();
+			}
 		}
 
 		/**
@@ -986,6 +989,27 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			return $item_id;
+		}
+
+		/**
+		 * Filter plugin strings with qTranslate-X
+		 */
+		public function qtranslatex_filters() {
+			$use_filters = array(
+				'wpo_wcpdf_shop_name'		=> 20,
+				'wpo_wcpdf_shop_address'	=> 20,
+				'wpo_wcpdf_footer'			=> 20,
+				'wpo_wcpdf_order_items'		=> 20,
+				'wpo_wcpdf_payment_method'	=> 20,
+				'wpo_wcpdf_shipping_method'	=> 20,
+				'wpo_wcpdf_extra_1'			=> 20,
+				'wpo_wcpdf_extra_2'			=> 20,
+				'wpo_wcpdf_extra_3'			=> 20,
+			);
+
+			foreach ( $use_filters as $name => $priority ) {
+				add_filter( $name, 'qtranxf_useCurrentLanguageIfNotFoundUseDefaultLanguage', $priority );
+			}
 		}
 		
 		public function enable_debug () {
