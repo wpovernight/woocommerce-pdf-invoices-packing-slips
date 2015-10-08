@@ -425,6 +425,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					'menu'			=> $option,
 					'id'			=> 'shop_name',
 					'size'			=> '72',
+					'translatable'	=> true,
 				)
 			);
 
@@ -437,8 +438,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				array(
 					'menu'			=> $option,
 					'id'			=> 'shop_address',
-					'width'			=> '28',
+					'width'			=> '72',
 					'height'		=> '8',
+					'translatable'	=> true,
 					//'description'			=> __( '...', 'wpo_wcpdf' ),
 				)
 			);
@@ -454,6 +456,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					'id'			=> 'footer',
 					'width'			=> '72',
 					'height'		=> '4',
+					'translatable'	=> true,
 					//'description'			=> __( '...', 'wpo_wcpdf' ),
 				)
 			);
@@ -635,9 +638,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				array(
 					'menu'			=> $option,
 					'id'			=> 'extra_1',
-					'width'			=> '28',
+					'width'			=> '72',
 					'height'		=> '8',
 					'description'	=> __( 'This is footer column 1 in the <i>Modern (Premium)</i> template', 'wpo_wcpdf' ),
+					'translatable'	=> true,
 				)
 			);
 
@@ -650,9 +654,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				array(
 					'menu'			=> $option,
 					'id'			=> 'extra_2',
-					'width'			=> '28',
+					'width'			=> '72',
 					'height'		=> '8',
 					'description'	=> __( 'This is footer column 2 in the <i>Modern (Premium)</i> template', 'wpo_wcpdf' ),
+					'translatable'	=> true,
 				)
 			);
 
@@ -665,9 +670,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				array(
 					'menu'			=> $option,
 					'id'			=> 'extra_3',
-					'width'			=> '28',
+					'width'			=> '72',
 					'height'		=> '8',
 					'description'	=> __( 'This is footer column 3 in the <i>Modern (Premium)</i> template', 'wpo_wcpdf' ),
+					'translatable'	=> true,
 				)
 			);
 
@@ -795,6 +801,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			$menu = $args['menu'];
 			$id = $args['id'];
 			$size = isset( $args['size'] ) ? $args['size'] : '25';
+			$class = isset( $args['translatable'] ) && $args['translatable'] === true ? 'translatable' : '';
 		
 			$options = get_option( $menu );
 		
@@ -804,7 +811,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				$current = isset( $args['default'] ) ? $args['default'] : '';
 			}
 		
-			$html = sprintf( '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" size="%4$s"/>', $id, $menu, $current, $size );
+			$html = sprintf( '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" size="%4$s" class="%5$s"/>', $id, $menu, $current, $size, $class );
 		
 			// Displays option description.
 			if ( isset( $args['description'] ) ) {
@@ -820,6 +827,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			$id = $args['id'];
 			$width = $args['width'];
 			$height = $args['height'];
+			$class = isset( $args['translatable'] ) && $args['translatable'] === true ? 'translatable' : '';
 		
 			$options = get_option( $menu );
 		
@@ -829,7 +837,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				$current = isset( $args['default'] ) ? $args['default'] : '';
 			}
 		
-			$html = sprintf( '<textarea id="%1$s" name="%2$s[%1$s]" cols="%4$s" rows="%5$s"/>%3$s</textarea>', $id, $menu, $current, $width, $height );
+			$html = sprintf( '<textarea id="%1$s" name="%2$s[%1$s]" cols="%4$s" rows="%5$s" class="%6$s"/>%3$s</textarea>', $id, $menu, $current, $width, $height, $class );
 		
 			// Displays option description.
 			if ( isset( $args['description'] ) ) {
