@@ -161,6 +161,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				}
 
 				echo $wpo_wcpdf->export->get_invoice_number( $the_order->id );
+
+				do_action( 'wcpdf_invoice_number_column_end', $the_order );
 			}
 		}
 
