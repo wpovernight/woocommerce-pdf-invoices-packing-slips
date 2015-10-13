@@ -64,8 +64,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				add_filter( 'wpo_wcpdf_use_path', '__return_false' );
 			}
 
+			// WooCommerce Subscriptions compatibility
 			if ( class_exists('WC_Subscriptions') ) {
-				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'reset_invoice_data' ), 10, 4 );
+				if ( version_compare( WC_Subscriptions::$version, '2.0', '<' ) ) {
+					add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'reset_invoice_data' ), 10, 4 );
+				} else {
+					add_action( 'wcs_renewal_order_created', array( $this, 'reset_invoice_data' ), 10, 4 );
+				}
 			}
 
 			// WooCommerce Product Bundles compatibility (add row classes)
@@ -628,6 +633,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			delete_post_meta( $renewal_order->id, '_wcpdf_formatted_invoice_number' );
 			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_date' );
 			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_exists' );
+
+			return $renewal_order;
 		}
 
 		public function format_invoice_number( $invoice_number, $order_number, $order_id, $order_date ) {
