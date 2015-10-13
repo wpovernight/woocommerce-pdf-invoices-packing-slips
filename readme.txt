@@ -2,8 +2,8 @@
 Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 4.2
-Stable tag: 1.5.22
+Tested up to: 4.3.1
+Stable tag: 1.5.23
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.23 =
+* Fix: WooCommerce Subscriptons 2.0 deprecation notice.
+* Tweak: better qTranslate-X support
+* Tweak: filter for user privileges check (wpo_wcpdf_check_privs)
 
 = 1.5.22 =
 * Fix: Workaround for bug in WPML (which cleared all settings)
