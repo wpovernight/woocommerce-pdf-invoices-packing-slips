@@ -239,6 +239,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 * Fix: WooCommerce Subscriptons 2.0 deprecation notice.
 * Tweak: better qTranslate-X support
 * Tweak: filter for user privileges check (wpo_wcpdf_check_privs)
+* Translations: French translations fix
 
 = 1.5.22 =
 * Fix: Workaround for bug in WPML (which cleared all settings)
