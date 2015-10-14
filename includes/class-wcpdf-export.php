@@ -67,9 +67,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// WooCommerce Subscriptions compatibility
 			if ( class_exists('WC_Subscriptions') ) {
 				if ( version_compare( WC_Subscriptions::$version, '2.0', '<' ) ) {
-					add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'reset_invoice_data' ), 10, 4 );
+					add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
 				} else {
-					add_action( 'wcs_renewal_order_created', array( $this, 'reset_invoice_data' ), 10, 4 );
+					add_action( 'wcs_renewal_order_created', array( $this, 'wcs_renewal_order_created' ), 10, 2 );
 				}
 			}
 
@@ -627,14 +627,22 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Reset invoice data for WooCommerce subscription renewal orders
 		 * https://wordpress.org/support/topic/subscription-renewal-duplicate-invoice-number?replies=6#post-6138110
 		 */
-		public function reset_invoice_data ( $renewal_order, $original_order, $product_id, $new_order_role ) {
-			// delete invoice number, invoice date & invoice exists meta
-			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_number' );
-			delete_post_meta( $renewal_order->id, '_wcpdf_formatted_invoice_number' );
-			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_date' );
-			delete_post_meta( $renewal_order->id, '_wcpdf_invoice_exists' );
-
+		public function woocommerce_subscriptions_renewal_order_created ( $renewal_order, $original_order, $product_id, $new_order_role ) {
+			$this->reset_invoice_data( $renewal_order->id );
 			return $renewal_order;
+		}
+
+		public function wcs_renewal_order_created (  $renewal_order, $subscription ) {
+			$this->reset_invoice_data( $renewal_order->id );
+			return $renewal_order;
+		}
+
+		public function reset_invoice_data ( $order_id ) {
+			// delete invoice number, invoice date & invoice exists meta
+			delete_post_meta( $order_id, '_wcpdf_invoice_number' );
+			delete_post_meta( $order_id, '_wcpdf_formatted_invoice_number' );
+			delete_post_meta( $order_id, '_wcpdf_invoice_date' );
+			delete_post_meta( $order_id, '_wcpdf_invoice_exists' );
 		}
 
 		public function format_invoice_number( $invoice_number, $order_number, $order_id, $order_date ) {
