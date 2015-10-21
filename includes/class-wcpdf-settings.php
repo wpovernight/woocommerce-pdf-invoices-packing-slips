@@ -392,10 +392,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				array(
 					'menu'			=> $option,
 					'id'			=> 'paper_size',
-					'options' 		=> array(
+					'options' 		=> apply_filters( 'wpo_wcpdf_template_settings_paper_size', array(
 						'a4'		=> __( 'A4' , 'wpo_wcpdf' ),
 						'letter'	=> __( 'Letter' , 'wpo_wcpdf' ),
-					),
+					) ),
 				)
 			);
 
