@@ -343,7 +343,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			}
 
 			//if we got here, it means the addresses are equal -> doesn't ship to different address!
-			return false;
+			return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order_meta );
 		}
 		
 		/**
