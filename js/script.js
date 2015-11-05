@@ -12,6 +12,11 @@ jQuery(document).ready(function($) {
 				}
 			);
 			
+			if (!checked.length) {
+				alert('You have to select order(s) first!');
+				return;
+			}
+			
 			var order_ids=checked.join('x');
 			url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&template_type='+template+'&order_ids='+order_ids+'&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			window.open(url,'_blank');
