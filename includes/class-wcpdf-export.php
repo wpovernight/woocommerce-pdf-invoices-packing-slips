@@ -78,6 +78,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 3 );
 			}
 
+			// WooCommerce Chained Products compatibility (add row classes)
+			if ( class_exists('SA_WC_Chained_Products') ) {
+				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 3 );
+			}
+
 			// qTranslate-X compatibility
 			if ( function_exists('qtranxf_useCurrentLanguageIfNotFoundUseDefaultLanguage')) {
 				$this->qtranslatex_filters();
@@ -1001,6 +1006,16 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return  $item_id . ' bundled-item';
 			} elseif (isset($item_meta['_bundled_items'])) {
 				return  $item_id . ' product-bundle';
+			}
+
+			return $item_id;
+		}
+
+		public function add_chained_product_class ( $item_id, $template_type, $order ) {
+			$item_meta = $order->get_item_meta( $item_id );
+
+			if (isset($item_meta['_chained_product_of'])) {
+				return  $item_id . ' chained-product';
 			}
 
 			return $item_id;
