@@ -27,11 +27,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		}
 	
 		public function menu() {
-			if (class_exists('WPOvernight_Core')) {
-				$parent_slug = 'wpo-core-menu';
-			} else {
-				$parent_slug = 'woocommerce';
-			}
+			$parent_slug = 'woocommerce';
 			
 			$this->options_page_hook = add_submenu_page(
 				$parent_slug,
