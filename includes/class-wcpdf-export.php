@@ -75,12 +75,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			// WooCommerce Product Bundles compatibility (add row classes)
 			if ( class_exists('WC_Bundles') ) {
-				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 3 );
+				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 4 );
 			}
 
 			// WooCommerce Chained Products compatibility (add row classes)
 			if ( class_exists('SA_WC_Chained_Products') ) {
-				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 3 );
+				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 4 );
 			}
 
 			// qTranslate-X compatibility
@@ -962,7 +962,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// DEPRICATED (does not support thumbnail sizes)
 			global $woocommerce;
 	
-	    	if ( $product->variation_id && has_post_thumbnail( $product->variation_id ) ) {
+			if ( $product->variation_id && has_post_thumbnail( $product->variation_id ) ) {
 				$thumbnail_id = get_post_thumbnail_id ( $product->variation_id );
 			} elseif ( has_post_thumbnail( $product->id ) ) {
 				$thumbnail_id = get_post_thumbnail_id ( $product->id );
@@ -999,26 +999,65 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			return $thumbnail;
 		}
 
-		public function add_product_bundles_classes ( $item_id, $template_type, $order ) {
+		public function add_product_bundles_classes ( $classes, $template_type, $order, $item_id = '' ) {
+			if ( empty($item_id) ) {
+				// get item id from classes (backwards compatibility fix)
+				$class_array = explode(' ', $classes);
+				foreach ($class_array as $class) {
+					if (is_numeric($class)) {
+						$item_id = $class;
+						break;
+					}
+				}
+
+				// if still empty, we lost the item id somewhere :(
+				if (empty($item_id)) {
+					return $classes;
+				}
+			}
+
 			$item_meta = $order->get_item_meta( $item_id );
 
 			if (isset($item_meta['_bundled_by'])) {
-				return  $item_id . ' bundled-item';
+				$classes = $classes . ' bundled-item';
+
+				// check bundled item visibility
+				if ( ! empty( $item_meta[ '_bundled_item_hidden' ] ) ) {
+					$classes = $classes . ' hidden';
+				}
+
+				return $classes;
 			} elseif (isset($item_meta['_bundled_items'])) {
-				return  $item_id . ' product-bundle';
+				return  $classes . ' product-bundle';
 			}
 
-			return $item_id;
+			return $classes;
 		}
 
-		public function add_chained_product_class ( $item_id, $template_type, $order ) {
+		public function add_chained_product_class ( $classes, $template_type, $order, $item_id = '' ) {
+			if ( empty($item_id) ) {
+				// get item id from classes (backwards compatibility fix)
+				$class_array = explode(' ', $classes);
+				foreach ($class_array as $class) {
+					if (is_numeric($class)) {
+						$item_id = $class;
+						break;
+					}
+				}
+
+				// if still empty, we lost the item id somewhere :(
+				if (empty($item_id)) {
+					return $classes;
+				}
+			}
+
 			$item_meta = $order->get_item_meta( $item_id );
 
 			if (isset($item_meta['_chained_product_of'])) {
-				return  $item_id . ' chained-product';
+				return  $classes . ' chained-product';
 			}
 
-			return $item_id;
+			return $classes;
 		}
 
 		/**
