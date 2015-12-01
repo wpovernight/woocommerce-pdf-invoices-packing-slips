@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.3.1
-Stable tag: 1.5.24
+Stable tag: 1.5.25
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,17 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.25 =
+* Feature: Automatically list all emails registered in WooCommerce
+* Feature: Reset invoice number yearly
+* Feature: WooCommerce Chained Products compatibility
+* Feature: WooCommerce Product Bundles visibility settings taken into account in invoice
+* Fix: Disable PDF creation from trashed order_ids
+* Tweak: Alert when no orders selected for bulk export (Props to Dartui!)
+* Tweak: PDF invoice settings always under WooCommerce menu (also for premium users)
+* Tweak: extra $item_id passed in row class filter
+* Translations: Updated Slovenian
 
 = 1.5.24 =
 * Hotfix: Subscriptions renewal filter arguments
