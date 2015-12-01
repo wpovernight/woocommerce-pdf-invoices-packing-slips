@@ -599,6 +599,21 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				} else {
 					$invoice_number = $next_invoice_number;
 				}
+
+				// reset invoice number yearly
+				if ( isset( $this->template_settings['yearly_reset_invoice_number'] ) {
+					$current_year = date("Y");
+					$last_invoice_year = get_option( 'wpo_wcpdf_last_invoice_year' );
+					// check first time use
+					if ( empty( $last_invoice_year ) ) {
+						$last_invoice_year = $current_year;
+						update_option( 'wpo_wcpdf_last_invoice_year', $current_year );
+					}
+					if ( $current_year != $last_invoice_year ) {
+						$invoice_number = 1;
+						update_option( 'wpo_wcpdf_last_invoice_year', $current_year );
+					}
+				}
 				// die($invoice_number);
 
 				update_post_meta($order_id, '_wcpdf_invoice_number', $invoice_number);

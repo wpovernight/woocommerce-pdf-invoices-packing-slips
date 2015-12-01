@@ -576,6 +576,18 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			add_settings_field(
+				'yearly_reset_invoice_number',
+				__( 'Reset invoice number yearly', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'invoice',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'yearly_reset_invoice_number',
+				)
+			);	
+
 			// Section.
 			add_settings_section(
 				'packing_slip',
