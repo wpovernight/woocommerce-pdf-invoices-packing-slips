@@ -601,7 +601,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 
 				// reset invoice number yearly
-				if ( isset( $this->template_settings['yearly_reset_invoice_number'] ) {
+				if ( isset( $this->template_settings['yearly_reset_invoice_number'] ) ) {
 					$current_year = date("Y");
 					$last_invoice_year = get_option( 'wpo_wcpdf_last_invoice_year' );
 					// check first time use
@@ -609,6 +609,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 						$last_invoice_year = $current_year;
 						update_option( 'wpo_wcpdf_last_invoice_year', $current_year );
 					}
+					// check if we need to reset
 					if ( $current_year != $last_invoice_year ) {
 						$invoice_number = 1;
 						update_option( 'wpo_wcpdf_last_invoice_year', $current_year );
