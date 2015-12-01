@@ -213,6 +213,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				'customer_invoice'	=> __( 'Customer Invoice email' , 'wpo_wcpdf' ),
 			);
 
+			// load custom emails
+			$extra_emails = $this->get_wc_emails();
+			$wc_emails = array_merge( $wc_emails, $extra_emails );
+
 			add_settings_field(
 				'email_pdf',
 				__( 'Attach invoice to:', 'wpo_wcpdf' ),
@@ -758,6 +762,37 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			// Register settings.
 			register_setting( $option, $option, array( &$this, 'validate_options' ) );
 	
+		}
+
+		/**
+		 * get all emails registered in WooCommerce
+		 * @param  boolean $remove_defaults switch to remove default woocommerce emails
+		 * @return array   $emails       list of all email ids/slugs and names
+		 */
+		public function get_wc_emails ( $remove_defaults = true ) {
+			// get emails from WooCommerce
+			global $woocommerce;
+			$mailer = $woocommerce->mailer();
+			$wc_emails = $mailer->get_emails();
+
+			$default_emails = array(
+				'new_order',
+				'customer_processing_order',
+				'customer_completed_order',
+				'customer_invoice',
+				'customer_note',
+				'customer_reset_password',
+				'customer_new_account'
+			);
+
+			$emails = array();
+			foreach ($wc_emails as $name => $template) {
+				if ( !( $remove_defaults && in_array( $template->id, $default_emails ) ) ) {
+					$emails[$template->id] = $template->title;
+				}
+			}
+
+			return $emails;
 		}
 
 		/**
