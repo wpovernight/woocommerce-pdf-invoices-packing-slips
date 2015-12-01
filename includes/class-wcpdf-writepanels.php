@@ -157,12 +157,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 
 			if ( $column == 'pdf_invoice_number' ) {
 				if ( empty( $the_order ) || $the_order->id != $post->ID ) {
-					$the_order = new WC_Order( $post->ID );
+					$order = new WC_Order( $post->ID );
 				}
 
-				echo $wpo_wcpdf->export->get_invoice_number( $the_order->id );
+				echo $wpo_wcpdf->export->get_invoice_number( $order->id );
 
-				do_action( 'wcpdf_invoice_number_column_end', $the_order );
+				do_action( 'wcpdf_invoice_number_column_end', $order );
 			}
 		}
 
