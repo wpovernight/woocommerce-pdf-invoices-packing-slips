@@ -107,6 +107,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Add PDF actions to the orders listing
 		 */
 		public function add_listing_actions( $order ) {
+			// do not show buttons for trashed orders
+			if ( $order->status == 'trash' ) {
+				return;
+			}
+
 			$listing_actions = array(
 				'invoice'		=> array (
 					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
@@ -158,11 +163,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			if ( $column == 'pdf_invoice_number' ) {
 				if ( empty( $the_order ) || $the_order->id != $post->ID ) {
 					$order = new WC_Order( $post->ID );
+					echo $wpo_wcpdf->export->get_invoice_number( $order->id );
+					do_action( 'wcpdf_invoice_number_column_end', $order );
+				} else {
+					echo $wpo_wcpdf->export->get_invoice_number( $the_order->id );
+					do_action( 'wcpdf_invoice_number_column_end', $the_order );
 				}
-
-				echo $wpo_wcpdf->export->get_invoice_number( $order->id );
-
-				do_action( 'wcpdf_invoice_number_column_end', $order );
 			}
 		}
 

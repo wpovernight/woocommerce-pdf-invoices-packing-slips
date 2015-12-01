@@ -232,7 +232,22 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function process_template( $template_type, $order_ids ) {
 			$this->template_type = $template_type;
-			$order_ids = $this->order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $template_type );
+			$order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $template_type );
+
+			// filter out trashed orders
+			foreach ($order_ids as $key => $order_id) {
+				$order_status = get_post_status( $order_id );
+				if ( $order_status == 'trash' ) {
+					unset( $order_ids[ $key ] );
+				}
+			}
+			// sharing is caring!
+			$this->order_ids = $order_ids;
+
+			// throw error when no order ids
+			if ( empty( $order_ids ) ) {
+				throw new Exception('No orders to export!');
+			}
 
 			do_action( 'wpo_wcpdf_process_template', $template_type );
 
