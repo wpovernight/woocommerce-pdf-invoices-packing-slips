@@ -235,7 +235,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 
 == Changelog ==
 
-= 1.5.25 =
+= 1.5.26 =
 * Feature: Automatically list all emails registered in WooCommerce
 * Feature: Reset invoice number yearly
 * Feature: WooCommerce Chained Products compatibility
@@ -244,7 +244,7 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 * Tweak: Alert when no orders selected for bulk export (Props to Dartui!)
 * Tweak: PDF invoice settings always under WooCommerce menu (also for premium users)
 * Tweak: extra $item_id passed in row class filter
-* Translations: Updated Slovenian
+* Translations: Updated Slovenian, Spanish, Dutch & POT file
 
 = 1.5.24 =
 * Hotfix: Subscriptions renewal filter arguments
