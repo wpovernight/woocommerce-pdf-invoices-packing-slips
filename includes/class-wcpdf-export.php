@@ -49,6 +49,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ));
 			add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3);
+			add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_numer' ), 10, 2 );
 
 			// check if an invoice number filter has already been registered, if not, use settings
 			if ( !has_filter( 'wpo_wcpdf_invoice_number' ) ) {
@@ -657,6 +658,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				// no invoice number for this order
 				return false;
 			}
+		}
+
+		/**
+		 * Add invoice number to WC REST API
+		 */
+		public function woocommerce_api_invoice_numer ( $data, $order ) {
+			$data['wpo_wcpdf_invoice_number'] = $this->get_invoice_number( $order->id );
+			return $data;
 		}
 
 		/**
