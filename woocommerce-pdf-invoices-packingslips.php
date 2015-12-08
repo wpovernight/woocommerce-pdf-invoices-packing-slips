@@ -796,11 +796,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			}
 
 			$discount = array (
-				'label'	=> __('Discount', 'wpo_wcpdf'),
-				'value'	=> $this->export->wc_price($discount_value),
+				'label'		=> __('Discount', 'wpo_wcpdf'),
+				'value'		=> $this->export->wc_price($discount_value),
+				'raw_value'	=> $discount_value,
 			);
 
-			if ( $discount_value > 0 ) {
+			if ( $discount_value != 0 ) {
 				return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax );
 			}
 		}
