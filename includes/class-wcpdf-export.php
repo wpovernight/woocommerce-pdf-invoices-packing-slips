@@ -664,7 +664,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Add invoice number to WC REST API
 		 */
 		public function woocommerce_api_invoice_numer ( $data, $order ) {
-			$data['wpo_wcpdf_invoice_number'] = $this->get_invoice_number( $order->id );
+			if ( $invoice_number = $this->get_invoice_number( $order->id ) ) {
+				$data['wpo_wcpdf_invoice_number'] = $invoice_number;
+			} else {
+				$data['wpo_wcpdf_invoice_number'] = '';
+			}
 			return $data;
 		}
 
