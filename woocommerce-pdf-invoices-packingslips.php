@@ -800,8 +800,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				'value'		=> $this->export->wc_price($discount_value),
 				'raw_value'	=> $discount_value,
 			);
-
-			if ( $discount_value != 0 ) {
+			// discount is float and (int) 0 can equal (float) 1.7763568394003E-15
+			// Using 0.005 instead of 0.01 to have a safety margin for rounding
+			if ( $discount_value >= 0.005 ) {
 				return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax );
 			}
 		}
