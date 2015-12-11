@@ -801,7 +801,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				'raw_value'	=> $discount_value,
 			);
 
-			if ( $discount_value != 0 ) {
+			if ( round( $discount_value, 3 ) != 0 ) {
 				return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax );
 			}
 		}
