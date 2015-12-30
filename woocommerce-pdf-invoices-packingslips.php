@@ -520,8 +520,16 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show payment method  
 		 */
 		public function get_payment_method() {
-			$Payment_method_label = __( 'Payment method', 'wpo_wcpdf' );
-			return apply_filters( 'wpo_wcpdf_payment_method', __( $this->export->order->payment_method_title, 'woocommerce' ) );
+			$payment_method_label = __( 'Payment method', 'wpo_wcpdf' );
+
+			$payment_method = __( $this->export->order->payment_method_title, 'woocommerce' );
+			if ( !$payment_method && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
+				// try parent
+				$payment_method = get_post_meta( $parent_order_id, '_payment_method_title', true );
+				$payment_method = __( $payment_method, 'woocommerce' );
+			}
+
+			return apply_filters( 'wpo_wcpdf_payment_method', $payment_method );
 		}
 		public function payment_method() {
 			echo $this->get_payment_method();
