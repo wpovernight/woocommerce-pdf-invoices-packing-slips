@@ -696,17 +696,23 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 		public function format_invoice_number( $invoice_number, $order_number, $order_id, $order_date ) {
 			// get format settings
-			$order_year = date_i18n( 'Y', strtotime( $order_date ) );
-			$order_month = date_i18n( 'm', strtotime( $order_date ) );
-
 			$formats['prefix'] = isset($this->template_settings['invoice_number_formatting_prefix'])?$this->template_settings['invoice_number_formatting_prefix']:'';
 			$formats['suffix'] = isset($this->template_settings['invoice_number_formatting_suffix'])?$this->template_settings['invoice_number_formatting_suffix']:'';
 			$formats['padding'] = isset($this->template_settings['invoice_number_formatting_padding'])?$this->template_settings['invoice_number_formatting_padding']:'';
 
 			// Replacements
+			$order_year = date_i18n( 'Y', strtotime( $order_date ) );
+			$order_month = date_i18n( 'm', strtotime( $order_date ) );
+			$invoice_date = get_post_meta($order_id,'_wcpdf_invoice_date',true);
+			$invoice_date = empty($invoice_date) ? current_time('mysql') : $invoice_date;
+			$invoice_year = date_i18n( 'Y', strtotime( $invoice_date ) );
+			$invoice_month = date_i18n( 'm', strtotime( $invoice_date ) );
+
 			foreach ($formats as $key => $value) {
 				$value = str_replace('[order_year]', $order_year, $value);
 				$value = str_replace('[order_month]', $order_month, $value);
+				$value = str_replace('[invoice_year]', $invoice_year, $value);
+				$value = str_replace('[invoice_month]', $invoice_month, $value);
 				$formats[$key] = $value;
 			}
 
