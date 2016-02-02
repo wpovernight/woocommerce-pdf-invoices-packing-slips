@@ -24,6 +24,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			
 			$this->general_settings = get_option('wpo_wcpdf_general_settings');
 			$this->template_settings = get_option('wpo_wcpdf_template_settings');
+
+			// WooCommerce Order Status & Actions Manager emails compatibility
+			add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
 		}
 	
 		public function menu() {
@@ -804,6 +807,23 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				}
 			}
 
+			return $emails;
+		}
+
+		/**
+		 * WooCommerce Order Status & Actions Manager emails compatibility
+		 */
+		public function wc_order_status_actions_emails ( $emails ) {
+			// check if WC_Custom_Status class is loaded!
+			if (class_exists('WC_Custom_Status')) {
+				// get list of custom statuses from WooCommerce Custom Order Status & Actions
+				// status slug => status name
+				$custom_statuses = WC_Custom_Status::get_status_list_names();
+				// append _email to slug (=email_id) and add to emails list
+				foreach ($custom_statuses as $status_slug => $status_name) {
+					$emails[$status_slug.'_email'] = $status_name;
+				}
+			}
 			return $emails;
 		}
 
