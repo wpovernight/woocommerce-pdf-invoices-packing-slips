@@ -2,8 +2,8 @@
 Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 4.3.1
-Stable tag: 1.5.25
+Tested up to: 4.4.1
+Stable tag: 1.5.27
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,14 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.27 =
+* Feature: Use [invoice_year] and [invoice_month] placeholders in invoice number prefix/suffix
+* Feature: WooCommerce Order Status & Actions Manager emails compatibility
+* Feature: Add invoice number to WC REST API
+* Fix: Allow positive 'discounts' (price corrections)
+* Fix: Discounts rounding
+* Translations: Updated Finnish & Portugese & POT
 
 = 1.5.26 =
 * Feature: Automatically list all emails registered in WooCommerce
