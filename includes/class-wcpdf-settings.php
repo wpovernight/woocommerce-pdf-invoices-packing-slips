@@ -562,7 +562,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 						'prefix'			=> array(
 							'title'			=> __( 'Prefix' , 'wpo_wcpdf' ),
 							'size'			=> 20,
-							'description'	=> __( 'to use the order year and/or month, use [order_year] or [order_month] respectively' , 'wpo_wcpdf' ),
+							'description'	=> __( 'to use the invoice year and/or month, use [invoice_year] or [invoice_month] respectively' , 'wpo_wcpdf' ),
 						),
 						'suffix'			=> array(
 							'title'			=> __( 'Suffix' , 'wpo_wcpdf' ),
