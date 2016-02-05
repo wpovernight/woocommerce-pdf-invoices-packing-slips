@@ -205,6 +205,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$this->export->copy_fonts( $font_path );
 			}
 			
+			// 1.5.28 update: copy next invoice number to separate setting
+			if ( $installed_version == 'versionless' || version_compare( $installed_version, '1.5.28', '<' ) ) {
+				$template_settings = get_option( 'wpo_wcpdf_template_settings' );
+				$next_invoice_number = isset($template_settings['next_invoice_number'])?$template_settings['next_invoice_number']:'';
+				update_option( 'wpo_wcpdf_next_invoice_number', $next_invoice_number );
+			}
 		}		
 
 		/***********************************************************************/

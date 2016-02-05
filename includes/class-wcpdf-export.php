@@ -616,7 +616,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			// add invoice number if it doesn't exist
 			if ( empty($invoice_number) || !isset($invoice_number) ) {
-				$next_invoice_number = apply_filters( 'wpo_wcpdf_next_invoice_number', $this->template_settings['next_invoice_number'], $order_id );
+				global $wpdb;
+				// making direct DB call to avoid caching issues
+				$next_invoice_number = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'wpo_wcpdf_next_invoice_number' ) );
+				$next_invoice_number = apply_filters( 'wpo_wcpdf_next_invoice_number', $next_invoice_number, $order_id );
 
 				if ( empty($next_invoice_number) ) {
 					// First time! We start numbering from order_number or order_id
@@ -656,12 +659,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				update_post_meta($order_id, '_wcpdf_formatted_invoice_number', $this->get_invoice_number( $order_id ) );
 
 				// increase next_order_number
-				$template_settings = apply_filters( 'wpml_unfiltered_admin_string', get_option( 'wpo_wcpdf_template_settings' ), 'wpo_wcpdf_template_settings' );
-				// fix wpml bug
-				$template_settings = maybe_unserialize($template_settings);
-
-				$template_settings['next_invoice_number'] = $this->template_settings['next_invoice_number'] = $invoice_number+1;
-				update_option( 'wpo_wcpdf_template_settings', $template_settings );
+				$update_args = array(
+					'option_value'	=> $invoice_number + 1,
+					'autoload'		=> 'yes',
+				);
+				$result = $wpdb->update( $wpdb->options, $update_args, array( 'option_name' => 'wpo_wcpdf_next_invoice_number' ) );
 			}
 
 			// store invoice_number in class object

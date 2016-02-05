@@ -535,19 +535,39 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			// invoice number is stored separately for direct retrieval
+			register_setting( $option, 'wpo_wcpdf_next_invoice_number', array( &$this, 'validate_options' ) );
 			add_settings_field(
 				'next_invoice_number',
 				__( 'Next invoice number (without prefix/suffix etc.)', 'wpo_wcpdf' ),
-				array( &$this, 'text_element_callback' ),
+				array( &$this, 'singular_text_element_callback' ),
 				$option,
 				'invoice',
 				array(
-					'menu'			=> $option,
+					'menu'			=> 'wpo_wcpdf_next_invoice_number',
 					'id'			=> 'next_invoice_number',
 					'size'			=> '10',
 					'description'	=> __( 'This is the number that will be used on the next invoice that is created. By default, numbering starts from the WooCommerce Order Number of the first invoice that is created and increases for every new invoice. Note that if you override this and set it lower than the highest (PDF) invoice number, this could create double invoice numbers!', 'wpo_wcpdf' ),
 				)
 			);
+
+			// first time invoice number
+			$next_invoice_number = get_option('wpo_wcpdf_next_invoice_number');
+			// determine highest invoice number if option not set
+			if ( !isset( $next_invoice_number ) ) {
+				// Based on code from WooCommerce Sequential Order Numbers
+				global $wpdb;
+				// get highest invoice_number in postmeta table
+				$max_invoice_number = $wpdb->get_var( 'SELECT max(cast(meta_value as UNSIGNED)) from ' . $wpdb->postmeta . ' where meta_key="_wcpdf_invoice_number"' );
+				
+				if ( !empty($max_invoice_number) ) {
+					$next_invoice_number = $max_invoice_number+1;
+				} else {
+					$next_invoice_number = '';
+				}
+
+				update_option( 'wpo_wcpdf_next_invoice_number', $next_invoice_number );
+			}
 
 			add_settings_field(
 				'invoice_number_formatting',
@@ -695,27 +715,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 			// Register settings.
 			register_setting( $option, $option, array( &$this, 'validate_options' ) );
 
-			$option_values = get_option($option);
-			// determine highest invoice number if option not set
-			if ( !isset( $option_values['next_invoice_number']) ) {
-				// Based on code from WooCommerce Sequential Order Numbers
-				global $wpdb;
-				// get highest invoice_number in postmeta table
-				$max_invoice_number = $wpdb->get_var( 'SELECT max(cast(meta_value as UNSIGNED)) from ' . $wpdb->postmeta . ' where meta_key="_wcpdf_invoice_number"' );
-				// get highest order_number in postmeta table
-				// $max_order_number = $wpdb->get_var( 'SELECT max(cast(meta_value as UNSIGNED)) from ' . $wpdb->postmeta . ' where meta_key="_order_number"' );
-				// get highest post_id with type shop_order in post table
-				// $max_order_id = $wpdb->get_var( 'SELECT max(cast(ID as UNSIGNED)) from ' . $wpdb->posts . ' where post_type="shop_order"' );
-				
-				$next_invoice_number = '';
-
-				if ( isset($max_invoice_number) && !empty($max_invoice_number) ) {
-					$next_invoice_number = $max_invoice_number+1;
-				}
-
-				$option_values['next_invoice_number'] = $next_invoice_number;
-				update_option( $option, $option_values );
-			}
 			/**************************************/
 			/******** DEBUG/STATUS SETTINGS *******/
 			/**************************************/
@@ -883,7 +882,32 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		
 			echo $html;
 		}
+
+		// Single text option (not part of any settings array)
+		public function singular_text_element_callback( $args ) {
+			$menu = $args['menu'];
+			$id = $args['id'];
+			$size = isset( $args['size'] ) ? $args['size'] : '25';
+			$class = isset( $args['translatable'] ) && $args['translatable'] === true ? 'translatable' : '';
 		
+			$option = get_option( $menu );
+
+			if ( isset( $option ) ) {
+				$current = $option;
+			} else {
+				$current = isset( $args['default'] ) ? $args['default'] : '';
+			}
+		
+			$html = sprintf( '<input type="text" id="%1$s" name="%2$s" value="%3$s" size="%4$s" class="%5$s"/>', $id, $menu, $current, $size, $class );
+		
+			// Displays option description.
+			if ( isset( $args['description'] ) ) {
+				$html .= sprintf( '<p class="description">%s</p>', $args['description'] );
+			}
+		
+			echo $html;
+		}
+
 		// Text element callback.
 		public function textarea_element_callback( $args ) {
 			$menu = $args['menu'];
