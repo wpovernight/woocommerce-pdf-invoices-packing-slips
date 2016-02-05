@@ -268,3 +268,11 @@ table.totals tr.payment_method {
 	margin-bottom: 0;
 	padding-top: 2mm;
 }
+
+/* page numbers */
+.pagenum:before {
+	content: counter(page);
+}
+.pagenum,.pagecount {
+	font-family: sans-serif;
+}

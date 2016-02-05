@@ -47,6 +47,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				require_once( $this->template_path . '/template-functions.php' );
 			}
 
+			// make page number replacements
+			add_action( 'wpo_wcpdf_processed_template_html', array($this, 'clear_page_number_styles' ), 10, 3 );
+			add_action( 'wpo_wcpdf_after_dompdf_render', array($this, 'page_number_replacements' ), 9, 4 );
+
 			add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ));
 			add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3);
 			add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_numer' ), 10, 2 );
@@ -315,6 +319,33 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		/**
+		 * Adds spans around placeholders to be able to make replacement (page count) and css (page number)
+		 */
+		public function clear_page_number_styles ( $html, $template_type, $order_ids ) {
+			$html = str_replace('{{PAGE_COUNT}}', '<span class="pagecount">{{PAGE_COUNT}}</span>', $html);
+			$html = str_replace('{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
+			return $html;
+		}
+
+		/**
+		 * Replace {{PAGE_COUNT}} placeholder with total page count
+		 */
+		public function page_number_replacements ( $dompdf, $html, $template_type, $order_ids ) {
+			$placeholder = '{{PAGE_COUNT}}';
+
+			// check if placeholder is used
+			if (strpos($html, $placeholder) !== false ) {
+				foreach ($dompdf->get_canvas()->get_cpdf()->objects as &$object) {
+					if (array_key_exists("c", $object) && strpos($object["c"], $placeholder) !== false) {
+						$object["c"] = str_replace( $placeholder , $dompdf->get_canvas()->get_page_count() , $object["c"] );
+					}
+				}
+			}
+
+			return $dompdf;
+		}
+
+		/**
 		 * Create & render DOMPDF object
 		 */
 		public function generate_pdf( $template_type, $order_ids )	{
@@ -331,9 +362,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			$dompdf = new DOMPDF();
-			$dompdf->load_html($this->process_template( $template_type, $order_ids ));
+			$html = apply_filters( 'wpo_wcpdf_processed_template_html', $this->process_template( $template_type, $order_ids ), $template_type, $order_ids );
+			$dompdf->load_html( $html );
 			$dompdf->set_paper( $paper_size, $paper_orientation );
+			$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $html, $template_type, $order_ids );
 			$dompdf->render();
+			$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $html, $template_type, $order_ids );
 			do_action( 'wpo_wcpdf_after_pdf', $template_type );
 
 			// Try to clean up a bit of memory
