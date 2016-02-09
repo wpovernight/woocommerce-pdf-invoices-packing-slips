@@ -82,7 +82,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				wp_localize_script(  
 					'wpo-wcpdf',  
 					'wpo_wcpdf_ajax',  
-					array(  
+					array(
+						// 'ajaxurl'		=> add_query_arg( 'action', 'generate_wpo_wcpdf', admin_url( 'admin-ajax.php' ) ), // URL to WordPress ajax handling page  
 						'ajaxurl'		=> admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
 						'nonce'			=> wp_create_nonce('generate_wpo_wcpdf'),
 						'bulk_actions'	=> array_keys( apply_filters( 'wpo_wcpdf_bulk_actions', $this->bulk_actions ) ),
