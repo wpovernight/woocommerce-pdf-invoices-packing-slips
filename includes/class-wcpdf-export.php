@@ -262,7 +262,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				do_action( 'wpo_wcpdf_process_template_order', $template_type, $order_id );
 
 				$template = $this->template_path . '/' . $template_type . '.php';
-				$template = apply_filters( 'wpo_wcpdf_template_file', $template, $template_type );
+				$template = apply_filters( 'wpo_wcpdf_template_file', $template, $template_type, $this->order );
 
 				if (!file_exists($template)) {
 					throw new Exception('Template not found! Check if the following file exists: <pre>'.$template.'</pre><br/>');
