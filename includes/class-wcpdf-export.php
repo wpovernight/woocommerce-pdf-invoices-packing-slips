@@ -239,6 +239,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$this->template_type = $template_type;
 			$order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $template_type );
 
+			// custom function fix
+			if (function_exists('wpo_wcpdf_payment_form')) {
+				return false;
+			}
+
 			// filter out trashed orders
 			foreach ($order_ids as $key => $order_id) {
 				$order_status = get_post_status( $order_id );
