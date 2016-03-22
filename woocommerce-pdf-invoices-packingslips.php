@@ -308,8 +308,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show shop/company address if provided
 		 */
 		public function get_shop_address() {
-			if (isset($this->settings->template_settings['shop_address']))
-				return apply_filters( 'wpo_wcpdf_shop_address', wpautop( wptexturize( $this->settings->template_settings['shop_address'] ) ) );
+			$shop_address = apply_filters( 'wpo_wcpdf_shop_address', wpautop( wptexturize( $this->settings->template_settings['shop_address'] ) ) );
+			if (!empty($shop_address)) {
+				return $shop_address;
+			} else {
+				return false;
+			}
 		}
 		public function shop_address() {
 			echo $this->get_shop_address();
