@@ -660,6 +660,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 				// die($invoice_number);
 
+				// invoice number logging
+				// $order_number = ltrim($this->order->get_order_number(), '#');
+				// $this->log( $order_id, "Invoice number {$invoice_number} set for order {$order_number} (id {$order_id})" );
+
 				update_post_meta($order_id, '_wcpdf_invoice_number', $invoice_number);
 				update_post_meta($order_id, '_wcpdf_formatted_invoice_number', $this->get_invoice_number( $order_id ) );
 
