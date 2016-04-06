@@ -2,8 +2,8 @@
 Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 4.4.1
-Stable tag: 1.5.28
+Tested up to: 4.4.2
+Stable tag: 1.5.29
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,11 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.29 =
+* Translations: Added Croation (Thanks Neven/Spine ICT!), updated French (Thanks Sabra!)
+* Tweak: filter shop address before checking if it's empty
+* Dev: added $order to `wpo_wcpdf_template_file` filter
 
 = 1.5.28 =
 * Tweak: the 'Next invoice number' is now stored separately in the database for faster and more reliable retrieval. Circumventing any caching, this should prevent duplicate invoice numbers.
