@@ -69,6 +69,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				add_filter( 'wpo_wcpdf_use_path', '__return_false' );
 			}
 
+			if ( isset($this->template_settings['currency_font'])) {
+				add_action( 'wpo_wcpdf_before_pdf', array($this, 'use_currency_font' ) );
+			}
+
+
 			// WooCommerce Subscriptions compatibility
 			if ( class_exists('WC_Subscriptions') ) {
 				if ( version_compare( WC_Subscriptions::$version, '2.0', '<' ) ) {
@@ -1175,7 +1180,26 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				add_filter( $name, 'qtranxf_useCurrentLanguageIfNotFoundUseDefaultLanguage', $priority );
 			}
 		}
-		
+
+		/**
+		 * Use currency symbol font (when enabled in options)
+		 */
+		public function use_currency_font ( $template_type ) {
+			add_filter( 'woocommerce_currency_symbol', array( $this, 'wrap_currency_symbol' ), 10, 2);
+			add_action( 'wpo_wcpdf_custom_styles', array($this, 'currency_symbol_font_styles' ) );
+		}
+
+		public function wrap_currency_symbol( $currency_symbol, $currency ) {
+			$currency_symbol = sprintf( '<span class="wcpdf-currency-symbol">%s</span>', $currency_symbol );
+			return $currency_symbol;
+		}
+
+		public function currency_symbol_font_styles () {
+			?>
+			.wcpdf-currency-symbol { font-family: 'Currencies'; }
+			<?php
+		}
+
 		public function enable_debug () {
 			error_reporting( E_ALL );
 			ini_set( 'display_errors', 1 );

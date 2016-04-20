@@ -611,6 +611,19 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);	
 
+			add_settings_field(
+				'currency_font',
+				__( 'Extended currency symbol support', 'wpo_wcpdf' ),
+				array( &$this, 'checkbox_element_callback' ),
+				$option,
+				'invoice',
+				array(
+					'menu'				=> $option,
+					'id'				=> 'currency_font',
+					'description'			=> __( 'Enable this if your currency symbol is not displaying properly' , 'wpo_wcpdf' ),
+				)
+			);			
+
 			// Section.
 			add_settings_section(
 				'packing_slip',
