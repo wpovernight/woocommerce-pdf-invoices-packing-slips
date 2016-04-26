@@ -2,8 +2,8 @@
 Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 4.4.2
-Stable tag: 1.5.29
+Tested up to: 4.5
+Stable tag: 1.5.30
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,10 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.30 =
+* Feature: Enable currency font for extended currency support
+* Fix: Font sync on plugin update
 
 = 1.5.29 =
 * Translations: Added Croation (Thanks Neven/Spine ICT!), updated French (Thanks Sabra!)
