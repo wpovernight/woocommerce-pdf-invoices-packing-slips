@@ -713,7 +713,14 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				}
 
 				$totals['order_total']['value'] .= $tax_string;			
-			}	
+			}
+
+			// remove refund lines (shouldn't be in invoice)
+			foreach ( $totals as $key => $total ) {
+				if ( strpos($key, 'refund_') !== false ) {
+					unset( $totals[$key] );
+				}
+			}
 	
 			return apply_filters( 'wpo_wcpdf_woocommerce_totals', $totals, $this->export->order );
 		}
