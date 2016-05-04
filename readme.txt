@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.5
-Stable tag: 1.5.30
+Stable tag: 1.5.31
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,10 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.31 =
+* Feature: [invoice_day] or [order_day] in invoice number format
+* Fix: Link to hide all ads when premium extensions active
 
 = 1.5.30 =
 * Feature: Enable currency font for extended currency support
