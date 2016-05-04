@@ -753,16 +753,20 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// Replacements
 			$order_year = date_i18n( 'Y', strtotime( $order_date ) );
 			$order_month = date_i18n( 'm', strtotime( $order_date ) );
+			$order_day = date_i18n( 'd', strtotime( $order_date ) );
 			$invoice_date = get_post_meta($order_id,'_wcpdf_invoice_date',true);
 			$invoice_date = empty($invoice_date) ? current_time('mysql') : $invoice_date;
 			$invoice_year = date_i18n( 'Y', strtotime( $invoice_date ) );
 			$invoice_month = date_i18n( 'm', strtotime( $invoice_date ) );
+			$invoice_day = date_i18n( 'd', strtotime( $invoice_date ) );
 
 			foreach ($formats as $key => $value) {
 				$value = str_replace('[order_year]', $order_year, $value);
 				$value = str_replace('[order_month]', $order_month, $value);
+				$value = str_replace('[order_day]', $order_day, $value);
 				$value = str_replace('[invoice_year]', $invoice_year, $value);
 				$value = str_replace('[invoice_month]', $invoice_month, $value);
+				$value = str_replace('[invoice_day]', $invoice_day, $value);
 				$formats[$key] = $value;
 			}
 
