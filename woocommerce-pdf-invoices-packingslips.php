@@ -733,7 +733,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			
 			$subtotal = $this->export->order->get_subtotal_to_display( false, $tax );
 			
-			$subtotal = ($pos = strpos($subtotal, ' <small>')) ? substr($subtotal, 0, $pos) : $subtotal; //removing the 'excluding tax' text			
+			$subtotal = ($pos = strpos($subtotal, ' <small')) ? substr($subtotal, 0, $pos) : $subtotal; //removing the 'excluding tax' text			
 			
 			$subtotal = array (
 				'label'	=> __('Subtotal', 'wpo_wcpdf'),
