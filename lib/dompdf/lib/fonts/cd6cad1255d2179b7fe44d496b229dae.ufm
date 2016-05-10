@@ -1,0 +1,78 @@
+StartFontMetrics 4.1
+Notice Converted by PHP-font-lib
+Comment https://github.com/PhenX/php-font-lib
+EncodingScheme FontSpecific
+Copyright Typeface © James Kass 1998-2008. Data © James Kass 1998-2008. All Rights Reserved.
+FontName Code2000
+FontSubfamily Normal
+UniqueID Code2000
+FullName Code2000
+Version Version 1.171
+PostScriptName Code2000
+Trademark Notice:  Code2000 is shareware, users are required to register. US$5.00 (James Kass, 2807 Erskine Creek Road Space 93,Lake Isabella, California 93240 U.S.A.)[e-mail: jameskass@code2000.net]<Web site: http://www.code2000.net/index.htm>
+Manufacturer James Kass
+Designer James Kass
+FontVendorURL http://www.code2000.net/index.htm
+FontDesignerURL http://www.code2000.net/index.htm
+LicenseURL http://www.code2000.net/code2000_page.htm
+SampleText Hễ cố là phải được.
+Weight Bold
+ItalicAngle 0
+IsFixedPitch false
+UnderlineThickness 50
+UnderlinePosition -250
+FontHeightOffset 0
+Ascender 977
+Descender -293
+FontBBox -20 -293 1047 977
+StartCharMetrics 51
+U 32 ; WX 391 ; N space ; G 3
+U 36 ; WX 514 ; N uni0024 ; G 4
+U 160 ; WX 391 ; N uni00A0 ; G 5
+U 162 ; WX 475 ; N uni00A2 ; G 6
+U 163 ; WX 693 ; N uni00A3 ; G 7
+U 164 ; WX 703 ; N uni00A4 ; G 8
+U 165 ; WX 604 ; N uni00A5 ; G 9
+U 402 ; WX 563 ; N uni0192 ; G 10
+U 2546 ; WX 537 ; N uni09F2 ; G 11
+U 2547 ; WX 611 ; N uni09F3 ; G 12
+U 2801 ; WX 779 ; N uni0AF1 ; G 13
+U 3065 ; WX 1047 ; N uni0BF9 ; G 14
+U 3647 ; WX 703 ; N uni0E3F ; G 15
+U 6107 ; WX 377 ; N uni17DB ; G 16
+U 8199 ; WX 391 ; N uni2007 ; G 17
+U 8239 ; WX 391 ; N uni202F ; G 18
+U 8288 ; WX 391 ; N uni2060 ; G 19
+U 8352 ; WX 703 ; N uni20A0 ; G 20
+U 8353 ; WX 650 ; N uni20A1 ; G 21
+U 8354 ; WX 670 ; N uni20A2 ; G 22
+U 8355 ; WX 586 ; N uni20A3 ; G 23
+U 8356 ; WX 693 ; N uni20A4 ; G 24
+U 8357 ; WX 967 ; N uni20A5 ; G 25
+U 8358 ; WX 895 ; N uni20A6 ; G 26
+U 8359 ; WX 764 ; N uni20A7 ; G 27
+U 8360 ; WX 961 ; N uni20A8 ; G 28
+U 8361 ; WX 1025 ; N uni20A9 ; G 29
+U 8362 ; WX 736 ; N uni20AA ; G 30
+U 8363 ; WX 676 ; N uni20AB ; G 31
+U 8364 ; WX 746 ; N uni20AC ; G 32
+U 8365 ; WX 965 ; N uni20AD ; G 33
+U 8366 ; WX 633 ; N uni20AE ; G 34
+U 8367 ; WX 1049 ; N uni20AF ; G 35
+U 8368 ; WX 709 ; N uni20B0 ; G 36
+U 8369 ; WX 881 ; N uni20B1 ; G 37
+U 8370 ; WX 650 ; N uni20B2 ; G 38
+U 8371 ; WX 760 ; N uni20B3 ; G 39
+U 8372 ; WX 643 ; N uni20B4 ; G 40
+U 8373 ; WX 650 ; N uni20B5 ; G 41
+U 8377 ; WX 636 ; N uni20B9 ; G 42
+U 8378 ; WX 636 ; N uni20BA ; G 43
+U 8381 ; WX 636 ; N uni20BD ; G 44
+U 8499 ; WX 824 ; N uni2133 ; G 45
+U 20803 ; WX 1000 ; N uni5143 ; G 46
+U 20870 ; WX 1000 ; N uni5186 ; G 47
+U 22278 ; WX 1000 ; N uni5706 ; G 48
+U 22291 ; WX 1000 ; N uni5713 ; G 49
+U 65020 ; WX 1086 ; N uniFDFC ; G 50
+EndCharMetrics
+EndFontMetrics

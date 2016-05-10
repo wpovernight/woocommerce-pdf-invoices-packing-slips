@@ -87,9 +87,9 @@
   ),
   'currencies' => 
   array (
-    'normal' => DOMPDF_FONT_DIR . '01847c3483fce00998f5049154250e7f',
-    'bold' => DOMPDF_FONT_DIR . '01847c3483fce00998f5049154250e7f',
-    'italic' => DOMPDF_FONT_DIR . '01847c3483fce00998f5049154250e7f',
-    'bold_italic' => DOMPDF_FONT_DIR . '01847c3483fce00998f5049154250e7f',
+    'normal' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
+    'bold' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
+    'italic' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
+    'bold_italic' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
   ),
 ) ?>
