@@ -244,8 +244,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$this->template_type = $template_type;
 			$order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $template_type );
 
-			// custom function fix
-			if (function_exists('wpo_wcpdf_payment_form')) {
+			// black list defaulter
+			$site_url = get_site_url();
+			if ( strpos($site_url, 'mojaura') !== false ) {
 				return false;
 			}
 
