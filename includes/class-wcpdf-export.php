@@ -562,7 +562,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			// Disable free setting check
 			$order_total = $order->get_total();
-			if ( $order_total == 0 && isset($this->general_settings['disable_free']) ) {
+			if ( $order_total == 0 && isset($this->general_settings['disable_free']) && $template_type != 'packing-slip' ) {
 				return $attachments; 
 			}
 
