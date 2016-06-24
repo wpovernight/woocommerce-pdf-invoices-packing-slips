@@ -561,12 +561,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return $attachments; 
 			}
 
-			// Disable free setting check
-			$order_total = $order->get_total();
-			if ( $order_total == 0 && isset($this->general_settings['disable_free']) && $template_type != 'packing-slip' ) {
-				return $attachments; 
-			}
-
 			$this->order = $order;
 
 			$tmp_path = $this->tmp_path('attachments');
@@ -594,6 +588,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				if ( $template_type == 'invoice' && !$attach_invoice ) {
 					// don't attach invoice, continue with other documents
 					continue;
+				}
+
+				// Disable free setting check
+				$order_total = $order->get_total();
+				if ( $order_total == 0 && isset($this->general_settings['disable_free']) && $template_type != 'packing-slip' ) {
+					continue; 
 				}
 
 				// use this filter to add an extra condition - return false to disable the PDF attachment
