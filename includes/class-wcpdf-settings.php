@@ -179,6 +179,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 		public function init_settings() {
 			global $woocommerce, $wpo_wcpdf;
 	
+			// Whether a third-party plugin claims responsibility for generating invoice numbers
+			$invoicenumber_thirdparty = apply_filters('woocommerce_invoice_number_by_plugin', false);
+
 			/**************************************/
 			/*********** GENERAL SETTINGS *********/
 			/**************************************/
@@ -530,9 +533,20 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 				)
 			);
 
+			if ($invoicenumber_thirdparty) {
+				$invoice_number_desc = __( 'Invoice numbers are created by a third-party extension.', 'yith-woocommerce-pdf-invoice');
+				$config_link = esc_attr(apply_filters('woocommerce_invoice_number_configuration_link', null));
+				if ($config_link) {
+					$invoice_number_desc .= ' '.sprintf(__( 'Configure it <a href="%s">here</a>.', 'yith-woocommerce-pdf-invoice'), $config_link);
+				}
+				$invoice_number_desc = '<i>'.$invoice_number_desc.'</i>';
+			} else {
+				$invoice_number_desc = null;
+			}
+
 			add_settings_field(
 				'display_number',
-				__( 'Display built-in sequential invoice number', 'wpo_wcpdf' ),
+				$invoicenumber_thirdparty ? __( 'Display invoice number', 'wpo_wcpdf' ) : __( 'Display built-in sequential invoice number', 'wpo_wcpdf' ),
 				array( &$this, 'checkbox_element_callback' ),
 				$option,
 				'invoice',
@@ -540,84 +554,87 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 					'menu'				=> $option,
 					'id'				=> 'display_number',
 					'value' 			=> 'invoice_number',
+					'description'		=> $invoice_number_desc,
 				)
 			);
 
-			// invoice number is stored separately for direct retrieval
-			register_setting( $option, 'wpo_wcpdf_next_invoice_number', array( &$this, 'validate_options' ) );
-			add_settings_field(
-				'next_invoice_number',
-				__( 'Next invoice number (without prefix/suffix etc.)', 'wpo_wcpdf' ),
-				array( &$this, 'singular_text_element_callback' ),
-				$option,
-				'invoice',
-				array(
-					'menu'			=> 'wpo_wcpdf_next_invoice_number',
-					'id'			=> 'next_invoice_number',
-					'size'			=> '10',
-					'description'	=> __( 'This is the number that will be used on the next invoice that is created. By default, numbering starts from the WooCommerce Order Number of the first invoice that is created and increases for every new invoice. Note that if you override this and set it lower than the highest (PDF) invoice number, this could create double invoice numbers!', 'wpo_wcpdf' ),
-				)
-			);
+			if (!$invoicenumber_thirdparty) {
+				// invoice number is stored separately for direct retrieval
+				register_setting( $option, 'wpo_wcpdf_next_invoice_number', array( &$this, 'validate_options' ) );
+				add_settings_field(
+					'next_invoice_number',
+					__( 'Next invoice number (without prefix/suffix etc.)', 'wpo_wcpdf' ),
+					array( &$this, 'singular_text_element_callback' ),
+					$option,
+					'invoice',
+					array(
+						'menu'			=> 'wpo_wcpdf_next_invoice_number',
+						'id'			=> 'next_invoice_number',
+						'size'			=> '10',
+						'description'	=> __( 'This is the number that will be used on the next invoice that is created. By default, numbering starts from the WooCommerce Order Number of the first invoice that is created and increases for every new invoice. Note that if you override this and set it lower than the highest (PDF) invoice number, this could create double invoice numbers!', 'wpo_wcpdf' ),
+					)
+				);
 
-			// first time invoice number
-			$next_invoice_number = get_option('wpo_wcpdf_next_invoice_number');
-			// determine highest invoice number if option not set
-			if ( !isset( $next_invoice_number ) ) {
-				// Based on code from WooCommerce Sequential Order Numbers
-				global $wpdb;
-				// get highest invoice_number in postmeta table
-				$max_invoice_number = $wpdb->get_var( 'SELECT max(cast(meta_value as UNSIGNED)) from ' . $wpdb->postmeta . ' where meta_key="_wcpdf_invoice_number"' );
-				
-				if ( !empty($max_invoice_number) ) {
-					$next_invoice_number = $max_invoice_number+1;
-				} else {
-					$next_invoice_number = '';
+				// first time invoice number
+				$next_invoice_number = get_option('wpo_wcpdf_next_invoice_number');
+				// determine highest invoice number if option not set
+				if ( !isset( $next_invoice_number ) ) {
+					// Based on code from WooCommerce Sequential Order Numbers
+					global $wpdb;
+					// get highest invoice_number in postmeta table
+					$max_invoice_number = $wpdb->get_var( 'SELECT max(cast(meta_value as UNSIGNED)) from ' . $wpdb->postmeta . ' where meta_key="_wcpdf_invoice_number"' );
+					
+					if ( !empty($max_invoice_number) ) {
+						$next_invoice_number = $max_invoice_number+1;
+					} else {
+						$next_invoice_number = '';
+					}
+
+					update_option( 'wpo_wcpdf_next_invoice_number', $next_invoice_number );
 				}
 
-				update_option( 'wpo_wcpdf_next_invoice_number', $next_invoice_number );
-			}
+				add_settings_field(
+					'invoice_number_formatting',
+					__( 'Invoice number format', 'wpo_wcpdf' ),
+					array( &$this, 'invoice_number_formatting_callback' ),
+					$option,
+					'invoice',
+					array(
+						'menu'					=> $option,
+						'id'					=> 'invoice_number_formatting',
+						'fields'				=> array(
+							'prefix'			=> array(
+								'title'			=> __( 'Prefix' , 'wpo_wcpdf' ),
+								'size'			=> 20,
+								'description'	=> __( 'to use the invoice year and/or month, use [invoice_year] or [invoice_month] respectively' , 'wpo_wcpdf' ),
+							),
+							'suffix'			=> array(
+								'title'			=> __( 'Suffix' , 'wpo_wcpdf' ),
+								'size'			=> 20,
+								'description'	=> '',
+							),
+							'padding'			=> array(
+								'title'			=> __( 'Padding' , 'wpo_wcpdf' ),
+								'size'			=> 2,
+								'description'	=> __( 'enter the number of digits here - enter "6" to display 42 as 000042' , 'wpo_wcpdf' ),
+							),
+						),
+						'description'			=> __( 'note: if you have already created a custom invoice number format with a filter, the above settings will be ignored' , 'wpo_wcpdf' ),
+					)
+				);
 
-			add_settings_field(
-				'invoice_number_formatting',
-				__( 'Invoice number format', 'wpo_wcpdf' ),
-				array( &$this, 'invoice_number_formatting_callback' ),
-				$option,
-				'invoice',
-				array(
-					'menu'					=> $option,
-					'id'					=> 'invoice_number_formatting',
-					'fields'				=> array(
-						'prefix'			=> array(
-							'title'			=> __( 'Prefix' , 'wpo_wcpdf' ),
-							'size'			=> 20,
-							'description'	=> __( 'to use the invoice year and/or month, use [invoice_year] or [invoice_month] respectively' , 'wpo_wcpdf' ),
-						),
-						'suffix'			=> array(
-							'title'			=> __( 'Suffix' , 'wpo_wcpdf' ),
-							'size'			=> 20,
-							'description'	=> '',
-						),
-						'padding'			=> array(
-							'title'			=> __( 'Padding' , 'wpo_wcpdf' ),
-							'size'			=> 2,
-							'description'	=> __( 'enter the number of digits here - enter "6" to display 42 as 000042' , 'wpo_wcpdf' ),
-						),
-					),
-					'description'			=> __( 'note: if you have already created a custom invoice number format with a filter, the above settings will be ignored' , 'wpo_wcpdf' ),
-				)
-			);
-
-			add_settings_field(
-				'yearly_reset_invoice_number',
-				__( 'Reset invoice number yearly', 'wpo_wcpdf' ),
-				array( &$this, 'checkbox_element_callback' ),
-				$option,
-				'invoice',
-				array(
-					'menu'				=> $option,
-					'id'				=> 'yearly_reset_invoice_number',
-				)
-			);	
+				add_settings_field(
+					'yearly_reset_invoice_number',
+					__( 'Reset invoice number yearly', 'wpo_wcpdf' ),
+					array( &$this, 'checkbox_element_callback' ),
+					$option,
+					'invoice',
+					array(
+						'menu'				=> $option,
+						'id'				=> 'yearly_reset_invoice_number',
+					)
+				);
+			} // End if ($invoicenumber_thirdparty)
 
 			add_settings_field(
 				'currency_font',

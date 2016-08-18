@@ -625,6 +625,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// first check: get invoice number from post meta
 			$invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true );
 
+			// If a third-party plugin claims to generate invoice numbers, use it instead
+			$third_party = apply_filters('woocommerce_invoice_number_by_plugin', false);
+			if ($third_party) {
+				$order = new WC_Order($order_id);
+				$invoice_number = apply_filters('woocommerce_generate_invoice_number', null, $order);
+			}
+
 			// add invoice number if it doesn't exist
 			if ( empty($invoice_number) || !isset($invoice_number) ) {
 				global $wpdb;
@@ -692,6 +699,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function get_invoice_number( $order_id ) {
+			// Call the woocommerce_invoice_number filter and let third-party plugins set a number.
+			// Default is null, so we can detect whether a plugin has set the invoice number
+			$third_party_invoice_number = apply_filters( 'woocommerce_invoice_number', null, $order_id );
+			if ($third_party_invoice_number !== null) {
+				return $third_party_invoice_number;
+			}
+
 			// get invoice number from post meta
 			if ( $invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true ) ) {
 				// check if we have already loaded this order
