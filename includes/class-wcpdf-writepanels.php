@@ -289,7 +289,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				<?php if (!empty($invoice_exists)) : ?>
 				<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number ?>">
 				<?php else : ?>
-				<input type="text" class="short" style="" name="" id="_wcpdf_invoice_number" value="" disabled="disabled" >
+				<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number ?>" disabled="disabled" >
 				<?php endif; ?>
 			</p>
 			<p class="form-field form-field-wide">
@@ -297,7 +297,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				<?php if (!empty($invoice_exists)) : ?>
 				<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" value="<?php echo date_i18n( 'Y-m-d', strtotime( $invoice_date ) ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="text" class="hour" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" value="<?php echo date_i18n( 'H', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />:<input type="text" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" value="<?php echo date_i18n( 'i', strtotime( $invoice_date ) ); ?>" pattern="\-?\d+(\.\d{0,})?" />
 				<?php else : ?>
-				<input type="text" class="date-picker-field" id="wcpdf_invoice_date" maxlength="10" disabled="disabled" >@<input type="text" class="hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" disabled="disabled" />:<input type="text" class="minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" disabled="disabled" />
+				<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" disabled="disabled" value="" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="text" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" maxlength="2" size="2" value="" pattern="\-?\d+(\.\d{0,})?" />:<input type="text" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" maxlength="2" size="2" value="" pattern="\-?\d+(\.\d{0,})?" disabled="disabled" />
 				<?php endif; ?>
 			</p>
 			<?php
@@ -333,6 +333,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			if( $post_type == 'shop_order' ) {
 				if ( isset($_POST['_wcpdf_invoice_number']) ) {
 					update_post_meta( $post_id, '_wcpdf_invoice_number', stripslashes( $_POST['_wcpdf_invoice_number'] ));
+					update_post_meta( $post_id, '_wcpdf_invoice_exists', 1 );
 				}
 
 				if ( isset($_POST['wcpdf_invoice_date']) ) {
@@ -342,10 +343,16 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 						$invoice_date = strtotime( $_POST['wcpdf_invoice_date'] . ' ' . (int) $_POST['wcpdf_invoice_date_hour'] . ':' . (int) $_POST['wcpdf_invoice_date_minute'] . ':00' );
 						$invoice_date = date_i18n( 'Y-m-d H:i:s', $invoice_date );
 						update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );
+						update_post_meta( $post_id, '_wcpdf_invoice_exists', 1 );
 					}
 				}
 
-				if ( empty($_POST['wcpdf_invoice_date']) && empty($_POST['wcpdf_invoice_number'])) {
+				if (empty($_POST['wcpdf_invoice_date']) && isset($_POST['_wcpdf_invoice_number'])) {
+					$invoice_date = date_i18n( 'Y-m-d H:i:s', time() );
+					update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );
+				}
+
+				if ( empty($_POST['wcpdf_invoice_date']) && empty($_POST['_wcpdf_invoice_number'])) {
 					delete_post_meta( $post_id, '_wcpdf_invoice_exists' );
 				}
 			}

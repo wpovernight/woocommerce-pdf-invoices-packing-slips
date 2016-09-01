@@ -30,5 +30,14 @@ jQuery(document).ready(function($) {
 	});
 
 	$('#wpo_wcpdf-data-input-box').insertAfter('#woocommerce-order-data');
+
+	// enable invoice number edit if user initiated
+	$('#wpo_wcpdf-data-input-box label').click(function (event) {
+		input = $(this).attr('for');
+		$('#'+input).prop('disabled', false);
+	});
+	$( "#_wcpdf_invoice_number" ).on( "click", function() {
+		console.log( this );
+	});
 });
 
