@@ -110,9 +110,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Settings' ) ) {
 
 			?>
 				<script type="text/javascript">
-					window.onload = function () {
-						document.getElementById("footer-thankyou").innerHTML = "If you like <strong>WooCommerce PDF Invoices & Packing Slips</strong> please leave us a <a href='https://wordpress.org/support/view/plugin-reviews/woocommerce-pdf-invoices-packing-slips?rate=5#postform'>★★★★★</a> rating. A huge thank you in advance!";
-					};
+					jQuery( function( $ ) {
+						$("#footer-thankyou").html("If you like <strong>WooCommerce PDF Invoices & Packing Slips</strong> please leave us a <a href='https://wordpress.org/support/view/plugin-reviews/woocommerce-pdf-invoices-packing-slips?rate=5#postform'>★★★★★</a> rating. A huge thank you in advance!");
+					});
 				</script>
 				<div class="wrap">
 					<div class="icon32" id="icon-options-general"><br /></div>
