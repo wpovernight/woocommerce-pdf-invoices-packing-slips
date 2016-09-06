@@ -104,7 +104,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function is_woocommerce_activated() {
 			$blog_plugins = get_option( 'active_plugins', array() );
-			$site_plugins = get_site_option( 'active_sitewide_plugins', array() );
+			$site_plugins = is_multisite() ? (array) maybe_unserialize( get_site_option('active_sitewide_plugins' ) ) : array();
 
 			if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
 				return true;
