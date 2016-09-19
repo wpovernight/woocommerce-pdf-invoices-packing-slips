@@ -2,8 +2,8 @@
 Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 4.5
-Stable tag: 1.5.36
+Tested up to: 4.6
+Stable tag: 1.5.37
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,14 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.37 =
+* Feature: Added support for third party invoice numbers
+* Feature: Enable pre-invoice number click-to-edit
+* Fix: Review link for custom admins
+* Fix: PHP7 compatibility
+* Fix: Invoice date hour/minute pattern
+* Tweak: Multisite WooCommerce check optimization
 
 = 1.5.36 =
 * Translations: Fixed Romanian (incorrect "Factură Proforma" translation for "Invoice")
