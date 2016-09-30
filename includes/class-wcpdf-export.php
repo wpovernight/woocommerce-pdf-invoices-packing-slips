@@ -1076,12 +1076,12 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		/**
 		 * Returns the main product image ID
 		 * Adapted from the WC_Product class
+		 * (does not support thumbnail sizes)
 		 *
 		 * @access public
 		 * @return string
 		 */
 		public function get_thumbnail_id ( $product ) {
-			// DEPRICATED (does not support thumbnail sizes)
 			global $woocommerce;
 	
 			if ( $product->variation_id && has_post_thumbnail( $product->variation_id ) ) {
@@ -1091,12 +1091,22 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			} elseif ( ( $parent_id = wp_get_post_parent_id( $product->id ) ) && has_post_thumbnail( $parent_id ) ) {
 				$thumbnail_id = get_post_thumbnail_id ( $parent_id );
 			} else {
-				$thumbnail_id = $woocommerce->plugin_url() . '/assets/images/placeholder.png';
+				$thumbnail_id = false;
 			}
 	
 			return $thumbnail_id;
 		}
 
+		/**
+		 * Returns the thumbnail image tag
+		 * 
+		 * uses the internal WooCommerce/WP functions and extracts the image url or path
+		 * rather than the thumbnail ID, to simplify the code and make it possible to
+		 * filter for different thumbnail sizes
+		 *
+		 * @access public
+		 * @return string
+		 */
 		public function get_thumbnail ( $product ) {
 			// Get default WooCommerce img tag (url/http)
 			$size = apply_filters( 'wpo_wcpdf_thumbnail_size', 'shop_thumbnail' );
@@ -1105,7 +1115,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			// Extract the url from img
 			preg_match('/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
 			// convert url to path
-			$thumbnail_path = str_replace( get_site_url() . '/', ABSPATH, array_pop($thumbnail_url));
+			$thumbnail_path = str_replace( trailingslashit( get_site_url() ), ABSPATH, array_pop($thumbnail_url));
+
+			// fallback if thumbnail file doesn't exist
+			if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
+				if ($thumnail_id = $this->get_thumbnail_id( $product ) ) {
+					$thumbnail_path = get_attached_file( $thumbnail_id );
+				}
+			}
 
 			// Thumbnail (full img tag)
 			if (apply_filters('wpo_wcpdf_use_path', true) && file_exists($thumbnail_path)) {
