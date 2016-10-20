@@ -976,11 +976,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * @return string $tax_rates imploded list of tax rates
 		 */
 		public function get_tax_rate( $tax_class, $line_total, $line_tax, $line_tax_data = '' ) {
-			if ( $line_tax == 0 ) {
-				return '-'; // no need to determine tax rate...
-			}
-
-			// first try the easy wc2.2 way, using line_tax_data
+			// first try the easy wc2.2+ way, using line_tax_data
 			if ( !empty( $line_tax_data ) && isset($line_tax_data['total']) ) {
 				$tax_rates = array();
 
@@ -993,6 +989,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 				$tax_rates = implode(' ,', $tax_rates );
 				return $tax_rates;
+			}
+
+			if ( $line_tax == 0 ) {
+				return '-'; // no need to determine tax rate...
 			}
 
 			if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 && !apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
