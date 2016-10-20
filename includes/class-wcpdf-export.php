@@ -980,9 +980,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			if ( !empty( $line_tax_data ) && isset($line_tax_data['total']) ) {
 				$tax_rates = array();
 
-				$line_taxes = $line_tax_data['total'];
+				$line_taxes = $line_tax_data['subtotal'];
 				foreach ( $line_taxes as $tax_id => $tax ) {
-					if ( !empty($tax) && $tax != 0 ) {
+					if ( !empty($tax) ) {
 						$tax_rates[] = $this->get_tax_rate_by_id( $tax_id ) . ' %';
 					}
 				}
