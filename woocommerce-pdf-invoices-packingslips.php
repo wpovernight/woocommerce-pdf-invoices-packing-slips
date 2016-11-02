@@ -354,7 +354,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// temporarily switch order to make all filters / order calls work correctly
 				$current_order = $this->export->order;
-				$this->export->order = new WC_Order( $parent_order_id );
+				$this->export->order = wc_get_order( $parent_order_id );
 				$address = apply_filters( 'wpo_wcpdf_billing_address', $this->export->order->get_formatted_billing_address() );
 				// switch back & unset
 				$this->export->order = $current_order;
@@ -415,7 +415,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
 				// temporarily switch order to make all filters / order calls work correctly
 				$current_order = $this->export->order;
-				$this->export->order = new WC_Order( $parent_order_id );
+				$this->export->order = wc_get_order( $parent_order_id );
 				$address = apply_filters( 'wpo_wcpdf_shipping_address', $this->export->order->get_formatted_shipping_address() );
 				// switch back & unset
 				$this->export->order = $current_order;
@@ -544,7 +544,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		public function get_order_number() {
 			// try parent first
 			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
-				$parent_order = new WC_Order( $parent_order_id );
+				$parent_order = wc_get_order( $parent_order_id );
 				$order_number = $parent_order->get_order_number();
 			} else {
 				$order_number = $this->export->order->get_order_number();
@@ -581,7 +581,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_order_date() {
 			if ( get_post_type( $this->export->order->id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $this->export->order->id ) ) {
-				$parent_order = new WC_Order( $parent_order_id );
+				$parent_order = wc_get_order( $parent_order_id );
 				$order_date = $parent_order->order_date;
 			} else {
 				$order_date = $this->export->order->order_date;

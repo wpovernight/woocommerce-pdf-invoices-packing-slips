@@ -22,7 +22,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function __construct() {					
 			global $woocommerce;
-			$this->order = new WC_Order('');
+			$this->order = wc_get_order();
 			$this->general_settings = get_option('wpo_wcpdf_general_settings');
 			$this->template_settings = get_option('wpo_wcpdf_template_settings');
 			$this->debug_settings = get_option('wpo_wcpdf_debug_settings');
@@ -238,7 +238,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			$output_html = array();
 			foreach ($order_ids as $order_id) {
-				$this->order = new WC_Order( $order_id );
+				$this->order = wc_get_order( $order_id );
 				do_action( 'wpo_wcpdf_process_template_order', $template_type, $order_id );
 
 				$template = $this->template_path . '/' . $template_type . '.php';
@@ -379,7 +379,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 
 				// Get user_id of order
-				$this->order = new WC_Order ( $order_ids[0] );	
+				$this->order = wc_get_order( $order_ids[0] );
 
 				// Check if current user is owner of order IMPORTANT!!!
 				if ( $this->order->user_id != get_current_user_id() ) {
@@ -616,7 +616,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$order_number = $this->order->get_order_number();
 					$order_date = $this->order->order_date;
 				} else {
-					$order = new WC_Order( $order_id );
+					$order = wc_get_order( $order_id );
 					$order_number = $order->get_order_number();
 					$order_date = $order->order_date;
 				}
@@ -678,7 +678,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 		public function get_display_number( $order_id ) {
 			if ( !isset($this->order->id) ) {
-				$this->order = new WC_Order ( $order_id );
+				$this->order = wc_get_order( $order_id );
 			}
 
 			if ( isset($this->template_settings['display_number']) && $this->template_settings['display_number'] == 'invoice_number' ) {
