@@ -433,7 +433,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// User call from my-account page
-			if ( isset( $_GET['my-account'] ) ) {
+			if ( !current_user_can('manage_options') && isset( $_GET['my-account'] ) ) {
 				// Only for single orders!
 				if ( count( $order_ids ) > 1 ) {
 					wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
