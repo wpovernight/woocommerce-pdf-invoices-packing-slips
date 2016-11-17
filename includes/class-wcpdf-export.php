@@ -1115,12 +1115,16 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			
 			// Extract the url from img
 			preg_match('/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
-			// convert url to path
-			$thumbnail_path = str_replace( trailingslashit( get_site_url() ), ABSPATH, array_pop($thumbnail_url));
+			// remove http/https from image tag url to avoid mixed origin conflicts
+			$thumbnail_url = array_pop($thumbnail_url);
+			$contextless_thumbnail_url = str_replace(array('http://','https://'), '', $thumbnail_url );
+			$contextless_site_url = str_replace(array('http://','https://'), '', trailingslashit(get_site_url()));
 
+			// convert url to path
+			$thumbnail_path = str_replace( $contextless_site_url, ABSPATH, $contextless_thumbnail_url);
 			// fallback if thumbnail file doesn't exist
 			if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
-				if ($thumnail_id = $this->get_thumbnail_id( $product ) ) {
+				if ($thumbnail_id = $this->get_thumbnail_id( $product ) ) {
 					$thumbnail_path = get_attached_file( $thumbnail_id );
 				}
 			}
@@ -1135,7 +1139,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// die($thumbnail);
-
 			return $thumbnail;
 		}
 
