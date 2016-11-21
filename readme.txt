@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.6
-Stable tag: 1.5.37
+Stable tag: 1.5.38
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -234,6 +234,14 @@ This usually only happens on batch actions. PDF creation is a memory intensive j
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.38 =
+* Fix: Thumbnail path fallback
+* Fix: Edge/IE hour & minute pattern
+* Fix: Skip over non-order objects
+* Tweak: Let shop manager view My Account links
+* Dev: added `wpo_wcpdf_before_attachment_creation` action
+* Translations: Updated POT, Swedish, Dutch & Norwegian
 
 = 1.5.37 =
 * Feature: Added support for third party invoice numbers
