@@ -544,12 +544,13 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			if ( !is_object( $order ) || !isset( $status ) ) {
 				return $attachments;
 			}
-			if ( !isset($order->id) ) {
-				return $attachments;
-			}
 
 			// Skip User emails
 			if ( get_class( $order ) == 'WP_User' ) {
+				return $attachments;
+			}
+
+			if ( !isset($order->id) ) {
 				return $attachments;
 			}
 
