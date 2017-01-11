@@ -63,11 +63,17 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 == Frequently Asked Questions ==
 
-Make sure to check out [WooCommerce PDF Invoices & Packing Slips documentation](http://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/) on our site - it covers most of the questions below (and more!) in more detail!
+= Where can I find the documentation? =
 
-= How do I create my own custom template? =
+[WooCommerce PDF Invoices & Packing Slips documentation](http://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/)
 
-Copy the files from `wp-content/plugins/woocommerce-pdf-invoices-packing-slips/templates/pdf/Simple/` to your (child) theme in `wp-content/themes/yourtheme/woocommerce/pdf/yourtemplate` and customize them there. The new template will show up as 'yourtemplate' (the folder name) in the settings panel.
+= It's not working! =
+
+Check out our step by step diagnostic instructions here: https://wordpress.org/support/topic/read-this-first-9/
+
+
+
+
 
 = Where can I find more templates? =
 
@@ -80,151 +86,9 @@ This is a feature of our Professional extension, which can be found at [wpoverni
 You're more than welcome! This plugin is hosted on github, where you can post issues or make pull requests.
 https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips
 
-= My language is not included, how can I contribute? =
-
-This plugin is translation ready, which means that you can translate it using standard WordPress methods.
-
-1. Download POEdit at (http://www.poedit.net/download.php)
-2. Open POEdit
-3. File > New from POT
-4. Open wpo_wcpdf.pot (from `woocommerce-pdf-invoices-packing-slips/languages/`)
-5. A popup will ask you for your language
-6. This step is a bit tricky, configuring the plurals. Somehow the settings can't be copied from the pot. Go to Catalogue > Preferences. Then enter nplurals=2; plural=n != 1; in the custom expression field
-7. Enter the translations. invoice and packing-slip now have two translation fields, single & plural. Note that this is a filename, so replace spaces with a - just to be sure!
-8. Save as `wpo_wcpdf-xx_XX.po`, where you replace xx_XX with your language code & country code suffix (da_DK, pl_PL, de_DE etc.)
-
-= How can I use my own font? =
-Although the plugin supports webfonts, this is somewhat limited and has a lot of caveats, read [this thread](https://wordpress.org/support/topic/webfonts-within-a-custom-template-not-rendering-in-pdf?replies=4#post-5395442) on the forum.
-Some languages (Japanese, Chinese, etc.) are not supported by the default font included with the plugin, in this case a custom font is required.
-The best method is to create a custom template first (see above), then add a `fonts/` folder to that template and use the following code (replace the font names/filenames) to load the font in the style.css from the pdf template:
-`
-<?php global $wpo_wcpdf;?>
-/* Load font */
-@font-face {
-	font-family: 'MyFont';
-	font-style: normal;
-	font-weight: normal;
-	src: local('MyFont'), local('MyFont'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont.ttf) format('truetype');
-}
-@font-face {
-	font-family: 'MyFont';
-	font-style: normal;
-	font-weight: bold;
-	src: local('MyFont Bold'), local('MyFont-Bold'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont-bold.ttf) format('truetype');
-}
-@font-face {
-	font-family: 'MyFont';
-	font-style: italic;
-	font-weight: normal;
-	src: local('MyFont Italic'), local('MyFont-Italic'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont-italic.ttf) format('truetype');
-}
-@font-face {
-	font-family: 'MyFont';
-	font-style: italic;
-	font-weight: bold;
-	src: local('MyFont Bold Italic'), local('MyFont-BoldItalic'), url(<?php echo $wpo_wcpdf->export->template_path; ?>/fonts/myfont-bolditalic.ttf) format('truetype');
-}
-`
-then make sure you assign that font family to the body or other elements of the template:
-`
-	font-family: 'MyFont';
-`
-
-Some notes:
-
-* Only TTF fonts are supported.
-* You can't use numeric font weights (like 700 instead of bold)!
-* Avoid spaces or special characters in the font filenames.
-* I have found that not all servers cope well with the font paths. If this is the case with your font, try to put the font in the root of your site and put that in the font url (i.e. `url(http://yoursite.com/fonts/myfont-italic.ttf)` )
-
-Some font links:
-
-* Japanese - http://ipafont.ipa.go.jp/index.html
-* Chinese - http://www.study-area.org/apt/firefly-font/
-
 = How can I display the HTML/CSS source for debugging/developing templates? =
 There's a setting on the Status tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
 
-= How can I display custom fields in the invoice or packing slip? =
-First, you need to create a custom template following instructions from the first item in this FAQ.
-Then place the following snippet where you would like the custom field to appear:
-
-`
-<?php $wpo_wcpdf->custom_field('custom_fieldname', 'Custom field:'); ?>
-`
-
-Where you replace 'custom_fieldname' with the name of the field you want to display, and 'Custom field' with the label. The plugin only displays the field when it contains data. If you also want to display the label when the field is empty, you can pass a third parameter (true), like this:
-
-`
-<?php $wpo_wcpdf->custom_field('custom_fieldname', 'Custom field:',  true); ?>
-`
-
-= How can I display order notes in the invoice or packing slip? =
-First, you need to create a custom template following instructions from the first item in this FAQ.
-Then place the following snippet where you would like the order notes to appear:
-
-`
-<?php $wpo_wcpdf->order_notes(); ?>
-`
-
-if you want to display all order notes, including the (private) admin notes, use:
-`
-<?php $wpo_wcpdf->order_notes('all'); ?>
-`
-
-= How do can I modify the pdf filename? =
-You can do this via a filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings).
-
-Here's a simple example for putting your shop name in front of the filname.
-`
-add_filter( 'wpo_wcpdf_filename', 'wpo_wcpdf_custom_filename', 10, 4 );
-function wpo_wcpdf_custom_filename( $filename, $template_type, $order_ids, $context ) {
-	// prepend your shopname to the file
-	$new_filename = 'myshopname_' . $filename;
-
-	return $new_filename;
-}
-`
-You can also use the $template_type ('invoice' or 'packing-slip'), $order_ids (single array) or $context ('download' or 'attachment') variables to make more complex rules for the filename.
-
-= How can I add a download link to the invoice on the Thank you page? =
-You can do this with an action in your theme's `functions.php` (Some themes have a "custom functions" area in the settings). Note that due to security restrictions, this will only work for registered/logged in users!
-
-`
-add_filter('woocommerce_thankyou_order_received_text', 'wpo_wcpdf_thank_you_link', 10, 2);
-function wpo_wcpdf_thank_you_link( $text, $order ) {
-	if ( is_user_logged_in() ) {
-		$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id . '&my-account'), 'generate_wpo_wcpdf' );
-		$text .= '<p><a href="'.esc_attr($pdf_url).'">Download a printable invoice / payment confirmation (PDF format)</a></p>';
-	}
-	return $text;
-}
-`
-
-alternatively, you can hook this text to the `woocommerce_thankyou` action, see [this thread](https://wordpress.org/support/topic/suggestion-for-the-faq?replies=5#post-6298810) on the support forum.
-
-= How can I get a copy of the invoice emailed to the shop manager? =
-The easiest way to do this is to just tick the 'new order' box. However, this also means that an invoice will be created for all new orders, also the ones that are never completed.
-
-Alternatively you can get a (BCC) copy of the completed order email by placing the following filter in your theme's `functions.php` (Some themes have a "custom functions" area in the settings)
-Modify the name & email address to your own preferences, 
-
-`
-add_filter( 'woocommerce_email_headers', 'mycustom_headers_filter_function', 10, 2);
-
-function mycustom_headers_filter_function( $headers, $object ) { 
-	if ($object == 'customer_completed_order') { 
-		$headers .= 'BCC: Your name <your@email.com>' . "\r\n"; //just repeat this line again to insert another email address in BCC
-	}
-
-	return $headers; 
-}
-`
-
-
-= Fatal error: Allowed memory size of ######## bytes exhausted (tried to allocate ### bytes) =
-
-This usually only happens on batch actions. PDF creation is a memory intensive job, especially if it includes several pages with images. Go to WooCommerce > System Status to check your WP Memory Limit. We recommend setting it to 128mb or more.
 
 == Screenshots ==
 
