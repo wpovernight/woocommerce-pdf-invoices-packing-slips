@@ -245,8 +245,8 @@ table.totals td.price {
 	width: 50%;
 }
 
-table.totals tr:last-child td,
-table.totals tr:last-child th {
+table.totals tr.order_total td,
+table.totals tr.order_total th {
 	border-top: 2px solid #000;
 	border-bottom: 2px solid #000;
 	font-weight: bold;
