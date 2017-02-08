@@ -1,4 +1,6 @@
 <?php global $wpo_wcpdf; ?>
+<?php do_action( 'wpo_wcpdf_before_document', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
+
 <table class="head container">
 	<tr>
 		<td class="header">
@@ -108,10 +110,12 @@
 		<tr class="no-borders">
 			<td class="no-borders">
 				<div class="customer-notes">
+					<?php do_action( 'wpo_wcpdf_before_customer_notes', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 					<?php if ( $wpo_wcpdf->get_shipping_notes() ) : ?>
 						<h3><?php _e( 'Customer Notes', 'wpo_wcpdf' ); ?></h3>
 						<?php $wpo_wcpdf->shipping_notes(); ?>
 					<?php endif; ?>
+					<?php do_action( 'wpo_wcpdf_after_customer_notes', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
 				</div>				
 			</td>
 			<td class="no-borders" colspan="2">
@@ -138,3 +142,4 @@
 	<?php $wpo_wcpdf->footer(); ?>
 </div><!-- #letter-footer -->
 <?php endif; ?>
+<?php do_action( 'wpo_wcpdf_after_document', $wpo_wcpdf->export->template_type, $wpo_wcpdf->export->order ); ?>
