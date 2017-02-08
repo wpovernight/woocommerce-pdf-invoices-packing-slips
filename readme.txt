@@ -2,8 +2,8 @@
 Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 4.6
-Stable tag: 1.5.38
+Tested up to: 4.7
+Stable tag: 1.5.39
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.5.39 =
+* Feature: new template action hooks `wpo_wcpdf_before_document` & `wpo_wcpdf_after_document`
+* Tweak: In totals, emphasize order total rather than last item
+* Fix: User deprecation notices
+* Translations: Updated Slovenian
 
 = 1.5.38 =
 * Fix: Thumbnail path fallback
