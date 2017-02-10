@@ -332,13 +332,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Check if billing address and shipping address are equal
 		 */
 		public function ships_to_different_address() {
-			$order_id = WCX_Order::get_id( $this->export->order );
+			$order = &$this->export->order;
+			$order_id = WCX_Order::get_id( $order );
 			// always prefer parent address for refunds
 			if ( get_post_type( $order_id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $order_id ) ) {
-				// temporarily switch order to make all filters / order calls work correctly
-				$order_meta = get_post_meta( $parent_order_id );
-			} else {
-				$order_meta = get_post_meta( $order_id );
+				$order = WCX::get_order( $parent_order_id );
 			}
 
 			$address_comparison_fields = apply_filters( 'wpo_wcpdf_address_comparison_fields', array(
@@ -354,8 +352,10 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			) );
 			
 			foreach ($address_comparison_fields as $address_field) {
-				$billing_field = isset( $order_meta['_billing_'.$address_field] ) ? $order_meta['_billing_'.$address_field] : '';
-				$shipping_field = isset( $order_meta['_shipping_'.$address_field] ) ? $order_meta['_shipping_'.$address_field] : '';
+				$billing_field = WCX_Order::get_prop( $order, "billing_{$address_field}");
+				$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}");
+
+				error_log("$billing_field vs $shipping_field");
 				if ( $shipping_field != $billing_field ) {
 					// this address field is different -> ships to different address!
 					return true;
@@ -363,7 +363,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			}
 
 			//if we got here, it means the addresses are equal -> doesn't ship to different address!
-			return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order_meta );
+			return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order );
 		}
 		
 		/**
