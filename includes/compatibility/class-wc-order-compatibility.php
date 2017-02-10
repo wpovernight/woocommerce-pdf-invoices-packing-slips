@@ -110,52 +110,6 @@ class Order extends Data {
 
 
 	/**
-	 * Gets an address property.
-	 *
-	 * @since 4.6.0-dev
-	 * @param \WC_Order $object the order object
-	 * @param string $prop the property name
-	 * @param string $context if 'view' then the value will be filtered
-	 * @return string
-	 */
-	public static function get_address_prop( $object, $prop, $context = 'view', $compat_props = array() ) {
-		$value = '';
-
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
-			$legacy_props = array(
-				'billing_first_name',
-				'billing_last_name',
-				'billing_company',
-				'billing_address_1',
-				'billing_address_2',
-				'billing_city',
-				'billing_state',
-				'billing_postcode',
-				'billing_country',
-				'billing_phone',
-				'billing_email',
-				'shipping_first_name',
-				'shipping_last_name',
-				'shipping_company',
-				'shipping_address_1',
-				'shipping_address_2',
-				'shipping_city',
-				'shipping_state',
-				'shipping_postcode',
-				'shipping_country',
-				'customer_ip_address',
-				'customer_user_agent',
-				'payment_method_title',
-				'payment_method',
-				'order_currency'
-			);
-		}
-
-		return $value;
-	}
-
-
-	/**
 	 * Sets an order's properties.
 	 *
 	 * Note that this does not save any data to the database.
