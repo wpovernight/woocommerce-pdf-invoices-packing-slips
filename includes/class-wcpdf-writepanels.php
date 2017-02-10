@@ -279,9 +279,10 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Add metabox for invoice number & date
 		 */
 		public function data_input_box_content ( $post ) {
-			$invoice_exists = get_post_meta( $post->ID, '_wcpdf_invoice_exists', true );
-			$invoice_number = get_post_meta($post->ID,'_wcpdf_invoice_number',true);
-			$invoice_date = get_post_meta($post->ID,'_wcpdf_invoice_date',true);
+			$order = WCX::get_order( $post_id );
+			$invoice_exists = WCX_Order::get_meta( $order, 'wcpdf_invoice_exists', true );
+			$invoice_number = WCX_Order::get_meta( $order, '_wcpdf_invoice_number', true );
+			$invoice_date = WCX_Order::get_meta( $order, '_wcpdf_invoice_date', true );
 			
 			do_action( 'wpo_wcpdf_meta_box_start', $post->ID );
 
@@ -334,29 +335,30 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		public function save_invoice_number_date($post_id) {
 			global $post_type;
 			if( $post_type == 'shop_order' ) {
+				$order = WCX::get_order( $post_id );
 				if ( isset($_POST['_wcpdf_invoice_number']) ) {
-					update_post_meta( $post_id, '_wcpdf_invoice_number', stripslashes( $_POST['_wcpdf_invoice_number'] ));
-					update_post_meta( $post_id, '_wcpdf_invoice_exists', 1 );
+					WCX_Order::update_meta_data( $order, '_wcpdf_invoice_number', stripslashes( $_POST['_wcpdf_invoice_number'] ) );
+					WCX_Order::update_meta_data( $order, '_wcpdf_invoice_exists', 1 );
 				}
 
 				if ( isset($_POST['wcpdf_invoice_date']) ) {
 					if ( empty($_POST['wcpdf_invoice_date']) ) {
-						delete_post_meta( $post_id, '_wcpdf_invoice_date' );
+						WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_date' );
 					} else {
 						$invoice_date = strtotime( $_POST['wcpdf_invoice_date'] . ' ' . (int) $_POST['wcpdf_invoice_date_hour'] . ':' . (int) $_POST['wcpdf_invoice_date_minute'] . ':00' );
 						$invoice_date = date_i18n( 'Y-m-d H:i:s', $invoice_date );
-						update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );
-						update_post_meta( $post_id, '_wcpdf_invoice_exists', 1 );
+						WCX_Order::update_meta_data( $order, '_wcpdf_invoice_date', $invoice_date );
+						WCX_Order::update_meta_data( $order, '_wcpdf_invoice_exists', 1 );
 					}
 				}
 
 				if (empty($_POST['wcpdf_invoice_date']) && isset($_POST['_wcpdf_invoice_number'])) {
 					$invoice_date = date_i18n( 'Y-m-d H:i:s', time() );
-					update_post_meta( $post_id, '_wcpdf_invoice_date', $invoice_date );
+					WCX_Order::update_meta_data( $order, '_wcpdf_invoice_date', $invoice_date );
 				}
 
 				if ( empty($_POST['wcpdf_invoice_date']) && empty($_POST['_wcpdf_invoice_number'])) {
-					delete_post_meta( $post_id, '_wcpdf_invoice_exists' );
+					WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_exists' );
 				}
 			}
 		}

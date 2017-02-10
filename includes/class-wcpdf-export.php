@@ -293,7 +293,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 				// store meta to be able to check if an invoice for an order has been created already
 				if ( $template_type == 'invoice' ) {
-					update_post_meta( $order_id, '_wcpdf_invoice_exists', 1 );
+					WCX_Order::update_meta_data( $this->order, '_wcpdf_invoice_exists', 1 );
 				}
 
 
@@ -639,13 +639,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function set_invoice_number( $order_id ) {
+			$order = $this->get_order( $order_id );
+
 			// first check: get invoice number from post meta
-			$invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true );
+			$invoice_number = WCX_Order::get_meta( $order, '_wcpdf_invoice_number', true );
 
 			// If a third-party plugin claims to generate invoice numbers, use it instead
 			$third_party = apply_filters('woocommerce_invoice_number_by_plugin', false);
 			if ($third_party) {
-				$order = WCX::get_order($order_id);
 				$invoice_number = apply_filters('woocommerce_generate_invoice_number', null, $order);
 			}
 
@@ -660,7 +661,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					// First time! We start numbering from order_number or order_id
 					
 					// Check if $order_number is an integer
-					$order_number = ltrim($this->order->get_order_number(), '#');
+					$order_number = ltrim($order->get_order_number(), '#');
 					if ( ctype_digit( (string)$order_number ) ) {
 						// order_number == integer: use as starting point.
 						$invoice_number = $order_number;
@@ -694,8 +695,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				// $order_number = ltrim($this->order->get_order_number(), '#');
 				// $this->log( $order_id, "Invoice number {$invoice_number} set for order {$order_number} (id {$order_id})" );
 
-				update_post_meta($order_id, '_wcpdf_invoice_number', $invoice_number);
-				update_post_meta($order_id, '_wcpdf_formatted_invoice_number', $this->get_invoice_number( $order_id ) );
+				WCX_Order::update_meta_data( $order, '_wcpdf_invoice_number', $invoice_number );
+				WCX_Order::update_meta_data( $order, '_wcpdf_formatted_invoice_number', $this->get_invoice_number( $order_id ) );
 
 				// increase next_order_number
 				$update_args = array(
@@ -716,6 +717,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function get_invoice_number( $order_id ) {
+			$order = $this->get_order( $order_id );
 			// Call the woocommerce_invoice_number filter and let third-party plugins set a number.
 			// Default is null, so we can detect whether a plugin has set the invoice number
 			$third_party_invoice_number = apply_filters( 'woocommerce_invoice_number', null, $order_id );
@@ -723,8 +725,9 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return $third_party_invoice_number;
 			}
 
-			// get invoice number from post meta
-			if ( $invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true ) ) {
+			// get invoice number from order
+			$invoice_number = WCX_Order::get_meta( $order, '_wcpdf_invoice_number', true );
+			if ( $invoice_number ) {
 				// check if we have already loaded this order
 				if ( !empty( $this->order ) && WCX_Order::get_id( $this->order ) == $order_id ) {
 					$order_number = $this->order->get_order_number();
@@ -769,14 +772,16 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function reset_invoice_data ( $order_id ) {
+			$order = $this->get_order( $order_id );
 			// delete invoice number, invoice date & invoice exists meta
-			delete_post_meta( $order_id, '_wcpdf_invoice_number' );
-			delete_post_meta( $order_id, '_wcpdf_formatted_invoice_number' );
-			delete_post_meta( $order_id, '_wcpdf_invoice_date' );
-			delete_post_meta( $order_id, '_wcpdf_invoice_exists' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_number' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_formatted_invoice_number' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_date' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_exists' );
 		}
 
 		public function format_invoice_number( $invoice_number, $order_number, $order_id, $order_date ) {
+			$order = $this->get_order( $order_id );
 			// get format settings
 			$formats['prefix'] = isset($this->template_settings['invoice_number_formatting_prefix'])?$this->template_settings['invoice_number_formatting_prefix']:'';
 			$formats['suffix'] = isset($this->template_settings['invoice_number_formatting_suffix'])?$this->template_settings['invoice_number_formatting_suffix']:'';
@@ -786,7 +791,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$order_year = date_i18n( 'Y', strtotime( $order_date ) );
 			$order_month = date_i18n( 'm', strtotime( $order_date ) );
 			$order_day = date_i18n( 'd', strtotime( $order_date ) );
-			$invoice_date = get_post_meta($order_id,'_wcpdf_invoice_date',true);
+			$invoice_date = WCX_Order::get_meta( $order, '_wcpdf_invoice_date', true );
 			$invoice_date = empty($invoice_date) ? current_time('mysql') : $invoice_date;
 			$invoice_year = date_i18n( 'Y', strtotime( $invoice_date ) );
 			$invoice_month = date_i18n( 'm', strtotime( $invoice_date ) );
@@ -841,10 +846,16 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}			
 		
 		/**
-		 * Get the current order
+		 * Get the current order or order by id
 		 */
-		public function get_order() {
-			return $this->order;
+		public function get_order( $order_id = null ) {
+			if ( empty( $order_id ) && isset( $this->order ) ) {
+				return $this->order;
+			} elseif ( is_object( $this->order ) && WCX_Order::get_id( $this->order ) == $order_id ) {
+				return $this->order;
+			} else {
+				return WCX::get_order( $order_id );
+			}
 		}
 
 		/**
