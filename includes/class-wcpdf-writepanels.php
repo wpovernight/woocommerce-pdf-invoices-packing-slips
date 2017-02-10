@@ -1,4 +1,7 @@
 <?php
+use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
+use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
+use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
 
 /**
  * Writepanel class
@@ -109,18 +112,18 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 */
 		public function add_listing_actions( $order ) {
 			// do not show buttons for trashed orders
-			if ( $order->status == 'trash' ) {
+			if ( WCX_Order::get_status( $order ) == 'trash' ) {
 				return;
 			}
 
 			$listing_actions = array(
 				'invoice'		=> array (
-					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
+					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . WCX_Order::get_id( $order ) ), 'generate_wpo_wcpdf' ),
 					'img'		=> WooCommerce_PDF_Invoices::$plugin_url . 'images/invoice.png',
 					'alt'		=> __( 'PDF Invoice', 'wpo_wcpdf' ),
 				),
 				'packing-slip'	=> array (
-					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=packing-slip&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
+					'url'		=> wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=packing-slip&order_ids=' . WCX_Order::get_id( $order ) ), 'generate_wpo_wcpdf' ),
 					'img'		=> WooCommerce_PDF_Invoices::$plugin_url . 'images/packing-slip.png',
 					'alt'		=> __( 'PDF Packing Slip', 'wpo_wcpdf' ),
 				),
@@ -162,12 +165,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			global $post, $the_order, $wpo_wcpdf;
 
 			if ( $column == 'pdf_invoice_number' ) {
-				if ( empty( $the_order ) || $the_order->id != $post->ID ) {
-					$order = new WC_Order( $post->ID );
-					echo $wpo_wcpdf->export->get_invoice_number( $order->id );
+				if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
+					$order = WCX::get_order( $post->ID );
+					echo $wpo_wcpdf->export->get_invoice_number( WCX_Order::get_id( $order ) );
 					do_action( 'wcpdf_invoice_number_column_end', $order );
 				} else {
-					echo $wpo_wcpdf->export->get_invoice_number( $the_order->id );
+					echo $wpo_wcpdf->export->get_invoice_number( WCX_Order::get_id( $the_order ) );
 					do_action( 'wcpdf_invoice_number_column_end', $the_order );
 				}
 			}
@@ -177,13 +180,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Display download link on My Account page
 		 */
 		public function my_account_pdf_link( $actions, $order ) {
-			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->id . '&my-account'), 'generate_wpo_wcpdf' );
+			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . WCX_Order::get_id( $order ) . '&my-account'), 'generate_wpo_wcpdf' );
 
 			// check my account button settings
 			if (isset($this->general_settings['my_account_buttons'])) {
 				switch ($this->general_settings['my_account_buttons']) {
 					case 'available':
-						$invoice_allowed = get_post_meta($order->id,'_wcpdf_invoice_exists',true);
+						$invoice_allowed = WCX_Order::get_meta( $order, 'wcpdf_invoice_exists', true );
 						break;
 					case 'always':
 						$invoice_allowed = true;
@@ -192,7 +195,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 						$invoice_allowed = false;
 						break;
 					case 'custom':
-						if ( isset( $this->general_settings['my_account_restrict'] ) && in_array( $order->status, array_keys( $this->general_settings['my_account_restrict'] ) ) ) {
+						if ( isset( $this->general_settings['my_account_restrict'] ) && in_array( WCX_Order::get_status( $order ), array_keys( $this->general_settings['my_account_restrict'] ) ) ) {
 							$invoice_allowed = true;
 						} else {
 							$invoice_allowed = false;							
@@ -201,11 +204,11 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				}
 			} else {
 				// backwards compatibility
-				$invoice_allowed = get_post_meta($order->id,'_wcpdf_invoice_exists',true);
+				$invoice_allowed = WCX_Order::get_meta( $order, 'wcpdf_invoice_exists', true );
 			}
 
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
-			if ( $invoice_allowed || in_array($order->status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+			if ( $invoice_allowed || in_array(WCX_Order::get_status( $order ), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
 				$actions['invoice'] = array(
 					'url'  => $pdf_url,
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', __( 'Download invoice (PDF)', 'wpo_wcpdf' ) )
