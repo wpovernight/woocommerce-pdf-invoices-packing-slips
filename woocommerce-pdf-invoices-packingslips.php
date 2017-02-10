@@ -354,8 +354,6 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			foreach ($address_comparison_fields as $address_field) {
 				$billing_field = WCX_Order::get_prop( $order, "billing_{$address_field}");
 				$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}");
-
-				error_log("$billing_field vs $shipping_field");
 				if ( $shipping_field != $billing_field ) {
 					// this address field is different -> ships to different address!
 					return true;
