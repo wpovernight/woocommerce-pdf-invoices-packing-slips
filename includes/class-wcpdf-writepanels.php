@@ -279,8 +279,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Add metabox for invoice number & date
 		 */
 		public function data_input_box_content ( $post ) {
-			$order = WCX::get_order( $post_id );
-			$invoice_exists = WCX_Order::get_meta( $order, 'wcpdf_invoice_exists', true );
+			$order = WCX::get_order( $post->ID );
+			$invoice_exists = WCX_Order::get_meta( $order, '_wcpdf_invoice_exists', true );
 			$invoice_number = WCX_Order::get_meta( $order, '_wcpdf_invoice_number', true );
 			$invoice_date = WCX_Order::get_meta( $order, '_wcpdf_invoice_date', true );
 			
