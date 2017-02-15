@@ -106,6 +106,23 @@ class Order extends Data {
 	}
 
 	/**
+	 * Implements WC_Order::get_item_meta for 2.7+
+	 * @param  \WC_Order $order the order object
+	 * @param  int     $item_id the item id
+	 * @param  int     $key     the meta key
+	 * @param  boolean $single  single or multiple
+	 * @return mixed            item meta
+	 */
+	public static function get_item_meta( $object, $item_id, $key = '', $single = false ) {
+		if (function_exists('wc_get_order_item_meta')) {
+			$item_meta = wc_get_order_item_meta( $item_id, $key, $single );
+		} else {
+			$item_meta = $object->get_item_meta( $item_id, $key, $single );
+		}
+		return $item_meta;
+	}
+
+	/**
 	 * Backports WC_Order::get_status() to pre-2.7.0
 	 *
 	 * @since 4.6.0-dev
