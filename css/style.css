@@ -7,6 +7,15 @@
 	width: 110px;
 }
 
+@media screen and (max-width: 782px) {
+	.wp-list-table .column-pdf_invoice_number, .wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number:not(.check-column) {
+		display: none;
+	}
+	.wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number {
+		padding: 3px 8px 3px 35%
+	}
+}
+
 #wpo_wcpdf-data-input-box h4 {
 	font-size: 14px;
 	line-height: 1.4;
