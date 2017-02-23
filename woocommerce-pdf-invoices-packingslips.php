@@ -936,12 +936,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			}
 
 			if ($tax == 'excl' ) {
-				$total_tax = 0;
-				foreach ( $this->export->order->get_taxes() as $tax ) {
-					$total_tax += ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] );
-				}
-
-				$total = $this->export->wc_price( ( $total_unformatted - $total_tax ) );
+				$total = $this->export->wc_price( $total_unformatted - $this->export->order->get_total_tax() );
 				$label = __( 'Total ex. VAT', 'wpo_wcpdf' );
 			} else {
 				$total = $this->export->wc_price( ( $total_unformatted ) );
