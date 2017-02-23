@@ -758,9 +758,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		public function get_order_subtotal( $tax = 'excl', $discount = 'incl' ) { // set $tax to 'incl' to include tax, same for $discount
 			//$compound = ($discount == 'incl')?true:false;
-			
 			$subtotal = $this->export->order->get_subtotal_to_display( false, $tax );
-			
+
 			$subtotal = ($pos = strpos($subtotal, ' <small')) ? substr($subtotal, 0, $pos) : $subtotal; //removing the 'excluding tax' text			
 			
 			$subtotal = array (
@@ -898,14 +897,26 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			$tax_rate_ids = $this->export->get_tax_rate_ids();
 			if ($this->export->order->get_taxes()) {
 				foreach ( $this->export->order->get_taxes() as $key => $tax ) {
-					$taxes[ $key ] = array(
-						'label'					=> isset( $tax[ 'label' ] ) ? $tax[ 'label' ] : $tax[ 'name' ],
-						'value'					=> $this->export->wc_price( ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] ) ),
-						'rate_id'				=> $tax['rate_id'],
-						'tax_amount'			=> $tax['tax_amount'],
-						'shipping_tax_amount'	=> $tax['shipping_tax_amount'],
-						'rate'					=> isset( $tax_rate_ids[ $tax['rate_id'] ] ) ? ( (float) $tax_rate_ids[$tax['rate_id']]['tax_rate'] ) . ' %': '',
-					);
+					if ( WCX::is_wc_version_gte_2_7() ) {
+						$taxes[ $key ] = array(
+							'label'					=> $tax->get_label(),
+							'value'					=> $this->export->wc_price( $tax->get_tax_total() + $tax->get_shipping_tax_total() ),
+							'rate_id'				=> $tax->get_rate_id(),
+							'tax_amount'			=> $tax->get_tax_total(),
+							'shipping_tax_amount'	=> $tax->get_shipping_tax_total(),
+							'rate'					=> isset( $tax_rate_ids[ $tax->get_rate_id() ] ) ? ( (float) $tax_rate_ids[$tax->get_rate_id()]['tax_rate'] ) . ' %': '',
+						);
+					} else {
+						$taxes[ $key ] = array(
+							'label'					=> isset( $tax[ 'label' ] ) ? $tax[ 'label' ] : $tax[ 'name' ],
+							'value'					=> $this->export->wc_price( ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] ) ),
+							'rate_id'				=> $tax['rate_id'],
+							'tax_amount'			=> $tax['tax_amount'],
+							'shipping_tax_amount'	=> $tax['shipping_tax_amount'],
+							'rate'					=> isset( $tax_rate_ids[ $tax['rate_id'] ] ) ? ( (float) $tax_rate_ids[$tax['rate_id']]['tax_rate'] ) . ' %': '',
+						);
+					}
+
 				}
 				
 				return apply_filters( 'wpo_wcpdf_order_taxes', $taxes );
