@@ -737,7 +737,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					$order_number = $order->get_order_number();
 					$order_date = WCX_Order::get_prop( $order, 'date_created' );
 				}
-
+				$order_date = date("Y-m-d H:i:s", $order_date ); // order date is timestamp, filter uses mysql format
 				return apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $order_number, $order_id, $order_date );
 			} else {
 				// no invoice number for this order

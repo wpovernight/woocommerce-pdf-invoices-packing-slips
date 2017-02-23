@@ -627,8 +627,9 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$order_date = WCX_Order::get_prop( $this->export->order, 'date_created' );
 			}
 
-			$date = date_i18n( get_option( 'date_format' ), strtotime( $order_date ) );
-			return apply_filters( 'wpo_wcpdf_order_date', $date, $order_date );
+			$date = date_i18n( get_option( 'date_format' ), $order_date );
+			$mysql_date = date("Y-m-d H:i:s", $order_date );
+			return apply_filters( 'wpo_wcpdf_order_date', $date, $mysql_date );
 		}
 		public function order_date() {
 			echo $this->get_order_date();
@@ -638,7 +639,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show the invoice date
 		 */
 		public function get_invoice_date() {
-			$custom_field = WCX_Order::get_meta( $this->export->order, '_wcpdf_invoice_date', true );
+			$invoice_date = WCX_Order::get_meta( $this->export->order, '_wcpdf_invoice_date', true );
 
 			// add invoice date if it doesn't exist
 			if ( empty($invoice_date) || !isset($invoice_date) ) {
