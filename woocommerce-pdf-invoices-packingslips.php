@@ -779,7 +779,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/show the order shipping costs
 		 */
 		public function get_order_shipping( $tax = 'excl' ) { // set $tax to 'incl' to include tax
-			$shipping_cost = WCX_Order::get_prop( $this->export->order, 'order_shipping' );
+			$shipping_cost = WCX_Order::get_prop( $this->export->order, 'shipping_total' );
 			$shipping_tax = WCX_Order::get_prop( $this->export->order, 'shipping_tax' );
 
 			if ($tax == 'excl' ) {
