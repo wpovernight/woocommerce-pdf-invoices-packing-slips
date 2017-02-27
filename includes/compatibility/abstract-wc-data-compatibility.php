@@ -33,12 +33,13 @@ abstract class Data {
 	 * Gets an object property.
 	 *
 	 * @since 4.6.0-dev
-	 * @param object $object the data object, likely \WC_Order or \WC_Product
+	 * @param \WC_Data $object the data object, likely \WC_Order or \WC_Product
 	 * @param string $prop the property name
 	 * @param string $context if 'view' then the value will be filtered
-	 * @return string
+	 * @param array $compat_props Compatibility properties.
+	 * @return mixed
 	 */
-	public static function get_prop( $object, $prop, $context = 'view', $compat_props = array() ) {
+	public static function get_prop( $object, $prop, $context = 'edit', $compat_props = array() ) {
 
 		$value = '';
 
@@ -46,8 +47,6 @@ abstract class Data {
 
 			if ( is_callable( array( $object, "get_{$prop}" ) ) ) {
 				$value = $object->{"get_{$prop}"}( $context );
-			} else {
-				$value = '';
 			}
 
 		} else {
@@ -75,9 +74,10 @@ abstract class Data {
 	 * Note that this does not save any data to the database.
 	 *
 	 * @since 4.6.0-dev
-	 * @param object $object the data object, likely \WC_Order or \WC_Product
+	 * @param \WC_Data $object the data object, likely \WC_Order or \WC_Product
 	 * @param array $props the new properties as $key => $value
-	 * @return object
+	 * @param array $compat_props Compatibility properties.
+	 * @return \WC_Data
 	 */
 	public static function set_props( $object, $props, $compat_props = array() ) {
 
@@ -105,18 +105,19 @@ abstract class Data {
 	 * Gets an object's stored meta value.
 	 *
 	 * @since 4.6.0-dev
-	 * @param object $object the data object, likely \WC_Order or \WC_Product
+	 * @param \WC_Data $object the data object, likely \WC_Order or \WC_Product
 	 * @param string $key the meta key
 	 * @param bool $single whether to get the meta as a single item. Defaults to `true`
 	 * @param string $context if 'view' then the value will be filtered
-	 * @return string
+	 * @return mixed
 	 */
-	public static function get_meta( $object, $key = '', $single = true, $context = 'view' ) {
+	public static function get_meta( $object, $key = '', $single = true, $context = 'edit' ) {
 
 		if ( WC_Core::is_wc_version_gte_2_7() ) {
 			$value = $object->get_meta( $key, $single, $context );
 		} else {
-			$value = get_post_meta( $object->id, $key, $single );
+			$object_id = is_callable( array( $object, 'get_id' ) ) ? $object->get_id() : $object->id;
+			$value = get_post_meta( $object_id, $key, $single );
 		}
 
 		return $value;
@@ -127,10 +128,11 @@ abstract class Data {
 	 * Stores an object meta value.
 	 *
 	 * @since 4.6.0-dev
-	 * @param object $object the data object, likely \WC_Order or \WC_Product
+	 * @param \WC_Data $object the data object, likely \WC_Order or \WC_Product
 	 * @param string $key the meta key
 	 * @param string $value the meta value
-	 * @param strint $meta_id Optional. The specific meta ID to update
+	 * @param string $meta_id Optional. The specific meta ID to update
+	 * @param bool $unique Optional. Whether the meta should be unique.
 	 */
 	public static function add_meta_data( $object, $key, $value, $unique = false ) {
 
@@ -142,7 +144,8 @@ abstract class Data {
 
 		} else {
 
-			add_post_meta( $object->id, $key, $value, $unique );
+			$object_id = is_callable( array( $object, 'get_id' ) ) ? $object->get_id() : $object->id;
+			add_post_meta( $object_id, $key, $value, $unique );
 		}
 	}
 
@@ -151,10 +154,10 @@ abstract class Data {
 	 * Updates an object's stored meta value.
 	 *
 	 * @since 4.6.0-dev
-	 * @param object $object the data object, likely \WC_Order or \WC_Product
+	 * @param \WC_Data $object the data object, likely \WC_Order or \WC_Product
 	 * @param string $key the meta key
 	 * @param string $value the meta value
-	 * @param strint $meta_id Optional. The specific meta ID to update
+	 * @param int|strint $meta_id Optional. The specific meta ID to update
 	 */
 	public static function update_meta_data( $object, $key, $value, $meta_id = '' ) {
 
@@ -166,7 +169,8 @@ abstract class Data {
 
 		} else {
 
-			update_post_meta( $object->id, $key, $value );
+			$object_id = is_callable( array( $object, 'get_id' ) ) ? $object->get_id() : $object->id;
+			update_post_meta( $object_id, $key, $value );
 		}
 	}
 
@@ -175,7 +179,7 @@ abstract class Data {
 	 * Deletes an object's stored meta value.
 	 *
 	 * @since 4.6.0-dev
-	 * @param object $object the data object, likely \WC_Order or \WC_Product
+	 * @param \WC_Data $object the data object, likely \WC_Order or \WC_Product
 	 * @param string $key the meta key
 	 */
 	public static function delete_meta_data( $object, $key ) {
@@ -188,7 +192,8 @@ abstract class Data {
 
 		} else {
 
-			delete_post_meta( $object->id, $key );
+			$object_id = is_callable( array( $object, 'get_id' ) ) ? $object->get_id() : $object->id;
+			delete_post_meta( $object_id, $key );
 		}
 	}
 

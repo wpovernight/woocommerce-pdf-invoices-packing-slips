@@ -60,9 +60,9 @@ class Order extends Data {
 	 * @param \WC_Order $object the order object
 	 * @param string $prop the property name
 	 * @param string $context if 'view' then the value will be filtered
-	 * @return string
+	 * @return mixed
 	 */
-	public static function get_prop( $object, $prop, $context = 'view', $compat_props = array() ) {
+	public static function get_prop( $object, $prop, $context = 'edit', $compat_props = array() ) {
 
 		// backport a few specific properties to pre-2.7
 		if ( WC_Core::is_wc_version_lt_2_7() ) {
@@ -82,7 +82,7 @@ class Order extends Data {
 		$value = parent::get_prop( $object, $prop, $context, self::$compat_props );
 
 		// 2.7+ date getters return a timestamp, where previously MySQL date strings were returned
-		if ( WC_Core::is_wc_version_lt_2_7() && in_array( $prop, array( 'date_completed', 'date_modified', 'date_created' ), true ) && ! is_numeric( $value ) ) {
+		if ( WC_Core::is_wc_version_lt_2_7() && in_array( $prop, array( 'date_completed', 'date_paid', 'date_modified', 'date_created' ), true ) && ! is_numeric( $value ) ) {
 			$value = strtotime( $value );
 		}
 
@@ -98,7 +98,7 @@ class Order extends Data {
 	 * @since 4.6.0-dev
 	 * @param \WC_Order $object the order object
 	 * @param array $props the new properties as $key => $value
-	 * @return object
+	 * @return \WC_Order
 	 */
 	public static function set_props( $object, $props, $compat_props = array() ) {
 
@@ -143,7 +143,7 @@ class Order extends Data {
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Order $order the order object
-	 * @param string $code the coupon code
+	 * @param array $code the coupon code
 	 * @param int $discount the discount amount.
 	 * @param int $discount_tax the discount tax amount.
 	 * @return int the order item ID
@@ -180,7 +180,7 @@ class Order extends Data {
 	 * @since 4.6.0-dev
 	 * @param \WC_Order $order the order object
 	 * @param object $fee the fee to add
-	 * @return int the order item ID
+	 * @return int|\WC_Order_Item the order item ID
 	 */
 	public static function add_fee( \WC_Order $order, $fee ) {
 
@@ -217,7 +217,7 @@ class Order extends Data {
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Order $order the order object
-	 * @param int $item the order item ID
+	 * @param int|\WC_Order_Item $item the order item ID
 	 * @param array $args {
 	 *     The coupon item args.
 	 *
@@ -246,8 +246,6 @@ class Order extends Data {
 			$item->set_order_id( $order->get_id() );
 			$item->set_props( $args );
 			$item->save();
-
-			do_action( 'woocommerce_order_update_coupon', $order->get_id(), $item->get_id(), $args );
 
 			return $item->get_id();
 
@@ -301,8 +299,6 @@ class Order extends Data {
 			$item->set_order_id( $order->get_id() );
 			$item->set_props( $args );
 			$item->save();
-
-			do_action( 'woocommerce_order_update_fee', $order->get_id(), $item->get_id(), $args );
 
 			return $item->get_id();
 

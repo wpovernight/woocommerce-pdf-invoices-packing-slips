@@ -56,9 +56,9 @@ class Product extends Data {
 	 * @param \WC_Product $object the product object
 	 * @param string $prop the property name
 	 * @param string $context if 'view' then the value will be filtered
-	 * @return string
+	 * @return mixed
 	 */
-	public static function get_prop( $object, $prop, $context = 'view', $compat_props = array() ) {
+	public static function get_prop( $object, $prop, $context = 'edit', $compat_props = array() ) {
 
 		// backport 'WC_Product::get_parent_id()' to pre-2.7
 		if ( WC_Core::is_wc_version_lt_2_7() && 'parent_id' === $prop ) {
@@ -78,7 +78,7 @@ class Product extends Data {
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $object the product object
 	 * @param array $props the new properties as $key => $value
-	 * @return object
+	 * @return \WC_Product
 	 */
 	public static function set_props( $object, $props, $compat_props = array() ) {
 
