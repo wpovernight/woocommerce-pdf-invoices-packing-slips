@@ -515,7 +515,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					break;
 				default:
 					$name = $template_type;
-					$number = $this->order->get_order_number();
+					$number = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
 					break;
 			}
 

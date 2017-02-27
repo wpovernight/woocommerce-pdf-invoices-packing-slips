@@ -336,6 +336,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			$order_id = WCX_Order::get_id( $order );
 			// always prefer parent address for refunds
 			if ( get_post_type( $order_id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $order_id ) ) {
+				$current_order = $order;
 				$order = WCX::get_order( $parent_order_id );
 			}
 
@@ -356,11 +357,13 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}");
 				if ( $shipping_field != $billing_field ) {
 					// this address field is different -> ships to different address!
+					$order = isset($current_order) ? $current_order : $order; // reset back to refund if necessery
 					return true;
 				}
 			}
 
 			//if we got here, it means the addresses are equal -> doesn't ship to different address!
+			$order = isset($current_order) ? $current_order : $order; // reset back to refund if necessery
 			return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order );
 		}
 		
@@ -545,17 +548,19 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show payment method  
 		 */
 		public function get_payment_method() {
+			$order_id = WCX_Order::get_id( $this->export->order );
 			$payment_method_label = __( 'Payment method', 'wpo_wcpdf' );
-			
-			$payment_method_title = WCX_Order::get_prop( $this->export->order, 'payment_method_title' );
 
-			$payment_method = __( $payment_method_title, 'woocommerce' );
-			if ( !$payment_method && $parent_order_id = wp_get_post_parent_id( WCX_Order::get_id( $this->export->order ) ) ) {
-				// try parent
+			// use parent for credit notes
+			if ( get_post_type( $order_id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( WCX_Order::get_id( $this->export->order ) ) ) {
 				$parent_order = WCX::get_order( $parent_order_id );
 				$payment_method_title = WCX_Order::get_prop( $parent_order, 'payment_method_title' );
 				$payment_method = __( $payment_method_title, 'woocommerce' );
+			} else {
+				$payment_method_title = WCX_Order::get_prop( $this->export->order, 'payment_method_title' );
 			}
+
+			$payment_method = __( $payment_method_title, 'woocommerce' );
 
 			return apply_filters( 'wpo_wcpdf_payment_method', $payment_method );
 		}
@@ -740,7 +745,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 					}
 				}
 
-				$totals['order_total']['value'] .= $tax_string;			
+				$totals['order_total']['value'] .= $tax_string;
 			}
 
 			// remove refund lines (shouldn't be in invoice)
