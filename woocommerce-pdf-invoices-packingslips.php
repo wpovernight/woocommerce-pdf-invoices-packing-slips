@@ -96,16 +96,21 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Instantiate classes when woocommerce is activated
 		 */
 		public function load_classes() {
-			if ( $this->is_woocommerce_activated() ) {
-				$this->includes();
-				$this->settings = new WooCommerce_PDF_Invoices_Settings();
-				$this->writepanels = new WooCommerce_PDF_Invoices_Writepanels();
-				$this->export = new WooCommerce_PDF_Invoices_Export();
-			} else {
-				// display notice instead
+			if ( $this->is_woocommerce_activated() === false ) {
 				add_action( 'admin_notices', array ( $this, 'need_woocommerce' ) );
+				return;
 			}
 
+			if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+				add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
+				return;
+			}
+
+			// all systems ready - GO!
+			$this->includes();
+			$this->settings = new WooCommerce_PDF_Invoices_Settings();
+			$this->writepanels = new WooCommerce_PDF_Invoices_Writepanels();
+			$this->export = new WooCommerce_PDF_Invoices_Export();
 		}
 
 		/**
@@ -132,6 +137,18 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			$error = sprintf( __( 'WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be installed & activated!' , 'wpo_wcpdf' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
 			
 			$message = '<div class="error"><p>' . $error . '</p></div>';
+		
+			echo $message;
+		}
+
+		/**
+		 * PHP version requirement notice
+		 */
+		
+		public function required_php_version() {
+			$error = __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or later recommended).', 'wpo_wcpdf' );
+			$how_to_update = __( 'How to update your PHP version', 'wpo_wcnlpc' );
+			$message = sprintf('<div class="error"><p>%s</p><p><a href="%s">%s</a></p></div>', $error, 'http://docs.wpovernight.com/general/how-to-update-your-php-version/', $how_to_update);
 		
 			echo $message;
 		}
