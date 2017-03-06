@@ -147,7 +147,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		
 		public function required_php_version() {
 			$error = __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or later recommended).', 'wpo_wcpdf' );
-			$how_to_update = __( 'How to update your PHP version', 'wpo_wcnlpc' );
+			$how_to_update = __( 'How to update your PHP version', 'wpo_wcpdf' );
 			$message = sprintf('<div class="error"><p>%s</p><p><a href="%s">%s</a></p></div>', $error, 'http://docs.wpovernight.com/general/how-to-update-your-php-version/', $how_to_update);
 		
 			echo $message;
