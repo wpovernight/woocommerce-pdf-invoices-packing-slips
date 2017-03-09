@@ -146,7 +146,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 */
 		
 		public function required_php_version() {
-			$error = __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or later recommended).', 'wpo_wcpdf' );
+			$error = __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or higher recommended).', 'wpo_wcpdf' );
 			$how_to_update = __( 'How to update your PHP version', 'wpo_wcpdf' );
 			$message = sprintf('<div class="error"><p>%s</p><p><a href="%s">%s</a></p></div>', $error, 'http://docs.wpovernight.com/general/how-to-update-your-php-version/', $how_to_update);
 		
@@ -370,8 +370,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			) );
 			
 			foreach ($address_comparison_fields as $address_field) {
-				$billing_field = WCX_Order::get_prop( $order, "billing_{$address_field}");
-				$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}");
+				$billing_field = WCX_Order::get_prop( $order, "billing_{$address_field}", 'view');
+				$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}", 'view');
 				if ( $shipping_field != $billing_field ) {
 					// this address field is different -> ships to different address!
 					$order = isset($current_order) ? $current_order : $order; // reset back to refund if necessery
@@ -416,12 +416,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show billing email
 		 */
 		public function get_billing_email() {
-			$billing_email = WCX_Order::get_prop( $this->export->order, 'billing_email' );
+			$billing_email = WCX_Order::get_prop( $this->export->order, 'billing_email', 'view' );
 
 			if ( !$billing_email && $parent_order_id = wp_get_post_parent_id( WCX_Order::get_id( $this->export->order ) ) ) {
 				// try parent
 				$parent_order = WCX::get_order( $parent_order_id );
-				$billing_email = WCX_Order::get_prop( $parent_order, 'billing_email' );
+				$billing_email = WCX_Order::get_prop( $parent_order, 'billing_email', 'view' );
 			}
 
 			return apply_filters( 'wpo_wcpdf_billing_email', $billing_email );
@@ -434,12 +434,12 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show billing phone
 		 */
 		public function get_billing_phone() {
-			$billing_phone = WCX_Order::get_prop( $this->export->order, 'billing_phone' );
+			$billing_phone = WCX_Order::get_prop( $this->export->order, 'billing_phone', 'view' );
 
 			if ( !$billing_phone && $parent_order_id = wp_get_post_parent_id( WCX_Order::get_id( $this->export->order ) ) ) {
 				// try parent
 				$parent_order = WCX::get_order( $parent_order_id );
-				$billing_phone = WCX_Order::get_prop( $parent_order, 'billing_phone' );
+				$billing_phone = WCX_Order::get_prop( $parent_order, 'billing_phone', 'view' );
 			}
 
 			return apply_filters( 'wpo_wcpdf_billing_phone', $billing_phone );
@@ -571,10 +571,10 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			// use parent for credit notes
 			if ( get_post_type( $order_id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( WCX_Order::get_id( $this->export->order ) ) ) {
 				$parent_order = WCX::get_order( $parent_order_id );
-				$payment_method_title = WCX_Order::get_prop( $parent_order, 'payment_method_title' );
+				$payment_method_title = WCX_Order::get_prop( $parent_order, 'payment_method_title', 'view' );
 				$payment_method = __( $payment_method_title, 'woocommerce' );
 			} else {
-				$payment_method_title = WCX_Order::get_prop( $this->export->order, 'payment_method_title' );
+				$payment_method_title = WCX_Order::get_prop( $this->export->order, 'payment_method_title', 'view' );
 			}
 
 			$payment_method = __( $payment_method_title, 'woocommerce' );
@@ -800,8 +800,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/show the order shipping costs
 		 */
 		public function get_order_shipping( $tax = 'excl' ) { // set $tax to 'incl' to include tax
-			$shipping_cost = WCX_Order::get_prop( $this->export->order, 'shipping_total' );
-			$shipping_tax = WCX_Order::get_prop( $this->export->order, 'shipping_tax' );
+			$shipping_cost = WCX_Order::get_prop( $this->export->order, 'shipping_total', 'view' );
+			$shipping_tax = WCX_Order::get_prop( $this->export->order, 'shipping_tax', 'view' );
 
 			if ($tax == 'excl' ) {
 				$formatted_shipping_cost = $this->export->wc_price( $shipping_cost );
@@ -982,7 +982,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show shipping notes
 		 */
 		public function get_shipping_notes() {
-			$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( $this->export->order, 'customer_note' ) ) );
+			$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( $this->export->order, 'customer_note', 'view' ) ) );
 			return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes );
 		}
 		public function shipping_notes() {
