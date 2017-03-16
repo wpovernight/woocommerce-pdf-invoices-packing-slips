@@ -333,7 +333,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 		 * Save invoice number
 		 */
 		public function save_invoice_number_date($post_id) {
-			global $post_type;
+			$post_type = get_post_type( $post_id );
 			if( $post_type == 'shop_order' ) {
 				$order = WCX::get_order( $post_id );
 				if ( isset($_POST['_wcpdf_invoice_number']) ) {
