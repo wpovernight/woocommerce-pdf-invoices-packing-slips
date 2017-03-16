@@ -60,8 +60,8 @@ class Product extends Data {
 	 */
 	public static function get_prop( $object, $prop, $context = 'edit', $compat_props = array() ) {
 
-		// backport 'WC_Product::get_parent_id()' to pre-2.7
-		if ( WC_Core::is_wc_version_lt_2_7() && 'parent_id' === $prop ) {
+		// backport 'WC_Product::get_parent_id()' to pre-3.0
+		if ( WC_Core::is_wc_version_lt_3_0() && 'parent_id' === $prop ) {
 			$prop    = 'id';
 			$context = $object->is_type( 'variation' ) ? 'raw' : $context;
 		}
@@ -87,7 +87,7 @@ class Product extends Data {
 
 
 	/**
-	 * Makes WC_Product::get_parent() available for WC 2.7+
+	 * Makes WC_Product::get_parent() available for WC 3.0+
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -95,7 +95,7 @@ class Product extends Data {
 	 */
 	public static function get_parent( \WC_Product $product ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			$parent = wc_get_product( $product->get_parent_id() );
 		} else {
 			$parent = $product->get_parent();
@@ -107,7 +107,7 @@ class Product extends Data {
 
 
 	/**
-	 * Makes WC_Product::get_dimensions() available for WC 2.7+
+	 * Makes WC_Product::get_dimensions() available for WC 3.0+
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -116,7 +116,7 @@ class Product extends Data {
 	 */
 	public static function get_dimensions( \WC_Product $product ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			$dimensions = array(
 				'length' => $product->get_length(),
 				'width'  => $product->get_width(),
@@ -130,7 +130,7 @@ class Product extends Data {
 
 
 	/**
-	 * Backports wc_update_product_stock() to pre-2.7.0
+	 * Backports wc_update_product_stock() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -140,7 +140,7 @@ class Product extends Data {
 	 */
 	public static function wc_update_product_stock( \WC_Product $product, $amount = null, $mode = 'set' ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			return wc_update_product_stock( $product, $amount, $mode );
 		} else {
 			return $product->set_stock( $amount, $mode );
@@ -149,7 +149,7 @@ class Product extends Data {
 
 
 	/**
-	 * Backports wc_get_price_html_from_text() to pre-2.7.0
+	 * Backports wc_get_price_html_from_text() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -157,7 +157,7 @@ class Product extends Data {
 	 */
 	public static function wc_get_price_html_from_text( \WC_Product $product ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			return wc_get_price_html_from_text();
 		} else {
 			return $product->get_price_html_from_text();
@@ -166,7 +166,7 @@ class Product extends Data {
 
 
 	/**
-	 * Backports wc_get_price_including_tax() to pre-2.7.0
+	 * Backports wc_get_price_including_tax() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -176,7 +176,7 @@ class Product extends Data {
 	 */
 	public static function wc_get_price_including_tax( \WC_Product $product, $qty = 1, $price = '' ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			return wc_get_price_including_tax( $product, array(
 				'qty'   => $qty,
@@ -191,7 +191,7 @@ class Product extends Data {
 
 
 	/**
-	 * Backports wc_get_price_excluding_tax() to pre-2.7.0
+	 * Backports wc_get_price_excluding_tax() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -201,7 +201,7 @@ class Product extends Data {
 	 */
 	public static function wc_get_price_excluding_tax( \WC_Product $product, $qty = 1, $price = '' ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			return wc_get_price_excluding_tax( $product, array(
 				'qty'   => $qty,
@@ -216,7 +216,7 @@ class Product extends Data {
 
 
 	/**
-	 * Backports wc_get_price_to_display() to pre-2.7.0
+	 * Backports wc_get_price_to_display() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -226,7 +226,7 @@ class Product extends Data {
 	 */
 	public static function wc_get_price_to_display( \WC_Product $product, $price = '', $qty = 1 ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			return wc_get_price_to_display( $product, array(
 				'qty'   => $qty,
@@ -241,7 +241,7 @@ class Product extends Data {
 
 
 	/**
-	 * Backports wc_get_product_category_list() to pre-2.7.0
+	 * Backports wc_get_product_category_list() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -252,7 +252,7 @@ class Product extends Data {
 	 */
 	public static function wc_get_product_category_list( \WC_Product $product, $sep = ', ', $before = '', $after = '' ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			$id = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
 
@@ -266,7 +266,7 @@ class Product extends Data {
 
 
 	/**
-	 * Backports wc_get_rating_html() to pre-2.7.0
+	 * Backports wc_get_rating_html() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Product $product the product object
@@ -275,7 +275,7 @@ class Product extends Data {
 	 */
 	public static function wc_get_rating_html( \WC_Product $product, $rating = null ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			return wc_get_rating_html( $rating );
 		} else {
 			return $product->get_rating_html( $rating );

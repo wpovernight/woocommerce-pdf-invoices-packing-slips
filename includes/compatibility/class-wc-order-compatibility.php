@@ -64,8 +64,8 @@ class Order extends Data {
 	 */
 	public static function get_prop( $object, $prop, $context = 'edit', $compat_props = array() ) {
 
-		// backport a few specific properties to pre-2.7
-		if ( WC_Core::is_wc_version_lt_2_7() ) {
+		// backport a few specific properties to pre-3.0
+		if ( WC_Core::is_wc_version_lt_3_0() ) {
 
 			// converge the shipping total prop for the raw context
 			if ( 'shipping_total' === $prop && 'view' !== $context ) {
@@ -81,9 +81,15 @@ class Order extends Data {
 
 		$value = parent::get_prop( $object, $prop, $context, self::$compat_props );
 
-		// 2.7+ date getters return a timestamp, where previously MySQL date strings were returned
-		if ( WC_Core::is_wc_version_lt_2_7() && in_array( $prop, array( 'date_completed', 'date_paid', 'date_modified', 'date_created' ), true ) && ! is_numeric( $value ) ) {
-			$value = strtotime( $value );
+		// 3.0+ date getters return a DateTime object, where previously MySQL date strings were returned
+		if ( WC_Core::is_wc_version_lt_3_0() && in_array( $prop, array( 'date_completed', 'date_paid', 'date_modified', 'date_created' ), true ) && ! is_numeric( $value ) ) {
+			if ( is_numeric( $value ) ) {
+				$value = new WC_DateTime( "@{$value}", new \DateTimeZone( 'UTC' ) );
+				$value->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
+			} else {
+				$value = new WC_DateTime( $value, new \DateTimeZone( wc_timezone_string() ) );
+				$value->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
+			}
 		}
 
 		return $value;
@@ -106,7 +112,7 @@ class Order extends Data {
 	}
 
 	/**
-	 * Implements WC_Order::get_item_meta for 2.7+
+	 * Implements WC_Order::get_item_meta for 3.0+
 	 * @param  \WC_Order $order the order object
 	 * @param  int     $item_id the item id
 	 * @param  int     $key     the meta key
@@ -123,7 +129,7 @@ class Order extends Data {
 	}
 
 	/**
-	 * Backports WC_Order::get_status() to pre-2.7.0
+	 * Backports WC_Order::get_status() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Order $order the order object
@@ -150,7 +156,7 @@ class Order extends Data {
 	 */
 	public static function add_coupon( \WC_Order $order, $code = array(), $discount = 0, $discount_tax = 0 ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			$item = new \WC_Order_Item_Coupon();
 
@@ -184,7 +190,7 @@ class Order extends Data {
 	 */
 	public static function add_fee( \WC_Order $order, $fee ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			$item = new \WC_Order_Item_Fee();
 
@@ -229,7 +235,7 @@ class Order extends Data {
 	 */
 	public static function update_coupon( \WC_Order $order, $item, $args ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			if ( is_numeric( $item ) ) {
 				$item = $order->get_item( $item );
@@ -251,7 +257,7 @@ class Order extends Data {
 
 		} else {
 
-			// convert 2.7.0+ args for backwards compatibility
+			// convert 3.0+ args for backwards compatibility
 			if ( isset( $args['discount'] ) ) {
 				$args['discount_amount'] = $args['discount'];
 			}
@@ -282,7 +288,7 @@ class Order extends Data {
 	 */
 	public static function update_fee( \WC_Order $order, $item, $args ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			if ( is_numeric( $item ) ) {
 				$item = $order->get_item( $item );
@@ -310,14 +316,14 @@ class Order extends Data {
 
 
 	/**
-	 * Backports wc_reduce_stock_levels() to pre-2.7.0
+	 * Backports wc_reduce_stock_levels() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Order $order the order object
 	 */
 	public static function reduce_stock_levels( \WC_Order $order ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			wc_reduce_stock_levels( $order->get_id() );
 		} else {
 			$order->reduce_order_stock();
@@ -326,14 +332,14 @@ class Order extends Data {
 
 
 	/**
-	 * Backports wc_update_total_sales_counts() to pre-2.7.0
+	 * Backports wc_update_total_sales_counts() to pre-3.0.0
 	 *
 	 * @since 4.6.0-dev
 	 * @param \WC_Order $order the order object
 	 */
 	public static function update_total_sales_counts( \WC_Order $order ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			wc_update_total_sales_counts( $order->get_id() );
 		} else {
 			$order->record_product_sales();

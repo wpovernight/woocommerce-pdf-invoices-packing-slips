@@ -86,6 +86,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
 			// compatibility classes
 			include_once( 'includes/compatibility/abstract-wc-data-compatibility.php' );
+			include_once( 'includes/compatibility/class-wc-date-compatibility.php' );
 			include_once( 'includes/compatibility/class-wc-core-compatibility.php' );
 			include_once( 'includes/compatibility/class-wc-order-compatibility.php' );
 			include_once( 'includes/compatibility/class-wc-product-compatibility.php' );
@@ -649,8 +650,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$order_date = WCX_Order::get_prop( $this->export->order, 'date_created' );
 			}
 
-			$date = date_i18n( get_option( 'date_format' ), $order_date );
-			$mysql_date = date("Y-m-d H:i:s", $order_date );
+			$date = $order_date->date_i18n( get_option( 'date_format' ) );
+			$mysql_date = $order_date->date( "Y-m-d H:i:s" );
 			return apply_filters( 'wpo_wcpdf_order_date', $date, $mysql_date );
 		}
 		public function order_date() {
@@ -919,7 +920,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 			$tax_rate_ids = $this->export->get_tax_rate_ids();
 			if ($this->export->order->get_taxes()) {
 				foreach ( $this->export->order->get_taxes() as $key => $tax ) {
-					if ( WCX::is_wc_version_gte_2_7() ) {
+					if ( WCX::is_wc_version_gte_3_0() ) {
 						$taxes[ $key ] = array(
 							'label'					=> $tax->get_label(),
 							'value'					=> $this->export->wc_price( $tax->get_tax_total() + $tax->get_shipping_tax_total() ),

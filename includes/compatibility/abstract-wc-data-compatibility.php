@@ -43,7 +43,7 @@ abstract class Data {
 
 		$value = '';
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			if ( is_callable( array( $object, "get_{$prop}" ) ) ) {
 				$value = $object->{"get_{$prop}"}( $context );
@@ -81,7 +81,7 @@ abstract class Data {
 	 */
 	public static function set_props( $object, $props, $compat_props = array() ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			$object->set_props( $props );
 
@@ -113,7 +113,7 @@ abstract class Data {
 	 */
 	public static function get_meta( $object, $key = '', $single = true, $context = 'edit' ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 			$value = $object->get_meta( $key, $single, $context );
 		} else {
 			$object_id = is_callable( array( $object, 'get_id' ) ) ? $object->get_id() : $object->id;
@@ -136,7 +136,7 @@ abstract class Data {
 	 */
 	public static function add_meta_data( $object, $key, $value, $unique = false ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			$object->add_meta_data( $key, $value, $unique );
 
@@ -161,7 +161,7 @@ abstract class Data {
 	 */
 	public static function update_meta_data( $object, $key, $value, $meta_id = '' ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			$object->update_meta_data( $key, $value, $meta_id );
 
@@ -184,7 +184,7 @@ abstract class Data {
 	 */
 	public static function delete_meta_data( $object, $key ) {
 
-		if ( WC_Core::is_wc_version_gte_2_7() ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
 
 			$object->delete_meta_data( $key );
 
