@@ -112,6 +112,40 @@ class Order extends Data {
 	}
 
 	/**
+	 * Backports WC_Order::set_address_prop() to pre-3.0
+	 * Saves by default.
+	 *
+	 * @since 4.6.0-dev
+	 * @param \WC_Order $order the order object
+	 * @param string $prop Name of prop to set.
+	 * @param string $address Name of address to set. billing or shipping.
+	 * @param mixed  $value Value of the prop.
+	 * @param bool   $save whether to save the order/property
+	 * @return \WC_Order
+	 */
+	public static function set_address_prop( \WC_Order $order, $prop, $address = 'billing', $value, $save = true ) {
+		if ( WC_Core::is_wc_version_gte_3_0() ) {
+			if ( is_callable( array( $order, "set_{$address}_{$prop}" ) ) ) {
+				$order->{"set_{$address}_{$prop}"}( $value );
+				if ($save === true) {
+					$order->save();
+				}
+			}
+		} else {
+			// wc 2.6 or older
+			if ($save === true) {
+				// store directly in postmeta
+				update_post_meta( $order->id, "_{$address}_{$prop}", $value );
+			} else {
+				// only change property in the order
+				$order->$prop = $value;
+			}
+		}
+
+		return $order;
+	}
+
+	/**
 	 * Implements WC_Order::get_item_meta for 3.0+
 	 * @param  \WC_Order $order the order object
 	 * @param  int     $item_id the item id
