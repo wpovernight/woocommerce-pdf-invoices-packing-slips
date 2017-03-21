@@ -1046,4 +1046,4 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 }
 
 // Load main plugin class
-$wpo_wcpdf = new WooCommerce_PDF_Invoices();
+$GLOBALS['wpo_wcpdf'] = new WooCommerce_PDF_Invoices();
