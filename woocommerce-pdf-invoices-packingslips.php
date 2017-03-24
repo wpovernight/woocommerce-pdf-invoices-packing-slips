@@ -702,7 +702,8 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
 			// not a text attribute, try attribute taxonomy
 			$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
-			$product_terms = @wc_get_product_terms( $product->id, $attribute_key, array( 'fields' => 'names' ) );
+			$product_id = WCX_Product::get_prop($product, 'id');
+			$product_terms = @wc_get_product_terms( $product_id, $attribute_key, array( 'fields' => 'names' ) );
 			// check if not empty, then display
 			if ( !empty($product_terms) ) {
 				$attribute = array_shift( $product_terms );
