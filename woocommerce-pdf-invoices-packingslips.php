@@ -13,6 +13,7 @@
 use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
 use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
 use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
+defined( 'ABSPATH' ) or exit;
 
 if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
