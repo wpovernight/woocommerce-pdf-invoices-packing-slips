@@ -1,4 +1,9 @@
 <?php
+use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
+use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
+use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
+
+
 /**
  * PDF Export class
  */
@@ -22,7 +27,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 */
 		public function __construct() {					
 			global $woocommerce;
-			$this->order = new WC_Order('');
+			$this->order = WCX::get_order('');
 			$this->general_settings = get_option('wpo_wcpdf_general_settings');
 			$this->template_settings = get_option('wpo_wcpdf_template_settings');
 			$this->debug_settings = get_option('wpo_wcpdf_debug_settings');
@@ -84,7 +89,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// WooCommerce Product Bundles compatibility (add row classes)
-			if ( class_exists('WC_Bundles') ) {
+			if ( !class_exists('WC_Bundles') ) {
 				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 4 );
 			}
 
@@ -269,7 +274,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 			$output_html = array();
 			foreach ($order_ids as $order_id) {
-				$this->order = new WC_Order( $order_id );
+				$this->order = WCX::get_order( $order_id );
 				do_action( 'wpo_wcpdf_process_template_order', $template_type, $order_id );
 
 				$template = $this->template_path . '/' . $template_type . '.php';
@@ -288,7 +293,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 				// store meta to be able to check if an invoice for an order has been created already
 				if ( $template_type == 'invoice' ) {
-					update_post_meta( $order_id, '_wcpdf_invoice_exists', 1 );
+					WCX_Order::update_meta_data( $this->order, '_wcpdf_invoice_exists', 1 );
 				}
 
 
@@ -440,10 +445,10 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 
 				// Get user_id of order
-				$this->order = new WC_Order ( $order_ids[0] );	
+				$this->order = WCX::get_order ( $order_ids[0] );	
 
 				// Check if current user is owner of order IMPORTANT!!!
-				if ( $this->order->user_id != get_current_user_id() ) {
+				if ( WCX_Order::get_prop( $this->order, 'customer_id' ) != get_current_user_id() ) {
 					wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
 				}
 
@@ -510,7 +515,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					break;
 				default:
 					$name = $template_type;
-					$number = $this->order->get_order_number();
+					$number = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
 					break;
 			}
 
@@ -550,18 +555,20 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return $attachments;
 			}
 
-			if ( !isset($order->id) ) {
+			$order_id = WCX_Order::get_id($order);
+
+			if ( get_class( $order ) !== 'WC_Order' && $order_id == false ) {
 				return $attachments;
 			}
 
 			// WooCommerce Booking compatibility
-			if ( get_post_type( $order->id ) == 'wc_booking' && isset($order->order) ) {
+			if ( get_post_type( $order_id ) == 'wc_booking' && isset($order->order) ) {
 				// $order is actually a WC_Booking object!
 				$order = $order->order;
 			}
 
 			// do not process low stock notifications, user emails etc!
-			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) || get_post_type( $order->id ) != 'shop_order' ) {
+			if ( in_array( $status, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) || get_post_type( $order_id ) != 'shop_order' ) {
 				return $attachments; 
 			}
 
@@ -610,7 +617,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				if( in_array( $status, $allowed_statuses ) && $attach_document ) {
 					do_action( 'wpo_wcpdf_before_attachment_creation', $order, $status, $template_type );
 					// create pdf data
-					$pdf_data = $this->get_pdf( $template_type, (array) $order->id );
+					$pdf_data = $this->get_pdf( $template_type, (array) $order_id );
 
 					if ( !$pdf_data ) {
 						// something went wrong, continue trying with other documents
@@ -618,7 +625,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					}
 
 					// compose filename
-					$pdf_filename = $this->build_filename( $template_type, (array) $order->id, 'attachment' );
+					$pdf_filename = $this->build_filename( $template_type, (array) $order_id, 'attachment' );
 
 					$pdf_path = $tmp_path . $pdf_filename;
 					file_put_contents ( $pdf_path, $pdf_data );
@@ -632,13 +639,14 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function set_invoice_number( $order_id ) {
+			$order = $this->get_order( $order_id );
+
 			// first check: get invoice number from post meta
-			$invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true );
+			$invoice_number = WCX_Order::get_meta( $order, '_wcpdf_invoice_number', true );
 
 			// If a third-party plugin claims to generate invoice numbers, use it instead
 			$third_party = apply_filters('woocommerce_invoice_number_by_plugin', false);
 			if ($third_party) {
-				$order = new WC_Order($order_id);
 				$invoice_number = apply_filters('woocommerce_generate_invoice_number', null, $order);
 			}
 
@@ -653,7 +661,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					// First time! We start numbering from order_number or order_id
 					
 					// Check if $order_number is an integer
-					$order_number = ltrim($this->order->get_order_number(), '#');
+					$order_number = ltrim($order->get_order_number(), '#');
 					if ( ctype_digit( (string)$order_number ) ) {
 						// order_number == integer: use as starting point.
 						$invoice_number = $order_number;
@@ -687,8 +695,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				// $order_number = ltrim($this->order->get_order_number(), '#');
 				// $this->log( $order_id, "Invoice number {$invoice_number} set for order {$order_number} (id {$order_id})" );
 
-				update_post_meta($order_id, '_wcpdf_invoice_number', $invoice_number);
-				update_post_meta($order_id, '_wcpdf_formatted_invoice_number', $this->get_invoice_number( $order_id ) );
+				WCX_Order::update_meta_data( $order, '_wcpdf_invoice_number', $invoice_number );
+				WCX_Order::update_meta_data( $order, '_wcpdf_formatted_invoice_number', $this->get_invoice_number( $order_id ) );
 
 				// increase next_order_number
 				$update_args = array(
@@ -709,6 +717,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function get_invoice_number( $order_id ) {
+			$order = $this->get_order( $order_id );
 			// Call the woocommerce_invoice_number filter and let third-party plugins set a number.
 			// Default is null, so we can detect whether a plugin has set the invoice number
 			$third_party_invoice_number = apply_filters( 'woocommerce_invoice_number', null, $order_id );
@@ -716,19 +725,20 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				return $third_party_invoice_number;
 			}
 
-			// get invoice number from post meta
-			if ( $invoice_number = get_post_meta( $order_id, '_wcpdf_invoice_number', true ) ) {
+			// get invoice number from order
+			$invoice_number = WCX_Order::get_meta( $order, '_wcpdf_invoice_number', true );
+			if ( $invoice_number ) {
 				// check if we have already loaded this order
-				if ( $this->order->id == $order_id ) {
+				if ( !empty( $this->order ) && WCX_Order::get_id( $this->order ) == $order_id ) {
 					$order_number = $this->order->get_order_number();
-					$order_date = $this->order->order_date;
+					$order_date = WCX_Order::get_prop( $this->order, 'date_created' );
 				} else {
-					$order = new WC_Order( $order_id );
+					$order = WCX::get_order( $order_id );
 					$order_number = $order->get_order_number();
-					$order_date = $order->order_date;
+					$order_date = WCX_Order::get_prop( $order, 'date_created' );
 				}
-
-				return apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $order_number, $order_id, $order_date );
+				$mysql_order_date = $order_date->date( "Y-m-d H:i:s" );
+				return apply_filters( 'wpo_wcpdf_invoice_number', $invoice_number, $order_number, $order_id, $mysql_order_date );
 			} else {
 				// no invoice number for this order
 				return false;
@@ -739,7 +749,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * Add invoice number to WC REST API
 		 */
 		public function woocommerce_api_invoice_numer ( $data, $order ) {
-			if ( $invoice_number = $this->get_invoice_number( $order->id ) ) {
+			if ( $invoice_number = $this->get_invoice_number( WCX_Order::get_id( $order ) ) ) {
 				$data['wpo_wcpdf_invoice_number'] = $invoice_number;
 			} else {
 				$data['wpo_wcpdf_invoice_number'] = '';
@@ -752,24 +762,26 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		 * https://wordpress.org/support/topic/subscription-renewal-duplicate-invoice-number?replies=6#post-6138110
 		 */
 		public function woocommerce_subscriptions_renewal_order_created ( $renewal_order, $original_order, $product_id, $new_order_role ) {
-			$this->reset_invoice_data( $renewal_order->id );
+			$this->reset_invoice_data( WCX_Order::get_id( $renewal_order ) );
 			return $renewal_order;
 		}
 
 		public function wcs_renewal_order_created (  $renewal_order, $subscription ) {
-			$this->reset_invoice_data( $renewal_order->id );
+			$this->reset_invoice_data( WCX_Order::get_id( $renewal_order ) );
 			return $renewal_order;
 		}
 
 		public function reset_invoice_data ( $order_id ) {
+			$order = $this->get_order( $order_id );
 			// delete invoice number, invoice date & invoice exists meta
-			delete_post_meta( $order_id, '_wcpdf_invoice_number' );
-			delete_post_meta( $order_id, '_wcpdf_formatted_invoice_number' );
-			delete_post_meta( $order_id, '_wcpdf_invoice_date' );
-			delete_post_meta( $order_id, '_wcpdf_invoice_exists' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_number' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_formatted_invoice_number' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_date' );
+			WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_exists' );
 		}
 
 		public function format_invoice_number( $invoice_number, $order_number, $order_id, $order_date ) {
+			$order = $this->get_order( $order_id );
 			// get format settings
 			$formats['prefix'] = isset($this->template_settings['invoice_number_formatting_prefix'])?$this->template_settings['invoice_number_formatting_prefix']:'';
 			$formats['suffix'] = isset($this->template_settings['invoice_number_formatting_suffix'])?$this->template_settings['invoice_number_formatting_suffix']:'';
@@ -779,7 +791,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			$order_year = date_i18n( 'Y', strtotime( $order_date ) );
 			$order_month = date_i18n( 'm', strtotime( $order_date ) );
 			$order_day = date_i18n( 'd', strtotime( $order_date ) );
-			$invoice_date = get_post_meta($order_id,'_wcpdf_invoice_date',true);
+			$invoice_date = WCX_Order::get_meta( $order, '_wcpdf_invoice_date', true );
 			$invoice_date = empty($invoice_date) ? current_time('mysql') : $invoice_date;
 			$invoice_year = date_i18n( 'Y', strtotime( $invoice_date ) );
 			$invoice_month = date_i18n( 'm', strtotime( $invoice_date ) );
@@ -806,8 +818,8 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}
 
 		public function get_display_number( $order_id ) {
-			if ( !isset($this->order->id) ) {
-				$this->order = new WC_Order ( $order_id );
+			if ( !isset($this->order) ) {
+				$this->order = WCX::get_order ( $order_id );
 			}
 
 			if ( isset($this->template_settings['display_number']) && $this->template_settings['display_number'] == 'invoice_number' ) {
@@ -834,10 +846,16 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		}			
 		
 		/**
-		 * Get the current order
+		 * Get the current order or order by id
 		 */
-		public function get_order() {
-			return $this->order;
+		public function get_order( $order_id = null ) {
+			if ( empty( $order_id ) && isset( $this->order ) ) {
+				return $this->order;
+			} elseif ( is_object( $this->order ) && WCX_Order::get_id( $this->order ) == $order_id ) {
+				return $this->order;
+			} else {
+				return WCX::get_order( $order_id );
+			}
 		}
 
 		/**
@@ -899,9 +917,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					
 					// Checking fo existance, thanks to MDesigner0 
 					if(!empty($product)) {
-						// Set the thumbnail id DEPRICATED (does not support thumbnail sizes), use thumbnail_path or thumbnail instead
-						$data['thumbnail_id'] = $this->get_thumbnail_id( $product );
-
 						// Thumbnail (full img tag)
 						$data['thumbnail'] = $this->get_thumbnail ( $product );
 
@@ -915,7 +930,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 						$data['weight'] = $product->get_weight();
 						
 						// Set item dimensions
-						$data['dimensions'] = $product->get_dimensions();
+						$data['dimensions'] = WCX_Product::get_dimensions( $product );
 					
 						// Pass complete product object
 						$data['product'] = $product;
@@ -968,7 +983,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		public function wc_price( $price, $args = array() ) {
 			if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
 				// WC 2.1 or newer is used
-				$args['currency'] = $this->order->get_order_currency();
+				$args['currency'] = WCX_Order::get_prop( $this->order, 'currency' );
 				$formatted_price = wc_price( $price, $args );
 			} else {
 				$formatted_price = woocommerce_price( $price );
@@ -1091,11 +1106,11 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 		public function get_thumbnail_id ( $product ) {
 			global $woocommerce;
 	
-			if ( $product->variation_id && has_post_thumbnail( $product->variation_id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $product->variation_id );
-			} elseif ( has_post_thumbnail( $product->id ) ) {
-				$thumbnail_id = get_post_thumbnail_id ( $product->id );
-			} elseif ( ( $parent_id = wp_get_post_parent_id( $product->id ) ) && has_post_thumbnail( $parent_id ) ) {
+			$product_id = WCX_Product::get_id( $product );
+
+			if ( has_post_thumbnail( $product_id ) ) {
+				$thumbnail_id = get_post_thumbnail_id ( $product_id );
+			} elseif ( ( $parent_id = wp_get_post_parent_id( $product_id ) ) && has_post_thumbnail( $parent_id ) ) {
 				$thumbnail_id = get_post_thumbnail_id ( $parent_id );
 			} else {
 				$thumbnail_id = false;
@@ -1165,18 +1180,18 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 			}
 
-			$item_meta = $order->get_item_meta( $item_id );
+			$bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_by', true );
 
-			if (isset($item_meta['_bundled_by'])) {
+			if ( $bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_by', true ) ) {
 				$classes = $classes . ' bundled-item';
 
 				// check bundled item visibility
-				if ( ! empty( $item_meta[ '_bundled_item_hidden' ] ) ) {
+				if ( $hidden = WCX_Order::get_item_meta( $order, $item_id, '_bundled_item_hidden', true ) ) {
 					$classes = $classes . ' hidden';
 				}
 
 				return $classes;
-			} elseif (isset($item_meta['_bundled_items'])) {
+			} elseif ( $bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_items', true ) ) {
 				return  $classes . ' product-bundle';
 			}
 
@@ -1200,9 +1215,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 			}
 
-			$item_meta = $order->get_item_meta( $item_id );
-
-			if (isset($item_meta['_chained_product_of'])) {
+			if ( $chained_product_of = WCX_Order::get_item_meta( $order, $item_id, '_chained_product_of', true ) ) {
 				return  $classes . ' chained-product';
 			}
 
