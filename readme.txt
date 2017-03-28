@@ -103,6 +103,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * WooCommerce 3.0 Compatible
 * **Requires PHP version 5.3 or higher**
 * Fix: Invoice number display in mobile view
+* Fix: Update formatted invoice number in order meta when number is altered
 * Tweak: Avoid PHP7 scan false positives in DomPDF
 
 = 1.5.39 =
