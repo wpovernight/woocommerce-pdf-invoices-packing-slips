@@ -538,7 +538,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show shop/company footer imprint, copyright etc.
 		 */
 		public function get_footer() {
-			return $this->functions->get_shipping_notes();
+			return $this->functions->get_footer();
 		}
 		public function footer() {
 			$this->functions->footer();
@@ -548,7 +548,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show Extra field 1
 		 */
 		public function get_extra_1() {
-			return $this->functions->get_shipping_notes();
+			return $this->functions->get_extra_1();
 		}
 		public function extra_1() {
 			$this->functions->extra_1();
@@ -558,7 +558,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show Extra field 2
 		 */
 		public function get_extra_2() {
-			return $this->functions->get_shipping_notes();
+			return $this->functions->get_extra_2();
 		}
 		public function extra_2() {
 			$this->functions->extra_2();
@@ -568,7 +568,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 		 * Return/Show Extra field 3
 		 */
 		public function get_extra_3() {
-			return $this->functions->get_shipping_notes();
+			return $this->functions->get_extra_3();
 		}
 		public function extra_3() {
 			$this->functions->extra_3();
