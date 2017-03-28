@@ -99,11 +99,15 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 1.6.0.1 =
+* Fix: Crash when PHP5.2 (5.3 or higher required, 5.6 or higher recommended)
+
 = 1.6.0 =
 * WooCommerce 3.0 Compatible
 * **Requires PHP version 5.3 or higher**
 * Fix: Invoice number display in mobile view
 * Fix: Update formatted invoice number in order meta when number is altered
+* Fix: global plugin object loading in wrapped cron methods
 * Tweak: Avoid PHP7 scan false positives in DomPDF
 
 = 1.5.39 =
@@ -516,5 +520,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 1.6 =
+= 1.6.0.1 =
 Important: Version 1.6 requires PHP 5.3 or higher to run!
