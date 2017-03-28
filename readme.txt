@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.7
-Stable tag: 1.6.0
+Stable tag: 1.6.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,7 +99,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 1.6.0.1 =
+= 1.6.0.2 =
 * Fix: Don't crash with PHP 5.2 or older (5.3 or higher required, 5.6 or higher recommended)
 
 = 1.6.0 =
@@ -520,5 +520,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 1.6.0.1 =
+= 1.6.0.2 =
 Important: Version 1.6 requires PHP 5.3 or higher to run!
