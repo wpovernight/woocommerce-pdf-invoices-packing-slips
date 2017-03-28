@@ -100,7 +100,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 = 1.6.0.1 =
-* Fix: Crash when PHP5.2 (5.3 or higher required, 5.6 or higher recommended)
+* Fix: Don't crash with PHP 5.2 or older (5.3 or higher required, 5.6 or higher recommended)
 
 = 1.6.0 =
 * WooCommerce 3.0 Compatible
