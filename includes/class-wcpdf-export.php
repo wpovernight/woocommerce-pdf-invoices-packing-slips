@@ -90,7 +90,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			}
 
 			// WooCommerce Product Bundles compatibility (add row classes)
-			if ( !class_exists('WC_Bundles') ) {
+			if ( class_exists('WC_Bundles') ) {
 				add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 4 );
 			}
 
@@ -1181,8 +1181,6 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 			}
 
-			$bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_by', true );
-
 			if ( $bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_by', true ) ) {
 				$classes = $classes . ' bundled-item';
 
@@ -1192,7 +1190,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				}
 
 				return $classes;
-			} elseif ( $bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_items', true ) ) {
+			} elseif ( $bundled_items = WCX_Order::get_item_meta( $order, $item_id, '_bundled_items', true ) ) {
 				return  $classes . ' product-bundle';
 			}
 
