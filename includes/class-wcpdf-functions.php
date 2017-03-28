@@ -335,7 +335,7 @@ class WooCommerce_PDF_Invoices_Functions {
 		$payment_method_label = __( 'Payment method', 'wpo_wcpdf' );
 
 		// use parent for credit notes
-		if ( get_post_type( $order_id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( WCX_Order::get_id( WPO_WCPDF()->export->order ) ) ) {
+		if ( get_post_type( $order_id ) == 'shop_order_refund' && $parent_order_id = wp_get_post_parent_id( $order_id ) ) {
 			$parent_order = WCX::get_order( $parent_order_id );
 			$payment_method_title = WCX_Order::get_prop( $parent_order, 'payment_method_title', 'view' );
 			$payment_method = __( $payment_method_title, 'woocommerce' );
