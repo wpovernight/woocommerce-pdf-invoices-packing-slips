@@ -509,19 +509,24 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				case 'invoice':
 					$name = _n( 'invoice', 'invoices', $count, 'wpo_wcpdf' );
 					$number = $this->get_display_number( $order_ids[0] );
-					break;		
+					break;
 				case 'packing-slip':
 					$name = _n( 'packing-slip', 'packing-slips', $count, 'wpo_wcpdf' );
 					$number = $this->order->get_order_number();
 					break;
 				default:
 					$name = $template_type;
-					$number = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
+					$order_id =  WCX_Order::get_id( $this->order );
+					if ( get_post_type( $order_id ) == 'shop_order_refund' ) {
+						$number = $order_id;
+					} else {
+						$number = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
+					}
 					break;
 			}
 
 			if ( $count == 1 ) {
-				$suffix = $number;			
+				$suffix = $number;
 			} else {
 				$suffix = date('Y-m-d'); // 2020-11-11
 			}
