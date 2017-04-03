@@ -493,7 +493,7 @@ class WooCommerce_PDF_Invoices_Functions {
 		}
 
 		$order_id = WCX_Order::get_id( WPO_WCPDF()->export->order );
-		if ( get_post_type( $order_id ) == 'shop_order_refund' ) {
+		if ( get_post_type( $order_id ) != 'shop_order_refund' ) {
 			// WC2.4 fix order_total for refunded orders
 			if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '>=' ) && isset($totals['order_total']) ) {
 				$tax_display = WCX_Order::get_prop( WPO_WCPDF()->export->order, 'tax_display_cart' );
