@@ -427,17 +427,9 @@ class WooCommerce_PDF_Invoices_Functions {
 	 * Return/Show the invoice date
 	 */
 	public function get_invoice_date() {
-		$invoice_date = WCX_Order::get_meta( WPO_WCPDF()->export->order, '_wcpdf_invoice_date', true );
-
-		// add invoice date if it doesn't exist
-		if ( empty($invoice_date) || !isset($invoice_date) ) {
-			$invoice_date = current_time('mysql');
-			WCX_Order::update_meta_data( WPO_WCPDF()->export->order, '_wcpdf_invoice_date', $invoice_date );
-		}
-
-		$formatted_invoice_date = date_i18n( get_option( 'date_format' ), strtotime( $invoice_date ) );
-
-		return apply_filters( 'wpo_wcpdf_invoice_date', $formatted_invoice_date, $invoice_date );
+		$order_id = WCX_Order::get_id( WPO_WCPDF()->export->order );
+		$invoice_date = WPO_WCPDF()->export->get_invoice_date( $order_id );
+		return $invoice_date;
 	}
 	public function invoice_date() {
 		echo $this->get_invoice_date();

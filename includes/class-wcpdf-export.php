@@ -288,6 +288,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				// Set the invoice number
 				if ( $template_type == 'invoice' ) {
 					$this->set_invoice_number( $order_id );
+					$this->set_invoice_date( $order_id );
 				}
 
 				$output_html[$order_id] = $this->get_template($template);
@@ -749,6 +750,26 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 				// no invoice number for this order
 				return false;
 			}
+		}
+
+		public function set_invoice_date( $order_id ) {
+			$order = $this->get_order( $order_id );
+			$invoice_date = WCX_Order::get_meta( WPO_WCPDF()->export->order, '_wcpdf_invoice_date', true );
+
+			// add invoice date if it doesn't exist
+			if ( empty($invoice_date) || !isset($invoice_date) ) {
+				$invoice_date = current_time('mysql');
+				WCX_Order::update_meta_data( WPO_WCPDF()->export->order, '_wcpdf_invoice_date', $invoice_date );
+			}
+
+			return $invoice_date;
+		}
+
+		public function get_invoice_date( $order_id ) {
+			$invoice_date = $this->set_invoice_date( $order_id );
+			$formatted_invoice_date = date_i18n( get_option( 'date_format' ), strtotime( $invoice_date ) );
+
+			return apply_filters( 'wpo_wcpdf_invoice_date', $formatted_invoice_date, $invoice_date );
 		}
 
 		/**
