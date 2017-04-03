@@ -492,43 +492,47 @@ class WooCommerce_PDF_Invoices_Functions {
 			$totals[$key]['label'] = $label;
 		}
 
-		// WC2.4 fix order_total for refunded orders
-		if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '>=' ) && isset($totals['order_total']) ) {
-			$tax_display = WCX_Order::get_prop( WPO_WCPDF()->export->order, 'tax_display_cart' );
-			$totals['order_total']['value'] = wc_price( WPO_WCPDF()->export->order->get_total(), array( 'currency' => WCX_Order::get_prop( WPO_WCPDF()->export->order, 'currency' ) ) );
-			$order_total    = WPO_WCPDF()->export->order->get_total();
-			$tax_string     = '';
+		$order_id = WCX_Order::get_id( WPO_WCPDF()->export->order );
+		if ( get_post_type( $order_id ) == 'shop_order_refund' ) {
+			// WC2.4 fix order_total for refunded orders
+			if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '>=' ) && isset($totals['order_total']) ) {
+				$tax_display = WCX_Order::get_prop( WPO_WCPDF()->export->order, 'tax_display_cart' );
+				$totals['order_total']['value'] = wc_price( WPO_WCPDF()->export->order->get_total(), array( 'currency' => WCX_Order::get_prop( WPO_WCPDF()->export->order, 'currency' ) ) );
+				$order_total    = WPO_WCPDF()->export->order->get_total();
+				$tax_string     = '';
 
-			// Tax for inclusive prices
-			if ( wc_tax_enabled() && 'incl' == $tax_display ) {
-				$tax_string_array = array();
+				// Tax for inclusive prices
+				if ( wc_tax_enabled() && 'incl' == $tax_display ) {
+					$tax_string_array = array();
 
-				if ( 'itemized' == get_option( 'woocommerce_tax_total_display' ) ) {
-					foreach ( WPO_WCPDF()->export->order->get_tax_totals() as $code => $tax ) {
-						$tax_amount         = $tax->formatted_amount;
-						$tax_string_array[] = sprintf( '%s %s', $tax_amount, $tax->label );
-					}
-				} else {
-					$tax_string_array[] = sprintf( '%s %s', wc_price( WPO_WCPDF()->export->order->get_total_tax() - WPO_WCPDF()->export->order->get_total_tax_refunded(), array( 'currency' => WPO_WCPDF()->export->order->get_order_currency() ) ), WC()->countries->tax_or_vat() );
-				}
-				if ( ! empty( $tax_string_array ) ) {
-					if ( version_compare( WOOCOMMERCE_VERSION, '2.6', '>=' ) ) {
-						$tax_string = ' ' . sprintf( __( '(includes %s)', 'woocommerce' ), implode( ', ', $tax_string_array ) );
+					if ( 'itemized' == get_option( 'woocommerce_tax_total_display' ) ) {
+						foreach ( WPO_WCPDF()->export->order->get_tax_totals() as $code => $tax ) {
+							$tax_amount         = $tax->formatted_amount;
+							$tax_string_array[] = sprintf( '%s %s', $tax_amount, $tax->label );
+						}
 					} else {
-						// use old capitalized string
-						$tax_string = ' ' . sprintf( __( '(Includes %s)', 'woocommerce' ), implode( ', ', $tax_string_array ) );
+						$tax_string_array[] = sprintf( '%s %s', wc_price( WPO_WCPDF()->export->order->get_total_tax() - WPO_WCPDF()->export->order->get_total_tax_refunded(), array( 'currency' => WPO_WCPDF()->export->order->get_order_currency() ) ), WC()->countries->tax_or_vat() );
 					}
+					if ( ! empty( $tax_string_array ) ) {
+						if ( version_compare( WOOCOMMERCE_VERSION, '2.6', '>=' ) ) {
+							$tax_string = ' ' . sprintf( __( '(includes %s)', 'woocommerce' ), implode( ', ', $tax_string_array ) );
+						} else {
+							// use old capitalized string
+							$tax_string = ' ' . sprintf( __( '(Includes %s)', 'woocommerce' ), implode( ', ', $tax_string_array ) );
+						}
+					}
+				}
+
+				$totals['order_total']['value'] .= $tax_string;
+			}
+
+			// remove refund lines (shouldn't be in invoice)
+			foreach ( $totals as $key => $total ) {
+				if ( strpos($key, 'refund_') !== false ) {
+					unset( $totals[$key] );
 				}
 			}
 
-			$totals['order_total']['value'] .= $tax_string;
-		}
-
-		// remove refund lines (shouldn't be in invoice)
-		foreach ( $totals as $key => $total ) {
-			if ( strpos($key, 'refund_') !== false ) {
-				unset( $totals[$key] );
-			}
 		}
 
 		return apply_filters( 'wpo_wcpdf_woocommerce_totals', $totals, WPO_WCPDF()->export->order );
