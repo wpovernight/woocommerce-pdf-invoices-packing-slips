@@ -39,11 +39,11 @@ class WooCommerce_PDF_Invoices_Functions {
 		if (file_exists($css)) {
 			include($css);
 		}
-		$html = ob_get_clean();			
+		$html = ob_get_clean();
 		$html = apply_filters( 'wpo_wcpdf_template_styles', $html );
 		
 		echo $html;
-	}				
+	}
 
 	/**
 	 * Return logo id
