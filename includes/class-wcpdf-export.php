@@ -949,7 +949,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 
 						// Set the single price (turned off to use more consistent calculated price)
 						// $data['single_price'] = woocommerce_price ( $product->get_price() );
-										
+						
 						// Set item SKU
 						$data['sku'] = $product->get_sku();
 		

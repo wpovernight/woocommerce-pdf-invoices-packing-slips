@@ -496,7 +496,12 @@ class WooCommerce_PDF_Invoices_Functions {
 		if ( get_post_type( $order_id ) != 'shop_order_refund' ) {
 			// WC2.4 fix order_total for refunded orders
 			if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '>=' ) && isset($totals['order_total']) ) {
-				$tax_display = WCX_Order::get_prop( WPO_WCPDF()->export->order, 'tax_display_cart' );
+				if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) ) {
+					$tax_display = get_option( 'woocommerce_tax_display_cart' );
+				} else {
+					$tax_display = WCX_Order::get_prop( WPO_WCPDF()->export->order, 'tax_display_cart' );
+				}
+
 				$totals['order_total']['value'] = wc_price( WPO_WCPDF()->export->order->get_total(), array( 'currency' => WCX_Order::get_prop( WPO_WCPDF()->export->order, 'currency' ) ) );
 				$order_total    = WPO_WCPDF()->export->order->get_total();
 				$tax_string     = '';
@@ -504,7 +509,6 @@ class WooCommerce_PDF_Invoices_Functions {
 				// Tax for inclusive prices
 				if ( wc_tax_enabled() && 'incl' == $tax_display ) {
 					$tax_string_array = array();
-
 					if ( 'itemized' == get_option( 'woocommerce_tax_total_display' ) ) {
 						foreach ( WPO_WCPDF()->export->order->get_tax_totals() as $code => $tax ) {
 							$tax_amount         = $tax->formatted_amount;
