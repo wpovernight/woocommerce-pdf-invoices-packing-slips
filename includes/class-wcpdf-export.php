@@ -965,14 +965,18 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 					}
 					
 					// Set item meta
-					if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '<' ) ) {
-						$meta = new WC_Order_Item_Meta( $item['item_meta'], $product );
+					if (function_exists('wc_display_item_meta')) { // WC3.0+
+						$data['meta'] = wc_display_item_meta( $item, array(
+							'echo'      => false,
+						) );
 					} else {
-						// pass complete item for WC2.4+
-						$meta = new WC_Order_Item_Meta( $item, $product );						
+						if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '<' ) ) {
+							$meta = new WC_Order_Item_Meta( $item['item_meta'], $product );
+						} else { // pass complete item for WC2.4+
+							$meta = new WC_Order_Item_Meta( $item, $product );
+						}
+						$data['meta'] = $meta->display( false, true );
 					}
-
-					$data['meta'] = $meta->display( false, true );
 
 					$data_list[$item_id] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order );
 				}

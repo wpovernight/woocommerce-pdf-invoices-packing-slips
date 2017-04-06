@@ -204,6 +204,7 @@ table.order-details {
 }
 
 
+/* item meta formatting for WC2.6 and older */
 dl {
 	margin: 4px 0;
 }
@@ -221,6 +222,19 @@ dd {
 dd:after {
 	content: "\A";
 	white-space: pre;
+}
+/* item-meta formatting for WC3.0+ */
+.wc-item-meta {
+	margin: 4px 0;
+	font-size: 7pt;
+	line-height: 7pt;
+}
+.wc-item-meta p {
+	display: inline;
+}
+.wc-item-meta li {
+	margin: 0;
+	margin-left: 5px;
 }
 
 /* Notes & Totals */
