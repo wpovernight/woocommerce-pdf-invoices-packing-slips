@@ -82,7 +82,7 @@ class Order extends Data {
 		$value = parent::get_prop( $object, $prop, $context, self::$compat_props );
 
 		// 3.0+ date getters return a DateTime object, where previously MySQL date strings were returned
-		if ( WC_Core::is_wc_version_lt_3_0() && in_array( $prop, array( 'date_completed', 'date_paid', 'date_modified', 'date_created' ), true ) && ! is_numeric( $value ) ) {
+		if ( WC_Core::is_wc_version_lt_3_0() && in_array( $prop, array( 'date_completed', 'date_paid', 'date_modified', 'date_created' ), true ) && !empty( $value ) ) {
 			if ( is_numeric( $value ) ) {
 				$value = new WC_DateTime( "@{$value}", new \DateTimeZone( 'UTC' ) );
 				$value->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
