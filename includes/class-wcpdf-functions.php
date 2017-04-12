@@ -749,7 +749,19 @@ class WooCommerce_PDF_Invoices_Functions {
 	 * Return/Show shipping notes
 	 */
 	public function get_shipping_notes() {
-		$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( WPO_WCPDF()->export->order, 'customer_note', 'view' ) ) );
+		$order_id = WCX_Order::get_id( WPO_WCPDF()->export->order );
+		if ( get_post_type( $order_id ) == 'shop_order_refund' ) {
+			// return reason for refund if order is a refund
+			if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) ) {
+				$shipping_notes = WPO_WCPDF()->export->order->get_reason();
+			} elseif ( method_exists(WPO_WCPDF()->export->order, 'get_refund_reason') ) {
+				$shipping_notes = WPO_WCPDF()->export->order->get_refund_reason();
+			} else {
+				$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( WPO_WCPDF()->export->order, 'customer_note', 'view' ) ) );
+			}
+		} else {
+			$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( WPO_WCPDF()->export->order, 'customer_note', 'view' ) ) );
+		}
 		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes );
 	}
 	public function shipping_notes() {
