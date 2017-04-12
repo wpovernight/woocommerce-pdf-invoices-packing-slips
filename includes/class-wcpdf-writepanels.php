@@ -188,7 +188,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			if (isset($this->general_settings['my_account_buttons'])) {
 				switch ($this->general_settings['my_account_buttons']) {
 					case 'available':
-						$invoice_allowed = WCX_Order::get_meta( $order, 'wcpdf_invoice_exists', true );
+						$invoice_allowed = WCX_Order::get_meta( $order, '_wcpdf_invoice_exists', true );
 						break;
 					case 'always':
 						$invoice_allowed = true;
@@ -206,7 +206,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 				}
 			} else {
 				// backwards compatibility
-				$invoice_allowed = WCX_Order::get_meta( $order, 'wcpdf_invoice_exists', true );
+				$invoice_allowed = WCX_Order::get_meta( $order, '_wcpdf_invoice_exists', true );
 			}
 
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
