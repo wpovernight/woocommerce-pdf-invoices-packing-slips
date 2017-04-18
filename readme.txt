@@ -3,7 +3,7 @@ Contributors: pomegranate
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.7
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.6.5 =
+* Fix: Duplicate invoice numbers when bulk completing orders (WC3.0)
+* Fix: Hidden Invoice date when order refunded
 
 = 1.6.4 =
 * Fix: My account invoice button visibility
@@ -535,5 +539,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 1.6.4 =
+= 1.6.5 =
 Important: Version 1.6 requires PHP 5.3 or higher to run!
