@@ -339,7 +339,7 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices_Writepanels' ) ) {
 			$post_type = get_post_type( $post_id );
 			if( $post_type == 'shop_order' ) {
 				// bail if this is not an actual 'Save order' action
-				if (isset($_POST['action']) && $_POST['action'] != 'editpost') {
+				if (!isset($_POST['action']) || $_POST['action'] != 'editpost') {
 					return;
 				}
 				
