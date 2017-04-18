@@ -661,6 +661,7 @@ if ( ! class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
 			if ( empty($invoice_number) || !isset($invoice_number) ) {
 				global $wpdb;
 				// making direct DB call to avoid caching issues
+				wp_cache_delete ('wpo_wcpdf_next_invoice_number', 'options');
 				$next_invoice_number = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'wpo_wcpdf_next_invoice_number' ) );
 				$next_invoice_number = apply_filters( 'wpo_wcpdf_next_invoice_number', $next_invoice_number, $order_id );
 
