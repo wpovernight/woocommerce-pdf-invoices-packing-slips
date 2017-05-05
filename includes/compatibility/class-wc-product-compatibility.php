@@ -38,7 +38,7 @@ class Product extends Data {
 	 */
 	public static function get_id( \WC_Product $product ) {
 
-		if ( self::is_wc_version_gte_2_5() ) {
+		if ( method_exists( $product, 'get_id' ) ) {
 
 			return $product->get_id();
 
