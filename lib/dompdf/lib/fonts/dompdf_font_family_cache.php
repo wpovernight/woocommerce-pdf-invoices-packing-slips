@@ -87,9 +87,9 @@
   ),
   'currencies' => 
   array (
-    'normal' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
-    'bold' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
-    'italic' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
-    'bold_italic' => DOMPDF_FONT_DIR . 'cd6cad1255d2179b7fe44d496b229dae',
+    'normal' => DOMPDF_FONT_DIR . 'currencies',
+    'bold' => DOMPDF_FONT_DIR . 'currencies',
+    'italic' => DOMPDF_FONT_DIR . 'currencies',
+    'bold_italic' => DOMPDF_FONT_DIR . 'currencies',
   ),
 ) ?>
