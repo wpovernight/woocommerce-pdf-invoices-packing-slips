@@ -37,7 +37,9 @@ class WPO_WCPDF_Legacy {
 	 * Redirect function calls directly to legacy functions class
 	 */
 	public function __call( $name, $arguments ) {
-		if ( is_callable( array( $this->functions, $name ) ) ) {
+		if ( is_callable( array( WPO_WCPDF(), $name ) ) ) {
+			return call_user_func_array( array( WPO_WCPDF(), $name ), $arguments );
+		} elseif ( is_callable( array( $this->functions, $name ) ) ) {
 			return call_user_func_array( array( $this->functions, $name ), $arguments );
 		} else {
 			throw new \Exception("Call to undefined method ".__CLASS__."::{$name}()", 1);
