@@ -30,7 +30,7 @@
 	}
 
 	?>
-	<form method="post" action="options.php" id="wpo-wcpdf-settings">
+	<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
 		<?php
 			do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
 			if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
