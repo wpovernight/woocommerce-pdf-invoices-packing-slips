@@ -1,4 +1,4 @@
-<?
+<?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
 use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
