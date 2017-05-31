@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce PDF Invoices & Packing Slips
  * Plugin URI: http://www.wpovernight.com
  * Description: Create, print & email PDF invoices & packing slips for WooCommerce orders.
- * Version: 2.0
+ * Version: 2.0-beta-1
  * Author: Ewout Fernhout
  * Author URI: http://www.wpovernight.com
  * License: GPLv2 or later
@@ -19,7 +19,7 @@ if ( !class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '2.0';
+	public $version = '2.0-beta-1';
 	public $plugin_basename;
 	public $legacy_mode;
 
@@ -53,11 +53,6 @@ class WPO_WCPDF {
 
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-			// check if upgrading from versionless (1.4.14 and older)
-			if ( get_option('wpo_wcpdf_general_settings') && get_option('wpo_wcpdf_version') === false ) {
-				// tag 'versionless', so that we can apply necessary upgrade settings
-				add_option( 'wpo_wcpdf_version', 'versionless' );
-			}
 			add_action( 'wp_loaded', array( $this, 'do_install' ) );
 		}
 	}
@@ -289,6 +284,12 @@ class WPO_WCPDF {
 	 * Plugin install method. Perform any installation tasks here
 	 */
 	protected function install() {
+		// check if upgrading from versionless (1.4.14 and older)
+		if ( get_option('wpo_wcpdf_general_settings') ) {
+			$this->upgrade( 'versionless' );
+			return;
+		}
+
 		// Create temp folders
 		$tmp_base = $this->main->get_tmp_base();
 
@@ -368,7 +369,7 @@ class WPO_WCPDF {
 		}
 
 		// 2.0 update: reorganize settings
-		if ( $installed_version == 'versionless' || version_compare( $installed_version, '2.0', '<' ) ) {
+		if ( $installed_version == 'versionless' || version_compare( $installed_version, '2.0-dev', '<' ) ) {
 			$old_settings = array(
 				'wpo_wcpdf_general_settings'	=> get_option( 'wpo_wcpdf_general_settings' ),
 				'wpo_wcpdf_template_settings'	=> get_option( 'wpo_wcpdf_template_settings' ),
