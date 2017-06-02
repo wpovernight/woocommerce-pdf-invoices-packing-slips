@@ -48,7 +48,10 @@
 	margin-left:20px!important;
 }
 
-#edit-invoice-date-number:hover {
+#edit-invoice-date-number {
 	opacity:0.5;
+}
+#edit-invoice-date-number:hover {
+	opacity:1;
 	cursor:pointer;
 }
