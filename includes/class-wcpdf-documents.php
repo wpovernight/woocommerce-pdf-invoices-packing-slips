@@ -50,6 +50,8 @@ class Documents {
 		include_once( dirname( __FILE__ ) . '/documents/class-wcpdf-bulk-document.php' );
 		// Document number formatting class
 		include_once( dirname( __FILE__ ) . '/documents/class-wcpdf-document-number.php' );
+		// Sequential number handler
+		include_once( dirname( __FILE__ ) . '/documents/class-wcpdf-sequential-number-store.php' );
 
 		// Load Invoice & Packing Slip
 		$this->documents['\WPO\WC\PDF_Invoices\Documents\Invoice']		= include( 'documents/class-wcpdf-invoice.php' );

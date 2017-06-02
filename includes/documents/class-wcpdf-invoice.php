@@ -54,35 +54,19 @@ class Invoice extends Order_Document_Methods {
 			return $invoice_number;
 		}
 
-		// making direct DB call to avoid caching issues
-		wp_cache_delete ('wpo_wcpdf_next_invoice_number', 'options');
-		$next_invoice_number = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'wpo_wcpdf_next_invoice_number' ) );
-		$next_invoice_number = apply_filters( 'wpo_wcpdf_next_invoice_number', $next_invoice_number, $this->order_id );
-
-		$invoice_number = !empty($next_invoice_number) ? $next_invoice_number : 1;
-
+		$number_store = new Sequential_Number_Store( 'invoice_number' );
 		// reset invoice number yearly
-		if ( isset( $this->settings['yearly_reset_number'] ) ) {
+		if ( isset( $this->settings['reset_number_yearly'] ) ) {
 			$current_year = date("Y");
-			$last_invoice_year = get_option( 'wpo_wcpdf_last_invoice_year' );
-			// check first time use
-			if ( empty( $last_invoice_year ) ) {
-				$last_invoice_year = $current_year;
-				update_option( 'wpo_wcpdf_last_invoice_year', $current_year );
-			}
+			$last_number_year = $number_store->get_last_date('Y');
 			// check if we need to reset
-			if ( $current_year != $last_invoice_year ) {
-				$invoice_number = 1;
-				update_option( 'wpo_wcpdf_last_invoice_year', $current_year );
+			if ( $current_year != $last_number_year ) {
+				$number_store->set_next( 1 );
 			}
 		}
 
-		// increase next_order_number
-		$update_args = array(
-			'option_value'	=> $invoice_number + 1,
-			'autoload'		=> 'yes',
-		);
-		$result = $wpdb->update( $wpdb->options, $update_args, array( 'option_name' => 'wpo_wcpdf_next_invoice_number' ) );
+		$invoice_date = $this->get_date();
+		$invoice_number = $number_store->increment( $this->order_id, $invoice_date->date_i18n( 'Y-m-d H:i:s' ) );
 
 		$this->set_number( $invoice_number );
 
