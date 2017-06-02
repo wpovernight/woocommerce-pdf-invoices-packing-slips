@@ -133,3 +133,11 @@ table.wcpdf_documents_settings_list td.title {
 	font-weight: bold;
 	color: black;
 }
+
+.edit-next-number {
+	opacity:0.5;
+}
+.edit-next-number:hover {
+	opacity:1;
+	cursor:pointer;
+}

@@ -210,11 +210,10 @@ class Invoice extends Order_Document_Methods {
 				'type'			=> 'setting',
 				'id'			=> 'next_invoice_number',
 				'title'			=> __( 'Next invoice number (without prefix/suffix etc.)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'singular_text_element',
+				'callback'		=> 'next_number_edit',
 				'section'		=> 'invoice',
 				'args'			=> array(
-					'option_name'	=> 'wpo_wcpdf_next_invoice_number',
-					'id'			=> 'next_invoice_number',
+					'store'			=> 'invoice_number',
 					'size'			=> '10',
 					'description'	=> __( 'This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!', 'woocommerce-pdf-invoices-packing-slips' ),
 				)

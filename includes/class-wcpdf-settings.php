@@ -1,6 +1,8 @@
 <?php
 namespace WPO\WC\PDF_Invoices;
 
+use WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -30,6 +32,9 @@ class Settings {
 
 		$this->general_settings		= get_option('wpo_wcpdf_settings_general');
 		$this->debug_settings		= get_option('wpo_wcpdf_settings_debug');
+
+		// AJAX set number store
+		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array($this, 'set_number_store' ));
 	}
 
 	public function menu() {
@@ -182,6 +187,15 @@ class Settings {
 		}
 
 		return $template_path;
+	}
+
+	public function set_number_store() {
+		check_ajax_referer( "wpo_wcpdf_next_{$_POST['store']}", 'security' );
+		$number = isset( $_POST['number'] ) ? (int) $_POST['number'] : 0;
+		$number_store = new Sequential_Number_Store( $_POST['store'] );
+		$number_store->set_next( $number );
+		echo "next number ({$_POST['store']}) set to {$number}";
+		die();
 	}
 
 }

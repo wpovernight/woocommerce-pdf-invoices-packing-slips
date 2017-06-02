@@ -89,14 +89,26 @@ class Assets {
 				array(),
 				WPO_WCPDF_VERSION
 			);
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', ".next-number-input.ajax-waiting {
+				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/spinner.gif'.") !important;
+				background-position: 95% 50% !important;
+				background-repeat: no-repeat !important;
+			}" );
 
 			// SCRIPTS
-			// wp_enqueue_script(
-			// 	'wpo-wcpdf-admin',
-			// 	WPO_WCPDF()->plugin_url() . '/assets/js/admin-script.js',
-			// 	array( 'jquery' ),
-			// 	WPO_WCPDF_VERSION
-			// );
+			wp_enqueue_script(
+				'wpo-wcpdf-admin',
+				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script.js',
+				array( 'jquery' ),
+				WPO_WCPDF_VERSION
+			);
+			wp_localize_script(
+				'wpo-wcpdf-admin',
+				'wpo_wcpdf_admin',
+				array(
+					'ajaxurl'		=> admin_url( 'admin-ajax.php' ),
+				)
+			);
 
 			wp_enqueue_media();
 			wp_enqueue_script(

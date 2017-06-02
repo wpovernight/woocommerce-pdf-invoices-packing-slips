@@ -1,6 +1,8 @@
 <?php
 namespace WPO\WC\PDF_Invoices;
 
+use WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -309,6 +311,23 @@ class Settings_Callbacks {
 			printf( '<p class="description">%s</p>', $description );
 		}
 	}
+
+	/**
+	 * Next document number edit callback.
+	 *
+	 * @param  array $args Field arguments.
+	 */
+	public function next_number_edit( $args ) {
+		extract( $args );
+		$number_store = new Sequential_Number_Store( $store );
+		$next_number = $number_store->get_next();
+		$nonce = wp_create_nonce( "wpo_wcpdf_next_{$store}" );
+		printf( '<input id="next_%1$s" class="next-number-input" type="text" size="%2$s" value="%3$s" disabled="disabled" data-store="%1$s" data-nonce="%4$s"/> <span class="edit-next-number dashicons dashicons-edit"></span><span class="save-next-number button secondary" style="display:none;">%5$s</span>', $store, $size, $next_number, $nonce, __( 'Save', 'woocommerce-pdf-invoices-packing-slips' ) );
+		// Displays option description.
+		if ( isset( $description ) ) {
+			printf( '<p class="description">%s</p>', $description );
+		}
+	}	
 
 	/**
 	 * Wrapper function to create tabs for settings in different languages
