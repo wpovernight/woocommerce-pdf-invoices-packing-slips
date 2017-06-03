@@ -18,14 +18,14 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Store
 
 class Sequential_Number_Store {
 	/**
-	 * Name of the table that stores the number sequence (without the wp_ table prefix)
+	 * Name of the table that stores the number sequence (without the wp_wcpdf_ table prefix)
 	 * @var String
 	 */
 	public $table_name;
 
 	public function __construct( $table_name ) {
 		global $wpdb;
-		$this->table_name = $wpdb->prefix . $table_name;
+		$this->table_name = "{$wpdb->prefix}wcpdf_{$table_name}"; // i.e. wp_wcpdf_invoice_number
 
 		$this->init();
 	}
