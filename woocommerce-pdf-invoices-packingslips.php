@@ -368,7 +368,7 @@ class WPO_WCPDF {
 			update_option( 'wpo_wcpdf_next_invoice_number', $next_invoice_number );
 		}
 
-		// 2.0 update: reorganize settings
+		// 2.0-dev update: reorganize settings
 		if ( $installed_version == 'versionless' || version_compare( $installed_version, '2.0-dev', '<' ) ) {
 			$old_settings = array(
 				'wpo_wcpdf_general_settings'	=> get_option( 'wpo_wcpdf_general_settings' ),
@@ -476,6 +476,19 @@ class WPO_WCPDF {
 				// store new option values
 				update_option( $new_option, ${$new_option} );
 			}
+		}
+
+		// 2.0-beta-2 update: copy next number to separate db store
+		if ( version_compare( $installed_version, '2.0-beta-2', '<' ) ) {
+			// load number store class (just in case)
+			include_once( WPO_WCPDF()->plugin_path() . '/includes/documents/class-wcpdf-sequential-number-store.php' );
+
+			$next_number = get_option( 'wpo_wcpdf_next_invoice_number' );
+			if (!empty($next_number)) {
+				$number_store = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( 'invoice_number' );
+				$number_store->set_next( (int) $next_number );
+			}
+			delete_option( 'wpo_wcpdf_next_invoice_number' ); // clean up after ourselves
 		}
 
 	}		
