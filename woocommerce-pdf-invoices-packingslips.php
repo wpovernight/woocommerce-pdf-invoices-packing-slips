@@ -560,13 +560,6 @@ class WPO_WCPDF {
 
 endif; // class_exists
 
-// legacy class for plugin detecting
-if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
-	class WooCommerce_PDF_Invoices{
-		public static $version = '2.0';		
-	}
-}
-
 /**
  * Returns the main instance of WooCommerce PDF Invoices & Packing Slips to prevent the need to use globals.
  *
@@ -578,3 +571,15 @@ function WPO_WCPDF() {
 }
 
 WPO_WCPDF(); // load plugin
+
+// legacy class for plugin detecting
+if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
+	class WooCommerce_PDF_Invoices{
+		public static $version;
+
+		public function __construct() {
+			self::$version = WPO_WCPDF()->version;
+		}
+	}
+	new WooCommerce_PDF_Invoices();
+}
