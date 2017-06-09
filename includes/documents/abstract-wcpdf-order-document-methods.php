@@ -451,9 +451,9 @@ abstract class Order_Document_Methods extends Order_Document {
 					) );
 				} else {
 					if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '<' ) ) {
-						$meta = new WC_Order_Item_Meta( $item['item_meta'], $product );
+						$meta = new \WC_Order_Item_Meta( $item['item_meta'], $product );
 					} else { // pass complete item for WC2.4+
-						$meta = new WC_Order_Item_Meta( $item, $product );
+						$meta = new \WC_Order_Item_Meta( $item, $product );
 					}
 					$data['meta'] = $meta->display( false, true );
 				}
@@ -492,7 +492,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 		if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 && !apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
 			// WC 2.1 or newer is used
-			$tax = new WC_Tax();
+			$tax = new \WC_Tax();
 			$taxes = $tax->get_rates( $tax_class );
 
 			$tax_rates = array();
