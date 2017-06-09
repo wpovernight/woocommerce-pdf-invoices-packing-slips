@@ -159,10 +159,14 @@ abstract class Order_Document {
 	}
 
 	public function read_data( $order ) {
-		// fallback to legacy data for number
 		$number = WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_number_data", true );
+		// fallback to legacy data for number
 		if ( empty( $number ) ) {
 			$number = WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_number", true );
+			$formatted_number = WCX_Order::get_meta( $order, "_wcpdf_formatted_{$this->slug}_number", true );
+			if (!empty($formatted_number)) {
+				$number = compact( 'number', 'formatted_number' );
+			}
 		}
 
 		// pass data to setter functions
