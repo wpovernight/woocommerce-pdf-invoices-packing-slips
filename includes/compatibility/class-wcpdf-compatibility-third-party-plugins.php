@@ -15,7 +15,7 @@ class Third_Party_Plugins {
 	function __construct()	{
 		// WooCommerce Subscriptions compatibility
 		if ( class_exists('WC_Subscriptions') ) {
-			if ( version_compare( WC_Subscriptions::$version, '2.0', '<' ) ) {
+			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
 			} else {
 				add_action( 'wcs_renewal_order_created', array( $this, 'wcs_renewal_order_created' ), 10, 2 );
