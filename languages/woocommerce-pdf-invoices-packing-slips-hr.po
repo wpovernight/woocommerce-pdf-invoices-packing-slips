@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-26 12:55+0200\n"
-"PO-Revision-Date: 2017-05-26 12:55+0200\n"
+"POT-Creation-Date: 2017-06-09 16:37+0200\n"
+"PO-Revision-Date: 2017-06-09 16:37+0200\n"
 "Last-Translator: spineict <admin@spine-ict.hr>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: hr\n"
@@ -37,6 +37,7 @@ msgstr "Sadržaj PDF računa"
 
 #: includes/class-wcpdf-admin.php:166
 #: includes/documents/class-wcpdf-invoice.php:32
+#: includes/documents/class-wcpdf-invoice.php:41
 #: includes/legacy/class-wcpdf-legacy-functions.php:22
 #: templates/Simple/invoice.php:10 templates/Simple/invoice.php:22
 msgid "Invoice"
@@ -67,16 +68,16 @@ msgstr "m"
 msgid "Download invoice (PDF)"
 msgstr "Dohvati račun(PDF)"
 
-#: includes/class-wcpdf-main.php:131 includes/class-wcpdf-main.php:152
-#: includes/class-wcpdf-main.php:159 includes/class-wcpdf-main.php:165
+#: includes/class-wcpdf-main.php:132 includes/class-wcpdf-main.php:153
+#: includes/class-wcpdf-main.php:160 includes/class-wcpdf-main.php:166
 msgid "You do not have sufficient permissions to access this page."
 msgstr "Nemate dovoljne ovlasti kako bi pristupili ovoj stranici."
 
-#: includes/class-wcpdf-main.php:140
+#: includes/class-wcpdf-main.php:141
 msgid "Some of the export parameters are missing."
 msgstr "Neki od parametara za izvoz nedostaju."
 
-#: includes/class-wcpdf-settings-callbacks.php:25
+#: includes/class-wcpdf-settings-callbacks.php:27
 msgid ""
 "<b>Warning!</b> The settings below are meant for debugging/development only. "
 "Do not use them on a live website!"
@@ -84,7 +85,7 @@ msgstr ""
 "Upozorenje! Donje postavke su namijenjene isključivo za debugging/"
 "development. Ne koristite ih na stranicama koje su puštene u produkciju."
 
-#: includes/class-wcpdf-settings-callbacks.php:34
+#: includes/class-wcpdf-settings-callbacks.php:36
 msgid ""
 "These are used for the (optional) footer columns in the <em>Modern "
 "(Premium)</em> template, but can also be used for other elements in your "
@@ -94,9 +95,13 @@ msgstr ""
 "(Premium)</em> predlošku, ali se također može koristiti za druge elemente u "
 "vašem prilagođenom predlošku"
 
-#: includes/class-wcpdf-settings-callbacks.php:299
+#: includes/class-wcpdf-settings-callbacks.php:301
 msgid "Image resolution"
 msgstr "Rezolucija slike"
+
+#: includes/class-wcpdf-settings-callbacks.php:325
+msgid "Save"
+msgstr ""
 
 #: includes/class-wcpdf-settings-debug.php:34
 msgid "Debug settings"
@@ -135,7 +140,7 @@ msgid ""
 msgstr "Pošalji predložak u HTML formatu umjesto generiranja PDF-a."
 
 #: includes/class-wcpdf-settings-documents.php:29
-#: includes/class-wcpdf-settings.php:79
+#: includes/class-wcpdf-settings.php:84
 msgid "Documents"
 msgstr ""
 
@@ -250,27 +255,27 @@ msgstr "Dodatno polje 3"
 msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
 msgstr "Ovo je 3 kolona footera (podnožja) u <i>Modern (Premium)</i> predlošku"
 
-#: includes/class-wcpdf-settings.php:40 includes/class-wcpdf-settings.php:41
+#: includes/class-wcpdf-settings.php:45 includes/class-wcpdf-settings.php:46
 msgid "PDF Invoices"
 msgstr "PDF Račun"
 
-#: includes/class-wcpdf-settings.php:53
+#: includes/class-wcpdf-settings.php:58
 msgid "Settings"
 msgstr "Postavke"
 
-#: includes/class-wcpdf-settings.php:66
+#: includes/class-wcpdf-settings.php:71
 msgid "Documentation"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:67
+#: includes/class-wcpdf-settings.php:72
 msgid "Support Forum"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:78
+#: includes/class-wcpdf-settings.php:83
 msgid "General"
 msgstr "Općenito"
 
-#: includes/class-wcpdf-settings.php:84
+#: includes/class-wcpdf-settings.php:89
 msgid "Status"
 msgstr "Status"
 
@@ -329,36 +334,31 @@ msgstr "Ukupno bez PDV-a"
 msgid "Total"
 msgstr "Ukupno"
 
-#: includes/documents/abstract-wcpdf-order-document.php:670
+#: includes/documents/abstract-wcpdf-order-document.php:674
 msgid "Admin email"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:673
+#: includes/documents/abstract-wcpdf-order-document.php:677
 msgid "Manual email"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:98
+#: includes/documents/class-wcpdf-invoice.php:85
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] "Račun"
 msgstr[1] "Računi"
 msgstr[2] ""
 
-#: includes/documents/class-wcpdf-invoice.php:143
-#: includes/documents/class-wcpdf-packing-slip.php:89
-msgid "Enable/Disable"
+#: includes/documents/class-wcpdf-invoice.php:130
+#: includes/documents/class-wcpdf-packing-slip.php:94
+msgid "Enable"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:149
-#: includes/documents/class-wcpdf-packing-slip.php:95
-msgid "Enable this document"
-msgstr ""
-
-#: includes/documents/class-wcpdf-invoice.php:155
+#: includes/documents/class-wcpdf-invoice.php:141
 msgid "Attach to:"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:162
+#: includes/documents/class-wcpdf-invoice.php:148
 #, php-format
 msgid ""
 "It looks like the temp folder (<code>%s</code>) is not writable, check the "
@@ -369,39 +369,39 @@ msgstr ""
 "provjerite dozvole za ovaj folder. Bez ovlasti za upisivanje u ovaj folder "
 "plugin neće biti u mogućnosti poslati račune e-mailom."
 
-#: includes/documents/class-wcpdf-invoice.php:168
+#: includes/documents/class-wcpdf-invoice.php:154
 msgid "Display shipping address"
 msgstr "Prikazati adresu dostave"
 
-#: includes/documents/class-wcpdf-invoice.php:174
+#: includes/documents/class-wcpdf-invoice.php:160
 msgid ""
 "Display shipping address (in addition to the default billing address) if "
 "different from billing address"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:180
-#: includes/documents/class-wcpdf-packing-slip.php:113
+#: includes/documents/class-wcpdf-invoice.php:166
+#: includes/documents/class-wcpdf-packing-slip.php:117
 msgid "Display email address"
 msgstr "Prikaži e-mail adresu"
 
-#: includes/documents/class-wcpdf-invoice.php:191
-#: includes/documents/class-wcpdf-packing-slip.php:124
+#: includes/documents/class-wcpdf-invoice.php:177
+#: includes/documents/class-wcpdf-packing-slip.php:128
 msgid "Display phone number"
 msgstr "Prikaži broj telefona"
 
-#: includes/documents/class-wcpdf-invoice.php:202
+#: includes/documents/class-wcpdf-invoice.php:188
 msgid "Display invoice date"
 msgstr "Prikaži datum izrade računa"
 
-#: includes/documents/class-wcpdf-invoice.php:214
+#: includes/documents/class-wcpdf-invoice.php:200
 msgid "Display invoice number"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:226
+#: includes/documents/class-wcpdf-invoice.php:212
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr "Slijedeći broj računa (bez prefiksa i sufiksa)"
 
-#: includes/documents/class-wcpdf-invoice.php:233
+#: includes/documents/class-wcpdf-invoice.php:218
 msgid ""
 "This is the number that will be used for the next document. By default, "
 "numbering starts from 1 and increases for every new document. Note that if "
@@ -409,15 +409,15 @@ msgid ""
 "could create duplicate numbers!"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:239
+#: includes/documents/class-wcpdf-invoice.php:224
 msgid "Number format"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:247
+#: includes/documents/class-wcpdf-invoice.php:232
 msgid "Prefix"
 msgstr "Prefiks"
 
-#: includes/documents/class-wcpdf-invoice.php:249
+#: includes/documents/class-wcpdf-invoice.php:234
 msgid ""
 "to use the invoice year and/or month, use [invoice_year] or [invoice_month] "
 "respectively"
@@ -425,21 +425,21 @@ msgstr ""
 "kako bi koristili godinu i/ili mjesec, koristite [invoice_year] ili "
 "[invoice_month] poštujući"
 
-#: includes/documents/class-wcpdf-invoice.php:252
+#: includes/documents/class-wcpdf-invoice.php:237
 msgid "Suffix"
 msgstr "Sufiks"
 
-#: includes/documents/class-wcpdf-invoice.php:257
+#: includes/documents/class-wcpdf-invoice.php:242
 msgid "Padding"
 msgstr "prostor "
 
-#: includes/documents/class-wcpdf-invoice.php:260
+#: includes/documents/class-wcpdf-invoice.php:245
 msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
 msgstr ""
 "unesite broj znamenki ovdje - unesite\"6\" ako želite prikazati broj 42 kao "
 "000042"
 
-#: includes/documents/class-wcpdf-invoice.php:263
+#: includes/documents/class-wcpdf-invoice.php:248
 msgid ""
 "note: if you have already created a custom invoice number format with a "
 "filter, the above settings will be ignored"
@@ -447,70 +447,71 @@ msgstr ""
 "Bilješka: Ako ste već kreirali prilagođeni format broja računa s filterom, "
 "gornje postavke biti će zanemarene"
 
-#: includes/documents/class-wcpdf-invoice.php:269
+#: includes/documents/class-wcpdf-invoice.php:254
 msgid "Reset invoice number yearly"
 msgstr "Resetirati broj računa na godišnjoj razini"
 
-#: includes/documents/class-wcpdf-invoice.php:280
+#: includes/documents/class-wcpdf-invoice.php:265
 msgid "Allow My Account invoice download"
 msgstr "Dozvoliti preuzimanje računa za moj korisnički profil"
 
-#: includes/documents/class-wcpdf-invoice.php:287
+#: includes/documents/class-wcpdf-invoice.php:272
 msgid "Only when an invoice is already created/emailed"
 msgstr "Samo kada je račun već izrađen/poslan"
 
-#: includes/documents/class-wcpdf-invoice.php:288
+#: includes/documents/class-wcpdf-invoice.php:273
 msgid "Only for specific order statuses (define below)"
 msgstr "Samo za specifične statuse narudžbe (definirati ispod)"
 
-#: includes/documents/class-wcpdf-invoice.php:289
+#: includes/documents/class-wcpdf-invoice.php:274
 msgid "Always"
 msgstr "Uvijek"
 
-#: includes/documents/class-wcpdf-invoice.php:290
+#: includes/documents/class-wcpdf-invoice.php:275
 msgid "Never"
 msgstr "Nikad"
 
-#: includes/documents/class-wcpdf-invoice.php:305
+#: includes/documents/class-wcpdf-invoice.php:290
 msgid "Enable invoice number column in the orders list"
 msgstr "Omogućite prikaz stupca s brojem računa u listi narudžbi"
 
-#: includes/documents/class-wcpdf-invoice.php:316
+#: includes/documents/class-wcpdf-invoice.php:301
 msgid "Disable for free products"
 msgstr "Onemogući za besplatne proizvode"
 
-#: includes/documents/class-wcpdf-invoice.php:322
+#: includes/documents/class-wcpdf-invoice.php:307
 msgid ""
 "Disable automatic creation/attachment when only free products are ordered"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:336
+#: includes/documents/class-wcpdf-invoice.php:321
 msgid "Invoice numbers are created by a third-party extension."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:338
+#: includes/documents/class-wcpdf-invoice.php:323
 #, php-format
 msgid "Configure it <a href=\"%s\">here</a>."
 msgstr ""
 
 #: includes/documents/class-wcpdf-packing-slip.php:32
+#: includes/documents/class-wcpdf-packing-slip.php:41
 #: includes/legacy/class-wcpdf-legacy-functions.php:25
 #: templates/Simple/packing-slip.php:10 templates/Simple/packing-slip.php:22
 msgid "Packing Slip"
 msgstr "Paketni slip"
 
-#: includes/documents/class-wcpdf-packing-slip.php:48
+#: includes/documents/class-wcpdf-packing-slip.php:53
 msgid "packing-slip"
 msgid_plural "packing-slips"
 msgstr[0] "Slip uz paket"
 msgstr[1] "Slipovi za pakete"
 msgstr[2] ""
 
-#: includes/documents/class-wcpdf-packing-slip.php:101
+#: includes/documents/class-wcpdf-packing-slip.php:105
 msgid "Display billing address"
 msgstr "Prikazati adresu za naplatu"
 
-#: includes/documents/class-wcpdf-packing-slip.php:107
+#: includes/documents/class-wcpdf-packing-slip.php:111
 msgid ""
 "Display billing address (in addition to the default shipping address) if "
 "different from shipping address"
@@ -804,7 +805,7 @@ msgstr "Adresa za dostavu:"
 msgid "Shipping Method:"
 msgstr "Metoda dostave:"
 
-#: woocommerce-pdf-invoices-packing-slips.php:237
+#: woocommerce-pdf-invoices-packingslips.php:231
 #, php-format
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
@@ -813,13 +814,13 @@ msgstr ""
 "WooCommerce PDF Računi & Slipovi za pakete zahtjevaju instalaciju i "
 "aktivaciju %sWooCommerce%s!"
 
-#: woocommerce-pdf-invoices-packing-slips.php:249
+#: woocommerce-pdf-invoices-packingslips.php:243
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or "
 "higher recommended)."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packing-slips.php:250
+#: woocommerce-pdf-invoices-packingslips.php:244
 msgid "How to update your PHP version"
 msgstr ""
 
