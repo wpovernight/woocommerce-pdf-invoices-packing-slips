@@ -99,6 +99,18 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.0 beta 3 =
+* **BIG update!**
+* New: Better structured & more advanced settings for documents
+* New: Option to enable & disable Packing Slips or Invoices
+* New: Invoice number sequence stored separately for improved speed & performance
+* New: Completely rewritten codebase for more flexibility & better reliability
+* New: Updated PDF library to DOMPDF 0.8
+* New: PDF Library made pluggable (by using the `wpo_wcpdf_pdf_maker` filter)
+* New: lots of new functions & filters to allow developers to hook into the plugin
+* Changed: **$wpo_wcpdf variable is now deprecated** (legacy mode available & automatically enabled on update)
+* Fix: Improved PHP 7 & 7.1 support
+
 = 1.6.5 =
 * Fix: Duplicate invoice numbers when bulk completing orders (WC3.0)
 * Fix: Hidden Invoice date when order refunded
