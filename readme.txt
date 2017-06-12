@@ -100,7 +100,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 = 2.0 beta 3 =
-* **BIG update!**
+* **BIG update! Make a full site backup before upgrading**
 * New: Better structured & more advanced settings for documents
 * New: Option to enable & disable Packing Slips or Invoices
 * New: Invoice number sequence stored separately for improved speed & performance
