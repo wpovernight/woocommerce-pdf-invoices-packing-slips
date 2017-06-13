@@ -133,3 +133,22 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 			break;
 	}
 }
+
+/**
+ * Wrapper for deprecated functions so we can apply some extra logic.
+ *
+ * @since  2.0
+ * @param  string $function
+ * @param  string $version
+ * @param  string $replacement
+ */
+function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
+	if ( is_ajax() ) {
+		do_action( 'deprecated_function_run', $function, $replacement, $version );
+		$log_string  = "The {$function} function is deprecated since version {$version}.";
+		$log_string .= $replacement ? " Replace with {$replacement}." : '';
+		error_log( $log_string );
+	} else {
+		_deprecated_function( $function, $version, $replacement );
+	}
+}

@@ -37,7 +37,9 @@ class Legacy_Functions {
 	 * Redirect document function calls directly to document object
 	 */
 	public function __call( $name, $arguments ) {
-		WPO_WCPDF_Legacy()->auto_enable_check( '$wpo_wcpdf->functions->'.$name.'()' );
+		$human_readable_call = '$wpo_wcpdf->functions->'.$name.'()';
+		WPO_WCPDF_Legacy()->auto_enable_check( $human_readable_call );
+
 		if ( is_object( WPO_WCPDF_Legacy()->export->document ) && is_callable( array( WPO_WCPDF_Legacy()->export->document, $name ) ) ) {
 			return call_user_func_array( array( WPO_WCPDF_Legacy()->export->document, $name ), $arguments );
 		} else {

@@ -39,11 +39,14 @@ class WPO_WCPDF_Legacy {
 	 * Redirect function calls directly to legacy functions class
 	 */
 	public function __call( $name, $arguments ) {
-		$this->auto_enable_check( '$wpo_wcpdf->'.$name.'()' );
+		$human_readable_call = '$wpo_wcpdf->'.$name.'()';
+		$this->auto_enable_check( $human_readable_call );
 
 		if ( is_callable( array( WPO_WCPDF(), $name ) ) ) {
+			wcpdf_deprecated_function( $human_readable_call, '2.0', 'WPO_WCPDF()->'.$name.'()' );
 			return call_user_func_array( array( WPO_WCPDF(), $name ), $arguments );
 		} elseif ( is_callable( array( $this->functions, $name ) ) ) {
+			wcpdf_deprecated_function( $human_readable_call, '2.0', '$this->'.$name.'()' );
 			return call_user_func_array( array( $this->functions, $name ), $arguments );
 		} else {
 			throw new \Exception("Call to undefined method ".__CLASS__."::{$name}()", 1);

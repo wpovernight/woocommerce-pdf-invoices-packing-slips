@@ -32,7 +32,9 @@ class Legacy_Export {
 	 * Redirect document function calls directly to document object
 	 */
 	public function __call( $name, $arguments ) {
-		WPO_WCPDF_Legacy()->auto_enable_check( '$wpo_wcpdf->export->'.$name.'()' );
+		$human_readable_call = '$wpo_wcpdf->export->'.$name.'()';
+		WPO_WCPDF_Legacy()->auto_enable_check( $human_readable_call );
+
 		$callback_map = array(
 			'wc_price'	=> 'format_price',
 		);
@@ -42,8 +44,10 @@ class Legacy_Export {
 		}
 
 		if ( array_key_exists( $name, $callback_map ) && is_object( $this->document ) && is_callable( array( $this->document, $callback_map[$name] ) ) ) {
+			wcpdf_deprecated_function( $human_readable_call, '2.0', '$this->'.$callback_map[$name].'()' );
 			return call_user_func_array( array( $this->document, $callback_map[$name] ), $arguments );		
 		} elseif ( is_object( $this->document ) && is_callable( array( $this->document, $name ) ) ) {
+			wcpdf_deprecated_function( $human_readable_call, '2.0', '$this->'.$name.'()' );
 			return call_user_func_array( array( $this->document, $name ), $arguments );
 		} else {
 			throw new \Exception("Call to undefined method ".__CLASS__."::{$name}()", 1);
