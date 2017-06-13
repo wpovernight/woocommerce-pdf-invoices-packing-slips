@@ -99,6 +99,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.0 beta 4 =
+* New: Log deprecation notices (can be turned off with `wcpdf_disable_deprecation_notices` filter set to true)
+* Fix: Auto enable legacy classes when called
+* Fix: Update some vendor libraries to resolve PHP 7.0 issues
+
 = 2.0 beta 3 =
 * **BIG update! Make a full site backup before upgrading**
 * New: Better structured & more advanced settings for documents
