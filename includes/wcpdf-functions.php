@@ -143,6 +143,9 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
  * @param  string $replacement
  */
 function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
+	if ( apply_filters( 'wcpdf_disable_deprecation_notices', false ) ) {
+		return;
+	}
 	if ( is_ajax() ) {
 		do_action( 'deprecated_function_run', $function, $replacement, $version );
 		$log_string  = "The {$function} function is deprecated since version {$version}.";
