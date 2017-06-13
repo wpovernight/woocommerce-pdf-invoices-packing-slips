@@ -133,7 +133,8 @@ abstract class Order_Document {
 
 	public function get_settings() {
 		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-		return $common_settings;
+		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		return (array) $document_settings + (array) $common_settings;
 	}
 
 	public function get_setting( $key, $default = '' ) {
