@@ -77,6 +77,7 @@ class Legacy_Settings {
 	 * Redirect settings API callbacks
 	 */
 	public function __call( $name, $arguments ) {
+		WPO_WCPDF_Legacy()->auto_enable_check( '$wpo_wcpdf->settings->'.$name.'()', false );
 		$callback_map = array(
 			'text_element_callback'					=> 'text_input',
 			'singular_text_element_callback'		=> 'singular_text_element',

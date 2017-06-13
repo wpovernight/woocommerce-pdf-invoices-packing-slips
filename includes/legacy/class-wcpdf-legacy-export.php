@@ -32,6 +32,7 @@ class Legacy_Export {
 	 * Redirect document function calls directly to document object
 	 */
 	public function __call( $name, $arguments ) {
+		WPO_WCPDF_Legacy()->auto_enable_check( '$wpo_wcpdf->export->'.$name.'()' );
 		$callback_map = array(
 			'wc_price'	=> 'format_price',
 		);

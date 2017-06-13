@@ -170,9 +170,7 @@ class WPO_WCPDF {
 		include_once( 'includes/class-wcpdf-frontend.php' );
 
 		// Backwards compatibility with self
-		if ( $this->legacy_mode_enabled() === true ) {
-			include_once( 'includes/legacy/class-wcpdf-legacy.php' );
-		}
+		include_once( 'includes/legacy/class-wcpdf-legacy.php' );
 		include_once( 'includes/legacy/class-wcpdf-legacy-deprecated-hooks.php' );
 	}
 	
