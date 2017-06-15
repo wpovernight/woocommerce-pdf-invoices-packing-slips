@@ -398,9 +398,9 @@ abstract class Order_Document_Methods extends Order_Document {
 
 				// Set the line total (=after discount)
 				$data['line_total'] = $this->format_price( $item['line_total'] );
-				$data['single_line_total'] = $this->format_price( $item['line_total'] / max( 1, $item['qty'] ) );
+				$data['single_line_total'] = $this->format_price( $item['line_total'] / max( 1, abs( $item['qty'] ) ) );
 				$data['line_tax'] = $this->format_price( $item['line_tax'] );
-				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, $item['qty'] ) );
+				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
 				
 				$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
 				$data['tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'], $line_tax_data );
@@ -940,7 +940,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			return;
 		}
 
-		$divide_by = ($type == 'single' && $item['qty'] != 0 )?$item['qty']:1; //divide by 1 if $type is not 'single' (thus 'total')
+		$divide_by = ($type == 'single' && $item['qty'] != 0 )?abs($item['qty']):1; //divide by 1 if $type is not 'single' (thus 'total')
 		if ( $tax_display == 'excl' ) {
 			$item_price = $this->format_price( ($this->order->get_line_subtotal( $item )) / $divide_by );
 		} else {
