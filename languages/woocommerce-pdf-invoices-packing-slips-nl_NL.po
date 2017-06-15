@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-09 16:38+0200\n"
-"PO-Revision-Date: 2017-06-09 16:38+0200\n"
+"POT-Creation-Date: 2017-06-13 13:13+0200\n"
+"PO-Revision-Date: 2017-06-13 13:15+0200\n"
 "Last-Translator: Ewout Fernhout <chocolade@extrapuur.nl>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: nl_NL\n"
@@ -337,11 +337,11 @@ msgstr "Totaal excl. BTW"
 msgid "Total"
 msgstr "Totaal"
 
-#: includes/documents/abstract-wcpdf-order-document.php:674
+#: includes/documents/abstract-wcpdf-order-document.php:679
 msgid "Admin email"
 msgstr "Admin email"
 
-#: includes/documents/abstract-wcpdf-order-document.php:677
+#: includes/documents/abstract-wcpdf-order-document.php:682
 msgid "Manual email"
 msgstr "Handmatige email"
 
@@ -531,6 +531,23 @@ msgstr ""
 #: includes/legacy/class-wcpdf-legacy-document.php:32
 msgid "Legacy Document"
 msgstr "Oud document"
+
+#: includes/legacy/class-wcpdf-legacy.php:70
+msgid "Error"
+msgstr "Fout"
+
+#: includes/legacy/class-wcpdf-legacy.php:71
+msgid ""
+"An outdated template or action hook was used to generate the PDF. Legacy "
+"mode has been activated, please try again by reloading this page."
+msgstr ""
+"Een verouderd template of action hook werd gebruikt voor het genereren van "
+"het PDF-bestand. Legacy modus is ingeschakeld, probeer het opnieuw door deze "
+"pagina te herladen."
+
+#: includes/legacy/class-wcpdf-legacy.php:74
+msgid "The following function was called"
+msgstr "De volgende functie werd aangeroepen"
 
 #: includes/views/wcpdf-extensions.php:15
 msgid "Check out these premium extensions!"
@@ -825,7 +842,7 @@ msgstr "Verzendadres:"
 msgid "Shipping Method:"
 msgstr "Verzendmethode:"
 
-#: woocommerce-pdf-invoices-packingslips.php:231
+#: woocommerce-pdf-invoices-packingslips.php:229
 #, php-format
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
@@ -834,7 +851,7 @@ msgstr ""
 "WooCommerce PDF Invoices & Packing Slips vereist dat %sWooCommerce%s is "
 "geïnstalleerd & geactiveerd!"
 
-#: woocommerce-pdf-invoices-packingslips.php:243
+#: woocommerce-pdf-invoices-packingslips.php:241
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or "
 "higher recommended)."
@@ -842,7 +859,7 @@ msgstr ""
 "WooCommerce PDF Invoices & Packing Slips vereist PHP 5.3 of hoger (5.6 of "
 "hoger aanbevolen)."
 
-#: woocommerce-pdf-invoices-packingslips.php:244
+#: woocommerce-pdf-invoices-packingslips.php:242
 msgid "How to update your PHP version"
 msgstr "Hoe update ik mijn PHP versie?"
 

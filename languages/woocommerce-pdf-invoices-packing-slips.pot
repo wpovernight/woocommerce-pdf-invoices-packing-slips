@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
-"POT-Creation-Date: 2017-06-09 16:11+0200\n"
+"POT-Creation-Date: 2017-06-13 13:13+0200\n"
 "PO-Revision-Date: 2015-04-29 08:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
@@ -318,11 +318,11 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:674
+#: includes/documents/abstract-wcpdf-order-document.php:679
 msgid "Admin email"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:677
+#: includes/documents/abstract-wcpdf-order-document.php:682
 msgid "Manual email"
 msgstr ""
 
@@ -492,6 +492,20 @@ msgstr ""
 
 #: includes/legacy/class-wcpdf-legacy-document.php:32
 msgid "Legacy Document"
+msgstr ""
+
+#: includes/legacy/class-wcpdf-legacy.php:70
+msgid "Error"
+msgstr ""
+
+#: includes/legacy/class-wcpdf-legacy.php:71
+msgid ""
+"An outdated template or action hook was used to generate the PDF. Legacy "
+"mode has been activated, please try again by reloading this page."
+msgstr ""
+
+#: includes/legacy/class-wcpdf-legacy.php:74
+msgid "The following function was called"
 msgstr ""
 
 #: includes/views/wcpdf-extensions.php:15
@@ -755,19 +769,19 @@ msgstr ""
 msgid "Shipping Method:"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:231
+#: woocommerce-pdf-invoices-packingslips.php:229
 #, php-format
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
 "installed & activated!"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:243
+#: woocommerce-pdf-invoices-packingslips.php:241
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or "
 "higher recommended)."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:244
+#: woocommerce-pdf-invoices-packingslips.php:242
 msgid "How to update your PHP version"
 msgstr ""
