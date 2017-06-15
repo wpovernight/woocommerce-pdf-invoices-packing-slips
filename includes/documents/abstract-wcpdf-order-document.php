@@ -408,7 +408,7 @@ abstract class Order_Document {
 
 	public function get_settings_text( $settings_key, $default = false ) {
 		if ( !empty( $this->settings[$settings_key]['default'] ) ) {
-			$text = wptexturize( trim( $this->settings[$settings_key]['default'] ) );
+			$text = wpautop( wptexturize( trim( $this->settings[$settings_key]['default'] ) ) );
 		} else {
 			$text = $default;
 		}
