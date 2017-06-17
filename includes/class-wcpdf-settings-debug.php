@@ -27,13 +27,13 @@ class Settings_Debug {
 		<form method="post">
 			<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="install_fonts">
 			<input type="submit" name="submit" id="submit" class="button" value="<?php _e( 'Reinstall fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-			<div class="notice notice-success"><p><?php
-			if (isset($_POST['wpo_wcpdf_debug_tools_action'])) {
+			<?php
+			if (isset($_POST['wpo_wcpdf_debug_tools_action']) && $_POST['wpo_wcpdf_debug_tools_action'] == 'install_fonts') {
 				$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
 				WPO_WCPDF()->main->copy_fonts( $font_path );
-				_e( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' );
+				printf('<div class="notice notice-success"><p>%s</p></div>', __( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' ) );
 			}
-			?></p></div>
+			?>
 		</form>
 		<?php
 		include( WPO_WCPDF()->plugin_path() . '/includes/views/dompdf-status.php' );
