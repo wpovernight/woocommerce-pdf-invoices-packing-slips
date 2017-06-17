@@ -48,7 +48,7 @@ class WPO_WCPDF {
 		// load the localisation & classes
 		add_action( 'plugins_loaded', array( $this, 'translations' ) );
 		add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
-		add_action( 'init', array( $this, 'load_classes' ) );
+		add_action( 'plugins_loaded', array( $this, 'load_classes' ), 9 );
 		add_action( 'in_plugin_update_message-'.$this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
 
 		// run lifecycle methods
