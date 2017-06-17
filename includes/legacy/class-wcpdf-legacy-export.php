@@ -65,6 +65,29 @@ class Legacy_Export {
 
 		return $this->document->get_filename();
 	}
+
+	public function get_display_number( $order_id ) {
+		wcpdf_deprecated_function( '$wpo_wcpdf->export->get_display_number()', '2.0' );
+		if ( empty( $this->document ) ) {
+			// we don't know what document type we're handling, so we return the order number
+			$order = WCX::get_order ( $order_id );$order->get_order_number;
+			$order_number = method_exists( $order, 'get_order_number' ) ? $order->get_order_number() : '';
+			return $order_number;
+		}
+
+		if ( isset( $this->document->settings['display_number'] ) ) {
+			$order_number = (string) $this->document->get_number();
+		} else {
+			if ( empty( $this->order ) ) {
+				$order = WCX::get_order ( $order_ids[0] );
+				$order_number = method_exists( $order, 'get_order_number' ) ? $order->get_order_number() : '';
+			} else {
+				$order_number = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
+			}
+		}
+
+		return $order_number;
+	}
 }
 
 endif; // class_exists
