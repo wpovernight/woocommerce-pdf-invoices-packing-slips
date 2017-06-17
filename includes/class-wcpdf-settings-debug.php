@@ -12,6 +12,7 @@ class Settings_Debug {
 	function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'debug_tools' ), 10, 2 );
 	}
 
 	public function output( $section ) {
@@ -19,7 +20,22 @@ class Settings_Debug {
 		do_settings_sections( "wpo_wcpdf_settings_debug" );
 
 		submit_button();
+	}
 
+	public function debug_tools( $tab, $section ) {
+		?>
+		<form method="post">
+			<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="install_fonts">
+			<input type="submit" name="submit" id="submit" class="button" value="<?php _e( 'Reinstall fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+			<div class="notice notice-success"><p><?php
+			if (isset($_POST['wpo_wcpdf_debug_tools_action'])) {
+				$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
+				WPO_WCPDF()->main->copy_fonts( $font_path );
+				_e( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' );
+			}
+			?></p></div>
+		</form>
+		<?php
 		include( WPO_WCPDF()->plugin_path() . '/includes/views/dompdf-status.php' );
 	}
 
