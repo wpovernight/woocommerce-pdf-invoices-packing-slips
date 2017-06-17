@@ -36,7 +36,7 @@ class Documents {
 	 *
 	 */
 	public function __construct() {
-		$this->init();
+		add_action( 'init', array( $this, 'init' ), 999 );
 	}
 
 	/**
