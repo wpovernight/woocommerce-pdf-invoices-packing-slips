@@ -152,7 +152,7 @@ abstract class Order_Document {
 	}
 
 	public function is_enabled() {
-		return $this->enabled;
+		return apply_filters( 'wpo_wcpdf_document_is_enabled', $this->enabled, $this->type );
 	}
 
 	public function get_hook_prefix() {
