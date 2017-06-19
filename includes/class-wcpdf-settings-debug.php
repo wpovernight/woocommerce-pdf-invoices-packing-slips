@@ -23,6 +23,9 @@ class Settings_Debug {
 	}
 
 	public function debug_tools( $tab, $section ) {
+		if ($tab !== 'debug') {
+			return;
+		}
 		?>
 		<form method="post">
 			<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="install_fonts">
