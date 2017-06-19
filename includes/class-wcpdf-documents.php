@@ -68,7 +68,6 @@ class Documents {
 	 */
 	public function get_documents( $filter = 'enabled' ) {
 		if ( $filter == 'enabled' ) {
-			// return $this->documents;
 			$documents = array();
 			foreach ($this->documents as $class_name => $document) {
 				if ($document->is_enabled()) {
