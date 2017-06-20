@@ -99,6 +99,18 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.0 beta 6 =
+* Fix: Line breaks on settings fields (non-WPML)
+* Fix: Class loading order (preventing extension clash)
+* Fix: Included get_display_number() in legacy class
+* Fix: Removed font declaration from template styles
+* Feature: Manually re-install fonts from Status tab
+* Feature: Added wpo_wcpdf_document_is_enabled filter
+
+= 2.0 beta 5 =
+* Better deprecation notices
+* Fix: Positive prices for refunds
+
 = 2.0 beta 4 =
 * New: Log deprecation notices (can be turned off with `wcpdf_disable_deprecation_notices` filter set to true)
 * Fix: Auto enable legacy classes when called
