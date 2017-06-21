@@ -94,14 +94,14 @@ class Order extends Data {
 				} else {
 					$timestamp = wc_string_to_timestamp( get_gmt_from_date( gmdate( 'Y-m-d H:i:s', wc_string_to_timestamp( $value ) ) ) );
 				}
-				$datetime = new WC_DateTime( "@{$timestamp}", new DateTimeZone( 'UTC' ) );
+				$value = new WC_DateTime( "@{$timestamp}", new \DateTimeZone( 'UTC' ) );
 			}
 
 			// Set local timezone or offset.
 			if ( get_option( 'timezone_string' ) ) {
-				$datetime->setTimezone( new DateTimeZone( wc_timezone_string() ) );
+				$value->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
 			} else {
-				$datetime->set_utc_offset( wc_timezone_offset() );
+				$value->set_utc_offset( wc_timezone_offset() );
 			}
 		}
 
