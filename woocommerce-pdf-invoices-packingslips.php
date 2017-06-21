@@ -150,28 +150,28 @@ class WPO_WCPDF {
 	 */
 	public function includes() {
 		// WooCommerce compatibility classes
-		include_once( 'includes/compatibility/abstract-wc-data-compatibility.php' );
-		include_once( 'includes/compatibility/class-wc-date-compatibility.php' );
-		include_once( 'includes/compatibility/class-wc-core-compatibility.php' );
-		include_once( 'includes/compatibility/class-wc-order-compatibility.php' );
-		include_once( 'includes/compatibility/class-wc-product-compatibility.php' );
-		include_once( 'includes/compatibility/wc-datetime-functions-compatibility.php' );
+		include_once( $this->plugin_path() . '/includes/compatibility/abstract-wc-data-compatibility.php' );
+		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-date-compatibility.php' );
+		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-core-compatibility.php' );
+		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-order-compatibility.php' );
+		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-product-compatibility.php' );
+		include_once( $this->plugin_path() . '/includes/compatibility/wc-datetime-functions-compatibility.php' );
 
 		// Third party compatibility
-		include_once( 'includes/compatibility/class-wcpdf-compatibility-third-party-plugins.php' );
+		include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-compatibility-third-party-plugins.php' );
 
 		// Plugin classes
-		include_once( 'includes/wcpdf-functions.php' );
-		$this->settings = include_once( 'includes/class-wcpdf-settings.php' );
-		$this->documents = include_once( 'includes/class-wcpdf-documents.php' );
-		$this->main = include_once( 'includes/class-wcpdf-main.php' );
-		include_once( 'includes/class-wcpdf-assets.php' );
-		include_once( 'includes/class-wcpdf-admin.php' );
-		include_once( 'includes/class-wcpdf-frontend.php' );
+		include_once( $this->plugin_path() . '/includes/wcpdf-functions.php' );
+		$this->settings = include_once( $this->plugin_path() . '/includes/class-wcpdf-settings.php' );
+		$this->documents = include_once( $this->plugin_path() . '/includes/class-wcpdf-documents.php' );
+		$this->main = include_once( $this->plugin_path() . '/includes/class-wcpdf-main.php' );
+		include_once( $this->plugin_path() . '/includes/class-wcpdf-assets.php' );
+		include_once( $this->plugin_path() . '/includes/class-wcpdf-admin.php' );
+		include_once( $this->plugin_path() . '/includes/class-wcpdf-frontend.php' );
 
 		// Backwards compatibility with self
-		include_once( 'includes/legacy/class-wcpdf-legacy.php' );
-		include_once( 'includes/legacy/class-wcpdf-legacy-deprecated-hooks.php' );
+		include_once( $this->plugin_path() . '/includes/legacy/class-wcpdf-legacy.php' );
+		include_once( $this->plugin_path() . '/includes/legacy/class-wcpdf-legacy-deprecated-hooks.php' );
 	}
 	
 
