@@ -197,6 +197,10 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 
 				// new version number
 				update_option( $version_setting, self::$version );
+			} elseif ( $installed_version && version_compare( $installed_version, self::$version, '>' ) ) {
+				$this->downgrade( $installed_version );
+				// downgrade version number
+				update_option( $version_setting, self::$version );
 			}
 		}
 
@@ -252,7 +256,31 @@ if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 				$next_invoice_number = isset($template_settings['next_invoice_number'])?$template_settings['next_invoice_number']:'';
 				update_option( 'wpo_wcpdf_next_invoice_number', $next_invoice_number );
 			}
-		}		
+		}
+
+		/**
+		 * Plugin downgrade method.  Perform any required downgrades here
+		 *
+		 * @param string $installed_version the currently installed ('old') version (actually higher since this is a downgrade)
+		 */
+		protected function downgrade( $installed_version ) {
+			// sync fonts on downgrade, fixing incompatibility with 2.0
+			$debug_settings = get_option( 'wpo_wcpdf_debug_settings' ); // get temp setting
+
+			// do not copy if old_tmp function active! (double check for slow databases)
+			if ( !isset($debug_settings['old_tmp']) ) {
+				$tmp_base = $this->export->get_tmp_base();
+
+				// check if tmp folder exists => if not, initialize 
+				if ( !@is_dir( $tmp_base ) ) {
+					$this->export->init_tmp( $tmp_base );
+				}
+
+				$font_path = $tmp_base . 'fonts/';
+				$this->export->copy_fonts( $font_path );
+			}
+
+		}
 
 		/***********************************************************************/
 		/********************** GENERAL TEMPLATE FUNCTIONS *********************/
