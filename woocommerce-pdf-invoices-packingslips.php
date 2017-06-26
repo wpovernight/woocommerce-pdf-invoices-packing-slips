@@ -274,6 +274,10 @@ class WPO_WCPDF {
 
 			// new version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
+		} elseif ( $installed_version && version_compare( $installed_version, WPO_WCPDF_VERSION, '>' ) ) {
+			$this->downgrade( $installed_version );
+			// downgrade version number
+			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
 	}
 
@@ -486,10 +490,30 @@ class WPO_WCPDF {
 				$number_store = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( 'invoice_number' );
 				$number_store->set_next( (int) $next_number );
 			}
-			delete_option( 'wpo_wcpdf_next_invoice_number' ); // clean up after ourselves
+			// we're not deleting this option yet to make downgrading possible
+			// delete_option( 'wpo_wcpdf_next_invoice_number' ); // clean up after ourselves
 		}
 
-	}		
+	}
+
+	/**
+	 * Plugin downgrade method.  Perform any required downgrades here
+	 * 
+	 *
+	 * @param string $installed_version the currently installed ('old') version (actually higher since this is a downgrade)
+	 */
+	protected function downgrade( $installed_version ) {
+		// make sure fonts match with version: copy from plugin folder
+		$tmp_base = $this->main->get_tmp_base();
+
+		// check if tmp folder exists => if not, initialize 
+		if ( !@is_dir( $tmp_base ) ) {
+			$this->main->init_tmp( $tmp_base );
+		} else {
+			$font_path = $this->main->get_tmp_path( 'fonts' );
+			$this->main->copy_fonts( $font_path );
+		}
+	}
 
 	/**
 	 * Show plugin changes. Code adapted from W3 Total Cache.
