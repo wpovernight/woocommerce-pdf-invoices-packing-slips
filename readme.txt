@@ -1,16 +1,17 @@
-=== Plugin Name ===
+=== WooCommerce PDF Invoices & Packing Slips ===
 Contributors: pomegranate
+Donate link: https://wpovernight.com/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 4.7
-Stable tag: 1.6.5
+Tested up to: 4.8
+Stable tag: 1.6.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Create, print & automatically email PDF invoices & packing slips for WooCommerce orders.
 
 == Description ==
-
+	
 This WooCommerce extension automatically adds a PDF invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
@@ -98,6 +99,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 4. Simple packing slip PDF
 
 == Changelog ==
+
+= 1.6.6 =
+* **This is the last release before our [upcoming 2.0 update](https://wpovernight.com/2017/06/woocomerce-pdf-invoice-2-0-beta-testers-wanted/)**
+* Feature: Facilitate downgrading from 2.0 (re-installing fonts & resetting version)
+* Fix: Update currencies font (added Georgian Lari)
+* Translations: Added Indonesian
 
 = 1.6.5 =
 * Fix: Duplicate invoice numbers when bulk completing orders (WC3.0)
@@ -539,5 +546,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 1.6.5 =
+= 1.6.6 =
 Important: Version 1.6 requires PHP 5.3 or higher to run!
