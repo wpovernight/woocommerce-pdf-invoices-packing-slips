@@ -406,9 +406,12 @@ abstract class Order_Document {
 		}
 	}
 
-	public function get_settings_text( $settings_key, $default = false ) {
+	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
 		if ( !empty( $this->settings[$settings_key]['default'] ) ) {
-			$text = wpautop( wptexturize( trim( $this->settings[$settings_key]['default'] ) ) );
+			$text = wptexturize( trim( $this->settings[$settings_key]['default'] ) );
+			if ($autop === true) {
+				$text = wpautop( $text );
+			}
 		} else {
 			$text = $default;
 		}
@@ -420,7 +423,7 @@ abstract class Order_Document {
 	 */
 	public function get_shop_name() {
 		$default = get_bloginfo( 'name' );
-		return $this->get_settings_text( 'shop_name', $default );
+		return $this->get_settings_text( 'shop_name', $default, false );
 	}
 	public function shop_name() {
 		echo $this->get_shop_name();
