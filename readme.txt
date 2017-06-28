@@ -100,6 +100,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.0 beta 8 =
+* Fix: Shop name formatting
+* Fix: text domain for document title
+
 = 2.0 beta 7 =
 * fix fallback datetime order compatibility
 * implement downgrade lifecycle method
