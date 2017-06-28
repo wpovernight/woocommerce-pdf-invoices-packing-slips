@@ -93,12 +93,12 @@ function wcpdf_get_bulk_document( $document_type, $order_ids ) {
 	return new \WPO\WC\PDF_Invoices\Documents\Bulk_Document( $document_type, $order_ids );
 }
 
-function wcpdf_get_invoice( $order ) {
-	return wcpdf_get_document( 'invoice', $order );
+function wcpdf_get_invoice( $order, $init = false ) {
+	return wcpdf_get_document( 'invoice', $order, $init );
 }
 
-function wcpdf_get_packing_slip( $order ) {
-	return wcpdf_get_document( 'packing-slip', $order );
+function wcpdf_get_packing_slip( $order, $init = false ) {
+	return wcpdf_get_document( 'packing-slip', $order, $init );
 }
 
 /**
