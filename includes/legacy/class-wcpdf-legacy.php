@@ -6,6 +6,7 @@ defined( 'ABSPATH' ) or exit;
 if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\WPO_WCPDF_Legacy' ) ) :
 
 class WPO_WCPDF_Legacy {
+	public static $version;
 	public $enabled;
 	public $settings;
 	public $export;
@@ -29,7 +30,8 @@ class WPO_WCPDF_Legacy {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->enabled = WPO_WCPDF()->legacy_mode_enabled();
+		self::$version   = WPO_WCPDF()->version;
+		$this->enabled   = WPO_WCPDF()->legacy_mode_enabled();
 		$this->settings  = include_once( 'class-wcpdf-legacy-settings.php' );
 		$this->export    = include_once( 'class-wcpdf-legacy-export.php' );
 		$this->functions = include_once( 'class-wcpdf-legacy-functions.php' );
