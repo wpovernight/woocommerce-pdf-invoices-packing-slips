@@ -181,6 +181,9 @@ class Main {
 						break;
 					case 'pdf':
 					default:
+						if ( has_action( 'wpo_wcpdf_created_manually' ) ) {
+							do_action( 'wpo_wcpdf_created_manually', $document->get_pdf(), $document->get_filename() );
+						}
 						$document->output_pdf();
 						break;
 				}
