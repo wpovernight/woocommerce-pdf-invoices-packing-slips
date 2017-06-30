@@ -388,10 +388,12 @@ class WPO_WCPDF {
 			}
 
 			// convert abbreviated email_ids
-			foreach ($old_settings['wpo_wcpdf_general_settings']['email_pdf'] as $email_id => $value) {
-				if ($email_id == 'completed' || $email_id == 'processing') {
-					$old_settings['wpo_wcpdf_general_settings']['email_pdf']["customer_{$email_id}_order"] = $value;
-					unset($old_settings['wpo_wcpdf_general_settings']['email_pdf'][$email_id]);
+			if (isset($old_settings['wpo_wcpdf_general_settings']['email_pdf'])) {
+				foreach ($old_settings['wpo_wcpdf_general_settings']['email_pdf'] as $email_id => $value) {
+					if ($email_id == 'completed' || $email_id == 'processing') {
+						$old_settings['wpo_wcpdf_general_settings']['email_pdf']["customer_{$email_id}_order"] = $value;
+						unset($old_settings['wpo_wcpdf_general_settings']['email_pdf'][$email_id]);
+					}
 				}
 			}
 
