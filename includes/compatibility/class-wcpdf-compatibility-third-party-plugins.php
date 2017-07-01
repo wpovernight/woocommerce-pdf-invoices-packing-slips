@@ -42,17 +42,19 @@ class Third_Party_Plugins {
 	 * https://wordpress.org/support/topic/subscription-renewal-duplicate-invoice-number?replies=6#post-6138110
 	 */
 	public function woocommerce_subscriptions_renewal_order_created ( $renewal_order, $original_order, $product_id, $new_order_role ) {
-		$this->reset_invoice_data( WCX_Order::get_id( $renewal_order ) );
+		$this->reset_invoice_data( $renewal_order );
 		return $renewal_order;
 	}
 
-	public function wcs_renewal_order_created (  $renewal_order, $subscription ) {
-		$this->reset_invoice_data( WCX_Order::get_id( $renewal_order ) );
+	public function wcs_renewal_order_created ( $renewal_order, $subscription ) {
+		$this->reset_invoice_data( $renewal_order );
 		return $renewal_order;
 	}
 
-	public function reset_invoice_data ( $order_id ) {
-		$order = $this->get_order( $order_id );
+	public function reset_invoice_data ( $order ) {
+		if ( ! is_object( $order ) ) {
+			$order = wc_get_order( $order );
+		}
 		// delete invoice number, invoice date & invoice exists meta
 		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_number' );
 		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_number_data' );
