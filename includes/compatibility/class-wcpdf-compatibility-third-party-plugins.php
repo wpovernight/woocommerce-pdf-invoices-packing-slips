@@ -1,6 +1,10 @@
 <?php
-
 namespace WPO\WC\PDF_Invoices\Compatibility;
+
+use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
+use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
+use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
+use WPO\WC\PDF_Invoices\Compatibility\WC_DateTime;
 
 defined( 'ABSPATH' ) or exit;
 
