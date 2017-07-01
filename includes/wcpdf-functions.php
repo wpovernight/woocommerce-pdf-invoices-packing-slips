@@ -40,7 +40,8 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 			$order_ids = array( WCX_Order::get_id( $order ) );
 			$filtered_order_ids = wcpdf_filter_order_ids( $order_ids, $document_type );
 			// check if something has changed
-			if ( empty( array_diff( $filtered_order_ids, $order_ids ) ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
+			$order_id_diff = array_diff( $filtered_order_ids, $order_ids );
+			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
 				// nothing changed, load document with Order object
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, WCX_Order::get_id( $order ) );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
