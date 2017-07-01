@@ -195,7 +195,7 @@ subfolders <code>attachments</code>, <code>dompdf</code> and <code>fonts</code>
 are present (these will be created by the plugin if the central temp folder is writable).<br>
 <br>
 If the temporary folders were not automatically created by the plugin, verify that all the font
-files (from <code><?php echo WPO_WCPDF()->plugin_path() . "lib/dompdf/lib/fonts/"; ?></code>)
+files (from <code><?php echo WPO_WCPDF()->plugin_path() . "/vendor/dompdf/dompdf/lib/fonts/"; ?></code>)
 are copied to the fonts folder.
 Normally, this is fully automated, but if your server has strict security settings, this automated
 copying may have been prohibited. In that case, you also need to make sure these folders get
