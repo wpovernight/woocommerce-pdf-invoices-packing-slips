@@ -100,6 +100,17 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.0 RC 1 =
+* Fix: Third party compatibility namespace aliases
+* Fix: Subscriptions order resetting
+* Fix: Compatibility with PHP 5.3 & 5.4
+* Fix: Email attachment settings migration when no attachments set
+* Fix: Set $version property in legacy class
+* Fix: Added back wpo_wcpdf_created_manually action from previous versions
+* Fix: Show correct font path in status tab
+* Tweak: Add init parameter to wcpdf_get_invoice & wcpdf_get_packing_slip
+* Tweak: Warning on Status tab
+
 = 2.0 beta 8 =
 * Fix: Shop name formatting
 * Fix: text domain for document title
