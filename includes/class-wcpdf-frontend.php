@@ -23,7 +23,7 @@ class Frontend {
 	 */
 	public function my_account_pdf_link( $actions, $order ) {
 		$invoice = wcpdf_get_invoice( $order );
-		if ( $invoice->is_enabled() ) {
+		if ( $invoice && $invoice->is_enabled() ) {
 			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&document_type=invoice&order_ids=' . WCX_Order::get_id( $order ) . '&my-account'), 'generate_wpo_wcpdf' );
 
 			// check my account button settings

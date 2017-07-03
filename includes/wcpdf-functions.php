@@ -62,9 +62,9 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 			return false;
 		}
 
-		// throw error when no order ids
 		if ( empty( $order_ids ) ) {
-			throw new Exception('No orders to export!');
+			// No orders to export for this document type
+			return false;
 		}
 
 		// if we only have one order, it's simple

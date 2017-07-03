@@ -137,7 +137,11 @@ class Main {
 			$_GET['document_type'] = $_GET['template_type'];
 		}
 
-		if( empty( $_GET['document_type'] ) || empty( $_GET['order_ids'] ) ) {
+		if ( empty( $_GET['order_ids'] ) ) {
+			wp_die( __( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		if( empty( $_GET['document_type'] ) ) {
 			wp_die( __( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
@@ -165,11 +169,9 @@ class Main {
 			if ( WCX_Order::get_prop( $order, 'customer_id' ) != get_current_user_id() ) {
 				wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 			}
-
-			// if we got here, we're safe to go!
 		}
 	
-
+		// if we got here, we're safe to go!
 		try {
 			$document = wcpdf_get_document( $document_type, $order_ids, true );
 
@@ -187,6 +189,8 @@ class Main {
 						$document->output_pdf();
 						break;
 				}
+			} else {
+				wp_die( sprintf( __( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ), $document_type ) );
 			}
 		} catch (Exception $e) {
 			echo $e->getMessage();
