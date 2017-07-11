@@ -212,6 +212,10 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/show product attribute
 	 */
 	public function get_product_attribute( $attribute_name, $product ) {
+		// WC3.0+ use parent product for variations
+		if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) && $product->is_type( 'variation' ) ) {
+			$product = wc_get_product( $product->get_parent_id() );
+		}
 		// first, check the text attributes
 		$attributes = $product->get_attributes();
 		$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
