@@ -100,6 +100,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.0 RC 2 =
+* Fix: Set content type to PDF for download
+* Fix: Use parent for attributes retrieved for product variations
+* Tweak: Better document return value checking & error handling
+
 = 2.0 RC 1 =
 * Fix: Third party compatibility namespace aliases
 * Fix: Subscriptions order resetting
