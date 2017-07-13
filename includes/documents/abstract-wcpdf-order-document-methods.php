@@ -188,10 +188,21 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function get_custom_field( $field_name ) {
 		$custom_field = WCX_Order::get_meta( $this->order, $field_name, true );
 
+		// WC3.0 fallback to properties
+		$property = str_replace('-', '_', sanitize_title( ltrim($field_name, '_') ) );
+		if ( !$custom_field && is_callable( array( $this->order, "get_{$property}" ) ) ) {
+			$custom_field = $this->order->{"get_{$property}"}( 'view' );
+		}
+
+		// fallback to parent for refunds
 		if ( !$custom_field && $this->is_refund( $this->order ) ) {
-			// try parent
 			$parent_order = $this->get_refund_parent( $this->order );
 			$custom_field = WCX_Order::get_meta( $parent_order, $field_name, true );
+
+			// WC3.0 fallback to properties
+			if ( !$custom_field && is_callable( array( $parent_order, "get_{$property}" ) ) ) {
+				$custom_field = $parent_order->{"get_{$property}"}( 'view' );
+			}
 		}
 
 		return apply_filters( 'wpo_wcpdf_billing_custom_field', $custom_field, $this );
