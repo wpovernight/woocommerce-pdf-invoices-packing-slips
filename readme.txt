@@ -1,17 +1,17 @@
 === WooCommerce PDF Invoices & Packing Slips ===
 Contributors: pomegranate
-Donate link: https://wpovernight.com/
+Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 1.6.6
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Create, print & automatically email PDF invoices & packing slips for WooCommerce orders.
 
 == Description ==
-	
+
 This WooCommerce extension automatically adds a PDF invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
@@ -100,8 +100,22 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.0.0 =
+* **BIG update! Make a full site backup before upgrading**
+* New: Better structured & more advanced settings for documents
+* New: Option to enable & disable Packing Slips or Invoices
+* New: Invoice number sequence stored separately for improved speed & performance
+* New: Completely rewritten codebase for more flexibility & better reliability
+* New: Updated PDF library to DOMPDF 0.8
+* New: PDF Library made pluggable (by using the `wpo_wcpdf_pdf_maker` filter)
+* New: lots of new functions & filters to allow developers to hook into the plugin
+* Changed: **$wpo_wcpdf variable is now deprecated** (legacy mode available & automatically enabled on update)
+* Fix: Improved PHP 7 & 7.1 support
+* Fix: Positive prices for refunds
+* Fix: Use parent for attributes retrieved for product variations
+* Fix: Set content type to PDF for download
+
 = 1.6.6 =
-* **This is the last release before our [upcoming 2.0 update](https://wpovernight.com/2017/06/woocomerce-pdf-invoice-2-0-beta-testers-wanted/)**
 * Feature: Facilitate downgrading from 2.0 (re-installing fonts & resetting version)
 * Fix: Update currencies font (added Georgian Lari)
 * Translations: Added Indonesian
@@ -545,6 +559,9 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * First release
 
 == Upgrade Notice ==
+
+= 2.0 =
+**2.0 is a BIG update! Make a full site backup before upgrading!**
 
 = 1.6.6 =
 Important: Version 1.6 requires PHP 5.3 or higher to run!

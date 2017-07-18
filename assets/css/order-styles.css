@@ -1,0 +1,57 @@
+/* Order list buttons: */
+.type-shop_order .column-order_actions a.button.wpo_wcpdf img {
+	width: 16px;
+}
+
+.widefat .column-pdf_invoice_number {
+	width: 110px;
+}
+
+@media screen and (max-width: 782px) {
+	.wp-list-table .column-pdf_invoice_number, .wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number:not(.check-column) {
+		display: none;
+	}
+	.wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number {
+		padding: 3px 8px 3px 35%
+	}
+}
+
+#wpo_wcpdf-data-input-box h4 {
+	font-size: 14px;
+	line-height: 1.4;
+	margin: 1.5em 0 0 0;
+}
+
+#wpo_wcpdf-data-input-box p {
+	margin: 0.5em 0;
+}
+
+#wpo_wcpdf-data-input-box .form-field input {
+	width: auto;
+}
+
+.wcpdf-data-fields .read-only {
+	height:auto;
+	display:block;
+}
+
+.wcpdf-data-fields .editable {
+	height:auto;
+	display:none;
+}
+
+#set-invoice-date-number {
+	margin:15px 0px!important;
+}
+
+#edit-invoice-date-number {
+	margin-left:20px!important;
+}
+
+#edit-invoice-date-number {
+	opacity:0.5;
+}
+#edit-invoice-date-number:hover {
+	opacity:1;
+	cursor:pointer;
+}

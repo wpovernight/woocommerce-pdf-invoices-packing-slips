@@ -1,0 +1,7 @@
+{
+  "require": {
+    "php": ">=5.3.0",
+    "dompdf/dompdf": "*",
+    "phenx/php-svg-lib": "dev-master as 0.2"
+  }
+}

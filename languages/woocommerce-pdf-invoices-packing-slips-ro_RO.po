@@ -1,0 +1,959 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips v1.4.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-06-09 16:38+0200\n"
+"PO-Revision-Date: 2017-06-09 16:38+0200\n"
+"Last-Translator: SC 3G Personal SRL,RO 15233799 <levente_gergely@yahoo.com>\n"
+"Language-Team: \n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
+"_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Textdomain-Support: yes\n"
+"X-Poedit-SearchPath-0: .\n"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-admin.php:72 includes/class-wcpdf-admin.php:174
+msgid "Invoice Number"
+msgstr "Număr Factură"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-admin.php:105
+msgid "Create PDF"
+msgstr "Crează PDF"
+
+#: includes/class-wcpdf-admin.php:115
+msgid "PDF Invoice data"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-admin.php:166
+#: includes/documents/class-wcpdf-invoice.php:32
+#: includes/documents/class-wcpdf-invoice.php:41
+#: includes/legacy/class-wcpdf-legacy-functions.php:22
+#: templates/Simple/invoice.php:10 templates/Simple/invoice.php:22
+msgid "Invoice"
+msgstr "Factură"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-admin.php:183 includes/class-wcpdf-admin.php:204
+#: templates/Simple/invoice.php:56
+msgid "Invoice Date:"
+msgstr "Dată factură:"
+
+#: includes/class-wcpdf-admin.php:189
+msgid "Set invoice number & date"
+msgstr ""
+
+#: includes/class-wcpdf-admin.php:196
+msgid "Invoice Number (unformatted!)"
+msgstr ""
+
+# @ woocommerce
+#: includes/class-wcpdf-admin.php:206 includes/class-wcpdf-admin.php:208
+msgid "h"
+msgstr "h"
+
+# @ woocommerce
+#: includes/class-wcpdf-admin.php:206 includes/class-wcpdf-admin.php:208
+msgid "m"
+msgstr "m"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-frontend.php:55
+msgid "Download invoice (PDF)"
+msgstr "Descarcă factura  (PDF)"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-main.php:132 includes/class-wcpdf-main.php:153
+#: includes/class-wcpdf-main.php:160 includes/class-wcpdf-main.php:166
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Nu aveți permisiunea pentru a accesa această pagină."
+
+#: includes/class-wcpdf-main.php:141
+msgid "Some of the export parameters are missing."
+msgstr ""
+
+#: includes/class-wcpdf-settings-callbacks.php:27
+msgid ""
+"<b>Warning!</b> The settings below are meant for debugging/development only. "
+"Do not use them on a live website!"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-callbacks.php:36
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
+msgstr ""
+"Acestea sunt utilizate pentru (opțional) coloanele notei de subsol din "
+"șablonul <em>Modern (Premium)</ em>, dar poate fi de asemenea utilizat "
+"pentru alte elemente în șablonul personalizat"
+
+# @ default
+#: includes/class-wcpdf-settings-callbacks.php:301
+msgid "Image resolution"
+msgstr "Rezolutie imagine"
+
+#: includes/class-wcpdf-settings-callbacks.php:325
+msgid "Save"
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:34
+msgid "Debug settings"
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:40
+msgid "Legacy mode"
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:46
+msgid ""
+"Legacy mode ensures compatibility with templates and filters from previous "
+"versions."
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:52
+msgid "Enable debug output"
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:58
+msgid ""
+"Enable this option to output plugin errors if you're getting a blank page or "
+"other PDF generation issues"
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:64
+msgid "Output to HTML"
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:70
+msgid ""
+"Send the template output as HTML to the browser instead of creating a PDF."
+msgstr ""
+
+#: includes/class-wcpdf-settings-documents.php:29
+#: includes/class-wcpdf-settings.php:84
+msgid "Documents"
+msgstr ""
+
+#: includes/class-wcpdf-settings-documents.php:45
+msgid ""
+"All available documents are listed below. Click on a document to configure "
+"it."
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:37
+msgid "General settings"
+msgstr "Setări generale"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:43
+msgid "How do you want to view the PDF?"
+msgstr "Cum doriți să vizualizați PDF-ul?"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:50
+msgid "Download the PDF"
+msgstr "Descarcă PDF"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:51
+msgid "Open the PDF in a new browser tab/window"
+msgstr "Deschideți PDF-ul într-o filă/fereastră nouă"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:58
+msgid "Choose a template"
+msgstr "Alege un șablon"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:65
+#, php-format
+msgid ""
+"Want to use your own template? Copy all the files from <code>%s</code> to "
+"your (child) theme in <code>%s</code> to customize them"
+msgstr ""
+"Doriți să utilizați propriul șablon? Copiați toate fișierele din <code>%s</"
+"code> in folderul temei dvs. în <code>%s</code> pentru a le personaliza"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:71
+msgid "Paper size"
+msgstr "Dimensiune hârtie"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:78
+msgid "A4"
+msgstr "A4"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:79
+msgid "Letter"
+msgstr "Letter"
+
+#: includes/class-wcpdf-settings-general.php:86
+msgid "Extended currency symbol support"
+msgstr ""
+
+#: includes/class-wcpdf-settings-general.php:92
+msgid "Enable this if your currency symbol is not displaying properly"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:98
+msgid "Shop header/logo"
+msgstr "Antet/Logo"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:104
+msgid "Select or upload your invoice header/logo"
+msgstr "Selectați sau încărcați propriul dvs. antet sau logo"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:105
+msgid "Set image"
+msgstr "Setare imagine"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:106
+msgid "Remove image"
+msgstr "Șterge imagine"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:113
+msgid "Shop Name"
+msgstr "Nume magazin"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:126
+msgid "Shop Address"
+msgstr "Adresă magazin"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:141
+msgid "Footer: terms & conditions, policies, etc."
+msgstr ""
+"Notă de subsol: termeni și condiții, politică de confidențialitate, etc."
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:156
+msgid "Extra template fields"
+msgstr "Câmpuri suplimentare pentru șablon"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:162
+msgid "Extra field 1"
+msgstr "Câmp suplimentar 1"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:170
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr ""
+"Aceasta este coloana 1 pentru nota de subsol, disponibilă în șablonul "
+"<i>Modern (Premium)</ i>"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:177
+msgid "Extra field 2"
+msgstr "Câmp suplimentar 2"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:185
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr ""
+"Aceasta este coloana 2 pentru nota de subsol, disponibilă în șablonul "
+"<i>Modern (Premium)</ i>"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:192
+msgid "Extra field 3"
+msgstr "Câmp suplimentar 3"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings-general.php:200
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr ""
+"Aceasta este coloana 3 pentru nota de subsol, disponibilă în șablonul "
+"<i>Modern (Premium)</ i>"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings.php:45 includes/class-wcpdf-settings.php:46
+msgid "PDF Invoices"
+msgstr "Factură PDF"
+
+# @ woocommerce
+#: includes/class-wcpdf-settings.php:58
+msgid "Settings"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:71
+msgid "Documentation"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:72
+msgid "Support Forum"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings.php:83
+msgid "General"
+msgstr "General"
+
+# @ wpo_wcpdf
+#: includes/class-wcpdf-settings.php:89
+msgid "Status"
+msgstr "Status"
+
+#: includes/compatibility/class-wc-core-compatibility.php:222
+msgid "WooCommerce"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/abstract-wcpdf-order-document-methods.php:113
+#: includes/documents/abstract-wcpdf-order-document-methods.php:176
+msgid "N/A"
+msgstr "Nu se aplică (N/A)"
+
+# @ wpo_wcpdf
+#: includes/documents/abstract-wcpdf-order-document-methods.php:305
+msgid "Payment method"
+msgstr "Metodă de plată"
+
+# @ wpo_wcpdf
+#: includes/documents/abstract-wcpdf-order-document-methods.php:326
+msgid "Shipping method"
+msgstr "Metodă de livrare"
+
+#: includes/documents/abstract-wcpdf-order-document-methods.php:669
+#, php-format
+msgid "(includes %s)"
+msgstr ""
+
+#: includes/documents/abstract-wcpdf-order-document-methods.php:672
+#, php-format
+msgid "(Includes %s)"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/abstract-wcpdf-order-document-methods.php:702
+msgid "Subtotal"
+msgstr "Subtotal"
+
+# @ wpo_wcpdf
+#: includes/documents/abstract-wcpdf-order-document-methods.php:727
+msgid "Shipping"
+msgstr "Transport"
+
+# @ wpo_wcpdf
+#: includes/documents/abstract-wcpdf-order-document-methods.php:790
+msgid "Discount"
+msgstr "Reducere"
+
+# @ wpo_wcpdf
+#: includes/documents/abstract-wcpdf-order-document-methods.php:831
+msgid "VAT"
+msgstr "TVA"
+
+#: includes/documents/abstract-wcpdf-order-document-methods.php:832
+msgid "Tax rate"
+msgstr ""
+
+# @ default
+#: includes/documents/abstract-wcpdf-order-document-methods.php:876
+msgid "Total ex. VAT"
+msgstr "Total fara TVA"
+
+# @ default
+#: includes/documents/abstract-wcpdf-order-document-methods.php:879
+msgid "Total"
+msgstr "Total"
+
+#: includes/documents/abstract-wcpdf-order-document.php:674
+msgid "Admin email"
+msgstr ""
+
+#: includes/documents/abstract-wcpdf-order-document.php:677
+msgid "Manual email"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:85
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "Factura Fiscala"
+msgstr[1] "Facturi Fiscale"
+
+#: includes/documents/class-wcpdf-invoice.php:130
+#: includes/documents/class-wcpdf-packing-slip.php:94
+msgid "Enable"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:141
+msgid "Attach to:"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:148
+#, php-format
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+"Se pare că folderul Temp (<code>%s</ code>) nu poate fi scris, verificați "
+"permisiunile pentru acest folder! Fără a avea acces de scriere la acest "
+"folder, plugin-ul nu va fi în măsură să trimita email-ul cu facturi."
+
+#: includes/documents/class-wcpdf-invoice.php:154
+msgid "Display shipping address"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:160
+msgid ""
+"Display shipping address (in addition to the default billing address) if "
+"different from billing address"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:166
+#: includes/documents/class-wcpdf-packing-slip.php:117
+msgid "Display email address"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:177
+#: includes/documents/class-wcpdf-packing-slip.php:128
+msgid "Display phone number"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:188
+msgid "Display invoice date"
+msgstr "Afișează data facturii"
+
+#: includes/documents/class-wcpdf-invoice.php:200
+msgid "Display invoice number"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:212
+msgid "Next invoice number (without prefix/suffix etc.)"
+msgstr "Următorul număr de factură (fără prefix/sufix etc.)"
+
+#: includes/documents/class-wcpdf-invoice.php:218
+msgid ""
+"This is the number that will be used for the next document. By default, "
+"numbering starts from 1 and increases for every new document. Note that if "
+"you override this and set it lower than the current/highest number, this "
+"could create duplicate numbers!"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:224
+msgid "Number format"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:232
+msgid "Prefix"
+msgstr "Prefix"
+
+#: includes/documents/class-wcpdf-invoice.php:234
+msgid ""
+"to use the invoice year and/or month, use [invoice_year] or [invoice_month] "
+"respectively"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:237
+msgid "Suffix"
+msgstr "Sufix"
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:242
+msgid "Padding"
+msgstr "Umplutură"
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:245
+msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
+msgstr ""
+"introduceţi numărul aici - introduceţi \"6\" pentru a afișa 42 ca 000042"
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:248
+msgid ""
+"note: if you have already created a custom invoice number format with a "
+"filter, the above settings will be ignored"
+msgstr ""
+"Atenţie: dacă ați creat deja un număr personalizat de factură cu filtru, "
+"setările de mai sus vor fi ignorate"
+
+#: includes/documents/class-wcpdf-invoice.php:254
+msgid "Reset invoice number yearly"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:265
+msgid "Allow My Account invoice download"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:272
+msgid "Only when an invoice is already created/emailed"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:273
+msgid "Only for specific order statuses (define below)"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:274
+msgid "Always"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:275
+msgid "Never"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-invoice.php:290
+msgid "Enable invoice number column in the orders list"
+msgstr "Activați coloana Număr de Factură din lista comenzilor"
+
+#: includes/documents/class-wcpdf-invoice.php:301
+msgid "Disable for free products"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:307
+msgid ""
+"Disable automatic creation/attachment when only free products are ordered"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:321
+msgid "Invoice numbers are created by a third-party extension."
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:323
+#, php-format
+msgid "Configure it <a href=\"%s\">here</a>."
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-packing-slip.php:32
+#: includes/documents/class-wcpdf-packing-slip.php:41
+#: includes/legacy/class-wcpdf-legacy-functions.php:25
+#: templates/Simple/packing-slip.php:10 templates/Simple/packing-slip.php:22
+msgid "Packing Slip"
+msgstr "Ordin de comandă"
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-packing-slip.php:53
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:105
+msgid "Display billing address"
+msgstr ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:111
+msgid ""
+"Display billing address (in addition to the default shipping address) if "
+"different from shipping address"
+msgstr ""
+
+#: includes/legacy/class-wcpdf-legacy-document.php:32
+msgid "Legacy Document"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:15
+msgid "Check out these premium extensions!"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:16
+msgid "click items to read more"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:21
+msgid ""
+"Premium PDF Invoice bundle: Everything you need for a perfect invoicing "
+"system"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:23
+msgid ""
+"Supercharge WooCommerce PDF Invoices & Packing Slips with the all our "
+"premium extensions:"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:24
+msgid "Professional features:"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:26
+#: includes/views/wcpdf-extensions.php:56
+msgid "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:27
+#: includes/views/wcpdf-extensions.php:57
+msgid ""
+"Send out a separate <b>notification email</b> with (or without) PDF invoices/"
+"packing slips, for example to a drop-shipper or a supplier."
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:28
+#: includes/views/wcpdf-extensions.php:58
+msgid ""
+"Attach <b>up to 3 static files</b> (for example a terms & conditions "
+"document) to the WooCommerce emails of your choice."
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:29
+#: includes/views/wcpdf-extensions.php:59
+msgid ""
+"Use <b>separate numbering systems</b> and/or format for proforma invoices "
+"and credit notes or utilize the main invoice numbering system"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:30
+#: includes/views/wcpdf-extensions.php:60
+msgid ""
+"<b>Customize</b> the <b>shipping & billing address</b> format to include "
+"additional custom fields, font sizes etc. without the need to create a "
+"custom template."
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:31
+#: includes/views/wcpdf-extensions.php:61
+msgid "Use the plugin in multilingual <b>WPML</b> setups"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:33
+#: includes/views/wcpdf-extensions.php:131
+msgid "Advanced, customizable templates"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:35
+#: includes/views/wcpdf-extensions.php:134
+msgid ""
+"Completely customize the invoice contents (prices, taxes, thumbnails) to "
+"your needs with a drag & drop customizer"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:36
+#: includes/views/wcpdf-extensions.php:135
+msgid "Two extra stylish premade templates (Modern & Business)"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:38
+msgid "Upload automatically to dropbox"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:40
+#: includes/views/wcpdf-extensions.php:97
+msgid ""
+"This extension conveniently uploads all the invoices (and other pdf "
+"documents from the professional extension) that are emailed to your "
+"customers to Dropbox. The best way to keep your invoice administration up to "
+"date!"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:43
+msgid "Get WooCommerce PDF Invoices & Packing Slips Bundle"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:52
+msgid "Go Pro: Proforma invoices, credit notes (=refunds) & more!"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:54
+msgid ""
+"Supercharge WooCommerce PDF Invoices & Packing Slips with the following "
+"features:"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:63
+msgid "Get WooCommerce PDF Invoices & Packing Slips Professional!"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:71
+msgid "Automatically send payment reminders to your customers"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:73
+msgid "WooCommerce Smart Reminder emails"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:75
+msgid "<b>Completely automatic</b> scheduled emails"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:76
+msgid ""
+"<b>Rich text editor</b> for the email text, including placeholders for data "
+"from the order (name, order total, etc)"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:77
+msgid ""
+"Configure the exact requirements for sending an email (time after order, "
+"order status, payment method)"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:78
+msgid ""
+"Fully <b>WPML Compatible</b> – emails will be automatically sent in the "
+"order language."
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:79
+msgid ""
+"<b>Super versatile!</b> Can be used for any kind of reminder email (review "
+"reminders, repeat purchases)"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:80
+msgid "Integrates seamlessly with the PDF Invoices & Packing Slips plugin"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:82
+msgid "Get WooCommerce Smart Reminder Emails"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:91
+msgid "Upload all invoices automatically to your dropbox"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:98
+msgid "Get WooCommerce PDF Invoices & Packing Slips to dropbox!"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:110
+msgid ""
+"Automatically send new orders or packing slips to your printer, as soon as "
+"the customer orders!"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:116
+msgid ""
+"Check out the WooCommerce Automatic Order Printing extension from our "
+"partners at Simba Hosting"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:117
+msgid "WooCommerce Automatic Order Printing"
+msgstr ""
+
+#: includes/views/wcpdf-extensions.php:136
+#, php-format
+msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/views/wcpdf-extensions.php:137
+#, php-format
+msgid "For custom templates, contact us at %s."
+msgstr "Pentru șabloane personalizate, contactați-ne la %s."
+
+#: includes/views/wcpdf-extensions.php:146
+msgid "Hide this message"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/views/wcpdf-settings-page.php:8
+msgid "WooCommerce PDF Invoices"
+msgstr "Factură PDF WooCommerce"
+
+#: templates/Simple/invoice.php:30 templates/Simple/packing-slip.php:41
+msgid "Billing Address:"
+msgstr ""
+
+#: templates/Simple/invoice.php:41
+msgid "Ship To:"
+msgstr ""
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:50
+msgid "Invoice Number:"
+msgstr "Număr factură:"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:61 templates/Simple/packing-slip.php:49
+msgid "Order Number:"
+msgstr "Număr comandă:"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:65 templates/Simple/packing-slip.php:53
+msgid "Order Date:"
+msgstr "Dată comandă:"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:69
+msgid "Payment Method:"
+msgstr "Metodă de plată:"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:83 templates/Simple/packing-slip.php:71
+msgid "Product"
+msgstr "Produs"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:84 templates/Simple/packing-slip.php:72
+msgid "Quantity"
+msgstr "Cantitate"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:85
+msgid "Price"
+msgstr "Preț"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:92 templates/Simple/packing-slip.php:79
+msgid "Description"
+msgstr "Descriere"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:97 templates/Simple/packing-slip.php:84
+msgid "SKU"
+msgstr "Cod produs (SKU)"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:98 templates/Simple/packing-slip.php:85
+msgid "SKU:"
+msgstr "Cod produs (SKU):"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:99 templates/Simple/packing-slip.php:86
+msgid "Weight:"
+msgstr "Greutate:"
+
+# @ wpo_wcpdf
+#: templates/Simple/invoice.php:114 templates/Simple/packing-slip.php:101
+msgid "Customer Notes"
+msgstr "Notiță client"
+
+#: templates/Simple/packing-slip.php:30
+msgid "Shipping Address:"
+msgstr ""
+
+#: templates/Simple/packing-slip.php:57
+msgid "Shipping Method:"
+msgstr ""
+
+# @ wpo_wcpdf
+#: woocommerce-pdf-invoices-packingslips.php:231
+#, php-format
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
+"installed & activated!"
+msgstr ""
+"%sWooCommerce%s trebuie să fie instalat și activ pentru ca Factura PDF și "
+"Ordinul de comandă WooCommerce să funcționeze."
+
+#: woocommerce-pdf-invoices-packingslips.php:243
+msgid ""
+"WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or "
+"higher recommended)."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:244
+msgid "How to update your PHP version"
+msgstr ""
+
+# @ wpo_wcpdf
+#~ msgid "Attach invoice to:"
+#~ msgstr "Atașați factura la:"
+
+# @ wpo_wcpdf
+#~ msgid ""
+#~ "This is the number that will be used on the next invoice that is created. "
+#~ "By default, numbering starts from the WooCommerce Order Number of the "
+#~ "first invoice that is created and increases for every new invoice. Note "
+#~ "that if you override this and set it lower than the highest (PDF) invoice "
+#~ "number, this could create double invoice numbers!"
+#~ msgstr ""
+#~ "Acesta este numărul care va fi folosit la următoarea factură creată. În "
+#~ "mod implicit, numerotarea începe de la primul număr al Ordinului de "
+#~ "comanda WooCommerce creat și crește pentru fiecare nouă factură. Rețineți "
+#~ "că, dacă rescrieți factura și îi setați un număr mai mic decât cel mai "
+#~ "mare număr de factură (PDF), acest lucru ar putea crea un număr duplicat "
+#~ "la factură!"
+
+# @ wpo_wcpdf
+#~ msgid "Invoice number format"
+#~ msgstr "Număr factură"
+
+# @ wpo_wcpdf
+#~ msgid "Template"
+#~ msgstr "Șablon"
+
+# @ wpo_wcpdf
+#~ msgid "Admin New Order email"
+#~ msgstr "Comanda nouă destinată Administratorului"
+
+# @ wpo_wcpdf
+#~ msgid "Customer Processing Order email"
+#~ msgstr "Comanda trimisă clientului în momentul procesării acesteia"
+
+# @ wpo_wcpdf
+#~ msgid "Customer Completed Order email"
+#~ msgstr "Comanda trimisă clientului în momentul finalizării acesteia"
+
+# @ wpo_wcpdf
+#~ msgid "Customer Invoice email"
+#~ msgstr "Email-ul trimis cu factura finală"
+
+# @ wpo_wcpdf
+#~ msgid "PDF Template settings"
+#~ msgstr "Setări șablon PDF"
+
+# @ wpo_wcpdf
+#~ msgid "Display built-in sequential invoice number"
+#~ msgstr "Afișează numărul de factură secvenţial standard"
+
+# @ wpo_wcpdf
+#~ msgid "PDF Packing Slips"
+#~ msgstr "Ordine de comandă PDF"
+
+# @ wpo_wcpdf
+#~ msgid "PDF Invoice"
+#~ msgstr "Factură PDF"
+
+# @ wpo_wcpdf
+#~ msgid "PDF Packing Slip"
+#~ msgstr "Ordin de comandă PDF"
+
+# @ wpo_wcpdf
+#~ msgid ""
+#~ "Upload all invoices automatically to your dropbox!<br/>Check out the %s "
+#~ "extension."
+#~ msgstr ""
+#~ "Încărcaţi automat toate facturile în contul dvs. de Dropbox!<br/>Verifică "
+#~ "extensia %s."
+
+# @ wpo_wcpdf
+#~ msgid ""
+#~ "Looking for more advanced templates? Check out the Premium PDF Invoice & "
+#~ "Packing Slips templates at %s."
+#~ msgstr ""
+#~ "Căutați șabloane mai avansate? Vezi șabloanele Premium pentru Factură PDF "
+#~ "și pentru Ordinul de comandă la %s."
+
+# @ wpo_wcpdf
+#~ msgid ""
+#~ "to use the order year and/or month, use [order_year] or [order_month] "
+#~ "respectively"
+#~ msgstr ""
+#~ "Pentru a folosi sortarea după an și/sau lună, folosiţi [order_year] sau "
+#~ "[order_month]"
+
+# @ wpo_wcpdf
+#~ msgid "PDF Invoice Number (unformatted!)"
+#~ msgstr "Număr factură PDF (neformatat!)"

@@ -22,6 +22,11 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\WC_DateTime' ) ) :
 class WC_DateTime extends \DateTime {
 
 	/**
+	 * UTC Offset if needed.
+	 * @var integer
+	 */
+	protected $utc_offset = 0;
+	/**
 	 * Output an ISO 8601 date string in local timezone.
 	 *
 	 * @since  3.0.0
@@ -30,7 +35,30 @@ class WC_DateTime extends \DateTime {
 	public function __toString() {
 		return $this->format( DATE_ATOM );
 	}
-
+	/**
+	 * Set UTC offset.
+	 */
+	public function set_utc_offset( $offset ) {
+		$this->utc_offset = intval( $offset );
+	}
+	/**
+	 * getOffset.
+	 */
+	public function getOffset() {
+		if ( $this->utc_offset ) {
+			return $this->utc_offset;
+		} else {
+			return parent::getOffset();
+		}
+	}
+	/**
+	 * Set timezone.
+	 * @param DateTimeZone $timezone
+	 */
+	public function setTimezone( $timezone ) {
+		$this->utc_offset = 0;
+		return parent::setTimezone( $timezone );
+	}
 	/**
 	 * Missing in PHP 5.2.
 	 *
@@ -40,7 +68,6 @@ class WC_DateTime extends \DateTime {
 	public function getTimestamp() {
 		return method_exists( 'DateTime', 'getTimestamp' ) ? parent::getTimestamp() : $this->format( 'U' );
 	}
-
 	/**
 	 * Get the timestamp with the WordPress timezone offset added or subtracted.
 	 *
@@ -50,7 +77,6 @@ class WC_DateTime extends \DateTime {
 	public function getOffsetTimestamp() {
 		return $this->getTimestamp() + $this->getOffset();
 	}
-
 	/**
 	 * Format a date based on the offset timestamp.
 	 *
@@ -61,7 +87,6 @@ class WC_DateTime extends \DateTime {
 	public function date( $format ) {
 		return gmdate( $format, $this->getOffsetTimestamp() );
 	}
-
 	/**
 	 * Return a localised date based on offset timestamp. Wrapper for date_i18n function.
 	 *
@@ -75,3 +100,4 @@ class WC_DateTime extends \DateTime {
 }
 
 endif; // Class exists check
+
