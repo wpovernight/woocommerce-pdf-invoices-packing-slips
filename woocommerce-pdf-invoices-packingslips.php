@@ -286,6 +286,11 @@ class WPO_WCPDF {
 	 * Plugin install method. Perform any installation tasks here
 	 */
 	protected function install() {
+		// only install when php 5.3 or higher
+		if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+			return;
+		}
+
 		// check if upgrading from versionless (1.4.14 and older)
 		if ( get_option('wpo_wcpdf_general_settings') ) {
 			$this->upgrade( 'versionless' );
@@ -352,6 +357,11 @@ class WPO_WCPDF {
 	 * @param string $installed_version the currently installed ('old') version
 	 */
 	protected function upgrade( $installed_version ) {
+		// only upgrade when php 5.3 or higher
+		if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+			return;
+		}
+
 		// sync fonts on every upgrade!
 		$tmp_base = $this->main->get_tmp_base();
 
