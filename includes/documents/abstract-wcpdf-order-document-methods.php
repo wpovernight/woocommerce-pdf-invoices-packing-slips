@@ -263,7 +263,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		if ( $this->is_refund( $this->order ) ) {
 			$post_id = $this->get_refund_parent_id( $this->order );
 		} else {
-			$post_id = $order_id;
+			$post_id = $this->order_id;
 		}
 
 		$args = array(
