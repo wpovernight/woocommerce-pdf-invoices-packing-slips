@@ -4,7 +4,7 @@ Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 1.6.6
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,48 +100,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 2.0 RC 2 =
-* Fix: Set content type to PDF for download
-* Fix: Use parent for attributes retrieved for product variations
-* Tweak: Better document return value checking & error handling
-
-= 2.0 RC 1 =
-* Fix: Third party compatibility namespace aliases
-* Fix: Subscriptions order resetting
-* Fix: Compatibility with PHP 5.3 & 5.4
-* Fix: Email attachment settings migration when no attachments set
-* Fix: Set $version property in legacy class
-* Fix: Added back wpo_wcpdf_created_manually action from previous versions
-* Fix: Show correct font path in status tab
-* Tweak: Add init parameter to wcpdf_get_invoice & wcpdf_get_packing_slip
-* Tweak: Warning on Status tab
-
-= 2.0 beta 8 =
-* Fix: Shop name formatting
-* Fix: text domain for document title
-
-= 2.0 beta 7 =
-* fix fallback datetime order compatibility
-* implement downgrade lifecycle method
-
-= 2.0 beta 6 =
-* Fix: Line breaks on settings fields (non-WPML)
-* Fix: Class loading order (preventing extension clash)
-* Fix: Included get_display_number() in legacy class
-* Fix: Removed font declaration from template styles
-* Feature: Manually re-install fonts from Status tab
-* Feature: Added wpo_wcpdf_document_is_enabled filter
-
-= 2.0 beta 5 =
-* Better deprecation notices
-* Fix: Positive prices for refunds
-
-= 2.0 beta 4 =
-* New: Log deprecation notices (can be turned off with `wcpdf_disable_deprecation_notices` filter set to true)
-* Fix: Auto enable legacy classes when called
-* Fix: Update some vendor libraries to resolve PHP 7.0 issues
-
-= 2.0 beta 3 =
+= 2.0.0 =
 * **BIG update! Make a full site backup before upgrading**
 * New: Better structured & more advanced settings for documents
 * New: Option to enable & disable Packing Slips or Invoices
@@ -152,6 +111,14 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * New: lots of new functions & filters to allow developers to hook into the plugin
 * Changed: **$wpo_wcpdf variable is now deprecated** (legacy mode available & automatically enabled on update)
 * Fix: Improved PHP 7 & 7.1 support
+* Fix: Positive prices for refunds
+* Fix: Use parent for attributes retrieved for product variations
+* Fix: Set content type to PDF for download
+
+= 1.6.6 =
+* Feature: Facilitate downgrading from 2.0 (re-installing fonts & resetting version)
+* Fix: Update currencies font (added Georgian Lari)
+* Translations: Added Indonesian
 
 = 1.6.5 =
 * Fix: Duplicate invoice numbers when bulk completing orders (WC3.0)
