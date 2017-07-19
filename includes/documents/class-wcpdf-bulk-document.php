@@ -89,9 +89,9 @@ class Bulk_Document {
 		return $html;
 	}
 
-	public function output_pdf() {
+	public function output_pdf( $output_mode = 'download' ) {
 		$pdf = $this->get_pdf();
-		wcpdf_pdf_headers( $this->get_filename(), 'inline', $pdf );
+		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf;
 		die();
 	}

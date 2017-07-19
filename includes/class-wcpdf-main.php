@@ -186,7 +186,8 @@ class Main {
 						if ( has_action( 'wpo_wcpdf_created_manually' ) ) {
 							do_action( 'wpo_wcpdf_created_manually', $document->get_pdf(), $document->get_filename() );
 						}
-						$document->output_pdf();
+						$output_mode = WPO_WCPDF()->settings->get_output_mode( $document_type );
+						$document->output_pdf( $output_mode );
 						break;
 				}
 			} else {

@@ -174,6 +174,23 @@ class Settings {
 		return $output_format;
 	}
 
+	public function get_output_mode() {
+		if ( isset( WPO_WCPDF()->settings->general_settings['download_display'] ) ) {
+			switch ( WPO_WCPDF()->settings->general_settings['download_display'] ) {
+				case 'display':
+					$output_mode = 'inline';
+					break;
+				case 'download':
+				default:
+					$output_mode = 'download';
+					break;
+			}
+		} else {
+			$output_mode = 'download';
+		}
+		return $output_mode;
+	}
+
 	public function get_template_path( $document_type = NULL ) {
 		$template_path = isset( $this->general_settings['template_path'] )?$this->general_settings['template_path']:'';
 		// forward slash for consistency
