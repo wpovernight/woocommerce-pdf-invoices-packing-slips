@@ -520,7 +520,10 @@ abstract class Order_Document {
 		}
 
 		// clean up special characters
-		$html = utf8_decode(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+		if ( function_exists('utf8_decode') && function_exists('mb_convert_encoding') ) {
+			$html = utf8_decode(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+		}
+
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 
 		return apply_filters( 'wpo_wcpdf_get_html', $html, $this );
