@@ -4,7 +4,7 @@ Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,8 +100,20 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+**2.0 is a BIG update! Make a full site backup before upgrading**
+
+= 2.0.2 =
+* Fix: order notes using correct order_id
+* Fix: WC3.0 deprecation notice for currency
+* Fix: Avoid crashing on PHP5.2 and older
+* Fix: Only use PHP MB String when present
+* Fix: Remote images
+* Fix: Download option
+
 = 2.0.1 =
-* **BIG update! Make a full site backup before upgrading**
+* Fix: PHP 5.4 issue
+
+= 2.0.0 =
 * New: Better structured & more advanced settings for documents
 * New: Option to enable & disable Packing Slips or Invoices
 * New: Invoice number sequence stored separately for improved speed & performance
@@ -114,7 +126,6 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: Positive prices for refunds
 * Fix: Use parent for attributes retrieved for product variations
 * Fix: Set content type to PDF for download
-* Fix: PHP 5.4 issue
 
 = 1.6.6 =
 * Feature: Facilitate downgrading from 2.0 (re-installing fonts & resetting version)
@@ -561,7 +572,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.0.1 =
+= 2.0.2 =
 **2.0 is a BIG update! Make a full site backup before upgrading!**
 
 = 1.6.6 =
