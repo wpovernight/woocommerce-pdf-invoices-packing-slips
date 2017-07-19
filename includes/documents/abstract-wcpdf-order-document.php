@@ -335,7 +335,7 @@ abstract class Order_Document {
 			$document_number = null;
 		} elseif ( is_array( $value ) ) {
 			// WCPDF 2.0 number data
-			$document_number = new Document_Number( $value );
+			$document_number = new Document_Number( $value, $this->get_number_settings(), $this, $order  );
 		} else {
 			// plain number
 			$document_number = new Document_Number( $value, $this->get_number_settings(), $this, $order );
