@@ -677,7 +677,7 @@ abstract class Order_Document_Methods extends Order_Document {
 							$tax_string_array[] = sprintf( '%s %s', $tax_amount, $tax->label );
 						}
 					} else {
-						$tax_string_array[] = sprintf( '%s %s', wc_price( $this->order->get_total_tax() - $this->order->get_total_tax_refunded(), array( 'currency' => $this->order->get_order_currency() ) ), WC()->countries->tax_or_vat() );
+						$tax_string_array[] = sprintf( '%s %s', wc_price( $this->order->get_total_tax() - $this->order->get_total_tax_refunded(), array( 'currency' => WCX_Order::get_prop( $this->order, 'currency' ) ) ), WC()->countries->tax_or_vat() );
 					}
 					if ( ! empty( $tax_string_array ) ) {
 						if ( version_compare( WOOCOMMERCE_VERSION, '2.6', '>=' ) ) {
