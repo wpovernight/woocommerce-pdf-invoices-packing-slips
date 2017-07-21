@@ -266,6 +266,10 @@ abstract class Order_Document_Methods extends Order_Document {
 			$post_id = $this->order_id;
 		}
 
+		if ( empty( $post_id ) ) {
+			return; // prevent order notes from all orders showing when document is not loaded properly
+		}
+
 		$args = array(
 			'post_id' 	=> $post_id,
 			'approve' 	=> 'approve',
