@@ -574,6 +574,3 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 2.0.2 =
 **2.0 is a BIG update! Make a full site backup before upgrading!**
-
-= 1.6.6 =
-Important: Version 1.6 requires PHP 5.3 or higher to run!
