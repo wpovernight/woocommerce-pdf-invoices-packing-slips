@@ -10,7 +10,7 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents' ) ) :
 class Documents {
 
 	/** @var array Array of document classes */
-	public $documents;
+	public $documents = array();
 
 	/** @var Documents The single instance of the class */
 	protected static $_instance = null;
