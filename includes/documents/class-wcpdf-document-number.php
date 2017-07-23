@@ -97,6 +97,10 @@ class Document_Number {
 		// get dates
 		$order_date = WCX_Order::get_prop( $order, 'date_created' );
 		$document_date = $document->get_date();
+		// fallback to order date if no document date available
+		if (empty($document_date)) {
+			$document_date = $order_date;
+		}
 
 		// get format settings
 		$formats = array(
