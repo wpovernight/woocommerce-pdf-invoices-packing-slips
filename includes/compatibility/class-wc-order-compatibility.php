@@ -82,7 +82,19 @@ class Order extends Data {
 		$value = parent::get_prop( $object, $prop, $context, self::$compat_props );
 
 		// 3.0+ date getters return a DateTime object, where previously MySQL date strings were returned
-		if ( WC_Core::is_wc_version_lt_3_0() && in_array( $prop, array( 'date_completed', 'date_paid', 'date_modified', 'date_created' ), true ) && !empty( $value ) ) {
+		if ( WC_Core::is_wc_version_lt_3_0() && in_array( $prop, array( 'date_completed', 'date_paid', 'date_modified', 'date_created' ), true ) ) {
+			// parent fallback for empty date values in refunds
+			if ( empty( $value ) && $object->order_type == 'refund' ) {
+				$parent_order_id = wp_get_post_parent_id( $object->id );
+				$parent_order = wc_get_order( $parent_order_id );
+				$value = parent::get_prop( $parent_order, $prop, $context, self::$compat_props );
+			}
+
+			// abort mission if still empty
+			if ( empty( $value ) ) {
+				return $value;
+			}
+
 			if ( is_numeric( $value ) ) { // incidental for WC2.7 orders
 				$value = new WC_DateTime( "@{$value}", new \DateTimeZone( 'UTC' ) );
 				$value->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
