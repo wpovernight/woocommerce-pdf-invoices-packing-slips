@@ -67,6 +67,9 @@ class Main {
 
 		// clear pdf files from temp folder (from http://stackoverflow.com/a/13468943/1446634)
 		// array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
+		
+		// disable deprecation notices during email sending
+		add_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
@@ -92,6 +95,8 @@ class Main {
 				continue;
 			}
 		}
+
+		remove_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
 
 		return $attachments;
 	}
