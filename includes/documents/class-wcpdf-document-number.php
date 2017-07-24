@@ -46,6 +46,18 @@ class Document_Number {
 	public $suffix;
 
 	/**
+	 * Document Type
+	 * @var string
+	 */
+	public $document_type;
+
+	/**
+	 * Order ID
+	 * @var int
+	 */
+	public $order_id;
+
+	/**
 	 * Zeros padding (total number of digits including leading zeros)
 	 * @var int
 	 */
@@ -71,6 +83,13 @@ class Document_Number {
 				$this->{$key} = $value;
 			}
 		}
+
+		if (!empty($document)) {
+			$this->document_type = $document->get_type();
+		}
+		if (!empty($order)) {
+			$this->order_id = WCX_Order::get_id( $order );
+		}
 	}
 
 	public function __toString() {
@@ -78,7 +97,9 @@ class Document_Number {
 	}
 
 	public function get_formatted() {
-		return isset( $this->formatted_number ) ? $this->formatted_number : '';
+		$formatted_number = isset( $this->formatted_number ) ? $this->formatted_number : '';
+		$formatted_number = apply_filters( 'wpo_wcpdf_formatted_document_number', $formatted_number, $this, $this->document_type, $this->order_id );
+		return $formatted_number;
 	}
 
 	public function get_plain() {
@@ -135,7 +156,7 @@ class Document_Number {
 		// Add prefix & suffix
 		$this->formatted_number = $formats['prefix'] . $number . $formats['suffix'] ;
 		// Apply filters and store
-		$this->formatted_number = apply_filters( 'wpo_wcpdf_formatted_document_number', $this->formatted_number, $this, $document, $order );
+		$this->formatted_number = apply_filters( 'wpo_wcpdf_format_document_number', $this->formatted_number, $this, $document, $order );
 
 		return $this->formatted_number;
 	}

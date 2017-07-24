@@ -22,12 +22,12 @@ class Deprecated_Hooks {
 		}
 	}
 
-	public function wpo_wcpdf_invoice_number( $formatted_number, $number, $document, $order ) {
-		if ( $document->get_type() == 'invoice' ) {
+	public function wpo_wcpdf_invoice_number( $formatted_number, $number, $document_type, $order_id ) {
+		if ( $document_type == 'invoice' ) {
 			// prepare filter arguments
 			$invoice_number = $number->get_plain();
+			$order = WCX::get_order( $order_id );
 			$order_number = $order->get_order_number();
-			$order_id = WCX_Order::get_id( $order );
 			$order_date = WCX_Order::get_prop( $order, 'date_created' );
 			$mysql_order_date = $order_date->date( "Y-m-d H:i:s" );
 			// apply filter
