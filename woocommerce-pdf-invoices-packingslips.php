@@ -127,10 +127,16 @@ class WPO_WCPDF {
 					if ( $revision_timestamp = strtotime($revision_date) ) {
 						// check if revision is before threshold date
 						if ( $revision_timestamp < $block_before ) {
+							// try bundled
+							$bundled_file = $this->plugin_path() . '/languages/'. basename( $mofile );
+							if (file_exists($bundled_file)) {
+								return $bundled_file;
+							} else {
+								return '';
+							}
 							// delete po & mo file if possible
-							@unlink($pofile);
-							@unlink($mofile);
-							return '';
+							// @unlink($pofile);
+							// @unlink($mofile);
 						}
 					}
 				}
