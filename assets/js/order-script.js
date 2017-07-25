@@ -32,7 +32,7 @@ jQuery(document).ready(function($) {
 	$('#wpo_wcpdf-data-input-box').insertAfter('#woocommerce-order-data');
 
 	// enable invoice number edit if user initiated
-	$( "#set-invoice-date-number, #edit-invoice-date-number" ).click(function() {
+	$( ".wpo-wcpdf-edit-date-number" ).click(function() {
 		$form = $(this).closest('.wcpdf-data-fields');
 		$form.find(".read-only").hide();
 		$form.find(".editable").show();

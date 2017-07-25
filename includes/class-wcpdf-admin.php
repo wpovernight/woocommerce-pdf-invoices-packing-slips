@@ -164,7 +164,7 @@ class Admin {
 			$invoice_date = $invoice->get_date();
 			?>
 			<div class="wcpdf-data-fields">
-				<h4><?php _e( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ) ?><?php if ($invoice->exists()) : ?><span id="edit-invoice-date-number" class="dashicons dashicons-edit"></span><?php endif; ?></h4>
+				<h4><?php _e( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ) ?><?php if ($invoice->exists()) : ?><span id="" class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span><?php endif; ?></h4>
 
 				<!-- Read only -->
 				<div class="read-only">
