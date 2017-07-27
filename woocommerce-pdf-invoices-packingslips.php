@@ -174,6 +174,9 @@ class WPO_WCPDF {
 		// Backwards compatibility with self
 		include_once( $this->plugin_path() . '/includes/legacy/class-wcpdf-legacy.php' );
 		include_once( $this->plugin_path() . '/includes/legacy/class-wcpdf-legacy-deprecated-hooks.php' );
+
+		// PHP MB String fallback functions
+		include_once( $this->plugin_path() . '/includes/compatibility/mb-string-compatibility.php' );
 	}
 	
 
