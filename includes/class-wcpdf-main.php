@@ -139,7 +139,7 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_pdf_ajax() {
-        // Check the nonce
+		// Check the nonce
 		if( empty( $_GET['action'] ) || !check_admin_referer( $_GET['action'] ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
@@ -164,13 +164,13 @@ class Main {
 		// Process oldest first: reverse $order_ids array
 		$order_ids = array_reverse($order_ids);
 
-        // set default is allowed
-        $allowed = true;
+		// set default is allowed
+		$allowed = true;
 
-        // check if user is logged in
-        if ( ! is_user_logged_in() ) {
-            $allowed = false;
-        }
+		// check if user is logged in
+		if ( ! is_user_logged_in() ) {
+			$allowed = false;
+		}
 
 		// Check the user privileges
 		if( !current_user_can( 'manage_woocommerce_orders' ) && !isset( $_GET['my-account'] ) ) {
@@ -186,15 +186,15 @@ class Main {
 
 			// Check if current user is owner of order IMPORTANT!!!
 			if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
-                $allowed = false;
-            }
+				$allowed = false;
+			}
 		}
 
-        $allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
+		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
 
-        if ( ! $allowed ) {
-            wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
-        }
+		if ( ! $allowed ) {
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
 
 		// if we got here, we're safe to go!
 		try {
