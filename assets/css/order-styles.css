@@ -40,18 +40,14 @@
 	display:none;
 }
 
-#set-invoice-date-number {
-	margin:15px 0px!important;
-}
+/* Edit buttons Invoice, Proforma and Credit */
 
-#edit-invoice-date-number {
+.wpo-wcpdf-edit-date-number {
 	margin-left:20px!important;
-}
-
-#edit-invoice-date-number {
 	opacity:0.5;
 }
-#edit-invoice-date-number:hover {
+
+.wpo-wcpdf-edit-date-number:hover {
 	opacity:1;
 	cursor:pointer;
 }

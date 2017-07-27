@@ -4,7 +4,7 @@ Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 **2.0 is a BIG update! Make a full site backup before upgrading**
+
+= 2.0.4 =
+* Fix: Apply filters for custom invoice number formatting in document too
+* Fix: Parent fallback for missing dates from refunds
 
 = 2.0.3 =
 * Fix: Better support for legacy invoice number filter (`wpo_wcpdf_invoice_number` -  replaced by `wpo_wcpdf_formatted_document_number`)
@@ -580,5 +584,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.0.3 =
+= 2.0.4 =
 **2.0 is a BIG update! Make a full site backup before upgrading!**

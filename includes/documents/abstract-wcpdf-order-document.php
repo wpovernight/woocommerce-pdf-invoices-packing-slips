@@ -117,13 +117,6 @@ abstract class Order_Document {
 				$wpo_wcpdf->export->template_type = $this->type;
 			}
 		}
-
-		// self filtering
-		add_action( 'wpo_wcpdf_get_html', array($this, 'format_page_number_placeholders' ), 10, 2 );
-		add_action( 'wpo_wcpdf_after_dompdf_render', array($this, 'page_number_replacements' ), 9, 2 );
-		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
-			add_action( 'wpo_wcpdf_before_pdf', array($this, 'use_currency_font' ), 10, 2 );
-		}
 		
 	}
 
@@ -611,52 +604,6 @@ abstract class Order_Document {
 			include($file);
 		}
 		return ob_get_clean();
-	}
-
-	/**
-	 * Adds spans around placeholders to be able to make replacement (page count) and css (page number)
-	 */
-	public function format_page_number_placeholders ( $html, $document ) {
-		$html = str_replace('{{PAGE_COUNT}}', '<span class="pagecount">{{PAGE_COUNT}}</span>', $html);
-		$html = str_replace('{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
-		return $html;
-	}
-
-	/**
-	 * Replace {{PAGE_COUNT}} placeholder with total page count
-	 */
-	public function page_number_replacements ( $dompdf, $html ) {
-		$placeholder = '{{PAGE_COUNT}}';
-
-		// check if placeholder is used
-		if (strpos($html, $placeholder) !== false ) {
-			foreach ($dompdf->get_canvas()->get_cpdf()->objects as &$object) {
-				if (array_key_exists("c", $object) && strpos($object["c"], $placeholder) !== false) {
-					$object["c"] = str_replace( $placeholder , $dompdf->get_canvas()->get_page_count() , $object["c"] );
-				}
-			}
-		}
-
-		return $dompdf;
-	}
-
-	/**
-	 * Use currency symbol font (when enabled in options)
-	 */
-	public function use_currency_font ( $document_type, $document ) {
-		add_filter( 'woocommerce_currency_symbol', array( $this, 'wrap_currency_symbol' ), 10, 2);
-		add_action( 'wpo_wcpdf_custom_styles', array($this, 'currency_symbol_font_styles' ) );
-	}
-
-	public function wrap_currency_symbol( $currency_symbol, $currency ) {
-		$currency_symbol = sprintf( '<span class="wcpdf-currency-symbol">%s</span>', $currency_symbol );
-		return $currency_symbol;
-	}
-
-	public function currency_symbol_font_styles () {
-		?>
-		.wcpdf-currency-symbol { font-family: 'Currencies'; }
-		<?php
 	}
 
 	/*

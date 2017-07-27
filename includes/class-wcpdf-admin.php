@@ -164,7 +164,7 @@ class Admin {
 			$invoice_date = $invoice->get_date();
 			?>
 			<div class="wcpdf-data-fields">
-				<h4><?php _e( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ) ?><?php if ($invoice->exists()) : ?><span id="edit-invoice-date-number" class="dashicons dashicons-edit"></span><?php endif; ?></h4>
+				<h4><?php _e( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ) ?><?php if ($invoice->exists()) : ?><span id="" class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span><?php endif; ?></h4>
 
 				<!-- Read only -->
 				<div class="read-only">
@@ -173,7 +173,7 @@ class Admin {
 						<p class="form-field _wcpdf_invoice_number_field ">	
 							<p>
 								<span><strong><?php _e( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</strong></span>
-								<span><?php if (!empty($invoice_number)) echo $invoice_number->formatted_number ?></span>
+								<span><?php if (!empty($invoice_number)) echo $invoice_number->get_formatted(); ?></span>
 							</p>
 						</p>
 					</div>
@@ -196,7 +196,7 @@ class Admin {
 					<p class="form-field _wcpdf_invoice_number_field ">
 						<label for="_wcpdf_invoice_number"><?php _e( 'Invoice Number (unformatted!)', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</label>
 						<?php if ( $invoice->exists() && !empty($invoice_number) ) : ?>
-						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number->number ?>">
+						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number->get_plain(); ?>">
 						<?php else : ?>
 						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="" disabled="disabled" >
 						<?php endif; ?>

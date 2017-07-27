@@ -946,7 +946,10 @@ abstract class Order_Document_Methods extends Order_Document {
 
 		return $formatted_price;
 	}
-
+	public function wc_price( $price, $args = array() ) {
+		return $this->format_price( $price, $args );
+	}
+	
 	/**
 	 * Gets price - formatted for display.
 	 *
@@ -978,7 +981,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		if ( $invoice_number = $this->get_number('invoice') ) {
-			return $formatted_invoice_number = $invoice_number->formatted_number;
+			return $formatted_invoice_number = $invoice_number->get_formatted();
 		} else {
 			return '';
 		}
