@@ -946,7 +946,10 @@ abstract class Order_Document_Methods extends Order_Document {
 
 		return $formatted_price;
 	}
-
+	public function wc_price( $price, $args = array() ) {
+		return $this->format_price( $price, $args );
+	}
+	
 	/**
 	 * Gets price - formatted for display.
 	 *
