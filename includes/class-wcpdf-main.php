@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
 
 class Main {
-	
+
 	function __construct()	{
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3 );
@@ -67,14 +67,14 @@ class Main {
 
 		// do not process low stock notifications, user emails etc!
 		if ( in_array( $email_id, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) || get_post_type( $order_id ) != 'shop_order' ) {
-			return $attachments; 
+			return $attachments;
 		}
 
 		$tmp_path = $this->get_tmp_path('attachments');
 
 		// clear pdf files from temp folder (from http://stackoverflow.com/a/13468943/1446634)
 		// array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
-		
+
 		// disable deprecation notices during email sending
 		add_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
 
@@ -96,7 +96,7 @@ class Main {
 				file_put_contents ( $pdf_path, $pdf_data );
 				$attachments[] = $pdf_path;
 
-				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type );				
+				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type );
 			} catch (Exception $e) {
 				error_log($e->getMessage());
 				continue;
@@ -117,7 +117,7 @@ class Main {
 		}
 		$attach_documents = apply_filters('wpo_wcpdf_attach_documents', $attach_documents );
 
-		$document_types = array();		
+		$document_types = array();
 		foreach ($attach_documents as $document_type => $attach_to_email_ids ) {
 			// legacy settings: convert abbreviated email_ids
 			foreach ($attach_to_email_ids as $key => $attach_to_email_id) {
@@ -139,8 +139,8 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_pdf_ajax() {
-		// Check the nonce
-		if( empty( $_GET['action'] ) || ! is_user_logged_in() || !check_admin_referer( $_GET['action'] ) ) {
+        // Check the nonce
+		if( empty( $_GET['action'] ) || !check_admin_referer( $_GET['action'] ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
@@ -164,25 +164,38 @@ class Main {
 		// Process oldest first: reverse $order_ids array
 		$order_ids = array_reverse($order_ids);
 
+        // set default is allowed
+        $allowed = true;
+
+        // check if user is logged in
+        if ( ! is_user_logged_in() ) {
+            $allowed = false;
+        }
+
 		// Check the user privileges
-		if( apply_filters( 'wpo_wcpdf_check_privs', !current_user_can( 'manage_woocommerce_orders' ) && !current_user_can( 'edit_shop_orders' ) && !isset( $_GET['my-account'] ), $order_ids ) ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		if( !current_user_can( 'manage_woocommerce_orders' ) && !isset( $_GET['my-account'] ) ) {
+			$allowed = false;
 		}
 
 		// User call from my-account page
 		if ( !current_user_can('manage_options') && isset( $_GET['my-account'] ) ) {
 			// Only for single orders!
 			if ( count( $order_ids ) > 1 ) {
-				wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+				$allowed = false;
 			}
 
 			// Check if current user is owner of order IMPORTANT!!!
-			$order = WCX::get_order ( $order_ids[0] );
-			if ( WCX_Order::get_prop( $order, 'customer_id' ) != get_current_user_id() ) {
-				wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
-			}
+			if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+                $allowed = false;
+            }
 		}
-	
+
+        $allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
+
+        if ( ! $allowed ) {
+            wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+        }
+
 		// if we got here, we're safe to go!
 		try {
 			$document = wcpdf_get_document( $document_type, $order_ids, true );
@@ -217,11 +230,11 @@ class Main {
 	 */
 	public function get_tmp_path ( $type = '' ) {
 		$tmp_base = $this->get_tmp_base();
-		// check if tmp folder exists => if not, initialize 
+		// check if tmp folder exists => if not, initialize
 		if ( !@is_dir( $tmp_base ) ) {
 			$this->init_tmp( $tmp_base );
 		}
-		
+
 		if ( empty( $type ) ) {
 			return $tmp_base;
 		}
@@ -256,11 +269,11 @@ class Main {
 	public function get_tmp_base () {
 		// wp_upload_dir() is used to set the base temp folder, under which a
 		// 'wpo_wcpdf' folder and several subfolders are created
-		// 
+		//
 		// wp_upload_dir() will:
 		// * default to WP_CONTENT_DIR/uploads
 		// * UNLESS the ‘UPLOADS’ constant is defined in wp-config (http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder)
-		// 
+		//
 		// May also be overridden by the wpo_wcpdf_tmp_path filter
 
 		$upload_dir = wp_upload_dir();
@@ -348,7 +361,7 @@ class Main {
 		// check order total & setting
 		$order_total = $order->get_total();
 		if ( $order_total == 0 && isset( $document_settings['disable_free'] ) ) {
-			return false; 
+			return false;
 		}
 
 		return $attach;
