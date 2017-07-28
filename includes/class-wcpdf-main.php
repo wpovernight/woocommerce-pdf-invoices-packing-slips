@@ -173,7 +173,7 @@ class Main {
 		}
 
 		// Check the user privileges
-		if( !current_user_can( 'manage_woocommerce_orders' ) && !isset( $_GET['my-account'] ) ) {
+		if( !( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ) && !isset( $_GET['my-account'] ) ) {
 			$allowed = false;
 		}
 
