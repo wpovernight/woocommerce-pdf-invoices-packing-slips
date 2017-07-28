@@ -38,6 +38,45 @@ class Settings_Debug {
 			}
 			?>
 		</form>
+		<form method="post">
+			<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="clear_tmp">
+			<input type="submit" name="submit" id="submit" class="button" value="<?php _e( 'Remove temporary files', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+			<?php
+			if (isset($_POST['wpo_wcpdf_debug_tools_action']) && $_POST['wpo_wcpdf_debug_tools_action'] == 'clear_tmp') {
+				$tmp_path = WPO_WCPDF()->main->get_tmp_path('attachments');
+
+				if ( !function_exists("glob") ) {
+					// glob is disabled
+					printf('<div class="notice notice-error"><p>%s<br><code>%s</code></p></div>', __( "Unable to read temporary folder contents!", 'woocommerce-pdf-invoices-packing-slips' ), $tmp_path);
+				} else {
+					$success = 0;
+					$error = 0;
+					if ( $files = glob($tmp_path.'*.pdf') ) { // get all pdf files
+						foreach($files as $file) {
+							if(is_file($file)) {
+								// delete file
+								if ( unlink($file) === true ) {
+									$success++;
+								} else {
+									$error++;
+								}
+							}
+						}
+
+						if ($error > 0) {
+							$message =  sprintf( __( 'Unable to delete %d files! (deleted %d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success);
+							printf('<div class="notice notice-error"><p>%s</p></div>', $message);
+						} else {
+							$message =  sprintf( __( 'Successfully deleted %d files!', 'woocommerce-pdf-invoices-packing-slips' ), $success );
+							printf('<div class="notice notice-success"><p>%s</p></div>', $message);
+						}
+					} else {
+						printf('<div class="notice notice-success"><p>%s</p></div>', __( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' ) );
+					}
+				}
+			}
+			?>
+		</form>
 		<?php
 		include( WPO_WCPDF()->plugin_path() . '/includes/views/dompdf-status.php' );
 	}
