@@ -35,6 +35,7 @@ class PDF_Maker {
 		$options = new Options();
 		$options->setdefaultFont( 'dejavu sans');
 		$options->setTempDir( WPO_WCPDF()->main->get_tmp_path('dompdf') );
+        $options->setLogOutputFile( WPO_WCPDF()->main->get_tmp_path('dompdf') . "/log.htm");
 		$options->setFontDir( WPO_WCPDF()->main->get_tmp_path('fonts') );
 		$options->setFontCache( WPO_WCPDF()->main->get_tmp_path('fonts') );
 		$options->setIsRemoteEnabled( true );
