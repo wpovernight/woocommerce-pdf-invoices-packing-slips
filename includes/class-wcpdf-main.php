@@ -37,6 +37,9 @@ class Main {
 		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
 			add_action( 'wpo_wcpdf_before_pdf', array($this, 'use_currency_font' ), 10, 2 );
 		}
+
+		// scheduled attachments cleanup - disabled for now
+		// add_action( 'wp_scheduled_delete', array( $this, 'attachments_cleanup') );
 	}
 
 	/**
@@ -419,6 +422,32 @@ class Main {
 		?>
 		.wcpdf-currency-symbol { font-family: 'Currencies'; }
 		<?php
+	}
+
+	/**
+	 * Remove attachments older than 1 week (daily, hooked into wp_scheduled_delete )
+	 */
+	public function attachments_cleanup() {
+		if ( !function_exists("glob") || !function_exists('filemtime')) {
+			// glob is disabled
+			return;
+		}
+
+		$delete_timestamp = time() - ( DAY_IN_SECONDS * 7 );
+
+		$tmp_path = WPO_WCPDF()->main->get_tmp_path('attachments');
+
+		if ( $files = glob( $tmp_path.'*.pdf' ) ) { // get all pdf files
+			foreach( $files as $file ) {
+				if( is_file( $file ) ) {
+					$file_timestamp = filemtime( $file );
+					if ( !empty( $file_timestamp ) && $file_timestamp < $delete_timestamp ) {
+						@unlink($file);
+					}
+				}
+			}
+		}
+
 	}
 
 	/**
