@@ -33,6 +33,17 @@ class Settings_Debug {
 			<?php
 			if (isset($_POST['wpo_wcpdf_debug_tools_action']) && $_POST['wpo_wcpdf_debug_tools_action'] == 'install_fonts') {
 				$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
+
+				// clear folder first
+				if ( function_exists("glob") && $files = glob( $font_path.'/*.*' ) ) {
+					$exclude_files = array( 'index.php', '.htaccess' );
+					foreach($files as $file) {
+						if( is_file($file) && !in_array( basename($file), $exclude_files ) ) {
+							unlink($file);
+						}
+					}
+				}
+
 				WPO_WCPDF()->main->copy_fonts( $font_path );
 				printf('<div class="notice notice-success"><p>%s</p></div>', __( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' ) );
 			}
