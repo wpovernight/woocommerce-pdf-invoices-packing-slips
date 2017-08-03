@@ -260,7 +260,7 @@ class Install {
 
 				// merge with existing settings
 				${$new_option."_old"} = get_option( $new_option, ${$new_option} ); // second argument loads new as default in case the settings did not exist yet
-				${$new_option} = ${$new_option} + ${$new_option."_old"}; // duplicate options take new options as default
+				${$new_option} = (array) ${$new_option} + (array) ${$new_option."_old"}; // duplicate options take new options as default
 
 				// store new option values
 				update_option( $new_option, ${$new_option} );
