@@ -97,7 +97,21 @@ $sql = "CREATE TABLE {$this->table_name} (
 		$delete = $wpdb->query("TRUNCATE TABLE {$this->table_name}");
 
 		// set auto_increment
-		$wpdb->query("ALTER TABLE {$this->table_name} AUTO_INCREMENT={$number};");
+		if ( $number > 1 ) {
+			// if AUTO_INCREMENT is not 1, we need to make sure we have a 'highest value' in case of server restarts
+			// https://serverfault.com/questions/228690/mysql-auto-increment-fields-resets-by-itself
+			$highest_number = (int) $number - 1;
+			$wpdb->query("ALTER TABLE {$this->table_name} AUTO_INCREMENT={$highest_number};");
+			$data = array(
+				'order_id'	=> 0,
+				'date'		=> get_date_from_gmt( date( 'Y-m-d H:i:s' ) ),
+			);
+			// after this insert, AUTO_INCREMENT will be equal to $number
+			$wpdb->insert( $this->table_name, $data );
+		} else {
+			// simple scenario, no need to insert any rows
+			$wpdb->query("ALTER TABLE {$this->table_name} AUTO_INCREMENT={$number};");
+		}
 	}
 
 	public function get_last_date( $format = 'Y-m-d H:i:s' ) {
