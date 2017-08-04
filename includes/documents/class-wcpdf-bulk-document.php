@@ -74,7 +74,7 @@ class Bulk_Document {
 
 			$order = WCX::get_order( $order_id );
 
-			$document = wcpdf_get_document( $this->get_type(), $order, true );
+			$document = wcpdf_get_document( $this->get_type(), $order, true, false );
 			$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );
 		}
 
