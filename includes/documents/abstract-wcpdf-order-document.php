@@ -326,8 +326,11 @@ abstract class Order_Document {
 		
 		if ( empty( $value ) || ( is_array( $value ) && empty( $filtered_value ) ) ) {
 			$document_number = null;
-		} elseif ( is_array( $value ) ) {
+		} elseif ( $value instanceof Document_Number ) {
 			// WCPDF 2.0 number data
+			$document_number = $value;
+		} elseif ( is_array( $value ) ) {
+			// WCPDF 2.0 number data as array
 			$document_number = new Document_Number( $value, $this->get_number_settings(), $this, $order  );
 		} else {
 			// plain number
