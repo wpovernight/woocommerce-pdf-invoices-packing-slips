@@ -28,7 +28,7 @@ function wcpdf_filter_order_ids( $order_ids, $document_type ) {
 	return $order_ids;
 }
 
-function wcpdf_get_document( $document_type, $order, $init = false, $process_action = true ) {
+function wcpdf_get_document( $document_type, $order, $init = false ) {
 	// $order can be one of the following:
 	// - WC Order object
 	// - array of order ids
@@ -43,9 +43,7 @@ function wcpdf_get_document( $document_type, $order, $init = false, $process_act
 			$order_id_diff = array_diff( $filtered_order_ids, $order_ids );
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
 				// nothing changed, load document with Order object
-				if ($process_action === true) {
-					do_action( 'wpo_wcpdf_process_template_order', $document_type, WCX_Order::get_id( $order ) );
-				}
+				do_action( 'wpo_wcpdf_process_template_order', $document_type, WCX_Order::get_id( $order ) );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
 				if ( $init && !$document->exists() ) {
@@ -72,9 +70,7 @@ function wcpdf_get_document( $document_type, $order, $init = false, $process_act
 		// if we only have one order, it's simple
 		if ( count( $order_ids ) == 1 ) {
 			$order_id = array_pop ( $order_ids );
-			if ($process_action === true) {
-				do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
-			}
+			do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
 			$order = WCX::get_order( $order_id );
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
