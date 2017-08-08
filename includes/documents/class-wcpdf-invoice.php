@@ -49,7 +49,7 @@ class Invoice extends Order_Document_Methods {
 	public function init_number() {
 		global $wpdb;
 		// If a third-party plugin claims to generate invoice numbers, trigger this instead
-		if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) ) {
+		if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false, $this ) ) {
 			$invoice_number = apply_filters( 'woocommerce_generate_invoice_number', null, $this->order, $this );
 			if ( is_numeric($invoice_number) || $invoice_number instanceof Document_Number ) {
 				$this->set_number( $invoice_number );
