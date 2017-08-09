@@ -58,6 +58,12 @@ if (!extension_loaded('mbstring')) {
 		}
 	}
 	
+	if (!function_exists('mb_stripos')) {
+		function mb_stripos($haystack, $needle, $offset = 0) {
+			return stripos($haystack, $needle, $offset);
+		}
+	}
+	
 	if (!function_exists('mb_strrpos')) {
 		function mb_strrpos($haystack, $needle, $offset = 0) {
 			return strrpos($haystack, $needle, $offset);
