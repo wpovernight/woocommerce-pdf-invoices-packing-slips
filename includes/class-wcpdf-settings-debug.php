@@ -88,6 +88,24 @@ class Settings_Debug {
 			}
 			?>
 		</form>
+		<form method="post">
+			<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="delete_legacy_settings">
+			<input type="submit" name="submit" id="submit" class="button" value="<?php _e( 'Delete legacy (1.X) settings', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+			<?php
+			if (isset($_POST['wpo_wcpdf_debug_tools_action']) && $_POST['wpo_wcpdf_debug_tools_action'] == 'delete_legacy_settings') {
+				// delete options
+				delete_option( 'wpo_wcpdf_general_settings' );
+				delete_option( 'wpo_wcpdf_template_settings' );
+				delete_option( 'wpo_wcpdf_debug_settings' );
+				// and delete cache of these options, just in case...
+				wp_cache_delete( 'wpo_wcpdf_general_settings','options' );
+				wp_cache_delete( 'wpo_wcpdf_template_settings','options' );
+				wp_cache_delete( 'wpo_wcpdf_debug_settings','options' );
+
+				printf('<div class="notice notice-success"><p>%s</p></div>', __( 'Legacy settings deleted!', 'woocommerce-pdf-invoices-packing-slips' ) );
+			}
+			?>
+		</form>
 		<?php
 		include( WPO_WCPDF()->plugin_path() . '/includes/views/dompdf-status.php' );
 	}
