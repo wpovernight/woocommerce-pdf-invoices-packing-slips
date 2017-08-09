@@ -65,7 +65,8 @@ class Invoice extends Order_Document_Methods {
 			return $invoice_number;
 		}
 
-		$number_store = new Sequential_Number_Store( 'invoice_number' );
+		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+		$number_store = new Sequential_Number_Store( 'invoice_number', $number_store_method );
 		// reset invoice number yearly
 		if ( isset( $this->settings['reset_number_yearly'] ) ) {
 			$current_year = date("Y");

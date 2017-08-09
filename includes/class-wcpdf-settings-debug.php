@@ -135,6 +135,18 @@ class Settings_Debug {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'calculate_document_numbers',
+				'title'			=> __( 'Calculate document numbers (slow)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'calculate_document_numbers',
+					'description'	=> __( "Document numbers (such as invoice numbers) are generated using AUTO_INCREMENT by default. Use this setting if your database auto increments with more than 1.", 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'enable_debug',
 				'title'			=> __( 'Enable debug output', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',

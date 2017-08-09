@@ -33,6 +33,9 @@ class Settings {
 		$this->general_settings		= get_option('wpo_wcpdf_settings_general');
 		$this->debug_settings		= get_option('wpo_wcpdf_settings_debug');
 
+		// admin notice for auto_increment_increment
+		// add_action( 'admin_notices', array( $this, 'check_auto_increment_increment') );
+
 		// AJAX set number store
 		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array($this, 'set_number_store' ));
 	}
@@ -75,6 +78,15 @@ class Settings {
 			return array_merge( $links, $row_meta );
 		}
 		return (array) $links;
+	}
+
+	function check_auto_increment_increment() {
+		global $wpdb;
+		$row = $wpdb->get_row("SHOW VARIABLES LIKE 'auto_increment_increment'");
+		if ( !empty($row) && !empty($row->Value) && $row->Value != 1 ) {
+			$error = sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %s, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Status tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), $row->Value );
+			printf( '<div class="error"><p>%s</p></div>', $error );
+		}
 	}
 
 
@@ -209,10 +221,24 @@ class Settings {
 	public function set_number_store() {
 		check_ajax_referer( "wpo_wcpdf_next_{$_POST['store']}", 'security' );
 		$number = isset( $_POST['number'] ) ? (int) $_POST['number'] : 0;
-		$number_store = new Sequential_Number_Store( $_POST['store'] );
+		$number_store_method = $this->get_sequential_number_store_method();
+		$number_store = new Sequential_Number_Store( $_POST['store'], $number_store_method );
 		$number_store->set_next( $number );
 		echo "next number ({$_POST['store']}) set to {$number}";
 		die();
+	}
+
+	public function get_sequential_number_store_method() {
+		global $wpdb;
+		$method = isset( $this->debug_settings['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
+
+		// safety first - always use calculate when auto_increment_increment is not 1
+		$row = $wpdb->get_row("SHOW VARIABLES LIKE 'auto_increment_increment'");
+		if ( !empty($row) && !empty($row->Value) && $row->Value != 1 ) {
+			$method = 'calculate';
+		}
+
+		return $method;		
 	}
 
 }

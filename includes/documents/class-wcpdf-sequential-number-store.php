@@ -23,9 +23,16 @@ class Sequential_Number_Store {
 	 */
 	public $table_name;
 
-	public function __construct( $table_name ) {
+	/**
+	 * Number store method, either 'auto_increment' or 'calculate'
+	 * @var String
+	 */
+	public $method;
+
+	public function __construct( $table_name, $method = 'auto_increment' ) {
 		global $wpdb;
 		$this->table_name = "{$wpdb->prefix}wcpdf_{$table_name}"; // i.e. wp_wcpdf_invoice_number
+		$this->method = $method;
 
 		$this->init();
 	}
@@ -34,6 +41,13 @@ class Sequential_Number_Store {
 		global $wpdb;
 		// check if table exists
 		if( $wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") == $this->table_name) {
+			// check calculated_number column if using 'calculate' method
+			if ( $this->method == 'calculate' ) {
+				$column_exists = $wpdb->get_var("SHOW COLUMNS FROM `{$this->table_name}` LIKE 'calculated_number'");
+				if (empty($column_exists)) {
+					$wpdb->query("ALTER TABLE {$this->table_name} ADD calculated_number int (16)");
+				}
+			}
 			return; // no further business
 		}
 
@@ -44,6 +58,7 @@ $sql = "CREATE TABLE {$this->table_name} (
   id int(16) NOT NULL AUTO_INCREMENT,
   order_id int(16),
   date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+  calculated_number int (16),
   PRIMARY KEY  (id)
 ) $charset_collate;";
 
@@ -69,10 +84,17 @@ $sql = "CREATE TABLE {$this->table_name} (
 			'order_id'	=> (int) $order_id,
 			'date'		=> $date,
 		);
-		$wpdb->insert( $this->table_name, $data );
+
+		if ( $this->method == 'auto_increment' ) {
+			$wpdb->insert( $this->table_name, $data );
+			$number = $wpdb->insert_id;
+		} elseif ( $this->method == 'calculate' ) {
+			$number = $data['calculated_number'] = $this->get_next();
+			$wpdb->insert( $this->table_name, $data );
+		}
 		
 		// return generated number
-		return $wpdb->insert_id;
+		return $number;
 	}
 
 	/**
@@ -81,10 +103,21 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 */
 	public function get_next() {
 		global $wpdb;
-		$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$this->table_name}'");
-
-		// return next auto_increment value
-		return $table_status->Auto_increment;
+		if ( $this->method == 'auto_increment' ) {
+			// get next auto_increment value
+			$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$this->table_name}'");
+			$next = $table_status->Auto_increment;
+		} elseif ( $this->method == 'calculate' ) {
+			$last_row = $wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
+			if ( empty( $last_row ) ) {
+				$next = 1;
+			} elseif ( !empty( $last_row->calculated_number ) ) {
+				$next = (int) $last_row->calculated_number + 1;
+			} else {
+				$next = (int) $last_row->id + 1;
+			}
+		}
+		return $next;
 	}
 
 	/**
@@ -106,6 +139,11 @@ $sql = "CREATE TABLE {$this->table_name} (
 				'order_id'	=> 0,
 				'date'		=> get_date_from_gmt( date( 'Y-m-d H:i:s' ) ),
 			);
+			
+			if ( $this->method == 'calculate' ) {
+				$data['calculated_number'] = $highest_number;
+			}
+
 			// after this insert, AUTO_INCREMENT will be equal to $number
 			$wpdb->insert( $this->table_name, $data );
 		} else {
