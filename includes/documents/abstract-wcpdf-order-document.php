@@ -493,6 +493,7 @@ abstract class Order_Document {
 		$pdf_settings = array(
 			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type() ),
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type() ),
+			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
 		$pdf_maker = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
 		$pdf = $pdf_maker->output();

@@ -20,6 +20,7 @@ class PDF_Maker {
 		$default_settings = array(
 			'paper_size'		=> 'A4',
 			'paper_orientation'	=> 'portrait',
+			'font_subsetting'	=> false,
 		);
 		$this->settings = $settings + $default_settings;
 	}
@@ -39,6 +40,7 @@ class PDF_Maker {
 		$options->setFontDir( WPO_WCPDF()->main->get_tmp_path('fonts') );
 		$options->setFontCache( WPO_WCPDF()->main->get_tmp_path('fonts') );
 		$options->setIsRemoteEnabled( true );
+		$options->setIsFontSubsettingEnabled( $this->settings['font_subsetting'] );
 
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );

@@ -94,6 +94,18 @@ class Settings_General {
 			),
 			array(
 				'type'		=> 'setting',
+				'id'		=> 'font_subsetting',
+				'title'		=> __( 'Enable font subsetting', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'checkbox',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'font_subsetting',
+					'description'		=> __( "Font subsetting can reduce file size by only including the characters that are used in the PDF, but limits the ability to edit PDF files later. Recommended if you're using an Asian font." , 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
 				'id'		=> 'header_logo',
 				'title'		=> __( 'Shop header/logo', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'	=> 'media_upload',
