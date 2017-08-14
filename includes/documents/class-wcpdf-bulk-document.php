@@ -83,7 +83,7 @@ class Bulk_Document {
 		$this->wrapper_document = wcpdf_get_document( $this->get_type(), null );
 
 		// insert page breaks and wrap bulk document
-		$page_break = "\n<div style=\"page-break-before: always;\"></div>\n";
+		$page_break = apply_filters( 'wpo_wcpdf_page_break', "\n<div style=\"page-break-before: always;\"></div>\n" );
 		$html = $this->wrapper_document->wrap_html_content( implode( $page_break, $html_content ) );
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 		
