@@ -79,15 +79,20 @@ class Bulk_Document {
 			$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );
 		}
 
-		// get wrapper document
+		// get wrapper document & insert body content
 		$this->wrapper_document = wcpdf_get_document( $this->get_type(), null );
-
-		// insert page breaks and wrap bulk document
-		$page_break = "\n<div style=\"page-break-before: always;\"></div>\n";
-		$html = $this->wrapper_document->wrap_html_content( implode( $page_break, $html_content ) );
+		$html = $this->wrapper_document->wrap_html_content( $this->merge_documents( $html_content ) );
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 		
 		return $html;
+	}
+
+
+	public function merge_documents( $html_content ) {
+		// insert page breaks merge
+		$page_break = "\n<div style=\"page-break-before: always;\"></div>\n";
+		$html = implode( $page_break, $html_content );
+		return apply_filters( 'wpo_wcpdf_merged_bulk_document_content', $html, $html_content, $this );
 	}
 
 	public function output_pdf( $output_mode = 'download' ) {
