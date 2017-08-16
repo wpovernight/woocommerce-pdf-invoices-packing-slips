@@ -130,12 +130,12 @@ class Document_Number {
 		);
 
 		// load replacement values
-		$order_year       = $order_date->date_i18n( 'Y' );
-		$order_month      = $order_date->date_i18n( 'm' );
-		$order_day        = $order_date->date_i18n( 'd' );
-		$document_year    = $document_date->date_i18n( 'Y' );
-		$document_month	  = $document_date->date_i18n( 'm' );
-		$document_day     = $document_date->date_i18n( 'd' );
+		$order_year		= $order_date->date_i18n( 'Y' );
+		$order_month	= $order_date->date_i18n( 'm' );
+		$order_day		= $order_date->date_i18n( 'd' );
+		$document_year	= $document_date->date_i18n( 'Y' );
+		$document_month	= $document_date->date_i18n( 'm' );
+		$document_day	= $document_date->date_i18n( 'd' );
 		$document_year_short = $document_date->date_i18n( 'y' );
 
 		// make replacements
