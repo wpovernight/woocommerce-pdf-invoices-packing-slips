@@ -223,33 +223,33 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/show product attribute
 	 */
 	public function get_product_attribute( $attribute_name, $product ) {
-		// WC3.0+ use parent product for variations
-		if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) && $product->is_type( 'variation' ) ) {
-			$product = wc_get_product( $product->get_parent_id() );
-		}
 		// first, check the text attributes
 		$attributes = $product->get_attributes();
 		$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
 		if (array_key_exists( sanitize_title( $attribute_name ), $attributes) ) {
 			$attribute = $product->get_attribute ( $attribute_name );
-			return $attribute;
 		} elseif (array_key_exists( sanitize_title( $attribute_key ), $attributes) ) {
 			$attribute = $product->get_attribute ( $attribute_key );
-			return $attribute;
 		}
 
-		// not a text attribute, try attribute taxonomy
-		$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
-		$product_id = WCX_Product::get_prop($product, 'id');
-		$product_terms = @wc_get_product_terms( $product_id, $attribute_key, array( 'fields' => 'names' ) );
-		// check if not empty, then display
-		if ( !empty($product_terms) ) {
-			$attribute = array_shift( $product_terms );
-			return $attribute;
-		} else {
-			// no attribute under this name
-			return false;
+		if (empty($attribute)) {
+			// not a text attribute, try attribute taxonomy
+			$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
+			$product_id = WCX_Product::get_prop($product, 'id');
+			$product_terms = @wc_get_product_terms( $product_id, $attribute_key, array( 'fields' => 'names' ) );
+			// check if not empty, then display
+			if ( !empty($product_terms) ) {
+				$attribute = array_shift( $product_terms );
+			}
 		}
+
+		// WC3.0+ fallback parent product for variations
+		if ( empty($attribute) &&  version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) && $product->is_type( 'variation' ) ) {
+			$product = wc_get_product( $product->get_parent_id() );
+			$attribute = $this->get_product_attribute( $attribute_name, $product );
+		}
+
+		return isset($attribute) ? $attribute : false;
 	}
 	public function product_attribute( $attribute_name, $product ) {
 		echo $this->get_product_attribute( $attribute_name, $product );
