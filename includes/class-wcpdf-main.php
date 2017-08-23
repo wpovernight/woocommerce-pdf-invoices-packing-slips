@@ -374,7 +374,7 @@ class Main {
 	 * Adds spans around placeholders to be able to make replacement (page count) and css (page number)
 	 */
 	public function format_page_number_placeholders ( $html, $document ) {
-		$html = str_replace('{{PAGE_COUNT}}', '<span class="pagecount">{{PAGE_COUNT}}</span>', $html);
+		$html = str_replace('{{PAGE_COUNT}}', '<span class="pagecount">^C^</span>', $html);
 		$html = str_replace('{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
 		return $html;
 	}
@@ -383,7 +383,7 @@ class Main {
 	 * Replace {{PAGE_COUNT}} placeholder with total page count
 	 */
 	public function page_number_replacements ( $dompdf, $html ) {
-		$placeholder = '{{PAGE_COUNT}}';
+		$placeholder = '^C^';
 		// create placeholder version with ASCII 0 spaces (dompdf 0.8)
 		$placeholder_0 = '';
 		$placeholder_chars = str_split($placeholder);
