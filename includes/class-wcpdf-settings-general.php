@@ -240,14 +240,19 @@ class Settings_General {
 
 		$template_paths = apply_filters( 'wpo_wcpdf_template_paths', $template_paths );
 
+		if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+			$forwardslash_basepath = str_replace('\\','/', ABSPATH);
+		} else {
+			$forwardslash_basepath = str_replace('\\','/', WP_CONTENT_DIR);
+		}
+
 		foreach ($template_paths as $template_source => $template_path) {
 			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR);
 			
 			foreach ($dirs as $dir) {
 				// we're stripping abspath to make the plugin settings more portable
-				$forwardslash_abspath = str_replace('\\','/', ABSPATH);
 				$forwardslash_dir = str_replace('\\','/', $dir);
-				$installed_templates[ str_replace( $forwardslash_abspath, '', $forwardslash_dir ) ] = basename($dir);
+				$installed_templates[ str_replace( $forwardslash_basepath, '', $forwardslash_dir ) ] = basename($dir);
 			}
 		}
 

@@ -209,11 +209,17 @@ class Settings {
 		// forward slash for consistency
 		$template_path = str_replace('\\','/', $template_path);
 
-		// add abspath, checking if it's not already there
-		$abspath = str_replace('\\','/', ABSPATH);
-		if ( strpos( $template_path, $abspath ) === false ) {
-			// add site base path
-			$template_path = $abspath . $template_path;
+		// add base path, checking if it's not already there
+		// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
+		if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+			$forwardslash_basepath = str_replace('\\','/', ABSPATH);
+		} else {
+			// bedrock e.a
+			$forwardslash_basepath = str_replace('\\','/', WP_CONTENT_DIR);
+		}
+
+		if ( strpos( $template_path, $forwardslash_basepath ) === false ) {
+			$template_path = $forwardslash_basepath . $template_path;
 		}
 
 		return $template_path;
