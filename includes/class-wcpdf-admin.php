@@ -23,6 +23,48 @@ class Admin {
 
 		add_action( 'save_post', array( $this,'save_invoice_number_date' ) );
 
+		add_action( 'admin_notices', array( $this, 'review_plugin_notice' ) );
+		add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
+	}
+
+	// display review admin notice after 100 pdf downloads
+	public function review_plugin_notice() {
+		
+		if ( get_option( 'wpo_wcpdf_review_notice_dismissed' ) !== false ) {
+			return;
+		} else {
+			$pdf_count = get_option( 'wpo_wcpdf_pdf_counter' );
+			isset( $_GET['wpo_wcpdf_dismissed'] ) ? $dismiss_notice = $_GET['wpo_wcpdf_dismissed'] : $dismiss_notice = false;
+
+			if ( $dismiss_notice == true ) {
+				update_option( 'wpo_wcpdf_review_notice_dismissed', true );
+				return;
+			}
+
+			if ( $pdf_count > 100 && $dismiss_notice === false ) { ?>
+
+				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
+					<h3>Wow, you sent more than 100 invoices with our plugin!</h3>
+					<p>It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation! </p><button class="test">test</button>
+					<ul>
+						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post">Yes you deserve it!</a></li>
+						<li><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismissed', true ) ); ?>" class="wpo-wcpdf-dismiss">Nope, already did it.</a></li>
+						<li><a href="mailto:support@wpovernight.com?Subject=Here%20is%20how%20I%20think%20you%20can%20do%20better">Actually, I have a complaint...</a></li>
+					</ul>
+				</div>
+			<?php
+			}
+		}
+	}
+
+	public function update_pdf_counter( $document_type, $document ) { 
+		if ( get_option( 'wpo_wcpdf_pdf_counter' ) !== false ) {
+			$current_count = get_option( 'wpo_wcpdf_pdf_counter' );
+			$updated_count = $current_count + 1;
+    		update_option( 'wpo_wcpdf_pdf_counter', $updated_count );
+		} else {
+		    add_option( 'wpo_wcpdf_pdf_counter', 1, '', 'yes' );
+		}
 	}
 
 	/**
