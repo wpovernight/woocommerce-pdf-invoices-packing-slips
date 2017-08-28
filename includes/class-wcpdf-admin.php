@@ -33,7 +33,7 @@ class Admin {
 		if ( get_option( 'wpo_wcpdf_review_notice_dismissed' ) !== false ) {
 			return;
 		} else {
-			$pdf_count = get_option( 'wpo_wcpdf_pdf_counter' );
+			$invoice_count = get_option( 'wpo_wcpdf_count_invoice', 0 );
 			isset( $_GET['wpo_wcpdf_dismissed'] ) ? $dismiss_notice = $_GET['wpo_wcpdf_dismissed'] : $dismiss_notice = false;
 
 			if ( $dismiss_notice == true ) {
@@ -41,15 +41,14 @@ class Admin {
 				return;
 			}
 
-			if ( $pdf_count > 100 && $dismiss_notice === false ) { ?>
-
+			if ( $invoice_count > 100 ) { ?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
-					<h3>Wow, you sent more than 100 invoices with our plugin!</h3>
-					<p>It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation! </p><button class="test">test</button>
+					<h3><?php _e( 'Wow, you have created more than 100 invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+					<p><?php _e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', '$domain' ); ?></p>
 					<ul>
-						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post">Yes you deserve it!</a></li>
-						<li><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismissed', true ) ); ?>" class="wpo-wcpdf-dismiss">Nope, already did it.</a></li>
-						<li><a href="mailto:support@wpovernight.com?Subject=Here%20is%20how%20I%20think%20you%20can%20do%20better">Actually, I have a complaint...</a></li>
+						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post"><?php _e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
+						<li><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismissed', true ) ); ?>" class="wpo-wcpdf-dismiss"><?php _e( 'Nope, already did it.', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
+						<li><a href="mailto:support@wpovernight.com?Subject=Here%20is%20how%20I%20think%20you%20can%20do%20better"><?php _e( 'Actually, I have a complaint...', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
 					</ul>
 				</div>
 			<?php
@@ -57,13 +56,10 @@ class Admin {
 		}
 	}
 
-	public function update_pdf_counter( $document_type, $document ) { 
-		if ( get_option( 'wpo_wcpdf_pdf_counter' ) !== false ) {
-			$current_count = get_option( 'wpo_wcpdf_pdf_counter' );
-			$updated_count = $current_count + 1;
-    		update_option( 'wpo_wcpdf_pdf_counter', $updated_count );
-		} else {
-		    add_option( 'wpo_wcpdf_pdf_counter', 1, '', 'yes' );
+	public function update_pdf_counter( $document_type, $document ) {
+		if ( in_array( $document_type, array('invoice','packing-slip') ) ) {
+			$pdf_count = (int) get_option( 'wpo_wcpdf_count_'.$document_type, 0 );
+			update_option( 'wpo_wcpdf_count_'.$document_type, $pdf_count + 1 );
 		}
 	}
 
