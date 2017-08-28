@@ -28,4 +28,8 @@ jQuery( function( $ ) {
 			}
 		});
 	});
+	$( '.wpo-wcpdf-review-notice' ).on( 'click', '.notice-dismiss', function( event ) {
+		event.preventDefault();
+  		window.location.href = $( '.wpo-wcpdf-dismiss' ).attr('href');
+	});
 });
