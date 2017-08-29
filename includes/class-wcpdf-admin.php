@@ -24,7 +24,7 @@ class Admin {
 		add_action( 'save_post', array( $this,'save_invoice_number_date' ) );
 
 		add_action( 'admin_notices', array( $this, 'review_plugin_notice' ) );
-		add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
+		// add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -33,27 +33,34 @@ class Admin {
 		if ( get_option( 'wpo_wcpdf_review_notice_dismissed' ) !== false ) {
 			return;
 		} else {
-			$invoice_count = get_option( 'wpo_wcpdf_count_invoice', 0 );
-			isset( $_GET['wpo_wcpdf_dismissed'] ) ? $dismiss_notice = $_GET['wpo_wcpdf_dismissed'] : $dismiss_notice = false;
-
-			if ( $dismiss_notice == true ) {
+			if ( isset( $_GET['wpo_wcpdf_dismis_review'] ) ) {
 				update_option( 'wpo_wcpdf_review_notice_dismissed', true );
 				return;
 			}
 
-			if ( $invoice_count > 100 ) { ?>
+			$invoice_count = $this->get_invoice_count();
+			if ( $invoice_count > 3 ) {
+				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
 					<h3><?php _e( 'Wow, you have created more than 100 invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-					<p><?php _e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', '$domain' ); ?></p>
+					<p><?php _e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
-						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post"><?php _e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
-						<li><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismissed', true ) ); ?>" class="wpo-wcpdf-dismiss"><?php _e( 'Nope, already did it.', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
+						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post" class="button"><?php _e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></a></li>
+						<li><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismis_review', true ) ); ?>" class="wpo-wcpdf-dismiss"><?php _e( 'Already did!', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
 						<li><a href="mailto:support@wpovernight.com?Subject=Here%20is%20how%20I%20think%20you%20can%20do%20better"><?php _e( 'Actually, I have a complaint...', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
 					</ul>
 				</div>
-			<?php
+				<!-- Hide extensions ad if this is shown -->
+				<style>.wcpdf-extensions-ad { display: none; }</style>
+				<?php
 			}
 		}
+	}
+
+	public function get_invoice_count() {
+		global $wpdb;
+		$invoice_count = $wpdb->get_var("SELECT count(*)  FROM `wp_postmeta` WHERE `meta_key` = '_wcpdf_invoice_number'");
+		return (int) $invoice_count;
 	}
 
 	public function update_pdf_counter( $document_type, $document ) {
