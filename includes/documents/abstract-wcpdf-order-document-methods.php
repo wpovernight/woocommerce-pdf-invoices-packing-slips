@@ -496,7 +496,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 			$line_taxes = $line_tax_data['subtotal'];
 			foreach ( $line_taxes as $tax_id => $tax ) {
-				if ( !empty($tax) ) {
+				if ( isset($tax) && $tax !== '' ) {
 					$tax_rates[] = $this->get_tax_rate_by_id( $tax_id ) . ' %';
 				}
 			}
