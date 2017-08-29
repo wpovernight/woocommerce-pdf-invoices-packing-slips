@@ -145,6 +145,23 @@ class Document_Number {
 			$value = str_replace("[{$document->slug}_year]", $document_year, $value);
 			$value = str_replace("[{$document->slug}_month]", $document_month, $value);
 			$value = str_replace("[{$document->slug}_day]", $document_day, $value);
+
+			// replace date tag in the form [invoice_date="{$date_format}"] or [order_date="{$date_format}"]
+			$date_types = array( 'order', $document->slug );
+			foreach ($date_types as $date_type) {
+				if ( strpos($value, "[{$date_type}_date=") !== false ) {
+					preg_match_all("/\[{$date_type}_date=\"(.*?)\"\]/", $value, $document_date_tags);
+					if (!empty($document_date_tags[1])) {
+						foreach ($document_date_tags[1] as $match_id => $date_format) {
+							if ($date_type == 'order') {
+								$value = str_replace($document_date_tags[0][$match_id], $order_date->date_i18n( $date_format ), $value);
+							} else {
+								$value = str_replace($document_date_tags[0][$match_id], $document_date->date_i18n( $date_format ), $value);
+							}
+						}
+					}
+				}
+			}
 			$formats[$key] = $value;
 		}
 
