@@ -29,6 +29,9 @@ class Admin {
 
 	// display review admin notice after 100 pdf downloads
 	public function review_plugin_notice() {
+		if ( $this->is_order_page() === false && !( isset( $_GET['page'] ) && $_GET['page'] == 'wpo_wcpdf_options_page' ) ) {
+			return;
+		}
 		
 		if ( get_option( 'wpo_wcpdf_review_notice_dismissed' ) !== false ) {
 			return;
@@ -39,7 +42,7 @@ class Admin {
 			}
 
 			$invoice_count = $this->get_invoice_count();
-			if ( $invoice_count > 3 ) {
+			if ( $invoice_count > 100 ) {
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
 					<h3><?php _e( 'Wow, you have created more than 100 invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
