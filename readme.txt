@@ -4,7 +4,7 @@ Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 2.0.7
+Stable tag: 2.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 **2.0 is a BIG update! Make a full site backup before upgrading**
+
+= 2.0.8 =
+* Feature: Add support for Bedrock / alternative folder structures
+* Dev: Filter for merged documents
+* Fix: Better attributes fallback for product variations 
 
 = 2.0.7 =
 * Feature: Added button to delete legacy settings
@@ -605,5 +610,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.0.7 =
+= 2.0.8 =
 **2.0 is a BIG update! Make a full site backup before upgrading!**
