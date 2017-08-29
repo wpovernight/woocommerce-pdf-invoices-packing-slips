@@ -136,6 +136,7 @@ class Document_Number {
 		$document_year	= $document_date->date_i18n( 'Y' );
 		$document_month	= $document_date->date_i18n( 'm' );
 		$document_day	= $document_date->date_i18n( 'd' );
+		$document_year_short = $document_date->date_i18n( 'y' );
 
 		// make replacements
 		foreach ($formats as $key => $value) {
@@ -143,6 +144,7 @@ class Document_Number {
 			$value = str_replace('[order_month]', $order_month, $value);
 			$value = str_replace('[order_day]', $order_day, $value);
 			$value = str_replace("[{$document->slug}_year]", $document_year, $value);
+			$value = str_replace("[{$document->slug}_year_short]", $document_year_short, $value);
 			$value = str_replace("[{$document->slug}_month]", $document_month, $value);
 			$value = str_replace("[{$document->slug}_day]", $document_day, $value);
 			$formats[$key] = $value;
