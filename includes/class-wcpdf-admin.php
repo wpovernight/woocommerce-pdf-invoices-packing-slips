@@ -62,7 +62,7 @@ class Admin {
 
 	public function get_invoice_count() {
 		global $wpdb;
-		$invoice_count = $wpdb->get_var("SELECT count(*)  FROM `wp_postmeta` WHERE `meta_key` = '_wcpdf_invoice_number'");
+		$invoice_count = $wpdb->get_var( $wpdb->prepare( "SELECT count(*)  FROM {$wpdb->postmeta} WHERE meta_key = %s", '_wcpdf_invoice_number' ) );
 		return (int) $invoice_count;
 	}
 
