@@ -43,10 +43,10 @@ class Admin {
 
 			$invoice_count = $this->get_invoice_count();
 			if ( $invoice_count > 100 ) {
-				$rounded_count = substr($invoice_count, 0, 1) * pow(10,strlen($invoice_count)-1);
+				$rounded_count = (int) substr( (string) $invoice_count, 0, 1 ) * pow( 10, strlen( (string) $invoice_count ) - 1);
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
-					<h3><?php printf( __( 'Wow, you have created more than %s invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
+					<h3><?php printf( __( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
 					<p><?php _e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
 						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post" class="button"><?php _e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></a></li>
