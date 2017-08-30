@@ -236,7 +236,7 @@ class Admin {
 						</p>
 					</div>
 					<?php else : ?>
-					<span id="set-invoice-date-number" class="button"><?php _e( 'Set invoice number & date', 'woocommerce-pdf-invoices-packing-slips' ) ?></span>
+					<span class="wpo-wcpdf-set-date-number button"><?php _e( 'Set invoice number & date', 'woocommerce-pdf-invoices-packing-slips' ) ?></span>
 					<?php endif; ?>
 				</div>
 
