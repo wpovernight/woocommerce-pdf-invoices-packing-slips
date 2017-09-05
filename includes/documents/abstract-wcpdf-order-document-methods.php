@@ -614,13 +614,21 @@ abstract class Order_Document_Methods extends Order_Document {
 		
 		// Extract the url from img
 		preg_match('/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
-		// remove http/https from image tag url to avoid mixed origin conflicts
 		$thumbnail_url = array_pop($thumbnail_url);
-		$contextless_thumbnail_url = str_replace(array('http://','https://'), '', $thumbnail_url );
-		$contextless_site_url = str_replace(array('http://','https://'), '', trailingslashit(get_site_url()));
+		// remove http/https from image tag url to avoid mixed origin conflicts
+		$contextless_thumbnail_url = ltrim( str_replace(array('http://','https://'), '', $thumbnail_url ), '/' );
 
 		// convert url to path
-		$thumbnail_path = str_replace( $contextless_site_url, ABSPATH, $contextless_thumbnail_url);
+		if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+			$forwardslash_basepath = str_replace('\\','/', ABSPATH);
+			$contextless_site_url = str_replace(array('http://','https://'), '', trailingslashit(get_site_url()));
+		} else {
+			// bedrock e.a
+			$forwardslash_basepath = str_replace('\\','/', WP_CONTENT_DIR);
+			$contextless_site_url = str_replace(array('http://','https://'), '', trailingslashit(WP_CONTENT_URL));
+		}
+		$thumbnail_path = str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url);
+		
 		// fallback if thumbnail file doesn't exist
 		if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
 			if ($thumbnail_id = $this->get_thumbnail_id( $product ) ) {
