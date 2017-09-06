@@ -33,15 +33,15 @@ class PDF_Maker {
 		require WPO_WCPDF()->plugin_path() . '/vendor/autoload.php';
 
 		// set options
-		$options = new Options();
-		$options->setdefaultFont( 'dejavu sans');
-		$options->setTempDir( WPO_WCPDF()->main->get_tmp_path('dompdf') );
-		$options->setLogOutputFile( WPO_WCPDF()->main->get_tmp_path('dompdf') . "/log.htm");
-		$options->setFontDir( WPO_WCPDF()->main->get_tmp_path('fonts') );
-		$options->setFontCache( WPO_WCPDF()->main->get_tmp_path('fonts') );
-		$options->setIsRemoteEnabled( true );
-		$options->setIsFontSubsettingEnabled( $this->settings['font_subsetting'] );
-		// $options->setIsHtml5ParserEnabled( true );
+		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
+			'defaultFont'				=> 'dejavu sans',
+			'tempDir'					=> WPO_WCPDF()->main->get_tmp_path('dompdf'),
+			'logOutputFile'				=> WPO_WCPDF()->main->get_tmp_path('dompdf') . "/log.htm",
+			'fontDir'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
+			'fontCache'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
+			'isRemoteEnabled'			=> true,
+			'isFontSubsettingEnabled'	=> $this->settings['font_subsetting'],
+		) ) );
 
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );
