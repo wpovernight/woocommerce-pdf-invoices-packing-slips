@@ -669,7 +669,8 @@ abstract class Order_Document_Methods extends Order_Document {
 		// WC2.4 fix order_total for refunded orders
 		// not if this is the actual refund!
 		if ( ! $this->is_refund( $this->order ) ) {
-			if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '>=' ) && isset($totals['order_total']) ) {
+			$total_refunded = method_exists($this->order, 'get_total_refunded') ? $this->order->get_total_refunded() : 0;
+			if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '>=' ) && isset($totals['order_total']) && $total_refunded ) {
 				if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) ) {
 					$tax_display = get_option( 'woocommerce_tax_display_cart' );
 				} else {
