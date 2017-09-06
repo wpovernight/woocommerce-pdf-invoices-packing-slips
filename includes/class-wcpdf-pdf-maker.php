@@ -41,6 +41,7 @@ class PDF_Maker {
 		$options->setFontCache( WPO_WCPDF()->main->get_tmp_path('fonts') );
 		$options->setIsRemoteEnabled( true );
 		$options->setIsFontSubsettingEnabled( $this->settings['font_subsetting'] );
+		// $options->setIsHtml5ParserEnabled( true );
 
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );
