@@ -93,10 +93,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Screenshots ==
 
-1. General settings page
-2. Template settings page
-3. Simple invoice PDF
-4. Simple packing slip PDF
+1. Simple invoice PDF
+2. Simple packing slip PDF
+3. Quickly print individual invoices or packing slips from the order list
+4. Print invoices or packing slips in bulk
+5. Attach invoices to any WooCommerce email
+6. Set shop name, address, header logo, etc.
 
 == Changelog ==
 
