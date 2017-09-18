@@ -12,6 +12,7 @@ class Settings_General {
 	function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
 	}
 
 	public function output( $section ) {
@@ -219,6 +220,29 @@ class Settings_General {
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
+	}
+
+	public function attachment_settings_hint( $active_tab, $active_section ) {
+		// save or check option to hide attachments settings hint
+		if ( isset( $_GET['wpo_wcpdf_hide_attachments_hint'] ) ) {
+			update_option( 'wpo_wcpdf_hide_attachments_hint', true );
+			$hide_hint = true;
+		} else {
+			$hide_hint = get_option( 'wpo_wcpdf_hide_attachments_hint' );
+		}
+
+		if ( $active_tab == 'general' && !$hide_hint ) {
+			$documents = WPO_WCPDF()->documents->get_documents();
+
+			foreach ($documents as $document) {
+				if ( $document->get_type() == 'invoice' ) {
+					$invoice_email_ids = $document->get_attach_to_email_ids();
+					if (empty($invoice_email_ids)) {
+						include_once( WPO_WCPDF()->plugin_path() . '/includes/views/attachment-settings-hint.php' );
+					}
+				}
+			}
+		}
 	}
 
 	/**
