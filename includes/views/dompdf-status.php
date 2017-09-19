@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $memory_limit = function_exists('wc_let_to_num')?wc_let_to_num( WP_MEMORY_LIMIT ):woocommerce_let_to_num( WP_MEMORY_LIMIT );
+$php_mem_limit = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
 
 $server_configs = array(
 	"DOMDocument extension" => array(
@@ -55,7 +56,7 @@ $server_configs = array(
 	),
 	"WP Memory Limit" => array(
 		"required" => 'Recommended: 128MB (more for plugin-heavy setups)<br/>See: <a href="http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP">Increasing memory allocated to PHP</a>',
-		"value"    => WP_MEMORY_LIMIT,
+		"value"    => sprintf("WordPress: %s, PHP: %s", WP_MEMORY_LIMIT, $php_mem_limit ),
 		"result"   => $memory_limit > 67108864,
 	),
 	'allow_url_fopen'	=> array (
