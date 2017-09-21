@@ -359,8 +359,7 @@ class Main {
 		}
 
 		// first try the easy way with glob!
-		// if ( function_exists('glob') ) {
-		if ( false ) {
+		if ( function_exists('glob') ) {
 			$files = glob($dompdf_font_dir."*.*");
 			foreach($files as $file){
 				$filename = basename($file);
@@ -374,9 +373,6 @@ class Main {
 			$extensions = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
 			$fontDir = untrailingslashit($dompdf_font_dir);
 			$plugin_fonts = @require $dompdf_font_dir . $font_cache_files['cache'];
-			// printf("<pre>%s</pre>", var_export($font_cache_files['cache'],true));
-			// printf("<pre>%s</pre>", var_export($dompdf_font_dir . $font_cache_files['cache'],true));
-			// printf("<pre>%s</pre>", var_export($plugin_fonts,true));die();
 
 			foreach ($plugin_fonts as $font_family => $filenames) {
 				foreach ($filenames as $filename) {
