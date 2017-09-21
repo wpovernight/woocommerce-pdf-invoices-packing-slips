@@ -145,7 +145,10 @@ class Install {
 			WPO_WCPDF()->main->init_tmp( $tmp_base );
 		} else {
 			$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
-			WPO_WCPDF()->main->copy_fonts( $font_path );
+			// don't try merging fonts with local when updating pre 2.0
+			$pre_2 = ( $installed_version == 'versionless' || version_compare( $installed_version, '2.0-dev', '<' ) );
+			$merge_with_local = $pre_2 ? false : true;
+			WPO_WCPDF()->main->copy_fonts( $font_path, $merge_with_local );
 		}
 		
 		// 1.5.28 update: copy next invoice number to separate setting
