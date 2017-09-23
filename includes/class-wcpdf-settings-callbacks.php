@@ -168,7 +168,6 @@ class Settings_Callbacks {
 			jQuery(document).ready(function($) {
 				function check_<?php echo $id; ?>_custom() {
 					var custom = $('#<?php echo $id; ?>').val();
-					console.log(custom);
 					if (custom == 'custom') {
 						$( '.<?php echo $id; ?>_custom').show();
 					} else {
