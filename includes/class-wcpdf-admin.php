@@ -41,6 +41,20 @@ class Admin {
 				return;
 			}
 
+			// keep track of how many days this notice is show so we can remove it after 7 days
+			$notice_shown_on = get_option( 'wpo_wcpdf_review_notice_shown', array() );
+			$today = date('Y-m-d');
+			if ( !in_array($today, $notice_shown_on) ) {
+				$notice_shown_on[] = $today;
+				update_option( 'wpo_wcpdf_review_notice_shown', $notice_shown_on );
+			}
+			// count number of days review is shown, dismiss forever if shown more than 7
+			if (count($notice_shown_on) > 7) {
+				update_option( 'wpo_wcpdf_review_notice_dismissed', true );
+				return;
+			}
+
+			// get invoice count to determine whether notice should be shown
 			$invoice_count = $this->get_invoice_count();
 			if ( $invoice_count > 100 ) {
 				$rounded_count = (int) substr( (string) $invoice_count, 0, 1 ) * pow( 10, strlen( (string) $invoice_count ) - 1);
