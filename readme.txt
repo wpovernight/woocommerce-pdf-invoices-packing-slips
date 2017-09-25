@@ -106,7 +106,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 2.0.11 =
 * Fix: Improved fonts update routine (now preserves custom fonts)
-* Fix: Enable HTML parser by default (fixes issues with libxml)
+* Fix: Enable HTML5 parser by default (fixes issues with libxml)
 * Tweak: Show both PHP & WP Memory limit in Status tab
 
 = 2.0.10 =
