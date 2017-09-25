@@ -44,6 +44,10 @@ class PDF_Maker {
 			'isHtml5ParserEnabled'		=> true,
 		) ) );
 
+        if (!extension_loaded('iconv')) {
+			$options['isHtml5ParserEnabled'] = false;
+		}
+
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );
 		$dompdf->loadHtml( $this->html );
