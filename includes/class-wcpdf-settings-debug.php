@@ -170,6 +170,17 @@ class Settings_Debug {
 					'description'	=> __( 'Send the template output as HTML to the browser instead of creating a PDF.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'use_domdocument_parser',
+				'title'			=> __( 'Use DOMDocument to parse HTML', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'use_domdocument_parser',
+				)
+			),
 		);
 
 		// allow plugins to alter settings fields
