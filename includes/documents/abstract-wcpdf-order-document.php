@@ -348,7 +348,7 @@ abstract class Order_Document {
 
 	public function get_number_settings() {
 		$number_settings = isset($this->settings['number_format'])?$this->settings['number_format']:array();
-		return $number_settings;
+		return apply_filters( 'wpo_wcpdf_document_number_settings', $number_settings, $this );
 	}
 
 	/**
