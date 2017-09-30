@@ -163,7 +163,7 @@ class Main {
 		// Generate the output
 		$document_type = sanitize_text_field( $_GET['document_type'] );
 
-]		$order_ids = (array) array_map( 'absint', explode( 'x', $_GET['order_ids'] ) );
+		$order_ids = (array) array_map( 'absint', explode( 'x', $_GET['order_ids'] ) );
 		// Process oldest first: reverse $order_ids array
 		$order_ids = array_reverse( $order_ids );
 
