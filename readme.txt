@@ -4,7 +4,7 @@ Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 2.0.12
+Stable tag: 2.0.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 **2.0 is a BIG update! Make a full site backup before upgrading**
 
+= 2.0.13 =
+* Fix: Minor XSS issue on settings screens by escaping and sanitizing 'tab' & 'section' GET variables. 
+* Fix: Pakistani Rupee Symbol
+* Feature: Automatically enable extended currency symbol support for currencies not supported by Open Sans
+* Dev: added `wpo_wcpdf_document_number_settings` filter
+
 = 2.0.12 =
 * Option: Use different HTML parser (debug settings)
 
@@ -192,5 +198,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.0.12 =
+= 2.0.13 =
 **2.0 is a BIG update! Make a full site backup before upgrading!**
