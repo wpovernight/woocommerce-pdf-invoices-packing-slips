@@ -105,7 +105,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 **2.0 is a BIG update! Make a full site backup before upgrading**
 
 = 2.0.13 =
-* Fix: Minor XSS issue on settings screens by escaping and sanitizing 'tab' & 'section' GET variables. 
+* Fix: Minor XSS issue on settings screens by escaping and sanitizing 'tab' & 'section' GET variables. Discovered by Detectify.
 * Fix: Pakistani Rupee Symbol
 * Feature: Automatically enable extended currency symbol support for currencies not supported by Open Sans
 * Dev: added `wpo_wcpdf_document_number_settings` filter
