@@ -187,6 +187,10 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */		
 	public function get_custom_field( $field_name ) {
 		$custom_field = WCX_Order::get_meta( $this->order, $field_name, true );
+		// if not found, try prefixed with underscore
+		if ( !$custom_field && substr( $field_name, 0, 1 ) !== '_' ) {
+			$custom_field = WCX_Order::get_meta( $this->order, "_{$field_name}", true );
+		}
 
 		// WC3.0 fallback to properties
 		$property = str_replace('-', '_', sanitize_title( ltrim($field_name, '_') ) );
