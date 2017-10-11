@@ -4,6 +4,7 @@ Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 4.8
+Requires PHP: 5.3
 Stable tag: 2.0.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -42,7 +43,7 @@ In addition to a number of default settings (including a custom header/logo) and
 
 = Minimum Requirements =
 
-* WooCommerce 2.0 or later
+* WooCommerce 2.2 or later
 * WordPress 3.5 or later
 
 = Automatic installation =
