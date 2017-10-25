@@ -24,6 +24,8 @@ class Admin {
 		add_action( 'save_post', array( $this,'save_invoice_number_date' ) );
 
 		add_action( 'admin_notices', array( $this, 'review_plugin_notice' ) );
+
+		add_action( 'init', array( $this, 'setup_wizard') );
 		// add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
 	}
 
@@ -71,6 +73,17 @@ class Admin {
 				<!-- Hide extensions ad if this is shown -->
 				<style>.wcpdf-extensions-ad { display: none; }</style>
 				<?php
+			}
+		}
+	}
+
+	public function setup_wizard() {
+		// Setup/welcome
+		if ( ! empty( $_GET['page'] ) ) {
+			switch ( $_GET['page'] ) {
+				case 'wpo-wcpdf-setup' :
+					include_once( WPO_WCPDF()->plugin_path() . '/includes/class-wcpdf-setup-wizard.php' );
+				break;
 			}
 		}
 	}
