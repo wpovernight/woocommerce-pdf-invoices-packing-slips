@@ -23,6 +23,10 @@ class Admin {
 
 		add_action( 'save_post', array( $this,'save_invoice_number_date' ) );
 
+		// manually send emails
+		// WooCommerce core processes order actions at priority 50
+		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'send_emails' ), 60, 2 );
+
 		add_action( 'admin_notices', array( $this, 'review_plugin_notice' ) );
 
 		add_action( 'init', array( $this, 'setup_wizard') );
@@ -177,11 +181,23 @@ class Admin {
 	 * Add the meta box on the single order page
 	 */
 	public function add_meta_boxes() {
+		// resend order emails
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.2', '>=' ) ) {
+			add_meta_box(
+				'wpo_wcpdf_send_emails',
+				__( 'Send order email', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'send_order_email_meta_box' ),
+				'shop_order',
+				'side',
+				'high'
+			);
+		}
+
 		// create PDF buttons
 		add_meta_box(
 			'wpo_wcpdf-box',
 			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'sidebar_box_content' ),
+			array( $this, 'pdf_actions_meta_box' ),
 			'shop_order',
 			'side',
 			'default'
@@ -199,9 +215,44 @@ class Admin {
 	}
 
 	/**
+	 * Resend order emails
+	 */
+	public function send_order_email_meta_box( $post ) {
+		?>
+		<ul class="wpo_wcpdf_send_emails submitbox">
+			<li class="wide" id="actions">
+				<select name="wpo_wcpdf_send_emails">
+					<option value=""></option>
+					<?php
+					$mailer           = WC()->mailer();
+					$available_emails = apply_filters( 'woocommerce_resend_order_emails_available', array( 'new_order', 'cancelled_order', 'customer_processing_order', 'customer_completed_order', 'customer_invoice' ) );
+					$mails            = $mailer->get_emails();
+					if ( ! empty( $mails ) && ! empty( $available_emails ) ) { ?>
+						<?php
+						foreach ( $mails as $mail ) {
+							if ( in_array( $mail->id, $available_emails ) && 'no' !== $mail->enabled ) {
+								echo '<option value="send_email_' . esc_attr( $mail->id ) . '">' . esc_html( $mail->title ) . '</option>';
+							}
+						} ?>
+						<?php
+					}
+					?>
+				</select>
+				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
+				<?php
+				$title = __( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
+				$url = wp_nonce_url( add_query_arg('wpo_wcpdf_action','resend_email'), 'generate_wpo_wcpdf' );
+				// printf('<a href="%s" class="button wpo_wcpdf_send_email"><span>%s</span></a>')
+				?>
+			</li>
+		</ul>
+		<?php
+	}
+
+	/**
 	 * Create the meta box content on the single order page
 	 */
-	public function sidebar_box_content( $post ) {
+	public function pdf_actions_meta_box( $post ) {
 		global $post_id;
 
 		$meta_box_actions = array();
@@ -349,6 +400,47 @@ class Admin {
 			}
 		}
 	}
+
+	/**
+	 * Send emails manually
+	 */
+	public function send_emails( $post_id, $post ) {
+		if ( ! empty( $_POST['wpo_wcpdf_send_emails'] ) ) {
+			$order = wc_get_order( $post_id );
+			$action = wc_clean( $_POST['wpo_wcpdf_send_emails'] );
+			if ( strstr( $action, 'send_email_' ) ) {
+				// Switch back to the site locale.
+				wc_switch_to_site_locale();
+				do_action( 'woocommerce_before_resend_order_emails', $order );
+				// Ensure gateways are loaded in case they need to insert data into the emails.
+				WC()->payment_gateways();
+				WC()->shipping();
+				// Load mailer.
+				$mailer = WC()->mailer();
+				$email_to_send = str_replace( 'send_email_', '', $action );
+				$mails = $mailer->get_emails();
+				if ( ! empty( $mails ) ) {
+					foreach ( $mails as $mail ) {
+						if ( $mail->id == $email_to_send ) {
+							$mail->trigger( $order->get_id(), $order );
+							/* translators: %s: email title */
+							$order->add_order_note( sprintf( __( '%s email notification manually sent.', 'woocommerce-pdf-invoices-packing-slips' ), $mail->title ), false, true );
+						}
+					}
+				}
+				do_action( 'woocommerce_after_resend_order_email', $order, $email_to_send );
+				// Restore user locale.
+				wc_restore_locale();
+				// Change the post saved message.
+				add_filter( 'redirect_post_location', function( $location ) {
+					// messages in includes/admin/class-wc-admin-post-types.php
+					// 11 => 'Order updated and sent.'
+					return add_query_arg( 'message', 11, $location );
+				} );
+			}
+		}
+	}
+
 
 	/**
 	 * Add invoice number to order search scope
