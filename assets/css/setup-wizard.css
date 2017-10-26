@@ -1,3 +1,23 @@
+.wpo-wizzard {
+	background:#f9f9f9;
+}
+
+.wpo-wcpdf-setup {
+	padding:0;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 14px;
+    line-height: 22px;
+    color:#444;
+    background:none;
+    -webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.wpo-wcpdf-setup h1, .wpo-wcpdf-setup h2 {
+	border:none;
+	color:#444;
+	margin:0;
+}
 
 #confetti {
 	width:100%;
@@ -168,12 +188,13 @@
 	font-size:1.2em;
 	margin-bottom:20px;
 	border:1px solid #3e9b9a;
+	font-family: 'Ubuntu', sans-serif;
 }
 
 .wpo-setup-input .shop-address {
 	width:100%;
 	height:200px;
-	padding:20px;
+	padding:15px 15px;
 	font-size:1.2em;
 	line-height:1.4em;
 	box-sizing: border-box;
@@ -181,6 +202,8 @@
 	resize: none;
 	float:left;
 	margin:0;
+	font-family: 'Ubuntu', sans-serif;
+	text-align:left!important;
 }
 
 /* Your logo */
@@ -357,6 +380,16 @@
 
 /* Landscape phones and smaller */
 @media (max-width: 480px) {
+
+	.wpo-wizzard, .wpo-wcpdf-setup {
+		margin:0;
+		height:100%;
+	}
+
+	.wpo-wcpdf-setup form {
+		height:100%;
+	}
+
 	.wpo-setup-card {
 		width:100%;
 		min-height:100%;
@@ -391,6 +424,10 @@
 	.wpo-button-next, .wpo-button-previous, .wpo-skip-step {
 		font-size:1em;
 		padding:8px 12px;
+	}
+
+	.wpo-setup-input .checkbox {
+	font-size:1em;
 	}
 }
 

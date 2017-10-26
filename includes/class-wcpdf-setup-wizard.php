@@ -107,17 +107,18 @@ class Setup_Wizard {
 	public function setup_wizard_header() {
 		?>
 		<!DOCTYPE html>
-		<html <?php language_attributes(); ?>>
+		<html <?php language_attributes(); ?> class="wpo-wizzard">
 		<head>
 			<meta name="viewport" content="width=device-width" />
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 			<title><?php esc_html_e( 'WooCommerce PDF Invoices & Packing Slips &rsaquo; Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
+			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>
 		<body class="wpo-wcpdf-setup wp-core-ui">
-			<div id="confetti"></div>
+			<?php if( $this->step == 'good-to-go' ) { echo "<div id='confetti'></div>"; } ?>
 			<form method="post">
 		<?php
 	}
@@ -129,18 +130,20 @@ class Setup_Wizard {
 		$output_steps = $this->steps;
 		// array_shift( $output_steps );
 		?>
-		<ol class="wpo-progress-bar">
-			<?php foreach ( $output_steps as $step_key => $step ) : ?>
-				<li class="wpo-progress-marker <?php
-					if ( $step_key === $this->step ) {
-						echo 'active';
-					} elseif ( array_search( $this->step, array_keys( $this->steps ) ) > array_search( $step_key, array_keys( $this->steps ) ) ) {
-						echo 'done';
-					}
-				?>"><?php //echo esc_html( $step['name'] ); ?></li>
-			<?php endforeach; ?>
-		</ol>
-		<?php
+		<div class="wpo-setup-card">
+			<h1 class="wpo-plugin-title">PDF Invoices & Packing Slips</h1>
+			<ol class="wpo-progress-bar">
+				<?php foreach ( $output_steps as $step_key => $step ) : ?>
+					<a href="<?php echo $this->get_step_link($step_key); ?>" ><li><div class="wpo-progress-marker <?php
+						if ( $step_key === $this->step ) {
+							echo 'active';
+						} elseif ( array_search( $this->step, array_keys( $this->steps ) ) > array_search( $step_key, array_keys( $this->steps ) ) ) {
+							echo 'completed';
+						}
+					?>"><?php //echo esc_html( $step['name'] ); ?></div></li></a>
+				<?php endforeach; ?>
+			</ol>
+			<?php
 	}
 
 	/**
@@ -157,18 +160,19 @@ class Setup_Wizard {
 	 */
 	public function setup_wizard_footer() {
 		?>
-					<div class="wpo-setup-buttons">
-						<?php if ($step = $this->get_step(-1)): ?>
-							<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-button-previous">Previous</a>
-						<?php endif ?>
-						<!-- <input type="submit" class="wpo-button-next" value="Next" /> -->
-						<?php if ($step = $this->get_step(1)): ?>
-							<?php wp_nonce_field( 'wpo-wcpdf-setup' ); ?>
-							<input type="submit" class="button-primary button button-large button-next" value="<?php esc_attr_e( 'Next', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="save_step" />
-							<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-skip-step"><?php _e( 'Skip this step', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-						<?php else: ?>
-							<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-button-next">Finish</a>
-						<?php endif ?>
+						<div class="wpo-setup-buttons">
+							<?php if ($step = $this->get_step(-1)): ?>
+								<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-button-previous"><?php _e( 'Previous', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							<?php endif ?>
+							<!-- <input type="submit" class="wpo-button-next" value="Next" /> -->
+							<?php if ($step = $this->get_step(1)): ?>
+								<?php wp_nonce_field( 'wpo-wcpdf-setup' ); ?>
+								<input type="submit" class="wpo-button-next" value="<?php esc_attr_e( 'Next', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="save_step" />
+								<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-skip-step"><?php _e( 'Skip this step', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							<?php else: ?>
+								<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-button-next"><?php _e( 'Finish', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							<?php endif ?>
+						</div>
 					</div>
 				</form>
 			</body>
@@ -215,7 +219,9 @@ class Setup_Wizard {
 					}
 					$current_settings = get_option( $option, array() );
 					$new_settings = $settings + $current_settings;
-					// update_option( $option, $new_settings );
+					// echo "<pre>".var_export($settings,true)."</pre>";
+					// echo "<pre>".var_export($new_settings,true)."</pre>";die();
+					update_option( $option, $new_settings );
 				}
 			}
 		}

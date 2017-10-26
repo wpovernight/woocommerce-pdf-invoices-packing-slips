@@ -1,4 +1,4 @@
-$(document).ready(function() {
+jQuery(document).ready(function($) {
     var frameRate = 30;
     var dt = 1.0 / frameRate;
     var DEG_TO_RAD = Math.PI / 180;

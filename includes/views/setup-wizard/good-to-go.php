@@ -1,6 +1,6 @@
 <div class="wpo-step-description wpo-final">
-	<h1>You're good to go!</h1>
-	<p>If you have any questions please have a look at our documentation:<br>
-	<a href="">Invoices & Packing Slips</a></p>
-	<h2>Happy selling!</h2>
+	<h1><?php _e( 'You are good to go!' , 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
+	<p><?php _e( 'If you have any questions please have a look at our documentation:', 'woocommerce-pdf-invoices-packing-slips' ); ?><br>
+	<a href="https://docs.wpovernight.com/category/woocommerce-pdf-invoices-packing-slips/" target="_blank"><?php _e( 'Invoices & Packing Slips' , 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+	<h2><?php _e( 'Happy selling!' , 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 </div>
