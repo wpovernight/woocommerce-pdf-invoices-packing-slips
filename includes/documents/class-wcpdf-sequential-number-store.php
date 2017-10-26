@@ -80,6 +80,8 @@ $sql = "CREATE TABLE {$this->table_name} (
 			$date = get_date_from_gmt( date( 'Y-m-d H:i:s' ) );
 		}
 
+		do_action( 'wpo_wcpdf_before_sequential_number_increment', $this, $order_id, $date );
+
 		$data = array(
 			'order_id'	=> (int) $order_id,
 			'date'		=> $date,
