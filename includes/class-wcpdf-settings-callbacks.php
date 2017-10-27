@@ -289,7 +289,7 @@ class Settings_Callbacks {
 		extract( $this->normalize_settings_args( $args ) );
 
 		if( !empty($current) ) {
-			$attachment = wp_get_attachment_image_src( $current, 'thumbnail', false );
+			$attachment = wp_get_attachment_image_src( $current, 'full', false );
 			
 			$attachment_src = $attachment[0];
 			$attachment_width = $attachment[1];
