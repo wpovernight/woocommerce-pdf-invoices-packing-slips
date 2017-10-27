@@ -72,11 +72,21 @@ class Setup_Wizard {
 			WPO_WCPDF_VERSION
 		);
 		wp_register_script(
-			'wpo-wcpdf-setup',
-			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard.js',
-			array( 'jquery' ),
+			'wpo-wcpdf-media-upload',
+			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload.js',
+			array( 'jquery', 'media-editor', 'mce-view' ),
 			WPO_WCPDF_VERSION
 		);
+		wp_register_script(
+			'wpo-wcpdf-setup',
+			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard.js',
+			array( 'jquery', 'wpo-wcpdf-media-upload' ),
+			WPO_WCPDF_VERSION
+		);
+		wp_enqueue_media();
+
+
+
 		$step_keys = array_keys($this->steps);
 		if ( end( $step_keys ) === $this->step ) {
 			wp_register_script(
@@ -175,6 +185,7 @@ class Setup_Wizard {
 						</div>
 					</div>
 				</form>
+				<?php do_action( 'admin_footer' ); // for media uploader templates ?>
 			</body>
 		</html>
 		<?php
