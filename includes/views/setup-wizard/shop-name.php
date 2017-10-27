@@ -6,6 +6,6 @@
 	<?php
 	$current_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 	?>
-	<input type="text" class="shop-name" placeholder="Shop name" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_name][default]" value="<?php echo isset($current_settings['shop_name']) ? array_pop($current_settings['shop_name']) : ''; ?>">
+	<input type="text" class="shop-name" placeholder="Shop name" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_name][default]" value="<?php echo !empty($current_settings['shop_name']) ? array_pop($current_settings['shop_name']) : get_bloginfo( 'name' ); ?>">
 	<textarea class="shop-address" placeholder="Shop address" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address][default]"><?php echo isset($current_settings['shop_address']) ? array_pop($current_settings['shop_address']) : ''; ?></textarea>
 </div>
