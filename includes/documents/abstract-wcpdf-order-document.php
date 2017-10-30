@@ -164,11 +164,11 @@ abstract class Order_Document {
 		}
 
 		// pass data to setter functions
-		$this->set_data( array(
+		$this->set_data( apply_filters( 'wpo_wcpdf_document_data', array(
 			// always load date before number, because date is used in number formatting
 			'date'			=> WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_date", true ),
 			'number'		=> $number,
-		), $order );
+		), $order ), $order );
 
 		return;
 	}

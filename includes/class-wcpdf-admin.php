@@ -313,6 +313,7 @@ class Admin {
 							</p>
 						</p>
 					</div>
+                    <?php do_action( 'wpo_wcpdf_meta_box_after_readonly_fields', $post->ID ); ?>
 					<?php else : ?>
 					<span class="wpo-wcpdf-set-date-number button"><?php _e( 'Set invoice number & date', 'woocommerce-pdf-invoices-packing-slips' ) ?></span>
 					<?php endif; ?>
@@ -336,6 +337,7 @@ class Admin {
 						<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" disabled="disabled" value="" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" min="0" max="23" size="2" value="" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" min="0" max="59" size="2" value="" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
 						<?php endif; ?>
 					</p>
+                    <?php do_action( 'wpo_wcpdf_meta_box_after_editable_fields', $post->ID ); ?>
 				</div>
 			</div>
 			<?php
@@ -395,6 +397,8 @@ class Admin {
 				if ( isset( $_POST['_wcpdf_invoice_number'] ) ) {
 					$invoice->set_number( $_POST['_wcpdf_invoice_number'] );
 				}
+
+                do_action( 'wpo_wcpdf_before_save_invoice', $invoice, $post_id, $_POST );
 
 				$invoice->save();
 			}
