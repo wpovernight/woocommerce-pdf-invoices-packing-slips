@@ -323,15 +323,15 @@ class Admin {
 					<p class="form-field _wcpdf_invoice_number_field ">
 						<label for="_wcpdf_invoice_number"><?php _e( 'Invoice Number (unformatted!)', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</label>
 						<?php if ( $invoice->exists() && !empty($invoice_number) ) : ?>
-						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number->get_plain(); ?>">
+						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number->get_plain(); ?>" disabled="disabled">
 						<?php else : ?>
-						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="" disabled="disabled" >
+						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="" disabled="disabled">
 						<?php endif; ?>
 					</p>
 					<p class="form-field form-field-wide">
 						<label for="wcpdf_invoice_date"><?php _e( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 						<?php if ( $invoice->exists() && !empty($invoice_date) ) : ?>
-						<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" value="<?php echo $invoice_date->date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" min="0" max="23" size="2" value="<?php echo $invoice_date->date_i18n( 'H' ) ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" min="0" max="59" size="2" value="<?php echo $invoice_date->date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" />
+						<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" value="<?php echo $invoice_date->date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" min="0" max="23" size="2" value="<?php echo $invoice_date->date_i18n( 'H' ) ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" min="0" max="59" size="2" value="<?php echo $invoice_date->date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" />
 						<?php else : ?>
 						<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" disabled="disabled" value="" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" min="0" max="23" size="2" value="" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" min="0" max="59" size="2" value="" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
 						<?php endif; ?>
