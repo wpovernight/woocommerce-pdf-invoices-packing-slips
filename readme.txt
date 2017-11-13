@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 4.8
 Requires PHP: 5.3
-Stable tag: 2.0.14
+Stable tag: 2.0.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,9 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 **2.0 is a BIG update! Make a full site backup before upgrading**
+
+= 2.0.15 =
+* Fix: Prevent saving invoice number/date from order details page when not edited
 
 = 2.0.14 =
 * Feature: Manually resend specific order emails in WooCommerce 3.2+
@@ -205,5 +208,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.0.14 =
+= 2.0.15 =
 **2.0 is a BIG update! Make a full site backup before upgrading!**
