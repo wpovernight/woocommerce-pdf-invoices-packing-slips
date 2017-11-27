@@ -641,9 +641,17 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		// Thumbnail (full img tag)
-		if (apply_filters('wpo_wcpdf_use_path', true) && file_exists($thumbnail_path)) {
+		if ( apply_filters('wpo_wcpdf_use_path', true) && file_exists($thumbnail_path) ) {
 			// load img with server path by default
 			$thumbnail = sprintf('<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
+		} elseif ( apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path) ) {
+			// should use paths but file not found, replace // with http(s):// for dompdf compatibility
+			if ( substr( $thumbnail_url, 0, 2 ) === "//" ) {
+				$prefix = is_ssl() ? 'https://' : 'http://';
+				$https_thumbnail_url = $prefix . ltrim( $thumbnail_url, '/' );
+			}
+			$thumbnail_img_tag_url = str_replace($thumbnail_url, $https_thumbnail_url, $thumbnail_img_tag_url);
+			$thumbnail = $thumbnail_img_tag_url;
 		} else {
 			// load img with http url when filtered
 			$thumbnail = $thumbnail_img_tag_url;
