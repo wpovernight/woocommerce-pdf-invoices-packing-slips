@@ -92,4 +92,5 @@ return array(
             'italic' => $distFontDir . 'DejaVuSerif-Italic',
             'normal' => $distFontDir . 'DejaVuSerif'
         )
-);
+)
+?>
