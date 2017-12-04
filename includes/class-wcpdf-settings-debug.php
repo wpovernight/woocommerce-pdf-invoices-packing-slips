@@ -172,13 +172,13 @@ class Settings_Debug {
 			),
 			array(
 				'type'			=> 'setting',
-				'id'			=> 'use_domdocument_parser',
-				'title'			=> __( 'Use DOMDocument to parse HTML', 'woocommerce-pdf-invoices-packing-slips' ),
+				'id'			=> 'use_html5_parser',
+				'title'			=> __( 'Use alternative HTML5 parser to parse HTML', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
 				'section'		=> 'debug_settings',
 				'args'			=> array(
 					'option_name'	=> $option_name,
-					'id'			=> 'use_domdocument_parser',
+					'id'			=> 'use_html5_parser',
 				)
 			),
 		);

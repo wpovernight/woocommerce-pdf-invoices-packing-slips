@@ -42,7 +42,7 @@ class PDF_Maker {
 			'isRemoteEnabled'			=> true,
 			'isFontSubsettingEnabled'	=> $this->settings['font_subsetting'],
 			// HTML5 parser requires iconv
-			'isHtml5ParserEnabled'		=> ( isset(WPO_WCPDF()->settings->debug_settings['use_domdocument_parser']) || !extension_loaded('iconv') ) ? false : true,
+			'isHtml5ParserEnabled'		=> ( isset(WPO_WCPDF()->settings->debug_settings['use_html5_parser']) && extension_loaded('iconv') ) ? true : false,
 		) ) );
 
 		// instantiate and use the dompdf class
