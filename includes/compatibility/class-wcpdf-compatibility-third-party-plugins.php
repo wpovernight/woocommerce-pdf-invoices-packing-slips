@@ -146,7 +146,7 @@ class Third_Party_Plugins {
 	public function wc_order_status_actions_emails ( $emails ) {
 		// get list of custom statuses from WooCommerce Custom Order Status & Actions
 		// status slug => status name
-		$custom_statuses = WC_Custom_Status::get_status_list_names();
+		$custom_statuses = \WC_Custom_Status::get_status_list_names();
 		// append _email to slug (=email_id) and add to emails list
 		foreach ($custom_statuses as $status_slug => $status_name) {
 			$emails[$status_slug.'_email'] = $status_name;
