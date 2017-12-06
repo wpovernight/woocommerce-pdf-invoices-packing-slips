@@ -12,7 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
 
 class Admin {
-	
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_number_column' ), 999 );
@@ -31,6 +30,9 @@ class Admin {
 
 		add_action( 'init', array( $this, 'setup_wizard') );
 		// add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
+
+		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_number_column_sortable' ) );
+		add_filter( 'pre_get_posts', array( $this, 'sort_by_invoice_number' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -441,7 +443,6 @@ class Admin {
 		}
 	}
 
-
 	/**
 	 * Add invoice number to order search scope
 	 */
@@ -450,7 +451,6 @@ class Admin {
 		$custom_fields[] = '_wcpdf_formatted_invoice_number';
 		return $custom_fields;
 	}
-
 
 	/**
 	 * Check if this is a shop_order page (edit or list)
@@ -463,6 +463,25 @@ class Admin {
 			return false;
 		}
 	}
+
+	/**
+	 * Add invoice number to order search scope
+	 */
+	public function invoice_number_column_sortable( $columns ) {
+		$columns['pdf_invoice_number'] = 'pdf_invoice_number';
+		return $columns;
+	}
+
+	public function sort_by_invoice_number( $query ) {
+		if( ! is_admin() )
+			return;
+		$orderby = $query->get( 'orderby');
+		if( 'pdf_invoice_number' == $orderby ) {
+			$query->set('meta_key','_wcpdf_invoice_number');
+			$query->set('orderby','meta_value_num');
+		}
+	}
+
 }
 
 endif; // class_exists
