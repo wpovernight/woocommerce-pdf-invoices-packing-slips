@@ -124,7 +124,7 @@ jQuery(document).ready(function() {
 	</ul>
 	<?php
 	// link to hide message when one of the premium extensions is installed
-	if ( class_exists('WooCommerce_PDF_IPS_Pro') || class_exists('WooCommerce_PDF_IPS_Dropbox') || class_exists('WooCommerce_PDF_IPS_Templates') || class_exists('WooCommerce_Ext_PrintOrders') || class_exists('WPO_WC_Smart_Reminder_Emails') ) {
+	if ( class_exists('WooCommerce_PDF_IPS_Pro') || class_exists('WooCommerce_PDF_IPS_Dropbox') || class_exists('WPO_WCPDF_Templates') || class_exists('WooCommerce_PDF_IPS_Templates') || class_exists('WooCommerce_Ext_PrintOrders') || class_exists('WPO_WC_Smart_Reminder_Emails') ) {
 		printf('<a href="%s" style="display:inline-block; margin-top: 10px;">%s</a>', add_query_arg( 'wpo_wcpdf_hide_extensions_ad', 'true' ), __( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 	?>
