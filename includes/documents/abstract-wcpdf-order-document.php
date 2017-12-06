@@ -255,7 +255,7 @@ abstract class Order_Document {
 	}
 
 	public function get_title() {
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
 	}
 
 	/*

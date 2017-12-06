@@ -38,7 +38,7 @@ class Packing_Slip extends Order_Document_Methods {
 
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ) );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
 	public function get_settings() {
