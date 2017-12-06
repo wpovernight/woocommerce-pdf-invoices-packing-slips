@@ -7,7 +7,7 @@
 		if( $this->has_header_logo() ) {
 			$this->header_logo();
 		} else {
-			echo apply_filters( 'wpo_wcpdf_packing_slip_title', __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ) );
+			echo apply_filters( 'wpo_wcpdf_packing_slip_title', __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 		}
 		?>
 		</td>
@@ -19,7 +19,7 @@
 </table>
 
 <h1 class="document-type-label">
-<?php if( $this->has_header_logo() ) echo apply_filters( 'wpo_wcpdf_packing_slip_title', __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ) ); ?>
+<?php if( $this->has_header_logo() ) echo apply_filters( 'wpo_wcpdf_packing_slip_title', __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this ); ?>
 </h1>
 
 <?php do_action( 'wpo_wcpdf_after_document_label', $this->type, $this->order ); ?>
