@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.1.1 =
+* Fix: WooCommerce Order Status & Actions Manager emails compatibility
+* Feature: sort orders by invoice number column
+* Tweak: pass document object to title filters
+* Tweak: use title getter in template files (instead of title string)
 
 = 2.1.0 =
 * Feature: WooCommerce Order Status & Actions Manager emails compatibility
@@ -211,5 +217,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.0 =
+= 2.1.1 =
 2.0 is a BIG update! Make a full site backup before upgrading!
