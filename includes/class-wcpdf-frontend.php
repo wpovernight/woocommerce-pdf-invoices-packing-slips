@@ -50,9 +50,15 @@ class Frontend {
 
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
 			if ( $invoice_allowed || in_array(WCX_Order::get_status( $order ), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+				$document_title = $invoice->get_setting('title');
+				if ( !empty($document_title) && !empty(array_filter($document_title)) ) {
+					$button_text = sprintf ( __( 'Download %s (PDF)', 'woocommerce-pdf-invoices-packing-slips' ), $invoice->get_title() );
+				} else {
+					$button_text = __( 'Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips' );
+				}
 				$actions['invoice'] = array(
 					'url'  => $pdf_url,
-					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', __( 'Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips' ) )
+					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $button_text, $invoice )
 				);
 			}
 		}
