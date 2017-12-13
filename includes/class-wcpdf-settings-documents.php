@@ -22,6 +22,7 @@ class Settings_Documents {
 	}
 
 	public function output( $section ) {
+		$section = !empty($section) ? $section : 'invoice';
 		if ( !empty( $section ) ) {
 			$documents = WPO_WCPDF()->documents->get_documents('all');
 			?>
