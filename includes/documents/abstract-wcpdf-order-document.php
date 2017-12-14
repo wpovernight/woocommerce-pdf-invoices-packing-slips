@@ -175,6 +175,7 @@ abstract class Order_Document {
 
 	public function init() {
 		$this->set_date( current_time( 'timestamp', true ) );
+		do_action( 'wpo_wcpdf_init_document', $this );
 	}
 
 	public function save( $order = null ) {
