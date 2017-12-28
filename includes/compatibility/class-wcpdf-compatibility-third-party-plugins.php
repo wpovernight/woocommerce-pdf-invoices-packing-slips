@@ -36,6 +36,11 @@ class Third_Party_Plugins {
 			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 4 );
 		}
 
+		// WooCommerce Composite Products compatibility (add row classes)
+		if ( class_exists('WC_Composite_Products') ) {
+			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_composite_product_class' ), 10, 4 );
+		}
+
 	 	// WooCommerce Order Status & Actions Manager emails compatibility
 		if (class_exists('WC_Custom_Status')) {
 			add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
@@ -77,20 +82,9 @@ class Third_Party_Plugins {
 	 * @param int    $item_id       WooCommerce Item ID
 	 */
 	public function add_product_bundles_classes ( $classes, $document_type, $order, $item_id = '' ) {
+		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty($item_id) ) {
-			// get item id from classes (backwards compatibility fix)
-			$class_array = explode(' ', $classes);
-			foreach ($class_array as $class) {
-				if (is_numeric($class)) {
-					$item_id = $class;
-					break;
-				}
-			}
-
-			// if still empty, we lost the item id somewhere :(
-			if (empty($item_id)) {
-				return $classes;
-			}
+			return $classes;
 		}
 
 		if ( $bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_by', true ) ) {
@@ -117,20 +111,9 @@ class Third_Party_Plugins {
 	 * @param int    $item_id       WooCommerce Item ID
 	 */
 	public function add_chained_product_class ( $classes, $document_type, $order, $item_id = '' ) {
+		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty($item_id) ) {
-			// get item id from classes (backwards compatibility fix)
-			$class_array = explode(' ', $classes);
-			foreach ($class_array as $class) {
-				if (is_numeric($class)) {
-					$item_id = $class;
-					break;
-				}
-			}
-
-			// if still empty, we lost the item id somewhere :(
-			if (empty($item_id)) {
-				return $classes;
-			}
+			return $classes;
 		}
 
 		if ( $chained_product_of = WCX_Order::get_item_meta( $order, $item_id, '_chained_product_of', true ) ) {
@@ -138,6 +121,59 @@ class Third_Party_Plugins {
 		}
 
 		return $classes;
+	}
+
+	/**
+	 * WooCommerce Composite Products
+	 * @param string $classes       CSS classes for item row (tr) 
+	 * @param string $document_type PDF Document type
+	 * @param object $order         WC_Order order
+	 * @param int    $item_id       WooCommerce Item ID
+	 */
+	public function add_composite_product_class ( $classes, $document_type, $order, $item_id = '' ) {
+		if ( !function_exists('wc_cp_is_composited_order_item') || !function_exists('wc_cp_is_composite_container_order_item') ) {
+			return $classes;
+		}
+		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
+		if ( empty($item_id) ) {
+			return $classes;
+		}
+
+		// get order item object
+		$order_items = $order->get_items();
+		foreach ($order_items as $order_item_id => $order_item) {
+			if ($order_item_id == $item_id) {
+				if ( wc_cp_is_composited_order_item( $order_item, $order ) ) {
+					$classes .= ' component_table_item';
+				} elseif ( wc_cp_is_composite_container_order_item( $order_item ) ) {
+					$classes .= ' component_container_table_item';
+				}
+				break;
+			}
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * Backwards compatibility helper function: try to get item ID from row class
+	 * @param string $classes       CSS classes for item row (tr) 
+	 */
+	public function get_item_id_from_classes ( $classes ) {
+		$class_array = explode(' ', $classes);
+		foreach ($class_array as $class) {
+			if (is_numeric($class)) {
+				$item_id = $class;
+				break;
+			}
+		}
+
+		// if still empty, we lost the item id somewhere :(
+		if (empty($item_id)) {
+			return false;
+		} else {
+			return $item_id;
+		}
 	}
 
 	/**
