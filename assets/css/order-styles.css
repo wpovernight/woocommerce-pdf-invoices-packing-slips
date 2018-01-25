@@ -1,4 +1,9 @@
 /* Order list buttons: */
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf {
+	padding: 2px !important;
+}
+
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf img,
 .type-shop_order .column-order_actions a.button.wpo_wcpdf img {
 	width: 16px;
 }
