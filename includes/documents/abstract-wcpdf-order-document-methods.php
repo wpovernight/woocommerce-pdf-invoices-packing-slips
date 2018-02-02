@@ -501,7 +501,12 @@ abstract class Order_Document_Methods extends Order_Document {
 			$line_taxes = $line_tax_data['subtotal'];
 			foreach ( $line_taxes as $tax_id => $tax ) {
 				if ( isset($tax) && $tax !== '' ) {
-					$tax_rates[] = $this->get_tax_rate_by_id( $tax_id ) . ' %';
+					$tax_rate = $this->get_tax_rate_by_id( $tax_id );
+					if ( $tax_rate !== false ) {
+						$tax_rates[] = $tax_rate . ' %';
+					} else {
+						$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
+					}
 				}
 			}
 
@@ -526,24 +531,26 @@ abstract class Order_Document_Methods extends Order_Document {
 
 			if (empty($tax_rates)) {
 				// one last try: manually calculate
-				if ( $line_total != 0) {
-					$tax_rates[] = round( ($line_tax / $line_total)*100, 1 ).' %';
-				} else {
-					$tax_rates[] = '-';
-				}
+				$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
 			}
 
 			$tax_rates = implode(' ,', $tax_rates );
 		} else {
 			// Backwards compatibility/fallback: calculate tax from line items
-			if ( $line_total != 0) {
-				$tax_rates = round( ($line_tax / $line_total)*100, 1 ).' %';
-			} else {
-				$tax_rates = '-';
-			}
+			$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
 		}
 		
 		return $tax_rates;
+	}
+
+	public function calculate_tax_rate( $price_ex_tax, $tax ) {
+		$precision = apply_filters( 'wpo_wcpdf_calculate_tax_rate_precision', 1 );
+		if ( $price_ex_tax != 0) {
+			$tax_rate = round( ($tax / $price_ex_tax)*100, $precision ).' %';
+		} else {
+			$tax_rate = '-';
+		}
+		return $tax_rate;
 	}
 
 	/**
@@ -554,7 +561,11 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function get_tax_rate_by_id( $rate_id ) {
 		global $wpdb;
 		$rate = $wpdb->get_var( $wpdb->prepare( "SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d;", $rate_id ) );
-		return (float) $rate;
+		if ($rate === NULL) {
+			return false;
+		} else {
+			return (float) $rate;
+		}
 	}
 
 	/**
@@ -567,8 +578,6 @@ abstract class Order_Document_Methods extends Order_Document {
 
 		$tax_rate_ids = array();
 		foreach ($rates as $rate) {
-			// var_dump($rate->tax_rate_id);
-			// die($rate);
 			$rate_id = $rate->tax_rate_id;
 			unset($rate->tax_rate_id);
 			$tax_rate_ids[$rate_id] = (array) $rate;
