@@ -18,10 +18,10 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Store
 
 class Sequential_Number_Store {
 	/**
-	 * Name of the table that stores the number sequence (without the wp_wcpdf_ table prefix)
+	 * Name of the number store (used for table_name)
 	 * @var String
 	 */
-	public $table_name;
+	public $store_name;
 
 	/**
 	 * Number store method, either 'auto_increment' or 'calculate'
@@ -29,10 +29,17 @@ class Sequential_Number_Store {
 	 */
 	public $method;
 
-	public function __construct( $table_name, $method = 'auto_increment' ) {
+	/**
+	 * Name of the table that stores the number sequence (including the wp_wcpdf_ table prefix)
+	 * @var String
+	 */
+	public $table_name;
+
+	public function __construct( $store_name, $method = 'auto_increment' ) {
 		global $wpdb;
-		$this->table_name = "{$wpdb->prefix}wcpdf_{$table_name}"; // i.e. wp_wcpdf_invoice_number
+		$this->store_name = $store_name;
 		$this->method = $method;
+		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // i.e. wp_wcpdf_invoice_number
 
 		$this->init();
 	}
