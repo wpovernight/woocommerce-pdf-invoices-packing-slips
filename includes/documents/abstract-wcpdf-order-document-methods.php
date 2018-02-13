@@ -186,9 +186,11 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show a custom field
 	 */		
 	public function get_custom_field( $field_name ) {
-		$custom_field = WCX_Order::get_meta( $this->order, $field_name, true );
+		if ( !$this->is_order_prop( $field_name ) ) {
+			$custom_field = WCX_Order::get_meta( $this->order, $field_name, true );
+		}
 		// if not found, try prefixed with underscore
-		if ( !$custom_field && substr( $field_name, 0, 1 ) !== '_' ) {
+		if ( !$custom_field && substr( $field_name, 0, 1 ) !== '_' && !$this->is_order_prop( "_{$field_name}" ) ) {
 			$custom_field = WCX_Order::get_meta( $this->order, "_{$field_name}", true );
 		}
 
@@ -201,7 +203,9 @@ abstract class Order_Document_Methods extends Order_Document {
 		// fallback to parent for refunds
 		if ( !$custom_field && $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
-			$custom_field = WCX_Order::get_meta( $parent_order, $field_name, true );
+			if ( !$this->is_order_prop( $field_name ) ) {
+				$custom_field = WCX_Order::get_meta( $parent_order, $field_name, true );
+			}
 
 			// WC3.0 fallback to properties
 			if ( !$custom_field && is_callable( array( $parent_order, "get_{$property}" ) ) ) {
@@ -221,6 +225,61 @@ abstract class Order_Document_Methods extends Order_Document {
 		if (!empty($custom_field) || $display_empty) {
 			echo $field_label . nl2br ($custom_field);
 		}
+	}
+
+	public function is_order_prop( $key ) {
+		// Taken from WC class
+		$order_props = array(
+			// Abstract order props
+			'parent_id',
+			'status',
+			'currency',
+			'version',
+			'prices_include_tax',
+			'date_created',
+			'date_modified',
+			'discount_total',
+			'discount_tax',
+			'shipping_total',
+			'shipping_tax',
+			'cart_tax',
+			'total',
+			'total_tax',
+			// Order props
+			'customer_id',
+			'order_key',
+			'billing_first_name',
+			'billing_last_name',
+			'billing_company',
+			'billing_address_1',
+			'billing_address_2',
+			'billing_city',
+			'billing_state',
+			'billing_postcode',
+			'billing_country',
+			'billing_email',
+			'billing_phone',
+			'shipping_first_name',
+			'shipping_last_name',
+			'shipping_company',
+			'shipping_address_1',
+			'shipping_address_2',
+			'shipping_city',
+			'shipping_state',
+			'shipping_postcode',
+			'shipping_country',
+			'payment_method',
+			'payment_method_title',
+			'transaction_id',
+			'customer_ip_address',
+			'customer_user_agent',
+			'created_via',
+			'customer_note',
+			'date_completed',
+			'date_paid',
+			'cart_hash',
+		);
+		return in_array($key, $order_props);
 	}
 
 	/**
