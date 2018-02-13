@@ -228,6 +228,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	public function is_order_prop( $key ) {
+		if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '<' ) ) {
+			return false; // WC 2.X didn't have CRUD
+		}
 		// Taken from WC class
 		$order_props = array(
 			// Abstract order props
@@ -307,7 +310,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		// WC3.0+ fallback parent product for variations
-		if ( empty($attribute) &&  version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) && $product->is_type( 'variation' ) ) {
+		if ( empty($attribute) && version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) && $product->is_type( 'variation' ) ) {
 			$product = wc_get_product( $product->get_parent_id() );
 			$attribute = $this->get_product_attribute( $attribute_name, $product );
 		}
