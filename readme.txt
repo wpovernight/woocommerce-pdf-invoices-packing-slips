@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,13 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+
+= 2.1.5 =
+* Feature: Filter for number store table (wpo_wcpdf_number_store_table_name)
+* Fix: prevent accessing order properties as custom field/order meta
+* Fix: prevent wrong application of wpo_wcpdf_filename filter
+* Fix: Improved tax rate calculation fallback
 
 = 2.1.4 =
 * Fix: WooCommerce 3.3 action buttons
@@ -230,5 +237,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.1.4 =
+= 2.1.5 =
 2.0 is a BIG update! Make a full site backup before upgrading!
