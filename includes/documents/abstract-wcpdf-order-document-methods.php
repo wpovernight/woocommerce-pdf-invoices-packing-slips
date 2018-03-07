@@ -572,6 +572,13 @@ abstract class Order_Document_Methods extends Order_Document {
 				}
 			}
 
+			// apply decimal setting
+			if (function_exists('wc_get_price_decimal_separator')) {
+				foreach ($tax_rates as &$tax_rate) {
+					$tax_rate = str_replace('.', wc_get_price_decimal_separator(), strval($tax_rate) );
+				}
+			}
+
 			$tax_rates = implode(' ,', $tax_rates );
 			return $tax_rates;
 		}
