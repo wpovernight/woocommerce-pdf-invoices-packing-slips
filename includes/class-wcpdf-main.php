@@ -99,7 +99,7 @@ class Main {
 				file_put_contents ( $pdf_path, $pdf_data );
 				$attachments[] = $pdf_path;
 
-				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type );
+				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type, $document );
 			} catch (Exception $e) {
 				error_log($e->getMessage());
 				continue;
