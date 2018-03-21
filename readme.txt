@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.1.6 =
+* Fix: Extended currency symbol setting for WooCommerce Currency Switcher by realmag777
+* Fix: Apply WooCommerce decimal settings to tax rates with decimals
+* Tweak: Pass document object to `wpo_wcpdf_email_attachment` filter
 
 = 2.1.5 =
 * Feature: Filter for number store table (wpo_wcpdf_number_store_table_name)
@@ -237,5 +241,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.1.5 =
-2.0 is a BIG update! Make a full site backup before upgrading!
+= 2.1.6 =
+2.X is a BIG update! Make a full site backup before upgrading!
