@@ -5,13 +5,11 @@ jQuery(document).ready(function($) {
 		
 	// Uploading files
 	var file_frame;
-	 
-	$('.wpo_upload_image_button').live('click', function( event ){
-
-		// get input field id from data-input_id
-		input_id = '#'+$( this ).data( 'input_id' );
-		input_id_class = '.'+$( this ).data( 'input_id' );
-		input_id_clean = $( this ).data( 'input_id' );
+	$('#wpo-wcpdf-settings').on('click', '.wpo_upload_image_button', function( event ){
+		// get corresponding input fields
+		$row = $(this).parent();
+		$id = $row.find('input#header_logo');
+		$logo = $row.find('img#img-header_logo');
 
 		// get remove button text
 		remove_button_text = $( this ).data( 'remove_button_text' );
@@ -40,16 +38,15 @@ jQuery(document).ready(function($) {
 			attachment = file_frame.state().get('selection').first().toJSON();
 			
 			// set the value of the input field to the attachment id
-			$( input_id ).val(attachment.id);
+			$id.val(attachment.id);
 			
-			if ($( '#img-'+input_id_clean ).length){
-				$( '#img-'+input_id_clean ).attr("src", attachment.url );
-			} else {
+			if ( $logo.length == 0 ) {
 				// show image & remove button
-				attachment_img = '<img src="'+attachment.url+'" style="display:block" id="img-'+input_id_clean+'"/>';
-				remove_button = '<span class="button wpo_remove_image_button" data-input_id="'+input_id_clean+'">'+remove_button_text+'</span>';
-				$( input_id ).before(attachment_img+remove_button);
-				
+				attachment_img = '<img src="'+attachment.url+'" style="display:block" id="img-header_logo"/>';
+				remove_button = '<span class="button wpo_remove_image_button" data-input_id="header_logo">'+remove_button_text+'</span>';
+				$id.before(attachment_img+remove_button);
+			} else {
+				$logo.attr("src", attachment.url );
 			}
 		});
 	 
@@ -57,15 +54,14 @@ jQuery(document).ready(function($) {
 		file_frame.open();
 	});
  
-	$('.wpo_remove_image_button').live('click', function( event ){
-		
-		
-		// get input field from data-input_id
-		input_id = '#'+$( this ).data( 'input_id' );
-		img_id = '#img-'+$( this ).data( 'input_id' );
+	$('#wpo-wcpdf-settings').on('click', '.wpo_remove_image_button', function( event ){
+		// get corresponding input fields
+		$row = $(this).parent();
+		$id = $row.find('input#header_logo');
+		$logo = $row.find('img#img-header_logo');
 	 	
-		$( input_id ).val('');
-		$( img_id ).remove();
+		$id.val('');
+		$logo.remove();
 		$( this ).remove();
 		$( '.attachment-resolution' ).remove();
 	});		
