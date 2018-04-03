@@ -46,6 +46,13 @@ class Third_Party_Plugins {
 			add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
 		}
 
+		// Aelia Currency Switcher compatibility
+		$currency_switcher_active = !empty($GLOBALS['woocommerce-aelia-currencyswitcher']);
+		if ( $currency_switcher_active ) {
+			add_action( 'wpo_wcpdf_before_html', array( $this, 'aelia_currency_formatting' ), 10, 2 );
+		}
+
+
 	}
 
 	/**
@@ -190,6 +197,23 @@ class Third_Party_Plugins {
 		return $emails;
 	}
 
+
+	/**
+	 * Aelia Currency Switcher compatibility
+	 * Applies decimal & Thousand separator settings
+	 */
+	function aelia_currency_formatting( $document_type, $document ) {
+		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
+	}
+
+	function aelia_currency_price_args( $args ) {
+		if ( !empty( $args['currency'] && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) ) {
+			$cs_settings = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
+			$args['decimal_separator'] = $cs_settings->get_currency_decimal_separator( $args['currency'] );
+			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
+		}
+		return $args;
+	}
 }
 
 
