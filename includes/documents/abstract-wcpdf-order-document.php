@@ -517,7 +517,11 @@ abstract class Order_Document {
 		);
 		$args = $args + $default_args;
 
-		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ) );
+		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
+				'order' => $this->order,
+				'order_id' => $this->order_id,
+			)
+		);
 		if ($args['wrap_html_content']) {
 			$html = $this->wrap_html_content( $html );
 		}
