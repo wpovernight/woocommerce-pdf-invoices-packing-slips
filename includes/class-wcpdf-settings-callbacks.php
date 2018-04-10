@@ -369,7 +369,11 @@ class Settings_Callbacks {
 					if (!empty($args['i18n_description'])) {
 						$args['description'] = $args['i18n_description'];
 					}
-					call_user_func( array( $this, $callback ), $args );
+					if ( is_array( $callback ) ) {
+						call_user_func( $callback, $args );
+					} else {
+						call_user_func( array( $this, $callback ), $args );
+					}
 					echo '</div>';
 				}
 				?>
@@ -378,7 +382,11 @@ class Settings_Callbacks {
 			<?php
 		} else {
 			$args['lang'] = 'default';
-			call_user_func( array( $this, $callback ), $args );
+			if ( is_array( $callback ) ) {
+				call_user_func( $callback, $args );
+			} else {
+				call_user_func( array( $this, $callback ), $args );
+			}
 		}
 	}
 
