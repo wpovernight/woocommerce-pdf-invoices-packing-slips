@@ -488,7 +488,8 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
 				
 				$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
-				$data['tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'], $line_tax_data );
+				$data['tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'], $line_tax_data, true );
+				$data['calculated_tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'], $line_tax_data, false );
 				
 				// Set the line subtotal (=before discount)
 				$data['line_subtotal'] = $this->format_price( $item['line_subtotal'] );
@@ -555,7 +556,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @param  string $tax_class tax class slug
 	 * @return string $tax_rates imploded list of tax rates
 	 */
-	public function get_tax_rate( $tax_class, $line_total, $line_tax, $line_tax_data = '' ) {
+	public function get_tax_rate( $tax_class, $line_total, $line_tax, $line_tax_data = '', $force_calculation = false ) {
 		// first try the easy wc2.2+ way, using line_tax_data
 		if ( !empty( $line_tax_data ) && isset($line_tax_data['total']) ) {
 			$tax_rates = array();
@@ -564,7 +565,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			foreach ( $line_taxes as $tax_id => $tax ) {
 				if ( isset($tax) && $tax !== '' ) {
 					$tax_rate = $this->get_tax_rate_by_id( $tax_id );
-					if ( $tax_rate !== false ) {
+					if ( $tax_rate !== false && $force_calculation !== false ) {
 						$tax_rates[] = $tax_rate . ' %';
 					} else {
 						$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
