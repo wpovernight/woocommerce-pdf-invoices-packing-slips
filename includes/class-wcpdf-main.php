@@ -118,7 +118,7 @@ class Main {
 		foreach ($documents as $document) {
 			$attach_documents[ $document->get_type() ] = $document->get_attach_to_email_ids();
 		}
-		$attach_documents = apply_filters('wpo_wcpdf_attach_documents', $attach_documents );
+		$attach_documents = apply_filters('wpo_wcpdf_attach_documents', $attach_documents, $order );
 
 		$document_types = array();
 		foreach ($attach_documents as $document_type => $attach_to_email_ids ) {
