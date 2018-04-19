@@ -136,6 +136,7 @@ class Document_Number {
 		$document_year	= $document_date->date_i18n( 'Y' );
 		$document_month	= $document_date->date_i18n( 'm' );
 		$document_day	= $document_date->date_i18n( 'd' );
+		$order_number	= method_exists($order, 'get_order_number') ? $order->get_order_number() : '';
 
 		// make replacements
 		foreach ($formats as $key => $value) {
@@ -145,6 +146,7 @@ class Document_Number {
 			$value = str_replace("[{$document->slug}_year]", $document_year, $value);
 			$value = str_replace("[{$document->slug}_month]", $document_month, $value);
 			$value = str_replace("[{$document->slug}_day]", $document_day, $value);
+			$value = str_replace('[order_number]', $order_number, $value);
 
 			// replace date tag in the form [invoice_date="{$date_format}"] or [order_date="{$date_format}"]
 			$date_types = array( 'order', $document->slug );
