@@ -207,7 +207,7 @@ class Third_Party_Plugins {
 	}
 
 	function aelia_currency_price_args( $args ) {
-		if ( !empty( $args['currency'] && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) ) {
+		if ( !empty( $args['currency'] ) && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) {
 			$cs_settings = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
 			$args['decimal_separator'] = $cs_settings->get_currency_decimal_separator( $args['currency'] );
 			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
