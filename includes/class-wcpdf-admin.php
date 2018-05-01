@@ -32,7 +32,11 @@ class Admin {
 		// add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
 
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_number_column_sortable' ) );
-		add_filter( 'pre_get_posts', array( $this, 'sort_by_invoice_number' ) );
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
+			add_filter( 'request', array( $this, 'request_query_sort_by_invoice_number' ) );
+		} else {
+			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number' ) );
+		}
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -472,14 +476,39 @@ class Admin {
 		return $columns;
 	}
 
-	public function sort_by_invoice_number( $query ) {
-		if( ! is_admin() )
+
+	/**
+	 * Pre WC3.X sorting
+	 */
+	public function pre_get_posts_sort_by_invoice_number( $query ) {
+		if( ! is_admin() ) {
 			return;
+		}
 		$orderby = $query->get( 'orderby');
 		if( 'pdf_invoice_number' == $orderby ) {
 			$query->set('meta_key','_wcpdf_invoice_number');
-			$query->set('orderby','meta_value_num');
+			$query->set('orderby','meta_value');
 		}
+	}
+
+	/**
+	 * WC3.X+ sorting
+	 */
+	public function request_query_sort_by_invoice_number( $query_vars ) {
+		global $typenow;
+
+		if ( in_array( $typenow, wc_get_order_types( 'order-meta-boxes' ), true ) ) {
+			if ( isset( $query_vars['orderby'] ) ) {
+				if ( 'pdf_invoice_number' === $query_vars['orderby'] ) {
+					$query_vars = array_merge( $query_vars, array(
+						'meta_key'  => '_wcpdf_invoice_number',
+						'orderby'   => 'meta_value',
+					) );
+				}
+			}
+		}
+
+		return $query_vars;
 	}
 
 }
