@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.1.7
+Stable tag: 2.1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,9 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.1.8 =
+* Fix: Fatal error on PHP 5.X
 
 = 2.1.7 =
 * Feature: add [order_number] placeholder for number format
@@ -250,5 +253,5 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Upgrade Notice ==
 
-= 2.1.7 =
+= 2.1.8 =
 2.X is a BIG update! Make a full site backup before upgrading if you were using version 1.X!
