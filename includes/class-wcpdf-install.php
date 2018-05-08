@@ -162,11 +162,14 @@ class Install {
 				// 'display_email'				=> '',
 				// 'display_phone'				=> '',
 			),
-			// 'wpo_wcpdf_settings_debug' => array(
-			// 	'legacy_mode'				=> '',
-			// 	'enable_debug'				=> '',
-			// 	'html_output'				=> '',
-			// ),
+			'wpo_wcpdf_settings_debug' => array(
+				// 'legacy_mode'				=> '',
+				// 'enable_debug'				=> '',
+				// 'html_output'				=> '',
+				// 'html_output'				=> '',
+				'enable_cleanup'				=> 1,
+				'cleanup_days'					=> 7,
+			),
 		);
 		foreach ($settings_defaults as $option => $defaults) {
 			update_option( $option, $defaults );
@@ -329,6 +332,14 @@ class Install {
 			}
 			// we're not deleting this option yet to make downgrading possible
 			// delete_option( 'wpo_wcpdf_next_invoice_number' ); // clean up after ourselves
+		}
+
+		// 2.1.9: set cleanup defaults
+		if ( $installed_version == 'versionless' || version_compare( $installed_version, '2.1.9', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			$debug_settings['enable_cleanup'] = 1;
+			$debug_settings['cleanup_days'] = 7;
+			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		}
 
 	}

@@ -38,8 +38,8 @@ class Main {
 			add_action( 'wpo_wcpdf_before_pdf', array($this, 'use_currency_font' ), 10, 2 );
 		}
 
-		// scheduled attachments cleanup - disabled for now
-		// add_action( 'wp_scheduled_delete', array( $this, 'attachments_cleanup') );
+		// scheduled attachments cleanup (following settings on Status tab)
+		add_action( 'wp_scheduled_delete', array( $this, 'attachments_cleanup') );
 	}
 
 	/**
@@ -465,12 +465,19 @@ class Main {
 	 * Remove attachments older than 1 week (daily, hooked into wp_scheduled_delete )
 	 */
 	public function attachments_cleanup() {
-		if ( !function_exists("glob") || !function_exists('filemtime')) {
-			// glob is disabled
+		if ( !function_exists("glob") || !function_exists('filemtime') ) {
+			// glob is required
 			return;
 		}
 
-		$delete_timestamp = time() - ( DAY_IN_SECONDS * 7 );
+		
+		if ( !isset( WPO_WCPDF()->settings->debug_settings['enable_cleanup'] ) ) {
+			return;
+		}
+
+
+		$cleanup_age_days = isset(WPO_WCPDF()->settings->debug_settings['cleanup_days']) ? floatval(WPO_WCPDF()->settings->debug_settings['cleanup_days']) : 7.0;
+		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
 
 		$tmp_path = $this->get_tmp_path('attachments');
 
@@ -484,7 +491,6 @@ class Main {
 				}
 			}
 		}
-
 	}
 
 	/**
