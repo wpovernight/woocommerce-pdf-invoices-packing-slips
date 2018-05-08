@@ -52,7 +52,7 @@ class Settings_Callbacks {
 		extract( $this->normalize_settings_args( $args ) );
 
 		// output checkbox	
-		printf( '<input type="checkbox" id="%1$s" name="%2$s" value="%3$s"%4$s />', $id, $setting_name, $value, checked( $value, $current, false ) );
+		printf( '<input type="checkbox" id="%1$s" name="%2$s" value="%3$s" %4$s %5$s/>', $id, $setting_name, $value, checked( $value, $current, false ), !empty($disabled) ? 'disabled="disabled"' : '' );
 	
 		// output description.
 		if ( isset( $description ) ) {
@@ -80,7 +80,7 @@ class Settings_Callbacks {
 			$type = 'text';
 		}
 
-		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" size="%5$s" placeholder="%6$s"/>', $type, $id, $setting_name, esc_attr( $current ), $size, $placeholder );
+		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" size="%5$s" placeholder="%6$s" %7$s/>', $type, $id, $setting_name, esc_attr( $current ), $size, $placeholder, !empty($disabled) ? 'disabled="disabled"' : '' );
 	
 		// output description.
 		if ( isset( $description ) ) {
