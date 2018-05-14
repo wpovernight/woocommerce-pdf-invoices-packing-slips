@@ -233,6 +233,12 @@ class Main {
 	 */
 	public function get_tmp_path ( $type = '' ) {
 		$tmp_base = $this->get_tmp_base();
+
+		// don't continue if we don't have an upload dir
+		if ($tmp_base === false) {
+			return false;
+		}
+
 		// check if tmp folder exists => if not, initialize
 		if ( !@is_dir( $tmp_base ) ) {
 			$this->init_tmp( $tmp_base );
@@ -280,8 +286,18 @@ class Main {
 		// May also be overridden by the wpo_wcpdf_tmp_path filter
 
 		$upload_dir = wp_upload_dir();
-		$upload_base = trailingslashit( $upload_dir['basedir'] );
-		$tmp_base = trailingslashit( apply_filters( 'wpo_wcpdf_tmp_path', $upload_base . 'wpo_wcpdf/' ) );
+		if (!empty($upload_dir['error'])) {
+			$tmp_base = false;
+		} else {
+			$upload_base = trailingslashit( $upload_dir['basedir'] );
+			$tmp_base = $upload_base . 'wpo_wcpdf/';
+		}
+
+		$tmp_base = apply_filters( 'wpo_wcpdf_tmp_path', $tmp_base );
+		if ($tmp_base !== false) {
+			$tmp_base = trailingslashit( $tmp_base );
+		}
+
 		return $tmp_base;
 	}
 

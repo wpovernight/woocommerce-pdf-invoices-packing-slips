@@ -76,7 +76,7 @@ class Install {
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
 		// check if tmp folder exists => if not, initialize 
-		if ( !@is_dir( $tmp_base ) ) {
+		if ( $tmp_base !== false && !@is_dir( $tmp_base ) ) {
 			WPO_WCPDF()->main->init_tmp( $tmp_base );
 		}
 
@@ -191,7 +191,7 @@ class Install {
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
 		// check if tmp folder exists => if not, initialize 
-		if ( !@is_dir( $tmp_base ) ) {
+		if ( $tmp_base !== false && !@is_dir( $tmp_base ) ) {
 			WPO_WCPDF()->main->init_tmp( $tmp_base );
 		} else {
 			$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
@@ -353,6 +353,11 @@ class Install {
 	protected function downgrade( $installed_version ) {
 		// make sure fonts match with version: copy from plugin folder
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
+
+		// don't continue if we don't have an upload dir
+		if ($tmp_base === false) {
+			return false;
+		}
 
 		// check if tmp folder exists => if not, initialize 
 		if ( !@is_dir( $tmp_base ) ) {
