@@ -54,6 +54,10 @@ img.wpo-helper {
 	position: relative;
 }
 
+.extensions li:not(.expanded) {
+	cursor:pointer;
+}
+
 .extensions .expanded:before {
 	border-color: #111 transparent transparent transparent;
 	left: -1.17em;
@@ -70,6 +74,7 @@ img.wpo-helper {
 .extensions table td {
 	vertical-align: top;
 }
+
 .dropbox-logo {
 	margin-bottom: -10px;
 	margin-right: 10px;
