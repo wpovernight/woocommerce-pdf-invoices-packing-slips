@@ -728,8 +728,8 @@ abstract class Order_Document_Methods extends Order_Document {
 			if ( substr( $thumbnail_url, 0, 2 ) === "//" ) {
 				$prefix = is_ssl() ? 'https://' : 'http://';
 				$https_thumbnail_url = $prefix . ltrim( $thumbnail_url, '/' );
+				$thumbnail_img_tag_url = str_replace($thumbnail_url, $https_thumbnail_url, $thumbnail_img_tag_url);
 			}
-			$thumbnail_img_tag_url = str_replace($thumbnail_url, $https_thumbnail_url, $thumbnail_img_tag_url);
 			$thumbnail = $thumbnail_img_tag_url;
 		} else {
 			// load img with http url when filtered
