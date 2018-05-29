@@ -189,8 +189,8 @@ abstract class Order_Document_Methods extends Order_Document {
 		if ( !$this->is_order_prop( $field_name ) ) {
 			$custom_field = WCX_Order::get_meta( $this->order, $field_name, true );
 		}
-		// if not found, try prefixed with underscore
-		if ( !$custom_field && substr( $field_name, 0, 1 ) !== '_' && !$this->is_order_prop( "_{$field_name}" ) ) {
+		// if not found, try prefixed with underscore (not when ACF is active!)
+		if ( !$custom_field && substr( $field_name, 0, 1 ) !== '_' && !$this->is_order_prop( "_{$field_name}" ) && !class_exists('ACF') ) {
 			$custom_field = WCX_Order::get_meta( $this->order, "_{$field_name}", true );
 		}
 
