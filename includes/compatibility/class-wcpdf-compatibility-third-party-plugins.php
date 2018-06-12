@@ -32,7 +32,7 @@ class Third_Party_Plugins {
 		}
 
 		// WooCommerce Chained Products compatibility (add row classes)
-		if ( class_exists('SA_WC_Chained_Products') ) {
+		if ( class_exists('SA_WC_Chained_Products') || class_exists('WC_Chained_Products') ) {
 			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 4 );
 		}
 
