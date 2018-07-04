@@ -93,7 +93,7 @@ abstract class Order_Document {
 	public function __construct( $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = $order;
-			$this->order = WCX::get_order( $order_id );
+			$this->order = WCX::get_order( $this->order_id );
 		} elseif ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) {
 			$this->order_id = WCX_Order::get_id( $order );
 			$this->order = $order;
