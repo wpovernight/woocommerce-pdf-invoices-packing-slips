@@ -125,9 +125,21 @@ abstract class Order_Document {
 	}
 
 	public function get_settings() {
-		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		return (array) $document_settings + (array) $common_settings;
+		if ( empty( $this->order ) ) {
+			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+			$settings = (array) $document_settings + (array) $common_settings;
+		} else {
+			$settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
+			if ( empty( $settings ) ) {
+				$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+				$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+				$settings = (array) $document_settings + (array) $common_settings;
+				WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
+			}
+		}
+
+		return $settings;
 	}
 
 	public function get_setting( $key, $default = '' ) {
@@ -191,6 +203,8 @@ abstract class Order_Document {
 					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_formatted" );
 				} elseif ( $key == 'number' ) {
 					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_data" );
+					// deleting the number = deleting the document, so also delete document settings
+					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_settings" );
 				}
 			} else {
 				if ( $key == 'date' ) {

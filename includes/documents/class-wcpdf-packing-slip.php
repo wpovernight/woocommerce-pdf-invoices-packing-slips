@@ -41,12 +41,6 @@ class Packing_Slip extends Order_Document_Methods {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
-	public function get_settings() {
-		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_packing-slip' );
-		return (array) $document_settings + (array) $common_settings;
-	}
-
 	public function get_filename( $context = 'download', $args = array() ) {
 		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;
 
