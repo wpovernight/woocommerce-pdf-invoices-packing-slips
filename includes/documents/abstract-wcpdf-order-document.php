@@ -521,7 +521,7 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 
-		return $pdf;
+		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
 	}
 
 	public function get_html( $args = array() ) {
