@@ -82,7 +82,7 @@ class Assets {
 
 		// only load on our own settings page
 		// maybe find a way to refer directly to WPO\WC\PDF_Invoices\Settings::$options_page_hook ?
-		if ( $hook == 'woocommerce_page_wpo_wcpdf_options_page' || $hook == 'settings_page_wpo_wcpdf_options_page' ) {
+		if ( $hook == 'woocommerce_page_wpo_wcpdf_options_page' || $hook == 'settings_page_wpo_wcpdf_options_page' || ( isset($_GET['page']) && $_GET['page'] == 'wpo_wcpdf_options_page' ) ) {
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles.css',
