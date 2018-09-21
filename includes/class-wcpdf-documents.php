@@ -36,7 +36,7 @@ class Documents {
 	 *
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ), 999 );
+		add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
 	}
 
 	/**
