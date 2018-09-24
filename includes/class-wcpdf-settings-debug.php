@@ -13,6 +13,15 @@ class Settings_Debug {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'debug_tools' ), 10, 2 );
+
+		// yes, we're hiring!
+		if (defined('WP_DEBUG') && WP_DEBUG) {
+			add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'work_at_wpovernight' ), 10, 2 );
+		} else {
+			add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'work_at_wpovernight' ), 30, 2 );			
+		}
+
+		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'dompdf_status' ), 20, 2 );
 	}
 
 	public function output( $section ) {
@@ -107,7 +116,18 @@ class Settings_Debug {
 			?>
 		</form>
 		<?php
-		include( WPO_WCPDF()->plugin_path() . '/includes/views/dompdf-status.php' );
+	}
+
+	public function work_at_wpovernight( $tab, $section ) {
+		if ($tab === 'debug') {
+			include( WPO_WCPDF()->plugin_path() . '/includes/views/work-at-wpovernight.php' );		
+		}
+	}
+
+	public function dompdf_status( $tab, $section ) {
+		if ($tab === 'debug') {
+			include( WPO_WCPDF()->plugin_path() . '/includes/views/dompdf-status.php' );
+		}
 	}
 
 	public function init_settings() {

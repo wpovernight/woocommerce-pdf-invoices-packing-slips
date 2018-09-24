@@ -178,7 +178,7 @@ $upload_base = trailingslashit( $upload_dir['basedir'] );
 		?>
 	<tr>
 		<td><?php echo $permission['description']; ?></td>
-		<td><?php echo $permission['value']; ?></td>
+		<td><?php echo str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ), $permission['value'] ); ?></td>
 		<td style="background-color:<?php echo $background; ?>; color:<?php echo $color; ?>"><?php echo $permission['status_message']; ?></td>
 	</tr>
 
