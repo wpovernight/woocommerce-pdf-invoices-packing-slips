@@ -64,7 +64,7 @@
 	</code>
 	<div style="clear:both;"></div>
 	<div class="subtext">
-	Got PHP? Send your resume to <a href="mailto:work@wpovernight.com">work@wpovernight.com</a>!		
+	We're hiring! Got PHP? Send your resume to <a href="mailto:work@wpovernight.com">work@wpovernight.com</a>!		
 	</div>
 </div>
 <div style="clear:both;"></div>
