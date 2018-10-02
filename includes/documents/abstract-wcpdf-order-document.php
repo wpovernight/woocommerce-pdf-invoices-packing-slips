@@ -220,6 +220,26 @@ abstract class Order_Document {
 		}
 	}
 
+	public function delete( $order = null ) {
+		$order = empty( $order ) ? $this->order : $order;
+		if ( empty( $order ) ) {
+			return; // nothing to delete
+		}
+
+		$data_to_remove = apply_filters( 'wpo_wcpdf_delete_document_data_keys', array(
+			'settings',
+			'date',
+			'date_formatted',
+			'number',
+			'number_data',
+		), $this );
+		foreach ($data_to_remove as $data_key) {
+			WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$data_key}" );
+		}
+
+		do_action( 'wpo_wcpdf_delete_document', $this );
+	}
+
 	public function exists() {
 		return !empty( $this->data['number'] );
 	}

@@ -37,6 +37,9 @@ class Admin {
 		} else {
 			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number' ) );
 		}
+
+		// AJAX action for deleting document data
+		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array($this, 'delete_document' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -296,8 +299,8 @@ class Admin {
 			$invoice_number = $invoice->get_number();
 			$invoice_date = $invoice->get_date();
 			?>
-			<div class="wcpdf-data-fields">
-				<h4><?php echo $invoice->get_title(); ?><?php if ($invoice->exists()) : ?><span id="" class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span><?php endif; ?></h4>
+			<div class="wcpdf-data-fields" data-document="invoice" data-order_id="<?php echo WCX_Order::get_id( $order ); ?>">
+				<h4><?php echo $invoice->get_title(); ?><?php if ($invoice->exists()) : ?><span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span><span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span><?php endif; ?></h4>
 
 				<!-- Read only -->
 				<div class="read-only">
@@ -509,6 +512,41 @@ class Admin {
 		}
 
 		return $query_vars;
+	}
+
+	public function delete_document() {
+		if ( check_ajax_referer( "wpo_wcpdf_delete_document", 'security', false ) === false ) {
+			wp_send_json_error( array(
+				'message' => 'nonce expired',
+			) );
+		}
+		if ( empty($_POST['order_id']) || empty($_POST['document']) ) {
+			wp_send_json_error( array(
+				'message' => 'incomplete request',
+			) );
+		}
+
+		$order_id = absint($_POST['order_id']);
+		$document = sanitize_text_field($_POST['document']);
+
+		try {
+			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );
+			if ( !empty($document) && $document->exists() ) {
+				$document->delete();
+				$response = array(
+					'message' => $document->get_type()." deleted",
+				);
+				wp_send_json_success($response);
+			} else {
+				wp_send_json_error( array(
+					'message' => 'document does not exist',
+				) );
+			}
+		} catch (\Exception $e) {
+			wp_send_json_error( array(
+				'message' => 'error: '.$e->getMessage(),
+			) );			
+		}
 	}
 
 }

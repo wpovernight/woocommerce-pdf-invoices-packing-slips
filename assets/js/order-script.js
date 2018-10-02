@@ -38,5 +38,31 @@ jQuery(document).ready(function($) {
 		$form.find(".editable").show();
 		$form.find(':input').prop('disabled', false);
 	});
+
+	$( ".wcpdf-data-fields .wpo-wcpdf-delete-document" ).click(function() {
+		if ( window.confirm( wpo_wcpdf_ajax.confirm_delete ) === false ) {
+			return; // having second thoughts
+		}
+
+		$form = $(this).closest('.wcpdf-data-fields');
+		$.ajax({
+			url:     wpo_wcpdf_ajax.ajaxurl,
+			data:    {
+				action  : 'wpo_wcpdf_delete_document',
+				security: $(this).data('nonce'),
+				document: $form.data('document'),
+				order_id: $form.data('order_id')
+			},
+			type:    'POST',
+			context: $form,
+			success: function( response ) {
+				if ( response.success ) {
+					$(this).find(':input').val("");
+					$(this).find('.read-only').hide();
+				}
+			}
+		});
+	});
+
 });
 

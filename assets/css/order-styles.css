@@ -46,13 +46,17 @@
 }
 
 /* Edit buttons Invoice, Proforma and Credit */
+.wcpdf-data-fields h4 .dashicons:first-of-type {
+	margin-left:20px!important;	
+}
 
-.wpo-wcpdf-edit-date-number {
-	margin-left:20px!important;
+.dashicons-edit,
+.dashicons-trash {
 	opacity:0.5;
 }
 
-.wpo-wcpdf-edit-date-number:hover {
+.dashicons-edit:hover,
+.dashicons-trash:hover {
 	opacity:1;
 	cursor:pointer;
 }
