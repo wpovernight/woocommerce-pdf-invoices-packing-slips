@@ -102,10 +102,6 @@ abstract class Order_Document {
 		// set properties
 		$this->slug = str_replace('-', '_', $this->type);
 
-		// load settings
-		$this->settings = $this->get_settings();
-		$this->enabled = $this->get_setting( 'enabled', false );
-
 		// load data
 		if ( $this->order ) {
 			$this->read_data( $this->order );
@@ -117,15 +113,18 @@ abstract class Order_Document {
 				$wpo_wcpdf->export->template_type = $this->type;
 			}
 		}
-		
+
+		// load settings
+		$this->settings = $this->get_settings();
+		$this->enabled = $this->get_setting( 'enabled', false );
 	}
 
 	public function init_settings() {
-		return ;
+		return;
 	}
 
 	public function get_settings() {
-		if ( empty( $this->order ) ) {
+		if ( empty( $this->order ) || !$this->exists() ) {
 			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
 			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
 			$settings = (array) $document_settings + (array) $common_settings;
@@ -186,6 +185,14 @@ abstract class Order_Document {
 	}
 
 	public function init() {
+		// store settings in order
+		if ( !empty( $this->order ) ) {
+			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+			$settings = (array) $document_settings + (array) $common_settings;
+			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
+		}
+
 		$this->set_date( current_time( 'timestamp', true ) );
 		do_action( 'wpo_wcpdf_init_document', $this );
 	}
