@@ -105,7 +105,7 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 /**
  * Load HTML into (pluggable) PDF library, DomPDF 0.6 by default
  * Use wpo_wcpdf_pdf_maker filter to change the PDF class (which can wrap another PDF library).
- * @return WC_Logger
+ * @return PDF_Maker
  */
 function wcpdf_get_pdf_maker( $html, $settings = array() ) {
 	if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) {
