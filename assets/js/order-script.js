@@ -59,6 +59,7 @@ jQuery(document).ready(function($) {
 				if ( response.success ) {
 					$(this).find(':input').val("");
 					$(this).find('.read-only').hide();
+					$(this).find('.wpo-wcpdf-delete-document').hide();
 				}
 			}
 		});
