@@ -159,7 +159,50 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 		$log_string  = "The {$function} function is deprecated since version {$version}.";
 		$log_string .= $replacement ? " Replace with {$replacement}." : '';
 		error_log( $log_string );
+		wcpdf_log_error( $log_string, 'warning' );
 	} else {
 		_deprecated_function( $function, $version, $replacement );
 	}
+}
+
+/**
+ * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
+ */
+function wcpdf_log_error( $message, $level = 'error', $e = null ) {
+	if (function_exists('wc_get_logger')) {
+		$logger = wc_get_logger();
+		$context = array( 'source' => 'wpo-wcpdf' );
+
+		if ( apply_filters( 'wcpdf_log_stacktrace', false ) && !empty($e) && is_callable( array( $e, 'getTraceAsString') ) ) {
+			$message .= "\n".$e->getTraceAsString();
+		}
+		 
+		// The `log` method accepts any valid level as its first argument.
+		// debug     - 'Detailed debug information'
+		// info      - 'Interesting events'
+		// notice    - 'Normal but significant events'
+		// warning   - 'Exceptional occurrences that are not errors'
+		// error     - 'Runtime errors that do not require immediate'
+		// critical  - 'Critical conditions'
+		// alert     - 'Action must be taken immediately'
+		// emergency - 'System is unusable'
+		$logger->log( $level, $message, $context );
+	} else {
+		error_log( "WCPDF error ({$level}): {$message}" );
+	}
+}
+
+function wcpdf_output_error( $message, $level = 'error', $e = null ) {
+	if ( !current_user_can( 'edit_shop_orders' ) ) {
+		_e( 'Error creating PDF, please contact the site owner.', 'woocommerce-pdf-invoices-packing-slips' );
+		return;
+	}
+	?>
+	<div style="border: 2px solid red; padding: 5px;">
+		<h3><?php echo $message; ?></h3>
+		<?php if ( !empty($e) && is_callable( array( $e, 'getTraceAsString') ) ): ?>
+		<pre><?php echo $e->getTraceAsString(); ?></pre>
+		<?php endif ?>
+	</div>
+	<?php
 }

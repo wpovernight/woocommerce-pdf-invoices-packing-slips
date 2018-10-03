@@ -354,8 +354,11 @@ abstract class Order_Document {
 			}
 
 			$this->data[ 'date' ] = $datetime;
-		} catch ( Exception $e ) {}
-
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		} catch ( \Error $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		}
 
 	}
 

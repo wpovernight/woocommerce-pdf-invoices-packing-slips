@@ -106,8 +106,14 @@ class Main {
 				$attachments[] = $pdf_path;
 
 				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type, $document );
-			} catch (Exception $e) {
-				error_log($e->getMessage());
+			} catch ( \Exception $e ) {
+				wcpdf_log_error( $e->getMessage(), 'critical', $e );
+				continue;
+			} catch ( \Dompdf\Exception $e ) {
+				wcpdf_log_error( 'DOMPDF exception: '.$e->getMessage(), 'critical', $e );
+				continue;
+			} catch ( \Error $e ) {
+				wcpdf_log_error( $e->getMessage(), 'critical', $e );
 				continue;
 			}
 		}
@@ -227,10 +233,19 @@ class Main {
 			} else {
 				wp_die( sprintf( __( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ), $document_type ) );
 			}
-		} catch (Exception $e) {
-			echo $e->getMessage();
+		} catch ( \Dompdf\Exception $e ) {
+			$message = 'DOMPDF Exception: '.$e->getMessage();
+			wcpdf_log_error( $message, 'critical', $e );
+			wcpdf_output_error( $message, 'critical', $e );
+		} catch ( \Exception $e ) {
+			$message = 'Exception: '.$e->getMessage();
+			wcpdf_log_error( $message, 'critical', $e );
+			wcpdf_output_error( $message, 'critical', $e );
+		} catch ( \Error $e ) {
+			$message = 'Fatal error: '.$e->getMessage();
+			wcpdf_log_error( $message, 'critical', $e );
+			wcpdf_output_error( $message, 'critical', $e );
 		}
-
 		exit;
 	}
 
@@ -417,8 +432,6 @@ class Main {
 		}
 
 		$document_settings = WPO_WCPDF()->settings->get_document_settings( $document_type );
-		// echo '<pre>';var_dump($document_type);echo '</pre>';
-		// error_log( var_export($document_settings,true) );
 
 		// check order total & setting
 		$order_total = $order->get_total();
