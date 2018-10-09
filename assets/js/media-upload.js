@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
 		
 	// Uploading files
 	var file_frame;
-	$('#wpo-wcpdf-settings').on('click', '.wpo_upload_image_button', function( event ){
+	$('#wpo-wcpdf-settings, .wpo-wcpdf-setup').on('click', '.wpo_upload_image_button', function( event ){
 		// get corresponding input fields
 		$row = $(this).parent();
 		$id = $row.find('input#header_logo');

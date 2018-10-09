@@ -174,6 +174,9 @@ class Install {
 		foreach ($settings_defaults as $option => $defaults) {
 			update_option( $option, $defaults );
 		}
+
+		// set transient for wizard notification
+		set_transient( 'wpo_wcpdf_new_install', 'yes', WEEK_IN_SECONDS );
 	}
 
 	/**

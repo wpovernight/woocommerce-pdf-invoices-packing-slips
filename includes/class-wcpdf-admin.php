@@ -27,6 +27,7 @@ class Admin {
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'send_emails' ), 60, 2 );
 
 		add_action( 'admin_notices', array( $this, 'review_plugin_notice' ) );
+		add_action( 'admin_notices', array( $this, 'install_wizard_notice' ) );
 
 		add_action( 'init', array( $this, 'setup_wizard') );
 		// add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
@@ -90,14 +91,37 @@ class Admin {
 		}
 	}
 
+	public function install_wizard_notice() {
+		// automatically remove notice after 1 week, set transient the first time
+		if ( $this->is_order_page() === false && !( isset( $_GET['page'] ) && $_GET['page'] == 'wpo_wcpdf_options_page' ) ) {
+			return;
+		}
+		
+		if ( get_option( 'wpo_wcpdf_install_notice_dismissed' ) !== false ) {
+			return;
+		} else {
+			if ( isset( $_GET['wpo_wcpdf_dismis_install'] ) ) {
+				update_option( 'wpo_wcpdf_install_notice_dismissed', true );
+				return;
+			}
+
+			if ( get_transient( 'wpo_wcpdf_new_install' ) !== false ) {
+				?>
+				<div class="notice notice-info is-dismissible wpo-wcpdf-install-notice">
+					<p><strong><?php _e( 'New to WooCommerce PDF Invoices & Packing Slips?', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong> &#8211; <?php _e( 'Jumpstart the plugin by following our wizard!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p class="submit"><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button-primary"><?php _e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismis_install', true ) ); ?>" class="wpo-wcpdf-dismiss"><?php _e( 'Skip setup wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+				</div>
+				<?php
+			}
+		}
+
+	}
+
 	public function setup_wizard() {
 		// Setup/welcome
-		if ( ! empty( $_GET['page'] ) ) {
-			switch ( $_GET['page'] ) {
-				case 'wpo-wcpdf-setup' :
-					include_once( WPO_WCPDF()->plugin_path() . '/includes/class-wcpdf-setup-wizard.php' );
-				break;
-			}
+		if ( ! empty( $_GET['page'] ) && $_GET['page'] == 'wpo-wcpdf-setup' ) {
+			delete_transient( 'wpo_wcpdf_new_install' );
+			include_once( WPO_WCPDF()->plugin_path() . '/includes/class-wcpdf-setup-wizard.php' );
 		}
 	}
 
