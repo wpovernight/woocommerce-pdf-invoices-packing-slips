@@ -88,7 +88,8 @@ class WPO_WCPDF {
 		 * 	 	- woocommerce-pdf-invoices-packing-slips-pro/languages/woocommerce-pdf-invoices-packing-slips-LOCALE.mo (which if not found falls back to:)
 		 * 	 	- WP_LANG_DIR/plugins/woocommerce-pdf-invoices-packing-slips-LOCALE.mo
 		 */
-		foreach ($textdomains as $textdomain) {
+		foreach ( $textdomains as $textdomain ) {
+			unload_textdomain( $textdomain );
 			load_textdomain( $textdomain, $dir . 'woocommerce-pdf-invoices-packing-slips/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
 			load_textdomain( $textdomain, $dir . 'plugins/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
 			load_plugin_textdomain( $textdomain, false, dirname( plugin_basename(__FILE__) ) . '/languages' );

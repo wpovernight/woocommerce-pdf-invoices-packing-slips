@@ -87,6 +87,9 @@ class Main {
 		// disable deprecation notices during email sending
 		add_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
 
+		// reload translations because WC may have switched to site locale (by setting the plugin_locale filter to site locale in wc_switch_to_site_locale())
+		WPO_WCPDF()->translations();
+
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
 			do_action( 'wpo_wcpdf_before_attachment_creation', $order, $email_id, $document_type );
