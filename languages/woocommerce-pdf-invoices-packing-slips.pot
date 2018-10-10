@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
-"POT-Creation-Date: 2018-10-02 15:47+0200\n"
+"POT-Creation-Date: 2018-10-10 10:05+0200\n"
 "PO-Revision-Date: 2015-04-29 08:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
@@ -10,85 +10,102 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 1.8.12\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: includes/class-wcpdf-admin.php:78
+#: includes/class-wcpdf-admin.php:79
 #, php-format
 msgid "Wow, you have created more than %d invoices with our plugin!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:79
+#: includes/class-wcpdf-admin.php:80
 msgid ""
 "It would mean a lot to us if you would quickly give our plugin a 5-star "
 "rating. Help us spread the word and boost our motivation!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:81
+#: includes/class-wcpdf-admin.php:82
 msgid "Yes you deserve it!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:82
+#: includes/class-wcpdf-admin.php:83
 #: includes/views/attachment-settings-hint.php:22
 #: includes/views/wcpdf-extensions.php:128
 msgid "Hide this message"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:82
+#: includes/class-wcpdf-admin.php:83
 msgid "Already did!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:83
+#: includes/class-wcpdf-admin.php:84
 msgid "Actually, I have a complaint..."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:161 includes/class-wcpdf-admin.php:311
-#: includes/class-wcpdf-main.php:551
+#: includes/class-wcpdf-admin.php:119
+msgid "New to WooCommerce PDF Invoices & Packing Slips?"
+msgstr ""
+
+#: includes/class-wcpdf-admin.php:119
+msgid "Jumpstart the plugin by following our wizard!"
+msgstr ""
+
+#: includes/class-wcpdf-admin.php:120
+msgid "Run the Setup Wizard"
+msgstr ""
+
+#: includes/class-wcpdf-admin.php:120
+msgid "I am the wizard"
+msgstr ""
+
+#: includes/class-wcpdf-admin.php:201 includes/class-wcpdf-admin.php:351
+#: includes/class-wcpdf-main.php:567
 msgid "Invoice Number"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:197
+#: includes/class-wcpdf-admin.php:237
 msgid "Send order email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:208
+#: includes/class-wcpdf-admin.php:248
 msgid "Create PDF"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:218
+#: includes/class-wcpdf-admin.php:258
 msgid "PDF Invoice data"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:252
+#: includes/class-wcpdf-admin.php:292
 msgid "Send email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:320 includes/class-wcpdf-admin.php:341
+#: includes/class-wcpdf-admin.php:360 includes/class-wcpdf-admin.php:381
 #: templates/Simple/invoice.php:60
 msgid "Invoice Date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:326
+#: includes/class-wcpdf-admin.php:366
 msgid "Set invoice number & date"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:333
+#: includes/class-wcpdf-admin.php:373
 msgid "Invoice Number (unformatted!)"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:343 includes/class-wcpdf-admin.php:345
+#: includes/class-wcpdf-admin.php:383 includes/class-wcpdf-admin.php:385
 msgid "h"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:343 includes/class-wcpdf-admin.php:345
+#: includes/class-wcpdf-admin.php:383 includes/class-wcpdf-admin.php:385
 msgid "m"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:436
+#. translators: %s: email title
+#: includes/class-wcpdf-admin.php:476
 #, php-format
 msgid "%s email notification manually sent."
 msgstr ""
@@ -106,24 +123,24 @@ msgstr ""
 msgid "Download invoice (PDF)"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:153 includes/class-wcpdf-main.php:205
+#: includes/class-wcpdf-main.php:162 includes/class-wcpdf-main.php:214
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: includes/class-wcpdf-main.php:162
+#: includes/class-wcpdf-main.php:171
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:166
+#: includes/class-wcpdf-main.php:175
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/class-wcpdf-main.php:228
+#: includes/class-wcpdf-main.php:237
 #, php-format
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:552
+#: includes/class-wcpdf-main.php:568
 msgid "Invoice Date"
 msgstr ""
 
@@ -338,17 +355,17 @@ msgid "Shop header/logo"
 msgstr ""
 
 #: includes/class-wcpdf-settings-general.php:117
-#: includes/views/setup-wizard/logo.php:8
+#: includes/views/setup-wizard/logo.php:19
 msgid "Select or upload your invoice header/logo"
 msgstr ""
 
 #: includes/class-wcpdf-settings-general.php:118
-#: includes/views/setup-wizard/logo.php:8
+#: includes/views/setup-wizard/logo.php:19
 msgid "Set image"
 msgstr ""
 
 #: includes/class-wcpdf-settings-general.php:119
-#: includes/views/setup-wizard/logo.php:8
+#: includes/views/setup-wizard/logo.php:19
 msgid "Remove image"
 msgstr ""
 
@@ -516,11 +533,11 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:685
+#: includes/documents/abstract-wcpdf-order-document.php:695
 msgid "Admin email"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:688
+#: includes/documents/abstract-wcpdf-order-document.php:698
 msgid "Manual email"
 msgstr ""
 
@@ -530,22 +547,22 @@ msgstr ""
 msgid "Invoice"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:91
+#: includes/documents/class-wcpdf-invoice.php:99
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/documents/class-wcpdf-invoice.php:136
+#: includes/documents/class-wcpdf-invoice.php:144
 #: includes/documents/class-wcpdf-packing-slip.php:88
 msgid "Enable"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:147
+#: includes/documents/class-wcpdf-invoice.php:155
 msgid "Attach to:"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:154
+#: includes/documents/class-wcpdf-invoice.php:162
 #, php-format
 msgid ""
 "It looks like the temp folder (<code>%s</code>) is not writable, check the "
@@ -553,44 +570,44 @@ msgid ""
 "plugin will not be able to email invoices."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:160
+#: includes/documents/class-wcpdf-invoice.php:168
 #: includes/views/setup-wizard/display-options.php:10
 msgid "Display shipping address"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:166
+#: includes/documents/class-wcpdf-invoice.php:174
 msgid ""
 "Display shipping address (in addition to the default billing address) if "
 "different from billing address"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:172
+#: includes/documents/class-wcpdf-invoice.php:180
 #: includes/documents/class-wcpdf-packing-slip.php:111
 #: includes/views/setup-wizard/display-options.php:12
 msgid "Display email address"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:183
+#: includes/documents/class-wcpdf-invoice.php:191
 #: includes/documents/class-wcpdf-packing-slip.php:122
 #: includes/views/setup-wizard/display-options.php:14
 msgid "Display phone number"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:194
+#: includes/documents/class-wcpdf-invoice.php:202
 #: includes/views/setup-wizard/display-options.php:16
 msgid "Display invoice date"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:206
+#: includes/documents/class-wcpdf-invoice.php:214
 #: includes/views/setup-wizard/display-options.php:18
 msgid "Display invoice number"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:218
+#: includes/documents/class-wcpdf-invoice.php:226
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:224
+#: includes/documents/class-wcpdf-invoice.php:232
 msgid ""
 "This is the number that will be used for the next document. By default, "
 "numbering starts from 1 and increases for every new document. Note that if "
@@ -598,80 +615,80 @@ msgid ""
 "could create duplicate numbers!"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:230
+#: includes/documents/class-wcpdf-invoice.php:238
 msgid "Number format"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:238
+#: includes/documents/class-wcpdf-invoice.php:246
 msgid "Prefix"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:240
+#: includes/documents/class-wcpdf-invoice.php:248
 msgid ""
 "to use the invoice year and/or month, use [invoice_year] or [invoice_month] "
 "respectively"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:243
+#: includes/documents/class-wcpdf-invoice.php:251
 msgid "Suffix"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:248
+#: includes/documents/class-wcpdf-invoice.php:256
 msgid "Padding"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:251
+#: includes/documents/class-wcpdf-invoice.php:259
 msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:254
+#: includes/documents/class-wcpdf-invoice.php:262
 msgid ""
 "note: if you have already created a custom invoice number format with a "
 "filter, the above settings will be ignored"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:260
+#: includes/documents/class-wcpdf-invoice.php:268
 msgid "Reset invoice number yearly"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:271
+#: includes/documents/class-wcpdf-invoice.php:279
 msgid "Allow My Account invoice download"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:278
+#: includes/documents/class-wcpdf-invoice.php:286
 msgid "Only when an invoice is already created/emailed"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:279
+#: includes/documents/class-wcpdf-invoice.php:287
 msgid "Only for specific order statuses (define below)"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:280
+#: includes/documents/class-wcpdf-invoice.php:288
 msgid "Always"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:281
+#: includes/documents/class-wcpdf-invoice.php:289
 msgid "Never"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:296
+#: includes/documents/class-wcpdf-invoice.php:304
 msgid "Enable invoice number column in the orders list"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:307
+#: includes/documents/class-wcpdf-invoice.php:315
 msgid "Disable for free products"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:313
+#: includes/documents/class-wcpdf-invoice.php:321
 msgid ""
 "Disable automatic creation/attachment when only free products are ordered"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:327
+#: includes/documents/class-wcpdf-invoice.php:335
 msgid "Invoice numbers are created by a third-party extension."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:329
+#: includes/documents/class-wcpdf-invoice.php:337
 #, php-format
 msgid "Configure it <a href=\"%s\">here</a>."
 msgstr ""
@@ -954,6 +971,10 @@ msgstr ""
 msgid "WooCommerce PDF Invoices"
 msgstr ""
 
+#: includes/wcpdf-functions.php:197
+msgid "Error creating PDF, please contact the site owner."
+msgstr ""
+
 #: templates/Simple/invoice.php:30 templates/Simple/packing-slip.php:43
 msgid "Billing Address:"
 msgstr ""
@@ -1018,19 +1039,19 @@ msgstr ""
 msgid "Shipping Method:"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:236
+#: woocommerce-pdf-invoices-packingslips.php:237
 #, php-format
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
 "installed & activated!"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:248
+#: woocommerce-pdf-invoices-packingslips.php:249
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or "
 "higher recommended)."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:249
+#: woocommerce-pdf-invoices-packingslips.php:250
 msgid "How to update your PHP version"
 msgstr ""
