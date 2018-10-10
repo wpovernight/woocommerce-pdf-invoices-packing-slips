@@ -103,6 +103,16 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.2.0 =
+* Feature: Document settings are now saved per order - changing settings after a PDF has been created will no longer affect the output
+* Feature: Button to delete invoice or packing slip
+* Feature: Better error handling and logging via WC Logger (WooCommerce > Status > Logs)
+* Fix: Broader payment gateway compatibility (lower priority for documents initialization)
+* Fix: undefined variable in construct when loading document programmatically (props to Christopher)
+* Fix: compatibility with renamed WooCommerce plugins (settings page detection)
+* Tweak: Reload translations before creating attachment
+* Translations: Updated translations POT
+
 = 2.1.10 =
 * Feature: Include invoice number and date in WooCommerce data remover and exporter 
 * Fix: Row class for Chained Products compatibility
