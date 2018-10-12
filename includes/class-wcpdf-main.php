@@ -21,9 +21,6 @@ class Main {
 		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) ) {
 			$this->enable_debug();
 		}
-		if ( isset(WPO_WCPDF()->settings->debug_settings['html_output']) ) {
-			add_filter( 'wpo_wcpdf_use_path', '__return_false' );
-		}
 
 		// include template specific custom functions
 		$template_path = WPO_WCPDF()->settings->get_template_path();
@@ -222,6 +219,7 @@ class Main {
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
 				switch ( $output_format ) {
 					case 'html':
+						add_filter( 'wpo_wcpdf_use_path', '__return_false' );
 						$document->output_html();
 						break;
 					case 'pdf':
