@@ -178,13 +178,13 @@ class Settings {
 		return false;
 	}
 
-	public function get_output_format() {
+	public function get_output_format( $document_type = null ) {
 		if ( isset( $this->debug_settings['html_output'] ) ) {
 			$output_format = 'html';
 		} else {
 			$output_format = 'pdf';
 		}
-		return $output_format;
+		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document_type );
 	}
 
 	public function get_output_mode() {
