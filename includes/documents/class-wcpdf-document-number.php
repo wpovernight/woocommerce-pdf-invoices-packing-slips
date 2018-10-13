@@ -65,7 +65,7 @@ class Document_Number {
 
 	public function __construct( $number, $settings = array(), $document = null, $order = null ) {
 		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
-		if ( !is_array( $number ) ) {
+		if ( !is_array( $number ) && !empty( $number ) ) {
 			// we're creating a new number with settings as passed
 			$this->number = $number;
 
