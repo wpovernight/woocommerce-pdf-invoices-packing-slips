@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.2.2 =
+* Feature: Added option to always use most current settings for the invoice
+* Fix: Double check for empty document numbers on initialization
+* New filter: `wpo_wcpdf_output_format` to set output per document type
 
 = 2.2.1 =
 * Fix: potential number formatting issues with `wpo_wcpdf_raw_document_number` filter
