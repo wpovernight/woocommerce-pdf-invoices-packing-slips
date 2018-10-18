@@ -176,7 +176,7 @@ class Install {
 		}
 
 		// set transient for wizard notification
-		set_transient( 'wpo_wcpdf_new_install', 'yes', WEEK_IN_SECONDS );
+		set_transient( 'wpo_wcpdf_new_install', 'yes', DAY_IN_SECONDS * 2 );
 	}
 
 	/**
