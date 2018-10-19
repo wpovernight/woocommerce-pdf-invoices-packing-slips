@@ -190,25 +190,25 @@ abstract class Order_Document_Methods extends Order_Document {
 			$custom_field = WCX_Order::get_meta( $this->order, $field_name, true );
 		}
 		// if not found, try prefixed with underscore (not when ACF is active!)
-		if ( !$custom_field && substr( $field_name, 0, 1 ) !== '_' && !$this->is_order_prop( "_{$field_name}" ) && !class_exists('ACF') ) {
+		if ( empty( $custom_field ) && substr( $field_name, 0, 1 ) !== '_' && !$this->is_order_prop( "_{$field_name}" ) && !class_exists('ACF') ) {
 			$custom_field = WCX_Order::get_meta( $this->order, "_{$field_name}", true );
 		}
 
 		// WC3.0 fallback to properties
 		$property = str_replace('-', '_', sanitize_title( ltrim($field_name, '_') ) );
-		if ( !$custom_field && is_callable( array( $this->order, "get_{$property}" ) ) ) {
+		if ( empty( $custom_field ) && is_callable( array( $this->order, "get_{$property}" ) ) ) {
 			$custom_field = $this->order->{"get_{$property}"}( 'view' );
 		}
 
 		// fallback to parent for refunds
-		if ( !$custom_field && $this->is_refund( $this->order ) ) {
+		if ( empty( $custom_field ) && $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
 			if ( !$this->is_order_prop( $field_name ) ) {
 				$custom_field = WCX_Order::get_meta( $parent_order, $field_name, true );
 			}
 
 			// WC3.0 fallback to properties
-			if ( !$custom_field && is_callable( array( $parent_order, "get_{$property}" ) ) ) {
+			if ( empty( $custom_field ) && is_callable( array( $parent_order, "get_{$property}" ) ) ) {
 				$custom_field = $parent_order->{"get_{$property}"}( 'view' );
 			}
 		}
