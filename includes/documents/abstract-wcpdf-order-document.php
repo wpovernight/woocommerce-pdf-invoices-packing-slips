@@ -116,6 +116,7 @@ abstract class Order_Document {
 
 		// load settings
 		$this->settings = $this->get_settings();
+		$this->latest_settings = $this->get_settings( true );
 		$this->enabled = $this->get_setting( 'enabled', false );
 	}
 
@@ -158,7 +159,19 @@ abstract class Order_Document {
 	}
 
 	public function get_setting( $key, $default = '' ) {
-		$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
+		$non_historical_settings = apply_filters( 'wpo_wcpdf_non_historical_settings', array(
+			'enabled',
+			'my_account_buttons',
+			'my_account_restrict',
+			'invoice_number_column',
+			'paper_size',
+			'font_subsetting',
+		) );
+		if ( in_array( $key, $non_historical_settings ) && isset($this->latest_settings) ) {
+			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
+		} else {
+			$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
+		}
 		return $setting;
 	}
 
