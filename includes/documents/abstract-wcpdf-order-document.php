@@ -138,9 +138,9 @@ abstract class Order_Document {
 		// get historical settings if enabled
 		if ( !empty( $this->order ) && $this->use_historical_settings() == true ) {
 			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-			// not sure what happens if combining with current settings will have unwanted side effects
-			// like unchecked options being enabled because missing = unchecked in historical - disabled for now
 			if (!empty($order_settings)) {
+				// not sure what happens if combining with current settings will have unwanted side effects
+				// like unchecked options being enabled because missing = unchecked in historical - disabled for now
 				// $settings = (array) $order_settings + (array) $settings;
 				$settings = $order_settings;
 			}
@@ -161,6 +161,7 @@ abstract class Order_Document {
 	public function get_setting( $key, $default = '' ) {
 		$non_historical_settings = apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
+			'number_format', // this is stored in the number data already!
 			'my_account_buttons',
 			'my_account_restrict',
 			'invoice_number_column',
@@ -422,10 +423,10 @@ abstract class Order_Document {
 
 	public function get_number_settings() {
 		if (empty($this->settings)) {
-			$settings = $this->get_settings();
+			$settings = $this->get_settings( true ); // we always want the latest settings
 			$number_settings = isset($settings['number_format'])?$settings['number_format']:array();
 		} else {
-			$number_settings = isset($this->settings['number_format'])?$this->settings['number_format']:array();
+			$number_settings = $this->get_setting( 'number_format', array() );
 		}
 		return apply_filters( 'wpo_wcpdf_document_number_settings', $number_settings, $this );
 	}
