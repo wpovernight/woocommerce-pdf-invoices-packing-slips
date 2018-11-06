@@ -83,6 +83,18 @@ class Settings_General {
 			),
 			array(
 				'type'		=> 'setting',
+				'id'		=> 'test_mode',
+				'title'		=> __( 'Test mode', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'checkbox',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'test_mode',
+					'description'		=> __( 'With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created.' , 'woocommerce-pdf-invoices-packing-slips' ) . '<br>'. __( '<strong>Note:</strong> invoice numbers and dates are not affected by this setting and will still be generated.' , 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
 				'id'		=> 'currency_font',
 				'title'		=> __( 'Extended currency symbol support', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'	=> 'checkbox',
