@@ -377,7 +377,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show the current date
 	 */
 	public function get_current_date() {
-		return apply_filters( 'wpo_wcpdf_date', date_i18n( get_option( 'date_format' ) ) );
+		return apply_filters( 'wpo_wcpdf_date', date_i18n( wc_date_format() ) );
 	}
 	public function current_date() {
 		echo $this->get_current_date();
@@ -448,7 +448,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$order_date = WCX_Order::get_prop( $this->order, 'date_created' );
 		}
 
-		$date = $order_date->date_i18n( get_option( 'date_format' ) );
+		$date = $order_date->date_i18n( wc_date_format() );
 		$mysql_date = $order_date->date( "Y-m-d H:i:s" );
 		return apply_filters( 'wpo_wcpdf_order_date', $date, $mysql_date, $this );
 	}
