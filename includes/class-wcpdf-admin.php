@@ -32,6 +32,9 @@ class Admin {
 		add_action( 'init', array( $this, 'setup_wizard') );
 		// add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
 
+		add_action( 'admin_bar_menu', array( $this, 'debug_enabled_warning' ), 999 );
+
+
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_number_column_sortable' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
 			add_filter( 'request', array( $this, 'request_query_sort_by_invoice_number' ) );
@@ -589,6 +592,17 @@ class Admin {
 		}
 	}
 
+	public function debug_enabled_warning( $wp_admin_bar ) {
+		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) ) {
+			$status_settings_url = 'admin.php?page=wpo_wcpdf_options_page&tab=debug';
+			$title = __( 'DEBUG output enabled', 'woocommerce-pdf-invoices-packing-slips' );
+			$args = array(
+				'id'    => 'admin_bar_wpo_debug_mode',
+				'title' => sprintf( '<a href="%s" style="background-color: red; color: white;">%s</a>', $status_settings_url, $title ),
+			);
+			$wp_admin_bar->add_node( $args );
+		}
+	}
 }
 
 endif; // class_exists
