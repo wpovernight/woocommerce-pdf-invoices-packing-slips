@@ -593,7 +593,7 @@ class Admin {
 	}
 
 	public function debug_enabled_warning( $wp_admin_bar ) {
-		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) ) {
+		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) && current_user_can( 'administrator' ) ) {
 			$status_settings_url = 'admin.php?page=wpo_wcpdf_options_page&tab=debug';
 			$title = __( 'DEBUG output enabled', 'woocommerce-pdf-invoices-packing-slips' );
 			$args = array(
