@@ -476,7 +476,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['variation_id'] = $item['variation_id'];
 
 				// Set item name
-				$data['name'] = $item['name'];
+				$data['name'] = apply_filters( 'woocommerce_order_item_name', $item['name'], $item, false );
 				
 				// Set item quantity
 				$data['quantity'] = $item['qty'];
