@@ -161,6 +161,7 @@ abstract class Order_Document {
 	public function get_setting( $key, $default = '' ) {
 		$non_historical_settings = apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
+			'attach_to_email_ids',
 			'number_format', // this is stored in the number data already!
 			'my_account_buttons',
 			'my_account_restrict',
