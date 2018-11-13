@@ -477,7 +477,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 				// Compatibility: WooCommerce Composit Products uses a workaround for
 				// setting the order before the item name filter, so we run this first
-				if ( class_exists('WC_Bundles') ) {
+				if ( class_exists('WC_Composite_Products') ) {
 					$order_item_class = apply_filters( 'woocommerce_order_item_class', '', $item, $this->order );
 				}
 				
