@@ -475,6 +475,12 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['product_id'] = $item['product_id'];
 				$data['variation_id'] = $item['variation_id'];
 
+				// Compatibility: WooCommerce Composit Products uses a workaround for
+				// setting the order before the item name filter, so we run this first
+				if ( class_exists('WC_Bundles') ) {
+					$order_item_class = apply_filters( 'woocommerce_order_item_class', '', $item, $this->order );
+				}
+				
 				// Set item name
 				$data['name'] = apply_filters( 'woocommerce_order_item_name', $item['name'], $item, false );
 				
