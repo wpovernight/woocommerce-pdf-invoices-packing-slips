@@ -279,7 +279,7 @@ abstract class Order_Document {
 	}
 
 	public function exists() {
-		return !empty( $this->data['number'] );
+		return !empty( $this->data['date'] );
 	}
 
 	/*

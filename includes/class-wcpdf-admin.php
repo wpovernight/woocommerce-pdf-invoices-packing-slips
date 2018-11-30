@@ -169,10 +169,12 @@ class Admin {
 		$listing_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
 		foreach ($documents as $document) {
+            $document->read_data( $order );
 			$listing_actions[$document->get_type()] = array(
 				'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . WCX_Order::get_id( $order ) ), 'generate_wpo_wcpdf' ),
 				'img'		=> !empty($document->icon) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png",
 				'alt'		=> "PDF " . $document->get_title(),
+                'exists'    => $document->exists(),
 			);
 		}
 
@@ -180,7 +182,7 @@ class Admin {
 
 		foreach ($listing_actions as $action => $data) {
 			?>
-			<a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $action; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
+			<a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $data['exists'] == true ? "exists " . $action : $action; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
 				<img src="<?php echo $data['img']; ?>" alt="<?php echo $data['alt']; ?>" width="16">
 			</a>
 			<?php
