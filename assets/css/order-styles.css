@@ -4,11 +4,11 @@
 }
 
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf.exists::after {
-    content: "\f147";
-    position:absolute;
-    font-size:16px;
-    left:7px;
-    color:#2aad2a;
+	content: "\f147";
+	position:absolute;
+	font-size:16px;
+	left:7px;
+	color:#2aad2a;
 }
 
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf img,

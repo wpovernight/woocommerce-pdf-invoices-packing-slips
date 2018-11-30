@@ -65,9 +65,9 @@ class Invoice extends Order_Document_Methods {
 		$this->init_number();
 	}
 
-    public function exists() {
-        return !empty( $this->data['number'] );
-    }
+	public function exists() {
+		return !empty( $this->data['number'] );
+	}
 
 	public function init_number() {
 		global $wpdb;
