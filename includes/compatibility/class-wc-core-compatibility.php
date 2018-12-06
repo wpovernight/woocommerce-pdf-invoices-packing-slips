@@ -1,9 +1,9 @@
 <?php
+namespace WPO\WC\PDF_Invoices\Compatibility;
+
 /**
  * Derived from SkyVerge WooCommerce Plugin Framework https://github.com/skyverge/wc-plugin-framework/
  */
-
-namespace WPO\WC\PDF_Invoices\Compatibility;
 
 defined( 'ABSPATH' ) or exit;
 

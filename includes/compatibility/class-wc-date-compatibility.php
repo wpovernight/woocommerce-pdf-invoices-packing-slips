@@ -1,9 +1,9 @@
 <?php
+namespace WPO\WC\PDF_Invoices\Compatibility;
+
 /**
  * Copy of WC3.0 WC_DateTime class
  */
-
-namespace WPO\WC\PDF_Invoices\Compatibility;
 
 defined( 'ABSPATH' ) or exit;
 
