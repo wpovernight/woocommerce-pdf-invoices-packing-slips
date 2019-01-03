@@ -586,7 +586,7 @@
   'ItalicAngle' => '-12',
   'IsFixedPitch' => 'false',
   'UnderlineThickness' => '50',
-  'UnderlinePosition' => '-500',
+  'UnderlinePosition' => '-75',
   'FontHeightOffset' => '0',
   'Ascender' => '1069',
   'Descender' => '-293',
