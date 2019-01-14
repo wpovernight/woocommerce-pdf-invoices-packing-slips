@@ -67,25 +67,28 @@ abstract class Order_Document_Methods extends Order_Document {
 			$order = $this->order;
 		}
 
-		$address_comparison_fields = apply_filters( 'wpo_wcpdf_address_comparison_fields', array(
-			'first_name',
-			'last_name',
-			'company',
-			'address_1',
-			'address_2',
-			'city',
-			'state',
-			'postcode',
-			'country'
-		), $this );
-		
-		foreach ($address_comparison_fields as $address_field) {
-			$billing_field = WCX_Order::get_prop( $order, "billing_{$address_field}", 'view');
-			$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}", 'view');
-			if ( $shipping_field != $billing_field ) {
-				// this address field is different -> ships to different address!
-				return true;
-			}
+		// only check if there is a shipping address at all
+		if ( $formatted_shipping_address = $order->get_formatted_shipping_address() ) {
+			$address_comparison_fields = apply_filters( 'wpo_wcpdf_address_comparison_fields', array(
+				'first_name',
+				'last_name',
+				'company',
+				'address_1',
+				'address_2',
+				'city',
+				'state',
+				'postcode',
+				'country'
+			), $this );
+			
+			foreach ($address_comparison_fields as $address_field) {
+				$billing_field = WCX_Order::get_prop( $order, "billing_{$address_field}", 'view');
+				$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}", 'view');
+				if ( $shipping_field != $billing_field ) {
+					// this address field is different -> ships to different address!
+					return true;
+				}
+			}			
 		}
 
 		//if we got here, it means the addresses are equal -> doesn't ship to different address!
