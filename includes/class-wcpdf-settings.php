@@ -22,7 +22,7 @@ class Settings {
 
 
 		// Settings menu item
-		add_action( 'admin_menu', array( $this, 'menu' ) ); // Add menu.
+		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
 		// Links on plugin page
 		add_filter( 'plugin_action_links_'.WPO_WCPDF()->plugin_basename, array( $this, 'add_settings_link' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
