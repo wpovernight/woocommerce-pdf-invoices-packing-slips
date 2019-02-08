@@ -178,6 +178,9 @@ table.order-details {
 	border: 0;
 }
 
+.order-details tr.bundled-item.hidden {
+	display: none;
+}
 
 /* item meta formatting for WC2.6 and older */
 dl {
