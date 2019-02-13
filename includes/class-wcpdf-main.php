@@ -562,7 +562,7 @@ class Main {
 		foreach ( $number_stores as $store_name ) {
 			$order_id = $order->get_id();
 			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
-			$wpdb->query( "UPDATE $table_name SET order_id = 0 WHERE order_id = $order_id" );
+			$wpdb->query( $wpdb->prepare( "UPDATE $table_name SET order_id = 0 WHERE order_id = %s", $order_id ) );
 		}
 	}
 
