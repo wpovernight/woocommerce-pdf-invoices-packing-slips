@@ -440,14 +440,24 @@ class Admin {
 					$date = $_POST['wcpdf_invoice_date'];
 					$hour = !empty( $_POST['wcpdf_invoice_date_hour'] ) ? $_POST['wcpdf_invoice_date_hour'] : '00';
 					$minute = !empty( $_POST['wcpdf_invoice_date_minute'] ) ? $_POST['wcpdf_invoice_date_minute'] : '00';
+
+					// clean & sanitize input
+					$date = date( 'Y-m-d', strtotime( $date ) );
+					$hour = sprintf('%02d', intval( $hour ));
+					$minute = sprintf('%02d', intval( $minute ) );
 					$invoice_date = "{$date} {$hour}:{$minute}:00";
+
+					// set date
 					$invoice->set_date( $invoice_date );
 				} elseif ( empty( $_POST['wcpdf_invoice_date'] ) && !empty( $_POST['_wcpdf_invoice_number'] ) ) {
 					$invoice->set_date( current_time( 'timestamp', true ) );
 				}
 
 				if ( isset( $_POST['_wcpdf_invoice_number'] ) ) {
-					$invoice->set_number( $_POST['_wcpdf_invoice_number'] );
+					// sanitize
+					$invoice_number = sanitize_text_field( $_POST['_wcpdf_invoice_number'] );
+					// set number
+					$invoice->set_number( $invoice_number );
 				}
 
 				$invoice->save();
