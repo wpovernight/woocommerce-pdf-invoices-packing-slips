@@ -580,6 +580,11 @@ class Admin {
 				'message' => 'incomplete request',
 			) );
 		}
+		if ( !current_user_can('manage_woocommerce') ) {
+			wp_send_json_error( array(
+				'message' => 'no permissions',
+			) );
+		}
 
 		$order_id = absint($_POST['order_id']);
 		$document = sanitize_text_field($_POST['document']);

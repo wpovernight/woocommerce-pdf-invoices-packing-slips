@@ -227,6 +227,11 @@ class Settings {
 
 	public function set_number_store() {
 		check_ajax_referer( "wpo_wcpdf_next_{$_POST['store']}", 'security' );
+		// check permissions
+		if ( !current_user_can('manage_woocommerce') ) {
+			die(); 
+		}
+
 		$number = isset( $_POST['number'] ) ? (int) $_POST['number'] : 0;
 		$number_store_method = $this->get_sequential_number_store_method();
 		$number_store = new Sequential_Number_Store( $_POST['store'], $number_store_method );
