@@ -1,6 +1,8 @@
 <?php
 use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
 
+defined( 'ABSPATH' ) or exit;
+
 // load date/time functions for older WC versions
 if ( WCX::is_wc_version_lt_3_0() ) {
 	if ( !function_exists( 'wc_timezone_offset' ) ) {

@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or exit;
+
 /**
  * mb_string compatibility - something's better than nothing!
  * Taken from dompdf 0.6

@@ -1,3 +1,4 @@
+<?php defined( 'ABSPATH' ) or exit; ?>
 <script type="text/javascript">
 	jQuery( function( $ ) {
 		$("#footer-thankyou").html("If you like <strong>WooCommerce PDF Invoices & Packing Slips</strong> please leave us a <a href='https://wordpress.org/support/view/plugin-reviews/woocommerce-pdf-invoices-packing-slips?rate=5#postform'>★★★★★</a> rating. A huge thank you in advance!");

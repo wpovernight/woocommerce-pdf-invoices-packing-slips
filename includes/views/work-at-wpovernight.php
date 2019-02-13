@@ -1,3 +1,4 @@
+<?php defined( 'ABSPATH' ) or exit; ?>
 <style type="text/css">
 	.wpo-wcpdf-work-at-wpovernight {
 		background-color: #f6f6f6;

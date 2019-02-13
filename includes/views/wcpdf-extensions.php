@@ -1,3 +1,4 @@
+<?php defined( 'ABSPATH' ) or exit; ?>
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	jQuery('.extensions .more').hide();

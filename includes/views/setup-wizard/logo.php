@@ -1,3 +1,4 @@
+<?php defined( 'ABSPATH' ) or exit; ?>
 <div class="wpo-step-description">
 	<h2><?php _e( 'Your logo' , 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<p><?php _e( 'Set the header image that will display on your invoice.' , 'woocommerce-pdf-invoices-packing-slips' ); ?></p>

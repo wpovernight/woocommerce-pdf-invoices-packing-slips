@@ -1,3 +1,4 @@
+<?php defined( 'ABSPATH' ) or exit; ?>
 <div class="wpo-step-description">
 	<h2><?php _e( 'Display options', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<p><?php _e( 'Select some additional display options for your invoice.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
