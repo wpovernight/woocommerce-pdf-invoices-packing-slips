@@ -311,11 +311,14 @@ class Admin {
 
 		$meta_box_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
+		$order = WCX::get_order( $post->ID );
 		foreach ($documents as $document) {
+			$document->read_data( $order );
 			$meta_box_actions[$document->get_type()] = array(
 				'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . $post_id ), 'generate_wpo_wcpdf' ),
 				'alt'		=> esc_attr( "PDF " . $document->get_title() ),
 				'title'		=> "PDF " . $document->get_title(),
+				'exists'	=> $document->exists(),
 			);
 		}
 
@@ -325,7 +328,8 @@ class Admin {
 		<ul class="wpo_wcpdf-actions">
 			<?php
 			foreach ($meta_box_actions as $document_type => $data) {
-				printf('<li><a href="%1$s" class="button" target="_blank" alt="%2$s">%3$s</a></li>', $data['url'], $data['alt'],$data['title']);
+				$data['exists'] == true ? $exists = 'exists' : $exists = '';
+				printf('<li><a href="%1$s" class="button %4$s" target="_blank" alt="%2$s">%3$s</a></li>', $data['url'], $data['alt'], $data['title'], $exists);
 			}
 			?>
 		</ul>
