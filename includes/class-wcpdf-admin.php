@@ -328,7 +328,7 @@ class Admin {
 		<ul class="wpo_wcpdf-actions">
 			<?php
 			foreach ($meta_box_actions as $document_type => $data) {
-				$data['exists'] == true ? $exists = 'exists' : $exists = '';
+				$exists = ( isset( $data['exists'] ) && $data['exists'] == true ) ? 'exists' : '';
 				printf('<li><a href="%1$s" class="button %4$s" target="_blank" alt="%2$s">%3$s</a></li>', $data['url'], $data['alt'], $data['title'], $exists);
 			}
 			?>

@@ -12,11 +12,10 @@
 }
 
 .wpo_wcpdf-actions a.button.exists::after {
+	font-family: Dashicons;
 	content: "\f147";
-	position:inline;
 	font-size:16px;
-	left:7px;
-	margin-left:8px;
+	margin-left:4px;
 	color:#2aad2a;
 }
 
