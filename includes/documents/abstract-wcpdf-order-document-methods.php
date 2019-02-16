@@ -176,7 +176,13 @@ abstract class Order_Document_Methods extends Order_Document {
 			$address = apply_filters( 'wpo_wcpdf_shipping_address', $address, $this );
 		} else {
 			// no address
-			$address = apply_filters( 'wpo_wcpdf_shipping_address', __('N/A', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+			// use fallback for packing slip
+			if ( apply_filters( 'wpo_wcpdf_shipping_address_fallback', ( $this->get_type() == 'packing-slip' ), $this ) ) {
+				$address = $this->get_billing_address();
+			} else{
+				$address = apply_filters( 'wpo_wcpdf_shipping_address', __('N/A', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+
+			}
 		}
 
 		return $address;
