@@ -11,6 +11,15 @@
 	color:#2aad2a;
 }
 
+.wpo_wcpdf-actions a.button.exists::after {
+	content: "\f147";
+	position:inline;
+	font-size:16px;
+	left:7px;
+	margin-left:8px;
+	color:#2aad2a;
+}
+
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf img,
 .type-shop_order .column-order_actions a.button.wpo_wcpdf img {
 	width: 16px;
