@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.0
 Requires PHP: 5.3
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.2.7 =
+* Fix: permissions & security checks on several admin actions (audit by pluginvulnerabilities.com)
+* Feature: Show checkmarks for existing documents on order details page buttons too
+* Tweak: Product Bundles compatibility, hide items by default, following bundle settings (Simple Template)
+* Tweak: Fallback to billing address on packing slip for orders without shipping address
 
 = 2.2.6 =
 * Fix: ship to different address check for empty shipping addresses
