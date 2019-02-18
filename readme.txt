@@ -104,7 +104,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 = 2.2.7 =
-* Fix: permissions & security checks on several admin actions (audit by pluginvulnerabilities.com)
+* Fix: Hardened permissions & security checks on several admin actions (audit by pluginvulnerabilities.com)
 * Feature: Show checkmarks for existing documents on order details page buttons too
 * Tweak: Product Bundles compatibility, hide items by default, following bundle settings (Simple Template)
 * Tweak: Fallback to billing address on packing slip for orders without shipping address
