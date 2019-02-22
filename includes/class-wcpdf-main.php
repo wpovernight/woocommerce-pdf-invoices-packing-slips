@@ -175,6 +175,11 @@ class Main {
 			wp_die( __( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
+		// debug enabled by URL
+		if ( isset( $_GET['debug'] ) ) {
+			$this->enable_debug();
+		}
+
 		// Generate the output
 		$document_type = sanitize_text_field( $_GET['document_type'] );
 
@@ -220,6 +225,10 @@ class Main {
 
 			if ( $document ) {
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
+				// allow URL override
+				if ( isset( $_GET['output'] ) && in_array( $_GET['output'], array( 'html', 'pdf' ) ) ) {
+					$output_format = $_GET['output'];
+				}
 				switch ( $output_format ) {
 					case 'html':
 						add_filter( 'wpo_wcpdf_use_path', '__return_false' );
