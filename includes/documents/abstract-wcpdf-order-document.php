@@ -718,7 +718,6 @@ abstract class Order_Document {
 		$wc_emails = $mailer->get_emails();
 
 		$non_order_emails = array(
-			'customer_note',
 			'customer_reset_password',
 			'customer_new_account'
 		);
