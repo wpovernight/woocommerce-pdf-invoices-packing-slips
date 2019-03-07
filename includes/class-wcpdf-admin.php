@@ -440,7 +440,7 @@ class Admin {
 			
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				if ( isset( $_POST['wcpdf_invoice_date'] ) ) {
+				if ( !empty( $_POST['wcpdf_invoice_date'] ) ) {
 					$date = $_POST['wcpdf_invoice_date'];
 					$hour = !empty( $_POST['wcpdf_invoice_date_hour'] ) ? $_POST['wcpdf_invoice_date_hour'] : '00';
 					$minute = !empty( $_POST['wcpdf_invoice_date_minute'] ) ? $_POST['wcpdf_invoice_date_minute'] : '00';
