@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.1
 Requires PHP: 5.3
-Stable tag: 2.2.8
+Stable tag: 2.2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.2.9 =
+* Feature: Added customer note email to attachment options
+* Fix: Prevent empty invoice dates from being saved as 1970 (fallback to current date/time)
 
 = 2.2.8 =
 * Tested up to WP5.1
