@@ -119,7 +119,7 @@ class Main {
 									$locked = $this->file_is_locked( $fp );
 								}
 							}
-							fclose($pdf_path);
+							fclose($fp);
 
 							if ( !$locked ) {
 								$attachments[] = $pdf_path;
