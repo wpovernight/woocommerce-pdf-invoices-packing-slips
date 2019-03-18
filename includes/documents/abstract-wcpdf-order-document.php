@@ -278,6 +278,10 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_delete_document', $this );
 	}
 
+	public function is_allowed() {
+		return apply_filters( 'wpo_wcpdf_document_is_allowed', true, $this );
+	}
+
 	public function exists() {
 		return !empty( $this->data['date'] );
 	}

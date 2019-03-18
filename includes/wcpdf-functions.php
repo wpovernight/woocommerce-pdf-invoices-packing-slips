@@ -46,11 +46,14 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, WCX_Order::get_id( $order ) );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
+				if ( !$document->is_allowed() ) {
+					return false;
+				}
+
 				if ( $init && !$document->exists() ) {
 					$document->init();
 					$document->save();
 				}
-				// $document->read_data( $order ); // isn't data already read from construct?
 				return $document;
 			} else {
 				// order ids array changed, continue processing that array
@@ -74,6 +77,11 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 			$order = WCX::get_order( $order_id );
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+
+			if ( !$document->is_allowed() ) {
+				return false;
+			}
+
 			if ( $init && !$document->exists() ) {
 				$document->init();
 				$document->save();
