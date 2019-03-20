@@ -566,7 +566,7 @@ class Admin {
 				if ( 'pdf_invoice_number' === $query_vars['orderby'] ) {
 					$query_vars = array_merge( $query_vars, array(
 						'meta_key'  => '_wcpdf_invoice_number',
-						'orderby'   => 'meta_value',
+						'orderby'   => apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ),
 					) );
 				}
 			}
