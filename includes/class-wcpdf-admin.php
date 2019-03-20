@@ -550,8 +550,8 @@ class Admin {
 		}
 		$orderby = $query->get( 'orderby');
 		if( 'pdf_invoice_number' == $orderby ) {
-			$query->set('meta_key','_wcpdf_invoice_number');
-			$query->set('orderby','meta_value');
+			$query->set( 'meta_key', '_wcpdf_invoice_number' );
+			$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
 		}
 	}
 
