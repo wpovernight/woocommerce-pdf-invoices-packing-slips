@@ -273,6 +273,12 @@ class Admin {
 	 * Resend order emails
 	 */
 	public function send_order_email_meta_box( $post ) {
+		global $theorder;
+		// This is used by some callbacks attached to hooks such as woocommerce_resend_order_emails_available
+		// which rely on the global to determine if emails should be displayed for certain orders.
+		if ( ! is_object( $theorder ) ) {
+			$theorder = wc_get_order( $post->ID );
+		}
 		?>
 		<ul class="wpo_wcpdf_send_emails submitbox">
 			<li class="wide" id="actions">
