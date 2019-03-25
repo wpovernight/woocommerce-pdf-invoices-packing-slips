@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.1
 Requires PHP: 5.3
-Stable tag: 2.2.9
+Stable tag: 2.2.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,14 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.2.10 =
+* Fix: Possible conflict with latest Subscriptions
+* Fix: Load correct translations when admin user profile language is set to different locale
+* Fix: Use file lock to prevent parallel processes creating the same attachment file
+* Fix: Prevent notices for incorrectly loaded email classes
+* Feature: Allow different invoice number column sorting methods by filter
+* Feature: Filter for global prevention of creating specific document (`wpo_wcpdf_document_is_allowed`)
 
 = 2.2.9 =
 * Feature: Added customer note email to attachment options
