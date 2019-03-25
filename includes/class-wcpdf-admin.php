@@ -169,12 +169,15 @@ class Admin {
 		$listing_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
 		foreach ($documents as $document) {
+			$document_title = $document->get_title();
+			$icon = !empty($document->icon) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+				$document_title = method_exists($document, 'get_title') ? $document->get_title() : $document_title;
 				$listing_actions[$document->get_type()] = array(
 					'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . WCX_Order::get_id( $order ) ), 'generate_wpo_wcpdf' ),
-					'img'		=> !empty($document->icon) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png",
-					'alt'		=> "PDF " . $document->get_title(),
-					'exists'	=> $document->exists(),
+					'img'		=> $icon,
+					'alt'		=> "PDF " . $document_title,
+					'exists'	=> method_exists($document, 'exists') ? $document->exists() : false,
 				);
 			}
 		}
@@ -320,12 +323,14 @@ class Admin {
 		$documents = WPO_WCPDF()->documents->get_documents();
 		$order = WCX::get_order( $post->ID );
 		foreach ($documents as $document) {
+			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+				$document_title = method_exists($document, 'get_title') ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
 					'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . $post_id ), 'generate_wpo_wcpdf' ),
-					'alt'		=> esc_attr( "PDF " . $document->get_title() ),
-					'title'		=> "PDF " . $document->get_title(),
-					'exists'	=> $document->exists(),
+					'alt'		=> esc_attr( "PDF " . $document_title ),
+					'title'		=> "PDF " . $document_title,
+					'exists'	=> method_exists($document, 'exists') ? $document->exists() : false,
 				);
 			}
 		}
