@@ -171,6 +171,18 @@ class Settings_Debug {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'guest_access',
+				'title'			=> __( 'Allow guest access', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'guest_access',
+					'description'		=> __( 'Enable this to allow customers that purchase without an account to access their PDF with a unique key', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'calculate_document_numbers',
 				'title'			=> __( 'Calculate document numbers (slow)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
