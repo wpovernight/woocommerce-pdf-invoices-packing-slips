@@ -15,6 +15,7 @@ class Main {
 
 	function __construct()	{
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
+		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3 );
 		add_filter( 'wpo_wcpdf_custom_attachment_condition', array( $this, 'disable_free_attachment'), 1001, 4 );
 
@@ -199,8 +200,13 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_pdf_ajax() {
-		// Check the nonce
-		if( empty( $_GET['action'] ) || !check_admin_referer( $_GET['action'] ) ) {
+		$guest_access = isset( WPO_WCPDF()->settings->general_settings['guest_access'] );
+		if ( !$guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf') {
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		// Check the nonce - guest access doesn't use nonces but checks the unique order key (hash)
+		if( empty( $_GET['action'] ) || ( !$guest_access && !check_admin_referer( $_GET['action'] ) ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
@@ -218,7 +224,7 @@ class Main {
 		}
 
 		// debug enabled by URL
-		if ( isset( $_GET['debug'] ) ) {
+		if ( isset( $_GET['debug'] ) && !( $guest_access || isset( $_GET['my-account'] ) ) ) {
 			$this->enable_debug();
 		}
 
@@ -232,26 +238,39 @@ class Main {
 		// set default is allowed
 		$allowed = true;
 
-		// check if user is logged in
-		if ( ! is_user_logged_in() ) {
-			$allowed = false;
-		}
 
-		// Check the user privileges
-		if( !( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ) && !isset( $_GET['my-account'] ) ) {
-			$allowed = false;
-		}
-
-		// User call from my-account page
-		if ( !current_user_can('manage_options') && isset( $_GET['my-account'] ) ) {
-			// Only for single orders!
+		if ( $guest_access && isset( $_GET['order_key'] ) ) {
+			// Guest access with order key
 			if ( count( $order_ids ) > 1 ) {
+				$allowed = false;
+			} else {
+				$order = wc_get_order( $order_ids[0] );
+				if ( !$order || ! hash_equals( $order->get_order_key(), $_GET['order_key'] ) ) {
+					$allowed = false;
+				}
+			}
+		} else {
+			// check if user is logged in
+			if ( ! is_user_logged_in() ) {
 				$allowed = false;
 			}
 
-			// Check if current user is owner of order IMPORTANT!!!
-			if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+			// Check the user privileges
+			if( !( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ) && !isset( $_GET['my-account'] ) ) {
 				$allowed = false;
+			}
+
+			// User call from my-account page
+			if ( !current_user_can('manage_options') && isset( $_GET['my-account'] ) ) {
+				// Only for single orders!
+				if ( count( $order_ids ) > 1 ) {
+					$allowed = false;
+				}
+
+				// Check if current user is owner of order IMPORTANT!!!
+				if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+					$allowed = false;
+				}
 			}
 		}
 

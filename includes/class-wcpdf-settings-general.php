@@ -83,6 +83,18 @@ class Settings_General {
 			),
 			array(
 				'type'		=> 'setting',
+				'id'		=> 'guest_access',
+				'title'		=> __( 'Allow guest access', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'checkbox',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'guest_access',
+					'description'		=> __( 'Enable this to allow customers that purchase without an account to access their PDF with a unique key', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
 				'id'		=> 'test_mode',
 				'title'		=> __( 'Test mode', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'	=> 'checkbox',
