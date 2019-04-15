@@ -401,13 +401,17 @@ class Main {
 	 */
 	public function init_tmp ( $tmp_base ) {
 		// create plugin base temp folder
-		@mkdir( $tmp_base );
+		mkdir( $tmp_base );
+
+		if (!is_dir($tmp_base)) {
+			wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
+		}
 
 		// create subfolders & protect
 		$subfolders = array( 'attachments', 'fonts', 'dompdf' );
 		foreach ( $subfolders as $subfolder ) {
 			$path = $tmp_base . $subfolder . '/';
-			@mkdir( $path );
+			mkdir( $path );
 
 			// copy font files
 			if ( $subfolder == 'fonts' ) {
@@ -415,8 +419,8 @@ class Main {
 			}
 
 			// create .htaccess file and empty index.php to protect in case an open webfolder is used!
-			@file_put_contents( $path . '.htaccess', 'deny from all' );
-			@touch( $path . 'index.php' );
+			file_put_contents( $path . '.htaccess', 'deny from all' );
+			touch( $path . 'index.php' );
 		}
 
 	}
