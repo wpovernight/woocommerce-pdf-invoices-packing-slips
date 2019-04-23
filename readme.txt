@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.1
 Requires PHP: 5.3
-Stable tag: 2.2.11
+Stable tag: 2.2.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.2.12 =
+* Tested up to WC3.6
+* Fix: Prevent infinite loop on temporary folder creation for partially migrated sites or write permission issues
+* Tweak: Removed height & width attributes from logo image (+filter `wpo_wcpdf_header_logo_img_element`)
+* Dev: Enable guest access to PDF with order key in URL 
 
 = 2.2.11 =
 * Fix: Fatal error on orders with multiple refunds
