@@ -27,19 +27,13 @@ class Third_Party_Plugins {
 		}
 
 		// WooCommerce Product Bundles compatibility (add row classes)
-		if ( class_exists('WC_Bundles') ) {
-			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 4 );
-		}
+		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 4 );
 
 		// WooCommerce Chained Products compatibility (add row classes)
-		if ( class_exists('SA_WC_Chained_Products') || class_exists('WC_Chained_Products') ) {
-			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 4 );
-		}
+		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 4 );
 
 		// WooCommerce Composite Products compatibility (add row classes)
-		if ( class_exists('WC_Composite_Products') ) {
-			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_composite_product_class' ), 10, 4 );
-		}
+		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_composite_product_class' ), 10, 4 );
 
 	 	// WooCommerce Order Status & Actions Manager emails compatibility
 		if (class_exists('WC_Custom_Status')) {
@@ -89,6 +83,10 @@ class Third_Party_Plugins {
 	 * @param int    $item_id       WooCommerce Item ID
 	 */
 	public function add_product_bundles_classes ( $classes, $document_type, $order, $item_id = '' ) {
+		if ( !class_exists('WC_Bundles') ) {
+			return $classes;
+		}
+
 		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty($item_id) ) {
 			return $classes;
@@ -118,6 +116,10 @@ class Third_Party_Plugins {
 	 * @param int    $item_id       WooCommerce Item ID
 	 */
 	public function add_chained_product_class ( $classes, $document_type, $order, $item_id = '' ) {
+		if ( !class_exists('SA_WC_Chained_Products') && !class_exists('WC_Chained_Products') ) {
+			return $classes;
+		}
+
 		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty($item_id) ) {
 			return $classes;
@@ -141,6 +143,7 @@ class Third_Party_Plugins {
 		if ( !function_exists('wc_cp_is_composited_order_item') || !function_exists('wc_cp_is_composite_container_order_item') ) {
 			return $classes;
 		}
+
 		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty($item_id) ) {
 			return $classes;
