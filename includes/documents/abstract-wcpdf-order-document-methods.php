@@ -334,7 +334,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show order notes
 	 * could use $order->get_customer_order_notes(), but that filters out private notes already
 	 */		
-	public function get_order_notes( $filter = 'customer' ) {
+	public function get_order_notes( $filter = 'customer', $include_system_notes = true ) {
 		if ( $this->is_refund( $this->order ) ) {
 			$post_id = $this->get_refund_parent_id( $this->order );
 		} else {
@@ -345,37 +345,62 @@ abstract class Order_Document_Methods extends Order_Document {
 			return; // prevent order notes from all orders showing when document is not loaded properly
 		}
 
-		$args = array(
-			'post_id' 	=> $post_id,
-			'approve' 	=> 'approve',
-			'type' 		=> 'order_note'
-		);
+		if ( function_exists('wc_get_order_notes') ) { // WC3.2+
+			$type = ( $filter == 'private' ) ? 'internal' : $filter;
+			$notes = wc_get_order_notes( array(
+				'order_id' => $post_id,
+				'type'     => $type, // use 'internal' for admin and system notes, empty for all
+			) );
 
-		remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
-
-		$notes = get_comments( $args );
-
-		add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
-
-		if ( $notes ) {
-			foreach( $notes as $key => $note ) {
-				if ( $filter == 'customer' && !get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
-					unset($notes[$key]);
+			if ( $include_system_notes === false ) {
+				foreach ($notes as $key => $note) {
+            		if ( $note->added_by == 'system' ) {
+            			unset($notes[$key]);
+            		}
 				}
-				if ( $filter == 'private' && get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
-					unset($notes[$key]);
-				}					
 			}
+
 			return $notes;
+		} else {
+
+			$args = array(
+				'post_id' 	=> $post_id,
+				'approve' 	=> 'approve',
+				'type' 		=> 'order_note'
+			);
+
+			remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
+
+			$notes = get_comments( $args );
+
+			add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
+
+			if ( $notes ) {
+				foreach( $notes as $key => $note ) {
+					if ( $filter == 'customer' && !get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
+						unset($notes[$key]);
+					}
+					if ( $filter == 'private' && get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
+						unset($notes[$key]);
+					}					
+				}
+				return $notes;
+			}
 		}
+
 	}
-	public function order_notes( $filter = 'customer' ) {
-		$notes = $this->get_order_notes( $filter );
+	public function order_notes( $filter = 'customer', $include_system_notes = true ) {
+		$notes = $this->get_order_notes( $filter, $include_system_notes );
 		if ( $notes ) {
 			foreach( $notes as $note ) {
+				$css_class   = array( 'note', 'note_content' );
+				$css_class[] = $note->customer_note ? 'customer-note' : '';
+				$css_class[] = 'system' === $note->added_by ? 'system-note' : '';
+				$css_class   = apply_filters( 'woocommerce_order_note_class', array_filter( $css_class ), $note );
+				$content = isset($note->content) ? $note->content : $note->comment_content; 
 				?>
-				<div class="note_content">
-					<?php echo wpautop( wptexturize( wp_kses_post( $note->comment_content ) ) ); ?>
+				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
+					<?php echo wpautop( wptexturize( wp_kses_post( $content ) ) ); ?>
 				</div>
 				<?php
 			}
