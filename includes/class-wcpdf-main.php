@@ -16,7 +16,7 @@ class Main {
 	function __construct()	{
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
-		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 3 );
+		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 4 );
 		add_filter( 'wpo_wcpdf_custom_attachment_condition', array( $this, 'disable_free_attachment'), 1001, 4 );
 
 		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) ) {
@@ -52,7 +52,8 @@ class Main {
 	/**
 	 * Attach PDF to WooCommerce email
 	 */
-	public function attach_pdf_to_email ( $attachments, $email_id, $order ) {
+	public function attach_pdf_to_email ( $attachments, $email_id, $order, $email = null ) {
+		$order = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email );
 		// check if all variables properly set
 		if ( !is_object( $order ) || !isset( $email_id ) ) {
 			return $attachments;
@@ -65,7 +66,7 @@ class Main {
 
 		$order_id = WCX_Order::get_id( $order );
 
-		if ( get_class( $order ) !== 'WC_Order' && $order_id == false ) {
+		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) && $order_id == false ) {
 			return $attachments;
 		}
 
@@ -76,7 +77,12 @@ class Main {
 		}
 
 		// do not process low stock notifications, user emails etc!
-		if ( in_array( $email_id, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) || get_post_type( $order_id ) != 'shop_order' ) {
+		if ( in_array( $email_id, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) ) {
+			return $attachments;
+		}
+
+		// final check on order object
+		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) ) {
 			return $attachments;
 		}
 
