@@ -112,22 +112,14 @@ class Main {
 				$pdf_path = $tmp_path . $filename;
 
 				// if this file already exists in the temp path, we'll reuse it if it's not older than 60 seconds
-				if (file_exists($pdf_path)) {
+				$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
+				if ( file_exists($pdf_path) && $max_reuse_age > 0 ) {
 					// get last modification date
 					if ($filemtime = filemtime($pdf_path)) {
 						$time_difference = time() - $filemtime;
-						if ( $time_difference < apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 ) ) {
+						if ( $time_difference < $max_reuse_age ) {
 							// check if file is still being written to
-							$fp = fopen($pdf_path, 'r+');
-							if ( $locked = $this->file_is_locked( $fp ) ) {
-								// optional delay (ms) to double check if the write process is finished
-								$delay = intval( apply_filters( 'wpo_wcpdf_attachment_locked_file_delay', 250 ) );
-								if ( $delay > 0 ) {
-									usleep( $delay * 1000 );
-									$locked = $this->file_is_locked( $fp );
-								}
-							}
-							fclose($fp);
+							$locked = $this->wait_for_file_lock( $pdf_path );
 
 							if ( !$locked ) {
 								$attachments[] = $pdf_path;
@@ -143,6 +135,10 @@ class Main {
 				// get pdf data & store
 				$pdf_data = $document->get_pdf();
 				file_put_contents ( $pdf_path, $pdf_data, LOCK_EX );
+
+				// wait for file lock
+				$locked = $this->wait_for_file_lock( $pdf_path );
+
 				$attachments[] = $pdf_path;
 
 				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type, $document );
@@ -173,6 +169,21 @@ class Main {
 		} else {
 			return false; // not locked
 		}
+	}
+
+	public function wait_for_file_lock( $path ) {
+		$fp = fopen($pdf_path, 'r+');
+		if ( $locked = $this->file_is_locked( $fp ) ) {
+			// optional delay (ms) to double check if the write process is finished
+			$delay = intval( apply_filters( 'wpo_wcpdf_attachment_locked_file_delay', 250 ) );
+			if ( $delay > 0 ) {
+				usleep( $delay * 1000 );
+				$locked = $this->file_is_locked( $fp );
+			}
+		}
+		fclose($fp);
+
+		return $locked;
 	}
 
 	public function get_documents_for_email( $email_id, $order ) {
