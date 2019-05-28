@@ -180,7 +180,7 @@ class Main {
 	}
 
 	public function wait_for_file_lock( $path ) {
-		$fp = fopen($pdf_path, 'r+');
+		$fp = fopen($path, 'r+');
 		if ( $locked = $this->file_is_locked( $fp ) ) {
 			// optional delay (ms) to double check if the write process is finished
 			$delay = intval( apply_filters( 'wpo_wcpdf_attachment_locked_file_delay', 250 ) );
