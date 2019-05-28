@@ -111,6 +111,8 @@ class Main {
 				$filename = $document->get_filename();
 				$pdf_path = $tmp_path . $filename;
 
+				$lock_file = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
+
 				// if this file already exists in the temp path, we'll reuse it if it's not older than 60 seconds
 				$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
 				if ( file_exists($pdf_path) && $max_reuse_age > 0 ) {
@@ -119,14 +121,12 @@ class Main {
 						$time_difference = time() - $filemtime;
 						if ( $time_difference < $max_reuse_age ) {
 							// check if file is still being written to
-							$locked = $this->wait_for_file_lock( $pdf_path );
-
-							if ( !$locked ) {
+							if ( $lock_file && $this->wait_for_file_lock( $pdf_path ) === false ) {
 								$attachments[] = $pdf_path;
 								continue;
 							} else {
-								// make sure this gets logged
-								throw new \Exception("Failed attachment, file locked");
+								// make sure this gets logged, but don't abort process
+								wcpdf_log_error( "Attachment file locked (reusing: {$pdf_path})", 'critical' );
 							}
 						}
 					}
@@ -135,15 +135,14 @@ class Main {
 				// get pdf data & store
 				$pdf_data = $document->get_pdf();
 
-				if ( apply_filters( 'wpo_wcpdf_lock_attachment_file', true ) ) {
+				if ( $lock_file ) {
 					file_put_contents ( $pdf_path, $pdf_data, LOCK_EX );
 				} else {
 					file_put_contents ( $pdf_path, $pdf_data );					
 				}
 
 				// wait for file lock
-				$locked = $this->wait_for_file_lock( $pdf_path );
-				if ( $locked == true ) {
+				if ( $lock_file && $this->wait_for_file_lock( $pdf_path ) === true ) {
 					wcpdf_log_error( "Attachment file locked ({$pdf_path})", 'critical' );
 				}
 
@@ -175,6 +174,7 @@ class Main {
 				return true; // can't lock for whatever reason (could be locked in Windows + PHP5.3)
 			}
 		} else {
+			flock($fp,LOCK_UN); // release lock
 			return false; // not locked
 		}
 	}
