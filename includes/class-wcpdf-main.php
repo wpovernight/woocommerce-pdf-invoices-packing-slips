@@ -138,6 +138,9 @@ class Main {
 
 				// wait for file lock
 				$locked = $this->wait_for_file_lock( $pdf_path );
+				if ( $locked == true ) {
+					wcpdf_log_error( "Attachment file locked ({$pdf_path})", 'critical' );
+				}
 
 				$attachments[] = $pdf_path;
 
