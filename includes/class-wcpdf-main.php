@@ -134,7 +134,12 @@ class Main {
 
 				// get pdf data & store
 				$pdf_data = $document->get_pdf();
-				file_put_contents ( $pdf_path, $pdf_data, LOCK_EX );
+
+				if ( apply_filters( 'wpo_wcpdf_lock_attachment_file', true ) ) {
+					file_put_contents ( $pdf_path, $pdf_data, LOCK_EX );
+				} else {
+					file_put_contents ( $pdf_path, $pdf_data );					
+				}
 
 				// wait for file lock
 				$locked = $this->wait_for_file_lock( $pdf_path );
