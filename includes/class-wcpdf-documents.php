@@ -36,13 +36,6 @@ class Documents {
 	 *
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
-	}
-
-	/**
-	 * Init document classes.
-	 */
-	public function init() {
 		// Include document abstracts
 		include_once( dirname( __FILE__ ) . '/documents/abstract-wcpdf-order-document.php' );
 		include_once( dirname( __FILE__ ) . '/documents/abstract-wcpdf-order-document-methods.php' );
@@ -53,12 +46,17 @@ class Documents {
 		// Sequential number handler
 		include_once( dirname( __FILE__ ) . '/documents/class-wcpdf-sequential-number-store.php' );
 
+		add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
+	}
+
+	/**
+	 * Init document classes.
+	 */
+	public function init() {
 		// Load Invoice & Packing Slip
 		$this->documents['\WPO\WC\PDF_Invoices\Documents\Invoice']		= include( 'documents/class-wcpdf-invoice.php' );
 		$this->documents['\WPO\WC\PDF_Invoices\Documents\Packing_Slip']	= include( 'documents/class-wcpdf-packing-slip.php' );
 
-		// Allow plugins to add their own documents
-		$this->documents = apply_filters( 'wpo_wcpdf_document_classes', $this->documents );
 	}
 
 	/**
@@ -67,6 +65,12 @@ class Documents {
 	 * @return array
 	 */
 	public function get_documents( $filter = 'enabled' ) {
+		if ( empty($this->documents) ) {
+			$this->init();
+		}
+		// Allow plugins to add their own documents
+		$this->documents = apply_filters( 'wpo_wcpdf_document_classes', $this->documents );
+
 		if ( $filter == 'enabled' ) {
 			$documents = array();
 			foreach ($this->documents as $class_name => $document) {
@@ -82,7 +86,7 @@ class Documents {
 	}
 
 	public function get_document( $document_type, $order ) {
-		foreach ($this->documents as $class_name => $document) {
+		foreach ($this->get_documents('all') as $class_name => $document) {
 			if ($document->get_type() == $document_type) {
 				return new $class_name( $order );
 			}
