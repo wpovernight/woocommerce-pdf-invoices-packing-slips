@@ -16,8 +16,11 @@ class Main {
 	function __construct()	{
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
+
+		// email
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 4 );
 		add_filter( 'wpo_wcpdf_custom_attachment_condition', array( $this, 'disable_free_attachment'), 1001, 4 );
+		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );		
 
 		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) ) {
 			$this->enable_debug();
@@ -675,6 +678,25 @@ class Main {
 			'_wcpdf_invoice_date_formatted'	=> __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		return $meta_to_export + $private_address_meta;
+	}
+
+	/**
+	 * Set the default PHPMailer validator to 'php' ( which uses filter_var($address, FILTER_VALIDATE_EMAIL) )
+	 * This avoids issues with the presence of attachments affecting email address validation in some distros of PHP 7.3
+	 * See: https://wordpress.org/support/topic/invalid-address-setfrom/#post-11583815
+	 */
+	public function set_phpmailer_validator( $mailArray ) {
+		if ( version_compare( PHP_VERSION, '7.3', '>=' ) ) {
+			global $phpmailer;
+			if ( ! ( $phpmailer instanceof \PHPMailer ) ) {
+				require_once ABSPATH . WPINC . '/class-phpmailer.php';
+				require_once ABSPATH . WPINC . '/class-smtp.php';
+				$phpmailer = new \PHPMailer( true );
+			}
+			$phpmailer::$validator = 'php';
+		}
+
+		return $mailArray;
 	}
 
 	/**
