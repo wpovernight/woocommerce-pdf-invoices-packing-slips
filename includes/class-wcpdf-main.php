@@ -439,7 +439,9 @@ class Main {
 		$subfolders = array( 'attachments', 'fonts', 'dompdf' );
 		foreach ( $subfolders as $subfolder ) {
 			$path = $tmp_base . $subfolder . '/';
-			mkdir( $path );
+			if ( !is_dir( $path ) ) {
+				mkdir( $path );
+			}
 
 			// copy font files
 			if ( $subfolder == 'fonts' ) {
