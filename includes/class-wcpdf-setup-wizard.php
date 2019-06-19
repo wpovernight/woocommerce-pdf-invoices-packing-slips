@@ -58,6 +58,10 @@ class Setup_Wizard {
 				'name'	=> __( 'Paper format', 'woocommerce-pdf-invoices-packing-slips' ),
 				'view'	=> WPO_WCPDF()->plugin_path() . '/includes/views/setup-wizard/paper-format.php',
 			),
+			'show-action-buttons' => array(
+				'name'	=> __( 'Action buttons', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view'	=> WPO_WCPDF()->plugin_path() . '/includes/views/setup-wizard/show-action-buttons.php',
+			),
 			'good-to-go' => array(
 				'name'	=> __( 'Ready!', 'woocommerce-pdf-invoices-packing-slips' ),
 				'view'	=> WPO_WCPDF()->plugin_path() . '/includes/views/setup-wizard/good-to-go.php',
@@ -217,6 +221,8 @@ class Setup_Wizard {
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
+			$user_id = get_current_user_id();
+			$hidden = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
 			if (!empty($_POST['wcpdf_settings']) && is_array($_POST['wcpdf_settings'])) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
 				foreach ($_POST['wcpdf_settings'] as $option => $settings) {
@@ -234,6 +240,12 @@ class Setup_Wizard {
 					// echo "<pre>".var_export($new_settings,true)."</pre>";die();
 					update_option( $option, $new_settings );
 				}
+			} elseif ( !empty($_POST['wc_show_action_buttons'] ) ) {
+				$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
+				update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
+			} else {
+				array_push($hidden, 'wc_actions');
+				update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
 			}
 		}
 
