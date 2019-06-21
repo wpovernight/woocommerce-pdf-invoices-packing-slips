@@ -240,12 +240,14 @@ class Setup_Wizard {
 					// echo "<pre>".var_export($new_settings,true)."</pre>";die();
 					update_option( $option, $new_settings );
 				}
-			} elseif ( !empty($_POST['wc_show_action_buttons'] ) ) {
-				$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
-				update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
-			} else {
-				array_push($hidden, 'wc_actions');
-				update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
+			} elseif ( $_POST['wpo_wcpdf_step'] == 'show-action-buttons' ) {
+				if ( !empty( $_POST['wc_show_action_buttons'] ) ) {
+					$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
+					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
+				} else {
+					array_push($hidden, 'wc_actions');
+					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
+				}
 			}
 		}
 
