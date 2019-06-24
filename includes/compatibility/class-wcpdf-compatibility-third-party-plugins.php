@@ -46,7 +46,11 @@ class Third_Party_Plugins {
 			add_action( 'wpo_wcpdf_before_html', array( $this, 'aelia_currency_formatting' ), 10, 2 );
 		}
 
-
+		// Avoid double images from WooCommerce German Market
+		if ( class_exists('WGM_Product') ) {
+			add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
+			add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
+		}
 	}
 
 	/**
@@ -216,6 +220,22 @@ class Third_Party_Plugins {
 			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
 		}
 		return $args;
+	}
+
+	/**
+	 * Avoid double images from German Market: remove filter
+	 */
+	function remove_wgm_thumbnails( $document_type, $document ) {
+		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
+	}
+
+	/**
+	 * Restore above
+	 */
+	function restore_wgm_thumbnails( $document_type, $document ) {
+		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) ) {
+			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
+		}
 	}
 }
 
