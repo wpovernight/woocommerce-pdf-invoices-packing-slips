@@ -174,6 +174,7 @@ class Setup_Wizard {
 	 */
 	public function setup_wizard_footer() {
 		?>
+						<input type="hidden" name="wpo_wcpdf_step" value="<?php echo $this->step ?>">
 						<div class="wpo-setup-buttons">
 							<?php if ($step = $this->get_step(-1)): ?>
 								<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-button-previous"><?php _e( 'Previous', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
