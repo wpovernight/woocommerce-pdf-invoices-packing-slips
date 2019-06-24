@@ -229,10 +229,16 @@ class Setup_Wizard {
 				foreach ($_POST['wcpdf_settings'] as $option => $settings) {
 					// sanitize posted settings
 					foreach ($settings as $key => $value) {
-						if (is_array($value)) {
-							$settings[$key] = array_map('sanitize_text_field', $value);
+						if ( $key == 'shop_address' && function_exists('sanitize_textarea_field') ) {
+							$sanitize_function == 'sanitize_textarea_field';
 						} else {
-							$settings[$key] = sanitize_text_field( $value );
+							$sanitize_function == 'sanitize_text_field';							
+						}
+
+						if (is_array($value)) {
+							$settings[$key] = array_map($sanitize_function, $value);
+						} else {
+							$settings[$key] = call_user_func($sanitize_function, $value );
 						}
 					}
 					$current_settings = get_option( $option, array() );
