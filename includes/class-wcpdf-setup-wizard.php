@@ -58,6 +58,10 @@ class Setup_Wizard {
 				'name'	=> __( 'Paper format', 'woocommerce-pdf-invoices-packing-slips' ),
 				'view'	=> WPO_WCPDF()->plugin_path() . '/includes/views/setup-wizard/paper-format.php',
 			),
+			'show-action-buttons' => array(
+				'name'	=> __( 'Action buttons', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view'	=> WPO_WCPDF()->plugin_path() . '/includes/views/setup-wizard/show-action-buttons.php',
+			),
 			'good-to-go' => array(
 				'name'	=> __( 'Ready!', 'woocommerce-pdf-invoices-packing-slips' ),
 				'view'	=> WPO_WCPDF()->plugin_path() . '/includes/views/setup-wizard/good-to-go.php',
@@ -170,6 +174,7 @@ class Setup_Wizard {
 	 */
 	public function setup_wizard_footer() {
 		?>
+						<input type="hidden" name="wpo_wcpdf_step" value="<?php echo $this->step ?>">
 						<div class="wpo-setup-buttons">
 							<?php if ($step = $this->get_step(-1)): ?>
 								<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-button-previous"><?php _e( 'Previous', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
@@ -217,15 +222,23 @@ class Setup_Wizard {
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
+			$user_id = get_current_user_id();
+			$hidden = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
 			if (!empty($_POST['wcpdf_settings']) && is_array($_POST['wcpdf_settings'])) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
 				foreach ($_POST['wcpdf_settings'] as $option => $settings) {
 					// sanitize posted settings
 					foreach ($settings as $key => $value) {
-						if (is_array($value)) {
-							$settings[$key] = array_map('sanitize_text_field', $value);
+						if ( $key == 'shop_address' && function_exists('sanitize_textarea_field') ) {
+							$sanitize_function == 'sanitize_textarea_field';
 						} else {
-							$settings[$key] = sanitize_text_field( $value );
+							$sanitize_function == 'sanitize_text_field';							
+						}
+
+						if (is_array($value)) {
+							$settings[$key] = array_map($sanitize_function, $value);
+						} else {
+							$settings[$key] = call_user_func($sanitize_function, $value );
 						}
 					}
 					$current_settings = get_option( $option, array() );
@@ -233,6 +246,14 @@ class Setup_Wizard {
 					// echo "<pre>".var_export($settings,true)."</pre>";
 					// echo "<pre>".var_export($new_settings,true)."</pre>";die();
 					update_option( $option, $new_settings );
+				}
+			} elseif ( $_POST['wpo_wcpdf_step'] == 'show-action-buttons' ) {
+				if ( !empty( $_POST['wc_show_action_buttons'] ) ) {
+					$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
+					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
+				} else {
+					array_push($hidden, 'wc_actions');
+					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
 				}
 			}
 		}
