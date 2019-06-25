@@ -47,6 +47,10 @@ class Invoice extends Order_Document_Methods {
 		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', $use_historical_settings, $this );
 	}
 
+	public function storing_settings_enabled() {
+		return apply_filters( 'wpo_wcpdf_document_store_settings', true, $this );
+	}
+
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ), $this );
@@ -54,7 +58,7 @@ class Invoice extends Order_Document_Methods {
 
 	public function init() {
 		// store settings in order
-		if ( !empty( $this->order ) ) {
+		if ( $this->storing_settings_enabled() && !empty( $this->order ) ) {
 			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
 			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
 			$settings = (array) $document_settings + (array) $common_settings;

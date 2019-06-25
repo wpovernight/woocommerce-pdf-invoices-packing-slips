@@ -145,7 +145,7 @@ abstract class Order_Document {
 				$settings = $order_settings;
 			}
 		}
-		if ( empty( $order_settings ) && !empty( $this->order ) ) {
+		if ( $this->storing_settings_enabled() && empty( $order_settings ) && !empty( $this->order ) ) {
 			// this is either the first time the document is generated, or historical settings are disabled
 			// in both cases, we store the document settings
 			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
@@ -156,6 +156,10 @@ abstract class Order_Document {
 
 	public function use_historical_settings() {
 		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', false, $this );
+	}
+
+	public function storing_settings_enabled() {
+		return apply_filters( 'wpo_wcpdf_document_store_settings', false, $this );
 	}
 
 	public function get_setting( $key, $default = '' ) {
@@ -217,7 +221,7 @@ abstract class Order_Document {
 
 	public function init() {
 		// store settings in order
-		if ( !empty( $this->order ) ) {
+		if ( $this->storing_settings_enabled() && !empty( $this->order ) ) {
 			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
 			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
 			$settings = (array) $document_settings + (array) $common_settings;
