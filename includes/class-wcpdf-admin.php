@@ -165,6 +165,7 @@ class Admin {
 		if ( $order->get_status() == 'trash' ) {
 			return;
 		}
+		$this->disable_storing_document_settings();
 
 		$listing_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
@@ -220,6 +221,7 @@ class Admin {
 		global $post, $the_order;
 
 		if ( $column == 'pdf_invoice_number' ) {
+			$this->disable_storing_document_settings();
 			if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
 				$order = WCX::get_order( $post->ID );
 				if ( $invoice = wcpdf_get_invoice( $order ) ) {
@@ -318,6 +320,7 @@ class Admin {
 	 */
 	public function pdf_actions_meta_box( $post ) {
 		global $post_id;
+		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
@@ -354,6 +357,7 @@ class Admin {
 	 */
 	public function data_input_box_content ( $post ) {
 		$order = WCX::get_order( $post->ID );
+		$this->disable_storing_document_settings();
 
 		do_action( 'wpo_wcpdf_meta_box_start', $post->ID );
 		
@@ -480,6 +484,23 @@ class Admin {
 				$invoice->save();
 			}
 		}
+	}
+
+	/**
+	 * Document objects are created in order to check for existence and retrieve data,
+	 * but we don't want to store the settings for uninitialized documents.
+	 * Only use in frontend/backed (page requests), otherwise settings will never be stored!
+	 */
+	public function disable_storing_document_settings() {
+		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+	}
+
+	public function restore_storing_document_settings() {
+		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+	}
+
+	public function return_false(){
+		return false;
 	}
 
 	/**

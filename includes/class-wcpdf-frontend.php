@@ -22,6 +22,8 @@ class Frontend {
 	 * Display download link on My Account page
 	 */
 	public function my_account_pdf_link( $actions, $order ) {
+		$this->disable_storing_document_settings();
+
 		$invoice = wcpdf_get_invoice( $order );
 		if ( $invoice && $invoice->is_enabled() ) {
 			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&document_type=invoice&order_ids=' . WCX_Order::get_id( $order ) . '&my-account'), 'generate_wpo_wcpdf' );
@@ -70,6 +72,7 @@ class Frontend {
 	 * Add invoice number to WC REST API
 	 */
 	public function woocommerce_api_invoice_number ( $data, $order ) {
+		$this->disable_storing_document_settings();
 		$data['wpo_wcpdf_invoice_number'] = '';
 		if ( $invoice = wcpdf_get_invoice( $order ) ) {
 			$invoice_number = $invoice->get_number();
@@ -79,8 +82,25 @@ class Frontend {
 		}
 
 		return $data;
+		$this->restore_storing_document_settings();
 	}
 
+	/**
+	 * Document objects are created in order to check for existence and retrieve data,
+	 * but we don't want to store the settings for uninitialized documents.
+	 * Only use in frontend/backed (page requests), otherwise settings will never be stored!
+	 */
+	public function disable_storing_document_settings() {
+		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+	}
+
+	public function restore_storing_document_settings() {
+		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+	}
+
+	public function return_false(){
+		return false;
+	}
 }
 
 endif; // class_exists
