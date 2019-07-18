@@ -183,6 +183,21 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'disable_for_statuses',
+				'title'			=> __( 'Disable for:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'select',
+				'section'		=> 'invoice',
+				'args'			=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'disable_for_statuses',
+					'options' 			=> wc_get_order_statuses(),
+					'multiple'			=> true,
+					'enhanced_select'	=> true,
+					'placeholder'		=> __( 'Select one or more statuses', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'display_shipping_address',
 				'title'			=> __( 'Display shipping address', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',

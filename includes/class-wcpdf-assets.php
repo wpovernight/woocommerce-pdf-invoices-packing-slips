@@ -97,10 +97,11 @@ class Assets {
 			}" );
 
 			// SCRIPTS
+			wp_enqueue_script( 'wc-enhanced-select' );
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script.js',
-				array( 'jquery' ),
+				array( 'jquery', 'wc-enhanced-select' ),
 				WPO_WCPDF_VERSION
 			);
 			wp_localize_script(

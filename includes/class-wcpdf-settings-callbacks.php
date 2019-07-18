@@ -195,10 +195,30 @@ class Settings_Callbacks {
 	public function select( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 	
-		printf( '<select id="%1$s" name="%2$s">', $id, $setting_name );
+		if ( isset( $enhanced_select ) ) {
+			if ( isset( $multiple ) ) {
+				$setting_name = "{$setting_name}[]";
+				$multiple = 'multiple=multiple';
+			} else {
+				$multiple = '';
+			}
+
+			$placeholder = isset($placeholder) ? esc_attr( $placeholder ) : '';
+			$title = isset($title) ? esc_attr( $title ) : '';
+			$class = 'wc-enhanced-select wpo-wcpdf-enhanced-select';
+			$css = 'width:400px';
+			printf( '<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s>', $id, $setting_name, $placeholder, $title, $class, $css, $multiple );
+		} else {
+			printf( '<select id="%1$s" name="%2$s">', $id, $setting_name );
+		}
 
 		foreach ( $options as $key => $label ) {
-			printf( '<option value="%s"%s>%s</option>', $key, selected( $current, $key, false ), $label );
+			if ( isset( $multiple ) && is_array( $current ) ) {
+				$selected = in_array($key, $current) ? ' selected="selected"' : '';
+				printf( '<option value="%s"%s>%s</option>', $key, $selected, $label );
+			} else {
+				printf( '<option value="%s"%s>%s</option>', $key, selected( $current, $key, false ), $label );
+			}
 		}
 
 		echo '</select>';

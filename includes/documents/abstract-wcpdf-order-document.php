@@ -283,7 +283,20 @@ abstract class Order_Document {
 	}
 
 	public function is_allowed() {
-		return apply_filters( 'wpo_wcpdf_document_is_allowed', true, $this );
+		$allowed = true;
+		if ( !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
+			$status = $this->order->get_status();
+
+			$disabled_statuses = array_map( function($status){
+				$status = 'wc-' === substr( $status, 0, 3 ) ? substr( $status, 3 ) : $status;
+				return $status;
+			}, $this->settings['disable_for_statuses'] );
+
+			if ( in_array( $status, $disabled_statuses ) ) {
+				$allowed = false;
+			}
+		}
+		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
 	}
 
 	public function exists() {
