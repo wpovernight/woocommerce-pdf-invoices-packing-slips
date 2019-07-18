@@ -597,6 +597,13 @@ abstract class Order_Document {
 	*/
 
 	public function get_pdf() {
+		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
+			$pdf = file_get_contents( $pdf_file );
+			if ( !empty( $pdf ) ) {
+				return $pdf;
+			}
+		}
+
 		do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
 		
 		$pdf_settings = array(
