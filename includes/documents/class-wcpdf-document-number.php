@@ -93,7 +93,7 @@ class Document_Number {
 	}
 
 	public function __toString() {
-		return $this->get_formatted();
+		return (string) $this->get_formatted();
 	}
 
 	public function get_formatted() {
