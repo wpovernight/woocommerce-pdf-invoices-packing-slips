@@ -87,7 +87,7 @@ class Assets {
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles.css',
-				array(),
+				array('woocommerce_admin_styles'),
 				WPO_WCPDF_VERSION
 			);
 			wp_add_inline_style( 'wpo-wcpdf-settings-styles', ".next-number-input.ajax-waiting {
