@@ -527,9 +527,8 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['line_tax'] = $this->format_price( $item['line_tax'] );
 				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
 				
-				$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
-				$data['tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'], $line_tax_data, true );
-				$data['calculated_tax_rates'] = $this->get_tax_rate( $item['tax_class'], $item['line_total'], $item['line_tax'], $line_tax_data, false );
+				$data['tax_rates'] = $this->get_tax_rate( $item, $this->order, true );
+				$data['calculated_tax_rates'] = $this->get_tax_rate( $item, $this->order, false );
 				
 				// Set the line subtotal (=before discount)
 				$data['line_subtotal'] = $this->format_price( $item['line_subtotal'] );
@@ -592,11 +591,18 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
-	 * Get the tax rates/percentages for a given tax class
-	 * @param  string $tax_class tax class slug
+	 * Get the tax rates/percentages for an item
+	 * @param  object $item order item
+	 * @param  object $order WC_Order
+	 * @param  bool $force_calculation force calculation of rates rather than retrieving from db
 	 * @return string $tax_rates imploded list of tax rates
 	 */
-	public function get_tax_rate( $tax_class, $line_total, $line_tax, $line_tax_data = '', $force_calculation = false ) {
+	public function get_tax_rate( $item, $order, $force_calculation = false ) {
+		$tax_class = $item['tax_class'];
+		$line_total = $item['line_total'];
+		$line_tax = $item['line_tax'];
+		$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
+
 		// first try the easy wc2.2+ way, using line_tax_data
 		if ( !empty( $line_tax_data ) && isset($line_tax_data['total']) ) {
 			$tax_rates = array();
@@ -604,7 +610,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$line_taxes = $line_tax_data['subtotal'];
 			foreach ( $line_taxes as $tax_id => $tax ) {
 				if ( isset($tax) && $tax !== '' ) {
-					$tax_rate = $this->get_tax_rate_by_id( $tax_id );
+					$tax_rate = $this->get_tax_rate_by_id( $tax_id, $order );
 					if ( $tax_rate !== false && $force_calculation !== false ) {
 						$tax_rates[] = $tax_rate . ' %';
 					} else {
@@ -668,13 +674,38 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @param  int    $rate_id  woocommerce tax rate id
 	 * @return float  $rate     percentage rate
 	 */
-	public function get_tax_rate_by_id( $rate_id ) {
+	public function get_tax_rate_by_id( $rate_id, $order = null ) {
 		global $wpdb;
+		// WC 3.7+ stores rate in tax items!
+		if ( $order_rates = $this->get_tax_rates_from_order( $order ) ) {
+			if ( isset( $order_rates[ $rate_id ] ) ) {
+				return (float) $order_rates[ $rate_id ];
+			}
+		}
+
 		$rate = $wpdb->get_var( $wpdb->prepare( "SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d;", $rate_id ) );
 		if ($rate === NULL) {
 			return false;
 		} else {
 			return (float) $rate;
+		}
+	}
+
+	public function get_tax_rates_from_order( $order ) {
+		if ( !empty( $order ) && method_exists( $order, 'get_version' ) && version_compare( $order->get_version(), '3.7', '>=' ) ) {
+			$tax_rates = array();
+			$tax_items = $order->get_items( array('tax') );
+
+			if ( empty( $tax_items ) ) {
+				return $tax_rates;
+			}
+
+			foreach( $tax_items as $tax_item_key => $tax_item ) {
+				$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
+			}
+			return $tax_rates;
+		} else {
+			return false;
 		}
 	}
 
