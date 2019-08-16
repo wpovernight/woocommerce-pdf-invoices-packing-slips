@@ -77,6 +77,7 @@ class Main {
 		if ( get_post_type( $order_id ) == 'wc_booking' && isset($order->order) ) {
 			// $order is actually a WC_Booking object!
 			$order = $order->order;
+			$order_id = WCX_Order::get_id( $order );
 		}
 
 		// do not process low stock notifications, user emails etc!
@@ -107,7 +108,7 @@ class Main {
 
 			try {
 				// prepare document
-				$document = wcpdf_get_document( $document_type, (array) $order_id, true );
+				$document = wcpdf_get_document( $document_type, $order, true );
 				if ( !$document ) { // something went wrong, continue trying with other documents
 					continue;
 				}
