@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.2
 Requires PHP: 5.3
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,8 +26,7 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 
 In addition to this, we offer several premium extensions:
 
-* Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips & more with [WooCommerce PDF Invoices & Packing Slips Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
-* Upload all invoices automatically to Dropbox with [WooCommerce PDF Invoices & Packing Slips to Dropbox](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-dropbox/)
+* Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [WooCommerce PDF Invoices & Packing Slips Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
 * Automatically send new orders or packing slips to your printer, as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
 * More advanced & stylish templates with [WooCommerce PDF Invoices & Packing Slips Premium Templates](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)
 
@@ -67,7 +66,7 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 = Where can I find the documentation? =
 
-[WooCommerce PDF Invoices & Packing Slips documentation](http://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/)
+[WooCommerce PDF Invoices & Packing Slips documentation](https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/)
 
 = It's not working! =
 
@@ -102,6 +101,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.3.2 = 
+* Fix: Load enhanced selection styles on settings page
+* Fix: WC Bookings email attachment
+* Tweak: Use WooCommerce 3.7 tax rate data when available.
 
 = 2.3.1 =
 * Fix: Errors for filtered formatted invoice numbers
