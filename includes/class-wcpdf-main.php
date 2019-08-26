@@ -56,7 +56,6 @@ class Main {
 	 * Attach PDF to WooCommerce email
 	 */
 	public function attach_pdf_to_email ( $attachments, $email_id, $order, $email = null ) {
-		$order = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email );
 		// check if all variables properly set
 		if ( !is_object( $order ) || !isset( $email_id ) ) {
 			return $attachments;
@@ -104,6 +103,8 @@ class Main {
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
+			$order = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
+			
 			do_action( 'wpo_wcpdf_before_attachment_creation', $order, $email_id, $document_type );
 
 			try {
