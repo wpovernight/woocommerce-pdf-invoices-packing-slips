@@ -103,13 +103,11 @@ class Main {
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
-			$order = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
-			
 			do_action( 'wpo_wcpdf_before_attachment_creation', $order, $email_id, $document_type );
 
 			try {
 				// prepare document
-				$document = wcpdf_get_document( $document_type, $order, true );
+				$document = wcpdf_get_document( $document_type, apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type ), true );
 				if ( !$document ) { // something went wrong, continue trying with other documents
 					continue;
 				}
