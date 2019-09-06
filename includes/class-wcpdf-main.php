@@ -103,11 +103,16 @@ class Main {
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
-			do_action( 'wpo_wcpdf_before_attachment_creation', $order, $email_id, $document_type );
+			$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
+			$email_order_id = WCX_Order::get_id( $email_order );
+
+			do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
 
 			try {
 				// prepare document
-				$document = wcpdf_get_document( $document_type, apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type ), true );
+				// we use ID to force to reloading the order to make sure that all meta data is up to date.
+				// this is especially important when multiple emails with the PDF document are sent in the same session
+				$document = wcpdf_get_document( $document_type, (array) $email_order_id, true );
 				if ( !$document ) { // something went wrong, continue trying with other documents
 					continue;
 				}
