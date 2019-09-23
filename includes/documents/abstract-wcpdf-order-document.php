@@ -182,7 +182,7 @@ abstract class Order_Document {
 	}
 
 	public function get_attach_to_email_ids() {
-		$email_ids = isset( $this->settings['attach_to_email_ids'] ) ? array_keys( $this->settings['attach_to_email_ids'] ) : array();
+		$email_ids = isset( $this->settings['attach_to_email_ids'] ) ? array_keys( array_filter( $this->settings['attach_to_email_ids'] ) ) : array();
 		return $email_ids;  
 	}
 
