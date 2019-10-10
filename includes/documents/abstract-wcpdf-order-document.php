@@ -744,8 +744,12 @@ abstract class Order_Document {
 	 */
 	public function get_wc_emails() {
 		// get emails from WooCommerce
-		global $woocommerce;
-		$mailer = $woocommerce->mailer();
+		if (function_exists('WC')) {
+			$mailer = WC()->mailer();
+		} else {
+			global $woocommerce;
+			$mailer = $woocommerce->mailer();
+		}
 		$wc_emails = $mailer->get_emails();
 
 		$non_order_emails = array(

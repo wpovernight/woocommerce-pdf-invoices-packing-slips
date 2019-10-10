@@ -736,8 +736,6 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @return string
 	 */
 	public function get_thumbnail_id ( $product ) {
-		global $woocommerce;
-
 		$product_id = WCX_Product::get_id( $product );
 
 		if ( has_post_thumbnail( $product_id ) ) {
