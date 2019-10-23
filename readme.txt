@@ -3,9 +3,9 @@ Contributors: pomegranate
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 5.2
+Tested up to: 5.3
 Requires PHP: 5.3
-Stable tag: 2.3.4
+Stable tag: 2.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.3.5 =
+* Feature: Accept single order ID for wcpdf_get_document function
+* Feature: Filter to change number store for invoice
+* Tweak: Always prefer WC() function over global for WC3.0+
+* Fix: Incorrectly stored attachment settings couldn't be reset
+* Fix: Prevent error notices during setup wizard
+* Tested up to WooCommerce 3.8
 
 = 2.3.4 =
 * Fix: Prevent duplicate invoice numbers for multiple attachment setups
