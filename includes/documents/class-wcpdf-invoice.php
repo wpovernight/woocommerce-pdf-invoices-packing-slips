@@ -271,6 +271,12 @@ class Invoice extends Order_Document_Methods {
 						'invoice_number'	=> __( 'Invoice Number' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'order_number'		=> __( 'Order Number' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
+					'description'	=> sprintf(
+						'<strong>%s</strong> %s <a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/invoice-numbers-explained/#why-is-the-pdf-invoice-number-different-from-the-woocommerce-order-number">%s</a>',
+						__( 'Warning!', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Using the Order Number as invoice number is not recommended as this may lead to gaps in the invoice number sequence (even when order numbers are sequential).', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'More information', 'woocommerce-pdf-invoices-packing-slips' )
+					),
 				)
 			),
 			array(
