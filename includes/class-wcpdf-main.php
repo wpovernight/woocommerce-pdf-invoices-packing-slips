@@ -226,7 +226,7 @@ class Main {
 			}
 		}
 
-		return $document_types;
+		return apply_filters( 'wpo_wcpdf_document_types_for_email', $document_types, $email_id, $order );
 	}
 
 	/**
