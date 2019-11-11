@@ -748,6 +748,11 @@ abstract class Order_Document {
 			$mailer = WC()->mailer();
 		} else {
 			global $woocommerce;
+
+			if ( empty( $woocommerce ) ) { // bail if WooCommerce not active
+				return apply_filters( 'wpo_wcpdf_wc_emails', array() );
+			}
+			
 			$mailer = $woocommerce->mailer();
 		}
 		$wc_emails = $mailer->get_emails();
