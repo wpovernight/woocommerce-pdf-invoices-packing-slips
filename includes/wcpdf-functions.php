@@ -127,6 +127,9 @@ function wcpdf_get_pdf_maker( $html, $settings = array() ) {
 }
 
 function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
+	if ( ! headers_sent() ) {
+		header_remove();
+	}
 	switch ($mode) {
 		case 'download':
 			header('Content-Description: File Transfer');

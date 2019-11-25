@@ -28,4 +28,12 @@ jQuery( function( $ ) {
 			}
 		});
 	});
+
+	$("[name='wpo_wcpdf_documents_settings_invoice[display_number]']").change(function (event) {
+		if ($(this).val() == 'order_number') {
+			$(this).closest('td').find('.description').slideDown();
+		} else {
+			$(this).closest('td').find('.description').hide();
+		}
+	}).change();
 });
