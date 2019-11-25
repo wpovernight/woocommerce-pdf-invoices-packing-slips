@@ -20,7 +20,7 @@ class Admin {
 		add_action( 'admin_footer', array( $this, 'bulk_actions' ) );
 		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 
-		add_action( 'save_post', array( $this,'save_invoice_number_date' ) );
+		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 10, 2 );
 
 		// manually send emails
 		// WooCommerce core processes order actions at priority 50
@@ -447,7 +447,7 @@ class Admin {
 	/**
 	 * Save invoice number
 	 */
-	public function save_invoice_number_date($post_id) {
+	public function save_invoice_number_date($post_id, $post) {
 		$post_type = get_post_type( $post_id );
 		if( $post_type == 'shop_order' ) {
 			// bail if this is not an actual 'Save order' action
