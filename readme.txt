@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.3
 Requires PHP: 5.3
-Stable tag: 2.3.5
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.4.0 =
+* Feature: Option to use order number & date for invoice number & date
+* Fix: prevent errors during update when WC not active
+* Fix: don't auto create invoice number when manually entered & directly changing order status
+* Fix: invoice tax amount for refunded orders (in combination with WooCommerce tax setting "as a single total")
+* Tweak: Default to today's date when editing empty invoice date
+
 
 = 2.3.5 =
 * Feature: Accept single order ID for wcpdf_get_document function
