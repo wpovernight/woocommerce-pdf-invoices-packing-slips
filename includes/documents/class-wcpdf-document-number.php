@@ -117,6 +117,11 @@ class Document_Number {
 
 		// get dates
 		$order_date = WCX_Order::get_prop( $order, 'date_created' );
+		// order date can be empty when order is being saved, fallback to current time
+		if ( empty( $order_date ) && function_exists('wc_string_to_datetime') ) {
+			$order_date = wc_string_to_datetime( date_i18n('Y-m-d H:i:s') );
+		}
+
 		$document_date = $document->get_date();
 		// fallback to order date if no document date available
 		if (empty($document_date)) {
