@@ -20,7 +20,7 @@ class Admin {
 		add_action( 'admin_footer', array( $this, 'bulk_actions' ) );
 		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 
-		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 10, 2 );
+		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 35, 2 );
 
 		// manually send emails
 		// WooCommerce core processes order actions at priority 50
