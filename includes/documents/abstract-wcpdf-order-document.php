@@ -151,6 +151,15 @@ abstract class Order_Document {
 			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
 		}
 
+		// display date & display number were checkbox settings but now a select setting that could be set but empty - should behave as 'unchecked'
+		if ( empty( $settings['display_date'] ) ) {
+			unset( $settings['display_date'] );
+		}
+		
+		if ( empty( $settings['display_number'] ) ) {
+			unset( $settings['display_number'] );
+		}
+
 		return $settings;
 	}
 
