@@ -103,7 +103,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 = 2.4.2 =
-* Fix: 'No' option in new date & number visbibility setting
+* Fix: 'No' option in new date & number visibility setting
 * Fix: Resetting headers caused unintended caching of PDF files on some hosts
 
 = 2.4.1 =
