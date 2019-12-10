@@ -598,16 +598,28 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @return string $tax_rates imploded list of tax rates
 	 */
 	public function get_tax_rate( $item, $order, $force_calculation = false ) {
-		$tax_class = $item['tax_class'];
-		$line_total = $item['line_total'];
-		$line_tax = $item['line_tax'];
-		$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
+		if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) ) {
+	        $tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
+	        $tax_data_key = ( $item['type'] == 'line_item' ) ? 'subtotal' : 'total';
+	        $line_total_key = ( $item['type'] == 'line_item' ) ? 'line_total' : 'total';
+	        $line_tax_key = ( $item['type'] == 'shipping' ) ? 'total_tax' : 'line_tax';
+
+			$tax_class = isset($item['tax_class']) ? $item['tax_class'] : '';
+			$line_tax = $item[$line_tax_key];
+	        $line_total = $item[$line_total_key];
+	        $line_tax_data = $item[$tax_data_container];
+		} else {
+			$tax_class = $item['tax_class'];
+			$line_total = $item['line_total'];
+			$line_tax = $item['line_tax'];
+			$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
+		}
 
 		// first try the easy wc2.2+ way, using line_tax_data
-		if ( !empty( $line_tax_data ) && isset($line_tax_data['total']) ) {
+		if ( !empty( $line_tax_data ) && isset($line_tax_data[$tax_data_key]) ) {
 			$tax_rates = array();
 
-			$line_taxes = $line_tax_data['subtotal'];
+			$line_taxes = $line_tax_data[$tax_data_key];
 			foreach ( $line_taxes as $tax_id => $tax ) {
 				if ( isset($tax) && $tax !== '' ) {
 					$tax_rate = $this->get_tax_rate_by_id( $tax_id, $order );
