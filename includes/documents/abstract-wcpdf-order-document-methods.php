@@ -638,7 +638,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				}
 			}
 
-			$tax_rates = implode(' ,', $tax_rates );
+			$tax_rates = implode(', ', $tax_rates );
 			return $tax_rates;
 		}
 
