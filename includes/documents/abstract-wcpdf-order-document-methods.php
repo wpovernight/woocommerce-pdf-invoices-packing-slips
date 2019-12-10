@@ -527,8 +527,8 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['line_tax'] = $this->format_price( $item['line_tax'] );
 				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
 				
-				$data['tax_rates'] = $this->get_tax_rate( $item, $this->order, true );
-				$data['calculated_tax_rates'] = $this->get_tax_rate( $item, $this->order, false );
+				$data['tax_rates'] = $this->get_tax_rate( $item, $this->order, false );
+				$data['calculated_tax_rates'] = $this->get_tax_rate( $item, $this->order, true );
 				
 				// Set the line subtotal (=before discount)
 				$data['line_subtotal'] = $this->format_price( $item['line_subtotal'] );
@@ -611,7 +611,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			foreach ( $line_taxes as $tax_id => $tax ) {
 				if ( isset($tax) && $tax !== '' ) {
 					$tax_rate = $this->get_tax_rate_by_id( $tax_id, $order );
-					if ( $tax_rate !== false && $force_calculation !== false ) {
+					if ( $tax_rate !== false && $force_calculation === false ) {
 						$tax_rates[] = $tax_rate . ' %';
 					} else {
 						$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
