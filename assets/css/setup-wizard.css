@@ -230,42 +230,15 @@
 /* Attach to */
 
 .wpo-setup-input input[type=checkbox] {
-	-webkit-appearance: none;
 	background-color: #fdfdfd;
 	border: 1px solid #cacece;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
-	padding: 14px;
 	border-radius: 3px;
-	display: inline-block;
-	position: relative;
-}
-
-.wpo-setup-input input[type=checkbox]:active, .wpo-setup-input input[type=checkbox]:checked:active {
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
-}
-
-.wpo-setup-input input[type=checkbox]:checked {
-	background-color: #fdfdfd;
-	border: 1px solid #adb8c0;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
-	color: #99a1a7;
-}
-
-.wpo-setup-input input[type=checkbox]:checked:after {
-	content: '\2714';
-	font-size: 24px;
-	position: absolute;
-	top: 0px;
-	left: 3px;
-	color: #3e9b9a;
+	vertical-align: text-bottom;
+	margin-right: 20px;
 }
 
 .wpo-setup-input .checkbox {
-	font-size:1.2em;
-	margin-left:50px;
-	margin-top:-35px;
-	margin-bottom:-8px;
-	display:block;
+	font-size:1.1em;
 }
 
 /* Customizer */
