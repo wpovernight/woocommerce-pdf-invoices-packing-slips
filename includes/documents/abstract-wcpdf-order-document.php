@@ -152,11 +152,11 @@ abstract class Order_Document {
 		}
 
 		// display date & display number were checkbox settings but now a select setting that could be set but empty - should behave as 'unchecked'
-		if ( empty( $settings['display_date'] ) ) {
+		if ( array_key_exists( 'display_date', $settings ) && empty( $settings['display_date'] ) ) {
 			unset( $settings['display_date'] );
 		}
 		
-		if ( empty( $settings['display_number'] ) ) {
+		if ( array_key_exists( 'display_number', $settings ) && empty( $settings['display_number'] ) ) {
 			unset( $settings['display_number'] );
 		}
 
