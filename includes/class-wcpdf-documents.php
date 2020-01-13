@@ -74,7 +74,7 @@ class Documents {
 		if ( $filter == 'enabled' ) {
 			$documents = array();
 			foreach ($this->documents as $class_name => $document) {
-				if ($document->is_enabled()) {
+				if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled() ) {
 					$documents[$class_name] = $document;
 				}
 			}
@@ -86,8 +86,8 @@ class Documents {
 	}
 
 	public function get_document( $document_type, $order ) {
-		foreach ($this->get_documents('all') as $class_name => $document) {
-			if ($document->get_type() == $document_type) {
+		foreach ( $this->get_documents('all') as $class_name => $document) {
+			if ( $document->get_type() == $document_type && class_exists( $class_name ) ) {
 				return new $class_name( $order );
 			}
 		}
