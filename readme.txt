@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.3
 Requires PHP: 5.3
-Stable tag: 2.4.2
+Stable tag: 2.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,17 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.4.3 =
+* Fix: Prevent errors unsetting a non-existing setting
+* Fix: Potential crash on improperly initiated documents 
+* Fix: Reversed tax rate calculation arguments
+* Fix: Support tax rate functions for non-line items
+* Fix: comma position on multiple tax rates
+* Fix: Setup wizard styles
+* Translations: Added lv locale for Latvian (keeping lv_LV as fallback)
+* Translations: Updated bundled Czech translations
+* Tested up to WooCommerce 3.9
 
 = 2.4.2 =
 * Fix: 'No' option in new date & number visibility setting
