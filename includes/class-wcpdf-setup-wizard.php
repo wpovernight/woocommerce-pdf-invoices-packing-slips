@@ -230,9 +230,9 @@ class Setup_Wizard {
 					// sanitize posted settings
 					foreach ($settings as $key => $value) {
 						if ( $key == 'shop_address' && function_exists('sanitize_textarea_field') ) {
-							$sanitize_function == 'sanitize_textarea_field';
+							$sanitize_function = 'sanitize_textarea_field';
 						} else {
-							$sanitize_function == 'sanitize_text_field';							
+							$sanitize_function = 'sanitize_text_field';							
 						}
 
 						if (is_array($value)) {
