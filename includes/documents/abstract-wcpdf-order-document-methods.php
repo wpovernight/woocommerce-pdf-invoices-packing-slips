@@ -713,7 +713,20 @@ abstract class Order_Document_Methods extends Order_Document {
 			}
 
 			foreach( $tax_items as $tax_item_key => $tax_item ) {
-				$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
+				if ( $order->get_created_via() == 'subscription' ) {
+					// subscription renewals didn't properly record the rate_percent property between WC3.7 and WCS3.0.1
+					// so we use a fallback if the rate_percent = 0 and the amount != 0
+					$rate_percent = $tax_item->get_rate_percent();
+					$tax_amount = $tax_item->get_tax_total() + $tax_item->get_shipping_tax_total();
+					if ( $tax_amount > 0 && $rate_percent > 0 ) {
+						$tax_rates[ $tax_item->get_rate_id() ] = $rate_percent;
+					} else {
+						continue; // not setting the rate will let the plugin fall back to the rate from the settings
+					}
+				} else {
+					$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
+				}
+
 			}
 			return $tax_rates;
 		} else {
