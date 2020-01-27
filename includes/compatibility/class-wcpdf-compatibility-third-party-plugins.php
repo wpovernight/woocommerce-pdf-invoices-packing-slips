@@ -233,7 +233,7 @@ class Third_Party_Plugins {
 	 * Restore above
 	 */
 	function restore_wgm_thumbnails( $document_type, $document ) {
-		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) ) {
+		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
 	}
