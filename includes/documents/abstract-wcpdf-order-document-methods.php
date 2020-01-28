@@ -713,7 +713,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			}
 
 			foreach( $tax_items as $tax_item_key => $tax_item ) {
-				if ( $order->get_created_via() == 'subscription' ) {
+				if ( is_callable( array( $order, 'get_created_via' ) ) && $order->get_created_via() == 'subscription' ) {
 					// subscription renewals didn't properly record the rate_percent property between WC3.7 and WCS3.0.1
 					// so we use a fallback if the rate_percent = 0 and the amount != 0
 					$rate_percent = $tax_item->get_rate_percent();
