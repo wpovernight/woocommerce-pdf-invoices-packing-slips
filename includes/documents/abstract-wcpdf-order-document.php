@@ -752,6 +752,12 @@ abstract class Order_Document {
 	 * @return array   $emails       list of all email ids/slugs and names
 	 */
 	public function get_wc_emails() {
+		// only run this in the context of the settings page or setup wizard
+		// prevents WPML language mixups
+		if ( empty( $_GET['page'] ) || !in_array( $_GET['page'], array('wpo-wcpdf-setup','wpo_wcpdf_options_page') ) ) {
+			return array();
+		}
+
 		// get emails from WooCommerce
 		if (function_exists('WC')) {
 			$mailer = WC()->mailer();
