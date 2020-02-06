@@ -72,7 +72,11 @@ class WPO_WCPDF {
 	 * Note: the first-loaded translation file overrides any following ones if the same translation is present
 	 */
 	public function translations() {
-		$locale = function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
+		if ( function_exists( 'determine_locale' ) ) { // WP5.0+
+			$locale = determine_locale();
+		} else {
+			$locale = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
+		}
 		$locale = apply_filters( 'plugin_locale', $locale, 'woocommerce-pdf-invoices-packing-slips' );
 		$dir    = trailingslashit( WP_LANG_DIR );
 
