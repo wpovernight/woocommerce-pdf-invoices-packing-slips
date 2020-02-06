@@ -17,7 +17,11 @@ class Admin {
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_number_column' ), 999 );
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_number_column_data' ), 2 );
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
-		add_action( 'admin_footer', array( $this, 'bulk_actions' ) );
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
+			add_action( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
+		} else {
+			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
+		}
 		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 
 		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 35, 2 );
@@ -420,28 +424,40 @@ class Admin {
 	}
 
 	/**
-	 * Add actions to menu
+	 * Add actions to menu, WP3.5+
 	 */
-	public function bulk_actions() {
-		if ( $this->is_order_page() ) {
-			$bulk_actions = array();
-			$documents = WPO_WCPDF()->documents->get_documents();
-			foreach ($documents as $document) {
-				$bulk_actions[$document->get_type()] = "PDF " . $document->get_title();
-			}
+	public function bulk_actions( $actions ) {
+		foreach ($this->get_bulk_actions() as $action => $title) {
+			$actions[$action] = $title;
+		}
+		return $actions;
+	}
 
-			$bulk_actions = apply_filters( 'wpo_wcpdf_bulk_actions', $bulk_actions );
-			
+	/**
+	 * Add actions to menu, legacy method
+	 */
+	public function bulk_actions_js() {
+		if ( $this->is_order_page() ) {
 			?>
 			<script type="text/javascript">
 			jQuery(document).ready(function() {
-				<?php foreach ($bulk_actions as $action => $title) { ?>
+				<?php foreach ($this->get_bulk_actions() as $action => $title) { ?>
 				jQuery('<option>').val('<?php echo $action; ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
 				<?php }	?>
 			});
 			</script>
 			<?php
 		}
+	}
+
+	public function get_bulk_actions() {
+		$actions = array();
+		$documents = WPO_WCPDF()->documents->get_documents();
+		foreach ($documents as $document) {
+			$actions[$document->get_type()] = "PDF " . $document->get_title();
+		}
+
+		return apply_filters( 'wpo_wcpdf_bulk_actions', $actions );
 	}
 
 	/**
