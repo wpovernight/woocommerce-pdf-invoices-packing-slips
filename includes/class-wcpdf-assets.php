@@ -25,6 +25,7 @@ class Assets {
 	 * Load styles & scripts
 	 */
 	public function backend_scripts_styles ( $hook ) {
+		global $wp_version;
 		if( $this->is_order_page() ) {
 			// STYLES
 			wp_enqueue_style( 'thickbox' );
@@ -36,29 +37,30 @@ class Assets {
 				WPO_WCPDF_VERSION
 			);
 
-			global $wp_version;
+			$wc_version = defined( 'WC_VERSION' ) ? WC_VERSION : WOOCOMMERCE_VERSION;
 
-			if ( version_compare( WOOCOMMERCE_VERSION, '3.9' ) >= 0 ) {
-				// WC 3.9 or newer is used: realign img inside buttons
+			if ( version_compare( $wc_version, '2.1', '<' ) ) {
+				// legacy WC2.0 styles
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc20.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
-			} elseif ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 && version_compare( $wp_version, '5.3', '<' ) ) {
-				// WC 2.1 or newer (MP6) is used: bigger buttons
+			} elseif ( version_compare( $wc_version, '2.1', '>=' ) && version_compare( $wp_version, '5.3', '<' ) ) {
+				// WC2.1 - WC3.2 (MP6) is used: bigger buttons
+				// also applied to WC3.3+ but without affect due to .column-order_actions class being deprecated in 3.3+
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
 					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
-			} else {
-				// legacy WC 2.0 styles
+			} elseif ( version_compare( $wp_version, '5.3', '>=' ) ) {
+				// WP5.3 or newer is used: realign img inside buttons
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc20.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
