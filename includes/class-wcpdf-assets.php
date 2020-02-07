@@ -36,11 +36,21 @@ class Assets {
 				WPO_WCPDF_VERSION
 			);
 
-			if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
+			global $wp_version;
+
+			if ( version_compare( WOOCOMMERCE_VERSION, '3.9' ) >= 0 ) {
+				// WC 3.9 or newer is used: realign img inside buttons
+				wp_enqueue_style(
+					'wpo-wcpdf-order-styles-buttons',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39.css',
+					array(),
+					WPO_WCPDF_VERSION
+				);
+			} elseif ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 && version_compare( $wp_version, '5.3', '<' ) ) {
 				// WC 2.1 or newer (MP6) is used: bigger buttons
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);

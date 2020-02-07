@@ -21,7 +21,7 @@
 }
 
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf img,
-.type-shop_order .column-order_actions a.button.wpo_wcpdf img {
+.type-shop_order .column-order_actions a.button.wpo_wcpdf img /* legacy: 3.2 & older */ {
 	width: 16px;
 }
 
