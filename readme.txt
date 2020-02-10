@@ -103,7 +103,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 = 2.4.6 =
-* Fix: Locale determination for admins on their owm my account page
+* Fix: Locale determination for admins on their own my account page
 * Fix: Action buttons icon alignment in WP5.3+
 * Fix: Add bulk actions via native WP methods
 * Tweak: minimize calls to WooCommerce mailer class when loading settings
