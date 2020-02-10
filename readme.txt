@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.3
 Requires PHP: 5.3
-Stable tag: 2.4.5
+Stable tag: 2.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.4.6 =
+* Fix: Locale determination for admins on their owm my account page
+* Fix: Action buttons icon alignment in WP5.3+
+* Fix: Add bulk actions via native WP methods
+* Tweak: minimize calls to WooCommerce mailer class when loading settings
 
 = 2.4.5 =
 * Fix: Prevent errors for subscription tax fallback on refunds
