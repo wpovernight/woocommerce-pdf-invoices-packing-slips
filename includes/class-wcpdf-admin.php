@@ -393,7 +393,7 @@ class Admin {
 						</p>
 					</div>
 
-					<?php do_action( 'wpo_wcpdf_after_pdf_document_data', $invoice, $order ); ?>
+					<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $invoice, $order ); ?>
 
 					<?php else : ?>
 					<span class="wpo-wcpdf-set-date-number button"><?php _e( 'Set invoice number & date', 'woocommerce-pdf-invoices-packing-slips' ) ?></span>
