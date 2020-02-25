@@ -393,19 +393,8 @@ class Admin {
 						</p>
 					</div>
 
-					<?php if ( !empty( $order->get_meta( '_wpo_wcpdf_invoice_archived', true ) ) ) : ?>
-					
-					<div class="document-stored">
-						<p class="form-field _wcpdf_regenerate_stored_document">	
-							<p>
-								<span><strong><?php _e( 'Invoice stored on server', 'wpo_wcpdf_pro' ); ?>:</strong></span>
-								<span style="margin-right:10px;"><?php _e( 'Yes', 'wpo_wcpdf_pro' ); ?></span><span class="button button-small">Regenerate</span>
-							</p>
-						</p>
-					</div>
+					<?php do_action( 'wpo_wcpdf_after_pdf_document_data', $invoice, $order ); ?>
 
-					<?php endif; ?>
-					
 					<?php else : ?>
 					<span class="wpo-wcpdf-set-date-number button"><?php _e( 'Set invoice number & date', 'woocommerce-pdf-invoices-packing-slips' ) ?></span>
 					<?php endif; ?>
