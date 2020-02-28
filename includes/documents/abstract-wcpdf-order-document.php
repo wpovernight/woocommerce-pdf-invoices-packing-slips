@@ -270,6 +270,8 @@ abstract class Order_Document {
 				}
 			}
 		}
+
+		do_action( 'wpo_wcpdf_save_document', $this, $order );
 	}
 
 	public function delete( $order = null ) {
@@ -289,7 +291,7 @@ abstract class Order_Document {
 			WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$data_key}" );
 		}
 
-		do_action( 'wpo_wcpdf_delete_document', $this );
+		do_action( 'wpo_wcpdf_delete_document', $this, $order );
 	}
 
 	public function is_allowed() {
