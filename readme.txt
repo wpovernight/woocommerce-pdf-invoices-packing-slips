@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.4
 Requires PHP: 5.3
-Stable tag: 2.4.6
+Stable tag: 2.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.4.7 =
+* Fix: missing order number in filename when invoice number not enabled
+* Dev: Added action hook for document save method (`wpo_wcpdf_save_document`)
+* Dev: Added action hook for printing custom data in PDF invoice data panel (`wpo_wcpdf_meta_box_after_document_data`)
+* Tested up to WooCommerce 4.0 & WP 5.4
 
 = 2.4.6 =
 * Fix: Locale determination for admins on their own my account page
