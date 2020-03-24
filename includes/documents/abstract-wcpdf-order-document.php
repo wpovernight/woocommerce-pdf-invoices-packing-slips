@@ -613,7 +613,7 @@ abstract class Order_Document {
 		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
 			$pdf = file_get_contents( $pdf_file );
 		}
-		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
+		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this, $is_bulk = false );
 		if ( !empty( $pdf ) ) {
 			return $pdf;
 		}
