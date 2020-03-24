@@ -129,7 +129,7 @@ class Invoice extends Order_Document_Methods {
 		$name = _n( 'invoice', 'invoices', $order_count, 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( $order_count == 1 ) {
-			if ( isset( $this->settings['display_number'] ) ) {
+			if ( isset( $this->settings['display_number'] ) && $this->settings['display_number'] == 'invoice_number' ) {
 				$suffix = (string) $this->get_number();
 			} else {
 				if ( empty( $this->order ) ) {
