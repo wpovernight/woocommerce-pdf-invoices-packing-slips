@@ -67,6 +67,12 @@
 	margin-left:20px!important;	
 }
 
+/* Keep PDF */
+.wcpdf-data-fields .archived_document_regenerated {
+	color: #2aad2a;
+	visibility: hidden;
+}
+
 .dashicons-edit,
 .dashicons-trash {
 	opacity:0.5;
