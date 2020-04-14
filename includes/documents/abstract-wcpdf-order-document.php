@@ -651,7 +651,7 @@ abstract class Order_Document {
 		}
 
 		// clean up special characters
-		if ( function_exists('utf8_decode') && function_exists('mb_convert_encoding') ) {
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists('utf8_decode') && function_exists('mb_convert_encoding') ) ) {
 			$html = utf8_decode(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 		}
 
