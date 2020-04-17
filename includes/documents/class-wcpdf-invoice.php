@@ -371,13 +371,13 @@ class Invoice extends Order_Document_Methods {
 			array(
 				'type'			=> 'setting',
 				'id'			=> 'disable_free',
-				'title'			=> __( 'Disable for free products', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'			=> __( 'Disable for free orders', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
 				'section'		=> 'invoice',
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'disable_free',
-					'description'	=> __( "Disable automatic creation/attachment when only free products are ordered", 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'	=> sprintf(__( "Disable automatic creation/attachment when the order total is %s", 'woocommerce-pdf-invoices-packing-slips' ), wc_price( 0 ) ),
 				)
 			),
 			array(
