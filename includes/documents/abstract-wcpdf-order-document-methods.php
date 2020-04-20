@@ -609,6 +609,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	        $line_total = $item[$line_total_key];
 	        $line_tax_data = $item[$tax_data_container];
 		} else {
+	        $tax_data_key = ( $item['type'] == 'line_item' ) ? 'subtotal' : 'total';
 			$tax_class = $item['tax_class'];
 			$line_total = $item['line_total'];
 			$line_tax = $item['line_tax'];
