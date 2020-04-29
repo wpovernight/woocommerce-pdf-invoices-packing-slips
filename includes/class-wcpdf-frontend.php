@@ -16,6 +16,7 @@ class Frontend {
 	function __construct()	{
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
 		add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_number' ), 10, 2 );
+		add_shortcode( 'wcpdf_download_invoice', array($this, 'download_invoice_shortcode') );
 	}
 
 	/**
@@ -77,6 +78,50 @@ class Frontend {
 
 		return $data;
 		$this->restore_storing_document_settings();
+	}
+
+	/**
+	 * Download invoice frontend shortcode
+	 */
+	public function download_invoice_shortcode( $atts ) {
+
+		if( is_admin() ) return;
+
+		// Default values
+		$values = shortcode_atts(array(
+			'order_id'		=> '',
+			'guest_access'	=> '',
+			'link_text'		=> ''
+		), $atts);
+		if( !$values ) return;
+
+		// Get $order
+		if( is_checkout() && !empty(is_wc_endpoint_url('order-received')) && empty($values['order_id']) ) {
+			$order = wc_get_order( $_GET['order-received'] );
+		} elseif( !is_checkout() && is_object($order) && empty($values['order_id']) ) {
+			$order = wc_get_order( get_the_ID() );
+		} elseif( !empty($values['order_id']) ) {
+			$order = wc_get_order( $values['order_id'] );
+		}
+		if( !isset($order) || empty($order) ) return;
+
+		// Link text
+		$link_text = __('Download a printable invoice / payment confirmation (PDF format)', 'woocommerce-pdf-invoices-packing-slips');
+		if( ! empty($values['link_text']) ) {
+			$link_text = $values['link_text'];
+		}
+
+		// User permissions
+		if( is_user_logged_in() ) {
+			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->get_id() . '&my-account'), 'generate_wpo_wcpdf' );
+			$text .= '<p><a href="'.esc_attr($pdf_url).'" target="_blank">'.$link_text.'</a></p>';
+		} elseif( ! is_user_logged_in() && $values['guest_access'] == 'yes' ) {
+			$pdf_url = admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->get_id() . '&order_key=' . $order->get_order_key() );
+    		$text .= '<p><a href="'.esc_attr($pdf_url).'" target="_blank">'.$link_text.'</a></p>';
+		}
+
+		return $text;
+
 	}
 
 	/**
