@@ -20,7 +20,7 @@ class Main {
 		// email
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 4 );
 		add_filter( 'wpo_wcpdf_custom_attachment_condition', array( $this, 'disable_free_attachment'), 1001, 4 );
-		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );		
+		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
 
 		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) ) {
 			$this->enable_debug();
