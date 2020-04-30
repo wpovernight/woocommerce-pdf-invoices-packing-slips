@@ -84,7 +84,7 @@ class Frontend {
 	 * Download invoice frontend shortcode
 	 */
 	public function download_invoice_shortcode( $atts ) {
-
+		
 		if( is_admin() ) return;
 
 		// Default values
@@ -97,8 +97,8 @@ class Frontend {
 		// Get $order
 		if( is_checkout() && !empty(is_wc_endpoint_url('order-received')) && empty($values['order_id']) ) {
 			$order = wc_get_order( $_GET['order-received'] );
-		} elseif( !is_checkout() && empty($values['order_id']) ) {
-			$order = wc_get_order( get_the_ID() );
+		} elseif( is_account_page() && !empty(is_wc_endpoint_url('view-order')) && empty($values['order_id']) ) {
+			$order = wc_get_order( $_GET['view-order'] );
 		} elseif( !empty($values['order_id']) ) {
 			$order = wc_get_order( $values['order_id'] );
 		}
