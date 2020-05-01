@@ -68,12 +68,14 @@
 }
 
 .dashicons-edit,
-.dashicons-trash {
+.dashicons-trash,
+.dashicons-update-alt {
 	opacity:0.5;
 }
 
 .dashicons-edit:hover,
-.dashicons-trash:hover {
+.dashicons-trash:hover,
+.dashicons-update-alt:hover {
 	opacity:1;
 	cursor:pointer;
 }

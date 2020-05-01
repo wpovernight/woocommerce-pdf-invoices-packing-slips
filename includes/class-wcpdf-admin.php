@@ -48,6 +48,8 @@ class Admin {
 
 		// AJAX action for deleting document data
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array($this, 'delete_document' ) );
+
+		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_update_document_icon' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -430,6 +432,13 @@ class Admin {
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $post->ID );
+	}
+
+	public function add_update_document_icon( $document ) {
+		$document_settings = $document->get_settings( true );
+		if ( $document->use_historical_settings() == true || isset( $document_settings['archive_pdf'] ) ) {
+			printf( '<span class="wpo-wcpdf-update-document dashicons dashicons-update-alt" data-nonce="%s"></span>', wp_create_nonce( "wpo_wcpdf_update_document" ) );
+		}
 	}
 
 	/**
