@@ -89,6 +89,11 @@ td.no-borders {
 	width: auto;
 }
 
+div.clearfix {
+	clear: both;
+	height: 8mm;
+}
+
 /* Header */
 table.head {
 	margin-bottom: 12mm;
@@ -137,7 +142,7 @@ td.order-data table th {
 /* Order details */
 table.order-details {
 	width:100%;
-	margin-bottom: 8mm;
+	margin-bottom: 0mm;
 }
 
 .quantity,
