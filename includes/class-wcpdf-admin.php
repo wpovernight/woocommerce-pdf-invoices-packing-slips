@@ -47,7 +47,9 @@ class Admin {
 		}
 
 		// AJAX action for deleting document data
-		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array($this, 'delete_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'delete_document' ) );
+
+		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_update_document_icon' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
