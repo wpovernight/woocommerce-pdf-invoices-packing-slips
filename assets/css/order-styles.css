@@ -68,46 +68,12 @@
 }
 
 .dashicons-edit,
-.dashicons-trash,
-.dashicons-update-alt {
+.dashicons-trash {
 	opacity:0.5;
 }
 
 .dashicons-edit:hover,
-.dashicons-trash:hover,
-.dashicons-update-alt:hover {
+.dashicons-trash:hover {
 	opacity:1;
 	cursor:pointer;
-}
-
-.wcpdf-data-fields h4 .spin {
-	opacity: 1;
- 	-webkit-animation: spin 1.6s linear infinite; /* Safari */
- 	animation: spin 1.6s linear infinite;
- 	pointer-events: none;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-	0% { -webkit-transform: rotate(0deg); }
-	100% { -webkit-transform: rotate(-360deg); }
-}
-
-@keyframes spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(-360deg); }
-}
-
-.wcpdf-data-fields .document-action-success,
-.wcpdf-data-fields .document-action-failed {
-	display: none;
-	vertical-align: middle;
-}
-
-.wcpdf-data-fields .document-action-success {
-	color: #2aad2a;
-}
-
-.wcpdf-data-fields .document-action-failed {
-	color: red;
 }
