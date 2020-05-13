@@ -71,7 +71,7 @@ jQuery(document).ready(function($) {
 			return; // having second thoughts
 		}
 
-		$(this).addClass('spin');
+		$(this).addClass('wcpdf-regenerate-spin');
 		$form = $(this).closest('.wcpdf-data-fields');
 
 		// Make sure all feedback icons are hidden before each call
@@ -93,7 +93,7 @@ jQuery(document).ready(function($) {
 				} else {
 					$error = $(this).find('.document-action-failed').show();
 				}
-				$(this).find('.wpo-wcpdf-regenerate-document').removeClass('spin');
+				$(this).find('.wpo-wcpdf-regenerate-document').removeClass('wcpdf-regenerate-spin');
 			}
 		});
 		
