@@ -118,11 +118,11 @@ class WPO_WCPDF {
 
 		if ( $textdomain == $old_domain ) {
 			$textdomain = $plugin_domain;
-			$mofile = str_replace( "{$old_domain}-", "{$textdomain}-", $mofile ); // with trailing dash to target file and not folder
+			$mofile = str_replace( $old_domain, $textdomain, $mofile );
 		}
 
 		if ( $textdomain === $plugin_domain ) {
-			$old_mofile = str_replace( "{$textdomain}-", "{$old_domain}-", $mofile ); // with trailing dash to target file and not folder
+			$old_mofile = str_replace( $textdomain, $old_domain, $mofile );
 			if ( file_exists( $mopath.$old_mofile ) ) {
 				// we have an old override - use it
 				return $mopath.$old_mofile;
