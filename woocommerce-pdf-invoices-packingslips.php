@@ -116,7 +116,7 @@ class WPO_WCPDF {
 		$mopath = trailingslashit( dirname( $mo ) );
 		$mofile = basename( $mo );
 
-		if ($textdomain == $old_domain) {
+		if ( $textdomain == $old_domain ) {
 			$textdomain = $plugin_domain;
 			$mofile = str_replace( "{$old_domain}-", "{$textdomain}-", $mofile ); // with trailing dash to target file and not folder
 		}
@@ -136,15 +136,15 @@ class WPO_WCPDF {
 				// set revision date threshold
 				$block_before = strtotime( '2017-05-15' );
 				// read revision date
-				preg_match('~PO-Revision-Date: (.*?)\\\n~s',$podata,$matches);
-				if (isset($matches[1])) {
+				preg_match( '~PO-Revision-Date: (.*?)\\\n~s', $podata, $matches );
+				if ( isset( $matches[1] ) ) {
 					$revision_date = $matches[1];
-					if ( $revision_timestamp = strtotime($revision_date) ) {
+					if ( $revision_timestamp = strtotime( $revision_date ) ) {
 						// check if revision is before threshold date
 						if ( $revision_timestamp < $block_before ) {
 							// try bundled
 							$bundled_file = $this->plugin_path() . '/languages/'. $mofile;
-							if (file_exists($bundled_file)) {
+							if ( file_exists( $bundled_file ) ) {
 								return $bundled_file;
 							} else {
 								return '';
