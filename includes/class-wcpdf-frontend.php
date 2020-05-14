@@ -111,7 +111,7 @@ class Frontend {
 		}
 
 		// User permissions
-		$debug_settings = get_option('wpo_wcpdf_settings_debug');
+		$debug_settings = get_option('wpo_wcpdf_settings_debug', array());
 		if( is_user_logged_in() ) {
 			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->get_id() . '&my-account'), 'generate_wpo_wcpdf' );
 			$text .= '<p><a href="'.esc_attr($pdf_url).'" target="_blank">'.$link_text.'</a></p>';
