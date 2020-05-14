@@ -89,7 +89,7 @@ td.no-borders {
 	width: auto;
 }
 
-div.clearfix {
+div.bottom-spacer {
 	clear: both;
 	height: 8mm;
 }

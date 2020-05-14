@@ -139,7 +139,7 @@
 	</tfoot>
 </table>
 
-<div class="clearfix"></div>
+<div class="bottom-spacer"></div>
 
 <?php do_action( 'wpo_wcpdf_after_order_details', $this->type, $this->order ); ?>
 
