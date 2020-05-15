@@ -294,6 +294,22 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_delete_document', $this, $order );
 	}
 
+	public function regenerate( $order = null ) {
+		$order = empty( $order ) ? $this->order : $order;
+		if ( empty( $order ) ) {
+			return; //Nothing to update
+		}
+
+		//Get most current settings
+		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		$settings = (array) $document_settings + (array) $common_settings;
+		//Update document settings
+		WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
+
+		do_action( 'wpo_wcpdf_regenerate_document', $this );
+	}
+
 	public function is_allowed() {
 		$allowed = true;
 		if ( !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
