@@ -711,13 +711,7 @@ class Admin {
 		try {
 			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );
 			if ( !empty($document) && $document->exists() ) {
-
-				// Regenerate document
-				add_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'use_most_current_settings' ) );
-				do_action( 'wpo_wcpdf_regenerate_document', $document );
-				$document->get_pdf();
-				remove_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'use_most_current_settings' ) );
-
+				$document->regenerate();
 				$response = array(
 					'message' => $document->get_type()." regenerated",
 				);
@@ -732,10 +726,6 @@ class Admin {
 				'message' => 'error: '.$e->getMessage(),
 			) );			
 		}
-	}
-
-	public function use_most_current_settings() {
-		return false;
 	}
 
 	public function debug_enabled_warning( $wp_admin_bar ) {
