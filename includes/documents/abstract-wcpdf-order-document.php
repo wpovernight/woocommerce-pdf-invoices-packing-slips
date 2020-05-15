@@ -304,8 +304,11 @@ abstract class Order_Document {
 		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
 		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
 		$settings = (array) $document_settings + (array) $common_settings;
-		//Update document settings
+		//Update document settings in meta
 		WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
+
+		//Use most current settings from here on
+		$this->settings = $this->get_settings( true ); 
 
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
 	}
