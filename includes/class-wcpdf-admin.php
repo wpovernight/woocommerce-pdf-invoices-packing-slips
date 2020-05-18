@@ -49,6 +49,9 @@ class Admin {
 		// AJAX actions for deleting and regenerating document data
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'delete_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'regenerate_document' ) );
+
+		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
+		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_document_action_feedback_icons' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -431,6 +434,18 @@ class Admin {
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $post->ID );
+	}
+
+	public function add_regenerate_document_button( $document ) {
+		$document_settings = $document->get_settings( true );
+		if ( $document->use_historical_settings() == true || isset( $document_settings['archive_pdf'] ) ) {
+			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
+		}
+	}
+
+	public function add_document_action_feedback_icons( $document ) {
+		echo '<span class="dashicons dashicons-yes document-action-success"></span>';
+		echo '<span class="dashicons dashicons-no document-action-failed"></span>';
 	}
 
 	/**
