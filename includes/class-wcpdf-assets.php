@@ -89,7 +89,6 @@ class Assets {
 					'nonce'					=> wp_create_nonce('generate_wpo_wcpdf'),
 					'bulk_actions'			=> array_keys( $bulk_actions ),
 					'confirm_delete'		=> __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_regenerate'	=> __( 'Are you sure you want to regenerate this document?', 'woocommerce-pdf-invoices-packing-slips'),
 				)
 			);
 		}
