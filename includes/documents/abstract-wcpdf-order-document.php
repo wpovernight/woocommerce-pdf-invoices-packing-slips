@@ -296,7 +296,7 @@ abstract class Order_Document {
 
 	public function is_allowed() {
 		$allowed = true;
-		if ( !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
+		if ( !$this->exists() && !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
 			$status = $this->order->get_status();
 
 			$disabled_statuses = array_map( function($status){
