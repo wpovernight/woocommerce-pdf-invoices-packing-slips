@@ -522,12 +522,14 @@ abstract class Order_Document {
 			$company = $this->get_shop_name();
 			if( $attachment_id ) {
 				$attachment = wp_get_attachment_image_src( $attachment_id, 'full', false );
+				$attachment_path = get_attached_file( $attachment_id );
+				if ( empty( $attachment ) || empty( $attachment_path ) ) {
+					return;
+				}
 				
 				$attachment_src = $attachment[0];
 				$attachment_width = $attachment[1];
 				$attachment_height = $attachment[2];
-
-				$attachment_path = get_attached_file( $attachment_id );
 
 				if ( apply_filters('wpo_wcpdf_use_path', true) && file_exists($attachment_path) ) {
 					$src = $attachment_path;
