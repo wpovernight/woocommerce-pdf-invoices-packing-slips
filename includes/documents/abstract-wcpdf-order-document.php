@@ -138,7 +138,10 @@ abstract class Order_Document {
 		// get historical settings if enabled
 		if ( !empty( $this->order ) && $this->use_historical_settings() == true ) {
 			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-			if (!empty($order_settings)) {
+			if (!empty($order_settings) && !is_array($order_settings)) {
+				$order_settings = maybe_unserialize( $order_settings );
+			}
+			if (!empty($order_settings) && is_array($order_settings)) {
 				// not sure what happens if combining with current settings will have unwanted side effects
 				// like unchecked options being enabled because missing = unchecked in historical - disabled for now
 				// $settings = (array) $order_settings + (array) $settings;
