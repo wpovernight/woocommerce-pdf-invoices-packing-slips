@@ -432,6 +432,8 @@ abstract class Order_Document {
 	public function set_number( $value, $order = null ) {
 		$order = empty( $order ) ? $this->order : $order;
 
+		$value = maybe_unserialize( $value ); // fix incorrectly stored meta
+
 		if ( is_array( $value ) ) {
 			$filtered_value = array_filter( $value );
 		}
