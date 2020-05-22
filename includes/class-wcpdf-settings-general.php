@@ -134,6 +134,19 @@ class Settings_General {
 			),
 			array(
 				'type'		=> 'setting',
+				'id'		=> 'header_logo_height',
+				'title'		=> __( 'Logo height', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'text_input',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'header_logo_height',
+					'size'			=> '5',
+					'description'	=> __( 'Enter the total height of the logo in mm, cm or in and use a dot for decimals.<br/>For example: 1.15in or 30mm', 'woocommerce-pdf-invoices-packing-slips' )
+				)
+			),
+			array(
+				'type'		=> 'setting',
 				'id'		=> 'shop_name',
 				'title'		=> __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'	=> 'text_input',
