@@ -138,7 +138,10 @@ abstract class Order_Document {
 		// get historical settings if enabled
 		if ( !empty( $this->order ) && $this->use_historical_settings() == true ) {
 			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-			if (!empty($order_settings)) {
+			if (!empty($order_settings) && !is_array($order_settings)) {
+				$order_settings = maybe_unserialize( $order_settings );
+			}
+			if (!empty($order_settings) && is_array($order_settings)) {
 				// not sure what happens if combining with current settings will have unwanted side effects
 				// like unchecked options being enabled because missing = unchecked in historical - disabled for now
 				// $settings = (array) $order_settings + (array) $settings;
@@ -315,7 +318,7 @@ abstract class Order_Document {
 
 	public function is_allowed() {
 		$allowed = true;
-		if ( !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
+		if ( !$this->exists() && !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
 			$status = $this->order->get_status();
 
 			$disabled_statuses = array_map( function($status){
@@ -447,6 +450,8 @@ abstract class Order_Document {
 
 	public function set_number( $value, $order = null ) {
 		$order = empty( $order ) ? $this->order : $order;
+
+		$value = maybe_unserialize( $value ); // fix incorrectly stored meta
 
 		if ( is_array( $value ) ) {
 			$filtered_value = array_filter( $value );
