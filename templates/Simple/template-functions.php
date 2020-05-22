@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 add_action( 'wpo_wcpdf_custom_styles', 'wpo_wcpdf_templates_get_footer_settings', 10, 2 );
 
 function wpo_wcpdf_templates_get_footer_settings( $document_type, $document ) {
-    $header_logo_height = str_replace( ' ', '', $document->get_header_logo_height() );
+    $header_logo_height = $document->get_header_logo_height();
 	if ( !empty( $header_logo_height ) ) {
 		?>
         td.header img {

@@ -504,7 +504,7 @@ abstract class Order_Document {
 	 */
 	public function get_header_logo_height() {
 		if ( !empty( $this->settings['header_logo_height'] ) ) {
-			return apply_filters( 'wpo_wcpdf_header_logo_height', $this->settings['header_logo_height'], $this );
+			return apply_filters( 'wpo_wcpdf_header_logo_height', sanitize_text_field($this->settings['header_logo_height']), $this );
 		}
 	}
 

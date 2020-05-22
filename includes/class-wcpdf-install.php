@@ -255,7 +255,6 @@ class Install {
 					'currency_font'				=> array( 'wpo_wcpdf_template_settings' => 'currency_font' ),
 					'paper_size'				=> array( 'wpo_wcpdf_template_settings' => 'paper_size' ),
 					'header_logo'				=> array( 'wpo_wcpdf_template_settings' => 'header_logo' ),
-					'header_logo_height'		=> array( 'wpo_wcpdf_template_settings' => 'header_logo_height' ),
 					'shop_name'					=> array( 'wpo_wcpdf_template_settings' => 'shop_name' ),
 					'shop_address'				=> array( 'wpo_wcpdf_template_settings' => 'shop_address' ),
 					'footer'					=> array( 'wpo_wcpdf_template_settings' => 'footer' ),

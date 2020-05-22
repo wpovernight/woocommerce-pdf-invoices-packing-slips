@@ -9,6 +9,8 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings_General' ) ) :
 
 class Settings_General {
 
+	protected $option_name = 'wpo_wcpdf_settings_general';
+
 	function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 1 );
@@ -16,14 +18,14 @@ class Settings_General {
 	}
 
 	public function output( $section ) {
-		settings_fields( "wpo_wcpdf_settings_general" );
-		do_settings_sections( "wpo_wcpdf_settings_general" );
+		settings_fields( $this->option_name );
+		do_settings_sections( $this->option_name );
 
 		submit_button();
 	}
 
 	public function init_settings() {
-		$page = $option_group = $option_name = 'wpo_wcpdf_settings_general';
+		$page = $option_group = $option_name = $this->option_name;
 
 		$template_base_path = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
 		$theme_template_path = get_stylesheet_directory() . '/' . $template_base_path;
@@ -136,13 +138,14 @@ class Settings_General {
 				'type'		=> 'setting',
 				'id'		=> 'header_logo_height',
 				'title'		=> __( 'Logo height', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'text_input',
+				'callback'	=> array($this, 'text_element_callback'),
 				'section'	=> 'general_settings',
 				'args'		=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'header_logo_height',
 					'size'			=> '5',
-					'description'	=> __( 'Enter the total height of the logo in mm, cm or in and use a dot for decimals.<br/>For example: 1.15in or 30mm', 'woocommerce-pdf-invoices-packing-slips' )
+					'default'		=> '3cm',
+					'description'	=> __( 'Enter the total height of the logo in mm, cm or in and use a dot for decimals.<br/>For example: 1.15in or 40mm', 'woocommerce-pdf-invoices-packing-slips' )
 				)
 			),
 			array(
@@ -245,6 +248,29 @@ class Settings_General {
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
+	}
+
+	public function text_element_callback( $args ) {
+		$id = $args['id'];
+		$size = isset( $args['size'] ) ? $args['size'] : '25';
+	
+		$options = get_option( $this->option_name );
+
+		if ( isset($options[$id]) && !empty( $options[$id] ) ) {
+			$current = $options[$id];
+		} else {
+			$current = isset( $args['default'] ) ? $args['default'] : '';
+		}
+	
+
+		$html = sprintf( '<input type="text" id="%1$s" name="%4$s[%1$s]" value="%2$s" size="%3$s"/>', $id, $current, $size, $this->option_name );
+	
+		// Displays option description.
+		if ( isset( $args['description'] ) ) {
+			$html .= sprintf( '<p class="description">%s</p>', $args['description'] );
+		}
+	
+		echo $html;
 	}
 
 	public function attachment_settings_hint( $active_tab, $active_section ) {
