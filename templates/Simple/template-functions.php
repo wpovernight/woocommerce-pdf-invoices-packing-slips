@@ -5,9 +5,9 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-add_action( 'wpo_wcpdf_custom_styles', 'wpo_wcpdf_templates_get_footer_settings', 10, 2 );
+add_action( 'wpo_wcpdf_custom_styles', 'wpo_wcpdf_set_header_logo_height', 10, 2 );
 
-function wpo_wcpdf_templates_get_footer_settings( $document_type, $document ) {
+function wpo_wcpdf_set_header_logo_height( $document_type, $document ) {
     $header_logo_height = $document->get_header_logo_height();
 	if ( !empty( $header_logo_height ) ) {
 		?>
