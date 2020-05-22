@@ -364,7 +364,7 @@ class Settings_Callbacks {
 			$attachment_resolution = round($attachment_height/(3/2.54));
 			
 			printf('<img src="%1$s" style="display:block" id="img-%4$s"/>', $attachment_src, $attachment_width, $attachment_height, $id );
-			printf('<div class="attachment-resolution"><p class="description">%s: %sdpi (default height = 3cm)</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
+			printf('<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
 			printf('<span class="button wpo_remove_image_button" data-input_id="%1$s">%2$s</span>', $id, $remove_button_text );
 		}
 
