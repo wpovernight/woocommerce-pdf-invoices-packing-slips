@@ -80,6 +80,10 @@ class Settings_Callbacks {
 			$type = 'text';
 		}
 
+		if (empty($current)) {
+			$current = $default;
+		}
+
 		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" size="%5$s" placeholder="%6$s" %7$s/>', $type, $id, $setting_name, esc_attr( $current ), $size, $placeholder, !empty($disabled) ? 'disabled="disabled"' : '' );
 	
 		// output description.

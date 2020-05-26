@@ -138,7 +138,7 @@ class Settings_General {
 				'type'		=> 'setting',
 				'id'		=> 'header_logo_height',
 				'title'		=> __( 'Logo height', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> array($this, 'text_element_callback'),
+				'callback'	=> 'text_input',
 				'section'	=> 'general_settings',
 				'args'		=> array(
 					'option_name'	=> $option_name,
@@ -248,29 +248,6 @@ class Settings_General {
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
-	}
-
-	public function text_element_callback( $args ) {
-		$id = $args['id'];
-		$size = isset( $args['size'] ) ? $args['size'] : '25';
-	
-		$options = get_option( $this->option_name );
-
-		if ( isset($options[$id]) && !empty( $options[$id] ) ) {
-			$current = $options[$id];
-		} else {
-			$current = isset( $args['default'] ) ? $args['default'] : '';
-		}
-	
-
-		$html = sprintf( '<input type="text" id="%1$s" name="%4$s[%1$s]" value="%2$s" size="%3$s"/>', $id, $current, $size, $this->option_name );
-	
-		// Displays option description.
-		if ( isset( $args['description'] ) ) {
-			$html .= sprintf( '<p class="description">%s</p>', $args['description'] );
-		}
-	
-		echo $html;
 	}
 
 	public function attachment_settings_hint( $active_tab, $active_section ) {
