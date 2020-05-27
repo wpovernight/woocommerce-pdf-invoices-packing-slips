@@ -45,6 +45,10 @@ jQuery(document).ready(function($) {
 		}
 
 		$form = $(this).closest('.wcpdf-data-fields');
+
+		//Hide regenerate button
+		$form.find('.wpo-wcpdf-regenerate-document').hide();
+
 		$.ajax({
 			url:     wpo_wcpdf_ajax.ajaxurl,
 			data:    {
