@@ -67,15 +67,15 @@
 	margin-left:20px!important;	
 }
 
-.dashicons-edit,
-.dashicons-trash,
-.dashicons-update-alt {
+.wcpdf-data-fields .wpo-wcpdf-edit-date-number,
+.wcpdf-data-fields .wpo-wcpdf-delete-document,
+.wcpdf-data-fields .wpo-wcpdf-regenerate-document {
 	opacity:0.5;
 }
 
-.dashicons-edit:hover,
-.dashicons-trash:hover,
-.dashicons-update-alt:hover {
+.wcpdf-data-fields .wpo-wcpdf-edit-date-number:hover,
+.wcpdf-data-fields .wpo-wcpdf-delete-document:hover,
+.wcpdf-data-fields .wpo-wcpdf-regenerate-document:hover {
 	opacity:1;
 	cursor:pointer;
 }
