@@ -80,7 +80,7 @@ class Settings_Callbacks {
 			$type = 'text';
 		}
 
-		if (empty($current)) {
+		if (empty($current) && isset($default)) {
 			$current = $default;
 		}
 
