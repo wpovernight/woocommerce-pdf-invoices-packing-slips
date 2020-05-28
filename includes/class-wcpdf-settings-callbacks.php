@@ -80,6 +80,10 @@ class Settings_Callbacks {
 			$type = 'text';
 		}
 
+		if ( isset($args['default_if_empty']) && $args['default_if_empty'] == true && isset($default) ) {
+			$current = $default;
+		}
+
 		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" size="%5$s" placeholder="%6$s" %7$s/>', $type, $id, $setting_name, esc_attr( $current ), $size, $placeholder, !empty($disabled) ? 'disabled="disabled"' : '' );
 	
 		// output description.
@@ -529,7 +533,7 @@ class Settings_Callbacks {
 		}
 
 		// falback to default or empty if no value in option
-		if ( !isset($args['current']) || empty($args['current']) ) {
+		if ( !isset($args['current']) ) {
 			$args['current'] = isset( $args['default'] ) ? $args['default'] : '';
 		}
 
