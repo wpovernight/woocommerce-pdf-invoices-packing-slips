@@ -46,8 +46,12 @@ class Admin {
 			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number' ) );
 		}
 
-		// AJAX action for deleting document data
-		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array($this, 'delete_document' ) );
+		// AJAX actions for deleting and regenerating document data
+		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'delete_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'regenerate_document' ) );
+
+		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
+		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_document_action_feedback_icons' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -432,6 +436,18 @@ class Admin {
 		do_action( 'wpo_wcpdf_meta_box_end', $post->ID );
 	}
 
+	public function add_regenerate_document_button( $document ) {
+		$document_settings = $document->get_settings( true );
+		if ( $document->use_historical_settings() == true || isset( $document_settings['archive_pdf'] ) ) {
+			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
+		}
+	}
+
+	public function add_document_action_feedback_icons( $document ) {
+		echo '<span class="dashicons dashicons-yes document-action-success"></span>';
+		echo '<span class="dashicons dashicons-no document-action-failed"></span>';
+	}
+
 	/**
 	 * Add actions to menu, WP3.5+
 	 */
@@ -658,6 +674,46 @@ class Admin {
 				$document->delete();
 				$response = array(
 					'message' => $document->get_type()." deleted",
+				);
+				wp_send_json_success($response);
+			} else {
+				wp_send_json_error( array(
+					'message' => 'document does not exist',
+				) );
+			}
+		} catch (\Exception $e) {
+			wp_send_json_error( array(
+				'message' => 'error: '.$e->getMessage(),
+			) );			
+		}
+	}
+
+	public function regenerate_document() {
+		if ( check_ajax_referer( "wpo_wcpdf_regenerate_document", 'security', false ) === false ) {
+			wp_send_json_error( array(
+				'message' => 'nonce expired',
+			) );
+		}
+		if ( empty($_POST['order_id']) || empty($_POST['document']) ) {
+			wp_send_json_error( array(
+				'message' => 'incomplete request',
+			) );
+		}
+		if ( !current_user_can('manage_woocommerce') ) {
+			wp_send_json_error( array(
+				'message' => 'no permissions',
+			) );
+		}
+
+		$order_id = absint($_POST['order_id']);
+		$document = sanitize_text_field($_POST['document']);
+
+		try {
+			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );
+			if ( !empty($document) && $document->exists() ) {
+				$document->regenerate();
+				$response = array(
+					'message' => $document->get_type()." regenerated",
 				);
 				wp_send_json_success($response);
 			} else {

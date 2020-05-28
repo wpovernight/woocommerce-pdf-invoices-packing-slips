@@ -67,13 +67,47 @@
 	margin-left:20px!important;	
 }
 
-.dashicons-edit,
-.dashicons-trash {
+.wcpdf-data-fields .wpo-wcpdf-edit-date-number,
+.wcpdf-data-fields .wpo-wcpdf-delete-document,
+.wcpdf-data-fields .wpo-wcpdf-regenerate-document {
 	opacity:0.5;
 }
 
-.dashicons-edit:hover,
-.dashicons-trash:hover {
+.wcpdf-data-fields .wpo-wcpdf-edit-date-number:hover,
+.wcpdf-data-fields .wpo-wcpdf-delete-document:hover,
+.wcpdf-data-fields .wpo-wcpdf-regenerate-document:hover {
 	opacity:1;
 	cursor:pointer;
+}
+
+.wcpdf-data-fields h4 .wcpdf-regenerate-spin {
+	opacity: 1;
+ 	-webkit-animation: spin 1.6s linear infinite; /* Safari */
+ 	animation: spin 1.6s linear infinite;
+ 	pointer-events: none;
+}
+
+/* Safari */
+@-webkit-keyframes wcpdf-regenerate-spin {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(-360deg); }
+}
+
+@keyframes wcpdf-regenerate-spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(-360deg); }
+}
+
+.wcpdf-data-fields .document-action-success,
+.wcpdf-data-fields .document-action-failed {
+	display: none;
+	vertical-align: middle;
+}
+
+.wcpdf-data-fields .document-action-success {
+	color: #2aad2a;
+}
+
+.wcpdf-data-fields .document-action-failed {
+	color: red;
 }

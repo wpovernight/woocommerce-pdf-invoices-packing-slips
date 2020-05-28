@@ -297,6 +297,25 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_delete_document', $this, $order );
 	}
 
+	public function regenerate( $order = null ) {
+		$order = empty( $order ) ? $this->order : $order;
+		if ( empty( $order ) ) {
+			return; //Nothing to update
+		}
+
+		//Get most current settings
+		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		$settings = (array) $document_settings + (array) $common_settings;
+		//Update document settings in meta
+		WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
+
+		//Use most current settings from here on
+		$this->settings = $this->get_settings( true ); 
+
+		do_action( 'wpo_wcpdf_regenerate_document', $this );
+	}
+
 	public function is_allowed() {
 		$allowed = true;
 		if ( !$this->exists() && !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
@@ -508,12 +527,14 @@ abstract class Order_Document {
 			$company = $this->get_shop_name();
 			if( $attachment_id ) {
 				$attachment = wp_get_attachment_image_src( $attachment_id, 'full', false );
+				$attachment_path = get_attached_file( $attachment_id );
+				if ( empty( $attachment ) || empty( $attachment_path ) ) {
+					return;
+				}
 				
 				$attachment_src = $attachment[0];
 				$attachment_width = $attachment[1];
 				$attachment_height = $attachment[2];
-
-				$attachment_path = get_attached_file( $attachment_id );
 
 				if ( apply_filters('wpo_wcpdf_use_path', true) && file_exists($attachment_path) ) {
 					$src = $attachment_path;
