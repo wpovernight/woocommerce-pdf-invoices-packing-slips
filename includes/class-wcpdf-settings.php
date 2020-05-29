@@ -155,15 +155,16 @@ class Settings {
 
 	public function get_common_document_settings() {
 		$common_settings = array(
-			'paper_size'		=> isset( $this->general_settings['paper_size'] ) ? $this->general_settings['paper_size'] : '',
-			'font_subsetting'	=> isset( $this->general_settings['font_subsetting'] ) || ( defined("DOMPDF_ENABLE_FONTSUBSETTING") && DOMPDF_ENABLE_FONTSUBSETTING === true ) ? true : false,
-			'header_logo'		=> isset( $this->general_settings['header_logo'] ) ? $this->general_settings['header_logo'] : '',
-			'shop_name'			=> isset( $this->general_settings['shop_name'] ) ? $this->general_settings['shop_name'] : '',
-			'shop_address'		=> isset( $this->general_settings['shop_address'] ) ? $this->general_settings['shop_address'] : '',
-			'footer'			=> isset( $this->general_settings['footer'] ) ? $this->general_settings['footer'] : '',
-			'extra_1'			=> isset( $this->general_settings['extra_1'] ) ? $this->general_settings['extra_1'] : '',
-			'extra_2'			=> isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
-			'extra_3'			=> isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
+			'paper_size'			=> isset( $this->general_settings['paper_size'] ) ? $this->general_settings['paper_size'] : '',
+			'font_subsetting'		=> isset( $this->general_settings['font_subsetting'] ) || ( defined("DOMPDF_ENABLE_FONTSUBSETTING") && DOMPDF_ENABLE_FONTSUBSETTING === true ) ? true : false,
+			'header_logo'			=> isset( $this->general_settings['header_logo'] ) ? $this->general_settings['header_logo'] : '',
+			'header_logo_height'	=> isset( $this->general_settings['header_logo_height'] ) ? $this->general_settings['header_logo_height'] : '',
+			'shop_name'				=> isset( $this->general_settings['shop_name'] ) ? $this->general_settings['shop_name'] : '',
+			'shop_address'			=> isset( $this->general_settings['shop_address'] ) ? $this->general_settings['shop_address'] : '',
+			'footer'				=> isset( $this->general_settings['footer'] ) ? $this->general_settings['footer'] : '',
+			'extra_1'				=> isset( $this->general_settings['extra_1'] ) ? $this->general_settings['extra_1'] : '',
+			'extra_2'				=> isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
+			'extra_3'				=> isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
 		);
 		return $common_settings;
 	}
