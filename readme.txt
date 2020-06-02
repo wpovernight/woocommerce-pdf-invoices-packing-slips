@@ -103,8 +103,8 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 = 2.5.0 =
-* Feature: Regenerate individual documents with latest settings (shop address/footer/etc)
-* Feature: Shortcode to download invoice
+* Feature: Manually regenerate individual documents with latest settings (shop address/footer/etc)
+* Feature: Shortcode to download invoice: `[wcpdf_download_invoice]`
 * Feature: Logo height setting
 * Fix: textdomain fallback would fail on specific site domains including .mo
 * Fix: Unnecessary extra page on edge case table heights
