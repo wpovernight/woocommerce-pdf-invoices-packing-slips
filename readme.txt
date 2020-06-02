@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.4
 Requires PHP: 5.3
-Stable tag: 2.4.10
+Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,18 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.5.0 =
+* Feature: Regenerate individual documents with latest settings (shop address/footer/etc)
+* Feature: Shortcode to download invoice
+* Feature: Logo height setting
+* Fix: textdomain fallback would fail on specific site domains including .mo
+* Fix: Unnecessary extra page on edge case table heights
+* Fix: Settings disappearing when overriding document titles to empty string
+* Fix: check if header logo file still exists before loading
+* Fix: If document is already created, disregard 'disable for:' setting
+* Fix: Reading document settings & number when stored incorrectly (by external plugins)
+* Tested up to WooCommerce 4.2
 
 = 2.4.10 =
 * Tested up to WooCommerce 4.1
