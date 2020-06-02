@@ -94,11 +94,13 @@ class Frontend {
 		), $atts);
 		if( !$values ) return;
 
+		global $wp;
+
 		// Get $order
-		if( is_checkout() && !empty(is_wc_endpoint_url('order-received')) && empty($values['order_id']) ) {
-			$order = wc_get_order( $_GET['order-received'] );
-		} elseif( is_account_page() && !empty(is_wc_endpoint_url('view-order')) && empty($values['order_id']) ) {
-			$order = wc_get_order( $_GET['view-order'] );
+		if( is_checkout() && !empty(is_wc_endpoint_url('order-received')) && empty($values['order_id']) && isset($wp->query_vars['order-received']) ) {
+			$order = wc_get_order( $wp->query_vars['order-received'] );
+		} elseif( is_account_page() && !empty(is_wc_endpoint_url('view-order')) && empty($values['order_id']) && isset($wp->query_vars['view-order']) ) {
+			$order = wc_get_order( $wp->query_vars['view-order'] );
 		} elseif( !empty($values['order_id']) ) {
 			$order = wc_get_order( $values['order_id'] );
 		}
@@ -112,12 +114,13 @@ class Frontend {
 
 		// User permissions
 		$debug_settings = get_option('wpo_wcpdf_settings_debug', array());
+		$text = null;
 		if( is_user_logged_in() ) {
 			$pdf_url = wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->get_id() . '&my-account'), 'generate_wpo_wcpdf' );
-			$text .= '<p><a href="'.esc_attr($pdf_url).'" target="_blank">'.$link_text.'</a></p>';
+			$text = '<p><a href="'.esc_attr($pdf_url).'" target="_blank">'.$link_text.'</a></p>';
 		} elseif( ! is_user_logged_in() && isset($debug_settings['guest_access']) ) {
 			$pdf_url = admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&template_type=invoice&order_ids=' . $order->get_id() . '&order_key=' . $order->get_order_key() );
-    		$text .= '<p><a href="'.esc_attr($pdf_url).'" target="_blank">'.$link_text.'</a></p>';
+    		$text = '<p><a href="'.esc_attr($pdf_url).'" target="_blank">'.$link_text.'</a></p>';
 		}
 
 		return $text;
