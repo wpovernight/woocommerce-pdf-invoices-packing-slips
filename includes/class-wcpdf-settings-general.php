@@ -144,8 +144,7 @@ class Settings_General {
 					'option_name'		=> $option_name,
 					'id'				=> 'header_logo_height',
 					'size'				=> '5',
-					'default'			=> '3cm',
-					'default_if_empty'	=> true,
+					'placeholder'		=> '3cm',
 					'description'		=> __( 'Enter the total height of the logo in mm, cm or in and use a dot for decimals.<br/>For example: 1.15in or 40mm', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),

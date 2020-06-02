@@ -50,6 +50,9 @@ class Main {
 		add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'remove_order_personal_data' ), 10, 1 );
 		// export private data
 		add_action( 'woocommerce_privacy_export_order_personal_data_meta', array( $this, 'export_order_personal_data_meta' ), 10, 1 );
+
+		// apply header logo height
+		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
 	}
 
 	/**
@@ -614,6 +617,19 @@ class Main {
 		?>
 		.wcpdf-currency-symbol { font-family: 'Currencies'; }
 		<?php
+	}
+
+	/**
+	 * Apply header logo height from settings
+	 */
+	public function set_header_logo_height( $document_type, $document = null ) {
+		if ( !empty($document) && $header_logo_height = $document->get_header_logo_height() ) {
+			?>
+			td.header img {
+				max-height: <?php echo $header_logo_height; ?>;
+			}
+			<?php
+		}
 	}
 
 	/**
