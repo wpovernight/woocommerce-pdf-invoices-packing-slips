@@ -355,16 +355,29 @@ class Settings_Callbacks {
 	public function media_upload( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 
-		if( !empty($current) ) {
-			$attachment = wp_get_attachment_image_src( $current, 'full', false );
-			
+		if( !empty($current) && $attachment = wp_get_attachment_image_src( $current, 'full', false ) ) {
+			$general_settings = get_option('wpo_wcpdf_settings_general');
 			$attachment_src = $attachment[0];
 			$attachment_width = $attachment[1];
 			$attachment_height = $attachment[2];
-			$attachment_resolution = round($attachment_height/(3/2.54));
-			
+			// check if we have the height saved on settings
+			$header_logo_height = !empty($general_settings['header_logo_height']) ? $general_settings['header_logo_height'] : '3cm';
+			if ( stripos( $header_logo_height, 'mm' ) != false ) {
+				$in_height = floatval($header_logo_height)/25.4;
+			} elseif ( stripos( $header_logo_height, 'cm' ) != false ) {
+				$in_height = floatval($header_logo_height)/2.54;
+			} elseif ( stripos( $header_logo_height, 'in' ) != false ) {
+				$in_height = floatval($header_logo_height);
+			} else {
+				// don't display resolution
+			}
+
 			printf('<img src="%1$s" style="display:block" id="img-%4$s"/>', $attachment_src, $attachment_width, $attachment_height, $id );
-			printf('<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
+			if ( !empty($attachment_height) && !empty($in_height) ) {
+				$attachment_resolution = round(absint($attachment_height)/$in_height);
+				printf('<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
+			}
+
 			printf('<span class="button wpo_remove_image_button" data-input_id="%1$s">%2$s</span>', $id, $remove_button_text );
 		}
 
