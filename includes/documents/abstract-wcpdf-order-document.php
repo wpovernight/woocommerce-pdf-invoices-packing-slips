@@ -320,7 +320,7 @@ abstract class Order_Document {
 			$refund_id = $order->get_id();
 			$parent_order = wc_get_order( $order->get_parent_id() );
 		}
-		$note = $refund_id ? sprintf( __( '%s (refund #%s) was regenerated.', 'wpo_wcpdf_pro' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'wpo_wcpdf_pro' ), ucfirst( $this->get_title() ) );
+		$note = $refund_id ? sprintf( __( '%s (refund #%s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ) );
 		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
 
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
