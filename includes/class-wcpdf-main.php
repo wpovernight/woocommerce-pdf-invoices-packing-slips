@@ -36,7 +36,7 @@ class Main {
 		add_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'test_mode_settings' ), 15, 2 );
 
 		// page numbers & currency filters
-		add_action( 'wpo_wcpdf_get_html', array($this, 'format_page_number_placeholders' ), 10, 2 );
+		add_filter( 'wpo_wcpdf_get_html', array($this, 'format_page_number_placeholders' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_dompdf_render', array($this, 'page_number_replacements' ), 9, 2 );
 		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
 			add_action( 'wpo_wcpdf_before_pdf', array($this, 'use_currency_font' ), 10, 2 );
