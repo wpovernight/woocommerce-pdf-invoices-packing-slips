@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
-"POT-Creation-Date: 2020-06-02 14:43+0200\n"
+"POT-Creation-Date: 2020-06-04 16:08+0200\n"
 "PO-Revision-Date: 2015-04-29 08:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
@@ -263,37 +263,49 @@ msgid ""
 "enabled on live sites."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:212
+#: includes/class-wcpdf-settings-debug.php:207
+msgid ""
+"You can also add <code>&debug=true</code> to the URL to apply this on a per-"
+"order basis."
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:213
 msgid "Enable automatic cleanup"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:219
+#: includes/class-wcpdf-settings-debug.php:220
 #, php-format
 msgid "every %s days"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:224
+#: includes/class-wcpdf-settings-debug.php:225
 msgid ""
 "Automatically clean up PDF files stored in the temporary folder (used for "
 "email attachments)"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:225
+#: includes/class-wcpdf-settings-debug.php:226
 msgid ""
 "<b>Disabled:</b> The PHP functions glob and filemtime are required for "
 "automatic cleanup but not enabled on your server."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:231
+#: includes/class-wcpdf-settings-debug.php:232
 msgid "Output to HTML"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:237
+#: includes/class-wcpdf-settings-debug.php:238
 msgid ""
 "Send the template output as HTML to the browser instead of creating a PDF."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:243
+#: includes/class-wcpdf-settings-debug.php:239
+msgid ""
+"You can also add <code>&output=html</code> to the URL to apply this on a per-"
+"order basis."
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:245
 msgid "Use alternative HTML5 parser to parse HTML"
 msgstr ""
 
