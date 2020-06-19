@@ -97,7 +97,7 @@ jQuery(document).ready(function() {
 						<td><img src="<?php echo WPO_WCPDF()->plugin_url() . '/assets/images/cloud-print.png'; ?>" class="cloud-logo"></td>
 						<td>
 						<?php _e( 'Check out the WooCommerce Automatic Order Printing extension from our partners at Simba Hosting', 'woocommerce-pdf-invoices-packing-slips' ); ?><br/>
-						<a href="https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/?affiliates=2" target="_blank"><?php _e("WooCommerce Automatic Order Printing", 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						<a href="https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/?affiliates=2" target="_blank"><?php _e("WooCommerce Automatic Order Printing", 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</td>
 					</tr>
 				</table>
