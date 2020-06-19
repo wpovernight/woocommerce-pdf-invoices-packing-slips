@@ -11,7 +11,7 @@ jQuery(document).ready(function() {
 </script>
 
 <div class="wcpdf-extensions-ad">
-	<?php $no_pro = !class_exists('WooCommerce_PDF_IPS_Pro') && !class_exists('WooCommerce_PDF_IPS_Dropbox') && !class_exists('WooCommerce_PDF_IPS_Templates'); ?>
+	<?php $no_pro = !class_exists('WooCommerce_PDF_IPS_Pro') && !class_exists('WooCommerce_PDF_IPS_Dropbox') && !class_exists('WPO_WCPDF_Templates'); ?>
 	<img src="<?php echo WPO_WCPDF()->plugin_url() . '/assets/images/wpo-helper.png'; ?>" class="wpo-helper">
 	<h3><?php _e( 'Check out these premium extensions!', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 	<i>(<?php _e( 'click items to read more', 'woocommerce-pdf-invoices-packing-slips' ); ?>)</i>
