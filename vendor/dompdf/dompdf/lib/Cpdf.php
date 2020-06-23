@@ -4866,7 +4866,11 @@ EOT;
             if ($imagick->getImageAlphaChannel() !== 0) {
                 $alpha_channel = $imagickClonable ? clone $imagick : $imagick->clone();
                 $alpha_channel->separateImageChannel(\Imagick::CHANNEL_ALPHA);
-                $alpha_channel->negateImage(true);
+                // Since ImageMagick7 negate invert transparency as default
+                $imagick_version = \Imagick::getVersion();
+                if ( !empty($imagick_version) && is_array($imagick_version) && $imagick_version['versionNumber'] < 1800 ) {
+                    $alpha_channel->negateImage(true);
+                }
                 $alpha_channel->writeImage($tempfile_alpha);
 
                 // Cast to 8bit+palette
