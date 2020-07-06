@@ -707,9 +707,10 @@ class Main {
 	 * Set the default PHPMailer validator to 'php' ( which uses filter_var($address, FILTER_VALIDATE_EMAIL) )
 	 * This avoids issues with the presence of attachments affecting email address validation in some distros of PHP 7.3
 	 * See: https://wordpress.org/support/topic/invalid-address-setfrom/#post-11583815
+	 * Fixed in WP5.5 due to upgrade to newer PHPMailer
 	 */
 	public function set_phpmailer_validator( $mailArray ) {
-		if ( version_compare( PHP_VERSION, '7.3', '>=' ) ) {
+		if ( version_compare( PHP_VERSION, '7.3', '>=' ) && version_compare( get_bloginfo( 'version' ), '5.5-dev', '<' ) ) {
 			global $phpmailer;
 			if ( ! ( $phpmailer instanceof \PHPMailer ) ) {
 				require_once ABSPATH . WPINC . '/class-phpmailer.php';
