@@ -104,7 +104,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 2.5.3 =
 * Fix: WP5.5 compatible PHPMailer integration
-* Tested up to WooCommerce 4.2
+* Tested up to WooCommerce 4.3
 
 = 2.5.2 =
 * Fix: ImageMagick version conflict
