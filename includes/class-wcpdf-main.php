@@ -101,8 +101,10 @@ class Main {
 		add_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
 
 		// reload translations because WC may have switched to site locale (by setting the plugin_locale filter to site locale in wc_switch_to_site_locale())
-		WPO_WCPDF()->translations();
-		do_action( 'wpo_wcpdf_reload_attachment_translations' );
+		if ( apply_filters( 'wpo_wcpdf_allow_reload_attachment_translations', true ) ) {
+			WPO_WCPDF()->translations();
+			do_action( 'wpo_wcpdf_reload_attachment_translations' );
+		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
