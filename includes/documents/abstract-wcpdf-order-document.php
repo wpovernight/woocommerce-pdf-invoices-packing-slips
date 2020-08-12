@@ -328,7 +328,7 @@ abstract class Order_Document {
 
 	public function is_allowed() {
 		$allowed = true;
-		// Check of document is enabled
+		// Check if document is enabled
 		if ( !$this->is_enabled() ) {
 			$allowed = false;
 		// Check disabled for statuses
