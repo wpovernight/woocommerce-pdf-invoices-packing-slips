@@ -328,7 +328,11 @@ abstract class Order_Document {
 
 	public function is_allowed() {
 		$allowed = true;
-		if ( !$this->exists() && !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
+		// Check of document is enabled
+		if ( !$this->is_enabled() ) {
+			$allowed = false;
+		// Check disabled for statuses
+		} elseif ( !$this->exists() && !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
 			$status = $this->order->get_status();
 
 			$disabled_statuses = array_map( function($status){
@@ -339,7 +343,7 @@ abstract class Order_Document {
 			if ( in_array( $status, $disabled_statuses ) ) {
 				$allowed = false;
 			}
-		}
+		} 
 		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
 	}
 
