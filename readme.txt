@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.5
 Requires PHP: 5.3
-Stable tag: 2.5.3
+Stable tag: 2.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.5.4 =
+* Fix: check for existence of WooCommerce functions preventing incidental crashes in specific deployment setups
+* Fix: documents could still be generated programmatically when document disabled and not specifically checking for `$documment->is_allowed()`
+* Dev: Filter to disable reloading attachment translations
+* Tested up to WooCommerce 4.4 & WP 5.5
 
 = 2.5.3 =
 * Fix: WP5.5 compatible PHPMailer integration
