@@ -40,7 +40,7 @@
 			<?php } ?>
 		</td>
 		<td class="address shipping-address">
-			<?php if ( isset($this->settings['display_shipping_address']) && ( $this->ships_to_different_address() || $this->settings['display_shipping_address'] == 'always' ) ) { ?>
+			<?php if ( !empty($this->settings['display_shipping_address']) && ( $this->ships_to_different_address() || $this->settings['display_shipping_address'] == 'always' ) ) { ?>
 			<h3><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 			<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
 			<?php $this->shipping_address(); ?>
