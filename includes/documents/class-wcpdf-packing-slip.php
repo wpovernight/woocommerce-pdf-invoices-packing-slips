@@ -97,12 +97,17 @@ class Packing_Slip extends Order_Document_Methods {
 				'type'			=> 'setting',
 				'id'			=> 'display_billing_address',
 				'title'			=> __( 'Display billing address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
+				'callback'		=> 'select',
 				'section'		=> 'packing_slip',
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'display_billing_address',
-					'description'	=> __( 'Display billing address (in addition to the default shipping address) if different from shipping address', 'woocommerce-pdf-invoices-packing-slips' ),
+					'options' 		=> array(
+						''				=> __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'when_different'=> __( 'Only when different from shipping address' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'always'		=> __( 'Always' , 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+					// 'description'	=> __( 'Display billing address (in addition to the default shipping address) if different from shipping address', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
