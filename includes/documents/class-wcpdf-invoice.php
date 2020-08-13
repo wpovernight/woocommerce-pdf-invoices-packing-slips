@@ -211,12 +211,17 @@ class Invoice extends Order_Document_Methods {
 				'type'			=> 'setting',
 				'id'			=> 'display_shipping_address',
 				'title'			=> __( 'Display shipping address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
+				'callback'		=> 'select',
 				'section'		=> 'invoice',
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'display_shipping_address',
-					'description'		=> __( 'Display shipping address (in addition to the default billing address) if different from billing address', 'woocommerce-pdf-invoices-packing-slips' ),
+					'options' 		=> array(
+						''				=> __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'when_different'=> __( 'Only when different from billing address' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'always'		=> __( 'Always' , 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+					// 'description'		=> __( 'Display shipping address (in addition to the default billing address) if different from billing address', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
