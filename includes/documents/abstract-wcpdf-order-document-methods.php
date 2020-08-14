@@ -546,7 +546,11 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['item'] = $item;
 				
 				// Get the product to add more info
-				$product = $this->order->get_product_from_item( $item );
+				if ( is_callable( array( $item, 'get_product' ) ) ) { // WC4.4+
+					$product = $item->get_product();
+				} else {
+					$product = $this->order->get_product_from_item( $item );
+				}
 				
 				// Checking fo existance, thanks to MDesigner0 
 				if( !empty( $product ) ) {
