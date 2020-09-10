@@ -57,6 +57,8 @@ class Documents {
 		$this->documents['\WPO\WC\PDF_Invoices\Documents\Invoice']		= include( 'documents/class-wcpdf-invoice.php' );
 		$this->documents['\WPO\WC\PDF_Invoices\Documents\Packing_Slip']	= include( 'documents/class-wcpdf-packing-slip.php' );
 
+		// Allow plugins to add their own documents
+		$this->documents = apply_filters( 'wpo_wcpdf_document_classes', $this->documents );
 	}
 
 	/**
@@ -68,8 +70,6 @@ class Documents {
 		if ( empty($this->documents) ) {
 			$this->init();
 		}
-		// Allow plugins to add their own documents
-		$this->documents = apply_filters( 'wpo_wcpdf_document_classes', $this->documents );
 
 		if ( $filter == 'enabled' ) {
 			$documents = array();
