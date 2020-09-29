@@ -113,6 +113,10 @@ $sql = "CREATE TABLE {$this->table_name} (
 	public function get_next() {
 		global $wpdb;
 		if ( $this->method == 'auto_increment' ) {
+			// clear cache first on mysql 8.0+
+			if ( $wpdb->get_var( "SHOW VARIABLES LIKE 'information_schema_stats_expiry'" ) ) {
+				$wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
+			}
 			// get next auto_increment value
 			$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$this->table_name}'");
 			$next = $table_status->Auto_increment;
