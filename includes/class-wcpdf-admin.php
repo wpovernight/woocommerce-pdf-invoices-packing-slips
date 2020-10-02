@@ -372,7 +372,7 @@ class Admin {
 		if ( $invoice = wcpdf_get_invoice( $order ) ) {
 			$invoice_number = $invoice->get_number();
 			$invoice_date = $invoice->get_date();
-			$invoice_notes = html_entity_decode( $invoice->get_notes() );
+			$invoice_notes = $invoice->get_notes();
 			?>
 			<div class="wcpdf-data-fields" data-document="invoice" data-order_id="<?php echo WCX_Order::get_id( $order ); ?>">
 				<h4>
@@ -541,8 +541,37 @@ class Admin {
 				}
 
 				if ( isset( $_POST['wcpdf_invoice_notes'] ) ) {
+					// allowed HTML
+					$allowed_html = array(
+						'a'		=> array(
+							'href' 	=> array(),
+							'title' => array(),
+							'id' 	=> array(),
+							'class'	=> array(),
+							'style'	=> array(),
+						),
+						'br'	=> array(),
+						'em'	=> array(),
+						'strong'=> array(),
+						'div'	=> array(
+							'id'	=> array(),
+							'class' => array(),
+							'style'	=> array(),
+						),
+						'span'	=> array(
+							'id' 	=> array(),
+							'class'	=> array(),
+							'style'	=> array(),
+						),
+						'p'		=> array(
+							'id' 	=> array(),
+							'class' => array(),
+							'style' => array(),
+						),
+						'b'		=> array(),
+					);
 					// sanitize
-					$invoice_notes = htmlentities( stripslashes( $_POST['wcpdf_invoice_notes'] ) );
+					$invoice_notes = wp_kses( stripslashes(nl2br($_POST['wcpdf_invoice_notes'])), $allowed_html );
 					// set notes
 					$invoice->set_notes( $invoice_notes );
 				}
