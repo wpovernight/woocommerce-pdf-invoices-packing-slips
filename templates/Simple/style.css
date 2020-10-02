@@ -221,6 +221,7 @@ dd:after {
 }
 
 /* Notes & Totals */
+.invoice-notes,
 .customer-notes {
 	margin-top: 5mm;
 }

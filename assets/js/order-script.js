@@ -34,9 +34,16 @@ jQuery(document).ready(function($) {
 	// enable invoice number edit if user initiated
 	$( ".wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number" ).click(function() {
 		$form = $(this).closest('.wcpdf-data-fields');
-		$form.find(".read-only").hide();
-		$form.find(".editable").show();
-		$form.find(':input').prop('disabled', false);
+		// check visibility
+		if( $form.find(".read-only").is(":visible") ) {
+			$form.find(".read-only").hide();
+			$form.find(".editable").show();
+			$form.find(':input').prop('disabled', false);
+		} else {
+			$form.find(".read-only").show();
+			$form.find(".editable").hide();
+			$form.find(':input').prop('disabled', true);
+		}
 	});
 
 	$( ".wcpdf-data-fields .wpo-wcpdf-delete-document" ).click(function() {

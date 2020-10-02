@@ -113,6 +113,14 @@
 	<tfoot>
 		<tr class="no-borders">
 			<td class="no-borders">
+				<div class="invoice-notes">
+					<?php do_action( 'wpo_wcpdf_before_invoice_notes', $this->type, $this->order ); ?>
+					<?php if ( $this->get_invoice_notes() ) : ?>
+						<h3><?php _e( 'Invoice Notes', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+						<?php $this->invoice_notes(); ?>
+					<?php endif; ?>
+					<?php do_action( 'wpo_wcpdf_after_invoice_notes', $this->type, $this->order ); ?>
+				</div>
 				<div class="customer-notes">
 					<?php do_action( 'wpo_wcpdf_before_customer_notes', $this->type, $this->order ); ?>
 					<?php if ( $this->get_shipping_notes() ) : ?>

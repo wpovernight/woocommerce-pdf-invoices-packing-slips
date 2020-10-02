@@ -227,6 +227,7 @@ abstract class Order_Document {
 			// always load date before number, because date is used in number formatting
 			'date'			=> WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_date", true ),
 			'number'		=> $number,
+			'notes'			=> WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_notes", true ),
 		), $order );
 
 		return;
@@ -260,6 +261,8 @@ abstract class Order_Document {
 					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_data" );
 					// deleting the number = deleting the document, so also delete document settings
 					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_settings" );
+				} elseif ( $key == 'notes' ) {
+					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}" );
 				}
 			} else {
 				if ( $key == 'date' ) {
@@ -270,6 +273,9 @@ abstract class Order_Document {
 					// store both formatted number and number data
 					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}", $value->formatted_number );
 					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_data", $value->to_array() );
+				} elseif ( $key == 'notes' ) {
+					// store notes
+					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}", $value );
 				}
 			}
 		}
@@ -289,6 +295,7 @@ abstract class Order_Document {
 			'date_formatted',
 			'number',
 			'number_data',
+			'notes',
 		), $this );
 		foreach ($data_to_remove as $data_key) {
 			WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$data_key}" );
@@ -396,6 +403,10 @@ abstract class Order_Document {
 		return $this->get_data( 'date', $document_type, $order, $context );
 	}
 
+	public function get_notes( $document_type = '', $order = null, $context = 'view'  ) {
+		return $this->get_data( 'notes', $document_type, $order, $context );
+	}
+
 	public function get_title() {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
 	}
@@ -485,6 +496,23 @@ abstract class Order_Document {
 		}
 
 		$this->data[ 'number' ] = $document_number;
+	}
+
+	public function set_notes( $value, $order = null ) {
+		$order = empty( $order ) ? $this->order : $order;
+
+		try {
+			if ( empty( $value ) ) {
+				$this->data[ 'notes' ] = null;
+				return;
+			}
+
+			$this->data[ 'notes' ] = $value;
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		} catch ( \Error $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		}
 	}
 
 	/*
