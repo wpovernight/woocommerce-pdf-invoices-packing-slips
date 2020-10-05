@@ -372,7 +372,7 @@ class Admin {
 		if ( $invoice = wcpdf_get_invoice( $order ) ) {
 			$invoice_number = $invoice->get_number();
 			$invoice_date = $invoice->get_date();
-			$invoice_notes = $invoice->get_notes();
+			$invoice_notes = !empty($invoice->get_document_notes( 'invoice' )) ? $invoice->get_document_notes( 'invoice' ) : null;
 			?>
 			<div class="wcpdf-data-fields" data-document="invoice" data-order_id="<?php echo WCX_Order::get_id( $order ); ?>">
 				<h4>
