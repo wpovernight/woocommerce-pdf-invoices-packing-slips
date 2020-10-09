@@ -115,9 +115,9 @@
 			<td class="no-borders">
 				<div class="document-notes">
 					<?php do_action( 'wpo_wcpdf_before_document_notes', $this->type, $this->order ); ?>
-					<?php if ( $this->get_document_notes( $this->type ) ) : ?>
+					<?php if ( $this->get_document_notes() ) : ?>
 						<h3><?php _e( 'Document Notes', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-						<?php $this->document_notes( $this->type ); ?>
+						<?php $this->document_notes(); ?>
 					<?php endif; ?>
 					<?php do_action( 'wpo_wcpdf_after_document_notes', $this->type, $this->order ); ?>
 				</div>
