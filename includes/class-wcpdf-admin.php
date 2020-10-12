@@ -373,7 +373,9 @@ class Admin {
 			$invoice_number = $invoice->get_number();
 			$invoice_date = $invoice->get_date();
 			$invoice_notes = !empty($invoice->get_document_notes()) ? $invoice->get_document_notes() : null;
+
 			?>
+
 			<div class="wcpdf-data-fields" data-document="invoice" data-order_id="<?php echo WCX_Order::get_id( $order ); ?>">
 				<h4>
 					<?php echo $invoice->get_title(); ?><?php if ($invoice->exists()) : ?>
@@ -406,15 +408,6 @@ class Admin {
 
 					<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $invoice, $order ); ?>
 
-					<div class="invoice-notes">
-						<p class="form-field form-field-wide">
-							<p>
-								<span><strong><?php _e( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></span>
-								<p><?php if (!empty($invoice_notes)) echo "{$invoice_notes}"; ?></p>
-							</p>
-						</p>
-					</div>
-
 					<?php else : ?>
 					<span class="wpo-wcpdf-set-date-number button"><?php _e( 'Set invoice number & date', 'woocommerce-pdf-invoices-packing-slips' ) ?></span>
 					<?php endif; ?>
@@ -438,16 +431,40 @@ class Admin {
 						<input type="text" class="date-picker-field" name="wcpdf_invoice_date" id="wcpdf_invoice_date" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ) ?>" name="wcpdf_invoice_date_hour" id="wcpdf_invoice_date_hour" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ) ?>" name="wcpdf_invoice_date_minute" id="wcpdf_invoice_date_minute" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
 						<?php endif; ?>
 					</p>
-					<p class="form-field form-field-wide">
-						<label for="wcpdf_invoice_notes"><?php _e( 'Invoice Notes:', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-						<?php if ( $invoice->exists() ) : ?>
-						<p><textarea name="wcpdf_invoice_notes" cols="60" rows="5"><?php if (!empty($invoice_notes)) echo $invoice_notes; ?></textarea></p>
-						<?php else : ?>
-						<p><textarea name="wcpdf_invoice_notes" cols="60" rows="5" disabled="disabled"></textarea></p>
-						<?php endif; ?>
-					</p>
 				</div>
 			</div>
+
+			<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $invoice, $order ); ?>
+
+			<div class="wcpdf-data-fields" data-document="invoice" data-order_id="<?php echo WCX_Order::get_id( $order ); ?>">
+				<div class="invoice-notes">
+					<p class="form-field form-field-wide">
+						<div>
+							<span><strong><?php _e( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></span>
+							<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit"></span>
+						</div>
+						<!-- Read only -->
+						<div class="read-only">
+							<?php if ( $invoice->exists() ) : ?>
+								<p><?php if (!empty($invoice_notes)) echo $invoice_notes; ?></p>
+							<?php endif; ?>
+						</div>
+						<!-- Editable -->
+						<div class="editable">
+							<p class="form-field form-field-wide">
+								<?php if ( $invoice->exists() ) : ?>
+								<p><textarea name="wcpdf_invoice_notes" cols="60" rows="5" disabled="disabled"><?php if (!empty($invoice_notes)) echo $invoice_notes; ?></textarea></p>
+								<?php else : ?>
+								<p><textarea name="wcpdf_invoice_notes" cols="60" rows="5" disabled="disabled"></textarea></p>
+								<?php endif; ?>
+							</p>
+						</div>
+					</p>
+				</div>			
+			</div>
+
+			<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $invoice, $order ); ?>
+
 			<?php
 		}
 
@@ -571,7 +588,7 @@ class Admin {
 						'b'		=> array(),
 					);
 					// sanitize
-					$invoice_notes = wp_kses( stripslashes(nl2br($_POST['wcpdf_invoice_notes'])), $allowed_html );
+					$invoice_notes = wp_kses( stripslashes($_POST['wcpdf_invoice_notes']), $allowed_html );
 					// set notes
 					$invoice->set_notes( $invoice_notes );
 				}
