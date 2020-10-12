@@ -1207,6 +1207,18 @@ abstract class Order_Document_Methods extends Order_Document {
 		echo $this->get_invoice_date();
 	}
 
+	public function get_document_notes() {
+		if ( $document_notes = $this->get_notes( $this->get_type() ) ) {
+			return $document_notes;
+		} else {
+			return '';
+		}
+	}
+
+	public function document_notes() {
+		echo $this->get_document_notes();
+	}
+
 
 }
 

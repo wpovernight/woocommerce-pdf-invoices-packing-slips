@@ -221,6 +221,7 @@ dd:after {
 }
 
 /* Notes & Totals */
+.document-notes,
 .customer-notes {
 	margin-top: 5mm;
 }
