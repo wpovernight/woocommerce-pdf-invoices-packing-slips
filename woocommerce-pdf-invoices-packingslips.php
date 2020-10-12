@@ -52,6 +52,7 @@ class WPO_WCPDF {
 		add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
 		add_action( 'plugins_loaded', array( $this, 'load_classes' ), 9 );
 		add_action( 'in_plugin_update_message-'.$this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
+		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 	}
 
 	/**
@@ -323,6 +324,26 @@ class WPO_WCPDF {
 		}
 
 		return wp_kses_post( $upgrade_notice );
+	}
+
+	public function nginx_detected()
+	{
+		$tmp_path = WPO_WCPDF()->main->get_tmp_path('attachments');
+		$server_software   = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : false;
+
+		if ( stristr( $server_software, 'nginx' ) && current_user_can( 'manage_shop_settings' ) && ! get_option('wpo_wcpdf_hide_nginx_notice') ) {
+			ob_start();
+			?>
+			<div class="error">
+				<img src="<?php echo WPO_WCPDF()->plugin_url() . "/assets/images/nginx.svg"; ?>" style="margin-top:10px;">
+				<p><?php printf( __( 'The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>' . $tmp_path . '</strong>' ); ?></p>
+				<p><?php _e( 'To protect them, you must either use a filter to change the folder to a more secure location (outside of the site root folder) or add a Virtual Host location rule as explained in <a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/protect-the-attachments-directory-on-nginx/">this guide</a>.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><?php _e( 'If you have already added the filters or the vhost rule, you may safely hide this message.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_nginx_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo ob_get_clean();
+		}
 	}
 
 	/**
