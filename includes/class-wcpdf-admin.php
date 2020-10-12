@@ -409,7 +409,7 @@ class Admin {
 					<div class="invoice-notes">
 						<p class="form-field form-field-wide">
 							<p>
-								<span><strong><?php _e( 'Invoice Notes:', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></span>
+								<span><strong><?php _e( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></span>
 								<p><?php if (!empty($invoice_notes)) echo "{$invoice_notes}"; ?></p>
 							</p>
 						</p>
