@@ -331,7 +331,7 @@ class WPO_WCPDF {
 		$tmp_path = WPO_WCPDF()->main->get_tmp_path('attachments');
 		$server_software   = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : false;
 
-		if ( stristr( $server_software, 'nginx' ) && current_user_can( 'manage_shop_settings' ) && ! get_option('wpo_wcpdf_hide_nginx_notice') && get_current_screen()->id == 'woocommerce_page_wpo_wcpdf_options_page' ) {
+		if ( stristr( $server_software, 'nginx' ) && current_user_can( 'manage_shop_settings' ) && ! get_option('wpo_wcpdf_hide_nginx_notice') ) {
 			ob_start();
 			?>
 			<div class="error">
@@ -343,6 +343,13 @@ class WPO_WCPDF {
 			</div>
 			<?php
 			echo ob_get_clean();
+		}
+
+		// save or check option to hide nginx notice
+		if ( isset( $_GET['wpo_wcpdf_hide_nginx_notice'] ) ) {
+			update_option( 'wpo_wcpdf_hide_nginx_notice', true );
+			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+			exit;
 		}
 	}
 

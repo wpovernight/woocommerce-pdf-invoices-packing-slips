@@ -19,12 +19,6 @@
 	<?php
 	do_action( 'wpo_wcpdf_before_settings_page', $active_tab, $active_section );
 
-	// save or check option to hide nginx notice
-	if ( isset( $_GET['wpo_wcpdf_hide_nginx_notice'] ) ) {
-		update_option( 'wpo_wcpdf_hide_nginx_notice', true );
-		wp_redirect( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
-	}
-
 	// save or check option to hide extensions ad
 	if ( isset( $_GET['wpo_wcpdf_hide_extensions_ad'] ) ) {
 		update_option( 'wpo_wcpdf_hide_extensions_ad', true );
