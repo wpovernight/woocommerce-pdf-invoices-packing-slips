@@ -328,10 +328,12 @@ class WPO_WCPDF {
 
 	public function nginx_detected()
 	{
-		$tmp_path = WPO_WCPDF()->main->get_tmp_path('attachments');
+		if ( empty( $this->main ) ) {
+			return;
+		}
+		$tmp_path = $this->main->get_tmp_path('attachments');
 		$server_software   = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : false;
-
-		if ( stristr( $server_software, 'nginx' ) && current_user_can( 'manage_shop_settings' ) && ! get_option('wpo_wcpdf_hide_nginx_notice') ) {
+		if ( stristr( $server_software, 'nginx' ) && ( current_user_can( 'manage_shop_settings' ) || current_user_can( 'manage_woocommerce' ) ) && ! get_option('wpo_wcpdf_hide_nginx_notice') ) {
 			ob_start();
 			?>
 			<div class="error">
