@@ -22,9 +22,7 @@
 	// save or check option to hide nginx notice
 	if ( isset( $_GET['wpo_wcpdf_hide_nginx_notice'] ) ) {
 		update_option( 'wpo_wcpdf_hide_nginx_notice', true );
-		$hide_nginx_notice = true;
-	} else {
-		$hide_nginx_notice = get_option( 'wpo_wcpdf_hide_nginx_notice' );
+		wp_redirect( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
 	}
 
 	// save or check option to hide extensions ad
@@ -35,7 +33,7 @@
 		$hide_ad = get_option( 'wpo_wcpdf_hide_extensions_ad' );
 	}
 	
-	if ( !$hide_ad && !( class_exists('WooCommerce_PDF_IPS_Pro') && class_exists('WooCommerce_PDF_IPS_Dropbox') && class_exists('WooCommerce_PDF_IPS_Templates') && class_exists('WooCommerce_Ext_PrintOrders') ) ) {
+	if ( !$hide_ad && !( class_exists('WooCommerce_PDF_IPS_Pro') && class_exists('WooCommerce_PDF_IPS_Templates') && class_exists('WooCommerce_Ext_PrintOrders') ) ) {
 		include('wcpdf-extensions.php');
 	}
 
