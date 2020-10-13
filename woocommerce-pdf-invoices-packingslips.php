@@ -345,7 +345,7 @@ class WPO_WCPDF {
 			echo ob_get_clean();
 		}
 
-		// save or check option to hide nginx notice
+		// save option to hide nginx notice
 		if ( isset( $_GET['wpo_wcpdf_hide_nginx_notice'] ) ) {
 			update_option( 'wpo_wcpdf_hide_nginx_notice', true );
 			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
