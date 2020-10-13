@@ -337,8 +337,8 @@ class WPO_WCPDF {
 			<div class="error">
 				<img src="<?php echo WPO_WCPDF()->plugin_url() . "/assets/images/nginx.svg"; ?>" style="margin-top:10px;">
 				<p><?php printf( __( 'The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>' . $tmp_path . '</strong>' ); ?></p>
-				<p><?php _e( 'To protect them, you must either use a filter to change the folder to a more secure location (outside of the site root folder) or add a Virtual Host location rule as explained in <a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/protect-the-attachments-directory-on-nginx/">this guide</a>.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-				<p><?php _e( 'If you have already added the filters or the vhost rule, you may safely hide this message.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><?php _e( 'To protect them, you must either use a filter to change the folder to a more secure location (outside of the site root folder) or add a Virtual Host location rule as explained in <a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/protect-the-attachments-directory-on-nginx/" target="_blank">this guide</a>.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><?php _e( 'If you have already added the filter or the vhost rule, you may safely hide this message.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_nginx_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
 			<?php
