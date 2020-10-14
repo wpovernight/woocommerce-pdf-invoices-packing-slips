@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.5
 Requires PHP: 5.3
-Stable tag: 2.6.1
+Stable tag: 2.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.7.0 =
+* New: Add per-order notes to invoices (requires template update if you have a custom template)
+* New: Show notice with instructions for protecting the invoice folder on NGINX setups
+* Fix: Show correct "next number" on settings page for sites using MySQL 8+
+* Tested up to WooCommerce 4.6
 
 = 2.6.1 =
 * Fix: Load custom documents once rather than on every document request
