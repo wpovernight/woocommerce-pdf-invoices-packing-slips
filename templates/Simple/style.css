@@ -73,6 +73,7 @@ table {
 th, td {
 	vertical-align: top;
 	text-align: left;
+	word-wrap: break-word;
 }
 
 table.container {
