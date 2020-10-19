@@ -494,6 +494,11 @@ class Settings_Callbacks {
 	public function normalize_settings_args ( $args ) {
 		$args['value'] = isset( $args['value'] ) ? $args['value'] : 1;
 
+		// mark customer notes as checked if not set
+		if( $args['id'] == 'display_customer_notes' && ! isset($args['current']) ) {
+			$args['current'] = 1;
+		}
+
 		$args['placeholder'] = isset( $args['placeholder'] ) ? $args['placeholder'] : '';
 
 		// get main settings array
@@ -565,6 +570,11 @@ class Settings_Callbacks {
 
 		if (empty($input) || !is_array($input)) {
 			return $input;
+		}
+
+		// special check for customer notes input
+		if( ! isset($input['display_customer_notes']) ) {
+			$input['display_customer_notes'] = 0;
 		}
 	
 		// Loop through each of the incoming options.

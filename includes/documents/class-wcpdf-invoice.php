@@ -287,6 +287,17 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'display_customer_notes',
+				'title'			=> __( 'Display customer notes', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'invoice',
+				'args'			=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'display_customer_notes',
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'next_invoice_number',
 				'title'			=> __( 'Next invoice number (without prefix/suffix etc.)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'next_number_edit',
