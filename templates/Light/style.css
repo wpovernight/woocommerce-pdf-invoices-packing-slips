@@ -1,0 +1,268 @@
+/* Main Body */
+@page {
+	margin-top: 1cm;
+	margin-bottom: 3cm;
+	margin-left: 2cm;
+	margin-right: 2cm;
+}
+
+body {
+	background: #fff;
+	color: #000;
+	margin: 0cm;
+	font-family: sans-serif;
+	font-size: 9pt;
+}
+
+/* Standard elements */
+h1, h2, h3, h4 {
+	font-weight: bold;
+	margin: 0;
+}
+
+h1 {
+	font-size: 16pt;
+	margin: 5mm 0;
+}
+
+h2 {
+	font-size: 14pt;
+}
+
+h3, h4 {
+	font-size: 9pt;
+}
+
+ol,
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+li,
+ul {
+	margin-bottom: 0.75em;
+}
+
+p {
+	margin: 0;
+	padding: 0;
+}
+
+p + p {
+	margin-top: 1.25em;
+}
+
+a { 
+	border-bottom: 1px solid; 
+	text-decoration: none; 
+}
+
+table {
+
+	border-spacing: 0;
+	page-break-inside: always;
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+th, td {
+	vertical-align: top;
+	text-align: left;
+}
+
+/* Head */
+.head {
+	width:100%;
+	margin-bottom: 5mm;
+	overflow: auto;
+}
+
+.head .header {
+	font-size: 16pt;
+	font-weight: 700;
+}
+
+.head .header img {
+	/* img width & heights can only be set with inline styles (mpdf 8.0) https://github.com/mpdf/mpdf/issues/366 */
+	/* using wpo_wcpdf_header_logo_img_element filter instead in wcpdf-mpdf.php */
+}
+
+.head .shop-info {
+	width: 40%;
+	float: right;
+}
+
+/* Document type label & Order data */
+.document-type-label-order-data {
+	width: 100%;
+	overflow: auto;
+}
+
+.document-type-label-order-data .order-data {
+	width: 40%;
+	float: right;
+}
+
+.document-type-label-order-data .order-data table th {
+	padding-right: 2mm;
+}
+
+.document-type-label-order-data .document-type-label h1 {
+	text-transform: uppercase;
+	margin: 0;
+}
+
+/* Addresses */
+.addresses {
+	width: 100%;
+	overflow: auto;
+	margin-bottom: 10mm;
+}
+
+.addresses .shipping-address {
+	width: 40%;
+	float: right;
+	margin-top: 5mm;
+}
+
+.addresses .billing-address .billing-address-header {
+	visibility: hidden;
+}
+
+/* Order details */
+.order-details {
+	width:100%;
+	margin-bottom: 8mm;
+	overflow: auto;
+}
+
+.order-details .quantity,
+.order-details .price {
+	width: 20%;
+}
+
+.order-details table {
+	width:100%;
+}
+
+.order-details tr {
+	page-break-inside: always;
+	page-break-after: auto;	
+}
+
+.order-details th {
+	font-weight: bold;
+	text-align: left;
+}
+
+.order-details td,
+.order-details th {
+	padding: 0.375em;
+}
+
+.order-details thead th {
+	color: black;
+	background-color: white;
+	border-top: 0;
+	border-bottom: 1px solid black;
+}
+
+/* Order details ~ Product bundles compatibility */
+.order-details tr.bundled-item td.product {
+	padding-left: 5mm;
+}
+
+.order-details tr.product-bundle td,
+.order-details tr.bundled-item td {
+	border: 0;
+}
+
+.order-details tr.bundled-item.hidden {
+	display: none;
+}
+
+/* Notes & Totals */
+.notes-totals {
+	width: 100%;
+	overflow: auto;
+
+}
+
+.notes-totals .totals {
+	width: 40%;
+	float: right;
+}
+
+.notes-totals .totals table {
+	width: 100%;
+}
+
+.notes-totals .totals table th,
+.notes-totals .totals table td {
+	padding: 0.375em;
+	border: 0;
+}
+
+.notes-totals .totals table th.description,
+.notes-totals .totals table td.price {
+	width: 50%;
+}
+
+.notes-totals .totals table tr.order_total td,
+.notes-totals .totals table tr.order_total th {
+	border-top: 1px solid black;
+	font-weight: bold;
+}
+
+.notes-totals .totals table tr.payment_method {
+	display: none;
+}
+
+.notes-totals .notes .customer-notes {
+	margin-top: 5mm;
+}
+
+/* Footer Imprint */
+#footer {
+	position: absolute;
+	bottom: 0;
+	left: 2cm;
+	right: 2cm;
+	height: 2cm; /* if you change the footer height, don't forget to change the bottom (=negative height) and the @page margin-bottom as well! */
+	text-align: center;
+	border-top: 0.1mm solid gray;
+	margin-bottom: 0;
+	padding-top: 2mm;
+}
+
+/* Fixes DOMPDF floats */
+.bottom-spacer {
+	clear: both;
+	margin-top: 5mm;
+}
+
+/* item-meta formatting for WC3.0+ */
+.wc-item-meta, ul.meta {
+	margin: 4px 0;
+	font-size: 7pt;
+	line-height: 7pt;
+}
+.wc-item-meta p, ul.meta p {
+	display: inline;
+}
+.wc-item-meta li, ul.meta li {
+	margin: 0;
+	margin-left: 5px;
+}
+
+/* Page numbers */
+.pagenum:before {
+	content: counter(page);
+}
+
+.pagenum,.pagecount {
+	font-family: sans-serif;
+}
