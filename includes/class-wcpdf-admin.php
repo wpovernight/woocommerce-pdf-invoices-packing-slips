@@ -194,11 +194,9 @@ class Admin {
 		$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );			
 
 		foreach ($listing_actions as $action => $data) {
-			?>
-			<a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $data['exists'] == true ? "exists " . $action : $action; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
+			?><a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $data['exists'] == true ? "exists " . $action : $action; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
 				<img src="<?php echo $data['img']; ?>" alt="<?php echo $data['alt']; ?>" width="16">
-			</a>
-			<?php
+			</a><?php
 		}
 	}
 	
