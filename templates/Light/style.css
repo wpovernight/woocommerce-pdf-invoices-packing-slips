@@ -87,6 +87,7 @@ th, td {
 
 .head .logo img {
 	max-width: 100%;
+	max-height: 3cm; /* may be overriden by the settings */
 	/* img width & heights can only be set with inline styles (mpdf 8.0) https://github.com/mpdf/mpdf/issues/366 */
 	/* using wpo_wcpdf_header_logo_img_element filter instead in wcpdf-mpdf.php */
 }
@@ -112,6 +113,17 @@ th, td {
 .document-type-label-order-data {
 	width: 100%;
 	overflow: auto;
+	clear: both;
+	padding-top: 5mm;
+}
+
+.document-type-label-order-data .document-type-label {
+	float: left;
+}
+
+.document-type-label-order-data .document-type-label h1 {
+	text-transform: uppercase;
+	margin: 0;
 }
 
 .document-type-label-order-data .order-data {
@@ -123,26 +135,25 @@ th, td {
 	padding-right: 2mm;
 }
 
-.document-type-label-order-data .document-type-label h1 {
-	text-transform: uppercase;
-	margin: 0;
-}
-
 /* Addresses */
 .addresses {
 	width: 100%;
 	overflow: auto;
-	margin-bottom: 10mm;
+	clear: both;
+	padding-top: 5mm;
+}
+
+.addresses .billing-address {
+	float: left;
+}
+
+.addresses .billing-address .billing-address-label {
+	visibility: hidden;
 }
 
 .addresses .shipping-address {
 	width: 40%;
 	float: right;
-	margin-top: 5mm;
-}
-
-.addresses .billing-address .billing-address-label {
-	visibility: hidden;
 }
 
 /* Order details */
@@ -150,6 +161,8 @@ th, td {
 	width:100%;
 	margin-bottom: 8mm;
 	overflow: auto;
+	clear: both;
+	padding-top: 5mm;
 }
 
 .order-details .quantity,
@@ -207,6 +220,17 @@ th, td {
 
 }
 
+.notes-totals .notes {
+	width: 50%;
+	padding: 3mm;
+	border: 1px solid lightgray;
+	float: left;
+}
+
+.notes-totals .notes .customer-notes {
+	margin-top: 5mm;
+}
+
 .notes-totals .totals {
 	width: 40%;
 	float: right;
@@ -246,16 +270,6 @@ th, td {
 	display: none;
 }
 
-.notes-totals .notes {
-	width: 50%;
-	padding: 3mm;
-	border: 1px solid lightgray;
-}
-
-.notes-totals .notes .customer-notes {
-	margin-top: 5mm;
-}
-
 /* Footer Imprint */
 #footer {
 	position: absolute;
@@ -264,15 +278,14 @@ th, td {
 	right: 2cm;
 	height: 2cm; /* if you change the footer height, don't forget to change the bottom (=negative height) and the @page margin-bottom as well! */
 	text-align: center;
-	border-top: 0.1mm solid gray;
+	border-top: 1px solid lightgray;
 	margin-bottom: 0;
 	padding-top: 2mm;
 }
 
-/* Fixes DOMPDF floats */
+/* Fixes floats clearance */
 .bottom-spacer {
 	clear: both;
-	margin-top: 5mm;
 }
 
 /* item-meta formatting for WC3.0+ */

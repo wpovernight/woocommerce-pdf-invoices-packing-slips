@@ -627,7 +627,7 @@ class Main {
 	public function set_header_logo_height( $document_type, $document = null ) {
 		if ( !empty($document) && $header_logo_height = $document->get_header_logo_height() ) {
 			?>
-			td.header img {
+			.header img {
 				max-height: <?php echo $header_logo_height; ?>;
 			}
 			<?php

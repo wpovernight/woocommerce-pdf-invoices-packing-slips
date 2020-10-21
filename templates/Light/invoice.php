@@ -4,18 +4,16 @@
 
 <!-- Head -->
 <div class="head">
+	<div class="shop-info">
+		<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
+		<div class="shop-address"><?php $this->shop_address(); ?></div>
+	</div>
 	<?php if( $this->has_header_logo() ) : ?>
 		<div class="header logo"><?php $this->header_logo(); ?></div>
 	<?php else : ?>
 		<div class="header document-title"><?php echo $this->get_title(); ?></div>
 	<?php endif; ?>
-	<div class="shop-info">
-		<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
-		<div class="shop-address"><?php $this->shop_address(); ?></div>
-	</div>
 </div>
-
-<div class="bottom-spacer"></div>
 
 <!-- Document type label & Order data -->
 <div class="document-type-label-order-data">
@@ -53,8 +51,6 @@
 		<h1><?php if( $this->has_header_logo() ) echo $this->get_title(); ?></h1>
 	</div>
 </div>
-
-<div class="bottom-spacer"></div>
 
 <?php do_action( 'wpo_wcpdf_after_document_label', $this->type, $this->order ); ?>
 
@@ -129,18 +125,6 @@
 
 <!-- Notes & Totals -->
 <div class="notes-totals">
-	<div class="totals">
-		<table>
-			<tfoot>
-				<?php foreach( $this->get_woocommerce_totals() as $key => $total ) : ?>
-				<tr class="<?php echo $key; ?>">
-					<th class="description"><?php echo $total['label']; ?></th>
-					<td class="price"><span class="totals-price"><?php echo $total['value']; ?></span></td>
-				</tr>
-				<?php endforeach; ?>
-			</tfoot>
-		</table>
-	</div>
 	<div class="notes">
 		<?php do_action( 'wpo_wcpdf_before_document_notes', $this->get_type(), $this->order ); ?>
 		<div class="document-notes">
@@ -159,6 +143,18 @@
 			<?php endif; ?>
 		</div>				
 		<?php do_action( 'wpo_wcpdf_after_customer_notes', $this->get_type(), $this->order ); ?>
+	</div>
+	<div class="totals">
+		<table>
+			<tfoot>
+				<?php foreach( $this->get_woocommerce_totals() as $key => $total ) : ?>
+				<tr class="<?php echo $key; ?>">
+					<th class="description"><?php echo $total['label']; ?></th>
+					<td class="price"><span class="totals-price"><?php echo $total['value']; ?></span></td>
+				</tr>
+				<?php endforeach; ?>
+			</tfoot>
+		</table>
 	</div>
 </div>
 
