@@ -4,18 +4,14 @@
 
 <!-- Head -->
 <div class="head">
+	<?php if( $this->has_header_logo() ) : ?>
+		<div class="header logo"><?php $this->header_logo(); ?></div>
+	<?php else : ?>
+		<div class="header document-title"><?php echo $this->get_title(); ?></div>
+	<?php endif; ?>
 	<div class="shop-info">
 		<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
 		<div class="shop-address"><?php $this->shop_address(); ?></div>
-	</div>
-	<div class="header">
-		<?php
-			if( $this->has_header_logo() ) {
-				$this->header_logo();
-			} else {
-				echo $this->get_title();
-			}
-		?>
 	</div>
 </div>
 
@@ -66,7 +62,7 @@
 <div class="addresses">
 	<div class="address shipping-address">
 		<?php if ( !empty($this->settings['display_shipping_address']) && ( $this->ships_to_different_address() || $this->settings['display_shipping_address'] == 'always' ) ) { ?>
-		<h3><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+		<h3 class="shipping-address-label"><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
 		<?php $this->shipping_address(); ?>
 		<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
@@ -74,7 +70,7 @@
 	</div>
 	<div class="address billing-address">
 		<?php do_action( 'wpo_wcpdf_before_billing_address', $this->type, $this->order ); ?>
-		<h3 class="billing-address-header"><?php _e( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+		<h3 class="billing-address-label"><?php _e( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<?php $this->billing_address(); ?>
 		<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
 		<?php if ( isset($this->settings['display_email']) ) { ?>

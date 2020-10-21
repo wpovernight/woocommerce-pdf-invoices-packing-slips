@@ -75,24 +75,37 @@ th, td {
 
 /* Head */
 .head {
-	width:100%;
-	margin-bottom: 5mm;
+	width: 100%;
 	overflow: auto;
+	margin-bottom: 5mm;
 }
 
-.head .header {
-	font-size: 16pt;
-	font-weight: 700;
+.head .logo {
+	float: left;
+	padding-right: 1cm;
 }
 
-.head .header img {
+.head .logo img {
+	max-width: 100%;
 	/* img width & heights can only be set with inline styles (mpdf 8.0) https://github.com/mpdf/mpdf/issues/366 */
 	/* using wpo_wcpdf_header_logo_img_element filter instead in wcpdf-mpdf.php */
+}
+
+.head .document-title {
+	width: 60%;
+	text-transform: uppercase;
+	font-size: 16pt;
+	font-weight: 700;
+	display: inline;
 }
 
 .head .shop-info {
 	width: 40%;
 	float: right;
+}
+
+.head .shop-info .shop-address {
+	margin-bottom: 5mm;
 }
 
 /* Document type label & Order data */
@@ -128,7 +141,7 @@ th, td {
 	margin-top: 5mm;
 }
 
-.addresses .billing-address .billing-address-header {
+.addresses .billing-address .billing-address-label {
 	visibility: hidden;
 }
 
@@ -160,14 +173,17 @@ th, td {
 
 .order-details td,
 .order-details th {
-	padding: 0.375em;
+	padding-left: 0;
+	padding-top: 0.375em;
+	padding-right: 0.375em;
+	padding-bottom: 0.375em;
 }
 
 .order-details thead th {
-	color: black;
+	color: grey;
 	background-color: white;
 	border-top: 0;
-	border-bottom: 1px solid black;
+	border-bottom: 1px solid lightgray;
 }
 
 /* Order details ~ Product bundles compatibility */
@@ -202,8 +218,15 @@ th, td {
 
 .notes-totals .totals table th,
 .notes-totals .totals table td {
-	padding: 0.375em;
+	padding-left: 0;
+	padding-top: 0.375em;
+	padding-right: 0.375em;
+	padding-bottom: 0.375em;
 	border: 0;
+}
+
+.notes-totals .totals table th {
+	color: grey;
 }
 
 .notes-totals .totals table th.description,
@@ -213,12 +236,20 @@ th, td {
 
 .notes-totals .totals table tr.order_total td,
 .notes-totals .totals table tr.order_total th {
-	border-top: 1px solid black;
+	border-top: 1px solid lightgray;
 	font-weight: bold;
+	color: black;
+	padding-top: 2mm;
 }
 
 .notes-totals .totals table tr.payment_method {
 	display: none;
+}
+
+.notes-totals .notes {
+	width: 50%;
+	padding: 3mm;
+	border: 1px solid lightgray;
 }
 
 .notes-totals .notes .customer-notes {
