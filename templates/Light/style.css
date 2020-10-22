@@ -60,7 +60,6 @@ a {
 }
 
 table {
-
 	border-spacing: 0;
 	page-break-inside: always;
 	border: 0;
@@ -85,14 +84,14 @@ th, td {
 	padding-right: 1cm;
 }
 
-.head .logo img {
+.head img {
 	max-width: 100%;
 	max-height: 3cm; /* may be overriden by the settings */
 	/* img width & heights can only be set with inline styles (mpdf 8.0) https://github.com/mpdf/mpdf/issues/366 */
 	/* using wpo_wcpdf_header_logo_img_element filter instead in wcpdf-mpdf.php */
 }
 
-.head .document-title {
+.head .document-label {
 	width: 60%;
 	text-transform: uppercase;
 	font-size: 16pt;
@@ -109,30 +108,30 @@ th, td {
 	margin-bottom: 5mm;
 }
 
-/* Document type label & Order data */
-.document-type-label-order-data {
+/* Document title & Order data */
+.document-label-order-data {
 	width: 100%;
 	overflow: auto;
 	clear: both;
 	padding-top: 5mm;
 }
 
-.document-type-label-order-data .document-type-label {
-	float: left;
-}
-
-.document-type-label-order-data .document-type-label h1 {
-	text-transform: uppercase;
-	margin: 0;
-}
-
-.document-type-label-order-data .order-data {
+.document-label-order-data .order-data {
 	width: 40%;
 	float: right;
 }
 
-.document-type-label-order-data .order-data table th {
+.document-label-order-data .order-data table th {
 	padding-right: 2mm;
+}
+
+.document-label-order-data .document-label {
+	float: left;
+}
+
+.document-label-order-data .document-label h1 {
+	text-transform: uppercase;
+	margin: 0;
 }
 
 /* Addresses */
@@ -217,7 +216,6 @@ th, td {
 .notes-totals {
 	width: 100%;
 	overflow: auto;
-
 }
 
 .notes-totals .notes {
@@ -271,7 +269,7 @@ th, td {
 }
 
 /* Footer Imprint */
-#footer {
+.footer {
 	position: absolute;
 	bottom: 0;
 	left: 2cm;

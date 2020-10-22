@@ -4,19 +4,20 @@
 
 <!-- Head -->
 <div class="head">
+	<?php if( $this->has_header_logo() ) : ?>
+		<div class="header logo"><?php $this->header_logo(); ?></div>
+	<?php else : ?>
+		<div class="header document-label"><?php echo $this->get_title(); ?></div>
+	<?php endif; ?>
+	&nbsp;&nbsp;
 	<div class="shop-info">
 		<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
 		<div class="shop-address"><?php $this->shop_address(); ?></div>
 	</div>
-	<?php if( $this->has_header_logo() ) : ?>
-		<div class="header logo"><?php $this->header_logo(); ?></div>
-	<?php else : ?>
-		<div class="header document-title"><?php echo $this->get_title(); ?></div>
-	<?php endif; ?>
 </div>
 
 <!-- Document type label & Order data -->
-<div class="document-type-label-order-data">
+<div class="document-label-order-data">
 	<div class="order-data">
 		<table>
 			<?php do_action( 'wpo_wcpdf_before_order_data', $this->type, $this->order ); ?>
@@ -47,12 +48,11 @@
 			<?php do_action( 'wpo_wcpdf_after_order_data', $this->type, $this->order ); ?>
 		</table>			
 	</div>
-	<div class="document-type-label">
+	<div class="document-label">
 		<h1><?php if( $this->has_header_logo() ) echo $this->get_title(); ?></h1>
 	</div>
+	<?php do_action( 'wpo_wcpdf_after_document_label', $this->type, $this->order ); ?>
 </div>
-
-<?php do_action( 'wpo_wcpdf_after_document_label', $this->type, $this->order ); ?>
 
 <!-- Addresses -->
 <div class="addresses">
@@ -164,7 +164,7 @@
 
 <!-- Footer -->
 <?php if ( $this->get_footer() ): ?>
-<div id="footer">
+<div class="footer">
 	<?php $this->footer(); ?>
 </div><!-- #letter-footer -->
 <?php endif; ?>
