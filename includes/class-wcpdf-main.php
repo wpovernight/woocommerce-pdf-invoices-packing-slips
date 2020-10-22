@@ -626,11 +626,7 @@ class Main {
 	 */
 	public function set_header_logo_height( $document_type, $document = null ) {
 		if ( !empty($document) && $header_logo_height = $document->get_header_logo_height() ) {
-			?>
-			.header img {
-				max-height: <?php echo $header_logo_height; ?>;
-			}
-			<?php
+			apply_filters( 'wpo_wcpdf_set_header_logo_height', printf(".header img { max-height: %s; }", $header_logo_height) );
 		}
 	}
 
