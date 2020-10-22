@@ -527,7 +527,7 @@ class Admin {
 		$post_type = get_post_type( $post_id );
 		if( $post_type == 'shop_order' ) {
 			// bail if this is not an actual 'Save order' action
-			if (!isset($_POST['action']) || $_POST['action'] != 'editpost') {
+			if ( ! isset($_POST['action']) || ! in_array($_POST['action'], array( 'editpost', 'wpo_wcpdf_regenerate_document' )) ) {
 				return;
 			}
 			
@@ -783,6 +783,10 @@ class Admin {
 			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );
 			if ( !empty($document) && $document->exists() ) {
 				$document->regenerate();
+
+				// save number and date
+				$this->save_invoice_number_date($order_id, null);
+
 				$response = array(
 					'message' => $document->get_type()." regenerated",
 				);
