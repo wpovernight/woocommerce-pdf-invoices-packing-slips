@@ -260,6 +260,20 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'store_empty',
+				'title'			=> null,
+				'callback'		=> 'checkbox',
+				'section'		=> 'invoice',
+				'args'			=> array(
+					'option_name'		=> 'store_empty',
+					'id'				=> null,
+					'hidden'			=> true,
+					'value'				=> $option_name.'[display_customer_notes]',
+					'class'				=> 'hidden'
+				),
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'display_date',
 				'title'			=> __( 'Display invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
