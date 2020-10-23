@@ -621,15 +621,15 @@ class Admin {
 			$order = wc_get_order( $post_id );
 			$action = wc_clean( $_POST['wpo_wcpdf_send_emails'] );
 			if ( strstr( $action, 'send_email_' ) ) {
+				$email_to_send = str_replace( 'send_email_', '', $action );
 				// Switch back to the site locale.
 				wc_switch_to_site_locale();
-				do_action( 'woocommerce_before_resend_order_emails', $order );
+				do_action( 'woocommerce_before_resend_order_emails', $order, $email_to_send );
 				// Ensure gateways are loaded in case they need to insert data into the emails.
 				WC()->payment_gateways();
 				WC()->shipping();
 				// Load mailer.
 				$mailer = WC()->mailer();
-				$email_to_send = str_replace( 'send_email_', '', $action );
 				$mails = $mailer->get_emails();
 				if ( ! empty( $mails ) ) {
 					foreach ( $mails as $mail ) {
