@@ -19,7 +19,7 @@ class Main {
 
 		// email
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 4 );
-		add_filter( 'wpo_wcpdf_custom_attachment_condition', array( $this, 'disable_free_attachment'), 1001, 4 );
+		add_filter( 'wpo_wcpdf_document_is_allowed', array( $this, 'disable_free'), 10, 2 );
 		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
 
 		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) ) {
@@ -543,21 +543,19 @@ class Main {
 		}
 	}
 
-	public function disable_free_attachment( $attach, $order, $email_id, $document_type ) {
-		// prevent fatal error for non-order objects
-		if ( !method_exists( $order, 'get_total' ) ) {
-			return false;
+	public function disable_free( $allowed, $document ) {
+		if( ! $document->exists() && ! empty($document->order) ) {
+			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type() );
+			// check order total & setting
+			$order_total = $document->order->get_total();
+			if ( $order_total == 0 && isset( $document_settings['disable_free'] ) ) {
+				return false;
+			} else {
+				return $allowed;
+			}
+		} else {
+			return $allowed;
 		}
-
-		$document_settings = WPO_WCPDF()->settings->get_document_settings( $document_type );
-
-		// check order total & setting
-		$order_total = $order->get_total();
-		if ( $order_total == 0 && isset( $document_settings['disable_free'] ) ) {
-			return false;
-		}
-
-		return $attach;
 	}
 
 	public function test_mode_settings( $use_historical_settings, $document ) {
