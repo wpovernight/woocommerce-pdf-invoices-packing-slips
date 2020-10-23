@@ -1,0 +1,85 @@
+/* Main Body */
+@page {
+	margin-top: 1cm;
+	margin-bottom: 3cm;
+	margin-left: 2cm;
+	margin-right: 2cm;
+}
+
+body {
+	background: #fff;
+	color: #000;
+	margin: 0cm;
+	font-family: sans-serif;
+	font-size: 9pt;
+}
+
+/* Standard elements */
+h1, h2, h3, h4 {
+	font-weight: bold;
+	margin: 0;
+}
+
+h1 {
+	font-size: 16pt;
+	margin: 5mm 0;
+}
+
+h2 {
+	font-size: 14pt;
+}
+
+h3, h4 {
+	font-size: 9pt;
+}
+
+ol,
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+li,
+ul {
+	margin-bottom: 0.75em;
+}
+
+p {
+	margin: 0;
+	padding: 0;
+}
+
+p + p {
+	margin-top: 1.25em;
+}
+
+a { 
+	border-bottom: 1px solid; 
+	text-decoration: none; 
+}
+
+table {
+	border-spacing: 0;
+	page-break-inside: always;
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+th, td {
+	vertical-align: top;
+	text-align: left;
+}
+
+.logo img {
+	max-width: 100%;
+	height: 5cm; /* may be overriden by the settings */
+	/* img width & heights can only be set with inline styles (mpdf 8.0) https://github.com/mpdf/mpdf/issues/366 */
+	/* using wpo_wcpdf_header_logo_img_element filter instead in wcpdf-mpdf.php */
+}
+
+/* Page break */
+.page-break {
+	page-break-after: always;
+}
