@@ -256,21 +256,8 @@ class Invoice extends Order_Document_Methods {
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'display_customer_notes',
+					'store_unchecked'	=> true,
 				)
-			),
-			array(
-				'type'			=> 'setting',
-				'id'			=> 'store_empty',
-				'title'			=> null,
-				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
-				'args'			=> array(
-					'option_name'		=> 'store_empty',
-					'id'				=> null,
-					'hidden'			=> true,
-					'value'				=> $option_name.'[display_customer_notes]',
-					'class'				=> 'hidden'
-				),
 			),
 			array(
 				'type'			=> 'setting',
