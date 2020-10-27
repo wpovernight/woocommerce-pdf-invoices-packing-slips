@@ -544,11 +544,13 @@ class Main {
 	}
 
 	public function disable_free( $allowed, $document ) {
-		if( ! $document->exists() && ! empty($document->order) ) {
-			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type() );
+		if( ! $document->exists() && ! empty($order = $document->order) ) {
+			if ( ! is_callable( array($order, 'get_total') ) ) {
+				return false;
+			}
 			// check order total & setting
-			$order_total = $document->order->get_total();
-			if ( $order_total == 0 && isset( $document_settings['disable_free'] ) ) {
+			$order_total = $order->get_total();
+			if ( $order_total == 0 && $document->get_setting('disable_free') ) {
 				return false;
 			} else {
 				return $allowed;
