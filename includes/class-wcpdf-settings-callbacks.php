@@ -56,7 +56,7 @@ class Settings_Callbacks {
 
 		// print store empty input if true
 		if( $store_unchecked ) {
-			printf( '<input type="hidden" name="wpo_wcpdf_setting_store_empty[]" value="%s"/>', $id );
+			printf( '<input type="hidden" name="%s[wpo_wcpdf_setting_store_empty][]" value="%s"/>', $option_name, $id );
 		}
 	
 		// output description.
@@ -500,7 +500,7 @@ class Settings_Callbacks {
 		$args['value'] = isset( $args['value'] ) ? $args['value'] : 1;
 
 		$args['placeholder'] = isset( $args['placeholder'] ) ? $args['placeholder'] : '';
-		$args['store_unchecked'] = isset( $args['store_unchecked'] ) ? $args['store_unchecked'] : '';
+		$args['store_unchecked'] = isset( $args['store_unchecked'] ) && $args['store_unchecked'] ? true : false;
 
 		// get main settings array
 		$option = get_option( $args['option_name'] );
