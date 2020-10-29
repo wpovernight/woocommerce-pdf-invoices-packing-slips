@@ -104,7 +104,7 @@
 
 <?php do_action( 'wpo_wcpdf_before_customer_notes', $this->type, $this->order ); ?>
 <div class="customer-notes">
-	<?php if ( $this->get_shipping_notes() && $this->settings['display_customer_notes'] ) : ?>
+	<?php if ( $this->get_shipping_notes() ) : ?>
 		<h3><?php _e( 'Customer Notes', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<?php $this->shipping_notes(); ?>
 	<?php endif; ?>
