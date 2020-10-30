@@ -530,6 +530,14 @@ class Admin {
 			if ( ! isset($_POST['action']) || ! in_array($_POST['action'], array( 'editpost', 'wpo_wcpdf_regenerate_document' )) ) {
 				return;
 			}
+
+			// grab json data from the action 'wpo_wcpdf_regenerate_document' and save it to the $_POST variable to be saved
+			if( isset($_POST['json_data']) && ! empty($_POST['json_data']) ) {
+				$form_data = json_decode(stripslashes( $_POST['json_data'] ), true);
+				foreach( $form_data as $key => $value ) {
+					$_POST[$key] = sanitize_text_field($value);
+				}
+			}
 			
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
@@ -778,10 +786,10 @@ class Admin {
 			) );
 		}
 
-		$json_obj = json_decode( stripslashes( $_POST['json_data'] ) );
+		$form_data = json_decode(stripslashes( $_POST['json_data'] ), true);
 
-		$order_id = absint( $json_obj->order_id );
-		$document = sanitize_text_field( $json_obj->document );
+		$order_id = absint( $form_data['order_id'] );
+		$document = sanitize_text_field( $form_data['document'] );
 
 		try {
 			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );

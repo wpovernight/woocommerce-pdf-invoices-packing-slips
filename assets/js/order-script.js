@@ -84,7 +84,20 @@ jQuery(document).ready(function($) {
 
 		$(this).addClass('wcpdf-regenerate-spin');
 		$form = $(this).closest('.wcpdf-data-fields');
-		$form_data_json = JSON.stringify( $form.data() );
+
+		// create an object with the form inputs data
+		$form_inputs_data = {};
+		$form.find(':input').each( function() {
+			$name = $(this).attr("name");
+			$value = $(this).val();
+			$form_inputs_data[$name] = $value;
+		} );
+		// create an object with the data attributes
+		$form_data_attributes = $form.data();
+		// join both objects into one new
+		$form_data = $.extend( {}, $form_inputs_data, $form_data_attributes );
+		// convert data to json string
+		$form_data_json = JSON.stringify( $form_data );
 
 		// Make sure all feedback icons are hidden before each call
 		$form.find('.document-action-success, .document-action-failed').hide();
