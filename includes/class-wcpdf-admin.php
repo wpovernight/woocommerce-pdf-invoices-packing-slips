@@ -765,27 +765,31 @@ class Admin {
 				'message' => 'nonce expired',
 			) );
 		}
-		if ( empty($_POST['order_id']) || empty($_POST['document']) ) {
+
+		if( ! isset($_POST['json_data']) || empty($_POST['json_data']) ) {
 			wp_send_json_error( array(
 				'message' => 'incomplete request',
 			) );
 		}
+
 		if ( !current_user_can('manage_woocommerce') ) {
 			wp_send_json_error( array(
 				'message' => 'no permissions',
 			) );
 		}
 
-		$order_id = absint($_POST['order_id']);
-		$document = sanitize_text_field($_POST['document']);
+		$json_obj = json_decode( stripslashes( $_POST['json_data'] ) );
+
+		$order_id = absint( $json_obj->order_id );
+		$document = sanitize_text_field( $json_obj->document );
 
 		try {
 			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );
 			if ( !empty($document) && $document->exists() ) {
-				$document->regenerate();
-
 				// save number and date
 				$this->save_invoice_number_date($order_id, null);
+
+				$document->regenerate();
 
 				$response = array(
 					'message' => $document->get_type()." regenerated",

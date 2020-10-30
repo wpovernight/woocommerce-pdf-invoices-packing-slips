@@ -84,27 +84,17 @@ jQuery(document).ready(function($) {
 
 		$(this).addClass('wcpdf-regenerate-spin');
 		$form = $(this).closest('.wcpdf-data-fields');
+		$form_data_json = JSON.stringify( $form.data() );
 
 		// Make sure all feedback icons are hidden before each call
 		$form.find('.document-action-success, .document-action-failed').hide();
-
-		// Get invoice number & date
-		$invoice_number = $form.find('#_wcpdf_invoice_number').val();
-		$invoice_date = $form.find('#wcpdf_invoice_date').val();
-		$invoice_date_hour = $form.find('#wcpdf_invoice_date_hour').val();
-		$invoice_date_minute = $form.find('#wcpdf_invoice_date_minute').val();
 
 		$.ajax({
 			url:     wpo_wcpdf_ajax.ajaxurl,
 			data:    {
 				action:					'wpo_wcpdf_regenerate_document',
 				security:				$(this).data('nonce'),
-				document:				$form.data('document'),
-				order_id:				$form.data('order_id'),
-				_wcpdf_invoice_number:			$invoice_number,
-				wcpdf_invoice_date:			$invoice_date,
-				wcpdf_invoice_date_hour:		$invoice_date_hour,
-				wcpdf_invoice_date_minute:	$invoice_date_minute
+				json_data:				$form_data_json,
 			},
 			type:    'POST',
 			context: $form,
