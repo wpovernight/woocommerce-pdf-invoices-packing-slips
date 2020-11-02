@@ -13,8 +13,12 @@
 		?>
 		</td>
 		<td class="shop-info">
+			<?php do_action( 'wpo_wcpdf_before_shop_name', $this->type, $this->order ); ?>
 			<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
+			<?php do_action( 'wpo_wcpdf_after_shop_name', $this->type, $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_before_shop_address', $this->type, $this->order ); ?>
 			<div class="shop-address"><?php $this->shop_address(); ?></div>
+			<?php do_action( 'wpo_wcpdf_after_shop_address', $this->type, $this->order ); ?>
 		</td>
 	</tr>
 </table>
