@@ -30,7 +30,7 @@ class Legacy_Document extends Order_Document_Methods {
 		// set properties
 		$this->type		= 'legacy-document';
 		$this->title	= __( 'Legacy Document', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon		= WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.png";
+		$this->icon		= WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
 	}
 
 	public function set_props( $props, $call_parent_constructor = true ) {

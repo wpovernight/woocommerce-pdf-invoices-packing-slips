@@ -30,7 +30,7 @@ class Invoice extends Order_Document_Methods {
 		// set properties
 		$this->type		= 'invoice';
 		$this->title	= __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon		= WPO_WCPDF()->plugin_url() . "/assets/images/invoice.png";
+		$this->icon		= WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
 
 		// Call parent constructor
 		parent::__construct( $order );
