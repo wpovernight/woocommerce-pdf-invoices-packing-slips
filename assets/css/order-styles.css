@@ -1,6 +1,6 @@
 /* Order list buttons: */
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf {
-	padding: 2px !important;
+	padding: 3px 2px 1px 1px !important;
 }
 
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf.exists::after {
@@ -23,6 +23,13 @@
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf img,
 .type-shop_order .column-order_actions a.button.wpo_wcpdf img /* legacy: 3.2 & older */ {
 	width: 16px;
+	image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+  
 }
 
 .widefat .column-pdf_invoice_number {
