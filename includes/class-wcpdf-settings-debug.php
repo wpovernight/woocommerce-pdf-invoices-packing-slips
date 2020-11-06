@@ -42,7 +42,7 @@ class Settings_Debug {
 				<form method="post">
 					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
 					<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="generate_random_string">
-					<input type="submit" name="submit" id="submit" class="button" value="<?php _e( 'Generate random string', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+					<input type="submit" name="submit" id="submit" class="button" value="<?php _e( 'Protect PDF files directory', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 					<?php
 					if ( !empty($_POST) && isset($_POST['wpo_wcpdf_debug_tools_action']) && $_POST['wpo_wcpdf_debug_tools_action'] == 'generate_random_string' ) {
 						// check permissions
