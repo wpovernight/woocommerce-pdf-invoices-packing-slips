@@ -72,12 +72,12 @@ class Install {
 			return;
 		}
 
-		// Create temp folders
+		// Get tmp folders
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
 		// check if tmp folder exists => if not, initialize 
 		if ( $tmp_base !== false && !@is_dir( $tmp_base ) ) {
-			WPO_WCPDF()->main->init_tmp( $tmp_base );
+			WPO_WCPDF()->main->init_tmp();
 		}
 
 		// Unsupported currency symbols 

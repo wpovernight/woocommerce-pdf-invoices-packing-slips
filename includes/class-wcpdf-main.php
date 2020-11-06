@@ -418,12 +418,13 @@ class Main {
 		//
 		// May also be overridden by the wpo_wcpdf_tmp_path filter
 
-		$upload_dir = wp_upload_dir();
-		if (!empty($upload_dir['error'])) {
-			$tmp_base = false;
+		$tmp_base = false;
+		$legacy_tmp_base = $this->legacy_tmp_base();
+		$new_temp_base = $this->tmp_base();
+		if( $new_temp_base ) {
+			$tmp_base = $new_temp_base;
 		} else {
-			$upload_base = trailingslashit( $upload_dir['basedir'] );
-			$tmp_base = $upload_base . 'wpo_wcpdf/';
+			$tmp_base = $legacy_tmp_base;
 		}
 
 		$tmp_base = apply_filters( 'wpo_wcpdf_tmp_path', $tmp_base );
@@ -435,9 +436,85 @@ class Main {
 	}
 
 	/**
+	 * Get WordPress uploads folder base
+	 */
+	public function get_wp_upload_base () {
+		$upload_dir = wp_upload_dir();
+		if ( ! empty($upload_dir['error']) ) {
+			$wp_upload_base = false;
+		} else {
+			$upload_base = trailingslashit( $upload_dir['basedir'] );
+			$wp_upload_base = $upload_base;
+		}
+		return $wp_upload_base;
+	}
+
+	/**
+	 * Legacy tmp base
+	 */
+	public function legacy_tmp_base () {
+		$wp_upload_base = $this->get_wp_upload_base();
+		if( $wp_upload_base ) {
+			$legacy_tmp_base = $wp_upload_base . 'wpo_wcpdf/';
+		} else {
+			$legacy_tmp_base = false;
+		}
+		return $legacy_tmp_base;
+	}
+
+	/**
+	 * New tmp base
+	 */
+	public function tmp_base () {
+		$wp_upload_base = $this->get_wp_upload_base();
+		if( $wp_upload_base ) {
+			$code = $this->get_random_string();
+			if( $code ) {
+				$new_tmp_base = $wp_upload_base . 'wpo_wcpdf_'.$code.'/';
+			} else {
+				$new_tmp_base = false;
+			}
+		} else {
+			$new_tmp_base = false;
+		}
+		return $new_tmp_base;
+	}
+
+	/**
+	 * Generate random string
+	 */
+	public function generate_random_string () {
+		if ( function_exists( 'random_bytes' ) ) { // PHP7+
+			$code = bin2hex(random_bytes(16));
+		} else {
+			$code = md5(uniqid(rand(), true));
+		}
+		// create option
+		update_option( 'wpo_wcpdf_random_string', $code );
+	}
+
+	/**
+	 * Get random string
+	 */
+	public function get_random_string () {
+		$code = sanitize_text_field( get_option( 'wpo_wcpdf_random_string' ) );
+		if( $code ) {
+			return $code;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Install/create plugin tmp folders
 	 */
-	public function init_tmp ( $tmp_base ) {
+	public function init_tmp () {
+		// generate random string
+		$this->generate_random_string();
+
+		// get tmp base
+		$tmp_base = $this->get_tmp_base();
+
 		// create plugin base temp folder
 		mkdir( $tmp_base );
 
@@ -462,7 +539,34 @@ class Main {
 			file_put_contents( $path . '.htaccess', 'deny from all' );
 			touch( $path . 'index.php' );
 		}
+	}
 
+	/**
+	 * Copy contents from one directory to another
+	 */
+	public function copy_directory ( $old_path, $new_path ) {
+		if( empty($old_path) || empty($new_path) ) return;
+		if( ! is_dir($old_path) ) return;
+		if( ! is_dir($new_path) ) mkdir($new_path);
+
+		global $wp_filesystem;
+
+		// check for WP_Filesystem(), is required for copy_dir()
+		if ( ! WP_Filesystem() ) {
+			WP_Filesystem();
+		}
+
+		// we have the directories, let's try to copy
+		try {
+			$result = copy_dir( $old_path, $new_path );
+			// delete old directory with contents
+			if( $result ) {
+				$wp_filesystem->delete( $old_path, true );
+			}
+		} catch ( \Error $e ) {
+			wcpdf_log_error( "Unable to copy directory contents: ".$e->getMessage(), 'critical', $e );
+			return;
+		}
 	}
 
 	/**
