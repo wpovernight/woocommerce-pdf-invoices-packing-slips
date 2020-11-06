@@ -36,7 +36,6 @@ class Settings_Debug {
 			return;
 		}
 		?>
-		<hr>
 		<div>
 			<?php if( ! WPO_WCPDF()->main->get_random_string() ) : ?>
 			<p>
@@ -163,7 +162,7 @@ class Settings_Debug {
 				</form>
 			</p>
 		</div>
-		<hr><br>
+		<br>
 		<?php
 	}
 
