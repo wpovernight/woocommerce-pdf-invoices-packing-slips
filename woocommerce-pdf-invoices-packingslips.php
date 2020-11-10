@@ -333,14 +333,16 @@ class WPO_WCPDF {
 		}
 		$tmp_path = $this->main->get_tmp_path('attachments');
 		$server_software   = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : false;
-		if ( stristr( $server_software, 'nginx' ) && ( current_user_can( 'manage_shop_settings' ) || current_user_can( 'manage_woocommerce' ) ) && ! get_option('wpo_wcpdf_hide_nginx_notice') && ! get_option('wpo_wcpdf_random_string') ) {
+		$random_string = $this->main->get_random_string();
+
+		if ( stristr( $server_software, 'nginx' ) && ( current_user_can( 'manage_shop_settings' ) || current_user_can( 'manage_woocommerce' ) ) && ! get_option('wpo_wcpdf_hide_nginx_notice') && ! $random_string ) {
 			ob_start();
 			?>
 			<div class="error">
-				<img src="<?php echo WPO_WCPDF()->plugin_url() . "/assets/images/nginx.svg"; ?>" style="margin-top:10px;">
+				<img src="<?php echo $this->plugin_url() . "/assets/images/nginx.svg"; ?>" style="margin-top:10px;">
 				<p><?php printf( __( 'The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>' . $tmp_path . '</strong>' ); ?></p>
 				<p><?php _e( 'To protect them, you must click the button below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-				<p><a class="button" href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_protect_pdf_directory', 'true' ) ); ?>"><?php _e( 'Protect PDF files directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+				<p><a class="button" href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_protect_pdf_directory', 'true' ) ); ?>"><?php _e( 'Generate random temporary folder name', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_nginx_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
 			<?php
@@ -349,10 +351,10 @@ class WPO_WCPDF {
 
 		// protect PDF directory
 		if ( isset( $_GET['wpo_wcpdf_protect_pdf_directory'] ) ) {
-			WPO_WCPDF()->main->generate_random_string();
-			$old_path = WPO_WCPDF()->main->legacy_tmp_base();
-			$new_path = WPO_WCPDF()->main->tmp_base();
-			WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
+			$this->main->generate_random_string();
+			$old_path = $this->main->get_tmp_base( false );
+			$new_path = $this->main->get_tmp_base();
+			$this->main->copy_directory( $old_path, $new_path );
 			// save option to hide nginx notice
 			update_option( 'wpo_wcpdf_hide_nginx_notice', true );
 			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );

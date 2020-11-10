@@ -374,7 +374,7 @@ class Main {
 
 		// check if tmp folder exists => if not, initialize
 		if ( !@is_dir( $tmp_base ) ) {
-			$this->init_tmp( $tmp_base );
+			$this->init_tmp();
 		}
 
 		if ( empty( $type ) ) {
@@ -408,7 +408,7 @@ class Main {
 	/**
 	 * return the base tmp folder (usually uploads)
 	 */
-	public function get_tmp_base () {
+	public function get_tmp_base ( $append_random_string = true ) {
 		// wp_upload_dir() is used to set the base temp folder, under which a
 		// 'wpo_wcpdf' folder and several subfolders are created
 		//
@@ -417,14 +417,16 @@ class Main {
 		// * UNLESS the ‘UPLOADS’ constant is defined in wp-config (http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder)
 		//
 		// May also be overridden by the wpo_wcpdf_tmp_path filter
-
-		$tmp_base = false;
-		$legacy_tmp_base = $this->legacy_tmp_base();
-		$new_temp_base = $this->tmp_base();
-		if( $new_temp_base ) {
-			$tmp_base = $new_temp_base;
+		
+		$wp_upload_base = $this->get_wp_upload_base();
+		if( $wp_upload_base ) {
+			if( $append_random_string && $code = $this->get_random_string() ) {
+				$tmp_base = $wp_upload_base . 'wpo_wcpdf_'.$code.'/';
+			} else {
+				$tmp_base = $wp_upload_base . 'wpo_wcpdf/';
+			}
 		} else {
-			$tmp_base = $legacy_tmp_base;
+			$tmp_base = false;
 		}
 
 		$tmp_base = apply_filters( 'wpo_wcpdf_tmp_path', $tmp_base );
@@ -447,37 +449,6 @@ class Main {
 			$wp_upload_base = $upload_base;
 		}
 		return $wp_upload_base;
-	}
-
-	/**
-	 * Legacy tmp base
-	 */
-	public function legacy_tmp_base () {
-		$wp_upload_base = $this->get_wp_upload_base();
-		if( $wp_upload_base ) {
-			$legacy_tmp_base = $wp_upload_base . 'wpo_wcpdf/';
-		} else {
-			$legacy_tmp_base = false;
-		}
-		return $legacy_tmp_base;
-	}
-
-	/**
-	 * New tmp base
-	 */
-	public function tmp_base () {
-		$wp_upload_base = $this->get_wp_upload_base();
-		if( $wp_upload_base ) {
-			$code = $this->get_random_string();
-			if( $code ) {
-				$new_tmp_base = $wp_upload_base . 'wpo_wcpdf_'.$code.'/';
-			} else {
-				$new_tmp_base = false;
-			}
-		} else {
-			$new_tmp_base = false;
-		}
-		return $new_tmp_base;
 	}
 
 	/**
@@ -509,8 +480,10 @@ class Main {
 	 * Install/create plugin tmp folders
 	 */
 	public function init_tmp () {
-		// generate random string
-		$this->generate_random_string();
+		// generate random string if don't exist
+		if( ! $this->get_random_string() ) {
+			$this->generate_random_string();
+		}
 
 		// get tmp base
 		$tmp_base = $this->get_tmp_base();
