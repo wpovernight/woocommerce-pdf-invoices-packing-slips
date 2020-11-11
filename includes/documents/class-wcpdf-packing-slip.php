@@ -142,6 +142,7 @@ class Packing_Slip extends Order_Document_Methods {
 					'option_name'		=> $option_name,
 					'id'				=> 'display_customer_notes',
 					'store_unchecked'	=> true,
+					'default'			=> 1,
 				)
 			),
 		);
