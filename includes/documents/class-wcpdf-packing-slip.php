@@ -132,6 +132,19 @@ class Packing_Slip extends Order_Document_Methods {
 					'id'			=> 'display_phone',
 				)
 			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'display_customer_notes',
+				'title'			=> __( 'Display customer notes', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'packing_slip',
+				'args'			=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'display_customer_notes',
+					'store_unchecked'	=> true,
+					'default'			=> 1,
+				)
+			),
 		);
 
 

@@ -1131,6 +1131,12 @@ abstract class Order_Document_Methods extends Order_Document {
 		} else {
 			$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( $this->order, 'customer_note', 'view' ) ) );
 		}
+
+		// check document specific setting
+		if( isset($this->settings['display_customer_notes']) && $this->settings['display_customer_notes'] == 0 ) {
+			$shipping_notes = false;
+		}
+
 		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this );
 	}
 	public function shipping_notes() {

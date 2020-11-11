@@ -53,6 +53,11 @@ class Settings_Callbacks {
 
 		// output checkbox	
 		printf( '<input type="checkbox" id="%1$s" name="%2$s" value="%3$s" %4$s %5$s/>', $id, $setting_name, $value, checked( $value, $current, false ), !empty($disabled) ? 'disabled="disabled"' : '' );
+
+		// print store empty input if true
+		if( $store_unchecked ) {
+			printf( '<input type="hidden" name="%s[wpo_wcpdf_setting_store_empty][]" value="%s"/>', $option_name, $id );
+		}
 	
 		// output description.
 		if ( isset( $description ) ) {
@@ -495,6 +500,7 @@ class Settings_Callbacks {
 		$args['value'] = isset( $args['value'] ) ? $args['value'] : 1;
 
 		$args['placeholder'] = isset( $args['placeholder'] ) ? $args['placeholder'] : '';
+		$args['store_unchecked'] = isset( $args['store_unchecked'] ) && $args['store_unchecked'] ? true : false;
 
 		// get main settings array
 		$option = get_option( $args['option_name'] );
@@ -565,6 +571,15 @@ class Settings_Callbacks {
 
 		if (empty($input) || !is_array($input)) {
 			return $input;
+		}
+
+		if (!empty($input['wpo_wcpdf_setting_store_empty'])) { //perhaps we should use a more unique/specific name for this
+			foreach ($input['wpo_wcpdf_setting_store_empty'] as $key) {
+				if (empty($input[$key])) {
+					$output[$key] = 0;
+				}
+			}
+			unset($input['wpo_wcpdf_setting_store_empty']);
 		}
 	
 		// Loop through each of the incoming options.
