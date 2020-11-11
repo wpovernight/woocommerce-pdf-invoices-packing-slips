@@ -112,7 +112,7 @@ class Invoice extends Order_Document_Methods {
 			$last_number_year = $number_store->get_last_date('Y');
 			// check if we need to reset
 			if ( $current_year != $last_number_year ) {
-				$number_store->set_next( 1 );
+				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
 			}
 		}
 
