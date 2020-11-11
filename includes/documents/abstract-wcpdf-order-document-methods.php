@@ -558,10 +558,10 @@ abstract class Order_Document_Methods extends Order_Document {
 					$data['thumbnail'] = $this->get_thumbnail( $product );
 
 					// Set item SKU
-					$data['sku'] = $product->get_sku();
+					$data['sku'] = is_callable( array( $product, 'get_sku' ) ) ? $product->get_sku() : '';
 	
 					// Set item weight
-					$data['weight'] = $product->get_weight();
+					$data['weight'] = is_callable( array( $product, 'get_weight' ) ) ? $product->get_weight() : '';
 					
 					// Set item dimensions
 					$data['dimensions'] = WCX_Product::get_dimensions( $product );
