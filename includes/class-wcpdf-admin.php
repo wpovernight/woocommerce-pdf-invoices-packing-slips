@@ -416,11 +416,11 @@ class Admin {
 				<!-- Editable -->
 				<div class="editable">
 					<p class="form-field _wcpdf_invoice_number_field ">
-						<label for="_wcpdf_invoice_number"><?php _e( 'Invoice Number (unformatted!)', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</label>
+						<label for="wcpdf_invoice_number"><?php _e( 'Invoice Number (unformatted!)', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</label>
 						<?php if ( $invoice->exists() && !empty($invoice_number) ) : ?>
-						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number->get_plain(); ?>" disabled="disabled">
+						<input type="text" class="short" style="" name="wcpdf_invoice_number" id="_wcpdf_invoice_number" value="<?php echo $invoice_number->get_plain(); ?>" disabled="disabled">
 						<?php else : ?>
-						<input type="text" class="short" style="" name="_wcpdf_invoice_number" id="_wcpdf_invoice_number" value="" disabled="disabled">
+						<input type="text" class="short" style="" name="wcpdf_invoice_number" id="_wcpdf_invoice_number" value="" disabled="disabled">
 						<?php endif; ?>
 					</p>
 					<p class="form-field form-field-wide">
@@ -530,77 +530,11 @@ class Admin {
 			if ( ! isset($_POST['action']) || ! in_array($_POST['action'], array( 'editpost', 'wpo_wcpdf_regenerate_document' )) ) {
 				return;
 			}
-
-			// grab json data from the action 'wpo_wcpdf_regenerate_document' and save it to the $_POST variable to be saved
-			if( isset($_POST['json_data']) && ! empty($_POST['json_data']) ) {
-				$form_data = json_decode(stripslashes( $_POST['json_data'] ), true);
-				foreach( $form_data as $key => $value ) {
-					$_POST[$key] = sanitize_text_field($value);
-				}
-			}
 			
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				if ( !empty( $_POST['wcpdf_invoice_date'] ) ) {
-					$date = $_POST['wcpdf_invoice_date'];
-					$hour = !empty( $_POST['wcpdf_invoice_date_hour'] ) ? $_POST['wcpdf_invoice_date_hour'] : '00';
-					$minute = !empty( $_POST['wcpdf_invoice_date_minute'] ) ? $_POST['wcpdf_invoice_date_minute'] : '00';
-
-					// clean & sanitize input
-					$date = date( 'Y-m-d', strtotime( $date ) );
-					$hour = sprintf('%02d', intval( $hour ));
-					$minute = sprintf('%02d', intval( $minute ) );
-					$invoice_date = "{$date} {$hour}:{$minute}:00";
-
-					// set date
-					$invoice->set_date( $invoice_date );
-				} elseif ( empty( $_POST['wcpdf_invoice_date'] ) && !empty( $_POST['_wcpdf_invoice_number'] ) ) {
-					$invoice->set_date( current_time( 'timestamp', true ) );
-				}
-
-				if ( isset( $_POST['_wcpdf_invoice_number'] ) ) {
-					// sanitize
-					$invoice_number = sanitize_text_field( $_POST['_wcpdf_invoice_number'] );
-					// set number
-					$invoice->set_number( $invoice_number );
-				}
-
-				if ( isset( $_POST['wcpdf_invoice_notes'] ) ) {
-					// allowed HTML
-					$allowed_html = array(
-						'a'		=> array(
-							'href' 	=> array(),
-							'title' => array(),
-							'id' 	=> array(),
-							'class'	=> array(),
-							'style'	=> array(),
-						),
-						'br'	=> array(),
-						'em'	=> array(),
-						'strong'=> array(),
-						'div'	=> array(
-							'id'	=> array(),
-							'class' => array(),
-							'style'	=> array(),
-						),
-						'span'	=> array(
-							'id' 	=> array(),
-							'class'	=> array(),
-							'style'	=> array(),
-						),
-						'p'		=> array(
-							'id' 	=> array(),
-							'class' => array(),
-							'style' => array(),
-						),
-						'b'		=> array(),
-					);
-					// sanitize
-					$invoice_notes = wp_kses( stripslashes($_POST['wcpdf_invoice_notes']), $allowed_html );
-					// set notes
-					$invoice->set_notes( $invoice_notes );
-				}
-
+				$document_data = $this->process_order_document_form_data( $_POST );
+				$invoice->set_data( $document_data, $order );
 				$invoice->save();
 			}
 		}
@@ -774,7 +708,7 @@ class Admin {
 			) );
 		}
 
-		if( ! isset($_POST['json_data']) || empty($_POST['json_data']) ) {
+		if( ! isset($_POST['form_data']) || empty($_POST['form_data']) || ! isset($_POST['order_id']) || empty($_POST['order_id']) || ! isset($_POST['document_type']) || empty($_POST['document_type']) ) {
 			wp_send_json_error( array(
 				'message' => 'incomplete request',
 			) );
@@ -786,18 +720,17 @@ class Admin {
 			) );
 		}
 
-		$form_data = json_decode(stripslashes( $_POST['json_data'] ), true);
-
-		$order_id = absint( $form_data['order_id'] );
-		$document = sanitize_text_field( $form_data['document'] );
+		$order_id = absint( $_POST['order_id'] );
+		$document_type = sanitize_text_field( $_POST['document_type'] );
 
 		try {
-			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );
+			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 			if ( !empty($document) && $document->exists() ) {
 				// save number and date
-				$this->save_invoice_number_date($order_id, null);
+				$this->save_invoice_number_date( $order_id, null );
 
-				$document->regenerate();
+				$document_data = $this->process_order_document_form_data( $_POST );
+				$document->regenerate( $document_data );
 
 				$response = array(
 					'message' => $document->get_type()." regenerated",
@@ -825,6 +758,76 @@ class Admin {
 			);
 			$wp_admin_bar->add_node( $args );
 		}
+	}
+
+	public function process_order_document_form_data( $request )
+	{
+		$data = array();
+
+		if( isset($request['form_data']) && ! empty($request['form_data']) ) {
+			$form_data = json_decode( stripslashes( $request['form_data'] ), true );
+
+			if( isset($request['document_type']) && ! empty($request['document_type']) ) {
+				$document_type = sanitize_text_field( $request['document_type'] );
+
+				if( isset($form_data['wcpdf_'.$document_type.'_number']) && ! empty($form_data['wcpdf_'.$document_type.'_number']) ) {
+					$data['number'] = absint($form_data['wcpdf_'.$document_type.'_number']);
+				}
+
+				if( ! empty($form_data['wcpdf_'.$document_type.'_date']) ) {
+					$date = $form_data['wcpdf_'.$document_type.'_date'];
+					$hour = ! empty( $form_data['wcpdf_'.$document_type.'_date_hour'] ) ? $form_data['wcpdf_'.$document_type.'_date_hour'] : '00';
+					$minute = ! empty( $form_data['wcpdf_'.$document_type.'_date_minute'] ) ? $form_data['wcpdf_'.$document_type.'_date_minute'] : '00';
+
+					// clean & sanitize input
+					$date = date( 'Y-m-d', strtotime( $date ) );
+					$hour = sprintf('%02d', intval( $hour ));
+					$minute = sprintf('%02d', intval( $minute ) );
+					$data['date'] = "{$date} {$hour}:{$minute}:00";
+
+				} elseif ( empty( $_POST['wcpdf_'.$document_type.'_date'] ) && !empty( $_POST['wcpdf_'.$document_type.'_number'] ) ) {
+					$data['date'] = current_time( 'timestamp', true );
+				}
+
+				if ( isset( $request['wcpdf_'.$document_type.'_notes'] ) ) {
+					// allowed HTML
+					$allowed_html = array(
+						'a'		=> array(
+							'href' 	=> array(),
+							'title' => array(),
+							'id' 	=> array(),
+							'class'	=> array(),
+							'style'	=> array(),
+						),
+						'br'	=> array(),
+						'em'	=> array(),
+						'strong'=> array(),
+						'div'	=> array(
+							'id'	=> array(),
+							'class' => array(),
+							'style'	=> array(),
+						),
+						'span'	=> array(
+							'id' 	=> array(),
+							'class'	=> array(),
+							'style'	=> array(),
+						),
+						'p'		=> array(
+							'id' 	=> array(),
+							'class' => array(),
+							'style' => array(),
+						),
+						'b'		=> array(),
+					);
+					// sanitize
+					$data['notes'] = wp_kses( stripslashes($request['wcpdf_'.$document_type.'_notes']), $allowed_html );
+				}
+				
+			}
+
+		}
+
+		return $data;
 	}
 }
 

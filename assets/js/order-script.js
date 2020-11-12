@@ -92,25 +92,26 @@ jQuery(document).ready(function($) {
 			$value = $(this).val();
 			$form_inputs_data[$name] = $value;
 		} );
+		// convert data to json string
+		$form_data_json = JSON.stringify( $form_inputs_data );
+
 		// create an object with the data attributes
 		$form_data_attributes = $form.data();
-		// join both objects into one new
-		$form_data = $.extend( {}, $form_inputs_data, $form_data_attributes );
-		// convert data to json string
-		$form_data_json = JSON.stringify( $form_data );
 
 		// Make sure all feedback icons are hidden before each call
 		$form.find('.document-action-success, .document-action-failed').hide();
 
 		$.ajax({
-			url:     wpo_wcpdf_ajax.ajaxurl,
+			url:     			wpo_wcpdf_ajax.ajaxurl,
 			data:    {
-				action:					'wpo_wcpdf_regenerate_document',
-				security:				$(this).data('nonce'),
-				json_data:				$form_data_json,
+				action:			'wpo_wcpdf_regenerate_document',
+				security:		$(this).data('nonce'),
+				form_data:		$form_data_json,
+				order_id:		$form_data_attributes.order_id,
+				document_type:	$form_data_attributes.document,
 			},
-			type:    'POST',
-			context: $form,
+			type:    			'POST',
+			context: 			$form,
 			success: function( response ) {
 				if ( response.success ) {
 					$(this).find('.document-action-success').show();
