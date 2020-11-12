@@ -770,11 +770,11 @@ class Admin {
 	{
 		$data = array();
 
-		if( isset($form_data['_wcpdf_'.$document_slug.'_number']) && ! empty($form_data['_wcpdf_'.$document_slug.'_number']) ) {
-			$data['number'] = absint($form_data['_wcpdf_'.$document_slug.'_number']);
+		if( isset( $form_data['_wcpdf_'.$document_slug.'_number'] ) && ! empty( $form_data['_wcpdf_'.$document_slug.'_number'] ) ) {
+			$data['number'] = sanitize_text_field( $form_data['_wcpdf_'.$document_slug.'_number'] );
 		}
 
-		if( ! empty($form_data['_wcpdf_'.$document_slug.'_date']) ) {
+		if( ! empty( $form_data['_wcpdf_'.$document_slug.'_date'] ) ) {
 			$date = $form_data['_wcpdf_'.$document_slug.'_date'];
 			$hour = ! empty( $form_data['_wcpdf_'.$document_slug.'_date_hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date_hour'] : '00';
 			$minute = ! empty( $form_data['_wcpdf_'.$document_slug.'_date_minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date_minute'] : '00';
