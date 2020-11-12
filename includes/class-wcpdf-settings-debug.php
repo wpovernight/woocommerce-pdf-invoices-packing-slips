@@ -54,7 +54,7 @@ class Settings_Debug {
 						$old_path = WPO_WCPDF()->main->get_tmp_base( false );
 						$new_path = WPO_WCPDF()->main->get_tmp_base();
 						WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
-						printf('<div class="notice notice-success"><p>%s</p></div>', sprintf( __( 'Temporary folder moved to `%s`', 'woocommerce-pdf-invoices-packing-slips' ), $new_path ) ); 
+						printf('<div class="notice notice-success"><p>%s</p></div>', sprintf( __( 'Temporary folder moved to %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$new_path.'</code>' ) ); 
 					}
 					?>
 				</form>
