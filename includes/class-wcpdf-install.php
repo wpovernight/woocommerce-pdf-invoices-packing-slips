@@ -72,12 +72,12 @@ class Install {
 			return;
 		}
 
-		// Create temp folders
+		// Get tmp folders
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
 		// check if tmp folder exists => if not, initialize 
 		if ( $tmp_base !== false && !@is_dir( $tmp_base ) ) {
-			WPO_WCPDF()->main->init_tmp( $tmp_base );
+			WPO_WCPDF()->main->init_tmp();
 		}
 
 		// Unsupported currency symbols 
@@ -195,7 +195,7 @@ class Install {
 
 		// check if tmp folder exists => if not, initialize 
 		if ( $tmp_base !== false && !@is_dir( $tmp_base ) ) {
-			WPO_WCPDF()->main->init_tmp( $tmp_base );
+			WPO_WCPDF()->main->init_tmp();
 		} else {
 			$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
 			// don't try merging fonts with local when updating pre 2.0
@@ -364,7 +364,7 @@ class Install {
 
 		// check if tmp folder exists => if not, initialize 
 		if ( !@is_dir( $tmp_base ) ) {
-			WPO_WCPDF()->main->init_tmp( $tmp_base );
+			WPO_WCPDF()->main->init_tmp();
 		} else {
 			$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
 			WPO_WCPDF()->main->copy_fonts( $font_path );
