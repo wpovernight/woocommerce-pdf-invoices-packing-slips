@@ -770,7 +770,7 @@ class Admin {
 	{
 		$data = array();
 
-		if( isset( $form_data['_wcpdf_'.$document_slug.'_number'] ) && ! empty( $form_data['_wcpdf_'.$document_slug.'_number'] ) ) {
+		if( isset( $form_data['_wcpdf_'.$document_slug.'_number'] ) ) {
 			$data['number'] = sanitize_text_field( $form_data['_wcpdf_'.$document_slug.'_number'] );
 		}
 
