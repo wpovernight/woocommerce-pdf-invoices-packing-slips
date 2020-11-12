@@ -534,7 +534,7 @@ class Admin {
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
 				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
-				$invoice->set_data( $order, $document_data );
+				$invoice->set_data( $document_data, $order );
 				$invoice->save();
 			}
 		}
