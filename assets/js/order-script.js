@@ -89,9 +89,11 @@ jQuery(document).ready(function($) {
 		$form_inputs_data = {};
 		$form.find(':input').each( function() {
 			$name = $(this).attr("name");
+			$name = $name.split('[', 1)[0]; // for credit-note array []
 			$value = $(this).val();
 			$form_inputs_data[$name] = $value;
 		} );
+
 		// convert data to json string
 		$form_data_json = JSON.stringify( $form_inputs_data );
 
