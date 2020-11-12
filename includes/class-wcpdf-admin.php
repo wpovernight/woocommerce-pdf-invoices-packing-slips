@@ -527,13 +527,13 @@ class Admin {
 		$post_type = get_post_type( $post_id );
 		if( $post_type == 'shop_order' ) {
 			// bail if this is not an actual 'Save order' action
-			if ( ! isset($_POST['action']) || ! in_array($_POST['action'], array( 'editpost' )) ) {
+			if ( ! isset($_POST['action']) || $_POST['action'] != 'editpost' ) {
 				return;
 			}
 
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				$document_data = $this->process_order_document_form_data( $_POST, $invoice->type );
+				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
 				$invoice->set_data( $order, $document_data );
 				$invoice->save();
 			}
@@ -708,7 +708,13 @@ class Admin {
 			) );
 		}
 
-		if( empty($_POST['form_data']) || empty($_POST['order_id']) || empty($_POST['document_slug']) ) {
+		if ( ! isset($_POST['action']) || $_POST['action'] != 'wpo_wcpdf_regenerate_document' ) {
+			wp_send_json_error( array(
+				'message' => 'bad action',
+			) );
+		}
+
+		if( empty($_POST['form_data']) || empty($_POST['order_id']) || empty($_POST['document_type']) ) {
 			wp_send_json_error( array(
 				'message' => 'incomplete request',
 			) );
@@ -722,14 +728,14 @@ class Admin {
 
 		$order_id = absint( $_POST['order_id'] );
 		$order = WCX::get_order( $order_id );
-		$document_slug = sanitize_text_field( $_POST['document_slug'] );
+		$document_type = sanitize_text_field( $_POST['document_type'] );
 		$form_data = json_decode( stripslashes( $_POST['form_data'] ), true );
 
 		try {
-			$document = wcpdf_get_document( $document_slug, wc_get_order( $order_id ) );
+			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 			if ( !empty($document) && $document->exists() ) {
 				// save document data
-				$document_data = $this->process_order_document_form_data( $form_data, $document_slug );
+				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
 				$document->regenerate( $order, $document_data );
 
 				$response = array(
@@ -763,9 +769,6 @@ class Admin {
 	public function process_order_document_form_data( $form_data, $document_slug )
 	{
 		$data = array();
-
-		// replace dash with underscore for two words documents
-		$document_slug = str_replace( '-', '_', $document_slug );
 
 		if( isset($form_data['_wcpdf_'.$document_slug.'_number']) && ! empty($form_data['_wcpdf_'.$document_slug.'_number']) ) {
 			$data['number'] = absint($form_data['_wcpdf_'.$document_slug.'_number']);

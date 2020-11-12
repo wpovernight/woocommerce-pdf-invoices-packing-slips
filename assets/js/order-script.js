@@ -108,7 +108,7 @@ jQuery(document).ready(function($) {
 				security:		$(this).data('nonce'),
 				form_data:		$form_data_json,
 				order_id:		$form_data_attributes.order_id,
-				document_slug:	$form_data_attributes.document,
+				document_type:	$form_data_attributes.document,
 			},
 			type:    			'POST',
 			context: 			$form,
