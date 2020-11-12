@@ -33,7 +33,11 @@ jQuery(document).ready(function($) {
 
 	// enable invoice number edit if user initiated
 	$( ".wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes" ).click(function() {
-		$form = $(this).closest('.wcpdf-data-fields');
+		$form = $(this).closest('.wcpdf-data-fields-section');
+		if ($form.length == 0) { // no section, take overall wrapper
+			$form = $(this).closest('.wcpdf-data-fields');
+		}
+
 		// check visibility
 		if( $form.find(".read-only").is(":visible") ) {
 			$form.find(".read-only").hide();
