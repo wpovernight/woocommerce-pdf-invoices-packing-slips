@@ -21,7 +21,7 @@ if ( !class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '2.7.1';
+	public $version = '2.7.0';
 	public $plugin_basename;
 	public $legacy_mode;
 
