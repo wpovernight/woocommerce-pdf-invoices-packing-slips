@@ -494,13 +494,15 @@ class Main {
 		$tmp_base = $this->get_tmp_base();
 
 		// create plugin base temp folder
-		$dir = mkdir( $tmp_base );
+		if ( ! is_dir( $tmp_base ) ) {
+			$dir = mkdir( $tmp_base );
 
-		// don't continue if we don't have an upload dir
-		if ( ! $dir ) {
-			update_option( 'wpo_wcpdf_no_dir_error', $tmp_base );
-			wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
-			return false;
+			// don't continue if we don't have an upload dir
+			if ( ! $dir ) {
+				update_option( 'wpo_wcpdf_no_dir_error', $tmp_base );
+				wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
+				return false;
+			}
 		}
 
 		// create subfolders & protect
