@@ -274,7 +274,7 @@ class Admin {
 		// Invoice number & date
 		add_meta_box(
 			'wpo_wcpdf-data-input-box',
-			__( 'PDF Invoice data', 'woocommerce-pdf-invoices-packing-slips' ),
+			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'data_input_box_content' ),
 			'shop_order',
 			'normal',
