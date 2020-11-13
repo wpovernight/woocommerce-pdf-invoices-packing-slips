@@ -135,14 +135,9 @@ td.order-data {
 	width: 30%;
 }
 
-td.order-data table {
-	width: 100%;
-}
-
 td.order-data table th {
 	font-weight: normal;
 	padding-right: 2mm;
-	width: 50%;
 }
 
 /* Order details */
