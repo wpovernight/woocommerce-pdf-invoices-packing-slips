@@ -533,7 +533,7 @@ class Main {
 
 	public function no_dir_notice() {
 		$path = get_option( 'wpo_wcpdf_no_dir_error' );
-		if ( $path && ! get_option( 'wpo_wcpdf_hide_no_dir_notice' ) ) {
+		if ( $path ) {
 			ob_start();
 			?>
 			<div class="error">
