@@ -53,6 +53,11 @@ class Main {
 
 		// apply header logo height
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
+
+		// show notices of missing required directories
+		if( get_option( 'wpo_wcpdf_no_dir_error' ) ) {
+			add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
+		}
 	}
 
 	/**
@@ -489,18 +494,30 @@ class Main {
 		$tmp_base = $this->get_tmp_base();
 
 		// create plugin base temp folder
-		mkdir( $tmp_base );
+		if ( ! is_dir( $tmp_base ) ) {
+			$dir = mkdir( $tmp_base );
 
-		if (!is_dir($tmp_base)) {
-			wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
+			// don't continue if we don't have an upload dir
+			if ( ! $dir ) {
+				update_option( 'wpo_wcpdf_no_dir_error', $tmp_base );
+				wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
+				return false;
+			}
 		}
 
 		// create subfolders & protect
 		$subfolders = array( 'attachments', 'fonts', 'dompdf' );
 		foreach ( $subfolders as $subfolder ) {
 			$path = $tmp_base . $subfolder . '/';
-			if ( !is_dir( $path ) ) {
-				mkdir( $path );
+			if ( ! is_dir( $path ) ) {
+				$dir = mkdir( $path );
+
+				// check if we have dir
+				if ( ! $dir ) {
+					update_option( 'wpo_wcpdf_no_dir_error', $path );
+					wcpdf_log_error( "Unable to create folder {$path}", 'critical' );
+					return false;
+				}
 			}
 
 			// copy font files
@@ -511,6 +528,28 @@ class Main {
 			// create .htaccess file and empty index.php to protect in case an open webfolder is used!
 			file_put_contents( $path . '.htaccess', 'deny from all' );
 			touch( $path . 'index.php' );
+		}
+	}
+
+	public function no_dir_notice() {
+		$path = get_option( 'wpo_wcpdf_no_dir_error' );
+		if ( $path ) {
+			ob_start();
+			?>
+			<div class="error">
+				<p><?php printf( __( "The %s directory %s couldn't be created!", 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+				<p><?php _e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo ob_get_clean();
+
+			// save option to hide notice
+			if ( isset( $_GET['wpo_wcpdf_hide_no_dir_notice'] ) ) {
+				delete_option( 'wpo_wcpdf_no_dir_error', true );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			}
 		}
 	}
 
