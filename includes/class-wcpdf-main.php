@@ -98,6 +98,9 @@ class Main {
 		}
 
 		$tmp_path = $this->get_tmp_path('attachments');
+		if ( !@is_dir( $tmp_path ) ) {
+			return $attachments;
+		}
 
 		// clear pdf files from temp folder (from http://stackoverflow.com/a/13468943/1446634)
 		// array_map('unlink', ( glob( $tmp_path.'*.pdf' ) ? glob( $tmp_path.'*.pdf' ) : array() ) );
