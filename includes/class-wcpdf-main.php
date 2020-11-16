@@ -403,11 +403,17 @@ class Main {
 		}
 
 		// double check for existence, in case tmp_base was installed, but subfolder not created
-		if ( !@is_dir( $tmp_path ) ) {
-			@mkdir( $tmp_path );
+		if ( ! is_dir( $tmp_path ) ) {
+			$dir = mkdir( $tmp_path );
+
+			if ( ! $dir ) {
+				update_option( 'wpo_wcpdf_no_dir_error', $tmp_path );
+				wcpdf_log_error( "Unable to create folder {$tmp_path}", 'critical' );
+				return false;
+			}
 		}
 
-		return $tmp_path;
+		return apply_filters( 'wpo_wcpdf_tmp_path_{$type}', $tmp_path );;
 	}
 
 	/**
@@ -559,7 +565,16 @@ class Main {
 	public function copy_directory ( $old_path, $new_path ) {
 		if( empty($old_path) || empty($new_path) ) return;
 		if( ! is_dir($old_path) ) return;
-		if( ! is_dir($new_path) ) mkdir($new_path);
+		if( ! is_dir($new_path) ) {
+			$dir = mkdir($new_path);
+
+			// check if we have dir
+			if ( ! $dir ) {
+				update_option( 'wpo_wcpdf_no_dir_error', $new_path );
+				wcpdf_log_error( "Unable to create folder {$new_path}", 'critical' );
+				return false;
+			}
+		}
 
 		global $wp_filesystem;
 
