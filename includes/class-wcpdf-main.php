@@ -13,6 +13,8 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
 
 class Main {
 
+	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
+
 	function __construct()	{
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
@@ -56,7 +58,13 @@ class Main {
 
 		// show notices of missing required directories
 		if( get_option( 'wpo_wcpdf_no_dir_error' ) ) {
-			add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
+			// if all folders exist and are writable delete the option
+			if( $this->folders_exist_and_writable() ) {
+				delete_option( 'wpo_wcpdf_no_dir_error' );
+			// if not, show notice
+			} else {
+				add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
+			}
 		}
 	}
 
@@ -98,7 +106,7 @@ class Main {
 		}
 
 		$tmp_path = $this->get_tmp_path('attachments');
-		if ( !@is_dir( $tmp_path ) ) {
+		if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
 			return $attachments;
 		}
 
@@ -381,7 +389,7 @@ class Main {
 		}
 
 		// check if tmp folder exists => if not, initialize
-		if ( !@is_dir( $tmp_base ) ) {
+		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) ) {
 			$this->init_tmp();
 		}
 
@@ -414,6 +422,10 @@ class Main {
 				wcpdf_log_error( "Unable to create folder {$tmp_path}", 'critical' );
 				return false;
 			}
+		} elseif( ! wp_is_writable( $tmp_path ) ) {
+			update_option( 'wpo_wcpdf_no_dir_error', $tmp_path );
+			wcpdf_log_error( "Temp folder {$tmp_path} not writable", 'critical' );
+			return false;
 		}
 
 		return apply_filters( 'wpo_wcpdf_tmp_path_{$type}', $tmp_path );;
@@ -512,11 +524,14 @@ class Main {
 				wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
 				return false;
 			}
+		} elseif( ! wp_is_writable( $tmp_base ) ) {
+			update_option( 'wpo_wcpdf_no_dir_error', $tmp_base );
+			wcpdf_log_error( "Temp folder {$tmp_base} not writable", 'critical' );
+			return false;
 		}
 
 		// create subfolders & protect
-		$subfolders = array( 'attachments', 'fonts', 'dompdf' );
-		foreach ( $subfolders as $subfolder ) {
+		foreach ( $this->subfolders as $subfolder ) {
 			$path = $tmp_base . $subfolder . '/';
 			if ( ! is_dir( $path ) ) {
 				$dir = mkdir( $path );
@@ -527,6 +542,10 @@ class Main {
 					wcpdf_log_error( "Unable to create folder {$path}", 'critical' );
 					return false;
 				}
+			} elseif( ! wp_is_writable( $path ) ) {
+				update_option( 'wpo_wcpdf_no_dir_error', $path );
+				wcpdf_log_error( "Temp folder {$path} not writable", 'critical' );
+				return false;
 			}
 
 			// copy font files
@@ -546,7 +565,7 @@ class Main {
 			ob_start();
 			?>
 			<div class="error">
-				<p><?php printf( __( "The %s directory %s couldn't be created!", 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+				<p><?php printf( __( "The %s directory %s couldn't be created or is not writable!", 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
 				<p><?php _e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
@@ -577,6 +596,10 @@ class Main {
 				wcpdf_log_error( "Unable to create folder {$new_path}", 'critical' );
 				return false;
 			}
+		} elseif( ! wp_is_writable( $new_path ) ) {
+			update_option( 'wpo_wcpdf_no_dir_error', $new_path );
+			wcpdf_log_error( "Temp folder {$new_path} not writable", 'critical' );
+			return false;
 		}
 
 		global $wp_filesystem;
@@ -597,6 +620,28 @@ class Main {
 			wcpdf_log_error( "Unable to copy directory contents: ".$e->getMessage(), 'critical', $e );
 			return;
 		}
+	}
+
+	/**
+	 * checks if the plugin folders exist and are writable
+	 */
+	private function folders_exist_and_writable()
+	{
+		// tmp base
+		$tmp_base = $this->get_tmp_base();
+		if( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) ) {
+			return false;
+		}
+
+		// subfolders
+		foreach( $this->subfolders as $type ) {
+			$tmp_path = $this->get_tmp_path( $type );
+			if( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_base ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
