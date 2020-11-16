@@ -59,7 +59,7 @@ class Main {
 		// show notices of missing required directories
 		if( get_option( 'wpo_wcpdf_no_dir_error' ) ) {
 			// if all folders exist and are writable delete the option
-			if( $this->folders_exist_and_writable() ) {
+			if( $this->tmp_folders_exist_and_writable() ) {
 				delete_option( 'wpo_wcpdf_no_dir_error' );
 			// if not, show notice
 			} else {
@@ -623,9 +623,9 @@ class Main {
 	}
 
 	/**
-	 * checks if the plugin folders exist and are writable
+	 * checks if the plugin tmp folders exist and are writable
 	 */
-	private function folders_exist_and_writable()
+	private function tmp_folders_exist_and_writable()
 	{
 		// tmp base
 		$tmp_base = $this->get_tmp_base();
