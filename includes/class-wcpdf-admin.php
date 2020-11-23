@@ -816,7 +816,8 @@ class Admin {
 				'b'		=> array(),
 			);
 			// sanitize
-			$data['notes'] = wp_kses( stripslashes($form_data['_wcpdf_'.$document_slug.'_notes']), $allowed_html );
+			$notes = sanitize_textarea_field( wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html ) );
+			$data['notes'] = nl2br( $notes );
 		}
 
 		return $data;
