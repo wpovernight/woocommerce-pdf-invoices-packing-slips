@@ -304,10 +304,16 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_delete_document', $this, $order );
 	}
 
-	public function regenerate( $order = null ) {
+	public function regenerate( $order = null, $data = null ) {
 		$order = empty( $order ) ? $this->order : $order;
 		if ( empty( $order ) ) {
 			return; //Nothing to update
+		}
+
+		// pass data to setter functions
+		if( ! empty( $data ) ) {
+			$this->set_data( $data, $order );
+			$this->save();
 		}
 
 		//Get most current settings

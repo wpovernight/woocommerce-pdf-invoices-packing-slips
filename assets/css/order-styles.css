@@ -38,10 +38,16 @@
 	}
 }
 
+#wpo_wcpdf-data-input-box > .inside {
+	margin: 0;
+	padding: 10px 0;
+	background-color: #f8f8f8;
+}
+
 #wpo_wcpdf-data-input-box h4 {
 	font-size: 14px;
 	line-height: 1.4;
-	margin: 1.5em 0 0 0;
+	margin: 0;
 }
 
 #wpo_wcpdf-data-input-box p {
@@ -50,6 +56,19 @@
 
 #wpo_wcpdf-data-input-box .form-field input {
 	width: auto;
+}
+
+.wcpdf-data-fields {
+	margin-left: 10px;
+	margin-right: 10px;
+	padding: 10px;
+	margin-bottom: 10px;
+	background-color: white;
+	border-bottom: 1px solid #dfdfdf;
+}
+
+.wcpdf-data-fields:last-child {
+	margin-bottom: 0;
 }
 
 .wcpdf-data-fields .read-only {
