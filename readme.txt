@@ -107,7 +107,6 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: Prevent infinite loop when temporary folder is not writable
 * Fix: Prevent layout issues when custom order data exceeds column width
 * Fix: Error when PHP Ctype extension is not installed
-* Fix: PHP8.0 compatibility
 * Tested up to WooCommerce 4.8 & WP 5.6
 
 = 2.7.1 =
