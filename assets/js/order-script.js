@@ -92,10 +92,12 @@ jQuery(document).ready(function($) {
 		// create an object with the form inputs data
 		form_inputs_data = {};
 		$form.find(':input').each( function() {
-			name = $(this).attr("name");
-			name = name.split('[', 1)[0]; // for credit-note array []
-			value = $(this).val();
-			form_inputs_data[name] = value;
+			if (!$(this).is(':disabled')) {
+				name = $(this).attr("name");
+				name = name.split('[', 1)[0]; // for credit-note array []
+				value = $(this).val();
+				form_inputs_data[name] = value;
+			}
 		} );
 
 		// convert data to json string
