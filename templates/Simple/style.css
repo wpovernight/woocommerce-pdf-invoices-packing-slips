@@ -73,7 +73,6 @@ table {
 th, td {
 	vertical-align: top;
 	text-align: left;
-	word-wrap: break-word;
 }
 
 table.container {
@@ -121,6 +120,10 @@ td.shop-info {
 table.order-data-addresses {
 	width: 100%;
 	margin-bottom: 10mm;
+}
+
+table.order-data-addresses td.address {
+	word-wrap: break-word;
 }
 
 td.order-data {
