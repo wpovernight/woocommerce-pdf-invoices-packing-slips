@@ -203,6 +203,18 @@ class Settings_Debug {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'legacy_textdomain',
+				'title'			=> __( 'Legacy textdomain fallback', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'legacy_textdomain',
+					'description'	=> __( "Legacy textdomain fallback ensures compatibility with translation files from versions prior to 2017-05-15.", 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'guest_access',
 				'title'			=> __( 'Allow guest access', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',

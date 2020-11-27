@@ -24,6 +24,7 @@ class WPO_WCPDF {
 	public $version = '2.7.2';
 	public $plugin_basename;
 	public $legacy_mode;
+	public $legacy_textdomain;
 
 	protected static $_instance = null;
 
@@ -49,10 +50,14 @@ class WPO_WCPDF {
 
 		// load the localisation & classes
 		add_action( 'plugins_loaded', array( $this, 'translations' ) );
-		add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
 		add_action( 'plugins_loaded', array( $this, 'load_classes' ), 9 );
 		add_action( 'in_plugin_update_message-'.$this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
+
+		// legacy textdomain fallback
+		if ( $this->legacy_textdomain_enabled() === true ) {
+			add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
+		}
 	}
 
 	/**
@@ -225,6 +230,16 @@ class WPO_WCPDF {
 		return $this->legacy_mode;
 	}
 
+	/**
+	 * Check if legacy textdomain fallback is enabled
+	 */
+	public function legacy_textdomain_enabled() {
+		if (!isset($this->legacy_textdomain)) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug' );
+			$this->legacy_textdomain = isset($debug_settings['legacy_textdomain']);
+		}
+		return $this->legacy_textdomain;
+	}
 
 	/**
 	 * Check if woocommerce is activated
