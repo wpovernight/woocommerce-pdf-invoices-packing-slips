@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.6
 Requires PHP: 5.3
-Stable tag: 2.7.2
+Stable tag: 2.7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.7.3 =
+* New: Support for line breaks in invoice notes
+* Fix: Only pass opened edit fields when regenerating document
+* Fix: Words in table headers could be broken up
+* Deprecated: legacy translations (pre-2.0) are no longer read automatically (can be enabled in the Status tab)
 
 = 2.7.2 =
 * Fix: Update invoice number and date when regenerating document from edit mode
