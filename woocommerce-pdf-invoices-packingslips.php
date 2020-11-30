@@ -224,7 +224,7 @@ class WPO_WCPDF {
 	 */
 	public function legacy_mode_enabled() {
 		if (!isset($this->legacy_mode)) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug' );
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 			$this->legacy_mode = isset($debug_settings['legacy_mode']);
 		}
 		return $this->legacy_mode;
@@ -235,7 +235,7 @@ class WPO_WCPDF {
 	 */
 	public function legacy_textdomain_enabled() {
 		if (!isset($this->legacy_textdomain)) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug' );
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 			$this->legacy_textdomain = isset($debug_settings['legacy_textdomain']);
 		}
 		return $this->legacy_textdomain;
