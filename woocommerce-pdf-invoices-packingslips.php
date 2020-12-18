@@ -390,26 +390,23 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function mailpoet_mta_detected() {
-		$mailpoet = $this->namespace_exists( 'MailPoet' );
-		if( $mailpoet ) {
-			if( class_exists('\\MailPoet\\Settings\\SettingsController') ) {
-				$settings = \MailPoet\Settings\SettingsController::getInstance();
-				if( empty($settings) ) return;
-				$mta = $settings->get('mta');
+		if( is_callable( array( '\\MailPoet\\Settings\\SettingsController', 'getInstance' ) ) ) {
+			$settings = \MailPoet\Settings\SettingsController::getInstance();
+			if( empty($settings) ) return;
+			$mta = $settings->get('mta');
 
-				if( ! empty($mta) && ! empty($mta['method']) && $mta['method'] == 'MailPoet' && ! get_option('wpo_wcpdf_hide_mailpoet_notice') ) {
-					ob_start();
-					?>
-					<div class="error">
-						<img src="<?php echo $this->plugin_url() . "/assets/images/mailpoet.svg"; ?>" style="margin-top:10px;">
-						<p><?php printf( __( 'When sending emails with MailPoet 3 and the active sending method is MailPoet Sending Service, MailPoet does not include the %s attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ); ?></p>
-						<p><?php printf( __( 'To fix this you should select other method like %s or %s.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>'.__('Your web host / web server', 'woocommerce-pdf-invoices-packing-slips').'</strong>', '<strong>SMTP</strong>' ); ?></p>
-						<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=mailpoet-settings#/mta' ) ); ?>"><?php _e( 'Change MailPoet sending method', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-						<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-					</div>
-					<?php
-					echo ob_get_clean();
-				}
+			if( ! empty($mta) && ! empty($mta['method']) && $mta['method'] == 'MailPoet' && ! get_option('wpo_wcpdf_hide_mailpoet_notice') ) {
+				ob_start();
+				?>
+				<div class="error">
+					<img src="<?php echo $this->plugin_url() . "/assets/images/mailpoet.svg"; ?>" style="margin-top:10px;">
+					<p><?php printf( __( 'When sending emails with MailPoet 3 and the active sending method is MailPoet Sending Service, MailPoet does not include the %s attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ); ?></p>
+					<p><?php printf( __( 'To fix this you should select other method like %s or %s.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>'.__('Your web host / web server', 'woocommerce-pdf-invoices-packing-slips').'</strong>', '<strong>SMTP</strong>' ); ?></p>
+					<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=mailpoet-settings#/mta' ) ); ?>"><?php _e( 'Change MailPoet sending method', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+				</div>
+				<?php
+				echo ob_get_clean();
 			}
 		}
 
@@ -419,20 +416,6 @@ class WPO_WCPDF {
 			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 			exit;
 		}
-	}
-
-	/**
-	 * Check for namespace existence.
-	 * @return bool
-	 */
-	public function namespace_exists( $namespace ) {
-		$namespace .= "\\";
-		foreach( get_declared_classes() as $name ) {
-			if( strpos($name, $namespace) === 0) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
