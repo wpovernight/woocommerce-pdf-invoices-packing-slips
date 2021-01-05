@@ -56,16 +56,8 @@ class Main {
 		// apply header logo height
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
 
-		// show notices of missing required directories
-		if( get_option( 'wpo_wcpdf_no_dir_error' ) ) {
-			// if all folders exist and are writable delete the option
-			if( $this->tmp_folders_exist_and_writable() ) {
-				delete_option( 'wpo_wcpdf_no_dir_error' );
-			// if not, show notice
-			} else {
-				add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
-			}
-		}
+		// show notice of missing required directories
+		add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
 
 		// add custom webhook topics for documents
 		add_filter( 'woocommerce_webhook_topic_hooks', array( $this, 'wc_webhook_topic_hooks' ), 10, 2 );
@@ -568,23 +560,30 @@ class Main {
 	}
 
 	public function no_dir_notice() {
-		$path = get_option( 'wpo_wcpdf_no_dir_error' );
-		if ( $path ) {
-			ob_start();
-			?>
-			<div class="error">
-				<p><?php printf( __( "The %s directory %s couldn't be created or is not writable!", 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
-				<p><?php _e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-			</div>
-			<?php
-			echo ob_get_clean();
-
-			// save option to hide notice
-			if ( isset( $_GET['wpo_wcpdf_hide_no_dir_notice'] ) ) {
-				delete_option( 'wpo_wcpdf_no_dir_error', true );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-				exit;
+		if( is_admin() && ( $path = get_option( 'wpo_wcpdf_no_dir_error' ) ) ) {
+			// if all folders exist and are writable delete the option
+			if( $this->tmp_folders_exist_and_writable() ) {
+				delete_option( 'wpo_wcpdf_no_dir_error' );
+			// if not, show notice
+			} else {
+				if ( $path ) {
+					ob_start();
+					?>
+					<div class="error">
+						<p><?php printf( __( "The %s directory %s couldn't be created or is not writable!", 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+						<p><?php _e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+						<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+					</div>
+					<?php
+					echo ob_get_clean();
+		
+					// save option to hide notice
+					if ( isset( $_GET['wpo_wcpdf_hide_no_dir_notice'] ) ) {
+						delete_option( 'wpo_wcpdf_no_dir_error', true );
+						wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+						exit;
+					}
+				}
 			}
 		}
 	}
