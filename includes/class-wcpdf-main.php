@@ -66,6 +66,12 @@ class Main {
 				add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
 			}
 		}
+
+		// add custom webhook topics for documents
+		add_filter( 'woocommerce_webhook_topic_hooks', array( $this, 'wc_webhook_topic_hooks' ), 10, 2 );
+		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
+		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
+		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
 	}
 
 	/**
@@ -914,6 +920,35 @@ class Main {
 		ini_set( 'display_errors', 1 );
 	}
 
+	public function wc_webhook_topic_hooks( $topic_hooks, $wc_webhook ) {
+		$documents = WPO_WCPDF()->documents->get_documents();
+		foreach ($documents as $document) {
+			$topic_hooks["order.{$document->type}-saved"] = array(
+				"wpo_wcpdf_webhook_order_{$document->slug}_saved",
+			);
+		}
+		return $topic_hooks;
+	}
+
+	public function wc_webhook_topic_events( $topic_events ) {
+		$documents = WPO_WCPDF()->documents->get_documents();
+		foreach ($documents as $document) {
+			$topic_events[] = "{$document->type}-saved";
+		}
+		return $topic_events;
+	}
+
+	public function wc_webhook_topics( $topics ) {
+		$documents = WPO_WCPDF()->documents->get_documents();
+		foreach ($documents as $document) {
+			$topics["order.{$document->type}-saved"] = sprintf( __( 'Order %s Saved', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() );
+		}
+		return $topics;
+	}
+
+	public function wc_webhook_trigger( $document, $order ) {
+		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
+	}
 }
 
 endif; // class_exists
