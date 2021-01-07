@@ -211,9 +211,9 @@ class WPO_WCPDF {
 			return;
 		}
 
-		if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+		if ( has_filter( 'wpo_wcpdf_pdf_maker' ) === false && version_compare( PHP_VERSION, '7.1', '<' ) ) {
+			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
-			return;
 		}
 
 		// all systems ready - GO!
@@ -261,7 +261,6 @@ class WPO_WCPDF {
 	 *
 	 * @return string Fallack notice.
 	 */
-	 
 	public function need_woocommerce() {
 		$error = sprintf( __( 'WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
 		
@@ -273,11 +272,17 @@ class WPO_WCPDF {
 	/**
 	 * PHP version requirement notice
 	 */
-	
 	public function required_php_version() {
-		$error = __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
-		$how_to_update = __( 'How to update your PHP version', 'woocommerce-pdf-invoices-packing-slips' );
-		$message = sprintf('<div class="error"><p>%s</p><p><a href="%s">%s</a></p></div>', $error, 'http://docs.wpovernight.com/general/how-to-update-your-php-version/', $how_to_update);
+		$message = sprintf(
+			'<div class="error"><p>%s</p><p>%s <a href="%s">%s</a> %s <a href="%s">%s</a>.</p></div>',
+			__( 'WooCommerce PDF Invoices & Packing Slips requires PHP 7.1 or higher (7.1 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' ),
+			__( 'You should', 'woocommerce-pdf-invoices-packing-slips' ),
+			'http://docs.wpovernight.com/general/how-to-update-your-php-version/',
+			__( 'update your PHP version', 'woocommerce-pdf-invoices-packing-slips' ),
+			__( 'or', 'woocommerce-pdf-invoices-packing-slips' ),
+			'https://github.com/wpovernight/wcpdf-dompdf-0.8.3/releases',
+			__( 'download and install this add-on', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
 	
 		echo $message;
 	}
