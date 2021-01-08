@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '17a0f93a7c820ef8c23965f159d0e1db3cd53ed0',
+    'reference' => 'd259bb1f99339c894acb67bfccde5c0155787f23',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,15 +18,14 @@
       'aliases' => 
       array (
       ),
-      'reference' => '17a0f93a7c820ef8c23965f159d0e1db3cd53ed0',
+      'reference' => 'd259bb1f99339c894acb67bfccde5c0155787f23',
     ),
     'dompdf/dompdf' => 
     array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
+      'pretty_version' => 'v1.0.1',
+      'version' => '1.0.1.0',
       'aliases' => 
       array (
-        0 => '9999999-dev',
       ),
       'reference' => '45d260f2f6c6a542e0db3459470374c986a46d93',
     ),

@@ -1,11 +1,5 @@
 {
-	"repositories": [
-		{
-		"type": "git",
-		"url": "https://github.com/dompdf/dompdf.git"
-		}
-	],
-	"require": {
-		"dompdf/dompdf": "dev-master#45d260f2f6c6a542e0db3459470374c986a46d93"
-	}
+    "require": {
+        "dompdf/dompdf": "^1.0"
+    }
 }

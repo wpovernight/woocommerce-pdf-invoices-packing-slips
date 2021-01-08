@@ -2,12 +2,18 @@
     "packages": [
         {
             "name": "dompdf/dompdf",
-            "version": "dev-master",
-            "version_normalized": "dev-master",
+            "version": "v1.0.1",
+            "version_normalized": "1.0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
                 "reference": "45d260f2f6c6a542e0db3459470374c986a46d93"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/45d260f2f6c6a542e0db3459470374c986a46d93",
+                "reference": "45d260f2f6c6a542e0db3459470374c986a46d93",
+                "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
@@ -27,15 +33,14 @@
                 "ext-imagick": "Improves image processing performance",
                 "ext-zlib": "Needed for pdf stream compression"
             },
-            "time": "2020-12-31T13:29:53+00:00",
-            "default-branch": true,
+            "time": "2020-12-31T13:25:19+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
                     "dev-develop": "0.7-dev"
                 }
             },
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "psr-4": {
                     "Dompdf\\": "src/"
@@ -44,11 +49,7 @@
                     "lib/"
                 ]
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Dompdf\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "LGPL-2.1"
             ],
@@ -68,6 +69,10 @@
             ],
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
+            "support": {
+                "issues": "https://github.com/dompdf/dompdf/issues",
+                "source": "https://github.com/dompdf/dompdf/tree/v1.0.1"
+            },
             "install-path": "../dompdf/dompdf"
         },
         {

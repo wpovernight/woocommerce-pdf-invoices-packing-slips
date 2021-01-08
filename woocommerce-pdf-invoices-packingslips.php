@@ -273,17 +273,18 @@ class WPO_WCPDF {
 	 * PHP version requirement notice
 	 */
 	public function required_php_version() {
-		$message = sprintf(
-			'<div class="error"><p>%s</p><p>%s <a href="%s">%s</a> %s <a href="%s">%s</a>.</p></div>',
-			__( 'WooCommerce PDF Invoices & Packing Slips requires PHP 7.1 or higher (7.1 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' ),
-			__( 'You should', 'woocommerce-pdf-invoices-packing-slips' ),
-			'http://docs.wpovernight.com/general/how-to-update-your-php-version/',
-			__( 'update your PHP version', 'woocommerce-pdf-invoices-packing-slips' ),
-			__( 'or', 'woocommerce-pdf-invoices-packing-slips' ),
-			'https://github.com/wpovernight/wcpdf-dompdf-0.8.3/releases',
-			__( 'download and install this add-on', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
-	
+		$error_message	= __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 5.6 or higher (7.1 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
+		$php_message	= __( 'We strongly recommend to %supdate your PHP version%s.', 'woocommerce-pdf-invoices-packing-slips' );
+		$add_on_message	= __( 'If you cannot upgrade your PHP version, you can download %sthis addon%s to enable backwards compatibility with PHP5.6.', 'woocommerce-pdf-invoices-packing-slips' );
+
+		$message = '<div class="error">';
+		$message .= sprintf( '<p>%s</p>', $error_message );
+		$message .= sprintf( '<p>'.$php_message.'</p>', '<a href="https://docs.wpovernight.com/general/how-to-update-your-php-version/" target="_blank">', '</a>' );
+		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
+			$message .= sprintf( '<p>'.$add_on_message.'</p>', '<a href="https://github.com/wpovernight/wcpdf-dompdf-0.8.3/releases" target="_blank">', '</a>' );
+		}
+		$message .= '</div>';
+
 		echo $message;
 	}
 

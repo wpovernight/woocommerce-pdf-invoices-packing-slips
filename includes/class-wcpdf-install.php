@@ -61,8 +61,8 @@ class Install {
 	 * Plugin install method. Perform any installation tasks here
 	 */
 	protected function install() {
-		// only install when php 7.1 or higher
-		if ( version_compare( PHP_VERSION, '7.1', '<' ) ) {
+		// only install when php 5.6 or higher
+		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 			return;
 		}
 
@@ -185,8 +185,8 @@ class Install {
 	 * @param string $installed_version the currently installed ('old') version
 	 */
 	protected function upgrade( $installed_version ) {
-		// only upgrade when php 7.1 or higher
-		if ( version_compare( PHP_VERSION, '7.1', '<' ) ) {
+		// only upgrade when php 5.6 or higher
+		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 			return;
 		}
 
