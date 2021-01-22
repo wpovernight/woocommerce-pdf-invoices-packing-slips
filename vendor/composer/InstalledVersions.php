@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'd259bb1f99339c894acb67bfccde5c0155787f23',
+    'reference' => '9315d076090b6d7a2b7a28beb869abbd855d6a10',
     'name' => '__root__',
   ),
   'versions' => 
@@ -41,16 +41,16 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'd259bb1f99339c894acb67bfccde5c0155787f23',
+      'reference' => '9315d076090b6d7a2b7a28beb869abbd855d6a10',
     ),
     'dompdf/dompdf' => 
     array (
-      'pretty_version' => 'v1.0.1',
-      'version' => '1.0.1.0',
+      'pretty_version' => 'v1.0.2',
+      'version' => '1.0.2.0',
       'aliases' => 
       array (
       ),
-      'reference' => '45d260f2f6c6a542e0db3459470374c986a46d93',
+      'reference' => '8768448244967a46d6e67b891d30878e0e15d25c',
     ),
     'phenx/php-font-lib' => 
     array (

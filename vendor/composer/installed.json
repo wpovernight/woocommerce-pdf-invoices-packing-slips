@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "dompdf/dompdf",
-            "version": "v1.0.1",
-            "version_normalized": "1.0.1.0",
+            "version": "v1.0.2",
+            "version_normalized": "1.0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "45d260f2f6c6a542e0db3459470374c986a46d93"
+                "reference": "8768448244967a46d6e67b891d30878e0e15d25c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/45d260f2f6c6a542e0db3459470374c986a46d93",
-                "reference": "45d260f2f6c6a542e0db3459470374c986a46d93",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/8768448244967a46d6e67b891d30878e0e15d25c",
+                "reference": "8768448244967a46d6e67b891d30878e0e15d25c",
                 "shasum": ""
             },
             "require": {
@@ -33,7 +33,7 @@
                 "ext-imagick": "Improves image processing performance",
                 "ext-zlib": "Needed for pdf stream compression"
             },
-            "time": "2020-12-31T13:25:19+00:00",
+            "time": "2021-01-08T14:18:52+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -71,7 +71,7 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/v1.0.1"
+                "source": "https://github.com/dompdf/dompdf/tree/v1.0.2"
             },
             "install-path": "../dompdf/dompdf"
         },
