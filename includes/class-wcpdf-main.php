@@ -339,6 +339,8 @@ class Main {
 			$document = wcpdf_get_document( $document_type, $order_ids, true );
 
 			if ( $document ) {
+				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself)
+
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
 				// allow URL override
 				if ( isset( $_GET['output'] ) && in_array( $_GET['output'], array( 'html', 'pdf' ) ) ) {
