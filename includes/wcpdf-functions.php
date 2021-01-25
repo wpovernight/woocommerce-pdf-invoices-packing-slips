@@ -217,3 +217,13 @@ function wcpdf_output_error( $message, $level = 'error', $e = null ) {
 	</div>
 	<?php
 }
+
+/**
+ * Date formatting function
+ *
+ * @param object $document
+ * @param string $date_type Optional. A date type to be filtered eg. 'invoice_date', 'date_created', 'date_modified', 'order_date', 'date_paid', 'date_completed', 'current_date'.
+ */
+function wcpdf_date_format( $document = null, $date_type = null ) {
+	return apply_filters( 'wpo_wcpdf_date_format', wc_date_format(), $document, $date_type );
+}
