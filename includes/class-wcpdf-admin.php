@@ -371,7 +371,7 @@ class Admin {
 			$data['slug']               = $invoice->slug;
 			$data['title']              = ! empty( $invoice->get_title() ) ? $invoice->get_title() : '';
 			$data['number_formatted']   = ! empty( $invoice->get_number() ) ? $invoice->get_number()->get_formatted() : '';
-			$data['number_unformatted'] = ! empty( $data['number'] ) ? $data['number']->get_plain() : '';
+			$data['number_unformatted'] = ! empty( $invoice->get_number() ) ? $invoice->get_number()->get_plain() : '';
 			$data['date_formatted']     = ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '';
 			$data['date']               = ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( 'Y-m-d' ) : '';
 			$data['date_hour']          = ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( 'H' ) : '';
