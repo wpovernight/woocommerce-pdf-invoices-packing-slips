@@ -400,7 +400,7 @@ class Admin {
 							<p class="form-field form-field-wide">
 								<p>
 									<span><strong><?php _e( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></span>
-									<span><?php if (!empty($invoice_date)) echo $invoice_date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date' ).' @ '.wc_time_format() ); ?></span>
+									<span><?php if (!empty($invoice_date)) echo $invoice_date->date_i18n( wc_date_format().' @ '.wc_time_format() ); ?></span>
 								</p>
 							</p>
 						</div>
