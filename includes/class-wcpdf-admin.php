@@ -405,15 +405,15 @@ class Admin {
 
 				<!-- Read only -->
 				<div class="read-only">
-					<div class="<?= $data['slug']; ?>-number">
-						<p class="form-field _wcpdf_<?= $data['type']; ?>_number_field">	
+					<div class="<?= $data['type']; ?>-number">
+						<p class="form-field _wcpdf_<?= $data['slug']; ?>_number_field">	
 							<p>
 								<span><strong><?php echo sprintf( __( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ), $data['title'] ); ?></strong></span>
 								<span><?= $data['number_formatted']; ?></span>
 							</p>
 						</p>
 					</div>
-					<div class="<?= $data['slug']; ?>-date">
+					<div class="<?= $data['type']; ?>-date">
 						<p class="form-field form-field-wide">
 							<p>
 								<span><strong><?php echo sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $data['title'] ); ?></strong></span>
@@ -426,20 +426,20 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable">
-					<p class="form-field _wcpdf_<?= $data['type']; ?>_number_field ">
-						<label for="_wcpdf_<?= $data['type']; ?>_number"><?php echo sprintf( __( '%s Number (unformatted!):', 'woocommerce-pdf-invoices-packing-slips' ), $data['title'] ); ?></label>
+					<p class="form-field _wcpdf_<?= $data['slug']; ?>_number_field ">
+						<label for="_wcpdf_<?= $data['slug']; ?>_number"><?php echo sprintf( __( '%s Number (unformatted!):', 'woocommerce-pdf-invoices-packing-slips' ), $data['title'] ); ?></label>
 						<?php if ( ! empty( $data['number_unformatted'] ) ) : ?>
-							<input type="text" class="short" style="" name="_wcpdf_<?= $data['type']; ?>_number" id="_wcpdf_<?= $data['type']; ?>_number" value="<?= $data['number_unformatted']; ?>" disabled="disabled" >
+							<input type="text" class="short" style="" name="_wcpdf_<?= $data['slug']; ?>_number" id="_wcpdf_<?= $data['slug']; ?>_number" value="<?= $data['number_unformatted']; ?>" disabled="disabled" >
 						<?php else : ?>
-							<input type="text" class="short" style="" name="_wcpdf_<?= $data['type']; ?>_number" id="_wcpdf_<?= $data['type']; ?>_number" value="" disabled="disabled" >
+							<input type="text" class="short" style="" name="_wcpdf_<?= $data['slug']; ?>_number" id="_wcpdf_<?= $data['slug']; ?>_number" value="" disabled="disabled" >
 						<?php endif; ?>
 					</p>
 					<p class="form-field form-field-wide">
-						<label for="_wcpdf_<?= $data['type']; ?>_date"><?php echo sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $data['title'] ); ?></label>
+						<label for="_wcpdf_<?= $data['slug']; ?>_date"><?php echo sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $data['title'] ); ?></label>
 						<?php if ( ! empty( $data['date'] ) ) : ?>
-							<input type="text" class="date-picker-field" name="_wcpdf_<?= $data['type']; ?>_date" id="_wcpdf_<?= $data['type']; ?>_date" maxlength="10" value="<?= $data['date']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['type']; ?>_date_hour" id="_wcpdf_<?= $data['type']; ?>_date_hour" min="0" max="23" size="2" value="<?= $data['date_hour']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['type']; ?>_date_minute" id="_wcpdf_<?= $data['type']; ?>_date_minute" min="0" max="59" size="2" value="<?= $data['date_minute']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
+							<input type="text" class="date-picker-field" name="_wcpdf_<?= $data['slug']; ?>_date" id="_wcpdf_<?= $data['slug']; ?>_date" maxlength="10" value="<?= $data['date']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['slug']; ?>_date_hour" id="_wcpdf_<?= $data['slug']; ?>_date_hour" min="0" max="23" size="2" value="<?= $data['date_hour']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['slug']; ?>_date_minute" id="_wcpdf_<?= $data['slug']; ?>_date_minute" min="0" max="59" size="2" value="<?= $data['date_minute']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 						<?php else : ?>
-							<input type="text" class="date-picker-field" name="_wcpdf_<?= $data['type']; ?>_date" id="_wcpdf_<?= $data['type']; ?>_date" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['type']; ?>_date_hour" id="_wcpdf_<?= $data['type']; ?>_date_hour" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['type']; ?>_date_minute" id="_wcpdf_<?= $data['type']; ?>_date_minute" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
+							<input type="text" class="date-picker-field" name="_wcpdf_<?= $data['slug']; ?>_date" id="_wcpdf_<?= $data['slug']; ?>_date" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['slug']; ?>_date_hour" id="_wcpdf_<?= $data['slug']; ?>_date_hour" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="_wcpdf_<?= $data['slug']; ?>_date_minute" id="_wcpdf_<?= $data['slug']; ?>_date_minute" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
 						<?php endif; ?>
 					</p>
 				</div>
@@ -447,7 +447,9 @@ class Admin {
 
 			<!-- Invoice only -->
 			<?php if( $data['type'] == 'invoice' ) : ?>
+
 				<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
+
 				<!-- Notes -->
 				<section class="wcpdf-data-fields-section notes">
 					<p class="form-field form-field-wide">
@@ -467,7 +469,9 @@ class Admin {
 						</div>
 					</p>
 				</section>
+
 				<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
+				
 			<?php endif; ?>
 			<!-- / Invoice only -->
 
