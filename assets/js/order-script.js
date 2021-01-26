@@ -93,8 +93,8 @@ jQuery(document).ready(function($) {
 		form_inputs_data = {};
 		$form.find(':input').each( function() {
 			if (!$(this).is(':disabled')) {
-				name = $(this).attr("name");
-				name = name.split('[', 1)[0]; // for credit-note array []
+				var name = $(this).attr("name");
+				name = name.replace(/[[0-9]+]/, ''); // for credit-note array []
 				value = $(this).val();
 				form_inputs_data[name] = value;
 			}
