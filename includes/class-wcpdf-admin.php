@@ -369,13 +369,13 @@ class Admin {
 			// data
 			$data = array(
 				'number' => array(
-					'label'  => __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label'  => __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 				'date'   => array(
-					'label'  => __( 'Invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label'  => __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 				'notes'  => array(
-					'label'  => __( 'Invoice notes', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label'  => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 			);
 			// output
@@ -439,7 +439,7 @@ class Admin {
 					<div class="<?= $document->get_type(); ?>-number">
 						<p class="form-field <?= $data['number']['name']; ?>_field">	
 							<p>
-								<span><strong><?= $data['number']['label']; ?>:</strong></span>
+								<span><strong><?= $data['number']['label']; ?></strong></span>
 								<span><?= $data['number']['formatted']; ?></span>
 							</p>
 						</p>
@@ -447,7 +447,7 @@ class Admin {
 					<div class="<?= $document->get_type(); ?>-date">
 						<p class="form-field form-field-wide">
 							<p>
-								<span><strong><?= $data['date']['label']; ?>:</strong></span>
+								<span><strong><?= $data['date']['label']; ?></strong></span>
 								<span><?= $data['date']['formatted']; ?></span>
 							</p>
 						</p>
@@ -458,11 +458,11 @@ class Admin {
 				<!-- Editable -->
 				<div class="editable">
 					<p class="form-field <?= $data['number']['name']; ?>_field ">
-						<label for="<?= $data['number']['name']; ?>"><?php echo sprintf( __( '%s (unformatted!):', 'woocommerce-pdf-invoices-packing-slips' ), $data['number']['label'] ); ?></label>
+						<label for="<?= $data['number']['name']; ?>"><?= $data['number']['label']; ?></label>
 						<?php if ( ! empty( $data['number']['plain'] ) ) : ?>
-							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="<?= $data['number']['plain']; ?>" disabled="disabled" >
+							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="<?= $data['number']['plain']; ?>" disabled="disabled" > (<?= __( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
 						<?php else : ?>
-							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="" disabled="disabled" >
+							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="" disabled="disabled" > (<?= __( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
 						<?php endif; ?>
 					</p>
 					<p class="form-field form-field-wide">
