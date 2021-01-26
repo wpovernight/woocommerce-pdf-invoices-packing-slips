@@ -471,7 +471,7 @@ class Admin {
 				</section>
 
 				<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
-				
+
 			<?php endif; ?>
 			<!-- / Invoice only -->
 
@@ -544,6 +544,9 @@ class Admin {
 				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
 				$invoice->set_data( $document_data, $order );
 				$invoice->save();
+
+				// allow other documents to hook here and save their data
+				do_action( 'wpo_wcpdf_on_save_invoice_order_data', $document_data, $this );
 			}
 		}
 	}
