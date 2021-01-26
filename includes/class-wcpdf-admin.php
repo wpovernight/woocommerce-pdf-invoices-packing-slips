@@ -368,7 +368,7 @@ class Admin {
 		if ( $invoice && $invoice->exists() ) {
 			// data
 			$data = array(
-				'id'     => null, // used for multiple documents of the same type, must be a string like this: '['.$id.']'
+				'id'     => null, // used for multiple documents of the same type inside a loop, must be a string like this: '['.$id.']'
 				'number' => array(
 					'label'  => __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
 					'name'   => "_wcpdf_{$invoice->slug}_number",
@@ -465,12 +465,11 @@ class Admin {
 				</div>
 			</section>
 
-			<!-- Invoice only -->
+			<!-- Document Notes -->
 			<?php if( array_key_exists( 'notes', $current ) ) : ?>
 
 				<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
 
-				<!-- Notes -->
 				<section class="wcpdf-data-fields-section notes">
 					<p class="form-field form-field-wide">
 						<div>
@@ -493,7 +492,7 @@ class Admin {
 				<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
 
 			<?php endif; ?>
-			<!-- / Invoice only -->
+			<!-- / Document Notes -->
 
 		</div>
 		<?php
