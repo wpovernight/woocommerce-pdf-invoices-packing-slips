@@ -389,26 +389,32 @@ class Admin {
 	}
 
 	public function get_current_values_for_document( $document, $data ) {
-		// number
-		$data['number']['name']             = "_wcpdf_{$document->slug}_number";
-		$data['number']['plain']            = ! empty( $document->get_number() ) ? $document->get_number()->get_plain() : '';
-		$data['number']['formatted']        = ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '';
-		// date - formatted
-		$data['date']['formatted']['name']  = "_wcpdf_{$document->slug}_date";
-		$data['date']['formatted']['value'] = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '';
-		// date - date
-		$data['date']['date']['name']       = "_wcpdf_{$document->slug}_date";
-		$data['date']['date']['value']      = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'Y-m-d' ) : '';
-		// date - hour
-		$data['date']['hour']['name']       = "_wcpdf_{$document->slug}_date_hour";
-		$data['date']['hour']['value']      = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : '';
-		// date - minute
-		$data['date']['minute']['name']     = "_wcpdf_{$document->slug}_date_minute";
-		$data['date']['minute']['value']    = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : '';
-		// notes
-		if( ! empty( $notes = $document->get_document_notes() ) ) {
-			$data['notes']['name']          = "_wcpdf_{$document->slug}_notes";
-			$data['notes']['value']         = $notes;
+		$current = array(
+			'number' => array(
+				'plain'     => ! empty( $document->get_number() ) ? $document->get_number()->get_plain() : '',
+				'formatted' => ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '',
+				'name'      => "_wcpdf_{$document->slug}_number",
+			),
+			'date' => array(
+				'formatted' => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '',
+				'date'      => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'Y-m-d' ) : '',
+				'hour'      => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : '',
+				'minute'    => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : '',
+				'name'      => "_wcpdf_{$document->slug}_date",
+			),
+		);
+
+		if ( !empty( $data['notes'] ) ) {
+			$current['notes'] = array(
+				'value' => $document->get_document_notes(),
+				'name'  =>"_wcpdf_{$document->slug}_notes",
+			);
+		}
+
+		foreach ( $data as $key => $value ) {
+			if ( isset( $current[$key] ) ) {
+				$data[$key] = array_merge( $current[$key], $value );
+			}
 		}
 
 		return apply_filters( 'wpo_wcpdf_current_values_for_document', $data, $document );
@@ -416,7 +422,7 @@ class Admin {
 
 	public function output_number_date_edit_fields( $document, $data ) {
 		if( empty( $document ) || empty( $data ) ) return;
-		$current = $this->get_current_values_for_document( $document, $data );
+		$data = $this->get_current_values_for_document( $document, $data );
 		?>
 		<div class="wcpdf-data-fields" data-document="<?= $document->get_type(); ?>" data-order_id="<?php echo WCX_Order::get_id( $document->order ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
@@ -431,18 +437,18 @@ class Admin {
 				<!-- Read only -->
 				<div class="read-only">
 					<div class="<?= $document->get_type(); ?>-number">
-						<p class="form-field <?= $current['number']['name']; ?>_field">	
+						<p class="form-field <?= $data['number']['name']; ?>_field">	
 							<p>
-								<span><strong><?= $current['number']['label']; ?>:</strong></span>
-								<span><?= $current['number']['formatted']; ?></span>
+								<span><strong><?= $data['number']['label']; ?>:</strong></span>
+								<span><?= $data['number']['formatted']; ?></span>
 							</p>
 						</p>
 					</div>
 					<div class="<?= $document->get_type(); ?>-date">
 						<p class="form-field form-field-wide">
 							<p>
-								<span><strong><?= $current['date']['label']; ?>:</strong></span>
-								<span><?= $current['date']['formatted']['value']; ?></span>
+								<span><strong><?= $data['date']['label']; ?>:</strong></span>
+								<span><?= $data['date']['formatted']; ?></span>
 							</p>
 						</p>
 					</div>
@@ -451,44 +457,44 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable">
-					<p class="form-field <?= $current['number']['name']; ?>_field ">
-						<label for="<?= $current['number']['name']; ?>"><?php echo sprintf( __( '%s (unformatted!):', 'woocommerce-pdf-invoices-packing-slips' ), $current['number']['label'] ); ?></label>
-						<?php if ( ! empty( $current['number']['plain'] ) ) : ?>
-							<input type="text" class="short" style="" name="<?= $current['number']['name']; ?>" id="<?= $current['number']['name']; ?>" value="<?= $current['number']['plain']; ?>" disabled="disabled" >
+					<p class="form-field <?= $data['number']['name']; ?>_field ">
+						<label for="<?= $data['number']['name']; ?>"><?php echo sprintf( __( '%s (unformatted!):', 'woocommerce-pdf-invoices-packing-slips' ), $data['number']['label'] ); ?></label>
+						<?php if ( ! empty( $data['number']['plain'] ) ) : ?>
+							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="<?= $data['number']['plain']; ?>" disabled="disabled" >
 						<?php else : ?>
-							<input type="text" class="short" style="" name="<?= $current['number']['name']; ?>" id="<?= $current['number']['name']; ?>" value="" disabled="disabled" >
+							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="" disabled="disabled" >
 						<?php endif; ?>
 					</p>
 					<p class="form-field form-field-wide">
-						<label for="<?= $current['date']['date']['name'] ?>"><?= $current['date']['label']; ?></label>
-						<?php if ( ! empty( $current['date']['date']['value'] ) ) : ?>
-							<input type="text" class="date-picker-field" name="<?= $current['date']['date']['name']; ?>" id="<?= $current['date']['date']['name']; ?>" maxlength="10" value="<?= $current['date']['date']['value']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $current['date']['hour']['name']; ?>" id="<?= $current['date']['hour']['name']; ?>" min="0" max="23" size="2" value="<?= $current['date']['hour']['value']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $current['date']['minute']['name']; ?>" id="<?= $current['date']['minute']['name']; ?>" min="0" max="59" size="2" value="<?= $current['date']['minute']['value']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
+						<label for="<?= $data['date']['name'] ?>[date]"><?= $data['date']['label']; ?></label>
+						<?php if ( ! empty( $data['date']['date'] ) ) : ?>
+							<input type="text" class="date-picker-field" name="<?= $data['date']['name'] ?>[date]" id="<?= $data['date']['name'] ?>[date]" maxlength="10" value="<?= $data['date']['date']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[hour]" id="<?= $data['date']['name']; ?>[hour]" min="0" max="23" size="2" value="<?= $data['date']['hour']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[minute]" id="<?= $data['date']['name']; ?>[minute]" min="0" max="59" size="2" value="<?= $data['date']['minute']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 						<?php else : ?>
-							<input type="text" class="date-picker-field" name="<?= $current['date']['date']['name']; ?>" id="<?= $current['date']['date']['name']; ?>" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $current['date']['hour']['name']; ?>" id="<?= $current['date']['hour']['name']; ?>" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $current['date']['minute']['name']; ?>" id="<?= $current['date']['minute']['name']; ?>" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
+							<input type="text" class="date-picker-field" name="<?= $data['date']['name'] ?>[date]" id="<?= $data['date']['name'] ?>[date]" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[hour]" id="<?= $data['date']['name']; ?>[hour]" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[minute]" id="<?= $data['date']['name']; ?>[minute]" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
 						<?php endif; ?>
 					</p>
 				</div>
 			</section>
 
 			<!-- Document Notes -->
-			<?php if( array_key_exists( 'value', $current['notes'] ) ) : ?>
+			<?php if( array_key_exists( 'notes', $data ) ) : ?>
 
 				<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
 
 				<section class="wcpdf-data-fields-section notes">
 					<p class="form-field form-field-wide">
 						<div>
-							<span><strong><?= $current['notes']['label']; ?></strong></span>
+							<span><strong><?= $data['notes']['label']; ?></strong></span>
 							<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit"></span>
 						</div>
 						<!-- Read only -->
 						<div class="read-only">
-							<p><?= $current['notes']['value']; ?></p>
+							<p><?= $data['notes']['value']; ?></p>
 						</div>
 						<!-- Editable -->
 						<div class="editable">
 							<p class="form-field form-field-wide">
-								<p><textarea name="<?= $current['notes']['name']; ?>" class="<?= $current['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $current['notes']['value']; ?></textarea></p>
+								<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
 							</p>
 						</div>
 					</p>
@@ -809,10 +815,11 @@ class Admin {
 			$data['number'] = sanitize_text_field( $form_data['_wcpdf_'.$document_slug.'_number'] );
 		}
 
-		if( ! empty( $form_data['_wcpdf_'.$document_slug.'_date'] ) ) {
-			$date = $form_data['_wcpdf_'.$document_slug.'_date'];
-			$hour = ! empty( $form_data['_wcpdf_'.$document_slug.'_date_hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date_hour'] : '00';
-			$minute = ! empty( $form_data['_wcpdf_'.$document_slug.'_date_minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date_minute'] : '00';
+		$date_entered = ! empty( $form_data['_wcpdf_'.$document_slug.'_date'] ) && ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['date'] );
+		if( $date_entered ) {
+			$date = $form_data['_wcpdf_'.$document_slug.'_date']['date'];
+			$hour = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['hour'] : '00';
+			$minute = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
 
 			// clean & sanitize input
 			$date = date( 'Y-m-d', strtotime( $date ) );
@@ -820,7 +827,7 @@ class Admin {
 			$minute = sprintf('%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";
 
-		} elseif ( empty( $_POST['_wcpdf_'.$document_slug.'_date'] ) && !empty( $_POST['_wcpdf_'.$document_slug.'_number'] ) ) {
+		} elseif ( ! $date_entered && !empty( $_POST['_wcpdf_'.$document_slug.'_number'] ) ) {
 			$data['date'] = current_time( 'timestamp', true );
 		}
 
