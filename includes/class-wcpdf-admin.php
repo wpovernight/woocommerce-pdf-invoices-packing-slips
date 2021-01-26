@@ -544,10 +544,10 @@ class Admin {
 				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
 				$invoice->set_data( $document_data, $order );
 				$invoice->save();
-
-				// allow other documents to hook here and save their data
-				do_action( 'wpo_wcpdf_on_save_invoice_order_data', $document_data, $this );
 			}
+
+			// allow other documents to hook here and save their form data
+			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $_POST, $this );
 		}
 	}
 
