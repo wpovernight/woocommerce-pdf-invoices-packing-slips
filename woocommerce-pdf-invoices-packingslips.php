@@ -281,7 +281,7 @@ class WPO_WCPDF {
 		$message .= sprintf( '<p>%s</p>', $error_message );
 		$message .= sprintf( '<p>'.$php_message.'</p>', '<a href="https://docs.wpovernight.com/general/how-to-update-your-php-version/" target="_blank">', '</a>' );
 		if ( version_compare( PHP_VERSION, '5.6', '>' ) ) {
-			$message .= sprintf( '<p>'.$add_on_message.'</p>', '<a href="https://github.com/wpovernight/wcpdf-dompdf-0.8.3/releases" target="_blank">', '</a>' );
+			$message .= sprintf( '<p>'.$add_on_message.'</p>', '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
 		}
 		$message .= '</div>';
 
