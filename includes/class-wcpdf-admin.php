@@ -368,7 +368,6 @@ class Admin {
 		if ( $invoice && $invoice->exists() ) {
 			// data
 			$data = array(
-				'id'     => null, // used for multiple documents of the same type inside a loop, must be a string like this: '['.$id.']'
 				'number' => array(
 					'label'  => __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
@@ -391,29 +390,24 @@ class Admin {
 
 	public function get_current_values_for_document( $document, $data ) {
 		// number
-		$data['number']['name']             = "_wcpdf_{$document->slug}_number{$data['id']}";
-		$data['number']['class']            = "_wcpdf_{$document->slug}_number_field";
+		$data['number']['name']             = "_wcpdf_{$document->slug}_number";
 		$data['number']['plain']            = ! empty( $document->get_number() ) ? $document->get_number()->get_plain() : '';
 		$data['number']['formatted']        = ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '';
 		// date - formatted
-		$data['date']['formatted']['name']  = "_wcpdf_{$document->slug}_date{$data['id']}";
+		$data['date']['formatted']['name']  = "_wcpdf_{$document->slug}_date";
 		$data['date']['formatted']['value'] = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '';
 		// date - date
-		$data['date']['date']['name']       = "_wcpdf_{$document->slug}_date{$data['id']}";
-		$data['date']['date']['class']      = "_wcpdf_{$document->slug}_date";
+		$data['date']['date']['name']       = "_wcpdf_{$document->slug}_date";
 		$data['date']['date']['value']      = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'Y-m-d' ) : '';
 		// date - hour
-		$data['date']['hour']['name']       = "_wcpdf_{$document->slug}_date_hour{$data['id']}";
-		$data['date']['hour']['class']      = "_wcpdf_{$document->slug}_date_hour";
+		$data['date']['hour']['name']       = "_wcpdf_{$document->slug}_date_hour";
 		$data['date']['hour']['value']      = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : '';
 		// date - minute
-		$data['date']['minute']['name']     = "_wcpdf_{$document->slug}_date_minute{$data['id']}";
-		$data['date']['minute']['class']    = "_wcpdf_{$document->slug}_date_minute";
+		$data['date']['minute']['name']     = "_wcpdf_{$document->slug}_date_minute";
 		$data['date']['minute']['value']    = ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : '';
 		// notes
 		if( ! empty( $notes = $document->get_document_notes() ) ) {
-			$data['notes']['name']          = "_wcpdf_{$document->slug}_notes{$data['id']}";
-			$data['notes']['class']         = "_wcpdf_{$document->slug}_notes";
+			$data['notes']['name']          = "_wcpdf_{$document->slug}_notes";
 			$data['notes']['value']         = $notes;
 		}
 
@@ -437,7 +431,7 @@ class Admin {
 				<!-- Read only -->
 				<div class="read-only">
 					<div class="<?= $document->get_type(); ?>-number">
-						<p class="form-field _wcpdf_<?= $document->slug; ?>_number_field">	
+						<p class="form-field <?= $current['number']['name']; ?>_field">	
 							<p>
 								<span><strong><?= $current['number']['label']; ?>:</strong></span>
 								<span><?= $current['number']['formatted']; ?></span>
@@ -457,20 +451,20 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable">
-					<p class="form-field <?= $current['number']['class']; ?> ">
+					<p class="form-field <?= $current['number']['name']; ?>_field ">
 						<label for="<?= $current['number']['name']; ?>"><?php echo sprintf( __( '%s (unformatted!):', 'woocommerce-pdf-invoices-packing-slips' ), $current['number']['label'] ); ?></label>
 						<?php if ( ! empty( $current['number']['plain'] ) ) : ?>
-							<input type="text" class="short" style="" name="<?= $current['number']['name']; ?>" id="<?= $current['number']['class']; ?>" value="<?= $current['number']['plain']; ?>" disabled="disabled" >
+							<input type="text" class="short" style="" name="<?= $current['number']['name']; ?>" id="<?= $current['number']['name']; ?>" value="<?= $current['number']['plain']; ?>" disabled="disabled" >
 						<?php else : ?>
-							<input type="text" class="short" style="" name="<?= $current['number']['name']; ?>" id="<?= $current['number']['class']; ?>" value="" disabled="disabled" >
+							<input type="text" class="short" style="" name="<?= $current['number']['name']; ?>" id="<?= $current['number']['name']; ?>" value="" disabled="disabled" >
 						<?php endif; ?>
 					</p>
 					<p class="form-field form-field-wide">
-						<label for="<?= $current['date']['date']['class'] ?>"><?= $current['date']['label']; ?></label>
+						<label for="<?= $current['date']['date']['name'] ?>"><?= $current['date']['label']; ?></label>
 						<?php if ( ! empty( $current['date']['date']['value'] ) ) : ?>
-							<input type="text" class="date-picker-field" name="<?= $current['date']['date']['name']; ?>" id="<?= $current['date']['date']['class']; ?>" maxlength="10" value="<?= $current['date']['date']['value']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $current['date']['hour']['name']; ?>" id="<?= $current['date']['hour']['class']; ?>" min="0" max="23" size="2" value="<?= $current['date']['hour']['value']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $current['date']['minute']['name']; ?>" id="<?= $current['date']['minute']['class']; ?>" min="0" max="59" size="2" value="<?= $current['date']['minute']['value']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
+							<input type="text" class="date-picker-field" name="<?= $current['date']['date']['name']; ?>" id="<?= $current['date']['date']['name']; ?>" maxlength="10" value="<?= $current['date']['date']['value']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $current['date']['hour']['name']; ?>" id="<?= $current['date']['hour']['name']; ?>" min="0" max="23" size="2" value="<?= $current['date']['hour']['value']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $current['date']['minute']['name']; ?>" id="<?= $current['date']['minute']['name']; ?>" min="0" max="59" size="2" value="<?= $current['date']['minute']['value']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 						<?php else : ?>
-							<input type="text" class="date-picker-field" name="<?= $current['date']['date']['name']; ?>" id="<?= $current['date']['date']['class']; ?>" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $current['date']['hour']['name']; ?>" id="<?= $current['date']['hour']['class']; ?>" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $current['date']['minute']['name']; ?>" id="<?= $current['date']['minute']['class']; ?>" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
+							<input type="text" class="date-picker-field" name="<?= $current['date']['date']['name']; ?>" id="<?= $current['date']['date']['name']; ?>" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $current['date']['hour']['name']; ?>" id="<?= $current['date']['hour']['name']; ?>" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $current['date']['minute']['name']; ?>" id="<?= $current['date']['minute']['name']; ?>" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
 						<?php endif; ?>
 					</p>
 				</div>
@@ -494,7 +488,7 @@ class Admin {
 						<!-- Editable -->
 						<div class="editable">
 							<p class="form-field form-field-wide">
-								<p><textarea name="<?= $current['notes']['name']; ?>" class="<?= $current['notes']['class']; ?>" cols="60" rows="5" disabled="disabled"><?= $current['notes']['value']; ?></textarea></p>
+								<p><textarea name="<?= $current['notes']['name']; ?>" class="<?= $current['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $current['notes']['value']; ?></textarea></p>
 							</p>
 						</div>
 					</p>
