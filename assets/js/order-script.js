@@ -80,6 +80,20 @@ jQuery(document).ready(function($) {
 		});
 	});
 
+	// disable inputs from start
+	$( '.wcpdf-data-fields' ).find( ':input' ).attr( 'disabled', true );
+	$( '.wpo-wcpdf-edit-date-number' ).click( function() {
+		$form = $(this).closest('.wcpdf-data-fields');
+		$form.find( ':input' ).attr( 'disabled', false );
+		$(this).click( function() {
+			if( $form.find( ':input' ).is(':disabled') ) {
+				$form.find( ':input' ).attr( 'disabled', false );
+			} else {
+				$form.find( ':input' ).attr( 'disabled', true );
+			}
+		} )
+	} );
+
 	$( ".wcpdf-data-fields .wpo-wcpdf-regenerate-document" ).click(function() {
 		
 		if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
@@ -93,7 +107,11 @@ jQuery(document).ready(function($) {
 		form_data_attributes = $form.data();
 
 		// create a serialized string with the form inputs name/value
-		serialized = $form.find(":input:not(:disabled)").serialize();
+		serialized = $form.find(":input:visible:not(:disabled)").serialize();
+		if( serialized.length == 0 ) {
+			$(this).removeClass('wcpdf-regenerate-spin');
+			return; // no data to be submitted
+		}
 
 		// Make sure all feedback icons are hidden before each call
 		$form.find('.document-action-success, .document-action-failed').hide();
