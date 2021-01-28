@@ -92,9 +92,8 @@ jQuery(document).ready(function($) {
 		// create an object with the data attributes
 		form_data_attributes = $form.data();
 
-		// create a serialized string with the form inputs name/data and removes the [id] part globally in the string with regex expression
-		regex      = new RegExp("%5B"+form_data_attributes.order_id+"%5D", 'g');
-		serialized = $form.find(":input:not(:disabled)").serialize().replace(regex, '');
+		// create a serialized string with the form inputs name/value
+		serialized = $form.find(":input:not(:disabled)").serialize();
 
 		// Make sure all feedback icons are hidden before each call
 		$form.find('.document-action-success, .document-action-failed').hide();
