@@ -783,7 +783,7 @@ class Admin {
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
-			if ( !empty($document) && $document->exists() && ! empty($form_data) ) {
+			if ( !empty($document) && $document->exists() ) {
 				// perform legacy date fields replacements check
 				if( in_array( $document->get_type(), array( 'proforma', 'credit-note' ) ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
 					$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
