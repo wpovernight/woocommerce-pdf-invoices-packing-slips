@@ -770,7 +770,7 @@ class Admin {
 		$order_id = absint( $_POST['order_id'] );
 		$order = WCX::get_order( $order_id );
 		$document_type = sanitize_text_field( $_POST['document_type'] );
-		$form_data = json_decode( stripslashes( $_POST['form_data'] ), true );
+		parse_str($_POST['form_data'], $form_data);
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
