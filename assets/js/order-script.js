@@ -82,6 +82,7 @@ jQuery(document).ready(function($) {
 
 	// disable inputs from start
 	$( '.wcpdf-data-fields' ).find( ':input' ).attr( 'disabled', true );
+	// enabled inputs on editing only
 	$( '.wpo-wcpdf-edit-date-number' ).click( function() {
 		$form = $(this).closest('.wcpdf-data-fields');
 		$form.find( ':input' ).attr( 'disabled', false );
