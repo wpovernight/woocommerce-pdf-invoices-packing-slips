@@ -783,9 +783,9 @@ class Admin {
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
-			if ( !empty($document) && $document->exists() ) {
-				// perform legacy date fields replacements
-				if( in_array( $document->get_type(), array( 'proforma', 'credit-note' ) ) ) {
+			if ( !empty($document) && $document->exists() && ! empty($form_data) ) {
+				// perform legacy date fields replacements check
+				if( in_array( $document->get_type(), array( 'proforma', 'credit-note' ) ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
 					$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
 				}
 
@@ -810,19 +810,17 @@ class Admin {
 	}
 
 	public function legacy_date_fields_replacements( $form_data, $document_slug ) {
-		if( ! empty( $form_data ) && ! is_array( $form_data["_wcpdf_{$document_slug}_date"] ) ) {
-			$legacy_date   = sanitize_text_field( $form_data["_wcpdf_{$document_slug}_date"] );
-			$legacy_hour   = sanitize_text_field( $form_data["_wcpdf_{$document_slug}_date_hour"] );
-			$legacy_minute = sanitize_text_field( $form_data["_wcpdf_{$document_slug}_date_minute"] );
-			unset( $form_data["_wcpdf_{$document_slug}_date_hour"] );
-			unset( $form_data["_wcpdf_{$document_slug}_date_minute"] );
-	
-			return $form_data["_wcpdf_{$document_slug}_date"] = array(
-				'date'   => $legacy_date,
-				'hour'   => $legacy_hour,
-				'minute' => $legacy_minute,
-			);
-		}
+		$legacy_date   = sanitize_text_field( $form_data["_wcpdf_{$document_slug}_date"] );
+		$legacy_hour   = sanitize_text_field( $form_data["_wcpdf_{$document_slug}_date_hour"] );
+		$legacy_minute = sanitize_text_field( $form_data["_wcpdf_{$document_slug}_date_minute"] );
+		unset( $form_data["_wcpdf_{$document_slug}_date_hour"] );
+		unset( $form_data["_wcpdf_{$document_slug}_date_minute"] );
+
+		return $form_data["_wcpdf_{$document_slug}_date"] = array(
+			'date'   => $legacy_date,
+			'hour'   => $legacy_hour,
+			'minute' => $legacy_minute,
+		);
 	}
 
 	public function debug_enabled_warning( $wp_admin_bar ) {
