@@ -755,7 +755,7 @@ class Admin {
 			) );
 		}
 
-		if( empty($_POST['form_data']) || empty($_POST['order_id']) || empty($_POST['document_type']) ) {
+		if( empty($_POST['order_id']) || empty($_POST['document_type']) ) {
 			wp_send_json_error( array(
 				'message' => 'incomplete request',
 			) );

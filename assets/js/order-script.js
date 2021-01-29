@@ -94,10 +94,6 @@ jQuery(document).ready(function($) {
 
 		// create a serialized string with the form inputs name/value
 		serialized = $form.find(":input:visible:not(:disabled)").serialize();
-		if( serialized.length == 0 ) {
-			$(this).removeClass('wcpdf-regenerate-spin');
-			return; // no data to be submitted
-		}
 
 		// Make sure all feedback icons are hidden before each call
 		$form.find('.document-action-success, .document-action-failed').hide();
