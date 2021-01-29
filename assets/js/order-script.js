@@ -30,9 +30,6 @@ jQuery(document).ready(function($) {
 	});
 
 	$('#wpo_wcpdf-data-input-box').insertAfter('#woocommerce-order-data');
-
-	// disable inputs from start
-	$( '.wcpdf-data-fields' ).find( ':input' ).attr( 'disabled', true );
 	
 	// enable invoice number edit if user initiated
 	$( ".wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes" ).click(function() {
