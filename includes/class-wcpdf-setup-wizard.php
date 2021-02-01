@@ -37,6 +37,11 @@ class Setup_Wizard {
 		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] ) {
 			return;
 		}
+
+		if ( is_null ( get_current_screen() ) ) {
+			set_current_screen();
+		}
+				
 		$this->steps = array(
 			'shop-name' => array(
 				'name'	=> __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -119,7 +124,6 @@ class Setup_Wizard {
 	 * Setup Wizard Header.
 	 */
 	public function setup_wizard_header() {
-		set_current_screen();
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?> class="wpo-wizzard">
