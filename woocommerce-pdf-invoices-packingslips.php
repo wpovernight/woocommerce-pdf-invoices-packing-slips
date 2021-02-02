@@ -273,7 +273,7 @@ class WPO_WCPDF {
 	 * PHP version requirement notice
 	 */
 	public function required_php_version() {
-		$error_message	= __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 5.6 or higher (7.1 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
+		$error_message	= __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 7.1 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
 		$php_message	= __( 'We strongly recommend to %supdate your PHP version%s.', 'woocommerce-pdf-invoices-packing-slips' );
 		$add_on_message	= __( 'If you cannot upgrade your PHP version, you can download %sthis addon%s to enable backwards compatibility with PHP5.6.', 'woocommerce-pdf-invoices-packing-slips' );
 
