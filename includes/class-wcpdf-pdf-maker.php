@@ -34,15 +34,16 @@ class PDF_Maker {
 
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
-			'defaultFont'				=> 'dejavu sans',
 			'tempDir'					=> WPO_WCPDF()->main->get_tmp_path('dompdf'),
-			'logOutputFile'				=> WPO_WCPDF()->main->get_tmp_path('dompdf') . "/log.htm",
 			'fontDir'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
 			'fontCache'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
+			'chroot'					=> array( WP_CONTENT_DIR ),
+			'logOutputFile'				=> WPO_WCPDF()->main->get_tmp_path('dompdf') . "/log.htm",
+			'defaultFont'				=> 'dejavu sans',
 			'isRemoteEnabled'			=> true,
-			'isFontSubsettingEnabled'	=> $this->settings['font_subsetting'],
 			// HTML5 parser requires iconv
 			'isHtml5ParserEnabled'		=> ( isset(WPO_WCPDF()->settings->debug_settings['use_html5_parser']) && extension_loaded('iconv') ) ? true : false,
+			'isFontSubsettingEnabled'	=> $this->settings['font_subsetting'],
 		) ) );
 
 		// instantiate and use the dompdf class

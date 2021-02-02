@@ -1,6 +1,5 @@
 {
-  "require": {
-    "php": ">=5.3.0",
-    "dompdf/dompdf": "*"
-  }
+    "require": {
+        "dompdf/dompdf": "^1.0"
+    }
 }
