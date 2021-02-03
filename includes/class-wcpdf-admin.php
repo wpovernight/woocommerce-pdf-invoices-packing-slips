@@ -816,11 +816,13 @@ class Admin {
 		unset( $form_data["_wcpdf_{$document_slug}_date_hour"] );
 		unset( $form_data["_wcpdf_{$document_slug}_date_minute"] );
 
-		return $form_data["_wcpdf_{$document_slug}_date"] = array(
+		$form_data["_wcpdf_{$document_slug}_date"] = array(
 			'date'   => $legacy_date,
 			'hour'   => $legacy_hour,
 			'minute' => $legacy_minute,
 		);
+
+		return $form_data;
 	}
 
 	public function debug_enabled_warning( $wp_admin_bar ) {
