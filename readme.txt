@@ -4,8 +4,8 @@ Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 5.6
-Requires PHP: 5.3
 Stable tag: 2.7.4
+Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
