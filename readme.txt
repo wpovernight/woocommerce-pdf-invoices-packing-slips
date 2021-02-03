@@ -107,6 +107,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: Setup wizard crash when 3rd party plugins/themes check screen object
 * Dev: Use internal date formatting function, allowing easier PDF specific date format overrides 
 * Dev: Introduced new action hook `wpo_wcpdf_document_created_manually`
+* Marked tested up to WooCommerce 5.0
 
 = 2.7.4 =
 * New: Show notice if incompatible MailPoet mailing service is used
