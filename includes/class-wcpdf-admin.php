@@ -390,14 +390,14 @@ class Admin {
 		$current = array(
 			'number' => array(
 				'plain'     => $document->exists() && ! empty( $document->get_number() ) ? $document->get_number()->get_plain() : '',
-				'formatted' => ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '',
+				'formatted' => $document->exists() && ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '',
 				'name'      => "_wcpdf_{$document->slug}_number",
 			),
 			'date' => array(
-				'formatted' => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '',
+				'formatted' => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '',
 				'date'      => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'Y-m-d' ) : '',
-				'hour'      => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : '',
-				'minute'    => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : '',
+				'hour'      => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : '',
+				'minute'    => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : '',
 				'name'      => "_wcpdf_{$document->slug}_date",
 			),
 		);
