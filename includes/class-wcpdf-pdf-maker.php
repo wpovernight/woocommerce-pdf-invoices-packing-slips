@@ -60,11 +60,11 @@ class PDF_Maker {
 	private function get_chroot_paths() {
 		$chroot = array( WP_CONTENT_DIR ); // default
 
-		if( WPO_WCPDF()->main->get_wp_upload_base() ) {
-			$chroot[] = WPO_WCPDF()->main->get_wp_upload_base();
+		if( $wp_upload_base = WPO_WCPDF()->main->get_wp_upload_base() ) {
+			$chroot[] = $wp_upload_base;
 		}
-		if( WPO_WCPDF()->main->get_tmp_base() ) {
-			$chroot[] = WPO_WCPDF()->main->get_tmp_base();
+		if( $tmp_base = WPO_WCPDF()->main->get_tmp_base() ) {
+			$chroot[] = $tmp_base;
 		}
 
 		return apply_filters( 'wpo_wcpdf_dompdf_chroot', $chroot );
