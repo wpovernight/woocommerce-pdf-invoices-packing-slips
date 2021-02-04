@@ -52,9 +52,9 @@ class Packing_Slip extends Order_Document_Methods {
 			} else {
 				if ( empty( $this->order ) ) {
 					$order = WCX::get_order ( $order_ids[0] );
-					$suffix = method_exists( $order, 'get_order_number' ) ? $order->get_order_number() : '';
+					$suffix = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
 				} else {
-					$suffix = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
+					$suffix = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
 				}
 			}
 		} else {
