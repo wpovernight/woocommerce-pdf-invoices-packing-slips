@@ -365,7 +365,7 @@ class Admin {
 
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
 
-		if ( $invoice && $invoice->exists() ) {
+		if ( $invoice ) {
 			// data
 			$data = array(
 				'number' => array(
@@ -382,7 +382,7 @@ class Admin {
 			$this->output_number_date_edit_fields( $invoice, $data );
 
 		} else {
-			printf( '<div class="wcpdf-data-fields"><p>&#9888; %s</p></div>', __( 'Invoice not generated for this order.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			printf( '<div class="wcpdf-data-fields"><p>&#9888; %s</p></div>', __( 'Some error ocurred trying to access the Invoice document.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $order, $this );
