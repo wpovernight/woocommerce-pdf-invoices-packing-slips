@@ -144,6 +144,7 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 			header('Content-Disposition: inline; filename="'.$filename.'"');
 			break;
 	}
+	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
 }
 
 /**
