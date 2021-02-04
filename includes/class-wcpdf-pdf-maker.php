@@ -37,7 +37,7 @@ class PDF_Maker {
 			'tempDir'					=> WPO_WCPDF()->main->get_tmp_path('dompdf'),
 			'fontDir'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
 			'fontCache'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
-			'chroot'					=> array( WP_CONTENT_DIR, UPLOADS ),
+			'chroot'					=> $this->get_chroot_paths(),
 			'logOutputFile'				=> WPO_WCPDF()->main->get_tmp_path('dompdf') . "/log.htm",
 			'defaultFont'				=> 'dejavu sans',
 			'isRemoteEnabled'			=> true,
@@ -55,6 +55,19 @@ class PDF_Maker {
 		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html );
 
 		return $dompdf->output();
+	}
+
+	private function get_chroot_paths() {
+		$chroot = array( WP_CONTENT_DIR ); // default
+
+		if( WPO_WCPDF()->main->get_wp_upload_base() ) {
+			$chroot[] = WPO_WCPDF()->main->get_wp_upload_base();
+		}
+		if( WPO_WCPDF()->main->get_tmp_base() ) {
+			$chroot[] = WPO_WCPDF()->main->get_tmp_base();
+		}
+
+		return apply_filters( 'wpo_wcpdf_dompdf_chroot', $chroot );
 	}
 }
 
