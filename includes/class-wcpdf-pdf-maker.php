@@ -37,7 +37,7 @@ class PDF_Maker {
 			'tempDir'					=> WPO_WCPDF()->main->get_tmp_path('dompdf'),
 			'fontDir'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
 			'fontCache'					=> WPO_WCPDF()->main->get_tmp_path('fonts'),
-			'chroot'					=> array( WP_CONTENT_DIR ),
+			'chroot'					=> array( WP_CONTENT_DIR, UPLOADS ),
 			'logOutputFile'				=> WPO_WCPDF()->main->get_tmp_path('dompdf') . "/log.htm",
 			'defaultFont'				=> 'dejavu sans',
 			'isRemoteEnabled'			=> true,
