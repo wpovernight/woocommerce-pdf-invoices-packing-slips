@@ -892,9 +892,8 @@ class Admin {
 				),
 				'b'		=> array(),
 			);
-			// sanitize
-			$notes = sanitize_textarea_field( wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html ) );
-			$data['notes'] = nl2br( $notes );
+			
+			$data['notes'] = wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html );
 		}
 
 		return $data;
