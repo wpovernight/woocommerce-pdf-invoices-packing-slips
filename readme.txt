@@ -104,7 +104,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 2.8.2 =
 * Fix: Layout issues with totals for documents with more than 1 page
-* Fix: Allow seting an Invoice number and date manually
+* Fix: Allow setting an Invoice number and date manually
 * Fix: Prevent errors on PHP8.0 when order not loaded for a document
 
 = 2.8.1 =
