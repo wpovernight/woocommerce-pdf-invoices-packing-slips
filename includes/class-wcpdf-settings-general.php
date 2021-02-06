@@ -281,7 +281,7 @@ class Settings_General {
 		$installed_templates = array();
 
 		// get base paths
-		$template_base_path = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
+		$template_base_path = ( function_exists( 'WC' ) && is_callable( 'WC', 'template_path' ) ) ? WC()->template_path() : 'woocommerce/';
 		$template_base_path = untrailingslashit( $template_base_path );
 		$template_paths = array (
 			// note the order: child-theme before theme, so that array_unique filters out parent doubles
