@@ -238,7 +238,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 		return $last;
 	}
 
-	public function reset() {
+	public function maybe_reset() {
 		if( ! empty( $this->document ) && isset( $this->document->settings['reset_number_yearly'] ) ) {
 			$last_number = $this->get_last();
 

@@ -106,7 +106,7 @@ class Invoice extends Order_Document_Methods {
 		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
 		$number_store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $this );
 		$number_store = new Sequential_Number_Store( $number_store_name, $number_store_method, $this );
-		$number_store->reset();
+		$number_store->maybe_reset();
 
 		$invoice_date = $this->get_date();
 		$invoice_number = $number_store->increment( $this->order_id, $invoice_date->date_i18n( 'Y-m-d H:i:s' ), $number_store->get_last() );
