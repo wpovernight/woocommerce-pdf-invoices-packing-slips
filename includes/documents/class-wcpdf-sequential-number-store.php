@@ -18,6 +18,12 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Store
 
 class Sequential_Number_Store {
 	/**
+	 * The document object
+	 * @var String
+	 */
+	public $document;
+
+	/**
 	 * Name of the number store (used for table_name)
 	 * @var String
 	 */
@@ -30,16 +36,36 @@ class Sequential_Number_Store {
 	public $method;
 
 	/**
+	 * Current year
+	 * @var String
+	 */
+	public $current_year;
+
+	/**
+	 * Name of the legacy table that stores the number sequence (including the wp_wcpdf_ table prefix)
+	 * @var String
+	 */
+	public $legacy_table_name;
+
+	/**
 	 * Name of the table that stores the number sequence (including the wp_wcpdf_ table prefix)
 	 * @var String
 	 */
 	public $table_name;
 
-	public function __construct( $store_name, $method = 'auto_increment' ) {
+	public function __construct( $store_name, $method = 'auto_increment', $document = null ) {
 		global $wpdb;
-		$this->store_name = $store_name;
-		$this->method = $method;
-		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // i.e. wp_wcpdf_invoice_number
+		$this->document          = $document;
+		$this->store_name        = $store_name;
+		$this->method            = $method;
+		$this->legacy_table_name = apply_filters( "wpo_wcpdf_number_store_legacy_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // i.e. wp_wcpdf_invoice_number
+		$this->current_year      = date("Y");
+		$this->table_name        = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}_{$this->current_year}", $store_name, $method ); // i.e. wp_wcpdf_invoice_number_2021
+
+		$installed_version = get_option( 'wpo_wcpdf_version' );
+		if ( version_compare( $installed_version, '2.8.2', '<=' ) ) {
+			$this->rename_table();
+		}
 
 		$this->init();
 	}
@@ -81,7 +107,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 * @param  string  $date     Local date, formatted as Y-m-d H:i:s
 	 * @return int               Number that was consumed/created
 	 */
-	public function increment( $order_id = 0, $date = null ) {
+	public function increment( $order_id = 0, $date = null, $last_number = null ) {
 		global $wpdb;
 		if ( empty( $date ) ) {
 			$date = get_date_from_gmt( date( 'Y-m-d H:i:s' ) );
@@ -93,6 +119,10 @@ $sql = "CREATE TABLE {$this->table_name} (
 			'order_id'	=> (int) $order_id,
 			'date'		=> $date,
 		);
+
+		if( ! empty( $last_number ) ) {
+			$data['id'] = $last_number + 1;
+		}
 
 		if ( $this->method == 'auto_increment' ) {
 			$wpdb->insert( $this->table_name, $data );
@@ -165,13 +195,96 @@ $sql = "CREATE TABLE {$this->table_name} (
 		}
 	}
 
-	public function get_last_date( $format = 'Y-m-d H:i:s' ) {
+	/**
+	 * Get last number used
+	 */
+	public function get_last() {
 		global $wpdb;
-		$row = $wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
-		$date = isset( $row->date ) ? $row->date : 'now';
+		if ( $this->method == 'auto_increment' ) {
+			// clear cache first on mysql 8.0+
+			if ( $wpdb->get_var( "SHOW VARIABLES LIKE 'information_schema_stats_expiry'" ) ) {
+				$wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
+			}
+			// get last auto_increment value
+			$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$this->table_name}'");
+			$next = $table_status->Auto_increment;
+			if( empty( $next ) ) {
+				// let's check last year
+				$last_year = $this->current_year - 1;
+				$last_year_table_name = "{$wpdb->prefix}wcpdf_{$this->store_name}_{$last_year}";
+				$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$last_year_table_name}'");
+				if( ! empty( $table_status ) ) {
+					$last = (int) $table_status->Auto_increment - 1;
+				} else {
+					$last = null;
+				}
+			} else {
+				$last = (int) $next - 1;
+			}
+		} elseif ( $this->method == 'calculate' ) {
+			$last_row = $wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
+			if ( empty( $last_row ) ) {
+				// let's check last year
+				$last_year = $this->current_year - 1;
+				$last_year_table_name = "{$wpdb->prefix}wcpdf_{$this->store_name}_{$last_year}";
+				$last_row = $wpdb->get_row( "SELECT * FROM {$last_year_table_name} WHERE id = ( SELECT MAX(id) from {$last_year_table_name} )" );
+				if ( ! empty( $last_row ) ) {
+					$last = (int) $last_row->id;
+				} else {
+					$last = null;
+				}
+			}
+		}
+		return $last;
+	}
+
+	public function reset() {
+		if( ! empty( $this->document ) && isset( $this->document->settings['reset_number_yearly'] ) ) {
+			$last_number = $this->get_last();
+
+			if( ! empty( $last_number ) ) {
+				$last_number_year = $this->get_last_date( 'Y', $last_number );
+
+				// check if we need to reset
+				if ( $this->current_year != $last_number_year ) {
+					$this->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this->document ) );
+				}
+			}
+		}
+	}
+
+	public function get_last_date( $format = 'Y-m-d H:i:s', $last_number = null ) {
+		global $wpdb;
+		if( ! empty( $last_number ) ) {
+			$row = $wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = {$last_number}" );
+			if( ! empty( $row ) ) {
+				$date = isset( $row->date ) ? $row->date : 'now';
+			} else {
+				// let's try last year table
+				$last_year = $this->current_year - 1;
+				$last_year_table_name = "{$wpdb->prefix}wcpdf_{$this->store_name}_{$last_year}";
+				$row = $wpdb->get_row( "SELECT * FROM {$last_year_table_name} WHERE id = {$last_number}" );
+				$date = isset( $row->date ) ? $row->date : 'now';
+			}
+		} else {
+			$row = $wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
+			$date = isset( $row->date ) ? $row->date : 'now';
+		}
+
 		$formatted_date = date( $format, strtotime( $date ) );
 
 		return $formatted_date;
+	}
+
+	/**
+	 * Rename DB table for versions <=2.8.2
+	 */
+	public function rename_table() {
+		global $wpdb;
+		if( $wpdb->get_var("SHOW TABLES LIKE '{$this->legacy_table_name}'") == $this->legacy_table_name) {
+			$wpdb->query("ALTER TABLE {$this->legacy_table_name} RENAME {$this->table_name}");
+			return; // no further business
+		}
 	}
 }
 

@@ -105,19 +105,11 @@ class Invoice extends Order_Document_Methods {
 
 		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
 		$number_store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $this );
-		$number_store = new Sequential_Number_Store( $number_store_name, $number_store_method );
-		// reset invoice number yearly
-		if ( isset( $this->settings['reset_number_yearly'] ) ) {
-			$current_year = date("Y");
-			$last_number_year = $number_store->get_last_date('Y');
-			// check if we need to reset
-			if ( $current_year != $last_number_year ) {
-				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
-			}
-		}
+		$number_store = new Sequential_Number_Store( $number_store_name, $number_store_method, $this );
+		$number_store->reset();
 
 		$invoice_date = $this->get_date();
-		$invoice_number = $number_store->increment( $this->order_id, $invoice_date->date_i18n( 'Y-m-d H:i:s' ) );
+		$invoice_number = $number_store->increment( $this->order_id, $invoice_date->date_i18n( 'Y-m-d H:i:s' ), $number_store->get_last() );
 
 		$this->set_number( $invoice_number );
 
