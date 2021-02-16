@@ -38,7 +38,7 @@ class Sequential_Number_Store {
 	public function __construct( $store_name, $method = 'auto_increment' ) {
 		global $wpdb;
 		$this->store_name = $store_name;
-		$this->method = $method;
+		$this->method     = $method;
 		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // i.e. wp_wcpdf_invoice_number
 
 		$this->init();
@@ -98,7 +98,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 			$wpdb->insert( $this->table_name, $data );
 			$number = $wpdb->insert_id;
 		} elseif ( $this->method == 'calculate' ) {
-			$number = $data['calculated_number'] = $this->get_next();
+			$number = $data['calculated_number'] = self::get_next( $this->store_name, $this->method );
 			$wpdb->insert( $this->table_name, $data );
 		}
 		
@@ -110,18 +110,20 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 * Get the number that will be used on the next increment
 	 * @return int next number
 	 */
-	public function get_next() {
+	public static function get_next( $store_name, $method ) {
 		global $wpdb;
-		if ( $this->method == 'auto_increment' ) {
+		$table_name = "{$wpdb->prefix}wcpdf_{$store_name}";
+
+		if ( $method == 'auto_increment' ) {
 			// clear cache first on mysql 8.0+
 			if ( $wpdb->get_var( "SHOW VARIABLES LIKE 'information_schema_stats_expiry'" ) ) {
 				$wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
 			}
 			// get next auto_increment value
-			$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$this->table_name}'");
+			$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$table_name}'");
 			$next = $table_status->Auto_increment;
-		} elseif ( $this->method == 'calculate' ) {
-			$last_row = $wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
+		} elseif ( $method == 'calculate' ) {
+			$last_row = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE id = ( SELECT MAX(id) from {$table_name} )" );
 			if ( empty( $last_row ) ) {
 				$next = 1;
 			} elseif ( !empty( $last_row->calculated_number ) ) {
@@ -173,6 +175,22 @@ $sql = "CREATE TABLE {$this->table_name} (
 
 		return $formatted_date;
 	}
+
+	/**
+	 * @return bool
+	 */
+	public static function store_name_exists( $store_name ) {
+		global $wpdb;
+		$table_name = "{$wpdb->prefix}wcpdf_{$store_name}";
+
+		// check if table exists
+		if( $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") == $table_name) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }
 
 endif; // class_exists

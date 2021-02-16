@@ -104,24 +104,44 @@ class Invoice extends Order_Document_Methods {
 		}
 
 		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-		$number_store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $this );
-		$number_store = new Sequential_Number_Store( $number_store_name, $number_store_method );
-		// reset invoice number yearly
-		if ( isset( $this->settings['reset_number_yearly'] ) ) {
-			$current_year = date("Y");
-			$last_number_year = $number_store->get_last_date('Y');
-			// check if we need to reset
-			if ( $current_year != $last_number_year ) {
-				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
-			}
-		}
-
-		$invoice_date = $this->get_date();
-		$invoice_number = $number_store->increment( $this->order_id, $invoice_date->date_i18n( 'Y-m-d H:i:s' ) );
+		$number_store_name   = $this->store_name();
+		$number_store        = new Sequential_Number_Store( $number_store_name, $number_store_method );
+		$invoice_date        = $this->get_date();
+		$invoice_number      = $number_store->increment( $this->order_id, $invoice_date->date_i18n( 'Y-m-d H:i:s' ) );
 
 		$this->set_number( $invoice_number );
 
 		return $invoice_number;
+	}
+
+	public function store_name() {
+		$current_date       = date( 'Y' );
+		$document_date      = date( 'Y', $this->get_date() );
+		$reset_numeration   = isset( $this->settings['reset_number_yearly'] ) ? true : false;
+		$current_store_name = "{$this->slug}_number_{$document_date}";
+
+		// reset: on
+		if( $reset_numeration ) {
+			$store_name   = $current_store_name;
+		// reset: off
+		} else {
+			$store_name   = "{$this->slug}_number_{$current_date}";
+			$store_exists = Sequential_Number_Store::store_name_exists( $store_name );
+
+			// if store don't exist it's a new year
+			if( ! $store_exists ) {
+				$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+				$next_number         = Sequential_Number_Store::get_next( $current_store_name, $number_store_method );
+
+				// set next number based on current store
+				if( ! empty( $next_number ) ) {
+					$number_store    = new Sequential_Number_Store( $store_name, $number_store_method );
+					$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $next_number, $this ) );
+				}
+			}
+		}
+
+		return apply_filters( "wpo_wcpdf_{$this->slug}_store_name", $store_name, $this );
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {
