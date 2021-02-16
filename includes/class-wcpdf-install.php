@@ -172,7 +172,7 @@ class Install {
 			),
 		);
 		foreach ($settings_defaults as $option => $defaults) {
-			update_option( $option, $defaults );
+			add_option( $option, $defaults );
 		}
 
 		// set transient for wizard notification
