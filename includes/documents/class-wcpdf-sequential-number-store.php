@@ -113,6 +113,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 	public static function get_next( $store_name, $method ) {
 		global $wpdb;
 		$table_name = "{$wpdb->prefix}wcpdf_{$store_name}";
+		$next       = null;
 
 		if ( $method == 'auto_increment' ) {
 			// clear cache first on mysql 8.0+
@@ -121,7 +122,9 @@ $sql = "CREATE TABLE {$this->table_name} (
 			}
 			// get next auto_increment value
 			$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$table_name}'");
-			$next = $table_status->Auto_increment;
+			if( ! empty( $table_status ) ) {
+				$next = $table_status->Auto_increment;
+			}
 		} elseif ( $method == 'calculate' ) {
 			$last_row = $wpdb->get_row( "SELECT * FROM {$table_name} WHERE id = ( SELECT MAX(id) from {$table_name} )" );
 			if ( empty( $last_row ) ) {
