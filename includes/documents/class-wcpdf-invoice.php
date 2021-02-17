@@ -137,11 +137,9 @@ class Invoice extends Order_Document_Methods {
 				$number_store = new Sequential_Number_Store( $current_store_name, $number_store_method );
 				$next_number  = $number_store->get_next();
 
-				// set next number based on current store
-				if( ! empty( $next_number ) ) {
-					$number_store = new Sequential_Number_Store( $store_name, $number_store_method );
-					$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $next_number, $this ) );
-				}
+				// set next number based on current store max ID
+				$number_store = new Sequential_Number_Store( $store_name, $number_store_method );
+				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $next_number, $this ) );
 			}
 		}
 
