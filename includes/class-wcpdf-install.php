@@ -348,7 +348,7 @@ class Install {
 		}
 
 		// 2.8.2: rename invoice number store table
-		if ( $installed_version == 'versionless' || version_compare( $installed_version, '2.8.2', '<=' ) ) {
+		if ( version_compare( $installed_version, '2.8.2', '<=' ) ) {
 			global $wpdb;
 			$legacy_table_name = "{$wpdb->prefix}wcpdf_invoice_number";
 			$current_year      = date('Y');
