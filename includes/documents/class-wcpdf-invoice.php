@@ -103,30 +103,29 @@ class Invoice extends Order_Document_Methods {
 			return $invoice_number;
 		}
 
-		if( ! empty( $document_date = $this->get_date() ) ) {
-			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-			$number_store_name   = $this->store_name( $document_date );
-			$number_store        = new Sequential_Number_Store( $number_store_name, $number_store_method );
-			$invoice_number      = $number_store->increment( $this->order_id, $document_date->date_i18n( 'Y-m-d H:i:s' ) );
+		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+		$number_store_name   = $this->store_name();
+		$number_store        = new Sequential_Number_Store( $number_store_name, $number_store_method );
+		$invoice_number      = $number_store->increment( $this->order_id, $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 
-			$this->set_number( $invoice_number );
+		$this->set_number( $invoice_number );
 
-			return $invoice_number;
-		}
+		return $invoice_number;
 	}
 
-	public function store_name( $document_date ) {
-		$document_date      = date( 'Y', strtotime( $document_date ) );
-		$current_date       = date( 'Y' );
-		$reset_numeration   = isset( $this->settings['reset_number_yearly'] ) ? true : false;
-		$current_store_name = "{$this->slug}_number_{$document_date}";
+	public function store_name() {
+		$document_date       = $this->get_date()->date_i18n( 'Y' );
+		$current_date        = date( 'Y' );
+		$reset_numeration    = isset( $this->settings['reset_number_yearly'] ) ? true : false;
+		$current_store_name  = "{$this->slug}_number_{$document_date}";
+		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
 
 		// reset: on
 		if( $reset_numeration ) {
-			$store_name          = $current_store_name;
-			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-			$number_store        = new Sequential_Number_Store( $store_name, $number_store_method );
-			$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
+			$store_name   = $current_store_name;
+			$number_store = new Sequential_Number_Store( $store_name, $number_store_method );
+			$next_number  = $number_store->get_next();
+			$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $next_number, $this ) );
 
 		// reset: off
 		} else {
@@ -135,12 +134,12 @@ class Invoice extends Order_Document_Methods {
 
 			// if store don't exist it's a new year
 			if( ! $store_exists ) {
-				$number_store_method = 'calculate';
-				$next_number         = Sequential_Number_Store::get_next( $current_store_name, $number_store_method );
+				$number_store = new Sequential_Number_Store( $current_store_name, $number_store_method );
+				$next_number  = $number_store->get_next();
 
 				// set next number based on current store
 				if( ! empty( $next_number ) ) {
-					$number_store    = new Sequential_Number_Store( $store_name, $number_store_method );
+					$number_store = new Sequential_Number_Store( $store_name, $number_store_method );
 					$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $next_number, $this ) );
 				}
 			}
