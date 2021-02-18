@@ -404,7 +404,8 @@ class Settings_Callbacks {
 	public function next_number_edit( $args ) {
 		extract( $args );
 		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-		$next_number = Sequential_Number_Store::get_next( $store, $number_store_method );
+		$number_store = new Sequential_Number_Store( $store, $number_store_method );
+		$next_number = $number_store->get_next();
 		$nonce = wp_create_nonce( "wpo_wcpdf_next_{$store}" );
 		printf( '<input id="next_%1$s" class="next-number-input" type="text" size="%2$s" value="%3$s" disabled="disabled" data-store="%1$s" data-nonce="%4$s"/> <span class="edit-next-number dashicons dashicons-edit"></span><span class="save-next-number button secondary" style="display:none;">%5$s</span>', $store, $size, $next_number, $nonce, __( 'Save', 'woocommerce-pdf-invoices-packing-slips' ) );
 		// Displays option description.

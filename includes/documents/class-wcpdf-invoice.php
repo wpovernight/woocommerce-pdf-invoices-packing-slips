@@ -103,8 +103,7 @@ class Invoice extends Order_Document_Methods {
 			return $invoice_number;
 		}
 
-		$store_name     = $this->get_store_name();
-		$number_store   = $this->get_sequential_number_store( $store_name );
+		$number_store   = $this->get_sequential_number_store();
 		$invoice_number = $number_store->increment( $this->order_id, $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 
 		$this->set_number( $invoice_number );
@@ -112,49 +111,43 @@ class Invoice extends Order_Document_Methods {
 		return $invoice_number;
 	}
 
-	public function get_store_name() {
-		$document_date       = $this->get_date()->date_i18n( 'Y' );
-		$current_date        = date( 'Y' );
-		$reset_numeration    = isset( $this->settings['reset_number_yearly'] ) ? true : false;
-		$current_store_name  = "{$this->slug}_number_{$document_date}";
-
+	public function get_sequential_number_store() {
+		$reset_number_yearly = isset( $this->settings['reset_number_yearly'] ) ? true : false;
+		$method              = WPO_WCPDF()->settings->get_sequential_number_store_method();
+	
 		// reset: on
-		if( $reset_numeration ) {
-			$store_name   = $current_store_name;
-			$number_store = $this->get_sequential_number_store( $store_name );
-			$next_number  = $number_store->get_next();
-			$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $next_number, $this ) );
-
+		if( $reset_number_yearly ) {
+			$store_name   = $this->get_sequential_number_store_name( $this->get_date() );
+			$number_store = new Sequential_Number_Store( $store_name, $method );	
+	
+			if ( $number_store->is_new ) {
+				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
+			}
 		// reset: off
 		} else {
-			$store_name   = "{$this->slug}_number_{$current_date}";
-			$store_exists = Sequential_Number_Store::store_name_exists( $store_name );
-
-			// if store don't exist it's a new year
-			if( ! $store_exists ) {
-				$number_store = $this->get_sequential_number_store( $current_store_name );
-				$next_number  = $number_store->get_next();
-
-				// set next number based on current store max ID
-				$number_store = $this->get_sequential_number_store( $store_name );
-				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $next_number, $this ) );
+			$now          = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) );
+			$store_name   = $this->get_sequential_number_store_name( $now );
+			$number_store = new Sequential_Number_Store( $store_name, $method );
+	
+			if ( $number_store->is_new ) {
+				// get last year's store if available
+				$last_year         = $now->modify('-1 year');
+				$last_store_name   = $this->get_sequential_number_store_name( $last_year );
+				$last_number_store = new Sequential_Number_Store( $last_store_name, $method );	
+				if ( ! $number_store->is_new ) {
+					$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $last_number_store->get_next(), $this ) );
+				}
 			}
 		}
-
-		return apply_filters( "wpo_wcpdf_{$this->slug}_store_name", $store_name, $this );
+	
+		return $number_store;
 	}
-
-	public function get_sequential_number_store( $store_name ) {
-		global $wpdb;
-		$method = isset( WPO_WCPDF()->settings->debug_settings['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
-
-		// safety first - always use calculate when auto_increment_increment is not 1
-		$row = $wpdb->get_row("SHOW VARIABLES LIKE 'auto_increment_increment'");
-		if ( !empty($row) && !empty($row->Value) && $row->Value != 1 ) {
-			$method = 'calculate';
-		}
-
-		return new Sequential_Number_Store( $store_name, $method );	
+	
+	public function get_sequential_number_store_name( $date ) {
+		$year       = $date->date_i18n( 'Y' );
+		$store_name = "{$this->slug}_number_{$year}";
+	
+		return apply_filters( "wpo_wcpdf_{$this->slug}_store_name", $store_name, $this );
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {

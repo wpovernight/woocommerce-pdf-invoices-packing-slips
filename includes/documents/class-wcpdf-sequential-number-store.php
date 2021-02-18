@@ -35,6 +35,12 @@ class Sequential_Number_Store {
 	 */
 	public $table_name;
 
+	/**
+	 * Store name or table name could be filtered
+	 * @var Bool
+	 */
+	public $is_new = false;
+
 	public function __construct( $store_name, $method = 'auto_increment' ) {
 		global $wpdb;
 		$this->store_name = $store_name;
@@ -46,8 +52,11 @@ class Sequential_Number_Store {
 
 	public function init() {
 		global $wpdb;
+
 		// check if table exists
-		if( $wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") == $this->table_name) {
+		if( ! $this->store_name_exists() ) {
+			$this->is_new = true;
+		} else {
 			// check calculated_number column if using 'calculate' method
 			if ( $this->method == 'calculate' ) {
 				$column_exists = $wpdb->get_var("SHOW COLUMNS FROM `{$this->table_name}` LIKE 'calculated_number'");
@@ -177,12 +186,11 @@ $sql = "CREATE TABLE {$this->table_name} (
 	/**
 	 * @return bool
 	 */
-	public static function store_name_exists( $store_name ) {
+	public function store_name_exists() {
 		global $wpdb;
-		$table_name = "{$wpdb->prefix}wcpdf_{$store_name}";
 
 		// check if table exists
-		if( $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") == $table_name) {
+		if( $wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") == $this->table_name) {
 			return true;
 		} else {
 			return false;
