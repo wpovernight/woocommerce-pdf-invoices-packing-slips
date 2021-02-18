@@ -133,7 +133,14 @@ class Invoice extends Order_Document_Methods {
 				// get last year's store if available
 				$last_year         = $now->modify('-1 year');
 				$last_store_name   = $this->get_sequential_number_store_name( $last_year );
-				$last_number_store = new Sequential_Number_Store( $last_store_name, $method );	
+
+				// if the filter 'wpo_wcpdf_document_sequential_number_store' is used and the name is the same
+				if( $last_store_name == $store_name ) {
+					$last_number_store = $number_store;
+				} else {
+					$last_number_store = new Sequential_Number_Store( $last_store_name, $method );	
+				}
+				
 				if ( ! $number_store->is_new ) {
 					$number_store->set_next( $last_number_store->get_next() );
 				}
