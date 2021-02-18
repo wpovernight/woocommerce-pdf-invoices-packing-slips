@@ -36,7 +36,7 @@ class Sequential_Number_Store {
 	public $table_name;
 
 	/**
-	 * Store name or table name could be filtered
+	 * If table name not found in database, is new table
 	 * @var Bool
 	 */
 	public $is_new = false;

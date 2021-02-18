@@ -135,7 +135,7 @@ class Invoice extends Order_Document_Methods {
 				$last_store_name   = $this->get_sequential_number_store_name( $last_year );
 				$last_number_store = new Sequential_Number_Store( $last_store_name, $method );	
 				if ( ! $number_store->is_new ) {
-					$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', $last_number_store->get_next(), $this ) );
+					$number_store->set_next( $last_number_store->get_next() );
 				}
 			}
 		}
@@ -146,8 +146,11 @@ class Invoice extends Order_Document_Methods {
 	public function get_sequential_number_store_name( $date ) {
 		$year       = $date->date_i18n( 'Y' );
 		$store_name = "{$this->slug}_number_{$year}";
-	
-		return apply_filters( "wpo_wcpdf_{$this->slug}_store_name", $store_name, $this );
+
+		// legacy filter for backward compatibility
+		$store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', $store_name, $this );
+
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", $store_name, $this );
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {
