@@ -347,17 +347,6 @@ class Install {
 			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		}
 
-		// 2.8.2: rename invoice number store table
-		if ( version_compare( $installed_version, '2.8.2', '<=' ) ) {
-			global $wpdb;
-			$legacy_table_name = "{$wpdb->prefix}wcpdf_invoice_number";
-			$current_year      = date('Y');
-			$new_table_name    = "{$wpdb->prefix}wcpdf_invoice_number_{$current_year}";
-			if( $wpdb->get_var("SHOW TABLES LIKE '{$legacy_table_name}'") == $legacy_table_name) {
-				$wpdb->query("ALTER TABLE {$legacy_table_name} RENAME {$new_table_name}");
-			}
-		}
-
 	}
 
 	/**

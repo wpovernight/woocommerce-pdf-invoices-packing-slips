@@ -133,13 +133,7 @@ class Invoice extends Order_Document_Methods {
 				// get last year's store if available
 				$last_year         = $now->modify('-1 year');
 				$last_store_name   = $this->get_sequential_number_store_name( $last_year );
-
-				// if the filter 'wpo_wcpdf_document_sequential_number_store' is used and the name is the same
-				if( $last_store_name == $store_name ) {
-					$last_number_store = $number_store;
-				} else {
-					$last_number_store = new Sequential_Number_Store( $last_store_name, $method );	
-				}
+				$last_number_store = new Sequential_Number_Store( $last_store_name, $method );
 				
 				if ( ! $number_store->is_new ) {
 					$number_store->set_next( $last_number_store->get_next() );
@@ -151,13 +145,35 @@ class Invoice extends Order_Document_Methods {
 	}
 	
 	public function get_sequential_number_store_name( $date ) {
-		$year       = $date->date_i18n( 'Y' );
-		$store_name = "{$this->slug}_number_{$year}";
+		$year            = $date->date_i18n( 'Y' );
+		$store_base_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this );
+	
+		// migrate old stores without year suffix
+		$number_store_migrated = get_option( 'wpo_wcpdf_number_store_migrated' );
+		if( ! $number_store_migrated ) {
+			$this->maybe_migrate_number_store( $store_base_name );
+		}
+	
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", "{$store_base_name}_{$year}", $this );
+	}
 
-		// legacy filter for backward compatibility
-		$store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', $store_name, $this );
+	private function maybe_migrate_number_store( $store_base_name ) {
+		global $wpdb;
+		$now            = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) );
+		$year           = $now->date_i18n( 'Y' );
+		$new_table_name = "{$store_base_name}_{$year}";
 
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", $store_name, $this );
+		if( $wpdb->get_var( "SHOW TABLES LIKE '{$store_base_name}'") == $store_base_name ) {
+			$query = $wpdb->query( "ALTER TABLE {$store_base_name} RENAME {$new_table_name} ");
+			if( $query ) {
+				update_option( 'wpo_wcpdf_number_store_migrated', 1 );
+				wcpdf_log_error( sprintf( __( 'Number store migration from %s (old table) to %s (new table) run successfully!', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $new_table_name ), 'info' );
+			} else {
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store: %s', 'woocommerce-pdf-invoices-packing-slips' ), $wpdb->last_error ) );
+			}
+		} else {
+			wcpdf_log_error( sprintf( __( 'Legacy number store table not found: %s', 'woocommerce-pdf-invoices-packing-slips' ), $wpdb->last_error ), 'warning' );
+		}
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {
