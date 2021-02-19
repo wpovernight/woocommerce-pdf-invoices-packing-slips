@@ -294,6 +294,18 @@ class Settings_Debug {
 					'id'			=> 'use_html5_parser',
 				)
 			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'migrate_number_stores',
+				'title'			=> __( 'Migrate legacy number stores', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'migrate_number_stores',
+					'description'	=> sprintf( __( 'Renames the legacy database number store tables appending the year suffix, eg. %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>wp_wcpdf_invoice_number_'.date('Y').'</code>' ),
+				)
+			),
 		);
 
 		// allow plugins to alter settings fields

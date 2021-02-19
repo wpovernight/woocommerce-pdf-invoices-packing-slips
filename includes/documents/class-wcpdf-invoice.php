@@ -149,8 +149,8 @@ class Invoice extends Order_Document_Methods {
 		$store_base_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this );
 	
 		// migrate old stores without year suffix
-		$number_store_migrated = get_option( "wpo_wcpdf_number_store_{$store_base_name}_migrated" );
-		if( ! $number_store_migrated ) {
+		$migrate_number_stores = WPO_WCPDF()->settings->debug_settings['migrate_number_stores'];
+		if( ! $migrate_number_stores ) {
 			$this->maybe_migrate_number_store( $store_base_name );
 		}
 	
@@ -171,8 +171,6 @@ class Invoice extends Order_Document_Methods {
 			} else {
 				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $wpdb->last_error ) );
 			}
-		} else {
-			wcpdf_log_error( sprintf( __( 'Legacy number store table %s not found: %s', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $wpdb->last_error ), 'warning' );
 		}
 	}
 

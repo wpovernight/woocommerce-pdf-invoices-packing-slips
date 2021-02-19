@@ -347,6 +347,13 @@ class Install {
 			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		}
 
+		// 2.8.2: enable number store migration
+		if ( version_compare( $installed_version, '2.8.2', '<=' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			$debug_settings['migrate_number_stores'] = 1;
+			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+		}
+
 	}
 
 	/**
