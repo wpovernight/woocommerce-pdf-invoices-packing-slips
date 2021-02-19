@@ -161,15 +161,15 @@ class Invoice extends Order_Document_Methods {
 		global $wpdb;
 		$now            = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) );
 		$year           = $now->date_i18n( 'Y' );
-		$new_table_name = "{$store_base_name}_{$year}";
+		$old_table_name = "{$wpdb->prefix}wcpdf_{$store_base_name}";
+		$new_table_name = "{$old_table_name}_{$year}";
 
-		if( $wpdb->get_var( "SHOW TABLES LIKE '{$store_base_name}'") == $store_base_name ) {
-			$query = $wpdb->query( "ALTER TABLE {$store_base_name} RENAME {$new_table_name} ");
+		if( $wpdb->get_var( "SHOW TABLES LIKE '{$old_table_name}'") == $old_table_name ) {
+			$query = $wpdb->query( "ALTER TABLE {$old_table_name} RENAME {$new_table_name} ");
 			if( $query ) {
-				update_option( "wpo_wcpdf_number_store_{$store_base_name}_migrated", 1 );
-				wcpdf_log_error( sprintf( __( 'Number store migration from %s (old table) to %s (new table) run successfully!', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $new_table_name ), 'info' );
+				wcpdf_log_error( sprintf( __( 'Number store migration from %s (old table) to %s (new table) run successfully!', 'woocommerce-pdf-invoices-packing-slips' ), $old_table_name, $new_table_name ), 'info' );
 			} else {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $old_table_name, $wpdb->last_error ) );
 			}
 		}
 	}
