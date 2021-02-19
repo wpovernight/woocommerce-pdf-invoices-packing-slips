@@ -149,7 +149,7 @@ class Invoice extends Order_Document_Methods {
 		$store_base_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this );
 	
 		// migrate old stores without year suffix
-		$number_store_migrated = get_option( 'wpo_wcpdf_number_store_migrated' );
+		$number_store_migrated = get_option( "wpo_wcpdf_number_store_{$store_base_name}_migrated" );
 		if( ! $number_store_migrated ) {
 			$this->maybe_migrate_number_store( $store_base_name );
 		}
@@ -166,7 +166,8 @@ class Invoice extends Order_Document_Methods {
 		if( $wpdb->get_var( "SHOW TABLES LIKE '{$store_base_name}'") == $store_base_name ) {
 			$query = $wpdb->query( "ALTER TABLE {$store_base_name} RENAME {$new_table_name} ");
 			if( $query ) {
-				update_option( 'wpo_wcpdf_number_store_migrated', 1 );
+
+				update_option( "wpo_wcpdf_number_store_{$store_base_name}_migrated", 1 );
 				wcpdf_log_error( sprintf( __( 'Number store migration from %s (old table) to %s (new table) run successfully!', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $new_table_name ), 'info' );
 			} else {
 				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $wpdb->last_error ) );
