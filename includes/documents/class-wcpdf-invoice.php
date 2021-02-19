@@ -169,10 +169,10 @@ class Invoice extends Order_Document_Methods {
 				update_option( 'wpo_wcpdf_number_store_migrated', 1 );
 				wcpdf_log_error( sprintf( __( 'Number store migration from %s (old table) to %s (new table) run successfully!', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $new_table_name ), 'info' );
 			} else {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store: %s', 'woocommerce-pdf-invoices-packing-slips' ), $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $wpdb->last_error ) );
 			}
 		} else {
-			wcpdf_log_error( sprintf( __( 'Legacy number store table not found: %s', 'woocommerce-pdf-invoices-packing-slips' ), $wpdb->last_error ), 'warning' );
+			wcpdf_log_error( sprintf( __( 'Legacy number store table %s not found: %s', 'woocommerce-pdf-invoices-packing-slips' ), $store_base_name, $wpdb->last_error ), 'warning' );
 		}
 	}
 
