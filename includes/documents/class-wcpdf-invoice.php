@@ -135,8 +135,10 @@ class Invoice extends Order_Document_Methods {
 				$last_store_name   = $this->get_sequential_number_store_name( $last_year, $method );
 				$last_number_store = new Sequential_Number_Store( $last_store_name, $method );
 				
-				if ( ! $number_store->is_new ) {
+				if ( $last_number_store ) {
 					$number_store->set_next( $last_number_store->get_next() );
+				} else {
+					$number_store->set_next( 1 );
 				}
 			}
 		}
