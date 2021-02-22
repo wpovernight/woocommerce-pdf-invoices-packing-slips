@@ -117,7 +117,7 @@ class Invoice extends Order_Document_Methods {
 	
 		// reset: on
 		if( $reset_number_yearly ) {
-			$store_name   = $this->get_sequential_number_store_name( $this->get_date() );
+			$store_name   = $this->get_sequential_number_store_name( $this->get_date(), $method );
 			$number_store = new Sequential_Number_Store( $store_name, $method );	
 	
 			if ( $number_store->is_new ) {
@@ -126,13 +126,13 @@ class Invoice extends Order_Document_Methods {
 		// reset: off
 		} else {
 			$now          = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) );
-			$store_name   = $this->get_sequential_number_store_name( $now );
+			$store_name   = $this->get_sequential_number_store_name( $now, $method );
 			$number_store = new Sequential_Number_Store( $store_name, $method );
 	
 			if ( $number_store->is_new ) {
 				// get last year's store if available
 				$last_year         = $now->modify('-1 year');
-				$last_store_name   = $this->get_sequential_number_store_name( $last_year );
+				$last_store_name   = $this->get_sequential_number_store_name( $last_year, $method );
 				$last_number_store = new Sequential_Number_Store( $last_store_name, $method );
 				
 				if ( ! $number_store->is_new ) {
@@ -144,24 +144,24 @@ class Invoice extends Order_Document_Methods {
 		return $number_store;
 	}
 	
-	public function get_sequential_number_store_name( $date ) {
+	public function get_sequential_number_store_name( $date, $method ) {
 		$year            = $date->date_i18n( 'Y' );
 		$store_base_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this );
 	
 		// migrate old stores without year suffix
 		$migrate_number_stores = WPO_WCPDF()->settings->debug_settings['migrate_number_stores'];
 		if( ! $migrate_number_stores ) {
-			$this->maybe_migrate_number_store( $store_base_name );
+			$this->maybe_migrate_number_store( $store_base_name, $method );
 		}
 	
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", "{$store_base_name}_{$year}", $this );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", "{$store_base_name}_{$year}", $method, $this );
 	}
 
-	private function maybe_migrate_number_store( $store_base_name ) {
+	private function maybe_migrate_number_store( $store_base_name, $method ) {
 		global $wpdb;
 		$now            = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) );
 		$year           = $now->date_i18n( 'Y' );
-		$old_table_name = "{$wpdb->prefix}wcpdf_{$store_base_name}";
+		$old_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
 		$new_table_name = "{$old_table_name}_{$year}";
 
 		if( $wpdb->get_var( "SHOW TABLES LIKE '{$old_table_name}'") == $old_table_name ) {
