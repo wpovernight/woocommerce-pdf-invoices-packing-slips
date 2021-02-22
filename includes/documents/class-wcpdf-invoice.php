@@ -150,7 +150,7 @@ class Invoice extends Order_Document_Methods {
 			$this->maybe_migrate_number_store( $store_base_name, $method );
 		}
 	
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", "{$store_base_name}_{$year}", $method, $this );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", "{$store_base_name}_{$year}", $store_base_name, $year, $method, $this );
 	}
 
 	private function maybe_migrate_number_store( $store_base_name, $method ) {
