@@ -489,7 +489,7 @@ class Admin {
 						</div>
 						<!-- Read only -->
 						<div class="read-only">
-							<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value'] ; ?></p>
+							<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value']; ?></p>
 						</div>
 						<!-- Editable -->
 						<div class="editable">
