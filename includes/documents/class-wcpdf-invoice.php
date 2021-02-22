@@ -149,8 +149,7 @@ class Invoice extends Order_Document_Methods {
 		$store_base_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this );
 	
 		// migrate old stores without year suffix
-		$migrate_number_stores = WPO_WCPDF()->settings->debug_settings['migrate_number_stores'];
-		if( ! $migrate_number_stores ) {
+		if( isset( WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] ) ) {
 			$this->maybe_migrate_number_store( $store_base_name, $method );
 		}
 	
