@@ -117,7 +117,10 @@ class Invoice extends Order_Document_Methods {
 	
 		// reset: on
 		if( $reset_number_yearly ) {
-			$store_name   = $this->get_sequential_number_store_name( $this->get_date(), $method );
+			if( ! ( $date = $this->get_date() ) ) {
+				$date = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) ); // now (for settings callback)
+			}
+			$store_name   = $this->get_sequential_number_store_name( $date, $method );
 			$number_store = new Sequential_Number_Store( $store_name, $method );	
 	
 			if ( $number_store->is_new ) {
@@ -143,7 +146,7 @@ class Invoice extends Order_Document_Methods {
 	
 	public function get_sequential_number_store_name( $date, $method ) {
 		$year            = $date->date_i18n( 'Y' );
-		$store_base_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this );
+		$store_base_name = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
 	
 		// migrate old stores without year suffix
 		if( isset( WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] ) ) {
@@ -351,7 +354,7 @@ class Invoice extends Order_Document_Methods {
 				'callback'		=> 'next_number_edit',
 				'section'		=> 'invoice',
 				'args'			=> array(
-					'store'			=> 'invoice_number_'.date('Y'),
+					'store'			=> $this->get_sequential_number_store(),
 					'size'			=> '10',
 					'description'	=> __( 'This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
