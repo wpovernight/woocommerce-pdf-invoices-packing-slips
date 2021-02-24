@@ -118,7 +118,7 @@ class Invoice extends Order_Document_Methods {
 		// reset: on
 		if( $reset_number_yearly ) {
 			if( ! ( $date = $this->get_date() ) ) {
-				$date = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) ); // now (for settings callback)
+				$date = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
 			}
 			$store_name   = $this->get_sequential_number_store_name( $date, $method );
 			$number_store = new Sequential_Number_Store( $store_name, $method );	
@@ -128,7 +128,7 @@ class Invoice extends Order_Document_Methods {
 			}
 		// reset: off
 		} else {
-			$now          = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) );
+			$now          = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 			$store_name   = $this->get_sequential_number_store_name( $now, $method );
 			$number_store = new Sequential_Number_Store( $store_name, $method );
 	
@@ -158,7 +158,7 @@ class Invoice extends Order_Document_Methods {
 
 	private function maybe_migrate_number_store( $store_base_name, $method ) {
 		global $wpdb;
-		$now            = new \WC_DateTime( "@".time(), new \DateTimeZone( 'UTC' ) );
+		$now            = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 		$year           = $now->date_i18n( 'Y' );
 		$old_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
 		$new_table_name = "{$old_table_name}_{$year}";
