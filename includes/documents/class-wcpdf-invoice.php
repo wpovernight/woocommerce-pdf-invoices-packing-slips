@@ -147,6 +147,7 @@ class Invoice extends Order_Document_Methods {
 	public function get_sequential_number_store_name( $date, $method ) {
 		$year                  = $date->date_i18n( 'Y' );
 		$store_base_name       = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
+		$store_name            = "{$store_base_name}_{$year}";
 		
 		// migrate when setting not set (means default = set) or when set and not 0
 		$migrate_number_stores = ( ! isset( WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] ) || WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] != 0 );
@@ -154,9 +155,12 @@ class Invoice extends Order_Document_Methods {
 		// migrate old stores without year suffix
 		if( apply_filters( 'wpo_wcpdf_migrate_number_stores', $migrate_number_stores ) ) {
 			$this->maybe_migrate_number_store( $store_base_name, $method );
+		// don't migrate but check if legacy table exists
+		} elseif( $this->number_store_exists( $store_base_name, $method ) ) {
+			$store_name = $store_base_name;
 		}
 	
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", "{$store_base_name}_{$year}", $store_base_name, $date, $method, $this );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", $store_name, $store_base_name, $date, $method, $this );
 	}
 
 	private function maybe_migrate_number_store( $store_base_name, $method ) {
@@ -173,6 +177,17 @@ class Invoice extends Order_Document_Methods {
 			} else {
 				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $old_table_name, $wpdb->last_error ) );
 			}
+		}
+	}
+
+	private function number_store_exists( $store_base_name, $method ) {
+		global $wpdb;
+		$old_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
+
+		if( $wpdb->get_var( "SHOW TABLES LIKE '{$old_table_name}'") == $old_table_name ) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
