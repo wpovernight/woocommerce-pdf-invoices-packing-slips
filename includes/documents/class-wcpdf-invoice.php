@@ -161,6 +161,8 @@ class Invoice extends Order_Document_Methods {
 
 	private function maybe_migrate_number_store( $store_base_name, $method ) {
 		global $wpdb;
+		$wpdb->hide_errors(); // if something bad happens don't show, just log
+		
 		$now            = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 		$year           = $now->date_i18n( 'Y' );
 		$old_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
