@@ -156,7 +156,7 @@ class Invoice extends Order_Document_Methods {
 		if( apply_filters( 'wpo_wcpdf_migrate_number_stores', $migrate_number_stores ) ) {
 			$this->maybe_migrate_number_store( $store_base_name, $method );
 		// don't migrate but check if legacy table exists
-		} elseif( $this->number_store_exists( $store_base_name, $method ) ) {
+		} elseif( $this->legacy_number_store_exists( $store_base_name, $method ) ) {
 			$store_name = $store_base_name;
 		}
 	
@@ -180,7 +180,7 @@ class Invoice extends Order_Document_Methods {
 		}
 	}
 
-	private function number_store_exists( $store_base_name, $method ) {
+	private function legacy_number_store_exists( $store_base_name, $method ) {
 		global $wpdb;
 		$old_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
 
