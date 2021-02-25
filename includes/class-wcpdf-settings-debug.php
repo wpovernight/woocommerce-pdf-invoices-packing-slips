@@ -301,9 +301,11 @@ class Settings_Debug {
 				'callback'		=> 'checkbox',
 				'section'		=> 'debug_settings',
 				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'migrate_number_stores',
-					'description'	=> sprintf( __( 'Renames the legacy database number store tables appending the year suffix, eg. %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>wp_wcpdf_invoice_number_'.date('Y').'</code>' ),
+					'option_name'     => $option_name,
+					'id'              => 'migrate_number_stores',
+					'description'     => sprintf( __( 'Renames the legacy database number store tables appending the year suffix, eg. %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>wp_wcpdf_invoice_number_'.date('Y').'</code>' ),
+					'store_unchecked' => true,
+					'default'         => 1,
 				)
 			),
 		);

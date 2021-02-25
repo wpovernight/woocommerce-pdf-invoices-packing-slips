@@ -169,6 +169,7 @@ class Install {
 				// 'html_output'				=> '',
 				'enable_cleanup'				=> 1,
 				'cleanup_days'					=> 7,
+				'migrate_number_stores'			=> 0,
 			),
 		);
 		foreach ($settings_defaults as $option => $defaults) {
@@ -177,14 +178,6 @@ class Install {
 
 		// set transient for wizard notification
 		set_transient( 'wpo_wcpdf_new_install', 'yes', DAY_IN_SECONDS * 2 );
-
-		// 2.8.2: migrate number stores
-		if ( empty( get_option( 'wpo_wcpdf_number_stores_migrated' ) ) ) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-			$debug_settings['migrate_number_stores'] = 1;
-			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
-			update_option( 'wpo_wcpdf_number_stores_migrated', 1 );
-		}
 	}
 
 	/**

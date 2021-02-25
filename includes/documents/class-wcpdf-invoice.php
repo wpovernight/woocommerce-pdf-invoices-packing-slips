@@ -147,10 +147,12 @@ class Invoice extends Order_Document_Methods {
 	public function get_sequential_number_store_name( $date, $method ) {
 		$year                  = $date->date_i18n( 'Y' );
 		$store_base_name       = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
-		$migrate_number_stores = apply_filters( 'wpo_wcpdf_migrate_number_stores', isset( WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] ) );
+		
+		// migrate when setting not set (means default = set) or when set and not 0
+		$migrate_number_stores = ( ! isset( WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] ) || WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] != 0 );
 
 		// migrate old stores without year suffix
-		if( $migrate_number_stores ) {
+		if( apply_filters( 'wpo_wcpdf_migrate_number_stores', $migrate_number_stores ) ) {
 			$this->maybe_migrate_number_store( $store_base_name, $method );
 		}
 	
