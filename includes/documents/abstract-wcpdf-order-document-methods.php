@@ -430,7 +430,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$payment_method_title = WCX_Order::get_prop( $this->order, 'payment_method_title', 'view' );
 		}
 
-		$payment_method = __( $payment_method_title, 'woocommerce' );
+		$payment_method = __( ucfirst($payment_method_title), 'woocommerce' );
 
 		return apply_filters( 'wpo_wcpdf_payment_method', $payment_method, $this );
 	}
