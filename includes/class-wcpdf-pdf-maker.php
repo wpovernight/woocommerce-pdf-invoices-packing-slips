@@ -3,6 +3,7 @@ namespace WPO\WC\PDF_Invoices;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Dompdf\Adapter\CPDF;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -46,6 +47,11 @@ class PDF_Maker {
 			'isFontSubsettingEnabled'	=> $this->settings['font_subsetting'],
 		) ) );
 
+		// if auto height
+		if( apply_filters( 'wpo_wcpdf_dompdf_auto_height_enable', __return_false() ) ) {
+			$this->settings['paper_size'] = $this->auto_height_paper_size( $options );
+		}
+
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );
 		$dompdf->loadHtml( $this->html );
@@ -55,6 +61,41 @@ class PDF_Maker {
 		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html );
 
 		return $dompdf->output();
+	}
+
+	private function auto_height_paper_size( $options ) {
+		$dompdf = new Dompdf( $options );
+		$dompdf->setPaper( $this->settings['paper_size'], $this->settings['paper_orientation'] );
+
+		$GLOBALS['bodyHeight'] = 0;
+		$dompdf->setCallbacks(
+			array(
+				'myCallbacks' => array(
+					'event' => 'end_frame',
+					'f'     => function ( $infos ) {
+						$frame = $infos["frame"];
+						if ( strtolower( $frame->get_node()->nodeName ) === "body" ) {
+							$padding_box            = $frame->get_padding_box();
+							$GLOBALS['bodyHeight'] += $padding_box['h'];
+						}
+					},
+				)
+			)
+		);
+
+		$dompdf->loadHtml( $this->html );
+		$dompdf->render();
+		unset( $dompdf );
+
+		$paper_sizes         = CPDF::$PAPER_SIZES;
+		$settings_paper_size = strtolower( $this->settings['paper_size'] );
+		if( isset( $paper_sizes[$settings_paper_size] ) ) {
+			$paper_size    = $paper_sizes[$settings_paper_size];
+			$paper_size[3] = $GLOBALS['bodyHeight'] + apply_filters( 'wpo_wcpdf_dompdf_auto_height_margin', 150 );
+			return $paper_size;
+		} else {
+			return $this->settings['paper_size'];
+		}
 	}
 
 	private function get_chroot_paths() {
