@@ -1,12 +1,12 @@
 jQuery( function( $ ) {
-	$('.edit-next-number').click( function( event ) {
+	$('.edit-next-number').on('click', function( event ) {
 		// enable input & show save button
 		$( this ).hide();
 		$( this ).siblings( 'input' ).prop('disabled', false);
 		$( this ).siblings( '.save-next-number.button').show();
 	});
 
-	$('.save-next-number').click( function( event ) {
+	$('.save-next-number').on('click', function( event ) {
 		$input = $( this ).siblings( 'input' );
 		$input.addClass('ajax-waiting');
 		var data = {
@@ -29,11 +29,11 @@ jQuery( function( $ ) {
 		});
 	});
 
-	$("[name='wpo_wcpdf_documents_settings_invoice[display_number]']").change(function (event) {
+	$("[name='wpo_wcpdf_documents_settings_invoice[display_number]']").on('change', function (event) {
 		if ($(this).val() == 'order_number') {
 			$(this).closest('td').find('.description').slideDown();
 		} else {
 			$(this).closest('td').find('.description').hide();
 		}
-	}).change();
+	}).trigger('change');
 });
