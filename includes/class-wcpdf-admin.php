@@ -431,7 +431,7 @@ class Admin {
 				<!-- Title -->
 				<h4>
 					<?= $document->get_title(); ?>
-					<?php if( $document->exists() ) : ?>
+					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
 						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
@@ -441,6 +441,7 @@ class Admin {
 				<!-- Read only -->
 				<div class="read-only">
 					<?php if( $document->exists() ) : ?>
+						<?php if( isset( $data['number'] ) ) : ?>
 						<div class="<?= $document->get_type(); ?>-number">
 							<p class="form-field <?= $data['number']['name']; ?>_field">	
 								<p>
@@ -449,6 +450,8 @@ class Admin {
 								</p>
 							</p>
 						</div>
+						<?php endif; ?>
+						<?php if( isset( $data['date'] ) ) : ?>
 						<div class="<?= $document->get_type(); ?>-date">
 							<p class="form-field form-field-wide">
 								<p>
@@ -457,6 +460,7 @@ class Admin {
 								</p>
 							</p>
 						</div>
+						<?php endif; ?>
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<span class="wpo-wcpdf-set-date-number button"><?php printf( __( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></span>
@@ -465,14 +469,18 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable">
+					<?php if( isset( $data['number'] ) ) : ?>
 					<p class="form-field <?= $data['number']['name']; ?>_field ">
 						<label for="<?= $data['number']['name']; ?>"><?= $data['number']['label']; ?></label>
 						<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="<?= $data['number']['plain']; ?>" disabled="disabled" > (<?= __( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
 					</p>
+					<?php endif; ?>
+					<?php if( isset( $data['date'] ) ) : ?>
 					<p class="form-field form-field-wide">
 						<label for="<?= $data['date']['name'] ?>[date]"><?= $data['date']['label']; ?></label>
 						<input type="text" class="date-picker-field" name="<?= $data['date']['name'] ?>[date]" id="<?= $data['date']['name'] ?>[date]" maxlength="10" value="<?= $data['date']['date']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[hour]" id="<?= $data['date']['name']; ?>[hour]" min="0" max="23" size="2" value="<?= $data['date']['hour']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[minute]" id="<?= $data['date']['name']; ?>[minute]" min="0" max="59" size="2" value="<?= $data['date']['minute']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 					</p>
+					<?php endif; ?>
 				</div>
 			</section>
 
