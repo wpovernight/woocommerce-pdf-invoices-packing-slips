@@ -962,7 +962,7 @@ abstract class Order_Document {
 		$old_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
 		$new_table_name = "{$old_table_name}_{$year}";
 
-		if( $wpdb->get_var( "SHOW TABLES LIKE '{$old_table_name}'") == $old_table_name ) {
+		if( $wpdb->get_var( "SHOW TABLES LIKE '{$old_table_name}'") == $old_table_name && $wpdb->get_var( "SHOW TABLES LIKE '{$new_table_name}'") != $new_table_name ) {
 			$query = $wpdb->query( "ALTER TABLE {$old_table_name} RENAME {$new_table_name} ");
 			if( $query ) {
 				wcpdf_log_error( sprintf( __( 'Number store migration from %s (old table) to %s (new table) run successfully!', 'woocommerce-pdf-invoices-packing-slips' ), $old_table_name, $new_table_name ), 'info' );
