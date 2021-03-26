@@ -418,12 +418,28 @@ abstract class Order_Document {
 	}
 
 	public function get_number_title() {
-		$number_title = sprintf( __( '%s Number', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
+		// override/not using $this->title to allow for language switching!
+		if( $this->type == 'invoice' ) {
+			$number_title = __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' );
+		} elseif( $this->type == 'packing-slip' ) {
+			$number_title = __( 'Packing Slip Number', 'woocommerce-pdf-invoices-packing-slips' );
+		} else {
+			$number_title = __( 'Document Number', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
 		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
 	}
 
 	public function get_date_title() {
-		$date_title = sprintf( __( '%s Date', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
+		// override/not using $this->title to allow for language switching!
+		if( $this->type == 'invoice' ) {
+			$date_title = __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' );
+		} elseif( $this->type == 'packing-slip' ) {
+			$date_title = __( 'Packing Slip Date', 'woocommerce-pdf-invoices-packing-slips' );
+		} else {
+			$date_title = __( 'Document Date', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
