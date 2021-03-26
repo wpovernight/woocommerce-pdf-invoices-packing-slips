@@ -548,8 +548,10 @@ abstract class Order_Document_Methods extends Order_Document {
 				// Get the product to add more info
 				if ( is_callable( array( $item, 'get_product' ) ) ) { // WC4.4+
 					$product = $item->get_product();
-				} else {
+				} elseif ( defined( 'WOOCOMMERCE_VERSION' ) && version_compare( WOOCOMMERCE_VERSION, '4.4', '<' ) ) {
 					$product = $this->order->get_product_from_item( $item );
+				} else {
+					$product = null;
 				}
 				
 				// Checking fo existance, thanks to MDesigner0 
