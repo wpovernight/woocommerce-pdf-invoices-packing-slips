@@ -443,7 +443,6 @@ class Invoice extends Order_Document_Methods {
 	 * Document number title
 	 */
 	public function get_number_title() {
-		// override/not using $this->title to allow for language switching!
 		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
@@ -451,7 +450,6 @@ class Invoice extends Order_Document_Methods {
 	 * Document date title
 	 */
 	public function get_date_title() {
-		// override/not using $this->title to allow for language switching!
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
