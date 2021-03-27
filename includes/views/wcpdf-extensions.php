@@ -3,7 +3,7 @@
 jQuery(document).ready(function() {
 	jQuery('.extensions .more').hide();
 
-	jQuery('.extensions > li').click(function() {
+	jQuery('.extensions > li').on('click',function() {
 		jQuery(this).toggleClass('expanded');
 		jQuery(this).find('.more').slideToggle();
 	});

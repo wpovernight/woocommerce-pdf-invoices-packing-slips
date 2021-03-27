@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-	$("#doaction, #doaction2").click(function (event) {
+	$("#doaction, #doaction2").on("click", function (event) {
 		var actionselected = $(this).attr("id").substr(2);
 		var action = $('select[name="' + actionselected + '"]').val();
 		if ( $.inArray(action, wpo_wcpdf_ajax.bulk_actions) !== -1 ) {
@@ -32,7 +32,7 @@ jQuery(document).ready(function($) {
 	$('#wpo_wcpdf-data-input-box').insertAfter('#woocommerce-order-data');
 	
 	// enable invoice number edit if user initiated
-	$( ".wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes" ).click(function() {
+	$( ".wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes" ).on("click", function() {
 		$form = $(this).closest('.wcpdf-data-fields-section');
 		if ($form.length == 0) { // no section, take overall wrapper
 			$form = $(this).closest('.wcpdf-data-fields');
@@ -50,7 +50,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 
-	$( ".wcpdf-data-fields .wpo-wcpdf-delete-document" ).click(function() {
+	$( ".wcpdf-data-fields .wpo-wcpdf-delete-document" ).on("click", function() {
 		if ( window.confirm( wpo_wcpdf_ajax.confirm_delete ) === false ) {
 			return; // having second thoughts
 		}
@@ -80,7 +80,7 @@ jQuery(document).ready(function($) {
 		});
 	});
 
-	$( ".wcpdf-data-fields .wpo-wcpdf-regenerate-document" ).click(function() {
+	$( ".wcpdf-data-fields .wpo-wcpdf-regenerate-document" ).on("click", function() {
 		
 		if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
 			return; // having second thoughts
