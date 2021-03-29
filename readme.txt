@@ -3,7 +3,7 @@ Contributors: pomegranate
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 5.6
+Tested up to: 5.7
 Requires PHP: 7.1
 Stable tag: 2.8.2
 License: GPLv2 or later
