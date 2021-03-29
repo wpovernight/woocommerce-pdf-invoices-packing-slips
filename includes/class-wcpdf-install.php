@@ -169,6 +169,7 @@ class Install {
 				// 'html_output'				=> '',
 				'enable_cleanup'				=> 1,
 				'cleanup_days'					=> 7,
+				'migrate_number_stores'			=> 0,
 			),
 		);
 		foreach ($settings_defaults as $option => $defaults) {
@@ -346,7 +347,6 @@ class Install {
 			$debug_settings['cleanup_days'] = 7;
 			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		}
-
 	}
 
 	/**
