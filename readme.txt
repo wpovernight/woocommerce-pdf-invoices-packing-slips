@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.7
 Requires PHP: 7.1
-Stable tag: 2.8.2
+Stable tag: 2.8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,17 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.8.3 =
+* New: Allow filtering action button classes
+* Fix: Error when no order data passed to filename function
+* Fix: During first install, only set defaults if not already (pre-) configured 
+* Fix: Use `WC()->template_path()` instead of `WC_TEMPLATE_PATH` for theme template overrides
+* Fix: Checks existence of document data number and date for order metabox fields
+* Fix: Prevent WooCommerce deprecation notices for non-product item types
+* Fix: jQuery deprecation notices
+* Tweak: Show instructions for emails metabox
+* Marked tested up to WooCommerce 5.2 and WordPress 5.7
 
 = 2.8.2 =
 * Fix: Layout issues with totals for documents with more than 1 page
