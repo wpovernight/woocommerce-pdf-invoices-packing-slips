@@ -102,6 +102,9 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= DEV =
+* Added translation to Arabian (thanks to [Nabil Moqbel](https://profiles.wordpress.org/nabilmoqbel/))
+
 = 2.8.3 =
 * New: Allow filtering action button classes
 * Fix: Error when no order data passed to filename function
