@@ -908,68 +908,120 @@ abstract class Order_Document {
 	public function get_sequential_number_store() {
 		$reset_number_yearly = isset( $this->settings['reset_number_yearly'] ) ? true : false;
 		$method              = WPO_WCPDF()->settings->get_sequential_number_store_method();
+		$now                 = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
 	
 		// reset: on
 		if( $reset_number_yearly ) {
 			if( ! ( $date = $this->get_date() ) ) {
-				$date = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
+				$date = $now;
 			}
-			$store_name   = $this->get_sequential_number_store_name( $date, $method );
+			$store_name   = $this->get_sequential_number_store_name( $date, $method, $reset_number_yearly );
 			$number_store = new Sequential_Number_Store( $store_name, $method );	
 	
 			if ( $number_store->is_new ) {
 				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
+				update_option( 'wcpdf_current_year', $date->date_i18n( 'Y' ) );
 			}
 		// reset: off
 		} else {
-			$now          = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
-			$store_name   = $this->get_sequential_number_store_name( $now, $method );
+			$store_name   = $this->get_sequential_number_store_name( $now, $method, $reset_number_yearly );
 			$number_store = new Sequential_Number_Store( $store_name, $method );
-	
-			if ( $number_store->is_new ) {
-				// get last year's store if available
-				$last_year         = $now->modify('-1 year');
-				$last_store_name   = $this->get_sequential_number_store_name( $last_year, $method );
-				$last_number_store = new Sequential_Number_Store( $last_store_name, $method );
-				$number_store->set_next( $last_number_store->get_next() );
-			}
+			update_option( 'wcpdf_current_year', $now->date_i18n( 'Y' ) );
 		}
 	
 		return $number_store;
 	}
-	
-	public function get_sequential_number_store_name( $date, $method ) {
-		$year                  = $date->date_i18n( 'Y' );
-		$store_base_name       = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
-		
-		// migrate when setting not set (means default = set) or when set and not 0
-		$migrate_number_stores = ( ! isset( WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] ) || WPO_WCPDF()->settings->debug_settings['migrate_number_stores'] != 0 );
 
-		// migrate old stores without year suffix
-		if( apply_filters( 'wpo_wcpdf_migrate_number_stores', $migrate_number_stores ) ) {
-			$this->maybe_migrate_number_store( $store_base_name, $method );
+	public function get_sequential_number_store_name( $date, $method, $reset_number_yearly ) {
+		$year            = $date->date_i18n( 'Y' );
+		$store_base_name = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
+		$current_year    = $this->get_current_year();
+		$year_match      = $this->year_matches_last_number_year( $current_year, $store_base_name, $method );
+		$store_renamed   = false;
+
+		if( ! $year_match && $year == $current_year && $reset_number_yearly ) {
+			$store_renamed = $this->rename_number_store_table( $date, $store_base_name, $method );
 		}
-	
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", "{$store_base_name}_{$year}", $store_base_name, $date, $method, $this );
-	}
 
-	private function maybe_migrate_number_store( $store_base_name, $method ) {
-		global $wpdb;
-		$wpdb->hide_errors(); // if something bad happens don't show, just log
-		
-		$now            = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
-		$year           = $now->date_i18n( 'Y' );
-		$old_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
-		$new_table_name = "{$old_table_name}_{$year}";
-
-		if( $wpdb->get_var( "SHOW TABLES LIKE '{$old_table_name}'") == $old_table_name && $wpdb->get_var( "SHOW TABLES LIKE '{$new_table_name}'") != $new_table_name ) {
-			$query = $wpdb->query( "ALTER TABLE {$old_table_name} RENAME {$new_table_name} ");
-			if( $query ) {
-				wcpdf_log_error( sprintf( __( 'Number store migration from %s (old table) to %s (new table) run successfully!', 'woocommerce-pdf-invoices-packing-slips' ), $old_table_name, $new_table_name ), 'info' );
+		if( $store_renamed ) {
+			// new year, keep the default store name
+			$number_store_name = $store_base_name;
+		} else {
+			// 1 year in the future, append the year to the store name
+			if( $year != $current_year ) {
+				$number_store_name = "{$store_base_name}_{$year}";
+			// year and current year are the same, keep the default store name
 			} else {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to migrate the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $old_table_name, $wpdb->last_error ) );
+				$number_store_name = $store_base_name;
 			}
 		}
+	
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", $number_store_name, $store_base_name, $date, $method, $this );
+	}
+
+	public function rename_number_store_table( $date, $store_base_name, $method ) {
+		$year      = $date->date_i18n( 'Y' );
+		$last_year = strval( $year - 1 );
+
+		global $wpdb;
+		$wpdb->hide_errors(); // if something bad happens don't show, just log
+
+		$default_table_name   = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
+		$last_year_table_name = "{$default_table_name}_{$last_year}";
+
+		if( $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'") == $default_table_name && $wpdb->get_var( "SHOW TABLES LIKE '{$last_year_table_name}'") != $last_year_table_name ) {
+			$query = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$last_year_table_name} ");
+
+			if( $query ) {
+				return true;
+			} else {
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $last_year_table_name, $wpdb->last_error ) );
+			}
+		}
+
+		return false;
+	}
+
+	public function year_matches_last_number_year( $year, $store_base_name, $method ) {
+		if( ! empty( $year ) ) {
+			global $wpdb;
+			$wpdb->hide_errors(); // if something bad happens don't show, just log
+
+			$default_table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
+
+			if( $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'") == $default_table_name ) {
+				$row = $wpdb->get_row( "SELECT DISTINCT date FROM {$default_table_name} ORDER BY date ASC" );
+
+				if( ! $row ) {
+					wcpdf_log_error( sprintf( __( 'An error occurred while trying to get the current year from the database: %s', 'woocommerce-pdf-invoices-packing-slips' ), $wpdb->last_error ) );
+					return false;
+				}
+
+				$db_year = date_i18n( 'Y', strtotime( $row->date ) );
+
+				if( $db_year == $year ) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} else {
+			$year = $this->get_current_year();
+			$this->year_matches_last_number_year( $year, $store_base_name, $method );
+		}
+	}
+
+	public function get_current_year() {
+		$year = get_option( 'wcpdf_current_year' );
+
+		if( empty( $current_year ) ) {
+			$now  = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+			$year = $now->date_i18n( 'Y' );
+			update_option( 'wcpdf_current_year', $year );
+		}
+
+
+		return $year;
 	}
 
 }

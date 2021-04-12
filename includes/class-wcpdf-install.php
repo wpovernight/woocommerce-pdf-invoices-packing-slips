@@ -169,7 +169,6 @@ class Install {
 				// 'html_output'				=> '',
 				'enable_cleanup'				=> 1,
 				'cleanup_days'					=> 7,
-				'migrate_number_stores'			=> 0,
 			),
 		);
 		foreach ($settings_defaults as $option => $defaults) {
