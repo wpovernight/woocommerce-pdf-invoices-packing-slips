@@ -581,6 +581,12 @@ class Admin {
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
 				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
 				$invoice->set_data( $document_data, $order );
+
+				// check if we have number, and if not generate one
+				if( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
+					$invoice->init_number();
+				}
+
 				$invoice->save();
 			}
 
@@ -855,14 +861,14 @@ class Admin {
 
 		$date_entered = ! empty( $form_data['_wcpdf_'.$document_slug.'_date'] ) && ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['date'] );
 		if( $date_entered ) {
-			$date = $form_data['_wcpdf_'.$document_slug.'_date']['date'];
-			$hour = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['hour'] : '00';
-			$minute = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
+			$date         = $form_data['_wcpdf_'.$document_slug.'_date']['date'];
+			$hour         = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['hour'] : '00';
+			$minute       = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
 
 			// clean & sanitize input
-			$date = date( 'Y-m-d', strtotime( $date ) );
-			$hour = sprintf('%02d', intval( $hour ));
-			$minute = sprintf('%02d', intval( $minute ) );
+			$date         = date( 'Y-m-d', strtotime( $date ) );
+			$hour         = sprintf('%02d', intval( $hour ));
+			$minute       = sprintf('%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";
 
 		} elseif ( ! $date_entered && !empty( $_POST['_wcpdf_'.$document_slug.'_number'] ) ) {
@@ -900,7 +906,7 @@ class Admin {
 				'b'		=> array(),
 			);
 			// sanitize
-			$notes = sanitize_textarea_field( wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html ) );
+			$notes         = sanitize_textarea_field( wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html ) );
 			$data['notes'] = nl2br( $notes );
 		}
 
