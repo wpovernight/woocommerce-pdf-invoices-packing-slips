@@ -8,7 +8,7 @@ $php_mem_limit  = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limi
 
 $server_configs = array(
 	'PHP version' => array(
-		'required' => '7.1+ (7.4 or higher recommended)',
+		'required' => __( '7.1+ (7.4 or higher recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => PHP_VERSION,
 		'result'   => version_compare( PHP_VERSION, '7.1', '>' ),
 	),
@@ -136,41 +136,40 @@ if( ! $server_configs['PHP version']['result'] ) {
 </table>
 
 <?php
-$status = array(
-	'ok'     => __( 'Writable', 'woocommerce-pdf-invoices-packing-slips' ),
-	'failed' => __( 'Not writable', 'woocommerce-pdf-invoices-packing-slips' ),
-);
+	$status = array(
+		'ok'     => __( 'Writable', 'woocommerce-pdf-invoices-packing-slips' ),
+		'failed' => __( 'Not writable', 'woocommerce-pdf-invoices-packing-slips' ),
+	);
 
-$permissions = array(
-	'WCPDF_TEMP_DIR'		=> array (
-		'description'		=> __( 'Central temporary plugin folder', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'				=> WPO_WCPDF()->main->get_tmp_path(),
-		'status'			=> is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',			
-		'status_message'	=> is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? $status['ok'] : $status['failed'],
-	),
-	'WCPDF_ATTACHMENT_DIR'		=> array (
-		'description'		=> __( 'Temporary attachments folder', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'				=> trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ),
-		'status'			=> is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',			
-		'status_message'	=> is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
-	),
-	'DOMPDF_TEMP_DIR'		=> array (
-		'description'		=> __( 'Temporary DOMPDF folder', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'				=> trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )),
-		'status'			=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? 'ok' : 'failed',			
-		'status_message'	=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? $status['ok'] : $status['failed'],
-	),
-	'DOMPDF_FONT_DIR'		=> array (
-		'description'		=> __( 'DOMPDF fonts folder (needs to be writable for custom/remote fonts)', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'				=> trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'fonts' )),
-		'status'			=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? 'ok' : 'failed',			
-		'status_message'	=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? $status['ok'] : $status['failed'],
-	),
-);
+	$permissions = array(
+		'WCPDF_TEMP_DIR'		=> array (
+			'description'		=> __( 'Central temporary plugin folder', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'				=> WPO_WCPDF()->main->get_tmp_path(),
+			'status'			=> is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',			
+			'status_message'	=> is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? $status['ok'] : $status['failed'],
+		),
+		'WCPDF_ATTACHMENT_DIR'		=> array (
+			'description'		=> __( 'Temporary attachments folder', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'				=> trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ),
+			'status'			=> is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',			
+			'status_message'	=> is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
+		),
+		'DOMPDF_TEMP_DIR'		=> array (
+			'description'		=> __( 'Temporary DOMPDF folder', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'				=> trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )),
+			'status'			=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? 'ok' : 'failed',			
+			'status_message'	=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? $status['ok'] : $status['failed'],
+		),
+		'DOMPDF_FONT_DIR'		=> array (
+			'description'		=> __( 'DOMPDF fonts folder (needs to be writable for custom/remote fonts)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'				=> trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'fonts' )),
+			'status'			=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? 'ok' : 'failed',			
+			'status_message'	=> is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? $status['ok'] : $status['failed'],
+		),
+	);
 
-$upload_dir  = wp_upload_dir();
-$upload_base = trailingslashit( $upload_dir['basedir'] );
-
+	$upload_dir  = wp_upload_dir();
+	$upload_base = trailingslashit( $upload_dir['basedir'] );
 ?>
 <br />
 <h3 id="system"><?php _e( 'Write Permissions', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
