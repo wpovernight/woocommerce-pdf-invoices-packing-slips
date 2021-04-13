@@ -966,16 +966,42 @@ abstract class Order_Document {
 		global $wpdb;
 		$wpdb->hide_errors(); // if something bad happens don't show, just log
 
-		$default_table_name   = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
-		$last_year_table_name = "{$default_table_name}_{$last_year}";
+		$default_table_name      = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
+		$last_year_table_name    = "{$default_table_name}_{$last_year}";
+		$current_year_table_name = "{$default_table_name}_{$year}";
 
-		if( $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'") == $default_table_name && $wpdb->get_var( "SHOW TABLES LIKE '{$last_year_table_name}'") != $last_year_table_name ) {
-			$query = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$last_year_table_name} ");
+		// rename to last year
+		if( $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'" ) == $default_table_name && $wpdb->get_var( "SHOW TABLES LIKE '{$last_year_table_name}'" ) != $last_year_table_name ) {
+			$query = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$last_year_table_name}" );
 
 			if( $query ) {
 				return true;
 			} else {
 				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $last_year_table_name, $wpdb->last_error ) );
+			}
+		}
+
+		// rename current year to default store name
+		if( $wpdb->get_var( "SHOW TABLES LIKE '{$current_year_table_name}'" ) == $current_year_table_name ) {
+
+			// if for some reason the default table exists and not empty, rename to backup
+			if( $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'" ) == $default_table_name && $wpdb->get_var( "SELECT EXISTS ( SELECT 1 FROM {$default_table_name} )" ) != 0 ) {
+				$now               = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+				$date              = $now->date_i18n( 'Ymd' );
+				$table_name_backup = "{$default_table_name}__backup_{$date}";
+				$query             = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$table_name_backup}" );
+
+			// default table is empty, we are safe to delete
+			} else {
+				$query = $wpdb->query( "DROP TABLE IF EXISTS {$default_table_name}" );
+			}
+
+			$query = $wpdb->query( "ALTER TABLE {$current_year_table_name} RENAME {$default_table_name}" );
+
+			if( $query ) {
+				return true;
+			} else {
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $current_year_table_name, $default_table_name, $wpdb->last_error ) );
 			}
 		}
 
@@ -1021,7 +1047,7 @@ abstract class Order_Document {
 		}
 
 
-		return $year;
+		return apply_filters( 'wpo_wcpdf_current_year', $year );
 	}
 
 }
