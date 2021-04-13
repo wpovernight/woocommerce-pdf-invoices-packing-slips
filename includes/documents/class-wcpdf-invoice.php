@@ -67,7 +67,7 @@ class Invoice extends Order_Document_Methods {
 
 		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
 			$this->set_date( WCX_Order::get_prop( $this->order, 'date_created' ) );
-		} else {
+		} elseif( empty( $this->get_date() ) ) {
 			$this->set_date( current_time( 'timestamp', true ) );
 		}
 
