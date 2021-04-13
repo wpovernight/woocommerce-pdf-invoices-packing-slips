@@ -974,14 +974,13 @@ abstract class Order_Document {
 		if( $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'" ) == $default_table_name && $wpdb->get_var( "SHOW TABLES LIKE '{$last_year_table_name}'" ) != $last_year_table_name ) {
 			$query = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$last_year_table_name}" );
 
-			if( $query ) {
-				return true;
-			} else {
+			if( ! $query ) {
 				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $last_year_table_name, $wpdb->last_error ) );
+				return false;
 			}
 		}
 
-		// rename current year to default store name
+		// rename current year store table, if exists, to default store name
 		if( $wpdb->get_var( "SHOW TABLES LIKE '{$current_year_table_name}'" ) == $current_year_table_name ) {
 
 			// if for some reason the default table exists and not empty, rename to backup
@@ -991,21 +990,31 @@ abstract class Order_Document {
 				$table_name_backup = "{$default_table_name}__backup_{$date}";
 				$query             = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$table_name_backup}" );
 
+				if( ! $query ) {
+					wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $table_name_backup, $wpdb->last_error ) );
+					return false;
+				}
+
 			// default table is empty, we are safe to delete
 			} else {
 				$query = $wpdb->query( "DROP TABLE IF EXISTS {$default_table_name}" );
+
+				if( ! $query ) {
+					wcpdf_log_error( sprintf( __( 'An error occurred while trying to delete the number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $wpdb->last_error ) );
+					return false;
+				}
 			}
 
+			// all set, let's rename the current year table to default
 			$query = $wpdb->query( "ALTER TABLE {$current_year_table_name} RENAME {$default_table_name}" );
 
-			if( $query ) {
-				return true;
-			} else {
+			if( ! $query ) {
 				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $current_year_table_name, $default_table_name, $wpdb->last_error ) );
+				return false;
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	public function year_matches_last_number_year( $year, $store_base_name, $method ) {
