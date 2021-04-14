@@ -206,9 +206,17 @@ class Settings {
 	}
 
 	public function get_template_path( $document_type = NULL ) {
-		$template_path = isset( $this->general_settings['template_path'] )?$this->general_settings['template_path']:'';
+		// return default path if no template selected
+		if ( empty( $this->general_settings['template_path'] ) ) {
+			$default_path = WPO_WCPDF()->plugin_path() . '/templates/Simple';
+			if ( function_exists( 'wp_normalize_path' ) ) { // WP3.9+
+				$default_path = wp_normalize_path( $default_path );
+			}
+			return $default_path;
+		}
+
 		// forward slash for consistency
-		$template_path = str_replace('\\','/', $template_path);
+		$template_path = str_replace('\\','/', $this->general_settings['template_path']);
 
 		// add base path, checking if it's not already there
 		// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
