@@ -140,6 +140,16 @@ class Invoice extends Order_Document_Methods {
 					$suffix = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
 				}
 			}
+			// ensure unique filename in case suffix was empty
+			if ( empty( $suffix ) ) {
+				if ( ! empty( $this->order_id ) ) {
+					$suffix = $this->order_id;
+				} elseif ( ! empty( $args['order_ids'] ) && is_array( $args['order_ids'] ) ) {
+					$suffix = reset( $args['order_ids'] );
+				} else {
+					$suffix = uniqid();
+				}
+			}
 		} else {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
