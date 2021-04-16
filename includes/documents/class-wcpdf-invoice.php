@@ -77,14 +77,14 @@ class Invoice extends Order_Document_Methods {
 		if( isset( $document_settings['log_to_order_notes'] ) && ! empty( $this->order ) ) {
 			// manual request
 			if( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'generate_wpo_wcpdf' ) {
-				$request_type = __( 'manual request', 'woocommerce-pdf-invoices-packing-slips' );
+				$request_type = __( 'manual', 'woocommerce-pdf-invoices-packing-slips' );
 			// attachment request
 			} else {
-				$request_type = __( 'attachment request', 'woocommerce-pdf-invoices-packing-slips' );
+				$request_type = __( 'attachment', 'woocommerce-pdf-invoices-packing-slips' );
 			}
 
 			$invoice_date = $this->get_date();
-			$note         = sprintf( __( 'PDF Invoice %s generated on %s with %s.', 'woocommerce-pdf-invoices-packing-slips' ), $invoice_number, $invoice_date->date_i18n( wcpdf_date_format( $this, 'invoice_date' ) ), $request_type );
+			$note         = sprintf( __( 'PDF Invoice %s generated on %s with %s request.', 'woocommerce-pdf-invoices-packing-slips' ), $invoice_number, $invoice_date->date_i18n( wcpdf_date_format( $this, 'invoice_date' ) ), $request_type );
 			$this->order->add_order_note( $note );
 		}
 
