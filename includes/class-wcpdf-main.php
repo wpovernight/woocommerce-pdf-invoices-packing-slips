@@ -176,6 +176,13 @@ class Main {
 				$attachments[] = $pdf_path;
 
 				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type, $document );
+
+				// log document creation to order notes
+				$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+				if( isset( $debug_settings['log_to_order_notes'] ) ) {
+					$action = __( 'attachment', 'woocommerce-pdf-invoices-packing-slips' );
+					$this->log_document_creation_to_order_notes( $document, $action );
+				}
 			} catch ( \Exception $e ) {
 				wcpdf_log_error( $e->getMessage(), 'critical', $e );
 				continue;
@@ -340,6 +347,24 @@ class Main {
 
 			if ( $document ) {
 				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself)
+
+				// log document creation to order notes
+				$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+				if( isset( $debug_settings['log_to_order_notes'] ) ) {
+					if( count( $order_ids ) > 1 ) {
+						$action = __( 'bulk', 'woocommerce-pdf-invoices-packing-slips' );
+						foreach( $order_ids as $order_id ) {
+							$order     = wc_get_order( $order_id );
+							if( empty( $order ) ) continue;
+
+							$_document = wcpdf_get_document( $document_type, $order, true );
+							$this->log_document_creation_to_order_notes( $_document, $action );
+						}
+					} else {
+						$action = __( 'single', 'woocommerce-pdf-invoices-packing-slips' );
+						$this->log_document_creation_to_order_notes( $document, $action );
+					}
+				}
 
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
 				// allow URL override
@@ -911,6 +936,16 @@ class Main {
 		}
 
 		return $mailArray;
+	}
+
+	/**
+	 * Logs the document creation to the order notes
+	 */
+	public function log_document_creation_to_order_notes( $document, $action ) {
+		if( ! empty( $document ) && ! empty( $action ) && ! empty( $order = $document->order ) ) {
+			$note = sprintf( __( 'PDF %s %s created on %s action.', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() , $document->get_number()->get_plain(), $action );
+			$order->add_order_note( $note );
+		}
 	}
 
 	/**

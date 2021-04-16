@@ -71,22 +71,7 @@ class Invoice extends Order_Document_Methods {
 			$this->set_date( current_time( 'timestamp', true ) );
 		}
 
-		$invoice_number = $this->init_number();
-
-		// log to order notes if setting is enabled
-		if( isset( $document_settings['log_to_order_notes'] ) && ! empty( $this->order ) ) {
-			// manual request
-			if( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'generate_wpo_wcpdf' ) {
-				$request_type = __( 'manual', 'woocommerce-pdf-invoices-packing-slips' );
-			// attachment request
-			} else {
-				$request_type = __( 'attachment', 'woocommerce-pdf-invoices-packing-slips' );
-			}
-
-			$invoice_date = $this->get_date();
-			$note         = sprintf( __( 'PDF Invoice %s generated on %s with %s request.', 'woocommerce-pdf-invoices-packing-slips' ), $invoice_number, $invoice_date->date_i18n( wcpdf_date_format( $this, 'invoice_date' ) ), $request_type );
-			$this->order->add_order_note( $note );
-		}
+		$this->init_number();
 
 		do_action( 'wpo_wcpdf_init_document', $this );
 	}
@@ -437,18 +422,6 @@ class Invoice extends Order_Document_Methods {
 					'description'	=> __( "When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.", 'woocommerce-pdf-invoices-packing-slips' )
 					                   . "<br>"
 					                   . __( "<strong>Caution:</strong> enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected.", 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'			=> 'setting',
-				'id'			=> 'log_to_order_notes',
-				'title'			=> __( 'Log to order notes', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'log_to_order_notes',
-					'description'	=> __( "Log Invoice generation information to the order notes.", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);
