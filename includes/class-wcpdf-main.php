@@ -931,14 +931,14 @@ class Main {
 	 * Logs the bulk document creation to the order notes
 	 */
 	public function log_bulk_to_order_notes( $document ) {
-		$this->log_to_order_notes( $document, __( 'bulk', 'woocommerce-pdf-invoices-packing-slips' ) );
+		$this->log_to_order_notes( $document, __( 'bulk action', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
 	/**
 	 * Logs the single document creation to the order notes
 	 */
 	public function log_single_to_order_notes( $document ) {
-		$this->log_to_order_notes( $document, __( 'single', 'woocommerce-pdf-invoices-packing-slips' ) );
+		$this->log_to_order_notes( $document, __( 'single action', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
 	/**
