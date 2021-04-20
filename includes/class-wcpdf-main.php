@@ -176,9 +176,6 @@ class Main {
 				$attachments[] = $pdf_path;
 
 				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type, $document );
-
-				// log document creation to order notes
-				$this->log_document_creation_to_order_notes( $document, 'attachment' );
 				
 			} catch ( \Exception $e ) {
 				wcpdf_log_error( $e->getMessage(), 'critical', $e );
@@ -284,6 +281,20 @@ class Main {
 			$this->enable_debug();
 		}
 
+		// context bulk
+		if( isset( $_GET['bulk'] ) ) {
+			$bulk = true;
+		} else {
+			$bulk = false;
+		}
+
+		// context my account
+		if( isset( $_GET['my-account'] ) ) {
+			$my_account = true;
+		} else {
+			$my_account = false;
+		}
+
 		// Generate the output
 		$document_type = sanitize_text_field( $_GET['document_type'] );
 
@@ -340,13 +351,20 @@ class Main {
 
 		// if we got here, we're safe to go!
 		try {
+			// log document creation to order notes
+			if( count( $order_ids ) > 1 && $bulk ) {
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_bulk_to_order_notes' ) );
+			} elseif( $my_account ) {
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_my_account_to_order_notes' ) );
+			} else {
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_single_to_order_notes' ) );
+			}
+
+			// get document
 			$document = wcpdf_get_document( $document_type, $order_ids, true );
 
 			if ( $document ) {
 				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself with $document->order_ids)
-
-				// log document creation to order notes
-				$this->log_document_creation_to_order_notes( $document, array( 'bulk', 'single' ) );
 
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
 				// allow URL override
@@ -921,36 +939,41 @@ class Main {
 	}
 
 	/**
+	 * Logs the bulk document creation to the order notes
+	 */
+	public function log_bulk_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'bulk action', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
+	 * Logs the single document creation to the order notes
+	 */
+	public function log_single_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'single action', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
+	 * Logs the my account document creation to the order notes
+	 */
+	public function log_my_account_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'my account action', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
+	 * Logs the attachment document creation to the order notes
+	 */
+	public function log_attachment_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'attachment action', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
 	 * Logs the document creation to the order notes
 	 */
-	public function log_document_creation_to_order_notes( $document, $context ) {
-		if( ! empty( $document ) && ! empty( $context ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			$message = __( 'PDF %s created on %s action.', 'woocommerce-pdf-invoices-packing-slips' );
-
-			// bulk document
-			if( $document->is_bulk ) {
-				foreach( $document->order_ids as $order_id ) {
-					$order          = wc_get_order( $order_id );
-					if( empty( $order ) ) continue;
-
-					$document_title = ucwords( str_replace( '-', ' ', $document->type ) );
-					$note           = sprintf( $message, $document_title, 'bulk' );
-					$order->add_order_note( $note );
-				}
-				return;
-
-			// attachment & single documents
-			} else {
-				$order = $document->order;
-				if( empty( $order ) ) return;
-
-				if( $context != 'attachment' ) {
-					$context = 'single';
-				}
-
-				$note  = sprintf( $message, $document->get_title(), $context );
-				$order->add_order_note( $note );
-			}
+	public function log_to_order_notes( $document, $context ) {
+		if( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $context ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+			$message = __( 'PDF %s created via %s.', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title(), $context );
+			$order->add_order_note( $note );
 		}
 	}
 
