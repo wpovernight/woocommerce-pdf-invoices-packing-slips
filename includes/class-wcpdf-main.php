@@ -281,20 +281,6 @@ class Main {
 			$this->enable_debug();
 		}
 
-		// context bulk
-		if( isset( $_GET['bulk'] ) ) {
-			$bulk = true;
-		} else {
-			$bulk = false;
-		}
-
-		// context my account
-		if( isset( $_GET['my-account'] ) ) {
-			$my_account = true;
-		} else {
-			$my_account = false;
-		}
-
 		// Generate the output
 		$document_type = sanitize_text_field( $_GET['document_type'] );
 
@@ -352,9 +338,9 @@ class Main {
 		// if we got here, we're safe to go!
 		try {
 			// log document creation to order notes
-			if( count( $order_ids ) > 1 && $bulk ) {
+			if( count( $order_ids ) > 1 && isset( $_GET['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_bulk_to_order_notes' ) );
-			} elseif( $my_account ) {
+			} elseif( isset( $_GET['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_my_account_to_order_notes' ) );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_single_to_order_notes' ) );
@@ -942,37 +928,37 @@ class Main {
 	 * Logs the bulk document creation to the order notes
 	 */
 	public function log_bulk_to_order_notes( $document ) {
-		$this->log_to_order_notes( $document, __( 'bulk action', 'woocommerce-pdf-invoices-packing-slips' ) );
+		$this->log_to_order_notes( $document, __( 'bulk', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
 	/**
 	 * Logs the single document creation to the order notes
 	 */
 	public function log_single_to_order_notes( $document ) {
-		$this->log_to_order_notes( $document, __( 'single action', 'woocommerce-pdf-invoices-packing-slips' ) );
+		$this->log_to_order_notes( $document, __( 'single', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
 	/**
 	 * Logs the my account document creation to the order notes
 	 */
 	public function log_my_account_to_order_notes( $document ) {
-		$this->log_to_order_notes( $document, __( 'my account action', 'woocommerce-pdf-invoices-packing-slips' ) );
+		$this->log_to_order_notes( $document, __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
 	/**
 	 * Logs the attachment document creation to the order notes
 	 */
 	public function log_attachment_to_order_notes( $document ) {
-		$this->log_to_order_notes( $document, __( 'attachment action', 'woocommerce-pdf-invoices-packing-slips' ) );
+		$this->log_to_order_notes( $document, __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
 	/**
 	 * Logs the document creation to the order notes
 	 */
-	public function log_to_order_notes( $document, $context ) {
-		if( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $context ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			$message = __( 'PDF %s created via %s.', 'woocommerce-pdf-invoices-packing-slips' );
-			$note    = sprintf( $message, $document->get_title(), $context );
+	public function log_to_order_notes( $document, $created_via ) {
+		if( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $created_via ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+			$message = __( 'PDF %s created via %s action.', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title(), $created_via );
 			$order->add_order_note( $note );
 		}
 	}
