@@ -128,6 +128,9 @@ class Main {
 			do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
 
 			try {
+				// log document generation to order notes
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_email_attachment_to_order_notes' ) );
+				
 				// prepare document
 				// we use ID to force to reloading the order to make sure that all meta data is up to date.
 				// this is especially important when multiple emails with the PDF document are sent in the same session
@@ -946,9 +949,9 @@ class Main {
 	}
 
 	/**
-	 * Logs the attachment document creation to the order notes
+	 * Logs the email attachment document creation to the order notes
 	 */
-	public function log_attachment_to_order_notes( $document ) {
+	public function log_email_attachment_to_order_notes( $document ) {
 		$this->log_to_order_notes( $document, __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
