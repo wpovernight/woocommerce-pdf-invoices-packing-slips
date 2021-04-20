@@ -960,7 +960,7 @@ class Main {
 	 */
 	public function log_to_order_notes( $document, $created_via ) {
 		if( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $created_via ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			$message = __( 'PDF %s created via %s action.', 'woocommerce-pdf-invoices-packing-slips' );
+			$message = __( 'PDF %s created via %s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $created_via );
 			$order->add_order_note( $note );
 		}
