@@ -141,7 +141,7 @@ class Document_Number {
 		$document_year	= $document_date->date_i18n( 'Y' );
 		$document_month	= $document_date->date_i18n( 'm' );
 		$document_day	= $document_date->date_i18n( 'd' );
-		$order_number	= method_exists($order, 'get_order_number') ? $order->get_order_number() : '';
+		$order_number	= is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
 
 		// make replacements
 		foreach ($formats as $key => $value) {

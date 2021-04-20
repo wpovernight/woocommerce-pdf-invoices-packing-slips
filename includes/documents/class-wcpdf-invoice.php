@@ -67,7 +67,7 @@ class Invoice extends Order_Document_Methods {
 
 		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
 			$this->set_date( WCX_Order::get_prop( $this->order, 'date_created' ) );
-		} else {
+		} elseif( empty( $this->get_date() ) ) {
 			$this->set_date( current_time( 'timestamp', true ) );
 		}
 
@@ -133,11 +133,21 @@ class Invoice extends Order_Document_Methods {
 			if ( isset( $this->settings['display_number'] ) && $this->settings['display_number'] == 'invoice_number' ) {
 				$suffix = (string) $this->get_number();
 			} else {
-				if ( empty( $this->order ) ) {
-					$order = WCX::get_order ( $order_ids[0] );
-					$suffix = method_exists( $order, 'get_order_number' ) ? $order->get_order_number() : '';
+				if ( empty( $this->order ) && isset( $args['order_ids'][0] ) ) {
+					$order = WCX::get_order ( $args['order_ids'][0] );
+					$suffix = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
 				} else {
-					$suffix = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
+					$suffix = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
+				}
+			}
+			// ensure unique filename in case suffix was empty
+			if ( empty( $suffix ) ) {
+				if ( ! empty( $this->order_id ) ) {
+					$suffix = $this->order_id;
+				} elseif ( ! empty( $args['order_ids'] ) && is_array( $args['order_ids'] ) ) {
+					$suffix = reset( $args['order_ids'] );
+				} else {
+					$suffix = uniqid();
 				}
 			}
 		} else {

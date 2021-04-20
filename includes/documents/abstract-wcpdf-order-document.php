@@ -774,7 +774,7 @@ abstract class Order_Document {
 		if ( get_post_type( $this->order_id ) == 'shop_order_refund' ) {
 			$number = $this->order_id;
 		} else {
-			$number = method_exists( $this->order, 'get_order_number' ) ? $this->order->get_order_number() : '';
+			$number = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
 		}
 
 		if ( $order_count == 1 ) {

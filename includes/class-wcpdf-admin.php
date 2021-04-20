@@ -181,20 +181,25 @@ class Admin {
 			$document_title = $document->get_title();
 			$icon = !empty($document->icon) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$document_title = method_exists($document, 'get_title') ? $document->get_title() : $document_title;
+				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 				$listing_actions[$document->get_type()] = array(
-					'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . WCX_Order::get_id( $order ) ), 'generate_wpo_wcpdf' ),
-					'img'		=> $icon,
-					'alt'		=> "PDF " . $document_title,
-					'exists'	=> method_exists($document, 'exists') ? $document->exists() : false,
+					'url'    => wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . WCX_Order::get_id( $order ) ), 'generate_wpo_wcpdf' ),
+					'img'    => $icon,
+					'alt'    => "PDF " . $document_title,
+					'exists' => $document_exists,
+					'class'  => apply_filters( 'wpo_wcpdf_action_button_class', $document_exists ? "exists " . $document->get_type() : $document->get_type(), $document ),
 				);
 			}
 		}
 
-		$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );			
+		$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );
 
 		foreach ($listing_actions as $action => $data) {
-			?><a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $data['exists'] == true ? "exists " . $action : $action; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
+			if ( !isset( $data['class'] ) ) {
+				$data['class'] = $data['exists'] ? "exists " . $action : $action;
+			}
+			?><a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $data['class']; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
 				<img src="<?php echo $data['img']; ?>" alt="<?php echo $data['alt']; ?>" width="16">
 			</a><?php
 		}
@@ -294,7 +299,7 @@ class Admin {
 		<ul class="wpo_wcpdf_send_emails submitbox">
 			<li class="wide" id="actions">
 				<select name="wpo_wcpdf_send_emails">
-					<option value=""></option>
+					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce' ); ?></option>
 					<?php
 					$mailer           = WC()->mailer();
 					$available_emails = apply_filters( 'woocommerce_resend_order_emails_available', array( 'new_order', 'cancelled_order', 'customer_processing_order', 'customer_completed_order', 'customer_invoice' ) );
@@ -314,7 +319,6 @@ class Admin {
 				<?php
 				$title = __( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
 				$url = wp_nonce_url( add_query_arg('wpo_wcpdf_action','resend_email'), 'generate_wpo_wcpdf' );
-				// printf('<a href="%s" class="button wpo_wcpdf_send_email"><span>%s</span></a>')
 				?>
 			</li>
 		</ul>
@@ -334,12 +338,12 @@ class Admin {
 		foreach ($documents as $document) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$document_title = method_exists($document, 'get_title') ? $document->get_title() : $document_title;
+				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
 					'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . $post_id ), 'generate_wpo_wcpdf' ),
 					'alt'		=> esc_attr( "PDF " . $document_title ),
 					'title'		=> "PDF " . $document_title,
-					'exists'	=> method_exists($document, 'exists') ? $document->exists() : false,
+					'exists'	=> is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
 				);
 			}
 		}
@@ -365,7 +369,7 @@ class Admin {
 
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
 
-		if ( $invoice && $invoice->exists() ) {
+		if ( $invoice ) {
 			// data
 			$data = array(
 				'number' => array(
@@ -381,8 +385,6 @@ class Admin {
 			// output
 			$this->output_number_date_edit_fields( $invoice, $data );
 
-		} else {
-			printf( '<div class="wcpdf-data-fields"><p>&#9888; %s</p></div>', __( 'Invoice not generated for this order.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $order, $this );
@@ -391,15 +393,15 @@ class Admin {
 	public function get_current_values_for_document( $document, $data ) {
 		$current = array(
 			'number' => array(
-				'plain'     => ! empty( $document->get_number() ) ? $document->get_number()->get_plain() : '',
-				'formatted' => ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '',
+				'plain'     => $document->exists() && ! empty( $document->get_number() ) ? $document->get_number()->get_plain() : '',
+				'formatted' => $document->exists() && ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '',
 				'name'      => "_wcpdf_{$document->slug}_number",
 			),
 			'date' => array(
-				'formatted' => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '',
-				'date'      => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'Y-m-d' ) : '',
-				'hour'      => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : '',
-				'minute'    => ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : '',
+				'formatted' => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '',
+				'date'      => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'Y-m-d' ) : date_i18n( 'Y-m-d' ),
+				'hour'      => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : date_i18n( 'H' ),
+				'minute'    => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : date_i18n( 'i' ),
 				'name'      => "_wcpdf_{$document->slug}_date",
 			),
 		);
@@ -429,50 +431,56 @@ class Admin {
 				<!-- Title -->
 				<h4>
 					<?= $document->get_title(); ?>
-					<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
-					<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
-					<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
+					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) ) : ?>
+						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
+						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
+						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
+					<?php endif; ?>
 				</h4>
 
 				<!-- Read only -->
 				<div class="read-only">
-					<div class="<?= $document->get_type(); ?>-number">
-						<p class="form-field <?= $data['number']['name']; ?>_field">	
-							<p>
-								<span><strong><?= $data['number']['label']; ?></strong></span>
-								<span><?= $data['number']['formatted']; ?></span>
+					<?php if( $document->exists() ) : ?>
+						<?php if( isset( $data['number'] ) ) : ?>
+						<div class="<?= $document->get_type(); ?>-number">
+							<p class="form-field <?= $data['number']['name']; ?>_field">	
+								<p>
+									<span><strong><?= $data['number']['label']; ?></strong></span>
+									<span><?= $data['number']['formatted']; ?></span>
+								</p>
 							</p>
-						</p>
-					</div>
-					<div class="<?= $document->get_type(); ?>-date">
-						<p class="form-field form-field-wide">
-							<p>
-								<span><strong><?= $data['date']['label']; ?></strong></span>
-								<span><?= $data['date']['formatted']; ?></span>
+						</div>
+						<?php endif; ?>
+						<?php if( isset( $data['date'] ) ) : ?>
+						<div class="<?= $document->get_type(); ?>-date">
+							<p class="form-field form-field-wide">
+								<p>
+									<span><strong><?= $data['date']['label']; ?></strong></span>
+									<span><?= $data['date']['formatted']; ?></span>
+								</p>
 							</p>
-						</p>
-					</div>
-					<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
+						</div>
+						<?php endif; ?>
+						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
+					<?php else : ?>
+						<span class="wpo-wcpdf-set-date-number button"><?php printf( __( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></span>
+					<?php endif; ?>
 				</div>
 
 				<!-- Editable -->
 				<div class="editable">
+					<?php if( isset( $data['number'] ) ) : ?>
 					<p class="form-field <?= $data['number']['name']; ?>_field ">
 						<label for="<?= $data['number']['name']; ?>"><?= $data['number']['label']; ?></label>
-						<?php if ( ! empty( $data['number']['plain'] ) ) : ?>
-							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="<?= $data['number']['plain']; ?>" disabled="disabled" > (<?= __( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
-						<?php else : ?>
-							<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="" disabled="disabled" > (<?= __( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
-						<?php endif; ?>
+						<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="<?= $data['number']['plain']; ?>" disabled="disabled" > (<?= __( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
 					</p>
+					<?php endif; ?>
+					<?php if( isset( $data['date'] ) ) : ?>
 					<p class="form-field form-field-wide">
 						<label for="<?= $data['date']['name'] ?>[date]"><?= $data['date']['label']; ?></label>
-						<?php if ( ! empty( $data['date']['date'] ) ) : ?>
-							<input type="text" class="date-picker-field" name="<?= $data['date']['name'] ?>[date]" id="<?= $data['date']['name'] ?>[date]" maxlength="10" value="<?= $data['date']['date']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[hour]" id="<?= $data['date']['name']; ?>[hour]" min="0" max="23" size="2" value="<?= $data['date']['hour']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[minute]" id="<?= $data['date']['name']; ?>[minute]" min="0" max="59" size="2" value="<?= $data['date']['minute']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
-						<?php else : ?>
-							<input type="text" class="date-picker-field" name="<?= $data['date']['name'] ?>[date]" id="<?= $data['date']['name'] ?>[date]" maxlength="10" disabled="disabled" value="<?php echo date_i18n( 'Y-m-d' ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" />@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[hour]" id="<?= $data['date']['name']; ?>[hour]" min="0" max="23" size="2" value="<?php echo date_i18n( 'H' ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[minute]" id="<?= $data['date']['name']; ?>[minute]" min="0" max="59" size="2" value="<?php echo date_i18n( 'i' ); ?>" pattern="[0-5]{1}[0-9]{1}" disabled="disabled" />
-						<?php endif; ?>
+						<input type="text" class="date-picker-field" name="<?= $data['date']['name'] ?>[date]" id="<?= $data['date']['name'] ?>[date]" maxlength="10" value="<?= $data['date']['date']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[hour]" id="<?= $data['date']['name']; ?>[hour]" min="0" max="23" size="2" value="<?= $data['date']['hour']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[minute]" id="<?= $data['date']['name']; ?>[minute]" min="0" max="59" size="2" value="<?= $data['date']['minute']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 					</p>
+					<?php endif; ?>
 				</div>
 			</section>
 
@@ -574,6 +582,12 @@ class Admin {
 				$_POST = stripslashes_deep( $_POST );
 				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
 				$invoice->set_data( $document_data, $order );
+
+				// check if we have number, and if not generate one
+				if( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
+					$invoice->init_number();
+				}
+
 				$invoice->save();
 			}
 
@@ -848,14 +862,14 @@ class Admin {
 
 		$date_entered = ! empty( $form_data['_wcpdf_'.$document_slug.'_date'] ) && ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['date'] );
 		if( $date_entered ) {
-			$date = $form_data['_wcpdf_'.$document_slug.'_date']['date'];
-			$hour = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['hour'] : '00';
-			$minute = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
+			$date         = $form_data['_wcpdf_'.$document_slug.'_date']['date'];
+			$hour         = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['hour'] : '00';
+			$minute       = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
 
 			// clean & sanitize input
-			$date = date( 'Y-m-d', strtotime( $date ) );
-			$hour = sprintf('%02d', intval( $hour ));
-			$minute = sprintf('%02d', intval( $minute ) );
+			$date         = date( 'Y-m-d', strtotime( $date ) );
+			$hour         = sprintf('%02d', intval( $hour ));
+			$minute       = sprintf('%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";
 
 		} elseif ( ! $date_entered && !empty( $_POST['_wcpdf_'.$document_slug.'_number'] ) ) {

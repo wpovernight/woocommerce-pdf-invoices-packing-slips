@@ -238,6 +238,7 @@ dd:after {
 table.totals {
 	width: 100%;
 	margin-top: 5mm;
+	table-layout: fixed;
 }
 
 table.totals th,

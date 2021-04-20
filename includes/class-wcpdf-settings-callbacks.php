@@ -249,7 +249,7 @@ class Settings_Callbacks {
 
 				check_<?php echo $id; ?>_custom();
 
-				$( '#<?php echo $id; ?>' ).change(function() {
+				$( '#<?php echo $id; ?>' ).on( 'change', function() {
 					check_<?php echo $id; ?>_custom();
 				});
 
