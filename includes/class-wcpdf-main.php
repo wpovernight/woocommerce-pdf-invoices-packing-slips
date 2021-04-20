@@ -128,6 +128,9 @@ class Main {
 			do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
 
 			try {
+				// log document generation to order notes
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_email_attachment_to_order_notes' ) );
+				
 				// prepare document
 				// we use ID to force to reloading the order to make sure that all meta data is up to date.
 				// this is especially important when multiple emails with the PDF document are sent in the same session
@@ -176,6 +179,7 @@ class Main {
 				$attachments[] = $pdf_path;
 
 				do_action( 'wpo_wcpdf_email_attachment', $pdf_path, $document_type, $document );
+				
 			} catch ( \Exception $e ) {
 				wcpdf_log_error( $e->getMessage(), 'critical', $e );
 				continue;
@@ -336,10 +340,20 @@ class Main {
 
 		// if we got here, we're safe to go!
 		try {
+			// log document creation to order notes
+			if( count( $order_ids ) > 1 && isset( $_GET['bulk'] ) ) {
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_bulk_to_order_notes' ) );
+			} elseif( isset( $_GET['my-account'] ) ) {
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_my_account_to_order_notes' ) );
+			} else {
+				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_single_to_order_notes' ) );
+			}
+
+			// get document
 			$document = wcpdf_get_document( $document_type, $order_ids, true );
 
 			if ( $document ) {
-				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself)
+				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself with $document->order_ids)
 
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
 				// allow URL override
@@ -911,6 +925,45 @@ class Main {
 		}
 
 		return $mailArray;
+	}
+
+	/**
+	 * Logs the bulk document creation to the order notes
+	 */
+	public function log_bulk_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'bulk order action', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
+	 * Logs the single document creation to the order notes
+	 */
+	public function log_single_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'single order action', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
+	 * Logs the my account document creation to the order notes
+	 */
+	public function log_my_account_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
+	 * Logs the email attachment document creation to the order notes
+	 */
+	public function log_email_attachment_to_order_notes( $document ) {
+		$this->log_to_order_notes( $document, __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
+	/**
+	 * Logs the document creation to the order notes
+	 */
+	public function log_to_order_notes( $document, $created_via ) {
+		if( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $created_via ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+			$message = __( 'PDF %s created via %s.', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title(), $created_via );
+			$order->add_order_note( $note );
+		}
 	}
 
 	/**

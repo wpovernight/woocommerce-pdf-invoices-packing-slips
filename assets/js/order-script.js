@@ -20,9 +20,9 @@ jQuery(document).ready(function($) {
 			var order_ids=checked.join('x');
 
 			if (wpo_wcpdf_ajax.ajaxurl.indexOf("?") != -1) {
-				url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			} else {
-				url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			}
 
 			window.open(url,'_blank');

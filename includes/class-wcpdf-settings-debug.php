@@ -294,6 +294,18 @@ class Settings_Debug {
 					'id'			=> 'use_html5_parser',
 				)
 			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'log_to_order_notes',
+				'title'			=> __( 'Log to order notes', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'log_to_order_notes',
+					'description'	=> __( 'Log PDF document creation to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
 		);
 
 		// allow plugins to alter settings fields
