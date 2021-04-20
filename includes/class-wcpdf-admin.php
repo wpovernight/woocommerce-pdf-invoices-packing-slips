@@ -497,7 +497,7 @@ class Admin {
 						</div>
 						<!-- Read only -->
 						<div class="read-only">
-							<p><?= $data['notes']['value']; ?></p>
+							<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value']; ?></p>
 						</div>
 						<!-- Editable -->
 						<div class="editable">
@@ -579,6 +579,7 @@ class Admin {
 
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
+				$_POST = stripslashes_deep( $_POST );
 				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
 				$invoice->set_data( $document_data, $order );
 
@@ -905,9 +906,8 @@ class Admin {
 				),
 				'b'		=> array(),
 			);
-			// sanitize
-			$notes         = sanitize_textarea_field( wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html ) );
-			$data['notes'] = nl2br( $notes );
+			
+			$data['notes'] = wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html );
 		}
 
 		return $data;

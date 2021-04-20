@@ -1224,7 +1224,12 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	public function document_notes() {
-		echo $this->get_document_notes();
+		$document_notes = $this->get_document_notes();
+		if( $document_notes == strip_tags( $document_notes ) ) {
+			echo nl2br($document_notes);
+		} else {
+			echo $document_notes;
+		}
 	}
 
 
