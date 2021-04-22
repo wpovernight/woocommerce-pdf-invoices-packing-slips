@@ -648,7 +648,11 @@ abstract class Order_Document {
 	 * Return/Show shop/company footer imprint, copyright etc.
 	 */
 	public function get_footer() {
-		return $this->get_settings_text( 'footer' );
+		ob_start();
+		do_action( 'wpo_wcpdf_before_footer', $this->get_type(), $this->order );
+		echo $this->get_settings_text( 'footer' );
+		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
+		return ob_get_clean();
 	}
 	public function footer() {
 		echo $this->get_footer();
