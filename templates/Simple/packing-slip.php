@@ -117,7 +117,9 @@
 
 <?php if ( $this->get_footer() ): ?>
 <div id="footer">
+	<!-- hook available: wpo_wcpdf_before_footer -->
 	<?php $this->footer(); ?>
+	<!-- hook available: wpo_wcpdf_after_footer -->
 </div><!-- #letter-footer -->
 <?php endif; ?>
 
