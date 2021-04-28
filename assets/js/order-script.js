@@ -43,13 +43,16 @@ jQuery(document).ready(function($) {
 			$form.find(".read-only").hide();
 			$form.find(".editable").show();
 			$form.find(':input').attr('disabled', false);
+			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
 		} else {
 			$form.find(".read-only").show();
 			$form.find(".editable").hide();
 			$form.find(':input').attr('disabled', true);
+			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').hide();
 		}
 	});
 
+	// delete document
 	$( ".wcpdf-data-fields .wpo-wcpdf-delete-document" ).on("click", function() {
 		if ( window.confirm( wpo_wcpdf_ajax.confirm_delete ) === false ) {
 			return; // having second thoughts
@@ -80,6 +83,7 @@ jQuery(document).ready(function($) {
 		});
 	});
 
+	// regenerate document
 	$( ".wcpdf-data-fields .wpo-wcpdf-regenerate-document" ).on("click", function() {
 		
 		if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
@@ -119,6 +123,21 @@ jQuery(document).ready(function($) {
 			}
 		});
 		
+	});
+
+	// save document
+	$( ".wpo-wcpdf-save" ).on("click", function() {
+		$( ".save_order" ).trigger( "click" );
+	});
+
+	// cancel edit
+	$( ".wpo-wcpdf-cancel" ).on("click", function() {
+		$form = $(this).closest('.wcpdf-data-fields');
+
+		$form.find(".read-only").show();
+		$form.find(".editable").hide();
+		$form.find(':input').attr('disabled', true);
+		$form.find('.wpo-wcpdf-document-buttons').hide();
 	});
 
 });

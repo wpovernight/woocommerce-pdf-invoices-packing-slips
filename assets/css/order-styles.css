@@ -101,6 +101,10 @@
 	cursor:pointer;
 }
 
+.wcpdf-data-fields .wpo-wcpdf-document-buttons {
+	display: none;
+}
+
 .wcpdf-data-fields h4 .wcpdf-regenerate-spin {
 	opacity: 1;
  	-webkit-animation: spin 1.6s linear infinite; /* Safari */

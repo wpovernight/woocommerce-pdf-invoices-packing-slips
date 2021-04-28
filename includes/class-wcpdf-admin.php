@@ -513,6 +513,14 @@ class Admin {
 			<?php endif; ?>
 			<!-- / Document Notes -->
 
+			<!-- Save/Cancel buttons -->
+			<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
+				<p>
+					<a class="button button-primary wpo-wcpdf-save"><?php _e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<a class="button wpo-wcpdf-cancel"><?php _e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				</p>
+			</section>
+
 		</div>
 		<?php
 	}
