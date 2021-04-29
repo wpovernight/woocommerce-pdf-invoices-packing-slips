@@ -428,7 +428,7 @@ class Admin {
 		if( empty( $document ) || empty( $data ) ) return;
 		$data = $this->get_current_values_for_document( $document, $data );
 		?>
-		<div class="wcpdf-data-fields <?= $document->type.'-fields'; ?>" data-document="<?= $document->get_type(); ?>" data-order_id="<?php echo WCX_Order::get_id( $document->order ); ?>">
+		<div class="wcpdf-data-fields <?= $document->get_type().'-fields'; ?>" data-document="<?= $document->get_type(); ?>" data-order_id="<?php echo WCX_Order::get_id( $document->order ); ?>">
 			<div class="wrapper">
 				<section class="wcpdf-data-fields-section number-date">
 					<!-- Title -->
