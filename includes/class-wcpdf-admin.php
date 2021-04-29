@@ -47,7 +47,7 @@ class Admin {
 		}
 
 		// AJAX actions for deleting, regenerating and saving document data
-		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'delete_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_delete_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_save_regenerate_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_save_regenerate_document' ) );
 
@@ -728,7 +728,10 @@ class Admin {
 		return $query_vars;
 	}
 
-	public function delete_document() {
+	/**
+	 * Delete document on AJAX request
+	 */
+	public function ajax_delete_document() {
 		if ( check_ajax_referer( "wpo_wcpdf_delete_document", 'security', false ) === false ) {
 			wp_send_json_error( array(
 				'message' => 'nonce expired',
@@ -768,6 +771,9 @@ class Admin {
 		}
 	}
 
+	/**
+	 * Save or regenerate document on AJAX request
+	 */
 	public function ajax_save_regenerate_document() {
 		if ( check_ajax_referer( "wpo_wcpdf_regenerate_document", 'security', false ) === false && check_ajax_referer( "wpo_wcpdf_save_document", 'security', false ) === false ) {
 			wp_send_json_error( array(
