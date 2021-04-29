@@ -151,7 +151,8 @@ td.order-data table th {
 /* Order details */
 table.order-details {
 	width:100%;
-	margin-bottom: 0mm;
+	margin-bottom: 8mm;
+	page-break-before: avoid;
 }
 
 .quantity,
