@@ -33,10 +33,7 @@ jQuery(document).ready(function($) {
 	
 	// enable invoice number edit if user initiated
 	$( ".wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes" ).on("click", function() {
-		$form = $(this).closest('.wcpdf-data-fields-section');
-		if ($form.length == 0) { // no section, take overall wrapper
-			$form = $(this).closest('.wcpdf-data-fields');
-		}
+		$form = $(this).closest('.wcpdf-data-fields');
 
 		// check visibility
 		if( $form.find(".read-only").is(":visible") ) {
@@ -126,8 +123,60 @@ jQuery(document).ready(function($) {
 	});
 
 	// save document
-	$( ".wpo-wcpdf-save" ).on("click", function() {
-		$( ".save_order" ).trigger( "click" );
+	$( ".wcpdf-data-fields .wpo-wcpdf-save" ).on("click", function() {
+
+		$form = $(this).closest('.wcpdf-data-fields');
+
+		// create an object with the data attributes
+		form_data_attributes = $form.data();
+
+		// create a serialized string with the form inputs name/value
+		serialized = $form.find(":input:visible:not(:disabled)").serialize();
+
+		// Make sure all feedback icons are hidden before each call
+		$form.find('.document-action-success, .document-action-failed').hide();
+
+		// block UI
+		$form.block( {
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6
+			}
+		} );
+
+		$.ajax({
+			url:                wpo_wcpdf_ajax.ajaxurl,
+			data: {
+				action:         'wpo_wcpdf_save_document',
+				security:       $(this).data('nonce'),
+				form_data:      serialized,
+				order_id:       form_data_attributes.order_id,
+				document_type:  form_data_attributes.document,
+			},
+			type:               'POST',
+			context:            $form,
+			success: function( response ) {
+				if ( response.success ) {
+					$form.find(".read-only").show();
+					$form.find(".editable").hide();
+					$form.find(':input').attr('disabled', true);
+					$form.find('.wpo-wcpdf-document-buttons').hide();
+
+					// update DOM data
+					let wrapper = form_data_attributes.document + '-fields .wrapper';
+					$form.load( document.URL + ' .' + wrapper, function() {
+						$form.find('.document-action-success').show();
+					});
+				} else {
+					$form.find('.document-action-failed').show();
+				}
+
+				// unblock UI
+				$form.unblock();
+			}
+		});
+		
 	});
 
 	// cancel edit

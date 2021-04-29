@@ -70,7 +70,7 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf',
 				WPO_WCPDF()->plugin_url() . '/assets/js/order-script.js',
-				array( 'jquery' ),
+				array( 'jquery', 'jquery-blockui' ),
 				WPO_WCPDF_VERSION
 			);
 
