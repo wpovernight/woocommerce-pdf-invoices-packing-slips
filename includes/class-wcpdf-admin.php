@@ -516,7 +516,7 @@ class Admin {
 				<!-- Save/Cancel buttons -->
 				<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
 					<p>
-						<a class="button button-primary wpo-wcpdf-save" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>"><?php _e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>" data-action="save"><?php _e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						<a class="button wpo-wcpdf-cancel"><?php _e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 					</p>
 				</section>
@@ -529,7 +529,7 @@ class Admin {
 	public function add_regenerate_document_button( $document ) {
 		$document_settings = $document->get_settings( true );
 		if ( $document->use_historical_settings() == true || isset( $document_settings['archive_pdf'] ) ) {
-			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
+			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s" data-action="regenerate"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
 		}
 	}
 
