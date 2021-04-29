@@ -24,6 +24,8 @@ class Admin {
 		}
 		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 
+		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 35, 2 );
+
 		// manually send emails
 		// WooCommerce core processes order actions at priority 50
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'send_emails' ), 60, 2 );
@@ -46,8 +48,8 @@ class Admin {
 
 		// AJAX actions for deleting, regenerating and saving document data
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'delete_document' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'regenerate_document' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'save_document_number_date_notes' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_save_regenerate_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_save_regenerate_document' ) );
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -576,84 +578,32 @@ class Admin {
 	}
 
 	/**
-	 * Save document number
+	 * Save invoice number
 	 */
-	public function save_document_number_date_notes() {
-		if ( check_ajax_referer( "wpo_wcpdf_save_document", 'security', false ) === false ) {
-			wp_send_json_error( array(
-				'message' => 'nonce expired',
-			) );
-		}
-
-		if ( ! isset ($_POST['action'] ) || $_POST['action'] != 'wpo_wcpdf_save_document' ) {
-			wp_send_json_error( array(
-				'message' => 'bad action',
-			) );
-		}
-
-		if( empty( $_POST['order_id'] ) || empty( $_POST['document_type'] ) ) {
-			wp_send_json_error( array(
-				'message' => 'incomplete request',
-			) );
-		}
-
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_send_json_error( array(
-				'message' => 'no permissions',
-			) );
-		}
-
-		$order_id      = absint( $_POST['order_id'] );
-		$order         = WCX::get_order( $order_id );
-		$document_type = sanitize_text_field( $_POST['document_type'] );
-
-		// parse form data
-		parse_str( $_POST['form_data'], $form_data );
-		if ( is_array( $form_data ) ) {
-			foreach ( $form_data as $key => &$value ) {
-				if ( is_array( $value ) && ! empty( $value[$order_id] ) ) {
-					$value = $value[$order_id];
-				}
+	public function save_invoice_number_date($post_id, $post) {
+		$post_type = get_post_type( $post_id );
+		if( $post_type == 'shop_order' ) {
+			// bail if this is not an actual 'Save order' action
+			if ( ! isset($_POST['action']) || $_POST['action'] != 'editpost' ) {
+				return;
 			}
-		}
 
-		// remove legacy hooks (older versions of Pro)
-		if( function_exists( 'WPO_WCPDF_Pro' ) ) {
-			$pro_installed_version = get_option( 'wpo_wcpdf_pro_version' );
-			if ( version_compare( $pro_installed_version, '7.2.4', '<' ) && version_compare( $pro_installed_version, '7.2.2', '>' ) ) {
-				remove_action( 'wpo_wcpdf_on_save_invoice_order_data', array( WPO_WCPDF_Pro()->writepanels, 'save_numbers_dates' ), 10, 3 );
-			} elseif( version_compare( $pro_installed_version, '7.2.2', '<=' ) ) {
-				remove_action( 'save_post', array( WPO_WCPDF_Pro()->writepanels, 'save_numbers_dates' ) );
-			}
-		}
-
-		try {
-			if ( $document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) ) ) {
-				$form_data     = stripslashes_deep( $form_data );
-
-				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
-				$document->set_data( $document_data, $order );
+			$order = WCX::get_order( $post_id );
+			if ( $invoice = wcpdf_get_invoice( $order ) ) {
+				$_POST = stripslashes_deep( $_POST );
+				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
+				$invoice->set_data( $document_data, $order );
 
 				// check if we have number, and if not generate one
-				if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'init_number' ) ) ) {
-					$document->init_number();
+				if( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
+					$invoice->init_number();
 				}
 
-				$document->save();
-
-				$response      = array(
-					'message' => $document->get_type()." data saved!",
-				);
-				wp_send_json_success( $response );
-			} else {
-				wp_send_json_error( array(
-					'message' => 'could not get document object',
-				) );
+				$invoice->save();
 			}
-		} catch ( \Exception $e ) {
-			wp_send_json_error( array(
-				'message' => 'error: '.$e->getMessage(),
-			) );			
+
+			// allow other documents to hook here and save their form data
+			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $_POST, $order, $this );
 		}
 	}
 
@@ -818,20 +768,20 @@ class Admin {
 		}
 	}
 
-	public function regenerate_document() {
-		if ( check_ajax_referer( "wpo_wcpdf_regenerate_document", 'security', false ) === false ) {
+	public function ajax_save_regenerate_document() {
+		if ( check_ajax_referer( "wpo_wcpdf_regenerate_document", 'security', false ) === false && check_ajax_referer( "wpo_wcpdf_save_document", 'security', false ) === false ) {
 			wp_send_json_error( array(
 				'message' => 'nonce expired',
 			) );
 		}
 
-		if ( ! isset($_POST['action']) || $_POST['action'] != 'wpo_wcpdf_regenerate_document' ) {
+		if ( ! isset($_POST['action']) ||  ! in_array( $_POST['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document' ) ) ) {
 			wp_send_json_error( array(
 				'message' => 'bad action',
 			) );
 		}
 
-		if( empty($_POST['order_id']) || empty($_POST['document_type']) ) {
+		if( empty($_POST['order_id']) || empty($_POST['document_type']) || empty($_POST['action_type']) ) {
 			wp_send_json_error( array(
 				'message' => 'incomplete request',
 			) );
@@ -843,12 +793,13 @@ class Admin {
 			) );
 		}
 
-		$order_id = absint( $_POST['order_id'] );
-		$order = WCX::get_order( $order_id );
+		$order_id      = absint( $_POST['order_id'] );
+		$order         = WCX::get_order( $order_id );
 		$document_type = sanitize_text_field( $_POST['document_type'] );
+		$action_type   = sanitize_text_field( $_POST['action_type'] );
 
 		// parse form data
-		parse_str($_POST['form_data'], $form_data);
+		parse_str( $_POST['form_data'], $form_data );
 		if ( is_array( $form_data ) ) {
 			foreach ( $form_data as $key => &$value ) {
 				if ( is_array( $value ) && !empty( $value[$order_id] ) ) {
@@ -859,20 +810,44 @@ class Admin {
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
-			if ( !empty($document) && $document->exists() ) {
-				// perform legacy date fields replacements check
-				if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
-					$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
+
+			if( ! empty( $document ) ) {
+
+				// on regenerate
+				if( $action_type == 'regenerate' && $document->exists() ) {
+					// perform legacy date fields replacements check
+					if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
+						$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
+					}
+
+					// save document data
+					$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
+					$document->regenerate( $order, $document_data );
+
+					$response      = array(
+						'message' => $document->get_type()." regenerated",
+					);
+
+				// on save
+				} elseif( $action_type == 'save' ) {
+					$form_data     = stripslashes_deep( $form_data );
+					$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
+					$document->set_data( $document_data, $order );
+
+					// check if we have number, and if not generate one
+					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'init_number' ) ) ) {
+						$document->init_number();
+					}
+
+					$document->save();
+
+					$response      = array(
+						'message' => $document->get_type()." data saved!",
+					);
 				}
 
-				// save document data
-				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
-				$document->regenerate( $order, $document_data );
+				wp_send_json_success( $response );
 
-				$response = array(
-					'message' => $document->get_type()." regenerated",
-				);
-				wp_send_json_success($response);
 			} else {
 				wp_send_json_error( array(
 					'message' => 'document does not exist',
