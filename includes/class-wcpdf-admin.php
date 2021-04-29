@@ -850,13 +850,18 @@ class Admin {
 					$response      = array(
 						'message' => $document->get_type()." data saved!",
 					);
+
+				} else {
+					wp_send_json_error( array(
+						'message' => 'document does not exist',
+					) );
 				}
 
 				wp_send_json_success( $response );
 
 			} else {
 				wp_send_json_error( array(
-					'message' => 'document does not exist',
+					'message' => 'document is empty',
 				) );
 			}
 		} catch (\Exception $e) {
