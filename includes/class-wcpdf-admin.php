@@ -617,13 +617,13 @@ class Admin {
 			}
 		}
 
-		// remoce legacy hook (older versions of Pro)
+		// remove legacy hooks (older versions of Pro)
 		if( function_exists( 'WPO_WCPDF_Pro' ) ) {
 			$pro_installed_version = get_option( 'wpo_wcpdf_pro_version' );
 			if ( version_compare( $pro_installed_version, '7.2.4', '<' ) && version_compare( $pro_installed_version, '7.2.2', '>' ) ) {
 				remove_action( 'wpo_wcpdf_on_save_invoice_order_data', array( WPO_WCPDF_Pro()->writepanels, 'save_numbers_dates' ), 10, 3 );
 			} elseif( version_compare( $pro_installed_version, '7.2.2', '<=' ) ) {
-				remove_action( 'save_post', array( WPO_WCPDF_Pro()->writepanels, 'save_numbers_dates' ), 10, 3 );
+				remove_action( 'save_post', array( WPO_WCPDF_Pro()->writepanels, 'save_numbers_dates' ) );
 			}
 		}
 
