@@ -617,6 +617,11 @@ class Admin {
 			}
 		}
 
+		// remoce legacy hook (older versions of Pro)
+		if( function_exists( 'WPO_WCPDF_Pro' ) ) {
+			remove_action( 'wpo_wcpdf_on_save_invoice_order_data', array( WPO_WCPDF_Pro()->writepanels, 'save_numbers_dates' ), 10, 3 );
+		}
+
 		try {
 			if ( $document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) ) ) {
 				$form_data     = stripslashes_deep( $form_data );
@@ -630,9 +635,6 @@ class Admin {
 				}
 
 				$document->save();
-
-				// legacy hook (backwards compatibility)
-				do_action( "wpo_wcpdf_on_save_invoice_order_data", $form_data, $order, $this );
 
 				$response      = array(
 					'message' => $document->get_type()." data saved!",
