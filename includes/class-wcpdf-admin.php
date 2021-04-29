@@ -848,9 +848,10 @@ class Admin {
 					$document->save();
 
 					$response      = array(
-						'message' => $document->get_type()." data saved!",
+						'message' => $document->get_type()." data saved",
 					);
 
+				// document not exist
 				} else {
 					wp_send_json_error( array(
 						'message' => 'document does not exist',
@@ -864,7 +865,7 @@ class Admin {
 					'message' => 'document is empty',
 				) );
 			}
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			wp_send_json_error( array(
 				'message' => 'error: '.$e->getMessage(),
 			) );			
