@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 
-	$( document ).on( 'click', '#doaction, #doaction2', function( e ) {
+	$( '#doaction, #doaction2' ).on( 'click', function( e ) {
 		let actionselected = $(this).attr("id").substr(2);
 		let action         = $('select[name="' + actionselected + '"]').val();
 
@@ -36,19 +36,19 @@ jQuery( function( $ ) {
 	
 	// enable invoice number edit if user initiated
 	$( document ).on( 'click', '.wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes', function() {
-		let form = $(this).closest('.wcpdf-data-fields');
+		$form = $(this).closest('.wcpdf-data-fields');
 
 		// check visibility
-		if( form.find(".read-only").is(":visible") ) {
-			form.find(".read-only").hide();
-			form.find(".editable").show();
-			form.find(':input').attr('disabled', false);
-			form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
+		if( $form.find(".read-only").is(":visible") ) {
+			$form.find(".read-only").hide();
+			$form.find(".editable").show();
+			$form.find(':input').attr('disabled', false);
+			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
 		} else {
-			form.find(".read-only").show();
-			form.find(".editable").hide();
-			form.find(':input').attr('disabled', true);
-			form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').hide();
+			$form.find(".read-only").show();
+			$form.find(".editable").hide();
+			$form.find(':input').attr('disabled', true);
+			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').hide();
 		}
 	} );
 
@@ -58,21 +58,21 @@ jQuery( function( $ ) {
 			return; // having second thoughts
 		}
 
-		let form = $(this).closest('.wcpdf-data-fields');
+		$form = $(this).closest('.wcpdf-data-fields');
 
 		// Hide regenerate button
-		form.find('.wpo-wcpdf-regenerate-document').hide();
+		$form.find('.wpo-wcpdf-regenerate-document').hide();
 
 		$.ajax({
 			url:     wpo_wcpdf_ajax.ajaxurl,
 			data:    {
 				action  : 'wpo_wcpdf_delete_document',
 				security: $(this).data('nonce'),
-				document: form.data('document'),
-				order_id: form.data('order_id')
+				document: $form.data('document'),
+				order_id: $form.data('order_id')
 			},
 			type:    'POST',
-			context: form,
+			context: $form,
 			success: function( response ) {
 				if ( response.success ) {
 					$(this).find(':input').val("");
@@ -92,18 +92,18 @@ jQuery( function( $ ) {
 	function save_document_data( e ) {
 		e.preventDefault();
 
-		let form       = $(this).closest('.wcpdf-data-fields');
+		$form       = $(this).closest('.wcpdf-data-fields');
 		let action     = $(this).data('action');
 		let nonce      = $(this).data('nonce');
-		let data       = form.data();
-		let serialized = form.find(":input:visible:not(:disabled)").serialize();
+		let data       = $form.data();
+		let serialized = $form.find(":input:visible:not(:disabled)").serialize();
 
 		// Make sure all feedback icons are hidden before each call
-		form.find('.document-action-success, .document-action-failed').hide();
+		$form.find('.document-action-success, .document-action-failed').hide();
 
 		// block UI
 		if( action == 'save' ) {
-			form.block( {
+			$form.block( {
 				message: null,
 				overlayCSS: {
 					background: '#fff',
@@ -115,7 +115,7 @@ jQuery( function( $ ) {
 				return; // having second thoughts
 			}
 	
-			form.find('.wpo-wcpdf-regenerate-document').addClass('wcpdf-regenerate-spin');
+			$form.find('.wpo-wcpdf-regenerate-document').addClass('wcpdf-regenerate-spin');
 		}
 
 		$.ajax( {
@@ -126,47 +126,48 @@ jQuery( function( $ ) {
 				form_data:      serialized,
 				order_id:       data.order_id,
 				document_type:  data.document,
+				action_type:    action,
 			},
 			type:               'POST',
-			context:            form,
+			context:            $form,
 			success: function( response ) {
 				if ( response.success ) {
 					if( action == 'save' ) {
-						form.find(".read-only").show();
-						form.find(".editable").hide();
-						form.find(':input').attr('disabled', true);
-						form.find('.wpo-wcpdf-document-buttons').hide();
+						$form.find(".read-only").show();
+						$form.find(".editable").hide();
+						$form.find(':input').attr('disabled', true);
+						$form.find('.wpo-wcpdf-document-buttons').hide();
 
-						// update DOM data
+						// update document DOM data
 						let wrapper = data.document + '-fields .wrapper';
-						form.load( document.URL + ' .' + wrapper, function() {
-							form.find('.document-action-success').show();
+						$form.load( document.URL + ' .' + wrapper, function() {
+							$form.find('.document-action-success').show();
 						});
 					} else if( action == 'regenerate' ) {
-						form.find('.document-action-success').show();
+						$form.find('.document-action-success').show();
 					}
 				} else {
-					form.find('.document-action-failed').show();
+					$form.find('.document-action-failed').show();
 				}
 
 				if( action == 'save' ) {
 					// unblock UI
-					form.unblock();
+					$form.unblock();
 				} else if( action == 'regenerate' ) {
-					form.find('.wpo-wcpdf-regenerate-document').removeClass('wcpdf-regenerate-spin');
+					$form.find('.wpo-wcpdf-regenerate-document').removeClass('wcpdf-regenerate-spin');
 				}
 			}
 		} );
 	}
 
 	// cancel edit
-	$( document ).on( 'click', '.wpo-wcpdf-cancel',  function() {
-		let form = $(this).closest('.wcpdf-data-fields');
+	$( document ).on( 'click', '.wpo-wcpdf-cancel', function() {
+		$form = $(this).closest('.wcpdf-data-fields');
 
-		form.find(".read-only").show();
-		form.find(".editable").hide();
-		form.find(':input').attr('disabled', true);
-		form.find('.wpo-wcpdf-document-buttons').hide();
+		$form.find(".read-only").show();
+		$form.find(".editable").hide();
+		$form.find(':input').attr('disabled', true);
+		$form.find('.wpo-wcpdf-document-buttons').hide();
 	} );
 
 } );
