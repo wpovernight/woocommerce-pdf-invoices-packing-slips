@@ -60,7 +60,7 @@ jQuery( function( $ ) {
 
 		let form = $(this).closest('.wcpdf-data-fields');
 
-		//Hide regenerate button
+		// Hide regenerate button
 		form.find('.wpo-wcpdf-regenerate-document').hide();
 
 		$.ajax({
@@ -110,7 +110,7 @@ jQuery( function( $ ) {
 					opacity: 0.6
 				}
 			} );
-		} else if( $action == 'regenerate' ) {
+		} else if( action == 'regenerate' ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
 				return; // having second thoughts
 			}
