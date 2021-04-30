@@ -76,7 +76,8 @@
 	display:block;
 }
 
-.wcpdf-data-fields .editable {
+.wcpdf-data-fields .editable,
+.wcpdf-data-fields .editable-notes {
 	height:auto;
 	display:none;
 }

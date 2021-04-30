@@ -36,21 +36,31 @@ jQuery( function( $ ) {
 	
 	// enable invoice number edit if user initiated
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes', function() {
-		let $form = $(this).closest('.wcpdf-data-fields');
+		let $form = $(this).closest('.wcpdf-data-fields-section');
+		if ( $form.length == 0 ) { // no section, take overall wrapper
+			$form = $(this).closest('.wcpdf-data-fields');
+		}
+
+		let edit = $(this).data( 'edit' );
 
 		// check visibility
 		if( $form.find(".read-only").is(":visible") ) {
 			$form.find(".read-only").hide();
 			$form.find(".editable").show();
+			if( edit == 'notes' ) {
+				$form.find(".editable-notes").show();
+			}
 			$form.find(':input').attr('disabled', false);
 			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
 		} else {
 			$form.find(".read-only").show();
 			$form.find(".editable").hide();
+			$form.find(".editable-notes").hide();
 			$form.find(':input').attr('disabled', true);
 			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').hide();
 		}
 	} );
+
 
 	// delete document
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wcpdf-data-fields .wpo-wcpdf-delete-document', function() {
@@ -165,6 +175,7 @@ jQuery( function( $ ) {
 
 		$form.find(".read-only").show();
 		$form.find(".editable").hide();
+		$form.find(".editable-notes").hide();
 		$form.find(':input').attr('disabled', true);
 		$form.find('.wpo-wcpdf-document-buttons').hide();
 	} );

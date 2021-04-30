@@ -496,13 +496,14 @@ class Admin {
 					<p class="form-field form-field-wide">
 						<div>
 							<span><strong><?= $data['notes']['label']; ?></strong></span>
+							<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
 						</div>
 						<!-- Read only -->
 						<div class="read-only">
 							<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value']; ?></p>
 						</div>
 						<!-- Editable -->
-						<div class="editable">
+						<div class="editable-notes">
 							<p class="form-field form-field-wide">
 								<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
 							</p>
