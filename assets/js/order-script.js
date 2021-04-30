@@ -45,13 +45,18 @@ jQuery( function( $ ) {
 
 		// check visibility
 		if( $form.find(".read-only").is(":visible") ) {
-			$form.find(".read-only").hide();
-			$form.find(".editable").show();
 			if( edit == 'notes' ) {
+				$form.find(".read-only").hide();
 				$form.find(".editable-notes").show();
+				$form.find('.editable-notes :input').attr('disabled', false);
+				$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
+			} else {
+				$form.find(".read-only").hide();
+				$form.find(".editable").show();
+				$form.find(".editable-notes").show();
+				$form.find(':input').attr('disabled', false);
+				$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
 			}
-			$form.find(':input').attr('disabled', false);
-			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
 		} else {
 			$form.find(".read-only").show();
 			$form.find(".editable").hide();

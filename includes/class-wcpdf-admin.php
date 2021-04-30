@@ -485,43 +485,38 @@ class Admin {
 					</p>
 					<?php endif; ?>
 				</div>
-			</section>
 
-			<!-- Document Notes -->
-			<?php if( array_key_exists( 'notes', $data ) ) : ?>
+				<!-- Document Notes -->
+				<?php if( array_key_exists( 'notes', $data ) ) : ?>
 
 				<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
 
-				<section class="wcpdf-data-fields-section notes">
+				<!-- Read only -->
+				<div class="read-only">
+					<span><strong><?= $data['notes']['label']; ?></strong></span>
+					<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
+					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value']; ?></p>
+				</div>
+				<!-- Editable -->
+				<div class="editable-notes">
 					<p class="form-field form-field-wide">
-						<div>
-							<span><strong><?= $data['notes']['label']; ?></strong></span>
-							<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
-						</div>
-						<!-- Read only -->
-						<div class="read-only">
-							<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value']; ?></p>
-						</div>
-						<!-- Editable -->
-						<div class="editable-notes">
-							<p class="form-field form-field-wide">
-								<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
-							</p>
-						</div>
+						<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
 					</p>
-				</section>
+				</div>
 
 				<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
 
-			<?php endif; ?>
-			<!-- / Document Notes -->
+				<?php endif; ?>
+				<!-- / Document Notes -->
+
+			</section>
 
 			<!-- Save/Cancel buttons -->
 			<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
-				<p>
+				<div>
 					<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>" data-action="save"><?php _e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 					<a class="button wpo-wcpdf-cancel"><?php _e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-				</p>
+				</div>
 			</section>
 			<!-- / Save/Cancel buttons -->
 		</div>

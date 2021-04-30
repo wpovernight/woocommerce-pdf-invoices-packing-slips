@@ -61,10 +61,10 @@
 .wcpdf-data-fields {
 	margin-left: 10px;
 	margin-right: 10px;
-	padding: 10px;
 	margin-bottom: 10px;
 	background-color: white;
-	border-bottom: 1px solid #dfdfdf;
+	border: 1px solid #c3c4c7;
+	box-shadow: 0 1px 1px rgba(0,0,0,.04);
 }
 
 .wcpdf-data-fields:last-child {
@@ -74,12 +74,19 @@
 .wcpdf-data-fields .read-only {
 	height:auto;
 	display:block;
+	padding: 10px;
 }
 
 .wcpdf-data-fields .editable,
 .wcpdf-data-fields .editable-notes {
 	height:auto;
 	display:none;
+	padding: 10px;
+}
+
+.wcpdf-data-fields h4 {
+	padding: 10px;
+	border-bottom: 1px solid #dfdfdf;
 }
 
 /* Edit buttons Invoice, Proforma and Credit */
@@ -104,6 +111,8 @@
 
 .wcpdf-data-fields .wpo-wcpdf-document-buttons {
 	display: none;
+	padding: 10px;
+	border-top: 1px solid #dfdfdf;
 }
 
 .wcpdf-data-fields h4 .wcpdf-regenerate-spin {
