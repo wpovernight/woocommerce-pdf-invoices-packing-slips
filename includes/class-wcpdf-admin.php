@@ -813,21 +813,23 @@ class Admin {
 				}
 			}
 		}
+		$form_data     = stripslashes_deep( $form_data );
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 
 			if( ! empty( $document ) ) {
 
+				// perform legacy date fields replacements check
+				if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
+					$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
+				}
+
+				// save document data
+				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
+
 				// on regenerate
 				if( $action_type == 'regenerate' && $document->exists() ) {
-					// perform legacy date fields replacements check
-					if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
-						$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
-					}
-
-					// save document data
-					$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
 					$document->regenerate( $order, $document_data );
 
 					$response      = array(
@@ -836,8 +838,6 @@ class Admin {
 
 				// on save
 				} elseif( $action_type == 'save' ) {
-					$form_data     = stripslashes_deep( $form_data );
-					$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
