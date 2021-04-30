@@ -150,6 +150,7 @@ jQuery( function( $ ) {
 					if( action == 'save' ) {
 						$form.find(".read-only").show();
 						$form.find(".editable").hide();
+						$form.find(".editable-notes").hide();
 						$form.find(':input').attr('disabled', true);
 						$form.find('.wpo-wcpdf-document-buttons').hide();
 
