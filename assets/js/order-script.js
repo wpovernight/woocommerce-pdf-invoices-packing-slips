@@ -36,7 +36,7 @@ jQuery( function( $ ) {
 	
 	// enable invoice number edit if user initiated
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes', function() {
-		$form = $(this).closest('.wcpdf-data-fields');
+		let $form = $(this).closest('.wcpdf-data-fields');
 
 		// check visibility
 		if( $form.find(".read-only").is(":visible") ) {
@@ -58,7 +58,7 @@ jQuery( function( $ ) {
 			return; // having second thoughts
 		}
 
-		$form = $(this).closest('.wcpdf-data-fields');
+		let $form = $(this).closest('.wcpdf-data-fields');
 
 		// Hide regenerate button
 		$form.find('.wpo-wcpdf-regenerate-document').hide();
@@ -92,7 +92,7 @@ jQuery( function( $ ) {
 	function save_document_data( e ) {
 		e.preventDefault();
 
-		$form       = $(this).closest('.wcpdf-data-fields');
+		let $form      = $(this).closest('.wcpdf-data-fields');
 		let action     = $(this).data('action');
 		let nonce      = $(this).data('nonce');
 		let data       = $form.data();
@@ -162,7 +162,7 @@ jQuery( function( $ ) {
 
 	// cancel edit
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-cancel', function() {
-		$form = $(this).closest('.wcpdf-data-fields');
+		let $form = $(this).closest('.wcpdf-data-fields');
 
 		$form.find(".read-only").show();
 		$form.find(".editable").hide();
