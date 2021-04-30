@@ -139,9 +139,8 @@ jQuery( function( $ ) {
 						$form.find('.wpo-wcpdf-document-buttons').hide();
 
 						// update document DOM data
-						let wrapper = data.document + '-fields .wrapper';
-						$form.load( document.URL + ' .' + wrapper, function() {
-							$form.find('.document-action-success').show();
+						$form.closest('#wpo_wcpdf-data-input-box').load( document.URL + ' #wpo_wcpdf-data-input-box .postbox-header, #wpo_wcpdf-data-input-box .inside', function() {
+							$('#wpo_wcpdf-data-input-box .notice').show();
 						});
 					} else if( action == 'regenerate' ) {
 						$form.find('.document-action-success').show();
