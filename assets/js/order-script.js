@@ -103,16 +103,8 @@ jQuery( function( $ ) {
 		// Make sure all feedback icons are hidden before each call
 		$form.find('.document-action-success, .document-action-failed').hide();
 
-		// block UI
-		if( action == 'save' ) {
-			$form.block( {
-				message: null,
-				overlayCSS: {
-					background: '#fff',
-					opacity: 0.6
-				}
-			} );
-		} else if( action == 'regenerate' ) {
+		// regenerate specific
+		if( action == 'regenerate' ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
 				return; // having second thoughts
 			}
@@ -120,40 +112,50 @@ jQuery( function( $ ) {
 			$form.find('.wpo-wcpdf-regenerate-document').addClass('wcpdf-regenerate-spin');
 		}
 
+		// block ui
+		$form.block( {
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6
+			}
+		} );
+
+		// request
 		$.ajax( {
-			url:                wpo_wcpdf_ajax.ajaxurl,
+			url:                            wpo_wcpdf_ajax.ajaxurl,
 			data: {
-				action:         'wpo_wcpdf_'+action+'_document',
-				security:       nonce,
-				form_data:      serialized,
-				order_id:       data.order_id,
-				document_type:  data.document,
-				action_type:    action,
+				action:                     'wpo_wcpdf_'+action+'_document',
+				security:                   nonce,
+				form_data:                  serialized,
+				order_id:                   data.order_id,
+				document_type:              data.document,
+				action_type:                action,
+				wpcdf_document_data_notice: action+'d',
 			},
 			type:               'POST',
 			context:            $form,
 			success: function( response ) {
-				if ( response.success ) {
-					if( action == 'save' ) {
-						toggle_edit_mode( $form );
+				toggle_edit_mode( $form );
 
-						// update document DOM data
-						$form.closest('#wpo_wcpdf-data-input-box').load( document.URL + ' #wpo_wcpdf-data-input-box .postbox-header, #wpo_wcpdf-data-input-box .inside', function() {
-							$('#wpo_wcpdf-data-input-box .notice').show();
-						});
-					} else if( action == 'regenerate' ) {
-						$form.find('.document-action-success').show();
+				// update document DOM data
+				$form.closest('#wpo_wcpdf-data-input-box').load( document.URL + ' #wpo_wcpdf-data-input-box .postbox-header, #wpo_wcpdf-data-input-box .inside', function() {
+					let notice_type;
+					if( response.success ) {
+						notice_type = 'success';
+					} else {
+						notice_type = 'error';
 					}
-				} else {
-					$form.find('.document-action-failed').show();
+					$(this).find( ".wcpdf-data-fields[data-document='" + data.document +"'][data-order_id='" + data.order_id +"']" ).before( '<div class="notice notice-'+notice_type+' inline" style="margin:0 10px 10px 10px;"><p>'+response.data.message+'</p></div>' );
+				});
+
+				if( action == 'regenerate' ) {
+					$form.find('.wpo-wcpdf-regenerate-document').removeClass('wcpdf-regenerate-spin');
+					toggle_edit_mode( $form );
 				}
 
-				if( action == 'save' ) {
-					// unblock UI
-					$form.unblock();
-				} else if( action == 'regenerate' ) {
-					$form.find('.wpo-wcpdf-regenerate-document').removeClass('wcpdf-regenerate-spin');
-				}
+				// unblock ui
+				$form.unblock();
 			}
 		} );
 	}

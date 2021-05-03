@@ -50,7 +50,6 @@ class Admin {
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_delete_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_save_regenerate_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_save_regenerate_document' ) );
-		add_action( 'wpo_wcpdf_meta_box_start', array( $this, 'add_ajax_success_notice' ) );
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -500,6 +499,7 @@ class Admin {
 				<!-- Editable -->
 				<div class="editable-notes">
 					<p class="form-field form-field-wide">
+						<label for="<?= $data['notes']['name']; ?>"><?= $data['notes']['label']; ?></label>
 						<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
 					</p>
 				</div>
@@ -519,14 +519,6 @@ class Admin {
 				</div>
 			</section>
 			<!-- / Save/Cancel buttons -->
-		</div>
-		<?php
-	}
-
-	public function add_ajax_success_notice() {
-		?>
-		<div class="notice notice-success inline" style="display:none; margin:0 10px 10px 10px;">
-			<p><?php _e( 'Document data saved!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		</div>
 		<?php
 	}
@@ -802,10 +794,11 @@ class Admin {
 			) );
 		}
 
-		$order_id      = absint( $_POST['order_id'] );
-		$order         = WCX::get_order( $order_id );
-		$document_type = sanitize_text_field( $_POST['document_type'] );
-		$action_type   = sanitize_text_field( $_POST['action_type'] );
+		$order_id        = absint( $_POST['order_id'] );
+		$order           = WCX::get_order( $order_id );
+		$document_type   = sanitize_text_field( $_POST['document_type'] );
+		$action_type     = sanitize_text_field( $_POST['action_type'] );
+		$notice          = sanitize_text_field( $_POST['wpcdf_document_data_notice'] );
 
 		// parse form data
 		parse_str( $_POST['form_data'], $form_data );
@@ -816,7 +809,21 @@ class Admin {
 				}
 			}
 		}
-		$form_data     = stripslashes_deep( $form_data );
+		$form_data       = stripslashes_deep( $form_data );
+
+		// prepare notice message
+		$notice_types    = array(
+			'saved'       => array(
+				'success' => __( 'saved', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'saving', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'regenerated' => array(
+				'success' => __( 'regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'regenerating', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+		);
+		$success_message = sprintf( __( 'Document data %s!', 'woocommerce-pdf-invoices-packing-slips' ), $notice_types[$notice]['success'] );
+		$error_message   = sprintf( __( 'An error ocurred while %s the document data!', 'woocommerce-pdf-invoices-packing-slips' ), $notice_types[$notice]['error'] );
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
@@ -836,7 +843,7 @@ class Admin {
 					$document->regenerate( $order, $document_data );
 
 					$response      = array(
-						'message' => $document->get_type()." regenerated",
+						'message' => $success_message,
 					);
 
 				// on save
@@ -851,26 +858,28 @@ class Admin {
 					$document->save();
 
 					$response      = array(
-						'message' => $document->get_type()." data saved",
+						'message' => $success_message,
 					);
 
 				// document not exist
 				} else {
+					$message_complement = __( 'Document does not exist.', 'woocommerce-pdf-invoices-packing-slips' );
 					wp_send_json_error( array(
-						'message' => 'document does not exist',
+						'message' => $error_message . ' ' . $message_complement,
 					) );
 				}
 
 				wp_send_json_success( $response );
 
 			} else {
+				$message_complement = __( 'Document is empty.', 'woocommerce-pdf-invoices-packing-slips' );
 				wp_send_json_error( array(
-					'message' => 'document is empty',
+					'message' => $error_message . ' ' . $message_complement,
 				) );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( array(
-				'message' => 'error: '.$e->getMessage(),
+				'message' => $error_message . ' ' . $e->getMessage(),
 			) );			
 		}
 	}
