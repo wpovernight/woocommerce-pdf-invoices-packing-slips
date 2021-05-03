@@ -812,8 +812,8 @@ class Admin {
 				'error'   => __( 'An error ocurred while saving the document data!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'regenerated' => array(
-				'success' => __( 'Document data regenerated!', 'woocommerce-pdf-invoices-packing-slips' ),
-				'error'   => __( 'An error ocurred while regenerating the document data!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'success' => __( 'Document regenerated!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error ocurred while regenerating the document!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 		);
 
