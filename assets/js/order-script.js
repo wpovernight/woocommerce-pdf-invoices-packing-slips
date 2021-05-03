@@ -44,26 +44,7 @@ jQuery( function( $ ) {
 		let edit = $(this).data( 'edit' );
 
 		// check visibility
-		if( $form.find(".read-only").is(":visible") ) {
-			if( edit == 'notes' ) {
-				$form.find(".read-only").hide();
-				$form.find(".editable-notes").show();
-				$form.find('.editable-notes :input').attr('disabled', false);
-				$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
-			} else {
-				$form.find(".read-only").hide();
-				$form.find(".editable").show();
-				$form.find(".editable-notes").show();
-				$form.find(':input').attr('disabled', false);
-				$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
-			}
-		} else {
-			$form.find(".read-only").show();
-			$form.find(".editable").hide();
-			$form.find(".editable-notes").hide();
-			$form.find(':input').attr('disabled', true);
-			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').hide();
-		}
+		toggle_edit_mode( $form, edit );
 	} );
 
 
@@ -103,6 +84,12 @@ jQuery( function( $ ) {
 
 	// save document
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wcpdf-data-fields .wpo-wcpdf-save-document', save_document_data );
+
+	// cancel edit
+	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-cancel', function() {
+		let $form = $(this).closest('.wcpdf-data-fields');
+		toggle_edit_mode( $form );
+	} );
 
 	function save_document_data( e ) {
 		e.preventDefault();
@@ -148,11 +135,7 @@ jQuery( function( $ ) {
 			success: function( response ) {
 				if ( response.success ) {
 					if( action == 'save' ) {
-						$form.find(".read-only").show();
-						$form.find(".editable").hide();
-						$form.find(".editable-notes").hide();
-						$form.find(':input').attr('disabled', true);
-						$form.find('.wpo-wcpdf-document-buttons').hide();
+						toggle_edit_mode( $form );
 
 						// update document DOM data
 						$form.closest('#wpo_wcpdf-data-input-box').load( document.URL + ' #wpo_wcpdf-data-input-box .postbox-header, #wpo_wcpdf-data-input-box .inside', function() {
@@ -175,15 +158,26 @@ jQuery( function( $ ) {
 		} );
 	}
 
-	// cancel edit
-	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-cancel', function() {
-		let $form = $(this).closest('.wcpdf-data-fields');
+	function toggle_edit_mode( $form, mode = null ) {
+		// check visibility
+		if( $form.find(".read-only").is(":visible") ) {
+			if( mode == 'notes' ) {
+				$form.find('.editable-notes :input').attr('disabled', false);
+			} else {
+				$form.find(".editable").show();
+				$form.find(':input').attr('disabled', false);
+			}
 
-		$form.find(".read-only").show();
-		$form.find(".editable").hide();
-		$form.find(".editable-notes").hide();
-		$form.find(':input').attr('disabled', true);
-		$form.find('.wpo-wcpdf-document-buttons').hide();
-	} );
+			$form.find(".read-only").hide();
+			$form.find(".editable-notes").show();
+			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').show();
+		} else {
+			$form.find(".read-only").show();
+			$form.find(".editable").hide();
+			$form.find(".editable-notes").hide();
+			$form.find(':input').attr('disabled', true);
+			$form.closest('.wcpdf-data-fields').find('.wpo-wcpdf-document-buttons').hide();
+		}
+	}
 
 } );
