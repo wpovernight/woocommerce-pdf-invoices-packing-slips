@@ -100,9 +100,6 @@ jQuery( function( $ ) {
 		let data       = $form.data();
 		let serialized = $form.find(":input:visible:not(:disabled)").serialize();
 
-		// Make sure all feedback icons are hidden before each call
-		$form.find('.document-action-success, .document-action-failed').hide();
-
 		// regenerate specific
 		if( action == 'regenerate' ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {

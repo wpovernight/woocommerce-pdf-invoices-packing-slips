@@ -132,17 +132,3 @@
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(-360deg); }
 }
-
-.wcpdf-data-fields .document-action-success,
-.wcpdf-data-fields .document-action-failed {
-	display: none;
-	vertical-align: middle;
-}
-
-.wcpdf-data-fields .document-action-success {
-	color: #2aad2a;
-}
-
-.wcpdf-data-fields .document-action-failed {
-	color: red;
-}
