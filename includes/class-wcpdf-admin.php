@@ -805,19 +805,17 @@ class Admin {
 		}
 		$form_data       = stripslashes_deep( $form_data );
 
-		// prepare notice message
-		$notice_types    = array(
+		// notice messages
+		$notice_messages = array(
 			'saved'       => array(
-				'success' => __( 'saved', 'woocommerce-pdf-invoices-packing-slips' ),
-				'error'   => __( 'saving', 'woocommerce-pdf-invoices-packing-slips' ),
+				'success' => __( 'Document data saved!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error ocurred while saving the document data!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'regenerated' => array(
-				'success' => __( 'regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
-				'error'   => __( 'regenerating', 'woocommerce-pdf-invoices-packing-slips' ),
+				'success' => __( 'Document data regenerated!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error ocurred while regenerating the document data!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 		);
-		$success_message = sprintf( __( 'Document data %s!', 'woocommerce-pdf-invoices-packing-slips' ), $notice_types[$notice]['success'] );
-		$error_message   = sprintf( __( 'An error ocurred while %s the document data!', 'woocommerce-pdf-invoices-packing-slips' ), $notice_types[$notice]['error'] );
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
@@ -837,7 +835,7 @@ class Admin {
 					$document->regenerate( $order, $document_data );
 
 					$response      = array(
-						'message' => $success_message,
+						'message' => $notice_messages[$notice]['success'],
 					);
 
 				// on save
@@ -852,14 +850,14 @@ class Admin {
 					$document->save();
 
 					$response      = array(
-						'message' => $success_message,
+						'message' => $notice_messages[$notice]['success'],
 					);
 
 				// document not exist
 				} else {
 					$message_complement = __( 'Document does not exist.', 'woocommerce-pdf-invoices-packing-slips' );
 					wp_send_json_error( array(
-						'message' => $error_message . ' ' . $message_complement,
+						'message' => $notice_messages[$notice]['error'] . ' ' . $message_complement,
 					) );
 				}
 
@@ -868,12 +866,12 @@ class Admin {
 			} else {
 				$message_complement = __( 'Document is empty.', 'woocommerce-pdf-invoices-packing-slips' );
 				wp_send_json_error( array(
-					'message' => $error_message . ' ' . $message_complement,
+					'message' => $notice_messages[$notice]['error'] . ' ' . $message_complement,
 				) );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( array(
-				'message' => $error_message . ' ' . $e->getMessage(),
+				'message' => $notice_messages[$notice]['error'] . ' ' . $e->getMessage(),
 			) );			
 		}
 	}
