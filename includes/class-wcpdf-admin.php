@@ -47,9 +47,9 @@ class Admin {
 		}
 
 		// AJAX actions for deleting, regenerating and saving document data
-		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_delete_document' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_save_regenerate_document' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_save_regenerate_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_crud_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -434,7 +434,7 @@ class Admin {
 					<?= $document->get_title(); ?>
 					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
-						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
+						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
 					<?php endif; ?>
 				</h4>
@@ -718,60 +718,16 @@ class Admin {
 	}
 
 	/**
-	 * Delete document on AJAX request
+	 * Save, regenerate or delete a document from AJAX request
 	 */
-	public function ajax_delete_document() {
-		if ( check_ajax_referer( 'wpo_wcpdf_delete_document', 'security', false ) === false ) {
-			wp_send_json_error( array(
-				'message' => __( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
-			) );
-		}
-		if ( empty( $_POST['order_id'] ) || empty( $_POST['document_type'] ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
-			) );
-		}
-		if ( ! current_user_can('manage_woocommerce') ) {
-			wp_send_json_error( array(
-				'message' => __( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
-			) );
-		}
-
-		$order_id      = absint($_POST['order_id']);
-		$document_type = sanitize_text_field($_POST['document_type']);
-
-		try {
-			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
-			if ( !empty( $document ) && $document->exists() ) {
-				$document->delete();
-
-				$response = array(
-					'message' => __( 'Document deleted!', 'woocommerce-pdf-invoices-packing-slips' ),
-				);
-				wp_send_json_success( $response );
-			} else {
-				wp_send_json_error( array(
-					'message' => __( 'Document does not exist!', 'woocommerce-pdf-invoices-packing-slips' ),
-				) );
-			}
-		} catch (\Exception $e) {
-			wp_send_json_error( array(
-				'message' => __( 'Error', 'woocommerce-pdf-invoices-packing-slips' ).': '.$e->getMessage(),
-			) );			
-		}
-	}
-
-	/**
-	 * Save or regenerate document on AJAX request
-	 */
-	public function ajax_save_regenerate_document() {
-		if ( check_ajax_referer( "wpo_wcpdf_regenerate_document", 'security', false ) === false && check_ajax_referer( "wpo_wcpdf_save_document", 'security', false ) === false ) {
+	public function ajax_crud_document() {
+		if ( check_ajax_referer( 'wpo_wcpdf_regenerate_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_save_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_delete_document', 'security', false ) === false ) {
 			wp_send_json_error( array(
 				'message' => __( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		if ( ! isset($_POST['action']) ||  ! in_array( $_POST['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document' ) ) ) {
+		if ( ! isset($_POST['action']) ||  ! in_array( $_POST['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
 			wp_send_json_error( array(
 				'message' => __( 'Bad action!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
@@ -816,6 +772,10 @@ class Admin {
 				'success' => __( 'Document regenerated!', 'woocommerce-pdf-invoices-packing-slips' ),
 				'error'   => __( 'An error ocurred while regenerating the document!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
+			'deleted' => array(
+				'success' => __( 'Document deleted!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error ocurred while deleting the document!', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
 		);
 
 		try {
@@ -834,6 +794,14 @@ class Admin {
 				// on regenerate
 				if( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
+
+					$response      = array(
+						'message' => $notice_messages[$notice]['success'],
+					);
+
+				// on delete
+				} elseif( $action_type == 'delete' && $document->exists() ) {
+					$document->delete();
 
 					$response      = array(
 						'message' => $notice_messages[$notice]['success'],

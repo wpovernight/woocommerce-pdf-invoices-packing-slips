@@ -47,71 +47,14 @@ jQuery( function( $ ) {
 		toggle_edit_mode( $form, edit );
 	} );
 
-
-	// delete document
-	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wcpdf-data-fields .wpo-wcpdf-delete-document', function() {
-		if ( window.confirm( wpo_wcpdf_ajax.confirm_delete ) === false ) {
-			return; // having second thoughts
-		}
-
-		let $form = $(this).closest('.wcpdf-data-fields');
-		let data  = $form.data();
-
-		// Hide regenerate button
-		$form.find('.wpo-wcpdf-regenerate-document').hide();
-
-		// block ui
-		$form.block( {
-			message: null,
-			overlayCSS: {
-				background: '#fff',
-				opacity: 0.6
-			}
-		} );
-
-		$.ajax({
-			url:               wpo_wcpdf_ajax.ajaxurl,
-			data: {
-				action:        'wpo_wcpdf_delete_document',
-				security:      $(this).data('nonce'),
-				document_type: data.document,
-				order_id:      data.order_id,
-			},
-			type:    'POST',
-			context: $form,
-			success: function( response ) {
-				toggle_edit_mode( $form );
-
-				// update document DOM data
-				$form.closest('#wpo_wcpdf-data-input-box').load( document.URL + ' #wpo_wcpdf-data-input-box .postbox-header, #wpo_wcpdf-data-input-box .inside', function() {
-					let notice_type;
-					if( response.success ) {
-						notice_type = 'success';
-					} else {
-						notice_type = 'error';
-					}
-					$(this).find( ".wcpdf-data-fields[data-document='" + data.document +"'][data-order_id='" + data.order_id +"']" ).before( '<div class="notice notice-'+notice_type+' inline" style="margin:0 10px 10px 10px;"><p>'+response.data.message+'</p></div>' );
-				});
-
-				// unblock ui
-				$form.unblock();
-			}
-		});
-	} );
-
-	// regenerate document
-	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wcpdf-data-fields .wpo-wcpdf-regenerate-document', save_document_data );
-
-	// save document
-	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wcpdf-data-fields .wpo-wcpdf-save-document', save_document_data );
-
 	// cancel edit
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-cancel', function() {
 		let $form = $(this).closest('.wcpdf-data-fields');
 		toggle_edit_mode( $form );
 	} );
 
-	function save_document_data( e ) {
+	// save, regenerate and delete document
+	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-save-document, .wpo-wcpdf-regenerate-document, .wpo-wcpdf-delete-document', function( e ) {
 		e.preventDefault();
 
 		let $form      = $(this).closest('.wcpdf-data-fields');
@@ -127,6 +70,15 @@ jQuery( function( $ ) {
 			}
 	
 			$form.find('.wpo-wcpdf-regenerate-document').addClass('wcpdf-regenerate-spin');
+
+		// delete specific
+		} else if( action == 'delete' ) {
+			if ( window.confirm( wpo_wcpdf_ajax.confirm_delete ) === false ) {
+				return; // having second thoughts
+			}
+
+			// hide regenerate button
+			$form.find('.wpo-wcpdf-regenerate-document').hide();
 		}
 
 		// block ui
@@ -175,7 +127,8 @@ jQuery( function( $ ) {
 				$form.unblock();
 			}
 		} );
-	}
+		
+	} );
 
 	function toggle_edit_mode( $form, mode = null ) {
 		// check visibility
