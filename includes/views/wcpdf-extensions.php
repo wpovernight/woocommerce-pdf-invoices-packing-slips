@@ -116,7 +116,9 @@ jQuery(document).ready(function() {
 				<ul>
 					<li><?php _e( 'Completely customize the invoice contents (prices, taxes, thumbnails) to your needs with a drag & drop customizer', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
 					<li><?php _e( 'Two extra stylish premade templates (Modern & Business)', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+					<?php /* translators: Premium Templates link */?>
 					<li><?php printf( __("Check out the Premium PDF Invoice & Packing Slips templates at %s.", 'woocommerce-pdf-invoices-packing-slips' ), $template_link );?></li>
+					<?php /* translators: email link */?>
 					<li><?php printf( __("For custom templates, contact us at %s.", 'woocommerce-pdf-invoices-packing-slips' ), $email_link );?></li>
 				</ul>
 				</div>

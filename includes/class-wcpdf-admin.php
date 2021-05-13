@@ -88,6 +88,7 @@ class Admin {
 				$rounded_count = (int) substr( (string) $invoice_count, 0, 1 ) * pow( 10, strlen( (string) $invoice_count ) - 1);
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
+					<?php /* translators: rounded count */ ?>
 					<h3><?php printf( __( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
 					<p><?php _e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
@@ -464,6 +465,7 @@ class Admin {
 						<?php endif; ?>
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
+						<?php /* translators: document title */ ?>
 						<span class="wpo-wcpdf-set-date-number button"><?php printf( __( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></span>
 					<?php endif; ?>
 				</div>
