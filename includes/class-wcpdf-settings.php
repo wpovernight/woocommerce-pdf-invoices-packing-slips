@@ -84,6 +84,7 @@ class Settings {
 		global $wpdb;
 		$row = $wpdb->get_row("SHOW VARIABLES LIKE 'auto_increment_increment'");
 		if ( !empty($row) && !empty($row->Value) && $row->Value != 1 ) {
+			/* translators: database row value */
 			$error = sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %s, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Status tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), $row->Value );
 			printf( '<div class="error"><p>%s</p></div>', $error );
 		}

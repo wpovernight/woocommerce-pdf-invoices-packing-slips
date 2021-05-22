@@ -60,7 +60,8 @@ $server_configs = array(
 		'fallback' => __( 'Check PHP disable_functions', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'WP Memory Limit' => array(
-		'required' => sprintf( __( 'Recommended: 128MB (more for plugin-heavy setups<br/>See: %sIncreasing the WordPress Memory Limit%s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
+		/* translators: <a> tags */
+		'required' => sprintf( __( 'Recommended: 128MB (more for plugin-heavy setups<br/>See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
 		'value'    => sprintf('WordPress: %s, PHP: %s', WP_MEMORY_LIMIT, $php_mem_limit ),
 		'result'   => $memory_limit > 67108864,
 	),
@@ -87,7 +88,8 @@ if ( ( $gm = extension_loaded('gmagick') ) || ( $im = extension_loaded('imagick'
 }
 
 if( ! $server_configs['PHP version']['result'] ) {
-	$server_configs['PHP version']['required'] .= sprintf( __( '<br/>Download %sthis addon%s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
+	/* translators: <a> tags */
+	$server_configs['PHP version']['required'] .= sprintf( __( '<br/>Download %1$sthis addon%2$s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
 }
 
 ?>
@@ -201,7 +203,8 @@ if( ! $server_configs['PHP version']['result'] ) {
 
 <p>
 	<?php
-	printf( __( 'The central temp folder is %s. By default, this folder is created in the WordPress uploads folder (%s), which can be defined by setting %s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %s filter. Make sure this folder is writable and that the subfolders %s, %s and %s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
+	/* translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts */
+	printf( __( 'The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
 		'<code>'.WPO_WCPDF()->main->get_tmp_path().'</code>',
 		'<code>'.$upload_base.'</code>',
 		'<code>UPLOADS</code>',
@@ -213,6 +216,7 @@ if( ! $server_configs['PHP version']['result'] ) {
 	?>
 </p>
 	<?php
+	/* translators: directory path */
 	printf( __('If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!', 'woocommerce-pdf-invoices-packing-slips' ),
 		'<code>'.WPO_WCPDF()->plugin_path() . "/vendor/dompdf/dompdf/lib/fonts/".'</code>'
 	);

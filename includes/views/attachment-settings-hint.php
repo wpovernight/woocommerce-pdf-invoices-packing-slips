@@ -19,6 +19,7 @@ $invoice_settings_url = add_query_arg( array(
 </style>
 <!-- <div id="message" class="updated woocommerce-message"> -->
 <div class="wcpdf-attachment-settings-hint">
-	<?php printf(__( "It looks like you haven't setup any email attachments yet, check the settings under <b>%sDocuments > Invoice%s</b>", 'woocommerce-pdf-invoices-packing-slips' ), '<a href="'.$invoice_settings_url.'">', '</a>'); ?><br>
+<?php /* translators: <a> tags */ ?>
+	<?php printf(__( 'It looks like you haven\'t setup any email attachments yet, check the settings under <b>%1$sDocuments > Invoice%2$s</b>', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="'.$invoice_settings_url.'">', '</a>'); ?><br>
 	<?php printf('<a href="%s" style="font">%s</a>', add_query_arg( 'wpo_wcpdf_hide_attachments_hint', 'true' ), __( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ) ); ?>
 </div>

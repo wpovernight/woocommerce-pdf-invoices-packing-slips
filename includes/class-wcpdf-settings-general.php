@@ -65,7 +65,8 @@ class Settings_General {
 					'option_name'	=> $option_name,
 					'id'			=> 'template_path',
 					'options' 		=> $this->find_templates(),
-					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%s</code> to your (child) theme in <code>%s</code> to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), $plugin_template_path, $theme_template_path),
+					/* translators: 1,2. template paths */
+					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%1$s</code> to your (child) theme in <code>%2$s</code> to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), $plugin_template_path, $theme_template_path),
 				)
 			),
 			array(

@@ -375,6 +375,7 @@ class Main {
 						break;
 				}
 			} else {
+				/* translators: document type */
 				wp_die( sprintf( __( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ), $document_type ) );
 			}
 		} catch ( \Dompdf\Exception $e ) {
@@ -586,7 +587,8 @@ class Main {
 					ob_start();
 					?>
 					<div class="error">
-						<p><?php printf( __( "The %s directory %s couldn't be created or is not writable!", 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+					<?php /* translators: 1. plugin name, 2. directory path */ ?>
+						<p><?php printf( __( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
 						<p><?php _e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 						<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					</div>
@@ -960,7 +962,8 @@ class Main {
 	 */
 	public function log_to_order_notes( $document, $created_via ) {
 		if( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $created_via ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			$message = __( 'PDF %s created via %s.', 'woocommerce-pdf-invoices-packing-slips' );
+			/* translators: 1. document title, 2. creation source */
+			$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $created_via );
 			$order->add_order_note( $note );
 		}
@@ -995,6 +998,7 @@ class Main {
 	public function wc_webhook_topics( $topics ) {
 		$documents = WPO_WCPDF()->documents->get_documents();
 		foreach ($documents as $document) {
+			/* translators: document title */
 			$topics["order.{$document->type}-saved"] = sprintf( __( 'Order %s Saved', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() );
 		}
 		return $topics;
