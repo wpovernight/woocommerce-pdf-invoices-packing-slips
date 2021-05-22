@@ -301,7 +301,7 @@ class Admin {
 		<ul class="wpo_wcpdf_send_emails submitbox">
 			<li class="wide" id="actions">
 				<select name="wpo_wcpdf_send_emails">
-					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce' ); ?></option>
+					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
 					<?php
 					$mailer           = WC()->mailer();
 					$available_emails = apply_filters( 'woocommerce_resend_order_emails_available', array( 'new_order', 'cancelled_order', 'customer_processing_order', 'customer_completed_order', 'customer_invoice' ) );
