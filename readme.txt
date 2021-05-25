@@ -114,7 +114,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: ensure unique filename in case order number or document number not accessible
 * Fix: Fallback if no template is selected
 * Translations: Added hints for translators, use numbered placeholders
-* Translations: Added arabian (thanks to [Nabil Moqbel](https://profiles.wordpress.org/nabilmoqbel/))
+* Translations: Added Arabic (thanks to [Nabil Moqbel](https://profiles.wordpress.org/nabilmoqbel/))
 
 = 2.8.3 =
 * New: Allow filtering action button classes
