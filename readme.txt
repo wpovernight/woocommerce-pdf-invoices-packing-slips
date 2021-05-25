@@ -102,8 +102,19 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= DEV =
-* Added translation to Arabian (thanks to [Nabil Moqbel](https://profiles.wordpress.org/nabilmoqbel/))
+= 2.9.0 =
+* New: Setting to log document generation time & context to order notes
+* New: template hooks 'wpo_wcpdf_before_footer' and 'wpo_wcpdf_after_footer'
+* New: Save and Cancel buttons for the Document Data metabox
+* Fix: Fallback to bundled fonts when temporary folder is not writable
+* Fix: empty first page under specific conditions
+* Fix: HTML line breaks and special characters in invoice notes
+* Fix: Allow setting document date prior to generating it
+* Fix: variable not set for filename
+* Fix: ensure unique filename in case order number or document number not accessible
+* Fix: Fallback if no template is selected
+* Translations: Added hints for translators, use numbered placeholders
+* Translations: Added arabian (thanks to [Nabil Moqbel](https://profiles.wordpress.org/nabilmoqbel/))
 
 = 2.8.3 =
 * New: Allow filtering action button classes
