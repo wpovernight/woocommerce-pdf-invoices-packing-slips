@@ -6,8 +6,8 @@ msgstr ""
 "Stable (latest release)\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-05-25T12:50:50+00:00\n"
-"PO-Revision-Date: 2021-05-25 08:52-0400\n"
+"POT-Creation-Date: 2021-05-30T22:57:30+00:00\n"
+"PO-Revision-Date: 2021-05-30 19:08-0400\n"
 "Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
 "Language-Team: \n"
 "Language: cs_CZ\n"
@@ -100,7 +100,6 @@ msgid "Create PDF"
 msgstr "Vytvořit PDF"
 
 #: includes/class-wcpdf-admin.php:282
-#| msgid "PDF Invoice data"
 msgid "PDF document data"
 msgstr ""
 
@@ -130,7 +129,6 @@ msgstr ""
 
 #. translators: document title
 #: includes/class-wcpdf-admin.php:469
-#| msgid "Set invoice number & date"
 msgid "Set %s number & date"
 msgstr ""
 
@@ -168,12 +166,11 @@ msgid "No permissions!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:770
-#| msgid "Documents"
 msgid "Document data saved!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:771
-msgid "An error ocurred while saving the document data!"
+msgid "An error occurred while saving the document data!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:774
@@ -181,16 +178,15 @@ msgid "Document regenerated!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:775
-msgid "An error ocurred while regenerating the document!"
+msgid "An error occurred while regenerating the document!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:778
-#| msgid "Nothing to delete!"
 msgid "Document deleted!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:779
-msgid "An error ocurred while deleting the document!"
+msgid "An error occurred while deleting the document!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:829
@@ -198,7 +194,6 @@ msgid "Document does not exist."
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:838
-#| msgid "Documents"
 msgid "Document is empty."
 msgstr ""
 
@@ -212,10 +207,6 @@ msgstr ""
 "Jste si jistí, že chcete smazat tento dokument? Nebude to možné vzít zpět."
 
 #: includes/class-wcpdf-assets.php:92
-#| msgid ""
-#| "When enabled, the document will always reflect the most current settings "
-#| "(such as footer text, document name, etc.) rather than using historical "
-#| "settings."
 msgid ""
 "Are you sure you want to regenerate this document? This will make the "
 "document reflect the most current settings (such as footer text, document "
@@ -273,7 +264,6 @@ msgid "my account"
 msgstr ""
 
 #: includes/class-wcpdf-main.php:957
-#| msgid "Attachments"
 msgid "email attachment"
 msgstr ""
 
@@ -284,7 +274,6 @@ msgstr ""
 
 #. translators: document title
 #: includes/class-wcpdf-main.php:1002
-#| msgid "Order Date"
 msgid "Order %s Saved"
 msgstr ""
 
@@ -315,7 +304,6 @@ msgstr "Uložit"
 
 #: includes/class-wcpdf-settings-debug.php:45
 #: woocommerce-pdf-invoices-packingslips.php:376
-#| msgid "Unable to read temporary folder contents!"
 msgid "Generate random temporary folder name"
 msgstr ""
 
@@ -342,7 +330,6 @@ msgstr "Nelze číst obsah dočasných složek!"
 
 #. translators: 1,2. file count
 #: includes/class-wcpdf-settings-debug.php:127
-#| msgid "Unable to delete %d files! (deleted %d)"
 msgid "Unable to delete %1$d files! (deleted %2$d)"
 msgstr ""
 
@@ -384,9 +371,6 @@ msgid "Legacy textdomain fallback"
 msgstr ""
 
 #: includes/class-wcpdf-settings-debug.php:216
-#| msgid ""
-#| "Legacy mode ensures compatibility with templates and filters from "
-#| "previous versions."
 msgid ""
 "Legacy textdomain fallback ensures compatibility with translation files from "
 "versions prior to 2017-05-15."
@@ -505,7 +489,6 @@ msgstr "Dokumenty"
 
 #: includes/class-wcpdf-settings-documents.php:36
 #: includes/class-wcpdf-settings-documents.php:57
-#| msgid "Quantity"
 msgid "untitled"
 msgstr ""
 
@@ -539,9 +522,6 @@ msgstr "Vyberte šablonu"
 
 #. translators: 1,2. template paths
 #: includes/class-wcpdf-settings-general.php:69
-#| msgid ""
-#| "Want to use your own template? Copy all the files from <code>%s</code> to "
-#| "your (child) theme in <code>%s</code> to customize them"
 msgid ""
 "Want to use your own template? Copy all the files from <code>%1$s</code> to "
 "your (child) theme in <code>%2$s</code> to customize them"
@@ -891,7 +871,6 @@ msgstr "Zobrazit telefonní číslo"
 
 #: includes/documents/class-wcpdf-invoice.php:265
 #: includes/documents/class-wcpdf-packing-slip.php:138
-#| msgid "Customer Notes"
 msgid "Display customer notes"
 msgstr ""
 
@@ -1006,13 +985,11 @@ msgid "Enable invoice number column in the orders list"
 msgstr "Zobrazit v seznamu objednávek sloupec s čísly faktur"
 
 #: includes/documents/class-wcpdf-invoice.php:405
-#| msgid "Disable for free products"
 msgid "Disable for free orders"
 msgstr ""
 
 #. translators: zero number
 #: includes/documents/class-wcpdf-invoice.php:412
-#| msgid "Enable invoice number column in the orders list"
 msgid "Disable document when the order total is %s"
 msgstr ""
 
@@ -1092,9 +1069,6 @@ msgstr "Byla vyvolána následující funkce"
 
 #. translators: <a> tags
 #: includes/views/attachment-settings-hint.php:23
-#| msgid ""
-#| "It looks like you haven't setup any email attachments yet, check the "
-#| "settings under <b>%sDocuments > Invoice%s</b>"
 msgid ""
 "It looks like you haven't setup any email attachments yet, check the "
 "settings under <b>%1$sDocuments > Invoice%2$s</b>"
@@ -1577,18 +1551,12 @@ msgstr "Doručovací metoda:"
 
 #. translators: <a> tags
 #: woocommerce-pdf-invoices-packingslips.php:271
-#| msgid ""
-#| "WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be "
-#| "installed & activated!"
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires %1$sWooCommerce%2$s to be "
 "installed & activated!"
 msgstr ""
 
 #: woocommerce-pdf-invoices-packingslips.php:282
-#| msgid ""
-#| "WooCommerce PDF Invoices & Packing Slips requires PHP 5.3 or higher (5.6 "
-#| "or higher recommended)."
 msgid ""
 "WooCommerce PDF Invoices & Packing Slips requires PHP 7.1 (7.4 or higher "
 "recommended)."
@@ -1596,7 +1564,6 @@ msgstr ""
 
 #. translators: <a> tags
 #: woocommerce-pdf-invoices-packingslips.php:284
-#| msgid "How to update your PHP version"
 msgid "We strongly recommend to %1$supdate your PHP version%2$s."
 msgstr ""
 

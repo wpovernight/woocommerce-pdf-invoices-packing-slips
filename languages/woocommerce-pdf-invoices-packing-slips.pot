@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the WooCommerce PDF Invoices & Packing Slips plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips 2.8.3\n"
+"Project-Id-Version: WooCommerce PDF Invoices & Packing Slips 2.9.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-05-25T12:50:50+00:00\n"
+"POT-Creation-Date: 2021-05-30T22:57:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -164,7 +164,7 @@ msgid "Document data saved!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:771
-msgid "An error ocurred while saving the document data!"
+msgid "An error occurred while saving the document data!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:774
@@ -172,7 +172,7 @@ msgid "Document regenerated!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:775
-msgid "An error ocurred while regenerating the document!"
+msgid "An error occurred while regenerating the document!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:778
@@ -180,7 +180,7 @@ msgid "Document deleted!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:779
-msgid "An error ocurred while deleting the document!"
+msgid "An error occurred while deleting the document!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:829
