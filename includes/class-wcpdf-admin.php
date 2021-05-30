@@ -768,15 +768,15 @@ class Admin {
 		$notice_messages = array(
 			'saved'       => array(
 				'success' => __( 'Document data saved!', 'woocommerce-pdf-invoices-packing-slips' ),
-				'error'   => __( 'An error ocurred while saving the document data!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error occurred while saving the document data!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'regenerated' => array(
 				'success' => __( 'Document regenerated!', 'woocommerce-pdf-invoices-packing-slips' ),
-				'error'   => __( 'An error ocurred while regenerating the document!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error occurred while regenerating the document!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'deleted' => array(
 				'success' => __( 'Document deleted!', 'woocommerce-pdf-invoices-packing-slips' ),
-				'error'   => __( 'An error ocurred while deleting the document!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error occurred while deleting the document!', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 		);
 
