@@ -765,7 +765,7 @@ abstract class Order_Document {
 		}
 
 		$html = $this->render_template( $this->locate_template_file( "html-document-wrapper.php" ), array(
-				'content' => $content,
+				'content' => apply_filters( 'wpo_wcpdf_html_content', $content ),
 			)
 		);
 		return $html;
