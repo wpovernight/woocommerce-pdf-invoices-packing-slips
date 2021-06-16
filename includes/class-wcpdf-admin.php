@@ -562,7 +562,9 @@ class Admin {
 		$actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
 		foreach ($documents as $document) {
-			$actions[$document->get_type()] = "PDF " . $document->get_title();
+			if( $document->is_enabled() ) {
+				$actions[$document->get_type()] = "PDF " . $document->get_title();
+			}
 		}
 
 		return apply_filters( 'wpo_wcpdf_bulk_actions', $actions );
