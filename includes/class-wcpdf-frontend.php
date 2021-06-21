@@ -79,10 +79,6 @@ class Frontend {
 		}
 	}
 
-	public function get_file_content( $file_path ) {
-		file_get_contents( $path );
-	}
-
 	/**
 	 * Add invoice number to WC REST API
 	 */
