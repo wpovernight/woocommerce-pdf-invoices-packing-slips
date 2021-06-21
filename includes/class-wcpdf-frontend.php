@@ -71,19 +71,16 @@ class Frontend {
 		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
 			if ( $general_settings = get_option( 'wpo_wcpdf_settings_general' ) ) {
 				if ( isset( $general_settings['download_display'] ) && $general_settings['download_display'] == 'display' ) {
-					wp_add_inline_script( 'jquery', "
-						jQuery( function( $ ) {
-							$('a').each(function(e){
-								// for lack of specific classes on the my account action buttons we check the url
-								if( $(this).attr('href').indexOf('generate_wpo_wcpdf') != -1 ){
-									$(this).attr('target', '_blank');
-								};
-							});
-						});
-					" );
+					if ( function_exists( 'file_get_contents' ) && !empty( $file = file_get_contents( WPO_WCPDF()->plugin_url() . '/assets/js/my-account-link.js' ) ) ) {
+						wp_add_inline_script( 'jquery', $file );
+					}
 				}
 			}
 		}
+	}
+
+	public function get_file_content( $file_path ) {
+		file_get_contents( $path );
 	}
 
 	/**
