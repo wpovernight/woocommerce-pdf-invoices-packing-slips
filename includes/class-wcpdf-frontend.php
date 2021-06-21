@@ -71,8 +71,8 @@ class Frontend {
 		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
 			if ( $general_settings = get_option( 'wpo_wcpdf_settings_general' ) ) {
 				if ( isset( $general_settings['download_display'] ) && $general_settings['download_display'] == 'display' ) {
-					if ( function_exists( 'file_get_contents' ) && !empty( $file = file_get_contents( WPO_WCPDF()->plugin_url() . '/assets/js/my-account-link.js' ) ) ) {
-						wp_add_inline_script( 'jquery', $file );
+					if ( function_exists( 'file_get_contents' ) && $script = file_get_contents( WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link.js' ) ) {
+						wp_add_inline_script( 'jquery', $script );
 					}
 				}
 			}
