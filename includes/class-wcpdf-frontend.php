@@ -16,6 +16,7 @@ class Frontend {
 	function __construct()	{
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
 		add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_number' ), 10, 2 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
 		add_shortcode( 'wcpdf_download_invoice', array($this, 'download_invoice_shortcode') );
 	}
 
@@ -61,6 +62,21 @@ class Frontend {
 		}
 
 		return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
+	}
+
+	/**
+	 * Open PDF on My Account page in a new browser tab/window
+	 */
+	public function open_my_account_pdf_link_on_new_tab() {
+		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+			if ( $general_settings = get_option( 'wpo_wcpdf_settings_general' ) ) {
+				if ( isset( $general_settings['download_display'] ) && $general_settings['download_display'] == 'display' ) {
+					if ( function_exists( 'file_get_contents' ) && $script = file_get_contents( WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link.js' ) ) {
+						wp_add_inline_script( 'jquery', $script );
+					}
+				}
+			}
+		}
 	}
 
 	/**
