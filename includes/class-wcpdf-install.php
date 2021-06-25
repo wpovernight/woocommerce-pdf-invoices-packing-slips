@@ -346,7 +346,6 @@ class Install {
 			$debug_settings['cleanup_days'] = 7;
 			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		}
-
 	}
 
 	/**
