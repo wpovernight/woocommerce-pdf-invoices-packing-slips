@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-05-30T22:57:30+00:00\n"
-"PO-Revision-Date: 2021-05-30 19:17-0400\n"
+"POT-Creation-Date: 2021-06-30T03:08:00+00:00\n"
+"PO-Revision-Date: 2021-06-29 23:21-0400\n"
 "Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: sv_SE\n"
@@ -20,7 +20,7 @@ msgstr ""
 "esc_html_x:1,2c;comments_number_link:2,3;t:1;st:1;trans:1;transChoice:1,2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Textdomain-Support: yes\n"
-"X-Generator: Poedit 2.4.3\n"
+"X-Generator: Poedit 3.0\n"
 "X-Loco-Target-Locale: sv_SE\n"
 "X-Poedit-SearchPath-0: .\n"
 
@@ -147,60 +147,65 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-admin.php:598 includes/class-wcpdf-admin.php:832
+msgid "order details (number and/or date set manually)"
+msgstr ""
+
 #. translators: %s: email title
-#: includes/class-wcpdf-admin.php:641
+#: includes/class-wcpdf-admin.php:647
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:728
+#: includes/class-wcpdf-admin.php:734
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:734
+#: includes/class-wcpdf-admin.php:740
 msgid "Bad action!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:740
+#: includes/class-wcpdf-admin.php:746
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:746
+#: includes/class-wcpdf-admin.php:752
 msgid "No permissions!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:770
+#: includes/class-wcpdf-admin.php:776
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:771
+#: includes/class-wcpdf-admin.php:777
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:774
+#: includes/class-wcpdf-admin.php:780
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:775
+#: includes/class-wcpdf-admin.php:781
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:778
+#: includes/class-wcpdf-admin.php:784
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:779
+#: includes/class-wcpdf-admin.php:785
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:829
+#: includes/class-wcpdf-admin.php:841
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:838
+#: includes/class-wcpdf-admin.php:850
 msgid "Document is empty."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:869
+#: includes/class-wcpdf-admin.php:881
 msgid "DEBUG output enabled"
 msgstr ""
 
@@ -215,7 +220,7 @@ msgid ""
 "name, etc.) rather than using historical settings."
 msgstr ""
 
-#: includes/class-wcpdf-frontend.php:110
+#: includes/class-wcpdf-frontend.php:126
 msgid "Download invoice (PDF)"
 msgstr "Ladda ner Faktura (PDF)"
 
@@ -253,29 +258,33 @@ msgstr ""
 msgid "Invoice Date"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:936
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:937
 msgid "bulk order action"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:943
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:945
 msgid "single order action"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:950
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:953
 msgid "my account"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:957
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:961
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document title, 2. creation source
-#: includes/class-wcpdf-main.php:966
+#: includes/class-wcpdf-main.php:970
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/class-wcpdf-main.php:1002
+#: includes/class-wcpdf-main.php:1006
 msgid "Order %s Saved"
 msgstr ""
 

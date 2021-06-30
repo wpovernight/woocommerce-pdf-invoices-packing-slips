@@ -6,8 +6,8 @@ msgstr ""
 "Stable (latest release)\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-05-30T22:57:30+00:00\n"
-"PO-Revision-Date: 2021-05-30 19:19-0400\n"
+"POT-Creation-Date: 2021-06-30T03:08:00+00:00\n"
+"PO-Revision-Date: 2021-06-29 23:16-0400\n"
 "Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Poedit 2.4.3\n"
+"X-Generator: Poedit 3.0\n"
 
 #. Plugin Name of the plugin
 msgid "WooCommerce PDF Invoices & Packing Slips"
@@ -144,60 +144,65 @@ msgstr "Guardar cambios"
 msgid "Cancel"
 msgstr "Cancelar"
 
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-admin.php:598 includes/class-wcpdf-admin.php:832
+msgid "order details (number and/or date set manually)"
+msgstr "detalles del pedido (número y/o fecha establecidos manualmente)"
+
 #. translators: %s: email title
-#: includes/class-wcpdf-admin.php:641
+#: includes/class-wcpdf-admin.php:647
 msgid "%s email notification manually sent."
 msgstr "%s correo electrónico de aviso enviado manualmente."
 
-#: includes/class-wcpdf-admin.php:728
+#: includes/class-wcpdf-admin.php:734
 msgid "Nonce expired!"
 msgstr "¡El nonce ha caducado!"
 
-#: includes/class-wcpdf-admin.php:734
+#: includes/class-wcpdf-admin.php:740
 msgid "Bad action!"
 msgstr "¡Acción incorrecta!"
 
-#: includes/class-wcpdf-admin.php:740
+#: includes/class-wcpdf-admin.php:746
 msgid "Incomplete request!"
 msgstr "¡Solicitud incompleta!"
 
-#: includes/class-wcpdf-admin.php:746
+#: includes/class-wcpdf-admin.php:752
 msgid "No permissions!"
 msgstr "¡No tienes permisos!"
 
-#: includes/class-wcpdf-admin.php:770
+#: includes/class-wcpdf-admin.php:776
 msgid "Document data saved!"
 msgstr "¡Los datos del documento se han guardado!"
 
-#: includes/class-wcpdf-admin.php:771
+#: includes/class-wcpdf-admin.php:777
 msgid "An error occurred while saving the document data!"
 msgstr "¡Se ha producido un error al guardar los datos del documento!"
 
-#: includes/class-wcpdf-admin.php:774
+#: includes/class-wcpdf-admin.php:780
 msgid "Document regenerated!"
 msgstr "¡El documento se ha regenerado!"
 
-#: includes/class-wcpdf-admin.php:775
+#: includes/class-wcpdf-admin.php:781
 msgid "An error occurred while regenerating the document!"
 msgstr "¡Se ha producido un error al regenerar el documento!"
 
-#: includes/class-wcpdf-admin.php:778
+#: includes/class-wcpdf-admin.php:784
 msgid "Document deleted!"
 msgstr "¡Datos del documento en PDF!"
 
-#: includes/class-wcpdf-admin.php:779
+#: includes/class-wcpdf-admin.php:785
 msgid "An error occurred while deleting the document!"
 msgstr "¡Se ha producido un error al borrar el documento!"
 
-#: includes/class-wcpdf-admin.php:829
+#: includes/class-wcpdf-admin.php:841
 msgid "Document does not exist."
 msgstr "El documento no existe."
 
-#: includes/class-wcpdf-admin.php:838
+#: includes/class-wcpdf-admin.php:850
 msgid "Document is empty."
 msgstr "El documento está vacío."
 
-#: includes/class-wcpdf-admin.php:869
+#: includes/class-wcpdf-admin.php:881
 msgid "DEBUG output enabled"
 msgstr "Salida de DEPURACIÓN activa"
 
@@ -216,7 +221,7 @@ msgstr ""
 "refleje los ajustes más actuales (como el texto del pié de página, nombre "
 "del documento, etc.) en vez de usar los ajustes históricos."
 
-#: includes/class-wcpdf-frontend.php:110
+#: includes/class-wcpdf-frontend.php:126
 msgid "Download invoice (PDF)"
 msgstr "Descargar factura (PDF)"
 
@@ -260,29 +265,33 @@ msgstr ""
 msgid "Invoice Date"
 msgstr "Fecha de factura"
 
-#: includes/class-wcpdf-main.php:936
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:937
 msgid "bulk order action"
 msgstr "acción de pedido en lote"
 
-#: includes/class-wcpdf-main.php:943
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:945
 msgid "single order action"
 msgstr "acción de pedido individual"
 
-#: includes/class-wcpdf-main.php:950
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:953
 msgid "my account"
 msgstr "mi cuenta"
 
-#: includes/class-wcpdf-main.php:957
+#. translators: name/description of the context for document creation logs
+#: includes/class-wcpdf-main.php:961
 msgid "email attachment"
 msgstr "archivo adjunto de correo electrónico"
 
 #. translators: 1. document title, 2. creation source
-#: includes/class-wcpdf-main.php:966
+#: includes/class-wcpdf-main.php:970
 msgid "PDF %1$s created via %2$s."
 msgstr "El PDF de %1$s se ha creado a través de %2$s."
 
 #. translators: document title
-#: includes/class-wcpdf-main.php:1002
+#: includes/class-wcpdf-main.php:1006
 msgid "Order %s Saved"
 msgstr "Pedido %s guardado"
 
