@@ -234,6 +234,7 @@ dd:after {
 .document-notes,
 .customer-notes {
 	margin-top: 5mm;
+	word-wrap: break-word;
 }
 
 table.totals {
