@@ -453,6 +453,22 @@ class Invoice extends Order_Document_Methods {
 
 	}
 
+	/**
+	 * Document number title
+	 */
+	public function get_number_title() {
+		$number_title = trim( __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ), ':' );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
+	}
+
+	/**
+	 * Document date title
+	 */
+	public function get_date_title() {
+		$date_title = trim( __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ), ':' );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
+	}
+
 }
 
 endif; // class_exists
