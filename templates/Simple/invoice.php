@@ -56,13 +56,13 @@
 				<?php do_action( 'wpo_wcpdf_before_order_data', $this->type, $this->order ); ?>
 				<?php if ( isset($this->settings['display_number']) ) { ?>
 				<tr class="invoice-number">
-					<th><?php echo "{$this->get_number_title()}:"; ?></th>
+					<th><?php echo $this->get_number_title(); ?></th>
 					<td><?php $this->invoice_number(); ?></td>
 				</tr>
 				<?php } ?>
 				<?php if ( isset($this->settings['display_date']) ) { ?>
 				<tr class="invoice-date">
-					<th><?php echo "{$this->get_date_title()}:"; ?></th>
+					<th><?php echo $this->get_date_title(); ?></th>
 					<td><?php $this->invoice_date(); ?></td>
 				</tr>
 				<?php } ?>
