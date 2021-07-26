@@ -6,9 +6,9 @@ msgstr ""
 "Stable (latest release)\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-06-30T03:08:00+00:00\n"
-"PO-Revision-Date: 2021-06-29 23:16-0400\n"
-"Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
+"POT-Creation-Date: 2021-07-26T15:06:25+00:00\n"
+"PO-Revision-Date: 2021-07-26 17:11+0200\n"
+"Last-Translator: WP Overnight <support@wpovernight.com>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
@@ -115,11 +115,13 @@ msgstr "Guardar pedido y enviar correo"
 msgid "Send email"
 msgstr "Enviar correo electrónico"
 
-#: includes/class-wcpdf-admin.php:378 templates/Simple/invoice.php:59
+#: includes/class-wcpdf-admin.php:378
+#: includes/documents/class-wcpdf-invoice.php:460
 msgid "Invoice Number:"
 msgstr "Número de factura:"
 
-#: includes/class-wcpdf-admin.php:381 templates/Simple/invoice.php:65
+#: includes/class-wcpdf-admin.php:381
+#: includes/documents/class-wcpdf-invoice.php:468
 msgid "Invoice Date:"
 msgstr "Fecha de factura:"
 
@@ -823,11 +825,21 @@ msgstr "La %s (reembolso #%s) se ha regenerado."
 msgid "%s was regenerated"
 msgstr "%s se regeneró"
 
-#: includes/documents/abstract-wcpdf-order-document.php:879
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:422
+msgid "%s Number:"
+msgstr ""
+
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:428
+msgid "%s Date:"
+msgstr ""
+
+#: includes/documents/abstract-wcpdf-order-document.php:891
 msgid "Admin email"
 msgstr "Correo electrónico de administrador"
 
-#: includes/documents/abstract-wcpdf-order-document.php:882
+#: includes/documents/abstract-wcpdf-order-document.php:894
 msgid "Manual email"
 msgstr "Correo electrónico manual"
 
@@ -1085,6 +1097,14 @@ msgstr "Mostrar dirección de facturación"
 #: includes/documents/class-wcpdf-packing-slip.php:107
 msgid "Only when different from shipping address"
 msgstr "Solo cuando sea diferente de la dirección de envío"
+
+#: includes/documents/class-wcpdf-packing-slip.php:162
+msgid "Packing Slip Number:"
+msgstr ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:170
+msgid "Packing Slip Date:"
+msgstr ""
 
 #: includes/legacy/class-wcpdf-legacy-document.php:32
 msgid "Legacy Document"

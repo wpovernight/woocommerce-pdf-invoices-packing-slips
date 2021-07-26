@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips v1.4.9\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-06-30T03:08:00+00:00\n"
-"PO-Revision-Date: 2021-06-29 23:20-0400\n"
-"Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
+"POT-Creation-Date: 2021-07-26T15:06:25+00:00\n"
+"PO-Revision-Date: 2021-07-26 17:36+0200\n"
+"Last-Translator: WP Overnight <support@wpovernight.com>\n"
 "Language-Team: \n"
 "Language: ro_RO\n"
 "MIME-Version: 1.0\n"
@@ -118,12 +118,14 @@ msgid "Send email"
 msgstr ""
 
 # @ wpo_wcpdf
-#: includes/class-wcpdf-admin.php:378 templates/Simple/invoice.php:59
+#: includes/class-wcpdf-admin.php:378
+#: includes/documents/class-wcpdf-invoice.php:460
 msgid "Invoice Number:"
 msgstr "Număr factură:"
 
 # @ wpo_wcpdf
-#: includes/class-wcpdf-admin.php:381 templates/Simple/invoice.php:65
+#: includes/class-wcpdf-admin.php:381
+#: includes/documents/class-wcpdf-invoice.php:468
 msgid "Invoice Date:"
 msgstr "Dată factură:"
 
@@ -813,11 +815,23 @@ msgstr ""
 msgid "%s was regenerated"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:879
+# @ wpo_wcpdf
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:422
+msgid "%s Number:"
+msgstr ""
+
+# @ wpo_wcpdf
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:428
+msgid "%s Date:"
+msgstr ""
+
+#: includes/documents/abstract-wcpdf-order-document.php:891
 msgid "Admin email"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:882
+#: includes/documents/abstract-wcpdf-order-document.php:894
 msgid "Manual email"
 msgstr ""
 
@@ -1073,6 +1087,16 @@ msgstr ""
 
 #: includes/documents/class-wcpdf-packing-slip.php:107
 msgid "Only when different from shipping address"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-packing-slip.php:162
+msgid "Packing Slip Number:"
+msgstr ""
+
+# @ wpo_wcpdf
+#: includes/documents/class-wcpdf-packing-slip.php:170
+msgid "Packing Slip Date:"
 msgstr ""
 
 #: includes/legacy/class-wcpdf-legacy-document.php:32

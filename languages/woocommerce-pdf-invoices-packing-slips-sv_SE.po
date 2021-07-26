@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-06-30T03:08:00+00:00\n"
-"PO-Revision-Date: 2021-06-29 23:21-0400\n"
-"Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
+"POT-Creation-Date: 2021-07-26T15:06:25+00:00\n"
+"PO-Revision-Date: 2021-07-26 17:40+0200\n"
+"Last-Translator: WP Overnight <support@wpovernight.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: sv_SE\n"
 "MIME-Version: 1.0\n"
@@ -118,11 +118,13 @@ msgstr ""
 msgid "Send email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:378 templates/Simple/invoice.php:59
+#: includes/class-wcpdf-admin.php:378
+#: includes/documents/class-wcpdf-invoice.php:460
 msgid "Invoice Number:"
 msgstr "Fakturanummer:"
 
-#: includes/class-wcpdf-admin.php:381 templates/Simple/invoice.php:65
+#: includes/class-wcpdf-admin.php:381
+#: includes/documents/class-wcpdf-invoice.php:468
 msgid "Invoice Date:"
 msgstr "Fakturadatum:"
 
@@ -235,7 +237,7 @@ msgstr ""
 
 #: includes/class-wcpdf-main.php:279
 msgid "Some of the export parameters are missing."
-msgstr "Vissa paramertrar i exporten saknas"
+msgstr "Vissa paramertrar i exporten saknas."
 
 #. translators: document type
 #: includes/class-wcpdf-main.php:379
@@ -304,7 +306,7 @@ msgid ""
 msgstr ""
 "Dessa kan användas (valfritt) som kolumner i sidfoten i <em>Modern "
 "(Premium)</em> mallen, men kan även användas för dina egna element i dina "
-"skräddarsydda mallar."
+"skräddarsydda mallar"
 
 #: includes/class-wcpdf-settings-callbacks.php:383
 msgid "Image resolution"
@@ -728,39 +730,39 @@ msgstr "N/A"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:424
 msgid "Payment method"
-msgstr "Betalningssätt:"
+msgstr "Betalningssätt"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:445
 msgid "Shipping method"
-msgstr "Fraktmetod:"
+msgstr "Fraktmetod"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:927
 msgid "Subtotal"
-msgstr "Belopp:"
+msgstr "Belopp"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:952
 msgid "Shipping"
-msgstr "Frakt:"
+msgstr "Frakt"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1015
 msgid "Discount"
-msgstr "Rabatt:"
+msgstr "Rabatt"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1056
 msgid "VAT"
-msgstr "Moms:"
+msgstr "Moms"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1057
 msgid "Tax rate"
-msgstr "Momssats:"
+msgstr "Momssats"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1101
 msgid "Total ex. VAT"
-msgstr "Totalt exkl. moms:"
+msgstr "Totalt exkl. moms"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1104
 msgid "Total"
-msgstr "Totalt:"
+msgstr "Totalt"
 
 #. translators: 1. credit note title, 2. refund id
 #: includes/documents/abstract-wcpdf-order-document.php:336
@@ -772,11 +774,21 @@ msgstr ""
 msgid "%s was regenerated"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:879
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:422
+msgid "%s Number:"
+msgstr ""
+
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:428
+msgid "%s Date:"
+msgstr ""
+
+#: includes/documents/abstract-wcpdf-order-document.php:891
 msgid "Admin email"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:882
+#: includes/documents/abstract-wcpdf-order-document.php:894
 msgid "Manual email"
 msgstr ""
 
@@ -944,7 +956,7 @@ msgstr ""
 
 #: includes/documents/class-wcpdf-invoice.php:369
 msgid "Allow My Account invoice download"
-msgstr "Tillåt nerladdning av faktura på \"Mitt konto\" "
+msgstr "Tillåt nerladdning av faktura på \"Mitt konto\""
 
 #: includes/documents/class-wcpdf-invoice.php:376
 msgid "Only when an invoice is already created/emailed"
@@ -960,7 +972,7 @@ msgstr ""
 
 #: includes/documents/class-wcpdf-invoice.php:394
 msgid "Enable invoice number column in the orders list"
-msgstr "Aktivera fakturanummer i orderlistan."
+msgstr "Aktivera fakturanummer i orderlistan"
 
 #: includes/documents/class-wcpdf-invoice.php:405
 msgid "Disable for free orders"
@@ -1016,6 +1028,14 @@ msgstr "Visa fakturaadress"
 
 #: includes/documents/class-wcpdf-packing-slip.php:107
 msgid "Only when different from shipping address"
+msgstr ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:162
+msgid "Packing Slip Number:"
+msgstr ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:170
+msgid "Packing Slip Date:"
 msgstr ""
 
 #: includes/legacy/class-wcpdf-legacy-document.php:32
@@ -1147,7 +1167,7 @@ msgstr ""
 #: includes/views/dompdf-status.php:180 templates/Simple/invoice.php:101
 #: templates/Simple/packing-slip.php:88
 msgid "Description"
-msgstr "Beskrivning:"
+msgstr "Beskrivning"
 
 #: includes/views/dompdf-status.php:181
 msgid "Value"
@@ -1236,7 +1256,7 @@ msgstr ""
 
 #: includes/views/wcpdf-extensions.php:16
 msgid "Check out these premium extensions!"
-msgstr "Kolla in dessa Premium tillägg"
+msgstr "Kolla in dessa Premium tillägg!"
 
 #: includes/views/wcpdf-extensions.php:17
 msgid "click items to read more"
@@ -1289,7 +1309,7 @@ msgid ""
 "and credit notes or utilize the main invoice numbering system"
 msgstr ""
 "Använd <b>Separata nummer system</b> för preformafakturor, kreditfakturor "
-"eller använd huvud fakturanummer systemet. "
+"eller använd huvud fakturanummer systemet"
 
 #: includes/views/wcpdf-extensions.php:31
 #: includes/views/wcpdf-extensions.php:61
@@ -1299,7 +1319,7 @@ msgid ""
 "custom template."
 msgstr ""
 "<b>Förändra, faktura och leveransadress</b> efter dina behov, typsnitt "
-"storlek mm. utan att behöva skapa en egen mall. "
+"storlek mm. utan att behöva skapa en egen mall."
 
 #: includes/views/wcpdf-extensions.php:32
 #: includes/views/wcpdf-extensions.php:62
@@ -1433,7 +1453,7 @@ msgstr "Kolla in Premium PDF-faktura och följesedlar mallar på %s."
 #. translators: email link
 #: includes/views/wcpdf-extensions.php:122
 msgid "For custom templates, contact us at %s."
-msgstr "För skräddarsydda mallar, kontakta oss på %s"
+msgstr "För skräddarsydda mallar, kontakta oss på %s."
 
 #: includes/views/wcpdf-settings-page.php:9
 msgid "WooCommerce PDF Invoices"
@@ -1465,19 +1485,19 @@ msgstr "Betalningssätt:"
 
 #: templates/Simple/invoice.php:92 templates/Simple/packing-slip.php:80
 msgid "Product"
-msgstr "Produkt:"
+msgstr "Produkt"
 
 #: templates/Simple/invoice.php:93 templates/Simple/packing-slip.php:81
 msgid "Quantity"
-msgstr "Antal:"
+msgstr "Antal"
 
 #: templates/Simple/invoice.php:94
 msgid "Price"
-msgstr "Pris:"
+msgstr "Pris"
 
 #: templates/Simple/invoice.php:106 templates/Simple/packing-slip.php:93
 msgid "SKU"
-msgstr "Artikelnummer:"
+msgstr "Artikelnummer"
 
 #: templates/Simple/invoice.php:107 templates/Simple/packing-slip.php:94
 msgid "SKU:"
@@ -1493,7 +1513,7 @@ msgstr ""
 
 #: templates/Simple/invoice.php:131 templates/Simple/packing-slip.php:112
 msgid "Customer Notes"
-msgstr "Kundnoteringar:"
+msgstr "Kundnoteringar"
 
 #: templates/Simple/packing-slip.php:35
 msgid "Shipping Address:"

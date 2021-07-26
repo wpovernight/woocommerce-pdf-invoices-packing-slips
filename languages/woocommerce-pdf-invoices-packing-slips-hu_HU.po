@@ -4,8 +4,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
 "POT-Creation-Date: 2021-06-30T03:08:00+00:00\n"
-"PO-Revision-Date: 2021-06-29 23:18-0400\n"
-"Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
+"PO-Revision-Date: 2021-07-26 17:22+0200\n"
+"Last-Translator: WP Overnight <support@wpovernight.com>\n"
 "Language-Team: \n"
 "Language: hu_HU\n"
 "MIME-Version: 1.0\n"
@@ -85,9 +85,8 @@ msgstr ""
 
 #: includes/class-wcpdf-admin.php:224 includes/class-wcpdf-main.php:906
 #: includes/documents/class-wcpdf-invoice.php:302
-#, fuzzy
 msgid "Invoice Number"
-msgstr "Számla"
+msgstr ""
 
 #: includes/class-wcpdf-admin.php:261
 msgid "Send order email"
@@ -114,14 +113,12 @@ msgid "Send email"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:378 templates/Simple/invoice.php:59
-#, fuzzy
 msgid "Invoice Number:"
-msgstr "Rendelési szám:"
+msgstr ""
 
 #: includes/class-wcpdf-admin.php:381 templates/Simple/invoice.php:65
-#, fuzzy
 msgid "Invoice Date:"
-msgstr "Számla"
+msgstr ""
 
 #: includes/class-wcpdf-admin.php:384
 msgid "Notes (printed in the invoice):"
@@ -718,14 +715,12 @@ msgid "N/A"
 msgstr "N/A"
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:424
-#, fuzzy
 msgid "Payment method"
-msgstr "Fizetési mód"
+msgstr ""
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:445
-#, fuzzy
 msgid "Shipping method"
-msgstr "Szállítás"
+msgstr ""
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:927
 msgid "Subtotal"
@@ -1434,7 +1429,7 @@ msgstr "Rendelés dátuma:"
 
 #: templates/Simple/invoice.php:78
 msgid "Payment Method:"
-msgstr "Fizetési mód"
+msgstr "Fizetési mód:"
 
 #: templates/Simple/invoice.php:92 templates/Simple/packing-slip.php:80
 msgid "Product"

@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-06-30T03:08:00+00:00\n"
-"PO-Revision-Date: 2021-06-29 23:17-0400\n"
-"Last-Translator: Yordan Soares <contacto@yordansoar.es>\n"
+"POT-Creation-Date: 2021-07-26T15:06:25+00:00\n"
+"PO-Revision-Date: 2021-07-26 17:17+0200\n"
+"Last-Translator: WP Overnight <support@wpovernight.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: da_DK\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +86,7 @@ msgstr ""
 #: includes/class-wcpdf-admin.php:224 includes/class-wcpdf-main.php:906
 #: includes/documents/class-wcpdf-invoice.php:302
 msgid "Invoice Number"
-msgstr "Fakturanummer "
+msgstr "Fakturanummer"
 
 #: includes/class-wcpdf-admin.php:261
 msgid "Send order email"
@@ -112,13 +112,15 @@ msgstr ""
 msgid "Send email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:378 templates/Simple/invoice.php:59
+#: includes/class-wcpdf-admin.php:378
+#: includes/documents/class-wcpdf-invoice.php:460
 msgid "Invoice Number:"
-msgstr "Fakturanummer: "
+msgstr "Fakturanummer:"
 
-#: includes/class-wcpdf-admin.php:381 templates/Simple/invoice.php:65
+#: includes/class-wcpdf-admin.php:381
+#: includes/documents/class-wcpdf-invoice.php:468
 msgid "Invoice Date:"
-msgstr "Fakturadato: "
+msgstr "Fakturadato:"
 
 #: includes/class-wcpdf-admin.php:384
 msgid "Notes (printed in the invoice):"
@@ -216,12 +218,12 @@ msgstr ""
 
 #: includes/class-wcpdf-frontend.php:126
 msgid "Download invoice (PDF)"
-msgstr "Hent faktura (PDF) "
+msgstr "Hent faktura (PDF)"
 
 #: includes/class-wcpdf-main.php:261 includes/class-wcpdf-main.php:266
 #: includes/class-wcpdf-main.php:338
 msgid "You do not have sufficient permissions to access this page."
-msgstr "Du har ikke tilstrækkelig tilladelse til at tilgå denne side. "
+msgstr "Du har ikke tilstrækkelig tilladelse til at tilgå denne side."
 
 #: includes/class-wcpdf-main.php:275
 msgid "You haven't selected any orders"
@@ -355,7 +357,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings-debug.php:192
 msgid "Debug settings"
-msgstr "debug indstillinger"
+msgstr "Debug indstillinger"
 
 #: includes/class-wcpdf-settings-debug.php:198
 msgid "Legacy mode"
@@ -490,7 +492,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings-general.php:40
 msgid "General settings"
-msgstr "Generelle indstillinger "
+msgstr "Generelle indstillinger"
 
 #: includes/class-wcpdf-settings-general.php:46
 msgid "How do you want to view the PDF?"
@@ -502,7 +504,7 @@ msgstr "Hent PDF'en"
 
 #: includes/class-wcpdf-settings-general.php:54
 msgid "Open the PDF in a new browser tab/window"
-msgstr "Åben PDF'en i en ny browser fane/vindue "
+msgstr "Åben PDF'en i en ny browser fane/vindue"
 
 #: includes/class-wcpdf-settings-general.php:61
 msgid "Choose a template"
@@ -517,7 +519,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings-general.php:75
 msgid "Paper size"
-msgstr "Papir størrelse "
+msgstr "Papir størrelse"
 
 #: includes/class-wcpdf-settings-general.php:82
 #: includes/views/setup-wizard/paper-format.php:12
@@ -567,7 +569,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings-general.php:126
 msgid "Shop header/logo"
-msgstr "Butik header/logo "
+msgstr "Butik header/logo"
 
 #: includes/class-wcpdf-settings-general.php:132
 #: includes/views/setup-wizard/logo.php:20
@@ -577,7 +579,7 @@ msgstr "Vælg eller upload dit faktura header/logo"
 #: includes/class-wcpdf-settings-general.php:133
 #: includes/views/setup-wizard/logo.php:20
 msgid "Set image"
-msgstr "Indstil billedet "
+msgstr "Indstil billedet"
 
 #: includes/class-wcpdf-settings-general.php:134
 #: includes/views/setup-wizard/logo.php:20
@@ -601,15 +603,15 @@ msgstr "Butik navn"
 
 #: includes/class-wcpdf-settings-general.php:168
 msgid "Shop Address"
-msgstr "Butik adresse "
+msgstr "Butik adresse"
 
 #: includes/class-wcpdf-settings-general.php:183
 msgid "Footer: terms & conditions, policies, etc."
-msgstr "Sidefod: Vilkår & betingelser, politikker mm. "
+msgstr "Sidefod: Vilkår & betingelser, politikker mm."
 
 #: includes/class-wcpdf-settings-general.php:198
 msgid "Extra template fields"
-msgstr "Ekstra skabelons felter "
+msgstr "Ekstra skabelons felter"
 
 #: includes/class-wcpdf-settings-general.php:204
 msgid "Extra field 1"
@@ -617,7 +619,7 @@ msgstr "Ekstra felt 1"
 
 #: includes/class-wcpdf-settings-general.php:212
 msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
-msgstr "Dette er sidefon kolonne 1 i <i>Modern (Premium)</i> skabelonen "
+msgstr "Dette er sidefon kolonne 1 i <i>Modern (Premium)</i> skabelonen"
 
 #: includes/class-wcpdf-settings-general.php:219
 msgid "Extra field 2"
@@ -625,7 +627,7 @@ msgstr "Ekstra felt 2"
 
 #: includes/class-wcpdf-settings-general.php:227
 msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
-msgstr "Dette er sidefod kolonne 2 i <i>Modern (Premium)</i> skabelonen "
+msgstr "Dette er sidefod kolonne 2 i <i>Modern (Premium)</i> skabelonen"
 
 #: includes/class-wcpdf-settings-general.php:234
 msgid "Extra field 3"
@@ -633,11 +635,11 @@ msgstr "Ekstra felt 3"
 
 #: includes/class-wcpdf-settings-general.php:242
 msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
-msgstr "Dette er sidefod kolonne 3 i <i>Modern (Premium)</i> skabelonen "
+msgstr "Dette er sidefod kolonne 3 i <i>Modern (Premium)</i> skabelonen"
 
 #: includes/class-wcpdf-settings.php:48 includes/class-wcpdf-settings.php:49
 msgid "PDF Invoices"
-msgstr "PDF fakturaer "
+msgstr "PDF fakturaer"
 
 #: includes/class-wcpdf-settings.php:74
 msgid "Documentation"
@@ -658,7 +660,7 @@ msgstr ""
 
 #: includes/class-wcpdf-settings.php:96
 msgid "General"
-msgstr "Generelt "
+msgstr "Generelt"
 
 #: includes/class-wcpdf-settings.php:102 includes/views/dompdf-status.php:182
 msgid "Status"
@@ -763,11 +765,21 @@ msgstr ""
 msgid "%s was regenerated"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:879
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:422
+msgid "%s Number:"
+msgstr ""
+
+#. translators: %s: document name
+#: includes/documents/abstract-wcpdf-order-document.php:428
+msgid "%s Date:"
+msgstr ""
+
+#: includes/documents/abstract-wcpdf-order-document.php:891
 msgid "Admin email"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document.php:882
+#: includes/documents/abstract-wcpdf-order-document.php:894
 msgid "Manual email"
 msgstr ""
 
@@ -775,14 +787,14 @@ msgstr ""
 #: includes/documents/class-wcpdf-invoice.php:56
 #: includes/legacy/class-wcpdf-legacy-functions.php:22
 msgid "Invoice"
-msgstr "Faktura "
+msgstr "Faktura"
 
 # This is a filename (prefix). do not use spaces or special characters!
 #: includes/documents/class-wcpdf-invoice.php:131
 msgid "invoice"
 msgid_plural "invoices"
-msgstr[0] "Faktura"
-msgstr[1] "Fakturaen "
+msgstr[0] "faktura"
+msgstr[1] "fakturaen"
 
 #: includes/documents/class-wcpdf-invoice.php:186
 #: includes/documents/class-wcpdf-packing-slip.php:88
@@ -803,7 +815,7 @@ msgstr ""
 "Det ser ud som om at skabelon mappen (<code>%s</code>) ikke er skrivebar, "
 "kontrollere adgangskravene for denne mappe. Uden at have adgang til at "
 "redigere i mappen, vil dette plugin ikke være i stand til at sende e-mails "
-"med fakturaer. "
+"med fakturaer."
 
 #: includes/documents/class-wcpdf-invoice.php:211
 msgid "Disable for:"
@@ -887,7 +899,7 @@ msgstr ""
 
 #: includes/documents/class-wcpdf-invoice.php:316
 msgid "Next invoice number (without prefix/suffix etc.)"
-msgstr "Næste faktura nummer (uden prefix/suffix mm.) "
+msgstr "Næste faktura nummer (uden prefix/suffix mm.)"
 
 #: includes/documents/class-wcpdf-invoice.php:322
 msgid ""
@@ -913,16 +925,16 @@ msgstr ""
 
 #: includes/documents/class-wcpdf-invoice.php:341
 msgid "Suffix"
-msgstr "Suffix "
+msgstr "Suffix"
 
 #: includes/documents/class-wcpdf-invoice.php:346
 msgid "Padding"
-msgstr "Padding "
+msgstr "Padding"
 
 #: includes/documents/class-wcpdf-invoice.php:349
 msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
 msgstr ""
-"Indtast nummeret af cifre her - indtast \"6\" for at vise 42 som 000042"
+"indtast nummeret af cifre her - indtast \"6\" for at vise 42 som 000042"
 
 #: includes/documents/class-wcpdf-invoice.php:352
 msgid ""
@@ -930,7 +942,7 @@ msgid ""
 "filter, the above settings will be ignored"
 msgstr ""
 "Bemærk: Hvis du allerede har oprettet et brugerdefinerede fakturanummer "
-"format med et filter, så vil denne indstillingen ovenover blive ignoreret.  "
+"format med et filter, så vil denne indstillingen ovenover blive ignoreret"
 
 #: includes/documents/class-wcpdf-invoice.php:358
 msgid "Reset invoice number yearly"
@@ -954,7 +966,7 @@ msgstr ""
 
 #: includes/documents/class-wcpdf-invoice.php:394
 msgid "Enable invoice number column in the orders list"
-msgstr "Aktiver faktura nummer kolonne i ordre listen "
+msgstr "Aktiver faktura nummer kolonne i ordre listen"
 
 #: includes/documents/class-wcpdf-invoice.php:405
 msgid "Disable for free orders"
@@ -996,14 +1008,14 @@ msgstr ""
 #: includes/documents/class-wcpdf-packing-slip.php:41
 #: includes/legacy/class-wcpdf-legacy-functions.php:25
 msgid "Packing Slip"
-msgstr "Følgeseddel "
+msgstr "Følgeseddel"
 
 # This is a filename (prefix). do not use spaces or special characters!
 #: includes/documents/class-wcpdf-packing-slip.php:47
 msgid "packing-slip"
 msgid_plural "packing-slips"
-msgstr[0] "Følgeseddel "
-msgstr[1] "Følgesedler "
+msgstr[0] "følgeseddel"
+msgstr[1] "følgesedler"
 
 #: includes/documents/class-wcpdf-packing-slip.php:99
 msgid "Display billing address"
@@ -1011,6 +1023,14 @@ msgstr "Vis leveringsadresse"
 
 #: includes/documents/class-wcpdf-packing-slip.php:107
 msgid "Only when different from shipping address"
+msgstr ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:162
+msgid "Packing Slip Number:"
+msgstr ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:170
+msgid "Packing Slip Date:"
 msgstr ""
 
 #: includes/legacy/class-wcpdf-legacy-document.php:32
@@ -1142,7 +1162,7 @@ msgstr ""
 #: includes/views/dompdf-status.php:180 templates/Simple/invoice.php:101
 #: templates/Simple/packing-slip.php:88
 msgid "Description"
-msgstr "Beskrivelse "
+msgstr "Beskrivelse"
 
 #: includes/views/dompdf-status.php:181
 msgid "Value"
@@ -1438,7 +1458,7 @@ msgstr ""
 
 #: templates/Simple/invoice.php:35 templates/Simple/packing-slip.php:48
 msgid "Billing Address:"
-msgstr "Faktureringsadresse"
+msgstr "Faktureringsadresse:"
 
 #: templates/Simple/invoice.php:48
 msgid "Ship To:"
@@ -1450,11 +1470,11 @@ msgstr "Ordrenummer:"
 
 #: templates/Simple/invoice.php:74 templates/Simple/packing-slip.php:62
 msgid "Order Date:"
-msgstr "Ordredato: "
+msgstr "Ordredato:"
 
 #: templates/Simple/invoice.php:78
 msgid "Payment Method:"
-msgstr "Betaling: "
+msgstr "Betaling:"
 
 #: templates/Simple/invoice.php:92 templates/Simple/packing-slip.php:80
 msgid "Product"
@@ -1462,7 +1482,7 @@ msgstr "Produkt"
 
 #: templates/Simple/invoice.php:93 templates/Simple/packing-slip.php:81
 msgid "Quantity"
-msgstr "Antal "
+msgstr "Antal"
 
 #: templates/Simple/invoice.php:94
 msgid "Price"
@@ -1474,11 +1494,11 @@ msgstr "Varenummer"
 
 #: templates/Simple/invoice.php:107 templates/Simple/packing-slip.php:94
 msgid "SKU:"
-msgstr "Varenummer: "
+msgstr "Varenummer:"
 
 #: templates/Simple/invoice.php:108 templates/Simple/packing-slip.php:95
 msgid "Weight:"
-msgstr "Vægt: "
+msgstr "Vægt:"
 
 #: templates/Simple/invoice.php:123
 msgid "Notes"
@@ -1490,7 +1510,7 @@ msgstr "Kunde bemærkning"
 
 #: templates/Simple/packing-slip.php:35
 msgid "Shipping Address:"
-msgstr "Leveringsadresse"
+msgstr "Leveringsadresse:"
 
 #: templates/Simple/packing-slip.php:66
 msgid "Shipping Method:"
