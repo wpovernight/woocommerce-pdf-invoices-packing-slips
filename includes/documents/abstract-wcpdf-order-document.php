@@ -417,6 +417,18 @@ abstract class Order_Document {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
 	}
 
+	public function get_number_title() {
+		/* translators: %s: document name */
+		$number_title = sprintf( __( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
+	}
+
+	public function get_date_title() {
+		/* translators: %s: document name */
+		$date_title = sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Data setters
