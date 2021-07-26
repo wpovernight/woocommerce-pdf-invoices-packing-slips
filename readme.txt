@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.9.0
+Stable tag: 2.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.9.1 =
+* New: Log manual invoice creation (with logging enabled)
+* New: Filters to override body class and content (`wpo_wcpdf_body_class` & `wpo_wcpdf_html_content`)
+* New: Document methods to get (and override) the number and date titles
+* Fix: Open PDF on My Account page in a new browser tab/window (following settings)
+* Translations: Update template (POT) and current translation projects
+* Marked tested up to WooCommerce 5.5 and WordPress 5.8
 
 = 2.9.0 =
 * New: Setting to log document generation time & context to order notes
