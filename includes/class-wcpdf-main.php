@@ -290,7 +290,7 @@ class Main {
 		$order_ids = (array) array_map( 'absint', explode( 'x', $_GET['order_ids'] ) );
 
 		// Process oldest first: reverse $order_ids array if required
-		if ( count( $order_ids ) > 1 && end( $order_ids ) < reset( $order_ids ) && apply_filters( 'wpo_wcpdf_generate_pdf_ajax_order_ids_reverse', true ) ) {
+		if ( count( $order_ids ) > 1 && end( $order_ids ) < reset( $order_ids ) && apply_filters( 'wpo_wcpdf_pdf_ajax_reverse_order_ids', true ) ) {
 			$order_ids = array_reverse( $order_ids );
 		}
 
