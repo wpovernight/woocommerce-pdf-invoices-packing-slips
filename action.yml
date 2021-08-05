@@ -1,26 +1,22 @@
-inputs:
-  directory: "assets"
-    description: "Directory that contains the files you want to minify. Defaults to current directory (.)"
-    required: false
-    default: "."
-  output:
-    description: "Directory that contains the minified files. Defaults to same directory"
-    required: false
-    default: ""
-  maxdepth: 5
-    description: "Descend at most levels (a non-negative integer) levels of directories below the starting-points."
-    required: false
-    default: ""
-  js_engine:
-    description: "Specifies which of the supported packages minifies JS files."
-    required: false
-    default: "babel"
+name: Auto Minify JS and CSS Files
 
-runs:
-  using: "docker"
-  image: "Dockerfile"
+on:
+  push:
+    branches: [ master ]
 
-branding:
-  icon: "archive"
-  color: "purple"
-  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Auto Minify
+      uses: nizarmah/auto-minify@v1.3
+
+    - name: Auto committing minified files
+      uses: stefanzweifel/git-auto-commit-action@v3.0.0
+      with:
+        commit_message: "Github Action: Auto Minified JS and CSS files"
+        branch: ${{ github.ref }}
