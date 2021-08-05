@@ -1,23 +1,5 @@
 name: Auto Minify JS and CSS Files
 
-inputs:
-  directory: '../../assets'
-    description: "Directory that contains the files you want to minify. Defaults to current directory (.)"
-    required: false
-    default: "."
-  output: '../../assets'
-    description: "Directory that contains the minified files. Defaults to same directory"
-    required: false
-    default: ""
-  maxdepth:
-    description: "Descend at most levels (a non-negative integer) levels of directories below the starting-points."
-    required: false
-    default: ""
-  js_engine:
-    description: "Specifies which of the supported packages minifies JS files."
-    required: false
-    default: "babel"
-
 on:
   push:
     branches: [ master ]
