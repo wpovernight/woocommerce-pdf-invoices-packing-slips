@@ -1,11 +1,11 @@
 name: Auto Minify JS and CSS Files
 
 inputs:
-  directory: 'assets'
+  directory: '../../assets'
     description: "Directory that contains the files you want to minify. Defaults to current directory (.)"
     required: false
     default: "."
-  output: 'assets'
+  output: '../../assets'
     description: "Directory that contains the minified files. Defaults to same directory"
     required: false
     default: ""
