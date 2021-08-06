@@ -3,6 +3,8 @@ name: Auto Minify JS and CSS Files
 on:
   push:
     branches: [ master ]
+    paths: 
+      - 'assets'
 
 jobs:
   build:
