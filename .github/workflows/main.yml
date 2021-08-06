@@ -13,10 +13,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Auto Minify
-        uses: nizarmah/auto-minify@v1.3
+        uses: nizarmah/auto-minify@v2.0
         with:
-          directory: '../../assets'
-          output: '../../assets/minified'
+          directory: 'assets'
 
       - name: Auto committing minified files
         uses: stefanzweifel/git-auto-commit-action@v3.0.0
