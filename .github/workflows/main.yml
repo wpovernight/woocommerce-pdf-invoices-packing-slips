@@ -10,13 +10,15 @@ jobs:
     
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Auto Minify
-      uses: nizarmah/auto-minify@v1.3
+      - name: Auto Minify
+        uses: nizarmah/auto-minify@v1.3
+        with:
+          directory: 'assets'
 
-    - name: Auto committing minified files
-      uses: stefanzweifel/git-auto-commit-action@v3.0.0
-      with:
-        commit_message: "Github Action: Auto Minified JS and CSS files"
-        branch: ${{ github.ref }}
+      - name: Auto committing minified files
+        uses: stefanzweifel/git-auto-commit-action@v3.0.0
+        with:
+          commit_message: "Github Action: Auto Minified JS and CSS files"
+          branch: ${{ github.ref }}
