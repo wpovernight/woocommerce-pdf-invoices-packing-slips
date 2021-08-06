@@ -16,6 +16,7 @@ jobs:
         uses: nizarmah/auto-minify@v1.3
         with:
           directory: '../../assets'
+          output: '../../assets'
 
       - name: Auto committing minified files
         uses: stefanzweifel/git-auto-commit-action@v3.0.0
