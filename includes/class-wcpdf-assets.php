@@ -19,6 +19,7 @@ class Assets {
 	 */
 	public function frontend_scripts_styles ( $hook ) {
 		# none yet
+		// $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 	}
 
 	/**
@@ -27,6 +28,8 @@ class Assets {
 	public function backend_scripts_styles ( $hook ) {
 		global $wp_version;
 		if( $this->is_order_page() ) {
+			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 			// STYLES
 			wp_enqueue_style( 'thickbox' );
 

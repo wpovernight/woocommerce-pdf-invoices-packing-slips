@@ -72,6 +72,7 @@ class Frontend {
 			if ( $general_settings = get_option( 'wpo_wcpdf_settings_general' ) ) {
 				if ( isset( $general_settings['download_display'] ) && $general_settings['download_display'] == 'display' ) {
 					if ( function_exists( 'file_get_contents' ) && $script = file_get_contents( WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link.js' ) ) {
+						$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 						wp_add_inline_script( 'jquery', $script );
 					}
 				}

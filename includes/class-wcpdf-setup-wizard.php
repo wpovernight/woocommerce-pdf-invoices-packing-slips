@@ -34,6 +34,8 @@ class Setup_Wizard {
 	 * Show the setup wizard.
 	 */
 	public function setup_wizard() {
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] ) {
 			return;
 		}
