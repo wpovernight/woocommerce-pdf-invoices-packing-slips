@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.9.2
+Stable tag: 2.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.9.3 =
+* Fix: JavaScript errors on My Account page with empty link tags
+* Fix: Long URLs in notes area breaking layout
 
 = 2.9.2 =
 * Tweak: Added new 'item-' prefix to item row class ID
