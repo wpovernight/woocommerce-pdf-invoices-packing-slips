@@ -36,6 +36,58 @@ class Setup_Wizard {
 	public function setup_wizard() {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
+		// register js scripts
+		wp_register_script( 
+			wpo-wcpdf-frontend . 'admin-script', 
+			WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js'
+		);
+		wp_register_script( 
+			wpo-wcpdf-frontend . 'confetti', 
+			WPO_WCPDF()->plugin_url() . '/assets/js/confetti'.$suffix.'.js'
+		);
+		wp_register_script( 
+			wpo-wcpdf-frontend . 'media-upload', 
+			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js'
+		);
+		wp_register_script( 
+			wpo-wcpdf-frontend . 'my-account-link', 
+			WPO_WCPDF()->plugin_url() . '/assets/js/my-account-link'.$suffix.'.js'
+		);
+		wp_register_script( 
+			wpo-wcpdf-frontend . 'order-script', 
+			WPO_WCPDF()->plugin_url() . '/assets/js/order-script'.$suffix.'.js'
+		);
+		wp_register_script( 
+			wpo-wcpdf-frontend . 'setup-wizard', 
+			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard'.$suffix.'.js'
+		);
+
+		// register css stylesheets
+		wp_enqueue_style( 
+			wpo-wcpdf-frontend . 'order-styles-buttons-wc20', 
+			WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc20'.$suffix.'.css'
+		);
+		wp_enqueue_style( 
+			wpo-wcpdf-frontend . 'order-styles-buttons-wc38', 
+			WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38'.$suffix.'.css'
+		);
+		wp_enqueue_style( 
+			wpo-wcpdf-frontend . 'order-styles-buttons-wc39', 
+			WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39'.$suffix.'.css'
+		);
+		wp_enqueue_style( 
+			wpo-wcpdf-frontend . 'order-styles', 
+			WPO_WCPDF()->plugin_url() . '/assets/css/order-styles'.$suffix.'.css'
+		);
+		wp_enqueue_style( 
+			wpo-wcpdf-frontend . 'settings-styles', 
+			WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css'
+		);
+		wp_enqueue_style( 
+			wpo-wcpdf-frontend . 'setup-wizard', 
+			WPO_WCPDF()->plugin_url() . '/assets/css/setup-wizard'.$suffix.'.css'
+		);
+
 		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] ) {
 			return;
 		}
