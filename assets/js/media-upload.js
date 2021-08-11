@@ -55,7 +55,7 @@ jQuery(document).ready(function($) {
 	});
  
 	$('#wpo-wcpdf-settings').on('click', '.wpo_remove_image_button', function( event ){
-		// get corresponding input fields
+		// Get corresponding input fields
 		$row = $(this).parent();
 		$id = $row.find('input#header_logo');
 		$logo = $row.find('img#img-header_logo');
