@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
       - name: Auto Minify
@@ -21,7 +20,7 @@ jobs:
           directory: 'assets'
 
       - name: Auto committing minified files
-        uses: stefanzweifel/git-auto-commit-action@v3.0.0
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Github Action: Auto Minified JS and CSS files"
+          commit_message: "Generate minified JS and CSS files"
           branch: ${{ github.ref }}
