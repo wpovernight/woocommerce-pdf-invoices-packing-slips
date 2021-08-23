@@ -619,14 +619,19 @@ abstract class Order_Document {
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
-		if ( !empty( $this->settings[$settings_key]['default'] ) ) {
+		if( array_key_exists( 'default', $this->settings[$settings_key] ) ) {
 			$text = wptexturize( trim( $this->settings[$settings_key]['default'] ) );
-			if ($autop === true) {
-				$text = wpautop( $text );
-			}
 		} else {
-			$text = $default;
+			$text = wptexturize( trim( reset( $this->settings[$settings_key] ) ) );
+			if( ! $text ) {
+				$text = $default;
+			}
 		}
+
+		if ( $autop === true ) {
+			$text = wpautop( $text );
+		}
+
 		// legacy filters
 		if ( in_array( $settings_key, array( 'shop_name', 'shop_address', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
 			$text = apply_filters( "wpo_wcpdf_{$settings_key}", $text, $this );
