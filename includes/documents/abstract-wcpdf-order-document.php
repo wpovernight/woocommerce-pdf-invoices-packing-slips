@@ -619,7 +619,7 @@ abstract class Order_Document {
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
-		if( array_key_exists( 'default', $this->settings[$settings_key] ) ) {
+		if( ! empty( $this->settings[$settings_key]['default'] ) ) {
 			$text = wptexturize( trim( $this->settings[$settings_key]['default'] ) );
 		} elseif( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
 			$text = wptexturize( trim( reset( $this->settings[$settings_key] ) ) );
