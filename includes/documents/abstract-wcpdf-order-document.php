@@ -620,13 +620,15 @@ abstract class Order_Document {
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
 		// uses 'default' key
-		if( ! empty( $this->settings[$settings_key]['default'] ) ) {
+		if( array_key_exists( 'default', $this->settings[$settings_key] ) ) {
 			$text = wptexturize( trim( $this->settings[$settings_key]['default'] ) );
 		// uses first key
-		} elseif( empty( $this->settings[$settings_key]['default'] ) && ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
+		} elseif( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
 			$text = wptexturize( trim( reset( $this->settings[$settings_key] ) ) );
+		}
+		
 		// fallback to default
-		} else {
+		if ( empty( $text ) ) {
 			$text = $default;
 		}
 
