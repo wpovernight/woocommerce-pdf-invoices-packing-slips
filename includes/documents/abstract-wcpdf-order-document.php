@@ -619,14 +619,18 @@ abstract class Order_Document {
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
+		// uses 'default' key
 		if( ! empty( $this->settings[$settings_key]['default'] ) ) {
 			$text = wptexturize( trim( $this->settings[$settings_key]['default'] ) );
-		} elseif( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
+		// uses first key
+		} elseif( empty( $this->settings[$settings_key]['default'] ) && ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
 			$text = wptexturize( trim( reset( $this->settings[$settings_key] ) ) );
+		// fallback to default
 		} else {
 			$text = $default;
 		}
 
+		// replacements
 		if ( $autop === true ) {
 			$text = wpautop( $text );
 		}
