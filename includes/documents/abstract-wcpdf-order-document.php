@@ -619,14 +619,14 @@ abstract class Order_Document {
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
-		// uses 'default' key
-		if( array_key_exists( 'default', $this->settings[$settings_key] ) ) {
+		// check for 'default' key existence
+		if ( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) && array_key_exists( 'default', $this->settings[$settings_key] ) ) {
 			$text = $this->settings[$settings_key]['default'];
-		// uses first key
+		// fallback to first array element if default is not present
 		} elseif( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
 			$text = reset( $this->settings[$settings_key] );
 		}
-		
+
 		// fallback to default
 		if ( empty( $text ) ) {
 			$text = $default;
