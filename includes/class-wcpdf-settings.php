@@ -283,7 +283,7 @@ class Settings {
 
 		if ( empty( $installed_templates ) ) {
 			// fallback to Simple template for servers with glob() disabled
-			$simple_template_path = $template_paths['default'] . 'Simple';
+			$simple_template_path = $this->normalize_path( $template_paths['default'] . 'Simple' );
 			$installed_templates[$simple_template_path] = 'default/Simple';
 		}
 
@@ -357,19 +357,35 @@ class Settings {
 		return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace('\\','/', $path );
 	}
 
-	public function maybe_migrate_template_paths( $settings_section ) {
+	public function maybe_migrate_template_paths( $settings_section = null ) {
 		$installed_templates = $this->get_installed_templates();
 		$selected_template = $this->normalize_path( $this->general_settings['template_path'] );
-		// die($selected_template);
+		$template_match = '';
 		if ( ! in_array( $selected_template, $installed_templates ) && substr_count( $selected_template, '/' ) > 1 ) {
+			// search for path match
 			foreach ( $installed_templates as $path => $template_id ) {
 				$path = $this->normalize_path( $path );
 				// check if the last part of the path matches
 				if ( substr( $path, -strlen( $selected_template ) ) === $selected_template ) {
-					$this->general_settings['template_path'] = $template_id;
-					update_option( 'wpo_wcpdf_settings_general', $this->general_settings );
-					return;
+					$template_match = $template_id;
+					break;
 				}
+			}
+
+			// fallback to template name if no path match
+			if ( empty( $template_match ) ) {
+				$template_ids = array_flip( array_unique( array_combine( $installed_templates, array_map( 'basename', $installed_templates ) ) ) );
+				$template_name = basename( $selected_template );
+				if ( ! empty ( $template_ids[$template_name] ) ) {
+					$template_match = $template_ids[$template_name];
+				}
+			}
+
+			// migrate setting if we have a match
+			if ( ! empty( $template_match ) ) {
+				$this->general_settings['template_path'] = $template_match;
+				update_option( 'wpo_wcpdf_settings_general', $this->general_settings );
+				wcpdf_log_error( sprintf( __( 'Template setting migrated from %1$s to %2$s', 'woocommerce-pdf-invoices-packing-slips' ), $path, $template_id ), 'info' );
 			}
 		}
 	}
