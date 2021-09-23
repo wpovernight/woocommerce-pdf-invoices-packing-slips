@@ -42,6 +42,8 @@ class Settings {
 
 		// refresh template path cache each time the general settings are updated
 		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
+		// migrate old template paths to template IDs before loading settings page
+		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 1 );
 	}
 
 	public function menu() {
@@ -213,11 +215,7 @@ class Settings {
 	public function get_template_path() {
 		// return default path if no template selected
 		if ( empty( $this->general_settings['template_path'] ) ) {
-			$default_path = WPO_WCPDF()->plugin_path() . '/templates/Simple';
-			if ( function_exists( 'wp_normalize_path' ) ) { // WP3.9+
-				$default_path = wp_normalize_path( $default_path );
-			}
-			return $default_path;
+			return $this->normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
 		}
 
 		$installed_templates = $this->get_installed_templates();
@@ -357,6 +355,23 @@ class Settings {
 
 	public function normalize_path( $path ) {
 		return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace('\\','/', $path );
+	}
+
+	public function maybe_migrate_template_paths( $settings_section ) {
+		$installed_templates = $this->get_installed_templates();
+		$selected_template = $this->normalize_path( $this->general_settings['template_path'] );
+		// die($selected_template);
+		if ( ! in_array( $selected_template, $installed_templates ) && substr_count( $selected_template, '/' ) > 1 ) {
+			foreach ( $installed_templates as $path => $template_id ) {
+				$path = $this->normalize_path( $path );
+				// check if the last part of the path matches
+				if ( substr( $path, -strlen( $selected_template ) ) === $selected_template ) {
+					$this->general_settings['template_path'] = $template_id;
+					update_option( 'wpo_wcpdf_settings_general', $this->general_settings );
+					return;
+				}
+			}
+		}
 	}
 
 	public function set_number_store() {
