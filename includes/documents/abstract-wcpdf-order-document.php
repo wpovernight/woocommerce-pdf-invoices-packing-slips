@@ -830,7 +830,7 @@ abstract class Order_Document {
 		if (empty($file)) {
 			$file = $this->type.'.php';
 		}
-		$path = WPO_WCPDF()->settings->get_template_path( $file );
+		$path = $this->get_template_path();
 		$file_path = "{$path}/{$file}";
 
 		$fallback_file_path = WPO_WCPDF()->plugin_path() . '/templates/Simple/' . $file;

@@ -11,6 +11,7 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings' ) ) :
 
 class Settings {
 	public $options_page_hook;
+	private $installed_templates = array();
 	
 	function __construct()	{
 		$this->callbacks = include( 'class-wcpdf-settings-callbacks.php' );
@@ -37,7 +38,10 @@ class Settings {
 		// add_action( 'admin_notices', array( $this, 'check_auto_increment_increment') );
 
 		// AJAX set number store
-		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array($this, 'set_number_store' ));
+		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
+
+		// refresh template path cache each time the general settings are updated
+		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
 	}
 
 	public function menu() {
@@ -206,7 +210,7 @@ class Settings {
 		return $output_mode;
 	}
 
-	public function get_template_path( $document_type = NULL ) {
+	public function get_template_path() {
 		// return default path if no template selected
 		if ( empty( $this->general_settings['template_path'] ) ) {
 			$default_path = WPO_WCPDF()->plugin_path() . '/templates/Simple';
@@ -216,23 +220,143 @@ class Settings {
 			return $default_path;
 		}
 
-		// forward slash for consistency
-		$template_path = str_replace('\\','/', $this->general_settings['template_path']);
-
-		// add base path, checking if it's not already there
-		// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
-		if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
-			$forwardslash_basepath = str_replace('\\','/', ABSPATH);
+		$installed_templates = $this->get_installed_templates();
+		$selected_template = $this->general_settings['template_path'];
+		if ( in_array( $selected_template, $installed_templates ) ) {
+			return array_search( $selected_template, $installed_templates );
 		} else {
-			// bedrock e.a
-			$forwardslash_basepath = str_replace('\\','/', WP_CONTENT_DIR);
-		}
-
-		if ( strpos( $template_path, $forwardslash_basepath ) === false ) {
-			$template_path = $forwardslash_basepath . $template_path;
+			// unknown template or full template path (legacy settings or filter override)
+			$template_path = $this->normalize_path( $selected_template );
+			// die($template_path);
+			
+			// add base path, checking if it's not already there
+			// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
+			if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+				$base_path = $this->normalize_path( ABSPATH );
+			} else {
+				$base_path = $this->normalize_path( WP_CONTENT_DIR );
+			}
+			
+			if ( strpos( $template_path, $base_path ) === false ) {
+				$template_path = $this->normalize_path( $base_path . $template_path );
+			}
 		}
 
 		return $template_path;
+	}
+
+	public function get_installed_templates() {
+		// because this method can be called (too) early we load from a cached list in those cases
+		// this cache is updated each time the template settings are saved/updated
+		if ( ! did_action( 'wpo_wcpdf_init_documents' ) && ( $cached_template_list = $this->get_template_list_cache() ) ) {
+			return $cached_template_list;
+		}
+
+		// to save resources on the disk operations we only do this once
+		if ( ! empty ( $this->installed_templates ) ) {
+			return $this->installed_templates;
+		}
+
+		$installed_templates = array();
+
+		// get base paths
+		$template_base_path = ( function_exists( 'WC' ) && is_callable( 'WC', 'template_path' ) ) ? WC()->template_path() : 'woocommerce/';
+		$template_base_path = untrailingslashit( $template_base_path );
+		$template_paths = array (
+			// note the order: theme before child-theme, so that child theme is always preferred (overwritten)
+			'default'		=> WPO_WCPDF()->plugin_path() . '/templates/',
+			'theme'			=> get_template_directory() . "/{$template_base_path}/pdf/",
+			'child-theme'	=> get_stylesheet_directory() . "/{$template_base_path}/pdf/",
+		);
+
+		$template_paths = apply_filters( 'wpo_wcpdf_template_paths', $template_paths );
+
+		foreach ($template_paths as $template_source => $template_path) {
+			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR );
+			
+			foreach ( $dirs as $dir ) {
+				$clean_dir = $this->normalize_path( $dir );
+				$template_name = basename( $clean_dir );
+				// let child theme override parent theme
+				$group = ( $template_source == 'child-theme' ) ? 'theme' : $template_source; 
+				$installed_templates[ $clean_dir ] = "{$group}/{$template_name}" ;
+			}
+		}
+
+		if ( empty( $installed_templates ) ) {
+			// fallback to Simple template for servers with glob() disabled
+			$simple_template_path = $template_paths['default'] . 'Simple';
+			$installed_templates[$simple_template_path] = 'default/Simple';
+		}
+
+		$installed_templates = apply_filters( 'wpo_wcpdf_installed_templates', $installed_templates );
+		
+		$this->installed_templates = $installed_templates;
+
+		return $installed_templates;
+	}
+
+	public function get_template_list_cache() {
+		$template_list = get_option( 'wpo_wcpdf_installed_template_paths', array() );
+		if ( ! empty( $template_list ) ) {
+			$checked_list = array();
+			$outdated = false;
+			// cache could be outdated, so we check whether the folders exist
+			foreach ( $template_list as $path => $template_id ) {
+				if ( @is_dir( $path ) ) {
+					$checked_list[$path] = $template_id; // folder exists
+					continue;
+				}
+
+				$outdated = true;
+				// folder does not exist, try replacing base if we can locate wp-content
+				$wp_content_folder = 'wp-content';
+				if ( strpos( $path, $wp_content_folder ) !== false && defined( WP_CONTENT_DIR ) ) {
+					// try wp-content
+					$relative_path = substr( $path, strrpos( $path, $wp_content_folder ) + strlen( $wp_content_folder ) );
+					$new_path = WP_CONTENT_DIR . $relative_path;
+					if ( @is_dir( $new_path ) ) {
+						$checked_list[$new_path] = $template_id;
+					}
+				}
+			}
+
+			if ( $outdated ) {
+				$this->set_template_list_cache( $checked_list );
+			}
+
+			return $checked_list;
+		} else {
+			return array();
+		}
+	}
+
+	public function set_template_list_cache( $template_list ) {
+		update_option( 'wpo_wcpdf_installed_template_paths', $template_list );
+	}
+
+	public function delete_template_list_cache() {
+		delete_option( 'wpo_wcpdf_installed_template_paths' );
+	}
+
+	public function general_settings_updated( $old_settings, $settings, $option ) {
+		if ( is_array( $settings ) && ! empty ( $settings['template_path'] ) ) {
+			$this->delete_template_list_cache();
+			$this->set_template_list_cache( $this->get_installed_templates() );
+		}
+	}
+
+	public function get_relative_template_path( $absolute_path ) {
+		if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+			$base_path = $this->normalize_path( ABSPATH );
+		} else {
+			$base_path = $this->normalize_path( WP_CONTENT_DIR );
+		}
+		return str_replace( $base_path, '', $this->normalize_path( $absolute_path ) );
+	}
+
+	public function normalize_path( $path ) {
+		return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace('\\','/', $path );
 	}
 
 	public function set_number_store() {

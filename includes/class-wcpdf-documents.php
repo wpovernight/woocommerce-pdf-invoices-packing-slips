@@ -59,6 +59,8 @@ class Documents {
 
 		// Allow plugins to add their own documents
 		$this->documents = apply_filters( 'wpo_wcpdf_document_classes', $this->documents );
+
+		do_action( 'wpo_wcpdf_init_documents' );
 	}
 
 	/**
