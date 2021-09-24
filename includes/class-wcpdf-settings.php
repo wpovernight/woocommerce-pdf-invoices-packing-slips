@@ -12,6 +12,7 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings' ) ) :
 class Settings {
 	public $options_page_hook;
 	private $installed_templates = array();
+	private $installed_templates_cache = array();
 	
 	function __construct()	{
 		$this->callbacks = include( 'class-wcpdf-settings-callbacks.php' );
@@ -291,6 +292,10 @@ class Settings {
 		
 		$this->installed_templates = $installed_templates;
 
+		if ( ! empty( $this->template_list_cache ) && array_diff_assoc( $this->template_list_cache, $this->installed_templates ) ) {
+			$this->set_template_list_cache( $this->installed_templates );
+		}
+
 		return $installed_templates;
 	}
 
@@ -323,6 +328,8 @@ class Settings {
 				$this->set_template_list_cache( $checked_list );
 			}
 
+			$this->installed_templates_cache = $checked_list;
+
 			return $checked_list;
 		} else {
 			return array();
@@ -330,6 +337,7 @@ class Settings {
 	}
 
 	public function set_template_list_cache( $template_list ) {
+		$this->template_list_cache = $template_list;
 		update_option( 'wpo_wcpdf_installed_template_paths', $template_list );
 	}
 
