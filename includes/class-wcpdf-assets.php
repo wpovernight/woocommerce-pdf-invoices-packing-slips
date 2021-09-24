@@ -124,7 +124,8 @@ class Assets {
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',
 				array(
-					'ajaxurl'		=> admin_url( 'admin-ajax.php' ),
+					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
+					'template_paths' => WPO_WCPDF()->settings->get_installed_templates(),
 				)
 			);
 
