@@ -123,7 +123,7 @@ class Frontend {
 		} elseif( !empty($values['order_id']) ) {
 			$order = wc_get_order( $values['order_id'] );
 		}
-		if( !is_object($order) || !isset($order) || empty($order) ) return;
+		if( empty($order) || !is_object($order) ) return;
 
 		// Link text
 		$link_text = __('Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips');
