@@ -116,7 +116,6 @@ class Frontend {
 		global $wp;
 
 		// Get $order
-		$order = '';
 		if( is_checkout() && !empty(is_wc_endpoint_url('order-received')) && empty($values['order_id']) && isset($wp->query_vars['order-received']) ) {
 			$order = wc_get_order( $wp->query_vars['order-received'] );
 		} elseif( is_account_page() && !empty(is_wc_endpoint_url('view-order')) && empty($values['order_id']) && isset($wp->query_vars['view-order']) ) {
@@ -124,7 +123,7 @@ class Frontend {
 		} elseif( !empty($values['order_id']) ) {
 			$order = wc_get_order( $values['order_id'] );
 		}
-		if( !is_object($order) || !isset($order) || empty($order) ) return;
+		if( empty($order) || !is_object($order) ) return;
 
 		// Link text
 		$link_text = __('Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips');
