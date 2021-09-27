@@ -116,6 +116,7 @@ class Frontend {
 		global $wp;
 
 		// Get $order
+		$order = '';
 		if( is_checkout() && !empty(is_wc_endpoint_url('order-received')) && empty($values['order_id']) && isset($wp->query_vars['order-received']) ) {
 			$order = wc_get_order( $wp->query_vars['order-received'] );
 		} elseif( is_account_page() && !empty(is_wc_endpoint_url('view-order')) && empty($values['order_id']) && isset($wp->query_vars['view-order']) ) {
