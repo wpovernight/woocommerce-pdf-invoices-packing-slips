@@ -281,13 +281,11 @@ class Settings_General {
 			$template_name = basename( $template_id );
 			$group = dirname( $template_id );
 			switch ( $group ) {
-				case 'theme':
-					$template_name = sprintf( '%s (%s)', $template_name, __( 'Theme', 'woocommerce-pdf-invoices-packing-slips' ) );
-					break;
 				case 'default':
 				case 'premium_plugin':
 					// no suffix
 					break;
+				case 'theme':
 				default:
 					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
 					break;
