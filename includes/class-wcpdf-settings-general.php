@@ -64,7 +64,7 @@ class Settings_General {
 				'args'		=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'template_path',
-					'options' 		=> $this->find_templates(),
+					'options' 		=> $this->get_installed_templates_list(),
 					/* translators: 1,2. template paths */
 					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%1$s</code> to your (child) theme in <code>%2$s</code> to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), $plugin_template_path, $theme_template_path),
 				)
@@ -272,6 +272,27 @@ class Settings_General {
 				}
 			}
 		}
+	}
+
+	public function get_installed_templates_list() {
+		$installed_templates = WPO_WCPDF()->settings->get_installed_templates();
+		$template_list = array();
+		foreach ( $installed_templates as $path => $template_id ) {
+			$template_name = basename( $template_id );
+			$group = dirname( $template_id );
+			switch ( $group ) {
+				case 'default':
+				case 'premium_plugin':
+					// no suffix
+					break;
+				case 'theme':
+				default:
+					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
+					break;
+			}
+			$template_list[$template_id] = $template_name;
+		}
+		return $template_list;
 	}
 
 	/**
