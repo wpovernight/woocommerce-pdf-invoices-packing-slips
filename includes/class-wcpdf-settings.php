@@ -226,7 +226,6 @@ class Settings {
 		} else {
 			// unknown template or full template path (legacy settings or filter override)
 			$template_path = $this->normalize_path( $selected_template );
-			// die($template_path);
 			
 			// add base path, checking if it's not already there
 			// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
