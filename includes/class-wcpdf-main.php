@@ -29,10 +29,7 @@ class Main {
 		}
 
 		// include template specific custom functions
-		$template_path = WPO_WCPDF()->settings->get_template_path();
-		if ( file_exists( $template_path . '/template-functions.php' ) ) {
-			require_once( $template_path . '/template-functions.php' );
-		}
+		$this->load_template_functions();
 
 		// test mode
 		add_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'test_mode_settings' ), 15, 2 );
@@ -394,6 +391,19 @@ class Main {
 			wcpdf_output_error( $message, 'critical', $e );
 		}
 		exit;
+	}
+
+	/**
+	 * Include template specific custom functions
+	 */
+	private function load_template_functions() {
+		$file = trailingslashit( WPO_WCPDF()->settings->get_template_path() ) . 'template-functions.php';
+		if ( file_exists( $file ) ) {
+			$loaded = @include_once( $file );
+			if ( $loaded === false ) {
+				wcpdf_log_error( sprintf( 'Failed to load template functions: %s', $file ), 'critical' );
+			}
+		}
 	}
 
 	/**
