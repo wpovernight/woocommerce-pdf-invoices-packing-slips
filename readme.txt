@@ -66,7 +66,7 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 = Where can I find the documentation? =
 
-[WooCommerce PDF Invoices & Packing Slips documentation](https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/)
+[WooCommerce PDF Invoices & Packing Slips documentation](https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/)
 
 = It's not working! =
 

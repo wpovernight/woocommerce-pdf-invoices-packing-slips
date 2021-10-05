@@ -78,7 +78,7 @@ class Settings {
 	public function add_support_links( $links, $file ) {
 		if ( $file == WPO_WCPDF()->plugin_basename ) {
 			$row_meta = array(
-				'docs'    => '<a href="http://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/" target="_blank" title="' . __( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . __( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
+				'docs'    => '<a href="https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/" target="_blank" title="' . __( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . __( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
 				'support' => '<a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips" target="_blank" title="' . __( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . __( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
 			);
 
