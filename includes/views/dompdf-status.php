@@ -53,6 +53,12 @@ $server_configs = array(
 		'result'   => extension_loaded('gmagick') || extension_loaded('imagick'),
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
+	'Intl' => array(
+		'required' => __( 'Recommended when using the PHP NumberFormatter class', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'    => null,
+		'result'   => extension_loaded('intl'),
+		'fallback' => __( 'Needed when using the PHP NumberFormatter class', 'woocommerce-pdf-invoices-packing-slips' ),
+	),
 	'glob()' => array(
 		'required' => __( 'Required to detect custom templates and to clear the temp folder periodically', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => null,
