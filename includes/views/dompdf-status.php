@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $memory_limit   = function_exists( 'wc_let_to_num' )?wc_let_to_num( WP_MEMORY_LIMIT ):woocommerce_let_to_num( WP_MEMORY_LIMIT );
 $php_mem_limit  = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
 
-$server_configs = array(
+$server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	'PHP version' => array(
 		'required' => __( '7.1+ (7.4 or higher recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => PHP_VERSION,
@@ -71,7 +71,7 @@ $server_configs = array(
 		'result'   => ini_get('allow_url_fopen'),			
 		'fallback' => __( 'allow_url_fopen disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
-);
+) );
 
 if ( ( $xc = extension_loaded('xcache') ) || ( $apc = extension_loaded('apc') ) || ( $zop = extension_loaded('Zend OPcache') ) || ( $op = extension_loaded('opcache') ) ) {
 	$server_configs['opcache']['result'] = true;
