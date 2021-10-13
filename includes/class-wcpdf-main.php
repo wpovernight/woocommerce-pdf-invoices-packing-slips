@@ -977,7 +977,7 @@ class Main {
 	 * Logs the document creation to the order notes
 	 */
 	public function log_to_order_notes( $document, $created_via ) {
-		if( ! empty( $document ) && ! empty( $order = $document->order ) && $order->get_type() == 'shop_order' && ! empty( $created_via ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+		if( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $created_via ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
 			/* translators: 1. document title, 2. creation source */
 			$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $created_via );
