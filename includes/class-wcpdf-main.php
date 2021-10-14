@@ -981,7 +981,15 @@ class Main {
 			/* translators: 1. document title, 2. creation source */
 			$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $created_via );
-			$order->add_order_note( $note );
+
+			if( is_callable( array( $order, 'add_order_note' ) ) ) { // order
+				$order->add_order_note( $note );
+			} elseif ( $document->is_refund( $order ) ) {            // refund order
+				$order = $document->get_refund_parent( $order );
+				if( ! empty( $order ) && is_callable( array( $order, 'add_order_note' ) ) ) {
+					$order->add_order_note( $note );
+				}
+			}
 		}
 	}
 
