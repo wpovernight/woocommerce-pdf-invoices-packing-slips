@@ -25,14 +25,17 @@ class Assets {
 	 * Load styles & scripts
 	 */
 	public function backend_scripts_styles ( $hook ) {
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		global $wp_version;
 		if( $this->is_order_page() ) {
+
 			// STYLES
 			wp_enqueue_style( 'thickbox' );
 
 			wp_enqueue_style(
 				'wpo-wcpdf-order-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/order-styles.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/order-styles'.$suffix.'.css',
 				array(),
 				WPO_WCPDF_VERSION
 			);
@@ -43,7 +46,7 @@ class Assets {
 				// legacy WC2.0 styles
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc20.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc20'.$suffix.'.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
@@ -52,7 +55,7 @@ class Assets {
 				// also applied to WC3.3+ but without affect due to .column-order_actions class being deprecated in 3.3+
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38'.$suffix.'.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
@@ -60,7 +63,7 @@ class Assets {
 				// WP5.3 or newer is used: realign img inside buttons
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39'.$suffix.'.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
@@ -69,8 +72,8 @@ class Assets {
 			// SCRIPTS
 			wp_enqueue_script(
 				'wpo-wcpdf',
-				WPO_WCPDF()->plugin_url() . '/assets/js/order-script.js',
-				array( 'jquery' ),
+				WPO_WCPDF()->plugin_url() . '/assets/js/order-script'.$suffix.'.js',
+				array( 'jquery', 'jquery-blockui' ),
 				WPO_WCPDF_VERSION
 			);
 
@@ -99,7 +102,7 @@ class Assets {
 		if ( $hook == 'woocommerce_page_wpo_wcpdf_options_page' || $hook == 'settings_page_wpo_wcpdf_options_page' || ( isset($_GET['page']) && $_GET['page'] == 'wpo_wcpdf_options_page' ) ) {
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
 				array('woocommerce_admin_styles'),
 				WPO_WCPDF_VERSION
 			);
@@ -113,7 +116,7 @@ class Assets {
 			wp_enqueue_script( 'wc-enhanced-select' );
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
-				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
 				array( 'jquery', 'wc-enhanced-select' ),
 				WPO_WCPDF_VERSION
 			);
@@ -121,14 +124,15 @@ class Assets {
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',
 				array(
-					'ajaxurl'		=> admin_url( 'admin-ajax.php' ),
+					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
+					'template_paths' => WPO_WCPDF()->settings->get_installed_templates(),
 				)
 			);
 
 			wp_enqueue_media();
 			wp_enqueue_script(
 				'wpo-wcpdf-media-upload',
-				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);

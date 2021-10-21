@@ -332,8 +332,8 @@ abstract class Order_Document {
 		if ( $this->get_type() == 'credit-note' ) {
 			$refund_id = $order->get_id();
 			$parent_order = wc_get_order( $order->get_parent_id() );
-		}
-		$note = $refund_id ? sprintf( __( '%s (refund #%s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ) );
+		} /*translators: 1. credit note title, 2. refund id */
+		$note = $refund_id ? sprintf( __( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ) );
 		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
 
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
@@ -415,6 +415,18 @@ abstract class Order_Document {
 
 	public function get_title() {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
+	}
+
+	public function get_number_title() {
+		/* translators: %s: document name */
+		$number_title = sprintf( __( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
+	}
+
+	public function get_date_title() {
+		/* translators: %s: document name */
+		$date_title = sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
 	/*
@@ -607,14 +619,27 @@ abstract class Order_Document {
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
-		if ( !empty( $this->settings[$settings_key]['default'] ) ) {
-			$text = wptexturize( trim( $this->settings[$settings_key]['default'] ) );
-			if ($autop === true) {
-				$text = wpautop( $text );
-			}
-		} else {
+		// check for 'default' key existence
+		if ( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) && array_key_exists( 'default', $this->settings[$settings_key] ) ) {
+			$text = $this->settings[$settings_key]['default'];
+		// fallback to first array element if default is not present
+		} elseif( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
+			$text = reset( $this->settings[$settings_key] );
+		}
+
+		// fallback to default
+		if ( empty( $text ) ) {
 			$text = $default;
 		}
+
+		// clean up
+		$text = wptexturize( trim( $text ) );
+
+		// replacements
+		if ( $autop === true ) {
+			$text = wpautop( $text );
+		}
+
 		// legacy filters
 		if ( in_array( $settings_key, array( 'shop_name', 'shop_address', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
 			$text = apply_filters( "wpo_wcpdf_{$settings_key}", $text, $this );
@@ -648,7 +673,11 @@ abstract class Order_Document {
 	 * Return/Show shop/company footer imprint, copyright etc.
 	 */
 	public function get_footer() {
-		return $this->get_settings_text( 'footer' );
+		ob_start();
+		do_action( 'wpo_wcpdf_before_footer', $this->get_type(), $this->order );
+		echo $this->get_settings_text( 'footer' );
+		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
+		return ob_get_clean();
 	}
 	public function footer() {
 		echo $this->get_footer();
@@ -761,7 +790,7 @@ abstract class Order_Document {
 		}
 
 		$html = $this->render_template( $this->locate_template_file( "html-document-wrapper.php" ), array(
-				'content' => $content,
+				'content' => apply_filters( 'wpo_wcpdf_html_content', $content ),
 			)
 		);
 		return $html;
@@ -801,7 +830,7 @@ abstract class Order_Document {
 		if (empty($file)) {
 			$file = $this->type.'.php';
 		}
-		$path = WPO_WCPDF()->settings->get_template_path( $file );
+		$path = $this->get_template_path();
 		$file_path = "{$path}/{$file}";
 
 		$fallback_file_path = WPO_WCPDF()->plugin_path() . '/templates/Simple/' . $file;

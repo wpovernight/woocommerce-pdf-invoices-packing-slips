@@ -56,13 +56,13 @@
 				<?php do_action( 'wpo_wcpdf_before_order_data', $this->type, $this->order ); ?>
 				<?php if ( isset($this->settings['display_number']) ) { ?>
 				<tr class="invoice-number">
-					<th><?php _e( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php echo $this->get_number_title(); ?></th>
 					<td><?php $this->invoice_number(); ?></td>
 				</tr>
 				<?php } ?>
 				<?php if ( isset($this->settings['display_date']) ) { ?>
 				<tr class="invoice-date">
-					<th><?php _e( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php echo $this->get_date_title(); ?></th>
 					<td><?php $this->invoice_date(); ?></td>
 				</tr>
 				<?php } ?>
@@ -96,7 +96,7 @@
 	</thead>
 	<tbody>
 		<?php $items = $this->get_order_items(); if( sizeof( $items ) > 0 ) : foreach( $items as $item_id => $item ) : ?>
-		<tr class="<?php echo apply_filters( 'wpo_wcpdf_item_row_class', $item_id, $this->type, $this->order, $item_id ); ?>">
+		<tr class="<?php echo apply_filters( 'wpo_wcpdf_item_row_class', 'item-'.$item_id, $this->type, $this->order, $item_id ); ?>">
 			<td class="product">
 				<?php $description_label = __( 'Description', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
 				<span class="item-name"><?php echo $item['name']; ?></span>
@@ -156,7 +156,9 @@
 
 <?php if ( $this->get_footer() ): ?>
 <div id="footer">
+	<!-- hook available: wpo_wcpdf_before_footer -->
 	<?php $this->footer(); ?>
+	<!-- hook available: wpo_wcpdf_after_footer -->
 </div><!-- #letter-footer -->
 <?php endif; ?>
 <?php do_action( 'wpo_wcpdf_after_document', $this->type, $this->order ); ?>

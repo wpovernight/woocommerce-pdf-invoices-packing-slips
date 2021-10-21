@@ -34,6 +34,8 @@ class Setup_Wizard {
 	 * Show the setup wizard.
 	 */
 	public function setup_wizard() {
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] ) {
 			return;
 		}
@@ -76,19 +78,19 @@ class Setup_Wizard {
 
 		wp_enqueue_style(
 			'wpo-wcpdf-setup',
-			WPO_WCPDF()->plugin_url() . '/assets/css/setup-wizard.css',
+			WPO_WCPDF()->plugin_url() . '/assets/css/setup-wizard'.$suffix.'.css',
 			array( 'dashicons', 'install' ), 
 			WPO_WCPDF_VERSION
 		);
 		wp_register_script(
 			'wpo-wcpdf-media-upload',
-			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload.js',
+			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
 			array( 'jquery', 'media-editor', 'mce-view' ),
 			WPO_WCPDF_VERSION
 		);
 		wp_register_script(
 			'wpo-wcpdf-setup',
-			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard.js',
+			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard'.$suffix.'.js',
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
 			WPO_WCPDF_VERSION
 		);
@@ -100,7 +102,7 @@ class Setup_Wizard {
 		if ( end( $step_keys ) === $this->step ) {
 			wp_register_script(
 				'wpo-wcpdf-setup-confetti',
-				WPO_WCPDF()->plugin_url() . '/assets/js/confetti.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/confetti'.$suffix.'.js',
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);

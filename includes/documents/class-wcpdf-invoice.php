@@ -72,6 +72,7 @@ class Invoice extends Order_Document_Methods {
 		}
 
 		$this->init_number();
+
 		do_action( 'wpo_wcpdf_init_document', $this );
 	}
 
@@ -127,6 +128,16 @@ class Invoice extends Order_Document_Methods {
 					$suffix = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
 				}
 			}
+			// ensure unique filename in case suffix was empty
+			if ( empty( $suffix ) ) {
+				if ( ! empty( $this->order_id ) ) {
+					$suffix = $this->order_id;
+				} elseif ( ! empty( $args['order_ids'] ) && is_array( $args['order_ids'] ) ) {
+					$suffix = reset( $args['order_ids'] );
+				} else {
+					$suffix = uniqid();
+				}
+			}
 		} else {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
@@ -177,6 +188,7 @@ class Invoice extends Order_Document_Methods {
 					'option_name'	=> $option_name,
 					'id'			=> 'attach_to_email_ids',
 					'fields' 		=> $this->get_wc_emails(),
+					/* translators: directory path */
 					'description'	=> !is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
 				)
 			),
@@ -383,6 +395,7 @@ class Invoice extends Order_Document_Methods {
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'disable_free',
+					/* translators: zero number */
 					'description'	=> sprintf(__( "Disable document when the order total is %s", 'woocommerce-pdf-invoices-packing-slips' ), function_exists('wc_price') ? wc_price( 0 ) : 0 ),
 				)
 			),
@@ -412,6 +425,7 @@ class Invoice extends Order_Document_Methods {
 					// alternate description for invoice number
 					$invoice_number_desc = __( 'Invoice numbers are created by a third-party extension.', 'woocommerce-pdf-invoices-packing-slips' );
 					if ( $config_link = apply_filters( 'woocommerce_invoice_number_configuration_link', null ) ) {
+						/* translators: link */
 						$invoice_number_desc .= ' '.sprintf(__( 'Configure it <a href="%s">here</a>.', 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $config_link ) );
 					}
 					$settings_fields[$key]['args']['description'] = '<i>'.$invoice_number_desc.'</i>';
@@ -424,6 +438,22 @@ class Invoice extends Order_Document_Methods {
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
 
+	}
+
+	/**
+	 * Document number title
+	 */
+	public function get_number_title() {
+		$number_title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
+	}
+
+	/**
+	 * Document date title
+	 */
+	public function get_date_title() {
+		$date_title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
 }

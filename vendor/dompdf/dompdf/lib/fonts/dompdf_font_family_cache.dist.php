@@ -1,6 +1,7 @@
 <?php
+// $distFontDir = $rootDir . '/lib/fonts'; // should work fine too?
+$distFontDir = trailingslashit( WPO_WCPDF()->plugin_path() ) . 'vendor' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'fonts' . DIRECTORY_SEPARATOR;
 
-$distFontDir = WPO_WCPDF()->plugin_path() . 'vendor' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'fonts' . DIRECTORY_SEPARATOR;
 return array(
     'sans-serif' =>
         array(
@@ -92,6 +93,34 @@ return array(
             'bold_italic' => $distFontDir . 'DejaVuSerif-BoldItalic',
             'italic' => $distFontDir . 'DejaVuSerif-Italic',
             'normal' => $distFontDir . 'DejaVuSerif'
-        )
+        ),
+    'open sans' => 
+        array(
+        'normal' => $distFontDir . 'OpenSans-Normal',
+        'bold' => $distFontDir . 'OpenSans-Bold',
+        'italic' => $distFontDir . 'OpenSans-Italic',
+        'bold_italic' => $distFontDir . 'OpenSans-BoldItalic',
+    ),
+    'segoe' => 
+        array(
+            'normal' => $distFontDir . 'Segoe-Normal',
+            'bold' => $distFontDir . 'Segoe-Bold',
+            'italic' => $distFontDir . 'Segoe-Italic',
+            'bold_italic' => $distFontDir . 'Segoe-BoldItalic',
+        ),
+    'roboto slab' => 
+        array(
+            'normal' => $distFontDir . 'RobotoSlab-Normal',
+            'bold' => $distFontDir . 'RobotoSlab-Bold',
+            'italic' => $distFontDir . 'RobotoSlab-Italic',
+            'bold_italic' => $distFontDir . 'RobotoSlab-BoldItalic',
+        ),
+    'currencies' => 
+        array(
+            'normal' => $distFontDir . 'currencies',
+            'bold' => $distFontDir . 'currencies',
+            'italic' => $distFontDir . 'currencies',
+            'bold_italic' => $distFontDir . 'currencies',
+        ),
 )
 ?>

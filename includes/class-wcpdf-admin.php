@@ -46,12 +46,13 @@ class Admin {
 			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number' ) );
 		}
 
-		// AJAX actions for deleting and regenerating document data
-		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'delete_document' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'regenerate_document' ) );
+		// AJAX actions for deleting, regenerating and saving document data
+		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_crud_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
 
+		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
-		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_document_action_feedback_icons' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -87,6 +88,7 @@ class Admin {
 				$rounded_count = (int) substr( (string) $invoice_count, 0, 1 ) * pow( 10, strlen( (string) $invoice_count ) - 1);
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
+					<?php /* translators: rounded count */ ?>
 					<h3><?php printf( __( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
 					<p><?php _e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
@@ -299,7 +301,7 @@ class Admin {
 		<ul class="wpo_wcpdf_send_emails submitbox">
 			<li class="wide" id="actions">
 				<select name="wpo_wcpdf_send_emails">
-					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce' ); ?></option>
+					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
 					<?php
 					$mailer           = WC()->mailer();
 					$available_emails = apply_filters( 'woocommerce_resend_order_emails_available', array( 'new_order', 'cancelled_order', 'customer_processing_order', 'customer_completed_order', 'customer_invoice' ) );
@@ -433,7 +435,7 @@ class Admin {
 					<?= $document->get_title(); ?>
 					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
-						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
+						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
 					<?php endif; ?>
 				</h4>
@@ -463,6 +465,7 @@ class Admin {
 						<?php endif; ?>
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
+						<?php /* translators: document title */ ?>
 						<span class="wpo-wcpdf-set-date-number button"><?php printf( __( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></span>
 					<?php endif; ?>
 				</div>
@@ -482,37 +485,41 @@ class Admin {
 					</p>
 					<?php endif; ?>
 				</div>
-			</section>
 
-			<!-- Document Notes -->
-			<?php if( array_key_exists( 'notes', $data ) ) : ?>
+				<!-- Document Notes -->
+				<?php if( array_key_exists( 'notes', $data ) ) : ?>
 
 				<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
 
-				<section class="wcpdf-data-fields-section notes">
+				<!-- Read only -->
+				<div class="read-only">
+					<span><strong><?= $data['notes']['label']; ?></strong></span>
+					<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
+					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value']; ?></p>
+				</div>
+				<!-- Editable -->
+				<div class="editable-notes">
 					<p class="form-field form-field-wide">
-						<div>
-							<span><strong><?= $data['notes']['label']; ?></strong></span>
-							<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit"></span>
-						</div>
-						<!-- Read only -->
-						<div class="read-only">
-							<p><?= $data['notes']['value']; ?></p>
-						</div>
-						<!-- Editable -->
-						<div class="editable">
-							<p class="form-field form-field-wide">
-								<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
-							</p>
-						</div>
+						<label for="<?= $data['notes']['name']; ?>"><?= $data['notes']['label']; ?></label>
+						<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
 					</p>
-				</section>
+				</div>
 
 				<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
 
-			<?php endif; ?>
-			<!-- / Document Notes -->
+				<?php endif; ?>
+				<!-- / Document Notes -->
 
+			</section>
+
+			<!-- Save/Cancel buttons -->
+			<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
+				<div>
+					<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>" data-action="save"><?php _e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<a class="button wpo-wcpdf-cancel"><?php _e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				</div>
+			</section>
+			<!-- / Save/Cancel buttons -->
 		</div>
 		<?php
 	}
@@ -520,13 +527,8 @@ class Admin {
 	public function add_regenerate_document_button( $document ) {
 		$document_settings = $document->get_settings( true );
 		if ( $document->use_historical_settings() == true || isset( $document_settings['archive_pdf'] ) ) {
-			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
+			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s" data-action="regenerate"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
 		}
-	}
-
-	public function add_document_action_feedback_icons( $document ) {
-		echo '<span class="dashicons dashicons-yes document-action-success"></span>';
-		echo '<span class="dashicons dashicons-no document-action-failed"></span>';
 	}
 
 	/**
@@ -579,6 +581,8 @@ class Admin {
 
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
+				$is_new = false === $invoice->exists();
+				$_POST = stripslashes_deep( $_POST );
 				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
 				$invoice->set_data( $document_data, $order );
 
@@ -588,6 +592,11 @@ class Admin {
 				}
 
 				$invoice->save();
+
+				if ( $is_new ) {
+					/* translators: name/description of the context for document creation logs */
+					WPO_WCPDF()->main->log_to_order_notes( $invoice, __( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
+				}
 			}
 
 			// allow other documents to hook here and save their form data
@@ -716,77 +725,42 @@ class Admin {
 		return $query_vars;
 	}
 
-	public function delete_document() {
-		if ( check_ajax_referer( "wpo_wcpdf_delete_document", 'security', false ) === false ) {
+	/**
+	 * Save, regenerate or delete a document from AJAX request
+	 */
+	public function ajax_crud_document() {
+		if ( check_ajax_referer( 'wpo_wcpdf_regenerate_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_save_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_delete_document', 'security', false ) === false ) {
 			wp_send_json_error( array(
-				'message' => 'nonce expired',
-			) );
-		}
-		if ( empty($_POST['order_id']) || empty($_POST['document']) ) {
-			wp_send_json_error( array(
-				'message' => 'incomplete request',
-			) );
-		}
-		if ( !current_user_can('manage_woocommerce') ) {
-			wp_send_json_error( array(
-				'message' => 'no permissions',
+				'message' => __( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		$order_id = absint($_POST['order_id']);
-		$document = sanitize_text_field($_POST['document']);
-
-		try {
-			$document = wcpdf_get_document( $document, wc_get_order( $order_id ) );
-			if ( !empty($document) && $document->exists() ) {
-				$document->delete();
-				$response = array(
-					'message' => $document->get_type()." deleted",
-				);
-				wp_send_json_success($response);
-			} else {
-				wp_send_json_error( array(
-					'message' => 'document does not exist',
-				) );
-			}
-		} catch (\Exception $e) {
+		if ( ! isset($_POST['action']) ||  ! in_array( $_POST['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
 			wp_send_json_error( array(
-				'message' => 'error: '.$e->getMessage(),
-			) );			
-		}
-	}
-
-	public function regenerate_document() {
-		if ( check_ajax_referer( "wpo_wcpdf_regenerate_document", 'security', false ) === false ) {
-			wp_send_json_error( array(
-				'message' => 'nonce expired',
+				'message' => __( 'Bad action!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		if ( ! isset($_POST['action']) || $_POST['action'] != 'wpo_wcpdf_regenerate_document' ) {
+		if( empty($_POST['order_id']) || empty($_POST['document_type']) || empty($_POST['action_type']) ) {
 			wp_send_json_error( array(
-				'message' => 'bad action',
-			) );
-		}
-
-		if( empty($_POST['order_id']) || empty($_POST['document_type']) ) {
-			wp_send_json_error( array(
-				'message' => 'incomplete request',
+				'message' => __( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
 		if ( !current_user_can('manage_woocommerce') ) {
 			wp_send_json_error( array(
-				'message' => 'no permissions',
+				'message' => __( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		$order_id = absint( $_POST['order_id'] );
-		$order = WCX::get_order( $order_id );
-		$document_type = sanitize_text_field( $_POST['document_type'] );
+		$order_id        = absint( $_POST['order_id'] );
+		$order           = WCX::get_order( $order_id );
+		$document_type   = sanitize_text_field( $_POST['document_type'] );
+		$action_type     = sanitize_text_field( $_POST['action_type'] );
+		$notice          = sanitize_text_field( $_POST['wpcdf_document_data_notice'] );
 
 		// parse form data
-		parse_str($_POST['form_data'], $form_data);
+		parse_str( $_POST['form_data'], $form_data );
 		if ( is_array( $form_data ) ) {
 			foreach ( $form_data as $key => &$value ) {
 				if ( is_array( $value ) && !empty( $value[$order_id] ) ) {
@@ -794,10 +768,29 @@ class Admin {
 				}
 			}
 		}
+		$form_data       = stripslashes_deep( $form_data );
+
+		// notice messages
+		$notice_messages = array(
+			'saved'       => array(
+				'success' => __( 'Document data saved!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error occurred while saving the document data!', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'regenerated' => array(
+				'success' => __( 'Document regenerated!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error occurred while regenerating the document!', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'deleted' => array(
+				'success' => __( 'Document deleted!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'error'   => __( 'An error occurred while deleting the document!', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+		);
 
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
-			if ( !empty($document) && $document->exists() ) {
+
+			if( ! empty( $document ) ) {
+
 				// perform legacy date fields replacements check
 				if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
 					$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
@@ -805,20 +798,63 @@ class Admin {
 
 				// save document data
 				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
-				$document->regenerate( $order, $document_data );
 
-				$response = array(
-					'message' => $document->get_type()." regenerated",
-				);
-				wp_send_json_success($response);
+				// on regenerate
+				if( $action_type == 'regenerate' && $document->exists() ) {
+					$document->regenerate( $order, $document_data );
+
+					$response      = array(
+						'message' => $notice_messages[$notice]['success'],
+					);
+
+				// on delete
+				} elseif( $action_type == 'delete' && $document->exists() ) {
+					$document->delete();
+
+					$response      = array(
+						'message' => $notice_messages[$notice]['success'],
+					);
+
+				// on save
+				} elseif( $action_type == 'save' ) {
+					$is_new = false === $document->exists();
+					$document->set_data( $document_data, $order );
+
+					// check if we have number, and if not generate one
+					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'init_number' ) ) ) {
+						$document->init_number();
+					}
+
+					$document->save();
+
+					if ( $is_new ) {
+						/* translators: name/description of the context for document creation logs */
+						WPO_WCPDF()->main->log_to_order_notes( $document, __( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
+					}
+
+					$response      = array(
+						'message' => $notice_messages[$notice]['success'],
+					);
+
+				// document not exist
+				} else {
+					$message_complement = __( 'Document does not exist.', 'woocommerce-pdf-invoices-packing-slips' );
+					wp_send_json_error( array(
+						'message' => $notice_messages[$notice]['error'] . ' ' . $message_complement,
+					) );
+				}
+
+				wp_send_json_success( $response );
+
 			} else {
+				$message_complement = __( 'Document is empty.', 'woocommerce-pdf-invoices-packing-slips' );
 				wp_send_json_error( array(
-					'message' => 'document does not exist',
+					'message' => $notice_messages[$notice]['error'] . ' ' . $message_complement,
 				) );
 			}
-		} catch (\Exception $e) {
+		} catch ( \Exception $e ) {
 			wp_send_json_error( array(
-				'message' => 'error: '.$e->getMessage(),
+				'message' => $notice_messages[$notice]['error'] . ' ' . $e->getMessage(),
 			) );			
 		}
 	}
@@ -905,9 +941,8 @@ class Admin {
 				),
 				'b'		=> array(),
 			);
-			// sanitize
-			$notes         = sanitize_textarea_field( wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html ) );
-			$data['notes'] = nl2br( $notes );
+			
+			$data['notes'] = wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html );
 		}
 
 		return $data;

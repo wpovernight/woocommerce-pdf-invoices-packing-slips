@@ -3,14 +3,14 @@
  * Plugin Name: WooCommerce PDF Invoices & Packing Slips
  * Plugin URI: http://www.wpovernight.com
  * Description: Create, print & email PDF invoices & packing slips for WooCommerce orders.
- * Version: 2.8.3
+ * Version: 2.10.1
  * Author: Ewout Fernhout
  * Author URI: http://www.wpovernight.com
  * License: GPLv2 or later
  * License URI: http://www.opensource.org/licenses/gpl-license.php
  * Text Domain: woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 2.2.0
- * WC tested up to: 5.2.0
+ * WC tested up to: 5.7.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,7 +21,7 @@ if ( !class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '2.8.3';
+	public $version = '2.10.1';
 	public $plugin_basename;
 	public $legacy_mode;
 	public $legacy_textdomain;
@@ -267,7 +267,8 @@ class WPO_WCPDF {
 	 * @return string Fallack notice.
 	 */
 	public function need_woocommerce() {
-		$error = sprintf( __( 'WooCommerce PDF Invoices & Packing Slips requires %sWooCommerce%s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
+		/* translators: <a> tags */
+		$error = sprintf( __( 'WooCommerce PDF Invoices & Packing Slips requires %1$sWooCommerce%2$s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
 		
 		$message = '<div class="error"><p>' . $error . '</p></div>';
 	
@@ -279,8 +280,10 @@ class WPO_WCPDF {
 	 */
 	public function required_php_version() {
 		$error_message	= __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 7.1 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
-		$php_message	= __( 'We strongly recommend to %supdate your PHP version%s.', 'woocommerce-pdf-invoices-packing-slips' );
-		$add_on_message	= __( 'If you cannot upgrade your PHP version, you can download %sthis addon%s to enable backwards compatibility with PHP5.6.', 'woocommerce-pdf-invoices-packing-slips' );
+		/* translators: <a> tags */
+		$php_message	= __( 'We strongly recommend to %1$supdate your PHP version%2$s.', 'woocommerce-pdf-invoices-packing-slips' );
+		/* translators: <a> tags */
+		$add_on_message	= __( 'If you cannot upgrade your PHP version, you can download %1$sthis addon%2$s to enable backwards compatibility with PHP5.6.', 'woocommerce-pdf-invoices-packing-slips' );
 
 		$message = '<div class="error">';
 		$message .= sprintf( '<p>%s</p>', $error_message );
@@ -367,6 +370,7 @@ class WPO_WCPDF {
 			?>
 			<div class="error">
 				<img src="<?php echo $this->plugin_url() . "/assets/images/nginx.svg"; ?>" style="margin-top:10px;">
+				<?php /* translators: directory path */ ?>
 				<p><?php printf( __( 'The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>' . $tmp_path . '</strong>' ); ?></p>
 				<p><?php _e( 'To protect them, you must click the button below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<p><a class="button" href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_protect_pdf_directory', 'true' ) ); ?>"><?php _e( 'Generate random temporary folder name', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
@@ -411,8 +415,10 @@ class WPO_WCPDF {
 				?>
 				<div class="error">
 					<img src="<?php echo $this->plugin_url() . "/assets/images/mailpoet.svg"; ?>" style="margin-top:10px;">
+					<?php /* translators: plugin name */ ?>
 					<p><?php printf( __( 'When sending emails with MailPoet 3 and the active sending method is MailPoet Sending Service, MailPoet does not include the %s attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ); ?></p>
-					<p><?php printf( __( 'To fix this you should select other method like %s or %s.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>'.__('Your web host / web server', 'woocommerce-pdf-invoices-packing-slips').'</strong>', '<strong>SMTP</strong>' ); ?></p>
+					<?php /* translators: "Your web host / web server" */ ?>
+					<p><?php printf( __( 'To fix this you should select other method like %1$s or %2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>'.__('Your web host / web server', 'woocommerce-pdf-invoices-packing-slips').'</strong>', '<strong>SMTP</strong>' ); ?></p>
 					<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=mailpoet-settings#/mta' ) ); ?>"><?php _e( 'Change MailPoet sending method', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>

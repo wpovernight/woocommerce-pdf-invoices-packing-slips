@@ -3,9 +3,9 @@ Contributors: pomegranate
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 5.7
+Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.8.3
+Stable tag: 2.10.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,7 +66,7 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 = Where can I find the documentation? =
 
-[WooCommerce PDF Invoices & Packing Slips documentation](https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/)
+[WooCommerce PDF Invoices & Packing Slips documentation](https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/)
 
 = It's not working! =
 
@@ -102,8 +102,47 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= DEV =
-* Added translation to Arabian (thanks to [Nabil Moqbel](https://profiles.wordpress.org/nabilmoqbel/))
+= 2.10.1 =
+* Fix: prevent fatal errors if template functions cannot be loaded
+
+= 2.10.0 =
+* New: Use minified JS & CSS files to reduce load time on live sites (enabling `SCRIPT_DEBUG` will load full versions)
+* New: Selected template setting is now stored as a reference ID rather than a fixed path ([#209](https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/209))
+* Fix: Fallback to first available translation for settings when migrating from multilingual to single language setup
+* Fix: Undefined variable notice when using [wcpdf_download_invoice] on non-order pages
+* Fix: Updated documentation links
+* Marked tested up to WooCommerce 5.7
+
+= 2.9.3 =
+* Fix: JavaScript errors on My Account page with empty link tags
+* Fix: Long URLs in notes area breaking layout
+
+= 2.9.2 =
+* Tweak: Added new 'item-' prefix to item row class ID
+* New: filter to set sort order for bulk documents (`wpo_wcpdf_bulk_document_sort_order`)
+* Marked tested up to WooCommerce 5.6
+
+= 2.9.1 =
+* New: Log manual invoice creation (with logging enabled)
+* New: Filters to override body class and content (`wpo_wcpdf_body_class` & `wpo_wcpdf_html_content`)
+* New: Document methods to get (and override) the number and date titles
+* Fix: Open PDF on My Account page in a new browser tab/window (following settings)
+* Translations: Update template (POT) and current translation projects
+* Marked tested up to WooCommerce 5.5 and WordPress 5.8
+
+= 2.9.0 =
+* New: Setting to log document generation time & context to order notes
+* New: template hooks 'wpo_wcpdf_before_footer' and 'wpo_wcpdf_after_footer'
+* New: Save and Cancel buttons for the Document Data metabox
+* Fix: Fallback to bundled fonts when temporary folder is not writable
+* Fix: empty first page under specific conditions
+* Fix: HTML line breaks and special characters in invoice notes
+* Fix: Allow setting document date prior to generating it
+* Fix: variable not set for filename
+* Fix: ensure unique filename in case order number or document number not accessible
+* Fix: Fallback if no template is selected
+* Translations: Added hints for translators, use numbered placeholders
+* Translations: Added Arabic (thanks to [Nabil Moqbel](https://profiles.wordpress.org/nabilmoqbel/))
 
 = 2.8.3 =
 * New: Allow filtering action button classes

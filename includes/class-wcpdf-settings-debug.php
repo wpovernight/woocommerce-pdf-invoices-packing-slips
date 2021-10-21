@@ -54,6 +54,7 @@ class Settings_Debug {
 						$old_path = WPO_WCPDF()->main->get_tmp_base( false );
 						$new_path = WPO_WCPDF()->main->get_tmp_base();
 						WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
+						/* translators: directory path */
 						printf('<div class="notice notice-success"><p>%s</p></div>', sprintf( __( 'Temporary folder moved to %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$new_path.'</code>' ) ); 
 					}
 					?>
@@ -122,9 +123,11 @@ class Settings_Debug {
 								}
 
 								if ($error > 0) {
-									$message =  sprintf( __( 'Unable to delete %d files! (deleted %d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success);
+									/* translators: 1,2. file count  */
+									$message =  sprintf( __( 'Unable to delete %1$d files! (deleted %2$d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success);
 									printf('<div class="notice notice-error"><p>%s</p></div>', $message);
 								} else {
+									/* translators: file count */
 									$message =  sprintf( __( 'Successfully deleted %d files!', 'woocommerce-pdf-invoices-packing-slips' ), $success );
 									printf('<div class="notice notice-success"><p>%s</p></div>', $message);
 								}
@@ -261,6 +264,7 @@ class Settings_Debug {
 					'option_name'		=> $option_name,
 					'id'				=> 'enable_cleanup',
 					'disabled'			=> ( !function_exists("glob") || !function_exists('filemtime') ) ? 1 : NULL,
+					/* translators: number of days */
 					'text_input_wrap'	=> __( "every %s days", 'woocommerce-pdf-invoices-packing-slips' ),
 					'text_input_size'	=> 4,
 					'text_input_id'		=> 'cleanup_days',
@@ -292,6 +296,18 @@ class Settings_Debug {
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'use_html5_parser',
+				)
+			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'log_to_order_notes',
+				'title'			=> __( 'Log to order notes', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'log_to_order_notes',
+					'description'	=> __( 'Log PDF document creation to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);
