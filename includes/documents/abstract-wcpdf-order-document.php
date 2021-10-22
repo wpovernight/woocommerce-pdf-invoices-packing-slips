@@ -1030,7 +1030,7 @@ abstract class Order_Document {
 		
 		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
-		$current_year       = $now->date_i18n( 'Y' );
+		$current_year       = intval( $now->date_i18n( 'Y' ) );
 		$current_store_year = $this->get_number_store_year( $default_table_name );
 		// $current_store_year = $this->get_current_number_store_year( $store_base_name );
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
