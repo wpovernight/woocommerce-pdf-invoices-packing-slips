@@ -403,7 +403,7 @@ class Settings_Callbacks {
 	 * @param  array $args Field arguments.
 	 */
 	public function next_number_edit( $args ) {
-		extract( $args );
+		extract( $args ); // $store, $size, $description
 		// Sequential_Number_Store object
 		if( is_object( $store ) ) {
 			$next_number         = $store->get_next();
