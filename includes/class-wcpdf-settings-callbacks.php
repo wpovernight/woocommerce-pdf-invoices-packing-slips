@@ -17,6 +17,18 @@ class Settings_Callbacks {
 	 */
 	public function section() {
 	}
+	
+	/**
+	 * Throw notice if image resolution is too high
+	 */
+	function check_image_resolution($resolution) {
+		if ($resolution > 600) {
+			echo 
+			'<div class="notice notice-info is-dismissible">
+				<p>The resolution of the image you uploaded for the Shop logo is above the recommended 600dpi!</p>
+			</div>';
+		}
+	}
 
 	/**
 	 * Debug section callback.
@@ -380,7 +392,8 @@ class Settings_Callbacks {
 
 			printf('<img src="%1$s" style="display:block" id="img-%4$s"/>', $attachment_src, $attachment_width, $attachment_height, $id );
 			if ( !empty($attachment_height) && !empty($in_height) ) {
-				$attachment_resolution = round(absint($attachment_height)/$in_height);
+				$attachment_resolution = round(absint($attachment_height)/$in_height);	
+				$this->check_image_resolution($attachment_resolution);
 				printf('<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
 			}
 
