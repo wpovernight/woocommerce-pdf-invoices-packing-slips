@@ -36,4 +36,51 @@ jQuery( function( $ ) {
 			$(this).closest('td').find('.description').hide();
 		}
 	}).trigger('change');
+
+	//Match wrapper to settings height
+	settingsHeight = $('#wpo-wcpdf-preview-wrapper .sidebar').height();
+    $('#wpo-wcpdf-preview-wrapper').height(settingsHeight);
+
+    //Preview
+    let previewStates = $('#wpo-wcpdf-preview-wrapper').attr('data-preview-states');
+    
+    $('.gutter .slide-left').on( 'click', function() {
+		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
+		let previewState = $wrapper.attr('data-preview-state');
+		if ( previewStates == 3 ) {
+			previewState == 'closed' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'full');
+		} else {
+			$wrapper.attr('data-preview-state', 'full');
+		}
+	});
+
+	$('.gutter .slide-right').on( 'click', function() {
+		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
+		let previewState = $wrapper.attr('data-preview-state');
+		if ( previewStates == 3 ) {
+			previewState == 'full' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'closed');
+		} else {
+			$wrapper.attr('data-preview-state', 'closed');
+		}	
+	});
+
+	$('.preview-document .preview-data p').on( 'click', function() {
+		let $previewData = $(this).closest('.preview-data');
+		$previewData.find('ul').toggleClass('active');
+	});
+
+	$('.preview-document .preview-data li').on( 'click', function() {
+		let $previewData = $(this).closest('.preview-data');
+		$previewData.find('ul').toggleClass('active');
+		if ( $(this).hasClass('order-number') ) {
+			$previewData.find('p.last-order').hide();
+			$previewData.find('p.order-number').show();
+			$previewData.find('input').addClass('active');
+		} else {
+			$previewData.find('p.last-order').show();
+			$previewData.find('p.order-number').hide();
+			$previewData.find('input').removeClass('active');
+		}
+	});
+
 });

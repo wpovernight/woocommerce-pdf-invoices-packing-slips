@@ -99,14 +99,22 @@ class Settings {
 
 
 	public function settings_page() {
-		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array (
-				'general'	=> __('General', 'woocommerce-pdf-invoices-packing-slips' ),
-				'documents'	=> __('Documents', 'woocommerce-pdf-invoices-packing-slips' ),
-			)
-		);
+		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
+			'general' => array(
+				'tab_title' => __('General', 'woocommerce-pdf-invoices-packing-slips' ),
+				'preview_states' => 3,
+			),
+			'documents'	=> array(
+				'tab_title' => __('Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'preview_states' => 3,
+			),
+		) );
 
 		// add status tab last in row
-		$settings_tabs['debug'] = __('Status', 'woocommerce-pdf-invoices-packing-slips' );
+		$settings_tabs['debug'] = array(
+			'tab_title' => __('Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'preview_states' => 1,
+		);
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : 'general';
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';

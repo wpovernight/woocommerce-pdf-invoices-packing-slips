@@ -9,7 +9,8 @@
 	<h2><?php _e( 'WooCommerce PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<h2 class="nav-tab-wrapper">
 	<?php
-	foreach ($settings_tabs as $tab_slug => $tab_title ) {
+	foreach ( $settings_tabs as $tab_slug => $tab_data ) {
+		$tab_title = is_array( $tab_data ) ? $tab_data['tab_title'] : $tab_data;
 		$tab_link = esc_url("?page=wpo_wcpdf_options_page&tab={$tab_slug}");
 		printf('<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', $tab_link, $tab_slug, (($active_tab == $tab_slug) ? 'nav-tab-active' : ''), $tab_title);
 	}
@@ -31,22 +32,51 @@
 		include('wcpdf-extensions.php');
 	}
 
+	$preview_states = isset( $settings_tabs[$active_tab]['preview_states'] ) ? $settings_tabs[$active_tab]['preview_states'] : 1;
+	$preview_state = $preview_states == 3 ? 'sidebar' : 'closed';
 	?>
-	<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
-		<?php
-			do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
-			if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
-				do_action( 'wpo_wcpdf_settings_output_'.$active_tab, $active_section );
-			} else {
-				// legacy settings
-				settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
-				do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
+	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo $preview_states; ?>" data-preview-state="<?php echo $preview_state; ?>">
 
-				submit_button();
-			}
-			do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
-		?>
+		<div class="sidebar">
+			<div class="panel-wrapper">
+				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
+					<?php
+						do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
+						if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
+							do_action( 'wpo_wcpdf_settings_output_'.$active_tab, $active_section );
+						} else {
+							// legacy settings
+							settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
+							do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
 
-	</form>
-	<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
+							submit_button();
+						}
+						do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
+					?>
+
+				</form>
+				<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
+			</div>
+		</div>
+
+		<div class="gutter">
+			<div class="slider slide-left">&#9664;</div>
+			<div class="slider slide-right">&#9654;</div>
+		</div>
+
+		<div class="preview-document">
+			<div class="preview-data">
+				<input type="text">
+				<p class="last-order">Currently showing last order <span class="arrow-down">&#9660;</span></p>
+				<p class="order-number">Currently showing order number <span class="arrow-down">&#9660;</span></p>
+				<ul>
+					<li class="last-order">Show last order</li>
+					<li class="order-number">Show specific order number</li>
+				</ul>
+			</div>
+			<div class="preview"></div>
+		</div>
+
+	</div>
+
 </div>
