@@ -415,10 +415,8 @@ class WPO_WCPDF {
 				?>
 				<div class="error">
 					<img src="<?php echo $this->plugin_url() . "/assets/images/mailpoet.svg"; ?>" style="margin-top:10px;">
-					<?php /* translators: plugin name */ ?>
-					<p><?php printf( __( 'When sending emails with MailPoet 3 and the active sending method is MailPoet Sending Service or Your web host / web server, MailPoet does not include the %s attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ); ?></p>
-					<?php /* translators: "Your web host / web server" */ ?>
-					<p><?php printf( __( 'To fix this you should select the method %1$s under the %2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>'.__( 'The default WordPress sending method (default)', 'woocommerce-pdf-invoices-packing-slips' ).'</strong>', '<strong>Advanced tab</strong>' ); ?></p>
+					<p><?php _e( 'When sending emails with MailPoet 3 and the active sending method is <strong>MailPoet Sending Service</strong> or <strong>Your web host / web server</strong>, MailPoet does not include the <strong>WooCommerce PDF Invoices & Packing Slips</strong> attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'To fix this you should select <strong>The default WordPress sending method (default)</strong> on the <strong>Advanced tab</strong>.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=mailpoet-settings#/advanced' ) ); ?>"><?php _e( 'Change MailPoet sending method to WordPress (default)', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
