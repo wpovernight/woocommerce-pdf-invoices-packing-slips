@@ -36,39 +36,39 @@
 			<?php do_action( 'wpo_wcpdf_before_billing_address', $this->type, $this->order ); ?>
 			<?php $this->billing_address(); ?>
 			<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
-			<?php if ( isset($this->settings['display_email']) ) { ?>
+			<?php if ( isset($this->settings['display_email']) ) : ?>
 				<div class="billing-email"><?php $this->billing_email(); ?></div>
-			<?php } ?>
-			<?php if ( isset($this->settings['display_phone']) ) { ?>
+			<?php endif; ?>
+			<?php if ( isset($this->settings['display_phone']) ) : ?>
 				<div class="billing-phone"><?php $this->billing_phone(); ?></div>
-			<?php } ?>
+			<?php endif; ?>
 		</td>
 		<td class="address shipping-address">
-			<?php if ( $this->show_billing_address() ) { ?>
+			<?php if ( $this->show_billing_address() ) : ?>
 				<h3><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 				<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
 				<?php $this->shipping_address(); ?>
 				<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
-				<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+				<?php if ( isset( $this->settings['display_phone'] ) ) : ?>
 					<div class="shipping-phone"><?php $this->shipping_phone(); ?></div>
-				<?php } ?>
-			<?php } ?>
+				<?php endif; ?>
+			<?php endif; ?>
 		</td>
 		<td class="order-data">
 			<table>
 				<?php do_action( 'wpo_wcpdf_before_order_data', $this->type, $this->order ); ?>
-				<?php if ( isset($this->settings['display_number']) ) { ?>
+				<?php if ( isset($this->settings['display_number']) ) : ?>
 					<tr class="invoice-number">
 						<th><?php echo $this->get_number_title(); ?></th>
 						<td><?php $this->invoice_number(); ?></td>
 					</tr>
-				<?php } ?>
-				<?php if ( isset($this->settings['display_date']) ) { ?>
-				<tr class="invoice-date">
-					<th><?php echo $this->get_date_title(); ?></th>
-					<td><?php $this->invoice_date(); ?></td>
-				</tr>
-				<?php } ?>
+				<?php endif; ?>
+				<?php if ( isset($this->settings['display_date']) ) : ?>
+					<tr class="invoice-date">
+						<th><?php echo $this->get_date_title(); ?></th>
+						<td><?php $this->invoice_date(); ?></td>
+					</tr>
+				<?php endif; ?>
 				<tr class="order-number">
 					<th><?php _e( 'Order Number:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<td><?php $this->order_number(); ?></td>
@@ -141,10 +141,10 @@
 				<table class="totals">
 					<tfoot>
 						<?php foreach( $this->get_woocommerce_totals() as $key => $total ) : ?>
-						<tr class="<?php echo $key; ?>">
-							<th class="description"><?php echo $total['label']; ?></th>
-							<td class="price"><span class="totals-price"><?php echo $total['value']; ?></span></td>
-						</tr>
+							<tr class="<?php echo $key; ?>">
+								<th class="description"><?php echo $total['label']; ?></th>
+								<td class="price"><span class="totals-price"><?php echo $total['value']; ?></span></td>
+							</tr>
 						<?php endforeach; ?>
 					</tfoot>
 				</table>
@@ -158,10 +158,10 @@
 <?php do_action( 'wpo_wcpdf_after_order_details', $this->type, $this->order ); ?>
 
 <?php if ( $this->get_footer() ): ?>
-<div id="footer">
-	<!-- hook available: wpo_wcpdf_before_footer -->
-	<?php $this->footer(); ?>
-	<!-- hook available: wpo_wcpdf_after_footer -->
-</div><!-- #letter-footer -->
+	<div id="footer">
+		<!-- hook available: wpo_wcpdf_before_footer -->
+		<?php $this->footer(); ?>
+		<!-- hook available: wpo_wcpdf_after_footer -->
+	</div><!-- #letter-footer -->
 <?php endif; ?>
 <?php do_action( 'wpo_wcpdf_after_document', $this->type, $this->order ); ?>

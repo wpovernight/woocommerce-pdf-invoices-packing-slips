@@ -36,23 +36,23 @@
 			<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
 			<?php $this->shipping_address(); ?>
 			<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
-			<?php if ( isset($this->settings['display_email']) ) { ?>
+			<?php if ( isset($this->settings['display_email']) ) : ?>
 				<div class="billing-email"><?php $this->billing_email(); ?></div>
-			<?php } ?>
-			<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+			<?php endif; ?>
+			<?php if ( isset( $this->settings['display_phone'] ) ) : ?>
 				<div class="shipping-phone"><?php $this->shipping_phone( ! $this->show_billing_address() ); ?></div>
-			<?php } ?>
+			<?php endif; ?>
 		</td>
 		<td class="address billing-address">
-			<?php if ( $this->show_billing_address() ) { ?>
+			<?php if ( $this->show_billing_address() ) : ?>
 				<h3><?php _e( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 				<?php do_action( 'wpo_wcpdf_before_billing_address', $this->type, $this->order ); ?>
 				<?php $this->billing_address(); ?>
 				<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
-				<?php if ( isset( $this->settings['display_phone'] ) && ! empty( $this->get_shipping_phone() ) ) { ?>
+				<?php if ( isset( $this->settings['display_phone'] ) && ! empty( $this->get_shipping_phone() ) ) : ?>
 					<div class="billing-phone"><?php $this->billing_phone(); ?></div>
-				<?php } ?>
-			<?php } ?>
+				<?php endif; ?>
+			<?php endif; ?>
 		</td>
 		<td class="order-data">
 			<table>
@@ -119,11 +119,11 @@
 <?php do_action( 'wpo_wcpdf_after_customer_notes', $this->type, $this->order ); ?>
 
 <?php if ( $this->get_footer() ): ?>
-<div id="footer">
-	<!-- hook available: wpo_wcpdf_before_footer -->
-	<?php $this->footer(); ?>
-	<!-- hook available: wpo_wcpdf_after_footer -->
-</div><!-- #letter-footer -->
+	<div id="footer">
+		<!-- hook available: wpo_wcpdf_before_footer -->
+		<?php $this->footer(); ?>
+		<!-- hook available: wpo_wcpdf_after_footer -->
+	</div><!-- #letter-footer -->
 <?php endif; ?>
 
 <?php do_action( 'wpo_wcpdf_after_document', $this->type, $this->order ); ?>
