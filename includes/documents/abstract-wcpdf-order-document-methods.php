@@ -122,8 +122,15 @@ abstract class Order_Document_Methods extends Order_Document {
 		echo $this->get_billing_address();
 	}
 
+	/**
+	 * Show billing address conditionally
+	 */
 	public function show_billing_address() {
-		return ! empty( $this->settings['display_billing_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_billing_address'] == 'always' );
+		if( $this->get_type() != 'packing_slip' ) {
+			return true;
+		} else {
+			return ! empty( $this->settings['display_billing_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_billing_address'] == 'always' );
+		}
 	}
 
 	/**
