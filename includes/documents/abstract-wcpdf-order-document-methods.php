@@ -122,6 +122,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		echo $this->get_billing_address();
 	}
 
+	public function show_billing_address() {
+		return ! empty( $this->settings['display_billing_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_billing_address'] == 'always' );
+	}
+
 	/**
 	 * Return/Show billing email
 	 */
@@ -159,7 +163,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	public function get_billing_phone() {
 		$phone = $this->get_phone( 'billing' );
-		
+
 		return apply_filters( "wpo_wcpdf_billing_phone", $phone, $this );
 	}
 

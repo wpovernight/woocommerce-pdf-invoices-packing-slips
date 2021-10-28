@@ -37,31 +37,31 @@
 			<?php $this->billing_address(); ?>
 			<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
 			<?php if ( isset($this->settings['display_email']) ) { ?>
-			<div class="billing-email"><?php $this->billing_email(); ?></div>
+				<div class="billing-email"><?php $this->billing_email(); ?></div>
 			<?php } ?>
 			<?php if ( isset($this->settings['display_phone']) ) { ?>
-			<div class="billing-phone"><?php $this->billing_phone(); ?></div>
+				<div class="billing-phone"><?php $this->billing_phone(); ?></div>
 			<?php } ?>
 		</td>
 		<td class="address shipping-address">
-			<?php if ( !empty($this->settings['display_shipping_address']) && ( $this->ships_to_different_address() || $this->settings['display_shipping_address'] == 'always' ) ) { ?>
-			<h3><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-			<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
-			<?php $this->shipping_address(); ?>
-			<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
-			<?php } ?>
-			<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
-			<div class="shipping-phone"><?php $this->shipping_phone(); ?></div>
+			<?php if ( $this->show_billing_address() ) { ?>
+				<h3><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+				<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
+				<?php $this->shipping_address(); ?>
+				<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
+				<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+					<div class="shipping-phone"><?php $this->shipping_phone(); ?></div>
+				<?php } ?>
 			<?php } ?>
 		</td>
 		<td class="order-data">
 			<table>
 				<?php do_action( 'wpo_wcpdf_before_order_data', $this->type, $this->order ); ?>
 				<?php if ( isset($this->settings['display_number']) ) { ?>
-				<tr class="invoice-number">
-					<th><?php echo $this->get_number_title(); ?></th>
-					<td><?php $this->invoice_number(); ?></td>
-				</tr>
+					<tr class="invoice-number">
+						<th><?php echo $this->get_number_title(); ?></th>
+						<td><?php $this->invoice_number(); ?></td>
+					</tr>
 				<?php } ?>
 				<?php if ( isset($this->settings['display_date']) ) { ?>
 				<tr class="invoice-date">
