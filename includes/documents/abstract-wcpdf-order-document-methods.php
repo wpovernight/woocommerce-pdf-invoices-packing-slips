@@ -167,6 +167,13 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function shipping_phone( $fallback_to_billing = false ) {
 		echo $this->get_phone( 'shipping', $fallback_to_billing );
 	}
+
+	/**
+	 * legacy function for backwards compatibility (<= v2.10.1)
+	 */
+	public function get_billing_phone() {
+		$this->get_phone( 'billing' );
+	}
 	
 	/**
 	 * Return/Show shipping address
