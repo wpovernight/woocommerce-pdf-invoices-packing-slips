@@ -50,6 +50,9 @@
 			<?php $this->shipping_address(); ?>
 			<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
 			<?php } ?>
+			<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+			<div class="shipping-phone"><?php $this->shipping_phone(); ?></div>
+			<?php } ?>
 		</td>
 		<td class="order-data">
 			<table>

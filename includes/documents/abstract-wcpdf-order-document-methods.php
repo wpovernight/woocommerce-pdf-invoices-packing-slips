@@ -141,21 +141,31 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	
 	/**
-	 * Return/Show billing phone
+	 * Return/Show billing or shipping phone
 	 */
-	public function get_billing_phone() {
-		$billing_phone = WCX_Order::get_prop( $this->order, 'billing_phone', 'view' );
+	public function get_phone( $phone_type = 'billing', $fallback_to_billing = false ) {
+		$phone_type = "{$phone_type}_phone";
+		$phone      = WCX_Order::get_prop( $this->order, $phone_type, 'view' );
 
-		if ( !$billing_phone && $this->is_refund( $this->order ) ) {
+		// on refund orders
+		if ( ! $phone && $this->is_refund( $this->order ) ) {
 			// try parent
 			$parent_order = $this->get_refund_parent( $this->order );
-			$billing_phone = WCX_Order::get_prop( $parent_order, 'billing_phone', 'view' );
+			$phone        = WCX_Order::get_prop( $parent_order, 'billing_phone', 'view' );
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_phone', $billing_phone, $this );
+		// fallback to billing
+		if( $fallback_to_billing ) {
+			$phone = WCX_Order::get_prop( $this->order, 'billing_phone', 'view' );
+		}
+
+		return apply_filters( "wpo_wcpdf_{$phone_type}", $phone, $this );
 	}
 	public function billing_phone() {
-		echo $this->get_billing_phone();
+		echo $this->get_phone( 'billing' );
+	}
+	public function shipping_phone( $fallback_to_billing = false ) {
+		echo $this->get_phone( 'shipping', $fallback_to_billing );
 	}
 	
 	/**

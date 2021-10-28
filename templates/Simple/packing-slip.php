@@ -39,8 +39,8 @@
 			<?php if ( isset($this->settings['display_email']) ) { ?>
 			<div class="billing-email"><?php $this->billing_email(); ?></div>
 			<?php } ?>
-			<?php if ( isset($this->settings['display_phone']) ) { ?>
-			<div class="billing-phone"><?php $this->billing_phone(); ?></div>
+			<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+			<div class="shipping-phone"><?php $this->shipping_phone( true ); ?></div>
 			<?php } ?>
 		</td>
 		<td class="address billing-address">
