@@ -172,7 +172,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * legacy function for backwards compatibility (<= v2.10.1)
 	 */
 	public function get_billing_phone() {
-		$this->get_phone( 'billing' );
+		$this->get_phone();
 	}
 	
 	/**
