@@ -50,6 +50,9 @@
 			<?php $this->billing_address(); ?>
 			<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
 			<?php } ?>
+			<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+			<div class="billing-phone"><?php $this->billing_phone(); ?></div>
+			<?php } ?>
 		</td>
 		<td class="order-data">
 			<table>

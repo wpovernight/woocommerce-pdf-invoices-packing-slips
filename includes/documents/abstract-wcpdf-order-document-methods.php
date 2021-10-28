@@ -141,9 +141,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	
 	/**
-	 * Return/Show billing or shipping phone
+	 * Return/Show phone by type
 	 */
-	public function get_phone( $phone_type = 'billing', $fallback_to_billing = false ) {
+	public function get_phone( $phone_type = 'billing' ) {
 		$phone_type = "{$phone_type}_phone";
 		$phone      = WCX_Order::get_prop( $this->order, $phone_type, 'view' );
 
@@ -151,28 +151,42 @@ abstract class Order_Document_Methods extends Order_Document {
 		if ( ! $phone && $this->is_refund( $this->order ) ) {
 			// try parent
 			$parent_order = $this->get_refund_parent( $this->order );
-			$phone        = WCX_Order::get_prop( $parent_order, 'billing_phone', 'view' );
+			$phone        = WCX_Order::get_prop( $parent_order, $phone_type, 'view' );
 		}
 
-		// fallback to billing
-		if( $fallback_to_billing ) {
-			$phone = WCX_Order::get_prop( $this->order, 'billing_phone', 'view' );
-		}
-
-		return apply_filters( "wpo_wcpdf_{$phone_type}", $phone, $this );
-	}
-	public function billing_phone() {
-		echo $this->get_phone( 'billing' );
-	}
-	public function shipping_phone( $fallback_to_billing = false ) {
-		echo $this->get_phone( 'shipping', $fallback_to_billing );
+		return $phone;
 	}
 
-	/**
-	 * legacy function for backwards compatibility (<= v2.10.1)
-	 */
 	public function get_billing_phone() {
-		$this->get_phone();
+		$phone = $this->get_phone();
+
+		if( $this->type == 'packing-slip' && ( empty( $this->get_phone( 'shipping' ) ) || empty( $this->settings['display_billing_address'] ) ) ) {
+			$phone = '';
+		}
+
+		return apply_filters( "wpo_wcpdf_billing_phone", $phone, $this );
+	}
+
+	public function get_shipping_phone( $fallback_to_billing ) {
+		if( ! is_bool( $fallback_to_billing ) ) {
+			$fallback_to_billing = false;
+		}
+
+		$phone = $this->get_phone( 'shipping' );
+
+		if( $fallback_to_billing && empty( $phone ) ) {
+			$phone = $this->get_phone();
+		}
+
+		return apply_filters( "wpo_wcpdf_shipping_phone", $phone, $this );
+	}
+
+	public function billing_phone() {
+		echo $this->get_billing_phone();
+	}
+
+	public function shipping_phone( $fallback_to_billing = false ) {
+		echo $this->get_shipping_phone( $fallback_to_billing );
 	}
 	
 	/**
