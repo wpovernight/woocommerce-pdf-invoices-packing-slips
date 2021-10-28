@@ -39,7 +39,7 @@
 			<?php if ( isset($this->settings['display_email']) ) { ?>
 			<div class="billing-email"><?php $this->billing_email(); ?></div>
 			<?php } ?>
-			<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+			<?php if ( isset( $this->settings['display_phone'] ) && ! empty( $this->get_billing_phone() ) ) { ?>
 			<div class="shipping-phone"><?php $this->shipping_phone( true ); ?></div>
 			<?php } ?>
 		</td>
@@ -49,9 +49,9 @@
 			<?php do_action( 'wpo_wcpdf_before_billing_address', $this->type, $this->order ); ?>
 			<?php $this->billing_address(); ?>
 			<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
-			<?php } ?>
-			<?php if ( isset( $this->settings['display_phone'] ) ) { ?>
+			<?php if ( isset( $this->settings['display_phone'] ) && ! empty( $this->get_shipping_phone() ) ) { ?>
 			<div class="billing-phone"><?php $this->billing_phone(); ?></div>
+			<?php } ?>
 			<?php } ?>
 		</td>
 		<td class="order-data">

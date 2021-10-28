@@ -158,24 +158,16 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	public function get_billing_phone() {
-		$phone = $this->get_phone();
-
-		if( $this->type == 'packing-slip' && ( empty( $this->get_phone( 'shipping' ) ) || empty( $this->settings['display_billing_address'] ) ) ) {
-			$phone = '';
-		}
-
+		$phone = $this->get_phone( 'billing' );
+		
 		return apply_filters( "wpo_wcpdf_billing_phone", $phone, $this );
 	}
 
-	public function get_shipping_phone( $fallback_to_billing ) {
-		if( ! is_bool( $fallback_to_billing ) ) {
-			$fallback_to_billing = false;
-		}
-
+	public function get_shipping_phone( $fallback_to_billing = false ) {
 		$phone = $this->get_phone( 'shipping' );
 
 		if( $fallback_to_billing && empty( $phone ) ) {
-			$phone = $this->get_phone();
+			$phone = $this->get_billing_phone();
 		}
 
 		return apply_filters( "wpo_wcpdf_shipping_phone", $phone, $this );
