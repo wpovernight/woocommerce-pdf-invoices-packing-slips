@@ -123,7 +123,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
-	 * Show billing address conditionally
+	 * Check whether the billing address should be shown
 	 */
 	public function show_billing_address() {
 		if( $this->get_type() != 'packing_slip' ) {
@@ -226,7 +226,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
-	 * Show shipping address conditionally
+	 * Check whether the shipping address should be shown
 	 */
 	public function show_shipping_address() {
 		if( $this->get_type() != 'packing_slip' ) {
