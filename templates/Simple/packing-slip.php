@@ -25,7 +25,7 @@
 </table>
 
 <h1 class="document-type-label">
-	<?php if( $this->has_header_logo() ) echo $this->get_title(); ?>
+	<?php if ( $this->has_header_logo() ) echo $this->get_title(); ?>
 </h1>
 
 <?php do_action( 'wpo_wcpdf_after_document_label', $this->type, $this->order ); ?>
@@ -86,7 +86,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach( $this->get_order_items() as $item_id => $item ) : ?>
+		<?php foreach ( $this->get_order_items() as $item_id => $item ) : ?>
 			<tr class="<?php echo apply_filters( 'wpo_wcpdf_item_row_class', 'item-'.$item_id, $this->type, $this->order, $item_id ); ?>">
 				<td class="product">
 					<?php $description_label = __( 'Description', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
@@ -95,8 +95,8 @@
 					<span class="item-meta"><?php echo $item['meta']; ?></span>
 					<dl class="meta">
 						<?php $description_label = __( 'SKU', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
-						<?php if( !empty( $item['sku'] ) ) : ?><dt class="sku"><?php _e( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="sku"><?php echo $item['sku']; ?></dd><?php endif; ?>
-						<?php if( !empty( $item['weight'] ) ) : ?><dt class="weight"><?php _e( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="weight"><?php echo $item['weight']; ?><?php echo get_option( 'woocommerce_weight_unit' ); ?></dd><?php endif; ?>
+						<?php if ( ! empty( $item['sku'] ) ) : ?><dt class="sku"><?php _e( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="sku"><?php echo $item['sku']; ?></dd><?php endif; ?>
+						<?php if ( ! empty( $item['weight'] ) ) : ?><dt class="weight"><?php _e( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="weight"><?php echo $item['weight']; ?><?php echo get_option( 'woocommerce_weight_unit' ); ?></dd><?php endif; ?>
 					</dl>
 					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->type, $item, $this->order  ); ?>
 				</td>
@@ -121,7 +121,7 @@
 
 <?php do_action( 'wpo_wcpdf_after_customer_notes', $this->type, $this->order ); ?>
 
-<?php if ( $this->get_footer() ): ?>
+<?php if ( $this->get_footer() ) : ?>
 	<div id="footer">
 		<!-- hook available: wpo_wcpdf_before_footer -->
 		<?php $this->footer(); ?>
