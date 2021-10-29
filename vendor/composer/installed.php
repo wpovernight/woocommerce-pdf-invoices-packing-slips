@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '9315d076090b6d7a2b7a28beb869abbd855d6a10',
+    'reference' => 'ba1fbf4cdabe15ed71f2516cb26b47a11f75d020',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '9315d076090b6d7a2b7a28beb869abbd855d6a10',
+      'reference' => 'ba1fbf4cdabe15ed71f2516cb26b47a11f75d020',
     ),
     'dompdf/dompdf' => 
     array (
@@ -55,6 +55,15 @@
       array (
       ),
       'reference' => 'd217848e1396ef962fb1997cf3e2421acba7f796',
+    ),
+    'symfony/polyfill-mbstring' => 
+    array (
+      'pretty_version' => 'v1.23.1',
+      'version' => '1.23.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '9174a3d80210dca8daa7f31fec659150bbeabfc6',
     ),
   ),
 );
