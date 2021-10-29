@@ -226,6 +226,17 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
+	 * Show shipping address conditionally
+	 */
+	public function show_shipping_address() {
+		if( $this->get_type() != 'packing_slip' ) {
+			return ! empty( $this->settings['display_shipping_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_shipping_address'] == 'always' );
+		} else {
+			return true;
+		}
+	}
+
+	/**
 	 * Return/Show a custom field
 	 */		
 	public function get_custom_field( $field_name ) {
