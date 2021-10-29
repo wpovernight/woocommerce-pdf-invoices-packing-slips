@@ -32,26 +32,26 @@
 <table class="order-data-addresses">
 	<tr>
 		<td class="address billing-address">
-			<!-- <h3><?php _e( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3> -->
-			<?php do_action( 'wpo_wcpdf_before_billing_address', $this->type, $this->order ); ?>
-			<?php $this->billing_address(); ?>
-			<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
-			<?php if ( isset($this->settings['display_email']) ) : ?>
-				<div class="billing-email"><?php $this->billing_email(); ?></div>
-			<?php endif; ?>
-			<?php if ( isset($this->settings['display_phone']) ) : ?>
-				<div class="billing-phone"><?php $this->billing_phone(); ?></div>
+			<?php if ( $this->show_billing_address() ) : ?>
+				<!-- <h3><?php _e( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3> -->
+				<?php do_action( 'wpo_wcpdf_before_billing_address', $this->type, $this->order ); ?>
+				<?php $this->billing_address(); ?>
+				<?php do_action( 'wpo_wcpdf_after_billing_address', $this->type, $this->order ); ?>
+				<?php if ( isset($this->settings['display_email']) ) : ?>
+					<div class="billing-email"><?php $this->billing_email(); ?></div>
+				<?php endif; ?>
+				<?php if ( isset($this->settings['display_phone']) ) : ?>
+					<div class="billing-phone"><?php $this->billing_phone(); ?></div>
+				<?php endif; ?>
 			<?php endif; ?>
 		</td>
 		<td class="address shipping-address">
-			<?php if ( $this->show_billing_address() ) : ?>
-				<h3><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-				<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
-				<?php $this->shipping_address(); ?>
-				<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
-				<?php if ( isset( $this->settings['display_phone'] ) ) : ?>
-					<div class="shipping-phone"><?php $this->shipping_phone(); ?></div>
-				<?php endif; ?>
+			<h3><?php _e( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+			<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->type, $this->order ); ?>
+			<?php $this->shipping_address(); ?>
+			<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->type, $this->order ); ?>
+			<?php if ( isset( $this->settings['display_phone'] ) ) : ?>
+				<div class="shipping-phone"><?php $this->shipping_phone(); ?></div>
 			<?php endif; ?>
 		</td>
 		<td class="order-data">
