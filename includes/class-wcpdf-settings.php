@@ -133,25 +133,28 @@ class Settings {
 			die(); 
 		}
 
-		if( ! empty( $_POST['order_id'] ) ) {
+		if ( ! empty( $_POST['order_id'] ) ) {
 			$order_id = sanitize_text_field( $_POST['order_id'] );
 			$order    = wc_get_order( $order_id );
-			if( empty( $order ) ) wp_send_json_error( array( 'error' => __( 'Order not found', 'woocommerce-pdf-invoices-packing-slips' ) ) );
-			$invoice = wcpdf_get_invoice( $order );
-			$invoice->set_date(current_time( 'timestamp', true ));
+			if ( empty( $order ) ) {
+				wp_send_json_error( array( 'error' => __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			}
+
+			$invoice             = wcpdf_get_invoice( $order );
+			$invoice->set_date( current_time( 'timestamp', true ) );
 			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-			$number_store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
-			$number_store = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
+			$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
+			$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
 			$invoice->set_number( $number_store->get_next() );
 
 			// make replacements
-			if( ! empty( $_POST['data'] ) ) {
+			if ( ! empty( $_POST['data'] ) ) {
 				// parse form data
 				parse_str( $_POST['data'], $form_data );
 				$form_data = stripslashes_deep( $form_data );
-				foreach( $form_data as $key => $settings ) {
+				foreach ( $form_data as $key => $settings ) {
 					if ( str_contains( $key, 'wpo_wcpdf_settings_' ) ) {
-						foreach( $settings as $setting => $value ) {
+						foreach ( $settings as $setting => $value ) {
 							$invoice->settings[$setting]['default'] = $value['default'];
 						}
 					}
