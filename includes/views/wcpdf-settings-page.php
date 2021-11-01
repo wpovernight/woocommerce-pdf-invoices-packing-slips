@@ -65,8 +65,12 @@
 		</div>
 
 		<div class="preview-document">
+			<?php
+				$last_order_id = wc_get_orders( array( 'limit' => 1, 'return' => 'ids' ) );
+				$order_id      = reset( $last_order_id );
+			?>
 			<div class="preview-data">
-				<input type="text">
+				<input type="number" name="preview-order" id="preview-order">
 				<p class="last-order">Currently showing last order <span class="arrow-down">&#9660;</span></p>
 				<p class="order-number">Currently showing order number <span class="arrow-down">&#9660;</span></p>
 				<ul>
@@ -74,7 +78,8 @@
 					<li class="order-number">Show specific order number</li>
 				</ul>
 			</div>
-			<div class="preview"></div>
+			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
+			<div class="preview" data-order_id="<?= $order_id; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>"></div>
 		</div>
 
 	</div>

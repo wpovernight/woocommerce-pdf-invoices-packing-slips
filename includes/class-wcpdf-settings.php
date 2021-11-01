@@ -45,6 +45,9 @@ class Settings {
 		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
 		// migrate old template paths to template IDs before loading settings page
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 1 );
+
+		// AJAX preview
+		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
 	}
 
 	public function menu() {
@@ -120,6 +123,43 @@ class Settings {
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
 
 		include('views/wcpdf-settings-page.php');
+	}
+
+	public function ajax_preview() {
+		check_ajax_referer( "wpo_wcpdf_preview", 'security' );
+
+		// check permissions
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			die(); 
+		}
+
+		if( ! empty( $_POST['order_id'] ) ) {
+			$order_id = sanitize_text_field( $_POST['order_id'] );
+			$order    = wc_get_order( $order_id );
+			if( empty( $order ) ) wp_send_json_error( array( 'error' => __( 'Order not found', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			$invoice = wcpdf_get_invoice( $order );
+			$invoice->set_date(current_time( 'timestamp', true ));
+			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+			$number_store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
+			$number_store = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
+			$invoice->set_number( $number_store->get_next() );
+
+			// make replacements
+			if( ! empty( $_POST['data'] ) ) {
+				// parse form data
+				parse_str( $_POST['data'], $form_data );
+				$form_data = stripslashes_deep( $form_data );
+				foreach( $form_data['wpo_wcpdf_settings_test'] as $setting => $value ) {
+					$invoice->settings[$setting]['default'] = $value['default'];
+				}
+			}
+
+			$pdf_data = $invoice->get_pdf();
+
+			wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
+		}
+
+		exit();
 	}
 
 	public function add_settings_fields( $settings_fields, $page, $option_group, $option_name ) {

@@ -117,7 +117,7 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
-				array( 'jquery', 'wc-enhanced-select' ),
+				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui' ),
 				WPO_WCPDF_VERSION
 			);
 			wp_localize_script(
@@ -126,6 +126,7 @@ class Assets {
 				array(
 					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
 					'template_paths' => WPO_WCPDF()->settings->get_installed_templates(),
+					'pdfjs_worker'   => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
 				)
 			);
 
