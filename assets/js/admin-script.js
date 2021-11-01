@@ -97,6 +97,16 @@ jQuery( function( $ ) {
 		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
+	// Preview on user select option (using 'change' event breaks the PDF render)
+	$( '#wpo-wcpdf-settings select option' ).on( 'click', function( event ) {
+		event.preventDefault();
+		let elem      = $(this);
+		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let duration  = event.type == 'click' ? 1000 : 0;
+		clearTimeout( wcpdf_preview );
+		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+	} );
+
 	function ajax_load_preview( form_data, elem ) {
 		let preview   = $( '#wpo-wcpdf-preview-wrapper .preview' );
 		let order_id  = preview.data( 'order_id' );
