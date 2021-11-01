@@ -149,8 +149,12 @@ class Settings {
 				// parse form data
 				parse_str( $_POST['data'], $form_data );
 				$form_data = stripslashes_deep( $form_data );
-				foreach( $form_data['wpo_wcpdf_settings_test'] as $setting => $value ) {
-					$invoice->settings[$setting]['default'] = $value['default'];
+				foreach( $form_data as $key => $settings ) {
+					if ( str_contains( $key, 'wpo_wcpdf_settings_' ) ) {
+						foreach( $settings as $setting => $value ) {
+							$invoice->settings[$setting]['default'] = $value['default'];
+						}
+					}
 				}
 			}
 
