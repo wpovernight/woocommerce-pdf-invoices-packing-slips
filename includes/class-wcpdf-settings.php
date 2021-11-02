@@ -153,7 +153,7 @@ class Settings {
 				parse_str( $_POST['data'], $form_data );
 				$form_data = stripslashes_deep( $form_data );
 				foreach ( $form_data as $key => $settings ) {
-					if ( str_contains( $key, 'wpo_wcpdf_settings_' ) ) {
+					if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false ) {
 						foreach ( $settings as $setting => $value ) {
 							// general settings
 							if( isset( WPO_WCPDF()->settings->general_settings[$setting] ) ) {
