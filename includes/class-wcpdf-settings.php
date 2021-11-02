@@ -146,6 +146,7 @@ class Settings {
 			$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
 			$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
 			$invoice->set_number( $number_store->get_next() );
+			$general_settings = WPO_WCPDF()->settings->general_settings;
 
 			// make replacements
 			if ( ! empty( $_POST['data'] ) ) {
@@ -155,7 +156,17 @@ class Settings {
 				foreach ( $form_data as $key => $settings ) {
 					if ( str_contains( $key, 'wpo_wcpdf_settings_' ) ) {
 						foreach ( $settings as $setting => $value ) {
-							$invoice->settings[$setting]['default'] = $value['default'];
+							// general settings
+							if( isset( WPO_WCPDF()->settings->general_settings[$setting] ) ) {
+								WPO_WCPDF()->settings->general_settings[$setting] = $value;
+							// document settings
+							} else {
+								if( isset( $invoice->settings[$setting]['default'] ) && isset( $value['default'] ) ) {
+									$invoice->settings[$setting]['default'] = $value['default'];
+								} else {
+									$invoice->settings[$setting] = $value;
+								}
+							}
 						}
 					}
 				}
