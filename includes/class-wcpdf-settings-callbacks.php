@@ -19,18 +19,6 @@ class Settings_Callbacks {
 	}
 	
 	/**
-	 * Throw notice if image resolution is too high
-	 */
-	function check_image_resolution($resolution) {
-		if ($resolution > 600) {
-			echo 
-			'<div class="notice notice-info is-dismissible">
-				<p>The resolution of the image you uploaded for the Shop logo is above the recommended 600dpi!</p>
-			</div>';
-		}
-	}
-
-	/**
 	 * Debug section callback.
 	 *
 	 * @return void.
@@ -392,9 +380,13 @@ class Settings_Callbacks {
 
 			printf('<img src="%1$s" style="display:block" id="img-%4$s"/>', $attachment_src, $attachment_width, $attachment_height, $id );
 			if ( !empty($attachment_height) && !empty($in_height) ) {
-				$attachment_resolution = round(absint($attachment_height)/$in_height);	
-				$this->check_image_resolution($attachment_resolution);
+				$attachment_resolution = round(absint($attachment_height)/$in_height);
 				printf('<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
+
+				// warn the user if the image is unnecessarily large
+				if ($attachment_resolution > 600 ) {
+					echo '<p class="notice notice-warning inline is-dismissible">'. esc_html( __('The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance.')) . '</p>';
+				}
 			}
 
 			printf('<span class="button wpo_remove_image_button" data-input_id="%1$s">%2$s</span>', $id, $remove_button_text );
