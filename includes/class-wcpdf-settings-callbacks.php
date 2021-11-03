@@ -387,7 +387,7 @@ class Settings_Callbacks {
 				if ($attachment_resolution > 600 ) {
 					echo 
 					"<p class='notice notice-warning inline is-dismissible'>" 
-						. esc_html( __('The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance.') )
+						. esc_html__('The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance.')
 						. 
 					"</p>";
 				}
