@@ -37,14 +37,10 @@ jQuery( function( $ ) {
 		}
 	}).trigger('change');
 
-	//Match wrapper to settings height
-	settingsHeight = $('#wpo-wcpdf-preview-wrapper .sidebar').height();
-    $('#wpo-wcpdf-preview-wrapper').height(settingsHeight);
-
     //Preview
     let previewStates = $('#wpo-wcpdf-preview-wrapper').attr('data-preview-states');
     
-    $('.gutter .slide-left').on( 'click', function() {
+    $('.slide-left').on( 'click', function() {
 		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
 		let previewState = $wrapper.attr('data-preview-state');
 		if ( previewStates == 3 ) {
@@ -54,7 +50,7 @@ jQuery( function( $ ) {
 		}
 	});
 
-	$('.gutter .slide-right').on( 'click', function() {
+	$('.slide-right').on( 'click', function() {
 		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
 		let previewState = $wrapper.attr('data-preview-state');
 		if ( previewStates == 3 ) {

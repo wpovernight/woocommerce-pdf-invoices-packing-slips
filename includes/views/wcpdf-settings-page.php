@@ -52,14 +52,9 @@
 					}
 					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
 				?>
-
 			</form>
-			<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
-		</div>
-
-		<div class="gutter">
 			<div class="slider slide-left">&#9664;</div>
-			<div class="slider slide-right">&#9654;</div>
+			<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
 		</div>
 
 		<div class="preview-document">
@@ -67,6 +62,7 @@
 				$last_order_id = wc_get_orders( array( 'limit' => 1, 'return' => 'ids' ) );
 				$order_id      = reset( $last_order_id );
 			?>
+			<div class="slider slide-right">&#9654;</div>
 			<div class="preview-data">
 				<input type="number" name="preview-order" id="preview-order">
 				<p class="last-order">Currently showing last order <span class="arrow-down">&#9660;</span></p>
