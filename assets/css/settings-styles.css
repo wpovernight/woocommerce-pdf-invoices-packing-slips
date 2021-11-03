@@ -152,6 +152,7 @@ table.wcpdf_documents_settings_list td.title {
 #wpo-wcpdf-preview-wrapper {
 	width: 100%;
 	position: relative;
+	overflow: hidden;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar {
@@ -160,10 +161,13 @@ table.wcpdf_documents_settings_list td.title {
 	left: 0;
 	z-index: 999;
 	height: auto;
-	background: transparent;
+	background: white;
 	box-sizing: border-box;
 	overflow: hidden;
-	transition: width .3s ease-in-out;
+	padding: 1em 2em;
+	margin-top: 4em;
+	box-shadow: 0 0 30px -25px rgba(0,0,0,0.3);
+	transition: all .3s ease-in-out;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table,
@@ -209,7 +213,6 @@ table.wcpdf_documents_settings_list td.title {
 	margin-left: 0!important;
 }
 
-
 #wpo-wcpdf-settings .translations input,
 #wpo-wcpdf-settings .translations textarea {
 	width: 100%;
@@ -219,12 +222,13 @@ table.wcpdf_documents_settings_list td.title {
 	width: 100%;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"] .sidebar {
-	transition: width 0.5s ease-in-out;
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar {
+	width: 97.5%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .sidebar {
-	width: 60%;
+	width: 97.5%;
+	left: -97.5%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar {
@@ -236,16 +240,30 @@ table.wcpdf_documents_settings_list td.title {
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .sidebar {
-	width: 0;
+	width: 30%;
+	left: -30%;
 }
 
 #wpo-wcpdf-preview-wrapper .preview-document {
 	position: absolute;
 	top: 0;
 	box-sizing: border-box;
+	transition: 0.3s ease-in-out;
 }
 
-/* 3 preview states */
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .preview-document {
+	display: none;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .preview-document {
+	opacity: 0;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .preview-document,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .preview-document {
+	width: 77.5%;
+	left: 12.5%;
+}
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"] .preview-document {
 	transition: .3s ease-in-out;
@@ -265,29 +283,6 @@ table.wcpdf_documents_settings_list td.title {
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .preview-document {
 	width: 77.5%;
 	left: 12.5%;
-}
-
-/* 2 preview states */
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"] .preview-document {
-	opacity: 0;
-	transition: 0.3s ease-in-out;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .preview-document,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .preview-document {
-	width: 77.5%;
-	left: 12.5%;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .preview-document {
-	opacity: 1;
-}
-
-/* 1 preview state */
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .preview-document {
-	display: none;
 }
 
 .preview-document .preview {
@@ -373,57 +368,6 @@ table.wcpdf_documents_settings_list td.title {
 .preview-document .preview-data p:hover,
 .preview-document .preview-data p:hover > .arrow-down { 
 	color: #222;
-}
-
-.sidebar .panel-wrapper {
-	width: 100%;
-	height: 100%;
-	box-sizing: border-box;
-	padding: 1em 2em;
-	overflow: hidden;
-	background: white;
-	margin-top: 4em;
-	box-shadow: 0 0 30px -25px rgba(0,0,0,0.3);
-	transition: margin-left .3s ease-in-out;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"] .sidebar .panel-wrapper {
-	transition: margin-left .5s ease-in-out;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-state="full"] .sidebar .panel-wrapper {
-	margin-left: -300%;
-}
-
-.sidebar .panel-wrapper img {
-	width: 1210px;
-	margin-top: -1px;
-}
-
-.sidebar .panel-wrapper h1 {
-	border-bottom: 0.5px solid #eaeaea;
-	font-size: 1.8em;
-	width: 100%;
-	padding: 1.15rem 2rem 1.15rem 2rem;
-	margin: 0;
-	font-weight: 300;
-	box-sizing: border-box;
-}
-
-.sidebar .panel-wrapper .panel {
-	border-bottom: 0.5px solid #eaeaea;
-	width: 100%;
-	padding: 1rem 2rem;
-	font-weight: 400;
-	box-sizing: border-box;
-}
-
-.sidebar .panel-wrapper .panel .setting {
-	padding-bottom: 1.5em;
-}
-
-.sidebar .panel-wrapper .panel .setting select {
-	padding: 0.5em 0.6em;
 }
 
 .gutter {

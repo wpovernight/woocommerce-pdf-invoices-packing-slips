@@ -38,25 +38,23 @@
 	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo $preview_states; ?>" data-preview-state="<?php echo $preview_state; ?>">
 
 		<div class="sidebar">
-			<div class="panel-wrapper">
-				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
-					<?php
-						do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
-						if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
-							do_action( 'wpo_wcpdf_settings_output_'.$active_tab, $active_section );
-						} else {
-							// legacy settings
-							settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
-							do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
+			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
+				<?php
+					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
+					if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
+						do_action( 'wpo_wcpdf_settings_output_'.$active_tab, $active_section );
+					} else {
+						// legacy settings
+						settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
+						do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
 
-							submit_button();
-						}
-						do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
-					?>
+						submit_button();
+					}
+					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
+				?>
 
-				</form>
-				<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
-			</div>
+			</form>
+			<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
 		</div>
 
 		<div class="gutter">
