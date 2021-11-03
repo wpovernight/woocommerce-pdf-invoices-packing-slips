@@ -292,7 +292,7 @@ table.wcpdf_documents_settings_list td.title {
 
 .preview-document .preview {
 	width: 100%;
-	height: 35cm;
+	min-height: 5cm;
 	border: 1px solid #eaeaea;
 	background: white;
 	box-shadow: 0 0 30px -25px;
