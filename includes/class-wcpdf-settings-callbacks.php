@@ -384,9 +384,9 @@ class Settings_Callbacks {
 				printf('<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
 
 				// warn the user if the image is unnecessarily large
-				if ($attachment_resolution > 600 ) {
+				if ($attachment_resolution > 500 ) {
 					echo 
-					"<p class='notice notice-warning inline is-dismissible'>" 
+					"<p class='notice notice-warning inline'>" 
 						. esc_html__('The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance.')
 						. 
 					"</p>";
