@@ -395,6 +395,7 @@ class Settings {
 			if ( ! empty( $template_match ) ) {
 				$this->general_settings['template_path'] = $template_match;
 				update_option( 'wpo_wcpdf_settings_general', $this->general_settings );
+				/* translators: 1. path, 2. template ID */
 				wcpdf_log_error( sprintf( __( 'Template setting migrated from %1$s to %2$s', 'woocommerce-pdf-invoices-packing-slips' ), $path, $template_id ), 'info' );
 			}
 		}
