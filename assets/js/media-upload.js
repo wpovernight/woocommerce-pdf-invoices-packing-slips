@@ -57,9 +57,13 @@ jQuery(document).ready(function($) {
 				url:     wpo_wcpdf_admin.ajaxurl,
 				data:    data,
 				success: function( response ) {
-					$settings_wrapper
-						.html( response.data )
-						.removeAttr( 'style' );
+					if ( response && typeof response.success != 'undefined' && response.success === true ) {
+						$settings_wrapper.html( response.data );
+					}
+					$settings_wrapper.removeAttr( 'style' );	
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					$settings_wrapper.removeAttr( 'style' );	
 				}
 			});
 	
