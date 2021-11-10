@@ -383,7 +383,7 @@ class Settings_Callbacks {
 				$attachment_resolution = round(absint($attachment_height)/$in_height);
 				printf(
 					'<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>',
-					__('Image resolution','woocommerce-pdf-invoices-packing-slips'),
+					__( 'Image resolution', 'woocommerce-pdf-invoices-packing-slips' ),
 					$attachment_resolution
 				);
 
@@ -391,7 +391,7 @@ class Settings_Callbacks {
 				if ($attachment_resolution > 600 ) {
 					printf(
 						'<div class="attachment-resolution-warning notice notice-warning inline"><p>%s</p></div>',
-						esc_html__('The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance.')
+						esc_html__( 'The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance.', 'woocommerce-pdf-invoices-packing-slips' )
 					); 
 				}
 			}

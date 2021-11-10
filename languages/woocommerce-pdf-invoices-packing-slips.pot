@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-10-26T18:14:01+00:00\n"
+"POT-Creation-Date: 2021-11-10T10:38:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -49,7 +49,7 @@ msgstr ""
 #: includes/views/attachment-settings-hint.php:24
 #: includes/views/wcpdf-extensions.php:131
 #: woocommerce-pdf-invoices-packingslips.php:377
-#: woocommerce-pdf-invoices-packingslips.php:423
+#: woocommerce-pdf-invoices-packingslips.php:421
 msgid "Hide this message"
 msgstr ""
 
@@ -284,11 +284,15 @@ msgstr ""
 msgid "These are used for the (optional) footer columns in the <em>Modern (Premium)</em> template, but can also be used for other elements in your custom template"
 msgstr ""
 
-#: includes/class-wcpdf-settings-callbacks.php:384
+#: includes/class-wcpdf-settings-callbacks.php:386
 msgid "Image resolution"
 msgstr ""
 
-#: includes/class-wcpdf-settings-callbacks.php:411
+#: includes/class-wcpdf-settings-callbacks.php:394
+msgid "The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance."
+msgstr ""
+
+#: includes/class-wcpdf-settings-callbacks.php:423
 msgid "Save"
 msgstr ""
 
@@ -434,7 +438,7 @@ msgid "Log PDF document creation to order notes."
 msgstr ""
 
 #: includes/class-wcpdf-settings-documents.php:30
-#: includes/class-wcpdf-settings.php:104
+#: includes/class-wcpdf-settings.php:107
 msgid "Documents"
 msgstr ""
 
@@ -586,35 +590,35 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:55
-#: includes/class-wcpdf-settings.php:56
+#: includes/class-wcpdf-settings.php:58
+#: includes/class-wcpdf-settings.php:59
 msgid "PDF Invoices"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:81
+#: includes/class-wcpdf-settings.php:84
 msgid "Documentation"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:82
+#: includes/class-wcpdf-settings.php:85
 msgid "Support Forum"
 msgstr ""
 
 #. translators: database row value
-#: includes/class-wcpdf-settings.php:95
+#: includes/class-wcpdf-settings.php:98
 msgid "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %s, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Status tab to use an alternate method."
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:103
+#: includes/class-wcpdf-settings.php:106
 msgid "General"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:109
+#: includes/class-wcpdf-settings.php:112
 #: includes/views/dompdf-status.php:188
 msgid "Status"
 msgstr ""
 
 #. translators: 1. path, 2. template ID
-#: includes/class-wcpdf-settings.php:396
+#: includes/class-wcpdf-settings.php:399
 msgid "Template setting migrated from %1$s to %2$s"
 msgstr ""
 
@@ -667,43 +671,43 @@ msgid "Finish"
 msgstr ""
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:116
-#: includes/documents/abstract-wcpdf-order-document-methods.php:183
+#: includes/documents/abstract-wcpdf-order-document-methods.php:217
 msgid "N/A"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:424
+#: includes/documents/abstract-wcpdf-order-document-methods.php:469
 msgid "Payment method"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:445
+#: includes/documents/abstract-wcpdf-order-document-methods.php:490
 msgid "Shipping method"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:927
+#: includes/documents/abstract-wcpdf-order-document-methods.php:972
 msgid "Subtotal"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:952
+#: includes/documents/abstract-wcpdf-order-document-methods.php:997
 msgid "Shipping"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1015
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1060
 msgid "Discount"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1056
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1101
 msgid "VAT"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1057
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1102
 msgid "Tax rate"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1101
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1146
 msgid "Total ex. VAT"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1104
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1149
 msgid "Total"
 msgstr ""
 
@@ -1085,8 +1089,8 @@ msgid "Write Permissions"
 msgstr ""
 
 #: includes/views/dompdf-status.php:186
-#: templates/Simple/invoice.php:101
-#: templates/Simple/packing-slip.php:88
+#: templates/Simple/invoice.php:105
+#: templates/Simple/packing-slip.php:92
 msgid "Description"
 msgstr ""
 
@@ -1316,72 +1320,72 @@ msgstr ""
 msgid "Error creating PDF, please contact the site owner."
 msgstr ""
 
-#: templates/Simple/invoice.php:35
-#: templates/Simple/packing-slip.php:48
+#: templates/Simple/invoice.php:36
+#: templates/Simple/packing-slip.php:49
 msgid "Billing Address:"
 msgstr ""
 
-#: templates/Simple/invoice.php:48
+#: templates/Simple/invoice.php:49
 msgid "Ship To:"
-msgstr ""
-
-#: templates/Simple/invoice.php:70
-#: templates/Simple/packing-slip.php:58
-msgid "Order Number:"
 msgstr ""
 
 #: templates/Simple/invoice.php:74
 #: templates/Simple/packing-slip.php:62
-msgid "Order Date:"
+msgid "Order Number:"
 msgstr ""
 
 #: templates/Simple/invoice.php:78
+#: templates/Simple/packing-slip.php:66
+msgid "Order Date:"
+msgstr ""
+
+#: templates/Simple/invoice.php:82
 msgid "Payment Method:"
 msgstr ""
 
-#: templates/Simple/invoice.php:92
-#: templates/Simple/packing-slip.php:80
+#: templates/Simple/invoice.php:96
+#: templates/Simple/packing-slip.php:84
 msgid "Product"
 msgstr ""
 
-#: templates/Simple/invoice.php:93
-#: templates/Simple/packing-slip.php:81
+#: templates/Simple/invoice.php:97
+#: templates/Simple/packing-slip.php:85
 msgid "Quantity"
 msgstr ""
 
-#: templates/Simple/invoice.php:94
+#: templates/Simple/invoice.php:98
 msgid "Price"
 msgstr ""
 
-#: templates/Simple/invoice.php:106
-#: templates/Simple/packing-slip.php:93
+#: templates/Simple/invoice.php:110
+#: templates/Simple/packing-slip.php:97
 msgid "SKU"
 msgstr ""
 
-#: templates/Simple/invoice.php:107
-#: templates/Simple/packing-slip.php:94
+#: templates/Simple/invoice.php:111
+#: templates/Simple/packing-slip.php:98
 msgid "SKU:"
 msgstr ""
 
-#: templates/Simple/invoice.php:108
-#: templates/Simple/packing-slip.php:95
+#: templates/Simple/invoice.php:112
+#: templates/Simple/packing-slip.php:99
 msgid "Weight:"
 msgstr ""
 
-#: templates/Simple/invoice.php:123
+#: templates/Simple/invoice.php:127
 msgid "Notes"
 msgstr ""
 
-#: templates/Simple/invoice.php:131
-#: templates/Simple/packing-slip.php:112
+#: templates/Simple/invoice.php:135
+#: templates/Simple/packing-slip.php:117
 msgid "Customer Notes"
 msgstr ""
 
-#: templates/Simple/packing-slip.php:35
+#: templates/Simple/packing-slip.php:36
 msgid "Shipping Address:"
 msgstr ""
 
-#: templates/Simple/packing-slip.php:66
+#: templates/Simple/packing-slip.php:70
 msgid "Shipping Method:"
 msgstr ""
 
@@ -1413,21 +1417,14 @@ msgstr ""
 msgid "To protect them, you must click the button below."
 msgstr ""
 
-#. translators: plugin name
+#: woocommerce-pdf-invoices-packingslips.php:418
+msgid "When sending emails with MailPoet 3 and the active sending method is <strong>MailPoet Sending Service</strong> or <strong>Your web host / web server</strong>, MailPoet does not include the <strong>WooCommerce PDF Invoices & Packing Slips</strong> attachments in the emails."
+msgstr ""
+
 #: woocommerce-pdf-invoices-packingslips.php:419
-msgid "When sending emails with MailPoet 3 and the active sending method is MailPoet Sending Service, MailPoet does not include the %s attachments in the emails."
+msgid "To fix this you should select <strong>The default WordPress sending method (default)</strong> on the <strong>Advanced tab</strong>."
 msgstr ""
 
-#. translators: "Your web host / web server"
-#: woocommerce-pdf-invoices-packingslips.php:421
-msgid "To fix this you should select other method like %1$s or %2$s."
-msgstr ""
-
-#. translators: "Your web host / web server"
-#: woocommerce-pdf-invoices-packingslips.php:421
-msgid "Your web host / web server"
-msgstr ""
-
-#: woocommerce-pdf-invoices-packingslips.php:422
-msgid "Change MailPoet sending method"
+#: woocommerce-pdf-invoices-packingslips.php:420
+msgid "Change MailPoet sending method to WordPress (default)"
 msgstr ""
