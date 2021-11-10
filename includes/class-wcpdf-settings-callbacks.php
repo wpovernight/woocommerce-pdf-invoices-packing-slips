@@ -17,7 +17,7 @@ class Settings_Callbacks {
 	 */
 	public function section() {
 	}
-
+	
 	/**
 	 * Debug section callback.
 	 *
@@ -381,13 +381,25 @@ class Settings_Callbacks {
 			printf('<img src="%1$s" style="display:block" id="img-%4$s"/>', $attachment_src, $attachment_width, $attachment_height, $id );
 			if ( !empty($attachment_height) && !empty($in_height) ) {
 				$attachment_resolution = round(absint($attachment_height)/$in_height);
-				printf('<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>', __('Image resolution','woocommerce-pdf-invoices-packing-slips'), $attachment_resolution );
+				printf(
+					'<div class="attachment-resolution"><p class="description">%s: %sdpi</p></div>',
+					__('Image resolution','woocommerce-pdf-invoices-packing-slips'),
+					$attachment_resolution
+				);
+
+				// warn the user if the image is unnecessarily large
+				if ($attachment_resolution > 600 ) {
+					printf(
+						'<div class="attachment-resolution-warning notice notice-warning inline"><p>%s</p></div>',
+						esc_html__('The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance.')
+					); 
+				}
 			}
 
-			printf('<span class="button wpo_remove_image_button" data-input_id="%1$s">%2$s</span>', $id, $remove_button_text );
+			printf('<span class="button wpo_remove_image_button" data-input_id="%1$s">%2$s</span> ', $id, $remove_button_text );
 		}
 
-		printf( '<input id="%1$s" name="%2$s" type="hidden" value="%3$s" />', $id, $setting_name, $current );
+		printf( '<input id="%1$s" name="%2$s" type="hidden" value="%3$s" data-settings_callback_args="%4$s" data-ajax_nonce="%5$s"/>', $id, $setting_name, $current, esc_attr( json_encode( $args ) ), wp_create_nonce( "wpo_wcpdf_get_media_upload_setting_html" ) );
 		
 		printf( '<span class="button wpo_upload_image_button %4$s" data-uploader_title="%1$s" data-uploader_button_text="%2$s" data-remove_button_text="%3$s" data-input_id="%4$s">%2$s</span>', $uploader_title, $uploader_button_text, $remove_button_text, $id );
 	
@@ -512,39 +524,41 @@ class Settings_Callbacks {
 			$args['lang'] = 'default';
 		}
 
-		if (isset($args['lang'])) {
-			// i18n settings name
-			$args['setting_name'] = "{$args['setting_name']}[{$args['lang']}]";
-			// copy current option value if set
-			
-			if ( $args['lang'] == 'default' && !empty($option[$args['id']]) && !isset( $option[$args['id']]['default'] ) ) {
-				// we're switching back from WPML to normal
-				// try english first
-				if ( isset( $option[$args['id']]['en'] ) ) {
-					$args['current'] = $option[$args['id']]['en'];
-				} elseif ( is_array( $option[$args['id']] ) ) {
-					// fallback to the first language if english not found
-					$first = array_shift($option[$args['id']]);
-					if (!empty($first)) {
-						$args['current'] = $first;
+		if ( ! array_key_exists( 'current', $args ) ) {
+			if (isset($args['lang'])) {
+				// i18n settings name
+				$args['setting_name'] = "{$args['setting_name']}[{$args['lang']}]";
+				// copy current option value if set
+				
+				if ( $args['lang'] == 'default' && !empty($option[$args['id']]) && !isset( $option[$args['id']]['default'] ) ) {
+					// we're switching back from WPML to normal
+					// try english first
+					if ( isset( $option[$args['id']]['en'] ) ) {
+						$args['current'] = $option[$args['id']]['en'];
+					} elseif ( is_array( $option[$args['id']] ) ) {
+						// fallback to the first language if english not found
+						$first = array_shift($option[$args['id']]);
+						if (!empty($first)) {
+							$args['current'] = $first;
+						}
+					} elseif ( is_string( $option[$args['id']] ) ) {
+						$args['current'] = $option[$args['id']];
+					} else {
+						// nothing, really?
+						$args['current'] = '';
 					}
-				} elseif ( is_string( $option[$args['id']] ) ) {
-					$args['current'] = $option[$args['id']];
 				} else {
-					// nothing, really?
-					$args['current'] = '';
+					if ( isset( $option[$args['id']][$args['lang']] ) ) {
+						$args['current'] = $option[$args['id']][$args['lang']];
+					} elseif (isset( $option[$args['id']]['default'] )) {
+						$args['current'] = $option[$args['id']]['default'];
+					}
 				}
 			} else {
-				if ( isset( $option[$args['id']][$args['lang']] ) ) {
-					$args['current'] = $option[$args['id']][$args['lang']];
-				} elseif (isset( $option[$args['id']]['default'] )) {
-					$args['current'] = $option[$args['id']]['default'];
+				// copy current option value if set
+				if ( isset( $option[$args['id']] ) ) {
+					$args['current'] = $option[$args['id']];
 				}
-			}
-		} else {
-			// copy current option value if set
-			if ( isset( $option[$args['id']] ) ) {
-				$args['current'] = $option[$args['id']];
 			}
 		}
 
