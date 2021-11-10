@@ -975,7 +975,6 @@ abstract class Order_Document {
 		$store_base_name    = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
 		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
 		$current_store_year = $this->get_number_store_year( $default_table_name );
-		// $current_store_year = $this->get_current_number_store_year( $store_base_name );
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
 
 		// if we don't reset the number yearly, the store name is always the same
@@ -1032,7 +1031,6 @@ abstract class Order_Document {
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 		$current_year       = intval( $now->date_i18n( 'Y' ) );
 		$current_store_year = $this->get_number_store_year( $default_table_name );
-		// $current_store_year = $this->get_current_number_store_year( $store_base_name );
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
 
 		// nothing to retire if requested year matches current store year or if current store year is not in the past
@@ -1078,9 +1076,6 @@ abstract class Order_Document {
 			}
 		}
 
-		// update reference for current store year
-		$this->set_current_number_store_year( $store_base_name, $current_year );
-
 		// current store year has been updated to current year, returning this means no year suffix has to be used
 		return $current_year;
 	}
@@ -1109,35 +1104,6 @@ abstract class Order_Document {
 		}
 
 		return intval( $year );
-	}
-
-	/**
-	 * Retuns the year corresponding to the un-numbered (default) number store
-	 * @param  string $store_base_name
-	 * 
-	 * @return int
-	 */
-	public function get_current_number_store_year( $store_base_name ) {
-		$year = get_option( "wcpdf_current_year_{$store_base_name}" );
-
-		if( empty( $current_year ) ) {
-			$now  = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
-			$year = $now->date_i18n( 'Y' );
-			$this->set_current_number_store_year( $store_base_name, $year );
-		}
-
-		return apply_filters( 'wpo_wcpdf_current_year', intval( $year ) );
-	}
-
-	/**
-	 * Set the year corresponding to the un-numbered (default) number store
-	 * @param  string $store_base_name
-	 * @param  int|string $year
-	 * 
-	 * @return bool
-	 */
-	public function set_current_number_store_year( $store_base_name, $year ) {
-		return update_option( "wcpdf_current_year_{$store_base_name}", intval( $year ) );
 	}
 
 }
