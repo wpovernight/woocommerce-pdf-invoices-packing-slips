@@ -41,6 +41,9 @@ class Settings {
 		// AJAX set number store
 		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
 
+		// AJAX get header logo setting HTML
+		add_action( 'wp_ajax_wpo_wcpdf_get_media_upload_setting_html', array( $this, 'get_media_upload_setting_html' ) );
+
 		// refresh template path cache each time the general settings are updated
 		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
 		// migrate old template paths to template IDs before loading settings page
@@ -392,6 +395,7 @@ class Settings {
 			if ( ! empty( $template_match ) ) {
 				$this->general_settings['template_path'] = $template_match;
 				update_option( 'wpo_wcpdf_settings_general', $this->general_settings );
+				/* translators: 1. path, 2. template ID */
 				wcpdf_log_error( sprintf( __( 'Template setting migrated from %1$s to %2$s', 'woocommerce-pdf-invoices-packing-slips' ), $path, $template_id ), 'info' );
 			}
 		}
@@ -423,6 +427,25 @@ class Settings {
 		}
 
 		return $method;		
+	}
+
+	public function get_media_upload_setting_html() {
+		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
+		// check permissions
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error(); 
+		}
+
+		// get previous (default) args and preset current
+		$args = $_POST['args'];
+		$args['current'] = absint( $_POST['attachment_id'] );
+
+		// get settings HTML
+		ob_start();
+		$this->callbacks->media_upload( $args );
+		$html = ob_get_clean();
+
+		return wp_send_json_success( $html );
 	}
 
 }
