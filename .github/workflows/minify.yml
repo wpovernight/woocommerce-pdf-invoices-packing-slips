@@ -2,9 +2,7 @@ name: Auto Minify JS and CSS Files
 
 on:
   workflow_dispatch:
-  pull_request:
   push:
-    branches: [ master ]
     paths: 
       - 'assets/**/*.js'
       - 'assets/**/*.css'
