@@ -126,7 +126,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Check whether the billing address should be shown
 	 */
 	public function show_billing_address() {
-		if( $this->get_type() != 'packing_slip' ) {
+		if( $this->get_type() != 'packing-slip' ) {
 			return true;
 		} else {
 			return ! empty( $this->settings['display_billing_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_billing_address'] == 'always' );
@@ -229,7 +229,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Check whether the shipping address should be shown
 	 */
 	public function show_shipping_address() {
-		if( $this->get_type() != 'packing_slip' ) {
+		if( $this->get_type() != 'packing-slip' ) {
 			return ! empty( $this->settings['display_shipping_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_shipping_address'] == 'always' );
 		} else {
 			return true;
