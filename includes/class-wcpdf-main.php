@@ -985,9 +985,9 @@ class Main {
 			if( is_callable( array( $order, 'add_order_note' ) ) ) { // order
 				$order->add_order_note( $note );
 			} elseif ( $document->is_refund( $order ) ) {            // refund order
-				$order = $document->get_refund_parent( $order );
-				if( ! empty( $order ) && is_callable( array( $order, 'add_order_note' ) ) ) {
-					$order->add_order_note( $note );
+				$parent_order = $document->get_refund_parent( $order );
+				if( ! empty( $parent_order ) && is_callable( array( $parent_order, 'add_order_note' ) ) ) {
+					$parent_order->add_order_note( $note );
 				}
 			}
 		}
