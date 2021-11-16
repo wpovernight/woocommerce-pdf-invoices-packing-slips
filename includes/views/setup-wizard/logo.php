@@ -1,7 +1,7 @@
 <?php defined( 'ABSPATH' ) or exit; ?>
 <div class="wpo-step-description">
-	<h2><?php _e( 'Your logo' , 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
-	<p><?php _e( 'Set the header image that will display on your invoice.' , 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+	<h2><?php esc_html_e( 'Your logo' , 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
+	<p><?php esc_html_e( 'Set the header image that will display on your invoice.' , 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 </div>
 <div class="wpo-setup-input">
 	<?php
@@ -17,5 +17,5 @@
 	?>
 	<img src="<?php echo $logo_src; ?>" width="100%" height="20px" alt="" id="img-header_logo"/>
 	<input id="header_logo" name="wcpdf_settings[wpo_wcpdf_settings_general][header_logo]" type="hidden" value="<?php echo $logo_id; ?>" />
-	<span class="button wpo_upload_image_button header_logo" data-uploader_title="<?php _e( 'Select or upload your invoice header/logo', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-uploader_button_text="<?php _e( 'Set image', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-remove_button_text="<?php _e( 'Remove image', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-input_id="header_logo"><?php _e( 'Set image', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
+	<span class="button wpo_upload_image_button header_logo" data-uploader_title="<?php esc_html_e( 'Select or upload your invoice header/logo', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-uploader_button_text="<?php esc_html_e( 'Set image', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-remove_button_text="<?php esc_html_e( 'Remove image', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-input_id="header_logo"><?php esc_html_e( 'Set image', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
 </div>

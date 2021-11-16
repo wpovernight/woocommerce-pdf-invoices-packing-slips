@@ -1,4 +1,4 @@
-.wpo-wizzard {
+.wpo-wizard {
 	background:#f9f9f9;
 }
 
@@ -319,7 +319,7 @@
 /* Landscape phones and smaller */
 @media (max-width: 480px) {
 
-	.wpo-wizzard, .wpo-wcpdf-setup {
+	.wpo-wizard, .wpo-wcpdf-setup {
 		margin:0;
 		height:100%;
 	}
