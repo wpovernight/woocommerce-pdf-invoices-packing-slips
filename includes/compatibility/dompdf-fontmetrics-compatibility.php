@@ -14,15 +14,14 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\Dompdf_FontMetrics
 		public function __construct( Canvas $canvas, Options $options ) {
 			parent::__construct( $canvas, $options );
 			
-			$this->fontLookup += $this->wcpdf_fonts( $options );
+			$this->fontLookup += $this->wcpdf_fonts( $options->getFontDir() );
 
 			if( ! file_exists( $this->getCacheFile() ) ) {
 				$this->saveFontFamilies();
 			}
 		}
 
-		public function wcpdf_fonts( Options $options ) {
-			$fontDir = $options->getFontDir();
+		public function wcpdf_fonts( $fontDir ) {
 			return array (
 				'sans-serif' => array(
 					'normal' => $fontDir . '/Helvetica',
