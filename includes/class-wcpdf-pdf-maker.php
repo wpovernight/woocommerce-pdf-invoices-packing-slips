@@ -3,6 +3,7 @@ namespace WPO\WC\PDF_Invoices;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use WPO\WC\PDF_Invoices\Compatibility\Dompdf_FontMetrics;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -31,6 +32,7 @@ class PDF_Maker {
 		}
 		
 		require WPO_WCPDF()->plugin_path() . '/vendor/autoload.php';
+		require WPO_WCPDF()->plugin_path() . '/includes/compatibility/dompdf-fontmetrics-compatibility.php';
 
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
@@ -48,6 +50,7 @@ class PDF_Maker {
 
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );
+		$dompdf->setFontMetrics( new Dompdf_FontMetrics( $dompdf->getCanvas(), $dompdf->getOptions() ) );
 		$dompdf->loadHtml( $this->html );
 		$dompdf->setPaper( $this->settings['paper_size'], $this->settings['paper_orientation'] );
 		$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $this->html );
