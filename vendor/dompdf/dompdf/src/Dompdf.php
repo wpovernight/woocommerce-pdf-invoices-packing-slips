@@ -17,7 +17,6 @@ use Dompdf\Frame\FrameTree;
 use HTML5_Tokenizer;
 use HTML5_TreeBuilder;
 use Dompdf\Image\Cache;
-use Dompdf\Renderer\ListBullet;
 use Dompdf\Css\Stylesheet;
 use Dompdf\Helpers;
 
@@ -289,7 +288,7 @@ class Dompdf
 
         $versionFile = realpath(__DIR__ . '/../VERSION');
         if (file_exists($versionFile) && ($version = trim(file_get_contents($versionFile))) !== false && $version !== '$Format:<%h>$') {
-          $this->version = sprintf('dompdf %s', $version);
+            $this->version = sprintf('dompdf %s', $version);
         }
 
         $this->setPhpConfig();
@@ -387,7 +386,7 @@ class Dompdf
 
             $chroot = $this->options->getChroot();
             $chrootValid = false;
-            foreach($chroot as $chrootPath) {
+            foreach ($chroot as $chrootPath) {
                 $chrootPath = realpath($chrootPath);
                 if ($chrootPath !== false && strpos($realfile, $chrootPath) === 0) {
                     $chrootValid = true;
@@ -1421,12 +1420,20 @@ class Dompdf
 
     /**
      * Sets callbacks for events like rendering of pages and elements.
-     * The callbacks array contains arrays with 'event' set to 'begin_page',
-     * 'end_page', 'begin_frame', or 'end_frame' and 'f' set to a function or
-     * object plus method to be called.
      *
-     * The function 'f' must take an array as argument, which contains info
-     * about the event.
+     * The callbacks array should contain arrays with `event` set to a callback
+     * event name and `f` set to a function or object plus method to be called.
+     *
+     * The available callback events are:
+     * * `begin_page_reflow`: called before page reflow
+     * * `begin_frame`: called before a frame is rendered
+     * * `end_frame`: called after frame rendering is complete
+     * * `begin_page_render`: called before a page is rendered
+     * * `end_page_render`: called after page rendering is complete
+     *
+     * The function `f` must take an array as argument, which contains info
+     * about the event (`[0 => Canvas, 1 => Frame, "canvas" => Canvas,
+     * "frame" => Frame]`).
      *
      * @param array $callbacks the set of callbacks to set
      */
@@ -1496,12 +1503,11 @@ class Dompdf
      */
     function __get($prop)
     {
-        switch ($prop)
-        {
-            case 'version' :
+        switch ($prop) {
+            case 'version':
                 return $this->version;
             default:
-                throw new Exception( 'Invalid property: ' . $prop );
+                throw new Exception('Invalid property: ' . $prop);
         }
     }
 }

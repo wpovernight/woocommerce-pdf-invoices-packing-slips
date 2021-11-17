@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "dompdf/dompdf",
-            "version": "v1.0.2",
-            "version_normalized": "1.0.2.0",
+            "version": "v1.1.0",
+            "version_normalized": "1.1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "8768448244967a46d6e67b891d30878e0e15d25c"
+                "reference": "aa594c1cdbcdab04977fdd0fff669a017fb50ef4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/8768448244967a46d6e67b891d30878e0e15d25c",
-                "reference": "8768448244967a46d6e67b891d30878e0e15d25c",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/aa594c1cdbcdab04977fdd0fff669a017fb50ef4",
+                "reference": "aa594c1cdbcdab04977fdd0fff669a017fb50ef4",
                 "shasum": ""
             },
             "require": {
@@ -33,13 +33,8 @@
                 "ext-imagick": "Improves image processing performance",
                 "ext-zlib": "Needed for pdf stream compression"
             },
-            "time": "2021-01-08T14:18:52+00:00",
+            "time": "2021-11-16T18:39:01+00:00",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-develop": "0.7-dev"
-                }
-            },
             "installation-source": "dist",
             "autoload": {
                 "psr-4": {
@@ -71,7 +66,7 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/v1.0.2"
+                "source": "https://github.com/dompdf/dompdf/tree/v1.1.0"
             },
             "install-path": "../dompdf/dompdf"
         },
@@ -121,26 +116,27 @@
         },
         {
             "name": "phenx/php-svg-lib",
-            "version": "v0.3.3",
-            "version_normalized": "0.3.3.0",
+            "version": "0.3.4",
+            "version_normalized": "0.3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PhenX/php-svg-lib.git",
-                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32"
+                "reference": "f627771eb854aa7f45f80add0f23c6c4d67ea0f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
-                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
+                "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/f627771eb854aa7f45f80add0f23c6c4d67ea0f2",
+                "reference": "f627771eb854aa7f45f80add0f23c6c4d67ea0f2",
                 "shasum": ""
             },
             "require": {
+                "php": "^7.4 || ^8.0",
                 "sabberworm/php-css-parser": "^8.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.5|^6.5"
+                "phpunit/phpunit": "^9.5"
             },
-            "time": "2019-09-11T20:02:13+00:00",
+            "time": "2021-10-18T02:13:32+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -162,7 +158,7 @@
             "homepage": "https://github.com/PhenX/php-svg-lib",
             "support": {
                 "issues": "https://github.com/PhenX/php-svg-lib/issues",
-                "source": "https://github.com/PhenX/php-svg-lib/tree/master"
+                "source": "https://github.com/PhenX/php-svg-lib/tree/0.3.4"
             },
             "install-path": "../phenx/php-svg-lib"
         },
