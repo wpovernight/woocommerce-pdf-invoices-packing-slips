@@ -1,6 +1,7 @@
 <?php
 return function ($rootDir) {
-    $distFontDir = $rootDir . '/lib/fonts';
+    //$distFontDir = $rootDir . '/lib/fonts';
+	$distFontDir = trailingslashit( WPO_WCPDF()->plugin_path() ) . 'vendor' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'fonts' . DIRECTORY_SEPARATOR;
     return [
         'sans-serif' =>
             [

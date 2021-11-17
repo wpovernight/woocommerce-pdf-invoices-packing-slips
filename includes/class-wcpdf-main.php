@@ -690,21 +690,21 @@ class Main {
 
 		// get local font dir from filtered options
 		$dompdf_options = apply_filters( 'wpo_wcpdf_dompdf_options', array(
-			'defaultFont'				=> 'dejavu sans',
-			'tempDir'					=> $this->get_tmp_path('dompdf'),
-			'logOutputFile'				=> $this->get_tmp_path('dompdf') . "/log.htm",
-			'fontDir'					=> $this->get_tmp_path('fonts'),
-			'fontCache'					=> $this->get_tmp_path('fonts'),
-			'isRemoteEnabled'			=> true,
-			'isFontSubsettingEnabled'	=> true,
-			'isHtml5ParserEnabled'		=> true,
+			'defaultFont'             => 'dejavu sans',
+			'tempDir'                 => $this->get_tmp_path('dompdf'),
+			'logOutputFile'           => $this->get_tmp_path('dompdf') . "/log.htm",
+			'fontDir'                 => $this->get_tmp_path('fonts'),
+			'fontCache'               => $this->get_tmp_path('fonts'),
+			'isRemoteEnabled'         => true,
+			'isFontSubsettingEnabled' => true,
+			'isHtml5ParserEnabled'    => true,
 		) );
 		$fontDir = $dompdf_options['fontDir'];
 
 		// merge font family cache with local/custom if present
 		$font_cache_files = array(
-			'cache'			=> 'dompdf_font_family_cache.php',
-			'cache_dist'	=> 'dompdf_font_family_cache.dist.php',
+			'cache'      => 'dompdf_font_family_cache.php',
+			'cache_dist' => 'dompdf_font_family_cache.dist.php',
 		);
 		foreach ( $font_cache_files as $font_cache_name => $font_cache_filename ) {
 			$plugin_fonts = @require $dompdf_font_dir . $font_cache_filename;
