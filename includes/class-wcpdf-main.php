@@ -604,18 +604,34 @@ class Main {
 			'isHtml5ParserEnabled'		=> true,
 		);
 
+		if ( ! @is_dir( $this->get_dompdf_fonts_path() ) || ! wp_is_writable( $this->get_dompdf_fonts_path() ) ) {
+			$rootDir = $this->get_custom_fonts_path();
+		}
+
 		// save custom fonts
-		$dompdf = new Dompdf( new Options( $options ) );
+		$custom_fonts_options = new Options( $options );
+		if( isset( $rootDir ) ) {
+			$custom_fonts_options->setRootDir( $rootDir );
+		}
+		$dompdf = new Dompdf( $custom_fonts_options );
 		$dompdf->getFontMetrics()->saveFontFamilies();
 
 		// save local fonts
-		$options['fontDir'] = $options['fontCache'] = $this->get_tmp_path( 'fonts' );
-		$dompdf->getFontMetrics()->setOptions( new Options( $options ) );
+		$options['fontDir']  = $options['fontCache'] = $this->get_tmp_path( 'fonts' );
+		$local_fonts_options = new Options( $options );
+		if( isset( $rootDir ) ) {
+			$local_fonts_options->setRootDir( $rootDir );
+		}
+		$dompdf->getFontMetrics()->setOptions( $local_fonts_options );
 		$dompdf->getFontMetrics()->saveFontFamilies();
 	}
 
 	public function get_custom_fonts_path() {
-		return WPO_WCPDF()->plugin_path() . "/assets/fonts";
+		return trailingslashit( WPO_WCPDF()->plugin_path() ) . 'assets' . DIRECTORY_SEPARATOR . 'fonts';
+	}
+
+	public function get_dompdf_fonts_path() {
+		return trailingslashit( WPO_WCPDF()->plugin_path() ) . 'vendor' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'dompdf' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'fonts' . DIRECTORY_SEPARATOR;
 	}
 
 	public function no_dir_notice() {

@@ -1,4 +1,7 @@
-<?php return array (
+<?php
+$fontDir = trailingslashit( WPO_WCPDF()->plugin_path() ) . 'assets' . DIRECTORY_SEPARATOR . 'fonts';
+
+return array (
   'sans-serif' => array(
     'normal' => $fontDir . '/Helvetica',
     'bold' => $fontDir . '/Helvetica-Bold',
