@@ -80,6 +80,9 @@ class Install {
 			WPO_WCPDF()->main->init_tmp();
 		}
 
+		// load fonts
+		WPO_WCPDF()->main->load_custom_and_local_fonts();
+
 		// Unsupported currency symbols 
 		$unsupported_symbols = array (
 			'AED',

@@ -1,4 +1,5 @@
-<?php return array (
+<?php return function ($fontDir, $rootDir) {
+return array (
   'sans-serif' => array(
     'normal' => $fontDir . '/Helvetica',
     'bold' => $fontDir . '/Helvetica-Bold',
@@ -101,4 +102,5 @@
     'italic' => $fontDir . '/currencies',
     'bold_italic' => $fontDir . '/currencies',
   ),
-) ?>
+);
+}; ?>

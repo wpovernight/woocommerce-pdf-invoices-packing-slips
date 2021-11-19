@@ -4,6 +4,8 @@ namespace WPO\WC\PDF_Invoices;
 use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
 use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
 use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -586,6 +588,34 @@ class Main {
 			file_put_contents( $path . '.htaccess', 'deny from all' );
 			touch( $path . 'index.php' );
 		}
+	}
+
+	public function load_custom_and_local_fonts() {
+		require WPO_WCPDF()->plugin_path() . '/vendor/autoload.php';
+
+		$options = array(
+			'defaultFont'				=> 'dejavu sans',
+			'tempDir'					=> $this->get_tmp_path( 'dompdf' ),
+			'logOutputFile'				=> $this->get_tmp_path( 'dompdf' ) . "/log.htm",
+			'fontDir'					=> $this->get_custom_fonts_path(),
+			'fontCache'					=> $this->get_custom_fonts_path(),
+			'isRemoteEnabled'			=> true,
+			'isFontSubsettingEnabled'	=> true,
+			'isHtml5ParserEnabled'		=> true,
+		);
+
+		// save custom fonts
+		$dompdf = new Dompdf( new Options( $options ) );
+		$dompdf->getFontMetrics()->saveFontFamilies();
+
+		// save local fonts
+		$options['fontDir'] = $options['fontCache'] = $this->get_tmp_path( 'fonts' );
+		$dompdf->getFontMetrics()->setOptions( new Options( $options ) );
+		$dompdf->getFontMetrics()->saveFontFamilies();
+	}
+
+	public function get_custom_fonts_path() {
+		return WPO_WCPDF()->plugin_path() . "/assets/fonts";
 	}
 
 	public function no_dir_notice() {
