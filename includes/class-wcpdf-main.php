@@ -579,15 +579,13 @@ class Main {
 				return false;
 			}
 
-			// copy font files
-			if ( $subfolder == 'fonts' ) {
-				$this->copy_fonts( $path, false );
-			}
-
 			// create .htaccess file and empty index.php to protect in case an open webfolder is used!
 			file_put_contents( $path . '.htaccess', 'deny from all' );
 			touch( $path . 'index.php' );
 		}
+
+		// load fonts
+		WPO_WCPDF()->main->load_custom_and_local_fonts();
 	}
 
 	public function load_custom_and_local_fonts() {

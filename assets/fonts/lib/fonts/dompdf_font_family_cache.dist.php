@@ -1,5 +1,5 @@
 <?php
-$distFontDir = trailingslashit( WPO_WCPDF()->plugin_path() ) . 'assets/fonts';
+$distFontDir = trailingslashit( WPO_WCPDF()->plugin_path() ) . 'assets/fonts/lib/fonts';
 
 return array (
   'sans-serif' => array(
