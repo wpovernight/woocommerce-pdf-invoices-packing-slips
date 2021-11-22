@@ -55,8 +55,8 @@ class Settings {
 		
 		$this->options_page_hook = add_submenu_page(
 			$parent_slug,
-			__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
-			__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
+			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
+			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
 			'manage_woocommerce',
 			'wpo_wcpdf_options_page',
 			array( $this, 'settings_page' )
@@ -68,7 +68,7 @@ class Settings {
 	 */
 	public function add_settings_link( $links ) {
 		$action_links = array(
-			'settings' => '<a href="admin.php?page=wpo_wcpdf_options_page">'. __( 'Settings', 'woocommerce' ) . '</a>',
+			'settings' => '<a href="admin.php?page=wpo_wcpdf_options_page">'. esc_html__( 'Settings', 'woocommerce' ) . '</a>',
 		);
 		
 		return array_merge( $action_links, $links );
@@ -81,8 +81,8 @@ class Settings {
 	public function add_support_links( $links, $file ) {
 		if ( $file == WPO_WCPDF()->plugin_basename ) {
 			$row_meta = array(
-				'docs'    => '<a href="https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/" target="_blank" title="' . __( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . __( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
-				'support' => '<a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips" target="_blank" title="' . __( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . __( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
+				'docs'    => '<a href="https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/" target="_blank" title="' . esc_html__( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . esc_html__( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
+				'support' => '<a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips" target="_blank" title="' . esc_html__( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . esc_html__( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
 			);
 
 			return array_merge( $links, $row_meta );
@@ -92,10 +92,10 @@ class Settings {
 
 	function check_auto_increment_increment() {
 		global $wpdb;
-		$row = $wpdb->get_row("SHOW VARIABLES LIKE 'auto_increment_increment'");
-		if ( !empty($row) && !empty($row->Value) && $row->Value != 1 ) {
+		$row = $wpdb->get_row( "SHOW VARIABLES LIKE 'auto_increment_increment'" );
+		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			/* translators: database row value */
-			$error = sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %s, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Status tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), $row->Value );
+			$error = wp_kses_post( sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %d, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Status tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), intval( $row->Value ) ) );
 			printf( '<div class="error"><p>%s</p></div>', $error );
 		}
 	}
@@ -103,23 +103,23 @@ class Settings {
 
 	public function settings_page() {
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array (
-				'general'	=> __('General', 'woocommerce-pdf-invoices-packing-slips' ),
-				'documents'	=> __('Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'general'	=> __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+				'documents'	=> __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
 
 		// add status tab last in row
-		$settings_tabs['debug'] = __('Status', 'woocommerce-pdf-invoices-packing-slips' );
+		$settings_tabs['debug'] = __( 'Status', 'woocommerce-pdf-invoices-packing-slips' );
 
 		$active_tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : 'general';
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
 
-		include('views/wcpdf-settings-page.php');
+		include( 'views/wcpdf-settings-page.php' );
 	}
 
 	public function add_settings_fields( $settings_fields, $page, $option_group, $option_name ) {
 		foreach ( $settings_fields as $settings_field ) {
-			if (!isset($settings_field['callback'])) {
+			if ( ! isset( $settings_field['callback'] ) ) {
 				continue;
 			} elseif ( is_callable( array( $this->callbacks, $settings_field['callback'] ) ) ) {
 				$callback = array( $this->callbacks, $settings_field['callback'] );
@@ -146,7 +146,7 @@ class Settings {
 					$settings_field['args']
 				);
 				// register option separately for singular options
-				if (is_string($settings_field['callback']) && $settings_field['callback'] == 'singular_text_element') {
+				if ( is_string( $settings_field['callback'] ) && $settings_field['callback'] == 'singular_text_element') {
 					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) );
 				}
 			}
@@ -181,8 +181,8 @@ class Settings {
 	}
 
 	public function get_document_settings( $document_type ) {
-		$documents = WPO_WCPDF()->documents->get_documents('all');
-		foreach ($documents as $document) {
+		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+		foreach ( $documents as $document ) {
 			if ( $document->get_type() == $document_type ) {
 				return $document->settings;
 			}
@@ -232,7 +232,7 @@ class Settings {
 			
 			// add base path, checking if it's not already there
 			// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
-			if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+			if ( defined( 'WP_CONTENT_DIR' ) && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
 				$base_path = $this->normalize_path( ABSPATH );
 			} else {
 				$base_path = $this->normalize_path( WP_CONTENT_DIR );
@@ -404,7 +404,7 @@ class Settings {
 	public function set_number_store() {
 		check_ajax_referer( "wpo_wcpdf_next_{$_POST['store']}", 'security' );
 		// check permissions
-		if ( !current_user_can('manage_woocommerce') ) {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			die(); 
 		}
 
@@ -422,7 +422,7 @@ class Settings {
 
 		// safety first - always use calculate when auto_increment_increment is not 1
 		$row = $wpdb->get_row("SHOW VARIABLES LIKE 'auto_increment_increment'");
-		if ( !empty($row) && !empty($row->Value) && $row->Value != 1 ) {
+		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			$method = 'calculate';
 		}
 

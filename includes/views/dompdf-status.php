@@ -95,25 +95,25 @@ if ( ( $gm = extension_loaded('gmagick') ) || ( $im = extension_loaded('imagick'
 
 if( ! $server_configs['PHP version']['result'] ) {
 	/* translators: <a> tags */
-	$server_configs['PHP version']['required'] .= sprintf( __( '<br/>Download %1$sthis addon%2$s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
+	$server_configs['PHP version']['required'] .= '<br/>' . sprintf( __( 'Download %1$sthis addon%2$s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
 }
 
 ?>
 
-<h3 id="system"><?php _e( 'System Configuration', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+<h3 id="system"><?php esc_html_e( 'System Configuration', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 
 <table cellspacing="1px" cellpadding="4px" style="background-color: white; padding: 5px; border: 1px solid #ccc;">
 	<tr>
 		<th align="left">&nbsp;</th>
-		<th align="left"><?php _e( 'Required', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-		<th align="left"><?php _e( 'Present', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left"><?php esc_html_e( 'Required', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left"><?php esc_html_e( 'Present', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 	</tr>
 
-	<?php foreach( $server_configs as $label => $server_config ) {
+	<?php foreach ( $server_configs as $label => $server_config ) {
 		if ( $server_config['result'] ) {
 			$background = '#9e4';
 			$color      = 'black';
-		} elseif ( isset($server_config['fallback']) ) {
+		} elseif ( isset( $server_config['fallback'] ) ) {
 			$background = '#FCC612';
 			$color      = 'black';
 		} else {
@@ -122,18 +122,18 @@ if( ! $server_configs['PHP version']['result'] ) {
 		}
 		?>
 		<tr>
-			<td class="title"><?php echo $label; ?></td>
-			<td><?php echo ($server_config['required'] === true ? 'Yes' : $server_config['required']); ?></td>
+			<td class="title"><?php echo wp_kses_post( $label ); ?></td>
+			<td><?php echo wp_kses_post( $server_config['required'] === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : $server_config['required'] ); ?></td>
 			<td style="background-color:<?php echo $background; ?>; color:<?php echo $color; ?>">
 				<?php
-				echo $server_config['value'];
-				if ($server_config['result'] && !$server_config['value']) echo 'Yes';
-				if (!$server_config['result']) {
-					if (isset($server_config['fallback'])) {
-						echo '<div>No. '.$server_config['fallback'].'</div>';
+				echo wp_kses_post( $server_config['value'] );
+				if ( $server_config['result'] && ! $server_config['value'] ) echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
+				if ( ! $server_config['result'] ) {
+					if ( isset( $server_config['fallback'] ) ) {
+						printf( '<div>%s. %s</div>', esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ), esc_html( $server_config['fallback'] ) );
 					}
-					if (isset($server_config['failure'])) {
-						echo '<div>'.$server_config['failure'].'</div>';
+					if ( isset( $server_config['failure'] ) ) {
+						printf( '<div>%s</div>', wp_kses_post( $server_config['failure'] ) );
 					}
 				}
 				?>
@@ -180,12 +180,12 @@ if( ! $server_configs['PHP version']['result'] ) {
 	$upload_base = trailingslashit( $upload_dir['basedir'] );
 ?>
 <br />
-<h3 id="system"><?php _e( 'Write Permissions', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+<h3 id="system"><?php esc_html_e( 'Write Permissions', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 <table cellspacing="1px" cellpadding="4px" style="background-color: white; padding: 5px; border: 1px solid #ccc;">
 	<tr>
-		<th align="left"><?php _e( 'Description', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-		<th align="left"><?php _e( 'Value', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-		<th align="left"><?php _e( 'Status', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left"><?php esc_html_e( 'Description', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left"><?php esc_html_e( 'Value', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left"><?php esc_html_e( 'Status', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 	</tr>
 	<?php
 	foreach ( $permissions as $permission ) {
@@ -198,9 +198,9 @@ if( ! $server_configs['PHP version']['result'] ) {
 		}
 		?>
 	<tr>
-		<td><?php echo $permission['description']; ?></td>
-		<td><?php echo str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ), $permission['value'] ); ?></td>
-		<td style="background-color:<?php echo $background; ?>; color:<?php echo $color; ?>"><?php echo $permission['status_message']; ?></td>
+		<td><?php echo wp_kses_post( $permission['description'] ); ?></td>
+		<td><?php echo str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ),  wp_kses_post( $permission['value'] ) ); ?></td>
+		<td style="background-color:<?php echo $background; ?>; color:<?php echo $color; ?>"><?php echo wp_kses_post( $permission['status_message'] ); ?></td>
 	</tr>
 
 	<?php } ?>
@@ -210,7 +210,7 @@ if( ! $server_configs['PHP version']['result'] ) {
 <p>
 	<?php
 	/* translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts */
-	printf( __( 'The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
+	printf( esc_attr__( 'The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
 		'<code>'.WPO_WCPDF()->main->get_tmp_path().'</code>',
 		'<code>'.$upload_base.'</code>',
 		'<code>UPLOADS</code>',
@@ -223,7 +223,7 @@ if( ! $server_configs['PHP version']['result'] ) {
 </p>
 	<?php
 	/* translators: directory path */
-	printf( __('If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!', 'woocommerce-pdf-invoices-packing-slips' ),
+	printf( esc_attr__('If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!', 'woocommerce-pdf-invoices-packing-slips' ),
 		'<code>'.WPO_WCPDF()->plugin_path() . "/vendor/dompdf/dompdf/lib/fonts/".'</code>'
 	);
 	?>
