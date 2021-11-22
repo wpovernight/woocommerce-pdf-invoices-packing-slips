@@ -179,14 +179,20 @@ class Admin {
 
 		$listing_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
-		foreach ($documents as $document) {
+		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			$icon = !empty($document->icon) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+				$pdf_url = wp_nonce_url( add_query_arg( array(
+					'action'        => 'generate_wpo_wcpdf',
+					'document_type' => $document->get_type(),
+					'order_ids'     => WCX_Order::get_id( $order ),
+				), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
 				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+
 				$listing_actions[$document->get_type()] = array(
-					'url'    => wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . WCX_Order::get_id( $order ) ), 'generate_wpo_wcpdf' ),
+					'url'    => $pdf_url,
 					'img'    => $icon,
 					'alt'    => "PDF " . $document_title,
 					'exists' => $document_exists,
@@ -201,9 +207,14 @@ class Admin {
 			if ( !isset( $data['class'] ) ) {
 				$data['class'] = $data['exists'] ? "exists " . $action : $action;
 			}
-			?><a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $data['class']; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
-				<img src="<?php echo $data['img']; ?>" alt="<?php echo $data['alt']; ?>" width="16">
-			</a><?php
+
+			printf(
+				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s"><img src="%4$s" alt="%3$s" width="16"></a>',
+				esc_attr( $data['url'] ),
+				esc_attr( $data['class'] ),
+				esc_attr( $data['alt'] ),
+				esc_attr( $data['img'] ),
+			);
 		}
 	}
 	
@@ -320,7 +331,7 @@ class Admin {
 				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
 				<?php
 				$title = __( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
-				$url = wp_nonce_url( add_query_arg('wpo_wcpdf_action','resend_email'), 'generate_wpo_wcpdf' );
+				$url = wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' );
 				?>
 			</li>
 		</ul>
@@ -337,13 +348,18 @@ class Admin {
 		$meta_box_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
 		$order = WCX::get_order( $post->ID );
-		foreach ($documents as $document) {
+		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+				$pdf_url = wp_nonce_url( add_query_arg( array(
+					'action'        => 'generate_wpo_wcpdf',
+					'document_type' => $document->get_type(),
+					'order_ids'     => $post_id,
+				), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
 				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
-					'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_wpo_wcpdf&document_type={$document->get_type()}&order_ids=" . $post_id ), 'generate_wpo_wcpdf' ),
-					'alt'		=> esc_attr( "PDF " . $document_title ),
+					'url'		=> $pdf_url,
+					'alt'		=> "PDF " . $document_title,
 					'title'		=> "PDF " . $document_title,
 					'exists'	=> is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
 				);
@@ -356,8 +372,14 @@ class Admin {
 		<ul class="wpo_wcpdf-actions">
 			<?php
 			foreach ($meta_box_actions as $document_type => $data) {
-				$exists = ( isset( $data['exists'] ) && $data['exists'] == true ) ? 'exists' : '';
-				printf('<li><a href="%1$s" class="button %4$s" target="_blank" alt="%2$s">%3$s</a></li>', $data['url'], $data['alt'], $data['title'], $exists);
+				$data['class'] = ( isset( $data['exists'] ) && $data['exists'] == true ) ? 'exists' : '';
+				printf(
+					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s</a></li>',
+					esc_attr( $data['url'] ),
+					esc_attr( $data['class'] ),
+					esc_attr( $data['alt'] ),
+					esc_html( $data['title'] ),
+				);
 			}
 			?>
 		</ul>
