@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'ba1fbf4cdabe15ed71f2516cb26b47a11f75d020',
+    'reference' => '0ff9b86fd28a59488d9b215bd51e57198655c7b9',
     'name' => '__root__',
   ),
   'versions' => 
@@ -42,7 +42,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'ba1fbf4cdabe15ed71f2516cb26b47a11f75d020',
+      'reference' => '0ff9b86fd28a59488d9b215bd51e57198655c7b9',
     ),
     'dompdf/dompdf' => 
     array (
@@ -82,12 +82,12 @@ private static $installed = array (
     ),
     'symfony/polyfill-mbstring' => 
     array (
-      'pretty_version' => 'v1.23.1',
-      'version' => '1.23.1.0',
+      'pretty_version' => 'v1.20.0',
+      'version' => '1.20.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => '9174a3d80210dca8daa7f31fec659150bbeabfc6',
+      'reference' => '39d483bdf39be819deabf04ec872eb0b2410b531',
     ),
   ),
 );
