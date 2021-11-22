@@ -181,7 +181,7 @@ class Admin {
 		$documents = WPO_WCPDF()->documents->get_documents();
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
-			$icon = !empty($document->icon) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
+			$icon = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
 				$pdf_url = wp_nonce_url( add_query_arg( array(
 					'action'        => 'generate_wpo_wcpdf',
@@ -454,7 +454,7 @@ class Admin {
 			<section class="wcpdf-data-fields-section number-date">
 				<!-- Title -->
 				<h4>
-					<?= $document->get_title(); ?>
+					<?php echo wp_kses_post( $document->get_title() ); ?>
 					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
 						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
@@ -488,7 +488,7 @@ class Admin {
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<?php /* translators: document title */ ?>
-						<span class="wpo-wcpdf-set-date-number button"><?php printf( __( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></span>
+						<span class="wpo-wcpdf-set-date-number button"><?php printf( __( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), wp_kses_post( $document->get_title() ) ); ?></span>
 					<?php endif; ?>
 				</div>
 
