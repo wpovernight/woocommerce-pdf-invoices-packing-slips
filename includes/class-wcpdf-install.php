@@ -379,6 +379,8 @@ class Install {
 		// check if tmp folder exists => if not, initialize 
 		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) || ! @is_dir( $font_path ) || ! wp_is_writable( $font_path ) ) {
 			WPO_WCPDF()->main->init_tmp();
+		} elseif( is_callable( array( WPO_WCPDF()->main, 'load_custom_and_local_fonts' ) ) ) {
+			WPO_WCPDF()->main->load_custom_and_local_fonts();
 		} else {
 			WPO_WCPDF()->main->copy_fonts( $font_path );
 		}

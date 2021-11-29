@@ -85,7 +85,7 @@ class Settings_Debug {
 							}
 						}
 
-						WPO_WCPDF()->main->copy_fonts( $font_path );
+						WPO_WCPDF()->main->load_custom_and_local_fonts();
 						printf('<div class="notice notice-success"><p>%s</p></div>', __( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' ) );
 					}
 					?>
