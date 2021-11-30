@@ -148,7 +148,7 @@ class Setup_Wizard {
 		// array_shift( $output_steps );
 		?>
 		<div class="wpo-setup-card">
-			<h1 class="wpo-plugin-title"><?php esc_html_e( 'PDF Invoices & Packing Slips' ); ?></h1>
+			<h1 class="wpo-plugin-title"><?php esc_html_e( 'PDF Invoices & Packing Slips', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
 			<ol class="wpo-progress-bar">
 				<?php foreach ( $output_steps as $step_key => $step ) : ?>
 					<a href="<?php echo esc_attr( $this->get_step_link( $step_key ) ); ?>" ><li><div class="wpo-progress-marker <?php
