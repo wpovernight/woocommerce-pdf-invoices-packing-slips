@@ -89,12 +89,12 @@ class Admin {
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
 					<?php /* translators: rounded count */ ?>
-					<h3><?php printf( __( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
-					<p><?php _e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<h3><?php printf( esc_html__( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
+					<p><?php esc_html_e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
-						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post" class="button"><?php _e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></a></li>
-						<li><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismis_review', true ) ); ?>" class="wpo-wcpdf-dismiss"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?> / <?php _e( 'Already did!', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
-						<li><a href="mailto:support@wpovernight.com?Subject=Here%20is%20how%20I%20think%20you%20can%20do%20better"><?php _e( 'Actually, I have a complaint...', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
+						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post" class="button"><?php esc_html_e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></a></li>
+						<li><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismis_review', true ) ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?> / <?php esc_html_e( 'Already did!', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
+						<li><a href="mailto:support@wpovernight.com?Subject=Here%20is%20how%20I%20think%20you%20can%20do%20better"><?php esc_html_e( 'Actually, I have a complaint...', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
 					</ul>
 				</div>
 				<script type="text/javascript">
@@ -129,8 +129,8 @@ class Admin {
 			if ( get_transient( 'wpo_wcpdf_new_install' ) !== false ) {
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-install-notice">
-					<p><strong><?php _e( 'New to WooCommerce PDF Invoices & Packing Slips?', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong> &#8211; <?php _e( 'Jumpstart the plugin by following our wizard!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-					<p class="submit"><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button-primary"><?php _e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismis_install', true ) ); ?>" class="wpo-wcpdf-dismiss-wizard"><?php _e( 'I am the wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+					<p><strong><?php esc_html_e( 'New to WooCommerce PDF Invoices & Packing Slips?', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong> &#8211; <?php esc_html_e( 'Jumpstart the plugin by following our wizard!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p class="submit"><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button-primary"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismis_install', true ) ); ?>" class="wpo-wcpdf-dismiss-wizard"><?php _e( 'I am the wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
 				<script type="text/javascript">
 				jQuery( function( $ ) {
@@ -617,7 +617,7 @@ class Admin {
 
 				if ( $is_new ) {
 					/* translators: name/description of the context for document creation logs */
-					WPO_WCPDF()->main->log_to_order_notes( $invoice, __( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
+					WPO_WCPDF()->main->log_to_order_notes( $invoice, esc_html__( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
 				}
 			}
 
@@ -666,7 +666,7 @@ class Admin {
 						if ( $mail->id == $email_to_send ) {
 							$mail->trigger( $order->get_id(), $order );
 							/* translators: %s: email title */
-							$order->add_order_note( sprintf( __( '%s email notification manually sent.', 'woocommerce-pdf-invoices-packing-slips' ), $mail->title ), false, true );
+							$order->add_order_note( sprintf( esc_html__( '%s email notification manually sent.', 'woocommerce-pdf-invoices-packing-slips' ), $mail->title ), false, true );
 						}
 					}
 				}
@@ -753,25 +753,25 @@ class Admin {
 	public function ajax_crud_document() {
 		if ( check_ajax_referer( 'wpo_wcpdf_regenerate_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_save_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_delete_document', 'security', false ) === false ) {
 			wp_send_json_error( array(
-				'message' => __( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'message' => esc_html__( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
 		if ( ! isset($_POST['action']) ||  ! in_array( $_POST['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
 			wp_send_json_error( array(
-				'message' => __( 'Bad action!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'message' => esc_html__( 'Bad action!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
 		if( empty($_POST['order_id']) || empty($_POST['document_type']) || empty($_POST['action_type']) ) {
 			wp_send_json_error( array(
-				'message' => __( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'message' => esc_html__( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
 		if ( !current_user_can('manage_woocommerce') ) {
 			wp_send_json_error( array(
-				'message' => __( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
@@ -851,7 +851,7 @@ class Admin {
 
 					if ( $is_new ) {
 						/* translators: name/description of the context for document creation logs */
-						WPO_WCPDF()->main->log_to_order_notes( $document, __( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
+						WPO_WCPDF()->main->log_to_order_notes( $document, esc_html__( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
 					}
 
 					$response      = array(
@@ -862,8 +862,13 @@ class Admin {
 				} else {
 					$message_complement = __( 'Document does not exist.', 'woocommerce-pdf-invoices-packing-slips' );
 					wp_send_json_error( array(
-						'message' => $notice_messages[$notice]['error'] . ' ' . $message_complement,
+						'message' => wp_kses_post( $notice_messages[$notice]['error'] . ' ' . $message_complement ),
 					) );
+				}
+
+				// clean/escape response message
+				if ( ! empty( $response['message'] ) ) {
+					$response['message'] = wp_kses_post( $response['message'] );
 				}
 
 				wp_send_json_success( $response );
@@ -871,12 +876,12 @@ class Admin {
 			} else {
 				$message_complement = __( 'Document is empty.', 'woocommerce-pdf-invoices-packing-slips' );
 				wp_send_json_error( array(
-					'message' => $notice_messages[$notice]['error'] . ' ' . $message_complement,
+					'message' => wp_kses_post( $notice_messages[$notice]['error'] . ' ' . $message_complement ),
 				) );
 			}
-		} catch ( \Exception $e ) {
+		} catch ( \Throwable $e ) {
 			wp_send_json_error( array(
-				'message' => $notice_messages[$notice]['error'] . ' ' . $e->getMessage(),
+				'message' => wp_kses_post( $notice_messages[$notice]['error'] . ' ' . $e->getMessage() ),
 			) );			
 		}
 	}
@@ -903,7 +908,7 @@ class Admin {
 			$title = __( 'DEBUG output enabled', 'woocommerce-pdf-invoices-packing-slips' );
 			$args = array(
 				'id'    => 'admin_bar_wpo_debug_mode',
-				'title' => sprintf( '<a href="%s" style="background-color: red; color: white;">%s</a>', $status_settings_url, $title ),
+				'title' => sprintf( '<a href="%s" style="background-color: red; color: white;">%s</a>', esc_attr( $status_settings_url ), esc_html( $title ) ),
 			);
 			$wp_admin_bar->add_node( $args );
 		}
