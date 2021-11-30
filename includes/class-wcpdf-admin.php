@@ -450,7 +450,7 @@ class Admin {
 		if( empty( $document ) || empty( $data ) ) return;
 		$data = $this->get_current_values_for_document( $document, $data );
 		?>
-		<div class="wcpdf-data-fields" data-document="<?= $document->get_type(); ?>" data-order_id="<?php echo WCX_Order::get_id( $document->order ); ?>">
+		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( WCX_Order::get_id( $document->order ) ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
 				<!-- Title -->
 				<h4>
@@ -466,21 +466,21 @@ class Admin {
 				<div class="read-only">
 					<?php if( $document->exists() ) : ?>
 						<?php if( isset( $data['number'] ) ) : ?>
-						<div class="<?= $document->get_type(); ?>-number">
-							<p class="form-field <?= $data['number']['name']; ?>_field">	
+						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
+							<p class="form-field <?= esc_attr( $data['number']['name'] ); ?>_field">	
 								<p>
-									<span><strong><?= $data['number']['label']; ?></strong></span>
-									<span><?= $data['number']['formatted']; ?></span>
+									<span><strong><?= wp_kses_post( $data['number']['label'] ); ?></strong></span>
+									<span><?= esc_attr( $data['number']['formatted'] ); ?></span>
 								</p>
 							</p>
 						</div>
 						<?php endif; ?>
 						<?php if( isset( $data['date'] ) ) : ?>
-						<div class="<?= $document->get_type(); ?>-date">
+						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
 							<p class="form-field form-field-wide">
 								<p>
-									<span><strong><?= $data['date']['label']; ?></strong></span>
-									<span><?= $data['date']['formatted']; ?></span>
+									<span><strong><?= wp_kses_post( $data['date']['label'] ); ?></strong></span>
+									<span><?= esc_attr( $data['date']['formatted'] ); ?></span>
 								</p>
 							</p>
 						</div>
@@ -488,22 +488,22 @@ class Admin {
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<?php /* translators: document title */ ?>
-						<span class="wpo-wcpdf-set-date-number button"><?php printf( __( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), wp_kses_post( $document->get_title() ) ); ?></span>
+						<span class="wpo-wcpdf-set-date-number button"><?php printf( esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), wp_kses_post( $document->get_title() ) ); ?></span>
 					<?php endif; ?>
 				</div>
 
 				<!-- Editable -->
 				<div class="editable">
 					<?php if( isset( $data['number'] ) ) : ?>
-					<p class="form-field <?= $data['number']['name']; ?>_field ">
-						<label for="<?= $data['number']['name']; ?>"><?= $data['number']['label']; ?></label>
-						<input type="text" class="short" style="" name="<?= $data['number']['name']; ?>" id="<?= $data['number']['name']; ?>" value="<?= $data['number']['plain']; ?>" disabled="disabled" > (<?= __( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
+					<p class="form-field <?= esc_attr( $data['number']['name'] ); ?>_field">	
+						<label for="<?= esc_attr( $data['number']['name'] ); ?>"><?= wp_kses_post( $data['number']['label'] ); ?></label>
+						<input type="text" class="short" style="" name="<?= esc_attr( $data['number']['name'] ); ?>" id="<?= esc_attr( $data['number']['name'] ); ?>" value="<?= esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?= esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ) ?>)
 					</p>
 					<?php endif; ?>
 					<?php if( isset( $data['date'] ) ) : ?>
 					<p class="form-field form-field-wide">
-						<label for="<?= $data['date']['name'] ?>[date]"><?= $data['date']['label']; ?></label>
-						<input type="text" class="date-picker-field" name="<?= $data['date']['name'] ?>[date]" id="<?= $data['date']['name'] ?>[date]" maxlength="10" value="<?= $data['date']['date']; ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php _e( 'h', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[hour]" id="<?= $data['date']['name']; ?>[hour]" min="0" max="23" size="2" value="<?= $data['date']['hour']; ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php _e( 'm', 'woocommerce' ); ?>" name="<?= $data['date']['name']; ?>[minute]" id="<?= $data['date']['name']; ?>[minute]" min="0" max="59" size="2" value="<?= $data['date']['minute']; ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
+						<label for="<?= esc_attr( $data['date']['name'] ) ?>[date]"><?= wp_kses_post( $data['date']['label'] ); ?></label>
+						<input type="text" class="date-picker-field" name="<?= esc_attr( $data['date']['name'] ) ?>[date]" id="<?= esc_attr( $data['date']['name'] ) ?>[date]" maxlength="10" value="<?= esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce' ); ?>" name="<?= esc_attr( $data['date']['name'] ); ?>[hour]" id="<?= esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?= esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce' ); ?>" name="<?= esc_attr( $data['date']['name'] ); ?>[minute]" id="<?= esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?= esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 					</p>
 					<?php endif; ?>
 				</div>
@@ -515,15 +515,15 @@ class Admin {
 
 				<!-- Read only -->
 				<div class="read-only">
-					<span><strong><?= $data['notes']['label']; ?></strong></span>
+					<span><strong><?= wp_kses_post( $data['notes']['label'] ); ?></strong></span>
 					<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
-					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? nl2br( $data['notes']['value'] ) : $data['notes']['value']; ?></p>
+					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
 				</div>
 				<!-- Editable -->
 				<div class="editable-notes">
 					<p class="form-field form-field-wide">
-						<label for="<?= $data['notes']['name']; ?>"><?= $data['notes']['label']; ?></label>
-						<p><textarea name="<?= $data['notes']['name']; ?>" class="<?= $data['notes']['name']; ?>" cols="60" rows="5" disabled="disabled"><?= $data['notes']['value']; ?></textarea></p>
+						<label for="<?= esc_attr( $data['notes']['name'] ); ?>"><?= wp_kses_post( $data['notes']['label'] ); ?></label>
+						<p><textarea name="<?= esc_attr( $data['notes']['name'] ); ?>" class="<?= esc_attr( $data['notes']['name'] ); ?>" cols="60" rows="5" disabled="disabled"><?= wp_kses_post( $data['notes']['value'] ); ?></textarea></p>
 					</p>
 				</div>
 
@@ -537,8 +537,8 @@ class Admin {
 			<!-- Save/Cancel buttons -->
 			<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
 				<div>
-					<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>" data-action="save"><?php _e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-					<a class="button wpo-wcpdf-cancel"><?php _e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>" data-action="save"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<a class="button wpo-wcpdf-cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 				</div>
 			</section>
 			<!-- / Save/Cancel buttons -->
