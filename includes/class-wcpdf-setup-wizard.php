@@ -110,6 +110,9 @@ class Setup_Wizard {
 			$this->save_step();
 		}
 
+		// disable query monitor during wizard
+		add_filter( 'qm/dispatch/html', '__return_false' );
+
 		ob_start();
 		$this->setup_wizard_header();
 		$this->setup_wizard_steps();
@@ -180,15 +183,15 @@ class Setup_Wizard {
 						<input type="hidden" name="wpo_wcpdf_step" value="<?php echo esc_attr( $this->step ); ?>">
 						<div class="wpo-setup-buttons">
 							<?php if ( $step = $this->get_step( -1 ) ): ?>
-								<a href="<?php echo $this->get_step_link( $step ); ?>" class="wpo-button-previous"><?php esc_html_e( 'Previous', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="<?php echo esc_attr( $this->get_step_link( $step ) ); ?>" class="wpo-button-previous"><?php esc_html_e( 'Previous', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							<?php endif ?>
 							<!-- <input type="submit" class="wpo-button-next" value="Next" /> -->
 							<?php if ( $step = $this->get_step( 1 ) ): ?>
 								<?php wp_nonce_field( 'wpo-wcpdf-setup' ); ?>
 								<input type="submit" class="wpo-button-next" value="<?php esc_attr_e( 'Next', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="save_step" />
-								<a href="<?php echo $this->get_step_link( $step ); ?>" class="wpo-skip-step"><?php esc_html_e( 'Skip this step', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="<?php echo esc_attr( $this->get_step_link( $step ) ); ?>" class="wpo-skip-step"><?php esc_html_e( 'Skip this step', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							<?php else: ?>
-								<a href="<?php echo $this->get_step_link($step); ?>" class="wpo-button-next"><?php esc_html_e( 'Finish', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="<?php echo esc_attr( $this->get_step_link($step) ); ?>" class="wpo-button-next"><?php esc_html_e( 'Finish', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							<?php endif ?>
 						</div>
 					</div>
