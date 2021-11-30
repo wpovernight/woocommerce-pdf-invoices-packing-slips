@@ -20,7 +20,7 @@ jQuery(document).ready(function() {
 		<?php if ( $no_pro ): ?>
 			<!-- No Pro extensions: Ad for PDF bundle -->
 			<li>
-				<?php esc_html_e( 'Premium PDF Invoice bundle: Everything you need for a perfect invoicing system', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'Premium PDF Invoice bundle: Everything you need for a perfect invoicing system', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<div class="more" style="display:none;">
 				<h4><?php esc_html_e( 'Supercharge WooCommerce PDF Invoices & Packing Slips with the all our premium extensions:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 				<?php esc_html_e( 'Professional features:', 'woocommerce-pdf-invoices-packing-slips' ); ?>
@@ -32,12 +32,12 @@ jQuery(document).ready(function() {
 					<li><?php echo wp_kses_post( __( '<b>Customize</b> the <b>shipping & billing address</b> format to include additional custom fields, font sizes etc. without the need to create a custom template.', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 					<li><?php echo wp_kses_post( __( 'Use the plugin in multilingual <b>WPML</b> setups', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 				</ul>
-				<?php esc_html_e( 'Advanced, customizable templates', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'Advanced, customizable templates', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<ul>
 					<li><?php echo wp_kses_post( __( 'Completely customize the invoice contents (prices, taxes, thumbnails) to your needs with a drag & drop customizer', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 					<li><?php echo wp_kses_post( __( 'Two extra stylish premade templates (Modern & Business)', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 				</ul>
-				<?php esc_html_e( 'Upload automatically to dropbox', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'Upload automatically to dropbox', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<ul>
 					<li><?php echo wp_kses_post( __( 'This extension conveniently uploads all the invoices (and other pdf documents from the professional extension) that are emailed to your customers to Dropbox. The best way to keep your invoice administration up to date!', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 				</ul>
@@ -51,7 +51,7 @@ jQuery(document).ready(function() {
 		if ( ! class_exists( 'WooCommerce_PDF_IPS_Pro' ) && ! $no_pro ) {
 			?>
 			<li>
-				<?php esc_html_e( 'Go Pro: Proforma invoices, credit notes (=refunds) & more!', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'Go Pro: Proforma invoices, credit notes (=refunds) & more!', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<div class="more" style="display:none;">
 				<?php esc_html_e( 'Supercharge WooCommerce PDF Invoices & Packing Slips with the following features:', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<ul>
@@ -71,9 +71,9 @@ jQuery(document).ready(function() {
 		if ( ! class_exists( 'WPO_WC_Smart_Reminder_Emails' ) ) {
 			?>
 			<li>
-				<?php esc_html_e( 'Automatically send payment reminders to your customers', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'Automatically send payment reminders to your customers', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<div class="more" style="display:none;">
-				<?php esc_html_e( 'WooCommerce Smart Reminder emails', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'WooCommerce Smart Reminder emails', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<ul>
 					<li><?php echo wp_kses_post( __( '<b>Completely automatic</b> scheduled emails', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 					<li><?php echo wp_kses_post( __( '<b>Rich text editor</b> for the email text, including placeholders for data from the order (name, order total, etc)', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
@@ -91,7 +91,7 @@ jQuery(document).ready(function() {
 		if ( ! class_exists( 'WooCommerce_Ext_PrintOrders' ) ) {
 			?>
 			<li>
-				<?php esc_html_e( 'Automatically send new orders or packing slips to your printer, as soon as the customer orders!', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'Automatically send new orders or packing slips to your printer, as soon as the customer orders!', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<div class="more" style="display:none;">
 				<table>
 					<tr>
@@ -112,15 +112,15 @@ jQuery(document).ready(function() {
 			$email_link = '<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
 			?>
 			<li>
-				<?php esc_html_e( 'Advanced, customizable templates', 'woocommerce-pdf-invoices-packing-slips' )?>
+				<?php esc_html_e( 'Advanced, customizable templates', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<div class="more" style="display:none;">
 				<ul>
 					<li><?php esc_html_e( 'Completely customize the invoice contents (prices, taxes, thumbnails) to your needs with a drag & drop customizer', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
 					<li><?php esc_html_e( 'Two extra stylish premade templates (Modern & Business)', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
 					<?php /* translators: Premium Templates link */?>
-					<li><?php printf( esc_html__( "Check out the Premium PDF Invoice & Packing Slips templates at %s.", 'woocommerce-pdf-invoices-packing-slips' ), $template_link );?></li>
+					<li><?php printf( esc_html__( "Check out the Premium PDF Invoice & Packing Slips templates at %s.", 'woocommerce-pdf-invoices-packing-slips' ), $template_link ); ?></li>
 					<?php /* translators: email link */?>
-					<li><?php printf( esc_html__( "For custom templates, contact us at %s.", 'woocommerce-pdf-invoices-packing-slips' ), $email_link );?></li>
+					<li><?php printf( esc_html__( "For custom templates, contact us at %s.", 'woocommerce-pdf-invoices-packing-slips' ), $email_link ); ?></li>
 				</ul>
 				</div>
 			</li>
