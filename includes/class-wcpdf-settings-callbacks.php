@@ -198,16 +198,16 @@ class Settings_Callbacks {
 	public function select( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 	
-		if ( isset( $enhanced_select ) ) {
-			if ( isset( $multiple ) ) {
+		if ( ! empty( $enhanced_select ) ) {
+			if ( ! empty( $multiple ) ) {
 				$setting_name = "{$setting_name}[]";
 				$multiple = 'multiple=multiple';
 			} else {
 				$multiple = '';
 			}
 
-			$placeholder = isset( $placeholder ) ? esc_attr( $placeholder ) : '';
-			$title = isset( $title ) ? esc_attr( $title ) : '';
+			$placeholder = ! empty( $placeholder ) ? esc_attr( $placeholder ) : '';
+			$title = ! empty( $title ) ? esc_attr( $title ) : '';
 			$class = 'wc-enhanced-select wpo-wcpdf-enhanced-select';
 			$css = 'width:400px';
 			printf( '<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $placeholder ), esc_attr( $title ), esc_attr( $class ), esc_attr( $css ), $multiple );
@@ -216,7 +216,7 @@ class Settings_Callbacks {
 		}
 
 		foreach ( $options as $key => $label ) {
-			if ( isset( $multiple ) && is_array( $current ) ) {
+			if ( ! empty( $multiple ) && is_array( $current ) ) {
 				$selected = in_array( $key, $current ) ? ' selected="selected"' : '';
 				printf( '<option value="%s"%s>%s</option>', esc_attr( $key ), $selected, esc_html( $label ) );
 			} else {
@@ -374,7 +374,7 @@ class Settings_Callbacks {
 				// don't display resolution
 			}
 
-			printf( '<img src="%1$s" style="display:block" id="img-%4$s"/>', $attachment_src, $attachment_width, $attachment_height, $id );
+			printf( '<img src="%1$s" style="display:block" id="img-%2$s"/>', esc_attr( $attachment_src ), esc_attr( $id ) );
 			if ( ! empty( $attachment_height ) && ! empty( $in_height ) ) {
 				$attachment_resolution = round( absint( $attachment_height ) / $in_height );
 				printf(
