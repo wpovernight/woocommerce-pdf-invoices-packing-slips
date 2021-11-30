@@ -303,7 +303,7 @@ class Settings_Callbacks {
 				$style = '';
 			}
 
-			$description = isset( $field['description'] ) ? '<span style="font-style:italic;">'.$field['description'].'</span>' : '';
+			$field_description = ! empty( $field['description'] ) ? '<span style="font-style:italic;">'.$field['description'].'</span>' : '';
 
 			// output field label
 			if ( isset( $field['label'] ) ) {
@@ -313,7 +313,7 @@ class Settings_Callbacks {
 			// output field
 			$field_current = isset( $current[$name] ) ? $current[$name] : '';
 			$type = isset( $field['type'] ) ? $field['type'] : 'text';
-			printf( '<input type="%1$s" id="%2$s_%4$s" name="%3$s[%4$s]" value="%5$s" size="%6$s" placeholder="%7$s"/> %8$s<br/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $name ), esc_attr( $field_current ), esc_attr( $size ), esc_attr( $placeholder ), esc_html( $description ) );
+			printf( '<input type="%1$s" id="%2$s_%4$s" name="%3$s[%4$s]" value="%5$s" size="%6$s" placeholder="%7$s"/> %8$s<br/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $name ), esc_attr( $field_current ), esc_attr( $size ), esc_attr( $placeholder ), wp_kses_post( $field_description ) );
 		}
 		echo "</p>";
 	
