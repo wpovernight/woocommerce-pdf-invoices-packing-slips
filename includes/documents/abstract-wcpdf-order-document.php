@@ -606,13 +606,13 @@ abstract class Order_Document {
 				$attachment_width = $attachment[1];
 				$attachment_height = $attachment[2];
 
-				if ( apply_filters('wpo_wcpdf_use_path', true) && file_exists($attachment_path) ) {
+				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 					$src = $attachment_path;
 				} else {
 					$src = $attachment_src;
 				}
 				
-				$img_element = sprintf('<img src="%1$s" alt="%4$s" />', $src, $attachment_width, $attachment_height, esc_attr( $company ) );
+				$img_element = sprintf('<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
 				
 				echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 			}
