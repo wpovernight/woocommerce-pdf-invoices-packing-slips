@@ -518,7 +518,9 @@ class Settings_Callbacks {
 		// get main settings array
 		$option = get_option( $args['option_name'] );
 	
-		$args['setting_name'] = "{$args['option_name']}[{$args['id']}]";
+		if ( empty ( $args['setting_name'] ) ) {
+			$args['setting_name'] = "{$args['option_name']}[{$args['id']}]";
+		}
 
 		if ( !isset($args['lang']) && !empty($args['translatable']) ) {
 			$args['lang'] = 'default';
