@@ -255,12 +255,12 @@ class Main {
 	public function generate_pdf_ajax() {
 		$guest_access = isset( WPO_WCPDF()->settings->debug_settings['guest_access'] );
 		if ( !$guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf') {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// Check the nonce - guest access doesn't use nonces but checks the unique order key (hash)
 		if( empty( $_GET['action'] ) || ( !$guest_access && !check_admin_referer( $_GET['action'] ) ) ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// Check if all parameters are set
@@ -269,11 +269,11 @@ class Main {
 		}
 
 		if ( empty( $_GET['order_ids'] ) ) {
-			wp_die( __( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' ) );
+			wp_die( esc_attr__( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		if( empty( $_GET['document_type'] ) ) {
-			wp_die( __( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			wp_die( esc_attr__( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// debug enabled by URL
@@ -334,7 +334,7 @@ class Main {
 		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
 
 		if ( ! $allowed ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// if we got here, we're safe to go!
@@ -375,7 +375,7 @@ class Main {
 				}
 			} else {
 				/* translators: document type */
-				wp_die( sprintf( __( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ), $document_type ) );
+				wp_die( sprintf( esc_html__( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ), $document_type ) );
 			}
 		} catch ( \Dompdf\Exception $e ) {
 			$message = 'DOMPDF Exception: '.$e->getMessage();
@@ -600,12 +600,12 @@ class Main {
 					?>
 					<div class="error">
 					<?php /* translators: 1. plugin name, 2. directory path */ ?>
-						<p><?php printf( __( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
-						<p><?php _e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-						<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+						<p><?php printf( esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+						<p><?php esc_html_e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+						<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					</div>
 					<?php
-					echo ob_get_clean();
+					echo wp_kses_post( ob_get_clean() );
 		
 					// save option to hide notice
 					if ( isset( $_GET['wpo_wcpdf_hide_no_dir_notice'] ) ) {
@@ -844,7 +844,7 @@ class Main {
 		if ( !empty($document) && $header_logo_height = $document->get_header_logo_height() ) {
 			?>
 			td.header img {
-				max-height: <?php echo $header_logo_height; ?>;
+				max-height: <?php echo esc_html( $header_logo_height ); ?>;
 			}
 			<?php
 		}
@@ -915,8 +915,8 @@ class Main {
 	public function export_order_personal_data_meta( $meta_to_export ) {
 		$private_address_meta = array(
 			// _wcpdf_invoice_number_data & _wcpdf_invoice_date are duplicates of the below and therefor not included
-			'_wcpdf_invoice_number'			=> __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'_wcpdf_invoice_date_formatted'	=> __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
+			'_wcpdf_invoice_number'			=> esc_html__( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
+			'_wcpdf_invoice_date_formatted'	=> esc_html__( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		return $meta_to_export + $private_address_meta;
 	}
@@ -983,11 +983,11 @@ class Main {
 			$note    = sprintf( $message, $document->get_title(), $created_via );
 
 			if( is_callable( array( $order, 'add_order_note' ) ) ) { // order
-				$order->add_order_note( $note );
+				$order->add_order_note( strip_tags( $note ) );
 			} elseif ( $document->is_refund( $order ) ) {            // refund order
 				$parent_order = $document->get_refund_parent( $order );
 				if( ! empty( $parent_order ) && is_callable( array( $parent_order, 'add_order_note' ) ) ) {
-					$parent_order->add_order_note( $note );
+					$parent_order->add_order_note( strip_tags( $note ) );
 				}
 			}
 		}
@@ -1023,7 +1023,7 @@ class Main {
 		$documents = WPO_WCPDF()->documents->get_documents();
 		foreach ($documents as $document) {
 			/* translators: document title */
-			$topics["order.{$document->type}-saved"] = sprintf( __( 'Order %s Saved', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() );
+			$topics["order.{$document->type}-saved"] = esc_html( sprintf( __( 'Order %s Saved', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ) );
 		}
 		return $topics;
 	}
