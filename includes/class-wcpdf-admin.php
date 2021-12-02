@@ -213,7 +213,7 @@ class Admin {
 				esc_attr( $data['url'] ),
 				esc_attr( $data['class'] ),
 				esc_attr( $data['alt'] ),
-				esc_attr( $data['img'] ),
+				esc_attr( $data['img'] )
 			);
 		}
 	}
