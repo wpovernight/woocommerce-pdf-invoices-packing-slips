@@ -33,4 +33,4 @@ jobs:
       - name: Run PHP Parallel Lint on PHP ${{ matrix.php-versions }}
         run: |
             curl -o parallel-lint.phar -L -C - https://github.com/php-parallel-lint/PHP-Parallel-Lint/releases/latest/download/parallel-lint.phar
-            php parallel-lint.phar . --exclude lib --checkstyle --show-deprecated | cs2pr
+            php parallel-lint.phar . --exclude vendor --checkstyle --show-deprecated | cs2pr
