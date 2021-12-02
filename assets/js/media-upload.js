@@ -73,7 +73,7 @@ jQuery(document).ready(function($) {
 		file_frame.open();
 	});
  
-	$( '#wpo-wcpdf-settings' ).on( 'click', '.wpo_remove_image_button', function( event ){
+	$( '#wpo-wcpdf-settings, .wpo-wcpdf-setup' ).on( 'click', '.wpo_remove_image_button', function( event ){
 		// get source & target elements
 		let $settings_wrapper = $(this).parent();
 		let $input            = $settings_wrapper.find( 'input#header_logo' );

@@ -265,7 +265,7 @@ class WPO_WCPDF {
 	 */
 	public function need_woocommerce() {
 		/* translators: <a> tags */
-		$error = sprintf( __( 'WooCommerce PDF Invoices & Packing Slips requires %1$sWooCommerce%2$s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
+		$error = sprintf( esc_html__( 'WooCommerce PDF Invoices & Packing Slips requires %1$sWooCommerce%2$s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
 		
 		$message = '<div class="error"><p>' . $error . '</p></div>';
 	
@@ -290,7 +290,7 @@ class WPO_WCPDF {
 		}
 		$message .= '</div>';
 
-		echo $message;
+		echo wp_kses_post( $message );
 	}
 
 	/**
@@ -374,7 +374,7 @@ class WPO_WCPDF {
 				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_nginx_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
 			<?php
-			echo ob_get_clean();
+			echo wp_kses_post( ob_get_clean() );
 		}
 
 		// protect PDF directory
@@ -418,7 +418,7 @@ class WPO_WCPDF {
 					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
 				<?php
-				echo ob_get_clean();
+				echo wp_kses_post( ob_get_clean() );
 			}
 		}
 
