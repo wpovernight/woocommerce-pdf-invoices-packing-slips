@@ -307,7 +307,7 @@ class Settings_Callbacks {
 
 			// output field label
 			if ( isset( $field['label'] ) ) {
-				printf( '<label for="%1$s_%2$s" %3$s>%4$s:</label>', esc_attr( $id ), esc_attr( $name ), esc_attr( $style ), esc_attr( $field['label'] ) );
+				printf( '<label for="%1$s_%2$s" %3$s>%4$s:</label>', esc_attr( $id ), esc_attr( $name ), esc_attr( $style ), esc_html( $field['label'] ) );
 			}
 
 			// output field
