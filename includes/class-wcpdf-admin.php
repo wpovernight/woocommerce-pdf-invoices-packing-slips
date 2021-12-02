@@ -378,7 +378,7 @@ class Admin {
 					esc_attr( $data['url'] ),
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
-					esc_html( $data['title'] ),
+					esc_html( $data['title'] )
 				);
 			}
 			?>
