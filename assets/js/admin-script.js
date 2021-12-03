@@ -10,17 +10,17 @@ jQuery( function( $ ) {
 		$input = $( this ).siblings( 'input' );
 		$input.addClass('ajax-waiting');
 		var data = {
-			security:      $input.data('nonce'),
-			action:        "wpo_wcpdf_set_next_number",
-			store:         $input.data('store'),
-			number:        $input.val(), 
+			security: $input.data('nonce'),
+			action:   "wpo_wcpdf_set_next_number",
+			store:    $input.data('store'),
+			number:   $input.val(), 
 		};
 
 		xhr = $.ajax({
-			type:		'POST',
-			url:		wpo_wcpdf_admin.ajaxurl,
-			data:		data,
-			success:	function( response ) {
+			type: 'POST',
+			url:  wpo_wcpdf_admin.ajaxurl,
+			data: data,
+			success: function( response ) {
 				$input.removeClass('ajax-waiting');
 				$input.siblings( '.edit-next-number' ).show();
 				$input.prop('disabled', 'disabled');
@@ -37,10 +37,10 @@ jQuery( function( $ ) {
 		}
 	}).trigger('change');
 
-    //Preview
-    let previewStates = $('#wpo-wcpdf-preview-wrapper').attr('data-preview-states');
-    
-    $('.slide-left').on( 'click', function() {
+	//Preview
+	let previewStates = $('#wpo-wcpdf-preview-wrapper').attr('data-preview-states');
+	
+	$('.slide-left').on( 'click', function() {
 		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
 		let previewState = $wrapper.attr('data-preview-state');
 		if ( previewStates == 3 ) {
@@ -74,12 +74,14 @@ jQuery( function( $ ) {
 			$previewData.find('p.order-number').show();
 			$previewData.find('input[name="preview-order-number"]').addClass('active');
 			$previewData.find('input[name="preview-order-search"]').removeClass('active');
+			$previewData.find('#preview-order-search-results').hide();
 		} else if ( $(this).hasClass('order-search') ) {
 			$previewData.find('p.last-order').hide();
 			$previewData.find('p.order-number').hide();
 			$previewData.find('p.order-search').show();
 			$previewData.find('input[name="preview-order-search"]').addClass('active');
 			$previewData.find('input[name="preview-order-number"]').removeClass('active');
+			$previewData.find('#preview-order-search-results').hide();
 		} else {
 			$previewData.find('p.last-order').show();
 			$previewData.find('p.order-number').hide();
@@ -202,6 +204,45 @@ jQuery( function( $ ) {
 			console.error(reason);
 			}
 		);
+	}
+
+	// Preview on user input
+	let wcpdf_preview_search;
+	$( '#preview-order-search' ).on( 'keyup paste', function( event ) {
+		let elem      = $(this);
+		let duration  = event.type == 'keyup' ? 1000 : 0;
+		clearTimeout( wcpdf_preview_search );
+		wcpdf_preview_search = setTimeout( function() { preview_order_search( elem ) }, duration );
+	} );
+
+	// Preview order search
+	function preview_order_search( elem ) {
+		let div = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+		div.children( 'a' ).remove(); // remove previous results
+		let data   = {
+			security: elem.data('nonce'),
+			action:   "wpo_wcpdf_preview_order_search",
+			search:   elem.val(), 
+		};
+
+		$.ajax({
+			type:  'POST',
+			url:   wpo_wcpdf_admin.ajaxurl,
+			data:  data,
+			success: function( response ) {
+				if( response.data ) {
+					$.each( response.data, function ( i, item ) {
+						let first_line = '<a href="#"><span class="order-number">'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
+						if( item.billing_company.length > 0 ) {
+							first_line = first_line+', '+item.billing_company;
+						}
+						let second_line = '<br><span class="date">'+item.date_created+'</span><span class="total">'+item.total+'</span></a>';
+						div.append( first_line+second_line );
+						div.show();
+					});
+				}
+			}
+		});
 	}
 
 });

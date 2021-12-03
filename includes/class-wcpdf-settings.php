@@ -51,6 +51,8 @@ class Settings {
 
 		// AJAX preview
 		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
+		// AJAX preview order search
+		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
 	}
 
 	public function menu() {
@@ -186,6 +188,78 @@ class Settings {
 		}
 
 		exit();
+	}
+
+	public function preview_order_search() {
+		check_ajax_referer( "wpo_wcpdf_preview", 'security' );
+
+		// check permissions
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			die(); 
+		}
+
+		if ( ! empty( $_POST['search'] ) ) {
+			$search       = sanitize_text_field( $_POST['search'] );
+			$customer_id  = is_numeric( $search );
+			$customer     = is_email( $search );
+			$default_args = apply_filters( 'wpo_wcpdf_preview_order_search_args', array(
+				'type'     => 'shop_order',
+				'limit'    => 3,
+				'orderby'  => 'date',
+				'order'    => 'DESC',
+				'return'   => 'ids',
+			) );
+
+			// search by customer ID
+			if ( $customer_id ) {
+				$args = array( 'customer_id' => $search );
+			}
+
+			// search by customer email
+			if ( $customer ) {
+				$args = array( 'customer' => $search );
+			}
+
+			// let's try with names
+			if ( ! $customer_id && ! $customer ) {
+				$names = array( 'billing_first_name', 'billing_last_name', 'billing_company' );
+				foreach( $names as $name ) {
+					$args    = array( $name => $search );
+					$args    = $args + $default_args;
+					$results = wc_get_orders( $args );
+					if( count( $results ) > 0 ) {
+						break;
+					}
+				}
+			} else {
+				$args    = $args + $default_args;
+				$results = wc_get_orders( $args );
+			}
+
+			// if we got here we have results!
+			if ( ! empty( $results ) ) {
+				$data = array();
+				foreach ( $results as $value ) {
+					$order = wc_get_order( $value );
+					if ( empty( $order ) ) {
+						continue;
+					}
+					$order_id                              = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : 0;
+					$data[$order_id]['order_number']       = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
+					$data[$order_id]['billing_first_name'] = is_callable( array( $order, 'get_billing_first_name' ) ) ? $order->get_billing_first_name() : '';
+					$data[$order_id]['billing_last_name']  = is_callable( array( $order, 'get_billing_last_name' ) ) ? $order->get_billing_last_name() : '';
+					$data[$order_id]['billing_company']    = is_callable( array( $order, 'get_billing_company' ) ) ? $order->get_billing_company() : '';
+					$data[$order_id]['date_created']       = is_callable( array( $order, 'get_date_created' ) ) ? esc_attr__( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . $order->get_date_created()->format( wcpdf_date_format() ) : '';
+					$data[$order_id]['total']              = is_callable( array( $order, 'get_total' ) ) ? esc_attr__( 'Total', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . $order->get_total() : '';
+				}
+
+				$data = apply_filters( 'wpo_wcpdf_preview_order_search_data', $data, $results );
+
+				wp_send_json_success( $data );
+			}
+
+			wp_die();
+		}
 	}
 
 	public function add_settings_fields( $settings_fields, $page, $option_group, $option_name ) {
