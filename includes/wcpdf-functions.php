@@ -162,8 +162,8 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 	// if the deprecated function is called from one of our filters, $this should be $document
 	$filter = current_filter();
 	$global_wcpdf_filters = array( 'wp_ajax_generate_wpo_wcpdf' );
-	if ( !in_array($filter, $global_wcpdf_filters) && strpos($filter, 'wpo_wcpdf') !== false && strpos($replacement, '$this') !== false ) {
-		$replacement = str_replace('$this', '$document', $replacement);
+	if ( ! in_array ($filter, $global_wcpdf_filters ) && strpos( $filter, 'wpo_wcpdf' ) !== false && strpos( $replacement, '$this' ) !== false ) {
+		$replacement = str_replace( '$this', '$document', $replacement );
 		$replacement = "{$replacement} - check that the \$document parameter is included in your action or filter ($filter)!";
 	}
 	if ( is_ajax() ) {
@@ -181,7 +181,7 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
  * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
  */
 function wcpdf_log_error( $message, $level = 'error', $e = null ) {
-	if (function_exists('wc_get_logger')) {
+	if ( function_exists( 'wc_get_logger' ) ) {
 		$logger = wc_get_logger();
 		$context = array( 'source' => 'wpo-wcpdf' );
 
@@ -205,13 +205,13 @@ function wcpdf_log_error( $message, $level = 'error', $e = null ) {
 }
 
 function wcpdf_output_error( $message, $level = 'error', $e = null ) {
-	if ( !current_user_can( 'edit_shop_orders' ) ) {
-		_e( 'Error creating PDF, please contact the site owner.', 'woocommerce-pdf-invoices-packing-slips' );
+	if ( ! current_user_can( 'edit_shop_orders' ) ) {
+		esc_html_e( 'Error creating PDF, please contact the site owner.', 'woocommerce-pdf-invoices-packing-slips' );
 		return;
 	}
 	?>
 	<div style="border: 2px solid red; padding: 5px;">
-		<h3><?php echo $message; ?></h3>
+		<h3><?php echo wp_kses_post( $message ); ?></h3>
 		<?php if ( !empty($e) && is_callable( array( $e, 'getTraceAsString') ) ): ?>
 		<pre><?php echo $e->getTraceAsString(); ?></pre>
 		<?php endif ?>

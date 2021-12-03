@@ -225,9 +225,9 @@ abstract class Order_Document {
 		// pass data to setter functions
 		$this->set_data( array(
 			// always load date before number, because date is used in number formatting
-			'date'			=> WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_date", true ),
-			'number'		=> $number,
-			'notes'			=> WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_notes", true ),
+			'date'   => WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_date", true ),
+			'number' => $number,
+			'notes'  => WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_notes", true ),
 		), $order );
 
 		return;
@@ -334,6 +334,7 @@ abstract class Order_Document {
 			$parent_order = wc_get_order( $order->get_parent_id() );
 		} /*translators: 1. credit note title, 2. refund id */
 		$note = $refund_id ? sprintf( __( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ) );
+		$note = wp_kses( $note, 'strip' );
 		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
 
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
@@ -605,13 +606,13 @@ abstract class Order_Document {
 				$attachment_width = $attachment[1];
 				$attachment_height = $attachment[2];
 
-				if ( apply_filters('wpo_wcpdf_use_path', true) && file_exists($attachment_path) ) {
+				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 					$src = $attachment_path;
 				} else {
 					$src = $attachment_src;
 				}
 				
-				$img_element = sprintf('<img src="%1$s" alt="%4$s" />', $src, $attachment_width, $attachment_height, esc_attr( $company ) );
+				$img_element = sprintf('<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
 				
 				echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 			}

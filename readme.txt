@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.10.1
+Stable tag: 2.10.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,29 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.10.6 =
+* Fix: PHP7.1 compatibility
+
+= 2.10.5 =
+* Security: Apply escaping to translated strings
+
+= 2.10.4 =
+* Fix: Billing phone not displaying in Packing Slip when billing address was enabled
+* Fix: Support for special characters on sites without the PHP MB-string module
+* Fix: Don't alter order object when logging document creation for refunds to order notes
+
+= 2.10.3 =
+* Fix: Secondary address always showed, regardless of setting
+
+= 2.10.2 =
+* New: Print shipping phone number when available (and enabled in the settings)
+* New: Show inline warning on the settings page when the logo is bigger than 600dpi
+* Fix: Prevent fatal error when trying to log notes to refund orders
+* Fix: MailPoet email compatibility notice
+* Translations: Updated translation template (POT)
+* Translations: Removed bundled translations for language packs available on wordpress.org
+* Marked tested up to WooCommerce 5.9
 
 = 2.10.1 =
 * Fix: prevent fatal errors if template functions cannot be loaded

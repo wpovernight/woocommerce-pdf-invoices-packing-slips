@@ -1,9 +1,9 @@
 <?php defined( 'ABSPATH' ) or exit; ?>
 <?php
 $invoice_settings_url = add_query_arg( array(
-		'tab' => 'documents',
-		'section' => 'invoice',
-	) );
+	'tab' => 'documents',
+	'section' => 'invoice',
+) );
 ?>
 <style>
 .wcpdf-attachment-settings-hint {
@@ -17,9 +17,8 @@ $invoice_settings_url = add_query_arg( array(
 	font-size: 120%;
 }
 </style>
-<!-- <div id="message" class="updated woocommerce-message"> -->
 <div class="wcpdf-attachment-settings-hint">
-<?php /* translators: <a> tags */ ?>
-	<?php printf(__( 'It looks like you haven\'t setup any email attachments yet, check the settings under <b>%1$sDocuments > Invoice%2$s</b>', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="'.$invoice_settings_url.'">', '</a>'); ?><br>
-	<?php printf('<a href="%s" style="font">%s</a>', add_query_arg( 'wpo_wcpdf_hide_attachments_hint', 'true' ), __( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ) ); ?>
+	<?php /* translators: <a> tags */ ?>
+	<?php printf( wp_kses_post( __( 'It looks like you haven\'t setup any email attachments yet, check the settings under <b>%1$sDocuments > Invoice%2$s</b>', 'woocommerce-pdf-invoices-packing-slips' ) ), '<a href="'.$invoice_settings_url.'">', '</a>' ); ?><br>
+	<?php printf( '<a href="%s" style="font">%s</a>', add_query_arg( 'wpo_wcpdf_hide_attachments_hint', 'true' ), esc_html__( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ) ); ?>
 </div>

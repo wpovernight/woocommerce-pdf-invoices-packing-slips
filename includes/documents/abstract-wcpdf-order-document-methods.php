@@ -123,6 +123,17 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
+	 * Check whether the billing address should be shown
+	 */
+	public function show_billing_address() {
+		if( $this->get_type() != 'packing-slip' ) {
+			return true;
+		} else {
+			return ! empty( $this->settings['display_billing_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_billing_address'] == 'always' );
+		}
+	}
+
+	/**
 	 * Return/Show billing email
 	 */
 	public function get_billing_email() {
@@ -141,21 +152,44 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	
 	/**
-	 * Return/Show billing phone
+	 * Return/Show phone by type
 	 */
-	public function get_billing_phone() {
-		$billing_phone = WCX_Order::get_prop( $this->order, 'billing_phone', 'view' );
+	public function get_phone( $phone_type = 'billing' ) {
+		$phone_type = "{$phone_type}_phone";
+		$phone      = WCX_Order::get_prop( $this->order, $phone_type, 'view' );
 
-		if ( !$billing_phone && $this->is_refund( $this->order ) ) {
+		// on refund orders
+		if ( ! $phone && $this->is_refund( $this->order ) ) {
 			// try parent
 			$parent_order = $this->get_refund_parent( $this->order );
-			$billing_phone = WCX_Order::get_prop( $parent_order, 'billing_phone', 'view' );
+			$phone        = WCX_Order::get_prop( $parent_order, $phone_type, 'view' );
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_phone', $billing_phone, $this );
+		return $phone;
 	}
+
+	public function get_billing_phone() {
+		$phone = $this->get_phone( 'billing' );
+
+		return apply_filters( "wpo_wcpdf_billing_phone", $phone, $this );
+	}
+
+	public function get_shipping_phone( $fallback_to_billing = false ) {
+		$phone = $this->get_phone( 'shipping' );
+
+		if( $fallback_to_billing && empty( $phone ) ) {
+			$phone = $this->get_billing_phone();
+		}
+
+		return apply_filters( "wpo_wcpdf_shipping_phone", $phone, $this );
+	}
+
 	public function billing_phone() {
 		echo $this->get_billing_phone();
+	}
+
+	public function shipping_phone( $fallback_to_billing = false ) {
+		echo $this->get_shipping_phone( $fallback_to_billing );
 	}
 	
 	/**
@@ -189,6 +223,17 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	public function shipping_address() {
 		echo $this->get_shipping_address();
+	}
+
+	/**
+	 * Check whether the shipping address should be shown
+	 */
+	public function show_shipping_address() {
+		if( $this->get_type() != 'packing-slip' ) {
+			return ! empty( $this->settings['display_shipping_address'] ) && ( $this->ships_to_different_address() || $this->settings['display_shipping_address'] == 'always' );
+		} else {
+			return true;
+		}
 	}
 
 	/**
