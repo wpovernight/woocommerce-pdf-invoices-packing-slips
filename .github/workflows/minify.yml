@@ -1,8 +1,8 @@
 name: Auto Minify JS and CSS Files
 
 on:
-  workflow_dispatch:
   push:
+    branches: [ master ]
     paths: 
       - 'assets/**/*.js'
       - 'assets/**/*.css'
@@ -13,11 +13,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
-  
+
       - name: Auto Minify
-        uses: nizarmah/auto-minify@v2.1
+        uses: nizarmah/auto-minify@v2.0
         with:
           directory: 'assets'
 
@@ -25,3 +23,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Generate minified JS and CSS files"
+          branch: ${{ github.ref }}
