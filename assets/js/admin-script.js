@@ -70,12 +70,22 @@ jQuery( function( $ ) {
 		$previewData.find('ul').toggleClass('active');
 		if ( $(this).hasClass('order-number') ) {
 			$previewData.find('p.last-order').hide();
+			$previewData.find('p.order-search').hide();
 			$previewData.find('p.order-number').show();
-			$previewData.find('input').addClass('active');
+			$previewData.find('input[name="preview-order-number"]').addClass('active');
+			$previewData.find('input[name="preview-order-search"]').removeClass('active');
+		} else if ( $(this).hasClass('order-search') ) {
+			$previewData.find('p.last-order').hide();
+			$previewData.find('p.order-number').hide();
+			$previewData.find('p.order-search').show();
+			$previewData.find('input[name="preview-order-search"]').addClass('active');
+			$previewData.find('input[name="preview-order-number"]').removeClass('active');
 		} else {
 			$previewData.find('p.last-order').show();
 			$previewData.find('p.order-number').hide();
-			$previewData.find('input').removeClass('active');
+			$previewData.find('p.order-search').hide();
+			$previewData.find('input[name="preview-order-number"]').removeClass('active');
+			$previewData.find('input[name="preview-order-search"]').removeClass('active');
 		}
 	});
 
@@ -85,7 +95,7 @@ jQuery( function( $ ) {
 	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $( '#wpo-wcpdf-preview-wrapper .preview' ) ) );
 
 	// Preview on user input
-	$( '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #wpo-wcpdf-settings checkbox, #preview-order' ).on( 'keyup paste', function( event ) {
+	$( '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #wpo-wcpdf-settings checkbox, #preview-order-number' ).on( 'keyup paste', function( event ) {
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'keyup' ? 1000 : 0;
@@ -106,7 +116,7 @@ jQuery( function( $ ) {
 	function ajax_load_preview( form_data, elem ) {
 		let preview   = $( '#wpo-wcpdf-preview-wrapper .preview' );
 		let order_id  = preview.data( 'order_id' );
-		if( elem[0].id == 'preview-order' ) {
+		if( elem[0].id == 'preview-order-number' ) {
 			order_id = elem.val();
 		}
 		let nonce     = preview.data('nonce');

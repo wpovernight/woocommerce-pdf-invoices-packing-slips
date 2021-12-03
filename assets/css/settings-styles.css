@@ -324,7 +324,8 @@ table.wcpdf_documents_settings_list td.title {
 	float: right;
 }
 
-.preview-document .preview-data p.order-number {
+.preview-document .preview-data p.order-number,
+.preview-document .preview-data p.order-search {
 	display: none;
 }
 
@@ -335,10 +336,12 @@ table.wcpdf_documents_settings_list td.title {
 	width: 20ch;
 	margin-right: -25ch;
 	transition: .2s ease-in-out;
+	display: none;
 }
 
 .preview-document .preview-data input.active {
 	margin-right: 0;
+	display: inline-block;
 }
 
 .preview-document .preview-data ul {

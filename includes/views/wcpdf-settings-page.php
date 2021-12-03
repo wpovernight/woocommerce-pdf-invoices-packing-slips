@@ -73,12 +73,15 @@ $review_invitation = sprintf(
 			?>
 			<div class="slider slide-right">&#9654;</div>
 			<div class="preview-data">
-				<input type="number" name="preview-order" id="preview-order">
-				<p class="last-order">Currently showing last order <span class="arrow-down">&#9660;</span></p>
-				<p class="order-number">Currently showing order number <span class="arrow-down">&#9660;</span></p>
+				<input type="number" name="preview-order-number" id="preview-order-number">
+				<input type="text" name="preview-order-search" id="preview-order-search" placeholder="<?php esc_attr_e( 'Type...', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+				<p class="last-order"><?php esc_html_e( 'Currently showing last order', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+				<p class="order-number"><?php esc_html_e( 'Currently showing order number', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+				<p class="order-search"><?php esc_html_e( 'Currently showing order search result', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
 				<ul>
-					<li class="last-order">Show last order</li>
-					<li class="order-number">Show specific order number</li>
+					<li class="last-order"><?php esc_html_e( 'Show last order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+					<li class="order-number"><?php esc_html_e( 'Show specific order number', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+					<li class="order-search"><?php esc_html_e( 'Search for an order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
 				</ul>
 			</div>
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
