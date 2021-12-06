@@ -45,7 +45,7 @@ class Sequential_Number_Store {
 		global $wpdb;
 		$this->store_name = $store_name;
 		$this->method     = $method;
-		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // i.e. wp_wcpdf_invoice_number_2021
+		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // e.g. wp_wcpdf_invoice_number
 
 		$this->init();
 	}
