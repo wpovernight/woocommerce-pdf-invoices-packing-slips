@@ -411,10 +411,17 @@ class Settings_Callbacks {
 	 * @param  array $args Field arguments.
 	 */
 	public function next_number_edit( $args ) {
-		extract( $args );
-		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-		$number_store = new Sequential_Number_Store( $store, $number_store_method );
-		$next_number = $number_store->get_next();
+		extract( $args ); // $store, $size, $description
+		// Sequential_Number_Store object
+		if( is_object( $store ) ) {
+			$next_number         = $store->get_next();
+			$store               = $store->store_name;
+		// legacy
+		} else {
+			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method(); 
+			$number_store        = new Sequential_Number_Store( $store, $number_store_method ); 
+			$next_number         = $number_store->get_next();
+		}
 		$nonce = wp_create_nonce( "wpo_wcpdf_next_{$store}" );
 		printf(
 			'<input id="next_%1$s" class="next-number-input" type="text" size="%2$s" value="%3$s" disabled="disabled" data-store="%1$s" data-nonce="%4$s"/> <span class="edit-next-number dashicons dashicons-edit"></span><span class="save-next-number button secondary" style="display:none;">%5$s</span>',
