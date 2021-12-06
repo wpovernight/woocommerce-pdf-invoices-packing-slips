@@ -104,21 +104,8 @@ class Invoice extends Order_Document_Methods {
 			return $invoice_number;
 		}
 
-		$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-		$number_store_name = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $this );
-		$number_store = new Sequential_Number_Store( $number_store_name, $number_store_method );
-		// reset invoice number yearly
-		if ( isset( $this->settings['reset_number_yearly'] ) ) {
-			$current_year = date("Y");
-			$last_number_year = $number_store->get_last_date('Y');
-			// check if we need to reset
-			if ( $current_year != $last_number_year ) {
-				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
-			}
-		}
-
-		$invoice_date = $this->get_date();
-		$invoice_number = $number_store->increment( $this->order_id, $invoice_date->date_i18n( 'Y-m-d H:i:s' ) );
+		$number_store   = $this->get_sequential_number_store();
+		$invoice_number = $number_store->increment( $this->order_id, $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 
 		$this->set_number( $invoice_number );
 
@@ -317,7 +304,7 @@ class Invoice extends Order_Document_Methods {
 				'callback'		=> 'next_number_edit',
 				'section'		=> 'invoice',
 				'args'			=> array(
-					'store'			=> 'invoice_number',
+					'store'			=> $this->get_sequential_number_store(),
 					'size'			=> '10',
 					'description'	=> __( 'This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!', 'woocommerce-pdf-invoices-packing-slips' ),
 				)

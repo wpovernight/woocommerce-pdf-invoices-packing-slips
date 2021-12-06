@@ -1,16 +1,18 @@
-.wpo-wizzard {
+.wpo-wizard {
 	background:#f9f9f9;
 }
 
 .wpo-wcpdf-setup {
-	padding:0;
+	margin: 100px auto 25px;
+	padding: 0;
 	font-family: 'Ubuntu', sans-serif;
 	font-size: 14px;
-    line-height: 22px;
-    color:#444;
-    background:none;
-    -webkit-box-shadow: none;
+	line-height: 22px;
+	color:#444;
+	background: none;
+	-webkit-box-shadow: none;
 	box-shadow: none;
+	border: none;
 }
 
 .wpo-wcpdf-setup h1, .wpo-wcpdf-setup h2 {
@@ -32,12 +34,12 @@
 	background-color:#f9f9f9;
 	font-family: 'Ubuntu', sans-serif;
 	font-size: 14px;
-    line-height: 22px;
-    color:#444;
-    width:100%;
-    height:100%;
-    margin:0;
-    padding:0;
+	line-height: 22px;
+	color:#444;
+	width:100%;
+	height:100%;
+	margin:0;
+	padding:0;
 }
 
 .confetti {
@@ -51,11 +53,10 @@
 	display:block;
 	background-color:#f2fafa;
 	max-width:900px;
-	margin:100px auto 100px auto;
-    padding:0;
-    border-radius:10px;
-    box-shadow:10px 10px 80px rgba(0,0,0,0.05);
-    overflow:hidden;
+	padding:0;
+	border-radius:10px;
+	box-shadow:10px 10px 80px rgba(0,0,0,0.05);
+	overflow:hidden;
 }
 
 .wpo-plugin-title {
@@ -223,8 +224,8 @@
 	position:absolute;
 	left:50%;
 	-ms-transform: 			translate(-50%, 0%); /* IE 9 */
-    -webkit-transform: 		translate(-50%, 0%); /* Safari */
-    transform: 				translate(-50%, 0%);
+	-webkit-transform: 		translate(-50%, 0%); /* Safari */
+	transform: 				translate(-50%, 0%);
 }
 
 /* Attach to */
@@ -319,7 +320,7 @@
 /* Landscape phones and smaller */
 @media (max-width: 480px) {
 
-	.wpo-wizzard, .wpo-wcpdf-setup {
+	.wpo-wizard, .wpo-wcpdf-setup {
 		margin:0;
 		height:100%;
 	}
