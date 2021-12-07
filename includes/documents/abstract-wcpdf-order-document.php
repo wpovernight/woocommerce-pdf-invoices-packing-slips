@@ -1026,7 +1026,7 @@ abstract class Order_Document {
 	 */
 	public function maybe_retire_number_store( $date, $store_base_name, $method ) {
 		global $wpdb;
-		$wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
 		
 		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
@@ -1035,7 +1035,7 @@ abstract class Order_Document {
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
 
 		// nothing to retire if requested year matches current store year or if current store year is not in the past
-		if ( $requested_year == $current_store_year || ! ( $current_store_year < $current_year ) ) {
+		if ( empty( $current_store_year ) || $requested_year == $current_store_year || ! ( $current_store_year < $current_year ) ) {
 			return $current_store_year;
 		}
 		
@@ -1077,6 +1077,10 @@ abstract class Order_Document {
 			}
 		}
 
+		if( $was_showing_errors ) {
+			$wpdb->show_errors();
+		}
+
 		// current store year has been updated to current year, returning this means no year suffix has to be used
 		return $current_year;
 	}
@@ -1089,19 +1093,29 @@ abstract class Order_Document {
 	 */
 	public function get_number_store_year( $table_name ) {
 		global $wpdb;
-		$wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
 
 		$current_year = date_i18n( 'Y' );
 		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'") == $table_name; 
 		if( $table_exists ) {
 			// get year for the last row
 			$year = $wpdb->get_var( "SELECT YEAR(date) FROM {$table_name} ORDER BY id DESC LIMIT 1" );
+			// default to currenty year if no results
 			if( ! $year ) {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to get the current year from the %s table: %s', 'woocommerce-pdf-invoices-packing-slips' ), $table_name, $wpdb->last_error ) );
 				$year = $current_year;
+				// if we don't get a result, this could either mean there's an error,
+				// OR that the first number simply has not been created yet (=no rows)
+				// we only log when there's an actual error
+				if( ! empty( $wpdb->last_error ) ) {
+					wcpdf_log_error( sprintf( __( 'An error occurred while trying to get the current year from the %s table: %s', 'woocommerce-pdf-invoices-packing-slips' ), $table_name, $wpdb->last_error ) );
+				}
 			}
 		} else {
 			$year = $current_year;
+		}
+
+		if( $was_showing_errors ) {
+			$wpdb->show_errors();
 		}
 
 		return intval( $year );
