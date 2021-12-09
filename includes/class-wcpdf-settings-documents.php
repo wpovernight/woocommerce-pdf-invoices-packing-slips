@@ -17,7 +17,9 @@ class Settings_Documents {
 	public function init_settings() {
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 		foreach ( $documents as $document ) {
-			$document->init_settings();
+			if ( is_callable( array( $document, 'init_settings' ) ) ) {
+				$document->init_settings();
+			}
 		}
 	}
 
