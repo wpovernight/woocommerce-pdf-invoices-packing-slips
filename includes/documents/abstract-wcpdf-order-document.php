@@ -185,8 +185,8 @@ abstract class Order_Document {
 			'invoice_number_column',
 			'paper_size',
 			'font_subsetting',
-		) );
-		if ( in_array( $key, $non_historical_settings ) && isset($this->latest_settings) ) {
+		), $this );
+		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
 			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
 		} else {
 			$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
@@ -620,12 +620,13 @@ abstract class Order_Document {
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
+		$setting = $this->get_setting( $settings_key, $default );
 		// check for 'default' key existence
-		if ( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) && array_key_exists( 'default', $this->settings[$settings_key] ) ) {
-			$text = $this->settings[$settings_key]['default'];
+		if ( ! empty( $setting ) && is_array( $setting ) && array_key_exists( 'default', $setting ) ) {
+			$text = $setting['default'];
 		// fallback to first array element if default is not present
-		} elseif( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
-			$text = reset( $this->settings[$settings_key] );
+		} elseif( ! empty( $setting ) && is_array( $setting ) ) {
+			$text = reset( $setting );
 		}
 
 		// fallback to default
