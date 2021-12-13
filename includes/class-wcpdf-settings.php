@@ -111,7 +111,8 @@ class Settings {
 		// add status tab last in row
 		$settings_tabs['debug'] = __( 'Status', 'woocommerce-pdf-invoices-packing-slips' );
 
-		$active_tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : 'general';
+		$default_tab    = apply_filters( 'wpo_wcpdf_settings_tabs_default', ! empty( $settings_tabs['general'] ) ? 'general' : key( $settings_tabs ) );
+		$active_tab     = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : $default_tab;
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
 
 		include( 'views/wcpdf-settings-page.php' );
