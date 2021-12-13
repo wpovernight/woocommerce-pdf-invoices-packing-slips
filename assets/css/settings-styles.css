@@ -409,6 +409,7 @@ table.wcpdf_documents_settings_list td.title {
 	padding: 10px;
 	margin: 0 20px;
 	text-decoration: none;
+	cursor: pointer;
 }
 
 .preview-document .preview-data #preview-order-search-results a:last-child {
