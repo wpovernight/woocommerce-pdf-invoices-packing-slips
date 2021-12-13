@@ -434,6 +434,10 @@ table.wcpdf_documents_settings_list td.title {
 	float: right;
 }
 
+.preview-document .preview-data #preview-order-search-results .error {
+	margin: 0 20px;
+}
+
 .slider {
 	box-sizing: border-box;
 	position: absolute;
