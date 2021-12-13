@@ -389,6 +389,51 @@ table.wcpdf_documents_settings_list td.title {
 	color: #222;
 }
 
+.preview-document .preview-data #preview-order-search-results {
+	display: none;
+	clear: both;
+	width: 300px;
+	float: right;
+	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
+	border-radius: 6px;
+	padding: 20px 0;
+	margin-top: -4px;
+}
+
+.preview-document .preview-data #preview-order-search-results a {
+	display: block;
+	border-left: 1px solid #999;
+	border-right: 1px solid #999;
+	border-top: 1px solid #999;
+	color: #999;
+	padding: 10px;
+	margin: 0 20px;
+	text-decoration: none;
+}
+
+.preview-document .preview-data #preview-order-search-results a:last-child {
+	border-bottom: 1px solid #999;
+}
+
+.preview-document .preview-data #preview-order-search-results a:hover {
+	background-color: #51266b;
+	color: white;
+}
+
+.preview-document .preview-data #preview-order-search-results .order-number {
+	font-weight: bold;
+}
+
+.preview-document .preview-data #preview-order-search-results .date,
+.preview-document .preview-data #preview-order-search-results .total {
+	margin-top: 6px;
+	display: inline-block;
+}
+
+.preview-document .preview-data #preview-order-search-results .total {
+	float: right;
+}
+
 .slider {
 	box-sizing: border-box;
 	position: absolute;

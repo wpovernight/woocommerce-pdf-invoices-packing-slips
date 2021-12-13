@@ -75,7 +75,6 @@ $review_invitation = sprintf(
 			<div class="preview-data">
 				<input type="number" name="preview-order-number" id="preview-order-number">
 				<input type="text" name="preview-order-search" id="preview-order-search" placeholder="<?php esc_attr_e( 'Type...', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
-				<div id="preview-order-search-results" style="display:none;"></div>
 				<p class="last-order"><?php esc_html_e( 'Currently showing last order', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
 				<p class="order-number"><?php esc_html_e( 'Currently showing order number', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
 				<p class="order-search"><?php esc_html_e( 'Currently showing order search result', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
@@ -84,6 +83,7 @@ $review_invitation = sprintf(
 					<li class="order-number"><?php esc_html_e( 'Show specific order number', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
 					<li class="order-search"><?php esc_html_e( 'Search for an order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
 				</ul>
+				<div id="preview-order-search-results"><!-- Results populated with JS --></div>
 			</div>
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
 			<div class="preview" data-order_id="<?= $order_id; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>"></div>

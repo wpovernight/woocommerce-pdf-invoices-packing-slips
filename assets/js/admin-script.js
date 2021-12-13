@@ -218,7 +218,8 @@ jQuery( function( $ ) {
 	// Preview order search
 	function preview_order_search( elem ) {
 		let div = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
-		div.children( 'a' ).remove(); // remove previous results
+		div.children( 'a' ).remove();      // remove previous results
+		div.children( '.error' ).remove(); // remove previous errors
 		let data   = {
 			security: elem.data('nonce'),
 			action:   "wpo_wcpdf_preview_order_search",
@@ -231,15 +232,20 @@ jQuery( function( $ ) {
 			data:  data,
 			success: function( response ) {
 				if( response.data ) {
-					$.each( response.data, function ( i, item ) {
-						let first_line = '<a href="#"><span class="order-number">'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
-						if( item.billing_company.length > 0 ) {
-							first_line = first_line+', '+item.billing_company;
-						}
-						let second_line = '<br><span class="date">'+item.date_created+'</span><span class="total">'+item.total+'</span></a>';
-						div.append( first_line+second_line );
+					if( response.data.error ) {
+						div.append( '<span class="error">'+response.data.error+'</span>' );
 						div.show();
-					});
+					} else {
+						$.each( response.data, function ( i, item ) {
+							let first_line = '<a href="#"><span class="order-number">#'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
+							if( item.billing_company.length > 0 ) {
+								first_line = first_line+', '+item.billing_company;
+							}
+							let second_line = '<br><span class="date">'+item.date_created+'</span><span class="total">'+item.total+'</span></a>';
+							div.append( first_line+second_line );
+							div.show();
+						});
+					}
 				}
 			}
 		});
