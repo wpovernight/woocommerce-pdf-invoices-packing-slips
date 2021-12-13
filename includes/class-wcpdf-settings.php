@@ -207,7 +207,7 @@ class Settings {
 			$customer     = is_email( $search );
 			$default_args = apply_filters( 'wpo_wcpdf_preview_order_search_args', array(
 				'type'     => 'shop_order',
-				'limit'    => 3,
+				'limit'    => 10,
 				'orderby'  => 'date',
 				'order'    => 'DESC',
 				'return'   => 'ids',

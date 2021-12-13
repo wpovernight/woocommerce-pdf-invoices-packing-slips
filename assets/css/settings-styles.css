@@ -398,6 +398,7 @@ table.wcpdf_documents_settings_list td.title {
 	border-radius: 6px;
 	padding: 20px 0;
 	margin-top: -4px;
+	background-color: white;
 }
 
 .preview-document .preview-data #preview-order-search-results a {
@@ -405,7 +406,7 @@ table.wcpdf_documents_settings_list td.title {
 	border-left: 1px solid #999;
 	border-right: 1px solid #999;
 	border-top: 1px solid #999;
-	color: #999;
+	color: #000;
 	padding: 10px;
 	margin: 0 20px;
 	text-decoration: none;
