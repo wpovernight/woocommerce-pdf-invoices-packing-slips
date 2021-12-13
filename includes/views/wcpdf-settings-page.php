@@ -68,7 +68,11 @@ $review_invitation = sprintf(
 
 		<div class="preview-document">
 			<?php
-				$last_order_id = wc_get_orders( array( 'limit' => 1, 'return' => 'ids' ) );
+				$last_order_id = wc_get_orders( array(
+					'limit'  => 1,
+					'return' => 'ids',
+					'type'   => 'shop_order',
+				) );
 				$order_id      = reset( $last_order_id );
 			?>
 			<div class="slider slide-right">&#9654;</div>

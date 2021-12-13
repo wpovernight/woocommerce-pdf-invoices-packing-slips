@@ -144,6 +144,9 @@ class Settings {
 			if ( empty( $order ) ) {
 				wp_send_json_error( array( 'error' => __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
+			if ( $order->get_type() == 'shop_order_refund' ) {
+				wp_send_json_error( array( 'error' => __( 'Order is a refund!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			}
 
 			$invoice             = wcpdf_get_invoice( $order );
 			$invoice->set_date( current_time( 'timestamp', true ) );
