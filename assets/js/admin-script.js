@@ -105,7 +105,7 @@ jQuery( function( $ ) {
 		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
-	// Preview on user select option (using 'change' event breaks the PDF render)
+	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( '#wpo-wcpdf-settings select option' ).on( 'click', function( event ) {
 		event.preventDefault();
 		let elem      = $(this);
@@ -115,8 +115,8 @@ jQuery( function( $ ) {
 		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
-	// Preview on user click search result
-	$( document ).on( 'click', '#preview-order-search-results a.preview-order-search-result', function( event ) {
+	// Preview on user click in search result
+	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
 		let elem      = $(this);
 		let order_id  = elem.data( 'order_id' );
@@ -252,7 +252,7 @@ jQuery( function( $ ) {
 						div.show();
 					} else {
 						$.each( response.data, function ( i, item ) {
-							let first_line = '<a class="preview-order-search-result" data-order_id="'+i+'"><span class="order-number">#'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
+							let first_line = '<a data-order_id="'+i+'"><span class="order-number">#'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
 							if( item.billing_company.length > 0 ) {
 								first_line = first_line+', '+item.billing_company;
 							}
