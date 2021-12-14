@@ -440,6 +440,21 @@ table.wcpdf_documents_settings_list td.title {
 	margin: 0 20px;
 }
 
+.preview-document .preview-order-search-wrapper {
+	position: relative;
+	float: right;
+}
+
+.preview-document .preview-order-search-wrapper img.preview-order-search-clear {
+	position: absolute;
+	width: 30px;
+	height: 16px;
+	top: 22px;
+	right: 6px;
+	display: none;
+	cursor: pointer;
+}
+
 .slider {
 	box-sizing: border-box;
 	position: absolute;

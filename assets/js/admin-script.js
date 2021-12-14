@@ -132,6 +132,17 @@ jQuery( function( $ ) {
 		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
+	// Clear preview order search results/input
+	$( document ).on( 'click', 'img.preview-order-search-clear', function( event ) {
+		event.preventDefault();
+		let elem      = $(this);
+		elem.closest( 'div' ).find( 'input#preview-order-search' ).val( '' );
+		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( 'a' ).remove();      // remove previous results
+		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( '.error' ).remove(); // remove previous errors
+		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
+		elem.hide();
+	} );
+
 	function ajax_load_preview( form_data, elem ) {
 		let preview   = $( '#wpo-wcpdf-preview-wrapper .preview' );
 		let order_id  = preview.data( 'order_id' );
@@ -269,6 +280,7 @@ jQuery( function( $ ) {
 				}
 
 				elem.removeClass( 'ajax-waiting' );
+				elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).show();
 			}
 		});
 	}
