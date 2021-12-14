@@ -253,7 +253,7 @@ class Settings {
 					$data[$order_id]['billing_last_name']  = is_callable( array( $order, 'get_billing_last_name' ) ) ? $order->get_billing_last_name() : '';
 					$data[$order_id]['billing_company']    = is_callable( array( $order, 'get_billing_company' ) ) ? $order->get_billing_company() : '';
 					$data[$order_id]['date_created']       = is_callable( array( $order, 'get_date_created' ) ) ? '<strong>' . esc_attr__( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . $order->get_date_created()->format( 'Y/m/d' ) : '';
-					$data[$order_id]['total']              = is_callable( array( $order, 'get_total' ) ) ? '<strong>' . esc_attr__( 'Total', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . $order->get_total() : '';
+					$data[$order_id]['total']              = is_callable( array( $order, 'get_total' ) ) ? '<strong>' . esc_attr__( 'Total', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . wc_price( $order->get_total() ) : '';
 				}
 
 				$data = apply_filters( 'wpo_wcpdf_preview_order_search_data', $data, $results );
