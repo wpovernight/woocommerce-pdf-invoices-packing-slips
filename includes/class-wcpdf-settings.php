@@ -185,7 +185,7 @@ class Settings {
 				}
 			}
 
-			$pdf_data = $invoice->get_preview();
+			$pdf_data = $invoice->preview_pdf();
 
 			wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
 		}
