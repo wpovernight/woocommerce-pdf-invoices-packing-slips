@@ -135,7 +135,7 @@ jQuery( function( $ ) {
 	// Clear preview order search results/input
 	$( document ).on( 'click', 'img.preview-order-search-clear', function( event ) {
 		event.preventDefault();
-		let elem      = $(this);
+		let elem = $(this);
 		elem.closest( 'div' ).find( 'input#preview-order-search' ).val( '' );
 		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( 'a' ).remove();      // remove previous results
 		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( '.error' ).remove(); // remove previous errors
