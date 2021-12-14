@@ -121,9 +121,11 @@ jQuery( function( $ ) {
 		let elem      = $(this);
 		let order_id  = elem.data( 'order_id' );
 		let preview   = $( '#wpo-wcpdf-preview-wrapper .preview' );
-		preview.data( 'order_id', order_id );
+		preview.data( 'order_id', order_id );           // pass the clicked order_id to the preview order_id
+
 		elem.closest( 'div' ).hide();                   // hide results div
 		elem.closest( 'div' ).children( 'a' ).remove(); // remove all results
+
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
 		clearTimeout( wcpdf_preview );
@@ -156,9 +158,9 @@ jQuery( function( $ ) {
 		} );
 
 		$.ajax({
-			type:     'POST',
-			url:      wpo_wcpdf_admin.ajaxurl,
-			data:     data,
+			type:    'POST',
+			url:     wpo_wcpdf_admin.ajaxurl,
+			data:    data,
 			success: function( response ) {
 				if( response.data.error ) {
 					$( '#'+canvas_id ).remove();
@@ -225,6 +227,7 @@ jQuery( function( $ ) {
 	let wcpdf_preview_search;
 	$( '#preview-order-search' ).on( 'keyup paste', function( event ) {
 		let elem      = $(this);
+		elem.addClass( 'ajax-waiting' );
 		let duration  = event.type == 'keyup' ? 1000 : 0;
 		clearTimeout( wcpdf_preview_search );
 		wcpdf_preview_search = setTimeout( function() { preview_order_search( elem ) }, duration );
@@ -232,9 +235,11 @@ jQuery( function( $ ) {
 
 	// Preview order search
 	function preview_order_search( elem ) {
-		let div = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+		let div    = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+
 		div.children( 'a' ).remove();      // remove previous results
 		div.children( '.error' ).remove(); // remove previous errors
+
 		let data   = {
 			security: elem.data('nonce'),
 			action:   "wpo_wcpdf_preview_order_search",
@@ -242,9 +247,9 @@ jQuery( function( $ ) {
 		};
 
 		$.ajax({
-			type:  'POST',
-			url:   wpo_wcpdf_admin.ajaxurl,
-			data:  data,
+			type:    'POST',
+			url:     wpo_wcpdf_admin.ajaxurl,
+			data:    data,
 			success: function( response ) {
 				if( response.data ) {
 					if( response.data.error ) {
@@ -262,6 +267,8 @@ jQuery( function( $ ) {
 						});
 					}
 				}
+
+				elem.removeClass( 'ajax-waiting' );
 			}
 		});
 	}

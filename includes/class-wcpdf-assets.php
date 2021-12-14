@@ -111,6 +111,11 @@ class Assets {
 				background-position: 95% 50% !important;
 				background-repeat: no-repeat !important;
 			}" );
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', "#preview-order-search.ajax-waiting {
+				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/spinner.gif'.") !important;
+				background-repeat: no-repeat !important;
+				background-position: 95% center !important;
+			}" );
 
 			// SCRIPTS
 			wp_enqueue_script( 'wc-enhanced-select' );
