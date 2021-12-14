@@ -81,7 +81,7 @@ $review_invitation = sprintf(
 				<input type="text" name="preview-order-search" id="preview-order-search" placeholder="<?php esc_attr_e( 'Type...', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
 				<p class="last-order"><?php esc_html_e( 'Currently showing last order', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
 				<p class="order-number"><?php esc_html_e( 'Currently showing order number', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
-				<p class="order-search"><?php esc_html_e( 'Currently showing order search result', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+				<p class="order-search"><?php esc_html_e( 'Currently showing order search results', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
 				<ul>
 					<li class="last-order"><?php esc_html_e( 'Show last order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
 					<li class="order-number"><?php esc_html_e( 'Show specific order number', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
