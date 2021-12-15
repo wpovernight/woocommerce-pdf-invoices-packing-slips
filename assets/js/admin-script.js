@@ -248,8 +248,9 @@ jQuery( function( $ ) {
 	function preview_order_search( elem ) {
 		let div    = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
 
-		div.children( 'a' ).remove();      // remove previous results
-		div.children( '.error' ).remove(); // remove previous errors
+		div.children( 'a' ).remove();      										// remove previous results
+		div.children( '.error' ).remove(); 										// remove previous errors
+		elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).hide();	// remove the clear button
 
 		let data   = {
 			security: elem.data('nonce'),
