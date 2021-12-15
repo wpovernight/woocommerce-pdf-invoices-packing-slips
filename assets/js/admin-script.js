@@ -237,8 +237,14 @@ jQuery( function( $ ) {
 	// Preview on user input
 	let wcpdf_preview_search;
 	$( '#preview-order-search' ).on( 'keyup paste', function( event ) {
-		let elem      = $(this);
+		let elem = $(this);
 		elem.addClass( 'ajax-waiting' );
+		let div  = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+		div.children( 'a' ).remove();      										// remove previous results
+		div.children( '.error' ).remove(); 										// remove previous errors
+		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
+		elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).hide();	// remove the clear button
+
 		let duration  = event.type == 'keyup' ? 1000 : 0;
 		clearTimeout( wcpdf_preview_search );
 		wcpdf_preview_search = setTimeout( function() { preview_order_search( elem ) }, duration );
@@ -246,13 +252,8 @@ jQuery( function( $ ) {
 
 	// Preview order search
 	function preview_order_search( elem ) {
-		let div    = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
-
-		div.children( 'a' ).remove();      										// remove previous results
-		div.children( '.error' ).remove(); 										// remove previous errors
-		elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).hide();	// remove the clear button
-
-		let data   = {
+		let div  = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+		let data = {
 			security: elem.data('nonce'),
 			action:   "wpo_wcpdf_preview_order_search",
 			search:   elem.val(), 
