@@ -58,7 +58,11 @@ class Install {
 			// new version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		} elseif ( $installed_version && version_compare( $installed_version, WPO_WCPDF_VERSION, '>' ) ) {
-			$this->downgrade( $installed_version );
+			try {
+				$this->downgrade( $installed_version );
+			} catch ( \Throwable $th ) {
+				wcpdf_log_error( sprintf( "Plugin downgrade procedure failed (downgrading from version %s to %s): %s", $installed_version, WPO_WCPDF_VERSION, $th->getMessage() ), 'critical', $th );
+			}
 			// downgrade version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
