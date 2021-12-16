@@ -743,7 +743,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		// WC 3.7+ stores rate in tax items!
 		if ( $order_rates = $this->get_tax_rates_from_order( $order ) ) {
 			if ( isset( $order_rates[ $rate_id ] ) ) {
-				return (float) $order_rates[ $rate_id ];
+				return (float) $order_rates[ $rate_id ]['rate'];
 			}
 		}
 
@@ -769,14 +769,16 @@ abstract class Order_Document_Methods extends Order_Document {
 					// subscription renewals didn't properly record the rate_percent property between WC3.7 and WCS3.0.1
 					// so we use a fallback if the rate_percent = 0 and the amount != 0
 					$rate_percent = $tax_item->get_rate_percent();
-					$tax_amount = $tax_item->get_tax_total() + $tax_item->get_shipping_tax_total();
+					$tax_amount   = $tax_item->get_tax_total() + $tax_item->get_shipping_tax_total();
 					if ( $tax_amount > 0 && $rate_percent > 0 ) {
-						$tax_rates[ $tax_item->get_rate_id() ] = $rate_percent;
+						$tax_rates[ $tax_item->get_rate_id() ]['rate']  = $rate_percent;
+						$tax_rates[ $tax_item->get_rate_id() ]['label'] = $tax_item->get_label();
 					} else {
 						continue; // not setting the rate will let the plugin fall back to the rate from the settings
 					}
 				} else {
-					$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
+					$tax_rates[ $tax_item->get_rate_id() ]['rate']  = $tax_item->get_rate_percent();
+					$tax_rates[ $tax_item->get_rate_id() ]['label'] = $tax_item->get_label();
 				}
 
 			}
