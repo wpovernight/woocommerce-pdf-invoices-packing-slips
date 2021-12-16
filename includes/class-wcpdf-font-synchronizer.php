@@ -139,6 +139,12 @@ class Font_Synchronizer {
 		} else {
 			$font_data = array();
 		}
+
+		// if include fails it returns false - we'll log an error in that case
+		if ( $font_data === false ) {
+			wcpdf_log_error( sprintf( "Could not read font cache file (%s)", $cache_file ), 'critical' );
+		}
+
 		// dompdf 1.1.X uses a closure to return the fonts, instead of a plain array (1.0.X and older)
 		if ( ! is_array( $font_data ) && is_callable( $font_data ) ) {
 			$font_data = $destination;
@@ -209,6 +215,9 @@ class Font_Synchronizer {
 	 */
 	public function normalize_font_paths( $fonts ) {
 		foreach( $fonts as $font_name => $filenames ) {
+			if ( ! is_array( $filenames ) ) {
+				continue;
+			}
 			foreach ( $filenames as $variant => $filename ) {
 				$fonts[$font_name][$variant] = $this->normalize_path( $filename );
 			}
