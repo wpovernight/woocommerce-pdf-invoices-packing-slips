@@ -686,6 +686,12 @@ class Main {
 	 * Copy DOMPDF fonts to wordpress tmp folder
 	 */
 	public function copy_fonts( $path = '', $merge_with_local = true ) {
+		// only copy fonts if the bundled dompdf library is used!
+		$default_pdf_maker = '\\WPO\\WC\\PDF_Invoices\\PDF_Maker';
+		if ( $default_pdf_maker !== apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker ) ) {
+			return;
+		}
+
 		if ( empty( $path ) ) {
 			$path = $this->get_tmp_path( 'fonts' );
 		}
