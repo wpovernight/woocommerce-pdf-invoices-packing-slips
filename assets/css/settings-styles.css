@@ -162,8 +162,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .nav-tab-wrapper a.nav-tab {
 	background: transparent;
 	border: none;
-	padding: 1em 1.2em;
-	margin: 0;
+	padding: 1em 0em;
+	margin: 0 1.2em;
 	font-weight: 300;
 	font-size: 15px;
 }
