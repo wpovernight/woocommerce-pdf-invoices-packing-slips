@@ -707,19 +707,23 @@ class Main {
 			'cache_dist' => 'dompdf_font_family_cache.dist.php',
 		);
 		foreach ( $font_cache_files as $font_cache_name => $font_cache_filename ) {
-			$plugin_fonts = @require $dompdf_font_dir . $font_cache_filename;
+			$plugin_fonts = include $dompdf_font_dir . $font_cache_filename;
 			if ( $merge_with_local && is_readable( $path . $font_cache_filename ) ) {
-				$local_fonts = @require $path . $font_cache_filename;
-				if (is_array($local_fonts) && is_array($plugin_fonts)) {
+				$local_fonts = @include $path . $font_cache_filename;				
+				if ( $local_fonts === false ) {
+					wcpdf_log_error( sprintf( "Could not read font cache file (%s)", $path . $font_cache_filename ), 'critical' );
+					continue;
+				}
+				if ( is_array( $local_fonts ) && is_array( $plugin_fonts ) ) {
 					// merge local & plugin fonts, plugin fonts overwrite (update) local fonts
 					// while custom local fonts are retained
-					$local_fonts = array_merge($local_fonts, $plugin_fonts);
+					$local_fonts = array_merge( $local_fonts, $plugin_fonts );
 					// create readable array with $fontDir in place of the actual folder for portability
-					$fonts_export = var_export($local_fonts,true);
-					$fonts_export = str_replace('\'' . $fontDir , '$fontDir . \'', $fonts_export);
-					$cacheData = sprintf("<?php return %s;%s?>", $fonts_export, PHP_EOL );
+					$fonts_export = var_export( $local_fonts, true );
+					$fonts_export = str_replace( '\'' . $fontDir , '$fontDir . \'', $fonts_export );
+					$cacheData = sprintf( "<?php return %s;%s?>", $fonts_export, PHP_EOL );
 					// write file with merged cache data
-					file_put_contents($path . $font_cache_filename, $cacheData);
+					file_put_contents( $path . $font_cache_filename, $cacheData );
 				} else { // empty local file
 					copy( $dompdf_font_dir . $font_cache_filename, $path . $font_cache_filename );
 				}
@@ -730,28 +734,28 @@ class Main {
 		}
 
 		// first try the easy way with glob!
-		if ( function_exists('glob') ) {
-			$files = glob($dompdf_font_dir."*.*");
-			foreach($files as $file){
-				$filename = basename($file);
-				if( !is_dir($file) && is_readable($file) && !in_array($filename, $font_cache_files)) {
+		if ( function_exists( 'glob' ) ) {
+			$files = glob( $dompdf_font_dir."*.*" );
+			foreach( $files as $file ){
+				$filename = basename( $file );
+				if( ! is_dir( $file ) && is_readable( $file ) && ! in_array( $filename, $font_cache_files ) ) {
 					$dest = $path . $filename;
-					copy($file, $dest);
+					copy( $file, $dest );
 				}
 			}
 		} else {
 			// fallback method using font cache file (glob is disabled on some servers with disable_functions)
 			$extensions = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
-			$fontDir = untrailingslashit($dompdf_font_dir);
+			$fontDir = untrailingslashit( $dompdf_font_dir );
 			$plugin_fonts = @require $dompdf_font_dir . $font_cache_files['cache'];
 
-			foreach ($plugin_fonts as $font_family => $filenames) {
-				foreach ($filenames as $filename) {
-					foreach ($extensions as $extension) {
-						$file = $filename.$extension;
-						if (file_exists($file)) {
-							$dest = $path . basename($file);
-							copy($file, $dest);
+			foreach ( $plugin_fonts as $font_family => $filenames ) {
+				foreach ( $filenames as $filename ) {
+					foreach ( $extensions as $extension ) {
+						$file = $filename . $extension;
+						if ( file_exists( $file ) ) {
+							$dest = $path . basename( $file );
+							copy( $file, $dest );
 						}
 					}
 				}
