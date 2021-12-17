@@ -149,6 +149,30 @@ table.wcpdf_documents_settings_list td.title {
 
 /* Preview */
 
+body.woocommerce_page_wpo_wcpdf_options_page {
+	background: #fff;
+}
+
+.wrap [class$="icon32"] + h2 {
+	font-size: 18px;
+	padding: 1em;
+	font-weight: 200;
+}
+
+.nav-tab-wrapper a.nav-tab {
+	background: transparent;
+	border: none;
+	padding: 1em 1.2em;
+	margin: 0;
+	font-weight: 300;
+	font-size: 15px;
+}
+
+.nav-tab-wrapper a.nav-tab.nav-tab-active {
+	border-bottom: 3px solid #51266b;
+	font-weight: 600;
+}
+
 #wpo-wcpdf-preview-wrapper {
 	width: 100%;
 	height: auto;
@@ -175,8 +199,7 @@ table.wcpdf_documents_settings_list td.title {
 #wpo-wcpdf-preview-wrapper .sidebar > form {
 	background: white;
 	overflow: hidden;
-	padding: 1em 2em;
-	box-shadow: 0 0 30px -25px rgba(0,0,0,0.3);
+	padding: 0 2em;
 	box-sizing: border-box;
 }
 
@@ -262,7 +285,7 @@ table.wcpdf_documents_settings_list td.title {
 	position: relative;
 	float: right;
 	overflow: hidden;
-	padding: 4em 0 0 2em;
+	padding: 4em;
 	box-sizing: border-box;
 }
 
@@ -305,7 +328,7 @@ table.wcpdf_documents_settings_list td.title {
 	box-sizing: border-box;
 	min-height: 5cm;
 	background: white;
-	box-shadow: 0 0 30px -25px;
+	box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
 }
 
 .preview-document .preview-data {
