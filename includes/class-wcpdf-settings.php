@@ -369,6 +369,11 @@ class Settings {
 	}
 
 	public function maybe_migrate_template_paths( $settings_section = null ) {
+		// bail if no template is selected yet (fresh install)
+		if ( empty( $this->general_settings['template_path'] ) ) {
+			return;
+		}
+
 		$installed_templates = $this->get_installed_templates();
 		$selected_template = $this->normalize_path( $this->general_settings['template_path'] );
 		$template_match = '';
