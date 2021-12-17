@@ -366,10 +366,10 @@ class Install {
 			}
 		}
 
-		// 2.12.0: remove the obsolete .dist font cache file
+		// 2.12.0: remove the obsolete .dist font cache file and mustRead.html from local fonts folder
 		if ( version_compare( $installed_version, '2.12.0-dev', '<' ) ) {
-			$dist_cache_file = trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php';
-			@unlink( $dist_cache_file );
+			@unlink( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
+			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
 		}
 		
 	}
