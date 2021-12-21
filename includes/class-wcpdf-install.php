@@ -365,6 +365,13 @@ class Install {
 				WPO_WCPDF()->settings->maybe_migrate_template_paths();
 			}
 		}
+
+		// 2.12.0: remove the obsolete .dist font cache file and mustRead.html from local fonts folder
+		if ( version_compare( $installed_version, '2.12.0-dev', '<' ) ) {
+			@unlink( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
+			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
+		}
+		
 	}
 
 	/**
