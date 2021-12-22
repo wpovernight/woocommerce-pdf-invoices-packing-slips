@@ -202,6 +202,11 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	overflow: hidden;
 	padding: 0 2em;
 	box-sizing: border-box;
+	max-width: 600px;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar > form.editor {
+	max-width: none;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table,
