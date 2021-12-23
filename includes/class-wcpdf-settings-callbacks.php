@@ -216,7 +216,7 @@ class Settings_Callbacks {
 		}
 
 		if ( ! empty( $options_callback ) ) {
-			$options = ! empty( $options_callback_args ) ? call_user_func_array( $options_callback, $options_callback_args ) : call_user_func( $options_callback );
+			$options = isset( $options_callback_args ) ? call_user_func_array( $options_callback, $options_callback_args ) : call_user_func( $options_callback );
 		}
 
 		foreach ( $options as $key => $label ) {
@@ -272,7 +272,7 @@ class Settings_Callbacks {
 		extract( $this->normalize_settings_args( $args ) );
 
 		if ( ! empty( $options_callback ) ) {
-			$options = ! empty( $options_callback_args ) ? call_user_func_array( $options_callback, $options_callback_args ) : call_user_func( $options_callback );
+			$options = isset( $options_callback_args ) ? call_user_func_array( $options_callback, $options_callback_args ) : call_user_func( $options_callback );
 		}
 	
 		foreach ( $options as $key => $label ) {
@@ -297,7 +297,7 @@ class Settings_Callbacks {
 		extract( $this->normalize_settings_args( $args ) );
 
 		if ( ! empty( $fields_callback ) ) {
-			$fields = ! empty( $fields_callback_args ) ? call_user_func_array( $fields_callback, $fields_callback_args ) : call_user_func( $fields_callback );
+			$fields = isset( $fields_callback_args ) ? call_user_func_array( $fields_callback, $fields_callback_args ) : call_user_func( $fields_callback );
 		}
 
 		if ( ! empty( $header ) ) {
@@ -344,7 +344,7 @@ class Settings_Callbacks {
 		extract( $this->normalize_settings_args( $args ) );
 
 		if ( ! empty( $fields_callback ) ) {
-			$fields = ! empty( $fields_callback_args ) ? call_user_func_array( $fields_callback, $fields_callback_args ) : call_user_func( $fields_callback );
+			$fields = isset( $fields_callback_args ) ? call_user_func_array( $fields_callback, $fields_callback_args ) : call_user_func( $fields_callback );
 		}
 
 		foreach ( $fields as $name => $label ) {
@@ -429,30 +429,29 @@ class Settings_Callbacks {
 	public function next_number_edit( $args ) {
 		extract( $args ); // $store, $size, $description
 
-		$store_name  = '';
-		$next_number = '';
-
-		if( ! empty( $store_callback ) ) {
-			// Sequential_Number_Store object
-			if ( $store_callback instanceof Sequential_Number_Store ) {
+		if ( ! empty( $store_callback ) ) {
+			if( $store_callback instanceof Sequential_Number_Store ) {
 				$store = $store_callback;
-			// array with document object + function name
 			} elseif ( is_array( $store_callback ) ) {
-				$store = ! empty( $store_callback_args ) ? call_user_func_array( $store_callback, $store_callback_args ) : call_user_func( $store_callback );
-			// legacy
-			} else {
-				$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method(); 
-				$store               = new Sequential_Number_Store( $store_callback, $number_store_method ); 
+				$store = isset( $store_callback_args ) ? call_user_func_array( $store_callback, $store_callback_args ) : call_user_func( $store_callback );
 			}
-
-			$store_name  = $store->store_name;
-			$next_number = $store->get_next();
 		}
 
-		$nonce = wp_create_nonce( "wpo_wcpdf_next_{$store_name}" );
+		// Sequential_Number_Store object
+		if( is_object( $store ) ) {
+			$next_number         = $store->get_next();
+			$store               = $store->store_name;
+		// legacy
+		} else {
+			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method(); 
+			$number_store        = new Sequential_Number_Store( $store, $number_store_method ); 
+			$next_number         = $number_store->get_next();
+		}
+
+		$nonce = wp_create_nonce( "wpo_wcpdf_next_{$store}" );
 		printf(
 			'<input id="next_%1$s" class="next-number-input" type="text" size="%2$s" value="%3$s" disabled="disabled" data-store="%1$s" data-nonce="%4$s"/> <span class="edit-next-number dashicons dashicons-edit"></span><span class="save-next-number button secondary" style="display:none;">%5$s</span>',
-			esc_attr( $store_name ),
+			esc_attr( $store ),
 			esc_attr( $size ),
 			esc_attr( $next_number ),
 			esc_attr( $nonce ),
