@@ -430,11 +430,7 @@ class Settings_Callbacks {
 		extract( $args ); // $store, $size, $description
 
 		if ( ! empty( $store_callback ) ) {
-			if( $store_callback instanceof Sequential_Number_Store ) {
-				$store = $store_callback;
-			} elseif ( is_array( $store_callback ) ) {
-				$store = isset( $store_callback_args ) ? call_user_func_array( $store_callback, $store_callback_args ) : call_user_func( $store_callback );
-			}
+			$store = isset( $store_callback_args ) ? call_user_func_array( $store_callback, $store_callback_args ) : call_user_func( $store_callback );
 		}
 
 		// Sequential_Number_Store object
