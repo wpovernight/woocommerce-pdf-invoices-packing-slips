@@ -62,11 +62,11 @@ class Settings_General {
 				'callback'	=> 'select',
 				'section'	=> 'general_settings',
 				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'template_path',
-					'options' 		=> $this->get_installed_templates_list(),
+					'option_name'      => $option_name,
+					'id'               => 'template_path',
+					'options_callback' => array( $this, 'get_installed_templates_list' ),
 					/* translators: 1,2. template paths */
-					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%1$s</code> to your (child) theme in <code>%2$s</code> to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), $plugin_template_path, $theme_template_path),
+					'description'      => sprintf( __( 'Want to use your own template? Copy all the files from <code>%1$s</code> to your (child) theme in <code>%2$s</code> to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), $plugin_template_path, $theme_template_path),
 				)
 			),
 			array(
