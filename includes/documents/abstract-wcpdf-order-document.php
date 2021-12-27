@@ -733,7 +733,11 @@ abstract class Order_Document {
 		}
 
 		do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
-		
+
+		// temporarily apply filters that need to be removed again after the pdf is generated
+		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array() );
+		$this->add_filters( $pdf_filters );
+
 		$pdf_settings = array(
 			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
@@ -743,6 +747,10 @@ abstract class Order_Document {
 		$pdf = $pdf_maker->output();
 		
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
+
+		// remove temporary filters
+		$this->remove_filters( $pdf_filters );
+
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 
 		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
@@ -750,6 +758,11 @@ abstract class Order_Document {
 
 	public function get_html( $args = array() ) {
 		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
+
+		// temporarily apply filters that need to be removed again after the html is generated
+		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array() );
+		$this->add_filters( $html_filters );
+
 		$default_args = array (
 			'wrap_html_content'	=> true,
 		);
@@ -770,6 +783,9 @@ abstract class Order_Document {
 		}
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
+
+		// remove temporary filters
+		$this->remove_filters( $html_filters );
 
 		return apply_filters( 'wpo_wcpdf_get_html', $html, $this );
 	}
@@ -1120,6 +1136,29 @@ abstract class Order_Document {
 		}
 
 		return intval( $year );
+	}
+
+	protected function add_filters( $filters ) {
+		foreach ( $filters as $filter ) {
+			$filter = $this->normalize_filter_args( $filter );
+			add_filter( $filter['hook_name'], $filter['callback'], $filter['priority'], $filter['accepted_args'] );
+		}
+	}
+
+	protected function remove_filters( $filters ) {
+		foreach ( $filters as $filter ) {
+			$filter = $this->normalize_filter_args( $filter );
+			remove_filter( $filter['hook_name'], $filter['callback'], $filter['priority'] );
+		}
+	}
+
+	protected function normalize_filter_args( $filter ) {
+		$filter = array_values( $filter ); 
+		$hook_name = $filter[0];
+		$callback = $filter[1];
+		$priority = isset( $filter[2] ) ? $filter[2] : 10;
+		$accepted_args = isset( $filter[3] ) ? $filter[3] : 1;
+		return compact( 'filter', 'hook_name', 'callback', 'accepted_args' );
 	}
 
 }
