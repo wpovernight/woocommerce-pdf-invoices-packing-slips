@@ -1158,7 +1158,7 @@ abstract class Order_Document {
 		$callback = $filter[1];
 		$priority = isset( $filter[2] ) ? $filter[2] : 10;
 		$accepted_args = isset( $filter[3] ) ? $filter[3] : 1;
-		return compact( 'filter', 'hook_name', 'callback', 'accepted_args' );
+		return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
 	}
 
 }
