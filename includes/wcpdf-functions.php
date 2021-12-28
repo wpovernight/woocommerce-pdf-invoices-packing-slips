@@ -114,8 +114,11 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 }
 
 /**
- * Load HTML into (pluggable) PDF library, DomPDF 0.6 by default
+ * Load HTML into (pluggable) PDF library, DomPDF 1.0.2 by default
  * Use wpo_wcpdf_pdf_maker filter to change the PDF class (which can wrap another PDF library).
+ * 
+ * @param string $html
+ * @param array  $settings
  * @return PDF_Maker
  */
 function wcpdf_get_pdf_maker( $html, $settings = array() ) {
@@ -124,6 +127,16 @@ function wcpdf_get_pdf_maker( $html, $settings = array() ) {
 	}
 	$class = apply_filters( 'wpo_wcpdf_pdf_maker', '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' );
 	return new $class( $html, $settings );
+}
+
+/**
+ * Check if the default PDF maker is used for creating PDF
+ * 
+ * @return bool whether the PDF maker is the default or not
+ */
+function wcpdf_pdf_maker_is_default() {
+	$default_pdf_maker = '\\WPO\\WC\\PDF_Invoices\\PDF_Maker';
+	return $default_pdf_maker == apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker );
 }
 
 function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
