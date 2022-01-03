@@ -19,10 +19,10 @@ class Third_Party_Plugins {
 	function __construct()	{
 		// WooCommerce Subscriptions compatibility
 		if ( class_exists('WC_Subscriptions') ) {
-			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
+			if ( version_compare( \WC_Subscriptions::$version, '2.0.17', '<' ) ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
 			} else {
-				add_action( 'wcs_renewal_order_created', array( $this, 'wcs_renewal_order_created' ), 10, 2 );
+				add_action( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			}
 		}
 
@@ -62,11 +62,6 @@ class Third_Party_Plugins {
 		return $renewal_order;
 	}
 
-	public function wcs_renewal_order_created ( $renewal_order, $subscription ) {
-		$this->reset_invoice_data( $renewal_order );
-		return $renewal_order;
-	}
-
 	public function reset_invoice_data ( $order ) {
 		if ( ! is_object( $order ) ) {
 			$order = wc_get_order( $order );
@@ -77,6 +72,30 @@ class Third_Party_Plugins {
 		WCX_Order::delete_meta_data( $order, '_wcpdf_formatted_invoice_number' );
 		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_date' );
 		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_exists' );
+	}
+
+	/**
+	 * Removes documents meta from WooCommerce Subscriptions renewal order
+	 */
+	public function wcs_renewal_order_meta ( $meta, $to_order, $from_order ) {
+		if ( ! empty( $meta ) ) {
+			$documents = WPO_WCPDF()->documents->get_documents();
+			foreach( $documents as $document ) {
+				foreach( $meta as $key => $value ) {
+					$document_meta = array(
+						"_wcpdf_{$document->slug}_number",
+						"_wcpdf_{$document->slug}_number_data",
+						"_wcpdf_formatted_{$document->slug}_number",
+						"_wcpdf_{$document->slug}_date",
+						"_wcpdf_{$document->slug}_exists",
+					);
+					if ( in_array( $value['meta_key'], $document_meta ) ) {
+						unset( $meta[$key] );
+					}
+				}
+			}
+		}
+		return $meta;
 	}
 
 	/**
