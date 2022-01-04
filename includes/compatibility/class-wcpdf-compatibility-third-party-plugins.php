@@ -22,7 +22,8 @@ class Third_Party_Plugins {
 			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
 			} else {
-				add_action( 'wcs_renewal_order_created', array( $this, 'wcs_renewal_order_created' ), 10, 2 );
+				add_action( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_action( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			}
 		}
 
@@ -62,11 +63,6 @@ class Third_Party_Plugins {
 		return $renewal_order;
 	}
 
-	public function wcs_renewal_order_created ( $renewal_order, $subscription ) {
-		$this->reset_invoice_data( $renewal_order );
-		return $renewal_order;
-	}
-
 	public function reset_invoice_data ( $order ) {
 		if ( ! is_object( $order ) ) {
 			$order = wc_get_order( $order );
@@ -77,6 +73,41 @@ class Third_Party_Plugins {
 		WCX_Order::delete_meta_data( $order, '_wcpdf_formatted_invoice_number' );
 		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_date' );
 		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_exists' );
+	}
+
+	/**
+	 * Removes documents meta from WooCommerce Subscriptions renewal order
+	 */
+	public function wcs_renewal_order_meta ( $meta, $to_order, $from_order ) {
+		if ( ! empty( $meta ) ) {
+			$documents      = WPO_WCPDF()->documents->get_documents();
+			$documents_meta = array();
+			
+			foreach ( $documents as $document ) {
+				$document_data_keys = apply_filters( 'wpo_wcpdf_delete_document_data_keys', array( 
+					'settings',
+					'date',
+					'date_formatted',
+					'number',
+					'number_data',
+					'notes',
+					'exists',
+				), $document );
+				
+				$document_meta      = array_map( function ( $data_key ) use ( $document ) {
+					return "_wcpdf_{$document->slug}_{$data_key}";
+				}, $document_data_keys );
+				$document_meta[]    = "_wcpdf_formatted_{$document->slug}_number"; // legacy meta key
+				$documents_meta     = array_merge( $documents_meta, $document_meta );
+			}
+
+			foreach ( $meta as $key => $value ) {
+				if ( in_array( $value['meta_key'], $documents_meta ) ) {
+					unset( $meta[$key] );
+				}
+			}
+		}
+		return $meta;
 	}
 
 	/**
