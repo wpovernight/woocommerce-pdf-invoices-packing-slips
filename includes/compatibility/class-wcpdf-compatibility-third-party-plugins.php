@@ -19,7 +19,7 @@ class Third_Party_Plugins {
 	function __construct()	{
 		// WooCommerce Subscriptions compatibility
 		if ( class_exists('WC_Subscriptions') ) {
-			if ( version_compare( \WC_Subscriptions::$version, '2.0.17', '<' ) ) {
+			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
 			} else {
 				add_action( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
@@ -79,19 +79,30 @@ class Third_Party_Plugins {
 	 */
 	public function wcs_renewal_order_meta ( $meta, $to_order, $from_order ) {
 		if ( ! empty( $meta ) ) {
-			$documents = WPO_WCPDF()->documents->get_documents();
-			foreach( $documents as $document ) {
-				foreach( $meta as $key => $value ) {
-					$document_meta = array(
-						"_wcpdf_{$document->slug}_number",
-						"_wcpdf_{$document->slug}_number_data",
-						"_wcpdf_formatted_{$document->slug}_number",
-						"_wcpdf_{$document->slug}_date",
-						"_wcpdf_{$document->slug}_exists",
-					);
-					if ( in_array( $value['meta_key'], $document_meta ) ) {
-						unset( $meta[$key] );
-					}
+			$documents      = WPO_WCPDF()->documents->get_documents();
+			$documents_meta = array();
+			
+			foreach ( $documents as $document ) {
+				$document_data_keys = apply_filters( 'wpo_wcpdf_delete_document_data_keys', array( 
+					'settings',
+					'date',
+					'date_formatted',
+					'number',
+					'number_data',
+					'notes',
+					'exists',
+				), $document );
+				
+				$document_meta      = array_map( function ( $data_key ) use ( $document ) {
+					return "_wcpdf_{$document->slug}_{$data_key}";
+				}, $document_data_keys );
+				$document_meta[]    = "_wcpdf_formatted_{$document->slug}_number"; // legacy meta key
+				$documents_meta     = array_merge( $documents_meta, $document_meta );
+			}
+
+			foreach ( $meta as $key => $value ) {
+				if ( in_array( $value['meta_key'], $documents_meta ) ) {
+					unset( $meta[$key] );
 				}
 			}
 		}
