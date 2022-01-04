@@ -211,12 +211,12 @@ class FontMetrics
         $entry[$styleString] = $cacheEntry;
 
         // Download the remote file
-        [$protocol, $baseHost, $basePath] = Helpers::explode_url($remoteFile);
-        if (!$this->options->isRemoteEnabled() && ($protocol != "" && $protocol !== "file://")) {
+        [$protocol] = Helpers::explode_url($remoteFile);
+        if (!$this->options->isRemoteEnabled() && ($protocol !== "" && $protocol !== "file://")) {
             Helpers::record_warnings(E_USER_WARNING, "Remote font resource $remoteFile referenced, but remote file download is disabled.", __FILE__, __LINE__);
             return false;
         }
-        if ($protocol == "" || $protocol === "file://") {
+        if ($protocol === "" || $protocol === "file://") {
             $realfile = realpath($remoteFile);
 
             $rootDir = realpath($this->options->getRootDir());
@@ -244,7 +244,7 @@ class FontMetrics
             $remoteFile = $realfile;
         }
         list($remoteFileContent, $http_response_header) = @Helpers::getFileContent($remoteFile, $context);
-        if (empty($remoteFileContent)) {
+        if ($remoteFileContent === null) {
             return false;
         }
 
@@ -351,7 +351,7 @@ class FontMetrics
     }
 
     /**
-     * Calculates font height
+     * Calculates font height, in points
      *
      * @param string $font
      * @param float $size
@@ -361,6 +361,19 @@ class FontMetrics
     public function getFontHeight($font, $size)
     {
         return $this->canvas->get_font_height($font, $size);
+    }
+
+    /**
+     * Calculates font baseline, in points
+     *
+     * @param string $font
+     * @param float $size
+     *
+     * @return float
+     */
+    public function getFontBaseline($font, $size)
+    {
+        return $this->canvas->get_font_baseline($font, $size);
     }
 
     /**

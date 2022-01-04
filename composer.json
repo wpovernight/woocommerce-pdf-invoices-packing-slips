@@ -1,6 +1,12 @@
 {
+	"repositories": [
+		{
+			"url": "https://github.com/dompdf/dompdf.git",
+			"type": "git"
+		}
+	],
     "require": {
-        "dompdf/dompdf": "^1.1",
+        "dompdf/dompdf": "dev-whitespace",
         "symfony/polyfill-mbstring": "1.20",
         "symfony/polyfill-iconv": "1.20.0"
     }

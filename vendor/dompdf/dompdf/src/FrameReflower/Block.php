@@ -12,9 +12,9 @@ use Dompdf\Frame;
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
 use Dompdf\FrameDecorator\Text as TextFrameDecorator;
-use Dompdf\Positioner\Inline as InlinePositioner;
 use Dompdf\Exception;
 use Dompdf\Css\Style;
+use Dompdf\Helpers;
 
 /**
  * Reflows block frames
@@ -233,29 +233,34 @@ class Block extends AbstractFrameReflower
 
         $width = $style->length_in_pt($style->width, $cb["w"]);
 
-        $calculate_width = $this->_calculate_width($width);
-        $margin_left = $calculate_width['margin_left'];
-        $margin_right = $calculate_width['margin_right'];
-        $width =  $calculate_width['width'];
-        $left =  $calculate_width['left'];
-        $right =  $calculate_width['right'];
+        $values = $this->_calculate_width($width);
+        $margin_left = $values["margin_left"];
+        $margin_right = $values["margin_right"];
+        $width = $values["width"];
+        $left = $values["left"];
+        $right = $values["right"];
 
         // Handle min/max width
         // https://www.w3.org/TR/CSS21/visudet.html#min-max-widths
         $min_width = $style->length_in_pt($style->min_width, $cb["w"]);
         $max_width = $style->length_in_pt($style->max_width, $cb["w"]);
 
-        if ($max_width !== "none" && $width > $max_width) {
-            extract($this->_calculate_width($max_width));
+        if ($max_width !== "none" && $max_width !== "auto" && $width > $max_width) {
+            $values = $this->_calculate_width($max_width);
+            $margin_left = $values["margin_left"];
+            $margin_right = $values["margin_right"];
+            $width = $values["width"];
+            $left = $values["left"];
+            $right = $values["right"];
         }
 
-        if ($width < $min_width) {
-            $calculate_width = $this->_calculate_width($min_width);
-            $margin_left = $calculate_width['margin_left'];
-            $margin_right = $calculate_width['margin_right'];
-            $width =  $calculate_width['width'];
-            $left =  $calculate_width['left'];
-            $right =  $calculate_width['right'];
+        if ($min_width !== "auto" && $min_width !== "none" && $width < $min_width) {
+            $values = $this->_calculate_width($min_width);
+            $margin_left = $values["margin_left"];
+            $margin_right = $values["margin_right"];
+            $width = $values["width"];
+            $left = $values["left"];
+            $right = $values["right"];
         }
 
         return [$width, $margin_left, $margin_right, $left, $right];
@@ -411,25 +416,20 @@ class Block extends AbstractFrameReflower
             if (isset($cb["h"])) {
                 $min_height = $style->length_in_pt($min_height, $cb["h"]);
                 $max_height = $style->length_in_pt($max_height, $cb["h"]);
-            } else if (isset($cb["w"])) {
-                if (mb_strpos($min_height, "%") !== false) {
-                    $min_height = 0;
-                } else {
-                    $min_height = $style->length_in_pt($min_height, $cb["w"]);
-                }
-
-                if (mb_strpos($max_height, "%") !== false) {
-                    $max_height = "none";
-                } else {
-                    $max_height = $style->length_in_pt($max_height, $cb["w"]);
-                }
+            } else {
+                $min_height = !Helpers::is_percent($min_height)
+                    ? $style->length_in_pt($min_height, $cb["w"])
+                    : "auto";
+                $max_height = !Helpers::is_percent($max_height)
+                    ? $style->length_in_pt($max_height, $cb["w"])
+                    : "none";
             }
 
-            if ($max_height !== "none" && $max_height !== "auto" && $height > (float)$max_height) {
+            if ($max_height !== "none" && $max_height !== "auto" && $height > $max_height) {
                 $height = $max_height;
             }
 
-            if ($height < (float)$min_height) {
+            if ($min_height !== "auto" && $min_height !== "none" && $height < $min_height) {
                 $height = $min_height;
             }
         }
@@ -452,12 +452,14 @@ class Block extends AbstractFrameReflower
             default:
             case "left":
                 foreach ($this->_frame->get_line_boxes() as $line) {
-                    if (!$line->inline || !$line->left) {
+                    if (!$line->inline) {
                         continue;
                     }
 
-                    foreach ($line->get_frames() as $frame) {
-                        if ($frame->get_positioner() instanceof InlinePositioner) {
+                    $line->trim_trailing_ws();
+
+                    if ($line->left) {
+                        foreach ($line->frames_to_align() as $frame) {
                             $frame->move($line->left, 0);
                         }
                     }
@@ -470,14 +472,13 @@ class Block extends AbstractFrameReflower
                         continue;
                     }
 
-                    // Move each child over by $dx
+                    $line->trim_trailing_ws();
+
                     $indent = $i === 0 ? $text_indent : 0;
                     $dx = $width - $line->w - $line->right - $indent;
 
-                    foreach ($line->get_frames() as $frame) {
-                        if ($frame->get_positioner() instanceof InlinePositioner) {
-                            $frame->move($dx, 0);
-                        }
+                    foreach ($line->frames_to_align() as $frame) {
+                        $frame->move($dx, 0);
                     }
                 }
                 break;
@@ -494,11 +495,11 @@ class Block extends AbstractFrameReflower
                         continue;
                     }
 
+                    $line->trim_trailing_ws();
+
                     if ($line->left) {
-                        foreach ($line->get_frames() as $frame) {
-                            if ($frame->get_positioner() instanceof InlinePositioner) {
-                                $frame->move($line->left, 0);
-                            }
+                        foreach ($line->frames_to_align() as $frame) {
+                            $frame->move($line->left, 0);
                         }
                     }
 
@@ -506,9 +507,10 @@ class Block extends AbstractFrameReflower
                         continue;
                     }
 
+                    $frames = $line->get_frames();
                     $other_frame_count = 0;
 
-                    foreach ($line->get_frames() as $frame) {
+                    foreach ($frames as $frame) {
                         if (!($frame instanceof TextFrameDecorator)) {
                             $other_frame_count++;
                         }
@@ -525,7 +527,7 @@ class Block extends AbstractFrameReflower
                     }
 
                     $dx = 0;
-                    foreach ($line->get_frames() as $frame) {
+                    foreach ($frames as $frame) {
                         if ($frame instanceof TextFrameDecorator) {
                             $text = $frame->get_text();
                             $spaces = mb_substr_count($text, " ");
@@ -551,14 +553,13 @@ class Block extends AbstractFrameReflower
                         continue;
                     }
 
-                    // Centre each line by moving each frame in the line by:
+                    $line->trim_trailing_ws();
+
                     $indent = $i === 0 ? $text_indent : 0;
                     $dx = ($width + $line->left - $line->w - $line->right - $indent) / 2;
 
-                    foreach ($line->get_frames() as $frame) {
-                        if ($frame->get_positioner() instanceof InlinePositioner) {
-                            $frame->move($dx, 0);
-                        }
+                    foreach ($line->frames_to_align() as $frame) {
+                        $frame->move($dx, 0);
                     }
                 }
                 break;
@@ -571,41 +572,52 @@ class Block extends AbstractFrameReflower
      */
     function vertical_align()
     {
-        $canvas = null;
+        $fontMetrics = $this->get_dompdf()->getFontMetrics();
 
         foreach ($this->_frame->get_line_boxes() as $line) {
-
             $height = $line->h;
 
-            foreach ($line->get_frames() as $frame) {
+            // Move all markers to the top of the line box
+            foreach ($line->get_list_markers() as $marker) {
+                $x = $marker->get_position("x");
+                $marker->set_position($x, $line->y);
+            }
+
+            foreach ($line->frames_to_align() as $frame) {
                 $style = $frame->get_style();
-                $isInlineBlock = (
-                    '-dompdf-image' === $style->display
-                    || 'inline-block' === $style->display
-                    || 'inline-table' === $style->display
-                );
-                if (!$isInlineBlock && $style->display !== "inline") {
-                    continue;
-                }
+                $isInlineBlock = $style->display !== "inline"
+                    && $style->display !== "-dompdf-list-bullet";
 
-                if (!isset($canvas)) {
-                    $canvas = $frame->get_root()->get_dompdf()->getCanvas();
-                }
-
-                $baseline = $canvas->get_font_baseline($style->font_family, $style->font_size);
+                $baseline = $fontMetrics->getFontBaseline($style->font_family, $style->font_size);
                 $y_offset = 0;
 
                 //FIXME: The 0.8 ratio applied to the height is arbitrary (used to accommodate descenders?)
                 if ($isInlineBlock) {
-                    $lineFrames = $line->get_frames();
-                    if (count($lineFrames) == 1) {
+                    // Workaround: Skip vertical alignment if the frame is the
+                    // only one one the line, excluding empty text frames, which
+                    // may be the result of trailing white space
+                    // FIXME: This special case should be removed once vertical
+                    // alignment is properly fixed
+                    $skip = true;
+
+                    foreach ($line->get_frames() as $other) {
+                        if ($other !== $frame
+                            && !($other->is_text_node() && $other->get_node()->nodeValue === "")
+                         ) {
+                            $skip = false;
+                            break;
+                        }
+                    }
+
+                    if ($skip) {
                         continue;
                     }
-                    $frameBox = $frame->get_border_box();
-                    $imageHeightDiff = $height * 0.8 - $frameBox['h'];
+
+                    $marginHeight = $frame->get_margin_height();
+                    $imageHeightDiff = $height * 0.8 - $marginHeight;
 
                     $align = $frame->get_style()->vertical_align;
-                    if (in_array($align, Style::$vertical_align_keywords) === true) {
+                    if (in_array($align, Style::$vertical_align_keywords, true)) {
                         switch ($align) {
                             case "middle":
                                 $y_offset = $imageHeightDiff / 2;
@@ -637,7 +649,7 @@ class Block extends AbstractFrameReflower
                                 break;
                         }
                     } else {
-                        $y_offset = $baseline - (float)$style->length_in_pt($align, $style->font_size) - $frameBox['h'];
+                        $y_offset = $baseline - (float)$style->length_in_pt($align, $style->font_size) - $marginHeight;
                     }
                 } else {
                     $parent = $frame->get_parent();
@@ -646,7 +658,7 @@ class Block extends AbstractFrameReflower
                     } else {
                         $align = $parent->get_style()->vertical_align;
                     }
-                    if (in_array($align, Style::$vertical_align_keywords) === true) {
+                    if (in_array($align, Style::$vertical_align_keywords, true)) {
                         switch ($align) {
                             case "middle":
                                 $y_offset = ($height * 0.8 - $baseline) / 2;
@@ -779,7 +791,6 @@ class Block extends AbstractFrameReflower
 
     /**
      * @param BlockFrameDecorator $block
-     * @return mixed|void
      */
     function reflow(BlockFrameDecorator $block = null)
     {
@@ -797,6 +808,11 @@ class Block extends AbstractFrameReflower
 
         // Generated content
         $this->_set_content();
+
+        // Inherit any dangling list markers
+        if ($block && $this->_frame->is_in_flow()) {
+            $this->_frame->inherit_dangling_markers($block);
+        }
 
         // Collapse margins if required
         $this->_collapse_margins();
@@ -858,7 +874,6 @@ class Block extends AbstractFrameReflower
 
         // Set the containing blocks and reflow each child
         foreach ($this->_frame->get_children() as $child) {
-
             // Bail out if the page is full
             if ($page->is_full()) {
                 break;
@@ -876,6 +891,12 @@ class Block extends AbstractFrameReflower
             }
 
             $this->process_float($child, $cb_x, $width);
+        }
+
+        // Stop reflow if a page break has occurred before the frame, in which
+        // case it has been reset, including its position
+        if ($page->is_full() && $this->_frame->get_position("x") === null) {
+            return;
         }
 
         // Determine our height
