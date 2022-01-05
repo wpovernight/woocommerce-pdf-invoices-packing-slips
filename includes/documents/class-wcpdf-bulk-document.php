@@ -45,6 +45,8 @@ class Bulk_Document {
 		$this->type = $document_type;
 		$this->order_ids = $order_ids;
 		$this->is_bulk = true;
+
+		add_filter( 'wpo_wcpdf_pdf_filters', array( $this, 'pdf_currency_filters' ) );
 	}
 
 	public function get_type() {
@@ -149,6 +151,36 @@ class Bulk_Document {
 		$priority = isset( $filter[2] ) ? $filter[2] : 10;
 		$accepted_args = isset( $filter[3] ) ? $filter[3] : 1;
 		return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
+	}
+
+	public function pdf_currency_filters( $filters ) {
+		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
+			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_font' ), 10001, 2 );
+			// 'wpo_wcpdf_custom_styles' is actually an action, but WP handles them with the same functions
+			$filters[] = array( 'wpo_wcpdf_custom_styles', array( $this, 'currency_symbol_font_styles' ) );
+		}
+		return $filters;
+	}
+
+	/**
+	 * Use currency symbol font (when enabled in options)
+	 * @param string $currency_symbol Currency symbol
+	 * @param string $currency        Currency
+	 * 
+	 * @return string Currency symbol
+	 */
+	public function use_currency_font( $currency_symbol, $currency ) {
+		$currency_symbol = sprintf( '<span class="wcpdf-currency-symbol">%s</span>', $currency_symbol );
+		return $currency_symbol;
+	}
+
+	/**
+	 * Set currency font CSS
+	 */
+	public function currency_symbol_font_styles () {
+		?>
+		.wcpdf-currency-symbol { font-family: 'Currencies'; }
+		<?php
 	}
 
 }
