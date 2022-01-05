@@ -140,7 +140,7 @@ class Frame
     /**
      * This frame's containing line box
      *
-     * @var LineBox|null
+     * @var LineBox
      */
     protected $_containing_line;
 
@@ -664,7 +664,7 @@ class Frame
     }
 
     /**
-     * @return LineBox|null
+     * @return LineBox
      */
     public function &get_containing_line()
     {

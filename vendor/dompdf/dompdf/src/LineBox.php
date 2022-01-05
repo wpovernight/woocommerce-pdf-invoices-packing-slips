@@ -10,7 +10,6 @@ namespace Dompdf;
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
 use Dompdf\FrameDecorator\Block;
 use Dompdf\FrameDecorator\Page;
-use Dompdf\FrameReflower\Text as TextFrameReflower;
 use Dompdf\Positioner\Inline as InlinePositioner;
 
 /**
@@ -305,26 +304,6 @@ class LineBox
         }
 
         $this->h = $h;
-    }
-
-	/**
-     * Trim trailing whitespace from the line.
-     */
-    public function trim_trailing_ws(): void
-    {
-        $lastIndex = count($this->_frames) - 1;
-
-        if ($lastIndex < 0) {
-            return;
-        }
-
-        $lastFrame = $this->_frames[$lastIndex];
-        $reflower = $lastFrame->get_reflower();
-
-        if ($reflower instanceof TextFrameReflower && !$lastFrame->is_pre()) {
-            $reflower->trim_trailing_ws();
-            $this->recalculate_width();
-        }
     }
 
     /**

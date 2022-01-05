@@ -116,8 +116,13 @@ class Factory
                     $decorator = "Text";
                     $reflower = "Text";
                 } else {
-                    $decorator = "Inline";
-                    $reflower = "Inline";
+                    if ($style->float !== "none") {
+                        $decorator = "Block";
+                        $reflower = "Block";
+                    } else {
+                        $decorator = "Inline";
+                        $reflower = "Inline";
+                    }
                 }
                 break;
 
