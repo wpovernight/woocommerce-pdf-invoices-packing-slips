@@ -75,19 +75,21 @@ jQuery( function( $ ) {
 			$previewData.find('input[name="preview-order-number"]').addClass('active');
 			$previewData.find('input[name="preview-order-search"]').removeClass('active');
 			$previewData.find('#preview-order-search-results').hide();
+			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 		} else if ( $(this).hasClass('order-search') ) {
 			$previewData.find('p.last-order').hide();
 			$previewData.find('p.order-number').hide();
 			$previewData.find('p.order-search').show();
 			$previewData.find('input[name="preview-order-search"]').addClass('active');
 			$previewData.find('input[name="preview-order-number"]').removeClass('active');
-			$previewData.find('#preview-order-search-results').hide();
 		} else {
 			$previewData.find('p.last-order').show();
 			$previewData.find('p.order-number').hide();
 			$previewData.find('p.order-search').hide();
 			$previewData.find('input[name="preview-order-number"]').removeClass('active');
 			$previewData.find('input[name="preview-order-search"]').removeClass('active');
+			$previewData.find('#preview-order-search-results').hide();
+			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 		}
 	});
 
