@@ -42,15 +42,27 @@ class Install {
 		if ( version_compare( $installed_version, WPO_WCPDF_VERSION, '<' ) ) {
 
 			if ( ! $installed_version ) {
-				$this->install();
+				try {
+					$this->install();
+				} catch ( \Throwable $th ) {
+					wcpdf_log_error( sprintf( "Plugin install procedure failed (version %s): %s", WPO_WCPDF_VERSION, $th->getMessage() ), 'critical', $th );
+				}
 			} else {
-				$this->upgrade( $installed_version );
+				try {
+					$this->upgrade( $installed_version );
+				} catch ( \Throwable $th ) {
+					wcpdf_log_error( sprintf( "Plugin upgrade procedure failed (updating from version %s to %s): %s", $installed_version, WPO_WCPDF_VERSION, $th->getMessage() ), 'critical', $th );
+				}
 			}
 
 			// new version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		} elseif ( $installed_version && version_compare( $installed_version, WPO_WCPDF_VERSION, '>' ) ) {
-			$this->downgrade( $installed_version );
+			try {
+				$this->downgrade( $installed_version );
+			} catch ( \Throwable $th ) {
+				wcpdf_log_error( sprintf( "Plugin downgrade procedure failed (downgrading from version %s to %s): %s", $installed_version, WPO_WCPDF_VERSION, $th->getMessage() ), 'critical', $th );
+			}
 			// downgrade version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
@@ -353,6 +365,13 @@ class Install {
 				WPO_WCPDF()->settings->maybe_migrate_template_paths();
 			}
 		}
+
+		// 2.12.0: remove the obsolete .dist font cache file and mustRead.html from local fonts folder
+		if ( version_compare( $installed_version, '2.12.0-dev', '<' ) ) {
+			@unlink( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
+			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
+		}
+		
 	}
 
 	/**

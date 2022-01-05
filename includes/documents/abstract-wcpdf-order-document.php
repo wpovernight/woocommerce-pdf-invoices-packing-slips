@@ -185,8 +185,8 @@ abstract class Order_Document {
 			'invoice_number_column',
 			'paper_size',
 			'font_subsetting',
-		) );
-		if ( in_array( $key, $non_historical_settings ) && isset($this->latest_settings) ) {
+		), $this );
+		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
 			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
 		} else {
 			$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
@@ -620,12 +620,13 @@ abstract class Order_Document {
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
+		$setting = $this->get_setting( $settings_key, $default );
 		// check for 'default' key existence
-		if ( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) && array_key_exists( 'default', $this->settings[$settings_key] ) ) {
-			$text = $this->settings[$settings_key]['default'];
+		if ( ! empty( $setting ) && is_array( $setting ) && array_key_exists( 'default', $setting ) ) {
+			$text = $setting['default'];
 		// fallback to first array element if default is not present
-		} elseif( ! empty( $this->settings[$settings_key] ) && is_array( $this->settings[$settings_key] ) ) {
-			$text = reset( $this->settings[$settings_key] );
+		} elseif( ! empty( $setting ) && is_array( $setting ) ) {
+			$text = reset( $setting );
 		}
 
 		// fallback to default
@@ -732,7 +733,11 @@ abstract class Order_Document {
 		}
 
 		do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
-		
+
+		// temporarily apply filters that need to be removed again after the pdf is generated
+		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array() );
+		$this->add_filters( $pdf_filters );
+
 		$pdf_settings = array(
 			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
@@ -742,6 +747,10 @@ abstract class Order_Document {
 		$pdf          = $pdf_maker->output();
 		
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
+
+		// remove temporary filters
+		$this->remove_filters( $pdf_filters );
+
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 
 		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
@@ -761,6 +770,11 @@ abstract class Order_Document {
 
 	public function get_html( $args = array() ) {
 		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
+
+		// temporarily apply filters that need to be removed again after the html is generated
+		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array() );
+		$this->add_filters( $html_filters );
+
 		$default_args = array (
 			'wrap_html_content'	=> true,
 		);
@@ -781,6 +795,9 @@ abstract class Order_Document {
 		}
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
+
+		// remove temporary filters
+		$this->remove_filters( $html_filters );
 
 		return apply_filters( 'wpo_wcpdf_get_html', $html, $this );
 	}
@@ -947,6 +964,214 @@ abstract class Order_Document {
 		return $order_statuses;
 	}
 
+	/**
+	 * Get the Sequential Number Store class that handles invoice number generation/consumption
+	 * 
+	 * @return Sequential_Number_Store
+	 */
+	public function get_sequential_number_store() {
+		$reset_number_yearly = isset( $this->settings['reset_number_yearly'] ) ? true : false;
+		$method              = WPO_WCPDF()->settings->get_sequential_number_store_method();
+		$now                 = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
+	
+		// reset: on
+		if( $reset_number_yearly ) {
+			if( ! ( $date = $this->get_date() ) ) {
+				$date = $now;
+			}
+			$store_name   = $this->get_sequential_number_store_name( $date, $method, $reset_number_yearly );
+			$number_store = new Sequential_Number_Store( $store_name, $method );	
+	
+			if ( $number_store->is_new ) {
+				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
+			}
+		// reset: off
+		} else {
+			$store_name   = $this->get_sequential_number_store_name( $now, $method, $reset_number_yearly );
+			$number_store = new Sequential_Number_Store( $store_name, $method );
+		}
+	
+		return $number_store;
+	}
+
+	/**
+	 * Get the name of the Sequential Number Store, based on the date ('now' or 'document date')
+	 * and whether the number should be reset yearly. When the number is reset yearly, numbered
+	 * stores are used for non-current years, adding the year as the suffix
+	 * 
+	 * @return string $number_store_name
+	 */
+	public function get_sequential_number_store_name( $date, $method, $reset_number_yearly ) {
+		$store_base_name    = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
+		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
+		$current_store_year = $this->get_number_store_year( $default_table_name );
+		$requested_year     = intval( $date->date_i18n( 'Y' ) );
+
+		// if we don't reset the number yearly, the store name is always the same
+		if ( ! $reset_number_yearly ) {
+			$number_store_name = $store_base_name;
+		} else {
+			// if the current store year doesn't match the year requested, check if we need to retire the store
+			// (meaning that we have entered a new year)
+			if( $requested_year !== $current_store_year ) {
+				$current_store_year = $this->maybe_retire_number_store( $date, $store_base_name, $method );
+			}
+
+			// If it's a non-current year (future or past), append the year to the store name, otherwise use default
+			if( $requested_year !== $current_store_year ) {
+				$number_store_name = "{$store_base_name}_{$requested_year}";
+			} else {
+				$number_store_name = $store_base_name;
+			}
+		}
+	
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", $number_store_name, $store_base_name, $date, $method, $this );
+	}
+
+	/**
+	 * Get the default table name of the Sequential Number Store
+	 * @param  string $store_base_name
+	 * @param  string $metod
+	 * 
+	 * @return string $table_name
+	 */
+	public function get_number_store_table_default_name( $store_base_name, $method ) {
+		global $wpdb;
+		return apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
+	}
+
+	/**
+	 * Takes care of the rotation of database tables for the number store, used when 'reset yearly' is enabled:
+	 * 
+	 * The table name for the current year is _always_ "{$wpdb->prefix}wcpdf_{$store_base_name}", e.g. wp_wcpdf_invoice_number
+	 * 
+	 * when a year lapses, the existing table ('last year') is 'retired' by renaming it with the year appended,
+	 * e.g. wp_wcpdf_invoice_number_2021 (when the current/new year is 2022). If there was a table for the new year,
+	 * this will be renamed to the default store name (e.g. wp_wcdpdf_invoice_number)
+	 * 
+	 * returns requested year if any error occurs, so that the current store table will be used
+	 * 
+	 * @return int $year year of the current number store
+	 */
+	public function maybe_retire_number_store( $date, $store_base_name, $method ) {
+		global $wpdb;
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+		
+		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
+		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$current_year       = intval( $now->date_i18n( 'Y' ) );
+		$current_store_year = $this->get_number_store_year( $default_table_name );
+		$requested_year     = intval( $date->date_i18n( 'Y' ) );
+
+		// nothing to retire if requested year matches current store year or if current store year is not in the past
+		if ( empty( $current_store_year ) || $requested_year == $current_store_year || ! ( $current_store_year < $current_year ) ) {
+			return $current_store_year;
+		}
+		
+		// current store year is in the past: rename table so that we can replace it with the current year
+
+		$retired_table_name      = "{$default_table_name}_{$current_store_year}";
+		$current_year_table_name = "{$default_table_name}_{$current_year}";
+
+		// first, remove last year if it already exists
+		$retired_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$retired_table_name}'" ) == $retired_table_name; 
+		if( $retired_exists ) {
+			$table_removed = $wpdb->query( "DROP TABLE IF EXISTS {$retired_table_name}" );
+
+			if( ! $table_removed ) {
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to remove the duplicate number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $retired_table_name, $wpdb->last_error ) );
+				return $requested_year;
+			}
+		}
+
+		// rename current to last year
+		$default_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'" ) == $default_table_name;
+		if( $default_exists ) {
+			$table_renamed = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$retired_table_name}" );
+			
+			if( ! $table_renamed ) {
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $retired_table_name, $wpdb->last_error ) );
+				return $requested_year;
+			}
+		}
+		
+		// if the current year table name already exists (created earlier as a 'future' year), rename that to default
+		$current_year_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$current_year_table_name}'" ) == $current_year_table_name;
+		if( $current_year_exists ) {
+			$table_renamed = $wpdb->query( "ALTER TABLE {$current_year_table_name} RENAME {$default_table_name}" );
+
+			if( ! $table_renamed ) {
+				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $current_year_table_name, $default_table_name, $wpdb->last_error ) );
+				return $requested_year;
+			}
+		}
+
+		if( $was_showing_errors ) {
+			$wpdb->show_errors();
+		}
+
+		// current store year has been updated to current year, returning this means no year suffix has to be used
+		return $current_year;
+	}
+
+	/**
+	 * Gets the year from the last row of a number store table
+	 * @param  string $table_name
+	 * 
+	 * @return string
+	 */
+	public function get_number_store_year( $table_name ) {
+		global $wpdb;
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+
+		$current_year = date_i18n( 'Y' );
+		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'") == $table_name; 
+		if( $table_exists ) {
+			// get year for the last row
+			$year = $wpdb->get_var( "SELECT YEAR(date) FROM {$table_name} ORDER BY id DESC LIMIT 1" );
+			// default to currenty year if no results
+			if( ! $year ) {
+				$year = $current_year;
+				// if we don't get a result, this could either mean there's an error,
+				// OR that the first number simply has not been created yet (=no rows)
+				// we only log when there's an actual error
+				if( ! empty( $wpdb->last_error ) ) {
+					wcpdf_log_error( sprintf( __( 'An error occurred while trying to get the current year from the %s table: %s', 'woocommerce-pdf-invoices-packing-slips' ), $table_name, $wpdb->last_error ) );
+				}
+			}
+		} else {
+			$year = $current_year;
+		}
+
+		if( $was_showing_errors ) {
+			$wpdb->show_errors();
+		}
+
+		return intval( $year );
+	}
+
+	protected function add_filters( $filters ) {
+		foreach ( $filters as $filter ) {
+			$filter = $this->normalize_filter_args( $filter );
+			add_filter( $filter['hook_name'], $filter['callback'], $filter['priority'], $filter['accepted_args'] );
+		}
+	}
+
+	protected function remove_filters( $filters ) {
+		foreach ( $filters as $filter ) {
+			$filter = $this->normalize_filter_args( $filter );
+			remove_filter( $filter['hook_name'], $filter['callback'], $filter['priority'] );
+		}
+	}
+
+	protected function normalize_filter_args( $filter ) {
+		$filter = array_values( $filter ); 
+		$hook_name = $filter[0];
+		$callback = $filter[1];
+		$priority = isset( $filter[2] ) ? $filter[2] : 10;
+		$accepted_args = isset( $filter[3] ) ? $filter[3] : 1;
+		return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
+	}
 
 }
 

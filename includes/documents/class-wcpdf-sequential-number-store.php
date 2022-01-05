@@ -35,19 +35,28 @@ class Sequential_Number_Store {
 	 */
 	public $table_name;
 
+	/**
+	 * If table name not found in database, is new table
+	 * @var Bool
+	 */
+	public $is_new = false;
+
 	public function __construct( $store_name, $method = 'auto_increment' ) {
 		global $wpdb;
 		$this->store_name = $store_name;
-		$this->method = $method;
-		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // i.e. wp_wcpdf_invoice_number
+		$this->method     = $method;
+		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method ); // e.g. wp_wcpdf_invoice_number
 
 		$this->init();
 	}
 
 	public function init() {
 		global $wpdb;
+
 		// check if table exists
-		if( $wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") == $this->table_name) {
+		if( ! $this->store_name_exists() ) {
+			$this->is_new = true;
+		} else {
 			// check calculated_number column if using 'calculate' method
 			if ( $this->method == 'calculate' ) {
 				$column_exists = $wpdb->get_var("SHOW COLUMNS FROM `{$this->table_name}` LIKE 'calculated_number'");
@@ -173,6 +182,21 @@ $sql = "CREATE TABLE {$this->table_name} (
 
 		return $formatted_date;
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function store_name_exists() {
+		global $wpdb;
+
+		// check if table exists
+		if( $wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") == $this->table_name) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }
 
 endif; // class_exists

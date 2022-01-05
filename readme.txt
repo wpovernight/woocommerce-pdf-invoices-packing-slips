@@ -1,11 +1,11 @@
 === WooCommerce PDF Invoices & Packing Slips ===
-Contributors: pomegranate
+Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.10.6
+Stable tag: 2.11.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,24 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.11.2 =
+* New: filter and fallback for the default settings tab
+* Tweak: Improved font synchronization during plugin updates
+* Fix: Allow non-historical text settings
+* Fix: Fail more gracefully during install/upgrade/downgrade
+* Fix: notice on missing setting on fresh install
+* Fix: don't initialize settings when document can't be loaded
+* Fix: Prevent unnecessary database queries when settings API is initiated
+* Fix: Use ISO currency code for RTL currencies when the default PDF library (dompdf) is used
+
+= 2.11.1 =
+* Fix: Errors were incorrectly logged after installation when no invoices had been created yet
+* Fix: Button styles in order backend
+
+= 2.11.0 =
+* New: Use year-based number stores for future and past years to handle yearly resets more reliably
+* Fix: PHP iconv fallback for custom PHP builds without this function
 
 = 2.10.6 =
 * Fix: PHP7.1 compatibility

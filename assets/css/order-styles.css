@@ -14,7 +14,8 @@
 .wpo_wcpdf-actions a.button.exists::after {
 	font-family: Dashicons;
 	content: "\f147";
-	font-size: 16px;
+	font-size: 125%;
+	line-height: 80%;
 	margin-left: 4px;
 	color: #2aad2a;
 	vertical-align: middle;
