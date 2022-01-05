@@ -704,6 +704,7 @@ abstract class AbstractFrameDecorator extends Frame
             $frame = $iter;
             $iter = $iter->get_next_sibling();
             $frame->reset();
+            $frame->_parent = $split;
             $split->append_child($frame);
 
             // recalculate the float offsets
@@ -798,7 +799,7 @@ abstract class AbstractFrameDecorator extends Frame
      *
      * TODO: What version is the best : this one or the one in ListBullet ?
      */
-    function counter_value(string $id = self::DEFAULT_COUNTER, string $type = "decimal")
+    function counter_value($id = self::DEFAULT_COUNTER, $type = "decimal")
     {
         $type = mb_strtolower($type);
 

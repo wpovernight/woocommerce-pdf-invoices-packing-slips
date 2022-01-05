@@ -397,8 +397,8 @@ class Style
             $d["margin"] = "";
             $d["max_height"] = "none";
             $d["max_width"] = "none";
-            $d["min_height"] = "auto";
-            $d["min_width"] = "auto";
+            $d["min_height"] = "0";
+            $d["min_width"] = "0";
             $d["orphans"] = "2";
             $d["outline_color"] = ""; // "invert" special color is not supported
             $d["outline_style"] = "none";
@@ -655,8 +655,6 @@ class Style
                 $ret += 2.5;
                 continue;
             }
-
-            $l = (string) $l;
 
             if (($i = mb_stripos($l, "px")) !== false) {
                 $dpi = $this->_stylesheet->get_dompdf()->getOptions()->getDpi();
@@ -3413,11 +3411,7 @@ class Style
         $this->_props_computed["z_index"] = null;
         $this->_prop_cache["z_index"] = null;
 
-        if ($val === "inherit") {
-            return;
-        }
-
-        if ($val !== "auto" && round((float) $val) != $val) {
+        if ($val !== "auto" && round($val) != $val) {
             return;
         }
 

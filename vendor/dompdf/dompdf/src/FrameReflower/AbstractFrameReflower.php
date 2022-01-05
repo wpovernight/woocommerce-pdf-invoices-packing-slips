@@ -280,6 +280,7 @@ abstract class AbstractFrameReflower
 
     /**
      * @param Block|null $block
+     * @return mixed
      */
     abstract function reflow(Block $block = null);
 
@@ -450,7 +451,7 @@ abstract class AbstractFrameReflower
     /**
      * Parses the CSS "content" property
      *
-     * @return string The resulting string
+     * @return string|null The resulting string
      */
     protected function _parse_content()
     {
@@ -470,7 +471,7 @@ abstract class AbstractFrameReflower
 
         // split on spaces, except within quotes
         if (!preg_match_all($re, $content, $matches, PREG_SET_ORDER)) {
-            return "";
+            return null;
         }
 
         $text = "";
@@ -507,7 +508,7 @@ abstract class AbstractFrameReflower
                     if (isset($args[5])) {
                         $type = trim($args[5]);
                     } else {
-                        $type = "decimal";
+                        $type = null;
                     }
                     $p = $this->_frame->lookup_counter_frame($counter_id);
 
@@ -524,7 +525,7 @@ abstract class AbstractFrameReflower
                     if (isset($args[7])) {
                         $type = trim($args[7]);
                     } else {
-                        $type = "decimal";
+                        $type = null;
                     }
 
                     $p = $this->_frame->lookup_counter_frame($counter_id);
@@ -603,19 +604,16 @@ abstract class AbstractFrameReflower
 
         if ($style->content && $frame->get_node()->nodeName === "dompdf_generated") {
             $content = $this->_parse_content();
+            $node = $frame->get_node()->ownerDocument->createTextNode($content);
 
-            if ($content !== "") {
-                $node = $frame->get_node()->ownerDocument->createTextNode($content);
+            $new_style = $style->get_stylesheet()->create_style();
+            $new_style->inherit($style);
 
-                $new_style = $style->get_stylesheet()->create_style();
-                $new_style->inherit($style);
+            $new_frame = new Frame($node);
+            $new_frame->set_style($new_style);
 
-                $new_frame = new Frame($node);
-                $new_frame->set_style($new_style);
-
-                Factory::decorate_frame($new_frame, $frame->get_dompdf(), $frame->get_root());
-                $frame->append_child($new_frame);
-            }
+            Factory::decorate_frame($new_frame, $frame->get_dompdf(), $frame->get_root());
+            $frame->append_child($new_frame);
         }
 
         $frame->content_set = true;

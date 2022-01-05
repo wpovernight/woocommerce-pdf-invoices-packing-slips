@@ -331,16 +331,6 @@ class Cpdf
     public $imagelist = [];
 
     /**
-     * @var array Table of already added alpha and plain image files for transparent PNG images.
-     */
-    protected $imageAlphaList = [];
-
-    /**
-     * @var array List of temporary image files to be deleted after processing.
-     */
-    protected $imageCache = [];
-
-    /**
      * @var boolean Whether the text passed in should be treated as Unicode or just local character set.
      */
     public $isUnicode = false;
@@ -419,15 +409,6 @@ class Cpdf
 
         // also initialize the font families that are known about already
         $this->setFontFamily('init');
-    }
-
-    public function __destruct()
-    {
-        foreach ($this->imageCache as $file) {
-            if (file_exists($file)) {
-                unlink($file);
-            }
-        }
     }
 
     /**
@@ -1192,7 +1173,8 @@ class Cpdf
                 $font_obj->reduce();
 
                 // Write new font
-                $tmp_name = @tempnam($this->tmp, "cpdf_subset_");
+                $tmp_name = $this->tmp . "/" . basename($fbfile) . ".tmp." . uniqid();
+                touch($tmp_name);
                 $font_obj->open($tmp_name, BinaryStream::modeReadWrite);
                 $font_obj->encode(["OS/2"]);
                 $font_obj->close();
@@ -1791,14 +1773,14 @@ EOT;
 
                     // dates must be outputted as-is, without Unicode transformations
                     if ($k !== 'CreationDate' && $k !== 'ModDate') {
-                        $v = $this->utf8toUtf16BE($v);
+                        $v = $this->filterText($v, true, false);
                     }
 
                     if ($encrypted) {
                         $v = $this->ARC4($v);
                     }
 
-                    $res .= $this->filterText($v, false, false);
+                    $res .= $v;
                     $res .= ")\n";
                 }
 
@@ -2918,17 +2900,15 @@ EOT;
                 break;
             case 'out':
                 $info = &$this->objects[$id]['info'];
-                $filename = $this->utf8toUtf16BE($info['filename']);
-                $description = $this->utf8toUtf16BE($info['description']);
 
                 if ($this->encrypted) {
                     $this->encryptInit($id);
-                    $filename = $this->ARC4($filename);
-                    $description = $this->ARC4($description);
+                    $filename = $this->ARC4($info['filename']);
+                    $description = $this->ARC4($info['description']);
+                } else {
+                    $filename = $info['filename'];
+                    $description = $info['description'];
                 }
-
-                $filename = $this->filterText($filename, false, false);
-                $description = $this->filterText($description, false, false);
 
                 $res = "\n$id 0 obj <</Type /Filespec /EF";
                 $res .= " <</F " . $info['embedded_reference'] . " 0 R >>";
@@ -5052,17 +5032,17 @@ EOT;
 
         $text = str_replace(["\r", "\n"], "", $text);
 
-        // if ($smallCaps) {
-        //     preg_match_all("/(\P{Ll}+)/u", $text, $matches, PREG_SET_ORDER);
-        //     $lower = $this->concatMatches($matches);
-        //     d($lower);
+        if ($smallCaps) {
+            preg_match_all("/(\P{Ll}+)/u", $text, $matches, PREG_SET_ORDER);
+            $lower = $this->concatMatches($matches);
+            d($lower);
 
-        //     preg_match_all("/(\p{Ll}+)/u", $text, $matches, PREG_SET_ORDER);
-        //     $other = $this->concatMatches($matches);
-        //     d($other);
+            preg_match_all("/(\p{Ll}+)/u", $text, $matches, PREG_SET_ORDER);
+            $other = $this->concatMatches($matches);
+            d($other);
 
-        //     $text = preg_replace_callback("/\p{Ll}/u", array($this, "toUpper"), $text);
-        // }
+            //$text = preg_replace_callback("/\p{Ll}/u", array($this, "toUpper"), $text);
+        }
 
         // if there are any open callbacks, then they should be called, to show the start of the line
         if ($this->nCallback > 0) {
@@ -5549,7 +5529,7 @@ EOT;
      * Check if image already added to pdf image directory.
      * If yes, need not to create again (pass empty data)
      *
-     * @param string $imgname
+     * @param $imgname
      * @return bool
      */
     function image_iscached($imgname)
@@ -5561,7 +5541,7 @@ EOT;
      * add a PNG image into the document, from a GD object
      * this should work with remote files
      *
-     * @param \GdImage|resource $img A GD resource
+     * @param resource $img A GD resource
      * @param string $file The PNG file
      * @param float $x X position
      * @param float $y Y position
@@ -5763,7 +5743,7 @@ EOT;
                     if ($eight_bit) {
                         // with gamma correction
                         $gammacorr = 2.2;
-                        $pixel = round(pow((((127 - $alpha) * 255 / 127) / 255), $gammacorr) * 255);
+                        $pixel = pow((((127 - $alpha) * 255 / 127) / 255), $gammacorr) * 255;
                     } else {
                         // without gamma correction
                         $pixel = (127 - $alpha) * 2;
@@ -5793,19 +5773,21 @@ EOT;
             imagepng($imgplain, $tempfile_plain);
         }
 
-        $this->imageAlphaList[$file] = [$tempfile_alpha, $tempfile_plain];
-
         // embed mask image
         if ($tempfile_alpha) {
             $this->addImagePng($imgalpha, $tempfile_alpha, $x, $y, $w, $h, true);
             imagedestroy($imgalpha);
-            $this->imageCache[] = $tempfile_alpha;
         }
 
         // embed image, masked with previously embedded mask
         $this->addImagePng($imgplain, $tempfile_plain, $x, $y, $w, $h, false, ($tempfile_alpha !== null));
         imagedestroy($imgplain);
-        $this->imageCache[] = $tempfile_plain;
+
+        // remove temp files
+        if ($tempfile_alpha) {
+            unlink($tempfile_alpha);
+        }
+        unlink($tempfile_plain);
     }
 
     /**
@@ -5823,19 +5805,6 @@ EOT;
     {
         if (!function_exists("imagecreatefrompng")) {
             throw new \Exception("The PHP GD extension is required, but is not installed.");
-        }
-
-        if (isset($this->imageAlphaList[$file])) {
-            [$alphaFile, $plainFile] = $this->imageAlphaList[$file];
-
-            if ($alphaFile) {
-                $img = null;
-                $this->addImagePng($img, $alphaFile, $x, $y, $w, $h, true);
-            }
-
-            $img = null;
-            $this->addImagePng($img, $plainFile, $x, $y, $w, $h, false, ($plainFile !== null));
-            return;
         }
 
         //if already cached, need not to read again
