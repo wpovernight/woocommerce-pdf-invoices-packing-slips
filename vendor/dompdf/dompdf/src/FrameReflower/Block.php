@@ -452,12 +452,14 @@ class Block extends AbstractFrameReflower
             default:
             case "left":
                 foreach ($this->_frame->get_line_boxes() as $line) {
-                    if (!$line->inline || !$line->left) {
+                    if (!$line->inline) {
                         continue;
                     }
 
-                    foreach ($line->get_frames() as $frame) {
-                        if ($frame->get_positioner() instanceof InlinePositioner) {
+                    $line->trim_trailing_ws();
+
+                    if ($line->left) {
+                        foreach ($line->frames_to_align() as $frame) {
                             $frame->move($line->left, 0);
                         }
                     }
@@ -469,6 +471,8 @@ class Block extends AbstractFrameReflower
                     if (!$line->inline) {
                         continue;
                     }
+
+					$line->trim_trailing_ws();
 
                     // Move each child over by $dx
                     $indent = $i === 0 ? $text_indent : 0;
@@ -493,6 +497,8 @@ class Block extends AbstractFrameReflower
                     if (!$line->inline) {
                         continue;
                     }
+
+					$line->trim_trailing_ws();
 
                     if ($line->left) {
                         foreach ($line->get_frames() as $frame) {
@@ -551,6 +557,8 @@ class Block extends AbstractFrameReflower
                         continue;
                     }
 
+					$line->trim_trailing_ws();
+
                     // Centre each line by moving each frame in the line by:
                     $indent = $i === 0 ? $text_indent : 0;
                     $dx = ($width + $line->left - $line->w - $line->right - $indent) / 2;
@@ -597,12 +605,28 @@ class Block extends AbstractFrameReflower
 
                 //FIXME: The 0.8 ratio applied to the height is arbitrary (used to accommodate descenders?)
                 if ($isInlineBlock) {
-                    $lineFrames = $line->get_frames();
-                    if (count($lineFrames) == 1) {
+                    // Workaround: Skip vertical alignment if the frame is the
+                    // only one one the line, excluding empty text frames, which
+                    // may be the result of trailing white space
+                    // FIXME: This special case should be removed once vertical
+                    // alignment is properly fixed
+                    $skip = true;
+
+                    foreach ($line->get_frames() as $other) {
+                        if ($other !== $frame
+                            && !($other->is_text_node() && $other->get_node()->nodeValue === "")
+                         ) {
+                            $skip = false;
+                            break;
+                        }
+                    }
+
+                    if ($skip) {
                         continue;
                     }
-                    $frameBox = $frame->get_border_box();
-                    $imageHeightDiff = $height * 0.8 - $frameBox['h'];
+
+                    $marginHeight = $frame->get_margin_height();
+                    $imageHeightDiff = $height * 0.8 - $marginHeight;
 
                     $align = $frame->get_style()->vertical_align;
                     if (in_array($align, Style::$vertical_align_keywords) === true) {
