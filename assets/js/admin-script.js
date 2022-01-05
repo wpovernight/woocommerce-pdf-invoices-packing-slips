@@ -220,12 +220,13 @@ jQuery( function( $ ) {
 			pdf.getPage(pageNumber).then(function(page) {
 				console.log('Page loaded');
 				
-				var scale = 1.5;
+				var scale = 2;
 				var viewport = page.getViewport({scale: scale});
 
 				// Prepare canvas using PDF page dimensions
 				var canvas = document.getElementById(canvas_id);
 				var context = canvas.getContext('2d');
+
 				canvas.height = viewport.height;
 				canvas.width = viewport.width;
 
