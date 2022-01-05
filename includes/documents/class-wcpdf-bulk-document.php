@@ -54,6 +54,10 @@ class Bulk_Document {
 	public function get_pdf() {
 		do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
 
+		// temporarily apply filters that need to be removed again after the pdf is generated
+		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array() );
+		$this->add_filters( $pdf_filters );
+
 		$html = $this->get_html();
 		$pdf_settings = array(
 			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->wrapper_document->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
@@ -64,6 +68,9 @@ class Bulk_Document {
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );
 		
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
+
+		// remove temporary filters
+		$this->remove_filters( $pdf_filters );
 
 		return $pdf;
 	}
@@ -119,6 +126,29 @@ class Bulk_Document {
 		$args = $args + $default_args;
 		$filename = $this->wrapper_document->get_filename( $context, $args );
 		return $filename;
+	}
+
+	protected function add_filters( $filters ) {
+		foreach ( $filters as $filter ) {
+			$filter = $this->normalize_filter_args( $filter );
+			add_filter( $filter['hook_name'], $filter['callback'], $filter['priority'], $filter['accepted_args'] );
+		}
+	}
+
+	protected function remove_filters( $filters ) {
+		foreach ( $filters as $filter ) {
+			$filter = $this->normalize_filter_args( $filter );
+			remove_filter( $filter['hook_name'], $filter['callback'], $filter['priority'] );
+		}
+	}
+
+	protected function normalize_filter_args( $filter ) {
+		$filter = array_values( $filter ); 
+		$hook_name = $filter[0];
+		$callback = $filter[1];
+		$priority = isset( $filter[2] ) ? $filter[2] : 10;
+		$accepted_args = isset( $filter[3] ) ? $filter[3] : 1;
+		return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
 	}
 
 }
