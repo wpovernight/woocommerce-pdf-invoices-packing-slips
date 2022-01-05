@@ -159,6 +159,16 @@ jQuery( function( $ ) {
 			data:      form_data,
 		};
 
+		// remove previous error notices
+		preview.children( '.notice' ).remove();
+
+		// if we don't have an order_id, let's finish here
+		if( order_id.length === 0 ) {
+			let no_order_message = preview.data( 'no_order' );
+			preview.append( '<div class="notice notice-error inline" style="margin:20px"><p>'+no_order_message+'</p></div>' );
+			return;
+		}
+
 		// block ui
 		preview.block( {
 			message: null,
@@ -175,7 +185,7 @@ jQuery( function( $ ) {
 			success: function( response ) {
 				if( response.data.error ) {
 					$( '#'+canvas_id ).remove();
-					preview.append( '<div class="notice notice-error inline" style="margin:0;"><p>'+response.data.error+'</p></div>' );
+					preview.append( '<div class="notice notice-error inline" style="margin:20px;"><p>'+response.data.error+'</p></div>' );
 				} else if( response.data.pdf_data ) {
 					$( '#'+canvas_id ).remove();
 					preview.append( '<canvas id="'+canvas_id+'" style="width:100%;"></canvas>' );

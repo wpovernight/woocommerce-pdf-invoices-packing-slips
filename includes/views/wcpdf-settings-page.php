@@ -73,7 +73,7 @@ $review_invitation = sprintf(
 					'return' => 'ids',
 					'type'   => 'shop_order',
 				) );
-				$order_id      = reset( $last_order_id );
+				$order_id      = ! empty( $last_order_id ) ? reset( $last_order_id ) : false;
 			?>
 			<div class="slider slide-right">&#9654;</div>
 			<div class="preview-data">
@@ -93,7 +93,7 @@ $review_invitation = sprintf(
 				<div id="preview-order-search-results"><!-- Results populated with JS --></div>
 			</div>
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
-			<div class="preview" data-order_id="<?= $order_id; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>"></div>
+			<div class="preview" data-order_id="<?= $order_id; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>" data-no_order="<?= __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ); ?>"></div>
 		</div>
 
 	</div>

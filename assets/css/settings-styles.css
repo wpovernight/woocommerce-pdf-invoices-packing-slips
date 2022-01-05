@@ -331,10 +331,13 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding-right: 15%;
 }
 
+.preview-document {
+	min-height: 10cm;
+}
+
 .preview-document .preview {
 	width: 100%;
 	box-sizing: border-box;
-	min-height: 5cm;
 	background: white;
 	box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
 }
