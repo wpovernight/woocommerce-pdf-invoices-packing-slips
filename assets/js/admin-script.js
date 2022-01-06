@@ -99,7 +99,7 @@ jQuery( function( $ ) {
 	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $( '#wpo-wcpdf-preview-wrapper .preview' ) ) );
 
 	// Preview on user input
-	$( '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #wpo-wcpdf-settings checkbox, #preview-order-number' ).on( 'keyup paste', function( event ) {
+	$( '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #preview-order-number' ).on( 'keyup paste', function( event ) {
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'keyup' ? 1000 : 0;
@@ -109,6 +109,16 @@ jQuery( function( $ ) {
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( '#wpo-wcpdf-settings select option' ).on( 'click', function( event ) {
+		event.preventDefault();
+		let elem      = $(this);
+		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let duration  = event.type == 'click' ? 1000 : 0;
+		clearTimeout( wcpdf_preview );
+		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+	} );
+
+	// Preview on user checkbox change
+	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
 		event.preventDefault();
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
@@ -164,9 +174,18 @@ jQuery( function( $ ) {
 		// remove previous error notices
 		preview.children( '.notice' ).remove();
 
+		// settings need to be saved before preview?
+		if( save_before_preview( elem ) ) {
+			let save_settings_message = preview.data( 'save_settings' );
+			preview.find( 'canvas' ).remove();
+			preview.append( '<div class="notice notice-error inline" style="margin:20px"><p>'+save_settings_message+'</p></div>' );
+			return;
+		}
+
 		// if we don't have an order_id, let's finish here
 		if( order_id.length === 0 ) {
 			let no_order_message = preview.data( 'no_order' );
+			preview.find( 'canvas' ).remove();
 			preview.append( '<div class="notice notice-error inline" style="margin:20px"><p>'+no_order_message+'</p></div>' );
 			return;
 		}
@@ -200,8 +219,7 @@ jQuery( function( $ ) {
 
 	function pdf_js( worker, canvas_id, pdf_data ) {
 		// atob() is used to convert base64 encoded PDF to binary-like data.
-		// (See also https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/
-		// Base64_encoding_and_decoding.)
+		// (See also https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding.)
 		var pdfData = atob( pdf_data );
 
 		// Loaded via <script> tag, create shortcut to access PDF.js exports.
@@ -253,10 +271,10 @@ jQuery( function( $ ) {
 		let elem = $(this);
 		elem.addClass( 'ajax-waiting' );
 		let div  = elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
-		div.children( 'a' ).remove();      										// remove previous results
-		div.children( '.error' ).remove(); 										// remove previous errors
+		div.children( 'a' ).remove();                                          // remove previous results
+		div.children( '.error' ).remove();                                     // remove previous errors
 		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
-		elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).hide();	// remove the clear button
+		elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 
 		let duration  = event.type == 'keyup' ? 1000 : 0;
 		clearTimeout( wcpdf_preview_search );
@@ -298,6 +316,33 @@ jQuery( function( $ ) {
 				elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).show();
 			}
 		});
+	}
+
+	// Settings that need to be saved before trigger the Preview
+	function save_before_preview ( elem ) {
+		let save_this_setting_ids = [
+			'paper_size',
+			'test_mode',
+			'header_logo',
+			'header_logo_height',
+			'display_shipping_address',
+			'display_customer_notes',
+			'display_date',
+			'display_number',
+			'number_format',
+		];
+		let id      = elem.attr( 'id' );
+		let tagName = elem.prop( 'tagName' );
+
+		if ( tagName == 'OPTION' ) { // if it's an OPTION grab instead the parent ID (select)
+			id = elem.parent().attr( 'id' );
+		}
+
+		if ( $.inArray( id, save_this_setting_ids ) !== -1 ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 });
