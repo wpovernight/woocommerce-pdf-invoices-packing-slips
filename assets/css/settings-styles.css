@@ -369,7 +369,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding: 0.1em;
 	width: 20ch;
 	margin-right: -25ch;
-	transition: .2s ease-in-out;
 	display: none;
 }
 

@@ -114,7 +114,7 @@ class Assets {
 			wp_add_inline_style( 'wpo-wcpdf-settings-styles', "#preview-order-search.ajax-waiting {
 				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/spinner.gif'.") !important;
 				background-repeat: no-repeat !important;
-				background-position: 95% center !important;
+				background-position: right 10px center !important;
 			}" );
 
 			// SCRIPTS
