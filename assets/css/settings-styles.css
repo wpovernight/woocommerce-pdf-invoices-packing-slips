@@ -171,7 +171,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .nav-tab-wrapper a.nav-tab.nav-tab-active {
 	border-bottom: 3px solid #51266b;
-	font-weight: 600;
 }
 
 #wpo-wcpdf-preview-wrapper {
@@ -402,7 +401,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-bottom: 0;
 	border-bottom: 1px solid #eaeaea;
 	font-size: 1.1em;
-	font-weight: 300;
 }
 
 .preview-document .preview-data ul li:hover {
