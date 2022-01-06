@@ -28,7 +28,7 @@ class Settings_Documents {
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 		?>
 		<div class="wcpdf_document_settings_sections">
-			<?php esc_attr_e( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
+			<h2><?php esc_attr_e( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 			<ul>
 				<?php
 				foreach ( $documents as $document ) {
@@ -36,7 +36,8 @@ class Settings_Documents {
 					if ( empty( trim( $title ) ) ) {
 						$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
 					}
-					printf( '<li><a href="%s" class="%s">%s</a></li>', add_query_arg( 'section', $document->get_type() ), $document->get_type() == $section ? 'active' : '', esc_html( $title ) );
+					$active = $document->get_type() == $section ? 'active' : '';
+					printf( '<li class="%2$s"><a href="%1$s" class="%2$s">%3$s</a></li>', add_query_arg( 'section', $document->get_type() ), $active, esc_html( $title ) );
 				}
 				?>
 			</ul>
