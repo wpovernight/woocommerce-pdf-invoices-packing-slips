@@ -149,46 +149,50 @@ class Settings {
 				wp_send_json_error( array( 'error' => __( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 
-			$invoice             = wcpdf_get_invoice( $order );
-			$invoice->set_date( current_time( 'timestamp', true ) );
-			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-			$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
-			$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
-			$invoice->set_number( $number_store->get_next() );
+			$invoice = wcpdf_get_invoice( $order );
+			if( $invoice ) {
+				$invoice->set_date( current_time( 'timestamp', true ) );
+				$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+				$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
+				$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
+				$invoice->set_number( $number_store->get_next() );
 
-			// make replacements
-			if ( ! empty( $_POST['data'] ) ) {
-				// parse form data
-				parse_str( $_POST['data'], $form_data );
-				$form_data = stripslashes_deep( $form_data );
-				foreach ( $form_data as $key => $settings ) {
-					if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false ) {
-						foreach ( $settings as $setting => $value ) {
-							if ( is_array( $value ) ) {
-								foreach ( $value as $k => $v ) {
-									if ( isset( WPO_WCPDF()->settings->general_settings[$setting][$k] ) ) {
-										WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
+				// make replacements
+				if ( ! empty( $_POST['data'] ) ) {
+					// parse form data
+					parse_str( $_POST['data'], $form_data );
+					$form_data = stripslashes_deep( $form_data );
+					foreach ( $form_data as $key => $settings ) {
+						if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false ) {
+							foreach ( $settings as $setting => $value ) {
+								if ( is_array( $value ) ) {
+									foreach ( $value as $k => $v ) {
+										if ( isset( WPO_WCPDF()->settings->general_settings[$setting][$k] ) ) {
+											WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
+										}
+										if ( isset( $invoice->settings[$setting][$k] ) ) {
+											$invoice->settings[$setting][$k] = $value[$k];
+										}
 									}
-									if ( isset( $invoice->settings[$setting][$k] ) ) {
-										$invoice->settings[$setting][$k] = $value[$k];
+								} else {
+									if ( isset( WPO_WCPDF()->settings->general_settings[$setting] ) ) {
+										WPO_WCPDF()->settings->general_settings[$setting] = $value;
 									}
-								}
-							} else {
-								if ( isset( WPO_WCPDF()->settings->general_settings[$setting] ) ) {
-									WPO_WCPDF()->settings->general_settings[$setting] = $value;
-								}
-								if ( isset( $invoice->settings[$setting] ) ) {
-									$invoice->settings[$setting] = $value;
+									if ( isset( $invoice->settings[$setting] ) ) {
+										$invoice->settings[$setting] = $value;
+									}
 								}
 							}
 						}
 					}
 				}
+
+				$pdf_data = $invoice->preview_pdf();
+
+				wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
+			} else {
+				wp_send_json_error( array( 'error' => __( 'Document is not enabled!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
-
-			$pdf_data = $invoice->preview_pdf();
-
-			wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
 		}
 
 		wp_die();
