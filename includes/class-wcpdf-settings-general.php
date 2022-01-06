@@ -160,7 +160,6 @@ class Settings_General {
 					'id'			=> 'shop_name',
 					'size'			=> '72',
 					'translatable'	=> true,
-					'css'           => 'width:100%;',
 				)
 			),
 			array(

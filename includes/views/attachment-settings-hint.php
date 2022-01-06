@@ -7,7 +7,7 @@ $invoice_settings_url = add_query_arg( array(
 ?>
 <style>
 .wcpdf-attachment-settings-hint {
-	display: inline-block;
+	display: block;
 	background: #fff;
 	border-left: 4px solid #51266b !important;
 	-webkit-box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
