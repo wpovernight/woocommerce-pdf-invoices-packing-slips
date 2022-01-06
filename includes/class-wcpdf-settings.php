@@ -164,20 +164,20 @@ class Settings {
 				foreach ( $form_data as $key => $settings ) {
 					if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false ) {
 						foreach ( $settings as $setting => $value ) {
-							if( is_array( $value ) ) {
-								foreach( $value as $k => $v ) {
-									if( isset( WPO_WCPDF()->settings->general_settings[$setting][$k] ) ) {
+							if ( is_array( $value ) ) {
+								foreach ( $value as $k => $v ) {
+									if ( isset( WPO_WCPDF()->settings->general_settings[$setting][$k] ) ) {
 										WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
 									}
-									if( isset( $invoice->settings[$setting][$k] ) ) {
+									if ( isset( $invoice->settings[$setting][$k] ) ) {
 										$invoice->settings[$setting][$k] = $value[$k];
 									}
 								}
 							} else {
-								if( isset( WPO_WCPDF()->settings->general_settings[$setting] ) ) {
+								if ( isset( WPO_WCPDF()->settings->general_settings[$setting] ) ) {
 									WPO_WCPDF()->settings->general_settings[$setting] = $value;
 								}
-								if( isset( $invoice->settings[$setting] ) ) {
+								if ( isset( $invoice->settings[$setting] ) ) {
 									$invoice->settings[$setting] = $value;
 								}
 							}
@@ -191,7 +191,7 @@ class Settings {
 			wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
 		}
 
-		exit();
+		wp_die();
 	}
 
 	public function preview_order_search() {
