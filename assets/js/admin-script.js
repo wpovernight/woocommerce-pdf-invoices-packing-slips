@@ -322,6 +322,7 @@ jQuery( function( $ ) {
 	// Settings that need to be saved before trigger the Preview
 	function save_before_preview ( elem ) {
 		let save_this_setting_ids = [
+			'enabled',
 			'paper_size',
 			'test_mode',
 			'header_logo',
