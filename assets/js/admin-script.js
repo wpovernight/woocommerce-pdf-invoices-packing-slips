@@ -81,12 +81,12 @@ jQuery( function( $ ) {
 			$previewData.find('p.order-number').hide();
 			$previewData.find('p.order-search').show();
 			$previewData.find('input[name="preview-order-search"]').addClass('active');
-			$previewData.find('input[name="preview-order-number"]').removeClass('active');
+			$previewData.find('input[name="preview-order-number"]').removeClass('active').val('');
 		} else {
 			$previewData.find('p.last-order').show();
 			$previewData.find('p.order-number').hide();
 			$previewData.find('p.order-search').hide();
-			$previewData.find('input[name="preview-order-number"]').removeClass('active');
+			$previewData.find('input[name="preview-order-number"]').removeClass('active').val('');
 			$previewData.find('input[name="preview-order-search"]').removeClass('active');
 			$previewData.find('#preview-order-search-results').hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
@@ -156,10 +156,11 @@ jQuery( function( $ ) {
 	} );
 
 	function ajax_load_preview( form_data, elem ) {
-		let preview   = $( '#wpo-wcpdf-preview-wrapper .preview' );
-		let order_id  = preview.data( 'order_id' );
-		if( elem[0].id == 'preview-order-number' ) {
-			order_id = elem.val();
+		let preview      = $( '#wpo-wcpdf-preview-wrapper .preview' );
+		let order_id     = preview.data( 'order_id' );
+		let order_number = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
+		if( order_number.length > 0 ) {
+			order_id = order_number;
 		}
 		let nonce     = preview.data('nonce');
 		let worker    = wpo_wcpdf_admin.pdfjs_worker;
