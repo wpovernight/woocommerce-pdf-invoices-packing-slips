@@ -178,7 +178,7 @@ jQuery( function( $ ) {
 		if( save_before_preview( elem ) ) {
 			let save_settings_message = preview.data( 'save_settings' );
 			preview.find( 'canvas' ).remove();
-			preview.append( '<div class="notice notice-error inline" style="margin:20px"><p>'+save_settings_message+'</p></div>' );
+			preview.append( '<div class="notice notice-warning inline" style="margin:20px"><p>'+save_settings_message+'</p></div>' );
 			return;
 		}
 
@@ -326,10 +326,13 @@ jQuery( function( $ ) {
 			'header_logo',
 			'header_logo_height',
 			'display_shipping_address',
+			'display_email',
+			'display_phone',
 			'display_customer_notes',
 			'display_date',
 			'display_number',
 			'number_format',
+			'title',
 		];
 		let id      = elem.attr( 'id' );
 		let tagName = elem.prop( 'tagName' );
