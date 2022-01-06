@@ -37,7 +37,7 @@ jQuery( function( $ ) {
 		}
 	}).trigger('change');
 
-	//Preview
+	// Preview
 	let previewStates = $('#wpo-wcpdf-preview-wrapper').attr('data-preview-states');
 	
 	$('.slide-left').on( 'click', function() {

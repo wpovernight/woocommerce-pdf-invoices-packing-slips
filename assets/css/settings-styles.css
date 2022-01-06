@@ -339,6 +339,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	max-width: 30cm;
 	box-sizing: border-box;
 	background: white;
+	float: none;
+	margin: 0 auto;
 	box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
 	-webkit-box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
 }
