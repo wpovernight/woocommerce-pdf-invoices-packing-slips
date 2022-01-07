@@ -105,7 +105,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 = 2.11.3 =
 * Fix: Extended currency symbol support in bulk documents
 * Fix: Prevent copying packing slip and other document data for renewal orders (WooCommerce Subscriptions)
-* Marked tested up to WooCommerce 5.9
+* Marked tested up to WooCommerce 6.0
 
 = 2.11.2 =
 * New: filter and fallback for the default settings tab
