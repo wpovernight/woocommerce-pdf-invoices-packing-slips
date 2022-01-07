@@ -88,8 +88,13 @@ class Font_Synchronizer {
 	 * @return void
 	 */
 	public function delete_font_files( $filenames ) {
+		$plugin_folder = $this->normalize_path( WPO_WCPDF()->plugin_path() );
 		$extensions = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
 		foreach ( $filenames as $filename ) {
+			// never delete files in our own plugin folder
+			if ( strpos( $filename, $plugin_folder ) !== false ) {
+				continue;
+			}
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
 				if ( file_exists( $file ) ) {
