@@ -81,13 +81,11 @@ class Settings_Callbacks {
 	public function text_input( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 
-		$css = isset( $args['css'] ) ? $args['css'] : '';
-
 		if ( empty( $type ) ) {
 			$type = 'text';
 		}
 
-		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" size="%5$s" placeholder="%6$s" style="%7$s" %8$s/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $current ), esc_attr( $size ), esc_attr( $placeholder ), esc_attr( $css ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
+		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" size="%5$s" placeholder="%6$s" %7$s/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $current ), esc_attr( $size ), esc_attr( $placeholder ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
 	
 		// output description.
 		if ( ! empty( $description ) ) {
