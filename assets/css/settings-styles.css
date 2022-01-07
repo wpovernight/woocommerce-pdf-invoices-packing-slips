@@ -261,17 +261,30 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > select,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > textarea,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > textarea {
-	width: 100%;
 	max-width: none;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tr > td > input[type="text"],
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td > input[type="text"],
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tr > td > select,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td > select,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tr > td > textarea,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td > textarea {
-	max-width: 35%;
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > input[type="text"]:not(#next_invoice_number),
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input[type="text"]:not(#next_invoice_number) {
+	width: 100% !important;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
+	display: table-cell !important;
+	padding: 15px 10px 15px 0px !important;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th {
+	width: 300px !important;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
+	width: 600px !important;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .wcpdf-attachment-settings-hint {
+	width: 880px !important;
 }
 
 /* WPML */
