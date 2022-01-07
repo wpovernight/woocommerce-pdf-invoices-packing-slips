@@ -18,7 +18,8 @@ $review_invitation = sprintf(
 	<h2><?php esc_html_e( 'WooCommerce PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<h2 class="nav-tab-wrapper">
 	<?php
-	foreach ( $settings_tabs as $tab_slug => $tab_title ) {
+	foreach ( $settings_tabs as $tab_slug => $tab_data ) {
+		$tab_title = is_array( $tab_data ) ? $tab_data['title'] : $tab_data;
 		$tab_link = esc_url("?page=wpo_wcpdf_options_page&tab={$tab_slug}");
 		printf('<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', $tab_link, esc_attr( $tab_slug ), ( ( $active_tab == $tab_slug ) ? 'nav-tab-active' : '' ), esc_html( $tab_title ) );
 	}
