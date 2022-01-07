@@ -136,7 +136,6 @@ table.wcpdf_documents_settings_list td.title {
 	border-bottom: 3px solid transparent;
 	padding: 10px 0em;
 	margin: 0 1.2em;
-	font-weight: 300;
 	font-size: 15px;
 }
 .wcpdf_document_settings_sections li a {
@@ -172,7 +171,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .wrap [class$="icon32"] + h2 {
 	font-size: 18px;
 	padding: 1em;
-	font-weight: 200;
 }
 
 .nav-tab-wrapper a.nav-tab {
@@ -181,7 +179,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-bottom: 3px solid transparent;
 	padding: 1em 0em;
 	margin: 0 1.2em;
-	font-weight: 300;
 	font-size: 15px;
 }
 
@@ -552,7 +549,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	position: absolute;
 	right: 2em;
 	font-size: 1.4em;
-	font-weight: 300;
 	display: none;
 }
 
@@ -561,7 +557,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	position: absolute;
 	left: 2em;
 	font-size: 1.4em;
-	font-weight: 300;
 	display: none;
 }
 
