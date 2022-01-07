@@ -24,20 +24,28 @@ class Settings_Documents {
 	}
 
 	public function output( $section ) {
-		$section = ! empty( $section ) ? $section : 'invoice';
+		$section   = ! empty( $section ) ? $section : 'invoice';
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 		?>
 		<div class="wcpdf_document_settings_sections">
-			<h2><?php esc_attr_e( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
+			<?php 
+			foreach ( $documents as $document ) {
+				if ( $document->get_type() == $section ) {
+					echo '<h2>'.$document->get_title().'<span class="arrow-down">select &#9660;</span></h2>';
+				}
+			}
+			?>
 			<ul>
 				<?php
 				foreach ( $documents as $document ) {
-					$title = strip_tags( $document->get_title() );
-					if ( empty( trim( $title ) ) ) {
-						$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
+					if( $document->get_type() != $section ) {
+						$title = strip_tags( $document->get_title() );
+						if ( empty( trim( $title ) ) ) {
+							$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
+						}
+						$active = $document->get_type() == $section ? 'active' : '';
+						printf( '<li class="%2$s"><a href="%1$s" class="%2$s">%3$s</a></li>', add_query_arg( 'section', $document->get_type() ), $active, esc_html( $title ) );
 					}
-					$active = $document->get_type() == $section ? 'active' : '';
-					printf( '<li class="%2$s"><a href="%1$s" class="%2$s">%3$s</a></li>', add_query_arg( 'section', $document->get_type() ), $active, esc_html( $title ) );
 				}
 				?>
 			</ul>

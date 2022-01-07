@@ -37,6 +37,11 @@ jQuery( function( $ ) {
 		}
 	}).trigger('change');
 
+	// enable settings document switch
+	$('.wcpdf_document_settings_sections > h2').on( 'click', function() {
+		$(this).parent().find('ul').toggleClass('active');
+	} );
+
 	// Preview
 	let previewStates = $('#wpo-wcpdf-preview-wrapper').attr('data-preview-states');
 	
