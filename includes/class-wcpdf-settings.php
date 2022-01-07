@@ -109,18 +109,18 @@ class Settings {
 	public function settings_page() {
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
 			'general' => array(
-				'tab_title' => __('General', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title' => __('General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
 			'documents'	=> array(
-				'tab_title' => __('Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title' => __('Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
 		) );
 
 		// add status tab last in row
 		$settings_tabs['debug'] = array(
-			'tab_title' => __('Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title' => __('Status', 'woocommerce-pdf-invoices-packing-slips' ),
 			'preview_states' => 1,
 		);
 
