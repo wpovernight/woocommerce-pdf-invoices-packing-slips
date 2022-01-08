@@ -152,7 +152,7 @@ class Font_Synchronizer {
 
 		// dompdf 1.1.X uses a closure to return the fonts, instead of a plain array (1.0.X and older)
 		if ( ! is_array( $font_data ) && is_callable( $font_data ) ) {
-			$font_data = $destination;
+			$font_data = $font_data( $fontDir, $rootDir );
 		}
 
 		return is_array( $font_data ) ? $this->normalize_font_paths( $font_data ) : array();
