@@ -151,11 +151,13 @@ class Settings {
 
 			$invoice = wcpdf_get_invoice( $order );
 			if( $invoice ) {
-				$invoice->set_date( current_time( 'timestamp', true ) );
-				$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-				$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
-				$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
-				$invoice->set_number( $number_store->get_next() );
+				if( ! $invoice->exists() ) {
+					$invoice->set_date( current_time( 'timestamp', true ) );
+					$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+					$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
+					$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
+					$invoice->set_number( $number_store->get_next() );
+				}
 
 				// make replacements
 				if ( ! empty( $_POST['data'] ) ) {
