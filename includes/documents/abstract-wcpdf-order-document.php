@@ -126,7 +126,7 @@ abstract class Order_Document {
 
 	public function get_settings( $latest = false ) {
 		// get most current settings
-		$settings = $this->get_most_current_settings();
+		$settings = $this->get_most_current_settings( true );
 
 		// return only most current if forced
 		if ( $latest == true ) {
