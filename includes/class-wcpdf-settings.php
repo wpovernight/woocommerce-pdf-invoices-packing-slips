@@ -193,7 +193,7 @@ class Settings {
 
 				wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
 			} else {
-				wp_send_json_error( array( 'error' => __( 'Document not available for order #..., try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+				wp_send_json_error( array( 'error' => sprintf( __( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) ) );
 			}
 		}
 
