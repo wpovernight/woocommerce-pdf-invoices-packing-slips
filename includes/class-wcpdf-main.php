@@ -36,11 +36,10 @@ class Main {
 		add_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'test_mode_settings' ), 15, 2 );
 
 		// page numbers & currency filters
-		add_filter( 'wpo_wcpdf_get_html', array($this, 'format_page_number_placeholders' ), 10, 2 );
-		add_action( 'wpo_wcpdf_after_dompdf_render', array($this, 'page_number_replacements' ), 9, 2 );
-		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
-			add_action( 'wpo_wcpdf_before_pdf', array($this, 'use_currency_font' ), 10, 2 );
-		}
+		add_filter( 'wpo_wcpdf_get_html', array( $this, 'format_page_number_placeholders' ), 10, 2 );
+		add_action( 'wpo_wcpdf_after_dompdf_render', array( $this, 'page_number_replacements' ), 9, 2 );
+		add_filter( 'wpo_wcpdf_pdf_filters', array( $this, 'pdf_currency_filters' ) );
+		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
 
 		// scheduled attachments cleanup (following settings on Status tab)
 		add_action( 'wp_scheduled_delete', array( $this, 'attachments_cleanup') );
@@ -773,23 +772,65 @@ class Main {
 		return $dompdf;
 	}
 
-	/**
-	 * Use currency symbol font (when enabled in options)
-	 */
-	public function use_currency_font ( $document_type, $document ) {
-		add_filter( 'woocommerce_currency_symbol', array( $this, 'wrap_currency_symbol' ), 10001, 2);
-		add_action( 'wpo_wcpdf_custom_styles', array($this, 'currency_symbol_font_styles' ) );
+	public function pdf_currency_filters( $filters ) {
+		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
+			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_font' ), 10001, 2 );
+			// 'wpo_wcpdf_custom_styles' is actually an action, but WP handles them with the same functions
+			$filters[] = array( 'wpo_wcpdf_custom_styles', array( $this, 'currency_symbol_font_styles' ) );
+		}
+		return $filters;
 	}
 
-	public function wrap_currency_symbol( $currency_symbol, $currency ) {
+	public function html_currency_filters( $filters ) {
+		// only apply these fixes if the bundled dompdf version is used!
+		if ( wcpdf_pdf_maker_is_default() ) {
+			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_code' ), 10001, 2 );
+		}
+		return $filters;
+	}
+
+	/**
+	 * Use currency symbol font (when enabled in options)
+	 * @param string $currency_symbol Currency symbol
+	 * @param string $currency        Currency
+	 * 
+	 * @return string Currency symbol
+	 */
+	public function use_currency_font( $currency_symbol, $currency ) {
 		$currency_symbol = sprintf( '<span class="wcpdf-currency-symbol">%s</span>', $currency_symbol );
 		return $currency_symbol;
 	}
 
+	/**
+	 * Set currency font CSS
+	 */
 	public function currency_symbol_font_styles () {
 		?>
 		.wcpdf-currency-symbol { font-family: 'Currencies'; }
 		<?php
+	}
+	
+	/**
+	 * Replace dompdf incompatible (RTL) currencies with the ISO currency code (when default dompdf is used)
+	 * @param string $currency_symbol Currency symbol
+	 * @param string $currency        Currency
+	 * 
+	 * @return string Currency symbol
+	 */
+	public function use_currency_code( $currency_symbol, $currency ) {
+		if ( in_array( $currency, $this->get_rtl_currencies() ) ) {
+			$currency_symbol = $currency;
+		}
+		return $currency_symbol;
+	}
+
+	/**
+	 * Get all currencies that require RTL text direction support
+	 * 
+	 * @return array ISO currency codes
+	 */
+	public function get_rtl_currencies() {
+		return array( 'AED', 'BHD', 'DZD', 'IQD', 'IRR', 'JOD', 'KWD', 'LBP', 'LYD', 'MAD', 'MVR', 'OMR', 'QAR', 'SAR', 'SYP', 'TND', 'YER' );
 	}
 
 	/**

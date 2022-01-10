@@ -88,8 +88,13 @@ class Font_Synchronizer {
 	 * @return void
 	 */
 	public function delete_font_files( $filenames ) {
+		$plugin_folder = $this->normalize_path( WPO_WCPDF()->plugin_path() );
 		$extensions = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
 		foreach ( $filenames as $filename ) {
+			// never delete files in our own plugin folder
+			if ( strpos( $filename, $plugin_folder ) !== false ) {
+				continue;
+			}
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
 				if ( file_exists( $file ) ) {
@@ -147,7 +152,7 @@ class Font_Synchronizer {
 
 		// dompdf 1.1.X uses a closure to return the fonts, instead of a plain array (1.0.X and older)
 		if ( ! is_array( $font_data ) && is_callable( $font_data ) ) {
-			$font_data = $destination;
+			$font_data = $font_data( $fontDir, $rootDir );
 		}
 
 		return is_array( $font_data ) ? $this->normalize_font_paths( $font_data ) : array();

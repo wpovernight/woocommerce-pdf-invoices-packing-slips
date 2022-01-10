@@ -185,11 +185,11 @@ class Invoice extends Order_Document_Methods {
 				'callback'		=> 'multiple_checkboxes',
 				'section'		=> 'invoice',
 				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'attach_to_email_ids',
-					'fields' 		=> $this->get_wc_emails(),
+					'option_name'	  => $option_name,
+					'id'			  => 'attach_to_email_ids',
+					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
-					'description'	=> !is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+					'description'	  => !is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
 				)
 			),
 			array(
@@ -199,12 +199,12 @@ class Invoice extends Order_Document_Methods {
 				'callback'		=> 'select',
 				'section'		=> 'invoice',
 				'args'			=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'disable_for_statuses',
-					'options' 			=> function_exists('wc_get_order_statuses') ? wc_get_order_statuses() : array(),
-					'multiple'			=> true,
-					'enhanced_select'	=> true,
-					'placeholder'		=> __( 'Select one or more statuses', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'      => $option_name,
+					'id'               => 'disable_for_statuses',
+					'options_callback' => 'wc_get_order_statuses',
+					'multiple'         => true,
+					'enhanced_select'  => true,
+					'placeholder'      => __( 'Select one or more statuses', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -304,9 +304,9 @@ class Invoice extends Order_Document_Methods {
 				'callback'		=> 'next_number_edit',
 				'section'		=> 'invoice',
 				'args'			=> array(
-					'store'			=> $this->get_sequential_number_store(),
-					'size'			=> '10',
-					'description'	=> __( 'This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!', 'woocommerce-pdf-invoices-packing-slips' ),
+					'store_callback' => array( $this, 'get_sequential_number_store' ),
+					'size'           => '10',
+					'description'    => __( 'This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -368,9 +368,9 @@ class Invoice extends Order_Document_Methods {
 					'custom'		=> array(
 						'type'		=> 'multiple_checkboxes',
 						'args'		=> array(
-							'option_name'	=> $option_name,
-							'id'			=> 'my_account_restrict',
-							'fields'		=> $this->get_wc_order_status_list(),
+							'option_name'     => $option_name,
+							'id'              => 'my_account_restrict',
+							'fields_callback' => array( $this, 'get_wc_order_status_list' ),
 						),
 					),
 				)
