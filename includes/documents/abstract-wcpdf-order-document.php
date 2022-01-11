@@ -151,6 +151,9 @@ abstract class Order_Document {
 		if ( $this->storing_settings_enabled() && empty( $order_settings ) && !empty( $this->order ) ) {
 			// this is either the first time the document is generated, or historical settings are disabled
 			// in both cases, we store the document settings
+			$non_historical_settings = $this->get_non_historical_settings();
+			// exclude non historical settings from order meta
+			$settings = array_diff_key( $settings, array_flip(  $non_historical_settings ) );
 			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
 		}
 
@@ -174,8 +177,8 @@ abstract class Order_Document {
 		return apply_filters( 'wpo_wcpdf_document_store_settings', false, $this );
 	}
 
-	public function get_setting( $key, $default = '' ) {
-		$non_historical_settings = apply_filters( 'wpo_wcpdf_non_historical_settings', array(
+	public function get_non_historical_settings() {
+		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
 			'attach_to_email_ids',
 			'disable_for_statuses',
@@ -186,6 +189,10 @@ abstract class Order_Document {
 			'paper_size',
 			'font_subsetting',
 		), $this );
+	}
+
+	public function get_setting( $key, $default = '' ) {
+		$non_historical_settings = $this->get_non_historical_settings();
 		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
 			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
 		} else {
