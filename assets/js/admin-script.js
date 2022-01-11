@@ -95,6 +95,8 @@ jQuery( function( $ ) {
 			$previewData.find('input[name="preview-order-search"]').removeClass('active');
 			$previewData.find('#preview-order-search-results').hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
+			// load preview
+			ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $( '#wpo-wcpdf-preview-wrapper .preview' ) );
 		}
 	});
 
