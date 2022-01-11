@@ -360,7 +360,8 @@ class Install {
 		}
 
 		// 2.10.0-dev: migrate template path to template ID
-		if ( version_compare( $installed_version, '2.10.0-dev', '<' ) ) {
+		// 2.11.5: improvements to the migration procedure
+		if ( version_compare( $installed_version, '2.11.5', '<' ) ) {
 			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'maybe_migrate_template_paths' ) ) ) {
 				WPO_WCPDF()->settings->maybe_migrate_template_paths();
 			}
