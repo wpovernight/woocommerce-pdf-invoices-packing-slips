@@ -126,7 +126,9 @@ abstract class Order_Document {
 
 	public function get_settings( $latest = false ) {
 		// get most current settings
-		$settings = $this->get_most_current_settings();
+		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		$settings = (array) $document_settings + (array) $common_settings;
 
 		// return only most current if forced
 		if ( $latest == true ) {
@@ -173,17 +175,7 @@ abstract class Order_Document {
 	}
 
 	public function get_setting( $key, $default = '' ) {
-		$non_historical_settings = $this->get_non_historical_settings();
-		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
-			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
-		} else {
-			$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
-		}
-		return $setting;
-	}
-
-	public function get_non_historical_settings() {
-		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
+		$non_historical_settings = apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
 			'attach_to_email_ids',
 			'disable_for_statuses',
@@ -194,24 +186,12 @@ abstract class Order_Document {
 			'paper_size',
 			'font_subsetting',
 		), $this );
-	}
-
-	public function get_most_current_settings( $include_non_historical = false ) {
-		// get most current settings
-		$common_settings   = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		$settings          = (array) $document_settings + (array) $common_settings;
-
-		if ( ! $include_non_historical ) {
-			$non_historical_settings = $this->get_non_historical_settings();
-			foreach ( $non_historical_settings as $non_historical_setting ) {
-				if ( isset( $settings[$non_historical_setting] ) ) {
-					unset( $settings[$non_historical_setting] );
-				}
-			}
+		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
+			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
+		} else {
+			$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
 		}
-
-		return $settings;
+		return $setting;
 	}
 
 	public function get_attach_to_email_ids() {
@@ -256,8 +236,9 @@ abstract class Order_Document {
 	public function init() {
 		// store settings in order
 		if ( $this->storing_settings_enabled() && !empty( $this->order ) ) {
-			// get most current settings
-			$settings = $this->get_most_current_settings();
+			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+			$settings = (array) $document_settings + (array) $common_settings;
 			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
 		}
 
@@ -335,8 +316,10 @@ abstract class Order_Document {
 			$this->save();
 		}
 
-		// get most current settings
-		$settings = $this->get_most_current_settings();
+		//Get most current settings
+		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		$settings = (array) $document_settings + (array) $common_settings;
 		//Update document settings in meta
 		WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
 
