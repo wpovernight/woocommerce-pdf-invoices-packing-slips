@@ -151,9 +151,8 @@ abstract class Order_Document {
 		if ( $this->storing_settings_enabled() && empty( $order_settings ) && !empty( $this->order ) ) {
 			// this is either the first time the document is generated, or historical settings are disabled
 			// in both cases, we store the document settings
-			$non_historical_settings = $this->get_non_historical_settings();
 			// exclude non historical settings from order meta
-			$settings = array_diff_key( $settings, array_flip(  $non_historical_settings ) );
+			$settings = array_diff_key( $settings, array_flip(  $this->get_non_historical_settings() ) );
 			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
 		}
 
