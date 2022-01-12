@@ -183,12 +183,12 @@ jQuery( function( $ ) {
 		preview.children( '.notice' ).remove();
 
 		// settings need to be saved before preview?
-		if( save_before_preview( elem ) ) {
-			let save_settings_message = preview.data( 'save_settings' );
-			preview.find( 'canvas' ).remove();
-			preview.append( '<div class="notice notice-warning inline"><p>'+save_settings_message+'</p></div>' );
-			return;
-		}
+		// if( save_before_preview( elem ) ) {
+		// 	let save_settings_message = preview.data( 'save_settings' );
+		// 	preview.find( 'canvas' ).remove();
+		// 	preview.append( '<div class="notice notice-warning inline"><p>'+save_settings_message+'</p></div>' );
+		// 	return;
+		// }
 
 		// if we don't have an order_id, let's finish here
 		if( order_id.length === 0 ) {

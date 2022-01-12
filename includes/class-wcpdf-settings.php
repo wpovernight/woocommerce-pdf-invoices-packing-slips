@@ -164,25 +164,18 @@ class Settings {
 					// parse form data
 					parse_str( $_POST['data'], $form_data );
 					$form_data = stripslashes_deep( $form_data );
-					foreach ( $form_data as $key => $settings ) {
-						if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false ) {
-							foreach ( $settings as $setting => $value ) {
+
+					foreach ( $form_data as $key => $form_settings ) {
+						if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false || strpos( $key, 'wpo_wcpdf_documents_settings_' ) !== false ) {
+							foreach ( $form_settings as $setting => $value ) {
+								// array value setting
 								if ( is_array( $value ) ) {
 									foreach ( $value as $k => $v ) {
-										if ( isset( WPO_WCPDF()->settings->general_settings[$setting][$k] ) ) {
-											WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
-										}
-										if ( isset( $invoice->settings[$setting][$k] ) ) {
-											$invoice->settings[$setting][$k] = $value[$k];
-										}
+										$invoice->settings[$setting][$k] = $value[$k];
 									}
+								// single value setting
 								} else {
-									if ( isset( WPO_WCPDF()->settings->general_settings[$setting] ) ) {
-										WPO_WCPDF()->settings->general_settings[$setting] = $value;
-									}
-									if ( isset( $invoice->settings[$setting] ) ) {
-										$invoice->settings[$setting] = $value;
-									}
+									$invoice->settings[$setting] = $value;
 								}
 							}
 						}
