@@ -166,18 +166,52 @@ class Settings {
 					$form_data = stripslashes_deep( $form_data );
 
 					foreach ( $form_data as $key => $form_settings ) {
-						if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false || strpos( $key, 'wpo_wcpdf_documents_settings_' ) !== false ) {
-							foreach ( $form_settings as $setting => $value ) {
-								// array value setting
-								if ( is_array( $value ) ) {
-									foreach ( $value as $k => $v ) {
-										$invoice->settings[$setting][$k] = $value[$k];
+						// General settings
+						if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false ) {
+							$preview_settings['general'] = $form_settings;
+						// Document settings
+						} elseif( strpos( $key, 'wpo_wcpdf_documents_settings_' ) !== false ) {
+							$preview_settings['document'] = $form_settings;
+						}
+					}
+
+					$document_common_settings = $this->get_common_document_settings();
+					$preview_settings         = array();
+					
+					foreach ( $preview_settings as $type => $settings ) {
+						switch ( $type ) {
+							case 'general':
+								foreach( $settings as $setting => $value ) {
+									// array value setting
+									if ( is_array( $value ) ) {
+										foreach ( $value as $k => $v ) {
+											WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
+											if( isset( $document_common_settings[$setting] ) ) {
+												$invoice->settings[$setting][$k] = $value[$k];
+											}
+										}
+									// single value setting
+									} else {
+										WPO_WCPDF()->settings->general_settings[$setting] = $value;
+										if( isset( $document_common_settings[$setting] ) ) {
+											$invoice->settings[$setting] = $value;
+										}
 									}
-								// single value setting
-								} else {
-									$invoice->settings[$setting] = $value;
 								}
-							}
+								break;
+							case 'document':
+								foreach( $settings as $setting => $value ) {
+									// array value setting
+									if ( is_array( $value ) ) {
+										foreach ( $value as $k => $v ) {
+											$invoice->settings[$setting][$k] = $value[$k];
+										}
+									// single value setting
+									} else {
+										$invoice->settings[$setting] = $value;
+									}
+								}
+								break;
 						}
 					}
 				}
