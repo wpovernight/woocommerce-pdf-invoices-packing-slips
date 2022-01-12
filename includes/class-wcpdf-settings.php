@@ -150,8 +150,8 @@ class Settings {
 			}
 
 			$invoice = wcpdf_get_invoice( $order );
-			if( $invoice ) {
-				if( ! $invoice->exists() ) {
+			if ( $invoice ) {
+				if ( ! $invoice->exists() ) {
 					$invoice->set_date( current_time( 'timestamp', true ) );
 					$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
 					$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
