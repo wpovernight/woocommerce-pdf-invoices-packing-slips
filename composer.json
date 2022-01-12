@@ -3,5 +3,8 @@
         "dompdf/dompdf": "^1.1",
         "symfony/polyfill-mbstring": "1.20",
         "symfony/polyfill-iconv": "1.20.0"
+    },
+    "config": {
+        "platform-check": false
     }
 }
