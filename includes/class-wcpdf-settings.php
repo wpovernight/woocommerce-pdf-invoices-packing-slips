@@ -161,6 +161,9 @@ class Settings {
 
 				// make replacements
 				if ( ! empty( $_POST['data'] ) ) {
+					$document_common_settings = $this->get_common_document_settings();
+					$preview_settings         = array();
+
 					// parse form data
 					parse_str( $_POST['data'], $form_data );
 					$form_data = stripslashes_deep( $form_data );
@@ -175,9 +178,6 @@ class Settings {
 						}
 					}
 
-					$document_common_settings = $this->get_common_document_settings();
-					$preview_settings         = array();
-					
 					foreach ( $preview_settings as $type => $settings ) {
 						switch ( $type ) {
 							case 'general':
