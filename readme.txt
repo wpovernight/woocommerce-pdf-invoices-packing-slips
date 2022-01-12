@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.11.4
+Stable tag: 2.12.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,15 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.12.0 =
+* New: Support for webp images
+* Fix: Plugin version for font synchronizer upgrade procedure
+* Fix: force reloading installed template list during template path migration
+* Fix: PHP8.1 incompatible return type notice
+* Fix: WooCommerce 6.1 deprecations notices
+* Dependencies: Updated dompdf to 1.1.1
+* Marked tested up to WooCommerce 6.1
 
 = 2.11.4 =
 * Fix: bundled fonts being deleted during upgrades
