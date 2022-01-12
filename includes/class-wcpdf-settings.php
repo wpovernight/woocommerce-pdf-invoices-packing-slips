@@ -102,6 +102,9 @@ class Settings {
 
 
 	public function settings_page() {
+		// feedback on settings save
+		settings_errors();
+		
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array (
 				'general'	=> __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'documents'	=> __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
