@@ -35,7 +35,8 @@ class Invoice extends Order_Document_Methods {
 		// Call parent constructor
 		parent::__construct( $order );
 
-		add_action( 'wpo_wcpdf_schedule_invoice_yearly_reset_number', array( $this, 'yearly_reset_number' ) );
+		// schedule yearly reset invoice number
+		add_action( 'wpo_wcpdf_schedule_yearly_reset_invoice_number', array( $this, 'yearly_reset_number' ) );
 	}
 
 	public function use_historical_settings() {
@@ -477,8 +478,8 @@ class Invoice extends Order_Document_Methods {
 			$datetime->set_utc_offset( wc_timezone_offset() );
 		}
 
-		if ( false === as_next_scheduled_action( 'wpo_wcpdf_schedule_invoice_yearly_reset_number' ) ) {
-			as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_invoice_yearly_reset_number', );
+		if ( false === as_next_scheduled_action( 'wpo_wcpdf_schedule_yearly_reset_invoice_number' ) ) {
+			as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_invoice_number', );
 		}
 	}
 
