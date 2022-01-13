@@ -377,7 +377,7 @@ class Install {
 			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
 		}
 
-		// 2.12.1: schedule the invoice yearly reset number action
+		// 2.12.1: schedule the yearly reset invoice number action
 		if ( version_compare( $installed_version, '2.12.1-dev-1', '<' ) ) {
 			$invoice = wcpdf_get_invoice( null );
 			$invoice->schedule_yearly_reset_number();
