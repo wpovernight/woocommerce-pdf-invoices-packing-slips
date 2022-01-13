@@ -469,14 +469,7 @@ class Invoice extends Order_Document_Methods {
 		}
 
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
-		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( 'UTC' ) );
-
-		// set local timezone or offset
-		if ( get_option( 'timezone_string' ) ) {
-			$datetime->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
-		} else {
-			$datetime->set_utc_offset( wc_timezone_offset() );
-		}
+		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
 
 		// checks if there are pending actions
 		$scheduled_actions = as_get_scheduled_actions( array(
