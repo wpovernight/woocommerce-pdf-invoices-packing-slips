@@ -464,7 +464,7 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function schedule_yearly_reset_number() {
 		// checks AS functions existence
-		if( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_next_scheduled_action' ) ) {
+		if( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_get_scheduled_actions' ) ) {
 			return;
 		}
 
@@ -478,8 +478,15 @@ class Invoice extends Order_Document_Methods {
 			$datetime->set_utc_offset( wc_timezone_offset() );
 		}
 
-		if ( false === as_next_scheduled_action( 'wpo_wcpdf_schedule_yearly_reset_invoice_number' ) ) {
-			as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_invoice_number', );
+		// checks if there are pending actions
+		$scheduled_actions = as_get_scheduled_actions( array(
+			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_invoice_number',
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+		) );
+
+		// if no concurrent actions sets the action
+		if ( empty( $scheduled_actions ) ) {
+			as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_invoice_number' );
 		}
 	}
 
