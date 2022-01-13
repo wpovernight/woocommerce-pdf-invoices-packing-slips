@@ -462,7 +462,7 @@ class Invoice extends Order_Document_Methods {
 	 * Schedules the invoice yearly reset number with AS
 	 */
 	public function schedule_yearly_reset_number() {
-		// schedule AS action
+		// checks AS functions existence
 		if( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_next_scheduled_action' ) ) {
 			return;
 		}
