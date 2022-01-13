@@ -482,6 +482,9 @@ class Invoice extends Order_Document_Methods {
 		}
 	}
 
+	/**
+	 * Yearly reset invoice number and reschedule AS action
+	 */
 	public function yearly_reset_number() {
 		// reset number
 		$this->get_sequential_number_store();
