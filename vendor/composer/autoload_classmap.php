@@ -165,7 +165,6 @@ return array(
     'Svg\\Style' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Style.php',
     'Svg\\Surface\\CPdf' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Surface/CPdf.php',
     'Svg\\Surface\\SurfaceCpdf' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Surface/SurfaceCpdf.php',
-    'Svg\\Surface\\SurfaceGmagick' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Surface/SurfaceGmagick.php',
     'Svg\\Surface\\SurfaceInterface' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Surface/SurfaceInterface.php',
     'Svg\\Surface\\SurfacePDFLib' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Surface/SurfacePDFLib.php',
     'Svg\\Tag\\AbstractTag' => $vendorDir . '/phenx/php-svg-lib/src/Svg/Tag/AbstractTag.php',

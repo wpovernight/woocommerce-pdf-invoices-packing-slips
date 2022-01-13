@@ -223,8 +223,6 @@ abstract class AbstractFrameDecorator extends Frame
     {
         if ($this->content_set
             && $this->get_node()->nodeName === "dompdf_generated"
-            && $this->get_style()->content !== "normal"
-            && $this->get_style()->content !== "none"
         ) {
             foreach ($this->get_children() as $child) {
                 $this->remove_child($child);
@@ -722,39 +720,49 @@ abstract class AbstractFrameDecorator extends Frame
     }
 
     /**
-     * @param string $id
-     * @param int $value
+     * @param array $counters
      */
-    function reset_counter($id = self::DEFAULT_COUNTER, $value = 0)
+    public function reset_counters(array $counters): void
     {
-        $this->get_parent()->_counters[$id] = intval($value);
-    }
-
-    /**
-     * @param $counters
-     */
-    function decrement_counters($counters)
-    {
-        foreach ($counters as $id => $increment) {
-            $this->increment_counter($id, intval($increment) * -1);
-        }
-    }
-
-    /**
-     * @param $counters
-     */
-    function increment_counters($counters)
-    {
-        foreach ($counters as $id => $increment) {
-            $this->increment_counter($id, intval($increment));
+        foreach ($counters as $id => $value) {
+            $this->reset_counter($id, $value);
         }
     }
 
     /**
      * @param string $id
-     * @param int $increment
+     * @param int    $value
      */
-    function increment_counter($id = self::DEFAULT_COUNTER, $increment = 1)
+    public function reset_counter(string $id = self::DEFAULT_COUNTER, int $value = 0): void
+    {
+        $this->get_parent()->_counters[$id] = $value;
+    }
+
+    /**
+     * @param array $counters
+     */
+    public function decrement_counters(array $counters): void
+    {
+        foreach ($counters as $id => $increment) {
+            $this->increment_counter($id, $increment * -1);
+        }
+    }
+
+    /**
+     * @param array $counters
+     */
+    public function increment_counters(array $counters): void
+    {
+        foreach ($counters as $id => $increment) {
+            $this->increment_counter($id, $increment);
+        }
+    }
+
+    /**
+     * @param string $id
+     * @param int    $increment
+     */
+    public function increment_counter(string $id = self::DEFAULT_COUNTER, int $increment = 1): void
     {
         $counter_frame = $this->lookup_counter_frame($id);
 
@@ -798,7 +806,7 @@ abstract class AbstractFrameDecorator extends Frame
      *
      * TODO: What version is the best : this one or the one in ListBullet ?
      */
-    function counter_value($id = self::DEFAULT_COUNTER, $type = "decimal")
+    function counter_value(string $id = self::DEFAULT_COUNTER, string $type = "decimal")
     {
         $type = mb_strtolower($type);
 
@@ -867,7 +875,7 @@ abstract class AbstractFrameDecorator extends Frame
     /**
      * @return array
      */
-    final function get_min_max_width(): array
+    final public function get_min_max_width(): array
     {
         return $this->_reflower->get_min_max_width();
     }

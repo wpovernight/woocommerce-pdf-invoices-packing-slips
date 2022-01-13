@@ -9,6 +9,7 @@ namespace Dompdf;
 
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
 use Dompdf\FrameDecorator\Block;
+use Dompdf\FrameDecorator\ListBullet;
 use Dompdf\FrameDecorator\Page;
 use Dompdf\FrameReflower\Text as TextFrameReflower;
 use Dompdf\Positioner\Inline as InlinePositioner;
@@ -33,6 +34,11 @@ class LineBox
      * @var AbstractFrameDecorator[]
      */
     protected $_frames = [];
+
+    /**
+     * @var ListBullet[]
+     */
+    protected $list_markers = [];
 
     /**
      * @var int
@@ -307,7 +313,46 @@ class LineBox
         $this->h = $h;
     }
 
-	/**
+    /**
+     * Get the `outside` positioned list markers to be vertically aligned with
+     * the line box.
+     *
+     * @return ListBullet[]
+     */
+    public function get_list_markers(): array
+    {
+        return $this->list_markers;
+    }
+
+    /**
+     * Add a list marker to the line box.
+     *
+     * The list marker is only added for the purpose of vertical alignment, it
+     * is not actually added to the list of frames of the line box.
+     */
+    public function add_list_marker(ListBullet $marker): void
+    {
+        $this->list_markers[] = $marker;
+    }
+
+    /**
+     * An iterator of all list markers and inline positioned frames of the line
+     * box.
+     *
+     * @return \Iterator<AbstractFrameDecorator>
+     */
+    public function frames_to_align(): \Iterator
+    {
+        yield from $this->list_markers;
+
+        foreach ($this->_frames as $frame) {
+            if ($frame->get_positioner() instanceof InlinePositioner) {
+                yield $frame;
+            }
+        }
+    }
+
+    /**
      * Trim trailing whitespace from the line.
      */
     public function trim_trailing_ws(): void
@@ -334,7 +379,7 @@ class LineBox
      */
     public function recalculate_width()
     {
-        $width = 0;
+        $width = 0.0;
 
         foreach ($this->_frames as $frame) {
             $width += $frame->get_margin_width();

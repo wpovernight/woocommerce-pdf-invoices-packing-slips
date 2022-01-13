@@ -9,6 +9,7 @@ namespace Dompdf\FrameDecorator;
 
 use Dompdf\Cellmap;
 use DOMNode;
+use Dompdf\Css\Style;
 use Dompdf\Dompdf;
 use Dompdf\Frame;
 use Dompdf\Frame\Factory;
@@ -20,16 +21,7 @@ use Dompdf\Frame\Factory;
  */
 class Table extends AbstractFrameDecorator
 {
-    public static $VALID_CHILDREN = [
-        "table-row-group",
-        "table-row",
-        "table-header-group",
-        "table-footer-group",
-        "table-column",
-        "table-column-group",
-        "table-caption",
-        "table-cell"
-    ];
+    public static $VALID_CHILDREN = Style::TABLE_INTERNAL_TYPES;
 
     public static $ROW_GROUPS = [
         "table-row-group",
@@ -298,10 +290,10 @@ class Table extends AbstractFrameDecorator
                     // Lookup styles for tbody tags.  If the user wants styles to work
                     // better, they should make the tbody explicit... I'm not going to
                     // try to guess what they intended.
-                    if ($tbody_style = $css->lookup("tbody")) {
+                    foreach ($css->lookup("tbody") as $tbody_style) {
                         $style->merge($tbody_style);
                     }
-                    $style->display = 'table-row-group';
+                    $style->display = "table-row-group";
 
                     // Okay, I have absolutely no idea why I need this clone here, but
                     // if it's omitted, php (as of 2004-07-28) segfaults.
@@ -319,10 +311,10 @@ class Table extends AbstractFrameDecorator
                     // Lookup styles for tr tags.  If the user wants styles to work
                     // better, they should make the tr explicit... I'm not going to
                     // try to guess what they intended.
-                    if ($tr_style = $css->lookup("tr")) {
+                    foreach ($css->lookup("tr") as $tr_style) {
                         $style->merge($tr_style);
                     }
-                    $style->display = 'table-row';
+                    $style->display = "table-row";
 
                     // Okay, I have absolutely no idea why I need this clone here, but
                     // if it's omitted, php (as of 2004-07-28) segfaults.

@@ -314,8 +314,18 @@ class Text extends AbstractFrameReflower
         }
 
         if ($split === 0) {
+            // Make sure to move text when floating frames leave no space to
+            // place anything onto the line
+            // TODO: Would probably be better to move just below the current
+            // floating frame instead of trying to place text in line-height
+            // increments
+            if ($current_line->h === 0.0) {
+                // Line height might be 0
+                $h = max($frame->get_margin_height(), 1.0);
+                $block->maximize_line_height($h, $frame);
+            }
+
             // Break line and repeat layout
-            $block->maximize_line_height($frame->get_margin_height(), $frame);
             $block->add_line();
 
             // Find the appropriate inline ancestor to split
@@ -444,7 +454,7 @@ class Text extends AbstractFrameReflower
 
     //........................................................................
 
-    function get_min_max_width(): array
+    public function get_min_max_width(): array
     {
         $frame = $this->_frame;
         $style = $frame->get_style();
@@ -558,15 +568,18 @@ class Text extends AbstractFrameReflower
                 break;
         }
 
-        // The containing block is not defined yet, treat percentages as 0
-        $delta = (float) $style->length_in_pt([
-            $style->margin_left,
-            $style->border_left_width,
+        // Account for margins, borders, and padding
+        $dims = [
             $style->padding_left,
             $style->padding_right,
+            $style->border_left_width,
             $style->border_right_width,
+            $style->margin_left,
             $style->margin_right
-        ], 0);
+        ];
+
+        // The containing block is not defined yet, treat percentages as 0
+        $delta = (float) $style->length_in_pt($dims, 0);
         $min += $delta;
         $max += $delta;
 
