@@ -189,6 +189,10 @@ class Install {
 
 		// set transient for wizard notification
 		set_transient( 'wpo_wcpdf_new_install', 'yes', DAY_IN_SECONDS * 2 );
+
+		// schedule the invoice yearly reset number action
+		$invoice = wcpdf_get_invoice( null );
+		$invoice->schedule_yearly_reset_number();
 	}
 
 	/**
@@ -371,6 +375,12 @@ class Install {
 		if ( version_compare( $installed_version, '2.11.2', '<' ) ) {
 			@unlink( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
 			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
+		}
+
+		// 2.12.1: schedule the invoice yearly reset number action
+		if ( version_compare( $installed_version, '2.12.1-dev-1', '<' ) ) {
+			$invoice = wcpdf_get_invoice( null );
+			$invoice->schedule_yearly_reset_number();
 		}
 		
 	}

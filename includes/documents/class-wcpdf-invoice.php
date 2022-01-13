@@ -34,6 +34,8 @@ class Invoice extends Order_Document_Methods {
 
 		// Call parent constructor
 		parent::__construct( $order );
+
+		add_action( 'wpo_wcpdf_schedule_invoice_yearly_reset_number', array( $this, 'yearly_reset_number' ) );
 	}
 
 	public function use_historical_settings() {
@@ -454,6 +456,38 @@ class Invoice extends Order_Document_Methods {
 	public function get_date_title() {
 		$date_title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
+	}
+
+	/**
+	 * Schedules the invoice yearly reset number with AS
+	 */
+	public function schedule_yearly_reset_number() {
+		// schedule AS action
+		if( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_next_scheduled_action' ) ) {
+			return;
+		}
+
+		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
+		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( 'UTC' ) );
+
+		// set local timezone or offset
+		if ( get_option( 'timezone_string' ) ) {
+			$datetime->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
+		} else {
+			$datetime->set_utc_offset( wc_timezone_offset() );
+		}
+
+		if ( false === as_next_scheduled_action( 'wpo_wcpdf_schedule_invoice_yearly_reset_number' ) ) {
+			as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_invoice_yearly_reset_number', );
+		}
+	}
+
+	public function yearly_reset_number() {
+		// reset number
+		$this->get_sequential_number_store();
+
+		// reschedule the action for the next year
+		$this->schedule_yearly_reset_number();
 	}
 
 }
