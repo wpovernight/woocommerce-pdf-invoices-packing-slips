@@ -34,9 +34,6 @@ class Invoice extends Order_Document_Methods {
 
 		// Call parent constructor
 		parent::__construct( $order );
-
-		// schedule yearly reset invoice number
-		add_action( 'wpo_wcpdf_schedule_yearly_reset_invoice_number', array( $this, 'yearly_reset_number' ) );
 	}
 
 	public function use_historical_settings() {
@@ -457,41 +454,6 @@ class Invoice extends Order_Document_Methods {
 	public function get_date_title() {
 		$date_title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
-	}
-
-	/**
-	 * Schedules the invoice yearly reset number with AS
-	 */
-	public function schedule_yearly_reset_number() {
-		// checks AS functions existence
-		if( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_get_scheduled_actions' ) ) {
-			return;
-		}
-
-		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
-		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
-
-		// checks if there are pending actions
-		$scheduled_actions = as_get_scheduled_actions( array(
-			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_invoice_number',
-			'status' => \ActionScheduler_Store::STATUS_PENDING,
-		) );
-
-		// if no concurrent actions sets the action
-		if ( empty( $scheduled_actions ) ) {
-			as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_invoice_number' );
-		}
-	}
-
-	/**
-	 * Yearly reset invoice number and reschedule AS action
-	 */
-	public function yearly_reset_number() {
-		// reset number
-		$this->get_sequential_number_store();
-
-		// reschedule the action for the next year
-		$this->schedule_yearly_reset_number();
 	}
 
 }

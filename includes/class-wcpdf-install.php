@@ -191,8 +191,9 @@ class Install {
 		set_transient( 'wpo_wcpdf_new_install', 'yes', DAY_IN_SECONDS * 2 );
 
 		// schedule the invoice yearly reset number action
-		$invoice = wcpdf_get_invoice( null );
-		$invoice->schedule_yearly_reset_number();
+		if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
+			WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
+		}
 	}
 
 	/**
@@ -379,8 +380,9 @@ class Install {
 
 		// 2.12.1: schedule the yearly reset invoice number action
 		if ( version_compare( $installed_version, '2.12.1-dev-1', '<' ) ) {
-			$invoice = wcpdf_get_invoice( null );
-			$invoice->schedule_yearly_reset_number();
+			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
+				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
+			}
 		}
 		
 	}

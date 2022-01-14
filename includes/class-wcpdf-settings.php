@@ -48,6 +48,9 @@ class Settings {
 		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
 		// migrate old template paths to template IDs before loading settings page
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 1 );
+
+		// schedule yearly reset numbers
+		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
 	}
 
 	public function menu() {
@@ -436,6 +439,67 @@ class Settings {
 		}
 
 		return $method;		
+	}
+
+	public function schedule_yearly_reset_numbers() {
+		// checks AS functions existence
+		if( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_get_scheduled_actions' ) ) {
+			return;
+		}
+
+		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
+		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
+
+		// checks if there are pending actions
+		$scheduled_actions = as_get_scheduled_actions( array(
+			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+		) );
+
+		// if no concurrent actions sets the action
+		if ( empty( $scheduled_actions ) ) {
+			$action_id = as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+			if ( ! empty( $action_id ) ) {
+				wcpdf_log_error(
+					"Yearly document numbers reset scheduled with the action id: {$action_id}",
+					'info'
+				);
+			} else {
+				wcpdf_log_error(
+					'The yearly document numbers reset action schedule failed!',
+					'critical'
+				);
+			}
+		} else {
+			wcpdf_log_error(
+				"Concurrent yearly document numbers reset action found: {$scheduled_actions}",
+				'error'
+			);
+		}
+	}
+
+	public function yearly_reset_numbers() {
+		// reset numbers
+		$documents     = WPO_WCPDF()->documents->get_documents();
+		$number_stores = array();
+		foreach ( $documents as $document ) {
+			if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
+				$number_stores[$document->get_type()] = $document->get_sequential_number_store();
+			}
+		}
+
+		// log reset number events
+		if ( ! empty( $number_stores ) ) {
+			foreach( $number_stores as $document_type => $number_store ) {
+				wcpdf_log_error(
+					"Yearly number reset succeed for '{$document_type}' with database table name: {$number_store->table_name}",
+					'info'
+				);
+			}
+		}
+
+		// reschedule the action for the next year
+		$this->schedule_yearly_reset_numbers();
 	}
 
 	public function get_media_upload_setting_html() {
