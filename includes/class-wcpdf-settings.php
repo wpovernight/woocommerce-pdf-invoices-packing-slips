@@ -480,7 +480,7 @@ class Settings {
 
 	public function yearly_reset_numbers() {
 		// reset numbers
-		$documents     = WPO_WCPDF()->documents->get_documents();
+		$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
 		$number_stores = array();
 		foreach ( $documents as $document ) {
 			if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
