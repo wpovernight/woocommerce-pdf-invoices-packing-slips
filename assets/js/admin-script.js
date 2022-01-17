@@ -42,8 +42,11 @@ jQuery( function( $ ) {
 		$(this).parent().find('ul').toggleClass('active');
 	} );
 
-	// Preview
-	let previewStates = $('#wpo-wcpdf-preview-wrapper').attr('data-preview-states');
+
+	//----------> Preview <----------//
+	let previewStates = $( '#wpo-wcpdf-preview-wrapper' ).attr( 'data-preview-states' );
+	let $preview      = $( '#wpo-wcpdf-preview-wrapper .preview' );
+	let lastOrderId   = $preview.data( 'order_id' );
 	
 	$('.slide-left').on( 'click', function() {
 		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
@@ -96,22 +99,22 @@ jQuery( function( $ ) {
 			$previewData.find('#preview-order-search-results').hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 			// load preview
-			ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $( '#wpo-wcpdf-preview-wrapper .preview' ) );
+			ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $preview );
 		}
 	});
 
-	let wcpdf_preview;
+	let previewTimeout;
 
 	// Preview on page load
-	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $( '#wpo-wcpdf-preview-wrapper .preview' ) ) );
+	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $preview ) );
 
 	// Preview on user input
 	$( '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #preview-order-number' ).on( 'keyup paste', function( event ) {
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'keyup' ? 1000 : 0;
-		clearTimeout( wcpdf_preview );
-		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
@@ -120,8 +123,8 @@ jQuery( function( $ ) {
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
-		clearTimeout( wcpdf_preview );
-		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
 	// Preview on user checkbox change
@@ -130,25 +133,25 @@ jQuery( function( $ ) {
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
-		clearTimeout( wcpdf_preview );
-		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
 	// Preview on user click in search result
 	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
-		let elem      = $(this);
-		let order_id  = elem.data( 'order_id' );
-		let preview   = $( '#wpo-wcpdf-preview-wrapper .preview' );
-		preview.data( 'order_id', order_id );           // pass the clicked order_id to the preview order_id
+		let elem     = $(this);
+		let order_id = elem.data( 'order_id' );
+
+		$preview.data( 'order_id', order_id );          // pass the clicked order_id to the preview order_id
 
 		elem.closest( 'div' ).hide();                   // hide results div
 		elem.closest( 'div' ).children( 'a' ).remove(); // remove all results
 
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
-		clearTimeout( wcpdf_preview );
-		wcpdf_preview = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
 	} );
 
 	// Clear preview order search results/input
@@ -162,14 +165,14 @@ jQuery( function( $ ) {
 		elem.hide();
 	} );
 
+	// Load the Preview with AJAX
 	function ajax_load_preview( form_data, elem ) {
-		let preview      = $( '#wpo-wcpdf-preview-wrapper .preview' );
-		let order_id     = preview.data( 'order_id' );
+		let order_id     = $preview.data( 'order_id' );
 		let order_number = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
 		if( order_number.length > 0 ) {
 			order_id = order_number;
 		}
-		let nonce     = preview.data('nonce');
+		let nonce     = $preview.data('nonce');
 		let worker    = wpo_wcpdf_admin.pdfjs_worker;
 		let canvas_id = 'preview-canvas';
 		let data      = {
@@ -180,26 +183,26 @@ jQuery( function( $ ) {
 		};
 
 		// remove previous error notices
-		preview.children( '.notice' ).remove();
+		$preview.children( '.notice' ).remove();
 
 		// settings need to be saved before preview?
 		// if( save_before_preview( elem ) ) {
-		// 	let save_settings_message = preview.data( 'save_settings' );
-		// 	preview.find( 'canvas' ).remove();
-		// 	preview.append( '<div class="notice notice-warning inline"><p>'+save_settings_message+'</p></div>' );
+		// 	let save_settings_message = $preview.data( 'save_settings' );
+		// 	$preview.find( 'canvas' ).remove();
+		// 	$preview.append( '<div class="notice notice-warning inline"><p>'+save_settings_message+'</p></div>' );
 		// 	return;
 		// }
 
 		// if we don't have an order_id, let's finish here
 		if( order_id.length === 0 ) {
-			let no_order_message = preview.data( 'no_order' );
-			preview.find( 'canvas' ).remove();
-			preview.append( '<div class="notice notice-error inline"><p>'+no_order_message+'</p></div>' );
+			let no_order_message = $preview.data( 'no_order' );
+			$preview.find( 'canvas' ).remove();
+			$preview.append( '<div class="notice notice-error inline"><p>'+no_order_message+'</p></div>' );
 			return;
 		}
 
 		// block ui
-		preview.block( {
+		$preview.block( {
 			message: null,
 			overlayCSS: {
 				background: '#fff',
@@ -214,17 +217,20 @@ jQuery( function( $ ) {
 			success: function( response ) {
 				if( response.data.error ) {
 					$( '#'+canvas_id ).remove();
-					preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
+					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
 				} else if( response.data.pdf_data ) {
 					$( '#'+canvas_id ).remove();
-					preview.append( '<canvas id="'+canvas_id+'" style="width:100%;"></canvas>' );
+					$preview.append( '<canvas id="'+canvas_id+'" style="width:100%;"></canvas>' );
 					pdf_js( worker, canvas_id, response.data.pdf_data );
 				}
-				preview.unblock();
+				$preview.unblock();
+
+				$preview.data( 'order_id', lastOrderId ); // reset preview data to 'lastOrderId'
 			},
 		});
 	}
 
+	// pdf_js (third party library code)
 	function pdf_js( worker, canvas_id, pdf_data ) {
 		// atob() is used to convert base64 encoded PDF to binary-like data.
 		// (See also https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding.)
@@ -273,8 +279,9 @@ jQuery( function( $ ) {
 		);
 	}
 
+	let previewSearchTimeout;
+
 	// Preview on user input
-	let wcpdf_preview_search;
 	$( '#preview-order-search' ).on( 'keyup paste', function( event ) {
 		let elem = $(this);
 		elem.addClass( 'ajax-waiting' );
@@ -285,8 +292,8 @@ jQuery( function( $ ) {
 		elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 
 		let duration  = event.type == 'keyup' ? 1000 : 0;
-		clearTimeout( wcpdf_preview_search );
-		wcpdf_preview_search = setTimeout( function() { preview_order_search( elem ) }, duration );
+		clearTimeout( previewSearchTimeout );
+		previewSearchTimeout = setTimeout( function() { preview_order_search( elem ) }, duration );
 	} );
 
 	// Preview order search
