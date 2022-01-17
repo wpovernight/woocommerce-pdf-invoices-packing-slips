@@ -1,6 +1,6 @@
 {
     "require": {
-        "dompdf/dompdf": "dev-master",
+        "dompdf/dompdf": "dev-image-size",
         "symfony/polyfill-mbstring": "1.20",
         "symfony/polyfill-iconv": "1.20.0"
     },

@@ -32,6 +32,9 @@ class TableCell extends Block
      */
     function reflow(BlockFrameDecorator $block = null)
     {
+        // Counters and generated content
+        $this->_set_content();
+
         $style = $this->_frame->get_style();
 
         $table = TableFrameDecorator::find_parent_table($this->_frame);
@@ -127,8 +130,8 @@ class TableCell extends Block
 
     public function get_min_max_content_width(): array
     {
-        // Ignore percentage values for a specified width here, as the
-        // containing block is not defined yet
+        // Ignore percentage values for a specified width here, as they are
+        // relative to the table width, which is not determined yet
         $style = $this->_frame->get_style();
         $width = $style->width;
         $fixed_width = $width !== "auto" && !Helpers::is_percent($width);
@@ -144,6 +147,11 @@ class TableCell extends Block
         }
 
         // Handle min/max width style properties
-        return $this->restrict_min_max_width($min, $max);
+        $min_width = $this->resolve_min_width(null);
+        $max_width = $this->resolve_max_width(null);
+        $min = Helpers::clamp($min, $min_width, $max_width);
+        $max = Helpers::clamp($max, $min_width, $max_width);
+
+        return [$min, $max];
     }
 }

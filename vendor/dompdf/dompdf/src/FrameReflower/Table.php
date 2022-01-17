@@ -75,7 +75,7 @@ class Table extends AbstractFrameReflower
         $columns =& $this->_frame->get_cellmap()->get_columns();
 
         $width = $style->width;
-        $min_table_width = (float) $style->length_in_pt($style->min_width, $cb["w"]) - $delta;
+        $min_table_width = $this->resolve_min_width($cb["w"]) - $delta;
 
         if ($width !== "auto") {
             $preferred_width = (float) $style->length_in_pt($width, $cb["w"]) - $delta;
@@ -278,28 +278,10 @@ class Table extends AbstractFrameReflower
         }
 
         // Handle min/max height
-        $min_height = $style->min_height;
-        $max_height = $style->max_height;
-
-        if (isset($cb["h"])) {
-            $min_height = $style->length_in_pt($min_height, $cb["h"]);
-            $max_height = $style->length_in_pt($max_height, $cb["h"]);
-        } else {
-            $min_height = !Helpers::is_percent($min_height)
-                ? $style->length_in_pt($min_height, $cb["w"])
-                : "auto";
-            $max_height = !Helpers::is_percent($max_height)
-                ? $style->length_in_pt($max_height, $cb["w"])
-                : "none";
-        }
-
-        if ($max_height !== "none" && $max_height !== "auto" && $height > $max_height) {
-            $height = $max_height;
-        }
-
-        if ($min_height !== "auto" && $min_height !== "none" && $height < $min_height) {
-            $height = $min_height;
-        }
+        // https://www.w3.org/TR/CSS21/visudet.html#min-max-heights
+        $min_height = $this->resolve_min_height($cb["h"]);
+        $max_height = $this->resolve_max_height($cb["h"]);
+        $height = Helpers::clamp($height, $min_height, $max_height);
 
         // Use the content height or the height value, whichever is greater
         if ($height <= $content_height) {
@@ -337,7 +319,7 @@ class Table extends AbstractFrameReflower
 
         $this->determine_absolute_containing_block();
 
-        // Generated content
+        // Counters and generated content
         $this->_set_content();
 
         // Collapse vertical margins, if required
@@ -474,7 +456,7 @@ class Table extends AbstractFrameReflower
         $style = $this->_frame->get_style();
         $cellmap = $this->_frame->get_cellmap();
 
-        $this->_frame->normalise();
+        $this->_frame->normalize();
 
         // Add the cells to the cellmap (this will calculate column widths as
         // frames are added)
