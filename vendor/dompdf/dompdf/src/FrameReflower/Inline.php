@@ -18,7 +18,6 @@ use Dompdf\FrameDecorator\Text as TextFrameDecorator;
  */
 class Inline extends AbstractFrameReflower
 {
-
     /**
      * Inline constructor.
      * @param InlineFrameDecorator $frame
@@ -78,7 +77,7 @@ class Inline extends AbstractFrameReflower
      */
     function reflow(BlockFrameDecorator $block = null)
     {
-		/** @var InlineFrameDecorator */
+        /** @var InlineFrameDecorator */
         $frame = $this->_frame;
 
         // Check if a page break is forced
@@ -89,10 +88,10 @@ class Inline extends AbstractFrameReflower
             return;
         }
 
-        // Generated content
+        // Counters and generated content
         $this->_set_content();
 
-		$style = $frame->get_style();
+        $style = $frame->get_style();
 
         // Resolve auto margins
         // https://www.w3.org/TR/CSS21/visudet.html#inline-width
@@ -110,7 +109,7 @@ class Inline extends AbstractFrameReflower
             $style->margin_bottom = 0;
         }
 
-		// Handle line breaks
+        // Handle line breaks
         if ($frame->get_node()->nodeName === "br") {
             if ($block) {
                 $line = $block->get_current_line_box();
@@ -159,25 +158,24 @@ class Inline extends AbstractFrameReflower
             $child->set_containing_block($cb);
             $child->reflow($block);
 
-			// Stop reflow of subsequent children if the frame was split within
+            // Stop reflow of subsequent children if the frame was split within
             // child reflow
             if ($child->get_parent() !== $frame) {
                 break;
             }
         }
 
-		// Assume the position of the first child
+        // Assume the position of the first child
         [$x, $y] = $frame->get_first_child()->get_position();
         $frame->set_position($x, $y);
 
         // Handle relative positioning
-        foreach ($this->_frame->get_children() as $child) {
+        foreach ($frame->get_children() as $child) {
             $this->position_relative($child);
         }
 
-		if ($block) {
+        if ($block) {
             $block->add_frame_to_line($frame);
-		}
+        }
     }
-
 }

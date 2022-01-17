@@ -34,6 +34,15 @@ class Block extends AbstractFrameDecorator
     protected $_line_boxes;
 
     /**
+     * List of markers that have not found their line box to vertically align
+     * with yet. Markers are collected by nested block containers until an
+     * inline line box is found at the start of the block.
+     *
+     * @var ListBullet[]
+     */
+    protected $dangling_markers;
+
+    /**
      * Block constructor.
      * @param Frame $frame
      * @param Dompdf $dompdf
@@ -44,17 +53,16 @@ class Block extends AbstractFrameDecorator
 
         $this->_line_boxes = [new LineBox($this)];
         $this->_cl = 0;
+        $this->dangling_markers = [];
     }
 
-    /**
-     *
-     */
     function reset()
     {
         parent::reset();
 
         $this->_line_boxes = [new LineBox($this)];
         $this->_cl = 0;
+        $this->dangling_markers = [];
     }
 
     /**
@@ -227,5 +235,24 @@ class Block extends AbstractFrameDecorator
         $this->_line_boxes[++$this->_cl] = $new_line;
     }
 
-    //........................................................................
+    /**
+     * @param ListBullet $marker
+     */
+    public function add_dangling_marker(ListBullet $marker): void
+    {
+        $this->dangling_markers[] = $marker;
+    }
+
+    /**
+     * Inherit any dangling markers from the parent block.
+     *
+     * @param Block $block
+     */
+    public function inherit_dangling_markers(self $block): void
+    {
+        if ($block->dangling_markers !== []) {
+            $this->dangling_markers = $block->dangling_markers;
+            $block->dangling_markers = [];
+        }
+    }
 }
