@@ -80,10 +80,6 @@ $sql = "CREATE TABLE {$this->table_name} (
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		$result = dbDelta( $sql );
-		wcpdf_log_error(
-			"dbDelta log for database table {$this->table_name} creation query results: {$result}",
-			'notice'
-		);
 
 		return $result;
 	}
