@@ -80,8 +80,185 @@ $sql = "CREATE TABLE {$this->table_name} (
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		$result = dbDelta( $sql );
+		
+		// catch mysql errors
+		$wpdb_data = $this->process_db_object( $wpdb );
+		if ( ! empty( $wpdb_data['errors'] ) && is_array( $wpdb_data['errors'] ) ) {
+			foreach ( $wpdb_data['errors'] as $error ) {
+				if ( ! empty( $error['result']->errors ) && is_array( $error['result']->errors ) ) {
+					foreach ( $error['result']->errors as $error_message ) {
+						if ( isset( $error_message[0] ) ) {
+							wcpdf_log_error( $error_message[0], 'critical' );
+						}
+					}
+				}
+			}
+		}
 
 		return $result;
+	}
+
+	// original from: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
+	public function process_db_object( $wpdb ) {
+		global $EZSQL_ERROR, $wp_the_query;
+
+		$data = array();
+
+		// With SAVEQUERIES defined as false, `wpdb::queries` is empty but `wpdb::num_queries` is not.
+		if ( empty( $wpdb->queries ) ) {
+			$data['total_qs'] += $wpdb->num_queries;
+			return;
+		}
+
+		$rows = array();
+		$types = array();
+		$total_time = 0;
+		$has_result = false;
+		$has_trace = false;
+		$i = 0;
+		$request = trim( $wp_the_query->request ? $wp_the_query->request : '' );
+
+		if ( method_exists( $wpdb, 'remove_placeholder_escape' ) ) {
+			$request = $wpdb->remove_placeholder_escape( $request );
+		}
+
+		foreach ( $wpdb->queries as $query ) {
+			$has_trace = false;
+			$has_result = false;
+			$callers = array();
+
+			if ( isset( $query['query'], $query['elapsed'], $query['debug'] ) ) {
+				// WordPress.com VIP.
+				$sql = $query['query'];
+				$ltime = $query['elapsed'];
+				$stack = $query['debug'];
+			} else {
+				// Standard WP.
+				$sql = $query[0];
+				$ltime = $query[1];
+				$stack = $query[2];
+
+				// Query Monitor db.php drop-in.
+				$has_trace = isset( $query['trace'] );
+				$has_result = isset( $query['result'] );
+			}
+
+			// @TODO: decide what I want to do with this:
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( false !== strpos( $stack, 'wp_admin_bar' ) && ! isset( $_REQUEST['qm_display_admin_bar'] ) ) {
+				continue;
+			}
+
+			if ( $has_result ) {
+				$result = $query['result'];
+			} else {
+				$result = null;
+			}
+
+			$total_time += $ltime;
+
+			if ( $has_trace ) {
+
+				$trace = $query['trace'];
+				$component = $query['trace']->get_component();
+				$caller = $query['trace']->get_caller();
+				$caller_name = $caller['display'];
+				$caller = $caller['display'];
+
+			} else {
+
+				$trace = null;
+				$component = null;
+				$callers = array_reverse( explode( ',', $stack ) );
+				$callers = array_map( 'trim', $callers );
+				$caller = reset( $callers );
+				$caller_name = $caller;
+
+			}
+
+			$sql = trim( $sql );
+			$type = $this->get_query_type( $sql );
+
+			if ( ! isset( $types[ $type ]['total'] ) ) {
+				$types[ $type ]['total'] = 1;
+			} else {
+				$types[ $type ]['total']++;
+			}
+
+			if ( ! isset( $types[ $type ]['callers'][ $caller ] ) ) {
+				$types[ $type ]['callers'][ $caller ] = 1;
+			} else {
+				$types[ $type ]['callers'][ $caller ]++;
+			}
+
+			$is_main_query = ( $request === $sql && ( false !== strpos( $stack, ' WP->main,' ) ) );
+
+			$row = compact( 'caller', 'caller_name', 'sql', 'ltime', 'result', 'type', 'component', 'trace', 'is_main_query' );
+
+			if ( ! isset( $trace ) ) {
+				$row['stack'] = $callers;
+			}
+
+			if ( is_wp_error( $result ) ) {
+				$data['errors'][] = $row;
+			}
+
+			$rows[ $i ] = $row;
+			$i++;
+
+		}
+
+		if ( ! $has_result && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
+			// Fallback for displaying database errors when wp-content/db.php isn't in place
+			foreach ( $EZSQL_ERROR as $error ) {
+				$row = array(
+					'caller' => null,
+					'caller_name' => null,
+					'stack' => '',
+					'sql' => $error['query'],
+					'ltime' => 0,
+					'result' => new \WP_Error( 'qmdb', $error['error_str'] ),
+					'type' => '',
+					'component' => false,
+					'trace' => null,
+					'is_main_query' => false,
+				);
+				$data['errors'][] = $row;
+			}
+		}
+
+		$total_qs = count( $rows );
+
+		$data['total_qs']   += $total_qs;
+		$data['total_time'] += $total_time;
+
+		$has_main_query = wp_list_filter( $rows, array(
+			'is_main_query' => true,
+		) );
+
+		# @TODO put errors in here too:
+		# @TODO proper class instead of (object)
+		$data['dbs'][ '$wpdb' ] = (object) compact( 'rows', 'types', 'has_result', 'has_trace', 'total_time', 'total_qs', 'has_main_query' );
+
+		return $data;
+	}
+
+	public function get_query_type( $sql ) {
+		// Trim leading whitespace and brackets
+		$sql = ltrim( $sql, ' \t\n\r\0\x0B(' );
+
+		if ( 0 === strpos( $sql, '/*' ) ) {
+			// Strip out leading comments such as `/*NO_SELECT_FOUND_ROWS*/` before calculating the query type
+			$sql = preg_replace( '|^/\*[^\*/]+\*/|', '', $sql );
+		}
+
+		$words = preg_split( '/\b/', trim( $sql ), 2, PREG_SPLIT_NO_EMPTY );
+		$type = 'Unknown';
+		if ( isset( $words[0] ) ) {
+			$type = strtoupper( $words[0] );
+		}
+
+		return $type;
 	}
 
 	/**
