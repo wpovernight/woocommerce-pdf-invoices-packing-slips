@@ -641,6 +641,8 @@ class Main {
 
 		global $wp_filesystem;
 
+		require_once( ABSPATH . 'wp-admin/includes/file.php' ); // required for WP_Filesystem()
+
 		// check for WP_Filesystem(), is required for copy_dir()
 		if ( ! WP_Filesystem() ) {
 			WP_Filesystem();
