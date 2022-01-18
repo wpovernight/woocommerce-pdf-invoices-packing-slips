@@ -102,39 +102,10 @@ class Settings_Debug {
 						if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
 							return;
 						}
-						$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
 
-						if ( ! function_exists( "glob" ) ) {
-							// glob is disabled
-							printf('<div class="notice notice-error"><p>%s<br><code>%s</code></p></div>', esc_html__( "Unable to read temporary folder contents!", 'woocommerce-pdf-invoices-packing-slips' ), $tmp_path);
-						} else {
-							$success = 0;
-							$error = 0;
-							if ( $files = glob( $tmp_path.'*.pdf' ) ) { // get all pdf files
-								foreach( $files as $file ) {
-									if( is_file( $file ) ) {
-										// delete file
-										if ( unlink( $file ) === true ) {
-											$success++;
-										} else {
-											$error++;
-										}
-									}
-								}
-
-								if ( $error > 0 ) {
-									/* translators: 1,2. file count  */
-									$message =  sprintf( esc_html__( 'Unable to delete %1$d files! (deleted %2$d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success );
-									printf( '<div class="notice notice-error"><p>%s</p></div>', $message );
-								} else {
-									/* translators: file count */
-									$message =  sprintf( esc_html__( 'Successfully deleted %d files!', 'woocommerce-pdf-invoices-packing-slips' ), $success );
-									printf( '<div class="notice notice-success"><p>%s</p></div>', $message );
-								}
-							} else {
-								printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' ) );
-							}
-						}
+						// clean files
+						$output = WPO_WCPDF()->main->temporary_files_cleanup( $now = true );
+						printf( '<div class="notice notice-'.array_key_first( $output ).'"><p>%s</p></div>', reset( $output ) );
 					}
 					?>
 				</form>
