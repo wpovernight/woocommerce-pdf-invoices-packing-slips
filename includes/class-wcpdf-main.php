@@ -42,7 +42,7 @@ class Main {
 		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
 
 		// scheduled attachments cleanup (following settings on Status tab)
-		add_action( 'wp_scheduled_delete', array( $this, 'temporary_files_cleanup') );
+		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup') );
 
 		// remove private data
 		add_action( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
@@ -641,11 +641,13 @@ class Main {
 
 		global $wp_filesystem;
 
-		require_once( ABSPATH . 'wp-admin/includes/file.php' ); // required for WP_Filesystem()
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		}
 
-		// check for WP_Filesystem(), is required for copy_dir()
-		if ( ! WP_Filesystem() ) {
-			WP_Filesystem();
+		if ( ! WP_Filesystem() || is_null( WP_Filesystem() ) ) {
+			wcpdf_log_error( "WP_Filesystem couldn't be initiated! Unable to copy directory contents.", 'critical' );
+			return;
 		}
 
 		// we have the directories, let's try to copy
@@ -847,45 +849,56 @@ class Main {
 			<?php
 		}
 	}
+
+	public function schedule_temporary_files_cleanup() {
+		$cleanup_age_days = isset( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) ? floatval( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) : 7.0;
+		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
+		$this->temporary_files_cleanup( $delete_timestamp );
+	}
 	
 	/**
-	 * Remove temporary files from paths older than 1 week (daily, hooked into wp_scheduled_delete ) or manually
+	 * Remove temporary files from paths older than 1 week (daily, hooked into wp_scheduled_delete )
+	 * @param string|int  $delete_timestamp timestamp
+	 * 
+	 * @return array|void Output message
 	 */
-	public function temporary_files_cleanup( $now = false ) {
+	public function temporary_files_cleanup( $delete_timestamp = '' ) {
 		global $wp_filesystem;
 
-		require_once( ABSPATH . 'wp-admin/includes/file.php' ); // required for WP_Filesystem()
-
-		// loads WP_Filesystem()
-		if ( ! WP_Filesystem() ) {
-			WP_Filesystem();
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
 		}
 
-		$cleanup_age_days    = isset( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) ? floatval( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) : 7.0;
-		$delete_timestamp    = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
+		if ( ! WP_Filesystem() || is_null( WP_Filesystem() ) ) {
+			/* translators: WP_Filesystem */
+			return array( 'error' => sprintf( esc_html__( "%s couldn't be initiated!", 'woocommerce-pdf-invoices-packing-slips' ), 'WP_Filesystem' ) );
+		}
+
 		$paths_to_cleanup    = apply_filters( 'wpo_wcpdf_cleanup_tmp_paths', array(
 			$this->get_tmp_path( 'attachments' ),
 			$this->get_tmp_path( 'dompdf' ),
 		) );
-		$exclude_directories = apply_filters( 'wpo_wcpdf_cleanup_esclude_directories', array() );
-		$exclude_filetypes   = apply_filters( 'wpo_wcpdf_cleanup_esclude_filetypes', array() );
+		$exclude_directories = apply_filters( 'wpo_wcpdf_cleanup_exclude_directories', array() );
+		$allowed_filetypes   = apply_filters( 'wpo_wcpdf_cleanup_allowed_filetypes', array( 'pdf' ) );
+		$folders_level       = apply_filters( 'wpo_wcpdf_cleanup_folders_level', 3 );
 		$files               = array();
 		$success             = 0;
 		$error               = 0;
 		$output              = array();
 
 		foreach ( $paths_to_cleanup as $path ) {
-			$files = array_merge( $files, list_files( $path, 1, $exclude_directories ) );
+			$files = array_merge( $files, list_files( $path, $folders_level, $exclude_directories ) );
 		}
 
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $file ) {
 				$filetype = wp_check_filetype( $file ); // 'php' files return 'false' for 'ext'
-				if ( $filetype['ext'] != false && ! in_array( $filetype['ext'], $exclude_filetypes ) && $wp_filesystem->exists( $file ) ) {
-					$file_timestamp = $wp_filesystem->mtime( $file );
+				if ( $filetype['ext'] != false && in_array( $filetype['ext'], $allowed_filetypes ) && $wp_filesystem->exists( $file ) ) {
+					$file_timestamp  = $wp_filesystem->mtime( $file );
+					$can_delete_file = ! empty( $delete_timestamp ) && is_numeric( $delete_timestamp ) ? $file_timestamp < intval( $delete_timestamp ) : true;
 
 					// delete file
-					if ( $now || $file_timestamp < $delete_timestamp ) {
+					if ( $can_delete_file ) {
 						if ( $wp_filesystem->delete( $file, true ) ) {
 							$success++;
 						} else {
