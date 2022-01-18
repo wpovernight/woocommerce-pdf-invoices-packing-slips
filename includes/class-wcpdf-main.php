@@ -645,7 +645,7 @@ class Main {
 			require_once( ABSPATH . 'wp-admin/includes/file.php' );
 		}
 
-		if ( ! WP_Filesystem() || is_null( WP_Filesystem() ) ) {
+		if ( ! WP_Filesystem() ) {
 			wcpdf_log_error( "WP_Filesystem couldn't be initiated! Unable to copy directory contents.", 'critical' );
 			return;
 		}
@@ -850,6 +850,9 @@ class Main {
 		}
 	}
 
+	/**
+	 * Schedule temporary files cleanup from paths older than 1 week (daily, hooked into wp_scheduled_delete )
+	 */
 	public function schedule_temporary_files_cleanup() {
 		$cleanup_age_days = isset( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) ? floatval( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) : 7.0;
 		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
@@ -857,48 +860,52 @@ class Main {
 	}
 	
 	/**
-	 * Remove temporary files from paths older than 1 week (daily, hooked into wp_scheduled_delete )
-	 * @param string|int  $delete_timestamp timestamp
+	 * Temporary files cleanup from paths
+	 * @param  int    $delete_timestamp timestamp
 	 * 
-	 * @return array Output message
+	 * @return array  Output message
 	 */
-	public function temporary_files_cleanup( $delete_timestamp = '' ) {
+	public function temporary_files_cleanup( $delete_timestamp ) {
 		global $wp_filesystem;
+
+		$delete_before = ! empty( $delete_timestamp ) ? intval( $delete_timestamp ) : null;
 
 		if ( ! function_exists( 'WP_Filesystem' ) ) {
 			require_once( ABSPATH . 'wp-admin/includes/file.php' );
 		}
 
-		if ( ! WP_Filesystem() || is_null( WP_Filesystem() ) ) {
-			/* translators: WP_Filesystem */
-			return array( 'error' => sprintf( esc_html__( "%s couldn't be initiated!", 'woocommerce-pdf-invoices-packing-slips' ), 'WP_Filesystem' ) );
+		if ( ! WP_Filesystem() ) {
+			return array( 'error' => esc_html__( "WP_Filesystem couldn't be initiated!", 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
-		$paths_to_cleanup    = apply_filters( 'wpo_wcpdf_cleanup_tmp_paths', array(
+		$paths_to_cleanup = apply_filters( 'wpo_wcpdf_cleanup_tmp_paths', array(
 			$this->get_tmp_path( 'attachments' ),
 			$this->get_tmp_path( 'dompdf' ),
 		) );
-		$exclude_directories = apply_filters( 'wpo_wcpdf_cleanup_exclude_directories', array() );
-		$allowed_filetypes   = apply_filters( 'wpo_wcpdf_cleanup_allowed_filetypes', array( 'pdf' ) );
-		$folders_level       = apply_filters( 'wpo_wcpdf_cleanup_folders_level', 3 );
-		$files               = array();
-		$success             = 0;
-		$error               = 0;
-		$output              = array();
+		$excluded_files   = apply_filters( 'wpo_wcpdf_cleanup_excluded_files', array(
+			'.htaccess',
+			'index.php',
+		) );
+		$folders_level    = apply_filters( 'wpo_wcpdf_cleanup_folders_level', 3 );
+		$files            = array();
+		$success          = 0;
+		$error            = 0;
+		$output           = array();
 
 		foreach ( $paths_to_cleanup as $path ) {
-			$files = array_merge( $files, list_files( $path, $folders_level, $exclude_directories ) );
+			$files = array_merge( $files, list_files( $path, $folders_level ) );
 		}
 
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $file ) {
 				$filetype = wp_check_filetype( $file ); // 'php' files return 'false' for 'ext'
-				if ( $filetype['ext'] != false && in_array( $filetype['ext'], $allowed_filetypes ) && $wp_filesystem->exists( $file ) ) {
+				$basename = wp_basename( $file );
+
+				if ( $filetype['ext'] != false && ! in_array( $basename, $excluded_files ) && $wp_filesystem->exists( $file ) ) {
 					$file_timestamp  = $wp_filesystem->mtime( $file );
-					$can_delete_file = ! empty( $delete_timestamp ) && is_numeric( $delete_timestamp ) ? $file_timestamp < intval( $delete_timestamp ) : true;
 
 					// delete file
-					if ( $can_delete_file ) {
+					if ( $file_timestamp < $delete_before ) {
 						if ( $wp_filesystem->delete( $file, true ) ) {
 							$success++;
 						} else {
