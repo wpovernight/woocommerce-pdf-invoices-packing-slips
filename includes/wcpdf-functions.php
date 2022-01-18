@@ -278,7 +278,7 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 	}
 
 	// fallback for displaying database errors when wp-content/db.php isn't in place
-	if ( ! $result && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
+	if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
 		foreach ( $EZSQL_ERROR as $error ) {
 			$errors[] = $error['error_str'];
 		}
