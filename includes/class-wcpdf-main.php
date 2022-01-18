@@ -860,7 +860,7 @@ class Main {
 	 * Remove temporary files from paths older than 1 week (daily, hooked into wp_scheduled_delete )
 	 * @param string|int  $delete_timestamp timestamp
 	 * 
-	 * @return array|void Output message
+	 * @return array Output message
 	 */
 	public function temporary_files_cleanup( $delete_timestamp = '' ) {
 		global $wp_filesystem;
