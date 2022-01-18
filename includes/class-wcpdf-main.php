@@ -878,7 +878,7 @@ class Main {
 
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $file ) {
-				$filetype = wp_check_filetype( $file );
+				$filetype = wp_check_filetype( $file ); // 'php' files return 'false'
 				if ( $filetype['ext'] != false && ! in_array( $filetype['ext'], $exclude_filetypes ) && $wp_filesystem->exists( $file ) ) {
 					$file_timestamp = $wp_filesystem->mtime( $file );
 
