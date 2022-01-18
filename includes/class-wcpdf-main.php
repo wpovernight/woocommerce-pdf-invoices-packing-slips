@@ -909,7 +909,7 @@ class Main {
 
 				if ( $error > 0 ) {
 					/* translators: 1,2. file count  */
-					$message           =  sprintf( esc_html__( 'Unable to delete %1$d files! (deleted %2$d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success );
+					$message           = sprintf( esc_html__( 'Unable to delete %1$d files! (deleted %2$d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success );
 					$output['error']   = $message;
 				} else {
 					/* translators: file count */
