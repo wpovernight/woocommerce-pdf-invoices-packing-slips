@@ -883,7 +883,6 @@ class Main {
 			$this->get_tmp_path( 'dompdf' ),
 		) );
 		$excluded_files   = apply_filters( 'wpo_wcpdf_cleanup_excluded_files', array(
-			'.htaccess',
 			'index.php',
 		) );
 		$folders_level    = apply_filters( 'wpo_wcpdf_cleanup_folders_level', 3 );
