@@ -257,14 +257,7 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 
 	// with SAVEQUERIES defined as false, `wpdb::queries` is empty but `wpdb::num_queries` is not.
 	if ( empty( $wpdb->queries ) ) {
-		wcpdf_log_error( '$wpdb->queries is empty!' );
 		return $errors;
-	}
-
-	$request = trim( $wp_the_query->request ? $wp_the_query->request : '' );
-
-	if ( method_exists( $wpdb, 'remove_placeholder_escape' ) ) {
-		$request = $wpdb->remove_placeholder_escape( $request );
 	}
 
 	foreach ( $wpdb->queries as $query ) {
