@@ -854,6 +854,10 @@ class Main {
 	 * Schedule temporary files cleanup from paths older than 1 week (daily, hooked into wp_scheduled_delete )
 	 */
 	public function schedule_temporary_files_cleanup() {
+		if ( ! isset( WPO_WCPDF()->settings->debug_settings['enable_cleanup'] ) ) {
+			return;
+		}
+
 		$cleanup_age_days = isset( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) ? floatval( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) : 7.0;
 		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
 		$this->temporary_files_cleanup( $delete_timestamp );
