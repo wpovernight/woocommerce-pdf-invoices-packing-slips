@@ -159,9 +159,8 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
-		$item_id = !empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
-
-		if ( empty( $item_id ) ) {
+		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
+		if ( empty($item_id) ) {
 			return $classes;
 		}
 
@@ -174,7 +173,7 @@ class Third_Party_Plugins {
 		} elseif ( $bundled_items = WCX_Order::get_item_meta( $order, $class_item_id, '_woosb_ids', true ) ) {
 			$classes = $classes . ' product-bundle';
 		}
-		
+
 		return $classes;
 	}
 	
