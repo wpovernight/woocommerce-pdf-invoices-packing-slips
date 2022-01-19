@@ -251,15 +251,16 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
  * @return array  Errors found
  */
 function wcpdf_catch_db_object_errors( $wpdb ) {
-	global $EZSQL_ERROR, $wp_the_query;
+	global $EZSQL_ERROR;
 
 	$errors = array();
 
 	// with SAVEQUERIES defined as false, `wpdb::queries` is empty but `wpdb::num_queries` is not.
-	if ( empty( $wpdb->queries ) ) {
+	if ( empty( $wpdb ) || empty( $wpdb->queries ) ) {
 		return $errors;
 	}
 
+	// queries loop
 	foreach ( $wpdb->queries as $query ) {
 		$result = isset( $query['result'] ) ? $query['result'] : null;
 
