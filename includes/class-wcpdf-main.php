@@ -42,7 +42,7 @@ class Main {
 		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
 
 		// scheduled attachments cleanup (following settings on Status tab)
-		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup') );
+		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 
 		// remove private data
 		add_action( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
@@ -869,7 +869,7 @@ class Main {
 	 * 
 	 * @return array  Output message
 	 */
-	public function temporary_files_cleanup( $delete_timestamp ) {
+	public function temporary_files_cleanup( $delete_timestamp = 0 ) {
 		global $wp_filesystem;
 
 		$delete_before = ! empty( $delete_timestamp ) ? intval( $delete_timestamp ) : time();
@@ -888,6 +888,7 @@ class Main {
 		) );
 		$excluded_files   = apply_filters( 'wpo_wcpdf_cleanup_excluded_files', array(
 			'index.php',
+			'.htaccess',
 		) );
 		$folders_level    = apply_filters( 'wpo_wcpdf_cleanup_folders_level', 3 );
 		$files            = array();
