@@ -248,31 +248,26 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
  * Original from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
  *
  * @param  object $wpdb
- * @return array  Errors found
+ * @return array  errors found
  */
 function wcpdf_catch_db_object_errors( $wpdb ) {
 	global $EZSQL_ERROR;
 
 	$errors = array();
 
-	// with SAVEQUERIES defined as false, `wpdb::queries` is empty but `wpdb::num_queries` is not.
-	if ( empty( $wpdb ) || empty( $wpdb->queries ) ) {
-		return $errors;
-	}
-
-	// queries loop
-	foreach ( $wpdb->queries as $query ) {
-		$result = isset( $query['result'] ) ? $query['result'] : null;
-
-		if ( is_wp_error( $result ) && is_array( $result->errors ) ) {
-			foreach ( $result->errors as $error ) {
-				$errors[] = reset( $error );
+	// with SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
+	// using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
+	if ( ! empty( $wpdb->queries ) && is_array( $wpdb->queries ) ) {
+		foreach ( $wpdb->queries as $query ) {
+			$result = isset( $query['result'] ) ? $query['result'] : null;
+	
+			if ( is_wp_error( $result ) && is_array( $result->errors ) ) {
+				foreach ( $result->errors as $error ) {
+					$errors[] = reset( $error );
+				}
 			}
 		}
-	}
-
-	// fallback for displaying database errors when wp-content/db.php isn't in place
-	if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
+	} elseif ( ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
 		foreach ( $EZSQL_ERROR as $error ) {
 			$errors[] = $error['error_str'];
 		}
