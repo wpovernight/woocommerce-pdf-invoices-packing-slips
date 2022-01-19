@@ -897,10 +897,9 @@ class Main {
 
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $file ) {
-				$filetype = wp_check_filetype( $file ); // 'php' files return 'false' for 'ext'
 				$basename = wp_basename( $file );
 
-				if ( $filetype['ext'] != false && ! in_array( $basename, $excluded_files ) && $wp_filesystem->exists( $file ) ) {
+				if ( ! in_array( $basename, $excluded_files ) && $wp_filesystem->exists( $file ) ) {
 					$file_timestamp  = $wp_filesystem->mtime( $file );
 
 					// delete file
