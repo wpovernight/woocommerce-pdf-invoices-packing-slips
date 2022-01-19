@@ -42,7 +42,7 @@ class Main {
 		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
 
 		// scheduled attachments cleanup (following settings on Status tab)
-		add_action( 'wp_scheduled_delete', array( $this, 'attachments_cleanup') );
+		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 
 		// remove private data
 		add_action( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
@@ -641,9 +641,13 @@ class Main {
 
 		global $wp_filesystem;
 
-		// check for WP_Filesystem(), is required for copy_dir()
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		}
+
 		if ( ! WP_Filesystem() ) {
-			WP_Filesystem();
+			wcpdf_log_error( "WP_Filesystem couldn't be initiated! Unable to copy directory contents.", 'critical' );
+			return;
 		}
 
 		// we have the directories, let's try to copy
@@ -847,35 +851,87 @@ class Main {
 	}
 
 	/**
-	 * Remove attachments older than 1 week (daily, hooked into wp_scheduled_delete )
+	 * Schedule temporary files cleanup from paths older than 1 week (daily, hooked into wp_scheduled_delete )
 	 */
-	public function attachments_cleanup() {
-		if ( !function_exists("glob") || !function_exists('filemtime') ) {
-			// glob is required
+	public function schedule_temporary_files_cleanup() {
+		if ( ! isset( WPO_WCPDF()->settings->debug_settings['enable_cleanup'] ) ) {
 			return;
 		}
 
-		
-		if ( !isset( WPO_WCPDF()->settings->debug_settings['enable_cleanup'] ) ) {
-			return;
-		}
-
-
-		$cleanup_age_days = isset(WPO_WCPDF()->settings->debug_settings['cleanup_days']) ? floatval(WPO_WCPDF()->settings->debug_settings['cleanup_days']) : 7.0;
+		$cleanup_age_days = isset( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) ? floatval( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ) : 7.0;
 		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
+		$this->temporary_files_cleanup( $delete_timestamp );
+	}
+	
+	/**
+	 * Temporary files cleanup from paths
+	 * @param  int    $delete_timestamp timestamp of the date/time before which to clean up files
+	 * 
+	 * @return array  Output message
+	 */
+	public function temporary_files_cleanup( $delete_timestamp = 0 ) {
+		global $wp_filesystem;
 
-		$tmp_path = $this->get_tmp_path('attachments');
+		$delete_before = ! empty( $delete_timestamp ) ? intval( $delete_timestamp ) : time();
 
-		if ( $files = glob( $tmp_path.'*.pdf' ) ) { // get all pdf files
-			foreach( $files as $file ) {
-				if( is_file( $file ) ) {
-					$file_timestamp = filemtime( $file );
-					if ( !empty( $file_timestamp ) && $file_timestamp < $delete_timestamp ) {
-						@unlink($file);
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		}
+
+		if ( ! WP_Filesystem() ) {
+			return array( 'error' => esc_html__( "WP_Filesystem couldn't be initiated!", 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		$paths_to_cleanup = apply_filters( 'wpo_wcpdf_cleanup_tmp_paths', array(
+			$this->get_tmp_path( 'attachments' ),
+			$this->get_tmp_path( 'dompdf' ),
+		) );
+		$excluded_files   = apply_filters( 'wpo_wcpdf_cleanup_excluded_files', array(
+			'index.php',
+			'.htaccess',
+		) );
+		$folders_level    = apply_filters( 'wpo_wcpdf_cleanup_folders_level', 3 );
+		$files            = array();
+		$success          = 0;
+		$error            = 0;
+		$output           = array();
+
+		foreach ( $paths_to_cleanup as $path ) {
+			$files = array_merge( $files, list_files( $path, $folders_level ) );
+		}
+
+		if ( ! empty( $files ) ) {
+			foreach ( $files as $file ) {
+				$basename = wp_basename( $file );
+
+				if ( ! in_array( $basename, $excluded_files ) && $wp_filesystem->exists( $file ) ) {
+					$file_timestamp  = $wp_filesystem->mtime( $file );
+
+					// delete file
+					if ( $file_timestamp < $delete_before ) {
+						if ( $wp_filesystem->delete( $file, true ) ) {
+							$success++;
+						} else {
+							$error++;
+						}
 					}
 				}
+
+				if ( $error > 0 ) {
+					/* translators: 1,2. file count  */
+					$message           = sprintf( esc_html__( 'Unable to delete %1$d files! (deleted %2$d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success );
+					$output['error']   = $message;
+				} else {
+					/* translators: file count */
+					$message           = sprintf( esc_html__( 'Successfully deleted %d files!', 'woocommerce-pdf-invoices-packing-slips' ), $success );
+					$output['success'] = $message;
+				}
 			}
+		} else {
+			$output['success'] = esc_html__( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' );
 		}
+
+		return $output;
 	}
 
 	/**

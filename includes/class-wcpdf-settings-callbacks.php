@@ -122,6 +122,7 @@ class Settings_Callbacks {
 			'size'			=> isset( $args['text_input_size'] ) ? $args['text_input_size'] : NULL,
 		)  + $args;
 		unset( $input_args['current'] );
+		unset( $input_args['setting_name'] );
 
 		ob_start();
 		$this->text_input( $input_args );
