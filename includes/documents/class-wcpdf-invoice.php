@@ -62,7 +62,8 @@ class Invoice extends Order_Document_Methods {
 			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
 			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
 			$settings = (array) $document_settings + (array) $common_settings;
-			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
+			// exclude non historical settings from being saved in order meta
+			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
 		}
 
 		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
