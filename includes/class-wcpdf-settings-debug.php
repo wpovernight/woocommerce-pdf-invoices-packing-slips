@@ -234,15 +234,12 @@ class Settings_Debug {
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'enable_cleanup',
-					'disabled'			=> ( !function_exists("glob") || !function_exists('filemtime') ) ? 1 : NULL,
 					/* translators: number of days */
 					'text_input_wrap'	=> __( "every %s days", 'woocommerce-pdf-invoices-packing-slips' ),
 					'text_input_size'	=> 4,
 					'text_input_id'		=> 'cleanup_days',
 					'text_input_default'=> 7,
-					'description'		=> ( function_exists("glob") && function_exists('filemtime') ) ?
-										   __( "Automatically clean up PDF files stored in the temporary folder (used for email attachments)", 'woocommerce-pdf-invoices-packing-slips' ) :
-										   __( '<b>Disabled:</b> The PHP functions glob and filemtime are required for automatic cleanup but not enabled on your server.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'		=> __( "Automatically clean up PDF files stored in the temporary folder (used for email attachments)", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
