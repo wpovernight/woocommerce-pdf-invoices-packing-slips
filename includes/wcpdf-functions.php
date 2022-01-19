@@ -255,8 +255,11 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 
 	$errors = array();
 
-	// with SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
-	// using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
+	/*
+	 * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
+	 * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
+	 * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
+	 */
 	if ( ! empty( $wpdb->queries ) && is_array( $wpdb->queries ) ) {
 		foreach ( $wpdb->queries as $query ) {
 			$result = isset( $query['result'] ) ? $query['result'] : null;
