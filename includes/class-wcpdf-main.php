@@ -861,14 +861,14 @@ class Main {
 	
 	/**
 	 * Temporary files cleanup from paths
-	 * @param  int    $delete_timestamp timestamp
+	 * @param  int    $delete_timestamp timestamp of the date/time before which to clean up files
 	 * 
 	 * @return array  Output message
 	 */
 	public function temporary_files_cleanup( $delete_timestamp ) {
 		global $wp_filesystem;
 
-		$delete_before = ! empty( $delete_timestamp ) ? intval( $delete_timestamp ) : null;
+		$delete_before = ! empty( $delete_timestamp ) ? intval( $delete_timestamp ) : time();
 
 		if ( ! function_exists( 'WP_Filesystem' ) ) {
 			require_once( ABSPATH . 'wp-admin/includes/file.php' );

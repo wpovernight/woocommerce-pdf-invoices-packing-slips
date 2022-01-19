@@ -105,7 +105,7 @@ class Settings_Debug {
 
 						// clean files
 						$output = WPO_WCPDF()->main->temporary_files_cleanup( time() );
-						printf( '<div class="notice notice-'.array_key_first( $output ).'"><p>%s</p></div>', reset( $output ) );
+						printf( '<div class="notice notice-%1$s"><p>%2$s</p></div>', key( $output ), reset( $output ) );
 					}
 					?>
 				</form>
