@@ -73,15 +73,18 @@ class Sequential_Number_Store {
 $sql = "CREATE TABLE {$this->table_name} (
   id int(16) NOT NULL AUTO_INCREMENT,
   order_id int(16),
-  date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+  date datetime DEFAULT '1000-01-01 00:00:00' NOT NULL,
   calculated_number int (16),
   PRIMARY KEY  (id)
 ) $charset_collate;";
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		$result = dbDelta( $sql );
+		dbDelta( $sql );
+		
+		// catch mysql errors
+		wcpdf_catch_db_object_errors( $wpdb );
 
-		return $result;
+		return;
 	}
 
 	/**

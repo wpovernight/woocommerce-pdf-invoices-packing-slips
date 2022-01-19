@@ -242,3 +242,50 @@ function wcpdf_output_error( $message, $level = 'error', $e = null ) {
 function wcpdf_date_format( $document = null, $date_type = null ) {
 	return apply_filters( 'wpo_wcpdf_date_format', wc_date_format(), $document, $date_type );
 }
+
+/**
+ * Catch MySQL errors
+ * 
+ * Inspired from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
+ * 
+ * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
+ * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
+ * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
+ *
+ * @param  object $wpdb
+ * @return array  errors found
+ */
+function wcpdf_catch_db_object_errors( $wpdb ) {
+	global $EZSQL_ERROR;
+
+	$errors = array();
+
+	// using '$wpdb->queries'
+	if ( ! empty( $wpdb->queries ) && is_array( $wpdb->queries ) ) {
+		foreach ( $wpdb->queries as $query ) {
+			$result = isset( $query['result'] ) ? $query['result'] : null;
+	
+			if ( is_wp_error( $result ) && is_array( $result->errors ) ) {
+				foreach ( $result->errors as $error ) {
+					$errors[] = reset( $error );
+				}
+			}
+		}
+	} 
+	
+	// fallback to '$EZSQL_ERROR'
+	if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
+		foreach ( $EZSQL_ERROR as $error ) {
+			$errors[] = $error['error_str'];
+		}
+	}
+
+	// log errors
+	if ( ! empty( $errors ) ) {
+		foreach ( $errors as $error_message ) {
+			wcpdf_log_error( $error_message, 'critical' );
+		}
+	}
+
+	return $errors;
+}
