@@ -146,7 +146,6 @@ class Third_Party_Plugins {
 		return $classes;
 	}
 
-
 	/**
 	 * WPC Product Bundles
 	 * @param string $classes       CSS classes for item row (tr) 
@@ -175,11 +174,10 @@ class Third_Party_Plugins {
 		}
 
 		return $classes;
-	}
-	
+	}	
 
 	/**
-	 * WooCommerce Chanined Products
+	 * WooCommerce Chained Products
 	 * @param string $classes       CSS classes for item row (tr) 
 	 * @param string $document_type PDF Document type
 	 * @param object $order         WC_Order order
