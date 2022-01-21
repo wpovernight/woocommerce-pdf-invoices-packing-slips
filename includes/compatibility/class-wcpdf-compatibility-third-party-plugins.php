@@ -125,7 +125,7 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
-		$item_id = !empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
+		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty( $item_id ) ) {
 			return $classes;
 		}
@@ -158,7 +158,7 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
-		$item_id = !empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
+		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty( $item_id ) ) {
 			return $classes;
 		}
