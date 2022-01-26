@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '4b7c9dccbcd948634b4d49f98bf6365474b4910f',
+        'reference' => 'fe844de27e26d94ec840e09f105b82ec8e72b81a',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '4b7c9dccbcd948634b4d49f98bf6365474b4910f',
+            'reference' => 'fe844de27e26d94ec840e09f105b82ec8e72b81a',
             'dev_requirement' => false,
         ),
         'dompdf/dompdf' => array(
@@ -27,7 +27,7 @@
             'aliases' => array(
                 0 => '9999999-dev',
             ),
-            'reference' => '0ba53a901914317b7cc1ae9231b6637c0b33243a',
+            'reference' => '271c651ced0e2bc6dabfbbbc79dbb324d82df1cf',
             'dev_requirement' => false,
         ),
         'phenx/php-font-lib' => array(
