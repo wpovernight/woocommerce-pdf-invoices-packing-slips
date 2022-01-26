@@ -74,23 +74,39 @@ $review_invitation = sprintf(
 					'type'   => 'shop_order',
 				) );
 				$order_id      = ! empty( $last_order_id ) ? reset( $last_order_id ) : false;
+				$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			?>
 			<div class="slider slide-right">&#9654;</div>
-			<div class="preview-data">
-				<input type="text" name="preview-order-number" id="preview-order-number">
-				<div class="preview-order-search-wrapper">
-					<input type="text" name="preview-order-search" id="preview-order-search" placeholder="<?php esc_attr_e( 'Type...', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
-					<img class="preview-order-search-clear" src="<?php echo WPO_WCPDF()->plugin_url().'/assets/images/reset-input.svg'; ?>" alt="<?php esc_html_e( 'Clear search text', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+			<div class="preview-data-wrapper">
+
+				<div class="preview-data preview-order-data">
+					<input type="text" name="preview-order-number" id="preview-order-number">
+					<div class="preview-order-search-wrapper">
+						<input type="text" name="preview-order-search" id="preview-order-search" placeholder="<?php esc_attr_e( 'Type...', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
+						<img class="preview-order-search-clear" src="<?php echo WPO_WCPDF()->plugin_url().'/assets/images/reset-input.svg'; ?>" alt="<?php esc_html_e( 'Clear search text', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+					</div>
+					<p class="last-order"><?php esc_html_e( 'Currently showing last order', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+					<p class="order-number"><?php esc_html_e( 'Currently showing order number', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+					<p class="order-search"><?php esc_html_e( 'Currently showing order search results', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+					<ul>
+						<li class="last-order"><?php esc_html_e( 'Show last order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+						<li class="order-number"><?php esc_html_e( 'Show specific order number', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+						<li class="order-search"><?php esc_html_e( 'Search for an order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+					</ul>
+					<div id="preview-order-search-results"><!-- Results populated with JS --></div>
 				</div>
-				<p class="last-order"><?php esc_html_e( 'Currently showing last order', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
-				<p class="order-number"><?php esc_html_e( 'Currently showing order number', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
-				<p class="order-search"><?php esc_html_e( 'Currently showing order search results', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
-				<ul>
-					<li class="last-order"><?php esc_html_e( 'Show last order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
-					<li class="order-number"><?php esc_html_e( 'Show specific order number', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
-					<li class="order-search"><?php esc_html_e( 'Search for an order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
-				</ul>
-				<div id="preview-order-search-results"><!-- Results populated with JS --></div>
+
+				<div class="preview-data preview-document-type">
+					<p class="document-type"><?php _e( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+					<ul>
+						<?php 
+						foreach ( $documents as $document ) {
+							printf( '<li class="%s">%s</li>', $document->get_type(), $document->get_title() );
+						}
+						?>
+					</ul>
+				</div>
+
 			</div>
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
 			<div class="preview" data-order_id="<?= $order_id; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>" data-no_order="<?= __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-save_settings="<?= __( 'Please save your settings to preview the changes!', 'woocommerce-pdf-invoices-packing-slips' ); ?>"></div>

@@ -70,6 +70,7 @@ jQuery( function( $ ) {
 
 	$('.preview-document .preview-data p').on( 'click', function() {
 		let $previewData = $(this).closest('.preview-data');
+		$previewData.siblings('.preview-data').find('ul').removeClass('active');
 		$previewData.find('ul').toggleClass('active');
 	});
 

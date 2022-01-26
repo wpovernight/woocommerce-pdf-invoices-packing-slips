@@ -429,10 +429,19 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	-webkit-box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
 }
 
-.preview-document .preview-data {
+.preview-document .preview-data-wrapper {
 	position: absolute;
 	right: 0;
 	top: 0;
+}
+
+.preview-document .preview-data-wrapper .preview-order-data,
+.preview-document .preview-data-wrapper .preview-document-type {
+	float: right;
+}
+
+.preview-document .preview-data-wrapper .preview-document-type {
+	margin-right: 30px;
 }
 
 .preview-document .preview-data p {
