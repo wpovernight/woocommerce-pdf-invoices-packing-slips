@@ -360,16 +360,43 @@ class Install {
 		}
 
 		// 2.10.0-dev: migrate template path to template ID
-		if ( version_compare( $installed_version, '2.10.0-dev', '<' ) ) {
+		// 2.11.5: improvements to the migration procedure
+		if ( version_compare( $installed_version, '2.11.5', '<' ) ) {
 			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'maybe_migrate_template_paths' ) ) ) {
 				WPO_WCPDF()->settings->maybe_migrate_template_paths();
 			}
 		}
 
-		// 2.12.0: remove the obsolete .dist font cache file and mustRead.html from local fonts folder
-		if ( version_compare( $installed_version, '2.12.0-dev', '<' ) ) {
+		// 2.11.2: remove the obsolete .dist font cache file and mustRead.html from local fonts folder
+		if ( version_compare( $installed_version, '2.11.2', '<' ) ) {
 			@unlink( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
 			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
+		}
+
+		// 2.12.2-dev-1: change 'date' database table default value to '1000-01-01 00:00:00'
+		if ( version_compare( $installed_version, '2.12.2-dev-1', '<' ) ) {
+			global $wpdb;
+			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+			foreach ( $documents as $document ) {
+				if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
+					$number_store = $document->get_sequential_number_store();
+					if ( ! empty( $number_store ) ) {
+						$column_name = 'date';
+						$query       = $wpdb->query( "ALTER TABLE {$number_store->table_name} ALTER {$column_name} SET DEFAULT '1000-01-01 00:00:00'" );
+						if ( $query ) {
+							wcpdf_log_error(
+								"Default value changed for 'date' column to '1000-01-01 00:00:00' on database table: {$number_store->table_name}",
+								'info'
+							);
+						} else {
+							wcpdf_log_error(
+								"An error occurred! The default value for 'date' column couldn't be changed to '1000-01-01 00:00:00' on database table: {$number_store->table_name}",
+								'critical'
+							);
+						}
+					}
+				}
+			}
 		}
 		
 	}

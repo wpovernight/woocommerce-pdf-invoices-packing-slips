@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.8
 Requires PHP: 7.1
-Stable tag: 2.11.3
+Stable tag: 2.12.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 In addition to this, we offer several premium extensions:
 
 * Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [WooCommerce PDF Invoices & Packing Slips Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
-* Automatically send new orders or packing slips to your printer, as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
+* Automatically send new orders or packing slips to your printer, as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
 * More advanced & stylish templates with [WooCommerce PDF Invoices & Packing Slips Premium Templates](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)
 
 = Fully customizable =
@@ -101,6 +101,24 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.12.1 =
+* Fix: Show a feedback notice after saving settings
+* Fix: images with min-width/min-height styles rendered tables incorrectly (dompdf patch)
+* Tweak: Disable composer platform check
+
+= 2.12.0 =
+* New: Support for webp images
+* Fix: Plugin version for font synchronizer upgrade procedure
+* Fix: force reloading installed template list during template path migration
+* Fix: PHP8.1 incompatible return type notice
+* Fix: WooCommerce 6.1 deprecations notices
+* Dependencies: Updated dompdf to 1.1.1
+* Marked tested up to WooCommerce 6.1
+
+= 2.11.4 =
+* Fix: bundled fonts being deleted during upgrades
+* Fix: dompdf 1.1.0+ font cache data compatibility
 
 = 2.11.3 =
 * Fix: Extended currency symbol support in bulk documents

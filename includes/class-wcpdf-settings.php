@@ -107,6 +107,9 @@ class Settings {
 
 
 	public function settings_page() {
+		// feedback on settings save
+		settings_errors();
+
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
 			'general' => array(
 				'title' => __('General', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -430,7 +433,7 @@ class Settings {
 		return $template_path;
 	}
 
-	public function get_installed_templates() {
+	public function get_installed_templates( $force_reload = false ) {
 		// because this method can be called (too) early we load from a cached list in those cases
 		// this cache is updated each time the template settings are saved/updated
 		if ( ! did_action( 'wpo_wcpdf_init_documents' ) && ( $cached_template_list = $this->get_template_list_cache() ) ) {
@@ -438,7 +441,7 @@ class Settings {
 		}
 
 		// to save resources on the disk operations we only do this once
-		if ( ! empty ( $this->installed_templates ) ) {
+		if ( $force_reload === false && ! empty ( $this->installed_templates ) ) {
 			return $this->installed_templates;
 		}
 
@@ -557,7 +560,7 @@ class Settings {
 			return;
 		}
 
-		$installed_templates = $this->get_installed_templates();
+		$installed_templates = $this->get_installed_templates( true );
 		$selected_template = $this->normalize_path( $this->general_settings['template_path'] );
 		$template_match = '';
 		if ( ! in_array( $selected_template, $installed_templates ) && substr_count( $selected_template, '/' ) > 1 ) {
