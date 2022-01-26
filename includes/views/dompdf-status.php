@@ -29,6 +29,12 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'result'   => function_exists('imagecreate'),
 		'fallback' => __( 'Required if you have images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
+	'WebP Support' => array(
+		'required' => __( 'Required when using .webp images', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'    => null,
+		'result'   => function_exists('imagecreatefromwebp'),
+		'fallback' => __( 'Required if you have .webp images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
+	),
 	// "PCRE" => array(
 	// 	"required" => true,
 	// 	"value"    => phpversion("pcre"),
