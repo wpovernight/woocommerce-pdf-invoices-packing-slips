@@ -185,6 +185,10 @@ class Settings {
 						switch ( $type ) {
 							case 'general':
 								foreach( $settings as $setting => $value ) {
+									// skip empty setting
+									if ( empty( $value ) ) {
+										continue;
+									}
 									// array value setting
 									if ( is_array( $value ) ) {
 										foreach ( $value as $k => $v ) {
@@ -204,6 +208,10 @@ class Settings {
 								break;
 							case 'document':
 								foreach( $settings as $setting => $value ) {
+									// skip empty setting
+									if ( empty( $value ) ) {
+										continue;
+									}
 									// array value setting
 									if ( is_array( $value ) ) {
 										foreach ( $value as $k => $v ) {

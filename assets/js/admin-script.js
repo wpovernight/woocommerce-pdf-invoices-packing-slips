@@ -138,7 +138,6 @@ jQuery( function( $ ) {
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
 	} );
 	 
-
 	// Preview on user checkbox change
 	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
 		event.preventDefault();
