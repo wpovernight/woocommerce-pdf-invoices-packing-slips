@@ -237,7 +237,7 @@ class Settings {
 					$document_number->apply_formatting( $invoice, $order );
 				}
 
-
+				// preview
 				$pdf_data = $invoice->preview_pdf();
 
 				wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
