@@ -227,6 +227,17 @@ class Settings {
 					}
 				}
 
+				// apply document number formatting
+				if ( $document_number = $invoice->get_number( $invoice->get_type() ) ) {
+					if ( ! empty( $invoice->settings['number_format'] ) ) {
+						foreach ( $invoice->settings['number_format'] as $key => $value ) {
+							$document_number->$key = $invoice->settings['number_format'][$key];
+						}
+					}
+					$document_number->apply_formatting( $invoice, $order );
+				}
+
+
 				$pdf_data = $invoice->preview_pdf();
 
 				wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
