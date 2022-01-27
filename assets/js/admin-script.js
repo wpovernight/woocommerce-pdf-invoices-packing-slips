@@ -100,42 +100,53 @@ jQuery( function( $ ) {
 			$previewData.find('#preview-order-search-results').hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 			// load preview
-			ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $preview );
+			ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize() );
 		}
 	});
 
 	let previewTimeout;
 
 	// Preview on page load
-	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize(), $preview ) );
+	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize() ) );
 
 	// Preview on user input
 	$( '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #preview-order-number' ).on( 'keyup paste', function( event ) {
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
-		let duration  = event.type == 'keyup' ? 1000 : 0;
+		let duration  = event.type == 'keyup' || event.type == 'paste' ? 1000 : 0;
 		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
-	$( '#wpo-wcpdf-settings select option' ).on( 'click', function( event ) {
+	$( document ).on( 'click', '#wpo-wcpdf-settings select option', function( event ) {
 		event.preventDefault();
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
 		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
 	} );
+
+	// Preview on header logo change
+	$( document ).on( 'click', '#wpo-wcpdf-settings .wpo_upload_image_button', function( event ) {
+		event.preventDefault();
+		let elem      = $(this);
+		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let duration  = event.type == 'click' ? 8000 : 0;
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+	} );
+	 
 
 	// Preview on user checkbox change
 	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
 		event.preventDefault();
 		let elem      = $(this);
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
-		let duration  = event.type == 'click' ? 1000 : 0;
+		let duration  = event.type == 'change' ? 1000 : 0;
 		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
 	} );
 
 	// Preview on user click in search result
@@ -152,7 +163,7 @@ jQuery( function( $ ) {
 		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
 		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data, elem ) }, duration );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
 	} );
 
 	// Clear preview order search results/input
@@ -167,7 +178,7 @@ jQuery( function( $ ) {
 	} );
 
 	// Load the Preview with AJAX
-	function ajax_load_preview( form_data, elem ) {
+	function ajax_load_preview( form_data ) {
 		let order_id     = $preview.data( 'order_id' );
 		let order_number = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
 		if( order_number.length > 0 ) {
@@ -185,14 +196,6 @@ jQuery( function( $ ) {
 
 		// remove previous error notices
 		$preview.children( '.notice' ).remove();
-
-		// settings need to be saved before preview?
-		// if( save_before_preview( elem ) ) {
-		// 	let save_settings_message = $preview.data( 'save_settings' );
-		// 	$preview.find( 'canvas' ).remove();
-		// 	$preview.append( '<div class="notice notice-warning inline"><p>'+save_settings_message+'</p></div>' );
-		// 	return;
-		// }
 
 		// if we don't have an order_id, let's finish here
 		if( order_id.length === 0 ) {
@@ -332,37 +335,6 @@ jQuery( function( $ ) {
 				elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).show();
 			}
 		});
-	}
-
-	// Settings that need to be saved before trigger the Preview
-	function save_before_preview ( elem ) {
-		let save_this_setting_ids = [
-			'enabled',
-			'paper_size',
-			'test_mode',
-			'header_logo',
-			'header_logo_height',
-			'display_shipping_address',
-			'display_email',
-			'display_phone',
-			'display_customer_notes',
-			'display_date',
-			'display_number',
-			'number_format',
-			'title',
-		];
-		let id      = elem.attr( 'id' );
-		let tagName = elem.prop( 'tagName' );
-
-		if ( tagName == 'OPTION' ) { // if it's an OPTION grab instead the parent ID (select)
-			id = elem.parent().attr( 'id' );
-		}
-
-		if ( $.inArray( id, save_this_setting_ids ) !== -1 ) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 });
