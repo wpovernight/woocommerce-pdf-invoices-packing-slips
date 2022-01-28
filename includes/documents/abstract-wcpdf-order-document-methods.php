@@ -622,9 +622,9 @@ abstract class Order_Document_Methods extends Order_Document {
 				
 				// Set item meta
 				if (function_exists('wc_display_item_meta')) { // WC3.0+
-					$data['meta'] = wc_display_item_meta( $item, array(
+					$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array(
 						'echo'      => false,
-					) );
+					), $this ) );
 				} else {
 					if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '<' ) ) {
 						$meta = new \WC_Order_Item_Meta( $item['item_meta'], $product );
