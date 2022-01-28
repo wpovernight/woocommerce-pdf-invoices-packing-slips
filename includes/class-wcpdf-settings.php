@@ -153,6 +153,7 @@ class Settings {
 			}
 
 			$invoice = wcpdf_get_invoice( $order );
+
 			if ( $invoice ) {
 				if ( ! $invoice->exists() ) {
 					$invoice->set_date( current_time( 'timestamp', true ) );
@@ -184,7 +185,12 @@ class Settings {
 					foreach ( $preview_settings as $type => $settings ) {
 						switch ( $type ) {
 							case 'general':
-								foreach( $settings as $setting => $value ) {
+								// reset general settings first
+								WPO_WCPDF()->settings->general_settings = array();
+								$invoice->settings = array_diff( $invoice->settings, $document_common_settings );
+
+								// apply preview general settings
+								foreach ( $settings as $setting => $value ) {
 									// skip empty setting
 									if ( empty( $value ) ) {
 										continue;
@@ -193,21 +199,25 @@ class Settings {
 									if ( is_array( $value ) ) {
 										foreach ( $value as $k => $v ) {
 											WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
-											if( isset( $document_common_settings[$setting] ) ) {
+											if ( isset( $document_common_settings[$setting] ) ) {
 												$invoice->settings[$setting][$k] = $value[$k];
 											}
 										}
 									// single value setting
 									} else {
 										WPO_WCPDF()->settings->general_settings[$setting] = $value;
-										if( isset( $document_common_settings[$setting] ) ) {
+										if ( isset( $document_common_settings[$setting] ) ) {
 											$invoice->settings[$setting] = $value;
 										}
 									}
 								}
 								break;
 							case 'document':
-								foreach( $settings as $setting => $value ) {
+								// reset document settings first
+								$invoice->settings = array_intersect_key( $invoice->settings, $document_common_settings );
+
+								// apply preview document settings
+								foreach ( $settings as $setting => $value ) {
 									// skip empty setting
 									if ( empty( $value ) ) {
 										continue;

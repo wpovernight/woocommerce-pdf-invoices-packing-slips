@@ -110,9 +110,10 @@ jQuery( function( $ ) {
 	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize() ) );
 
 	// Preview on user input
-	$( '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #preview-order-number' ).on( 'keyup paste', function( event ) {
-		let elem      = $(this);
-		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+	$( '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #preview-order-number' ).on( 'keyup paste', function( event ) {
+		event.preventDefault();
+		let $elem     = $( this );
+		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'keyup' || event.type == 'paste' ? 1000 : 0;
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
@@ -121,8 +122,8 @@ jQuery( function( $ ) {
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select option', function( event ) {
 		event.preventDefault();
-		let elem      = $(this);
-		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let $elem     = $( this );
+		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
@@ -131,8 +132,8 @@ jQuery( function( $ ) {
 	// Preview on header logo change
 	$( document ).on( 'click', '#wpo-wcpdf-settings .wpo_upload_image_button', function( event ) {
 		event.preventDefault();
-		let elem      = $(this);
-		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let $elem     = $( this );
+		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 8000 : 0;
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
@@ -141,8 +142,8 @@ jQuery( function( $ ) {
 	// Preview on user checkbox change
 	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
 		event.preventDefault();
-		let elem      = $(this);
-		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let $elem     = $( this );
+		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'change' ? 1000 : 0;
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
@@ -151,15 +152,15 @@ jQuery( function( $ ) {
 	// Preview on user click in search result
 	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
-		let elem     = $(this);
-		let order_id = elem.data( 'order_id' );
+		let $elem    = $( this );
+		let order_id = $elem.data( 'order_id' );
 
-		$preview.data( 'order_id', order_id );          // pass the clicked order_id to the preview order_id
+		$preview.data( 'order_id', order_id );           // pass the clicked order_id to the preview order_id
 
-		elem.closest( 'div' ).hide();                   // hide results div
-		elem.closest( 'div' ).children( 'a' ).remove(); // remove all results
+		$elem.closest( 'div' ).hide();                   // hide results div
+		$elem.closest( 'div' ).children( 'a' ).remove(); // remove all results
 
-		let form_data = elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'click' ? 1000 : 0;
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
@@ -168,12 +169,12 @@ jQuery( function( $ ) {
 	// Clear preview order search results/input
 	$( document ).on( 'click', 'img.preview-order-search-clear', function( event ) {
 		event.preventDefault();
-		let elem = $(this);
-		elem.closest( 'div' ).find( 'input#preview-order-search' ).val( '' );
-		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( 'a' ).remove();      // remove previous results
-		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( '.error' ).remove(); // remove previous errors
-		elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
-		elem.hide();
+		let $elem = $( this );
+		$elem.closest( 'div' ).find( 'input#preview-order-search' ).val( '' );
+		$elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( 'a' ).remove();      // remove previous results
+		$elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( '.error' ).remove(); // remove previous errors
+		$elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
+		$elem.hide();
 	} );
 
 	// Load the Preview with AJAX
@@ -334,6 +335,21 @@ jQuery( function( $ ) {
 				elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).show();
 			}
 		});
+	}
+
+	function checkbox_settings() {
+		return [
+			// general settings
+			'test_mode',
+			'currency_font',
+			'font_subsetting',
+			// document settings
+			'display_email',
+			'display_phone',
+			'display_customer_notes',
+			'disable_free',
+			'use_latest_settings',
+		];
 	}
 
 });
