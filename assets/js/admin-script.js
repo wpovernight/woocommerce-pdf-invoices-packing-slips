@@ -132,11 +132,14 @@ jQuery( function( $ ) {
 	// Preview on header logo change
 	$( document ).on( 'click', '#wpo-wcpdf-settings .wpo_upload_image_button', function( event ) {
 		event.preventDefault();
-		let $elem     = $( this );
-		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
-		let duration  = event.type == 'click' ? 8000 : 0;
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+		let $elem = $( this );
+		let $form = $elem.closest( '#wpo-wcpdf-settings' );
+		setTimeout( function() {
+			let form_data = $form.serialize();
+			let duration  = event.type == 'click' ? 1000 : 0;
+			clearTimeout( previewTimeout );
+			previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+		}, 8000, [ $elem, $form, previewTimeout ] );
 	} );
 	 
 	// Preview on user checkbox change
