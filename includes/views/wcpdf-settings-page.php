@@ -74,7 +74,7 @@ $review_invitation = sprintf(
 					'type'   => 'shop_order',
 				) );
 				$order_id      = ! empty( $last_order_id ) ? reset( $last_order_id ) : false;
-				$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+				$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
 			?>
 			<div class="slider slide-right">&#9654;</div>
 			<div class="preview-data-wrapper">
@@ -97,12 +97,20 @@ $review_invitation = sprintf(
 				</div>
 
 				<div class="preview-data preview-document-type">
-					<p class="document-type"><?php _e( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+					<?php
+						if ( isset( $_REQUEST['preview'] ) ) {
+							$document = WPO_WCPDF()->documents->get_document( sanitize_text_field( $_REQUEST['preview'] ), null );
+							echo '<p class="document-type">'.$document->get_title().'<span class="arrow-down">&#9660;</span></p>';
+						} else {
+							echo '<p class="document-type">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'<span class="arrow-down">&#9660;</span></p>';
+						}
+					?>
 					<ul>
 						<?php 
-						foreach ( $documents as $document ) {
-							printf( '<li class="%s">%s</li>', $document->get_type(), $document->get_title() );
-						}
+							foreach ( $documents as $document ) {
+								/* translators: 1. document type, 2. URL, 3. document title */
+								printf( '<li class="%1$s"><a href="%2$s">%3$s</a></li>', $document->get_type(), "{$_SERVER['REQUEST_URI']}&preview={$document->get_type()}", $document->get_title() );
+							}
 						?>
 					</ul>
 				</div>
