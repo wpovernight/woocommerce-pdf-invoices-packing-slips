@@ -95,7 +95,7 @@ $review_invitation = sprintf(
 					</ul>
 					<div id="preview-order-search-results"><!-- Results populated with JS --></div>
 				</div>
-
+				<?php if ( $active_tab != 'documents' ) : ?>
 				<div class="preview-data preview-document-type">
 					<?php
 						if ( isset( $_REQUEST['preview'] ) ) {
@@ -109,12 +109,12 @@ $review_invitation = sprintf(
 						<?php 
 							foreach ( $documents as $document ) {
 								/* translators: 1. document type, 2. URL, 3. document title */
-								printf( '<li class="%1$s"><a href="%2$s">%3$s</a></li>', $document->get_type(), "{$_SERVER['REQUEST_URI']}&preview={$document->get_type()}", $document->get_title() );
+								printf( '<li class="%1$s"><a href="%2$s">%3$s</a></li>', $document->get_type(), add_query_arg( array( 'preview' => $document->get_type() ) ), $document->get_title() );
 							}
 						?>
 					</ul>
 				</div>
-
+				<?php endif; ?>
 			</div>
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
 			<div class="preview" data-order_id="<?= $order_id; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>" data-no_order="<?= __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-save_settings="<?= __( 'Please save your settings to preview the changes!', 'woocommerce-pdf-invoices-packing-slips' ); ?>"></div>
