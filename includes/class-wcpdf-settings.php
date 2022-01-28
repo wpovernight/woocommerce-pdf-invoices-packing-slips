@@ -142,9 +142,11 @@ class Settings {
 			die(); 
 		}
 
-		if ( ! empty( $_POST['order_id'] ) ) {
-			$order_id = sanitize_text_field( $_POST['order_id'] );
-			$order    = wc_get_order( $order_id );
+		if ( ! empty( $_POST['order_id'] ) && ! empty( $_POST['document_type'] ) ) {
+			$document_type = sanitize_text_field( $_POST['document_type'] );
+			$order_id      = sanitize_text_field( $_POST['order_id'] );
+			$order         = wc_get_order( $order_id );
+
 			if ( empty( $order ) ) {
 				wp_send_json_error( array( 'error' => __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
@@ -152,15 +154,15 @@ class Settings {
 				wp_send_json_error( array( 'error' => __( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 
-			$invoice = wcpdf_get_invoice( $order );
+			$document = wcpdf_get_document( $document_type, $order );
 
-			if ( $invoice ) {
-				if ( ! $invoice->exists() ) {
-					$invoice->set_date( current_time( 'timestamp', true ) );
+			if ( $document ) {
+				if ( ! $document->exists() ) {
+					$document->set_date( current_time( 'timestamp', true ) );
 					$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-					$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', 'invoice_number', $invoice );
+					$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
 					$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
-					$invoice->set_number( $number_store->get_next() );
+					$document->set_number( $number_store->get_next() );
 				}
 
 				// make replacements
@@ -187,7 +189,7 @@ class Settings {
 							case 'general':
 								// reset general settings first
 								WPO_WCPDF()->settings->general_settings = array();
-								$invoice->settings = array_diff( $invoice->settings, $document_common_settings );
+								$document->settings = array_diff( $document->settings, $document_common_settings );
 
 								// apply preview general settings
 								foreach ( $settings as $setting => $value ) {
@@ -200,21 +202,21 @@ class Settings {
 										foreach ( $value as $k => $v ) {
 											WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
 											if ( isset( $document_common_settings[$setting] ) ) {
-												$invoice->settings[$setting][$k] = $value[$k];
+												$document->settings[$setting][$k] = $value[$k];
 											}
 										}
 									// single value setting
 									} else {
 										WPO_WCPDF()->settings->general_settings[$setting] = $value;
 										if ( isset( $document_common_settings[$setting] ) ) {
-											$invoice->settings[$setting] = $value;
+											$document->settings[$setting] = $value;
 										}
 									}
 								}
 								break;
 							case 'document':
 								// reset document settings first
-								$invoice->settings = array_intersect_key( $invoice->settings, $document_common_settings );
+								$document->settings = array_intersect_key( $document->settings, $document_common_settings );
 
 								// apply preview document settings
 								foreach ( $settings as $setting => $value ) {
@@ -225,11 +227,11 @@ class Settings {
 									// array value setting
 									if ( is_array( $value ) ) {
 										foreach ( $value as $k => $v ) {
-											$invoice->settings[$setting][$k] = $value[$k];
+											$document->settings[$setting][$k] = $value[$k];
 										}
 									// single value setting
 									} else {
-										$invoice->settings[$setting] = $value;
+										$document->settings[$setting] = $value;
 									}
 								}
 								break;
@@ -238,17 +240,17 @@ class Settings {
 				}
 
 				// apply document number formatting
-				if ( $document_number = $invoice->get_number( $invoice->get_type() ) ) {
-					if ( ! empty( $invoice->settings['number_format'] ) ) {
-						foreach ( $invoice->settings['number_format'] as $key => $value ) {
-							$document_number->$key = $invoice->settings['number_format'][$key];
+				if ( $document_number = $document->get_number( $document->get_type() ) ) {
+					if ( ! empty( $document->settings['number_format'] ) ) {
+						foreach ( $document->settings['number_format'] as $key => $value ) {
+							$document_number->$key = $document->settings['number_format'][$key];
 						}
 					}
-					$document_number->apply_formatting( $invoice, $order );
+					$document_number->apply_formatting( $document, $order );
 				}
 
 				// preview
-				$pdf_data = $invoice->preview_pdf();
+				$pdf_data = $document->preview_pdf();
 
 				wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
 			} else {

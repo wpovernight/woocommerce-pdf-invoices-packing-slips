@@ -444,6 +444,16 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-right: 30px;
 }
 
+.preview-document .preview-data-wrapper .preview-document-type ul > li > a {
+	text-decoration: none;
+	color: initial;
+}
+
+.preview-document .preview-data-wrapper .preview-document-type ul > li:hover a,
+.preview-document .preview-data-wrapper .preview-document-type ul > li > a:hover {
+	color: white !important;
+}
+
 .preview-document .preview-data p {
 	padding:  1.4em 0;
 	margin:  0;

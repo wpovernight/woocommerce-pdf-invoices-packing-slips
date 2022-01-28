@@ -182,8 +182,9 @@ jQuery( function( $ ) {
 
 	// Load the Preview with AJAX
 	function ajax_load_preview( form_data ) {
-		let order_id     = $preview.data( 'order_id' );
-		let order_number = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
+		let order_id      = $preview.data( 'order_id' );
+		let document_type = $preview.data( 'document_type' );
+		let order_number  = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
 		if( order_number.length > 0 ) {
 			order_id = order_number;
 		}
@@ -191,10 +192,11 @@ jQuery( function( $ ) {
 		let worker    = wpo_wcpdf_admin.pdfjs_worker;
 		let canvas_id = 'preview-canvas';
 		let data      = {
-			security:  nonce,
-			action:    'wpo_wcpdf_preview',
-			order_id:  order_id,
-			data:      form_data,
+			security:      nonce,
+			action:        'wpo_wcpdf_preview',
+			order_id:      order_id,
+			document_type: document_type,
+			data:          form_data,
 		};
 
 		// remove previous error notices
