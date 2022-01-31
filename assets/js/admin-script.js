@@ -342,19 +342,4 @@ jQuery( function( $ ) {
 		});
 	}
 
-	function checkbox_settings() {
-		return [
-			// general settings
-			'test_mode',
-			'currency_font',
-			'font_subsetting',
-			// document settings
-			'display_email',
-			'display_phone',
-			'display_customer_notes',
-			'disable_free',
-			'use_latest_settings',
-		];
-	}
-
 });
