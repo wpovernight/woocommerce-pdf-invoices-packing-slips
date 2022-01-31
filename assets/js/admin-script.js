@@ -127,13 +127,17 @@ jQuery( function( $ ) {
 	} );
 
 	// Preview on header logo change
-	$( document.body ).on( 'wpo-wcpdf-media-upload', function() {
-		let $form     = $( this ).find( '#wpo-wcpdf-settings' );
-		let form_data = $form.serialize();
+	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
+		let form_data = $input.closest( '#wpo-wcpdf-settings' ).serialize();
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
 	} );
-	 
+	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
+		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+	} );
+	
 	// Preview on user checkbox change
 	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
 		event.preventDefault();

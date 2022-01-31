@@ -29,16 +29,16 @@ jQuery(document).ready(function($) {
 		// When an image is selected, run a callback.
 		file_frame.on( 'select', function() {
 			// get target elements
-			let $input            = $settings_wrapper.find( 'input#header_logo' );
-			let $logo             = $settings_wrapper.find( 'img#img-header_logo' );
+			let $input   = $settings_wrapper.find( 'input.media-upload-id' );
+			let $preview = $settings_wrapper.find( 'img.media-upload-preview' );
 
 			// We set multiple to false so only get one image from the uploader
 			let attachment = file_frame.state().get( 'selection' ).first().toJSON();
 			
 			// set the value of the input field to the attachment id and set the image until we have an ajax response
 			$input.val( attachment.id );
-			if ( $logo.length ) {
-				$logo.attr( 'src', attachment.url );
+			if ( $preview.length ) {
+				$preview.attr( 'src', attachment.url );
 			}
 			$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
 
@@ -63,7 +63,8 @@ jQuery(document).ready(function($) {
 					$settings_wrapper.removeAttr( 'style' );
 
 					// custom trigger
-					$( document.body ).trigger( 'wpo-wcpdf-media-upload' );	
+					$input = $settings_wrapper.find( 'input.media-upload-id' );
+					$( document.body ).trigger( 'wpo-wcpdf-media-upload-setting-updated', [ $input ] );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 					$settings_wrapper.removeAttr( 'style' );	
@@ -79,12 +80,12 @@ jQuery(document).ready(function($) {
 	$( '#wpo-wcpdf-settings, .wpo-wcpdf-setup' ).on( 'click', '.wpo_remove_image_button', function( event ){
 		// get source & target elements
 		let $settings_wrapper = $(this).parent();
-		let $input            = $settings_wrapper.find( 'input#header_logo' );
-		let $logo             = $settings_wrapper.find( 'img#img-header_logo' );
+		let $input            = $settings_wrapper.find( 'input.media-upload-id' );
+		let $preview          = $settings_wrapper.find( 'img.media-upload-preview' );
 	 	
 		// clear all inputs & warnings
 		$input.val( '' );
-		$logo.remove();
+		$preview.remove();
 		$( this ).remove();
 		$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
 	});		
