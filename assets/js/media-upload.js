@@ -63,7 +63,7 @@ jQuery(document).ready(function($) {
 					$settings_wrapper.removeAttr( 'style' );
 
 					// custom trigger for preview
-					$( document.body ).trigger( 'wpo-wcpdf-header-logo-changed' );	
+					$( document.body ).trigger( 'wpo-wcpdf-media-upload' );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 					$settings_wrapper.removeAttr( 'style' );	
