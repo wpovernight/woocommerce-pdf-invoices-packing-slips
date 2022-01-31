@@ -127,7 +127,7 @@ jQuery( function( $ ) {
 	} );
 
 	// Preview on header logo change
-	$( document ).ajaxSuccess(function( event, xhr, options ) {
+	$( document ).ajaxSuccess( function( event, xhr, options ) {
 		let action = 'wpo_wcpdf_get_media_upload_setting_html';
 		if ( options.data.length > 0 && options.data.indexOf( action ) != -1 ) {
 			let $form     = $( this ).find( '#wpo-wcpdf-settings' );
