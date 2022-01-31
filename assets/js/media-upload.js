@@ -60,7 +60,10 @@ jQuery(document).ready(function($) {
 					if ( response && typeof response.success != 'undefined' && response.success === true ) {
 						$settings_wrapper.html( response.data );
 					}
-					$settings_wrapper.removeAttr( 'style' );	
+					$settings_wrapper.removeAttr( 'style' );
+
+					// custom trigger for preview
+					$( document.body ).trigger( 'wpo-wcpdf-header-logo-changed' );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 					$settings_wrapper.removeAttr( 'style' );	
