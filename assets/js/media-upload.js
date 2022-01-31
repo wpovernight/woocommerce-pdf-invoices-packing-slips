@@ -62,7 +62,7 @@ jQuery(document).ready(function($) {
 					}
 					$settings_wrapper.removeAttr( 'style' );
 
-					// custom trigger for preview
+					// custom trigger
 					$( document.body ).trigger( 'wpo-wcpdf-media-upload' );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
