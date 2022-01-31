@@ -415,12 +415,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .preview-document {
-	min-height: 10cm;
+	min-height: 400px;
 }
 
 .preview-document .preview {
-	min-width: 10cm;
-	max-width: 30cm;
+	min-width: 400px;
+	max-width: 900px;
 	box-sizing: border-box;
 	background: white;
 	float: none;
