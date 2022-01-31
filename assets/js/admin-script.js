@@ -114,7 +114,7 @@ jQuery( function( $ ) {
 		event.preventDefault();
 		let $elem     = $( this );
 		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
-		let duration  = event.type == 'keyup' || event.type == 'paste' ? 1000 : 0;
+		let duration  = event.type == 'keyup' ? 1000 : 0; 
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
 	} );
@@ -124,9 +124,8 @@ jQuery( function( $ ) {
 		event.preventDefault();
 		let $elem     = $( this );
 		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
-		let duration  = event.type == 'click' ? 1000 : 0;
 		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
 	} );
 
 	// Preview on header logo change
@@ -136,9 +135,8 @@ jQuery( function( $ ) {
 		let $form = $elem.closest( '#wpo-wcpdf-settings' );
 		setTimeout( function() {
 			let form_data = $form.serialize();
-			let duration  = event.type == 'click' ? 1000 : 0;
 			clearTimeout( previewTimeout );
-			previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+			previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
 		}, 8000, [ $elem, $form, previewTimeout ] );
 	} );
 	 
@@ -164,9 +162,8 @@ jQuery( function( $ ) {
 		$elem.closest( 'div' ).children( 'a' ).remove(); // remove all results
 
 		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
-		let duration  = event.type == 'click' ? 1000 : 0;
 		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
 	} );
 
 	// Clear preview order search results/input
