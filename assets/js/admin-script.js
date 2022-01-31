@@ -112,8 +112,7 @@ jQuery( function( $ ) {
 	// Preview on user input
 	$( '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #preview-order-number' ).on( 'keyup paste', function( event ) {
 		event.preventDefault();
-		let $elem     = $( this );
-		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'keyup' ? 1000 : 0; 
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
@@ -122,29 +121,26 @@ jQuery( function( $ ) {
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select option', function( event ) {
 		event.preventDefault();
-		let $elem     = $( this );
-		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
 	} );
 
 	// Preview on header logo change
-	$( document ).on( 'click', '#wpo-wcpdf-settings .wpo_upload_image_button', function( event ) {
-		event.preventDefault();
-		let $elem = $( this );
-		let $form = $elem.closest( '#wpo-wcpdf-settings' );
-		setTimeout( function() {
+	$( document ).ajaxSuccess(function( event, xhr, options ) {
+		let action = 'wpo_wcpdf_get_media_upload_setting_html';
+		if ( options.data.length > 0 && options.data.indexOf( action ) != -1 ) {
+			let $form     = $( this ).find( '#wpo-wcpdf-settings' );
 			let form_data = $form.serialize();
 			clearTimeout( previewTimeout );
 			previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
-		}, 8000, [ $elem, $form, previewTimeout ] );
+		}
 	} );
 	 
 	// Preview on user checkbox change
 	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
 		event.preventDefault();
-		let $elem     = $( this );
-		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'change' ? 1000 : 0;
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
@@ -153,15 +149,14 @@ jQuery( function( $ ) {
 	// Preview on user click in search result
 	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
-		let $elem    = $( this );
-		let order_id = $elem.data( 'order_id' );
+		let order_id = $( this ).data( 'order_id' );
 
 		$preview.data( 'order_id', order_id );           // pass the clicked order_id to the preview order_id
 
-		$elem.closest( 'div' ).hide();                   // hide results div
-		$elem.closest( 'div' ).children( 'a' ).remove(); // remove all results
+		$( this ).closest( 'div' ).hide();                   // hide results div
+		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results
 
-		let form_data = $elem.closest( '#wpo-wcpdf-settings' ).serialize();
+		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
 	} );
@@ -169,12 +164,11 @@ jQuery( function( $ ) {
 	// Clear preview order search results/input
 	$( document ).on( 'click', 'img.preview-order-search-clear', function( event ) {
 		event.preventDefault();
-		let $elem = $( this );
-		$elem.closest( 'div' ).find( 'input#preview-order-search' ).val( '' );
-		$elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( 'a' ).remove();      // remove previous results
-		$elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).children( '.error' ).remove(); // remove previous errors
-		$elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
-		$elem.hide();
+		$( this ).closest( 'div' ).find( 'input#preview-order-search' ).val( '' );
+		$( this ).closest( '.preview-data' ).find( '#preview-order-search-results' ).children( 'a' ).remove();      // remove previous results
+		$( this ).closest( '.preview-data' ).find( '#preview-order-search-results' ).children( '.error' ).remove(); // remove previous errors
+		$( this ).closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
+		$( this ).hide();
 	} );
 
 	// Load the Preview with AJAX
