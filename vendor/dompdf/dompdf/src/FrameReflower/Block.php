@@ -564,10 +564,7 @@ class Block extends AbstractFrameReflower
         
         $line_height = $fontMetrics->getFontBaseline($style->font_family, $style->line_height);
         $nominal_line_height = $fontMetrics->getFontBaseline($style->font_family, $style->font_size * Style::$default_line_height);
-        $baseline_height_adjustment = 0;
-        if ($line_height > $nominal_line_height) {
-            $baseline_height_adjustment += $line_height - $baseline_height;
-        }
+        $baseline_height_adjustment = $line_height - $nominal_line_height;
 
         $line_top_adjustment = 0.0;
         $line_bottom_adjustment = 0.0;
