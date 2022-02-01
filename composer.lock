@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0e7b8eb1701105cfce24483aad1cfbea",
+    "content-hash": "ea8e0bc494bb96b0b0d459c65534cd14",
     "packages": [
         {
             "name": "dompdf/dompdf",
-            "version": "dev-master",
+            "version": "dev-vertical-align",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "271c651ced0e2bc6dabfbbbc79dbb324d82df1cf"
+                "reference": "89a689f7eaa7220104e97b3d9fc8fccd55e84454"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/271c651ced0e2bc6dabfbbbc79dbb324d82df1cf",
-                "reference": "271c651ced0e2bc6dabfbbbc79dbb324d82df1cf",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/89a689f7eaa7220104e97b3d9fc8fccd55e84454",
+                "reference": "89a689f7eaa7220104e97b3d9fc8fccd55e84454",
                 "shasum": ""
             },
             "require": {
@@ -38,7 +38,6 @@
                 "ext-imagick": "Improves image processing performance",
                 "ext-zlib": "Needed for pdf stream compression"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -70,9 +69,9 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/master"
+                "source": "https://github.com/dompdf/dompdf/tree/vertical-align"
             },
-            "time": "2022-01-24T17:01:40+00:00"
+            "time": "2022-02-01T02:47:00+00:00"
         },
         {
             "name": "phenx/php-font-lib",
