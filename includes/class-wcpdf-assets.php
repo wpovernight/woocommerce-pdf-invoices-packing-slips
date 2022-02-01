@@ -142,6 +142,13 @@ class Assets {
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
+
+			wp_enqueue_script(
+				'wpo-wcpdf-hc-sticky',
+				WPO_WCPDF()->plugin_url() . '/assets/js/hc-sticky/hc-sticky'.$suffix.'.js',
+				array( 'jquery' ),
+				WPO_WCPDF_VERSION
+			);
 		}
 	}
 

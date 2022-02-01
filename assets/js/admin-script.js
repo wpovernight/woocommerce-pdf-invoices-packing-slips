@@ -334,4 +334,9 @@ jQuery( function( $ ) {
 		});
 	}
 
+	// Sticky preview on scroll
+	$( '.preview-document' ).hcSticky( {
+		stickTo: $( '#wpo-wcpdf-preview-wrapper' )
+	} );
+
 });

@@ -418,6 +418,10 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	min-height: 400px;
 }
 
+.preview-document.sticky {
+	top: 30px !important;
+}
+
 .preview-document .preview {
 	min-width: 400px;
 	max-width: 900px;
