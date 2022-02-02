@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "af8920521653b70722bf7804534fa9cb6212f727"
+                "reference": "125e0f670f9df5f454211e8081c7da579cc41066"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/af8920521653b70722bf7804534fa9cb6212f727",
-                "reference": "af8920521653b70722bf7804534fa9cb6212f727",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/125e0f670f9df5f454211e8081c7da579cc41066",
+                "reference": "125e0f670f9df5f454211e8081c7da579cc41066",
                 "shasum": ""
             },
             "require": {
@@ -71,7 +71,7 @@
                 "issues": "https://github.com/dompdf/dompdf/issues",
                 "source": "https://github.com/dompdf/dompdf/tree/vertical-align"
             },
-            "time": "2022-02-01T13:53:20+00:00"
+            "time": "2022-02-02T15:51:31+00:00"
         },
         {
             "name": "phenx/php-font-lib",

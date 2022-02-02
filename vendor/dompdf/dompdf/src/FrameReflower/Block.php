@@ -573,10 +573,11 @@ class Block extends AbstractFrameReflower
 
         foreach ($this->_frame->get_line_boxes() as $line) {
             $line->y += $running_line_top_adjustment + $running_line_bottom_adjustment;
+            $line_bottom = $line->y + $line->h;
             $line_top_adjustment = 0.0;
             $line_bottom_adjustment = 0.0;
             
-            $line_baseline_height = $baseline_height;
+            $line_baseline_height = $baseline_height + $baseline_height_adjustment;
             $top_frames = [];
             $bottom_frames = [];
 
@@ -587,9 +588,19 @@ class Block extends AbstractFrameReflower
             }
 
             foreach ($line->frames_to_align() as $frame) {
+                if (!$frame->is_in_flow()) {
+                    continue;
+                }
+                $frame_style = $frame->get_style();
                 $frame_baseline_height = $frame->get_outer_baseline_height();
-                if ($frame_baseline_height > $line_baseline_height) {
-                    $line_baseline_height = $frame_baseline_height;
+                $frame_baseline_height_adjustment = 0;
+                if ($frame instanceof TextFrameDecorator) {
+                    $frame_line_height = $fontMetrics->getFontBaseline($frame_style->font_family, $frame_style->line_height);
+                    $frame_nominal_line_height = $fontMetrics->getFontBaseline($frame_style->font_family, $frame_style->font_size * Style::$default_line_height);
+                    $frame_baseline_height_adjustment = $frame_line_height - $frame_nominal_line_height;
+                }
+                if ($frame_baseline_height + $frame_baseline_height_adjustment > $line_baseline_height) {
+                    $line_baseline_height = $frame_baseline_height + $frame_baseline_height_adjustment;
                 }
             }
 
@@ -673,22 +684,21 @@ class Block extends AbstractFrameReflower
                     $y_offset = $line_baseline_height - $frame_baseline_height - (float)$frame_style->length_in_pt($align, $style->font_size);
                 }
 
-                $y_offset += $baseline_height_adjustment + $running_line_top_adjustment + $running_line_bottom_adjustment;
+                $y_offset += $running_line_top_adjustment + $running_line_bottom_adjustment;
 
                 if (!Helpers::lengthEqual($y_offset, 0)) {
                     $frame->move(0, $y_offset);
 
-                    if (Helpers::lengthLess($frame->get_position("y"), $line->y)) {
+                    if ($frame->get_position("y") < $line->y) {
                         $current_line_top_adjustment = $line->y - $frame->get_position("y");
-                        if (Helpers::lengthGreater($current_line_top_adjustment, $line_top_adjustment)) {
+                        if ($current_line_top_adjustment > $line_top_adjustment) {
                             $line_top_adjustment = $current_line_top_adjustment;
                         }
                     }
                     
                     $frame_bottom = $frame->get_position("y") + $frame_height;
-                    $line_bottom = $line->y + $line->h;
-                    if (Helpers::lengthGreater($frame_bottom, $line_bottom)) {
-                        $current_line_bottom_adjustment = abs($line_bottom - $frame_bottom);
+                    if ($frame_bottom > $line_bottom) {
+                        $current_line_bottom_adjustment = $frame_bottom - $line_bottom;
                         if ($current_line_bottom_adjustment > $line_bottom_adjustment) {
                             $line_bottom_adjustment = $current_line_bottom_adjustment;
                         }
@@ -697,7 +707,6 @@ class Block extends AbstractFrameReflower
             }
 
             $line->h += $line_top_adjustment + $line_bottom_adjustment;
-            //FIXME: passable but not quite right, tall lines are pushed down too much, probably only need to add if there's an actual height adjustment
             $running_line_top_adjustment += $line_top_adjustment;
             $running_line_bottom_adjustment += $line_bottom_adjustment;
             if ($style->height !== "auto") {
