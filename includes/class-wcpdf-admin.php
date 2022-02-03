@@ -15,7 +15,9 @@ class Admin {
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_number_column' ), 999 );
+		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_date_column' ), 999 );
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_number_column_data' ), 2 );
+		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_date_column_data' ), 2 );
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 			add_action( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
@@ -40,10 +42,11 @@ class Admin {
 
 
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_number_column_sortable' ) );
+		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_date_column_sortable' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
-			add_filter( 'request', array( $this, 'request_query_sort_by_invoice_number' ) );
+			add_filter( 'request', array( $this, 'request_query_sort_by_invoice_number_and_invoice_date' ) );
 		} else {
-			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number' ) );
+			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number_and_invoice_date' ) );
 		}
 
 		// AJAX actions for deleting, regenerating and saving document data
@@ -238,6 +241,26 @@ class Admin {
 	}
 
 	/**
+	 * Create additional Shop Order column for Invoice Dates
+	 * @param array $columns shop order columns
+	 */
+	public function add_invoice_date_column( $columns ) {
+		// get invoice settings
+		$invoice = wcpdf_get_invoice( null );
+		$invoice_settings = $invoice->get_settings();
+		if ( ! isset( $invoice_settings['invoice_date_column'] ) ) {
+			return $columns;
+		}
+
+		// put the column after the Status or Invoice Number column	(if enabled)
+		$array_offset = isset( $invoice_settings['invoice_number_column'] ) ? 3 : 2;
+		$new_columns = array_slice( $columns, 0, $array_offset, true ) +
+			array( 'pdf_invoice_date' => __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ) ) +
+			array_slice( $columns, $array_offset, count($columns) - 1, true ) ;
+		return $new_columns;
+	}
+
+	/**
 	 * Display Invoice Number in Shop Order column (if available)
 	 * @param  string $column column slug
 	 */
@@ -257,6 +280,34 @@ class Admin {
 					echo $invoice->get_number();
 				}
 				do_action( 'wcpdf_invoice_number_column_end', $the_order );
+			}
+		}
+	}
+
+	/**
+	 * Display Invoice Date in Shop Order column (if available)
+	 * @param  string $column column slug
+	 */
+	public function invoice_date_column_data( $column ) {
+		global $post, $the_order;
+
+		if ( $column == 'pdf_invoice_date' ) {
+			$this->disable_storing_document_settings();
+			if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
+				$order = WCX::get_order( $post->ID );
+				if ( $invoice = wcpdf_get_invoice( $order ) ) {
+					$output_format = get_option( 'date_format' ) . ' '.get_option( 'time_format' );
+					//echo wp_date( apply_filters( 'wcpdf_invoice_date_column_output_format', $output_format ), strtotime( $invoice->get_date() ) ) ;
+					echo $invoice->get_date();
+				}
+				do_action( 'wcpdf_invoice_date_column_end', $order );
+			} else {
+				if ( $invoice = wcpdf_get_invoice( $the_order ) ) {
+					$output_format = get_option( 'date_format' ) . ' '.get_option( 'time_format' );
+					//echo wp_date( apply_filters( 'wcpdf_invoice_date_column_output_format', $output_format ), strtotime( $invoice->get_date() ) ) ;
+					echo $invoice->get_date();
+				}
+				do_action( 'wcpdf_invoice_date_column_end', $the_order );
 			}
 		}
 	}
@@ -712,11 +763,18 @@ class Admin {
 		return $columns;
 	}
 
+	/**
+	 * Add invoice date to order search scope
+	 */
+	public function invoice_date_column_sortable( $columns ) {
+		$columns['pdf_invoice_date'] = 'pdf_invoice_date';
+		return $columns;
+	}
 
 	/**
 	 * Pre WC3.X sorting
 	 */
-	public function pre_get_posts_sort_by_invoice_number( $query ) {
+	public function pre_get_posts_sort_by_invoice_number_and_invoice_date( $query ) {
 		if( ! is_admin() ) {
 			return;
 		}
@@ -725,12 +783,16 @@ class Admin {
 			$query->set( 'meta_key', '_wcpdf_invoice_number' );
 			$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
 		}
+		if( 'pdf_invoice_date' == $orderby ) {
+			$query->set( 'meta_key', '_wcpdf_invoice_date' );
+			$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ) );
+		}
 	}
 
 	/**
 	 * WC3.X+ sorting
 	 */
-	public function request_query_sort_by_invoice_number( $query_vars ) {
+	public function request_query_sort_by_invoice_number_and_invoice_date( $query_vars ) {
 		global $typenow;
 
 		if ( in_array( $typenow, wc_get_order_types( 'order-meta-boxes' ), true ) ) {
@@ -739,6 +801,12 @@ class Admin {
 					$query_vars = array_merge( $query_vars, array(
 						'meta_key'  => '_wcpdf_invoice_number',
 						'orderby'   => apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ),
+					) );
+				}
+				if ( 'pdf_invoice_date' === $query_vars['orderby'] ) {
+					$query_vars = array_merge( $query_vars, array(
+						'meta_key'  => '_wcpdf_invoice_date',
+						'orderby'   => apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ),
 					) );
 				}
 			}
