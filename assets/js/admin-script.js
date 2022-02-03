@@ -335,7 +335,7 @@ jQuery( function( $ ) {
 	}
 
 	// Sticky preview on scroll
-	$( '.preview-document' ).hcSticky( {
+	$( '.preview' ).hcSticky( {
 		stickTo: $( '#wpo-wcpdf-preview-wrapper' )
 	} );
 
