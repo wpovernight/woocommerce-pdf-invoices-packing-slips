@@ -189,7 +189,7 @@ class Settings {
 							case 'general':
 								// reset general settings first
 								WPO_WCPDF()->settings->general_settings = array();
-								$document->settings = array_diff( $document->settings, $document_common_settings );
+								$document->settings = array_diff_key( $document->settings, $document_common_settings );
 
 								// apply preview general settings
 								foreach ( $settings as $setting => $value ) {
