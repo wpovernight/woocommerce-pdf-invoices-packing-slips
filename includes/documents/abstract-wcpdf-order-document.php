@@ -184,6 +184,7 @@ abstract class Order_Document {
 			'my_account_buttons',
 			'my_account_restrict',
 			'invoice_number_column',
+			'invoice_date_column',
 			'paper_size',
 			'font_subsetting',
 		), $this );

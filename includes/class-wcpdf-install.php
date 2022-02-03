@@ -166,6 +166,7 @@ class Install {
 				// 'reset_number_yearly'		=> '',
 				// 'my_account_buttons'		=> '',
 				// 'invoice_number_column'		=> '',
+				// 'invoice_date_column'		=> '',
 				// 'disable_free'				=> '',
 			),
 			'wpo_wcpdf_documents_settings_packing-slip' => array(
@@ -287,6 +288,7 @@ class Install {
 					'reset_number_yearly'		=> array( 'wpo_wcpdf_template_settings' => 'yearly_reset_invoice_number' ),
 					'my_account_buttons'		=> array( 'wpo_wcpdf_general_settings' => 'my_account_buttons' ),
 					'invoice_number_column'		=> array( 'wpo_wcpdf_general_settings' => 'invoice_number_column' ),
+					'invoice_date_column'		=> array( 'wpo_wcpdf_general_settings' => 'invoice_date_column' ),
 					'disable_free'				=> array( 'wpo_wcpdf_general_settings' => 'disable_free' ),
 				),
 				'wpo_wcpdf_documents_settings_packing-slip' => array(
