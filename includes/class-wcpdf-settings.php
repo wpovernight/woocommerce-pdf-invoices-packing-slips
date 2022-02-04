@@ -181,6 +181,9 @@ class Settings {
 						// Document settings
 						} elseif( strpos( $key, 'wpo_wcpdf_documents_settings_' ) !== false ) {
 							$preview_settings['document'] = $form_settings;
+						// Customizer settings (Premium Templates)
+						} elseif( $key == 'wpo_wcpdf_editor_settings' ) {
+							$preview_settings['editor'] = $form_settings;
 						}
 					}
 
@@ -234,6 +237,11 @@ class Settings {
 										$document->settings[$setting] = $value;
 									}
 								}
+								break;
+							case 'editor':
+								add_filter( 'option_wpo_wcpdf_editor_settings', function( $value, $option ) use ( $settings ) {
+									return maybe_unserialize( $settings );
+								}, 99, 2 );
 								break;
 						}
 					}

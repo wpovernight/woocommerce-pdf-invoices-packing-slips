@@ -138,7 +138,7 @@ jQuery( function( $ ) {
 	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize() ) );
 
 	// Preview on user input
-	$( '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select, #preview-order-number' ).on( 'keyup paste', function( event ) {
+	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field), #preview-order-number', function( event ) {
 		event.preventDefault();
 		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'keyup' ? 1000 : 0; 
@@ -147,7 +147,7 @@ jQuery( function( $ ) {
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
-	$( document ).on( 'click', '#wpo-wcpdf-settings select option', function( event ) {
+	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
 		event.preventDefault();
 		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
 		clearTimeout( previewTimeout );
@@ -175,12 +175,26 @@ jQuery( function( $ ) {
 		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
 	} );
 
+	// Preview on customizer sortable changes (Premium Templates)
+	$( '#documents .field-list' ).on( 'sortstop', function( event, ui ) {
+		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+	} );
+
+	// Preview on customizer adding column/totals fields or custom blocks (Premium Templates)
+	$( document ).on( 'wpo-wcpdf-customizer-document-field-added, wpo-wcpdf-customizer-document-custom-block-added', function( event ) {
+		let form_data = $( '#wpo-wcpdf-settings' ).serialize();
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+	} );
+
 	// Preview on user click in search result
 	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
 		let order_id = $( this ).data( 'order_id' );
 
-		$preview.data( 'order_id', order_id );           // pass the clicked order_id to the preview order_id
+		$preview.data( 'order_id', order_id );               // pass the clicked order_id to the preview order_id
 
 		$( this ).closest( 'div' ).hide();                   // hide results div
 		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results
