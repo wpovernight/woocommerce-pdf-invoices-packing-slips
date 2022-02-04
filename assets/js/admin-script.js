@@ -50,7 +50,8 @@ jQuery( function( $ ) {
 
 	// Sticky preview on scroll
 	$preview.hcSticky( {
-		stickTo: $( '#wpo-wcpdf-preview-wrapper' )
+		stickTo: $( '#wpo-wcpdf-preview-wrapper' ),
+		bottomEnd: -200
 	} );
 	
 	$('.slide-left').on( 'click', function() {
@@ -58,12 +59,12 @@ jQuery( function( $ ) {
 		let previewState = $wrapper.attr('data-preview-state');
 		if ( previewStates == 3 ) {
 			previewState == 'closed' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'full');
-
-			// Detach sticky on full view
-			$preview.hcSticky( 'detach' );
 		} else {
 			$wrapper.attr('data-preview-state', 'full');
 		}
+
+		// Detach sticky on full view
+		$preview.hcSticky( 'detach' );
 	});
 
 	$('.slide-right').on( 'click', function() {
