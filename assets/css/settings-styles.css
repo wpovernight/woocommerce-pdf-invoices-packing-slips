@@ -371,14 +371,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-left: -35%;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .sticky-spacer { /* disable sticky on full */
-	display: none !important;
-}
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .preview { /* disable sticky on full */
-	position: relative !important;
-	left: auto !important;
-}
-
 #wpo-wcpdf-preview-wrapper .preview-document {
 	position: relative;
 	float: right;

@@ -44,15 +44,23 @@ jQuery( function( $ ) {
 
 
 	//----------> Preview <----------//
-	let previewStates = $( '#wpo-wcpdf-preview-wrapper' ).attr( 'data-preview-states' );
-	let $preview      = $( '#wpo-wcpdf-preview-wrapper .preview' );
-	let lastOrderId   = $preview.data( 'order_id' );
+	let previewStates  = $( '#wpo-wcpdf-preview-wrapper' ).attr( 'data-preview-states' );
+	let $preview       = $( '#wpo-wcpdf-preview-wrapper .preview' );
+	let lastOrderId    = $preview.data( 'order_id' );
+
+	// Sticky preview on scroll
+	$preview.hcSticky( {
+		stickTo: $( '#wpo-wcpdf-preview-wrapper' )
+	} );
 	
 	$('.slide-left').on( 'click', function() {
 		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
 		let previewState = $wrapper.attr('data-preview-state');
 		if ( previewStates == 3 ) {
 			previewState == 'closed' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'full');
+
+			// Detach sticky on full view
+			$preview.hcSticky( 'detach' );
 		} else {
 			$wrapper.attr('data-preview-state', 'full');
 		}
@@ -63,6 +71,11 @@ jQuery( function( $ ) {
 		let previewState = $wrapper.attr('data-preview-state');
 		if ( previewStates == 3 ) {
 			previewState == 'full' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'closed');
+
+			// Attach sticky
+			setTimeout( function() {
+				$preview.hcSticky( 'attach' );
+			}, 1000 );
 		} else {
 			$wrapper.attr('data-preview-state', 'closed');
 		}	
@@ -333,10 +346,5 @@ jQuery( function( $ ) {
 			}
 		});
 	}
-
-	// Sticky preview on scroll
-	$( '.preview' ).hcSticky( {
-		stickTo: $( '#wpo-wcpdf-preview-wrapper' )
-	} );
 
 });
