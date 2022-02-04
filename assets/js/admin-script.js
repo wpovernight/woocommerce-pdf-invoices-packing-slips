@@ -72,18 +72,17 @@ jQuery( function( $ ) {
 			}
 		} else {
 			$wrapper.attr( 'data-preview-state', 'full' );
-			
 			// Detach sticky
 			$preview.hcSticky( 'detach' );
 		}
 	});
 
-	$('.slide-right').on( 'click', function() {
-		let $wrapper     = $(this).closest('#wpo-wcpdf-preview-wrapper');
-		let previewState = $wrapper.attr('data-preview-state');
+	$( '.slide-right' ).on( 'click', function() {
+		let $wrapper     = $(this).closest( '#wpo-wcpdf-preview-wrapper' );
+		let previewState = $wrapper.attr( 'data-preview-state' );
 
 		if ( previewStates == 3 ) {
-			previewState == 'full' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'closed');
+			previewState == 'full' ? $wrapper.attr( 'data-preview-state', 'sidebar' ) : $wrapper.attr( 'data-preview-state', 'closed' );
 
 			if ( previewState == 'closed' ) {
 				// Detach sticky
@@ -95,7 +94,7 @@ jQuery( function( $ ) {
 				}, 500 );
 			}
 		} else {
-			$wrapper.attr('data-preview-state', 'closed');
+			$wrapper.attr( 'data-preview-state', 'closed' );
 		}	
 	});
 
