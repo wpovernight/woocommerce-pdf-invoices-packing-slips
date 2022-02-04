@@ -44,9 +44,8 @@ jQuery( function( $ ) {
 
 
 	//----------> Preview <----------//
-	let previewStates = $( '#wpo-wcpdf-preview-wrapper' ).attr( 'data-preview-states' );
-	let $preview      = $( '#wpo-wcpdf-preview-wrapper .preview' );
-	let lastOrderId   = $preview.data( 'order_id' );
+	let $preview    = $( '#wpo-wcpdf-preview-wrapper .preview' );
+	let lastOrderId = $preview.data( 'order_id' );
 
 	// Sticky preview on scroll
 	$preview.hcSticky( {
@@ -55,18 +54,19 @@ jQuery( function( $ ) {
 	} );
 	
 	$( '.slide-left' ).on( 'click', function() {
-		let $wrapper     = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
-		let previewState = $wrapper.attr( 'data-preview-state' );
+		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
+		let previewStates = $wrapper.attr( 'data-preview-states' );
+		let previewState  = $wrapper.attr( 'data-preview-state' );
 
 		if ( previewStates == 3 ) {
-			previewState == 'closed' ? $wrapper.attr( 'data-preview-state', 'sidebar' ) : $wrapper.attr( 'data-preview-state', 'full' );
-
 			if ( previewState == 'closed' ) {
+				$wrapper.attr( 'data-preview-state', 'sidebar' );
 				// Attach sticky
 				setTimeout( function() {
 					$preview.hcSticky( 'attach' );
 				}, 500 );
 			} else {
+				$wrapper.attr( 'data-preview-state', 'full' );
 				// Detach sticky
 				$preview.hcSticky( 'detach' );
 			}
@@ -78,20 +78,19 @@ jQuery( function( $ ) {
 	});
 
 	$( '.slide-right' ).on( 'click', function() {
-		let $wrapper     = $(this).closest( '#wpo-wcpdf-preview-wrapper' );
-		let previewState = $wrapper.attr( 'data-preview-state' );
+		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
+		let previewStates = $wrapper.attr( 'data-preview-states' );
+		let previewState  = $wrapper.attr( 'data-preview-state' );
 
 		if ( previewStates == 3 ) {
-			previewState == 'full' ? $wrapper.attr( 'data-preview-state', 'sidebar' ) : $wrapper.attr( 'data-preview-state', 'closed' );
-
-			if ( previewState == 'closed' ) {
-				// Detach sticky
-				$preview.hcSticky( 'detach' );
-			} else {
+			if ( previewState == 'full' ) {
+				$wrapper.attr( 'data-preview-state', 'sidebar' );
 				// Attach sticky
 				setTimeout( function() {
 					$preview.hcSticky( 'attach' );
 				}, 500 );
+			} else {
+				$wrapper.attr( 'data-preview-state', 'closed' );
 			}
 		} else {
 			$wrapper.attr( 'data-preview-state', 'closed' );
