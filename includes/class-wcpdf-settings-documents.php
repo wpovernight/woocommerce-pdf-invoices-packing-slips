@@ -31,7 +31,7 @@ class Settings_Documents {
 			<?php 
 			foreach ( $documents as $document ) {
 				if ( $document->get_type() == $section ) {
-					echo '<h2>'.$document->get_title().'<span class="arrow-down">select &#9660;</span></h2>';
+					echo '<h2>'.$document->get_title().'<span class="arrow-down">&#9660;</span></h2>';
 				}
 			}
 			?>
