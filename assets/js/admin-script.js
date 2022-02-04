@@ -44,14 +44,14 @@ jQuery( function( $ ) {
 
 
 	//----------> Preview <----------//
-	let previewStates  = $( '#wpo-wcpdf-preview-wrapper' ).attr( 'data-preview-states' );
-	let $preview       = $( '#wpo-wcpdf-preview-wrapper .preview' );
-	let lastOrderId    = $preview.data( 'order_id' );
+	let previewStates = $( '#wpo-wcpdf-preview-wrapper' ).attr( 'data-preview-states' );
+	let $preview      = $( '#wpo-wcpdf-preview-wrapper .preview' );
+	let lastOrderId   = $preview.data( 'order_id' );
 
 	// Sticky preview on scroll
 	$preview.hcSticky( {
-		stickTo: $( '#wpo-wcpdf-preview-wrapper' ),
-		bottomEnd: -200
+		stickTo:   $( '#wpo-wcpdf-preview-wrapper' ),
+		bottomEnd: -200,
 	} );
 	
 	$('.slide-left').on( 'click', function() {
@@ -63,7 +63,7 @@ jQuery( function( $ ) {
 			$wrapper.attr('data-preview-state', 'full');
 		}
 
-		// Detach sticky on full view
+		// Detach sticky
 		$preview.hcSticky( 'detach' );
 	});
 
