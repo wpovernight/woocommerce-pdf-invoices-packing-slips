@@ -49,8 +49,7 @@ jQuery( function( $ ) {
 
 	// Sticky preview on scroll
 	$preview.hcSticky( {
-		stickTo:   $( '#wpo-wcpdf-preview-wrapper' ),
-		bottomEnd: -100,
+		stickTo: $( '#wpo-wcpdf-preview-wrapper' )
 	} );
 	
 	$( '.slide-left' ).on( 'click', function() {
