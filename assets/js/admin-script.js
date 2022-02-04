@@ -51,32 +51,49 @@ jQuery( function( $ ) {
 	// Sticky preview on scroll
 	$preview.hcSticky( {
 		stickTo:   $( '#wpo-wcpdf-preview-wrapper' ),
-		bottomEnd: -200,
+		bottomEnd: -100,
 	} );
 	
-	$('.slide-left').on( 'click', function() {
-		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
-		let previewState = $wrapper.attr('data-preview-state');
-		if ( previewStates == 3 ) {
-			previewState == 'closed' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'full');
-		} else {
-			$wrapper.attr('data-preview-state', 'full');
-		}
+	$( '.slide-left' ).on( 'click', function() {
+		let $wrapper     = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
+		let previewState = $wrapper.attr( 'data-preview-state' );
 
-		// Detach sticky
-		$preview.hcSticky( 'detach' );
+		if ( previewStates == 3 ) {
+			previewState == 'closed' ? $wrapper.attr( 'data-preview-state', 'sidebar' ) : $wrapper.attr( 'data-preview-state', 'full' );
+
+			if ( previewState == 'closed' ) {
+				// Attach sticky
+				setTimeout( function() {
+					$preview.hcSticky( 'attach' );
+				}, 500 );
+			} else {
+				// Detach sticky
+				$preview.hcSticky( 'detach' );
+			}
+		} else {
+			$wrapper.attr( 'data-preview-state', 'full' );
+			
+			// Detach sticky
+			$preview.hcSticky( 'detach' );
+		}
 	});
 
 	$('.slide-right').on( 'click', function() {
-		let $wrapper = $(this).closest('#wpo-wcpdf-preview-wrapper');
+		let $wrapper     = $(this).closest('#wpo-wcpdf-preview-wrapper');
 		let previewState = $wrapper.attr('data-preview-state');
+
 		if ( previewStates == 3 ) {
 			previewState == 'full' ? $wrapper.attr('data-preview-state', 'sidebar') : $wrapper.attr('data-preview-state', 'closed');
 
-			// Attach sticky
-			setTimeout( function() {
-				$preview.hcSticky( 'attach' );
-			}, 1000 );
+			if ( previewState == 'closed' ) {
+				// Detach sticky
+				$preview.hcSticky( 'detach' );
+			} else {
+				// Attach sticky
+				setTimeout( function() {
+					$preview.hcSticky( 'attach' );
+				}, 500 );
+			}
 		} else {
 			$wrapper.attr('data-preview-state', 'closed');
 		}	
