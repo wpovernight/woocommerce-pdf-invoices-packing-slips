@@ -24,6 +24,8 @@
 	</tr>
 </table>
 
+<?php do_action( 'wpo_wcpdf_before_document_label', $this->get_type(), $this->order ); ?>
+
 <h1 class="document-type-label">
 	<?php if ( $this->has_header_logo() ) echo $this->get_title(); ?>
 </h1>
