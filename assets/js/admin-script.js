@@ -127,7 +127,7 @@ jQuery( function( $ ) {
 			$previewData.find('input[name="preview-order-search"]').removeClass('active');
 			$previewData.find('#preview-order-search-results').hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
-			// load preview
+			// trigger preview
 			trigger_preview();
 		}
 	});
@@ -139,13 +139,24 @@ jQuery( function( $ ) {
 
 	// Preview on user input
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field), #preview-order-number', function( event ) {
-		let duration  = event.type == 'keyup' ? 1000 : 0; 
-		trigger_preview( duration );
+		if ( ! setting_is_excluded_for_preview( $( this ).attr( 'id' ) ) ) {
+			let duration  = event.type == 'keyup' ? 1000 : 0; 
+			trigger_preview( duration );
+		}
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
-		trigger_preview();
+		if ( ! setting_is_excluded_for_preview( $( this ).parent().attr( 'id' ) ) ) {
+			trigger_preview();
+		}
+	} );
+
+	// Preview on user checkbox change
+	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"]', function( event ) {
+		if ( ! setting_is_excluded_for_preview( $( this ).attr( 'id' ) ) ) {
+			trigger_preview( 1000 );
+		}
 	} );
 
 	// Preview on header logo change
@@ -154,11 +165,6 @@ jQuery( function( $ ) {
 	} );
 	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
 		trigger_preview();
-	} );
-	
-	// Preview on user checkbox change
-	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
-		trigger_preview( 1000 );
 	} );
 
 	// Preview on customizer sortable changes (Premium Templates)
@@ -187,6 +193,13 @@ jQuery( function( $ ) {
 	function trigger_preview( timeoutDuration = 0 ) {
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajax_load_preview() }, timeoutDuration );
+	}
+
+	function setting_is_excluded_for_preview( settingName ) {
+		if ( $.inArray( settingName, wpo_wcpdf_admin.preview_excluded_settings ) !== -1 ) {
+			return true;
+		}
+		return false;
 	}
 
 	// Clear preview order search results/input

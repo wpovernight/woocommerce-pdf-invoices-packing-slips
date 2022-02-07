@@ -129,9 +129,28 @@ class Assets {
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',
 				array(
-					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
-					'template_paths' => WPO_WCPDF()->settings->get_installed_templates(),
-					'pdfjs_worker'   => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
+					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
+					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
+					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
+						// general
+						'download_display',
+						'paper_size',
+						'test_mode',
+						'currency_font',
+						'font_subsetting',
+						// document
+						'enabled',
+						'archive_pdf',
+						'auto_generate_for_statuses',
+						'attach_to_email_ids',
+						'disable_for_statuses',
+						'reset_number_yearly',
+						'my_account_buttons',
+						'invoice_number_column',
+						'disable_free',
+						'use_latest_settings',
+					) ),
 				)
 			);
 
