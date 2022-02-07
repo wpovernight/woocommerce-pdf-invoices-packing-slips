@@ -128,65 +128,47 @@ jQuery( function( $ ) {
 			$previewData.find('#preview-order-search-results').hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 			// load preview
-			ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize() );
+			trigger_preview();
 		}
 	});
 
 	let previewTimeout;
 
 	// Preview on page load
-	$( document ).ready( ajax_load_preview( $( '#wpo-wcpdf-settings' ).serialize() ) );
+	$( document ).ready( trigger_preview() );
 
 	// Preview on user input
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field), #preview-order-number', function( event ) {
-		event.preventDefault();
-		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
 		let duration  = event.type == 'keyup' ? 1000 : 0; 
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+		trigger_preview( duration );
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
-		event.preventDefault();
-		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+		trigger_preview();
 	} );
 
 	// Preview on header logo change
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
-		let form_data = $input.closest( '#wpo-wcpdf-settings' ).serialize();
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+		trigger_preview();
 	} );
 	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
-		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+		trigger_preview();
 	} );
 	
 	// Preview on user checkbox change
 	$( '#wpo-wcpdf-settings input[type="checkbox"]' ).on( 'change', function( event ) {
-		event.preventDefault();
-		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
-		let duration  = event.type == 'change' ? 1000 : 0;
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, duration );
+		trigger_preview( 1000 );
 	} );
 
 	// Preview on customizer sortable changes (Premium Templates)
 	$( '#documents .field-list' ).on( 'sortstop', function( event, ui ) {
-		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+		trigger_preview();
 	} );
 
 	// Preview on customizer adding column/totals fields or custom blocks (Premium Templates)
 	$( document ).on( 'wpo-wcpdf-customizer-document-field-added, wpo-wcpdf-customizer-document-custom-block-added', function( event ) {
-		let form_data = $( '#wpo-wcpdf-settings' ).serialize();
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+		trigger_preview();
 	} );
 
 	// Preview on user click in search result
@@ -199,10 +181,13 @@ jQuery( function( $ ) {
 		$( this ).closest( 'div' ).hide();                   // hide results div
 		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results
 
-		let form_data = $( this ).closest( '#wpo-wcpdf-settings' ).serialize();
-		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview( form_data ) }, 0 );
+		trigger_preview();
 	} );
+
+	function trigger_preview( timeoutDuration = 0 ) {
+		clearTimeout( previewTimeout );
+		previewTimeout = setTimeout( function() { ajax_load_preview() }, timeoutDuration );
+	}
 
 	// Clear preview order search results/input
 	$( document ).on( 'click', 'img.preview-order-search-clear', function( event ) {
@@ -215,7 +200,8 @@ jQuery( function( $ ) {
 	} );
 
 	// Load the Preview with AJAX
-	function ajax_load_preview( form_data ) {
+	function ajax_load_preview() {
+		let form_data     = $( '#wpo-wcpdf-settings' ).serialize();
 		let order_id      = $preview.data( 'order_id' );
 		let document_type = $preview.data( 'document_type' );
 		let order_number  = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
