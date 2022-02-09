@@ -62,8 +62,12 @@ $review_invitation = sprintf(
 					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
 				?>
 			</form>
-			<div class="slider slide-left">&#9664;</div>
 			<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
+		</div>
+
+		<div class="gutter">
+			<div class="slider slide-left">&#9664;</div>
+			<div class="slider slide-right">&#9654;</div>
 		</div>
 
 		<div class="preview-document">
@@ -83,7 +87,6 @@ $review_invitation = sprintf(
 					$document_type = sanitize_text_field( $_REQUEST['preview'] );
 				}
 			?>
-			<div class="slider slide-right">&#9654;</div>
 			<div class="preview-data-wrapper">
 
 				<div class="preview-data preview-order-data">
@@ -123,8 +126,10 @@ $review_invitation = sprintf(
 				</div>
 				<?php endif; ?>
 			</div>
+			
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
 			<div class="preview" data-order_id="<?= $order_id; ?>" data-document_type="<?= $document_type; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>" data-no_order="<?= __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-save_settings="<?= __( 'Please save your settings to preview the changes!', 'woocommerce-pdf-invoices-packing-slips' ); ?>"></div>
+			
 		</div>
 
 	</div>

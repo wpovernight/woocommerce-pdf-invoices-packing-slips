@@ -135,13 +135,10 @@ table.wcpdf_documents_settings_list td.title {
 
 .wcpdf_document_settings_sections ul {
 	background: white;
-	/*box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);*/
-	/*-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);*/
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	/*min-width: 24em;*/
 	display: block;
 	height: auto;
 	display: none;
@@ -229,7 +226,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 100%;
 	height: auto;
 	position: relative;
-	overflow: hidden;
+	display: flex;
+	align-items: flex-start;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar,
@@ -245,6 +243,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding: 4em 2em 0 0;
 	box-sizing: border-box;
 	background: transparent;
+	flex: 0 0 35%;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form {
@@ -259,9 +258,10 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	max-width: none;
 }
 
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar > form,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar > form {
 	max-width: none;
-	width: 100%;
+	width: 60%;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table,
@@ -312,21 +312,40 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: auto !important;
 }
 
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table {
+	display: table;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tbody,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tbody {
+	display: table-row-group;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tr,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tr,
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tbody tr,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tbody tr {
+	display: table-row;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > td,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
 	display: table-cell !important;
 	padding: 15px 10px 15px 0px !important;
+	width: auto;
 }
 
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .wcpdf_document_settings_sections ul, 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .wcpdf_document_settings_sections ul {
 	width: 300px !important;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
-	width: 600px !important;
-}
-
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .wcpdf-attachment-settings-hint,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .wcpdf-attachment-settings-hint {
 	width: 880px !important;
 }
@@ -348,42 +367,37 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar {
-	width: 100%;
-	padding-right: 0;
-	padding-top: 1em;
+	flex: 0 0 100%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar {
-	width: 100%;
-	border-right: 1px solid #ccc;
+	flex: 0 0 95%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .sidebar {
-	width: 100%;
-	margin-left: -100%;
+	flex: 0 0 95%;
+	margin-left: -95%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar {
-	width: 100%;
-	border-right: 1px solid #ccc;
+	flex: 0 0 95%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="sidebar"] .sidebar {
-	width: 35%;
-	border-right: 1px solid #ccc;
+	flex: 0 0 35%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .sidebar {
-	width: 35%;
+	flex: 0 0 35%;
 	margin-left: -35%;
 }
 
 #wpo-wcpdf-preview-wrapper .preview-document {
-	position: relative;
-	float: right;
-	overflow: hidden;
-	padding: 4em;
+	padding: 0;
 	box-sizing: border-box;
+	position: sticky;
+	top: 2.4em;
+	flex: 0 0 60%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .preview-document {
@@ -391,33 +405,25 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .preview-document {
-	width: 100%;
-	margin-right: -100%;
-	padding-left: 15%;
-	padding-right: 15%;
+	flex: 0 0 95%;
+	margin-right: -95%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .preview-document {
-	width: 99.99%; /* Prevents rendering issues while transitioning */
-	padding-left: 15%;
-	padding-right: 15%;
-	border-left: 1px solid #ccc;
+	flex: 0 0 95%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .preview-document {
-	width: 65%;
-	margin-right: -65%;
+	flex: 0 0 60%;
+	margin-right: -60%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="sidebar"] .preview-document {
-	width: 65%;
+	flex: 0 0 60%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .preview-document {
-	width: 100%;
-	border-left: 1px solid #ccc;
-	padding-left: 15%;
-	padding-right: 15%;
+	flex: 0 0 95%;
 }
 
 .preview-document {
@@ -438,12 +444,16 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	background: white;
 	box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
 	-webkit-box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
+	height: 85vh;
+	width: auto!important;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%, 0);
 }
 
 .preview-document .preview-data-wrapper {
-	position: absolute;
-	right: 0;
-	top: 0;
+	width: 100%;
+	height: 4em;
 }
 
 .preview-document .preview-data-wrapper .preview-order-data,
@@ -611,24 +621,51 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	cursor: pointer;
 }
 
+#wpo-wcpdf-preview-wrapper .gutter  {
+	flex: 0 0 5%;
+	position: sticky;
+	top: 2.4em;
+	height: 100vh;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .gutter .slide-left,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .gutter .slide-left {
+	float: right;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .gutter .slide-right,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .gutter .slide-right {
+	display: none;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .gutter .slide-left,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .gutter .slide-left {
+	display: none;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .gutter .slide-right,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .gutter .slide-right {
+	border-left: 1px solid #ccc;
+}
+
 .slider {
 	box-sizing: border-box;
-	position: absolute;
-	top: 2.4em;
+	padding-top: 2.4em;
 	color: #999;
 	font-weight: bold;
 	cursor: pointer;
 	font-size: 0.7em;
 	line-height: 1em;
+	text-align: center;
+	width: 50%;
+	height: 100%;
+	float: left;
 }
 
 .slide-left {
-	right: 10px;
+	border-right: 1px solid #ccc;
 }
 
-.slide-right {
-	left: 10px;
-}
 
 .slider:hover {
 	color: #222;
@@ -650,7 +687,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	display: none;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .slider {
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .gutter {
 	display: none;
 }
 
