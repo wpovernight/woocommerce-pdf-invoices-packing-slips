@@ -46,11 +46,6 @@ jQuery( function( $ ) {
 	//----------> Preview <----------//
 	let $preview    = $( '#wpo-wcpdf-preview-wrapper .preview' );
 	let lastOrderId = $preview.data( 'order_id' );
-
-	// Sticky preview on scroll
-	$preview.hcSticky( {
-		stickTo: $( '#wpo-wcpdf-preview-wrapper' )
-	} );
 	
 	$( '.slide-left' ).on( 'click', function() {
 		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
@@ -60,19 +55,11 @@ jQuery( function( $ ) {
 		if ( previewStates == 3 ) {
 			if ( previewState == 'closed' ) {
 				$wrapper.attr( 'data-preview-state', 'sidebar' );
-				// Attach sticky
-				setTimeout( function() {
-					$preview.hcSticky( 'attach' );
-				}, 500 );
 			} else {
 				$wrapper.attr( 'data-preview-state', 'full' );
-				// Detach sticky
-				$preview.hcSticky( 'detach' );
 			}
 		} else {
 			$wrapper.attr( 'data-preview-state', 'full' );
-			// Detach sticky
-			$preview.hcSticky( 'detach' );
 		}
 	});
 
@@ -84,10 +71,6 @@ jQuery( function( $ ) {
 		if ( previewStates == 3 ) {
 			if ( previewState == 'full' ) {
 				$wrapper.attr( 'data-preview-state', 'sidebar' );
-				// Attach sticky
-				setTimeout( function() {
-					$preview.hcSticky( 'attach' );
-				}, 500 );
 			} else {
 				$wrapper.attr( 'data-preview-state', 'closed' );
 			}
