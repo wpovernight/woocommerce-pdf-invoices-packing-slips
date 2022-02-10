@@ -151,7 +151,7 @@ jQuery( function( $ ) {
 	} );
 
 	// Custom trigger
-	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, duration ){
+	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, duration ) {
 		trigger_preview( duration );
 	} );
 
