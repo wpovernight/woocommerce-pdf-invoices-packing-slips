@@ -154,6 +154,38 @@ class Settings {
 				wp_send_json_error( array( 'error' => __( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 
+			// process settings data
+			if ( ! empty( $_POST['data'] ) ) {
+				// parse form data
+				parse_str( $_POST['data'], $form_data );
+				$form_data = stripslashes_deep( $form_data );
+
+				foreach ( $form_data as $option_key => $form_settings ) {
+					if ( apply_filters( 'wpo_wcpdf_preview_filter_option', strpos( $option_key, 'wpo_wcpdf' ) === 0, $option_key ) === false ) {
+						continue; // not our business
+					}
+
+					// validate option values
+					$form_settings = WPO_WCPDF()->settings->callbacks->validate( $form_settings );
+
+					// filter general settings
+					if ( strpos( $option_key, 'settings_general' ) !== false ) {
+						$document_common_settings = $this->get_common_document_settings();
+						$form_settings            = array_intersect_key( $form_settings, $document_common_settings );
+
+						add_filter( "wpo_wcpdf_common_document_settings", function( $common_settings ) use ( $form_settings ) {
+							return maybe_unserialize( $form_settings );
+						}, 99, 1 );
+
+					// filter document & editor settings
+					} else {
+						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
+							return maybe_unserialize( $form_settings );
+						}, 99, 2 );
+					}
+				}
+			}
+
 			$document = wcpdf_get_document( $document_type, $order );
 
 			if ( $document ) {
@@ -163,88 +195,6 @@ class Settings {
 					$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
 					$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
 					$document->set_number( $number_store->get_next() );
-				}
-
-				// make replacements
-				if ( ! empty( $_POST['data'] ) ) {
-					$document_common_settings = $this->get_common_document_settings();
-					$preview_settings         = array();
-
-					// parse form data
-					parse_str( $_POST['data'], $form_data );
-					$form_data = stripslashes_deep( $form_data );
-
-					foreach ( $form_data as $key => $form_settings ) {
-						// General settings
-						if ( strpos( $key, 'wpo_wcpdf_settings_' ) !== false ) {
-							$preview_settings['general'] = $form_settings;
-						// Document settings
-						} elseif( strpos( $key, 'wpo_wcpdf_documents_settings_' ) !== false ) {
-							$preview_settings['document'] = $form_settings;
-						// Customizer settings (Premium Templates)
-						} elseif( $key == 'wpo_wcpdf_editor_settings' ) {
-							$preview_settings['editor'] = $form_settings;
-						}
-					}
-
-					foreach ( $preview_settings as $type => $settings ) {
-						switch ( $type ) {
-							case 'general':
-								// reset general settings first
-								WPO_WCPDF()->settings->general_settings = array();
-								$document->settings = array_diff_key( $document->settings, $document_common_settings );
-
-								// apply preview general settings
-								foreach ( $settings as $setting => $value ) {
-									// skip empty setting
-									if ( empty( $value ) ) {
-										continue;
-									}
-									// array value setting
-									if ( is_array( $value ) ) {
-										foreach ( $value as $k => $v ) {
-											WPO_WCPDF()->settings->general_settings[$setting][$k] = $value[$k];
-											if ( isset( $document_common_settings[$setting] ) ) {
-												$document->settings[$setting][$k] = $value[$k];
-											}
-										}
-									// single value setting
-									} else {
-										WPO_WCPDF()->settings->general_settings[$setting] = $value;
-										if ( isset( $document_common_settings[$setting] ) ) {
-											$document->settings[$setting] = $value;
-										}
-									}
-								}
-								break;
-							case 'document':
-								// reset document settings first
-								$document->settings = array_intersect_key( $document->settings, $document_common_settings );
-
-								// apply preview document settings
-								foreach ( $settings as $setting => $value ) {
-									// skip empty setting
-									if ( empty( $value ) ) {
-										continue;
-									}
-									// array value setting
-									if ( is_array( $value ) ) {
-										foreach ( $value as $k => $v ) {
-											$document->settings[$setting][$k] = $value[$k];
-										}
-									// single value setting
-									} else {
-										$document->settings[$setting] = $value;
-									}
-								}
-								break;
-							case 'editor':
-								add_filter( 'option_wpo_wcpdf_editor_settings', function( $value, $option ) use ( $settings ) {
-									return maybe_unserialize( $settings );
-								}, 99, 2 );
-								break;
-						}
-					}
 				}
 
 				// apply document number formatting
@@ -403,7 +353,7 @@ class Settings {
 			'extra_2'				=> isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
 			'extra_3'				=> isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
 		);
-		return $common_settings;
+		return apply_filters( 'wpo_wcpdf_common_document_settings', $common_settings );
 	}
 
 	public function get_document_settings( $document_type ) {
