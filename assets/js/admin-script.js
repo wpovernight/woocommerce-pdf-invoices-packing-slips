@@ -150,14 +150,9 @@ jQuery( function( $ ) {
 		trigger_preview();
 	} );
 
-	// Preview on customizer sortable changes (Premium Templates)
-	$( '#documents .field-list' ).on( 'sortstop', function( event, ui ) {
-		trigger_preview();
-	} );
-
-	// Preview on customizer adding column/totals fields or custom blocks (Premium Templates)
-	$( document ).on( 'wpo-wcpdf-customizer-document-field-added, wpo-wcpdf-customizer-document-custom-block-added', function( event ) {
-		trigger_preview();
+	// Custom trigger
+	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, duration ){
+		trigger_preview( duration );
 	} );
 
 	// Preview on user click in search result
