@@ -252,16 +252,11 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding: 0 2em;
 	box-sizing: border-box;
 	width: 100%;
+	max-width: 50vw;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form.editor {
 	max-width: none;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar > form,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar > form {
-	max-width: none;
-	width: 60%;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table,
