@@ -168,22 +168,15 @@ class Settings {
 					// validate option values
 					$form_settings = WPO_WCPDF()->settings->callbacks->validate( $form_settings );
 
-					// filter general settings
-					if ( strpos( $option_key, 'settings_general' ) !== false ) {
-						$document_common_settings = $this->get_common_document_settings();
-						$form_settings            = array_intersect_key( $form_settings, $document_common_settings );
-
-						add_filter( "wpo_wcpdf_common_document_settings", function( $common_settings ) use ( $form_settings ) {
-							return maybe_unserialize( $form_settings );
-						}, 99, 1 );
-
-					// filter document & editor settings
-					} else {
-						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
-							return maybe_unserialize( $form_settings );
-						}, 99, 2 );
-					}
+					// filter the options
+					add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
+						return maybe_unserialize( $form_settings );
+					}, 99, 2 );
 				}
+
+				// reload settings
+				$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
+				$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
 			}
 
 			$document = wcpdf_get_document( $document_type, $order );
@@ -353,7 +346,7 @@ class Settings {
 			'extra_2'				=> isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
 			'extra_3'				=> isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
 		);
-		return apply_filters( 'wpo_wcpdf_common_document_settings', $common_settings );
+		return $common_settings;
 	}
 
 	public function get_document_settings( $document_type ) {
