@@ -1,4 +1,11 @@
 jQuery( function( $ ) {
+	$('.wcpdf-extensions .more').hide();
+
+	$('.wcpdf-extensions > li').on('click',function( event ) {
+		$(this).toggleClass('expanded');
+		$(this).find('.more').slideToggle();
+	});
+
 	$('.edit-next-number').on('click', function( event ) {
 		// enable input & show save button
 		$( this ).hide();

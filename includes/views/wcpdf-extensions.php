@@ -1,22 +1,11 @@
 <?php defined( 'ABSPATH' ) or exit; ?>
 
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('.extensions .more').hide();
-
-	jQuery('.extensions > li').on('click',function() {
-		jQuery(this).toggleClass('expanded');
-		jQuery(this).find('.more').slideToggle();
-	});
-});
-</script>
-
 <div class="wcpdf-extensions-ad">
 	<?php $no_pro = ! class_exists( 'WooCommerce_PDF_IPS_Pro' ) && ! class_exists( 'WPO_WCPDF_Templates' ); ?>
 	<img src="<?php echo esc_url( WPO_WCPDF()->plugin_url() . '/assets/images/wpo-helper.png' ); ?>" class="wpo-helper">
 	<h3><?php esc_html_e( 'Check out these premium extensions!', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 	<i>(<?php esc_html_e( 'click items to read more', 'woocommerce-pdf-invoices-packing-slips' ); ?>)</i>
-	<ul class="extensions">
+	<ul class="wcpdf-extensions">
 		<?php if ( $no_pro ): ?>
 			<!-- No Pro extensions: Ad for PDF bundle -->
 			<li>

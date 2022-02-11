@@ -30,17 +30,17 @@ img.wpo-helper {
 	margin-left: 1.5em;
 }
 
-.extensions li {
+.wcpdf-extensions li {
 	margin: 0;
 }
 
-.extensions li ul {
+.wcpdf-extensions li ul {
 	list-style-type: square;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
 
-.extensions > li:before { 
+.wcpdf-extensions > li:before { 
 	content: "";
 	border-color: transparent transparent transparent #111;
 	border-style: solid;
@@ -53,24 +53,24 @@ img.wpo-helper {
 	position: relative;
 }
 
-.extensions li:not(.expanded) {
+.wcpdf-extensions li:not(.expanded) {
 	cursor:pointer;
 }
 
-.extensions .expanded:before {
+.wcpdf-extensions .expanded:before {
 	border-color: #111 transparent transparent transparent;
 	left: -1.17em;
 	border-width: 0.45em 0.45em 0.35em 0.35em !important;
 }
 
-.extensions .more {
+.wcpdf-extensions .more {
 	padding: 10px;
 	background-color: white;
 	border: 1px solid #ccc;
 	border-radius: 5px;
 }
 
-.extensions table td {
+.wcpdf-extensions table td {
 	vertical-align: top;
 }
 
