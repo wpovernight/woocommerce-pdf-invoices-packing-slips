@@ -241,6 +241,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	height: auto;
 	z-index: 999;
 	padding: 4em 2em 0 0;
+	padding: 4em 0 0 0;
 	box-sizing: border-box;
 	background: transparent;
 	flex: 0 0 35%;
@@ -421,13 +422,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	flex: 0 0 95%;
 }
 
-.preview-document {
-	min-height: 400px;
-}
-
 .preview-document .preview {
 	width: 100%;
-	min-width: 400px;
 	box-sizing: border-box;
 	padding-right: 5%;
 }
