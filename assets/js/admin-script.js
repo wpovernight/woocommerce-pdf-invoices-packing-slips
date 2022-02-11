@@ -87,7 +87,7 @@ jQuery( function( $ ) {
 		// Make preview scrollable after panel animation is complete
 		setTimeout( function() {
 			$wrapper.addClass('static');
-			$('html, body').animate({ scrollTop: 0 }, 1200);
+			window.scrollTo(0, 0);
 		}, 300);
 	}
 

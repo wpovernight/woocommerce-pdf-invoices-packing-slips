@@ -627,7 +627,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	flex: 0 0 5%;
 	position: sticky;
 	top: 2.4em;
-	height: 100vh;
+	height: 170vh;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .gutter .slide-left,
@@ -704,4 +704,9 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .static .preview-document,
 .static .gutter {
 	position: static!important;
+}
+
+.static .sidebar {
+	height: 170vh!important;
+	overflow: hidden;
 }
