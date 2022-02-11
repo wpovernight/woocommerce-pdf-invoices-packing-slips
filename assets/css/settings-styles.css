@@ -236,11 +236,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar {
-	position: relative;
-	float: left;
 	height: auto;
-	z-index: 999;
-	padding: 4em 2em 0 0;
 	padding: 4em 0 0 0;
 	box-sizing: border-box;
 	background: transparent;
