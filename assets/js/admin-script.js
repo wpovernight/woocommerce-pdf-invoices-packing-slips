@@ -57,9 +57,11 @@ jQuery( function( $ ) {
 				$wrapper.attr( 'data-preview-state', 'sidebar' );
 			} else {
 				$wrapper.attr( 'data-preview-state', 'full' );
+				makePreviewScrollable($wrapper);
 			}
 		} else {
 			$wrapper.attr( 'data-preview-state', 'full' );
+			makePreviewScrollable($wrapper);
 		}
 	});
 
@@ -76,8 +78,18 @@ jQuery( function( $ ) {
 			}
 		} else {
 			$wrapper.attr( 'data-preview-state', 'closed' );
-		}	
+		}
+		$wrapper.removeClass('static');
 	});
+
+	function makePreviewScrollable(wrapper) {
+		let $wrapper = wrapper;
+		// Make preview scrollable after panel animation is complete
+		setTimeout( function() {
+			$wrapper.addClass('static');
+			$('html, body').animate({ scrollTop: 0 }, 1200);
+		}, 300);
+	}
 
 	$('.preview-document .preview-data p').on( 'click', function() {
 		let $previewData = $(this).closest('.preview-data');
