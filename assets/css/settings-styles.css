@@ -338,11 +338,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 300px !important;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .wcpdf-attachment-settings-hint,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .wcpdf-attachment-settings-hint {
-	width: 880px !important;
-}
-
 /* WPML */
 
 #wpo-wcpdf-settings .form-table .ui-tabs-nav {
