@@ -391,7 +391,18 @@ class Settings_Callbacks {
 				// don't display resolution
 			}
 
-			printf( '<img src="%1$s" style="display:block" id="img-%2$s" class="media-upload-preview"/>', esc_attr( $attachment_src ), esc_attr( $id ) );
+			/*
+			 * .webp support can be disabled but still showing the image in settings.
+			 * We should add a notice because this will display an error when redering the PDF using DOMPDF.
+			 */
+			if ( 'webp' === wp_check_filetype( $attachment_src )['ext'] && ! function_exists( 'imagecreatefromwebp' ) ) {
+				printf(
+					'<div class="notice notice-warning inline" style="display:inline-block; width:auto;"><p>%s</p></div>',
+					wp_kses_post( 'File type <strong>webp</strong> is not supported by your server! Please check your <strong>System Configurations</strong> under the <strong>Status</strong> tab.', 'woocommerce-pdf-invoices-packing-slips' )
+				);
+			}
+
+			printf( '<img src="%1$s" style="display:block" id="img-%2$s"/>', esc_attr( $attachment_src ), esc_attr( $id ) );
 			if ( ! empty( $attachment_height ) && ! empty( $in_height ) ) {
 				$attachment_resolution = round( absint( $attachment_height ) / $in_height );
 				printf(

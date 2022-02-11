@@ -3,9 +3,9 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 5.8
+Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.12.1
+Stable tag: 2.13.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,17 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.13.0 =
+* New: include dompdf temporary folder in cleanup procedure
+* New: Add CSS row classes for WPC Product Bundles
+* New: filter to override `wc_display_item_meta` arguments
+* Fix: Prevent errors when server doesn't support `.webp` image rendering
+* Fix: change invalid default date 0000-00-00 00:00:00 on number store tables
+* Tweak: Don't store non-historical document settings in order meta
+* Templates: New action hook before the document label (`wpo_wcpdf_before_document_label`)
+* Libraries: updated dompdf to 1.2.0
+* Marked tested up to WP5.9
 
 = 2.12.1 =
 * Fix: Show a feedback notice after saving settings
