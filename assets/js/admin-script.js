@@ -90,11 +90,11 @@ jQuery( function( $ ) {
 	});
 
 	function makePreviewScrollable(wrapper) {
+		window.scrollTo(0, 0);
 		let $wrapper = wrapper;
 		// Make preview scrollable after panel animation is complete
 		setTimeout( function() {
 			$wrapper.addClass('static');
-			window.scrollTo(0, 0);
 		}, 300);
 	}
 
