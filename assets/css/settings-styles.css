@@ -426,30 +426,27 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .preview-document .preview {
+	width: 100%;
 	min-width: 400px;
-	text-align: center;
 	box-sizing: border-box;
-	float: none;
-	margin: 0 auto;
+	padding-right: 5%;
 }
 
 .preview-document .preview > #preview-canvas {
+	display: block;
 	max-width: 900px;
+	max-height: 85vh;
+	width: auto!important;
 	margin: 0 auto;
 	background: white;
 	box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
 	-webkit-box-shadow: 0 0 35px -8px rgba(0, 0, 0, 0.12);
-	max-height: 85vh;
-	width: auto!important;
-	position: absolute;
-	left: 50%;
-	transform: translate(-50%, 0);
 	transition: max-height .3s ease-in-out 0s;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-state="full"] #preview-canvas {
 	max-height: 170vh;
-	transition: max-height .3s ease-in-out 0.15s;
+	transition: max-height .4s ease-in-out 0.4s;
 }
 
 .preview-document .preview-data-wrapper {
