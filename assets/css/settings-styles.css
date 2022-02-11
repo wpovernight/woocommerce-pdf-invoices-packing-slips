@@ -523,6 +523,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .preview-document .preview-data ul.active {
 	height: auto;
+	z-index: 1;
 }
 
 .preview-document .preview-data ul li {
