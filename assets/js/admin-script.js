@@ -62,14 +62,17 @@ jQuery( function( $ ) {
 
 		if ( previewStates == 3 ) {
 			if ( previewState == 'closed' ) {
+				$wrapper.find( '.preview-document' ).show();
 				$wrapper.attr( 'data-preview-state', 'sidebar' );
 				$wrapper.attr( 'data-from-preview-state', 'closed' );
 			} else {
+				$wrapper.find( '.slide-left' ).hide();
 				$wrapper.attr( 'data-preview-state', 'full' );
 				$wrapper.attr( 'data-from-preview-state', 'sidebar' );
 				makePreviewScrollable($wrapper);
 			}
 		} else {
+			$wrapper.find( '.preview-document' ).show();
 			$wrapper.attr( 'data-preview-state', 'full' );
 			$wrapper.attr( 'data-from-preview-state', 'closed' );
 			makePreviewScrollable($wrapper);
@@ -83,13 +86,16 @@ jQuery( function( $ ) {
 
 		if ( previewStates == 3 ) {
 			if ( previewState == 'full' ) {
+				$wrapper.find( '.slide-left' ).delay(400).show(0);
 				$wrapper.attr( 'data-preview-state', 'sidebar' );
 				$wrapper.attr( 'data-from-preview-state', 'full' );
 			} else {
+				$wrapper.find( '.preview-document' ).hide(300);
 				$wrapper.attr( 'data-preview-state', 'closed' );
 				$wrapper.attr( 'data-from-preview-state', 'sidebar' );
 			}
 		} else {
+			$wrapper.find( '.preview-document' ).hide(300);
 			$wrapper.attr( 'data-preview-state', 'closed' );
 			$wrapper.attr( 'data-from-preview-state', 'full' );
 		}

@@ -397,8 +397,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .preview-document {
-	flex: 0 0 95%;
-	margin-right: -95%;
+	display: none;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .preview-document {
@@ -645,9 +644,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	display: none;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .gutter .slide-right,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .gutter .slide-right {
-	border-left: 1px solid #ccc;
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="sidebar"] .gutter .slide-left {
+	border: none;
 }
 
 .slider {
@@ -672,6 +670,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .slide-right {
 	text-align: left;
 	padding-left: 10px;
+	border-left: 1px solid #ccc;
 }
 
 .slider:hover {
