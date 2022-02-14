@@ -525,7 +525,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	color: white;
 }
 
-.preview-document .preview-data ul li a {
+.preview-document .preview-data ul li a,
+.preview-document .preview-data.preview-order-data ul li {
 	display: block;
 	padding: 1.4em 1.6em;
 }
