@@ -194,18 +194,18 @@ jQuery( function( $ ) {
 
 	// Trigger the Preview
 	function trigger_preview( timeoutDuration = 0, order_id = 0, document_type = '' ) {
-		if ( document_type.length == 0 || document_type == '' ) {
+		if ( ! document_type ) {
 			if ( documentType.length > 0 ) {
 				document_type = documentType;
 			} else {
 				document_type = 'invoice';
 			}
 		}
-		if ( order_id.length == 0 || order_id == '' || order_id == 0 ) {
+		if ( ! order_id ) {
 			order_id = lastOrderId;
 		}
-		let order_number  = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
-		if( order_number.length > 0 ) {
+		let order_number = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
+		if( ! order_number ) {
 			order_id = order_number;
 		}
 		clearTimeout( previewTimeout );
