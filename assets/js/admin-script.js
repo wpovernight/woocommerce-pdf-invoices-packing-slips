@@ -201,7 +201,7 @@ jQuery( function( $ ) {
 			order_id = lastOrderId;
 		}
 		let order_number = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
-		if( order_number.length > 0 ) {
+		if ( order_number.length > 0 ) {
 			order_id = order_number;
 		}
 		clearTimeout( previewTimeout );
