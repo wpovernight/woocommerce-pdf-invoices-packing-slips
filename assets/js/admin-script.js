@@ -195,11 +195,7 @@ jQuery( function( $ ) {
 	// Trigger the Preview
 	function trigger_preview( timeoutDuration = 0, order_id = 0, document_type = '' ) {
 		if ( ! document_type ) {
-			if ( documentType.length > 0 ) {
-				document_type = documentType;
-			} else {
-				document_type = 'invoice';
-			}
+			document_type = 'invoice';
 		}
 		if ( ! order_id ) {
 			order_id = lastOrderId;
