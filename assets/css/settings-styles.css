@@ -644,16 +644,21 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	cursor: pointer;
 	font-size: 0.7em;
 	line-height: 1em;
-	text-align: center;
 	width: 50%;
 	height: 100%;
 	float: left;
 }
 
 .slide-left {
+	text-align: right;
+	padding-right: 10px;
 	border-right: 1px solid #ccc;
 }
 
+.slide-right {
+	text-align: left;
+	padding-left: 10px;
+}
 
 .slider:hover {
 	color: #222;
