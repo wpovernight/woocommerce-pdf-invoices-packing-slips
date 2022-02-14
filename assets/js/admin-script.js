@@ -51,8 +51,9 @@ jQuery( function( $ ) {
 
 
 	//----------> Preview <----------//
-	let $preview    = $( '#wpo-wcpdf-preview-wrapper .preview' );
-	let lastOrderId = $preview.data( 'order_id' );
+	let $preview     = $( '#wpo-wcpdf-preview-wrapper .preview' );
+	let documentType = $preview.data( 'document_type' );
+	let lastOrderId  = $preview.data( 'order_id' );
 	
 	$( '.slide-left' ).on( 'click', function() {
 		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
@@ -176,8 +177,8 @@ jQuery( function( $ ) {
 	} );
 
 	// Custom trigger
-	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, duration ) {
-		trigger_preview( duration );
+	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, duration, order_id, document_type ) {
+		trigger_preview( duration, order_id, document_type );
 	} );
 
 	// Preview on user click in search result
@@ -185,19 +186,33 @@ jQuery( function( $ ) {
 		event.preventDefault();
 		let order_id = $( this ).data( 'order_id' );
 
-		$preview.data( 'order_id', order_id );               // pass the clicked order_id to the preview order_id
-
 		$( this ).closest( 'div' ).hide();                   // hide results div
 		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results
 
-		trigger_preview();
+		trigger_preview( 0, order_id );
 	} );
 
-	function trigger_preview( timeoutDuration = 0 ) {
+	// Trigger the Preview
+	function trigger_preview( timeoutDuration = 0, order_id = 0, document_type = '' ) {
+		if ( document_type.length == 0 || document_type == '' ) {
+			if ( documentType.length > 0 ) {
+				document_type = documentType;
+			} else {
+				document_type = 'invoice';
+			}
+		}
+		if ( order_id.length == 0 || order_id == '' || order_id == 0 ) {
+			order_id = lastOrderId;
+		}
+		let order_number  = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
+		if( order_number.length > 0 ) {
+			order_id = order_number;
+		}
 		clearTimeout( previewTimeout );
-		previewTimeout = setTimeout( function() { ajax_load_preview() }, timeoutDuration );
+		previewTimeout = setTimeout( function() { ajax_load_preview( order_id, document_type ) }, timeoutDuration );
 	}
 
+	// Settings excluded from trigger the Preview
 	function setting_is_excluded_for_preview( settingName ) {
 		let excluded = false;
 		$.each( wpo_wcpdf_admin.preview_excluded_settings, function( i, v ) {
@@ -206,6 +221,27 @@ jQuery( function( $ ) {
 			}
 		} );
 		return excluded;
+	}
+
+	// Set the document selector default if needs to be updated
+	function set_document_selector_default( document_type ) {
+		let $wrapper     = $( document ).find( '.preview-document-type' );
+		let $current     = $wrapper.find( '.current' );
+		let current_type = $current.data( 'type' );
+		let $documents   = $wrapper.find( 'ul > li' );
+
+		if ( document_type != current_type ) {
+			$.each( $documents, function( i, v ) {
+				let $document = $( v );
+				let type      = $document.data( 'type' );
+				let title     = $document.data( 'title' );
+
+				if ( document_type == type  ) {
+					$current.data( 'type', type );
+					$current.text( title ).append( '<span class="arrow-down">&#9660;</span>' );
+				}
+			} );
+		}
 	}
 
 	// Clear preview order search results/input
@@ -219,14 +255,8 @@ jQuery( function( $ ) {
 	} );
 
 	// Load the Preview with AJAX
-	function ajax_load_preview() {
-		let form_data     = $( '#wpo-wcpdf-settings' ).serialize();
-		let order_id      = $preview.data( 'order_id' );
-		let document_type = $preview.data( 'document_type' );
-		let order_number  = $( '#wpo-wcpdf-preview-wrapper input[name="preview-order-number"]' ).val();
-		if( order_number.length > 0 ) {
-			order_id = order_number;
-		}
+	function ajax_load_preview( order_id, document_type ) {
+		let form_data = $( '#wpo-wcpdf-settings' ).serialize();
 		let nonce     = $preview.data('nonce');
 		let worker    = wpo_wcpdf_admin.pdfjs_worker;
 		let canvas_id = 'preview-canvas';
@@ -271,6 +301,10 @@ jQuery( function( $ ) {
 					$preview.append( '<canvas id="'+canvas_id+'" style="width:100%;"></canvas>' );
 					pdf_js( worker, canvas_id, response.data.pdf_data );
 				}
+
+				// set document selector if needed
+				set_document_selector_default( document_type );
+
 				$preview.unblock();
 
 				$preview.data( 'order_id', lastOrderId ); // reset preview data to 'lastOrderId'

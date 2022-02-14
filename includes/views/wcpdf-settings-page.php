@@ -110,16 +110,16 @@ $review_invitation = sprintf(
 					<?php
 						if ( isset( $_REQUEST['preview'] ) ) {
 							$document = WPO_WCPDF()->documents->get_document( sanitize_text_field( $_REQUEST['preview'] ), null );
-							echo '<p class="document-type">'.$document->get_title().'<span class="arrow-down">&#9660;</span></p>';
+							echo '<p class="current" data-type="'.$document->get_type().'">'.$document->get_title().'<span class="arrow-down">&#9660;</span></p>';
 						} else {
-							echo '<p class="document-type">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'<span class="arrow-down">&#9660;</span></p>';
+							echo '<p class="current" data-type="invoice">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'<span class="arrow-down">&#9660;</span></p>';
 						}
 					?>
 					<ul>
 						<?php 
 							foreach ( $documents as $document ) {
-								/* translators: 1. document type, 2. URL, 3. document title */
-								printf( '<li class="%1$s"><a href="%2$s">%3$s</a></li>', $document->get_type(), add_query_arg( array( 'preview' => $document->get_type() ) ), $document->get_title() );
+								/* translators: 1. document type, 2. document title, 3. URL */
+								printf( '<li class="%1$s" data-type="%1$s" data-title="%2$s"><a href="%3$s">%2$s</a></li>', $document->get_type(), $document->get_title(), add_query_arg( array( 'preview' => $document->get_type() ) ) );
 							}
 						?>
 					</ul>
