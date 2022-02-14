@@ -559,14 +559,13 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .preview-document .preview-data #preview-order-search-results {
 	display: none;
-	clear: both;
+	position: absolute;
+	right: 0;
+	top: 4em;
 	width: 300px;
-	float: right;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
-	border-radius: 6px;
 	padding: 20px 0;
-	margin-top: -4px;
 	background-color: white;
 }
 
