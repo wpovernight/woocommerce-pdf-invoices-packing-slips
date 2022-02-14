@@ -199,10 +199,13 @@ jQuery( function( $ ) {
 	}
 
 	function setting_is_excluded_for_preview( settingName ) {
-		if ( $.inArray( settingName, wpo_wcpdf_admin.preview_excluded_settings ) !== -1 ) {
-			return true;
-		}
-		return false;
+		let excluded = false;
+		$.each( wpo_wcpdf_admin.preview_excluded_settings, function( i, v ) {
+			if ( settingName.indexOf( v ) != -1 ) {
+				excluded = true;
+			}
+		} );
+		return excluded;
 	}
 
 	// Clear preview order search results/input
