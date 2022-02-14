@@ -62,12 +62,15 @@ jQuery( function( $ ) {
 		if ( previewStates == 3 ) {
 			if ( previewState == 'closed' ) {
 				$wrapper.attr( 'data-preview-state', 'sidebar' );
+				$wrapper.attr( 'data-from-preview-state', 'closed' );
 			} else {
 				$wrapper.attr( 'data-preview-state', 'full' );
+				$wrapper.attr( 'data-from-preview-state', 'sidebar' );
 				makePreviewScrollable($wrapper);
 			}
 		} else {
 			$wrapper.attr( 'data-preview-state', 'full' );
+			$wrapper.attr( 'data-from-preview-state', 'closed' );
 			makePreviewScrollable($wrapper);
 		}
 	});
@@ -80,11 +83,14 @@ jQuery( function( $ ) {
 		if ( previewStates == 3 ) {
 			if ( previewState == 'full' ) {
 				$wrapper.attr( 'data-preview-state', 'sidebar' );
+				$wrapper.attr( 'data-from-preview-state', 'full' );
 			} else {
 				$wrapper.attr( 'data-preview-state', 'closed' );
+				$wrapper.attr( 'data-from-preview-state', 'sidebar' );
 			}
 		} else {
 			$wrapper.attr( 'data-preview-state', 'closed' );
+			$wrapper.attr( 'data-from-preview-state', 'full' );
 		}
 		$wrapper.removeClass('static');
 	});

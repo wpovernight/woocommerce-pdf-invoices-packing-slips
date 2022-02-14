@@ -44,7 +44,7 @@ $review_invitation = sprintf(
 	$preview_states = isset( $settings_tabs[$active_tab]['preview_states'] ) ? $settings_tabs[$active_tab]['preview_states'] : 1;
 	$preview_state = $preview_states == 3 ? 'sidebar' : 'closed';
 	?>
-	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo $preview_states; ?>" data-preview-state="<?php echo $preview_state; ?>">
+	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo $preview_states; ?>" data-preview-state="<?php echo $preview_state; ?>" data-from-preview-state="">
 
 		<div class="sidebar">
 			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
