@@ -302,7 +302,7 @@ jQuery( function( $ ) {
 					pdf_js( worker, canvas_id, response.data.pdf_data );
 				}
 
-				// set document selector if needed
+				// set document selector default if needed
 				set_document_selector_default( document_type );
 
 				$preview.unblock();
