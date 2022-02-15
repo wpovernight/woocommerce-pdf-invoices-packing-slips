@@ -246,6 +246,7 @@ jQuery( function( $ ) {
 		$( this ).hide();
 	} );
 
+	// Trigger preview on document selection and change the document type input with the new value
 	$( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list li' ).on( 'click', function() {
 		let inputName = $( this ).closest( 'ul' ).data( 'input-name' );
 		let $input    = $( '#wpo-wcpdf-preview-wrapper :input[name='+inputName+']');
@@ -253,6 +254,7 @@ jQuery( function( $ ) {
 		triggerPreview();
 	} );
 
+	// Detect document type input changes and apply the same document title to the document selector
 	$previewDocumentTypeInput.on( 'change', function() {
 		let inputValue = $( this ).val();
 		let $li        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list > li[data-value='+inputValue+']' );
