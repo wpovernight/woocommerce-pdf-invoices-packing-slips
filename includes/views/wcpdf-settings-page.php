@@ -88,7 +88,6 @@ $review_invitation = sprintf(
 				}
 			?>
 			<div class="preview-data-wrapper">
-
 				<div class="preview-data preview-order-data">
 					<input type="text" name="preview-order-number" id="preview-order-number">
 					<div class="preview-order-search-wrapper">
@@ -108,28 +107,29 @@ $review_invitation = sprintf(
 				<?php if ( $active_tab != 'documents' ) : ?>
 				<div class="preview-data preview-document-type">
 					<?php
-						if ( isset( $_REQUEST['preview'] ) ) {
-							$document = WPO_WCPDF()->documents->get_document( sanitize_text_field( $_REQUEST['preview'] ), null );
-							echo '<p class="current" data-type="'.$document->get_type().'">'.$document->get_title().'<span class="arrow-down">&#9660;</span></p>';
+						if ( $document_type ) {
+							$document = WPO_WCPDF()->documents->get_document( sanitize_text_field( $document_type ), null );
+							echo '<p class="current"><span class="current-label">'.$document->get_title().'</span><span class="arrow-down">&#9660;</span></p>';
 						} else {
-							echo '<p class="current" data-type="invoice">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'<span class="arrow-down">&#9660;</span></p>';
+							echo '<p class="current"><span class="current-label">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'</span><span class="arrow-down">&#9660;</span></p>';
 						}
 					?>
-					<ul>
+					<ul class="preview-data-option-list" data-input-name="document_type">
 						<?php 
 							foreach ( $documents as $document ) {
-								/* translators: 1. document type, 2. document title, 3. URL */
-								printf( '<li class="%1$s" data-type="%1$s" data-title="%2$s"><a href="%3$s">%2$s</a></li>', $document->get_type(), $document->get_title(), add_query_arg( array( 'preview' => $document->get_type() ) ) );
+								/* translators: 1. document type, 2. document title */
+								printf( '<li data-value="%1$s">%2$s</li>', $document->get_type(), $document->get_title() );
 							}
 						?>
 					</ul>
 				</div>
 				<?php endif; ?>
 			</div>
-			
+			<input type="hidden" name="document_type" value="<?= $document_type; ?>">
+			<input type="hidden" name="order_id" value="<?= $order_id; ?>">
+			<input type="hidden" name="nonce" value="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
-			<div class="preview" data-order_id="<?= $order_id; ?>" data-document_type="<?= $document_type; ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>" data-no_order="<?= __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-save_settings="<?= __( 'Please save your settings to preview the changes!', 'woocommerce-pdf-invoices-packing-slips' ); ?>"></div>
-			
+			<div class="preview"></div>
 		</div>
 
 	</div>

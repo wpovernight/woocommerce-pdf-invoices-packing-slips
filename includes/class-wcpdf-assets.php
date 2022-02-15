@@ -88,11 +88,11 @@ class Assets {
 				'wpo-wcpdf',
 				'wpo_wcpdf_ajax',
 				array(
-					'ajaxurl'				=> admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
-					'nonce'					=> wp_create_nonce('generate_wpo_wcpdf'),
-					'bulk_actions'			=> array_keys( $bulk_actions ),
-					'confirm_delete'		=> __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_regenerate'	=> __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
+					'ajaxurl'			 => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
+					'nonce'				 => wp_create_nonce('generate_wpo_wcpdf'),
+					'bulk_actions'		 => array_keys( $bulk_actions ),
+					'confirm_delete'	 => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
+					'confirm_regenerate' => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
 				)
 			);
 		}
@@ -132,6 +132,7 @@ class Assets {
 					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
 					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
 					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
+					'no_order'                  => __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
 						// general
 						'download_display',
