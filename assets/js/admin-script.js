@@ -1,4 +1,5 @@
 jQuery( function( $ ) {
+
 	$( '.wcpdf-extensions .more' ).hide();
 
 	$( '.wcpdf-extensions > li' ).on( 'click', function( event ) {
@@ -35,9 +36,9 @@ jQuery( function( $ ) {
 				$input.siblings( '.save-next-number.button' ).hide();
 			}
 		} );
-	});
+	} );
 
-	$( "[name='wpo_wcpdf_documents_settings_invoice[display_number]']" ).on( 'change', function(event) {
+	$( "[name='wpo_wcpdf_documents_settings_invoice[display_number]']" ).on( 'change', function( event ) {
 		if ( $( this ).val() == 'order_number' ) {
 			$( this ).closest( 'td' ).find( '.description' ).slideDown();
 		} else {
@@ -105,7 +106,7 @@ jQuery( function( $ ) {
 			$wrapper.attr( 'data-from-preview-state', 'closed' );
 			makePreviewScrollable( $wrapper );
 		}
-	});
+	} );
 
 	$( '.slide-right' ).on( 'click', function() {
 		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
@@ -128,7 +129,7 @@ jQuery( function( $ ) {
 			$wrapper.attr( 'data-from-preview-state', 'full' );
 		}
 		$wrapper.removeClass( 'static' );
-	});
+	} );
 
 	function makePreviewScrollable( wrapper ) {
 		window.scrollTo( 0, 0 );
@@ -161,7 +162,7 @@ jQuery( function( $ ) {
 			// trigger preview
 			triggerPreview();
 		}
-	});
+	} );
 
 	// Preview on page load
 	$( document ).ready( triggerPreview() );
@@ -327,7 +328,7 @@ jQuery( function( $ ) {
 		pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
 		// Using DocumentInitParameters object to load binary data.
-		let loadingTask = pdfjsLib.getDocument({data: pdfData});
+		let loadingTask = pdfjsLib.getDocument( { data: pdfData } );
 		loadingTask.promise.then( function( pdf ) {
 			console.log( 'PDF loaded' );
 			
@@ -352,11 +353,11 @@ jQuery( function( $ ) {
 					viewport:      viewport
 				};
 				let renderTask = page.render( renderContext );
-				renderTask.promise.then( function () {
+				renderTask.promise.then( function() {
 					console.log( 'Page rendered' );
 				} );
 			} );
-		}, function ( reason ) {
+		}, function( reason ) {
 			// PDF loading error
 			console.error( reason );
 		} );
@@ -399,7 +400,7 @@ jQuery( function( $ ) {
 						$div.append( '<span class="error">'+response.data.error+'</span>' );
 						$div.show();
 					} else {
-						$.each( response.data, function ( i, item ) {
+						$.each( response.data, function( i, item ) {
 							let firstLine = '<a data-order_id="'+i+'"><span class="order-number">#'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
 							if ( item.billing_company.length > 0 ) {
 								firstLine = firstLine+', '+item.billing_company;
@@ -407,7 +408,7 @@ jQuery( function( $ ) {
 							let secondLine = '<br><span class="date">'+item.date_created+'</span><span class="total">'+item.total+'</span></a>';
 							$div.append( firstLine+secondLine );
 							$div.show();
-						});
+						} );
 					}
 				}
 
