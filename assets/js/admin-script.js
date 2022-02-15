@@ -1,52 +1,53 @@
 jQuery( function( $ ) {
-	$('.wcpdf-extensions .more').hide();
+	$( '.wcpdf-extensions .more' ).hide();
 
-	$('.wcpdf-extensions > li').on('click',function( event ) {
-		$(this).toggleClass('expanded');
-		$(this).find('.more').slideToggle();
-	});
+	$( '.wcpdf-extensions > li' ).on( 'click', function( event ) {
+		$( this ).toggleClass( 'expanded' );
+		$( this ).find( '.more' ).slideToggle();
+	} );
 
-	$('.edit-next-number').on('click', function( event ) {
+	$( '.edit-next-number' ).on( 'click', function( event ) {
 		// enable input & show save button
 		$( this ).hide();
-		$( this ).siblings( 'input' ).prop('disabled', false);
-		$( this ).siblings( '.save-next-number.button').show();
-	});
+		$( this ).siblings( 'input' ).prop( 'disabled', false );
+		$( this ).siblings( '.save-next-number.button' ).show();
+	} );
 
-	$('.save-next-number').on('click', function( event ) {
+	$( '.save-next-number' ).on( 'click', function( event ) {
 		$input = $( this ).siblings( 'input' );
-		$input.addClass('ajax-waiting');
-		var data = {
-			security: $input.data('nonce'),
-			action:   "wpo_wcpdf_set_next_number",
-			store:    $input.data('store'),
+		$input.addClass( 'ajax-waiting' );
+
+		let data = {
+			security: $input.data( 'nonce' ),
+			action:   'wpo_wcpdf_set_next_number',
+			store:    $input.data( 'store' ),
 			number:   $input.val(), 
 		};
 
-		xhr = $.ajax({
+		xhr = $.ajax( {
 			type: 'POST',
 			url:  wpo_wcpdf_admin.ajaxurl,
 			data: data,
 			success: function( response ) {
-				$input.removeClass('ajax-waiting');
+				$input.removeClass( 'ajax-waiting' );
 				$input.siblings( '.edit-next-number' ).show();
-				$input.prop('disabled', 'disabled');
-				$input.siblings( '.save-next-number.button').hide();
+				$input.prop( 'disabled', 'disabled' );
+				$input.siblings( '.save-next-number.button' ).hide();
 			}
-		});
+		} );
 	});
 
-	$("[name='wpo_wcpdf_documents_settings_invoice[display_number]']").on('change', function (event) {
-		if ($(this).val() == 'order_number') {
-			$(this).closest('td').find('.description').slideDown();
+	$( "[name='wpo_wcpdf_documents_settings_invoice[display_number]']" ).on( 'change', function(event) {
+		if ( $( this ).val() == 'order_number' ) {
+			$( this ).closest( 'td' ).find( '.description' ).slideDown();
 		} else {
-			$(this).closest('td').find('.description').hide();
+			$( this ).closest( 'td' ).find( '.description' ).hide();
 		}
-	}).trigger('change');
+	} ).trigger( 'change' );
 
 	// enable settings document switch
-	$('.wcpdf_document_settings_sections > h2').on( 'click', function() {
-		$(this).parent().find('ul').toggleClass('active');
+	$( '.wcpdf_document_settings_sections > h2' ).on( 'click', function() {
+		$( this ).parent().find( 'ul' ).toggleClass( 'active' );
 	} );
 
 
@@ -416,4 +417,4 @@ jQuery( function( $ ) {
 		} );
 	}
 
-});
+} );
