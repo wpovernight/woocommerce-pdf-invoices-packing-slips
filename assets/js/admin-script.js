@@ -194,6 +194,13 @@ jQuery( function( $ ) {
 		}
 	} );
 
+	// Preview on select / radio setting change
+	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
+		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
+			triggerPreview();
+		}
+	} );
+
 	// Preview on header logo change
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
 		triggerPreview();
