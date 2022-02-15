@@ -153,7 +153,7 @@ jQuery( function( $ ) {
 		if ( $( this ).hasClass( 'order-search' ) ) {
 			$previewData.find( 'p.last-order' ).hide();
 			$previewData.find( 'input[name="preview-order-search"]' ).addClass( 'active' );
-			$previewData.find( 'p.order-search' ).show();
+			$previewData.find( 'p.order-search' ).show().find( '.order-search-label' ).text( $( this ).text() );
 		} else {
 			$previewData.find( 'p.last-order' ).show();
 			$previewData.find( 'p.order-search' ).hide();
@@ -213,6 +213,7 @@ jQuery( function( $ ) {
 	// Preview on user click in search result
 	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
+		$( '.preview-document .order-search-label').text( '#' + $( this ).data( 'order_id' ) );
 		$previewOrderIdInput.val( $( this ).data( 'order_id' ) ).change();
 		$( this ).closest( 'div' ).hide();                   // hide results div
 		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results

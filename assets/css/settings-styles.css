@@ -493,7 +493,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .preview-document .preview-data input {
 	float: right;
 	margin:  1em 0 0 1em;
-	padding: 0.1em;
+	padding: 0.1em 0.5em;
 	width: 20ch;
 	margin-right: -25ch;
 	display: none;
