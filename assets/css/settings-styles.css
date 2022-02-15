@@ -87,6 +87,7 @@ img.wpo-helper {
 #img-header_logo {
 	max-height: 200px;
 	width: auto;
+	max-width: 100%;
 }
 
 .multiple-text-input label {
