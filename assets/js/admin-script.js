@@ -53,6 +53,7 @@ jQuery( function( $ ) {
 
 
 	//----------> Preview <----------//
+
 	// objects
 	let $preview                  = $( '#wpo-wcpdf-preview-wrapper .preview' );
 	let $previewOrderIdInput      = $( '#wpo-wcpdf-preview-wrapper input[name="order_id"]' );
@@ -417,5 +418,7 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
+
+	//----------> /Preview <----------//
 
 } );
