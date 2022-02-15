@@ -109,9 +109,9 @@ $review_invitation = sprintf(
 					<?php
 						if ( $document_type ) {
 							$document = WPO_WCPDF()->documents->get_document( sanitize_text_field( $document_type ), null );
-							echo '<p class="current"><span class="current-label">'.$document->get_title().'</span><span class="arrow-down">&#9660;</span></p>';
+							echo '<p class="current" data-value="'.$document->get_type().'"><span class="current-label">'.$document->get_title().'</span><span class="arrow-down">&#9660;</span></p>';
 						} else {
-							echo '<p class="current"><span class="current-label">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'</span><span class="arrow-down">&#9660;</span></p>';
+							echo '<p class="current" data-value="invoice"><span class="current-label">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'</span><span class="arrow-down">&#9660;</span></p>';
 						}
 					?>
 					<ul class="preview-data-option-list" data-input-name="document_type">

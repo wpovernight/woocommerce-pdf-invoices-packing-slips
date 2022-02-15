@@ -59,23 +59,23 @@ jQuery( function( $ ) {
 	let $previewSettingsForm      = $( '#wpo-wcpdf-settings' );
 
 	// variables
-	let previewOrderId, previewOrderIdDefault, previewDocumentType, previewDocumentTypeDefault, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout;
-	
-	// load preview data
-	previewOrderId      = previewOrderIdDefault      = $previewOrderIdInput.val();
-	previewDocumentType = previewDocumentTypeDefault = $previewDocumentTypeInput.val();
+	let previewOrderId, previewDocumentType, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout;
 
-	function reloadPreviewData() {
+	function loadPreviewData() {
 		previewOrderId          = $previewOrderIdInput.val();
 		previewDocumentType     = $previewDocumentTypeInput.val();
 		previewNonce            = $previewNonceInput.val();
 		previewSettingsFormData = $previewSettingsForm.serialize();
 	}
 
-	function resetPreviewData() {
-		$previewOrderIdInput.val( previewOrderIdDefault );
-		$previewDocumentTypeInput.val( previewDocumentTypeDefault );
+	function resetDocumentType() {
+		$previewDocumentTypeInput.val( 'invoice' ).trigger( 'change' ); // default to invoice
 	}
+
+	$( document ).ready( function() {
+		resetDocumentType(); // force document type reset
+		loadPreviewData();   // load preview data
+	} );
 	
 	$( '.slide-left' ).on( 'click', function() {
 		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
@@ -218,7 +218,7 @@ jQuery( function( $ ) {
 
 	// Trigger the Preview
 	function triggerPreview( timeoutDuration ) {
-		reloadPreviewData();
+		loadPreviewData();
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajaxLoadPreview() }, timeoutDuration );
 	}
@@ -260,21 +260,20 @@ jQuery( function( $ ) {
 		let inputName  = $( this ).attr( 'name' );
 		let $ul        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
 		let $li        = $ul.find( 'li[data-value='+inputValue+']' );
-		$ul.parent().find('.current-label').text( $li.text() );
+		$ul.parent().find( '.current-label' ).text( $li.text() ).data( 'value', inputValue );
 	} ).trigger( 'change' );
 
 	// Load the Preview with AJAX
 	function ajaxLoadPreview() {
-		let data      = {
+		let worker   = wpo_wcpdf_admin.pdfjs_worker;
+		let canvasId = 'preview-canvas';
+		let data     = {
 			action:        'wpo_wcpdf_preview',
 			security:      previewNonce,
 			order_id:      previewOrderId,
 			document_type: previewDocumentType,
 			data:          previewSettingsFormData,
 		};
-
-		let worker   = wpo_wcpdf_admin.pdfjs_worker;
-		let canvasId = 'preview-canvas';
 
 		// remove previous error notices
 		$preview.children( '.notice' ).remove();
@@ -310,8 +309,6 @@ jQuery( function( $ ) {
 				}
 
 				$preview.unblock();
-
-				resetPreviewData();
 			},
 		});
 	}
