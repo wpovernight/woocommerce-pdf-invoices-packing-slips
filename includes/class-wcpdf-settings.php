@@ -145,12 +145,12 @@ class Settings {
 		if ( ! empty( $_POST['order_id'] ) && ! empty( $_POST['document_type'] ) ) {
 			$document_type = sanitize_text_field( $_POST['document_type'] );
 			$order_id      = sanitize_text_field( $_POST['order_id'] );
-			$order         = wc_get_order( $order_id );
+			$order         = apply_filters( 'wpo_wcpdf_preview_order_object', wc_get_order( $order_id ), $order_id, $document_type );
 
 			if ( empty( $order ) ) {
 				wp_send_json_error( array( 'error' => __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
-			if ( $order->get_type() != 'shop_order' ) {
+			if ( ! in_array( $order->get_type(), array( 'shop_order', 'shop_order_refund' ) ) ) {
 				wp_send_json_error( array( 'error' => __( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 
