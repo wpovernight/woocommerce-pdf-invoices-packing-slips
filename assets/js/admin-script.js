@@ -259,11 +259,13 @@ jQuery( function( $ ) {
 	// Detect document type input changes and apply the same document title to the document selector
 	$previewDocumentTypeInput.on( 'change', function() {
 		let inputValue = $( this ).val();
-		let inputName  = $( this ).attr( 'name' );
-		let $ul        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
-		let $li        = $ul.find( 'li[data-value='+inputValue+']' );
-		$ul.parent().find( '.current-label' ).text( $li.text() );
-		triggerPreview();
+		if ( inputValue.length ) {			
+			let inputName  = $( this ).attr( 'name' );
+			let $ul        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
+			let $li        = $ul.find( 'li[data-value='+inputValue+']' );
+			$ul.parent().find( '.current-label' ).text( $li.text() );
+			triggerPreview();
+		}
 	} ).trigger( 'change' );
 
 	// Load the Preview with AJAX

@@ -81,9 +81,9 @@ $review_invitation = sprintf(
 				$documents      = WPO_WCPDF()->documents->get_documents( 'all' );
 				$document_type  = 'invoice';
 
-				if ( isset( $_REQUEST['section'] ) ) {
+				if ( ! empty( $_REQUEST['section'] ) ) {
 					$document_type = sanitize_text_field( $_REQUEST['section'] );
-				} elseif ( isset( $_REQUEST['preview'] ) ) {
+				} elseif ( ! empty( $_REQUEST['preview'] ) ) {
 					$document_type = sanitize_text_field( $_REQUEST['preview'] );
 				}
 			?>
