@@ -136,10 +136,7 @@ class Assets {
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
 						// general
 						'download_display',
-						'paper_size',
 						'test_mode',
-						'currency_font',
-						'font_subsetting',
 						// document
 						'enabled',
 						'archive_pdf',
