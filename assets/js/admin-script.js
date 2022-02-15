@@ -260,7 +260,7 @@ jQuery( function( $ ) {
 		let inputName  = $( this ).attr( 'name' );
 		let $ul        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
 		let $li        = $ul.find( 'li[data-value='+inputValue+']' );
-		$ul.parent().find( '.current-label' ).text( $li.text() ).data( 'value', inputValue );
+		$ul.parent().find( '.current-label' ).text( $li.text() );
 	} ).trigger( 'change' );
 
 	// Load the Preview with AJAX
