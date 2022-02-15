@@ -468,6 +468,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .preview-document .preview-data-wrapper .preview-document-type ul > li {
 	text-decoration: none;
 	color: initial;
+	padding: 1.4em 1.6em;
 }
 
 .preview-document .preview-data-wrapper .preview-document-type ul > li:hover {
