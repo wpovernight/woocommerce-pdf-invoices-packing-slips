@@ -129,12 +129,10 @@ class Assets {
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',
 				array(
-					'ajaxurl'                           => admin_url( 'admin-ajax.php' ),
-					'template_paths'                    => WPO_WCPDF()->settings->get_installed_templates(),
-					'pdfjs_worker'                      => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
-					'no_order'                          => __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'order_search_id_placeholder'       => __( 'ID', 'woocommerce-pdf-invoices-packing-slips' ),
-					'order_search_customer_placeholder' => __( 'Email or name', 'woocommerce-pdf-invoices-packing-slips' ),
+					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
+					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
+					'no_order'                  => __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
 						// general
 						'download_display',

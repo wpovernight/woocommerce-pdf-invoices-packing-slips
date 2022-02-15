@@ -486,8 +486,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	float: right;
 }
 
-.preview-document .preview-data p.order-search-id,
-.preview-document .preview-data p.order-search-customer {
+.preview-document .preview-data p.order-search {
 	display: none;
 }
 

@@ -52,8 +52,7 @@ class Settings {
 		// AJAX preview
 		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
 		// AJAX preview order search
-		add_action( 'wp_ajax_wpo_wcpdf_preview_order_id_search', array( $this, 'preview_order_search' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_preview_order_customer_search', array( $this, 'preview_order_search' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
 	}
 
 	public function menu() {
@@ -214,54 +213,50 @@ class Settings {
 	}
 
 	public function preview_order_search() {
-		check_ajax_referer( "wpo_wcpdf_preview", 'security' );
+		check_ajax_referer( 'wpo_wcpdf_preview', 'security' );
 
 		// check permissions
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			die(); 
 		}
 
-		if ( ! empty( $_POST['search'] ) && ! empty( $_POST['action'] ) ) {
-			$search       = sanitize_text_field( $_POST['search'] );
-			$action       = str_replace( 'wpo_wcpdf_preview_order_', '', sanitize_text_field( $_POST['action'] ) );
-			$order_id     = is_numeric( $search );
-			$customer     = is_email( $search );
-			$default_args = apply_filters( 'wpo_wcpdf_preview_order_search_args', array(
-				'type'     => 'shop_order',
-				'limit'    => 10,
-				'orderby'  => 'date',
-				'order'    => 'DESC',
-				'return'   => 'ids',
-			) );
+		if ( ! empty( $_POST['search'] ) ) {
+			$search   = sanitize_text_field( $_POST['search'] );
+			$order_id = is_numeric( $search );
 
-			switch ( $action ) {
-				case 'id_search':
-					if ( $order_id ) {
-						$results = [ $search ];
-					}
-					break;
-				case 'customer_search':
-					// search by email
-					if ( $customer ) {
-						$args = array( 'customer' => $search );
-					}
+			// we have an order ID
+			if ( $order_id ) {
+				$results = [ $search ];
+				
+			// no order ID, let's try with customer
+			} else {
+				$email        = is_email( $search );
+				$default_args = apply_filters( 'wpo_wcpdf_preview_order_search_args', array(
+					'type'     => 'shop_order',
+					'limit'    => 10,
+					'orderby'  => 'date',
+					'order'    => 'DESC',
+					'return'   => 'ids',
+				) );
 
-					// let's try with names
-					if ( ! $customer ) {
-						$names = array( 'billing_first_name', 'billing_last_name', 'billing_company' );
-						foreach( $names as $name ) {
-							$args    = array( $name => $search );
-							$args    = $args + $default_args;
-							$results = wc_get_orders( $args );
-							if( count( $results ) > 0 ) {
-								break;
-							}
-						}
-					} else {
+				// search by email
+				if ( $email ) {
+					$args    = array( 'customer' => $email );
+					$args    = $args + $default_args;
+					$results = wc_get_orders( $args );
+					
+				// search by names
+				} else {
+					$names = array( 'billing_first_name', 'billing_last_name', 'billing_company' );
+					foreach ( $names as $name ) {
+						$args    = array( $name => $search );
 						$args    = $args + $default_args;
 						$results = wc_get_orders( $args );
+						if ( count( $results ) > 0 ) {
+							break;
+						}
 					}
-					break;
+				}
 			}
 
 			// if we got here we have results!

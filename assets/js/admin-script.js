@@ -144,29 +144,17 @@ jQuery( function( $ ) {
 		$previewData.find( 'ul' ).toggleClass( 'active' );
 	} );
 
-	$( '.preview-document .preview-data li' ).on( 'click', function() {
+	$( '.preview-document .preview-data ul > li' ).on( 'click', function() {
 		let $previewData = $( this ).closest( '.preview-data' );
 		$previewData.find( 'ul' ).toggleClass( 'active' );
-		if ( $( this ).hasClass( 'order-search-id' ) ) {
+		if ( $( this ).hasClass( 'order-search' ) ) {
 			$previewData.find( 'p.last-order' ).hide();
-			$previewData.find( 'p.order-search-customer' ).hide();
-			$previewData.find( 'p.order-search-id' ).show();
-			$previewData.find( 'input[name="preview-order-search"]' ).addClass( 'active' ).val( '' );
-			$previewData.find( 'input[name="preview-order-search"]' ).attr( 'placeholder', wpo_wcpdf_admin.order_search_id_placeholder );
-			$previewData.find( '#preview-order-search-results' ).hide();
-			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
-		} else if ( $( this ).hasClass( 'order-search-customer' ) ) {
-			$previewData.find( 'p.last-order' ).hide();
-			$previewData.find( 'p.order-search-id' ).hide();
-			$previewData.find( 'input[name="preview-order-search"]' ).addClass( 'active' ).val( '' );
-			$previewData.find( 'input[name="preview-order-search"]' ).attr( 'placeholder', wpo_wcpdf_admin.order_search_customer_placeholder );
-			$previewData.find( 'p.order-search-customer' ).show();
+			$previewData.find( 'input[name="preview-order-search"]' ).addClass( 'active' );
+			$previewData.find( 'p.order-search' ).show();
 		} else {
 			$previewData.find( 'p.last-order' ).show();
-			$previewData.find( 'p.order-search-id' ).hide();
-			$previewData.find( 'p.order-search-customer' ).hide();
+			$previewData.find( 'p.order-search' ).hide();
 			$previewData.find( 'input[name="preview-order-search"]' ).removeClass( 'active' ).val( '' );
-			$previewData.find( 'input[name="preview-order-search"]' ).attr( 'placeholder', '' );
 			$previewData.find( '#preview-order-search-results' ).hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 			// trigger preview
@@ -377,11 +365,6 @@ jQuery( function( $ ) {
 	$( '#preview-order-search' ).on( 'keyup paste', function( event ) {
 		let $elem = $( this );
 		$elem.addClass( 'ajax-waiting' );
-		let div = $elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
-		div.children( 'a' ).remove();                                          // remove previous results
-		div.children( '.error' ).remove();                                     // remove previous errors
-		$elem.closest( '.preview-data' ).find( '#preview-order-search-results' ).hide();
-		$elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 
 		let duration = event.type == 'keyup' ? 1000 : 0;
 		clearTimeout( previewSearchTimeout );
@@ -390,17 +373,10 @@ jQuery( function( $ ) {
 
 	// Preview order search
 	function previewOrderSearch( $elem ) {
-		let div   = $elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
-		let value = $elem.val();
-		let nonce = $elem.data( 'nonce' );
-		let action;
-
-		// check if value is numeric (order ID) or not (Customer email or name)
-		if ( $.isNumeric( value ) ) {
-			action = 'wpo_wcpdf_preview_order_id_search';
-		} else {
-			action = 'wpo_wcpdf_preview_order_customer_search'
-		}
+		let $div   = $elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+		let value  = $elem.val();
+		let nonce  = $elem.data( 'nonce' );
+		let action = 'wpo_wcpdf_preview_order_search';
 
 		let data = {
 			security: nonce,
@@ -408,15 +384,20 @@ jQuery( function( $ ) {
 			search:   value, 
 		};
 
-		$.ajax({
+		$div.parent().find( 'img.preview-order-search-clear' ).hide(); // hide the clear button
+		$div.children( '.error' ).remove();                            // remove previous errors
+		$div.children( 'a' ).remove();                                 // remove previous results
+		$div.hide();                                                   // hide search results
+
+		$.ajax( {
 			type:    'POST',
 			url:     wpo_wcpdf_admin.ajaxurl,
 			data:    data,
 			success: function( response ) {
 				if ( response.data ) {
 					if ( response.data.error ) {
-						div.append( '<span class="error">'+response.data.error+'</span>' );
-						div.show();
+						$div.append( '<span class="error">'+response.data.error+'</span>' );
+						$div.show();
 					} else {
 						$.each( response.data, function ( i, item ) {
 							let firstLine = '<a data-order_id="'+i+'"><span class="order-number">#'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
@@ -424,8 +405,8 @@ jQuery( function( $ ) {
 								firstLine = firstLine+', '+item.billing_company;
 							}
 							let secondLine = '<br><span class="date">'+item.date_created+'</span><span class="total">'+item.total+'</span></a>';
-							div.append( firstLine+secondLine );
-							div.show();
+							$div.append( firstLine+secondLine );
+							$div.show();
 						});
 					}
 				}
@@ -433,7 +414,7 @@ jQuery( function( $ ) {
 				$elem.removeClass( 'ajax-waiting' );
 				$elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).show();
 			}
-		});
+		} );
 	}
 
 });
