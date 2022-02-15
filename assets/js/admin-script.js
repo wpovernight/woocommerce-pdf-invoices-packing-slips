@@ -250,16 +250,18 @@ jQuery( function( $ ) {
 	$( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list li' ).on( 'click', function() {
 		let inputName = $( this ).closest( 'ul' ).data( 'input-name' );
 		let $input    = $( '#wpo-wcpdf-preview-wrapper :input[name='+inputName+']');
-		$input.val( $( this ).data( 'value' ) ).change();
+		$input.val( $( this ).data( 'value' ) ).trigger( 'change' );
 		triggerPreview();
 	} );
 
 	// Detect document type input changes and apply the same document title to the document selector
 	$previewDocumentTypeInput.on( 'change', function() {
 		let inputValue = $( this ).val();
-		let $li        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list > li[data-value='+inputValue+']' );
-		$( '#wpo-wcpdf-preview-wrapper .preview-document-type .current > .current-label' ).text( $li.text() );
-	} ).change();
+		let inputName  = $( this ).attr( 'name' );
+		let $ul        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
+		let $li        = $ul.find( 'li[data-value='+inputValue+']' );
+		$ul.parent().find('.current-label').text( $li.text() );
+	} ).trigger( 'change' );
 
 	// Load the Preview with AJAX
 	function ajaxLoadPreview() {

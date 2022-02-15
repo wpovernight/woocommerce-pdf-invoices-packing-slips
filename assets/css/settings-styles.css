@@ -465,13 +465,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-right: 30px;
 }
 
-.preview-document .preview-data-wrapper .preview-document-type ul > li > a {
+.preview-document .preview-data-wrapper .preview-document-type ul > li {
 	text-decoration: none;
 	color: initial;
 }
 
-.preview-document .preview-data-wrapper .preview-document-type ul > li:hover a,
-.preview-document .preview-data-wrapper .preview-document-type ul > li > a:hover {
+.preview-document .preview-data-wrapper .preview-document-type ul > li:hover {
 	color: white !important;
 }
 
