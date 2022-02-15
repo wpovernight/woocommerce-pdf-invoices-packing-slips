@@ -135,7 +135,7 @@ jQuery( function( $ ) {
 		// Make preview scrollable after panel animation is complete
 		setTimeout( function() {
 			$wrapper.addClass( 'static' );
-		}, 300);
+		}, 300 );
 	}
 
 	$( '.preview-document .preview-data p' ).on( 'click', function() {
@@ -279,7 +279,7 @@ jQuery( function( $ ) {
 		$preview.children( '.notice' ).remove();
 
 		// if we don't have an order_id, let's finish here
-		if( previewOrderId.length === 0 ) {
+		if ( previewOrderId.length === 0 ) {
 			$preview.find( 'canvas' ).remove();
 			$preview.append( '<div class="notice notice-error inline"><p>'+wpo_wcpdf_admin.no_order+'</p></div>' );
 			return;
@@ -294,15 +294,15 @@ jQuery( function( $ ) {
 			}
 		} );
 
-		$.ajax({
+		$.ajax( {
 			type:    'POST',
 			url:     wpo_wcpdf_admin.ajaxurl,
 			data:    data,
 			success: function( response ) {
-				if( response.data.error ) {
+				if ( response.data.error ) {
 					$( '#'+canvasId ).remove();
 					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
-				} else if( response.data.pdf_data ) {
+				} else if ( response.data.pdf_data ) {
 					$( '#'+canvasId ).remove();
 					$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );
 					renderPdf( worker, canvasId, response.data.pdf_data );
@@ -310,7 +310,7 @@ jQuery( function( $ ) {
 
 				$preview.unblock();
 			},
-		});
+		} );
 	}
 
 	// pdf_js (third party library code)
