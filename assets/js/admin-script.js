@@ -72,8 +72,13 @@ jQuery( function( $ ) {
 		$previewDocumentTypeInput.val( 'invoice' ).trigger( 'change' ); // default to invoice
 	}
 
+	function resetOrderId() {
+		$previewOrderIdInput.val( $previewOrderIdInput.data( 'default' ) );
+	}
+
 	$( document ).ready( function() {
 		resetDocumentType(); // force document type reset
+		resetOrderId();      // force order ID reset
 		loadPreviewData();   // load preview data
 	} );
 	
@@ -142,26 +147,26 @@ jQuery( function( $ ) {
 	$( '.preview-document .preview-data li' ).on( 'click', function() {
 		let $previewData = $( this ).closest( '.preview-data' );
 		$previewData.find( 'ul' ).toggleClass( 'active' );
-		if ( $( this ).hasClass( 'order-number' ) ) {
+		if ( $( this ).hasClass( 'order-search-id' ) ) {
 			$previewData.find( 'p.last-order' ).hide();
-			$previewData.find( 'p.order-search' ).hide();
-			$previewData.find( 'p.order-number' ).show();
-			$previewData.find( 'input[name="preview-order-number"]' ).addClass( 'active' );
-			$previewData.find( 'input[name="preview-order-search"]' ).removeClass( 'active' );
+			$previewData.find( 'p.order-search-customer' ).hide();
+			$previewData.find( 'p.order-search-id' ).show();
+			$previewData.find( 'input[name="preview-order-search"]' ).addClass( 'active' ).val( '' );
+			$previewData.find( 'input[name="preview-order-search"]' ).attr( 'placeholder', wpo_wcpdf_admin.order_search_id_placeholder );
 			$previewData.find( '#preview-order-search-results' ).hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
-		} else if ( $( this ).hasClass( 'order-search' ) ) {
+		} else if ( $( this ).hasClass( 'order-search-customer' ) ) {
 			$previewData.find( 'p.last-order' ).hide();
-			$previewData.find( 'p.order-number' ).hide();
-			$previewData.find( 'p.order-search' ).show();
-			$previewData.find( 'input[name="preview-order-search"]' ).addClass( 'active' );
-			$previewData.find( 'input[name="preview-order-number"]' ).removeClass( 'active' ).val( '' );
+			$previewData.find( 'p.order-search-id' ).hide();
+			$previewData.find( 'input[name="preview-order-search"]' ).addClass( 'active' ).val( '' );
+			$previewData.find( 'input[name="preview-order-search"]' ).attr( 'placeholder', wpo_wcpdf_admin.order_search_customer_placeholder );
+			$previewData.find( 'p.order-search-customer' ).show();
 		} else {
 			$previewData.find( 'p.last-order' ).show();
-			$previewData.find( 'p.order-number' ).hide();
-			$previewData.find( 'p.order-search' ).hide();
-			$previewData.find( 'input[name="preview-order-number"]' ).removeClass( 'active' ).val( '' );
-			$previewData.find( 'input[name="preview-order-search"]' ).removeClass( 'active' );
+			$previewData.find( 'p.order-search-id' ).hide();
+			$previewData.find( 'p.order-search-customer' ).hide();
+			$previewData.find( 'input[name="preview-order-search"]' ).removeClass( 'active' ).val( '' );
+			$previewData.find( 'input[name="preview-order-search"]' ).attr( 'placeholder', '' );
 			$previewData.find( '#preview-order-search-results' ).hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
 			// trigger preview
@@ -173,7 +178,7 @@ jQuery( function( $ ) {
 	$( document ).ready( triggerPreview() );
 
 	// Preview on user input
-	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field), #preview-order-number', function( event ) {
+	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field)', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
 			let duration  = event.type == 'keyup' ? 1000 : 0; 
 			triggerPreview( duration );
@@ -385,11 +390,22 @@ jQuery( function( $ ) {
 
 	// Preview order search
 	function previewOrderSearch( $elem ) {
-		let div  = $elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+		let div   = $elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
+		let value = $elem.val();
+		let nonce = $elem.data( 'nonce' );
+		let action;
+
+		// check if value is numeric (order ID) or not (Customer email or name)
+		if ( $.isNumeric( value ) ) {
+			action = 'wpo_wcpdf_preview_order_id_search';
+		} else {
+			action = 'wpo_wcpdf_preview_order_customer_search'
+		}
+
 		let data = {
-			security: $elem.data('nonce'),
-			action:   "wpo_wcpdf_preview_order_search",
-			search:   $elem.val(), 
+			security: nonce,
+			action:   action,
+			search:   value, 
 		};
 
 		$.ajax({
