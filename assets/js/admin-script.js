@@ -365,7 +365,6 @@ jQuery( function( $ ) {
 	$( '#preview-order-search' ).on( 'keyup paste', function( event ) {
 		let $elem = $( this );
 		$elem.addClass( 'ajax-waiting' );
-
 		let duration = event.type == 'keyup' ? 1000 : 0;
 		clearTimeout( previewSearchTimeout );
 		previewSearchTimeout = setTimeout( function() { previewOrderSearch( $elem ) }, duration );

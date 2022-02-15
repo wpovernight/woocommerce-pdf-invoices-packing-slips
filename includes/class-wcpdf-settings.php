@@ -221,16 +221,14 @@ class Settings {
 		}
 
 		if ( ! empty( $_POST['search'] ) ) {
-			$search   = sanitize_text_field( $_POST['search'] );
-			$order_id = is_numeric( $search );
+			$search = sanitize_text_field( $_POST['search'] );
 
 			// we have an order ID
-			if ( $order_id ) {
+			if ( is_numeric( $search ) ) {
 				$results = [ $search ];
 				
 			// no order ID, let's try with customer
 			} else {
-				$email        = is_email( $search );
 				$default_args = apply_filters( 'wpo_wcpdf_preview_order_search_args', array(
 					'type'     => 'shop_order',
 					'limit'    => 10,
@@ -240,11 +238,11 @@ class Settings {
 				) );
 
 				// search by email
-				if ( $email ) {
-					$args    = array( 'customer' => $email );
+				if ( is_email( $search ) ) {
+					$args    = array( 'customer' => $search );
 					$args    = $args + $default_args;
 					$results = wc_get_orders( $args );
-					
+
 				// search by names
 				} else {
 					$names = array( 'billing_first_name', 'billing_last_name', 'billing_company' );
