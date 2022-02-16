@@ -137,97 +137,103 @@ class Settings {
 	public function ajax_preview() {
 		check_ajax_referer( "wpo_wcpdf_preview", 'security' );
 
-		// check permissions
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			die(); 
-		}
 
-		// get document type
-		if ( ! empty( $_POST['document_type'] ) ) {
-			$document_type = sanitize_text_field( $_POST['document_type'] );
-		} else {
-			$document_type = 'invoice';
-		}
-
-		// get order ID
-		if ( ! empty( $_POST['order_id'] ) ) {
-			$order_id = sanitize_text_field( $_POST['order_id'] );
-		} else {
-			// default to last order
-			$default_order_id = wc_get_orders( apply_filters( 'wpo_wcpdf_preview_default_order_id_query_args', array(
-				'limit'  => 1,
-				'return' => 'ids',
-				'type'   => 'shop_order',
-			), $document_type ) );
-			$order_id = apply_filters( 'wpo_wcpdf_preview_default_order_id', ! empty( $default_order_id ) ? reset( $default_order_id ) : false );
-		}
-
-		// get PDF data for preview
-		if ( $order_id ) {
-			$order = apply_filters( 'wpo_wcpdf_preview_order_object', wc_get_order( $order_id ), $order_id, $document_type );
-
-			if ( empty( $order ) ) {
-				wp_send_json_error( array( 'error' => __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
-			}
-			if ( ! in_array( $order->get_type(), array( 'shop_order', 'shop_order_refund' ) ) ) {
-				wp_send_json_error( array( 'error' => __( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		try {
+			// check permissions
+			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+				throw new \Exception( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), 403 );
 			}
 
-			// process settings data
-			if ( ! empty( $_POST['data'] ) ) {
-				// parse form data
-				parse_str( $_POST['data'], $form_data );
-				$form_data = stripslashes_deep( $form_data );
-
-				foreach ( $form_data as $option_key => $form_settings ) {
-					if ( apply_filters( 'wpo_wcpdf_preview_filter_option', strpos( $option_key, 'wpo_wcpdf' ) === 0, $option_key ) === false ) {
-						continue; // not our business
-					}
-
-					// validate option values
-					$form_settings = WPO_WCPDF()->settings->callbacks->validate( $form_settings );
-
-					// filter the options
-					add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
-						return maybe_unserialize( $form_settings );
-					}, 99, 2 );
-				}
-
-				// reload settings
-				$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-				$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
-			}
-
-			$document = wcpdf_get_document( $document_type, $order );
-
-			if ( $document ) {
-				if ( ! $document->exists() ) {
-					$document->set_date( current_time( 'timestamp', true ) );
-					$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
-					$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
-					$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
-					$document->set_number( $number_store->get_next() );
-				}
-
-				// apply document number formatting
-				if ( $document_number = $document->get_number( $document->get_type() ) ) {
-					if ( ! empty( $document->settings['number_format'] ) ) {
-						foreach ( $document->settings['number_format'] as $key => $value ) {
-							$document_number->$key = $document->settings['number_format'][$key];
-						}
-					}
-					$document_number->apply_formatting( $document, $order );
-				}
-
-				// preview
-				$pdf_data = $document->preview_pdf();
-
-				wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
+			// get document type
+			if ( ! empty( $_POST['document_type'] ) ) {
+				$document_type = sanitize_text_field( $_POST['document_type'] );
 			} else {
-				wp_send_json_error( array( 'error' => sprintf( __( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) ) );
+				$document_type = 'invoice';
 			}
-		} else {
-			wp_send_json_error( array( 'error' => __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+
+			// get order ID
+			if ( ! empty( $_POST['order_id'] ) ) {
+				$order_id = sanitize_text_field( $_POST['order_id'] );
+			} else {
+				// default to last order
+				$default_order_id = wc_get_orders( apply_filters( 'wpo_wcpdf_preview_default_order_id_query_args', array(
+					'limit'  => 1,
+					'return' => 'ids',
+					'type'   => 'shop_order',
+				), $document_type ) );
+				$order_id = apply_filters( 'wpo_wcpdf_preview_default_order_id', ! empty( $default_order_id ) ? reset( $default_order_id ) : false );
+			}
+
+			// get PDF data for preview
+			if ( $order_id ) {
+				$order = apply_filters( 'wpo_wcpdf_preview_order_object', wc_get_order( $order_id ), $order_id, $document_type );
+
+				if ( empty( $order ) ) {
+					wp_send_json_error( array( 'error' => __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+				}
+				if ( ! in_array( $order->get_type(), array( 'shop_order', 'shop_order_refund' ) ) ) {
+					wp_send_json_error( array( 'error' => __( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+				}
+
+				// process settings data
+				if ( ! empty( $_POST['data'] ) ) {
+					// parse form data
+					parse_str( $_POST['data'], $form_data );
+					$form_data = stripslashes_deep( $form_data );
+
+					foreach ( $form_data as $option_key => $form_settings ) {
+						if ( apply_filters( 'wpo_wcpdf_preview_filter_option', strpos( $option_key, 'wpo_wcpdf' ) === 0, $option_key ) === false ) {
+							continue; // not our business
+						}
+
+						// validate option values
+						$form_settings = WPO_WCPDF()->settings->callbacks->validate( $form_settings );
+
+						// filter the options
+						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
+							return maybe_unserialize( $form_settings );
+						}, 99, 2 );
+					}
+
+					// reload settings
+					$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
+					$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+				}
+
+				$document = wcpdf_get_document( $document_type, $order );
+
+				if ( $document ) {
+					if ( ! $document->exists() ) {
+						$document->set_date( current_time( 'timestamp', true ) );
+						$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+						$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
+						$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
+						$document->set_number( $number_store->get_next() );
+					}
+
+					// apply document number formatting
+					if ( $document_number = $document->get_number( $document->get_type() ) ) {
+						if ( ! empty( $document->settings['number_format'] ) ) {
+							foreach ( $document->settings['number_format'] as $key => $value ) {
+								$document_number->$key = $document->settings['number_format'][$key];
+							}
+						}
+						$document_number->apply_formatting( $document, $order );
+					}
+
+					// preview
+					$pdf_data = $document->preview_pdf();
+
+					wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
+				} else {
+					wp_send_json_error( array( 'error' => sprintf( __( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) ) );
+				}
+			} else {
+				wp_send_json_error( array( 'error' => __( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			}
+
+		} catch (\Throwable $th) {
+			wp_send_json_error( array( 'error' => sprintf( esc_html__( 'Error trying to generate document: %s', 'woocommerce-pdf-invoices-packing-slips' ), $th->getMessage() ) ) );
 		}
 
 		wp_die();

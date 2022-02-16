@@ -314,6 +314,12 @@ jQuery( function( $ ) {
 
 				$preview.unblock();
 			},
+			error: function(xhr, status, error){
+				let errorMessage = xhr.status + ': ' + xhr.statusText
+				$( '#'+canvasId ).remove();
+				$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
+				$preview.unblock();
+			},
 		} );
 	}
 
