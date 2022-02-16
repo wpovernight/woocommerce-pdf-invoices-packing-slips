@@ -158,7 +158,6 @@ class Settings_General {
 				'args'		=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'shop_name',
-					'size'			=> '72',
 					'translatable'	=> true,
 				)
 			),
