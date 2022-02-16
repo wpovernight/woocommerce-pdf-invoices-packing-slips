@@ -199,7 +199,11 @@ function wcpdf_log_error( $message, $level = 'error', $e = null ) {
 		$logger = wc_get_logger();
 		$context = array( 'source' => 'wpo-wcpdf' );
 
-		if ( apply_filters( 'wcpdf_log_stacktrace', false ) && !empty($e) && is_callable( array( $e, 'getTraceAsString') ) ) {
+		if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ) {
+			$message = sprintf( '%s (%s:%d)', $message, $e->getFile(), $e->getLine() );
+		}
+
+		if ( apply_filters( 'wcpdf_log_stacktrace', false ) && is_callable( array( $e, 'getTraceAsString' ) ) ) {
 			$message .= "\n".$e->getTraceAsString();
 		}
 		 
@@ -226,7 +230,10 @@ function wcpdf_output_error( $message, $level = 'error', $e = null ) {
 	?>
 	<div style="border: 2px solid red; padding: 5px;">
 		<h3><?php echo wp_kses_post( $message ); ?></h3>
-		<?php if ( !empty($e) && is_callable( array( $e, 'getTraceAsString') ) ): ?>
+		<?php if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ): ?>
+		<pre><?php echo $e->getFile(); ?> (<?php echo $e->getLine(); ?>)</pre>
+		<?php endif ?>
+		<?php if ( is_callable( array( $e, 'getTraceAsString' ) ) ): ?>
 		<pre><?php echo $e->getTraceAsString(); ?></pre>
 		<?php endif ?>
 	</div>
