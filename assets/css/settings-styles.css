@@ -242,6 +242,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	box-sizing: border-box;
 	background: transparent;
 	flex: 0 0 35%;
+	overflow-x: hidden;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form {
@@ -381,7 +382,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="sidebar"] .sidebar {
 	flex: 0 0 35%;
-	max-width: 35%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .sidebar {
