@@ -55,6 +55,7 @@ jQuery( function( $ ) {
 	//----------> Preview <----------//
 
 	// objects
+	let $previewWrapper           = $( '#wpo-wcpdf-preview-wrapper' );
 	let $preview                  = $( '#wpo-wcpdf-preview-wrapper .preview' );
 	let $previewOrderIdInput      = $( '#wpo-wcpdf-preview-wrapper input[name="order_id"]' );
 	let $previewDocumentTypeInput = $( '#wpo-wcpdf-preview-wrapper input[name="document_type"]' );
@@ -80,56 +81,90 @@ jQuery( function( $ ) {
 	}
 
 	$( document ).ready( function() {
-		resetDocumentType(); // force document type reset
-		resetOrderId();      // force order ID reset
-		loadPreviewData();   // load preview data
+		resetDocumentType();      // force document type reset
+		resetOrderId();           // force order ID reset
+		loadPreviewData();        // load preview data
+		determinePreviewStates(); // determine preview states based on screen size
 	} );
+
+	$(window).on( 'resize', determinePreviewStates );
+		
+	function determinePreviewStates() {
+
+		// Check if preview states are allowed to change based on screen size
+		if ( $previewWrapper.attr( 'data-preview-states-lock') == false ) {
+
+			// On small screens: 2 preview states and close preview
+			if ( $(this).width() <= 1200 ) {
+				$previewWrapper.find( '.preview-document' ).hide();
+				$previewWrapper.find( '.slide-left' ).show();
+				$previewWrapper.find( '.slide-right' ).hide();
+				$previewWrapper.attr( 'data-preview-states', 2 );
+				$previewWrapper.attr( 'data-preview-state', 'closed' );
+				$previewWrapper.attr( 'data-from-preview-state', '' );
+				makePreviewScrollable( $previewWrapper );
+
+			// On larger screens: 3 preview states and show settings as sidebar
+			} else {
+				$previewWrapper.find( '.preview-document' ).show();
+				$previewWrapper.find( '.slide-left, .slide-right' ).show();
+				$previewWrapper.attr( 'data-preview-states', 3 );
+				$previewWrapper.attr( 'data-preview-state', 'sidebar' );
+				$previewWrapper.attr( 'data-from-preview-state', '' );
+				$previewWrapper.removeClass( 'static' );
+			}
+		} 
+	}
 	
 	$( '.slide-left' ).on( 'click', function() {
-		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
-		let previewStates = $wrapper.attr( 'data-preview-states' );
-		let previewState  = $wrapper.attr( 'data-preview-state' );
+		let previewStates = $previewWrapper.attr( 'data-preview-states' );
+		let previewState  = $previewWrapper.attr( 'data-preview-state' );
 
 		if ( previewStates == 3 ) {
 			if ( previewState == 'closed' ) {
-				$wrapper.find( '.preview-document' ).show();
-				$wrapper.attr( 'data-preview-state', 'sidebar' );
-				$wrapper.attr( 'data-from-preview-state', 'closed' );
+				$previewWrapper.find( '.preview-document' ).show();
+				$previewWrapper.find( '.slide-right' ).show();
+				$previewWrapper.attr( 'data-preview-state', 'sidebar' );
+				$previewWrapper.attr( 'data-from-preview-state', 'closed' );
 			} else {
-				$wrapper.find( '.slide-left' ).hide();
-				$wrapper.attr( 'data-preview-state', 'full' );
-				$wrapper.attr( 'data-from-preview-state', 'sidebar' );
-				makePreviewScrollable( $wrapper );
+				$previewWrapper.find( '.slide-left' ).hide();
+				$previewWrapper.attr( 'data-preview-state', 'full' );
+				$previewWrapper.attr( 'data-from-preview-state', 'sidebar' );
+				makePreviewScrollable( $previewWrapper );
 			}
 		} else {
-			$wrapper.find( '.preview-document' ).show();
-			$wrapper.attr( 'data-preview-state', 'full' );
-			$wrapper.attr( 'data-from-preview-state', 'closed' );
-			makePreviewScrollable( $wrapper );
+			$previewWrapper.find( '.preview-document' ).show();
+			$previewWrapper.find( '.slide-left' ).hide();
+			$previewWrapper.find( '.slide-right' ).show();
+			$previewWrapper.attr( 'data-preview-state', 'full' );
+			$previewWrapper.attr( 'data-from-preview-state', 'closed' );
+			makePreviewScrollable( $previewWrapper );
 		}
 	} );
 
 	$( '.slide-right' ).on( 'click', function() {
-		let $wrapper      = $( this ).closest( '#wpo-wcpdf-preview-wrapper' );
-		let previewStates = $wrapper.attr( 'data-preview-states' );
-		let previewState  = $wrapper.attr( 'data-preview-state' );
+		let previewStates = $previewWrapper.attr( 'data-preview-states' );
+		let previewState  = $previewWrapper.attr( 'data-preview-state' );
 
 		if ( previewStates == 3 ) {
 			if ( previewState == 'full' ) {
-				$wrapper.find( '.slide-left' ).delay(400).show(0);
-				$wrapper.attr( 'data-preview-state', 'sidebar' );
-				$wrapper.attr( 'data-from-preview-state', 'full' );
+				$previewWrapper.find( '.slide-left' ).delay(400).show(0);
+				$previewWrapper.attr( 'data-preview-state', 'sidebar' );
+				$previewWrapper.attr( 'data-from-preview-state', 'full' );
 			} else {
-				$wrapper.find( '.preview-document' ).hide(300);
-				$wrapper.attr( 'data-preview-state', 'closed' );
-				$wrapper.attr( 'data-from-preview-state', 'sidebar' );
+				$previewWrapper.find( '.preview-document' ).hide(300);
+				$previewWrapper.find( '.slide-right' ).hide();
+				$previewWrapper.attr( 'data-preview-state', 'closed' );
+				$previewWrapper.attr( 'data-from-preview-state', 'sidebar' );
 			}
 		} else {
-			$wrapper.find( '.preview-document' ).hide(300);
-			$wrapper.attr( 'data-preview-state', 'closed' );
-			$wrapper.attr( 'data-from-preview-state', 'full' );
+			$previewWrapper.find( '.preview-document' ).hide(300);
+			$previewWrapper.find( '.slide-left' ).show();
+			$previewWrapper.find( '.slide-right' ).hide();
+			$previewWrapper.attr( 'data-preview-state', 'closed' );
+			$previewWrapper.attr( 'data-from-preview-state', 'full' );
 		}
-		$wrapper.removeClass( 'static' );
+		$previewWrapper.removeClass( 'static' );
 	} );
 
 	function makePreviewScrollable( wrapper ) {

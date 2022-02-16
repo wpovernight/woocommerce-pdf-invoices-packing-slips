@@ -641,16 +641,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	float: right;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .gutter .slide-right,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .gutter .slide-right {
-	display: none;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="full"] .gutter .slide-left,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="full"] .gutter .slide-left {
-	display: none;
-}
-
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="sidebar"] .gutter .slide-left {
 	border: none;
 }
@@ -678,6 +668,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	text-align: left;
 	padding-left: 10px;
 	border-left: 1px solid #ccc;
+	display: none;
 }
 
 #wpo-wcpdf-preview-wrapper .slider:hover {
