@@ -709,3 +709,10 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	height: 170vh!important;
 	overflow: hidden;
 }
+
+#wpo-wcpdf-preview-wrapper input.readonly,
+#wpo-wcpdf-preview-wrapper input[readonly],
+#wpo-wcpdf-preview-wrapper textarea.readonly,
+#wpo-wcpdf-preview-wrapper textarea[readonly] {
+	background-color: #f8f8f8;
+}
