@@ -72,7 +72,7 @@ jQuery( function( $ ) {
 	}
 
 	function resetDocumentType() {
-		$previewDocumentTypeInput.val( 'invoice' ).trigger( 'change' ); // default to invoice
+		$previewDocumentTypeInput.val( $previewDocumentTypeInput.data( 'default' ) ).trigger( 'change' );
 	}
 
 	function resetOrderId() {
@@ -372,6 +372,7 @@ jQuery( function( $ ) {
 		let $elem = $( this );
 		$elem.addClass( 'ajax-waiting' );
 		let duration = event.type == 'keyup' ? 1000 : 0;
+		loadPreviewData();
 		clearTimeout( previewSearchTimeout );
 		previewSearchTimeout = setTimeout( function() { previewOrderSearch( $elem ) }, duration );
 	} );
@@ -384,9 +385,10 @@ jQuery( function( $ ) {
 		let action = 'wpo_wcpdf_preview_order_search';
 
 		let data = {
-			security: nonce,
-			action:   action,
-			search:   value, 
+			security:      nonce,
+			action:        action,
+			search:        value,
+			document_type: previewDocumentType,
 		};
 
 		$div.parent().find( 'img.preview-order-search-clear' ).hide(); // hide the clear button

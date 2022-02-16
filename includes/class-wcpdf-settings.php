@@ -220,8 +220,9 @@ class Settings {
 			die(); 
 		}
 
-		if ( ! empty( $_POST['search'] ) ) {
-			$search = sanitize_text_field( $_POST['search'] );
+		if ( ! empty( $_POST['search'] ) && ! empty( $_POST['document_type'] ) ) {
+			$search        = sanitize_text_field( $_POST['search'] );
+			$document_type = sanitize_text_field( $_POST['document_type'] );
 
 			// we have an order ID
 			if ( is_numeric( $search ) ) {
@@ -235,7 +236,7 @@ class Settings {
 					'orderby'  => 'date',
 					'order'    => 'DESC',
 					'return'   => 'ids',
-				) );
+				), $document_type );
 
 				// search by email
 				if ( is_email( $search ) ) {
