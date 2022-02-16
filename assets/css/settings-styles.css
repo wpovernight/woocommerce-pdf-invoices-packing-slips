@@ -297,8 +297,9 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 100%;
 }
 
-input[type="text"][size] {
+#wpo-wcpdf-preview-wrapper input[type="text"][size] {
 	width: auto !important;
+	max-width: 100% !important;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input#next_invoice_number {
@@ -306,33 +307,40 @@ input[type="text"][size] {
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table {
 	display: table;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tbody,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table tbody,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tbody {
 	display: table-row-group;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tr,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table tr,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tr,
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tbody tr,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table tbody tr,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tbody tr {
 	display: table-row;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > td,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
-	display: table-cell !important;
-	padding: 15px 10px 15px 0px !important;
+	display: table-cell;
+	padding: 15px 10px 15px 0px;
 	width: auto;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .wcpdf_document_settings_sections ul, 
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .wcpdf_document_settings_sections ul {
 	width: 300px !important;
