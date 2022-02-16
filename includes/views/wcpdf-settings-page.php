@@ -72,14 +72,8 @@ $review_invitation = sprintf(
 
 		<div class="preview-document">
 			<?php
-				$last_order_id = wc_get_orders( array(
-					'limit'  => 1,
-					'return' => 'ids',
-					'type'   => 'shop_order',
-				) );
-				$order_id       = ! empty( $last_order_id ) ? reset( $last_order_id ) : false;
-				$documents      = WPO_WCPDF()->documents->get_documents( 'all' );
-				$document_type  = 'invoice';
+				$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
+				$document_type = 'invoice';
 
 				if ( ! empty( $_REQUEST['section'] ) ) {
 					$document_type = sanitize_text_field( $_REQUEST['section'] );
@@ -123,7 +117,7 @@ $review_invitation = sprintf(
 				<?php endif; ?>
 			</div>
 			<input type="hidden" name="document_type" data-default="<?= $document_type; ?>" value="<?= $document_type; ?>">
-			<input type="hidden" name="order_id" data-default="<?= $order_id; ?>" value="<?= $order_id; ?>">
+			<input type="hidden" name="order_id" value="">
 			<input type="hidden" name="nonce" value="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
 			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
 			<div class="preview"></div>

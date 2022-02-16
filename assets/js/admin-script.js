@@ -76,7 +76,7 @@ jQuery( function( $ ) {
 	}
 
 	function resetOrderId() {
-		$previewOrderIdInput.val( $previewOrderIdInput.data( 'default' ) );
+		$previewOrderIdInput.val( '' ).trigger( 'change' );
 	}
 
 	$( document ).ready( function() {
@@ -160,8 +160,8 @@ jQuery( function( $ ) {
 			$previewData.find( 'input[name="preview-order-search"]' ).removeClass( 'active' ).val( '' );
 			$previewData.find( '#preview-order-search-results' ).hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
-			// trigger preview
-			triggerPreview();
+			resetOrderId()    // force order ID reset
+			triggerPreview(); // trigger preview
 		}
 	} );
 
@@ -269,6 +269,11 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 
+	// Detect order ID input changes
+	$previewOrderIdInput.on( 'change', function() {
+		triggerPreview();
+	} ).trigger( 'change' );
+
 	// Load the Preview with AJAX
 	function ajaxLoadPreview() {
 		let worker   = wpo_wcpdf_admin.pdfjs_worker;
@@ -283,13 +288,6 @@ jQuery( function( $ ) {
 
 		// remove previous error notices
 		$preview.children( '.notice' ).remove();
-
-		// if we don't have an order_id, let's finish here
-		if ( previewOrderId.length === 0 ) {
-			$preview.find( 'canvas' ).remove();
-			$preview.append( '<div class="notice notice-error inline"><p>'+wpo_wcpdf_admin.no_order+'</p></div>' );
-			return;
-		}
 
 		// block ui
 		$preview.block( {
