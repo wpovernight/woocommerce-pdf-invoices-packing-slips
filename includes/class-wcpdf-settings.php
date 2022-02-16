@@ -258,6 +258,9 @@ class Settings {
 				}
 			}
 
+			// filter results
+			$results = apply_filters( 'wpo_wcpdf_preview_order_search_results', $results, $search, $document_type );
+
 			// if we got here we have results!
 			if ( ! empty( $results ) ) {
 				$data = array();
