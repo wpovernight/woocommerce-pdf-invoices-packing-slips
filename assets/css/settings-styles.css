@@ -723,3 +723,15 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 #wpo-wcpdf-preview-wrapper textarea[readonly] {
 	background-color: #f8f8f8;
 }
+
+@media screen and (max-width: 1200px) {
+	.preview-document .preview > #preview-canvas {
+		max-width: 680px;
+	}
+}
+
+@media screen and (max-width: 960px) {
+	.preview-document .preview > #preview-canvas {
+		width: 80vw!important;
+	}
+}
