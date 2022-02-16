@@ -223,6 +223,7 @@ class Settings {
 		if ( ! empty( $_POST['search'] ) && ! empty( $_POST['document_type'] ) ) {
 			$search        = sanitize_text_field( $_POST['search'] );
 			$document_type = sanitize_text_field( $_POST['document_type'] );
+			$results       = array();
 
 			// we have an order ID
 			if ( is_numeric( $search ) ) {
