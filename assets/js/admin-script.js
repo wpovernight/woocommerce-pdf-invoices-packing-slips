@@ -102,7 +102,6 @@ jQuery( function( $ ) {
 				$previewWrapper.attr( 'data-preview-states', 2 );
 				$previewWrapper.attr( 'data-preview-state', 'closed' );
 				$previewWrapper.attr( 'data-from-preview-state', '' );
-				makePreviewScrollable( $previewWrapper );
 
 			// On larger screens: 3 preview states and show settings as sidebar
 			} else {
