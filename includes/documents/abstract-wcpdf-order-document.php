@@ -136,12 +136,12 @@ abstract class Order_Document {
 		}
 
 		// get historical settings if enabled
-		if ( !empty( $this->order ) && $this->use_historical_settings() == true ) {
+		if ( ! empty( $this->order ) && $this->use_historical_settings() == true ) {
 			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-			if (!empty($order_settings) && !is_array($order_settings)) {
+			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
 				$order_settings = maybe_unserialize( $order_settings );
 			}
-			if (!empty($order_settings) && is_array($order_settings)) {
+			if ( ! empty( $order_settings ) && is_array( $order_settings ) ) {
 				// ideally we should combine the order settings with the latest settings, so that new settings will
 				// automatically be applied to existing orders too. However, doing this by combining arrays is not
 				// possible because the way settings are currently stored means unchecked options are not included.
