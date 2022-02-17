@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.13.0
+Stable tag: 2.13.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.13.1 =
+* Fix: load missing non-historical settings for existing invoices
+* Tweak: print file & line number for exceptions in error logs & output
+* Marked tested up to WooCommerce 6.2
 
 = 2.13.0 =
 * New: include dompdf temporary folder in cleanup procedure
