@@ -151,7 +151,7 @@ abstract class Order_Document {
 				$settings = (array) $order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
 			}
 		}
-		if ( $this->storing_settings_enabled() && empty( $order_settings ) && !empty( $this->order ) ) {
+		if ( $this->storing_settings_enabled() && empty( $order_settings ) && ! empty( $this->order ) ) {
 			// this is either the first time the document is generated, or historical settings are disabled
 			// in both cases, we store the document settings
 			// exclude non historical settings from being saved in order meta
