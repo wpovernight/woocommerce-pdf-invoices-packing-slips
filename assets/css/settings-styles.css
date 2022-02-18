@@ -266,18 +266,18 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	max-width: none;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > th,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td {
-	display: block;
-	width: 100%;
-	padding: 0;
-}
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > th,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td {
+		display: block;
+		width: 100%;
+		padding: 0;
+	}
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > th,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th {
@@ -754,5 +754,25 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 @media screen and (max-width: 960px) {
 	.preview-document .preview > #preview-canvas {
 		width: 80vw!important;
+	}
+
+	#wpo-wcpdf-preview-wrapper .sidebar > form {
+		max-width: 100%;
+	}
+
+	#wpo-wcpdf-preview-wrapper[data-preview-state="closed"] .select2.select2-container {
+	width: 100%!important;
+}
+
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > th,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th,
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td {
+		display: block!important;
+		/*width: 100%!important;*/
 	}
 }
