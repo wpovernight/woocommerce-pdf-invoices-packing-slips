@@ -127,6 +127,7 @@ jQuery( function( $ ) {
 				$previewWrapper.attr( 'data-from-preview-state', 'closed' );
 			} else {
 				$previewWrapper.find( '.slide-left' ).hide();
+				$previewWrapper.find( '.sidebar' ).delay(300).hide(0);
 				$previewWrapper.attr( 'data-preview-state', 'full' );
 				$previewWrapper.attr( 'data-from-preview-state', 'sidebar' );
 				makePreviewScrollable( $previewWrapper );
@@ -148,6 +149,7 @@ jQuery( function( $ ) {
 		if ( previewStates == 3 ) {
 			if ( previewState == 'full' ) {
 				$previewWrapper.find( '.slide-left' ).delay(400).show(0);
+				$previewWrapper.find( '.sidebar' ).show();
 				$previewWrapper.attr( 'data-preview-state', 'sidebar' );
 				$previewWrapper.attr( 'data-from-preview-state', 'full' );
 			} else {
