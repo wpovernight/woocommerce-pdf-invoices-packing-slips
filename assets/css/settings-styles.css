@@ -91,8 +91,8 @@ img.wpo-helper {
 }
 
 .multiple-text-input label {
-    min-width: 120px;
-    display: inline-block;
+	min-width: 120px;
+	display: inline-block;
 }
 
 table.wcpdf_documents_settings_list {
@@ -736,6 +736,18 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 @media screen and (max-width: 1200px) {
 	.preview-document .preview > #preview-canvas {
 		max-width: 680px;
+	}
+
+	.nav-tab-wrapper a.nav-tab {
+		padding: 1em 2em;
+		margin: 0 0.5em 0.5em 0;
+		border: 1px solid #ccc;
+		box-sizing: border-box;
+		height: 4em;
+	}
+
+	.nav-tab-wrapper a.nav-tab.nav-tab-active {
+		border: 3px solid #51266b;
 	}
 }
 
