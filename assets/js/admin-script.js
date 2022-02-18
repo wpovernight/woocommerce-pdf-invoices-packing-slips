@@ -105,7 +105,7 @@ jQuery( function( $ ) {
 
 			// On larger screens: 3 preview states and show settings as sidebar
 			} else {
-				$previewWrapper.find( '.preview-document' ).show();
+				$previewWrapper.find( '.preview-document, .sidebar' ).show();
 				$previewWrapper.find( '.slide-left, .slide-right' ).show();
 				$previewWrapper.attr( 'data-preview-states', 3 );
 				$previewWrapper.attr( 'data-preview-state', 'sidebar' );
