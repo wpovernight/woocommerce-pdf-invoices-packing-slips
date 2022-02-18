@@ -119,6 +119,8 @@ jQuery( function( $ ) {
 		let previewStates = $previewWrapper.attr( 'data-preview-states' );
 		let previewState  = $previewWrapper.attr( 'data-preview-state' );
 
+		$previewWrapper.find( '.preview-data-wrapper ul' ).removeClass( 'active' );
+
 		if ( previewStates == 3 ) {
 			if ( previewState == 'closed' ) {
 				$previewWrapper.find( '.preview-document' ).show();
@@ -145,6 +147,8 @@ jQuery( function( $ ) {
 	$( '.slide-right' ).on( 'click', function() {
 		let previewStates = $previewWrapper.attr( 'data-preview-states' );
 		let previewState  = $previewWrapper.attr( 'data-preview-state' );
+
+		$previewWrapper.find( '.preview-data-wrapper ul' ).removeClass( 'active' );
 
 		if ( previewStates == 3 ) {
 			if ( previewState == 'full' ) {
