@@ -378,7 +378,7 @@ class Install {
 			global $wpdb;
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
-				if ( ! function_exists( 'WPO_WCPDF_Pro' ) && $document->get_type() != 'invoice' ) {
+				if ( $document->get_type() != 'invoice' ) {
 					$table_name = "{$wpdb->prefix}wcpdf_{$document->slug}_number";
 					if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
 						continue;
