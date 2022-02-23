@@ -1075,7 +1075,7 @@ abstract class Order_Document {
 			$table_removed = $wpdb->query( "DROP TABLE IF EXISTS {$retired_table_name}" );
 
 			if( ! $table_removed ) {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to remove the duplicate number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $retired_table_name, $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( 'An error occurred while trying to remove the duplicate number store %s: %s', $retired_table_name, $wpdb->last_error ) );
 				return $requested_year;
 			}
 		}
@@ -1086,7 +1086,7 @@ abstract class Order_Document {
 			$table_renamed = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$retired_table_name}" );
 			
 			if( ! $table_renamed ) {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $retired_table_name, $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $default_table_name, $retired_table_name, $wpdb->last_error ) );
 				return $requested_year;
 			}
 		}
@@ -1097,7 +1097,7 @@ abstract class Order_Document {
 			$table_renamed = $wpdb->query( "ALTER TABLE {$current_year_table_name} RENAME {$default_table_name}" );
 
 			if( ! $table_renamed ) {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $current_year_table_name, $default_table_name, $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $current_year_table_name, $default_table_name, $wpdb->last_error ) );
 				return $requested_year;
 			}
 		}
@@ -1132,7 +1132,7 @@ abstract class Order_Document {
 				// OR that the first number simply has not been created yet (=no rows)
 				// we only log when there's an actual error
 				if( ! empty( $wpdb->last_error ) ) {
-					wcpdf_log_error( sprintf( __( 'An error occurred while trying to get the current year from the %s table: %s', 'woocommerce-pdf-invoices-packing-slips' ), $table_name, $wpdb->last_error ) );
+					wcpdf_log_error( sprintf( 'An error occurred while trying to get the current year from the %s table: %s', $table_name, $wpdb->last_error ) );
 				}
 			}
 		} else {
