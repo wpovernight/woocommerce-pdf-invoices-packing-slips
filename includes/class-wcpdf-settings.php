@@ -111,27 +111,43 @@ class Settings {
 		settings_errors();
 
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
-			'general' => array(
-				'title' => __('General', 'woocommerce-pdf-invoices-packing-slips' ),
+			'general'   => array(
+				'title'          => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
 			'documents'	=> array(
-				'title' => __('Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'          => __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
 		) );
 
 		// add status tab last in row
 		$settings_tabs['debug'] = array(
-			'title' => __('Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title'          => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
 			'preview_states' => 1,
 		);
 
+		$settings_tabs  = $this->maybe_disable_preview_on_settings_tabs( $settings_tabs ); // disable preview on debug setting
 		$default_tab    = apply_filters( 'wpo_wcpdf_settings_tabs_default', ! empty( $settings_tabs['general'] ) ? 'general' : key( $settings_tabs ) );
 		$active_tab     = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : $default_tab;
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
 
 		include( 'views/wcpdf-settings-page.php' );
+	}
+
+	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
+		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$close_preview  = isset( $debug_settings['disable_preview'] );
+
+		if ( $close_preview ) {
+			foreach ( $settings_tabs as $tab_key => &$tab ) {
+				if ( is_array( $tab ) && ! empty( $tab['preview_states'] ) ) {
+					$tab['preview_states'] = 1;
+				}
+			}		
+		}
+
+		return $settings_tabs;
 	}
 
 	public function ajax_preview() {
