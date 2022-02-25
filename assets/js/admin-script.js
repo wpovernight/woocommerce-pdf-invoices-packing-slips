@@ -63,7 +63,7 @@ jQuery( function( $ ) {
 	let $previewSettingsForm      = $( '#wpo-wcpdf-settings' );
 
 	// variables
-	let previewOrderId, previewDocumentType, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout;
+	let previewOrderId, previewDocumentType, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout, previousWindowWidth;
 
 	function loadPreviewData() {
 		previewOrderId          = $previewOrderIdInput.val();
@@ -84,6 +84,8 @@ jQuery( function( $ ) {
 		resetDocumentType();      // force document type reset
 		resetOrderId();           // force order ID reset
 		loadPreviewData();        // load preview data
+
+		previousWindowWidth = $(window).width();
 		determinePreviewStates(); // determine preview states based on screen size
 	} );
 
@@ -91,28 +93,64 @@ jQuery( function( $ ) {
 		
 	function determinePreviewStates() {
 
+		// console.log(previousWindowWidth);
+		// console.log('Now: ' + $(this).width() );
+
 		// Check if preview states are allowed to change based on screen size
 		if ( $previewWrapper.attr( 'data-preview-states-lock') == false ) {
 
 			// On small screens: 2 preview states and close preview
-			if ( $(this).width() <= 1200 ) {
-				$previewWrapper.find( '.preview-document' ).hide();
-				$previewWrapper.find( '.slide-left' ).show();
-				$previewWrapper.find( '.slide-right' ).hide();
-				$previewWrapper.attr( 'data-preview-states', 2 );
-				$previewWrapper.attr( 'data-preview-state', 'closed' );
-				$previewWrapper.attr( 'data-from-preview-state', '' );
+			if ( $(this).width() <= 1200 && ( previousWindowWidth > 1200 || $(this).width() == previousWindowWidth ) ) {
+				// console.log('Slide!');
+				if ( $previewWrapper.attr( 'data-preview-state') == 'full' ) {
+					$previewWrapper.find( '.preview-document' ).show();
+					$previewWrapper.find( '.sidebar' ).hide();
+					$previewWrapper.find( '.slide-left' ).hide();
+					$previewWrapper.find( '.slide-right' ).show();
+					$previewWrapper.attr( 'data-preview-states', 2 );
+					$previewWrapper.attr( 'data-preview-state', 'full' );
+					$previewWrapper.attr( 'data-from-preview-state', '' );
+				} else {
+					$previewWrapper.find( '.preview-document' ).hide();
+					$previewWrapper.find( '.sidebar' ).show();
+					$previewWrapper.find( '.slide-left' ).show();
+					$previewWrapper.find( '.slide-right' ).hide();
+					$previewWrapper.attr( 'data-preview-states', 2 );
+					$previewWrapper.attr( 'data-preview-state', 'closed' );
+					$previewWrapper.attr( 'data-from-preview-state', '' );
+				}
 
 			// On larger screens: 3 preview states and show settings as sidebar
-			} else {
-				$previewWrapper.find( '.preview-document, .sidebar' ).show();
-				$previewWrapper.find( '.slide-left, .slide-right' ).show();
-				$previewWrapper.attr( 'data-preview-states', 3 );
-				$previewWrapper.attr( 'data-preview-state', 'sidebar' );
-				$previewWrapper.attr( 'data-from-preview-state', '' );
-				$previewWrapper.removeClass( 'static' );
+			} else if ( $(this).width() > 1200 && ( previousWindowWidth <= 1200 || $(this).width() == previousWindowWidth ) ) {
+				if ( $previewWrapper.attr( 'data-preview-state') == 'full' ) {
+					$previewWrapper.find( '.preview-document' ).show();
+					$previewWrapper.find( '.sidebar' ).hide();
+					$previewWrapper.find( '.slide-left' ).hide();
+					$previewWrapper.find( '.slide-right' ).show();
+					$previewWrapper.attr( 'data-preview-states', 3 );
+					$previewWrapper.attr( 'data-preview-state', 'full' );
+					$previewWrapper.attr( 'data-from-preview-state', 'sidebar' );
+					$previewWrapper.addClass( 'static' );
+				} else if ( $previewWrapper.attr( 'data-preview-state') == 'closed' && $(this).width() !== previousWindowWidth ) {
+					$previewWrapper.find( '.preview-document' ).hide();
+					$previewWrapper.find( '.sidebar' ).show();
+					$previewWrapper.find( '.slide-left' ).show();
+					$previewWrapper.find( '.slide-right' ).hide();
+					$previewWrapper.attr( 'data-preview-states', 3 );
+					$previewWrapper.attr( 'data-preview-state', 'closed' );
+					$previewWrapper.attr( 'data-from-preview-state', '' );
+					$previewWrapper.removeClass( 'static' );
+				} else {
+					$previewWrapper.find( '.preview-document, .sidebar' ).show();
+					$previewWrapper.find( '.slide-left, .slide-right' ).show();
+					$previewWrapper.attr( 'data-preview-states', 3 );
+					$previewWrapper.attr( 'data-preview-state', 'sidebar' );
+					$previewWrapper.attr( 'data-from-preview-state', '' );
+					$previewWrapper.removeClass( 'static' );
+				}
 			}
-		} 
+		}
+		previousWindowWidth = $(this).width(); 
 	}
 	
 	$( '.slide-left' ).on( 'click', function() {
