@@ -368,11 +368,6 @@ jQuery( function( $ ) {
 		// remove previous error notices
 		$preview.children( '.notice' ).remove();
 
-		// check if a preview request is currently running and abort
-		if ( previewAjaxRunning ) {
-			return;
-		}
-
 		// block ui
 		$preview.block( {
 			message: null,
