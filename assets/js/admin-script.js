@@ -61,6 +61,7 @@ jQuery( function( $ ) {
 	let $previewDocumentTypeInput = $( '#wpo-wcpdf-preview-wrapper input[name="document_type"]' );
 	let $previewNonceInput        = $( '#wpo-wcpdf-preview-wrapper input[name="nonce"]' );
 	let $previewSettingsForm      = $( '#wpo-wcpdf-settings' );
+	let previewAjaxRunning        = false;
 
 	// variables
 	let previewOrderId, previewDocumentType, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout, previousWindowWidth;
@@ -89,7 +90,7 @@ jQuery( function( $ ) {
 		determinePreviewStates(); // determine preview states based on screen size
 	} );
 
-	$(window).on( 'resize', determinePreviewStates );
+	$( window ).on( 'resize', determinePreviewStates );
 		
 	function determinePreviewStates() {
 
@@ -367,6 +368,11 @@ jQuery( function( $ ) {
 		// remove previous error notices
 		$preview.children( '.notice' ).remove();
 
+		// check if a preview request is currently running and abort
+		if ( previewAjaxRunning ) {
+			return;
+		}
+
 		// block ui
 		$preview.block( {
 			message: null,
@@ -380,6 +386,9 @@ jQuery( function( $ ) {
 			type:    'POST',
 			url:     wpo_wcpdf_admin.ajaxurl,
 			data:    data,
+			beforeSend: function( xhr, settings ) {
+				previewAjaxRunning = true;
+			},
 			success: function( response ) {
 				if ( response.data.error ) {
 					$( '#'+canvasId ).remove();
@@ -391,12 +400,14 @@ jQuery( function( $ ) {
 				}
 
 				$preview.unblock();
+				previewAjaxRunning = false;
 			},
-			error: function(xhr, status, error){
+			error: function( xhr, status, error ) {
 				let errorMessage = xhr.status + ': ' + xhr.statusText
 				$( '#'+canvasId ).remove();
 				$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
 				$preview.unblock();
+				previewAjaxRunning = false;
 			},
 		} );
 	}
