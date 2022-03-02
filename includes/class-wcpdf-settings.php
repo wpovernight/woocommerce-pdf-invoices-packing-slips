@@ -269,7 +269,7 @@ class Settings {
 				$results       = array();
 	
 				// we have an order ID
-				if ( is_numeric( $search ) ) {
+				if ( is_numeric( $search ) && wc_get_order( $search ) ) {
 					$results = [ $search ];
 					
 				// no order ID, let's try with customer
