@@ -404,7 +404,7 @@ jQuery( function( $ ) {
 				$preview.unblock();
 			},
 			error: function( xhr, status, error ) {
-				if ( textStatus != 'abort' ) {
+				if ( status != 'abort' ) {
 					let errorMessage = xhr.status + ': ' + xhr.statusText
 					$( '#'+canvasId ).remove();
 					$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
