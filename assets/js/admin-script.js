@@ -61,7 +61,7 @@ jQuery( function( $ ) {
 	let $previewDocumentTypeInput = $( '#wpo-wcpdf-preview-wrapper input[name="document_type"]' );
 	let $previewNonceInput        = $( '#wpo-wcpdf-preview-wrapper input[name="nonce"]' );
 	let $previewSettingsForm      = $( '#wpo-wcpdf-settings' );
-	let previewAjaxRunning        = false;
+	let previewXhr                = false;
 
 	// variables
 	let previewOrderId, previewDocumentType, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout, previousWindowWidth;
@@ -382,12 +382,14 @@ jQuery( function( $ ) {
 			}
 		} );
 
-		$.ajax( {
+		previewXhr = $.ajax( {
 			type:    'POST',
 			url:     wpo_wcpdf_admin.ajaxurl,
 			data:    data,
 			beforeSend: function( xhr, settings ) {
-				previewAjaxRunning = true;
+				if ( previewXhr != false ) {
+					previewXhr.abort();
+				}
 			},
 			success: function( response ) {
 				if ( response.data.error ) {
@@ -400,14 +402,14 @@ jQuery( function( $ ) {
 				}
 
 				$preview.unblock();
-				previewAjaxRunning = false;
 			},
 			error: function( xhr, status, error ) {
-				let errorMessage = xhr.status + ': ' + xhr.statusText
-				$( '#'+canvasId ).remove();
-				$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
-				$preview.unblock();
-				previewAjaxRunning = false;
+				if ( textStatus != 'abort' ) {
+					let errorMessage = xhr.status + ': ' + xhr.statusText
+					$( '#'+canvasId ).remove();
+					$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
+					$preview.unblock();
+				}
 			},
 		} );
 	}
