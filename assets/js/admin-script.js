@@ -61,7 +61,7 @@ jQuery( function( $ ) {
 	let $previewDocumentTypeInput = $( '#wpo-wcpdf-preview-wrapper input[name="document_type"]' );
 	let $previewNonceInput        = $( '#wpo-wcpdf-preview-wrapper input[name="nonce"]' );
 	let $previewSettingsForm      = $( '#wpo-wcpdf-settings' );
-	let previewXhr                = false;
+	let previewXhr                = null;
 
 	// variables
 	let previewOrderId, previewDocumentType, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout, previousWindowWidth;
@@ -387,7 +387,7 @@ jQuery( function( $ ) {
 			url:     wpo_wcpdf_admin.ajaxurl,
 			data:    data,
 			beforeSend: function( xhr, settings ) {
-				if ( previewXhr != false ) {
+				if ( previewXhr != null ) {
 					previewXhr.abort();
 				}
 			},
