@@ -381,12 +381,12 @@ jQuery( function( $ ) {
 			type:    'POST',
 			url:     wpo_wcpdf_admin.ajaxurl,
 			data:    data,
-			beforeSend: function( xhr, settings ) {
+			beforeSend: function( jqXHR, settings ) {
 				if ( previewXhr != null ) {
 					previewXhr.abort();
 				}
 			},
-			success: function( response ) {
+			success: function( response, textStatus, jqXHR ) {
 				if ( response.data.error ) {
 					$( '#'+canvasId ).remove();
 					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
@@ -398,9 +398,9 @@ jQuery( function( $ ) {
 
 				$preview.unblock();
 			},
-			error: function( xhr, status, error ) {
-				if ( status != 'abort' ) {
-					let errorMessage = xhr.status + ': ' + xhr.statusText
+			error: function( jqXHR, textStatus, errorThrown ) {
+				if ( textStatus != 'abort' ) {
+					let errorMessage = jqXHR.status + ': ' + jqXHR.statusText
 					$( '#'+canvasId ).remove();
 					$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
 					$preview.unblock();
