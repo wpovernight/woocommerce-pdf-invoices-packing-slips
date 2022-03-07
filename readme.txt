@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.13.1
+Stable tag: 2.14.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,10 +102,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 2.14.0-beta-1 =
+= 2.14.0 =
 * New: Live preview of PDF document on the settings page
 * Fix: checks if number store table exists before applying DB migration
 * Tweak: Remove i18n for some log strings
+* Marked tested up to WooCommerce 6.3
 
 = 2.13.1 =
 * Fix: load missing non-historical settings for existing invoices
