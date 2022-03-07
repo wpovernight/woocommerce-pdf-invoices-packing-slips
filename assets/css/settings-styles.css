@@ -442,7 +442,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .preview-document .preview > #preview-canvas {
 	display: block;
-	max-width: 900px;
+	max-width: 800px;
 	max-height: 85vh;
 	width: auto!important;
 	margin: 0 auto;
@@ -733,6 +733,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 100%!important;
 }
 
+@media screen and (min-width: 1366px) {
+	.preview-document .preview > #preview-canvas {
+		max-width: 900px;
+	}
+}
+
 @media screen and (max-width: 1200px) {
 	.preview-document .preview > #preview-canvas {
 		max-width: 680px;
@@ -761,8 +767,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	}
 
 	#wpo-wcpdf-preview-wrapper[data-preview-state="closed"] .select2.select2-container {
-	width: 100%!important;
-}
+		width: 100%!important;
+	}
 
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table,
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr,
