@@ -278,6 +278,18 @@ class Settings_Debug {
 					'description'	=> __( 'Log PDF document creation to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'disable_preview',
+				'title'			=> __( 'Disable document preview', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'disable_preview',
+					'description'	=> __( 'Disables the document preview on the plugin settings pages.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
 		);
 
 		// allow plugins to alter settings fields

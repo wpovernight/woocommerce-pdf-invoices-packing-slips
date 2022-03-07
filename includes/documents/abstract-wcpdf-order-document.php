@@ -751,8 +751,8 @@ abstract class Order_Document {
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
 			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
-		$pdf_maker = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
-		$pdf = $pdf_maker->output();
+		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
+		$pdf          = $pdf_maker->output();
 		
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
 
@@ -762,6 +762,18 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 
 		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
+	}
+
+	public function preview_pdf() {
+		$pdf_settings = array(
+			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
+		);
+		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
+		$pdf          = $pdf_maker->output();
+		
+		return $pdf;
 	}
 
 	public function get_html( $args = array() ) {

@@ -102,6 +102,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 2.14.0-beta-1 =
+* New: Live preview of PDF document on the settings page
+* Fix: checks if number store table exists before applying DB migration
+* Tweak: Remove i18n for some log strings
+
 = 2.13.1 =
 * Fix: load missing non-historical settings for existing invoices
 * Tweak: print file & line number for exceptions in error logs & output

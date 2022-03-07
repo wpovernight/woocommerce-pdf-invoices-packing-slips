@@ -41,22 +41,88 @@ $review_invitation = sprintf(
 		include('wcpdf-extensions.php');
 	}
 
+	$preview_states = isset( $settings_tabs[$active_tab]['preview_states'] ) ? $settings_tabs[$active_tab]['preview_states'] : 1;
+	$preview_states_lock = $preview_states == 3 ? false : true;
 	?>
-	<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
-		<?php
-			do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
-			if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
-				do_action( 'wpo_wcpdf_settings_output_'.$active_tab, $active_section );
-			} else {
-				// legacy settings
-				settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
-				do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
+	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo $preview_states; ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo $preview_states_lock; ?>">
 
-				submit_button();
-			}
-			do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
-		?>
+		<div class="sidebar">
+			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
+				<?php
+					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
+					if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
+						do_action( 'wpo_wcpdf_settings_output_'.$active_tab, $active_section );
+					} else {
+						// legacy settings
+						settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
+						do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
 
-	</form>
-	<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
+						submit_button();
+					}
+					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
+				?>
+			</form>
+			<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
+		</div>
+
+		<div class="gutter">
+			<div class="slider slide-left">&#9664;</div>
+			<div class="slider slide-right">&#9654;</div>
+		</div>
+
+		<div class="preview-document">
+			<?php
+				$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
+				$document_type = 'invoice';
+
+				if ( ! empty( $_REQUEST['section'] ) ) {
+					$document_type = sanitize_text_field( $_REQUEST['section'] );
+				} elseif ( ! empty( $_REQUEST['preview'] ) ) {
+					$document_type = sanitize_text_field( $_REQUEST['preview'] );
+				}
+			?>
+			<div class="preview-data-wrapper">
+				<div class="preview-data preview-order-data">
+					<div class="preview-order-search-wrapper">
+						<input type="text" name="preview-order-search" id="preview-order-search" placeholder="<?php esc_html_e( 'ID, email or name', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
+						<img class="preview-order-search-clear" src="<?php echo WPO_WCPDF()->plugin_url().'/assets/images/reset-input.svg'; ?>" alt="<?php esc_html_e( 'Clear search text', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+					</div>
+					<p class="last-order"><?php esc_html_e( 'Currently showing last order', 'woocommerce-pdf-invoices-packing-slips' ); ?><span class="arrow-down">&#9660;</span></p>
+					<p class="order-search"><span class="order-search-label"><?php esc_html_e( 'Search for an order', 'woocommerce-pdf-invoices-packing-slips' ); ?></span><span class="arrow-down">&#9660;</span></p>
+					<ul>
+						<li class="last-order"><?php esc_html_e( 'Show last order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+						<li class="order-search"><?php esc_html_e( 'Search for an order', 'woocommerce-pdf-invoices-packing-slips' ); ?></li>
+					</ul>
+					<div id="preview-order-search-results"><!-- Results populated with JS --></div>
+				</div>
+				<?php if ( $active_tab != 'documents' ) : ?>
+				<div class="preview-data preview-document-type">
+					<?php
+						if ( $document_type ) {
+							$document = WPO_WCPDF()->documents->get_document( sanitize_text_field( $document_type ), null );
+							echo '<p class="current"><span class="current-label">'.$document->get_title().'</span><span class="arrow-down">&#9660;</span></p>';
+						} else {
+							echo '<p class="current"><span class="current-label">'.__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'</span><span class="arrow-down">&#9660;</span></p>';
+						}
+					?>
+					<ul class="preview-data-option-list" data-input-name="document_type">
+						<?php 
+							foreach ( $documents as $document ) {
+								/* translators: 1. document type, 2. document title */
+								printf( '<li data-value="%1$s">%2$s</li>', $document->get_type(), $document->get_title() );
+							}
+						?>
+					</ul>
+				</div>
+				<?php endif; ?>
+			</div>
+			<input type="hidden" name="document_type" data-default="<?= $document_type; ?>" value="<?= $document_type; ?>">
+			<input type="hidden" name="order_id" value="">
+			<input type="hidden" name="nonce" value="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
+			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
+			<div class="preview"></div>
+		</div>
+
+	</div>
+
 </div>
