@@ -488,6 +488,16 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	color: white !important;
 }
 
+.preview-document .preview-data-wrapper .save-settings {
+	padding: 1em 0 0 2em;
+	float: right;
+}
+
+.preview-document .preview-data-wrapper .save-settings p {
+	padding: 0;
+	margin: 0;
+}
+
 .preview-document .preview-data p {
 	padding:  1.4em 0;
 	margin:  0;
