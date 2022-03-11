@@ -489,13 +489,52 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .preview-document .preview-data-wrapper .save-settings {
-	padding: 1em 0 0 2em;
+	padding: 1em 0 0 0;
 	float: right;
+	overflow: hidden;
+	position: relative;
 }
 
 .preview-document .preview-data-wrapper .save-settings p {
 	padding: 0;
-	margin: 0;
+	margin: 0 0 0 2em;
+	position: relative;
+	margin-right: -200px;
+	transition: margin-right .3s ease-out;
+}
+
+.preview-document .preview-data-wrapper .save-settings p:after {
+	content: '';
+	display: block;
+	pointer-events: none;
+	position: absolute;
+	box-sizing: border-box;
+	border-radius: 3px;
+	right: 0;
+	top: 0;
+	background: transparent;
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+	border: 0px solid white; 
+	animation: border-pulse 4s infinite;
+
+}
+
+@keyframes border-pulse {
+	0% { 
+		border-color: rgba(255, 255, 255, 0);
+		border-width: 8px;
+	}
+	50% { 
+		border-color: rgba(255, 255, 255, 1);
+		border-width: 0;
+	}
+}
+
+.preview-document .preview-data-wrapper .save-settings p input:focus {
+	outline-width: 0;
+	box-shadow: none;
 }
 
 .preview-document .preview-data p {
