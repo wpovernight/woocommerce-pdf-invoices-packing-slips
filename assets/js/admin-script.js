@@ -251,6 +251,7 @@ jQuery( function( $ ) {
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field)', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
 			let duration  = event.type == 'keyup' ? 1000 : 0; 
+			showSaveBtn( event );
 			triggerPreview( duration );
 		}
 	} );
@@ -258,6 +259,7 @@ jQuery( function( $ ) {
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).parent().attr( 'name' ) ) ) {
+			showSaveBtn( event );
 			triggerPreview();
 		}
 	} );
@@ -265,6 +267,7 @@ jQuery( function( $ ) {
 	// Preview on user checkbox change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"]', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
+			showSaveBtn( event );
 			triggerPreview( 1000 );
 		}
 	} );
@@ -272,15 +275,18 @@ jQuery( function( $ ) {
 	// Preview on select / radio setting change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
+			showSaveBtn( event );
 			triggerPreview();
 		}
 	} );
 
 	// Preview on header logo change
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
+		showSaveBtn( event );
 		triggerPreview();
 	} );
 	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
+		showSaveBtn( event );
 		triggerPreview();
 	} );
 
@@ -299,6 +305,12 @@ jQuery( function( $ ) {
 		triggerPreview();
 	} );
 
+	function showSaveBtn( event ) {
+		// Only show save buttom if event is not triggered
+		if ( !event.isTrigger ) {
+			$('.preview-data-wrapper .save-settings p').css('margin-right', '0');
+		}
+	}
 	// Trigger the Preview
 	function triggerPreview( timeoutDuration ) {
 		loadPreviewData();
