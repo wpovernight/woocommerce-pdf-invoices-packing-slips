@@ -135,6 +135,9 @@ class Settings_Debug {
 					?>
 				</form>
 			</p>
+			<p>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+			</p>
 		</div>
 		<br>
 		<?php
