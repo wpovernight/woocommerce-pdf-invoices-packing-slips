@@ -311,6 +311,12 @@ jQuery( function( $ ) {
 			$('.preview-data-wrapper .save-settings p').css('margin-right', '0');
 		}
 	}
+
+	// Submit settings form when clicking on secondary save button
+	$( document ).on( 'click', '.preview-data-wrapper .save-settings p input', function( event ) {
+		$('#wpo-wcpdf-settings input#submit').click();
+	} );
+
 	// Trigger the Preview
 	function triggerPreview( timeoutDuration ) {
 		loadPreviewData();
