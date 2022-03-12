@@ -457,7 +457,7 @@ class Main {
 			return false;
 		}
 
-		return apply_filters( 'wpo_wcpdf_tmp_path_{$type}', $tmp_path );;
+		return apply_filters( "wpo_wcpdf_tmp_path_{$type}", $tmp_path );
 	}
 
 	/**
