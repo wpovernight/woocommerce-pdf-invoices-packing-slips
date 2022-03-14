@@ -251,43 +251,37 @@ jQuery( function( $ ) {
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field)', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
 			let duration  = event.type == 'keyup' ? 1000 : 0; 
-			showSaveBtn( event );
-			triggerPreview( duration );
+			settingsChanged( event, duration );
 		}
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).parent().attr( 'name' ) ) ) {
-			showSaveBtn( event );
-			triggerPreview();
+			settingsChanged( event );
 		}
 	} );
 
 	// Preview on user checkbox change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"]', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			showSaveBtn( event );
-			triggerPreview( 1000 );
+			settingsChanged( event, 1000 );
 		}
 	} );
 
 	// Preview on select / radio setting change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			showSaveBtn( event );
-			triggerPreview();
+			settingsChanged( event );
 		}
 	} );
 
 	// Preview on header logo change
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
-		showSaveBtn( event );
-		triggerPreview();
+		settingsChanged( event );
 	} );
 	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
-		showSaveBtn( event );
-		triggerPreview();
+		settingsChanged( event );
 	} );
 
 	// Custom trigger
@@ -304,6 +298,11 @@ jQuery( function( $ ) {
 		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results
 		triggerPreview();
 	} );
+
+	function settingsChanged( event, duration ) {
+		showSaveBtn( event );
+		triggerPreview( duration );
+	}
 
 	function showSaveBtn( event ) {
 		// Only show save buttom if event is not triggered
