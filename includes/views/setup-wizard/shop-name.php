@@ -10,6 +10,6 @@
 		'shop_address' => array( 'default' => '' ),
 	) );
 	?>
-	<input type="text" class="shop-name" placeholder="<?php esc_attr_e( 'Shop name', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_name][default]" value="<?php echo esc_attr( array_pop( $current_settings['shop_name'] ) ); ?>">
+	<input type="text" class="shop-name" placeholder="<?php esc_attr_e( 'Shop name', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_name][default]" value="<?php echo wp_kses( stripslashes( esc_attr( array_pop( $current_settings['shop_name'] ) ) ), array() ); ?>">
 	<textarea class="shop-address" placeholder="<?php esc_attr_e( 'Shop address', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address][default]"><?php echo esc_html( array_pop( $current_settings['shop_address'] ) ); ?></textarea>
 </div>
