@@ -82,6 +82,7 @@ $review_invitation = sprintf(
 				}
 			?>
 			<div class="preview-data-wrapper">
+				<div class="save-settings"><?php submit_button(); ?></div>
 				<div class="preview-data preview-order-data">
 					<div class="preview-order-search-wrapper">
 						<input type="text" name="preview-order-search" id="preview-order-search" placeholder="<?php esc_html_e( 'ID, email or name', 'woocommerce-pdf-invoices-packing-slips' ); ?>" data-nonce="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
