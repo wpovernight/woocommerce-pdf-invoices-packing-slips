@@ -242,11 +242,11 @@ class Setup_Wizard {
 						}
 
 						if ( is_array( $value ) ) {
+							$value = array_map( 'stripslashes_deep', $value );
 							$settings[$key] = array_map( $sanitize_function, $value );
 						} else {
 							$settings[$key] = call_user_func( $sanitize_function, $value );
 						}
-						$settings[$key] = wp_kses( array_map( 'stripslashes', $value ), array() );
 					}
 					$current_settings = get_option( $option, array() );
 					$new_settings = $settings + $current_settings;
