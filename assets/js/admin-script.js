@@ -279,8 +279,13 @@ jQuery( function( $ ) {
 		settingsChanged();
 	} );
 
-	// Custom trigger
-	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, delay ) {
+	// Custom trigger to signify settings have changed (will show save button and refresh preview)
+	$( document ).on( 'wpo-wcpdf-settings-changed', function( event, delay ) { 
+		settingsChanged( delay );
+	} ); 
+
+	// Custom trigger to refresh preview
+	$( document ).on( 'wpo-wcpdf-refresh-preview wpo_wcpdf_refresh_preview', function( event, delay ) {
 		triggerPreview( delay );
 	} );
 
