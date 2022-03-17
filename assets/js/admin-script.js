@@ -260,14 +260,18 @@ jQuery( function( $ ) {
 	// Preview on user checkbox change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"]', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			settingsChanged( 1000 );
+			if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
+				settingsChanged( 1000 );
+			}
 		}
 	} );
 
 	// Preview on select / radio setting change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			settingsChanged();
+			if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
+				settingsChanged();
+			}
 		}
 	} );
 
