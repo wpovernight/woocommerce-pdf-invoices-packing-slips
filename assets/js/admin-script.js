@@ -245,43 +245,43 @@ jQuery( function( $ ) {
 	// Preview on user input
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field)', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			let duration  = event.type == 'keyup' ? 1000 : 0; 
-			settingsChanged( event, duration );
+			let previewDelay = event.type == 'keyup' ? 1000 : 0; 
+			settingsChanged( previewDelay );
 		}
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).parent().attr( 'name' ) ) ) {
-			settingsChanged( event );
+			settingsChanged();
 		}
 	} );
 
 	// Preview on user checkbox change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"]', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			settingsChanged( event, 1000 );
+			settingsChanged( 1000 );
 		}
 	} );
 
 	// Preview on select / radio setting change
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			settingsChanged( event );
+			settingsChanged();
 		}
 	} );
 
 	// Preview on header logo change
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
-		settingsChanged( event );
+		settingsChanged();
 	} );
 	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
-		settingsChanged( event );
+		settingsChanged();
 	} );
 
 	// Custom trigger
-	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, duration ) {
-		triggerPreview( duration );
+	$( document ).on( 'wpo_wcpdf_refresh_preview', function( event, delay ) {
+		triggerPreview( delay );
 	} );
 
 	// Preview on user click in search result
@@ -294,16 +294,13 @@ jQuery( function( $ ) {
 		triggerPreview();
 	} );
 
-	function settingsChanged( event, duration ) {
-		showSaveBtn( event );
-		triggerPreview( duration );
+	function settingsChanged( previewDelay ) {
+		showSaveBtn();
+		triggerPreview( previewDelay );
 	}
 
-	function showSaveBtn( event ) {
-		// Only show save buttom if event is not triggered
-		if ( !event.isTrigger ) {
-			$('.preview-data-wrapper .save-settings p').css('margin-right', '0');
-		}
+	function showSaveBtn() {
+		$('.preview-data-wrapper .save-settings p').css('margin-right', '0');
 	}
 
 	// Submit settings form when clicking on secondary save button
@@ -313,6 +310,8 @@ jQuery( function( $ ) {
 
 	// Trigger the Preview
 	function triggerPreview( timeoutDuration ) {
+		timeoutDuration = typeof timeoutDuration == 'number' ? timeoutDuration : 0;
+
 		loadPreviewData();
 		clearTimeout( previewTimeout );
 		previewTimeout = setTimeout( function() { ajaxLoadPreview() }, timeoutDuration );
