@@ -93,16 +93,11 @@ jQuery( function( $ ) {
 	$( window ).on( 'resize', determinePreviewStates );
 		
 	function determinePreviewStates() {
-
-		// console.log(previousWindowWidth);
-		// console.log('Now: ' + $(this).width() );
-
 		// Check if preview states are allowed to change based on screen size
 		if ( $previewWrapper.attr( 'data-preview-states-lock') == false ) {
 
 			// On small screens: 2 preview states and close preview
 			if ( $(this).width() <= 1200 && ( previousWindowWidth > 1200 || $(this).width() == previousWindowWidth ) ) {
-				// console.log('Slide!');
 				if ( $previewWrapper.attr( 'data-preview-state') == 'full' ) {
 					$previewWrapper.find( '.preview-document' ).show();
 					$previewWrapper.find( '.sidebar' ).hide();
@@ -441,13 +436,9 @@ jQuery( function( $ ) {
 		// Using DocumentInitParameters object to load binary data.
 		let loadingTask = pdfjsLib.getDocument( { data: pdfData } );
 		loadingTask.promise.then( function( pdf ) {
-			console.log( 'PDF loaded' );
-			
 			// Fetch the first page
 			let pageNumber = 1;
 			pdf.getPage( pageNumber ).then( function( page ) {
-				console.log( 'Page loaded' );
-				
 				let scale     = 2;
 				let viewport  = page.getViewport( { scale: scale } );
 
@@ -465,7 +456,7 @@ jQuery( function( $ ) {
 				};
 				let renderTask = page.render( renderContext );
 				renderTask.promise.then( function() {
-					console.log( 'Page rendered' );
+					// page rendered
 				} );
 			} );
 		}, function( reason ) {
