@@ -403,7 +403,7 @@ class Settings_Callbacks {
 				);
 			}
 
-			printf( '<img src="%1$s" style="display:block" id="img-%2$s"/>', esc_attr( $attachment_src ), esc_attr( $id ) );
+			printf( '<img src="%1$s" style="display:block" id="img-%2$s" class="media-upload-preview"/>', esc_attr( $attachment_src ), esc_attr( $id ) );
 			if ( ! empty( $attachment_height ) && ! empty( $in_height ) ) {
 				$attachment_resolution = round( absint( $attachment_height ) / $in_height );
 				printf(
