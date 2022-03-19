@@ -64,6 +64,7 @@ body.wpo-wcpdf-setup form {
 	background-color: #fff;
 	padding: 0;
 	overflow: hidden;
+	box-shadow: 0 20px 50px 20px rgba(0,0,0,0.2);
 }
 
 .wpo-plugin-title {
@@ -376,6 +377,10 @@ li.completed .wpo-progress-marker::before {
 	body.wpo-wcpdf-setup form {
 		width: 100%;
 		padding-top: 30px;
+	}
+
+	.wpo-setup-card {
+		box-shadow: none;
 	}
 
 	#confetti { display: none }
