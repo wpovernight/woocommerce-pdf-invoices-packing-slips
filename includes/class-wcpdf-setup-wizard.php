@@ -154,13 +154,13 @@ class Setup_Wizard {
 			<h1 class="wpo-plugin-title"><?php esc_html_e( 'PDF Invoices & Packing Slips', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
 			<ol class="wpo-progress-bar">
 				<?php foreach ( $output_steps as $step_key => $step ) : ?>
-					<a href="<?php echo esc_attr( $this->get_step_link( $step_key ) ); ?>" ><li class="<?php
+					<li class="<?php
 						if ( $step_key === $this->step ) {
 							echo 'active';
 						} elseif ( array_search( $this->step, array_keys( $this->steps ) ) > array_search( $step_key, array_keys( $this->steps ) ) ) {
 							echo 'completed';
 						}
-					?>"><div class="wpo-progress-marker"></div></li></a>
+					?>"><a href="<?php echo esc_attr( $this->get_step_link( $step_key ) ); ?>" ><div class="wpo-progress-marker"></div></a></li>
 				<?php endforeach; ?>
 			</ol>
 			<?php
