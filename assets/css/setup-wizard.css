@@ -401,6 +401,29 @@ li.completed .wpo-progress-marker::before {
 		box-shadow: none;
 	}
 
+	.wpo-progress-bar {
+		padding: 0 0 25px 0;
+	}
+
+	.wpo-step-description,
+	.wpo-setup-input,
+	.wpo-setup-buttons {
+		width: 100%;
+		padding: 15px 25px;
+	}
+
+	.wpo-setup-card .wpo-button-next, 
+	.wpo-setup-card .wpo-button-previous, 
+	.wpo-setup-card .wpo-skip-step {
+		padding: 0.5em 0.8em;
+	}
+
+	.wpo-progress-marker {
+		height: 28px;
+		width: 28px;
+		font-size: 0.8em;
+	}
+
 	#confetti { display: none }
 }
 
