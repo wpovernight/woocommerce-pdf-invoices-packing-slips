@@ -11,46 +11,46 @@
 		<tr>
 			<th>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_shipping_address]" value="">
-				<input type="checkbox" <?php echo ! empty( $current_settings['display_shipping_address'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_shipping_address]" value="1">
+				<input id="display-shipping-address" type="checkbox" <?php echo ! empty( $current_settings['display_shipping_address'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_shipping_address]" value="1">
 			</th>
 			<td>
-				<span class="checkbox"><?php esc_html_e( 'Display shipping address', 'woocommerce-pdf-invoices-packing-slips' ); ?></span><br>
+				<label for="display-shipping-address" class="checkbox"><?php esc_html_e( 'Display shipping address', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 			</td>
 		</tr>
 		<tr>
 			<th>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_email]" value="">
-				<input type="checkbox" <?php echo ! empty( $current_settings['display_email'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_email]" value="1">
+				<input id="display-email" type="checkbox" <?php echo ! empty( $current_settings['display_email'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_email]" value="1">
 			</th>
 			<td>
-				<span class="checkbox"><?php esc_html_e( 'Display email address', 'woocommerce-pdf-invoices-packing-slips' ); ?></span><br>
+				<label for="display-email" class="checkbox"><?php esc_html_e( 'Display email address', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 			</td>
 		</tr>
 		<tr>
 			<th>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_phone]" value="">
-				<input type="checkbox" <?php echo ! empty( $current_settings['display_phone'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_phone]" value="1">
+				<input id="display-phone" type="checkbox" <?php echo ! empty( $current_settings['display_phone'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_phone]" value="1">
 			</th>
 			<td>
-				<span class="checkbox"><?php esc_html_e( 'Display phone number', 'woocommerce-pdf-invoices-packing-slips' ); ?></span><br>
+				<label for="display-phone" class="checkbox"><?php esc_html_e( 'Display phone number', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 			</td>
 		</tr>
 		<tr>
 			<th>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_date]" value="">
-				<input type="checkbox" <?php echo ! empty( $current_settings['display_date'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_date]" value="invoice_date">
+				<input id="display-date" type="checkbox" <?php echo ! empty( $current_settings['display_date'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_date]" value="invoice_date">
 			</th>
 			<td>
-				<span class="checkbox"><?php esc_html_e( 'Display invoice date', 'woocommerce-pdf-invoices-packing-slips' ); ?></span><br>
+				<label for="display-date" class="checkbox"><?php esc_html_e( 'Display invoice date', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 			</td>
 		<tr>
 		</tr>
 			<th>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_number]" value="">
-				<input type="checkbox" <?php echo ! empty( $current_settings['display_number'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_number]" value="invoice_number">
+				<input id="display-number" type="checkbox" <?php echo ! empty( $current_settings['display_number'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_number]" value="invoice_number">
 			</th>
 			<td>
-				<span class="checkbox"><?php esc_html_e( 'Display invoice number', 'woocommerce-pdf-invoices-packing-slips' ); ?></span><br>
+				<label for="display-number" class="checkbox"><?php esc_html_e( 'Display invoice number', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 			</td>
 		</tr>
 	</table>

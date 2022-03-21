@@ -20,10 +20,10 @@
 			'<tr>
 				<th>
 					<input type="hidden" value="" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][attach_to_email_ids][%1$s]">
-					<input type="checkbox" %3$s name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][attach_to_email_ids][%1$s]" value="1">
+					<input id="%1$s" type="checkbox" %3$s name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][attach_to_email_ids][%1$s]" value="1">
 				</th>
 				<td>
-					<span class="checkbox">%2$s</span><br>
+					<label for="%1$s" class="checkbox">%2$s</label>
 				</td>
 			</tr>',
 			esc_attr( $email_id ),
