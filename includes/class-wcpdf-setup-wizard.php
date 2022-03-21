@@ -240,7 +240,9 @@ class Setup_Wizard {
 						} else {
 							$sanitize_function = 'sanitize_text_field';							
 						}
-
+						
+						$value = array_map( 'stripslashes_deep', $value );
+						
 						if ( is_array( $value ) ) {
 							$settings[$key] = array_map( $sanitize_function, $value );
 						} else {
