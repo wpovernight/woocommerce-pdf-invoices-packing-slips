@@ -12,8 +12,8 @@ body.wpo-wcpdf-setup {
 	margin: 0;
 	width: 100%;
 	height: 100%;
-    background-repeat: no-repeat;
-    background-attachment: fixed!important;
+	background-repeat: no-repeat;
+	background-attachment: fixed!important;
 	font-size: 14px;
 	line-height: 22px;
 	background: #771787;
@@ -34,8 +34,8 @@ body.wpo-wcpdf-setup a:hover {
 body.wpo-wcpdf-setup input:focus,
 body.wpo-wcpdf-setup textarea:focus,
 body.wpo-wcpdf-setup select:focus {
-	border-color: #771787!important;
-	box-shadow: 0 0 0 1px #771787!important;
+	border-color: #239bb9!important;
+	box-shadow: 0 0 0 1px #239bb9!important;
 	outline: 2px solid transparent!important;
 	color: black!important;
 }
@@ -197,37 +197,48 @@ li.completed .wpo-progress-marker::before {
 	box-sizing: border-box;
 }
 
-.wpo-button-next, 
-.wpo-button-previous, 
-.wpo-skip-step,
-.wpo-setup-input span.button {
-	background-color: #fff;
+.wpo-setup-card .wpo-button-next, 
+.wpo-setup-card .wpo-button-previous, 
+.wpo-setup-card .wpo-skip-step,
+.wpo-setup-card .wpo-setup-input span.button {
 	padding: 0.5em 1.2em;
 	border-radius: 3px;
 	box-sizing: border-box;
 	font-size: 1em;
 	text-decoration: none;
 	cursor: pointer;
-	color: #771787;
 	font-size: 1.2em;
 	box-sizing: border-box;
-	border: 1px solid #771787;
+}
+
+.wpo-setup-card .wpo-button-next {
+	background-color: #1c6c8b;
+	border: 1px solid #1c6c8b;
+	color: #fff!important;
+}
+
+.wpo-setup-card .wpo-button-previous,
+.wpo-setup-input span.button {
+	background-color: transparent;
+	border: 1px solid #1c6c8b;
+	color: #1c6c8b;
 }
 
 .wpo-setup-card .wpo-button-next:hover, 
 .wpo-setup-card .wpo-button-previous:hover,
 .wpo-setup-input span.button:hover {
-	background-color: #771787;
-	color: #fff;
+	background-color: #239bb9;
+	color: #fff!important;
 	text-decoration: none;
-	border-color: #771787;
+	border-color: #239bb9;
 }
 
 .wpo-setup-card .wpo-button-next:focus, 
 .wpo-setup-card .wpo-button-previous:focus,
 .wpo-setup-input span.button:focus {
-	background-color: #fff;
-	color: #771787!important;	
+	background-color: #239bb9;
+	color: #fff!important;
+	border-color: #239bb9;
 }
 
 .wpo-setup-card .wpo-button-next, 
@@ -238,6 +249,7 @@ li.completed .wpo-progress-marker::before {
 
 .wpo-setup-card .wpo-button-previous {
 	float: left;
+	color: #1c6c8b!important;
 }
 
 .wpo-setup-card .wpo-skip-step {
@@ -297,7 +309,7 @@ li.completed .wpo-progress-marker::before {
 	transform: translate(-50%, 0%);
 }
 
-.wpo-setup-input span.button {
+.wpo-setup-card .wpo-setup-input span.button {
 	font-size: 0.9em;
 	padding: 0.2em 0.8em;
 	margin: 0 10px 10px 0;
