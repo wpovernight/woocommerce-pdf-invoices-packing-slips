@@ -68,9 +68,12 @@ class Main {
 	 */
 	public function attach_pdf_to_email ( $attachments, $email_id, $order, $email = null ) {
 		// check if all variables properly set
-		if ( !is_object( $order ) || !isset( $email_id ) ) {
+		if ( ! is_object( $order ) || ! isset( $email_id ) ) {
 			return $attachments;
 		}
+
+		// allow third party emails to swap the order object
+		$order = apply_filters( 'wpo_wcpdf_email_order_object', $order, $email_id, $email );
 
 		// Skip User emails
 		if ( get_class( $order ) == 'WP_User' ) {
@@ -84,7 +87,7 @@ class Main {
 		}
 
 		// WooCommerce Booking compatibility
-		if ( get_post_type( $order_id ) == 'wc_booking' && isset($order->order) ) {
+		if ( get_post_type( $order_id ) == 'wc_booking' && isset( $order->order ) ) {
 			// $order is actually a WC_Booking object!
 			$order = $order->order;
 			$order_id = WCX_Order::get_id( $order );
@@ -96,11 +99,11 @@ class Main {
 		}
 
 		// final check on order object
-		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) ) {
+		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order' ) ) ) {
 			return $attachments;
 		}
 
-		$tmp_path = $this->get_tmp_path('attachments');
+		$tmp_path = $this->get_tmp_path( 'attachments' );
 		if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
 			return $attachments;
 		}
@@ -132,7 +135,7 @@ class Main {
 				// we use ID to force to reloading the order to make sure that all meta data is up to date.
 				// this is especially important when multiple emails with the PDF document are sent in the same session
 				$document = wcpdf_get_document( $document_type, (array) $email_order_id, true );
-				if ( !$document ) { // something went wrong, continue trying with other documents
+				if ( ! $document ) { // something went wrong, continue trying with other documents
 					continue;
 				}
 				$filename = $document->get_filename();
@@ -142,9 +145,9 @@ class Main {
 
 				// if this file already exists in the temp path, we'll reuse it if it's not older than 60 seconds
 				$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
-				if ( file_exists($pdf_path) && $max_reuse_age > 0 ) {
+				if ( file_exists( $pdf_path ) && $max_reuse_age > 0 ) {
 					// get last modification date
-					if ($filemtime = filemtime($pdf_path)) {
+					if ($filemtime = filemtime( $pdf_path )) {
 						$time_difference = time() - $filemtime;
 						if ( $time_difference < $max_reuse_age ) {
 							// check if file is still being written to
