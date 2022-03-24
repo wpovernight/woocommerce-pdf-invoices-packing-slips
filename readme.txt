@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 5.9
 Requires PHP: 7.1
-Stable tag: 2.14.1
+Stable tag: 2.14.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,13 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.14.2 =
+* Fix: unescape text strings entered in the setup wizard
+* Dev: New filter wpo_wcpdf_email_order_object
+* UI: Update setup wizard layout
+* Libraries: updated dompdf to 1.2.1 (addressing potential security vulnerability)
+* Marked tested up to WooCommerce 6.4
 
 = 2.14.1 =
 * New: Relaunch the Setup Wizard manually from the Status tab
