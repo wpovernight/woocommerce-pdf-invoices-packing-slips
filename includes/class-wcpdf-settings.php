@@ -210,9 +210,6 @@ class Settings {
 						}, 99, 2 );
 					}
 
-					// disable historical settings
-					add_filter( 'wpo_wcpdf_document_use_historical_settings', __return_false(), 999, 2 );
-
 					// reload settings
 					$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 					$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
