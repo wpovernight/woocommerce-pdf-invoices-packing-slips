@@ -105,6 +105,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 = 2.14.3 =
 * Fix: preview not updating (unless test mode was enabled)
 * Tweak: add styles for custom settings sections
+* Tweak: Set Content-Length header for inline display
 
 = 2.14.2 =
 * Fix: unescape text strings entered in the setup wizard
