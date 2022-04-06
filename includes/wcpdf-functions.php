@@ -18,7 +18,7 @@ use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
 
 function wcpdf_filter_order_ids( $order_ids, $document_type ) {
 	$order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $document_type );
-	// filter out trashed orders
+	// filter out trashed orders.
 	foreach ( $order_ids as $key => $order_id ) {
 		$order_status = get_post_status( $order_id );
 		if ( $order_status == 'trash' ) {
@@ -33,33 +33,33 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 	// - WC Order object
 	// - array of order ids
 	// - null if order not loaded or loaded later
-	if ( !empty( $order ) ) {
-		if ( !is_object( $order) && !is_array( $order ) && is_numeric( $order ) ) {
+	if ( ! empty( $order ) ) {
+		if ( ! is_object( $order ) && ! is_array( $order ) && is_numeric( $order ) ) {
 			$order = array( absint( $order ) ); // convert single order id to array.
 		}
 		if ( is_object( $order ) ) {
 			// we filter order_ids for objects too:
-			// an order object may need to be converted to several refunds for example
+			// an order object may need to be converted to several refunds for example.
 			$order_ids = array( WCX_Order::get_id( $order ) );
 			$filtered_order_ids = wcpdf_filter_order_ids( $order_ids, $document_type );
-			// check if something has changed
+			// check if something has changed.
 			$order_id_diff = array_diff( $filtered_order_ids, $order_ids );
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
-				// nothing changed, load document with Order object
+				// nothing changed, load document with Order object.
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, WCX_Order::get_id( $order ) );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-				if ( !$document->is_allowed() ) {
+				if ( ! $document->is_allowed() ) {
 					return false;
 				}
 
-				if ( $init && !$document->exists() ) {
+				if ( $init && ! $document->exists() ) {
 					$document->init();
 					$document->save();
 				}
 				return $document;
 			} else {
-				// order ids array changed, continue processing that array
+				// order ids array changed, continue processing that array.
 				$order_ids = $filtered_order_ids;
 			}
 		} elseif ( is_array( $order ) ) {
@@ -69,32 +69,32 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		}
 
 		if ( empty( $order_ids ) ) {
-			// No orders to export for this document type
+			// No orders to export for this document type.
 			return false;
 		}
 
-		// if we only have one order, it's simple
+		// if we only have one order, it's simple.
 		if ( count( $order_ids ) == 1 ) {
-			$order_id = array_pop ( $order_ids );
+			$order_id = array_pop( $order_ids );
 			do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
 			$order = WCX::get_order( $order_id );
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-			if ( !$document->is_allowed() ) {
+			if ( ! $document->is_allowed() ) {
 				return false;
 			}
 
-			if ( $init && !$document->exists() ) {
+			if ( $init && ! $document->exists() ) {
 				$document->init();
 				$document->save();
 			}
-		// otherwise we use bulk class to wrap multiple documents in one
+		// otherwise we use bulk class to wrap multiple documents in one.
 		} else {
 			$document = wcpdf_get_bulk_document( $document_type, $order_ids );
 		}
 	} else {
-		// orderless document (used as wrapper for bulk, for example)
+		// orderless document (used as wrapper for bulk, for example).
 		$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 	}
 
@@ -140,21 +140,22 @@ function wcpdf_pdf_maker_is_default() {
 }
 
 function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
-	switch ($mode) {
+	switch ( $mode ) {
 		case 'download':
-			header('Content-Description: File Transfer');
-			header('Content-Type: application/pdf');
-			header('Content-Disposition: attachment; filename="'.$filename.'"'); 
-			header('Content-Transfer-Encoding: binary');
-			header('Connection: Keep-Alive');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-			header('Pragma: public');
+			header( 'Content-Description: File Transfer' );
+			header( 'Content-Type: application/pdf' );
+			header( 'Content-Disposition: attachment; filename="' . $filename.'"' );
+			header( 'Content-Transfer-Encoding: binary' );
+			header( 'Content-Length: ' . is_null( $pdf ) ? 0 : mb_strlen( $pdf ) );
+			header( 'Connection: Keep-Alive' );
+			header( 'Expires: 0' );
+			header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			header( 'Pragma: public' );
 			break;
 		case 'inline':
 		default:
-			header('Content-type: application/pdf');
-			header('Content-Disposition: inline; filename="'.$filename.'"');
+			header( 'Content-type: application/pdf' );
+			header( 'Content-Disposition: inline; filename="' . $filename . '"' );
 			break;
 	}
 	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
@@ -172,10 +173,10 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 	if ( apply_filters( 'wcpdf_disable_deprecation_notices', false ) ) {
 		return;
 	}
-	// if the deprecated function is called from one of our filters, $this should be $document
+	// if the deprecated function is called from one of our filters, $this should be $document.
 	$filter = current_filter();
 	$global_wcpdf_filters = array( 'wp_ajax_generate_wpo_wcpdf' );
-	if ( ! in_array ( $filter, $global_wcpdf_filters ) && strpos( $filter, 'wpo_wcpdf' ) !== false && strpos( $replacement, '$this' ) !== false ) {
+	if ( ! in_array( $filter, $global_wcpdf_filters ) && strpos( $filter, 'wpo_wcpdf' ) !== false && strpos( $replacement, '$this' ) !== false ) {
 		$replacement = str_replace( '$this', '$document', $replacement );
 		$replacement = "{$replacement} - check that the \$document parameter is included in your action or filter ($filter)!";
 	}
@@ -204,9 +205,8 @@ function wcpdf_log_error( $message, $level = 'error', $e = null ) {
 		}
 
 		if ( apply_filters( 'wcpdf_log_stacktrace', false ) && is_callable( array( $e, 'getTraceAsString' ) ) ) {
-			$message .= "\n".$e->getTraceAsString();
+			$message .= "\n" . $e->getTraceAsString();
 		}
-		 
 		// The `log` method accepts any valid level as its first argument.
 		// debug     - 'Detailed debug information'
 		// info      - 'Interesting events'
@@ -215,7 +215,7 @@ function wcpdf_log_error( $message, $level = 'error', $e = null ) {
 		// error     - 'Runtime errors that do not require immediate'
 		// critical  - 'Critical conditions'
 		// alert     - 'Action must be taken immediately'
-		// emergency - 'System is unusable'
+		// emergency - 'System is unusable'.
 		$logger->log( $level, $message, $context );
 	} else {
 		error_log( "WCPDF error ({$level}): {$message}" );
@@ -233,7 +233,7 @@ function wcpdf_output_error( $message, $level = 'error', $e = null ) {
 		<?php if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ): ?>
 		<pre><?php echo $e->getFile(); ?> (<?php echo $e->getLine(); ?>)</pre>
 		<?php endif ?>
-		<?php if ( is_callable( array( $e, 'getTraceAsString' ) ) ): ?>
+		<?php if ( is_callable( array( $e, 'getTraceAsString' ) ) ) : ?>
 		<pre><?php echo $e->getTraceAsString(); ?></pre>
 		<?php endif ?>
 	</div>
@@ -267,27 +267,25 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 
 	$errors = array();
 
-	// using '$wpdb->queries'
+	// using '$wpdb->queries'.
 	if ( ! empty( $wpdb->queries ) && is_array( $wpdb->queries ) ) {
 		foreach ( $wpdb->queries as $query ) {
 			$result = isset( $query['result'] ) ? $query['result'] : null;
-	
 			if ( is_wp_error( $result ) && is_array( $result->errors ) ) {
 				foreach ( $result->errors as $error ) {
 					$errors[] = reset( $error );
 				}
 			}
 		}
-	} 
-	
-	// fallback to '$EZSQL_ERROR'
+	}
+	// fallback to '$EZSQL_ERROR'.
 	if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
 		foreach ( $EZSQL_ERROR as $error ) {
 			$errors[] = $error['error_str'];
 		}
 	}
 
-	// log errors
+	// log errors.
 	if ( ! empty( $errors ) ) {
 		foreach ( $errors as $error_message ) {
 			wcpdf_log_error( $error_message, 'critical' );
