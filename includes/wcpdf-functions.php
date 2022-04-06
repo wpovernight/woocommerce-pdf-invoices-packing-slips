@@ -144,7 +144,7 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 		case 'download':
 			header( 'Content-Description: File Transfer' );
 			header( 'Content-Type: application/pdf' );
-			header( 'Content-Disposition: attachment; filename="' . $filename.'"' );
+			header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
 			header( 'Content-Transfer-Encoding: binary' );
 			header( 'Connection: Keep-Alive' );
 			header( 'Expires: 0' );
