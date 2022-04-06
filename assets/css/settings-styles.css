@@ -122,6 +122,30 @@ table.wcpdf_documents_settings_list td.title {
 	font-weight: bold;
 }
 
+.wcpdf-settings-sections ul {
+	height: 3em;
+}
+
+.wcpdf-settings-sections ul li {
+	float: left;
+	margin-right: 10px;
+}
+
+.wcpdf-settings-sections ul li a {
+	text-decoration: none;
+	display: inline-block;
+	padding: 0.8em 1em;
+	color: #50575e;
+	border:  1px solid #c3c4c7;
+	box-sizing: border-box;
+}
+
+.wcpdf-settings-sections ul li a.active {
+	border: 2px solid #51266b;
+	padding: calc(0.8em - 1px) calc(1em - 1px);
+	color: black;
+}
+
 .wcpdf_document_settings_sections {
 	margin-bottom: 40px;
 	position: relative;
