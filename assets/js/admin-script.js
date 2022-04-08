@@ -246,14 +246,14 @@ jQuery( function( $ ) {
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field)', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
 			let previewDelay = event.type == 'keyup' ? 1000 : 0; 
-			settingsChanged( previewDelay );
+			triggerPreview( previewDelay );
 		}
 	} );
 
 	// Preview on user selected option (using 'change' event breaks the PDF render)
 	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).parent().attr( 'name' ) ) ) {
-			settingsChanged();
+			triggerPreview();
 		}
 	} );
 
@@ -261,7 +261,7 @@ jQuery( function( $ ) {
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"]', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
 			if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
-				settingsChanged( 1000 );
+				triggerPreview( 1000 );
 			}
 		}
 	} );
@@ -270,22 +270,23 @@ jQuery( function( $ ) {
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
 		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
 			if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
-				settingsChanged();
+				triggerPreview();
 			}
 		}
 	} );
 
 	// Preview on header logo change
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
-		settingsChanged();
+		triggerPreview();
 	} );
 	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
-		settingsChanged();
+		triggerPreview();
 	} );
 
 	// Custom trigger to signify settings have changed (will show save button and refresh preview)
 	$( document ).on( 'wpo-wcpdf-settings-changed', function( event, delay ) { 
-		settingsChanged( delay );
+		showSaveBtn();
+		triggerPreview( delay );
 	} ); 
 
 	// Custom trigger to refresh preview
@@ -303,12 +304,18 @@ jQuery( function( $ ) {
 		triggerPreview();
 	} );
 
-	function settingsChanged( previewDelay ) {
-		showSaveBtn();
-		triggerPreview( previewDelay );
-	}
-
-	function showSaveBtn() {
+	// Show secondary save button when settings change
+	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea', showSaveBtn );
+	$( document ).on( 'click', '.wpo_remove_image_button', showSaveBtn );
+	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
+		if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
+			showSaveBtn( event );
+		}
+	});
+	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', showSaveBtn );
+	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', showSaveBtn );
+	
+	function showSaveBtn( event ) {
 		$('.preview-data-wrapper .save-settings p').css('margin-right', '0');
 	}
 
