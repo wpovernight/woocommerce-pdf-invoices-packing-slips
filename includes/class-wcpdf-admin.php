@@ -769,7 +769,7 @@ class Admin {
 			) );
 		}
 
-		if ( !current_user_can('manage_woocommerce') ) {
+		if ( ! apply_filters( 'wpo_wcpdf_current_user_is_allowed', current_user_can( 'manage_woocommerce' ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
