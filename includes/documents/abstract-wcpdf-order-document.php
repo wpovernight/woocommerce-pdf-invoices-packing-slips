@@ -256,7 +256,7 @@ abstract class Order_Document {
 
 	public function save( $order = null ) {
 		$order = empty( $order ) ? $this->order : $order;
-		if ( empty( $order ) || ! apply_filters( 'wpo_wcpdf_current_user_is_allowed', current_user_can( 'manage_woocommerce' ), $this->type ) ) {
+		if ( empty( $order ) || ( is_admin() && ! apply_filters( 'wpo_wcpdf_current_user_is_allowed', current_user_can( 'manage_woocommerce' ), $this->type ) ) ) {
 			return; // nowhere to save to...
 		}
 
