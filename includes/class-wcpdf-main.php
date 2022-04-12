@@ -316,20 +316,20 @@ class Main {
 			}
 
 			// Check the user privileges
-			if( !( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ) && !isset( $_GET['my-account'] ) ) {
-				$allowed = false;
-			}
-
-			// User call from my-account page
-			if ( !current_user_can('manage_options') && isset( $_GET['my-account'] ) ) {
-				// Only for single orders!
-				if ( count( $order_ids ) > 1 ) {
+			$full_permission = ( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) );
+			if ( ! $full_permission ) {
+				if ( ! isset( $_GET['my-account'] ) ) {
 					$allowed = false;
-				}
-
-				// Check if current user is owner of order IMPORTANT!!!
-				if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
-					$allowed = false;
+				} else { // User call from my-account page
+					// Only for single orders!
+					if ( count( $order_ids ) > 1 ) {
+						$allowed = false;
+					}
+		
+					// Check if current user is owner of order IMPORTANT!!!
+					if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+						$allowed = false;
+					}
 				}
 			}
 		}
