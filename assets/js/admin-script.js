@@ -242,47 +242,6 @@ jQuery( function( $ ) {
 	// Preview on page load
 	$( document ).ready( triggerPreview() );
 
-	// Preview on user input
-	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type=checkbox]), #wpo-wcpdf-settings textarea, #wpo-wcpdf-settings select:not(.dropdown-add-field)', function( event ) {
-		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			let previewDelay = event.type == 'keyup' ? 1000 : 0; 
-			triggerPreview( previewDelay );
-		}
-	} );
-
-	// Preview on user selected option (using 'change' event breaks the PDF render)
-	$( document ).on( 'click', '#wpo-wcpdf-settings select:not(.dropdown-add-field) option', function( event ) {
-		if ( ! settingIsExcludedForPreview( $( this ).parent().attr( 'name' ) ) ) {
-			triggerPreview();
-		}
-	} );
-
-	// Preview on user checkbox change
-	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"]', function( event ) {
-		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
-				triggerPreview( 1000 );
-			}
-		}
-	} );
-
-	// Preview on select / radio setting change
-	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
-		if ( ! settingIsExcludedForPreview( $( this ).attr( 'name' ) ) ) {
-			if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
-				triggerPreview();
-			}
-		}
-	} );
-
-	// Preview on header logo change
-	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', function( event, $input ) {
-		triggerPreview();
-	} );
-	$( document ).on( 'click', '.wpo_remove_image_button', function( event ) {
-		triggerPreview();
-	} );
-
 	// Custom trigger to signify settings have changed (will show save button and refresh preview)
 	$( document ).on( 'wpo-wcpdf-settings-changed', function( event, delay ) { 
 		showSaveBtn();
@@ -304,17 +263,45 @@ jQuery( function( $ ) {
 		triggerPreview();
 	} );
 
-	// Show secondary save button when settings change
-	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea', showSaveBtn );
-	$( document ).on( 'click', '.wpo_remove_image_button', showSaveBtn );
+	// Check for settings change
+	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea', settingsChanged );
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
 		if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
-			showSaveBtn( event );
+			settingsChanged( event );
 		}
 	});
-	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', showSaveBtn );
-	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', showSaveBtn );
+	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
+	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
+	$( document ).on( 'click', '.wpo_remove_image_button', settingsChanged );
 	
+	function settingsChanged( event, previewDelay ) {
+
+		// Show secondary save button
+		showSaveBtn();
+
+		// Check if preview needs to reload and with what delay
+		if ( ! settingIsExcludedForPreview( $(event.target).attr('name') ) ) {
+
+			let element = event.target.nodeName;
+			let elementType = $(event.target).attr('type');
+			let elementClass = $(event.target).attr('class');
+			
+			if ( jQuery.inArray( event.type, ['keyup', 'paste'] ) !== -1 ) {
+				if ( ( element == 'INPUT' && elementType == 'checkbox' ) || ( element == 'SELECT' && elementClass == 'dropdown-add-field' ) ) {
+					return;
+				} else {
+					previewDelay = event.type == 'keyup' ? 1000 : 0; 
+				}
+			} else if ( event.type == 'change' ) {
+				if ( element == 'INPUT' && elementType == 'checkbox' ) {
+					previewDelay = 1000;
+				}
+			}
+
+			triggerPreview( previewDelay );
+		}
+	}
+
 	function showSaveBtn( event ) {
 		$('.preview-data-wrapper .save-settings p').css('margin-right', '0');
 	}
