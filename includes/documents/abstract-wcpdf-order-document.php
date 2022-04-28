@@ -130,32 +130,29 @@ abstract class Order_Document {
 		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
 		$settings = (array) $document_settings + (array) $common_settings;
 
-		// return only most current if forced
-		if ( $latest == true ) {
-			return $settings;
-		}
-
-		// get historical settings if enabled
-		if ( ! empty( $this->order ) && $this->use_historical_settings() == true ) {
-			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
-				$order_settings = maybe_unserialize( $order_settings );
+		if ( $latest != true ) {
+			// get historical settings if enabled
+			if ( ! empty( $this->order ) && $this->use_historical_settings() == true ) {
+				$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
+				if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
+					$order_settings = maybe_unserialize( $order_settings );
+				}
+				if ( ! empty( $order_settings ) && is_array( $order_settings ) ) {
+					// ideally we should combine the order settings with the latest settings, so that new settings will
+					// automatically be applied to existing orders too. However, doing this by combining arrays is not
+					// possible because the way settings are currently stored means unchecked options are not included.
+					// This means there is no way to tell whether an option didn't exist yet (in which case the new
+					// option should be added) or whether the option was simly unchecked (in which case it should not
+					// be overwritten). This can only be address by storing unchecked checkboxes too.
+					$settings = (array) $order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
+				}
 			}
-			if ( ! empty( $order_settings ) && is_array( $order_settings ) ) {
-				// ideally we should combine the order settings with the latest settings, so that new settings will
-				// automatically be applied to existing orders too. However, doing this by combining arrays is not
-				// possible because the way settings are currently stored means unchecked options are not included.
-				// This means there is no way to tell whether an option didn't exist yet (in which case the new
-				// option should be added) or whether the option was simly unchecked (in which case it should not
-				// be overwritten). This can only be address by storing unchecked checkboxes too.
-				$settings = (array) $order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
+			if ( $this->storing_settings_enabled() && empty( $order_settings ) && ! empty( $this->order ) ) {
+				// this is either the first time the document is generated, or historical settings are disabled
+				// in both cases, we store the document settings
+				// exclude non historical settings from being saved in order meta
+				WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
 			}
-		}
-		if ( $this->storing_settings_enabled() && empty( $order_settings ) && ! empty( $this->order ) ) {
-			// this is either the first time the document is generated, or historical settings are disabled
-			// in both cases, we store the document settings
-			// exclude non historical settings from being saved in order meta
-			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
 		}
 
 		// display date & display number were checkbox settings but now a select setting that could be set but empty - should behave as 'unchecked'
