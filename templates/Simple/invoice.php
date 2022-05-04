@@ -60,13 +60,13 @@
 		<td class="order-data">
 			<table>
 				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order ); ?>
-				<?php if ( isset( $this->settings['display_number'] ) ) : ?>
+				<?php if ( ! empty( $this->settings['display_number'] ) ) : ?>
 					<tr class="invoice-number">
 						<th><?php echo $this->get_number_title(); ?></th>
 						<td><?php $this->invoice_number(); ?></td>
 					</tr>
 				<?php endif; ?>
-				<?php if ( isset( $this->settings['display_date'] ) ) : ?>
+				<?php if ( ! empty( $this->settings['display_date'] ) ) : ?>
 					<tr class="invoice-date">
 						<th><?php echo $this->get_date_title(); ?></th>
 						<td><?php $this->invoice_date(); ?></td>
