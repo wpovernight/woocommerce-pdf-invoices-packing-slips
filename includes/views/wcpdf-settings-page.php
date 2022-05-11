@@ -66,8 +66,8 @@ $review_invitation = sprintf(
 		</div>
 
 		<div class="gutter">
-			<div class="slider slide-left">&#9664;</div>
-			<div class="slider slide-right">&#9654;</div>
+			<div class="slider slide-left"><span class="gutter-arrow arrow-left"></span></div>
+			<div class="slider slide-right"><span class="gutter-arrow arrow-right"></span></div>
 		</div>
 
 		<div class="preview-document">
