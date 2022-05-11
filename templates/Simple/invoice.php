@@ -80,8 +80,7 @@
 					<th><?php _e( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<td><?php $this->order_date(); ?></td>
 				</tr>
-				<?php
-				if ( $payment_method = $this->get_payment_method() ) : ?>
+				<?php if ( $payment_method = $this->get_payment_method() ) : ?>
 				<tr class="payment-method">
 					<th><?php _e( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<td><?php echo $payment_method; ?></td>
