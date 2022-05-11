@@ -285,7 +285,7 @@ jQuery( function( $ ) {
 		if ( ! settingIsExcludedForPreview( $element.attr('name') ) ) {
 
 			if ( jQuery.inArray( event.type, ['keyup', 'paste'] ) !== -1 ) {
-				if ( ( element == 'INPUT' && elementType == 'checkbox' ) || ( element == 'SELECT' && elementClass == 'dropdown-add-field' ) ) {
+				if ( $element.is( 'input[type="checkbox"], select' ) ) {
 					return;
 				} else {
 					previewDelay = event.type == 'keyup' ? 1000 : 0; 
