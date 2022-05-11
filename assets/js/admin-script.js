@@ -290,10 +290,6 @@ jQuery( function( $ ) {
 				} else {
 					previewDelay = event.type == 'keyup' ? 1000 : 0; 
 				}
-			} else if ( event.type == 'change' ) {
-				if ( element == 'INPUT' && elementType == 'checkbox' ) {
-					previewDelay = 1000;
-				}
 			}
 
 			triggerPreview( previewDelay );
