@@ -280,12 +280,10 @@ jQuery( function( $ ) {
 		showSaveBtn();
 
 		// Check if preview needs to reload and with what delay
-		if ( ! settingIsExcludedForPreview( $(event.target).attr('name') ) ) {
+		let $element = $( event.target );
 
-			let element = event.target.nodeName;
-			let elementType = $(event.target).attr('type');
-			let elementClass = $(event.target).attr('class');
-			
+		if ( ! settingIsExcludedForPreview( $element.attr('name') ) ) {
+
 			if ( jQuery.inArray( event.type, ['keyup', 'paste'] ) !== -1 ) {
 				if ( ( element == 'INPUT' && elementType == 'checkbox' ) || ( element == 'SELECT' && elementClass == 'dropdown-add-field' ) ) {
 					return;
