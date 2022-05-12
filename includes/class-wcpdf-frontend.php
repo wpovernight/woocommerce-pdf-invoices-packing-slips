@@ -100,8 +100,8 @@ class Frontend {
 			}
 		}
 
-		return $data;
 		$this->restore_storing_document_settings();
+		return $data;
 	}
 
 	/**

@@ -119,7 +119,7 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
  * 
  * @param string $html
  * @param array  $settings
- * @return PDF_Maker
+ * @return WPO\WC\PDF_Invoices\PDF_Maker
  */
 function wcpdf_get_pdf_maker( $html, $settings = array() ) {
 	if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) {

@@ -262,7 +262,7 @@ class WPO_WCPDF {
 	/**
 	 * WooCommerce not active notice.
 	 *
-	 * @return string Fallack notice.
+	 * @return void
 	 */
 	public function need_woocommerce() {
 		/* translators: <a> tags */
@@ -334,7 +334,7 @@ class WPO_WCPDF {
 			$current_version_parts = explode( '.', $this->version );
 
 			if ( 3 !== sizeof( $notice_version_parts ) ) {
-				return;
+				return $upgrade_notice;
 			}
 
 			$notice_version  = $notice_version_parts[0] . '.' . $notice_version_parts[1];
