@@ -106,7 +106,7 @@ class Invoice extends Order_Document_Methods {
 		}
 
 		$number_store   = $this->get_sequential_number_store();
-		$invoice_number = $number_store->increment( $this->order_id, $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
+		$invoice_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 
 		$this->set_number( $invoice_number );
 

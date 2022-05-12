@@ -105,11 +105,11 @@ class Font_Synchronizer {
 	}
 
 	/**
-	 * Delete an array of files with all known extensions
+	 * Copy font files
 	 * 
-	 * @param array  $filenames   array of filenames without the extension
-	 * @param string $destination path to the local fonts
-	 * @return void
+	 * @param  array  $filenames   array of filenames without the extension
+	 * @param  string $destination path to the local fonts
+	 * @return array
 	 */
 	public function copy_font_files( $filenames, $destination ) {
 		$destination = trailingslashit( $destination );

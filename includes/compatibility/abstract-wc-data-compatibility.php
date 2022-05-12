@@ -154,10 +154,10 @@ abstract class Data {
 	 * Updates an object's stored meta value.
 	 *
 	 * @since 4.6.0-dev
-	 * @param \WC_Data $object the data object, likely \WC_Order or \WC_Product
-	 * @param string $key the meta key
-	 * @param string $value the meta value
-	 * @param int|strint $meta_id Optional. The specific meta ID to update
+	 * @param \WC_Data     $object the data object, likely \WC_Order or \WC_Product
+	 * @param string       $key the meta key
+	 * @param string|array $value the meta value
+	 * @param int|string   $meta_id Optional. The specific meta ID to update
 	 */
 	public static function update_meta_data( $object, $key, $value, $meta_id = '' ) {
 
