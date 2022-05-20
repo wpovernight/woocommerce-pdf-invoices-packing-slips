@@ -601,7 +601,7 @@ class Admin {
 				return;
 			}
 			// Check if user is allowed to change invoice data
-			if ( ! apply_filters( 'wpo_wcpdf_current_user_is_allowed', current_user_can( 'manage_woocommerce' ), 'invoice' ) ) {
+			if ( ! $this->user_can_manage_document( 'invoice' ) ) {
 				return;
 			}
 
@@ -751,6 +751,10 @@ class Admin {
 		return $query_vars;
 	}
 
+	public function user_can_manage_document( $document_type ) {
+		return apply_filters( 'wpo_wcpdf_current_user_is_allowed', ( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ), $document_type );
+	}
+
 	/**
 	 * Save, regenerate or delete a document from AJAX request
 	 */
@@ -773,7 +777,7 @@ class Admin {
 			) );
 		}
 
-		if ( ! apply_filters( 'wpo_wcpdf_current_user_is_allowed', current_user_can( 'manage_woocommerce' ), sanitize_text_field( $_POST['document_type'] ) ) ) {
+		if ( ! $this->user_can_manage_document( sanitize_text_field( $_POST['document_type'] ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );

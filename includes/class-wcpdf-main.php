@@ -316,7 +316,8 @@ class Main {
 			}
 
 			// Check the user privileges
-			$full_permission = apply_filters( 'wpo_wcpdf_current_user_is_allowed', ( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ), $document_type );
+			$admin = new Admin();
+			$full_permission = $admin->user_can_manage_document( $document_type );
 			if ( ! $full_permission ) {
 				if ( ! isset( $_GET['my-account'] ) ) {
 					$allowed = false;
