@@ -600,6 +600,10 @@ class Admin {
 			if ( ! isset($_POST['action']) || $_POST['action'] != 'editpost' ) {
 				return;
 			}
+			// Check if user is allowed to change invoice data
+			if ( ! apply_filters( 'wpo_wcpdf_current_user_is_allowed', current_user_can( 'manage_woocommerce' ), 'invoice' ) ) {
+				return;
+			}
 
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
