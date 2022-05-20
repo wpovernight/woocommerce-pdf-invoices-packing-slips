@@ -488,7 +488,12 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_shipping_method() {
 		$shipping_method_label = __( 'Shipping method', 'woocommerce-pdf-invoices-packing-slips' );
-		$shipping_method = __( $this->order->get_shipping_method(), 'woocommerce' );
+		if ( $this->is_refund( $this->order ) ) {
+			$order = wc_get_order( $this->order->get_parent_id() );
+			$shipping_method = __( $order->get_shipping_method(), 'woocommerce' );
+		} else {
+			$shipping_method = __( $this->order->get_shipping_method(), 'woocommerce' );
+		}
 		return apply_filters( 'wpo_wcpdf_shipping_method', $shipping_method, $this );
 	}
 	public function shipping_method() {
