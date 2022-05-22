@@ -316,8 +316,7 @@ class Main {
 			}
 
 			// Check the user privileges
-			$admin = new Admin();
-			$full_permission = $admin->user_can_manage_document( $document_type );
+			$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
 			if ( ! $full_permission ) {
 				if ( ! isset( $_GET['my-account'] ) ) {
 					$allowed = false;
