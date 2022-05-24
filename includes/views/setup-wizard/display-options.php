@@ -11,7 +11,7 @@
 		<tr>
 			<th>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_shipping_address]" value="">
-				<input id="display-shipping-address" type="checkbox" <?php echo ! empty( $current_settings['display_shipping_address'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_shipping_address]" value="1">
+				<input id="display-shipping-address" type="checkbox" <?php echo ! empty( $current_settings['display_shipping_address'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_shipping_address]" value="always">
 			</th>
 			<td>
 				<label for="display-shipping-address" class="checkbox"><?php esc_html_e( 'Display shipping address', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
