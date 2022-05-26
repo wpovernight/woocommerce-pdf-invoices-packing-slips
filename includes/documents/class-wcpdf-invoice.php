@@ -323,21 +323,41 @@ class Invoice extends Order_Document_Methods {
 						'prefix'			=> array(
 							'placeholder'	=> __( 'Prefix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
-							'description'	=> __( 'to use the invoice year and/or month, use [invoice_year] or [invoice_month] respectively' , 'woocommerce-pdf-invoices-packing-slips' ),
+							'description'	=> sprintf( '%1$s %2$s %3$s %4$s%5$s > %6$s%7$s',
+							__( 'If set, this value will be used as number prefix.' , 'woocommerce-pdf-invoices-packing-slips' ),
+							/* translators: 1. document type, 2,  3. placeh  */
+								sprintf( __( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>[invoice_year]</strong>', '<strong>[invoice_month]</strong>' ),
+								__( 'Check this Docs article to see all the available placeholders for prefix/suffix:', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/number-format/" target="_blank">',
+								__( 'Number format', 'woocommerce-pdf-invoices-packing-slips' ),
+								__( 'Available placeholders', 'woocommerce-pdf-invoices-packing-slips' ),
+								'</a>'
+							),
 						),
 						'suffix'			=> array(
 							'placeholder'	=> __( 'Suffix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
-							'description'	=> '',
+							'description'	=> sprintf( '%1$s %2$s %3$s %4$s%5$s > %6$s%7$s',
+							__( 'If set, this value will be used as number suffix.' , 'woocommerce-pdf-invoices-packing-slips' ),
+							/* translators: 1. document type, 2. [invoice_year], 3. [invoice_month]  */
+								sprintf( __( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>[invoice_year]</strong>', '<strong>[invoice_month]</strong>' ),
+								__( 'Check this Docs article to see all the available placeholders for prefix/suffix:', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/number-format/" target="_blank">',
+								__( 'Number format', 'woocommerce-pdf-invoices-packing-slips' ),
+								__( 'Available placeholders', 'woocommerce-pdf-invoices-packing-slips' ),
+								'</a>'
+							),
 						),
 						'padding'			=> array(
 							'placeholder'	=> __( 'Padding' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
 							'type'			=> 'number',
-							'description'	=> __( 'enter the number of digits here - enter "6" to display 42 as 000042' , 'woocommerce-pdf-invoices-packing-slips' ),
+							/* translators: document type */
+							'description' => sprintf( __( 'Enter the number of digits you want to use as padding. For instance, enter <code>6</code> to display the %s number <code>123</code> as <code>000123</code>, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
 						),
 					),
-					'description'			=> __( 'note: if you have already created a custom invoice number format with a filter, the above settings will be ignored' , 'woocommerce-pdf-invoices-packing-slips' ),
+					/* translators: document type */
+					'description'			=> sprintf( __( 'Note: if you have already created a custom %s number format with a filter, the above settings will be ignored.', 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
 				)
 			),
 			array(
