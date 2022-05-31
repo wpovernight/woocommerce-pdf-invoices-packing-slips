@@ -61,6 +61,8 @@ class Main {
 		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
 		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
+
+		add_action( 'parse_request', array( $this, 'parse_document_link_request' ) );
 	}
 
 	/**
@@ -262,32 +264,32 @@ class Main {
 		}
 
 		// Check the nonce - guest access doesn't use nonces but checks the unique order key (hash)
-		if( empty( $_GET['action'] ) || ( !$guest_access && !check_admin_referer( $_GET['action'] ) ) ) {
+		if( empty( $_REQUEST['action'] ) || ( !$guest_access && !check_admin_referer( $_REQUEST['action'] ) ) ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// Check if all parameters are set
-		if ( empty( $_GET['document_type'] ) && !empty( $_GET['template_type'] ) ) {
-			$_GET['document_type'] = $_GET['template_type'];
+		if ( empty( $_REQUEST['document_type'] ) && !empty( $_REQUEST['template_type'] ) ) {
+			$_REQUEST['document_type'] = $_REQUEST['template_type'];
 		}
 
-		if ( empty( $_GET['order_ids'] ) ) {
+		if ( empty( $_REQUEST['order_ids'] ) ) {
 			wp_die( esc_attr__( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
-		if( empty( $_GET['document_type'] ) ) {
+		if( empty( $_REQUEST['document_type'] ) ) {
 			wp_die( esc_attr__( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// debug enabled by URL
-		if ( isset( $_GET['debug'] ) && !( $guest_access || isset( $_GET['my-account'] ) ) ) {
+		if ( isset( $_REQUEST['debug'] ) && !( $guest_access || isset( $_REQUEST['my-account'] ) ) ) {
 			$this->enable_debug();
 		}
 
 		// Generate the output
-		$document_type = sanitize_text_field( $_GET['document_type'] );
+		$document_type = sanitize_text_field( $_REQUEST['document_type'] );
 
-		$order_ids = (array) array_map( 'absint', explode( 'x', $_GET['order_ids'] ) );
+		$order_ids = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
 
 		// Process oldest first: reverse $order_ids array if required
 		$sort_order         = apply_filters( 'wpo_wcpdf_bulk_document_sort_order', 'ASC' );
@@ -299,13 +301,13 @@ class Main {
 		// set default is allowed
 		$allowed = true;
 
-		if ( $guest_access && isset( $_GET['order_key'] ) ) {
+		if ( $guest_access && isset( $_REQUEST['order_key'] ) ) {
 			// Guest access with order key
 			if ( count( $order_ids ) > 1 ) {
 				$allowed = false;
 			} else {
 				$order = wc_get_order( $order_ids[0] );
-				if ( !$order || ! hash_equals( $order->get_order_key(), $_GET['order_key'] ) ) {
+				if ( !$order || ! hash_equals( $order->get_order_key(), $_REQUEST['order_key'] ) ) {
 					$allowed = false;
 				}
 			}
@@ -316,12 +318,12 @@ class Main {
 			}
 
 			// Check the user privileges
-			if( !( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ) && !isset( $_GET['my-account'] ) ) {
+			if( !( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ) && !isset( $_REQUEST['my-account'] ) ) {
 				$allowed = false;
 			}
 
 			// User call from my-account page
-			if ( !current_user_can('manage_options') && isset( $_GET['my-account'] ) ) {
+			if ( !current_user_can('manage_options') && isset( $_REQUEST['my-account'] ) ) {
 				// Only for single orders!
 				if ( count( $order_ids ) > 1 ) {
 					$allowed = false;
@@ -343,9 +345,9 @@ class Main {
 		// if we got here, we're safe to go!
 		try {
 			// log document creation to order notes
-			if( count( $order_ids ) > 1 && isset( $_GET['bulk'] ) ) {
+			if( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_bulk_to_order_notes' ) );
-			} elseif( isset( $_GET['my-account'] ) ) {
+			} elseif( isset( $_REQUEST['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_my_account_to_order_notes' ) );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_single_to_order_notes' ) );
@@ -359,8 +361,8 @@ class Main {
 
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
 				// allow URL override
-				if ( isset( $_GET['output'] ) && in_array( $_GET['output'], array( 'html', 'pdf' ) ) ) {
-					$output_format = $_GET['output'];
+				if ( isset( $_REQUEST['output'] ) && in_array( $_REQUEST['output'], array( 'html', 'pdf' ) ) ) {
+					$output_format = $_REQUEST['output'];
 				}
 				switch ( $output_format ) {
 					case 'html':
@@ -1086,6 +1088,45 @@ class Main {
 	public function wc_webhook_trigger( $document, $order ) {
 		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
 	}
+
+	public function parse_document_link_request( $wp ){
+		if ( strpos( $wp->request, 'wcpdf' ) !== false ) {
+			$vars = explode( '/', $wp->request );
+
+			/*
+				The $vars array should contain:
+				[0] => wcpdf
+				[1] => document_type
+				[2] => order_ids
+			*/
+
+			if ( ! empty( $vars[0] ) && strpos( $vars[0], 'wcpdf' ) === false ) {
+				return;
+			}
+
+			$document_types = [];
+			foreach ( WPO_WCPDF()->documents->get_documents() as $document ) {
+				$document_types[] = $document->get_type();
+			}
+
+			if ( ! empty( $vars[1] ) && in_array( $vars[1], $document_types ) ) {
+				$_REQUEST['document_type'] = sanitize_text_field( $vars[1] );
+			}
+			if ( ! empty( $vars[2] ) && ( is_numeric( $vars[2] ) || strpos( $vars[2], ',' ) !== false ) ) {
+				$_REQUEST['order_ids'] = sanitize_text_field( $vars[2] );
+			}
+
+			if ( ! empty( $_REQUEST['document_type'] ) && ! empty( $_REQUEST['order_ids'] ) ) {
+				$_REQUEST['action']   = 'generate_wpo_wcpdf';
+				$_REQUEST['_wpnonce'] = wp_create_nonce( $_REQUEST['action'] );
+
+				do_action( 'wp_ajax_' . $_REQUEST['action'] );
+			}
+		}
+
+		return;
+	}
+	
 }
 
 endif; // class_exists
