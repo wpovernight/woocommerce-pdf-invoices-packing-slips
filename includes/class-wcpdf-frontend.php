@@ -28,7 +28,7 @@ class Frontend {
 
 		$invoice = wcpdf_get_invoice( $order );
 		if ( $invoice && $invoice->is_enabled() ) {
-			$pdf_url = wp_nonce_url( esc_url( add_query_arg( array(
+			$pdf_url = wp_nonce_url( esc_url_raw( add_query_arg( array(
 				'action'        => 'generate_wpo_wcpdf',
 				'document_type' => 'invoice',
 				'order_ids'     => WCX_Order::get_id( $order ),
@@ -163,7 +163,7 @@ class Frontend {
 			return; // no business here
 		}
 	
-		$pdf_url = wp_nonce_url( esc_url( add_query_arg( $query_args, admin_url( 'admin-ajax.php' ) ) ), 'generate_wpo_wcpdf' );
+		$pdf_url = wp_nonce_url( esc_url_raw( add_query_arg( $query_args, admin_url( 'admin-ajax.php' ) ) ), 'generate_wpo_wcpdf' );
 		$text = sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_attr( $pdf_url ), esc_html( $link_text ) );
 
 		return $text;

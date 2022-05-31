@@ -183,7 +183,7 @@ class Admin {
 			$document_title = $document->get_title();
 			$icon = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url = wp_nonce_url( esc_url( add_query_arg( array(
+				$pdf_url = wp_nonce_url( esc_url_raw( add_query_arg( array(
 					'action'        => 'generate_wpo_wcpdf',
 					'document_type' => $document->get_type(),
 					'order_ids'     => WCX_Order::get_id( $order ),
@@ -331,7 +331,7 @@ class Admin {
 				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
 				<?php
 				$title = __( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
-				$url = wp_nonce_url( esc_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ) ), 'generate_wpo_wcpdf' );
+				$url = wp_nonce_url( esc_url_raw( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ) ), 'generate_wpo_wcpdf' );
 				?>
 			</li>
 		</ul>
@@ -351,7 +351,7 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url = wp_nonce_url( esc_url( add_query_arg( array(
+				$pdf_url = wp_nonce_url( esc_url_raw( add_query_arg( array(
 					'action'        => 'generate_wpo_wcpdf',
 					'document_type' => $document->get_type(),
 					'order_ids'     => $post_id,
