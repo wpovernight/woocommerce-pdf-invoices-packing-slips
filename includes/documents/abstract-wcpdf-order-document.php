@@ -136,6 +136,19 @@ abstract class Order_Document {
 		$this->save_settings();
 	}
 
+	public function get_order_settings() {
+		$order_settings = array();
+
+		if ( ! empty( $this->order ) ) {
+			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
+			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
+				$order_settings = maybe_unserialize( $order_settings );
+			}
+		}
+
+		return $order_settings;
+	}
+
 	public function get_settings( $latest = false ) {
 		// get most current settings
 		$common_settings   = WPO_WCPDF()->settings->get_common_document_settings();
@@ -176,19 +189,6 @@ abstract class Order_Document {
 			// exclude non historical settings from being saved in order meta
 			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $this->settings, array_flip( $this->get_non_historical_settings() ) ) );
 		}
-	}
-
-	public function get_order_settings() {
-		$order_settings = array();
-
-		if ( ! empty( $this->order ) ) {
-			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
-				$order_settings = maybe_unserialize( $order_settings );
-			}
-		}
-
-		return $order_settings;
 	}
 
 	public function use_historical_settings() {
