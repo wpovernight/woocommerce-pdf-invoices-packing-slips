@@ -28,12 +28,12 @@ class Frontend {
 
 		$invoice = wcpdf_get_invoice( $order );
 		if ( $invoice && $invoice->is_enabled() ) {
-			$pdf_url = wp_nonce_url( esc_url_raw( add_query_arg( array(
+			$pdf_url = wp_nonce_url( add_query_arg( array(
 				'action'        => 'generate_wpo_wcpdf',
 				'document_type' => 'invoice',
 				'order_ids'     => WCX_Order::get_id( $order ),
 				'my-account'    => true,
-			), admin_url( 'admin-ajax.php' ) ) ), 'generate_wpo_wcpdf' );
+			), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
 
 			// check my account button settings
 			$button_setting = $invoice->get_setting( 'my_account_buttons', 'available' );
@@ -60,7 +60,7 @@ class Frontend {
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
 			if ( $invoice_allowed || in_array( WCX_Order::get_status( $order ), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
 				$actions['invoice'] = array(
-					'url'  => $pdf_url,
+					'url'  => esc_url( $pdf_url ),
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $invoice->get_title(), $invoice )
 				);
 			}
@@ -163,7 +163,7 @@ class Frontend {
 			return; // no business here
 		}
 	
-		$pdf_url = wp_nonce_url( esc_url_raw( add_query_arg( $query_args, admin_url( 'admin-ajax.php' ) ) ), 'generate_wpo_wcpdf' );
+		$pdf_url = esc_url( wp_nonce_url( add_query_arg( $query_args, admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' ) );
 		$text = sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_attr( $pdf_url ), esc_html( $link_text ) );
 
 		return $text;
