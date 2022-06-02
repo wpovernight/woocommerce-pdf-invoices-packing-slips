@@ -192,7 +192,7 @@ class Admin {
 				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 
 				$listing_actions[$document->get_type()] = array(
-					'url'    => $pdf_url,
+					'url'    => esc_url( $pdf_url ),
 					'img'    => $icon,
 					'alt'    => "PDF " . $document_title,
 					'exists' => $document_exists,
@@ -331,7 +331,7 @@ class Admin {
 				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
 				<?php
 				$title = __( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
-				$url = wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' );
+				$url = esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' ) );
 				?>
 			</li>
 		</ul>
@@ -358,7 +358,7 @@ class Admin {
 				), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
 				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
-					'url'		=> $pdf_url,
+					'url'		=> esc_url( $pdf_url ),
 					'alt'		=> "PDF " . $document_title,
 					'title'		=> "PDF " . $document_title,
 					'exists'	=> is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
@@ -677,7 +677,7 @@ class Admin {
 				add_filter( 'redirect_post_location', function( $location ) {
 					// messages in includes/admin/class-wc-admin-post-types.php
 					// 11 => 'Order updated and sent.'
-					return add_query_arg( 'message', 11, $location );
+					return esc_url( add_query_arg( 'message', 11, $location ) );
 				} );
 			}
 		}

@@ -44,7 +44,7 @@ class Settings_Documents {
 							$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
 						}
 						$active = $document->get_type() == $section ? 'active' : '';
-						printf( '<li class="%2$s"><a href="%1$s" class="%2$s">%3$s</a></li>', add_query_arg( 'section', $document->get_type() ), $active, esc_html( $title ) );
+						printf( '<li class="%2$s"><a href="%1$s" class="%2$s">%3$s</a></li>', esc_url( add_query_arg( 'section', $document->get_type() ) ), $active, esc_html( $title ) );
 					}
 				}
 				?>
