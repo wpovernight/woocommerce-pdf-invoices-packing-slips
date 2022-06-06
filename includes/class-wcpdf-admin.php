@@ -690,7 +690,7 @@ class Admin {
 				add_filter( 'redirect_post_location', function( $location ) {
 					// messages in includes/admin/class-wc-admin-post-types.php
 					// 11 => 'Order updated and sent.'
-					return esc_url( add_query_arg( 'message', 11, $location ) );
+					return esc_url_raw( add_query_arg( 'message', 11, $location ) );
 				} );
 			}
 		}
