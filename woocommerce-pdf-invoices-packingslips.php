@@ -189,7 +189,7 @@ class WPO_WCPDF {
 		$this->documents = include_once( $this->plugin_path() . '/includes/class-wcpdf-documents.php' );
 		$this->main = include_once( $this->plugin_path() . '/includes/class-wcpdf-main.php' );
 		include_once( $this->plugin_path() . '/includes/class-wcpdf-assets.php' );
-		include_once( $this->plugin_path() . '/includes/class-wcpdf-admin.php' );
+		$this->admin = include_once( $this->plugin_path() . '/includes/class-wcpdf-admin.php' );
 		include_once( $this->plugin_path() . '/includes/class-wcpdf-frontend.php' );
 		include_once( $this->plugin_path() . '/includes/class-wcpdf-install.php' );
 		include_once( $this->plugin_path() . '/includes/class-wcpdf-font-synchronizer.php' );

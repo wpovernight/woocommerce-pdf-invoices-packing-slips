@@ -455,7 +455,7 @@ class Admin {
 				<!-- Title -->
 				<h4>
 					<?php echo wp_kses_post( $document->get_title() ); ?>
-					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) ) : ?>
+					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) && $this->user_can_manage_document( $document->get_type() ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
 						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
@@ -488,7 +488,14 @@ class Admin {
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<?php /* translators: document title */ ?>
-						<span class="wpo-wcpdf-set-date-number button"><?php printf( esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), wp_kses_post( $document->get_title() ) ); ?></span>
+						<?php
+						if ( $this->user_can_manage_document( $document->get_type() ) ) {
+							printf( '<span class="wpo-wcpdf-set-date-number button">%s</span>', sprintf( esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), wp_kses_post( $document->get_title() ) ) ); 
+						} else {
+							printf( '<p>%s</p>', esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ) );
+						}
+						?>
+						
 					<?php endif; ?>
 				</div>
 
@@ -516,7 +523,9 @@ class Admin {
 				<!-- Read only -->
 				<div class="read-only">
 					<span><strong><?= wp_kses_post( $data['notes']['label'] ); ?></strong></span>
-					<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
+					<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
+						<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
+					<?php endif; ?>
 					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
 				</div>
 				<!-- Editable -->
@@ -598,6 +607,10 @@ class Admin {
 		if( $post_type == 'shop_order' ) {
 			// bail if this is not an actual 'Save order' action
 			if ( ! isset($_POST['action']) || $_POST['action'] != 'editpost' ) {
+				return;
+			}
+			// Check if user is allowed to change invoice data
+			if ( ! $this->user_can_manage_document( 'invoice' ) ) {
 				return;
 			}
 
@@ -747,6 +760,10 @@ class Admin {
 		return $query_vars;
 	}
 
+	public function user_can_manage_document( $document_type ) {
+		return apply_filters( 'wpo_wcpdf_current_user_is_allowed', ( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ), $document_type );
+	}
+
 	/**
 	 * Save, regenerate or delete a document from AJAX request
 	 */
@@ -769,7 +786,7 @@ class Admin {
 			) );
 		}
 
-		if ( !current_user_can('manage_woocommerce') ) {
+		if ( ! $this->user_can_manage_document( sanitize_text_field( $_POST['document_type'] ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
