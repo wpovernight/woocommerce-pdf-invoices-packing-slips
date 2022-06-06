@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.14.5
+Stable tag: 2.15.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,13 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 2.15.0 =
+* New: Filter hooks to override ability to edit document data
+* Simple template: Only show shipping & payment method lines when set
+* Security: escape urls as late as possible
+* Fix: WP6.0+ converting interface elements to emojis
+* Tweak: Show sticky save button for all setting changes
 
 = 2.14.5 =
 * Fix: Preview invoice number & date display settings
