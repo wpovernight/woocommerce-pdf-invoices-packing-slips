@@ -1112,7 +1112,7 @@ class Main {
 			if ( ! empty( $vars[1] ) && in_array( $vars[1], $document_types ) ) {
 				$_REQUEST['document_type'] = sanitize_text_field( $vars[1] );
 			}
-			if ( ! empty( $vars[2] ) && ( is_numeric( $vars[2] ) || strpos( $vars[2], ',' ) !== false ) ) {
+			if ( ! empty( $vars[2] ) && ( is_numeric( $vars[2] ) || strpos( $vars[2], 'x' ) !== false ) ) {
 				$_REQUEST['order_ids'] = sanitize_text_field( $vars[2] );
 			}
 
