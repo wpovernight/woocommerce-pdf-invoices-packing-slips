@@ -183,12 +183,8 @@ class Admin {
 			$document_title = $document->get_title();
 			$icon = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url = wp_nonce_url( add_query_arg( array(
-					'action'        => 'generate_wpo_wcpdf',
-					'document_type' => $document->get_type(),
-					'order_ids'     => WCX_Order::get_id( $order ),
-				), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
-				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$pdf_url         = get_site_url().'/wcpdf/'.$document->get_type().'/'.WCX_Order::get_id( $order );
+				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 
 				$listing_actions[$document->get_type()] = array(
@@ -351,11 +347,7 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url = wp_nonce_url( add_query_arg( array(
-					'action'        => 'generate_wpo_wcpdf',
-					'document_type' => $document->get_type(),
-					'order_ids'     => $post_id,
-				), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
+				$pdf_url        = get_site_url().'/wcpdf/'.$document->get_type().'/'.$post_id;
 				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
 					'url'		=> esc_url( $pdf_url ),

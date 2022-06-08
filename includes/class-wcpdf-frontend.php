@@ -28,12 +28,7 @@ class Frontend {
 
 		$invoice = wcpdf_get_invoice( $order );
 		if ( $invoice && $invoice->is_enabled() ) {
-			$pdf_url = wp_nonce_url( add_query_arg( array(
-				'action'        => 'generate_wpo_wcpdf',
-				'document_type' => 'invoice',
-				'order_ids'     => WCX_Order::get_id( $order ),
-				'my-account'    => true,
-			), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
+			$pdf_url = get_site_url().'/wcpdf/invoice/'.WCX_Order::get_id( $order ).'?my-account=true';
 
 			// check my account button settings
 			$button_setting = $invoice->get_setting( 'my_account_buttons', 'available' );
@@ -146,25 +141,19 @@ class Frontend {
 			$link_text = __( 'Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
-		// Basic query args for PDF	
-		$query_args = array(
-			'action'        => 'generate_wpo_wcpdf',
-			'document_type' => 'invoice',
-			'order_ids'     => $order->get_id(),
-		);
+		$pdf_url = get_site_url().'/wcpdf/invoice/'.$order->get_id();
 		
 		// Add query args based on user permissions and guest access setting
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		if( is_user_logged_in() ) {
-			$query_args['my-account'] = true;
+			$pdf_url .= '?my-account=true';
 		} elseif( ! is_user_logged_in() && isset( $debug_settings['guest_access'] ) ) {
-			$query_args['order_key'] = $order->get_order_key();
+			$pdf_url .= '?order_key='.$order->get_order_key();
 		} else {
 			return; // no business here
 		}
-	
-		$pdf_url = esc_url( wp_nonce_url( add_query_arg( $query_args, admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' ) );
-		$text = sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_attr( $pdf_url ), esc_html( $link_text ) );
+
+		$text = sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $link_text ) );
 
 		return $text;
 	}

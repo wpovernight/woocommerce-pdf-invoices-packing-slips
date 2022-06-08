@@ -1095,7 +1095,7 @@ class Main {
 
 			/*
 				The $vars array should contain:
-				[0] => wcpdf
+				[0] => wcpdf (unique identifier)
 				[1] => document_type
 				[2] => order_ids
 			*/
