@@ -37,8 +37,8 @@ class Endpoint {
 	
 	public function add_endpoint() {
 		add_rewrite_rule(
-			'^'.$this->get_identifier().'/([^/]*)/([^/]*)/([^/]*)?',
-			'index.php?action=generate_wpo_wcpdf&document_type=$matches[1]&order_ids=$matches[2]&_wpnonce=$matches[3]',
+			'^'.$this->get_identifier().'/([^/]*)/([^/]*)?',
+			'index.php?action=generate_wpo_wcpdf&document_type=$matches[1]&order_ids=$matches[2]',
 			'top'
 		);
 	}
@@ -47,7 +47,6 @@ class Endpoint {
 		$vars[] = 'action';
 		$vars[] = 'document_type';
 		$vars[] = 'order_ids';
-		$vars[] = '_wpnonce';
 		return $vars;
 	}
 
@@ -55,36 +54,47 @@ class Endpoint {
 		global $wp;
 
 		if ( ! empty( $wp->query_vars['action'] ) && strpos( $this->action, $wp->query_vars['action'] ) !== false ) {
-			if ( ! empty( $wp->query_vars['document_type'] ) && ! empty( $wp->query_vars['order_ids'] ) && ! empty( $wp->query_vars['_wpnonce'] ) ) {
+			if ( ! empty( $wp->query_vars['document_type'] ) && ! empty( $wp->query_vars['order_ids'] ) ) {
 				$_REQUEST['action']        = $this->action;
 				$_REQUEST['document_type'] = sanitize_text_field( $wp->query_vars['document_type'] );
 				$_REQUEST['order_ids']     = sanitize_text_field( $wp->query_vars['order_ids'] );
-				$_REQUEST['_wpnonce']      = sanitize_text_field( $wp->query_vars['_wpnonce'] );
 				
 				do_action( 'wp_ajax_' . $this->action );
 			}
 		}
 	}
 
-	public function get_document_link( $order, $document_type, $additional_args = array() ) {
+	public function get_document_link( $order, $document_type, $additional_vars = array() ) {
+		if ( empty( $order ) || empty( $document_type ) ) {
+			return '';
+		}
+
 		if ( $this->is_enabled() ) {
 			$parameters = array(
 				$this->get_identifier(),
 				$document_type,
 				WCX_Order::get_id( $order ),
-				wp_create_nonce( $this->action ),
 			);
 			$document_link = trailingslashit( get_home_url() ) . implode( '/', $parameters );
 		} else {
-			$document_link = wp_nonce_url( add_query_arg( array(
+			$document_link = add_query_arg( array(
 				'action'        => $this->action,
 				'document_type' => $document_type,
 				'order_ids'     => WCX_Order::get_id( $order ),
-			), admin_url( 'admin-ajax.php' ) ), $this->action );
+			), admin_url( 'admin-ajax.php' ) );
 		}
 
-		if ( ! empty( $additional_args ) && is_array( $additional_args ) ) {
-			$document_link = add_query_arg( $additional_args, $document_link );
+		// handle guest access
+		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+		if ( is_user_logged_in() ) {
+			$document_link = add_query_arg( '_wpnonce', wp_create_nonce( $this->action ), $document_link );
+		} elseif ( ! is_user_logged_in() && isset( $debug_settings['guest_access'] ) ) {
+			$document_link = add_query_arg( 'order_key', $order->get_order_key(), $document_link );
+		}
+
+		// handle additional query vars
+		if ( ! empty( $additional_vars ) && is_array( $additional_vars ) ) {
+			$document_link = add_query_arg( $additional_vars, $document_link );
 		}
 
 		return $document_link;

@@ -145,15 +145,7 @@ class Frontend {
 			$link_text = __( 'Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
-		// Add query args based on user permissions and guest access setting
-		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-		if( is_user_logged_in() ) {
-			$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) );
-		} elseif( ! is_user_logged_in() && isset( $debug_settings['guest_access'] ) ) {
-			$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'order_key' => $order->get_order_key() ) );
-		} else {
-			return; // no business here
-		}
+		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'shortcode' => 'true' ) );
 
 		$text = sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $link_text ) );
 
