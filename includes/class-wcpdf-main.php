@@ -16,7 +16,7 @@ class Main {
 
 	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
 
-	function __construct()	{
+	public function __construct() {
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
 
@@ -61,8 +61,6 @@ class Main {
 		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
 		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
-
-		add_action( 'parse_request', array( $this, 'parse_document_link_request' ) );
 	}
 
 	/**
@@ -1087,44 +1085,6 @@ class Main {
 
 	public function wc_webhook_trigger( $document, $order ) {
 		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
-	}
-
-	public function parse_document_link_request( $wp ){
-		if ( strpos( $wp->request, 'wcpdf' ) !== false ) {
-			$vars = explode( '/', $wp->request );
-
-			/*
-				The $vars array should contain:
-				[0] => wcpdf (unique identifier)
-				[1] => document_type
-				[2] => order_ids
-			*/
-
-			if ( ! empty( $vars[0] ) && strpos( $vars[0], 'wcpdf' ) === false ) {
-				return;
-			}
-
-			$document_types = [];
-			foreach ( WPO_WCPDF()->documents->get_documents() as $document ) {
-				$document_types[] = $document->get_type();
-			}
-
-			if ( ! empty( $vars[1] ) && in_array( $vars[1], $document_types ) ) {
-				$_REQUEST['document_type'] = sanitize_text_field( $vars[1] );
-			}
-			if ( ! empty( $vars[2] ) && ( is_numeric( $vars[2] ) || strpos( $vars[2], 'x' ) !== false ) ) {
-				$_REQUEST['order_ids'] = sanitize_text_field( $vars[2] );
-			}
-
-			if ( ! empty( $_REQUEST['document_type'] ) && ! empty( $_REQUEST['order_ids'] ) ) {
-				$_REQUEST['action']   = 'generate_wpo_wcpdf';
-				$_REQUEST['_wpnonce'] = wp_create_nonce( $_REQUEST['action'] );
-
-				do_action( 'wp_ajax_' . $_REQUEST['action'] );
-			}
-		}
-
-		return;
 	}
 	
 }

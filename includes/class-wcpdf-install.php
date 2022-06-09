@@ -13,7 +13,7 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Install' ) ) :
 
 class Install {
 	
-	function __construct()	{
+	public function __construct() {
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
 			add_action( 'wp_loaded', array( $this, 'do_install' ) );

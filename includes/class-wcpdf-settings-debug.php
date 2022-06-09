@@ -283,6 +283,18 @@ class Settings_Debug {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'pretty_document_links',
+				'title'			=> __( 'Pretty document links', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'debug_settings',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'pretty_document_links',
+					'description'	=> __( 'Changes the document links to a prettier URL scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'disable_preview',
 				'title'			=> __( 'Disable document preview', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',

@@ -28,7 +28,7 @@ class Frontend {
 
 		$invoice = wcpdf_get_invoice( $order );
 		if ( $invoice && $invoice->is_enabled() ) {
-			$pdf_url = get_site_url().'/wcpdf/invoice/'.WCX_Order::get_id( $order ).'?my-account=true';
+			$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) );
 
 			// check my account button settings
 			$button_setting = $invoice->get_setting( 'my_account_buttons', 'available' );
@@ -74,6 +74,10 @@ class Frontend {
 					$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 					if ( function_exists( 'file_get_contents' ) && $script = file_get_contents( WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link'.$suffix.'.js' ) ) {
+
+						if ( WPO_WCPDF()->endpoint->is_enabled() ) {
+							$script = str_replace( 'generate_wpo_wcpdf', apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' ), $script );
+						}
 						
 						wp_add_inline_script( 'jquery', $script );
 					}
@@ -141,14 +145,12 @@ class Frontend {
 			$link_text = __( 'Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
-		$pdf_url = get_site_url().'/wcpdf/invoice/'.$order->get_id();
-		
 		// Add query args based on user permissions and guest access setting
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		if( is_user_logged_in() ) {
-			$pdf_url .= '?my-account=true';
+			$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) );
 		} elseif( ! is_user_logged_in() && isset( $debug_settings['guest_access'] ) ) {
-			$pdf_url .= '?order_key='.$order->get_order_key();
+			$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'order_key' => $order->get_order_key() ) );
 		} else {
 			return; // no business here
 		}
