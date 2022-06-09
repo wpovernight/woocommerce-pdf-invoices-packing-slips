@@ -290,7 +290,12 @@ class Settings_Debug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'pretty_document_links',
-					'description' => __( 'Changes the document links to a prettier URL scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						/* translators: <a> tags */
+						__( 'Changes the document links to a prettier URL scheme. (Saving the %1$spermalinks%2$s might be required)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="'.admin_url( 'options-permalink.php' ).'">',
+						'</a>'
+					),
 				)
 			),
 			array(
