@@ -11,6 +11,8 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Endpoint' ) ) :
 
 class Endpoint {
 
+	public $action = 'generate_wpo_wcpdf';
+
 	public function __construct() {
 		if ( $this->is_enabled() ) {
 			add_action( 'init', array( $this, 'add_endpoint' ) );
@@ -28,12 +30,14 @@ class Endpoint {
 			return false;
 		}
 	}
+
+	public function get_identifier() {
+		return apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' );
+	}
 	
 	public function add_endpoint() {
-		$identifier = apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' );
-
 		add_rewrite_rule(
-			'^'.$identifier.'/([^/]*)/([^/]*)/([^/]*)?',
+			'^'.$this->get_identifier().'/([^/]*)/([^/]*)/([^/]*)?',
 			'index.php?action=generate_wpo_wcpdf&document_type=$matches[1]&order_ids=$matches[2]&_wpnonce=$matches[3]',
 			'top'
 		);
@@ -50,33 +54,33 @@ class Endpoint {
 	public function handle_document_requests() {
 		global $wp;
 
-		if ( ! empty( $wp->query_vars['action'] ) && ! empty( $wp->query_vars['document_type'] ) && ! empty( $wp->query_vars['order_ids'] ) && ! empty( $wp->query_vars['_wpnonce'] ) ) {
-			$_REQUEST['action']        = sanitize_text_field( $wp->query_vars['action'] );
-			$_REQUEST['document_type'] = sanitize_text_field( $wp->query_vars['document_type'] );
-			$_REQUEST['order_ids']     = sanitize_text_field( $wp->query_vars['order_ids'] );
-			$_REQUEST['_wpnonce']      = sanitize_text_field( $wp->query_vars['_wpnonce'] );
-			
-			do_action( 'wp_ajax_' . $_REQUEST['action'] );
+		if ( ! empty( $wp->query_vars['action'] ) && strpos( $this->action, $wp->query_vars['action'] ) !== false ) {
+			if ( ! empty( $wp->query_vars['document_type'] ) && ! empty( $wp->query_vars['order_ids'] ) && ! empty( $wp->query_vars['_wpnonce'] ) ) {
+				$_REQUEST['action']        = $this->action;
+				$_REQUEST['document_type'] = sanitize_text_field( $wp->query_vars['document_type'] );
+				$_REQUEST['order_ids']     = sanitize_text_field( $wp->query_vars['order_ids'] );
+				$_REQUEST['_wpnonce']      = sanitize_text_field( $wp->query_vars['_wpnonce'] );
+				
+				do_action( 'wp_ajax_' . $this->action );
+			}
 		}
 	}
 
 	public function get_document_link( $order, $document_type, $additional_args = array() ) {
-		$action = 'generate_wpo_wcpdf';
-
 		if ( $this->is_enabled() ) {
 			$parameters = array(
-				apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' ),
+				$this->get_identifier(),
 				$document_type,
 				WCX_Order::get_id( $order ),
-				wp_create_nonce( $action ),
+				wp_create_nonce( $this->action ),
 			);
 			$document_link = trailingslashit( get_home_url() ) . implode( '/', $parameters );
 		} else {
 			$document_link = wp_nonce_url( add_query_arg( array(
-				'action'        => $action,
+				'action'        => $this->action,
 				'document_type' => $document_type,
 				'order_ids'     => WCX_Order::get_id( $order ),
-			), admin_url( 'admin-ajax.php' ) ), $action );
+			), admin_url( 'admin-ajax.php' ) ), $this->action );
 		}
 
 		if ( ! empty( $additional_args ) && is_array( $additional_args ) ) {

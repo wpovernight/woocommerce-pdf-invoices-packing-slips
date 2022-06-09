@@ -76,7 +76,7 @@ class Frontend {
 					if ( function_exists( 'file_get_contents' ) && $script = file_get_contents( WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link'.$suffix.'.js' ) ) {
 
 						if ( WPO_WCPDF()->endpoint->is_enabled() ) {
-							$script = str_replace( 'generate_wpo_wcpdf', apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' ), $script );
+							$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
 						}
 						
 						wp_add_inline_script( 'jquery', $script );
