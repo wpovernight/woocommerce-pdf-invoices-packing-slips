@@ -261,20 +261,16 @@ class Main {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
-		// check if nonce is valid
-		$valid_nonce = false;
-		if ( ! empty( $_REQUEST['access_key'] ) ) {
-			if ( wp_verify_nonce( $_REQUEST['access_key'], $_REQUEST['action'] ) ) {
-				$valid_nonce = true;
-			}
-		} else {
-			// handle legacy access keys
+		// handle legacy access keys
+		if ( empty( $_REQUEST['access_key'] ) ) {
 			foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
 				if ( ! empty( $_REQUEST[$legacy_key] ) ) {
 					$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST[$legacy_key] );
 				}
 			}
 		}
+
+		$valid_nonce = ! empty( $_REQUEST['access_key'] ) && ! empty( $_REQUEST['action'] ) && wp_verify_nonce( $_REQUEST['access_key'], $_REQUEST['action'] );
 
 		// check if we have the access key set
 		if ( empty( $_REQUEST['access_key'] ) ) {
