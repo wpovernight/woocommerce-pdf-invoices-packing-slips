@@ -261,7 +261,7 @@ class Main {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
-		// check access type by order_key
+		// check if the access type is 'order_key'
 		$order_key = false;
 		if ( ! empty( $_REQUEST['access_key'] ) ) {
 			if ( strpos( $_REQUEST['access_key'], 'wc_order_' ) !== false ) {
@@ -276,7 +276,7 @@ class Main {
 			}
 		}
 
-		// check if we have access key
+		// check if we have the access key
 		if ( empty( $_REQUEST['access_key'] ) ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
