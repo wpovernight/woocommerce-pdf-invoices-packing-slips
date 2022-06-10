@@ -257,12 +257,30 @@ class Main {
 	 */
 	public function generate_pdf_ajax() {
 		$guest_access = isset( WPO_WCPDF()->settings->debug_settings['guest_access'] );
-		if ( !$guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf') {
+		if ( ! $guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf' ) {
+			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		// handle legacy access keys
+		foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
+			if ( ! empty( $_REQUEST[$legacy_key] ) ) {
+				$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST[$legacy_key] );
+			}
+		}
+
+		// check access type by order_key
+		if ( ! empty( $_REQUEST['access_key'] ) ) {
+			if ( strpos( $_REQUEST['access_key'], 'wc_order_' ) !== false ) {
+				$order_key = true;
+			} else {
+				$order_key = false;
+			}
+		} else {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// Check the nonce - guest access doesn't use nonces but checks the unique order key (hash)
-		if( empty( $_REQUEST['action'] ) || ( !$guest_access && !check_admin_referer( $_REQUEST['action'] ) ) ) {
+		if ( empty( $_REQUEST['action'] ) || ( ! $order_key && ! check_admin_referer( $_REQUEST['action'], 'access_key' ) ) ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
@@ -299,13 +317,13 @@ class Main {
 		// set default is allowed
 		$allowed = true;
 
-		if ( $guest_access && isset( $_REQUEST['order_key'] ) ) {
+		if ( $guest_access && $order_key ) { // order key value starts always with 'wc_order_'
 			// Guest access with order key
 			if ( count( $order_ids ) > 1 ) {
 				$allowed = false;
 			} else {
 				$order = wc_get_order( $order_ids[0] );
-				if ( !$order || ! hash_equals( $order->get_order_key(), $_REQUEST['order_key'] ) ) {
+				if ( ! $order || ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
 				}
 			}
