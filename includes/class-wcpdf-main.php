@@ -261,11 +261,11 @@ class Main {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
-		// check if the access type is 'order_key'
-		$order_key = false;
+		// check if nonce is valid
+		$valid_nonce = false;
 		if ( ! empty( $_REQUEST['access_key'] ) ) {
-			if ( strpos( $_REQUEST['access_key'], 'wc_order_' ) !== false ) {
-				$order_key = true;
+			if ( wp_verify_nonce( $_REQUEST['access_key'], $_REQUEST['action'] ) ) {
+				$valid_nonce = true;
 			}
 		} else {
 			// handle legacy access keys
@@ -276,13 +276,13 @@ class Main {
 			}
 		}
 
-		// check if we have the access key
+		// check if we have the access key set
 		if ( empty( $_REQUEST['access_key'] ) ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// Check the nonce - guest access doesn't use nonces but checks the unique order key (hash)
-		if ( empty( $_REQUEST['action'] ) || ( ! $order_key && ! check_admin_referer( $_REQUEST['action'], 'access_key' ) ) ) {
+		if ( empty( $_REQUEST['action'] ) || ( ! $guest_access && ! $valid_nonce ) ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
@@ -319,7 +319,7 @@ class Main {
 		// set default is allowed
 		$allowed = true;
 
-		if ( $guest_access && $order_key ) { // order key value starts always with 'wc_order_'
+		if ( $guest_access && ! $valid_nonce ) { // if nonce is invalid maybe we are dealing with the order key
 			// Guest access with order key
 			if ( count( $order_ids ) > 1 ) {
 				$allowed = false;
@@ -363,9 +363,9 @@ class Main {
 		// if we got here, we're safe to go!
 		try {
 			// log document creation to order notes
-			if( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
+			if ( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_bulk_to_order_notes' ) );
-			} elseif( isset( $_REQUEST['my-account'] ) ) {
+			} elseif ( isset( $_REQUEST['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_my_account_to_order_notes' ) );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', array( $this, 'log_single_to_order_notes' ) );
