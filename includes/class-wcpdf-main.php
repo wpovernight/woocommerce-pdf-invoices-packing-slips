@@ -262,11 +262,10 @@ class Main {
 		}
 
 		// check access type by order_key
+		$order_key = false;
 		if ( ! empty( $_REQUEST['access_key'] ) ) {
 			if ( strpos( $_REQUEST['access_key'], 'wc_order_' ) !== false ) {
 				$order_key = true;
-			} else {
-				$order_key = false;
 			}
 		} else {
 			// handle legacy access keys
