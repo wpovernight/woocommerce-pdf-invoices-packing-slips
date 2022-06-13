@@ -207,7 +207,7 @@ class Setup_Wizard {
 		if ( end( $step_keys ) === $this->step && empty( $step ) ) {
 			return admin_url('admin.php?page=wpo_wcpdf_options_page');
 		}
-		return esc_url( add_query_arg( 'step', $step ) );
+		return esc_url_raw( add_query_arg( 'step', $step ) );
 	}
 
 
