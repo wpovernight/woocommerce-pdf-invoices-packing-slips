@@ -35,6 +35,18 @@ class Settings_Callbacks {
 	public function custom_fields_section() {
 		echo wp_kses_post( __( 'These are used for the (optional) footer columns in the <em>Modern (Premium)</em> template, but can also be used for other elements in your custom template' , 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
+	
+	/**
+	 * Internal notice section callback.
+	 *
+	 * @return void.
+	 */
+	public function notice_section( $args ) {
+		extract( $this->normalize_settings_args( $args ) );
+		
+		// output notice	
+		printf( '<div class="notice inline notice-info"><p>%s</p></di>', wp_kses_post( $text ) );
+	}
 
 	/**
 	 * Checkbox callback.
