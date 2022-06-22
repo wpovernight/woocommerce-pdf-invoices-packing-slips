@@ -481,8 +481,11 @@ class Settings {
 
 		$installed_templates = array();
 
+		// call the default WooCommerce filter here because by default it runs later and we could miss it
+		
+
 		// get base paths
-		$template_base_path = ( function_exists( 'WC' ) && is_callable( array( 'WC', 'template_path' ) ) ) ? WC()->template_path() : 'woocommerce/';
+		$template_base_path = ( function_exists( 'WC' ) && is_callable( array( 'WC', 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
 		$template_base_path = untrailingslashit( $template_base_path );
 		$template_paths = array (
 			// note the order: theme before child-theme, so that child theme is always preferred (overwritten)
