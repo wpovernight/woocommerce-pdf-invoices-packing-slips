@@ -479,10 +479,7 @@ class Settings {
 			return $this->installed_templates;
 		}
 
-		$installed_templates = array();
-
-		// call the default WooCommerce filter here because by default it runs later and we could miss it
-		
+		$installed_templates = array();	
 
 		// get base paths
 		$template_base_path = ( function_exists( 'WC' ) && is_callable( array( 'WC', 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
