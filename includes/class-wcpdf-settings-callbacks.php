@@ -37,15 +37,15 @@ class Settings_Callbacks {
 	}
 	
 	/**
-	 * Internal notice section callback.
+	 * HTML section callback.
 	 *
 	 * @return void.
 	 */
-	public function notice_section( $args ) {
+	public function html_section( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 		
-		// output notice	
-		printf( '<div class="notice inline notice-info"><p>%s</p></di>', wp_kses_post( $text ) );
+		// output HTML	
+		echo wp_kses_post( $html );
 	}
 
 	/**

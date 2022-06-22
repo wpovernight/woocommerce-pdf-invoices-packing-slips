@@ -182,7 +182,7 @@ class Invoice extends Order_Document_Methods {
 			array(
 				'type'			=> 'setting',
 				'id'			=> 'attach_to_email_ids',
-				'title'			=> __( 'Attach to', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'			=> __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'multiple_checkboxes',
 				'section'		=> 'invoice',
 				'args'			=> array(
