@@ -673,6 +673,39 @@ class Settings {
 		return wp_send_json_success( $html );
 	}
 
+	public function move_setting_after_id( $settings, $insert_settings, $after_setting_id ) {
+		$pos = 1; // this is already +1 to insert after the actual pos
+		foreach ( $settings as $setting ) {
+			if ( isset( $setting['id'] ) && $setting['id'] == $after_setting_id ) {
+				$section = $setting['section'];
+				break;
+			} else {
+				$pos++;
+			}
+		}
+
+		// replace section
+		if ( isset( $section ) ) {
+			foreach ( $insert_settings as $key => $insert_setting ) {
+				$insert_settings[$key]['section'] = $section;
+			}
+		} else {
+			$empty_section = array(
+				array(
+					'type'     => 'section',
+					'id'       => 'custom',
+					'title'    => '',
+					'callback' => 'section',
+				),
+			);
+			$insert_settings = array_merge( $empty_section, $insert_settings );
+		}
+		// insert our api settings
+		$new_settings = array_merge( array_slice( $settings, 0, $pos, true ), $insert_settings, array_slice( $settings, $pos, NULL, true ) );
+
+		return $new_settings;
+	}
+
 }
 
 endif; // class_exists
