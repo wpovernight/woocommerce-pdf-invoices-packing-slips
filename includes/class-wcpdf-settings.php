@@ -579,7 +579,7 @@ class Settings {
 	}
 
 	public function debug_settings_updated( $old_settings, $settings, $option ) {
-		if ( is_array( $settings ) && ! empty ( $settings['pretty_document_links'] ) ) {
+		if ( is_array( $settings ) && is_array( $old_settings ) && empty( $old_settings['pretty_document_links'] ) && ! empty ( $settings['pretty_document_links'] ) ) {
 			set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
 		}
 	}
