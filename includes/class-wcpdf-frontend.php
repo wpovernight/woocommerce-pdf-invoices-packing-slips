@@ -145,7 +145,7 @@ class Frontend {
 			$link_text = __( 'Download invoice (PDF)', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
-		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'shortcode' => 'true' ) );
+		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice' );
 
 		$text = sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $link_text ) );
 
