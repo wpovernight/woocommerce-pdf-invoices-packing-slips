@@ -196,7 +196,7 @@ class Invoice extends Order_Document_Methods {
 			array(
 				'type'			=> 'setting',
 				'id'			=> 'disable_for_statuses',
-				'title'			=> __( 'Disable for', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'			=> __( 'Disable for:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
 				'section'		=> 'invoice',
 				'args'			=> array(
