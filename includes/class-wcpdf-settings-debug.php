@@ -204,6 +204,23 @@ class Settings_Debug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'pretty_document_links',
+				'title'    => __( 'Pretty document links', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pretty_document_links',
+					'description' => sprintf(
+						/* translators: <a> tags */
+						__( 'Changes the document links to a prettier URL scheme. (Saving the %1$spermalinks%2$s might be required)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="'.admin_url( 'options-permalink.php' ).'">',
+						'</a>'
+					),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'calculate_document_numbers',
 				'title'    => __( 'Calculate document numbers (slow)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
@@ -279,23 +296,6 @@ class Settings_Debug {
 					'option_name' => $option_name,
 					'id'          => 'log_to_order_notes',
 					'description' => __( 'Log PDF document creation to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'pretty_document_links',
-				'title'    => __( 'Pretty document links', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'pretty_document_links',
-					'description' => sprintf(
-						/* translators: <a> tags */
-						__( 'Changes the document links to a prettier URL scheme. (Saving the %1$spermalinks%2$s might be required)', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="'.admin_url( 'options-permalink.php' ).'">',
-						'</a>'
-					),
 				)
 			),
 			array(
