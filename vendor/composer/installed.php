@@ -5,9 +5,9 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'e101badc1098fe47d82aa6d39c7bb794c4e35987',
+        'reference' => 'd3c96e9c5bc6c7ea8a022d053538b9c35be0e3fe',
         'name' => '__root__',
-        'dev' => false,
+        'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'e101badc1098fe47d82aa6d39c7bb794c4e35987',
+            'reference' => 'd3c96e9c5bc6c7ea8a022d053538b9c35be0e3fe',
             'dev_requirement' => false,
         ),
         'dompdf/dompdf' => array(
@@ -62,15 +62,6 @@
             'install_path' => __DIR__ . '/../sabberworm/php-css-parser',
             'aliases' => array(),
             'reference' => 'e41d2140031d533348b2192a83f02d8dd8a71d30',
-            'dev_requirement' => false,
-        ),
-        'symfony/polyfill-iconv' => array(
-            'pretty_version' => 'v1.20.0',
-            'version' => '1.20.0.0',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../symfony/polyfill-iconv',
-            'aliases' => array(),
-            'reference' => 'c536646fdb4f29104dd26effc2fdcb9a5b085024',
             'dev_requirement' => false,
         ),
         'symfony/polyfill-mbstring' => array(

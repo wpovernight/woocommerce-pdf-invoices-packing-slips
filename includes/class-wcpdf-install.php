@@ -404,7 +404,15 @@ class Install {
 				}
 			}
 		}
-		
+
+		// 3.0.0-dev-1: remove saved option 'use_html5_parser'
+		if ( version_compare( $installed_version, '3.0.0-dev-1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['use_html5_parser'] ) ) {
+				unset( $debug_settings['use_html5_parser'] );
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
 	}
 
 	/**
