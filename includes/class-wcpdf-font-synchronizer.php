@@ -140,6 +140,7 @@ class Font_Synchronizer {
 
 		if ( is_readable( $legacy_cache_file ) ) {
 			$font_data = include $legacy_cache_file;
+			@unlink( $legacy_cache_file );
 		} elseif ( is_readable( $cache_file ) ) {
 			$json_data = file_get_contents( $cache_file );
 			$font_data = json_decode( $json_data, true );
@@ -155,11 +156,6 @@ class Font_Synchronizer {
 		// dompdf 1.1.X uses a closure to return the fonts, instead of a plain array (1.0.X and older)
 		if ( ! is_array( $font_data ) && is_callable( $font_data ) ) {
 			$font_data = $font_data( $fontDir, $rootDir );
-		}
-
-		// removes the legacy file
-		if ( file_exists( $legacy_cache_file ) ) {
-			@unlink( $legacy_cache_file );
 		}
 
 		return is_array( $font_data ) ? $this->normalize_font_paths( $font_data ) : array();
