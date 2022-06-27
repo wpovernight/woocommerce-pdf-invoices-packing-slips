@@ -133,10 +133,14 @@ class Font_Synchronizer {
 	 */
 	public function get_local_fonts( $path ) {
 		// prepare variables used in the cache list
-		$fontDir    = $path;
-		$rootDir    = $this->dompdf->getOptions()->getRootDir();
-		$cache_file = trailingslashit( $path ) . $this->font_cache_filename;
-		if ( is_readable( $cache_file ) ) {
+		$fontDir           = $path;
+		$rootDir           = $this->dompdf->getOptions()->getRootDir();
+		$cache_file        = trailingslashit( $path ) . $this->font_cache_filename;
+		$legacy_cache_file = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
+
+		if ( is_readable( $legacy_cache_file ) ) {
+			$font_data = include $legacy_cache_file;
+		} elseif ( is_readable( $cache_file ) ) {
 			$json_data = file_get_contents( $cache_file );
 			$font_data = json_decode( $json_data, true );
 		} else {
@@ -151,6 +155,11 @@ class Font_Synchronizer {
 		// dompdf 1.1.X uses a closure to return the fonts, instead of a plain array (1.0.X and older)
 		if ( ! is_array( $font_data ) && is_callable( $font_data ) ) {
 			$font_data = $font_data( $fontDir, $rootDir );
+		}
+
+		// removes the legacy file
+		if ( file_exists( $legacy_cache_file ) ) {
+			@unlink( $legacy_cache_file );
 		}
 
 		return is_array( $font_data ) ? $this->normalize_font_paths( $font_data ) : array();
