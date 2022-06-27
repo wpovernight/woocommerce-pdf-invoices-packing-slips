@@ -17,7 +17,7 @@ class Font_Synchronizer {
 	 *
 	 * @var string
 	 */
-	public $font_cache_filename = "dompdf_font_family_cache.php";
+	public $font_cache_filename = "installed-fonts.dist.json";
 
 	/**
 	 * Vanilla instance of dompdf
@@ -72,11 +72,8 @@ class Font_Synchronizer {
 
 		// normalize one last time
 		$local_fonts = $this->normalize_font_paths( $local_fonts );
-
 		// rebuild font cache file
-		$fonts_export = var_export( $local_fonts, true );
-		$fonts_export = str_replace( '\'' . untrailingslashit( $destination ) , '$fontDir . \'', $fonts_export );
-		$cacheData = sprintf( "<?php return %s;%s?>", $fonts_export, PHP_EOL );
+		$cacheData   = json_encode( $local_fonts );
 		// write file with merged cache data
 		file_put_contents( $destination . $this->font_cache_filename, $cacheData );
 	}
@@ -136,11 +133,12 @@ class Font_Synchronizer {
 	 */
 	public function get_local_fonts( $path ) {
 		// prepare variables used in the cache list
-		$fontDir = $path;
-		$rootDir = $this->dompdf->getOptions()->getRootDir();
+		$fontDir    = $path;
+		$rootDir    = $this->dompdf->getOptions()->getRootDir();
 		$cache_file = trailingslashit( $path ) . $this->font_cache_filename;
 		if ( is_readable( $cache_file ) ) {
-			$font_data = include $cache_file;
+			$json_data = file_get_contents( $cache_file );
+			$font_data = json_decode( $json_data, true );
 		} else {
 			$font_data = array();
 		}
