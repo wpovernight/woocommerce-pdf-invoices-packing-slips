@@ -413,8 +413,6 @@ class Install {
 				unset( $debug_settings['use_html5_parser'] );
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
-			// force copy fonts merge to replace the fonts cache file (Dompdf <2.0)
-			WPO_WCPDF()->main->copy_fonts( $font_path, true );
 		}
 	}
 
