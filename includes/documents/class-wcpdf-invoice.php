@@ -321,6 +321,7 @@ class Invoice extends Order_Document_Methods {
 					'id'					=> 'number_format',
 					'fields'				=> array(
 						'prefix'			=> array(
+							'label'	=> __( 'Prefix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'placeholder'	=> __( 'Prefix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
 							'description'	=> sprintf( '%1$s %2$s %3$s %4$s%5$s > %6$s%7$s',
@@ -335,6 +336,7 @@ class Invoice extends Order_Document_Methods {
 							),
 						),
 						'suffix'			=> array(
+							'label'	=> __( 'Suffix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'placeholder'	=> __( 'Suffix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
 							'description'	=> sprintf( '%1$s %2$s %3$s %4$s%5$s > %6$s%7$s',
@@ -349,6 +351,7 @@ class Invoice extends Order_Document_Methods {
 							),
 						),
 						'padding'			=> array(
+							'label'	=> __( 'Padding' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'placeholder'	=> __( 'Padding' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
 							'type'			=> 'number',
@@ -357,7 +360,7 @@ class Invoice extends Order_Document_Methods {
 						),
 					),
 					/* translators: document type */
-					'description'			=> sprintf( __( 'Note: if you have already created a custom %s number format with a filter, the above settings will be ignored.', 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
+					'description'			=> __( 'For more information about setting up the number format, check this article:', 'woocommerce-pdf-invoices-packing-slips' ) . sprintf( ' <a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/number-format-explained/" target="_blank">%s</a>', __( 'Number format explained', 'woocommerce-pdf-invoices-packing-slips') ) . '<br>'. sprintf( __( '<strong>Note</strong>: if you have already created a custom %s number format with a filter, the above settings will be ignored.', 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
 				)
 			),
 			array(
