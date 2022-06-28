@@ -139,6 +139,11 @@ class Frontend {
 			return;
 		}
 
+		$invoice = wcpdf_get_invoice( $order );
+		if ( ! $invoice || ! $invoice->is_allowed() ) {
+			return;
+		}
+
 		// Link text
 		if( ! empty( $values['link_text'] ) ) {
 			$link_text = $values['link_text'];
