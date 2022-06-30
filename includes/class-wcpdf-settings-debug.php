@@ -260,17 +260,6 @@ class Settings_Debug {
 			),
 			array(
 				'type'			=> 'setting',
-				'id'			=> 'use_html5_parser',
-				'title'			=> __( 'Use alternative HTML5 parser to parse HTML', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'use_html5_parser',
-				)
-			),
-			array(
-				'type'			=> 'setting',
 				'id'			=> 'log_to_order_notes',
 				'title'			=> __( 'Log to order notes', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
