@@ -6,11 +6,13 @@
 	<tr>
 		<td class="header">
 		<?php
+		do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order );
 		if ( $this->has_header_logo() ) {
 			$this->header_logo();
 		} else {
 			echo $this->get_title();
 		}
+		do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order );
 		?>
 		</td>
 		<td class="shop-info">
