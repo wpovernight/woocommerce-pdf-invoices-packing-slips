@@ -272,7 +272,7 @@ jQuery( function( $ ) {
 	});
 	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
-	$( document ).on( 'click', '.wpo_remove_image_button', settingsChanged );
+	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
 	
 	function settingsChanged( event, previewDelay ) {
 
@@ -283,6 +283,10 @@ jQuery( function( $ ) {
 		let $element = $( event.target );
 
 		if ( ! settingIsExcludedForPreview( $element.attr('name') ) ) {
+
+			if ( $element.hasClass( 'remove-requirement' ) ) {
+				return;
+			}
 
 			if ( jQuery.inArray( event.type, ['keyup', 'paste'] ) !== -1 ) {
 				if ( $element.is( 'input[type="checkbox"], select' ) ) {
