@@ -284,7 +284,7 @@ jQuery( function( $ ) {
 
 		if ( ! settingIsExcludedForPreview( $element.attr('name') ) ) {
 
-			if ( $element.hasClass( 'remove-requirement' ) ) {
+			if ( $element.hasClass( 'remove-requirement' ) || $element.attr('id') == 'disable_for' ) {
 				return;
 			}
 
