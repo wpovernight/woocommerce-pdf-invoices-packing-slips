@@ -47,7 +47,7 @@ $review_invitation = sprintf(
 	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo $preview_states; ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo $preview_states_lock; ?>">
 
 		<div class="sidebar">
-			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
+			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 				<?php
 					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
 					if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
