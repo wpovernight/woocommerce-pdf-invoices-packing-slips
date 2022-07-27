@@ -322,7 +322,6 @@ class Invoice extends Order_Document_Methods {
 					'fields'				=> array(
 						'prefix'			=> array(
 							'label'	=> __( 'Prefix' , 'woocommerce-pdf-invoices-packing-slips' ),
-							'placeholder'	=> __( 'Prefix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
 							'description'	=> __( 'If set, this value will be used as number prefix.' , 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
 							/* translators: 1. document type, 2-3 placeholders */
@@ -331,7 +330,6 @@ class Invoice extends Order_Document_Methods {
 						),
 						'suffix'			=> array(
 							'label'	=> __( 'Suffix' , 'woocommerce-pdf-invoices-packing-slips' ),
-							'placeholder'	=> __( 'Suffix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
 							'description'	=> __( 'If set, this value will be used as number suffix.' , 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
 							/* translators: 1. document type, 2-3 placeholders */
@@ -340,7 +338,6 @@ class Invoice extends Order_Document_Methods {
 						),
 						'padding'			=> array(
 							'label'	=> __( 'Padding' , 'woocommerce-pdf-invoices-packing-slips' ),
-							'placeholder'	=> __( 'Padding' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'			=> 20,
 							'type'			=> 'number',
 							/* translators: document type */
