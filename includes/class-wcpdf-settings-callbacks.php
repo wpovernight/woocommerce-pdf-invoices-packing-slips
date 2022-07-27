@@ -316,6 +316,8 @@ class Settings_Callbacks {
 			// output field label
 			if ( isset( $field['label'] ) ) {
 				printf( '<td class="label"><label for="%1$s_%2$s">%3$s:</label></td>', esc_attr( $id ), esc_attr( $name ), esc_html( $field['label'] ) );
+			} else {
+				echo '<td></td>';
 			}
 
 			// output field
@@ -326,6 +328,8 @@ class Settings_Callbacks {
 			// field description.
 			if ( ! empty( $field_description ) ) {
 				echo '<td>' . wc_help_tip( $field_description, true ) . '</td>';
+			} else {
+				echo '<td></td>';
 			}
 			echo '</tr>';
 		}
