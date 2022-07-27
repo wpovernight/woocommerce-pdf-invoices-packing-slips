@@ -148,6 +148,19 @@ class Assets {
 						'disable_free',
 						'use_latest_settings',
 					) ),
+					'pointers'                  => array(
+						'wcpdf_document_settings_sections' => array(
+							'target'        => '.wcpdf_document_settings_sections',
+							'content'       => sprintf( '<h3>%s</h3><p>%s</p>', __( 'Document settings', 'woocommerce-pdf-invoices-packing-slips'), __( 'Select a document in the dropdown menu above to edit its settings.', 'woocommerce-pdf-invoices-packing-slips') ),
+							'pointer_class' => 'wp-pointer arrow-top wpo-wcpdf-pointer',
+							'pointer_width' => 300,
+							'position'      => array(
+								'edge'  => 'top',
+								'align' => 'left',
+							),
+						),
+					),
+					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
 				)
 			);
 
@@ -158,6 +171,14 @@ class Assets {
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
+
+			if ( wp_script_is( 'wp-pointer', 'enqueued' ) === false ) {
+				wp_enqueue_script( 'wp-pointer' );
+			}
+
+			if ( wp_style_is( 'wp-pointer', 'enqueued' ) === false ) {
+				wp_enqueue_style( 'wp-pointer' );
+			}
 
 		}
 	}
