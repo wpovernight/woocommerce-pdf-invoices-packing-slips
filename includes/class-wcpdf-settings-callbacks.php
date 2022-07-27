@@ -325,7 +325,7 @@ class Settings_Callbacks {
 
 			// field description.
 			if ( ! empty( $field_description ) ) {
-				echo '<td>' . wc_help_tip( $field_description, true ) . '<td>';
+				echo '<td>' . wc_help_tip( $field_description, true ) . '</td>';
 			}
 			echo '</tr>';
 		}
