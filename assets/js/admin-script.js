@@ -51,6 +51,41 @@ jQuery( function( $ ) {
 		$( this ).parent().find( 'ul' ).toggleClass( 'active' );
 	} );
 
+	// Add admin pointers
+	$.each( wpo_wcpdf_admin.pointers, function( key, pointer ) {
+
+		$( pointer.target ).pointer( 
+			{
+				content: pointer.content,
+	
+				position:
+					{
+						edge:  pointer.position.edge,
+						align: pointer.position.align
+					},
+	
+				pointerClass: pointer.pointer_class,
+	
+				pointerWidth: pointer.pointer_width,
+	
+				close: function() {
+					jQuery.post(
+						wpo_wcpdf_admin.ajaxurl,
+						{
+							pointer: key,
+							action:  'dismiss-wp-pointer',
+						}
+					);
+				},
+			}
+		);
+
+		// Check if pointer was dismissed
+		if ( $.inArray( key, wpo_wcpdf_admin.dismissed_pointers.split(',') ) === -1 ) {
+			$( pointer.target ).pointer('open');
+		}
+
+	});	
 
 	//----------> Preview <----------//
 
