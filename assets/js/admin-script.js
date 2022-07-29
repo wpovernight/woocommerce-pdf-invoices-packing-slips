@@ -70,7 +70,7 @@ jQuery( function( $ ) {
 	
 				close: function() {
 					jQuery.post(
-						ajaxurl,
+						wpo_wcpdf_admin.ajaxurl,
 						{
 							pointer: key,
 							action:  'dismiss-wp-pointer',
