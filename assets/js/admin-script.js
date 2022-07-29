@@ -78,7 +78,7 @@ jQuery( function( $ ) {
 					);
 				},
 			}
-		)
+		);
 
 		// Check if pointer was dismissed
 		if ( $.inArray( key, wpo_wcpdf_admin.dismissed_pointers.split(',') ) === -1 ) {
