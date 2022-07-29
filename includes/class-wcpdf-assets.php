@@ -151,7 +151,11 @@ class Assets {
 					'pointers'                  => array(
 						'wcpdf_document_settings_sections' => array(
 							'target'        => '.wcpdf_document_settings_sections',
-							'content'       => sprintf( '<h3>%s</h3><p>%s</p>', __( 'Document settings', 'woocommerce-pdf-invoices-packing-slips'), __( 'Select a document in the dropdown menu above to edit its settings.', 'woocommerce-pdf-invoices-packing-slips') ),
+							'content'       => sprintf(
+								'<h3>%s</h3><p>%s</p>',
+								__( 'Document settings', 'woocommerce-pdf-invoices-packing-slips' ),
+								__( 'Select a document in the dropdown menu above to edit its settings.', 'woocommerce-pdf-invoices-packing-slips' )
+							),
 							'pointer_class' => 'wp-pointer arrow-top wpo-wcpdf-pointer',
 							'pointer_width' => 300,
 							'position'      => array(
