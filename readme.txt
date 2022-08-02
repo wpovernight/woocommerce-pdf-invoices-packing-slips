@@ -104,7 +104,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 3.0.1 (2022-08-02) =
 * New: admin pointer for document settings dropdown
-* Security: escape the tab and section parameters before outputting it back in an attribute, leading to a Reflected Cross-Site Scripting in the admin dashboard
+* Security: escape the tab and section parameters before outputting it back, leading to a Reflected Cross-Site Scripting. This bug was reintroduced on version 2.14.0
 * Tweak: prevent requirements select to reload settings preview
 * Fix: allow remove requirement trigger secondary save button on settings pages
 * Marked tested up to WooCommerce 6.7
