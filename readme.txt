@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.15.0
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,24 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.0.1 (2022-08-02) =
+* New: admin pointer for document settings dropdown
+* Security: escape the tab and section parameters before outputting it back, leading to a Reflected Cross-Site Scripting. This bug was reintroduced on version 2.14.0
+* Tweak: prevent requirements select to reload settings preview
+* Fix: allow remove requirement trigger secondary save button on settings pages
+* Marked tested up to WooCommerce 6.7
+
+= 3.0.0 =
+* Libraries: Updated dompdf to 2.0.0, addressing security vulnerabilities and introducing some changes that could possibly break high level customized setups ([more information](https://github.com/dompdf/dompdf/releases/tag/v2.0.0))
+* Fix: respect custom (filtered) woocommerce template paths
+* Fix: Check if the invoice is allowed before the shortcode output
+* UI: Link to Professional extension for packing slip attachments
+
+= 2.16.0 =
+* Security: Fix authenticated reflected XSS on the settings page
+* Fix: Redirection URLs in wizard and when sending emails manually
+* Libraries: updated dompdf to 1.2.2
 
 = 2.15.0 =
 * New: Filter hooks to override ability to edit document data

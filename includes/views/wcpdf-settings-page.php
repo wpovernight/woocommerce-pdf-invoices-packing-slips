@@ -47,7 +47,7 @@ $review_invitation = sprintf(
 	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo $preview_states; ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo $preview_states_lock; ?>">
 
 		<div class="sidebar">
-			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo "{$active_tab} {$active_section}"; ?>">
+			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 				<?php
 					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
 					if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
@@ -117,10 +117,10 @@ $review_invitation = sprintf(
 				</div>
 				<?php endif; ?>
 			</div>
-			<input type="hidden" name="document_type" data-default="<?= $document_type; ?>" value="<?= $document_type; ?>">
+			<input type="hidden" name="document_type" data-default="<?php esc_attr_e( $document_type ); ?>" value="<?php esc_attr_e( $document_type ); ?>">
 			<input type="hidden" name="order_id" value="">
-			<input type="hidden" name="nonce" value="<?= wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
-			<script src="<?= WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
+			<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
+			<script src="<?php echo WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
 			<div class="preview"></div>
 		</div>
 

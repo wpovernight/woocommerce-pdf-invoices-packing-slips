@@ -483,27 +483,26 @@ class Settings {
 		}
 
 		$installed_templates = array();
-
 		// get base paths
-		$template_base_path = ( function_exists( 'WC' ) && is_callable( array( 'WC', 'template_path' ) ) ) ? WC()->template_path() : 'woocommerce/';
-		$template_base_path = untrailingslashit( $template_base_path );
-		$template_paths = array (
+		$template_base_path  = ( function_exists( 'WC' ) && is_callable( array( WC(), 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
+		$template_base_path  = untrailingslashit( $template_base_path );
+		$template_paths      = array (
 			// note the order: theme before child-theme, so that child theme is always preferred (overwritten)
-			'default'		=> WPO_WCPDF()->plugin_path() . '/templates/',
-			'theme'			=> get_template_directory() . "/{$template_base_path}/pdf/",
-			'child-theme'	=> get_stylesheet_directory() . "/{$template_base_path}/pdf/",
+			'default'     => WPO_WCPDF()->plugin_path() . '/templates/',
+			'theme'       => get_template_directory() . "/{$template_base_path}/pdf/",
+			'child-theme' => get_stylesheet_directory() . "/{$template_base_path}/pdf/",
 		);
 
 		$template_paths = apply_filters( 'wpo_wcpdf_template_paths', $template_paths );
 
-		foreach ($template_paths as $template_source => $template_path) {
+		foreach ( $template_paths as $template_source => $template_path ) {
 			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR );
 			
 			foreach ( $dirs as $dir ) {
-				$clean_dir = $this->normalize_path( $dir );
+				$clean_dir     = $this->normalize_path( $dir );
 				$template_name = basename( $clean_dir );
 				// let child theme override parent theme
-				$group = ( $template_source == 'child-theme' ) ? 'theme' : $template_source; 
+				$group = ( $template_source == 'child-theme' ) ? 'theme' : $template_source;
 				$installed_templates[ $clean_dir ] = "{$group}/{$template_name}" ;
 			}
 		}
@@ -688,6 +687,39 @@ class Settings {
 		$html = ob_get_clean();
 
 		return wp_send_json_success( $html );
+	}
+
+	public function move_setting_after_id( $settings, $insert_settings, $after_setting_id ) {
+		$pos = 1; // this is already +1 to insert after the actual pos
+		foreach ( $settings as $setting ) {
+			if ( isset( $setting['id'] ) && $setting['id'] == $after_setting_id ) {
+				$section = $setting['section'];
+				break;
+			} else {
+				$pos++;
+			}
+		}
+
+		// replace section
+		if ( isset( $section ) ) {
+			foreach ( $insert_settings as $key => $insert_setting ) {
+				$insert_settings[$key]['section'] = $section;
+			}
+		} else {
+			$empty_section = array(
+				array(
+					'type'     => 'section',
+					'id'       => 'custom',
+					'title'    => '',
+					'callback' => 'section',
+				),
+			);
+			$insert_settings = array_merge( $empty_section, $insert_settings );
+		}
+		// insert our api settings
+		$new_settings = array_merge( array_slice( $settings, 0, $pos, true ), $insert_settings, array_slice( $settings, $pos, NULL, true ) );
+
+		return $new_settings;
 	}
 
 }

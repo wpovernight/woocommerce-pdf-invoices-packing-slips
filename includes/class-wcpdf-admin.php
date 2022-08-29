@@ -18,7 +18,7 @@ class Admin {
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_number_column_data' ), 2 );
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
-			add_action( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
+			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
 		} else {
 			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
 		}
