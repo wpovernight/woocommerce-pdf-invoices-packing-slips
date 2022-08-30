@@ -46,6 +46,9 @@ class Settings {
 
 		// refresh template path cache each time the general settings are updated
 		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
+		// sets transient to flush rewrite rules
+		add_action( "update_option_wpo_wcpdf_settings_debug", array( $this, 'debug_settings_updated' ), 10, 3 );
+		add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
 		// migrate old template paths to template IDs before loading settings page
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 1 );
 
@@ -571,6 +574,19 @@ class Settings {
 		if ( is_array( $settings ) && ! empty ( $settings['template_path'] ) ) {
 			$this->delete_template_list_cache();
 			$this->set_template_list_cache( $this->get_installed_templates() );
+		}
+	}
+
+	public function debug_settings_updated( $old_settings, $settings, $option ) {
+		if ( is_array( $settings ) && is_array( $old_settings ) && empty( $old_settings['pretty_document_links'] ) && ! empty ( $settings['pretty_document_links'] ) ) {
+			set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
+		}
+	}
+
+	public function maybe_delete_flush_rewrite_rules_transient() {
+		if ( get_transient( 'wpo_wcpdf_flush_rewrite_rules' ) ) {
+			flush_rewrite_rules();
+			delete_transient( 'wpo_wcpdf_flush_rewrite_rules' );
 		}
 	}
 
