@@ -906,11 +906,10 @@ class Main {
 		$output           = array();
 
 		foreach ( $paths_to_cleanup as $path ) {
-			if ( function_exists( 'list_files' ) ) {
-				$files = array_merge( $files, list_files( $path, $folders_level ) );
-			} else {
-				$files = array_merge( $files, $this->dir_file_list( $path, $folders_level ) );
+			if ( ! function_exists( 'list_files' ) ) {
+				include_once( ABSPATH.'wp-admin/includes/file.php' );
 			}
+			$files = array_merge( $files, list_files( $path, $folders_level ) );
 		}
 
 		if ( ! empty( $files ) ) {
@@ -944,28 +943,6 @@ class Main {
 		}
 
 		return $output;
-	}
-
-	public function dir_file_list( $dir, $level_limit = 3 ){
-		$start_level = 0;
-		$found       = array();
-
-		if ( empty( $dir ) ) {
-			return $found;
-		}
-
-		$dir   = rtrim( $dir, '/' ); // removes ending "/"
-		$files = scandir( $dir );
-		foreach ( $files as $file ){
-			if ( $file != '.' && $file != '..' ) {
-				$found[] = $dir.'/'.$file;
-				if ( is_dir( $dir.'/'.$file ) && $start_level < $level_limit ) {
-					$this->dir_file_list( $dir.'/'.$file, $start_level + 1 );
-				}
-			}
-		}
-
-		return $found;
 	}
 
 	/**
