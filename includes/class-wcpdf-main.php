@@ -906,6 +906,9 @@ class Main {
 		$output           = array();
 
 		foreach ( $paths_to_cleanup as $path ) {
+			if ( ! function_exists( 'list_files' ) ) {
+				include_once( ABSPATH.'wp-admin/includes/file.php' );
+			}
 			$files = array_merge( $files, list_files( $path, $folders_level ) );
 		}
 
