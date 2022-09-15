@@ -17,7 +17,7 @@ class Font_Synchronizer {
 	 *
 	 * @var string
 	 */
-	public $font_cache_filename = "dompdf_font_family_cache.php";
+	public $font_cache_filename = "installed-fonts.json";
 
 	/**
 	 * Vanilla instance of dompdf
@@ -48,7 +48,7 @@ class Font_Synchronizer {
 		$plugin_fonts = $this->get_plugin_fonts();
 		$dompdf_fonts = $this->get_dompdf_fonts();
 		if ( $merge_with_local ) {
-			$local_fonts  = $this->get_local_fonts( $destination );
+			$local_fonts = $this->get_local_fonts( $destination );
 		} else {
 			$local_fonts = array();
 		}
@@ -72,11 +72,8 @@ class Font_Synchronizer {
 
 		// normalize one last time
 		$local_fonts = $this->normalize_font_paths( $local_fonts );
-
 		// rebuild font cache file
-		$fonts_export = var_export( $local_fonts, true );
-		$fonts_export = str_replace( '\'' . untrailingslashit( $destination ) , '$fontDir . \'', $fonts_export );
-		$cacheData = sprintf( "<?php return %s;%s?>", $fonts_export, PHP_EOL );
+		$cacheData   = json_encode( $local_fonts, JSON_PRETTY_PRINT );
 		// write file with merged cache data
 		file_put_contents( $destination . $this->font_cache_filename, $cacheData );
 	}
@@ -136,11 +133,17 @@ class Font_Synchronizer {
 	 */
 	public function get_local_fonts( $path ) {
 		// prepare variables used in the cache list
-		$fontDir = $path;
-		$rootDir = $this->dompdf->getOptions()->getRootDir();
-		$cache_file = trailingslashit( $path ) . $this->font_cache_filename;
+		$fontDir           = $path;
+		$rootDir           = $this->dompdf->getOptions()->getRootDir();
+		$cache_file        = trailingslashit( $path ) . $this->font_cache_filename;
+		$legacy_cache_file = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
+
 		if ( is_readable( $cache_file ) ) {
-			$font_data = include $cache_file;
+			$json_data = file_get_contents( $cache_file );
+			$font_data = json_decode( $json_data, true );
+		} elseif ( is_readable( $legacy_cache_file ) ) {
+			$font_data = include $legacy_cache_file;
+			@unlink( $legacy_cache_file );
 		} else {
 			$font_data = array();
 		}
