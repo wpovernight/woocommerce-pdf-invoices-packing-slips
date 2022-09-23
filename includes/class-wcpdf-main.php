@@ -334,9 +334,9 @@ class Main {
 			// Check the user privileges
 			$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
 			if ( ! $full_permission ) {
-				if ( ! isset( $_GET['my-account'] ) ) {
+				if ( ! isset( $_GET['my-account'] ) && ! isset( $_GET['shortcode'] ) ) {
 					$allowed = false;
-				} else { // User call from my-account page
+				} else { // User call from my-account page or via shortcode
 					// Only for single orders!
 					if ( count( $order_ids ) > 1 ) {
 						$allowed = false;
