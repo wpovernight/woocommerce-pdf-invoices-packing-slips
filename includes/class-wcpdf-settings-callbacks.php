@@ -314,7 +314,7 @@ class Settings_Callbacks {
 			$fields = isset( $fields_callback_args ) ? call_user_func_array( $fields_callback, $fields_callback_args ) : call_user_func( $fields_callback );
 		}
 
-		printf('<table class="%s multiple-text-input">', esc_attr( $id ) );
+		printf( '<table class="%s multiple-text-input">', esc_attr( $id ) );
 		if ( ! empty( $header ) ) {
 			echo wp_kses_post( "<tr><td><strong>{$header}</strong>:</td></tr>" );
 		}
