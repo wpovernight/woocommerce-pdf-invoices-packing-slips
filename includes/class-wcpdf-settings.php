@@ -244,14 +244,30 @@ class Settings {
 
 					wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
 				} else {
-					wp_send_json_error( array( 'error' => sprintf( esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) ) );
+					wp_send_json_error(
+						array(
+							'error' => sprintf(
+								/* translators: order ID */
+								esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ),
+								$order_id
+							)
+						)
+					);
 				}
 			} else {
 				wp_send_json_error( array( 'error' => esc_html__( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 
 		} catch ( \Throwable $th ) {
-			wp_send_json_error( array( 'error' => sprintf( esc_html__( 'Error trying to generate document: %s', 'woocommerce-pdf-invoices-packing-slips' ), $th->getMessage() ) ) );
+			wp_send_json_error(
+				array(
+					'error' => sprintf(
+						/* translators: error message */
+						esc_html__( 'Error trying to generate document: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+						$th->getMessage()
+					)
+				)
+			);
 		}
 
 		wp_die();
@@ -335,7 +351,15 @@ class Settings {
 				wp_send_json_error( array( 'error' => esc_html__( 'An error occurred when trying to process your request!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 		} catch ( \Throwable $th ) {
-			wp_send_json_error( array( 'error' => sprintf( esc_html__( 'Error trying to get orders: %s', 'woocommerce-pdf-invoices-packing-slips' ), $th->getMessage() ) ) );
+			wp_send_json_error(
+				array(
+					'error' => sprintf(
+						/* translators: error message */
+						esc_html__( 'Error trying to get orders: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+						$th->getMessage()
+					)
+				)
+			);
 		}
 
 		wp_die();

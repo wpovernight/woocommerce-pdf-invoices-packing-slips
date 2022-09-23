@@ -482,7 +482,14 @@ class Admin {
 						<?php /* translators: document title */ ?>
 						<?php
 						if ( $this->user_can_manage_document( $document->get_type() ) ) {
-							printf( '<span class="wpo-wcpdf-set-date-number button">%s</span>', sprintf( esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), wp_kses_post( $document->get_title() ) ) ); 
+							printf(
+								'<span class="wpo-wcpdf-set-date-number button">%s</span>',
+								sprintf(
+									/* translators: document title */
+									esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
+									wp_kses_post( $document->get_title() )
+								)
+							); 
 						} else {
 							printf( '<p>%s</p>', esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ) );
 						}
