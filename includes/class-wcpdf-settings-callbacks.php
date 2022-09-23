@@ -314,36 +314,40 @@ class Settings_Callbacks {
 			$fields = isset( $fields_callback_args ) ? call_user_func_array( $fields_callback, $fields_callback_args ) : call_user_func( $fields_callback );
 		}
 
+		printf( '<table class="%s multiple-text-input">', esc_attr( $id ) );
 		if ( ! empty( $header ) ) {
-			echo wp_kses_post( "<p><strong>{$header}</strong>:</p>" );
+			echo wp_kses_post( "<tr><td><strong>{$header}</strong>:</td></tr>" );
 		}
-
-		printf('<p class="%s multiple-text-input">', esc_attr( $id ) );
 		foreach ($fields as $name => $field) {
+			echo '<tr>';
 			$size = $field['size'];
 			$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
 
-			if ( isset( $field['label_width'] ) ) {
-				$style = sprintf( 'style="display:inline-block; width:%1$s;"', $field['label_width'] );
-			} else {
-				$style = '';
-			}
-
-			$field_description = ! empty( $field['description'] ) ? '<span style="font-style:italic;">'.$field['description'].'</span>' : '';
+			$field_description = ! empty( $field['description'] ) ? $field['description']: '';
 
 			// output field label
 			if ( isset( $field['label'] ) ) {
-				printf( '<label for="%1$s_%2$s" %3$s>%4$s:</label>', esc_attr( $id ), esc_attr( $name ), esc_attr( $style ), esc_html( $field['label'] ) );
+				printf( '<td class="label"><label for="%1$s_%2$s">%3$s:</label></td>', esc_attr( $id ), esc_attr( $name ), esc_html( $field['label'] ) );
+			} else {
+				echo '<td></td>';
 			}
 
 			// output field
 			$field_current = isset( $current[$name] ) ? $current[$name] : '';
 			$type = isset( $field['type'] ) ? $field['type'] : 'text';
-			printf( '<input type="%1$s" id="%2$s_%4$s" name="%3$s[%4$s]" value="%5$s" size="%6$s" placeholder="%7$s"/> %8$s<br/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $name ), esc_attr( $field_current ), esc_attr( $size ), esc_attr( $placeholder ), wp_kses_post( $field_description ) );
+			printf( '<td><input type="%1$s" id="%2$s_%4$s" name="%3$s[%4$s]" value="%5$s" size="%6$s" placeholder="%7$s"/></td>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $name ), esc_attr( $field_current ), esc_attr( $size ), esc_attr( $placeholder ) );
+
+			// field description.
+			if ( ! empty( $field_description ) ) {
+				echo '<td>' . wc_help_tip( $field_description, true ) . '</td>';
+			} else {
+				echo '<td></td>';
+			}
+			echo '</tr>';
 		}
-		echo "</p>";
-	
-		// output description.
+		echo "</table>";
+		
+		// group description.
 		if ( ! empty( $description ) ) {
 			printf( '<p class="description">%s</p>', wp_kses_post( $description ) );
 		}
