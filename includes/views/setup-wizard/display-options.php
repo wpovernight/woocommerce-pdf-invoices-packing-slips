@@ -77,9 +77,9 @@
 				<select id="display-number" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_number]">
 					<?php
 						$options = array(
-							''				=> __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
-							'invoice_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
-							'order_date'	=> __( 'Order Date' , 'woocommerce-pdf-invoices-packing-slips' ),
+							''					=> __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
+							'invoice_number'	=> __( 'Invoice Number' , 'woocommerce-pdf-invoices-packing-slips' ),
+							'order_number'		=> __( 'Order Number' , 'woocommerce-pdf-invoices-packing-slips' ),
 						);
 						foreach ( $options as $slug => $name ) {
 							$selected = ( ! empty( $current_settings['display_number'] ) && $current_settings['display_number'] == $slug ) ? 'selected' : '';
