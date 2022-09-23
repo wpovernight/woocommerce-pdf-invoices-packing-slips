@@ -332,6 +332,10 @@ li.completed .wpo-progress-marker::before {
 	padding: 0;
 }
 
+.wpo-setup-input table th label {
+	font-weight: normal;
+}
+
 .wpo-setup-input label:hover {
 	color: #666;
 }
