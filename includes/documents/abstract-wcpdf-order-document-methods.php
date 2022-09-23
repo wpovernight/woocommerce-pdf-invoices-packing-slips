@@ -336,6 +336,11 @@ abstract class Order_Document_Methods extends Order_Document {
 			'date_paid',
 			'cart_hash',
 		);
+
+		if ( version_compare( WOOCOMMERCE_VERSION, '5.6', '>=' ) ) {
+			$order_props[] = 'shipping_phone';
+		}
+
 		return in_array($key, $order_props);
 	}
 

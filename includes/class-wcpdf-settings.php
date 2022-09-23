@@ -46,6 +46,9 @@ class Settings {
 
 		// refresh template path cache each time the general settings are updated
 		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
+		// sets transient to flush rewrite rules
+		add_action( "update_option_wpo_wcpdf_settings_debug", array( $this, 'debug_settings_updated' ), 10, 3 );
+		add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
 		// migrate old template paths to template IDs before loading settings page
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 1 );
 
@@ -241,14 +244,30 @@ class Settings {
 
 					wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
 				} else {
-					wp_send_json_error( array( 'error' => sprintf( esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) ) );
+					wp_send_json_error(
+						array(
+							'error' => sprintf(
+								/* translators: order ID */
+								esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ),
+								$order_id
+							)
+						)
+					);
 				}
 			} else {
 				wp_send_json_error( array( 'error' => esc_html__( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 
 		} catch ( \Throwable $th ) {
-			wp_send_json_error( array( 'error' => sprintf( esc_html__( 'Error trying to generate document: %s', 'woocommerce-pdf-invoices-packing-slips' ), $th->getMessage() ) ) );
+			wp_send_json_error(
+				array(
+					'error' => sprintf(
+						/* translators: error message */
+						esc_html__( 'Error trying to generate document: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+						$th->getMessage()
+					)
+				)
+			);
 		}
 
 		wp_die();
@@ -332,7 +351,15 @@ class Settings {
 				wp_send_json_error( array( 'error' => esc_html__( 'An error occurred when trying to process your request!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			}
 		} catch ( \Throwable $th ) {
-			wp_send_json_error( array( 'error' => sprintf( esc_html__( 'Error trying to get orders: %s', 'woocommerce-pdf-invoices-packing-slips' ), $th->getMessage() ) ) );
+			wp_send_json_error(
+				array(
+					'error' => sprintf(
+						/* translators: error message */
+						esc_html__( 'Error trying to get orders: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+						$th->getMessage()
+					)
+				)
+			);
 		}
 
 		wp_die();
@@ -480,27 +507,26 @@ class Settings {
 		}
 
 		$installed_templates = array();
-
 		// get base paths
-		$template_base_path = ( function_exists( 'WC' ) && is_callable( array( 'WC', 'template_path' ) ) ) ? WC()->template_path() : 'woocommerce/';
-		$template_base_path = untrailingslashit( $template_base_path );
-		$template_paths = array (
+		$template_base_path  = ( function_exists( 'WC' ) && is_callable( array( WC(), 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
+		$template_base_path  = untrailingslashit( $template_base_path );
+		$template_paths      = array (
 			// note the order: theme before child-theme, so that child theme is always preferred (overwritten)
-			'default'		=> WPO_WCPDF()->plugin_path() . '/templates/',
-			'theme'			=> get_template_directory() . "/{$template_base_path}/pdf/",
-			'child-theme'	=> get_stylesheet_directory() . "/{$template_base_path}/pdf/",
+			'default'     => WPO_WCPDF()->plugin_path() . '/templates/',
+			'theme'       => get_template_directory() . "/{$template_base_path}/pdf/",
+			'child-theme' => get_stylesheet_directory() . "/{$template_base_path}/pdf/",
 		);
 
 		$template_paths = apply_filters( 'wpo_wcpdf_template_paths', $template_paths );
 
-		foreach ($template_paths as $template_source => $template_path) {
+		foreach ( $template_paths as $template_source => $template_path ) {
 			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR );
 			
 			foreach ( $dirs as $dir ) {
-				$clean_dir = $this->normalize_path( $dir );
+				$clean_dir     = $this->normalize_path( $dir );
 				$template_name = basename( $clean_dir );
 				// let child theme override parent theme
-				$group = ( $template_source == 'child-theme' ) ? 'theme' : $template_source; 
+				$group = ( $template_source == 'child-theme' ) ? 'theme' : $template_source;
 				$installed_templates[ $clean_dir ] = "{$group}/{$template_name}" ;
 			}
 		}
@@ -572,6 +598,19 @@ class Settings {
 		if ( is_array( $settings ) && ! empty ( $settings['template_path'] ) ) {
 			$this->delete_template_list_cache();
 			$this->set_template_list_cache( $this->get_installed_templates() );
+		}
+	}
+
+	public function debug_settings_updated( $old_settings, $settings, $option ) {
+		if ( is_array( $settings ) && is_array( $old_settings ) && empty( $old_settings['pretty_document_links'] ) && ! empty ( $settings['pretty_document_links'] ) ) {
+			set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
+		}
+	}
+
+	public function maybe_delete_flush_rewrite_rules_transient() {
+		if ( get_transient( 'wpo_wcpdf_flush_rewrite_rules' ) ) {
+			flush_rewrite_rules();
+			delete_transient( 'wpo_wcpdf_flush_rewrite_rules' );
 		}
 	}
 
@@ -672,6 +711,39 @@ class Settings {
 		$html = ob_get_clean();
 
 		return wp_send_json_success( $html );
+	}
+
+	public function move_setting_after_id( $settings, $insert_settings, $after_setting_id ) {
+		$pos = 1; // this is already +1 to insert after the actual pos
+		foreach ( $settings as $setting ) {
+			if ( isset( $setting['id'] ) && $setting['id'] == $after_setting_id ) {
+				$section = $setting['section'];
+				break;
+			} else {
+				$pos++;
+			}
+		}
+
+		// replace section
+		if ( isset( $section ) ) {
+			foreach ( $insert_settings as $key => $insert_setting ) {
+				$insert_settings[$key]['section'] = $section;
+			}
+		} else {
+			$empty_section = array(
+				array(
+					'type'     => 'section',
+					'id'       => 'custom',
+					'title'    => '',
+					'callback' => 'section',
+				),
+			);
+			$insert_settings = array_merge( $empty_section, $insert_settings );
+		}
+		// insert our api settings
+		$new_settings = array_merge( array_slice( $settings, 0, $pos, true ), $insert_settings, array_slice( $settings, $pos, NULL, true ) );
+
+		return $new_settings;
 	}
 
 }

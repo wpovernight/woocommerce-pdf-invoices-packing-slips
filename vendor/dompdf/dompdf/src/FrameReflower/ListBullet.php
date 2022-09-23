@@ -1,8 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\FrameReflower;
@@ -36,7 +35,7 @@ class ListBullet extends AbstractFrameReflower
         $frame = $this->_frame;
         $style = $frame->get_style();
 
-        $style->width = $frame->get_width();
+        $style->set_used("width", $frame->get_width());
         $frame->position();
 
         if ($style->list_style_position === "inside") {

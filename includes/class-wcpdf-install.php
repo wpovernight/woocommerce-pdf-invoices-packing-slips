@@ -13,7 +13,7 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Install' ) ) :
 
 class Install {
 	
-	function __construct()	{
+	public function __construct() {
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
 			add_action( 'wp_loaded', array( $this, 'do_install' ) );
@@ -404,7 +404,16 @@ class Install {
 				}
 			}
 		}
-		
+
+		// 3.0.0-dev-1: remove saved option 'use_html5_parser'
+		if ( version_compare( $installed_version, '3.0.0-dev-1', '<' ) ) {
+			// removes 'HTML5 parser' setting value
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['use_html5_parser'] ) ) {
+				unset( $debug_settings['use_html5_parser'] );
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
 	}
 
 	/**

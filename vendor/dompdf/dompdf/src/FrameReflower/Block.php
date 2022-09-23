@@ -1,14 +1,13 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
- * @author  Fabien Ménager <fabien.menager@gmail.com>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\FrameReflower;
 
 use Dompdf\Frame;
+use Dompdf\FrameDecorator\AbstractFrameDecorator;
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
 use Dompdf\FrameDecorator\Text as TextFrameDecorator;
@@ -27,6 +26,8 @@ class Block extends AbstractFrameReflower
     const MIN_JUSTIFY_WIDTH = 0.80;
 
     /**
+     * Frame for this reflower
+     *
      * @var BlockFrameDecorator
      */
     protected $_frame;
@@ -603,7 +604,7 @@ class Block extends AbstractFrameReflower
                     $imageHeightDiff = $height * 0.8 - $marginHeight;
 
                     $align = $frame->get_style()->vertical_align;
-                    if (in_array($align, Style::$vertical_align_keywords, true)) {
+                    if (in_array($align, Style::VERTICAL_ALIGN_KEYWORDS, true)) {
                         switch ($align) {
                             case "middle":
                                 $y_offset = $imageHeightDiff / 2;
@@ -644,7 +645,7 @@ class Block extends AbstractFrameReflower
                     } else {
                         $align = $parent->get_style()->vertical_align;
                     }
-                    if (in_array($align, Style::$vertical_align_keywords, true)) {
+                    if (in_array($align, Style::VERTICAL_ALIGN_KEYWORDS, true)) {
                         switch ($align) {
                             case "middle":
                                 $y_offset = ($height * 0.8 - $baseline) / 2;
@@ -685,9 +686,9 @@ class Block extends AbstractFrameReflower
     }
 
     /**
-     * @param Frame $child
+     * @param AbstractFrameDecorator $child
      */
-    function process_clear(Frame $child)
+    function process_clear(AbstractFrameDecorator $child)
     {
         $child_style = $child->get_style();
         $root = $this->_frame->get_root();
@@ -719,11 +720,11 @@ class Block extends AbstractFrameReflower
     }
 
     /**
-     * @param Frame $child
+     * @param AbstractFrameDecorator $child
      * @param float $cb_x
      * @param float $cb_w
      */
-    function process_float(Frame $child, $cb_x, $cb_w)
+    function process_float(AbstractFrameDecorator $child, $cb_x, $cb_w)
     {
         $child_style = $child->get_style();
         $root = $this->_frame->get_root();
@@ -808,14 +809,14 @@ class Block extends AbstractFrameReflower
 
         // Determine the constraints imposed by this frame: calculate the width
         // of the content area:
-        list($width, $left_margin, $right_margin, $left, $right) = $this->_calculate_restricted_width();
+        [$width, $margin_left, $margin_right, $left, $right] = $this->_calculate_restricted_width();
 
         // Store the calculated properties
-        $style->width = $width;
-        $style->margin_left = $left_margin;
-        $style->margin_right = $right_margin;
-        $style->left = $left;
-        $style->right = $right;
+        $style->set_used("width", $width);
+        $style->set_used("margin_left", $margin_left);
+        $style->set_used("margin_right", $margin_right);
+        $style->set_used("left", $left);
+        $style->set_used("right", $right);
 
         $margin_top = $style->length_in_pt($style->margin_top, $cb["w"]);
         $margin_bottom = $style->length_in_pt($style->margin_bottom, $cb["w"]);
@@ -825,7 +826,7 @@ class Block extends AbstractFrameReflower
 
         // Update the position
         $this->_frame->position();
-        list($x, $y) = $this->_frame->get_position();
+        [$x, $y] = $this->_frame->get_position();
 
         // Adjust the first line based on the text-indent property
         $indent = (float)$style->length_in_pt($style->text_indent, $cb["w"]);
@@ -843,7 +844,7 @@ class Block extends AbstractFrameReflower
             $style->padding_bottom
         ], $cb["w"]);
 
-        $cb_x = $x + (float)$left_margin + (float)$style->length_in_pt([$style->border_left_width,
+        $cb_x = $x + (float)$margin_left + (float)$style->length_in_pt([$style->border_left_width,
                 $style->padding_left], $cb["w"]);
 
         $cb_y = $y + $top;
@@ -884,12 +885,13 @@ class Block extends AbstractFrameReflower
         }
 
         // Determine our height
-        list($height, $margin_top, $margin_bottom, $top, $bottom) = $this->_calculate_restricted_height();
-        $style->height = $height;
-        $style->margin_top = $margin_top;
-        $style->margin_bottom = $margin_bottom;
-        $style->top = $top;
-        $style->bottom = $bottom;
+        [$height, $margin_top, $margin_bottom, $top, $bottom] = $this->_calculate_restricted_height();
+
+        $style->set_used("height", $height);
+        $style->set_used("margin_top", $margin_top);
+        $style->set_used("margin_bottom", $margin_bottom);
+        $style->set_used("top", $top);
+        $style->set_used("bottom", $bottom);
 
         if ($this->_frame->is_absolute()) {
             if ($auto_top) {

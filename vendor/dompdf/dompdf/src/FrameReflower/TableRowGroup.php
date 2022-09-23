@@ -1,8 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\FrameReflower;
@@ -64,8 +63,8 @@ class TableRowGroup extends AbstractFrameReflower
             return;
         }
 
-        $style->width = $cellmap->get_frame_width($frame);
-        $style->height = $cellmap->get_frame_height($frame);
+        $style->set_used("width", $cellmap->get_frame_width($frame));
+        $style->set_used("height", $cellmap->get_frame_height($frame));
 
         $frame->set_position($cellmap->get_frame_position($frame));
     }
