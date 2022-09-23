@@ -68,6 +68,12 @@ abstract class Order_Document {
 	public $settings;
 
 	/**
+	 * Document latest settings.
+	 * @var array
+	 */
+	public $latest_settings;
+
+	/**
 	 * Order settings.
 	 * @var array
 	 */
@@ -122,6 +128,7 @@ abstract class Order_Document {
 
 		// load settings
 		$this->init_settings_data();
+		$this->save_settings();
 		$this->enabled = $this->get_setting( 'enabled', false );
 	}
 
@@ -133,7 +140,6 @@ abstract class Order_Document {
 		$this->order_settings  = $this->get_order_settings();
 		$this->settings        = $this->get_settings();
 		$this->latest_settings = $this->get_settings( true );
-		$this->save_settings();
 	}
 
 	public function get_order_settings() {
@@ -182,12 +188,18 @@ abstract class Order_Document {
 		return $settings;
 	}
 
-	public function save_settings() {
-		if ( $this->storing_settings_enabled() && empty( $this->order_settings ) && ! empty( $this->settings ) && ! empty( $this->order ) ) {
+	public function save_settings( $latest = false ) {
+		if ( empty( $this->settings ) || empty( $this->latest_settings ) ) {
+			$this->init_settings_data();
+		}
+
+		$settings = ( $latest === true ) ? $this->latest_settings : $this->settings;
+
+		if ( $this->storing_settings_enabled() && ( empty( $this->order_settings ) || $latest ) && ! empty( $settings ) && ! empty( $this->order ) ) {
 			// this is either the first time the document is generated, or historical settings are disabled
 			// in both cases, we store the document settings
 			// exclude non historical settings from being saved in order meta
-			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $this->settings, array_flip( $this->get_non_historical_settings() ) ) );
+			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
 		}
 	}
 
@@ -265,6 +277,7 @@ abstract class Order_Document {
 	public function init() {
 		// init settings
 		$this->init_settings_data();
+		$this->save_settings();
 
 		$this->set_date( current_time( 'timestamp', true ) );
 		do_action( 'wpo_wcpdf_init_document', $this );
@@ -276,7 +289,7 @@ abstract class Order_Document {
 			return; // nowhere to save to...
 		}
 
-		foreach ($this->data as $key => $value) {
+		foreach ( $this->data as $key => $value ) {
 			if ( empty( $value ) ) {
 				WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}" );
 				if ( $key == 'date' ) {
@@ -342,6 +355,7 @@ abstract class Order_Document {
 
 		// init settings
 		$this->init_settings_data();
+		$this->save_settings( true );
 
 		//Add order note
 		$parent_order = $refund_id = false;

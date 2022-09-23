@@ -790,7 +790,7 @@ class Admin {
 				}
 			}
 		}
-		$form_data       = stripslashes_deep( $form_data );
+		$form_data = stripslashes_deep( $form_data );
 
 		// notice messages
 		$notice_messages = array(
