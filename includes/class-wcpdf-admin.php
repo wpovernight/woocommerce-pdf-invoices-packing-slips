@@ -23,7 +23,7 @@ class Admin {
 		} else {
 			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_column' ) );
 		}
-		
+
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
@@ -272,7 +272,7 @@ class Admin {
 				break;
 			case 'invoice_date_column':
 				if ( ! empty( $date = $invoice->get_date() ) ) {
-					echo $date->date_i18n( wcpdf_date_format() );
+					echo $date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) );
 				}
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
