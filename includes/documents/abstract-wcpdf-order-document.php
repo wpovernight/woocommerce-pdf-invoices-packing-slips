@@ -68,6 +68,18 @@ abstract class Order_Document {
 	public $settings;
 
 	/**
+	 * Document latest settings.
+	 * @var array
+	 */
+	public $latest_settings;
+
+	/**
+	 * Order settings.
+	 * @var array
+	 */
+	public $order_settings;
+
+	/**
 	 * TRUE if document is enabled.
 	 * @var bool
 	 */
@@ -115,8 +127,8 @@ abstract class Order_Document {
 		}
 
 		// load settings
-		$this->settings = $this->get_settings();
-		$this->latest_settings = $this->get_settings( true );
+		$this->init_settings_data();
+		$this->save_settings();
 		$this->enabled = $this->get_setting( 'enabled', false );
 	}
 
@@ -124,34 +136,43 @@ abstract class Order_Document {
 		return;
 	}
 
+	public function init_settings_data() {
+		$this->order_settings  = $this->get_order_settings();
+		$this->settings        = $this->get_settings();
+		$this->latest_settings = $this->get_settings( true );
+	}
+
+	public function get_order_settings() {
+		$order_settings = array();
+
+		if ( ! empty( $this->order ) ) {
+			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
+			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
+				$order_settings = maybe_unserialize( $order_settings );
+			}
+		}
+
+		return $order_settings;
+	}
+
 	public function get_settings( $latest = false ) {
 		// get most current settings
-		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
+		$common_settings   = WPO_WCPDF()->settings->get_common_document_settings();
 		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		$settings = (array) $document_settings + (array) $common_settings;
+		$settings          = (array) $document_settings + (array) $common_settings;
 
 		if ( $latest != true ) {
 			// get historical settings if enabled
 			if ( ! empty( $this->order ) && $this->use_historical_settings() == true ) {
-				$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-				if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
-					$order_settings = maybe_unserialize( $order_settings );
-				}
-				if ( ! empty( $order_settings ) && is_array( $order_settings ) ) {
+				if ( ! empty( $this->order_settings ) && is_array( $this->order_settings ) ) {
 					// ideally we should combine the order settings with the latest settings, so that new settings will
 					// automatically be applied to existing orders too. However, doing this by combining arrays is not
 					// possible because the way settings are currently stored means unchecked options are not included.
 					// This means there is no way to tell whether an option didn't exist yet (in which case the new
 					// option should be added) or whether the option was simly unchecked (in which case it should not
 					// be overwritten). This can only be address by storing unchecked checkboxes too.
-					$settings = (array) $order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
+					$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
 				}
-			}
-			if ( $this->storing_settings_enabled() && empty( $order_settings ) && ! empty( $this->order ) ) {
-				// this is either the first time the document is generated, or historical settings are disabled
-				// in both cases, we store the document settings
-				// exclude non historical settings from being saved in order meta
-				WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
 			}
 		}
 
@@ -165,6 +186,21 @@ abstract class Order_Document {
 		}
 
 		return $settings;
+	}
+
+	public function save_settings( $latest = false ) {
+		if ( empty( $this->settings ) || empty( $this->latest_settings ) ) {
+			$this->init_settings_data();
+		}
+
+		$settings = ( $latest === true ) ? $this->latest_settings : $this->settings;
+
+		if ( $this->storing_settings_enabled() && ( empty( $this->order_settings ) || $latest ) && ! empty( $settings ) && ! empty( $this->order ) ) {
+			// this is either the first time the document is generated, or historical settings are disabled
+			// in both cases, we store the document settings
+			// exclude non historical settings from being saved in order meta
+			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
+		}
 	}
 
 	public function use_historical_settings() {
@@ -239,13 +275,9 @@ abstract class Order_Document {
 	}
 
 	public function init() {
-		// store settings in order
-		if ( $this->storing_settings_enabled() && !empty( $this->order ) ) {
-			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-			$settings = (array) $document_settings + (array) $common_settings;
-			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
-		}
+		// init settings
+		$this->init_settings_data();
+		$this->save_settings();
 
 		$this->set_date( current_time( 'timestamp', true ) );
 		do_action( 'wpo_wcpdf_init_document', $this );
@@ -257,7 +289,7 @@ abstract class Order_Document {
 			return; // nowhere to save to...
 		}
 
-		foreach ($this->data as $key => $value) {
+		foreach ( $this->data as $key => $value ) {
 			if ( empty( $value ) ) {
 				WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}" );
 				if ( $key == 'date' ) {
@@ -321,15 +353,9 @@ abstract class Order_Document {
 			$this->save();
 		}
 
-		//Get most current settings
-		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		$settings = (array) $document_settings + (array) $common_settings;
-		//Update document settings in meta
-		WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
-
-		//Use most current settings from here on
-		$this->settings = $this->get_settings( true ); 
+		// init settings
+		$this->init_settings_data();
+		$this->save_settings( true );
 
 		//Add order note
 		$parent_order = $refund_id = false;
