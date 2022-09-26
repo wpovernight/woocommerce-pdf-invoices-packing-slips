@@ -1,8 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Fabien Ménager <fabien.menager@gmail.com>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf;
@@ -266,7 +265,7 @@ class LineBox
     /**
      * @param AbstractFrameDecorator $frame
      */
-    public function add_frame(Frame $frame)
+    public function add_frame(Frame $frame): void
     {
         $this->_frames[] = $frame;
 
@@ -377,7 +376,7 @@ class LineBox
      *
      * @return float
      */
-    public function recalculate_width()
+    public function recalculate_width(): float
     {
         $width = 0.0;
 
@@ -391,7 +390,7 @@ class LineBox
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $props = ["wc", "y", "w", "h", "left", "right", "br"];
         $s = "";

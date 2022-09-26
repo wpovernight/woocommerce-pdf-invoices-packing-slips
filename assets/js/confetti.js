@@ -4,10 +4,7 @@ jQuery(document).ready(function($) {
     var DEG_TO_RAD = Math.PI / 180;
     var RAD_TO_DEG = 180 / Math.PI;
     var colors = [
-        ["#df0049", "#660671"],
-        ["#00e857", "#005291"],
-        ["#2bebbc", "#05798a"],
-        ["#ffd200", "#b06c00"]
+        ["#771787", "#239bb9"],
     ];
 
     function Vector2(_x, _y) {

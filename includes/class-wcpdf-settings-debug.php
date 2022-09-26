@@ -135,6 +135,9 @@ class Settings_Debug {
 					?>
 				</form>
 			</p>
+			<p>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+			</p>
 		</div>
 		<br>
 		<?php
@@ -158,124 +161,137 @@ class Settings_Debug {
 
 		$settings_fields = array(
 			array(
-				'type'			=> 'section',
-				'id'			=> 'debug_settings',
-				'title'			=> __( 'Debug settings', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'section',
+				'type'     => 'section',
+				'id'       => 'debug_settings',
+				'title'    => __( 'Debug settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'section',
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'legacy_mode',
-				'title'			=> __( 'Legacy mode', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'legacy_mode',
-					'description'	=> __( "Legacy mode ensures compatibility with templates and filters from previous versions.", 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'legacy_mode',
+				'title'    => __( 'Legacy mode', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'legacy_mode',
+					'description' => __( "Legacy mode ensures compatibility with templates and filters from previous versions.", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'legacy_textdomain',
-				'title'			=> __( 'Legacy textdomain fallback', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'legacy_textdomain',
-					'description'	=> __( "Legacy textdomain fallback ensures compatibility with translation files from versions prior to 2017-05-15.", 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'legacy_textdomain',
+				'title'    => __( 'Legacy textdomain fallback', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'legacy_textdomain',
+					'description' => __( "Legacy textdomain fallback ensures compatibility with translation files from versions prior to 2017-05-15.", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'guest_access',
-				'title'			=> __( 'Allow guest access', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'guest_access',
-					'description'		=> __( 'Enable this to allow customers that purchase without an account to access their PDF with a unique key', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'guest_access',
+				'title'    => __( 'Allow guest access', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'guest_access',
+					'description' => __( 'Enable this to allow customers that purchase without an account to access their PDF with a unique key', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'calculate_document_numbers',
-				'title'			=> __( 'Calculate document numbers (slow)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'calculate_document_numbers',
-					'description'	=> __( "Document numbers (such as invoice numbers) are generated using AUTO_INCREMENT by default. Use this setting if your database auto increments with more than 1.", 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'pretty_document_links',
+				'title'    => __( 'Pretty document links', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pretty_document_links',
+					'description' => __( 'Changes the document links to a prettier URL scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'enable_debug',
-				'title'			=> __( 'Enable debug output', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'enable_debug',
-					'description'	=> __( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues", 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
-									   __( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefor this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
-					                   __( 'You can also add <code>&debug=true</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'calculate_document_numbers',
+				'title'    => __( 'Calculate document numbers (slow)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'calculate_document_numbers',
+					'description' => __( "Document numbers (such as invoice numbers) are generated using AUTO_INCREMENT by default. Use this setting if your database auto increments with more than 1.", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'enable_cleanup',
-				'title'			=> __( 'Enable automatic cleanup', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox_text_input',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'enable_cleanup',
+				'type'     => 'setting',
+				'id'       => 'enable_debug',
+				'title'    => __( 'Enable debug output', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'enable_debug',
+					'description' => __( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues", 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
+									 __( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefor this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+					                 __( 'You can also add <code>&debug=true</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'enable_cleanup',
+				'title'    => __( 'Enable automatic cleanup', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox_text_input',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name'        => $option_name,
+					'id'                 => 'enable_cleanup',
 					/* translators: number of days */
-					'text_input_wrap'	=> __( "every %s days", 'woocommerce-pdf-invoices-packing-slips' ),
-					'text_input_size'	=> 4,
-					'text_input_id'		=> 'cleanup_days',
-					'text_input_default'=> 7,
-					'description'		=> __( "Automatically clean up PDF files stored in the temporary folder (used for email attachments)", 'woocommerce-pdf-invoices-packing-slips' ),
+					'text_input_wrap'    => __( "every %s days", 'woocommerce-pdf-invoices-packing-slips' ),
+					'text_input_size'    => 4,
+					'text_input_id'      => 'cleanup_days',
+					'text_input_default' => 7,
+					'description'        => __( "Automatically clean up PDF files stored in the temporary folder (used for email attachments)", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'html_output',
-				'title'			=> __( 'Output to HTML', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'html_output',
-					'description'	=> __( 'Send the template output as HTML to the browser instead of creating a PDF.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
-					                   __( 'You can also add <code>&output=html</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'html_output',
+				'title'    => __( 'Output to HTML', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'html_output',
+					'description' => __( 'Send the template output as HTML to the browser instead of creating a PDF.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+					                 __( 'You can also add <code>&output=html</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'use_html5_parser',
-				'title'			=> __( 'Use alternative HTML5 parser to parse HTML', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'use_html5_parser',
+				'type'     => 'setting',
+				'id'       => 'log_to_order_notes',
+				'title'    => __( 'Log to order notes', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'log_to_order_notes',
+					'description' => __( 'Log PDF document creation to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'log_to_order_notes',
-				'title'			=> __( 'Log to order notes', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'debug_settings',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'log_to_order_notes',
-					'description'	=> __( 'Log PDF document creation to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'disable_preview',
+				'title'    => __( 'Disable document preview', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'disable_preview',
+					'description' => __( 'Disables the document preview on the plugin settings pages.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);

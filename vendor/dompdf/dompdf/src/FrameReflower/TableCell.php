@@ -1,8 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\FrameReflower;
@@ -73,7 +72,8 @@ class TableCell extends Block
                 $style->border_bottom_width],
             $h);
 
-        $style->width = $cb_w = $w - $left_space - $right_space;
+        $cb_w = $w - $left_space - $right_space;
+        $style->set_used("width", $cb_w);
 
         $content_x = $x + $left_space;
         $content_y = $line_y = $y + $top_space;
@@ -90,22 +90,25 @@ class TableCell extends Block
 
         // Set the containing blocks and reflow each child
         foreach ($this->_frame->get_children() as $child) {
-            if ($page->is_full()) {
-                break;
-            }
-
             $child->set_containing_block($content_x, $content_y, $cb_w, $h);
             $this->process_clear($child);
             $child->reflow($this->_frame);
-            $this->process_float($child, $x + $left_space, $w - $right_space - $left_space);
+            $this->process_float($child, $content_x, $cb_w);
+
+            if ($page->is_full()) {
+                break;
+            }
         }
 
         // Determine our height
         $style_height = (float)$style->length_in_pt($style->height, $h);
 
-        $this->_frame->set_content_height($this->_calculate_content_height());
+        /** @var FrameDecorator\TableCell */
+        $frame = $this->_frame;
 
-        $height = max($style_height, (float)$this->_frame->get_content_height());
+        $frame->set_content_height($this->_calculate_content_height());
+
+        $height = max($style_height, (float)$frame->get_content_height());
 
         // Let the cellmap know our height
         $cell_height = $height / count($cells["rows"]);
@@ -118,7 +121,8 @@ class TableCell extends Block
             $cellmap->set_row_height($i, $cell_height);
         }
 
-        $style->height = $height;
+        $style->set_used("height", $height);
+
         $this->_text_align();
         $this->vertical_align();
 

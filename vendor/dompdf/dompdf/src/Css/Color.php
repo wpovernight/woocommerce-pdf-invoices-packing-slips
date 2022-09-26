@@ -2,12 +2,9 @@
 
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
- * @author  Fabien Ménager <fabien.menager@gmail.com>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-
 namespace Dompdf\Css;
 
 use Dompdf\Helpers;
@@ -165,7 +162,7 @@ class Color
     ];
 
     /**
-     * @param $color
+     * @param array|string|null $color
      * @return array|string|null
      */
     static function parse($color)
@@ -261,7 +258,7 @@ class Color
 
             // Parse alpha value
             if (Helpers::is_percent($alpha)) {
-                $alpha = round((float) $alpha / 100, 2);
+                $alpha = (float) $alpha / 100;
             } else {
                 $alpha = (float) $alpha;
             }
@@ -294,7 +291,7 @@ class Color
                 return null;
             }
 
-            $values = array_map(function($c) {
+            $values = array_map(function ($c) {
                 return min(1.0, max(0.0, floatval(trim($c))));
             }, $values);
 
@@ -306,7 +303,7 @@ class Color
     }
 
     /**
-     * @param $color
+     * @param array|string $color
      * @param float $alpha
      * @return array
      */

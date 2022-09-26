@@ -7,7 +7,9 @@
 		<td class="header">
 		<?php
 		if ( $this->has_header_logo() ) {
+			do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order );
 			$this->header_logo();
+			do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order );
 		} else {
 			echo $this->get_title();
 		}
@@ -23,6 +25,8 @@
 		</td>
 	</tr>
 </table>
+
+<?php do_action( 'wpo_wcpdf_before_document_label', $this->get_type(), $this->order ); ?>
 
 <h1 class="document-type-label">
 	<?php if ( $this->has_header_logo() ) echo $this->get_title(); ?>
@@ -78,10 +82,12 @@
 					<th><?php _e( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<td><?php $this->order_date(); ?></td>
 				</tr>
+				<?php if ( $payment_method = $this->get_payment_method() ) : ?>
 				<tr class="payment-method">
 					<th><?php _e( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<td><?php $this->payment_method(); ?></td>
+					<td><?php echo $payment_method; ?></td>
 				</tr>
+				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
 			</table>			
 		</td>

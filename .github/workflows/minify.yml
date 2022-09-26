@@ -17,9 +17,10 @@ jobs:
           ref: ${{ github.head_ref }}
   
       - name: Auto Minify
-        uses: nizarmah/auto-minify@v2.1
+        uses: alexmigf/auto-minify@exclude-dirs
         with:
           directory: 'assets'
+          exclude_directories: 'js/pdf_js'
 
       - name: Auto committing minified files
         uses: stefanzweifel/git-auto-commit-action@v4

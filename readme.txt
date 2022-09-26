@@ -3,9 +3,9 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 5.9
+Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 2.12.1
+Stable tag: 3.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,88 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.1.1 (2022-09-13) =
+* Fix: fatal error caused by list_files() function missing
+
+= 3.1.0 (2022-09-06) =
+* New: custom document links feature available from the Status settings page. Changes the document links to a prettier URL scheme
+* New: action hooks before and after the shop logo: 'wpo_wcpdf_before_shop_logo' and'wpo_wcpdf_after_shop_logo'
+* Fix: replaces WP_Filesystem with PHP functions to delete temporary files
+* Marked tested up to WooCommerce 6.8
+
+= 3.0.1 (2022-08-02) =
+* New: admin pointer for document settings dropdown
+* Security: escape the tab and section parameters before outputting it back, leading to a Reflected Cross-Site Scripting. This bug was reintroduced on version 2.14.0
+* Tweak: prevent requirements select to reload settings preview
+* Fix: allow remove requirement trigger secondary save button on settings pages
+* Marked tested up to WooCommerce 6.7
+
+= 3.0.0 =
+* Libraries: Updated dompdf to 2.0.0, addressing security vulnerabilities and introducing some changes that could possibly break high level customized setups ([more information](https://github.com/dompdf/dompdf/releases/tag/v2.0.0))
+* Fix: respect custom (filtered) woocommerce template paths
+* Fix: Check if the invoice is allowed before the shortcode output
+* UI: Link to Professional extension for packing slip attachments
+
+= 2.16.0 =
+* Security: Fix authenticated reflected XSS on the settings page
+* Fix: Redirection URLs in wizard and when sending emails manually
+* Libraries: updated dompdf to 1.2.2
+
+= 2.15.0 =
+* New: Filter hooks to override ability to edit document data
+* Simple template: Only show shipping & payment method lines when set
+* Security: escape urls as late as possible
+* Fix: WP6.0+ converting interface elements to emojis
+* Tweak: Show sticky save button for all setting changes
+
+= 2.14.5 =
+* Fix: Preview invoice number & date display settings
+* Tested up to WooCommerce 6.5 & WordPress 6.0
+
+= 2.14.4 =
+* Fix: Content-Length header causing invalid response on some servers
+
+= 2.14.3 =
+* Fix: preview not updating (unless test mode was enabled)
+* Tweak: add styles for custom settings sections
+* Tweak: Set Content-Length header for inline display
+
+= 2.14.2 =
+* Fix: unescape text strings entered in the setup wizard
+* Dev: New filter wpo_wcpdf_email_order_object
+* UI: Update setup wizard layout
+* Libraries: updated dompdf to 1.2.1 (addressing potential security vulnerability)
+* Marked tested up to WooCommerce 6.4
+
+= 2.14.1 =
+* New: Relaunch the Setup Wizard manually from the Status tab
+* Fix: Dynamic `wpo_wcpdf_tmp_path_{$type}` filter hook name parsing
+* Fix: removing inline preview for media upload
+* UI: Show sticky save button on settings change
+* UI: Fill in the document icon sheet with white
+
+= 2.14.0 =
+* New: Live preview of PDF document on the settings page
+* Fix: checks if number store table exists before applying DB migration
+* Tweak: Remove i18n for some log strings
+* Marked tested up to WooCommerce 6.3
+
+= 2.13.1 =
+* Fix: load missing non-historical settings for existing invoices
+* Tweak: print file & line number for exceptions in error logs & output
+* Marked tested up to WooCommerce 6.2
+
+= 2.13.0 =
+* New: include dompdf temporary folder in cleanup procedure
+* New: Add CSS row classes for WPC Product Bundles
+* New: filter to override `wc_display_item_meta` arguments
+* Fix: Prevent errors when server doesn't support `.webp` image rendering
+* Fix: change invalid default date 0000-00-00 00:00:00 on number store tables
+* Tweak: Don't store non-historical document settings in order meta
+* Templates: New action hook before the document label (`wpo_wcpdf_before_document_label`)
+* Libraries: updated dompdf to 1.2.0
+* Marked tested up to WP5.9
 
 = 2.12.1 =
 * Fix: Show a feedback notice after saving settings

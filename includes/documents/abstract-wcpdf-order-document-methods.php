@@ -336,6 +336,11 @@ abstract class Order_Document_Methods extends Order_Document {
 			'date_paid',
 			'cart_hash',
 		);
+
+		if ( version_compare( WOOCOMMERCE_VERSION, '5.6', '>=' ) ) {
+			$order_props[] = 'shipping_phone';
+		}
+
 		return in_array($key, $order_props);
 	}
 
@@ -735,8 +740,8 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Returns the percentage rate (float) for a given tax rate ID.
-	 * @param  int    $rate_id  woocommerce tax rate id
-	 * @return float  $rate     percentage rate
+	 * @param  int         $rate_id  woocommerce tax rate id
+	 * @return float|bool  $rate     percentage rate
 	 */
 	public function get_tax_rate_by_id( $rate_id, $order = null ) {
 		global $wpdb;
@@ -1227,7 +1232,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_formatted_item_price ( $item, $type, $tax_display = '' ) {
 		if ( ! isset( $item['line_subtotal'] ) || ! isset( $item['line_subtotal_tax'] ) ) {
-			return;
+			return '';
 		}
 
 		$divide_by = ($type == 'single' && $item['qty'] != 0 )?abs($item['qty']):1; //divide by 1 if $type is not 'single' (thus 'total')

@@ -1,9 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
- * @author  Fabien Ménager <fabien.menager@gmail.com>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\Css;
@@ -351,12 +349,14 @@ class AttributeTranslator
 
     protected static function _set_px_width(\DOMElement $node, string $value): string
     {
-        if (Helpers::is_percent($value)) {
-            return sprintf("width: %s;", $value);
+        $v = trim($value);
+
+        if (Helpers::is_percent($v)) {
+            return sprintf("width: %s;", $v);
         }
 
-        if (is_numeric($value)) {
-            return sprintf("width: %spx;", $value);
+        if (is_numeric(mb_substr($v, 0, 1))) {
+            return sprintf("width: %spx;", (float) $v);
         }
 
         return "";
@@ -364,12 +364,14 @@ class AttributeTranslator
 
     protected static function _set_px_height(\DOMElement $node, string $value): string
     {
-        if (Helpers::is_percent($value)) {
-            return sprintf("height: %s;", $value);
+        $v = trim($value);
+
+        if (Helpers::is_percent($v)) {
+            return sprintf("height: %s;", $v);
         }
 
-        if (is_numeric($value)) {
-            return sprintf("height: %spx;", $value);
+        if (is_numeric(mb_substr($v, 0, 1))) {
+            return sprintf("height: %spx;", (float) $v);
         }
 
         return "";

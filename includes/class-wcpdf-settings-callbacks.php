@@ -35,6 +35,18 @@ class Settings_Callbacks {
 	public function custom_fields_section() {
 		echo wp_kses_post( __( 'These are used for the (optional) footer columns in the <em>Modern (Premium)</em> template, but can also be used for other elements in your custom template' , 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
+	
+	/**
+	 * HTML section callback.
+	 *
+	 * @return void.
+	 */
+	public function html_section( $args ) {
+		extract( $this->normalize_settings_args( $args ) );
+		
+		// output HTML	
+		echo wp_kses_post( $html );
+	}
 
 	/**
 	 * Checkbox callback.
@@ -85,7 +97,8 @@ class Settings_Callbacks {
 			$type = 'text';
 		}
 
-		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" size="%5$s" placeholder="%6$s" %7$s/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $current ), esc_attr( $size ), esc_attr( $placeholder ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
+		$size = ! empty( $size ) ? sprintf( 'size="%s"', esc_attr( $size ) ) : '';
+		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $current ), $size, esc_attr( $placeholder ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
 	
 		// output description.
 		if ( ! empty( $description ) ) {
@@ -194,7 +207,7 @@ class Settings_Callbacks {
 	 *
 	 * @param  array $args Field arguments.
 	 *
-	 * @return string	  Select field.
+	 * @return void
 	 */
 	public function select( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
@@ -292,7 +305,7 @@ class Settings_Callbacks {
 	/**
 	 * Multiple text element callback.
 	 * @param  array $args Field arguments.
-	 * @return string	   Text input field.
+	 * @return void
 	 */
 	public function multiple_text_input( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
@@ -301,36 +314,40 @@ class Settings_Callbacks {
 			$fields = isset( $fields_callback_args ) ? call_user_func_array( $fields_callback, $fields_callback_args ) : call_user_func( $fields_callback );
 		}
 
+		printf( '<table class="%s multiple-text-input">', esc_attr( $id ) );
 		if ( ! empty( $header ) ) {
-			echo wp_kses_post( "<p><strong>{$header}</strong>:</p>" );
+			echo wp_kses_post( "<tr><td><strong>{$header}</strong>:</td></tr>" );
 		}
-
-		printf('<p class="%s multiple-text-input">', esc_attr( $id ) );
 		foreach ($fields as $name => $field) {
+			echo '<tr>';
 			$size = $field['size'];
 			$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
 
-			if ( isset( $field['label_width'] ) ) {
-				$style = sprintf( 'style="display:inline-block; width:%1$s;"', $field['label_width'] );
-			} else {
-				$style = '';
-			}
-
-			$field_description = ! empty( $field['description'] ) ? '<span style="font-style:italic;">'.$field['description'].'</span>' : '';
+			$field_description = ! empty( $field['description'] ) ? $field['description']: '';
 
 			// output field label
 			if ( isset( $field['label'] ) ) {
-				printf( '<label for="%1$s_%2$s" %3$s>%4$s:</label>', esc_attr( $id ), esc_attr( $name ), esc_attr( $style ), esc_html( $field['label'] ) );
+				printf( '<td class="label"><label for="%1$s_%2$s">%3$s:</label></td>', esc_attr( $id ), esc_attr( $name ), esc_html( $field['label'] ) );
+			} else {
+				echo '<td></td>';
 			}
 
 			// output field
 			$field_current = isset( $current[$name] ) ? $current[$name] : '';
 			$type = isset( $field['type'] ) ? $field['type'] : 'text';
-			printf( '<input type="%1$s" id="%2$s_%4$s" name="%3$s[%4$s]" value="%5$s" size="%6$s" placeholder="%7$s"/> %8$s<br/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $name ), esc_attr( $field_current ), esc_attr( $size ), esc_attr( $placeholder ), wp_kses_post( $field_description ) );
+			printf( '<td><input type="%1$s" id="%2$s_%4$s" name="%3$s[%4$s]" value="%5$s" size="%6$s" placeholder="%7$s"/></td>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $name ), esc_attr( $field_current ), esc_attr( $size ), esc_attr( $placeholder ) );
+
+			// field description.
+			if ( ! empty( $field_description ) ) {
+				echo '<td>' . wc_help_tip( $field_description, true ) . '</td>';
+			} else {
+				echo '<td></td>';
+			}
+			echo '</tr>';
 		}
-		echo "</p>";
-	
-		// output description.
+		echo "</table>";
+		
+		// group description.
 		if ( ! empty( $description ) ) {
 			printf( '<p class="description">%s</p>', wp_kses_post( $description ) );
 		}
@@ -339,7 +356,7 @@ class Settings_Callbacks {
 	/**
 	 * Multiple text element callback.
 	 * @param  array $args Field arguments.
-	 * @return string	   Text input field.
+	 * @return void
 	 */
 	public function multiple_checkboxes( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
@@ -368,8 +385,7 @@ class Settings_Callbacks {
 	 * Media upload callback.
 	 *
 	 * @param  array $args Field arguments.
-	 *
-	 * @return string	  Media upload button & preview.
+	 * @return void
 	 */
 	public function media_upload( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
@@ -402,7 +418,7 @@ class Settings_Callbacks {
 				);
 			}
 
-			printf( '<img src="%1$s" style="display:block" id="img-%2$s"/>', esc_attr( $attachment_src ), esc_attr( $id ) );
+			printf( '<img src="%1$s" style="display:block" id="img-%2$s" class="media-upload-preview"/>', esc_attr( $attachment_src ), esc_attr( $id ) );
 			if ( ! empty( $attachment_height ) && ! empty( $in_height ) ) {
 				$attachment_resolution = round( absint( $attachment_height ) / $in_height );
 				printf(
@@ -423,7 +439,7 @@ class Settings_Callbacks {
 			printf('<span class="button wpo_remove_image_button" data-input_id="%1$s">%2$s</span> ', esc_attr( $id ), esc_attr( $remove_button_text ) );
 		}
 
-		printf( '<input id="%1$s" name="%2$s" type="hidden" value="%3$s" data-settings_callback_args="%4$s" data-ajax_nonce="%5$s"/>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $current ), esc_attr( json_encode( $args ) ), wp_create_nonce( "wpo_wcpdf_get_media_upload_setting_html" ) );
+		printf( '<input id="%1$s" name="%2$s" type="hidden" value="%3$s" data-settings_callback_args="%4$s" data-ajax_nonce="%5$s" class="media-upload-id"/>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $current ), esc_attr( json_encode( $args ) ), wp_create_nonce( "wpo_wcpdf_get_media_upload_setting_html" ) );
 		
 		printf( '<span class="button wpo_upload_image_button %4$s" data-uploader_title="%1$s" data-uploader_button_text="%2$s" data-remove_button_text="%3$s" data-input_id="%4$s">%2$s</span>', esc_attr( $uploader_title ), esc_attr( $uploader_button_text ), esc_attr( $remove_button_text ), esc_attr( $id ) );
 	
@@ -473,9 +489,8 @@ class Settings_Callbacks {
 
 	/**
 	 * Wrapper function to create tabs for settings in different languages
-	 * @param  [type] $args     [description]
-	 * @param  [type] $callback [description]
-	 * @return [type]           [description]
+	 * @param  array $args
+	 * @return void
 	 */
 	public function i18n_wrap ( $args ) {
 		extract( $this->normalize_settings_args( $args ) );

@@ -88,11 +88,11 @@ class Assets {
 				'wpo-wcpdf',
 				'wpo_wcpdf_ajax',
 				array(
-					'ajaxurl'				=> admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
-					'nonce'					=> wp_create_nonce('generate_wpo_wcpdf'),
-					'bulk_actions'			=> array_keys( $bulk_actions ),
-					'confirm_delete'		=> __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_regenerate'	=> __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
+					'ajaxurl'			 => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
+					'nonce'				 => wp_create_nonce('generate_wpo_wcpdf'),
+					'bulk_actions'		 => array_keys( $bulk_actions ),
+					'confirm_delete'	 => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
+					'confirm_regenerate' => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
 				)
 			);
 		}
@@ -111,21 +111,60 @@ class Assets {
 				background-position: 95% 50% !important;
 				background-repeat: no-repeat !important;
 			}" );
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', "#preview-order-search.ajax-waiting {
+				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/spinner.gif'.") !important;
+				background-repeat: no-repeat !important;
+				background-position: right 10px center !important;
+			}" );
 
 			// SCRIPTS
 			wp_enqueue_script( 'wc-enhanced-select' );
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
-				array( 'jquery', 'wc-enhanced-select' ),
+				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip' ),
 				WPO_WCPDF_VERSION
 			);
 			wp_localize_script(
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',
 				array(
-					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
-					'template_paths' => WPO_WCPDF()->settings->get_installed_templates(),
+					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
+					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
+					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
+						// general
+						'download_display',
+						'test_mode',
+						// document
+						'enabled',
+						'archive_pdf',
+						'auto_generate_for_statuses',
+						'attach_to_email_ids',
+						'disable_for_statuses',
+						'reset_number_yearly',
+						'my_account_buttons',
+						'invoice_number_column',
+						'disable_free',
+						'use_latest_settings',
+					) ),
+					'pointers'                  => array(
+						'wcpdf_document_settings_sections' => array(
+							'target'        => '.wcpdf_document_settings_sections',
+							'content'       => sprintf(
+								'<h3>%s</h3><p>%s</p>',
+								__( 'Document settings', 'woocommerce-pdf-invoices-packing-slips' ),
+								__( 'Select a document in the dropdown menu above to edit its settings.', 'woocommerce-pdf-invoices-packing-slips' )
+							),
+							'pointer_class' => 'wp-pointer arrow-top wpo-wcpdf-pointer',
+							'pointer_width' => 300,
+							'position'      => array(
+								'edge'  => 'top',
+								'align' => 'left',
+							),
+						),
+					),
+					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
 				)
 			);
 
@@ -136,6 +175,15 @@ class Assets {
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
+
+			if ( wp_script_is( 'wp-pointer', 'enqueued' ) === false ) {
+				wp_enqueue_script( 'wp-pointer' );
+			}
+
+			if ( wp_style_is( 'wp-pointer', 'enqueued' ) === false ) {
+				wp_enqueue_style( 'wp-pointer' );
+			}
+
 		}
 	}
 
