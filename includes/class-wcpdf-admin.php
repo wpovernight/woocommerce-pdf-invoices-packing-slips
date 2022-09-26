@@ -44,9 +44,9 @@ class Admin {
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_number_column_sortable' ) );
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_date_column_sortable' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
-			add_filter( 'request', array( $this, 'request_query_sort_by_invoice_number_and_invoice_date' ) );
+			add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 		} else {
-			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number_and_invoice_date' ) );
+			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_column' ) );
 		}
 
 		// AJAX actions for deleting, regenerating and saving document data
@@ -786,41 +786,47 @@ class Admin {
 	/**
 	 * Pre WC3.X sorting
 	 */
-	public function pre_get_posts_sort_by_invoice_number_and_invoice_date( $query ) {
-		if( ! is_admin() ) {
+	public function pre_get_posts_sort_by_column( $query ) {
+		if ( ! is_admin() ) {
 			return;
 		}
-		$orderby = $query->get( 'orderby');
-		if( 'pdf_invoice_number' == $orderby ) {
-			$query->set( 'meta_key', '_wcpdf_invoice_number' );
-			$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
-		}
-		if( 'pdf_invoice_date' == $orderby ) {
-			$query->set( 'meta_key', '_wcpdf_invoice_date' );
-			$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ) );
+
+		switch ( $query->get( 'orderby' ) ) {
+			case 'pdf_invoice_number':
+				$query->set( 'meta_key', '_wcpdf_invoice_number' );
+				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
+				break;
+			case 'pdf_invoice_date':
+				$query->set( 'meta_key', '_wcpdf_invoice_date' );
+				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ) );
+				break;
+			default:
+				return;
 		}
 	}
 
 	/**
 	 * WC3.X+ sorting
 	 */
-	public function request_query_sort_by_invoice_number_and_invoice_date( $query_vars ) {
+	public function request_query_sort_by_column( $query_vars ) {
 		global $typenow;
 
-		if ( in_array( $typenow, wc_get_order_types( 'order-meta-boxes' ), true ) ) {
-			if ( isset( $query_vars['orderby'] ) ) {
-				if ( 'pdf_invoice_number' === $query_vars['orderby'] ) {
+		if ( in_array( $typenow, wc_get_order_types( 'order-meta-boxes' ), true ) && ! empty( $query_vars['orderby'] ) ) {
+			switch ( $query_vars['orderby'] ) {
+				case 'pdf_invoice_number':
 					$query_vars = array_merge( $query_vars, array(
-						'meta_key'  => '_wcpdf_invoice_number',
-						'orderby'   => apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ),
+						'meta_key' => '_wcpdf_invoice_number',
+						'orderby'  => apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ),
 					) );
-				}
-				if ( 'pdf_invoice_date' === $query_vars['orderby'] ) {
+					break;
+				case 'pdf_invoice_date':
 					$query_vars = array_merge( $query_vars, array(
-						'meta_key'  => '_wcpdf_invoice_date',
-						'orderby'   => apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ),
+						'meta_key' => '_wcpdf_invoice_date',
+						'orderby'  => apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ),
 					) );
-				}
+					break;
+				default:
+					return $query_vars;
 			}
 		}
 
