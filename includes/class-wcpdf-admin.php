@@ -16,8 +16,7 @@ class Admin {
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_number_column' ), 999 );
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_date_column' ), 999 );
-		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_number_column_data' ), 2 );
-		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_date_column_data' ), 2 );
+		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 2 );
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
@@ -260,51 +259,37 @@ class Admin {
 	 * Display Invoice Number in Shop Order column (if available)
 	 * @param  string $column column slug
 	 */
-	public function invoice_number_column_data( $column ) {
+	public function invoice_columns_data( $column ) {
 		global $post, $the_order;
 
-		if ( $column == 'pdf_invoice_number' ) {
-			$this->disable_storing_document_settings();
-			if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
-				$order = WCX::get_order( $post->ID );
-				if ( $invoice = wcpdf_get_invoice( $order ) ) {
-					echo $invoice->get_number();
-				}
-				do_action( 'wcpdf_invoice_number_column_end', $order );
-			} else {
-				if ( $invoice = wcpdf_get_invoice( $the_order ) ) {
-					echo $invoice->get_number();
-				}
-				do_action( 'wcpdf_invoice_number_column_end', $the_order );
-			}
+		$this->disable_storing_document_settings();
+
+		$order = '';
+		if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
+			$order = WCX::get_order( $post->ID );
+		} else {
+			$order = $the_order;
 		}
-	}
 
-	/**
-	 * Display Invoice Date in Shop Order column (if available)
-	 * @param  string $column column slug
-	 */
-	public function invoice_date_column_data( $column ) {
-		global $post, $the_order;
+		$invoice = wcpdf_get_invoice( $order );
 
-		if ( $column == 'pdf_invoice_date' ) {
-			$this->disable_storing_document_settings();
-			if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
-				$order = WCX::get_order( $post->ID );
-				if ( $invoice = wcpdf_get_invoice( $order ) ) {
-					$output_format = get_option( 'date_format' ) . ' '.get_option( 'time_format' );
-					//echo wp_date( apply_filters( 'wcpdf_invoice_date_column_output_format', $output_format ), strtotime( $invoice->get_date() ) ) ;
-					echo $invoice->get_date();
+		if ( empty( $invoice ) ) {
+			return;
+		}
+
+		switch ( $column ) {
+			case 'pdf_invoice_number':
+				echo $invoice->get_number();
+				do_action( 'wcpdf_invoice_number_column_end', $order );
+				break;
+			case 'pdf_invoice_date':
+				if ( ! empty( $date = $invoice->get_date() ) ) {
+					echo $date->date_i18n( wcpdf_date_format() );
 				}
 				do_action( 'wcpdf_invoice_date_column_end', $order );
-			} else {
-				if ( $invoice = wcpdf_get_invoice( $the_order ) ) {
-					$output_format = get_option( 'date_format' ) . ' '.get_option( 'time_format' );
-					//echo wp_date( apply_filters( 'wcpdf_invoice_date_column_output_format', $output_format ), strtotime( $invoice->get_date() ) ) ;
-					echo $invoice->get_date();
-				}
-				do_action( 'wcpdf_invoice_date_column_end', $the_order );
-			}
+				break;
+			default:
+				return;
 		}
 	}
 
