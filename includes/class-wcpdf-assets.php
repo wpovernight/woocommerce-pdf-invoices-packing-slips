@@ -145,6 +145,7 @@ class Assets {
 						'reset_number_yearly',
 						'my_account_buttons',
 						'invoice_number_column',
+						'invoice_date_column',
 						'disable_free',
 						'use_latest_settings',
 					) ),
