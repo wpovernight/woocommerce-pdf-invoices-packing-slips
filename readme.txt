@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 3.1.1
+Stable tag: 3.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,15 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.2.0 (2022-09-26) =
+* New: setting to display the Invoice date column in the WooCommerce orders list
+* New: updated Dompdf to version 2.0.1, which fixes a security vulnerability.
+* New: filter 'wpo_wcpdf_document_link_additional_vars' to add additional query variables to the document link
+* Tweak: improved document settings data init/save
+* Tweak: improved wizard display settings
+* Tweak: improved styles and descriptions for the document 'Number format' settings
+* Tweak: new query variable for the shortcode document link
 
 = 3.1.1 (2022-09-13) =
 * Fix: fatal error caused by list_files() function missing
