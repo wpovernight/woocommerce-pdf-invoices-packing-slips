@@ -1,8 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\FrameReflower;
@@ -18,7 +17,6 @@ use Dompdf\FrameDecorator\Text as TextFrameDecorator;
  */
 class Inline extends AbstractFrameReflower
 {
-
     /**
      * Inline constructor.
      * @param InlineFrameDecorator $frame
@@ -44,7 +42,7 @@ class Inline extends AbstractFrameReflower
         $style = $frame->get_style();
 
         // Resolve width, so the margin width can be checked
-        $style->width = 0;
+        $style->set_used("width", 0.0);
 
         $cb = $frame->get_containing_block();
         $line = $block->get_current_line_box();
@@ -78,7 +76,7 @@ class Inline extends AbstractFrameReflower
      */
     function reflow(BlockFrameDecorator $block = null)
     {
-		/** @var InlineFrameDecorator */
+        /** @var InlineFrameDecorator */
         $frame = $this->_frame;
 
         // Check if a page break is forced
@@ -89,28 +87,28 @@ class Inline extends AbstractFrameReflower
             return;
         }
 
-        // Generated content
+        // Counters and generated content
         $this->_set_content();
 
-		$style = $frame->get_style();
+        $style = $frame->get_style();
 
         // Resolve auto margins
         // https://www.w3.org/TR/CSS21/visudet.html#inline-width
         // https://www.w3.org/TR/CSS21/visudet.html#inline-non-replaced
         if ($style->margin_left === "auto") {
-            $style->margin_left = 0;
+            $style->set_used("margin_left", 0.0);
         }
         if ($style->margin_right === "auto") {
-            $style->margin_right = 0;
+            $style->set_used("margin_right", 0.0);
         }
         if ($style->margin_top === "auto") {
-            $style->margin_top = 0;
+            $style->set_used("margin_top", 0.0);
         }
         if ($style->margin_bottom === "auto") {
-            $style->margin_bottom = 0;
+            $style->set_used("margin_bottom", 0.0);
         }
 
-		// Handle line breaks
+        // Handle line breaks
         if ($frame->get_node()->nodeName === "br") {
             if ($block) {
                 $line = $block->get_current_line_box();
@@ -141,14 +139,18 @@ class Inline extends AbstractFrameReflower
             $f_style = $f->get_style();
             $f_style->margin_left = $style->margin_left;
             $f_style->padding_left = $style->padding_left;
-            $f_style->border_left = $style->border_left;
+            $f_style->border_left_width = $style->border_left_width;
+            $f_style->border_left_style = $style->border_left_style;
+            $f_style->border_left_color = $style->border_left_color;
         }
 
         if (($l = $frame->get_last_child()) && $l instanceof TextFrameDecorator) {
             $l_style = $l->get_style();
             $l_style->margin_right = $style->margin_right;
             $l_style->padding_right = $style->padding_right;
-            $l_style->border_right = $style->border_right;
+            $l_style->border_right_width = $style->border_right_width;
+            $l_style->border_right_style = $style->border_right_style;
+            $l_style->border_right_color = $style->border_right_color;
         }
 
         $cb = $frame->get_containing_block();
@@ -159,25 +161,28 @@ class Inline extends AbstractFrameReflower
             $child->set_containing_block($cb);
             $child->reflow($block);
 
-			// Stop reflow of subsequent children if the frame was split within
-            // child reflow
-            if ($child->get_parent() !== $frame) {
-                break;
+            // Stop reflow if the frame has been reset by a line or page break
+            // due to child reflow
+            if (!$frame->content_set) {
+                return;
             }
         }
 
-		// Assume the position of the first child
+        if (!$frame->get_first_child()) {
+            return;
+        }
+
+        // Assume the position of the first child
         [$x, $y] = $frame->get_first_child()->get_position();
         $frame->set_position($x, $y);
 
         // Handle relative positioning
-        foreach ($this->_frame->get_children() as $child) {
+        foreach ($frame->get_children() as $child) {
             $this->position_relative($child);
         }
 
-		if ($block) {
+        if ($block) {
             $block->add_frame_to_line($frame);
-		}
+        }
     }
-
 }

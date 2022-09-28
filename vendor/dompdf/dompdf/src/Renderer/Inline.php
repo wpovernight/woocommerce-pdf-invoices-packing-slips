@@ -1,8 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\Renderer;
@@ -13,7 +12,6 @@ use Dompdf\Helpers;
 /**
  * Renders inline frames
  *
- * @access  private
  * @package dompdf
  */
 class Inline extends AbstractRenderer
@@ -27,75 +25,35 @@ class Inline extends AbstractRenderer
         $style = $frame->get_style();
         $dompdf = $this->_dompdf;
 
-        // Draw the left border if applicable
-        $bp = $style->get_border_properties();
-        $widths = [
-            (float)$style->length_in_pt($bp["top"]["width"]),
-            (float)$style->length_in_pt($bp["right"]["width"]),
-            (float)$style->length_in_pt($bp["bottom"]["width"]),
-            (float)$style->length_in_pt($bp["left"]["width"])
-        ];
-
-        // Draw the background & border behind each child.  To do this we need
-        // to figure out just how much space each child takes:
-        list($x, $y) = $frame->get_first_child()->get_position();
-
         $this->_set_opacity($frame->get_opacity($style->opacity));
 
         $do_debug_layout_line = $dompdf->getOptions()->getDebugLayout()
             && $dompdf->getOptions()->getDebugLayoutInline();
 
-        list($w, $h) = $this->get_child_size($frame, $do_debug_layout_line);
+        // Draw the background & border behind each child.  To do this we need
+        // to figure out just how much space each child takes:
+        [$x, $y] = $frame->get_first_child()->get_position();
+        [$w, $h] = $this->get_child_size($frame, $do_debug_layout_line);
 
-        // make sure the border and background start inside the left margin
-        $left_margin = (float)$style->length_in_pt($style->margin_left);
-        $x += $left_margin;
+        [, , $cbw] = $frame->get_containing_block();
+        $margin_left = $style->length_in_pt($style->margin_left, $cbw);
+        $pt = $style->length_in_pt($style->padding_top, $cbw);
+        $pb = $style->length_in_pt($style->padding_bottom, $cbw);
 
-        // Handle the last child
-        if (($bg = $style->background_color) !== "transparent") {
-            $this->_canvas->filled_rectangle($x + $widths[3], $y + $widths[0], $w, $h, $bg);
-        }
+        // Make sure that border and background start inside the left margin
+        // Extend the drawn box by border and padding in vertical direction, as
+        // these do not affect layout
+        // FIXME: Using a small vertical offset of a fraction of the height here
+        // to work around the vertical position being slightly off in general
+        $x += $margin_left;
+        $y -= $style->border_top_width + $pt - ($h * 0.1);
+        $w += $style->border_left_width + $style->border_right_width;
+        $h += $style->border_top_width + $pt + $style->border_bottom_width + $pb;
 
-        //On continuation lines (after line break) of inline elements, the style got copied.
-        //But a non repeatable background image should not be repeated on the next line.
-        //But removing the background image above has never an effect, and removing it below
-        //removes it always, even on the initial line.
-        //Need to handle it elsewhere, e.g. on certain ...clone()... usages.
-        // Repeat not given: default is Style::__construct
-        // ... && (!($repeat = $style->background_repeat) || $repeat === "repeat" ...
-        //different position? $this->_background_image($url, $x, $y, $w, $h, $style);
-        if (($url = $style->background_image) && $url !== "none") {
-            $this->_background_image($url, $x + $widths[3], $y + $widths[0], $w, $h, $style);
-        }
-
-        // Add the border widths
-        $w += (float)$widths[1] + (float)$widths[3];
-        $h += (float)$widths[0] + (float)$widths[2];
-
-        // If this is the first row, draw the left border too
-        if ($bp["left"]["style"] !== "none" && $bp["left"]["color"] !== "transparent" && $widths[3] > 0) {
-            $method = "_border_" . $bp["left"]["style"];
-            $this->$method($x, $y, $h, $bp["left"]["color"], $widths, "left");
-        }
-
-        // Draw the top & bottom borders
-        if ($bp["top"]["style"] !== "none" && $bp["top"]["color"] !== "transparent" && $widths[0] > 0) {
-            $method = "_border_" . $bp["top"]["style"];
-            $this->$method($x, $y, $w, $bp["top"]["color"], $widths, "top");
-        }
-
-        if ($bp["bottom"]["style"] !== "none" && $bp["bottom"]["color"] !== "transparent" && $widths[2] > 0) {
-            $method = "_border_" . $bp["bottom"]["style"];
-            $this->$method($x, $y + $h, $w, $bp["bottom"]["color"], $widths, "bottom");
-        }
-
-        // Helpers::var_dump(get_class($frame->get_next_sibling()));
-        // $last_row = get_class($frame->get_next_sibling()) !== 'Inline';
-        // Draw the right border if this is the last row
-        if ($bp["right"]["style"] !== "none" && $bp["right"]["color"] !== "transparent" && $widths[1] > 0) {
-            $method = "_border_" . $bp["right"]["style"];
-            $this->$method($x + $w, $y, $h, $bp["right"]["color"], $widths, "right");
-        }
+        $border_box = [$x, $y, $w, $h];
+        $this->_render_background($frame, $border_box);
+        $this->_render_border($frame, $border_box);
+        $this->_render_outline($frame, $border_box);
 
         $node = $frame->get_node();
         $id = $node->getAttribute("id");
@@ -118,7 +76,7 @@ class Inline extends AbstractRenderer
         // Handle anchors & links
         if ($is_link_node) {
             if ($href = $node->getAttribute("href")) {
-                $href = Helpers::build_url($dompdf->getProtocol(), $dompdf->getBaseHost(), $dompdf->getBasePath(), $href);
+                $href = Helpers::build_url($dompdf->getProtocol(), $dompdf->getBaseHost(), $dompdf->getBasePath(), $href) ?? $href;
                 $this->_canvas->add_link($href, $x, $y, $w, $h);
             }
         }
@@ -135,20 +93,24 @@ class Inline extends AbstractRenderer
             }
 
             $style = $child->get_style();
-            list(, , $child_w, $child_h) = $child->get_padding_box();
+            $auto_width = $style->width === "auto";
+            $auto_height = $style->height === "auto";
+            [, , $child_w, $child_h] = $child->get_padding_box();
 
-            $child_h2 = 0.0;
+            if ($auto_width || $auto_height) {
+                [$child_w2, $child_h2] = $this->get_child_size($child, $do_debug_layout_line);
 
-            if ($style->width === "auto") {
-                list($child_w, $child_h2) = $this->get_child_size($child, $do_debug_layout_line);
-            }
-
-            if ($style->height === "auto") {
-                list(, $child_h2) = $this->get_child_size($child, $do_debug_layout_line);
+                if ($auto_width) {
+                    $child_w = $child_w2;
+                }
+    
+                if ($auto_height) {
+                    $child_h = $child_h2;
+                }
             }
 
             $w += $child_w;
-            $h = max($h, $child_h, $child_h2);
+            $h = max($h, $child_h);
 
             if ($do_debug_layout_line) {
                 $this->_debug_layout($child->get_border_box(), "blue");

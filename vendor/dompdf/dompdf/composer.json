@@ -6,16 +6,8 @@
     "license": "LGPL-2.1",
     "authors": [
         {
-            "name": "Fabien Ménager",
-            "email": "fabien.menager@gmail.com"
-        },
-        {
-            "name": "Brian Sweeney",
-            "email": "eclecticgeek@gmail.com"
-        },
-        {
-            "name": "Gabriel Bull",
-            "email": "me@gabrielbull.com"
+            "name": "The Dompdf Community",
+            "homepage": "https://github.com/dompdf/dompdf/blob/master/AUTHORS.md"
         }
     ],
     "autoload": {
@@ -35,10 +27,13 @@
         "php": "^7.1 || ^8.0",
         "ext-dom": "*",
         "ext-mbstring": "*",
-        "phenx/php-font-lib": "^0.5.2",
-        "phenx/php-svg-lib": "^0.3.3"
+        "masterminds/html5": "^2.0",
+        "phenx/php-font-lib": ">=0.5.4 <1.0.0",
+        "phenx/php-svg-lib": ">=0.3.3 <1.0.0"
     },
     "require-dev": {
+        "ext-json": "*",
+        "ext-zip": "*",
         "phpunit/phpunit": "^7.5 || ^8 || ^9",
         "squizlabs/php_codesniffer": "^3.5",
         "mockery/mockery": "^1.3"

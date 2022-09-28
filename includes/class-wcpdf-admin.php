@@ -14,11 +14,19 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
 class Admin {
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
-		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_number_column' ), 999 );
-		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_number_column_data' ), 2 );
+
+		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
+		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 2 );
+		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
+			add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
+		} else {
+			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_column' ) );
+		}
+
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
-			add_action( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
+			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
 		} else {
 			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
 		}
@@ -37,14 +45,6 @@ class Admin {
 		// add_action( 'wpo_wcpdf_after_pdf', array( $this,'update_pdf_counter' ), 10, 2 );
 
 		add_action( 'admin_bar_menu', array( $this, 'debug_enabled_warning' ), 999 );
-
-
-		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_number_column_sortable' ) );
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
-			add_filter( 'request', array( $this, 'request_query_sort_by_invoice_number' ) );
-		} else {
-			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_invoice_number' ) );
-		}
 
 		// AJAX actions for deleting, regenerating and saving document data
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_crud_document' ) );
@@ -183,16 +183,12 @@ class Admin {
 			$document_title = $document->get_title();
 			$icon = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url = wp_nonce_url( add_query_arg( array(
-					'action'        => 'generate_wpo_wcpdf',
-					'document_type' => $document->get_type(),
-					'order_ids'     => WCX_Order::get_id( $order ),
-				), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
-				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$pdf_url         = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 
 				$listing_actions[$document->get_type()] = array(
-					'url'    => $pdf_url,
+					'url'    => esc_url( $pdf_url ),
 					'img'    => $icon,
 					'alt'    => "PDF " . $document_title,
 					'exists' => $document_exists,
@@ -219,46 +215,129 @@ class Admin {
 	}
 	
 	/**
-	 * Create additional Shop Order column for Invoice Numbers
+	 * Create additional Shop Order column for Invoice Number/Date
 	 * @param array $columns shop order columns
 	 */
-	public function add_invoice_number_column( $columns ) {
+	public function add_invoice_columns( $columns ) {
 		// get invoice settings
-		$invoice = wcpdf_get_invoice( null );
+		$invoice          = wcpdf_get_invoice( null );
 		$invoice_settings = $invoice->get_settings();
-		if ( !isset( $invoice_settings['invoice_number_column'] ) ) {
-			return $columns;
+		$invoice_columns  = array(
+			'invoice_number_column' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
+			'invoice_date_column'   => __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+
+		$offset = 2; // after order number column
+		foreach ( $invoice_columns as $slug => $name ) {
+			if ( ! isset( $invoice_settings[$slug] ) ) {
+				continue;
+			}
+
+			$columns = array_slice( $columns, 0, $offset, true ) +
+				array( $slug => $name ) +
+				array_slice( $columns, 2, count( $columns ) - 1, true ) ;
+
+			$offset++;
 		}
 
-		// put the column after the Status column
-		$new_columns = array_slice($columns, 0, 2, true) +
-			array( 'pdf_invoice_number' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ) ) +
-			array_slice($columns, 2, count($columns) - 1, true) ;
-		return $new_columns;
+		return $columns;
 	}
 
 	/**
-	 * Display Invoice Number in Shop Order column (if available)
+	 * Display Invoice Number/Date in Shop Order column (if available)
 	 * @param  string $column column slug
 	 */
-	public function invoice_number_column_data( $column ) {
+	public function invoice_columns_data( $column ) {
 		global $post, $the_order;
 
-		if ( $column == 'pdf_invoice_number' ) {
-			$this->disable_storing_document_settings();
-			if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
-				$order = WCX::get_order( $post->ID );
-				if ( $invoice = wcpdf_get_invoice( $order ) ) {
-					echo $invoice->get_number();
-				}
+		$this->disable_storing_document_settings();
+
+		$order = '';
+		if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
+			$order = WCX::get_order( $post->ID );
+		} else {
+			$order = $the_order;
+		}
+
+		$invoice = wcpdf_get_invoice( $order );
+
+		if ( empty( $invoice ) ) {
+			return;
+		}
+
+		switch ( $column ) {
+			case 'invoice_number_column':
+				echo $invoice->get_number();
 				do_action( 'wcpdf_invoice_number_column_end', $order );
-			} else {
-				if ( $invoice = wcpdf_get_invoice( $the_order ) ) {
-					echo $invoice->get_number();
+				break;
+			case 'invoice_date_column':
+				if ( ! empty( $date = $invoice->get_date() ) ) {
+					echo $date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) );
 				}
-				do_action( 'wcpdf_invoice_number_column_end', $the_order );
+				do_action( 'wcpdf_invoice_date_column_end', $order );
+				break;
+			default:
+				return;
+		}
+	}
+
+	/**
+	 * Makes invoice columns sortable
+	 */
+	public function invoice_columns_sortable( $columns ) {
+		$columns['invoice_number_column'] = 'invoice_number_column';
+		$columns['invoice_date_column']   = 'invoice_date_column';
+		return $columns;
+	}
+
+	/**
+	 * Pre WC3.X sorting
+	 */
+	public function pre_get_posts_sort_by_column( $query ) {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		switch ( $query->get( 'orderby' ) ) {
+			case 'invoice_number_column':
+				$query->set( 'meta_key', '_wcpdf_invoice_number' );
+				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
+				break;
+			case 'invoice_date_column':
+				$query->set( 'meta_key', '_wcpdf_invoice_date' );
+				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ) );
+				break;
+			default:
+				return;
+		}
+	}
+
+	/**
+	 * WC3.X+ sorting
+	 */
+	public function request_query_sort_by_column( $query_vars ) {
+		global $typenow;
+
+		if ( in_array( $typenow, wc_get_order_types( 'order-meta-boxes' ), true ) && ! empty( $query_vars['orderby'] ) ) {
+			switch ( $query_vars['orderby'] ) {
+				case 'invoice_number_column':
+					$query_vars = array_merge( $query_vars, array(
+						'meta_key' => '_wcpdf_invoice_number',
+						'orderby'  => apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ),
+					) );
+					break;
+				case 'invoice_date_column':
+					$query_vars = array_merge( $query_vars, array(
+						'meta_key' => '_wcpdf_invoice_date',
+						'orderby'  => apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ),
+					) );
+					break;
+				default:
+					return $query_vars;
 			}
 		}
+
+		return $query_vars;
 	}
 
 	/**
@@ -331,7 +410,7 @@ class Admin {
 				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
 				<?php
 				$title = __( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
-				$url = wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' );
+				$url = esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' ) );
 				?>
 			</li>
 		</ul>
@@ -351,14 +430,10 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url = wp_nonce_url( add_query_arg( array(
-					'action'        => 'generate_wpo_wcpdf',
-					'document_type' => $document->get_type(),
-					'order_ids'     => $post_id,
-				), admin_url( 'admin-ajax.php' ) ), 'generate_wpo_wcpdf' );
+				$pdf_url        = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
 				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
-					'url'		=> $pdf_url,
+					'url'		=> esc_url( $pdf_url ),
 					'alt'		=> "PDF " . $document_title,
 					'title'		=> "PDF " . $document_title,
 					'exists'	=> is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
@@ -455,7 +530,7 @@ class Admin {
 				<!-- Title -->
 				<h4>
 					<?php echo wp_kses_post( $document->get_title() ); ?>
-					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) ) : ?>
+					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) && $this->user_can_manage_document( $document->get_type() ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
 						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
@@ -488,7 +563,21 @@ class Admin {
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<?php /* translators: document title */ ?>
-						<span class="wpo-wcpdf-set-date-number button"><?php printf( esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ), wp_kses_post( $document->get_title() ) ); ?></span>
+						<?php
+						if ( $this->user_can_manage_document( $document->get_type() ) ) {
+							printf(
+								'<span class="wpo-wcpdf-set-date-number button">%s</span>',
+								sprintf(
+									/* translators: document title */
+									esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
+									wp_kses_post( $document->get_title() )
+								)
+							); 
+						} else {
+							printf( '<p>%s</p>', esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ) );
+						}
+						?>
+						
 					<?php endif; ?>
 				</div>
 
@@ -516,7 +605,9 @@ class Admin {
 				<!-- Read only -->
 				<div class="read-only">
 					<span><strong><?= wp_kses_post( $data['notes']['label'] ); ?></strong></span>
-					<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
+					<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
+						<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
+					<?php endif; ?>
 					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
 				</div>
 				<!-- Editable -->
@@ -600,6 +691,10 @@ class Admin {
 			if ( ! isset($_POST['action']) || $_POST['action'] != 'editpost' ) {
 				return;
 			}
+			// Check if user is allowed to change invoice data
+			if ( ! $this->user_can_manage_document( 'invoice' ) ) {
+				return;
+			}
 
 			$order = WCX::get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
@@ -639,7 +734,7 @@ class Admin {
 		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
 	}
 
-	public function return_false(){
+	public function return_false() {
 		return false;
 	}
 
@@ -677,7 +772,7 @@ class Admin {
 				add_filter( 'redirect_post_location', function( $location ) {
 					// messages in includes/admin/class-wc-admin-post-types.php
 					// 11 => 'Order updated and sent.'
-					return add_query_arg( 'message', 11, $location );
+					return esc_url_raw( add_query_arg( 'message', 11, $location ) );
 				} );
 			}
 		}
@@ -704,47 +799,8 @@ class Admin {
 		}
 	}
 
-	/**
-	 * Add invoice number to order search scope
-	 */
-	public function invoice_number_column_sortable( $columns ) {
-		$columns['pdf_invoice_number'] = 'pdf_invoice_number';
-		return $columns;
-	}
-
-
-	/**
-	 * Pre WC3.X sorting
-	 */
-	public function pre_get_posts_sort_by_invoice_number( $query ) {
-		if( ! is_admin() ) {
-			return;
-		}
-		$orderby = $query->get( 'orderby');
-		if( 'pdf_invoice_number' == $orderby ) {
-			$query->set( 'meta_key', '_wcpdf_invoice_number' );
-			$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
-		}
-	}
-
-	/**
-	 * WC3.X+ sorting
-	 */
-	public function request_query_sort_by_invoice_number( $query_vars ) {
-		global $typenow;
-
-		if ( in_array( $typenow, wc_get_order_types( 'order-meta-boxes' ), true ) ) {
-			if ( isset( $query_vars['orderby'] ) ) {
-				if ( 'pdf_invoice_number' === $query_vars['orderby'] ) {
-					$query_vars = array_merge( $query_vars, array(
-						'meta_key'  => '_wcpdf_invoice_number',
-						'orderby'   => apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ),
-					) );
-				}
-			}
-		}
-
-		return $query_vars;
+	public function user_can_manage_document( $document_type ) {
+		return apply_filters( 'wpo_wcpdf_current_user_is_allowed', ( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ), $document_type );
 	}
 
 	/**
@@ -769,7 +825,7 @@ class Admin {
 			) );
 		}
 
-		if ( !current_user_can('manage_woocommerce') ) {
+		if ( ! $this->user_can_manage_document( sanitize_text_field( $_POST['document_type'] ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
@@ -790,7 +846,7 @@ class Admin {
 				}
 			}
 		}
-		$form_data       = stripslashes_deep( $form_data );
+		$form_data = stripslashes_deep( $form_data );
 
 		// notice messages
 		$notice_messages = array(

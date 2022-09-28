@@ -55,7 +55,7 @@ class Bulk_Document {
 		do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
 
 		// temporarily apply filters that need to be removed again after the pdf is generated
-		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array() );
+		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array(), $this );
 		$this->add_filters( $pdf_filters );
 
 		$html = $this->get_html();
@@ -79,7 +79,7 @@ class Bulk_Document {
 		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
 
 		// temporarily apply filters that need to be removed again after the html is generated
-		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array() );
+		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
 		$this->add_filters( $html_filters );
 
 		$html_content = array();

@@ -336,6 +336,11 @@ abstract class Order_Document_Methods extends Order_Document {
 			'date_paid',
 			'cart_hash',
 		);
+
+		if ( version_compare( WOOCOMMERCE_VERSION, '5.6', '>=' ) ) {
+			$order_props[] = 'shipping_phone';
+		}
+
 		return in_array($key, $order_props);
 	}
 
@@ -622,9 +627,9 @@ abstract class Order_Document_Methods extends Order_Document {
 				
 				// Set item meta
 				if (function_exists('wc_display_item_meta')) { // WC3.0+
-					$data['meta'] = wc_display_item_meta( $item, array(
+					$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array(
 						'echo'      => false,
-					) );
+					), $this ) );
 				} else {
 					if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '<' ) ) {
 						$meta = new \WC_Order_Item_Meta( $item['item_meta'], $product );
@@ -735,8 +740,8 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Returns the percentage rate (float) for a given tax rate ID.
-	 * @param  int    $rate_id  woocommerce tax rate id
-	 * @return float  $rate     percentage rate
+	 * @param  int         $rate_id  woocommerce tax rate id
+	 * @return float|bool  $rate     percentage rate
 	 */
 	public function get_tax_rate_by_id( $rate_id, $order = null ) {
 		global $wpdb;
@@ -862,7 +867,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$contextless_site_url = str_replace(array('http://','https://'), '', trailingslashit(WP_CONTENT_URL));
 		}
 		$thumbnail_path = str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url);
-		
+
 		// fallback if thumbnail file doesn't exist
 		if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
 			if ($thumbnail_id = $this->get_thumbnail_id( $product ) ) {
@@ -885,6 +890,17 @@ abstract class Order_Document_Methods extends Order_Document {
 		} else {
 			// load img with http url when filtered
 			$thumbnail = $thumbnail_img_tag_url;
+		}
+
+		/*
+		 * PHP GD library can be installed but 'webp' support could be disabled,
+		 * which turns the function 'imagecreatefromwebp()' inexistent,
+		 * leading to display an error in DOMPDF.
+		 * 
+		 * Check 'System configuration' in the Status tab for 'webp' support.
+		 */
+		if ( 'webp' === wp_check_filetype( $thumbnail_path )['ext'] && ! function_exists( 'imagecreatefromwebp' ) ) {
+			$thumbnail = '';
 		}
 
 		// die($thumbnail);
@@ -1216,7 +1232,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_formatted_item_price ( $item, $type, $tax_display = '' ) {
 		if ( ! isset( $item['line_subtotal'] ) || ! isset( $item['line_subtotal_tax'] ) ) {
-			return;
+			return '';
 		}
 
 		$divide_by = ($type == 'single' && $item['qty'] != 0 )?abs($item['qty']):1; //divide by 1 if $type is not 'single' (thus 'total')

@@ -2,15 +2,12 @@
  * dompdf default stylesheet.
  *
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
- * @author  Blake Ross <BlakeR1234@aol.com>
- * @author  Fabien Ménager <fabien.menager@gmail.com>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  *
  * Portions from Mozilla
  * @link https://dxr.mozilla.org/mozilla-central/source/layout/style/res/html.css
- * @license http://mozilla.org/MPL/2.0/ Mozilla Public License, v. 2.0 
+ * @license http://mozilla.org/MPL/2.0/ Mozilla Public License, v. 2.0
  *
  * Portions from W3C
  * @link https://drafts.csswg.org/css-ui-3/#default-style-sheet
@@ -148,25 +145,22 @@ table {
 }
 
 table[border] {
-  border-style: outset;
-  border-color: gray;
+  border: outset gray;
 }
 
-/* This won't work (???) */
-/*
 table[border] td,
 table[border] th {
-  border: 1pt solid grey;
-}*/
+  border: 1px inset gray;
+}
+
+table[border="0"] td,
+table[border="0"] th {
+  border-width: 0;
+}
 
 /* make sure backgrounds are inherited in tables  -- see bug 4510 */
 td, th, tr {
-  background-color: inherit;
-  background-image: inherit;
-  background-image-resolution: inherit;
-  background-position: inherit;
-  background-repeat: inherit;
-  background-size: inherit;
+  background: inherit;
 }
 
 /* caption inherits from table not table-outer */
@@ -224,9 +218,6 @@ th {
 }
 
 /* inlines */
-q {
-  quotes: '"' '"' "'" "'"; /* FIXME only the first level is used */
-}
 
 q:before {
   content: open-quote;

@@ -68,6 +68,18 @@ abstract class Order_Document {
 	public $settings;
 
 	/**
+	 * Document latest settings.
+	 * @var array
+	 */
+	public $latest_settings;
+
+	/**
+	 * Order settings.
+	 * @var array
+	 */
+	public $order_settings;
+
+	/**
 	 * TRUE if document is enabled.
 	 * @var bool
 	 */
@@ -115,8 +127,8 @@ abstract class Order_Document {
 		}
 
 		// load settings
-		$this->settings = $this->get_settings();
-		$this->latest_settings = $this->get_settings( true );
+		$this->init_settings_data();
+		$this->save_settings();
 		$this->enabled = $this->get_setting( 'enabled', false );
 	}
 
@@ -124,34 +136,44 @@ abstract class Order_Document {
 		return;
 	}
 
-	public function get_settings( $latest = false ) {
-		// get most current settings
-		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		$settings = (array) $document_settings + (array) $common_settings;
+	public function init_settings_data() {
+		$this->order_settings  = $this->get_order_settings();
+		$this->settings        = $this->get_settings();
+		$this->latest_settings = $this->get_settings( true );
+	}
 
-		// return only most current if forced
-		if ( $latest == true ) {
-			return $settings;
-		}
+	public function get_order_settings() {
+		$order_settings = array();
 
-		// get historical settings if enabled
-		if ( !empty( $this->order ) && $this->use_historical_settings() == true ) {
+		if ( ! empty( $this->order ) ) {
 			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
-			if (!empty($order_settings) && !is_array($order_settings)) {
+			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
 				$order_settings = maybe_unserialize( $order_settings );
 			}
-			if (!empty($order_settings) && is_array($order_settings)) {
-				// not sure what happens if combining with current settings will have unwanted side effects
-				// like unchecked options being enabled because missing = unchecked in historical - disabled for now
-				// $settings = (array) $order_settings + (array) $settings;
-				$settings = $order_settings;
-			}
 		}
-		if ( $this->storing_settings_enabled() && empty( $order_settings ) && !empty( $this->order ) ) {
-			// this is either the first time the document is generated, or historical settings are disabled
-			// in both cases, we store the document settings
-			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
+
+		return $order_settings;
+	}
+
+	public function get_settings( $latest = false ) {
+		// get most current settings
+		$common_settings   = WPO_WCPDF()->settings->get_common_document_settings();
+		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		$settings          = (array) $document_settings + (array) $common_settings;
+
+		if ( $latest != true ) {
+			// get historical settings if enabled
+			if ( ! empty( $this->order ) && $this->use_historical_settings() == true ) {
+				if ( ! empty( $this->order_settings ) && is_array( $this->order_settings ) ) {
+					// ideally we should combine the order settings with the latest settings, so that new settings will
+					// automatically be applied to existing orders too. However, doing this by combining arrays is not
+					// possible because the way settings are currently stored means unchecked options are not included.
+					// This means there is no way to tell whether an option didn't exist yet (in which case the new
+					// option should be added) or whether the option was simly unchecked (in which case it should not
+					// be overwritten). This can only be address by storing unchecked checkboxes too.
+					$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
+				}
+			}
 		}
 
 		// display date & display number were checkbox settings but now a select setting that could be set but empty - should behave as 'unchecked'
@@ -166,6 +188,21 @@ abstract class Order_Document {
 		return $settings;
 	}
 
+	public function save_settings( $latest = false ) {
+		if ( empty( $this->settings ) || empty( $this->latest_settings ) ) {
+			$this->init_settings_data();
+		}
+
+		$settings = ( $latest === true ) ? $this->latest_settings : $this->settings;
+
+		if ( $this->storing_settings_enabled() && ( empty( $this->order_settings ) || $latest ) && ! empty( $settings ) && ! empty( $this->order ) ) {
+			// this is either the first time the document is generated, or historical settings are disabled
+			// in both cases, we store the document settings
+			// exclude non historical settings from being saved in order meta
+			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
+		}
+	}
+
 	public function use_historical_settings() {
 		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', false, $this );
 	}
@@ -174,8 +211,8 @@ abstract class Order_Document {
 		return apply_filters( 'wpo_wcpdf_document_store_settings', false, $this );
 	}
 
-	public function get_setting( $key, $default = '' ) {
-		$non_historical_settings = apply_filters( 'wpo_wcpdf_non_historical_settings', array(
+	public function get_non_historical_settings() {
+		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
 			'attach_to_email_ids',
 			'disable_for_statuses',
@@ -183,9 +220,14 @@ abstract class Order_Document {
 			'my_account_buttons',
 			'my_account_restrict',
 			'invoice_number_column',
+			'invoice_date_column',
 			'paper_size',
 			'font_subsetting',
 		), $this );
+	}
+
+	public function get_setting( $key, $default = '' ) {
+		$non_historical_settings = $this->get_non_historical_settings();
 		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
 			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
 		} else {
@@ -234,13 +276,9 @@ abstract class Order_Document {
 	}
 
 	public function init() {
-		// store settings in order
-		if ( $this->storing_settings_enabled() && !empty( $this->order ) ) {
-			$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-			$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-			$settings = (array) $document_settings + (array) $common_settings;
-			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
-		}
+		// init settings
+		$this->init_settings_data();
+		$this->save_settings();
 
 		$this->set_date( current_time( 'timestamp', true ) );
 		do_action( 'wpo_wcpdf_init_document', $this );
@@ -252,7 +290,7 @@ abstract class Order_Document {
 			return; // nowhere to save to...
 		}
 
-		foreach ($this->data as $key => $value) {
+		foreach ( $this->data as $key => $value ) {
 			if ( empty( $value ) ) {
 				WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}" );
 				if ( $key == 'date' ) {
@@ -316,15 +354,9 @@ abstract class Order_Document {
 			$this->save();
 		}
 
-		//Get most current settings
-		$common_settings = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		$settings = (array) $document_settings + (array) $common_settings;
-		//Update document settings in meta
-		WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", $settings );
-
-		//Use most current settings from here on
-		$this->settings = $this->get_settings( true ); 
+		// init settings
+		$this->init_settings_data();
+		$this->save_settings( true );
 
 		//Add order note
 		$parent_order = $refund_id = false;
@@ -735,7 +767,7 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
 
 		// temporarily apply filters that need to be removed again after the pdf is generated
-		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array() );
+		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array(), $this );
 		$this->add_filters( $pdf_filters );
 
 		$pdf_settings = array(
@@ -743,8 +775,8 @@ abstract class Order_Document {
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
 			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
-		$pdf_maker = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
-		$pdf = $pdf_maker->output();
+		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
+		$pdf          = $pdf_maker->output();
 		
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
 
@@ -756,11 +788,26 @@ abstract class Order_Document {
 		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
 	}
 
+	public function preview_pdf() {
+		// get last settings
+		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
+
+		$pdf_settings = array(
+			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
+		);
+		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
+		$pdf          = $pdf_maker->output();
+		
+		return $pdf;
+	}
+
 	public function get_html( $args = array() ) {
 		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
 
 		// temporarily apply filters that need to be removed again after the html is generated
-		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array() );
+		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
 		$this->add_filters( $html_filters );
 
 		$default_args = array (
@@ -1048,7 +1095,7 @@ abstract class Order_Document {
 		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 		$current_year       = intval( $now->date_i18n( 'Y' ) );
-		$current_store_year = $this->get_number_store_year( $default_table_name );
+		$current_store_year = intval( $this->get_number_store_year( $default_table_name ) );
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
 
 		// nothing to retire if requested year matches current store year or if current store year is not in the past
@@ -1067,7 +1114,7 @@ abstract class Order_Document {
 			$table_removed = $wpdb->query( "DROP TABLE IF EXISTS {$retired_table_name}" );
 
 			if( ! $table_removed ) {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to remove the duplicate number store %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $retired_table_name, $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( 'An error occurred while trying to remove the duplicate number store %s: %s', $retired_table_name, $wpdb->last_error ) );
 				return $requested_year;
 			}
 		}
@@ -1078,7 +1125,7 @@ abstract class Order_Document {
 			$table_renamed = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$retired_table_name}" );
 			
 			if( ! $table_renamed ) {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $default_table_name, $retired_table_name, $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $default_table_name, $retired_table_name, $wpdb->last_error ) );
 				return $requested_year;
 			}
 		}
@@ -1089,7 +1136,7 @@ abstract class Order_Document {
 			$table_renamed = $wpdb->query( "ALTER TABLE {$current_year_table_name} RENAME {$default_table_name}" );
 
 			if( ! $table_renamed ) {
-				wcpdf_log_error( sprintf( __( 'An error occurred while trying to rename the number store from %s to %s: %s', 'woocommerce-pdf-invoices-packing-slips' ), $current_year_table_name, $default_table_name, $wpdb->last_error ) );
+				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $current_year_table_name, $default_table_name, $wpdb->last_error ) );
 				return $requested_year;
 			}
 		}
@@ -1124,7 +1171,7 @@ abstract class Order_Document {
 				// OR that the first number simply has not been created yet (=no rows)
 				// we only log when there's an actual error
 				if( ! empty( $wpdb->last_error ) ) {
-					wcpdf_log_error( sprintf( __( 'An error occurred while trying to get the current year from the %s table: %s', 'woocommerce-pdf-invoices-packing-slips' ), $table_name, $wpdb->last_error ) );
+					wcpdf_log_error( sprintf( 'An error occurred while trying to get the current year from the %s table: %s', $table_name, $wpdb->last_error ) );
 				}
 			}
 		} else {

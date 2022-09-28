@@ -1,8 +1,7 @@
 <?php
 /**
  * @package dompdf
- * @link    http://dompdf.github.com/
- * @author  Benj Carson <benjcarson@digitaljunkies.ca>
+ * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 namespace Dompdf\FrameDecorator;
@@ -14,7 +13,6 @@ use Dompdf\LineBox;
 /**
  * Decorates frames for block layout
  *
- * @access  private
  * @package dompdf
  */
 class Block extends AbstractFrameDecorator
@@ -34,6 +32,15 @@ class Block extends AbstractFrameDecorator
     protected $_line_boxes;
 
     /**
+     * List of markers that have not found their line box to vertically align
+     * with yet. Markers are collected by nested block containers until an
+     * inline line box is found at the start of the block.
+     *
+     * @var ListBullet[]
+     */
+    protected $dangling_markers;
+
+    /**
      * Block constructor.
      * @param Frame $frame
      * @param Dompdf $dompdf
@@ -44,17 +51,16 @@ class Block extends AbstractFrameDecorator
 
         $this->_line_boxes = [new LineBox($this)];
         $this->_cl = 0;
+        $this->dangling_markers = [];
     }
 
-    /**
-     *
-     */
     function reset()
     {
         parent::reset();
 
         $this->_line_boxes = [new LineBox($this)];
         $this->_cl = 0;
+        $this->dangling_markers = [];
     }
 
     /**
@@ -106,7 +112,7 @@ class Block extends AbstractFrameDecorator
      * @param Frame $frame
      * @return LineBox|null
      */
-    public function add_frame_to_line(Frame $frame)
+    public function add_frame_to_line(Frame $frame): ?LineBox
     {
         $current_line = $this->_line_boxes[$this->_cl];
         $frame->set_containing_line($current_line);
@@ -195,7 +201,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @param float $w
      */
-    function increase_line_width($w)
+    public function increase_line_width(float $w): void
     {
         $this->_line_boxes[$this->_cl]->w += $w;
     }
@@ -204,7 +210,7 @@ class Block extends AbstractFrameDecorator
      * @param float $val
      * @param Frame $frame
      */
-    function maximize_line_height($val, Frame $frame)
+    public function maximize_line_height(float $val, Frame $frame): void
     {
         if ($val > $this->_line_boxes[$this->_cl]->h) {
             $this->_line_boxes[$this->_cl]->tallest_frame = $frame;
@@ -215,7 +221,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @param bool $br
      */
-    function add_line(bool $br = false)
+    public function add_line(bool $br = false): void
     {
         $line = $this->_line_boxes[$this->_cl];
 
@@ -227,5 +233,24 @@ class Block extends AbstractFrameDecorator
         $this->_line_boxes[++$this->_cl] = $new_line;
     }
 
-    //........................................................................
+    /**
+     * @param ListBullet $marker
+     */
+    public function add_dangling_marker(ListBullet $marker): void
+    {
+        $this->dangling_markers[] = $marker;
+    }
+
+    /**
+     * Inherit any dangling markers from the parent block.
+     *
+     * @param Block $block
+     */
+    public function inherit_dangling_markers(self $block): void
+    {
+        if ($block->dangling_markers !== []) {
+            $this->dangling_markers = $block->dangling_markers;
+            $block->dangling_markers = [];
+        }
+    }
 }

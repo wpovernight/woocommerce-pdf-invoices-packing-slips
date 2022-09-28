@@ -13,7 +13,7 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Install' ) ) :
 
 class Install {
 	
-	function __construct()	{
+	public function __construct() {
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
 			add_action( 'wp_loaded', array( $this, 'do_install' ) );
@@ -166,6 +166,7 @@ class Install {
 				// 'reset_number_yearly'		=> '',
 				// 'my_account_buttons'		=> '',
 				// 'invoice_number_column'		=> '',
+				// 'invoice_date_column'		=> '',
 				// 'disable_free'				=> '',
 			),
 			'wpo_wcpdf_documents_settings_packing-slip' => array(
@@ -292,6 +293,7 @@ class Install {
 					'reset_number_yearly'		=> array( 'wpo_wcpdf_template_settings' => 'yearly_reset_invoice_number' ),
 					'my_account_buttons'		=> array( 'wpo_wcpdf_general_settings' => 'my_account_buttons' ),
 					'invoice_number_column'		=> array( 'wpo_wcpdf_general_settings' => 'invoice_number_column' ),
+					'invoice_date_column'		=> array( 'wpo_wcpdf_general_settings' => 'invoice_date_column' ),
 					'disable_free'				=> array( 'wpo_wcpdf_general_settings' => 'disable_free' ),
 				),
 				'wpo_wcpdf_documents_settings_packing-slip' => array(
@@ -384,7 +386,48 @@ class Install {
 				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
 			}
 		}
-		
+
+		// 2.12.2-dev-1: change 'date' database table default value to '1000-01-01 00:00:00'
+		if ( version_compare( $installed_version, '2.12.2-dev-1', '<' ) ) {
+			global $wpdb;
+			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+			foreach ( $documents as $document ) {
+				$store_name = "{$document->slug}_number";
+				$method     = WPO_WCPDF()->settings->get_sequential_number_store_method();
+				$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method );
+				if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
+					continue;
+				}
+				if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
+					$number_store = $document->get_sequential_number_store();
+					if ( ! empty( $number_store ) ) {
+						$column_name = 'date';
+						$query       = $wpdb->query( "ALTER TABLE {$number_store->table_name} ALTER {$column_name} SET DEFAULT '1000-01-01 00:00:00'" );
+						if ( $query ) {
+							wcpdf_log_error(
+								"Default value changed for 'date' column to '1000-01-01 00:00:00' on database table: {$number_store->table_name}",
+								'info'
+							);
+						} else {
+							wcpdf_log_error(
+								"An error occurred! The default value for 'date' column couldn't be changed to '1000-01-01 00:00:00' on database table: {$number_store->table_name}",
+								'critical'
+							);
+						}
+					}
+				}
+			}
+		}
+
+		// 3.0.0-dev-1: remove saved option 'use_html5_parser'
+		if ( version_compare( $installed_version, '3.0.0-dev-1', '<' ) ) {
+			// removes 'HTML5 parser' setting value
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['use_html5_parser'] ) ) {
+				unset( $debug_settings['use_html5_parser'] );
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
 	}
 
 	/**
