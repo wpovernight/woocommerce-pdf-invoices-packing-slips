@@ -105,7 +105,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 = 3.2.0 (2022-09-26) =
 * New: setting to display the Invoice date column in the WooCommerce orders list
 * New: updated Dompdf to version 2.0.1, which fixes a security vulnerability.
-* New: filter 'wpo_wcpdf_document_link_additional_vars' to add additional query variables to the document link
+* New: filter `wpo_wcpdf_document_link_additional_vars` to add additional query variables to the document link
 * Tweak: improved document settings data init/save
 * Tweak: improved wizard display settings
 * Tweak: improved styles and descriptions for the document 'Number format' settings
@@ -116,7 +116,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 3.1.0 (2022-09-06) =
 * New: custom document links feature available from the Status settings page. Changes the document links to a prettier URL scheme
-* New: action hooks before and after the shop logo: 'wpo_wcpdf_before_shop_logo' and'wpo_wcpdf_after_shop_logo'
+* New: action hooks before and after the shop logo: `wpo_wcpdf_before_shop_logo` and `wpo_wcpdf_after_shop_logo`
 * Fix: replaces WP_Filesystem with PHP functions to delete temporary files
 * Marked tested up to WooCommerce 6.8
 
