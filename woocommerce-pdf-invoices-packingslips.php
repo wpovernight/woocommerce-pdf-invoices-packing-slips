@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WooCommerce PDF Invoices & Packing Slips
+ * Plugin Name: PDF Invoices & Packing Slips for WooCommerce
  * Plugin URI: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description: Create, print & email PDF invoices & packing slips for WooCommerce orders.
  * Version: 3.2.0
@@ -267,7 +267,7 @@ class WPO_WCPDF {
 	 */
 	public function need_woocommerce() {
 		/* translators: <a> tags */
-		$error = sprintf( esc_html__( 'WooCommerce PDF Invoices & Packing Slips requires %1$sWooCommerce%2$s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
+		$error = sprintf( esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
 		
 		$message = '<div class="error"><p>' . $error . '</p></div>';
 	
@@ -278,7 +278,7 @@ class WPO_WCPDF {
 	 * PHP version requirement notice
 	 */
 	public function required_php_version() {
-		$error_message	= __( 'WooCommerce PDF Invoices & Packing Slips requires PHP 7.1 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
+		$error_message	= __( 'PDF Invoices & Packing Slips for WooCommerce requires PHP 7.1 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
 		/* translators: <a> tags */
 		$php_message	= __( 'We strongly recommend to %1$supdate your PHP version%2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 		/* translators: <a> tags */
@@ -414,7 +414,7 @@ class WPO_WCPDF {
 				?>
 				<div class="error">
 					<img src="<?php echo $this->plugin_url() . "/assets/images/mailpoet.svg"; ?>" style="margin-top:10px;">
-					<p><?php _e( 'When sending emails with MailPoet 3 and the active sending method is <strong>MailPoet Sending Service</strong> or <strong>Your web host / web server</strong>, MailPoet does not include the <strong>WooCommerce PDF Invoices & Packing Slips</strong> attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'When sending emails with MailPoet 3 and the active sending method is <strong>MailPoet Sending Service</strong> or <strong>Your web host / web server</strong>, MailPoet does not include the <strong>PDF Invoices & Packing Slips for WooCommerce</strong> attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<p><?php _e( 'To fix this you should select <strong>The default WordPress sending method (default)</strong> on the <strong>Advanced tab</strong>.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=mailpoet-settings#/advanced' ) ); ?>"><?php _e( 'Change MailPoet sending method to WordPress (default)', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
@@ -453,7 +453,7 @@ class WPO_WCPDF {
 endif; // class_exists
 
 /**
- * Returns the main instance of WooCommerce PDF Invoices & Packing Slips to prevent the need to use globals.
+ * Returns the main instance of PDF Invoices & Packing Slips for WooCommerce to prevent the need to use globals.
  *
  * @since  1.6
  * @return WPO_WCPDF

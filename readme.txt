@@ -1,4 +1,4 @@
-=== WooCommerce PDF Invoices & Packing Slips ===
+=== PDF Invoices & Packing Slips for WooCommerce ===
 Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
@@ -26,9 +26,9 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 
 In addition to this, we offer several premium extensions:
 
-* Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [WooCommerce PDF Invoices & Packing Slips Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
+* Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [PDF Invoices & Packing Slips for WooCommerce Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
 * Automatically send new orders or packing slips to your printer, as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
-* More advanced & stylish templates with [WooCommerce PDF Invoices & Packing Slips Premium Templates](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)
+* More advanced & stylish templates with [PDF Invoices & Packing Slips for WooCommerce Premium Templates](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)
 
 = Fully customizable =
 In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS based templates that allow for customization & full control over the PDF output. Copy the templates to your theme folder and you don't have to worry that your customizations will be overwritten when you update the plugin.
@@ -46,9 +46,9 @@ In addition to a number of default settings (including a custom header/logo) and
 * WordPress 3.5 or later
 
 = Automatic installation =
-Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser. To do an automatic install of WooCommerce PDF Invoices & Packing Slips, log in to your WordPress admin panel, navigate to the Plugins menu and click Add New.
+Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser. To do an automatic install of PDF Invoices & Packing Slips for WooCommerce, log in to your WordPress admin panel, navigate to the Plugins menu and click Add New.
 
-In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Search Plugins. You can install it by simply clicking Install Now. After clicking that link you will be asked if you're sure you want to install the plugin. Click yes and WordPress will automatically complete the installation. After installation has finished, click the 'activate plugin' link.
+In the search field type "PDF Invoices & Packing Slips for WooCommerce" and click Search Plugins. You can install it by simply clicking Install Now. After clicking that link you will be asked if you're sure you want to install the plugin. Click yes and WordPress will automatically complete the installation. After installation has finished, click the 'activate plugin' link.
 
 = Manual installation via the WordPress interface =
 1. Download the plugin zip file to your computer
@@ -66,7 +66,7 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 = Where can I find the documentation? =
 
-[WooCommerce PDF Invoices & Packing Slips documentation](https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/)
+[PDF Invoices & Packing Slips for WooCommerce documentation](https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/)
 
 = It's not working! =
 
