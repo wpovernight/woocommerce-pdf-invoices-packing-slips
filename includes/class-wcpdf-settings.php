@@ -677,7 +677,7 @@ class Settings {
 		$number_store_method = $this->get_sequential_number_store_method();
 		$number_store = new Sequential_Number_Store( $_POST['store'], $number_store_method );
 		$number_store->set_next( $number );
-		echo "next number ({$_POST['store']}) set to {$number}";
+		echo wp_kses_post( "next number ({$_POST['store']}) set to {$number}" );
 		die();
 	}
 

@@ -267,12 +267,12 @@ class Admin {
 
 		switch ( $column ) {
 			case 'invoice_number_column':
-				echo $invoice->get_number();
+				echo esc_attr( $invoice->get_number() );
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
 				if ( ! empty( $date = $invoice->get_date() ) ) {
-					echo $date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) );
+					echo esc_attr( $date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) );
 				}
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
@@ -663,7 +663,7 @@ class Admin {
 			<script type="text/javascript">
 			jQuery(document).ready(function() {
 				<?php foreach ($this->get_bulk_actions() as $action => $title) { ?>
-				jQuery('<option>').val('<?php echo $action; ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
+				jQuery('<option>').val('<?php echo esc_attr( $action ); ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
 				<?php }	?>
 			});
 			</script>
