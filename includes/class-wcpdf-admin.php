@@ -249,6 +249,8 @@ class Admin {
 	 */
 	public function invoice_columns_data( $column ) {
 		global $post, $the_order;
+		$invoice_number = NULL;
+		$invoice_date = NULL;
 
 		$this->disable_storing_document_settings();
 
@@ -260,19 +262,20 @@ class Admin {
 		}
 
 		$invoice = wcpdf_get_invoice( $order );
-
-		if ( empty( $invoice ) ) {
-			return;
+		
+		if ( ! empty( $invoice ) ) {
+			$invoice_number = $invoice->get_number();
+			$invoice_date = $invoice->get_date();
 		}
 
 		switch ( $column ) {
 			case 'invoice_number_column':
-				echo $invoice->get_number();
+				echo $invoice_number;
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
-				if ( ! empty( $date = $invoice->get_date() ) ) {
-					echo $date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) );
+				if ( ! empty( $invoice_date ) ) {
+					echo $invoice_date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) );
 				}
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
