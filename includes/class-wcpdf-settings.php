@@ -56,6 +56,7 @@ class Settings {
 		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
 		// AJAX preview order search
 		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
+		
 	}
 
 	public function menu() {
@@ -744,6 +745,21 @@ class Settings {
 		$new_settings = array_merge( array_slice( $settings, 0, $pos, true ), $insert_settings, array_slice( $settings, $pos, NULL, true ) );
 
 		return $new_settings;
+	}
+
+	/**
+	 * Checks if guest access is enabled
+	 * 
+	 * @return bool
+	 */
+	public function is_guest_access_enabled() {
+		// return bool with filter applied
+		$guest_access = isset( $this->debug_settings['guest_access'] ) ? true : false;
+
+		$value_guest_access = apply_filters( 'wpo_wcpdf_guest_access_enabled', $guest_access );
+
+		return $guest_access;
+
 	}
 
 }
