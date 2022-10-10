@@ -268,8 +268,8 @@ class Admin {
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
-				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date() : '';
-				echo $invoice_date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) );
+				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) : '';
+				echo $invoice_date;
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
 			default:
