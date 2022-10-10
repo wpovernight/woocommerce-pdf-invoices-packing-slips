@@ -260,15 +260,15 @@ class Admin {
 		}
 
 		$invoice = wcpdf_get_invoice( $order );
-		$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? $invoice->get_number() : '';
-		$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date() : '';
 
 		switch ( $column ) {
 			case 'invoice_number_column':
+				$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? $invoice->get_number() : '';
 				echo $invoice_number;
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
+				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date() : '';
 				if ( ! empty( $invoice_date ) ) {
 					echo $invoice_date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) );
 				}
