@@ -753,7 +753,6 @@ class Settings {
 	 * @return bool
 	 */
 	public function is_guest_access_enabled() {
-		// return bool with filter applied
 		$guest_access = isset( $this->debug_settings['guest_access'] ) ? true : false;
 
 		return apply_filters( 'wpo_wcpdf_guest_access_enabled', $guest_access );
