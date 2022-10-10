@@ -66,7 +66,7 @@ class Endpoint {
 		}
 	}
 
-	public function get_document_link( $order, $document_type, $additional_vars = array(), $allow_guest_access = false ) {
+	public function get_document_link( $order, $document_type, $additional_vars = array() ) {
 		if ( empty( $order ) || empty( $document_type ) ) {
 			return '';
 		}
@@ -76,12 +76,7 @@ class Endpoint {
 		if ( is_user_logged_in() ) {
 			$access_key = wp_create_nonce( $this->action );
 		} elseif ( ! is_user_logged_in() && isset( $debug_settings['guest_access'] ) ) {
-			$allow_guest_access = apply_filters( 'wpo_wcpdf_allow_guest_access', $allow_guest_access );
-			if ( ! empty( $allow_guest_access ) && $allow_guest_access === true ) {
-				$access_key = wp_create_nonce( $this->action );
-			}else{
-				$access_key = $order->get_order_key();
-			}
+			$access_key = $order->get_order_key();
 		} else {
 			return '';
 		}
