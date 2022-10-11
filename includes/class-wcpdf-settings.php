@@ -746,6 +746,16 @@ class Settings {
 		return $new_settings;
 	}
 
+	/**
+	 * Checks if guest access is enabled
+	 * 
+	 * @return bool
+	 */
+	public function is_guest_access_enabled() {
+		$guest_access = isset( $this->debug_settings['guest_access'] ) ? true : false;
+
+		return apply_filters( 'wpo_wcpdf_guest_access_enabled', $guest_access, $this );
+	}
 }
 
 endif; // class_exists

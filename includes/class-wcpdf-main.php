@@ -256,7 +256,7 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_pdf_ajax() {
-		$guest_access = isset( WPO_WCPDF()->settings->debug_settings['guest_access'] );
+		$guest_access = WPO_WCPDF()->settings->is_guest_access_enabled();
 		if ( ! $guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf' ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
