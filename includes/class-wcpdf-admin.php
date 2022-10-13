@@ -755,7 +755,9 @@ class Admin {
 				if ( ! empty( $mails ) ) {
 					foreach ( $mails as $mail ) {
 						if ( $mail->id == $email_to_send ) {
+							add_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
 							$mail->trigger( $order->get_id(), $order );
+							remove_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
 							/* translators: %s: email title */
 							$order->add_order_note( sprintf( esc_html__( '%s email notification manually sent.', 'woocommerce-pdf-invoices-packing-slips' ), $mail->title ), false, true );
 						}
