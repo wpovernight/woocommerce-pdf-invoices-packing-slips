@@ -1,10 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -44,7 +40,7 @@ class Frontend {
 					break;
 				case 'custom':
 					$allowed_statuses = $button_setting = $invoice->get_setting( 'my_account_restrict', array() );
-					if ( !empty( $allowed_statuses ) && in_array( WCX_Order::get_status( $order ), array_keys( $allowed_statuses ) ) ) {
+					if ( !empty( $allowed_statuses ) && in_array( $order->get_status(), array_keys( $allowed_statuses ) ) ) {
 						$invoice_allowed = true;
 					} else {
 						$invoice_allowed = false;
@@ -53,7 +49,7 @@ class Frontend {
 			}
 
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
-			if ( $invoice_allowed || in_array( WCX_Order::get_status( $order ), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+			if ( $invoice_allowed || in_array( $order->get_status(), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
 				$actions['invoice'] = array(
 					'url'  => esc_url( $pdf_url ),
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $invoice->get_title(), $invoice )

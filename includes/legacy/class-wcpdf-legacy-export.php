@@ -1,10 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Legacy;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -70,7 +66,7 @@ class Legacy_Export {
 		wcpdf_deprecated_function( '$wpo_wcpdf->export->get_display_number()', '2.0' );
 		if ( empty( $this->document ) ) {
 			// we don't know what document type we're handling, so we return the order number
-			$order = WCX::get_order ( $order_id );
+			$order = wc_get_order( $order_id );
 			$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
 			return $order_number;
 		}
@@ -79,7 +75,7 @@ class Legacy_Export {
 			$order_number = (string) $this->document->get_number();
 		} else {
 			if ( empty( $this->order ) ) {
-				$order = WCX::get_order ( $order_ids[0] );
+				$order = wc_get_order( $order_ids[0] );
 				$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
 			} else {
 				$order_number = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';

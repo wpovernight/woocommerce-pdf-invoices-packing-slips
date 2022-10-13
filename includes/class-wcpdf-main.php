@@ -2,9 +2,6 @@
 namespace WPO\WC\PDF_Invoices;
 
 use WPO\WC\PDF_Invoices\Font_Synchronizer;
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -80,7 +77,7 @@ class Main {
 			return $attachments;
 		}
 
-		$order_id = WCX_Order::get_id( $order );
+		$order_id = $order->get_id();
 
 		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) && $order_id == false ) {
 			return $attachments;
@@ -90,7 +87,7 @@ class Main {
 		if ( get_post_type( $order_id ) == 'wc_booking' && isset( $order->order ) ) {
 			// $order is actually a WC_Booking object!
 			$order = $order->order;
-			$order_id = WCX_Order::get_id( $order );
+			$order_id = $order->get_id();
 		}
 
 		// do not process low stock notifications, user emails etc!
@@ -123,7 +120,7 @@ class Main {
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
 			$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
-			$email_order_id = WCX_Order::get_id( $email_order );
+			$email_order_id = $email_order->get_id();
 
 			do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
 

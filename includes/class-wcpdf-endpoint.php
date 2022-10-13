@@ -1,8 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices;
 
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -85,7 +83,7 @@ class Endpoint {
 			$parameters = array(
 				$this->get_identifier(),
 				$document_type,
-				WCX_Order::get_id( $order ),
+				$order->get_id(),
 				$access_key,
 			);
 			$document_link = trailingslashit( get_home_url() ) . implode( '/', $parameters );
@@ -93,7 +91,7 @@ class Endpoint {
 			$document_link = add_query_arg( array(
 				'action'        => $this->action,
 				'document_type' => $document_type,
-				'order_ids'     => WCX_Order::get_id( $order ),
+				'order_ids'     => $order->get_id(),
 				'access_key'    => $access_key,
 			), admin_url( 'admin-ajax.php' ) );
 		}

@@ -9,7 +9,7 @@
  * License:              GPLv2 or later
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
- * WC requires at least: 2.2.0
+ * WC requires at least: 3.0
  * WC tested up to:      6.9
  */
 
@@ -172,14 +172,6 @@ class WPO_WCPDF {
 	 * Load the main plugin classes and functions
 	 */
 	public function includes() {
-		// WooCommerce compatibility classes
-		include_once( $this->plugin_path() . '/includes/compatibility/abstract-wc-data-compatibility.php' );
-		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-date-compatibility.php' );
-		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-core-compatibility.php' );
-		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-order-compatibility.php' );
-		include_once( $this->plugin_path() . '/includes/compatibility/class-wc-product-compatibility.php' );
-		include_once( $this->plugin_path() . '/includes/compatibility/wc-datetime-functions-compatibility.php' );
-
 		// Third party compatibility
 		include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-compatibility-third-party-plugins.php' );
 
