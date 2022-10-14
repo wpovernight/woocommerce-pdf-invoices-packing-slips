@@ -14,11 +14,7 @@ class Admin {
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 2 );
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
-			add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
-		} else {
-			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_column' ) );
-		}
+		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
@@ -280,28 +276,6 @@ class Admin {
 		$columns['invoice_number_column'] = 'invoice_number_column';
 		$columns['invoice_date_column']   = 'invoice_date_column';
 		return $columns;
-	}
-
-	/**
-	 * Pre WC3.X sorting
-	 */
-	public function pre_get_posts_sort_by_column( $query ) {
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		switch ( $query->get( 'orderby' ) ) {
-			case 'invoice_number_column':
-				$query->set( 'meta_key', '_wcpdf_invoice_number' );
-				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
-				break;
-			case 'invoice_date_column':
-				$query->set( 'meta_key', '_wcpdf_invoice_date' );
-				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ) );
-				break;
-			default:
-				return;
-		}
 	}
 
 	/**

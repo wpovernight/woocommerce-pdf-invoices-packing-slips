@@ -984,18 +984,13 @@ abstract class Order_Document {
 	// get list of WooCommerce statuses
 	public function get_wc_order_status_list() {
 		$order_statuses = array();
-		if ( version_compare( WOOCOMMERCE_VERSION, '2.2', '<' ) ) {
-			$statuses = (array) get_terms( 'shop_order_status', array( 'hide_empty' => 0, 'orderby' => 'id' ) );
-			foreach ( $statuses as $status ) {
-				$order_statuses[esc_attr( $status->slug )] = esc_html__( $status->name, 'woocommerce' );
-			}
-		} else {
-			$statuses = function_exists('wc_get_order_statuses') ? wc_get_order_statuses() : array();
-			foreach ( $statuses as $status_slug => $status ) {
-				$status_slug   = 'wc-' === substr( $status_slug, 0, 3 ) ? substr( $status_slug, 3 ) : $status_slug;
-				$order_statuses[$status_slug] = $status;
-			}
+		$statuses       = function_exists('wc_get_order_statuses') ? wc_get_order_statuses() : array();
+		
+		foreach ( $statuses as $status_slug => $status ) {
+			$status_slug   = 'wc-' === substr( $status_slug, 0, 3 ) ? substr( $status_slug, 3 ) : $status_slug;
+			$order_statuses[$status_slug] = $status;
 		}
+
 		return $order_statuses;
 	}
 

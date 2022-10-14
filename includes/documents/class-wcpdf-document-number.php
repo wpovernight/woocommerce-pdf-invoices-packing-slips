@@ -112,7 +112,7 @@ class Document_Number {
 		$number = $this->number;
 
 		// get dates
-		$order_date = $order->get_prop( 'date_created' );
+		$order_date = $order->get_date_created();
 		// order date can be empty when order is being saved, fallback to current time
 		if ( empty( $order_date ) && function_exists('wc_string_to_datetime') ) {
 			$order_date = wc_string_to_datetime( date_i18n('Y-m-d H:i:s') );
