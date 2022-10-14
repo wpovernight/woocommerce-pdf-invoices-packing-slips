@@ -678,7 +678,6 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		if ( ! apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
-			// WC 2.1 or newer is used
 			$tax = new \WC_Tax();
 			$taxes = $tax->get_rates( $tax_class );
 
