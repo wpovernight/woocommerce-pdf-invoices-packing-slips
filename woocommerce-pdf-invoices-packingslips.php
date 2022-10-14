@@ -202,6 +202,11 @@ class WPO_WCPDF {
 			return;
 		}
 
+		if ( $this->is_woocommerce_version_supported() === false ) {
+			add_action( 'admin_notices', array ( $this, 'need_woocommerce_3_0' ) );
+			return;
+		}
+
 		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 			return;
@@ -237,6 +242,29 @@ class WPO_WCPDF {
 		}
 		return $this->legacy_textdomain;
 	}
+
+	/**
+	 * Check if woocommerce version is supported
+	 */
+	public function is_woocommerce_version_supported() {
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Woocommerce version < 3.0 notice
+	 */
+	public function need_woocommerce_3_0() {
+		/* translators: <a> tags */
+		$error = sprintf( esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version 3.0 or superior!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
+		
+		$message = '<div class="error"><p>' . $error . '</p></div>';
+	
+		echo $message;
+}
 
 	/**
 	 * Check if woocommerce is activated

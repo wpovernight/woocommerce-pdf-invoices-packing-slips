@@ -40,8 +40,6 @@ class Assets {
 				WPO_WCPDF_VERSION
 			);
 
-			$wc_version = defined( 'WC_VERSION' ) ? WC_VERSION : WOOCOMMERCE_VERSION;
-
 			if ( version_compare( $wp_version, '5.3', '<' ) ) {
 				// WC2.1 - WC3.2 (MP6) is used: bigger buttons
 				// also applied to WC3.3+ but without affect due to .column-order_actions class being deprecated in 3.3+

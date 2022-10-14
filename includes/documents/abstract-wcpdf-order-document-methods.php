@@ -677,7 +677,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			return '-'; // no need to determine tax rate...
 		}
 
-		if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 && !apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
+		if ( ! apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
 			// WC 2.1 or newer is used
 			$tax = new \WC_Tax();
 			$taxes = $tax->get_rates( $tax_class );
@@ -694,9 +694,6 @@ abstract class Order_Document_Methods extends Order_Document {
 			}
 
 			$tax_rates = implode(' ,', $tax_rates );
-		} else {
-			// Backwards compatibility/fallback: calculate tax from line items
-			$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
 		}
 		
 		return $tax_rates;
