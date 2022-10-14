@@ -21,23 +21,11 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods'
 
 abstract class Order_Document_Methods extends Order_Document {
 	public function is_refund( $order ) {
-		if ( is_callable( array( $order, 'get_type' ) ) ) { // WC 3.0+
-			$is_refund = $order->get_type() == 'shop_order_refund';
-		} else {
-			$is_refund = get_post_type( $order->get_id() ) == 'shop_order_refund';
-		}
-
-		return $is_refund;
+		return $order->get_type() == 'shop_order_refund';
 	}
 
 	public function get_refund_parent_id( $order ) {
-		if ( is_callable( array( $order, 'get_parent_id' ) ) ) { // WC3.0+
-			$parent_order_id = $order->get_parent_id();
-		} else {
-			$parent_order_id = wp_get_post_parent_id( $order->get_id() );
-		}
-
-		return $parent_order_id;
+		return $order->get_parent_id();
 	}
 
 
@@ -133,11 +121,13 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show billing email
 	 */
 	public function get_billing_email() {
-		$billing_email = $this->order->get_billing_email();
-
-		if ( !$billing_email && $this->is_refund( $this->order ) ) {
+		// normal order
+		if ( ! $this->is_refund( $this->order ) && is_callable( array( $this->order, 'get_billing_email' ) ) ) {
+			$billing_email = $this->order->get_billing_email();
+		// refund order
+		} else {
 			// try parent
-			$parent_order = $this->get_refund_parent( $this->order );
+			$parent_order  = $this->get_refund_parent( $this->order );
 			$billing_email = $parent_order->get_billing_email();
 		}
 
