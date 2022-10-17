@@ -4,7 +4,7 @@ $review_url = 'https://wordpress.org/support/plugin/woocommerce-pdf-invoices-pac
 $review_link = sprintf( '<a href="%s">★★★★★</a>', $review_url );
 $review_invitation = sprintf(
 	/* translators: ★★★★★ (5-star) */
-	__( 'If you like <strong>WooCommerce PDF Invoices & Packing Slips</strong> please leave us a %s rating. A huge thank you in advance!', 'woocommerce-pdf-invoices-packing-slips' ),
+	__( 'If you like <strong>PDF Invoices & Packing Slips for WooCommerce</strong> please leave us a %s rating. A huge thank you in advance!', 'woocommerce-pdf-invoices-packing-slips' ),
 	$review_link
 );
 ?>
@@ -15,7 +15,7 @@ $review_invitation = sprintf(
 </script>
 <div class="wrap">
 	<div class="icon32" id="icon-options-general"><br /></div>
-	<h2><?php esc_html_e( 'WooCommerce PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
+	<h2><?php esc_html_e( 'PDF Invoices & Packing Slips for WooCommerce', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<h2 class="nav-tab-wrapper">
 	<?php
 	foreach ( $settings_tabs as $tab_slug => $tab_data ) {

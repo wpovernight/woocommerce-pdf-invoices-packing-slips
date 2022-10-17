@@ -256,7 +256,7 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_pdf_ajax() {
-		$guest_access = isset( WPO_WCPDF()->settings->debug_settings['guest_access'] );
+		$guest_access = WPO_WCPDF()->settings->is_guest_access_enabled();
 		if ( ! $guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf' ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
@@ -619,7 +619,7 @@ class Main {
 					?>
 					<div class="error">
 					<?php /* translators: 1. plugin name, 2. directory path */ ?>
-						<p><?php printf( esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+						<p><?php printf( esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>PDF Invoices & Packing Slips for WooCommerce</strong>' ,'<code>' . $path . '</code>' ); ?></p>
 						<p><?php esc_html_e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 						<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					</div>

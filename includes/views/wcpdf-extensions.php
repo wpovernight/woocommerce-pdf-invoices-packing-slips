@@ -11,7 +11,7 @@
 			<li>
 				<?php esc_html_e( 'Premium PDF Invoice bundle: Everything you need for a perfect invoicing system', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<div class="more" style="display:none;">
-				<h4><?php esc_html_e( 'Supercharge WooCommerce PDF Invoices & Packing Slips with the all our premium extensions:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+				<h4><?php esc_html_e( 'Supercharge PDF Invoices & Packing Slips for WooCommerce with the all our premium extensions:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 				<?php esc_html_e( 'Professional features:', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<ul>
 					<li><?php echo wp_kses_post( __( 'Email/print/download <b>PDF Credit Notes & Proforma invoices</b>', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
@@ -31,7 +31,7 @@
 					<li><?php echo wp_kses_post( __( 'This extension conveniently uploads all the invoices (and other pdf documents from the professional extension) that are emailed to your customers to Dropbox. The best way to keep your invoice administration up to date!', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 				</ul>
 				<br>
-				<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/" target="_blank"><?php esc_html_e( "Get WooCommerce PDF Invoices & Packing Slips Bundle", 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/" target="_blank"><?php esc_html_e( "Get PDF Invoices & Packing Slips for WooCommerce Bundle", 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 				</div>
 			</li>
 		<?php endif; ?>
@@ -42,7 +42,7 @@
 			<li>
 				<?php esc_html_e( 'Go Pro: Proforma invoices, credit notes (=refunds) & more!', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<div class="more" style="display:none;">
-				<?php esc_html_e( 'Supercharge WooCommerce PDF Invoices & Packing Slips with the following features:', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				<?php esc_html_e( 'Supercharge PDF Invoices & Packing Slips for WooCommerce with the following features:', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				<ul>
 					<li><?php echo wp_kses_post( __( 'Email/print/download <b>PDF Credit Notes & Proforma invoices</b>', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 					<li><?php echo wp_kses_post( __( 'Send out a separate <b>notification email</b> with (or without) PDF invoices/packing slips, for example to a drop-shipper or a supplier.', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
@@ -52,7 +52,7 @@
 					<li><?php echo wp_kses_post( __( 'Use the plugin in multilingual <b>WPML</b> setups', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 					<li><?php echo wp_kses_post( __( 'Upload automatically to dropbox', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></li>
 				</ul>
-				<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/" target="_blank"><?php esc_html_e( "Get WooCommerce PDF Invoices & Packing Slips Professional!", 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/" target="_blank"><?php esc_html_e( "Get PDF Invoices & Packing Slips for WooCommerce Professional!", 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 			</li>
 		<?php } ?>
 

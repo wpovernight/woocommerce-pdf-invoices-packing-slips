@@ -129,7 +129,7 @@ class Admin {
 			if ( get_transient( 'wpo_wcpdf_new_install' ) !== false ) {
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-install-notice">
-					<p><strong><?php esc_html_e( 'New to WooCommerce PDF Invoices & Packing Slips?', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong> &#8211; <?php esc_html_e( 'Jumpstart the plugin by following our wizard!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><strong><?php esc_html_e( 'New to PDF Invoices & Packing Slips for WooCommerce?', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong> &#8211; <?php esc_html_e( 'Jumpstart the plugin by following our wizard!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<p class="submit"><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button-primary"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_dismis_install', true ) ); ?>" class="wpo-wcpdf-dismiss-wizard"><?php esc_html_e( 'I am the wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
 				<script type="text/javascript">
@@ -261,19 +261,15 @@ class Admin {
 
 		$invoice = wcpdf_get_invoice( $order );
 
-		if ( empty( $invoice ) ) {
-			return;
-		}
-
 		switch ( $column ) {
 			case 'invoice_number_column':
-				echo esc_attr( $invoice->get_number() );
+				$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? esc_attr( $invoice->get_number() ) : '';
+				echo $invoice_number;
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
-				if ( ! empty( $date = $invoice->get_date() ) ) {
-					echo esc_attr( $date->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) );
-				}
+				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) : '';
+				echo $invoice_date;
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
 			default:
@@ -759,7 +755,9 @@ class Admin {
 				if ( ! empty( $mails ) ) {
 					foreach ( $mails as $mail ) {
 						if ( $mail->id == $email_to_send ) {
+							add_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
 							$mail->trigger( $order->get_id(), $order );
+							remove_filter( 'woocommerce_new_order_email_allows_resend', '__return_true' );
 							/* translators: %s: email title */
 							$order->add_order_note( sprintf( esc_html__( '%s email notification manually sent.', 'woocommerce-pdf-invoices-packing-slips' ), $mail->title ), false, true );
 						}
