@@ -3,10 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 /*
 |--------------------------------------------------------------------------
 | Document getter functions
@@ -40,13 +36,13 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		if ( is_object( $order ) ) {
 			// we filter order_ids for objects too:
 			// an order object may need to be converted to several refunds for example.
-			$order_ids = array( WCX_Order::get_id( $order ) );
+			$order_ids = array( $order->get_id() );
 			$filtered_order_ids = wcpdf_filter_order_ids( $order_ids, $document_type );
 			// check if something has changed.
 			$order_id_diff = array_diff( $filtered_order_ids, $order_ids );
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
 				// nothing changed, load document with Order object.
-				do_action( 'wpo_wcpdf_process_template_order', $document_type, WCX_Order::get_id( $order ) );
+				do_action( 'wpo_wcpdf_process_template_order', $document_type, $order->get_id() );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
 				if ( ! $document->is_allowed() ) {
@@ -77,7 +73,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		if ( count( $order_ids ) == 1 ) {
 			$order_id = array_pop( $order_ids );
 			do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
-			$order = WCX::get_order( $order_id );
+			$order = wc_get_order( $order_id );
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 

@@ -1,10 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -86,7 +82,7 @@ class Bulk_Document {
 		foreach ( $this->order_ids as $key => $order_id ) {
 			do_action( 'wpo_wcpdf_process_template_order', $this->get_type(), $order_id );
 
-			$order = WCX::get_order( $order_id );
+			$order = wc_get_order( $order_id );
 
 			if ( $document = wcpdf_get_document( $this->get_type(), $order, true ) ) {
 				$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );

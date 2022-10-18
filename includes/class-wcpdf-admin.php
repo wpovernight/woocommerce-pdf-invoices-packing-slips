@@ -1,10 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -18,11 +14,7 @@ class Admin {
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 2 );
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
-			add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
-		} else {
-			add_filter( 'pre_get_posts', array( $this, 'pre_get_posts_sort_by_column' ) );
-		}
+		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
@@ -253,8 +245,8 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$order = '';
-		if ( empty( $the_order ) || WCX_Order::get_id( $the_order ) != $post->ID ) {
-			$order = WCX::get_order( $post->ID );
+		if ( empty( $the_order ) || $the_order->get_id() != $post->ID ) {
+			$order = wc_get_order( $post->ID );
 		} else {
 			$order = $the_order;
 		}
@@ -284,28 +276,6 @@ class Admin {
 		$columns['invoice_number_column'] = 'invoice_number_column';
 		$columns['invoice_date_column']   = 'invoice_date_column';
 		return $columns;
-	}
-
-	/**
-	 * Pre WC3.X sorting
-	 */
-	public function pre_get_posts_sort_by_column( $query ) {
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		switch ( $query->get( 'orderby' ) ) {
-			case 'invoice_number_column':
-				$query->set( 'meta_key', '_wcpdf_invoice_number' );
-				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_number_column_orderby', 'meta_value' ) );
-				break;
-			case 'invoice_date_column':
-				$query->set( 'meta_key', '_wcpdf_invoice_date' );
-				$query->set( 'orderby', apply_filters( 'wpo_wcpdf_invoice_date_column_orderby', 'meta_value' ) );
-				break;
-			default:
-				return;
-		}
 	}
 
 	/**
@@ -422,7 +392,7 @@ class Admin {
 
 		$meta_box_actions = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
-		$order = WCX::get_order( $post->ID );
+		$order = wc_get_order( $post->ID );
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
@@ -458,7 +428,7 @@ class Admin {
 	}
 
 	public function data_input_box_content( $post ) {
-		$order = WCX::get_order( $post->ID );
+		$order = wc_get_order( $post->ID );
 		$this->disable_storing_document_settings();
 		$invoice = wcpdf_get_document( 'invoice', $order );
 
@@ -521,7 +491,7 @@ class Admin {
 		if( empty( $document ) || empty( $data ) ) return;
 		$data = $this->get_current_values_for_document( $document, $data );
 		?>
-		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( WCX_Order::get_id( $document->order ) ); ?>">
+		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
 				<!-- Title -->
 				<h4>
@@ -692,7 +662,7 @@ class Admin {
 				return;
 			}
 
-			$order = WCX::get_order( $post_id );
+			$order = wc_get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
 				$is_new = false === $invoice->exists();
 				$_POST = stripslashes_deep( $_POST );
@@ -830,7 +800,7 @@ class Admin {
 		}
 
 		$order_id        = absint( $_POST['order_id'] );
-		$order           = WCX::get_order( $order_id );
+		$order           = wc_get_order( $order_id );
 		$document_type   = sanitize_text_field( $_POST['document_type'] );
 		$action_type     = sanitize_text_field( $_POST['action_type'] );
 		$notice          = sanitize_text_field( $_POST['wpcdf_document_data_notice'] );
