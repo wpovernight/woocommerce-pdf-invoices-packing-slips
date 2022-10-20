@@ -640,8 +640,10 @@ abstract class Order_Document {
 
 				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 					$src = $attachment_path;
-				} else {
+				} elseif ( file_exists( $attachment_src ) ) {
 					$src = $attachment_src;
+				} else {
+					return;
 				}
 				
 				$img_element = sprintf('<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
