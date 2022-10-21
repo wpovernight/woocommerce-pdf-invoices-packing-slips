@@ -592,7 +592,14 @@ class Main {
 				}
 			}
 
+			// copy fonts
 			$this->copy_fonts( $fonts_path );
+
+			// save to cache
+			if ( get_transient( 'wpo_wcpdf_subfolder_fonts_has_files' ) !== false ) {
+				delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
+			}
+			set_transient( 'wpo_wcpdf_subfolder_fonts_has_files', 'yes' , DAY_IN_SECONDS );
 		}
 	}
 
