@@ -523,6 +523,80 @@ class Main {
 	}
 
 	/**
+	 * Checks if the tmp subfolder has files
+	 * 
+	 * @param string $subfolder  can be 'attachments', 'fonts' or 'dompdf'
+	 * 
+	 * @return bool
+	 */
+	public function tmp_subfolder_has_files( $subfolder ) {
+		$has_files = false;
+
+		if ( empty( $subfolder ) || ! in_array( $subfolder, $this->subfolders ) ) {
+			return $has_files;
+		}
+
+		// we have a cached value
+		if ( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) !== false ) {
+			return wc_string_to_bool( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) );
+		}
+
+		if ( ! function_exists( 'glob' ) ) {
+			return $has_files;
+		}
+
+		$tmp_path = untrailingslashit( $this->get_tmp_path( $subfolder ) );
+
+		switch ( $subfolder ) {
+			case 'attachments':
+				if ( ! empty( glob( $tmp_path.'/*.pdf' ) ) ) {
+					$has_files = true;
+				}
+				break;
+			case 'fonts':
+				if ( ! empty( glob( $tmp_path.'/*.ttf' ) ) ) {
+					$has_files = true;
+				}
+				break;
+			case 'dompdf':
+				if ( ! empty( glob( $tmp_path.'/*.*' ) ) ) {
+					$has_files = true;
+				}
+				break;
+		}
+
+		// save value to cache
+		set_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files", ( true === $has_files ) ? 'yes' : 'no' , DAY_IN_SECONDS );
+
+		return $has_files;
+	}
+
+	/**
+	 * Maybe reinstall fonts
+	 * 
+	 * @param bool $force  force fonts reinstall
+	 * 
+	 * @return void
+	 */
+	public function maybe_reinstall_fonts( $force = false ) {
+		if ( false === $this->tmp_subfolder_has_files( 'fonts' ) || true === $force ) {
+			$fonts_path = untrailingslashit( $this->get_tmp_path( 'fonts' ) );
+
+			// clear folder first
+			if ( function_exists( 'glob' ) && $files = glob( $fonts_path.'/*.*' ) ) {
+				$exclude_files = array( 'index.php', '.htaccess' );
+				foreach ( $files as $file ) {
+					if ( is_file( $file ) && ! in_array( basename( $file ), $exclude_files ) ) {
+						unlink( $file );
+					}
+				}
+			}
+
+			$this->copy_fonts( $fonts_path );
+		}
+	}
+
+	/**
 	 * Generate random string
 	 */
 	public function generate_random_string () {
