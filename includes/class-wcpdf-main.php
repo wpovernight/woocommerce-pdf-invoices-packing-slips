@@ -906,7 +906,8 @@ class Main {
 			if ( ! function_exists( 'list_files' ) ) {
 				include_once( ABSPATH.'wp-admin/includes/file.php' );
 			}
-			$files = array_merge( $files, list_files( $path, $folders_level ) );
+			$list_files = !list_files( $path, $folders_level ) ? array() : list_files( $path, $folders_level );
+			$files = array_merge( $files, $list_files );
 		}
 
 		if ( ! empty( $files ) ) {
