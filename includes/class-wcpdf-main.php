@@ -533,6 +533,7 @@ class Main {
 		$has_files = false;
 
 		if ( empty( $subfolder ) || ! in_array( $subfolder, $this->subfolders ) ) {
+			wcpdf_log_error( sprintf( 'The directory %s is not a default tmp subfolder from this plugin.', $subfolder ), 'critical' );
 			return $has_files;
 		}
 
@@ -542,6 +543,7 @@ class Main {
 		}
 
 		if ( ! function_exists( 'glob' ) ) {
+			wcpdf_log_error( 'PHP glob function not found.', 'critical' );
 			return $has_files;
 		}
 
@@ -590,6 +592,8 @@ class Main {
 						unlink( $file );
 					}
 				}
+			} else {
+				wcpdf_log_error( "Couldn't clear fonts tmp subfolder before copy fonts.", 'critical' );
 			}
 
 			// copy fonts
