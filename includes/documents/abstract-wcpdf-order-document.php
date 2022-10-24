@@ -642,7 +642,7 @@ abstract class Order_Document {
 
 				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 					$src = $attachment_path;
-				} elseif ( file_exists( $attachment_src ) ) {
+				} elseif ( wp_remote_head( $attachment_src, [ 'sslverify' => false ] )['response']['code'] === 200 ) {
 					$src = $attachment_src;
 				} else {
 					return;
