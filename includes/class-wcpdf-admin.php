@@ -255,12 +255,12 @@ class Admin {
 
 		switch ( $column ) {
 			case 'invoice_number_column':
-				$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? $invoice->get_number() : '';
+				$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? esc_attr( $invoice->get_number() ) : '';
 				echo $invoice_number;
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
-				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) : '';
+				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? esc_attr( $invoice->get_date()->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) ) : '';
 				echo $invoice_date;
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
@@ -629,7 +629,7 @@ class Admin {
 			<script type="text/javascript">
 			jQuery(document).ready(function() {
 				<?php foreach ($this->get_bulk_actions() as $action => $title) { ?>
-				jQuery('<option>').val('<?php echo $action; ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
+				jQuery('<option>').val('<?php echo esc_attr( $action ); ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
 				<?php }	?>
 			});
 			</script>

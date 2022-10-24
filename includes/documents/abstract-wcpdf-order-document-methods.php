@@ -103,7 +103,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return $address;
 	}
 	public function billing_address() {
-		echo $this->get_billing_address();
+		echo wp_kses_post( $this->get_billing_address() );
 	}
 
 	/**
@@ -134,7 +134,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_billing_email', $billing_email, $this );
 	}
 	public function billing_email() {
-		echo $this->get_billing_email();
+		echo wp_kses_post( $this->get_billing_email() );
 	}
 	
 	/**
@@ -171,11 +171,11 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	public function billing_phone() {
-		echo $this->get_billing_phone();
+		echo wp_kses_post( $this->get_billing_phone() );
 	}
 
 	public function shipping_phone( $fallback_to_billing = false ) {
-		echo $this->get_shipping_phone( $fallback_to_billing );
+		echo wp_kses_post( $this->get_shipping_phone( $fallback_to_billing ) );
 	}
 	
 	/**
@@ -208,7 +208,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return $address;
 	}
 	public function shipping_address() {
-		echo $this->get_shipping_address();
+		echo wp_kses_post( $this->get_shipping_address() );
 	}
 
 	/**
@@ -263,7 +263,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		if (!empty($custom_field) || $display_empty) {
-			echo $field_label . nl2br ($custom_field);
+			echo wp_kses_post( $field_label . nl2br ($custom_field) );
 		}
 	}
 
@@ -360,7 +360,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return isset($attribute) ? $attribute : false;
 	}
 	public function product_attribute( $attribute_name, $product ) {
-		echo $this->get_product_attribute( $attribute_name, $product );
+		echo wp_kses_post( $this->get_product_attribute( $attribute_name, $product ) );
 	}
 
 	/**
@@ -447,7 +447,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_date', date_i18n( wcpdf_date_format( $this, 'current_date' ) ) );
 	}
 	public function current_date() {
-		echo $this->get_current_date();
+		echo wp_kses_post( $this->get_current_date() );
 	}
 
 	/**
@@ -468,7 +468,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_payment_method', $payment_method, $this );
 	}
 	public function payment_method() {
-		echo $this->get_payment_method();
+		echo wp_kses_post( $this->get_payment_method() );
 	}
 
 	/**
@@ -480,7 +480,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_shipping_method', $shipping_method, $this );
 	}
 	public function shipping_method() {
-		echo $this->get_shipping_method();
+		echo wp_kses_post( $this->get_shipping_method() );
 	}
 
 	/**
@@ -501,7 +501,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_order_number', $order_number, $this );
 	}
 	public function order_number() {
-		echo $this->get_order_number();
+		echo esc_attr( $this->get_order_number() );
 	}
 
 	/**
@@ -520,7 +520,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_order_date', $date, $mysql_date, $this );
 	}
 	public function order_date() {
-		echo $this->get_order_date();
+		echo wp_kses_post( $this->get_order_date() );
 	}
 
 	/**
@@ -942,7 +942,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	public function order_subtotal( $tax = 'excl', $discount = 'incl' ) {
 		$subtotal = $this->get_order_subtotal( $tax, $discount );
-		echo $subtotal['value'];
+		echo wp_kses_post( $subtotal['value'] );
 	}
 
 	/**
@@ -967,7 +967,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	public function order_shipping( $tax = 'excl' ) {
 		$shipping = $this->get_order_shipping( $tax );
-		echo $shipping['value'];
+		echo wp_kses_post( $shipping['value'] );
 	}
 
 	/**
@@ -1009,7 +1009,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	public function order_discount( $type = 'total', $tax = 'incl' ) {
 		$discount = $this->get_order_discount( $type, $tax );
-		echo $discount['value'];
+		echo wp_kses_post( $discount['value'] );
 	}
 
 	/**
@@ -1080,7 +1080,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	public function order_grand_total( $tax = 'incl' ) {
 		$grand_total = $this->get_order_grand_total( $tax );
-		echo $grand_total['value'];
+		echo wp_kses_post( $grand_total['value'] );
 	}
 
 
@@ -1102,7 +1102,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this );
 	}
 	public function shipping_notes() {
-		echo $this->get_shipping_notes();
+		echo wp_kses_post( $this->get_shipping_notes() );
 	}
 
 	/**
@@ -1156,7 +1156,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	public function invoice_number() {
-		echo $this->get_invoice_number();
+		echo esc_attr( $this->get_invoice_number() );
 	}
 
 	public function get_invoice_date() {
@@ -1168,7 +1168,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	public function invoice_date() {
-		echo $this->get_invoice_date();
+		echo wp_kses_post( $this->get_invoice_date() );
 	}
 
 	public function get_document_notes() {
@@ -1182,9 +1182,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function document_notes() {
 		$document_notes = $this->get_document_notes();
 		if( $document_notes == strip_tags( $document_notes ) ) {
-			echo nl2br($document_notes);
+			echo wp_kses_post( nl2br( $document_notes ) );
 		} else {
-			echo $document_notes;
+			echo wp_kses_post( $document_notes );
 		}
 	}
 

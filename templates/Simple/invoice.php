@@ -11,7 +11,7 @@
 			$this->header_logo();
 			do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order );
 		} else {
-			echo $this->get_title();
+			$this->title();
 		}
 		?>
 		</td>
@@ -29,7 +29,7 @@
 <?php do_action( 'wpo_wcpdf_before_document_label', $this->get_type(), $this->order ); ?>
 
 <h1 class="document-type-label">
-	<?php if ( $this->has_header_logo() ) echo $this->get_title(); ?>
+	<?php if ( $this->has_header_logo() ) $this->title(); ?>
 </h1>
 
 <?php do_action( 'wpo_wcpdf_after_document_label', $this->get_type(), $this->order ); ?>
@@ -64,13 +64,13 @@
 				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order ); ?>
 				<?php if ( isset( $this->settings['display_number'] ) ) : ?>
 					<tr class="invoice-number">
-						<th><?php echo $this->get_number_title(); ?></th>
+						<th><?php echo esc_html( $this->get_number_title() ); ?></th>
 						<td><?php $this->invoice_number(); ?></td>
 					</tr>
 				<?php endif; ?>
 				<?php if ( isset( $this->settings['display_date'] ) ) : ?>
 					<tr class="invoice-date">
-						<th><?php echo $this->get_date_title(); ?></th>
+						<th><?php echo esc_html( $this->get_date_title() ); ?></th>
 						<td><?php $this->invoice_date(); ?></td>
 					</tr>
 				<?php endif; ?>
@@ -85,7 +85,7 @@
 				<?php if ( $payment_method = $this->get_payment_method() ) : ?>
 				<tr class="payment-method">
 					<th><?php _e( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<td><?php echo $payment_method; ?></td>
+					<td><?php echo esc_html( $payment_method ); ?></td>
 				</tr>
 				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
@@ -106,21 +106,21 @@
 	</thead>
 	<tbody>
 		<?php foreach ( $this->get_order_items() as $item_id => $item ) : ?>
-			<tr class="<?php echo apply_filters( 'wpo_wcpdf_item_row_class', 'item-'.$item_id, $this->get_type(), $this->order, $item_id ); ?>">
+			<tr class="<?php echo apply_filters( 'wpo_wcpdf_item_row_class', 'item-'.$item_id, esc_attr( $this->get_type() ), $this->order, $item_id ); ?>">
 				<td class="product">
 					<?php $description_label = __( 'Description', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
-					<span class="item-name"><?php echo $item['name']; ?></span>
+					<span class="item-name"><?php echo esc_html( $item['name'] ); ?></span>
 					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order  ); ?>
-					<span class="item-meta"><?php echo $item['meta']; ?></span>
+					<span class="item-meta"><?php echo wp_kses_post( $item['meta'] ); ?></span>
 					<dl class="meta">
 						<?php $description_label = __( 'SKU', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
-						<?php if ( ! empty( $item['sku'] ) ) : ?><dt class="sku"><?php _e( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="sku"><?php echo $item['sku']; ?></dd><?php endif; ?>
-						<?php if ( ! empty( $item['weight'] ) ) : ?><dt class="weight"><?php _e( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="weight"><?php echo $item['weight']; ?><?php echo get_option( 'woocommerce_weight_unit' ); ?></dd><?php endif; ?>
+						<?php if ( ! empty( $item['sku'] ) ) : ?><dt class="sku"><?php _e( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="sku"><?php echo esc_attr( $item['sku'] ); ?></dd><?php endif; ?>
+						<?php if ( ! empty( $item['weight'] ) ) : ?><dt class="weight"><?php _e( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="weight"><?php echo esc_attr( $item['weight'] ); ?><?php echo esc_attr( get_option( 'woocommerce_weight_unit' ) ); ?></dd><?php endif; ?>
 					</dl>
 					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order  ); ?>
 				</td>
-				<td class="quantity"><?php echo $item['quantity']; ?></td>
-				<td class="price"><?php echo $item['order_price']; ?></td>
+				<td class="quantity"><?php echo esc_attr( $item['quantity'] ); ?></td>
+				<td class="price"><?php echo wp_kses_post( $item['order_price'] ); ?></td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
@@ -148,9 +148,9 @@
 				<table class="totals">
 					<tfoot>
 						<?php foreach ( $this->get_woocommerce_totals() as $key => $total ) : ?>
-							<tr class="<?php echo $key; ?>">
-								<th class="description"><?php echo $total['label']; ?></th>
-								<td class="price"><span class="totals-price"><?php echo $total['value']; ?></span></td>
+							<tr class="<?php echo esc_attr( $key ); ?>">
+								<th class="description"><?php echo esc_html( $total['label'] ); ?></th>
+								<td class="price"><span class="totals-price"><?php echo wp_kses_post( $total['value'] ); ?></span></td>
 							</tr>
 						<?php endforeach; ?>
 					</tfoot>

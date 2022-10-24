@@ -224,7 +224,7 @@ class Settings_Callbacks {
 			$title = ! empty( $title ) ? esc_attr( $title ) : '';
 			$class = 'wc-enhanced-select wpo-wcpdf-enhanced-select';
 			$css = 'width:400px';
-			printf( '<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $placeholder ), esc_attr( $title ), esc_attr( $class ), esc_attr( $css ), $multiple );
+			printf( '<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $placeholder ), esc_attr( $title ), esc_attr( $class ), esc_attr( $css ), esc_attr( $multiple ) );
 		} else {
 			printf( '<select id="%1$s" name="%2$s">', esc_attr( $id ), esc_attr( $setting_name ) );
 		}
@@ -236,9 +236,9 @@ class Settings_Callbacks {
 		foreach ( $options as $key => $label ) {
 			if ( ! empty( $multiple ) && is_array( $current ) ) {
 				$selected = in_array( $key, $current ) ? ' selected="selected"' : '';
-				printf( '<option value="%s"%s>%s</option>', esc_attr( $key ), $selected, esc_html( $label ) );
+				printf( '<option value="%s"%s>%s</option>', esc_attr( $key ), esc_attr( $selected ), esc_html( $label ) );
 			} else {
-				printf( '<option value="%s"%s>%s</option>', esc_attr( $key ), selected( $current, $key, false ), esc_html( $label ) );
+				printf( '<option value="%s"%s>%s</option>', esc_attr( $key ), esc_attr( selected( $current, $key, false ) ), esc_html( $label ) );
 			}
 		}
 
@@ -255,19 +255,19 @@ class Settings_Callbacks {
 			?>
 			<script type="text/javascript">
 			jQuery(document).ready(function($) {
-				function check_<?php echo $id; ?>_custom() {
-					var custom = $('#<?php echo $id; ?>').val();
+				function check_<?php echo esc_attr( $id ); ?>_custom() {
+					var custom = $('#<?php echo esc_attr( $id ); ?>').val();
 					if (custom == '<?php echo $custom_option; ?>') {
-						$( '.<?php echo $id; ?>_custom').show();
+						$( '.<?php echo esc_attr( $id ); ?>_custom').show();
 					} else {
-						$( '.<?php echo $id; ?>_custom').hide();
+						$( '.<?php echo esc_attr( $id ); ?>_custom').hide();
 					}
 				}
 
-				check_<?php echo $id; ?>_custom();
+				check_<?php echo esc_attr( $id ); ?>_custom();
 
-				$( '#<?php echo $id; ?>' ).on( 'change', function() {
-					check_<?php echo $id; ?>_custom();
+				$( '#<?php echo esc_attr( $id ); ?>' ).on( 'change', function() {
+					check_<?php echo esc_attr( $id ); ?>_custom();
 				});
 
 			});

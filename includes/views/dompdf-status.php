@@ -128,9 +128,9 @@ if( ! $server_configs['PHP version']['result'] ) {
 		}
 		?>
 		<tr>
-			<td class="title"><?php echo wp_kses_post( $label ); ?></td>
+			<td class="title"><?php echo esc_html( $label ); ?></td>
 			<td><?php echo wp_kses_post( $server_config['required'] === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : $server_config['required'] ); ?></td>
-			<td style="background-color:<?php echo $background; ?>; color:<?php echo $color; ?>">
+			<td style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
 				<?php
 				echo wp_kses_post( $server_config['value'] );
 				if ( $server_config['result'] && ! $server_config['value'] ) echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
@@ -205,8 +205,8 @@ if( ! $server_configs['PHP version']['result'] ) {
 		?>
 	<tr>
 		<td><?php echo wp_kses_post( $permission['description'] ); ?></td>
-		<td><?php echo str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ),  wp_kses_post( $permission['value'] ) ); ?></td>
-		<td style="background-color:<?php echo $background; ?>; color:<?php echo $color; ?>"><?php echo wp_kses_post( $permission['status_message'] ); ?></td>
+		<td><?php echo str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ), wp_kses_post( $permission['value'] ) ); ?></td>
+		<td style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>"><?php echo wp_kses_post( $permission['status_message'] ); ?></td>
 	</tr>
 
 	<?php } ?>

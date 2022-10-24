@@ -23,7 +23,7 @@
 						);
 						foreach ( $options as $slug => $name ) {
 							$selected = ( ! empty( $current_settings['display_shipping_address'] ) && $current_settings['display_shipping_address'] == $slug ) ? 'selected' : '';
-							echo '<option value="'.$slug.'" '.$selected.'>'.$name.'</option>';
+							echo '<option value="'.esc_attr( $slug ).'" '.esc_attr( $selected ).'>'.esc_html( $name ).'</option>';
 						}
 					?>
 				</select>
@@ -62,7 +62,7 @@
 						);
 						foreach ( $options as $slug => $name ) {
 							$selected = ( ! empty( $current_settings['display_date'] ) && $current_settings['display_date'] == $slug ) ? 'selected' : '';
-							echo '<option value="'.$slug.'" '.$selected.'>'.$name.'</option>';
+							echo '<option value="'.esc_attr( $slug ).'" '.esc_attr( $selected ).'>'.esc_html( $name ).'</option>';
 						}
 					?>
 				</select>
@@ -83,7 +83,7 @@
 						);
 						foreach ( $options as $slug => $name ) {
 							$selected = ( ! empty( $current_settings['display_number'] ) && $current_settings['display_number'] == $slug ) ? 'selected' : '';
-							echo '<option value="'.$slug.'" '.$selected.'>'.$name.'</option>';
+							echo '<option value="'.esc_attr( $slug ).'" '.esc_attr( $selected ).'>'.esc_html( $name ).'</option>';
 						}
 					?>
 				</select>

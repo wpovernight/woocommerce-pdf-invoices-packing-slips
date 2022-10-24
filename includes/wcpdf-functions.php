@@ -226,10 +226,10 @@ function wcpdf_output_error( $message, $level = 'error', $e = null ) {
 	<div style="border: 2px solid red; padding: 5px;">
 		<h3><?php echo wp_kses_post( $message ); ?></h3>
 		<?php if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ): ?>
-		<pre><?php echo $e->getFile(); ?> (<?php echo $e->getLine(); ?>)</pre>
+		<pre><?php echo esc_html( $e->getFile() ); ?> (<?php echo esc_html( $e->getLine() ); ?>)</pre>
 		<?php endif ?>
 		<?php if ( is_callable( array( $e, 'getTraceAsString' ) ) ) : ?>
-		<pre><?php echo $e->getTraceAsString(); ?></pre>
+		<pre><?php echo esc_html( $e->getTraceAsString() ); ?></pre>
 		<?php endif ?>
 	</div>
 	<?php
