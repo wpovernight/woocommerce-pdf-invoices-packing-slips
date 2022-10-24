@@ -642,10 +642,19 @@ abstract class Order_Document {
 
 				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 					$src = $attachment_path;
-				} elseif ( ( is_array( $head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] ) ) ) && $head['response']['code'] == 200 ) {
-					$src = $attachment_src;
 				} else {
-					return;
+					$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
+					if ( is_wp_error( $head ) ) {
+						$errors = $head->get_error_messages();
+						foreach ( $errors as $error ) {
+							wcpdf_log_error( $error, 'critical' );
+						}
+						return;
+					} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
+						$src = $attachment_src;
+					} else {
+						return;
+					}
 				}
 				
 				$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
