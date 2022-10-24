@@ -755,6 +755,9 @@ abstract class Order_Document {
 	*/
 
 	public function get_pdf() {
+		// maybe we need to reinstall fonts first?
+		WPO_WCPDF()->main->maybe_reinstall_fonts();
+
 		$pdf = null;
 		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
 			$pdf = file_get_contents( $pdf_file );
@@ -789,6 +792,9 @@ abstract class Order_Document {
 	}
 
 	public function preview_pdf() {
+		// maybe we need to reinstall fonts first?
+		WPO_WCPDF()->main->maybe_reinstall_fonts();
+
 		// get last settings
 		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
 
