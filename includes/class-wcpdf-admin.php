@@ -12,7 +12,7 @@ class Admin {
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '7.0', '>=' ) ) {
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '7.1', '>=' ) ) {
 			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 );
 			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
@@ -870,7 +870,7 @@ class Admin {
 				if( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
 
-					$response      = array(
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
@@ -878,7 +878,7 @@ class Admin {
 				} elseif( $action_type == 'delete' && $document->exists() ) {
 					$document->delete();
 
-					$response      = array(
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
