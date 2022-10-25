@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.0
 Requires PHP: 7.1
-Stable tag: 3.2.1
+Stable tag: 3.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,7 +42,7 @@ In addition to a number of default settings (including a custom header/logo) and
 
 = Minimum Requirements =
 
-* WooCommerce 2.2 or later
+* WooCommerce 3.0 or later
 * WordPress 3.5 or later
 
 = Automatic installation =
@@ -101,6 +101,17 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.2.2 (2022-10-25) =
+* New: filter to allow customers to access your PDF with a unique key
+* Fix: check if the shop logo exists
+* Fix: check if HTML is escaped properly before echoing
+* Fix: maybe reinstall fonts (if are missing) before PDF output
+* Fix: bug on automatic cleanup cron job
+* Fix: removes WC legacy versions compatibility classes. Bumps WC minimum version to 3.0
+* Fix: allow manually resending new order email
+* Fix: run action hooks within invoice columns under order list
+* Marked tested up to WooCommerce 7.0
 
 = 3.2.1 (2022-10-06) =
 * Renames the plugin to comply with trademark rules
