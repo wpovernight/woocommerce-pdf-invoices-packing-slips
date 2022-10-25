@@ -5,18 +5,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
 
 class Admin {
+
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
-		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
-		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 2 );
-		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '7.0', '>=' ) ) {
+			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 );
+			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
+			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+		} else {
+			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
+			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
+			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+		}
+
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.8', '>=' ) ) {
+			add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
+		} else {
+			add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes_legacy' ) );
+		}
+
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
-		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
 		} else {
@@ -238,19 +251,16 @@ class Admin {
 	/**
 	 * Display Invoice Number/Date in Shop Order column (if available)
 	 * @param  string $column column slug
+	 * @param  string $post   post object
 	 */
-	public function invoice_columns_data( $column ) {
-		global $post, $the_order;
-
-		$this->disable_storing_document_settings();
-
-		$order = '';
-		if ( empty( $the_order ) || $the_order->get_id() != $post->ID ) {
-			$order = wc_get_order( $post->ID );
+	public function invoice_columns_data( $column, $post ) {
+		if ( ! $post instanceOf \WC_Order ) {
+			return;
 		} else {
-			$order = $the_order;
+			$order = $post;
 		}
-
+		$this->disable_storing_document_settings();
+		
 		$invoice = wcpdf_get_invoice( $order );
 
 		switch ( $column ) {
@@ -307,16 +317,27 @@ class Admin {
 	}
 
 	/**
-	 * Add the meta box on the single order page
+	 * Add the meta box on the single order page ( WC < 3.8 )
 	 */
-	public function add_meta_boxes() {
+	public function add_meta_boxes_legacy() {
+		$this->generate_meta_boxes( 'shop_order' );
+	}
+
+	/**
+	 * Add the meta box on the single order page ( WC >= 3.8 )
+	 */
+	public function add_meta_boxes( $screen, $order ) {
+		$this->generate_meta_boxes( $screen );
+	}
+
+	public function generate_meta_boxes( $screen ) {
 		// resend order emails
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.2', '>=' ) ) {
 			add_meta_box(
 				'wpo_wcpdf_send_emails',
 				__( 'Send order email', 'woocommerce-pdf-invoices-packing-slips' ),
 				array( $this, 'send_order_email_meta_box' ),
-				'shop_order',
+				$screen,
 				'side',
 				'high'
 			);
@@ -327,7 +348,7 @@ class Admin {
 			'wpo_wcpdf-box',
 			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'pdf_actions_meta_box' ),
-			'shop_order',
+			$screen,
 			'side',
 			'default'
 		);
@@ -337,7 +358,7 @@ class Admin {
 			'wpo_wcpdf-data-input-box',
 			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'data_input_box_content' ),
-			'shop_order',
+			$screen,
 			'normal',
 			'default'
 		);
@@ -648,7 +669,7 @@ class Admin {
 	}
 
 	/**
-	 * Save invoice number
+	 * Save invoice number date
 	 */
 	public function save_invoice_number_date($post_id, $post) {
 		$post_type = get_post_type( $post_id );
@@ -759,8 +780,8 @@ class Admin {
 	 * Check if this is a shop_order page (edit or list)
 	 */
 	public function is_order_page() {
-		global $post_type;
-		if( $post_type == 'shop_order' ) {
+		$screen = get_current_screen();
+		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'woocommerce_page_wc-orders' ) ) ) {
 			return true;
 		} else {
 			return false;

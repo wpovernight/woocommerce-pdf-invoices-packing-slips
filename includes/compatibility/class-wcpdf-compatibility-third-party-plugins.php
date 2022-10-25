@@ -73,6 +73,7 @@ class Third_Party_Plugins {
 		$order->delete_meta_data( $order, '_wcpdf_invoice_exists' );
 
 		$order->save_meta_data();
+		$order->save();
 	}
 
 	/**

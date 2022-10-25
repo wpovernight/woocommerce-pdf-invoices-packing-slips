@@ -182,8 +182,8 @@ class Assets {
 	 * Check if this is a shop_order page (edit or list)
 	 */
 	public function is_order_page() {
-		global $post_type;
-		if( $post_type == 'shop_order' ) {
+		$screen = get_current_screen();
+		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'woocommerce_page_wc-orders' ) ) ) {
 			return true;
 		} else {
 			return false;
