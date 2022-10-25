@@ -28,7 +28,7 @@ class Assets {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		global $wp_version;
-		if( $this->is_order_page() ) {
+		if ( $this->is_order_page() ) {
 
 			// STYLES
 			wp_enqueue_style( 'thickbox' );
@@ -68,8 +68,8 @@ class Assets {
 			);
 
 			$bulk_actions = array();
-			$documents = WPO_WCPDF()->documents->get_documents();
-			foreach ($documents as $document) {
+			$documents    = WPO_WCPDF()->documents->get_documents();
+			foreach ( $documents as $document ) {
 				$bulk_actions[$document->get_type()] = "PDF " . $document->get_title();
 			}
 			$bulk_actions = apply_filters( 'wpo_wcpdf_bulk_actions', $bulk_actions );

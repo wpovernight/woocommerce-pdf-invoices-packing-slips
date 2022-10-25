@@ -1,9 +1,11 @@
 /* Order list buttons: */
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf {
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf, /* pre WC 7.1 */
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf {
 	padding: 3px 2px 1px 1px !important;
 }
 
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf.exists::after {
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf.exists::after, /* pre WC 7.1 */
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.exists::after {
 	content: "\f147";
 	position:absolute;
 	font-size:16px;
@@ -21,8 +23,9 @@
 	vertical-align: middle;
 }
 
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf img,
-.type-shop_order .column-order_actions a.button.wpo_wcpdf img /* legacy: 3.2 & older */ {
+.type-shop_order .column-order_actions a.button.wpo_wcpdf img, /* legacy: 3.2 & older */
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf img, /* pre WC 7.1 */
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf img {
 	width: 16px;
 }
 

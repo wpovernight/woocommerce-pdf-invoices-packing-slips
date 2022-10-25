@@ -204,8 +204,8 @@ class Admin {
 
 		$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );
 
-		foreach ($listing_actions as $action => $data) {
-			if ( !isset( $data['class'] ) ) {
+		foreach ( $listing_actions as $action => $data ) {
+			if ( ! isset( $data['class'] ) ) {
 				$data['class'] = $data['exists'] ? "exists " . $action : $action;
 			}
 
