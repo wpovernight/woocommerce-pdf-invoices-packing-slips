@@ -196,7 +196,6 @@ abstract class Order_Document {
 			// exclude non historical settings from being saved in order meta
 			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
 			$this->order->save_meta_data();
-			$this->order->save();
 		}
 	}
 
@@ -316,7 +315,6 @@ abstract class Order_Document {
 		}
 
 		$order->save_meta_data();
-		$order->save();
 
 		do_action( 'wpo_wcpdf_save_document', $this, $order );
 	}
@@ -340,7 +338,6 @@ abstract class Order_Document {
 		}
 
 		$order->save_meta_data();
-		$order->save();
 
 		do_action( 'wpo_wcpdf_delete_document', $this, $order );
 	}
