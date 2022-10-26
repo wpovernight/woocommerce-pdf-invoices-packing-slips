@@ -109,7 +109,7 @@
 			<tr class="<?php echo apply_filters( 'wpo_wcpdf_item_row_class', 'item-'.$item_id, esc_attr( $this->get_type() ), $this->order, $item_id ); ?>">
 				<td class="product">
 					<?php $description_label = __( 'Description', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
-					<span class="item-name"><?php echo esc_html( $item['name'] ); ?></span>
+					<span class="item-name"><?php echo wp_kses_post( $item['name'] ); ?></span>
 					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order  ); ?>
 					<span class="item-meta"><?php echo wp_kses_post( $item['meta'] ); ?></span>
 					<dl class="meta">
