@@ -302,6 +302,10 @@ class Main {
 
 		$order_ids = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
 
+		if ( count( $order_ids ) === 1 && ( $order = wc_get_order( $order_ids[0]) ) && $order->get_status() == 'auto-draft' ) {
+			wp_die( esc_attr__( "You have to save the order before generating a PDF document for it.", 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
 		// Process oldest first: reverse $order_ids array if required
 		$sort_order         = apply_filters( 'wpo_wcpdf_bulk_document_sort_order', 'ASC' );
 		$current_sort_order = ( count( $order_ids ) > 1 && end( $order_ids ) < reset( $order_ids ) ) ? 'DESC' : 'ASC';
@@ -317,7 +321,6 @@ class Main {
 			if ( count( $order_ids ) > 1 ) {
 				$allowed = false;
 			} else {
-				$order = wc_get_order( $order_ids[0] );
 				if ( ! $order || ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
 				}
