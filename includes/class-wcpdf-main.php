@@ -301,8 +301,12 @@ class Main {
 		$document_type = sanitize_text_field( $_REQUEST['document_type'] );
 
 		$order_ids = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
+		
+		if ( count( $order_ids ) === 1 && ! ( $order = wc_get_order( $order_ids[0]) ) ) {
+			wp_die( sprintf( esc_attr__( "Could not find the order #%s.", 'woocommerce-pdf-invoices-packing-slips' ), $order_ids[0] ) );
+		}
 
-		if ( count( $order_ids ) === 1 && ( $order = wc_get_order( $order_ids[0]) ) && $order->get_status() == 'auto-draft' ) {
+		if ( $order->get_status() == 'auto-draft' ) {
 			wp_die( esc_attr__( "You have to save the order before generating a PDF document for it.", 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
