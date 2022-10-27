@@ -142,10 +142,11 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_phone( $phone_type = 'billing' ) {
 		$phone_type = "get_{$phone_type}_phone";
-		$phone      = call_user_func( array( $this->order, $phone_type ) );
-
-		// on refund orders
-		if ( ! $phone && $this->is_refund( $this->order ) ) {
+		// normal order
+		if ( ! $this->is_refund( $this->order ) && is_callable( array( $this->order, $phone_type ) ) ) {
+			$phone = call_user_func( array( $this->order, $phone_type ) );
+		// refund order
+		} else {
 			// try parent
 			$parent_order = $this->get_refund_parent( $this->order );
 			$phone        = call_user_func( array( $parent_order, $phone_type ) );
