@@ -77,7 +77,7 @@ class Main {
 			return $attachments;
 		}
 
-		$order_id = $order->get_id();
+		$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : false;
 
 		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) && $order_id == false ) {
 			return $attachments;
