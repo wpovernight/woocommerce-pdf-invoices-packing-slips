@@ -301,6 +301,19 @@ class Main {
 		$document_type = sanitize_text_field( $_REQUEST['document_type'] );
 
 		$order_ids = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
+		
+		// solo order
+		$order = false;
+		if ( count( $order_ids ) === 1 ) {
+			$order_id = reset( $order_ids );
+			$order    = wc_get_order( $order_id );
+			if ( $order && $order->get_status() == 'auto-draft' ) {
+				wp_die( esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			} elseif ( ! $order ) {
+				/* translators: %s: Order ID */
+				wp_die( sprintf( esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) );
+			}
+		}
 
 		// Process oldest first: reverse $order_ids array if required
 		$sort_order         = apply_filters( 'wpo_wcpdf_bulk_document_sort_order', 'ASC' );
@@ -317,7 +330,6 @@ class Main {
 			if ( count( $order_ids ) > 1 ) {
 				$allowed = false;
 			} else {
-				$order = wc_get_order( $order_ids[0] );
 				if ( ! $order || ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
 				}
