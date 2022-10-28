@@ -141,6 +141,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show phone by type
 	 */
 	public function get_phone( $phone_type = 'billing' ) {
+		$phone = '';
 		if ( !empty( $order = $this->is_refund( $this->order ) ? $this->get_refund_parent( $this->order ) : $this->order ) ) {
 			$getter = "get_{$phone_type}_phone";
 			$phone = is_callable( array( $order, $getter ) ) ? call_user_func( array( $order, $getter ) ) : '';
