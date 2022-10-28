@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 3.2.2
+Stable tag: 3.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,7 +22,7 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 * **Fully customizable** HTML/CSS invoice templates
 * Download invoices from the My Account page
 * Sequential invoice numbers - with custom formatting
-* **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian**
+* **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Portuguese, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian**
 
 In addition to this, we offer several premium extensions:
 
@@ -101,6 +101,13 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.2.3 (2022-10-28) =
+* Fix: check if the order is unsaved or doesn't exist before rendering the PDF document
+* Fix: bug on getting the order ID from third party objects when attaching PDF to email
+* Fix: reverts documents functions/templates escaping that caused issues on version 3.2.2
+* Fix: billing/shipping phone getter functions for refund orders
+* Tested up to WordPress 6.1
 
 = 3.2.2 (2022-10-25) =
 * New: filter to allow customers to access your PDF with a unique key
