@@ -308,10 +308,10 @@ class Main {
 			$order_id = reset( $order_ids );
 			$order    = wc_get_order( $order_id );
 			if ( $order && $order->get_status() == 'auto-draft' ) {
-				wp_die( esc_attr__( "You have to save the order before generating a PDF document for it.", 'woocommerce-pdf-invoices-packing-slips' ) );
+				wp_die( esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' ) );
 			} elseif ( ! $order ) {
 				/* translators: %s: Order ID */
-				wp_die( sprintf( esc_attr__( "Could not find the order #%s.", 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) );
+				wp_die( sprintf( esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) );
 			}
 		}
 
