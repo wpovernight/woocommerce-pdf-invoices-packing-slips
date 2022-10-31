@@ -1034,6 +1034,8 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return the order taxes
 	 */
 	public function get_order_taxes() {
+		$tax_label = __( 'VAT', 'woocommerce-pdf-invoices-packing-slips' ); // register alternate label translation
+		$tax_label = __( 'Tax rate', 'woocommerce-pdf-invoices-packing-slips' );
 		$tax_rate_ids = $this->get_tax_rate_ids();
 		if ( $order_taxes = $this->order->get_taxes() ) {
 			foreach ( $order_taxes as $key => $tax ) {
