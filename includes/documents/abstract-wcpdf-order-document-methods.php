@@ -449,8 +449,6 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show payment method  
 	 */
 	public function get_payment_method() {
-		$payment_method_label = __( 'Payment method', 'woocommerce-pdf-invoices-packing-slips' );
-
 		if ( $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
 			$payment_method_title = $parent_order->get_payment_method_title();
@@ -470,7 +468,6 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show shipping method  
 	 */
 	public function get_shipping_method() {
-		$shipping_method_label = __( 'Shipping method', 'woocommerce-pdf-invoices-packing-slips' );
 		$shipping_method = __( $this->order->get_shipping_method(), 'woocommerce' );
 		return apply_filters( 'wpo_wcpdf_shipping_method', $shipping_method, $this );
 	}
