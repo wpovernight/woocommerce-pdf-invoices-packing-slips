@@ -594,8 +594,12 @@ abstract class Order_Document_Methods extends Order_Document {
 					$data['weight'] = is_callable( array( $product, 'get_weight' ) ) ? $product->get_weight() : '';
 					
 					// Set item dimensions
-					$data['dimensions'] = $product instanceof \WC_Product ? $product->get_dimensions() : '';
-				
+					if ( function_exists( 'wc_format_dimensions' ) && is_callable( array( $product, 'get_dimensions' ) ) ) {
+						$data['dimensions'] = wc_format_dimensions( $product->get_dimensions( false ) );
+					} else {
+						$data['dimensions'] = '';
+					}
+									
 					// Pass complete product object
 					$data['product'] = $product;
 				
