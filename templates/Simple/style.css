@@ -122,7 +122,8 @@ table.order-data-addresses {
 	margin-bottom: 10mm;
 }
 
-table.order-data-addresses td.address {
+table.order-data-addresses td.address,
+table.order-data-addresses td.order-data {
 	overflow-wrap: anywhere;
 }
 
