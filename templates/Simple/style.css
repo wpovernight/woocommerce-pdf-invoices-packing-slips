@@ -221,6 +221,7 @@ dd:after {
 	margin: 4px 0;
 	font-size: 7pt;
 	line-height: 7pt;
+	overflow-wrap: anywhere;
 }
 .wc-item-meta p {
 	display: inline;
