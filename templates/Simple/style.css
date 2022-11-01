@@ -123,7 +123,7 @@ table.order-data-addresses {
 }
 
 table.order-data-addresses td.address {
-	word-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 
 td.order-data {
@@ -235,7 +235,7 @@ dd:after {
 .document-notes,
 .customer-notes {
 	margin-top: 5mm;
-	word-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 
 table.totals {
