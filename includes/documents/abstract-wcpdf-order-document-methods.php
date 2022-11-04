@@ -364,19 +364,19 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */		
 	public function get_order_notes( $filter = 'customer', $include_system_notes = true ) {
 		if ( $this->is_refund( $this->order ) ) {
-			$post_id = $this->get_refund_parent_id( $this->order );
+			$order_id = $this->get_refund_parent_id( $this->order );
 		} else {
-			$post_id = $this->order_id;
+			$order_id = $this->order_id;
 		}
 
-		if ( empty( $post_id ) ) {
+		if ( empty( $order_id ) ) {
 			return; // prevent order notes from all orders showing when document is not loaded properly
 		}
 
 		if ( function_exists('wc_get_order_notes') ) { // WC3.2+
 			$type = ( $filter == 'private' ) ? 'internal' : $filter;
 			$notes = wc_get_order_notes( array(
-				'order_id' => $post_id,
+				'order_id' => $order_id,
 				'type'     => $type, // use 'internal' for admin and system notes, empty for all
 			) );
 
@@ -392,9 +392,9 @@ abstract class Order_Document_Methods extends Order_Document {
 		} else {
 
 			$args = array(
-				'post_id' 	=> $post_id,
-				'approve' 	=> 'approve',
-				'type' 		=> 'order_note'
+				'post_id' => $order_id,
+				'approve' => 'approve',
+				'type'    => 'order_note',
 			);
 
 			remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );

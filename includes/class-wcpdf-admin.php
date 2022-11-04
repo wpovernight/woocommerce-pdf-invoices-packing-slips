@@ -250,15 +250,12 @@ class Admin {
 
 	/**
 	 * Display Invoice Number/Date in Shop Order column (if available)
-	 * @param  string $column column slug
-	 * @param  string $post   post object
+	 * @param  string $column                 column slug
+	 * @param  string $post_or_order_object   object
 	 */
-	public function invoice_columns_data( $column, $post ) {
-		if ( ! $post instanceOf \WC_Order ) {
-			return;
-		} else {
-			$order = $post;
-		}
+	public function invoice_columns_data( $column, $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+
 		$this->disable_storing_document_settings();
 		
 		$invoice = wcpdf_get_invoice( $order );
@@ -367,13 +364,8 @@ class Admin {
 	/**
 	 * Resend order emails
 	 */
-	public function send_order_email_meta_box( $post ) {
-		global $theorder;
-		// This is used by some callbacks attached to hooks such as woocommerce_resend_order_emails_available
-		// which rely on the global to determine if emails should be displayed for certain orders.
-		if ( ! is_object( $theorder ) ) {
-			$theorder = wc_get_order( $post->ID );
-		}
+	public function send_order_email_meta_box( $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 		?>
 		<ul class="wpo_wcpdf_send_emails submitbox">
 			<li class="wide" id="actions">
@@ -406,33 +398,33 @@ class Admin {
 	/**
 	 * Create the meta box content on the single order page
 	 */
-	public function pdf_actions_meta_box( $post ) {
-		global $post_id;
+	public function pdf_actions_meta_box( $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents = WPO_WCPDF()->documents->get_documents();
-		$order = wc_get_order( $post->ID );
+		$documents        = WPO_WCPDF()->documents->get_documents();
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
 				$pdf_url        = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
 				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
-					'url'		=> esc_url( $pdf_url ),
-					'alt'		=> "PDF " . $document_title,
-					'title'		=> "PDF " . $document_title,
-					'exists'	=> is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
+					'url'    => esc_url( $pdf_url ),
+					'alt'    => "PDF " . $document_title,
+					'title'  => "PDF " . $document_title,
+					'exists' => is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
 				);
 			}
 		}
 
-		$meta_box_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_box_actions, $post_id );
+		$meta_box_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_box_actions, $order->get_id() );
 
 		?>
 		<ul class="wpo_wcpdf-actions">
 			<?php
-			foreach ($meta_box_actions as $document_type => $data) {
+			foreach ( $meta_box_actions as $document_type => $data ) {
 				$data['class'] = ( isset( $data['exists'] ) && $data['exists'] == true ) ? 'exists' : '';
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s</a></li>',
@@ -447,9 +439,11 @@ class Admin {
 		<?php
 	}
 
-	public function data_input_box_content( $post ) {
-		$order = wc_get_order( $post->ID );
+	public function data_input_box_content( $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+
 		$this->disable_storing_document_settings();
+
 		$invoice = wcpdf_get_document( 'invoice', $order );
 
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
@@ -734,9 +728,10 @@ class Admin {
 	/**
 	 * Send emails manually
 	 */
-	public function send_emails( $post_id, $post ) {
+	public function send_emails( $post_or_order_object_id, $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+
 		if ( ! empty( $_POST['wpo_wcpdf_send_emails'] ) ) {
-			$order = wc_get_order( $post_id );
 			$action = wc_clean( $_POST['wpo_wcpdf_send_emails'] );
 			if ( strstr( $action, 'send_email_' ) ) {
 				$email_to_send = str_replace( 'send_email_', '', $action );
@@ -748,7 +743,7 @@ class Admin {
 				WC()->shipping();
 				// Load mailer.
 				$mailer = WC()->mailer();
-				$mails = $mailer->get_emails();
+				$mails  = $mailer->get_emails();
 				if ( ! empty( $mails ) ) {
 					foreach ( $mails as $mail ) {
 						if ( $mail->id == $email_to_send ) {
