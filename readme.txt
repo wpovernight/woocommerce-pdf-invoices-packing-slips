@@ -1,5 +1,5 @@
 === PDF Invoices & Packing Slips for WooCommerce ===
-Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou
+Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, jhosagid
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
