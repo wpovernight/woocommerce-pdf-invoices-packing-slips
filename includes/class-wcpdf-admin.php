@@ -358,7 +358,7 @@ class Admin {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 		?>
 		<ul class="wpo_wcpdf_send_emails order_actions submitbox">
-			<li class="wide" id="actions">
+			<li class="wide" id="actions" style="padding-left:0; padding-right:0; border:0;">
 				<select name="wpo_wcpdf_send_emails">
 					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
 					<?php
@@ -377,7 +377,7 @@ class Admin {
 					?>
 				</select>
 			</li>
-			<li class="wide">
+			<li class="wide" style="border:0; padding-left:0; padding-right:0; padding-bottom:0; float:left;">
 				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
 				<?php
 				$url = esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' ) );
