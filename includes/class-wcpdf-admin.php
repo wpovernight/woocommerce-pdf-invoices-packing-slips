@@ -1,5 +1,8 @@
 <?php
+
 namespace WPO\WC\PDF_Invoices;
+
+use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -22,11 +25,7 @@ class Admin {
 			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
 		}
 
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.8', '>=' ) ) {
-			add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
-		} else {
-			add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes_legacy' ) );
-		}
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
@@ -314,20 +313,11 @@ class Admin {
 	}
 
 	/**
-	 * Add the meta box on the single order page ( WC < 3.8 )
+	 * Add the meta boxes on the single order page
 	 */
-	public function add_meta_boxes_legacy() {
-		$this->generate_meta_boxes( 'shop_order' );
-	}
+	public function add_meta_boxes() {
+		$screen = wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ? wc_get_page_screen_id( 'shop-order' ) : 'shop_order';
 
-	/**
-	 * Add the meta box on the single order page ( WC >= 3.8 )
-	 */
-	public function add_meta_boxes( $screen, $order ) {
-		$this->generate_meta_boxes( $screen );
-	}
-
-	public function generate_meta_boxes( $screen ) {
 		// resend order emails
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.2', '>=' ) ) {
 			add_meta_box(
