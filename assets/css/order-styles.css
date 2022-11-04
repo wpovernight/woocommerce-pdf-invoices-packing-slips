@@ -33,9 +33,9 @@
 	width: 110px;
 }
 
-.wpo_wcpdf_send_emails .inside {
-	margin: 0;
-	padding: 0;
+#poststuff .wpo_wcpdf_send_emails .inside {
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
 @media screen and (max-width: 782px) {
