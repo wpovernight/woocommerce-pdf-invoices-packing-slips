@@ -451,7 +451,7 @@ abstract class Order_Document {
 	}
 
 	public function title() {
-		echo esc_html( $this->get_title() ); 
+		echo $this->get_title(); 
 	}
 
 	public function get_number_title() {
@@ -707,7 +707,7 @@ abstract class Order_Document {
 		return $this->get_settings_text( 'shop_name', $default, false );
 	}
 	public function shop_name() {
-		echo wp_kses_post( $this->get_shop_name() );
+		echo $this->get_shop_name();
 	}
 	
 	/**
@@ -717,7 +717,7 @@ abstract class Order_Document {
 		return $this->get_settings_text( 'shop_address' );
 	}
 	public function shop_address() {
-		echo wp_kses_post( $this->get_shop_address() );
+		echo $this->get_shop_address();
 	}
 
 	/**
@@ -726,12 +726,12 @@ abstract class Order_Document {
 	public function get_footer() {
 		ob_start();
 		do_action( 'wpo_wcpdf_before_footer', $this->get_type(), $this->order );
-		echo wp_kses_post( $this->get_settings_text( 'footer' ) );
+		echo $this->get_settings_text( 'footer' );
 		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
 		return ob_get_clean();
 	}
 	public function footer() {
-		echo wp_kses_post( $this->get_footer() );
+		echo $this->get_footer();
 	}
 
 	/**
@@ -742,7 +742,7 @@ abstract class Order_Document {
 
 	}
 	public function extra_1() {
-		echo wp_kses_post( $this->get_extra_1() );
+		echo $this->get_extra_1();
 	}
 
 	/**
@@ -752,7 +752,7 @@ abstract class Order_Document {
 		return $this->get_settings_text( 'extra_2' );
 	}
 	public function extra_2() {
-		echo wp_kses_post( $this->get_extra_2() );
+		echo $this->get_extra_2();
 	}
 
 			/**
@@ -762,7 +762,7 @@ abstract class Order_Document {
 		return $this->get_settings_text( 'extra_3' );
 	}
 	public function extra_3() {
-		echo wp_kses_post( $this->get_extra_3() );
+		echo $this->get_extra_3();
 	}
 
 	/*
