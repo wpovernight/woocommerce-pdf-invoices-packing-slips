@@ -772,7 +772,7 @@ class Admin {
 	 */
 	public function is_order_page() {
 		$screen = get_current_screen();
-		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'woocommerce_page_wc-orders' ) ) ) {
+		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ) ) ) {
 			return true;
 		} else {
 			return false;

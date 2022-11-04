@@ -28,7 +28,7 @@ class Assets {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		global $wp_version;
-		if ( $this->is_order_page() ) {
+		if ( WPO_WCPDF()->admin->is_order_page() ) {
 
 			// STYLES
 			wp_enqueue_style( 'thickbox' );
@@ -178,17 +178,6 @@ class Assets {
 		}
 	}
 
-	/**
-	 * Check if this is a shop_order page (edit or list)
-	 */
-	public function is_order_page() {
-		$screen = get_current_screen();
-		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'woocommerce_page_wc-orders' ) ) ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 }
 
 endif; // class_exists
