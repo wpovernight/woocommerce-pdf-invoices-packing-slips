@@ -122,8 +122,9 @@ table.order-data-addresses {
 	margin-bottom: 10mm;
 }
 
-table.order-data-addresses td.address {
-	word-wrap: break-word;
+table.order-data-addresses td.address,
+table.order-data-addresses td.order-data {
+	overflow-wrap: anywhere;
 }
 
 td.order-data {
@@ -221,6 +222,7 @@ dd:after {
 	margin: 4px 0;
 	font-size: 7pt;
 	line-height: 7pt;
+	overflow-wrap: anywhere;
 }
 .wc-item-meta p {
 	display: inline;
@@ -234,7 +236,7 @@ dd:after {
 .document-notes,
 .customer-notes {
 	margin-top: 5mm;
-	word-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 
 table.totals {

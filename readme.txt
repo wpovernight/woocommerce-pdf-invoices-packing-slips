@@ -1,11 +1,11 @@
 === PDF Invoices & Packing Slips for WooCommerce ===
-Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou
+Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, jhosagid
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 3.2.3
+Stable tag: 3.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,13 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.2.4 (2022-11-07) =
+* Tweak: update translation template and files
+* Fix: break long URLs in different lines if it reaches the available space in Simple template
+* Fix: restore deleted strings and load them using standalone strings.php file 
+* Fix: warning on deprecated argument from product get_dimentions() method
+* Tested up to WooCommerce 7.1
 
 = 3.2.3 (2022-10-28) =
 * Fix: check if the order is unsaved or doesn't exist before rendering the PDF document
