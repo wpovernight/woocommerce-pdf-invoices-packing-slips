@@ -17,11 +17,8 @@ function wcpdf_filter_order_ids( $order_ids, $document_type ) {
 	// filter out trashed orders.
 	foreach ( $order_ids as $key => $order_id ) {
 		$order = wc_get_order( $order_id );
-		if ( ! empty( $order ) ) {
-			$order_status = $order->get_status();
-			if ( $order_status == 'trash' ) {
-				unset( $order_ids[ $key ] );
-			}
+		if ( ! empty( $order ) && is_callable( array( $order, 'get_status' ) ) && $order->get_status() == 'trash' ) {
+			unset( $order_ids[ $key ] );
 		}
 	}
 	return $order_ids;

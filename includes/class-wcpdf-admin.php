@@ -205,7 +205,7 @@ class Admin {
 
 		foreach ( $listing_actions as $action => $data ) {
 			if ( ! isset( $data['class'] ) ) {
-				$data['class'] = $data['exists'] ? "exists " . $action : $action;
+				$data['class'] = $data['exists'] ? "exists {$action}" : $action;
 			}
 
 			printf(
