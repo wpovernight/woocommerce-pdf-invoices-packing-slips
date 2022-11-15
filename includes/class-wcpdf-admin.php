@@ -313,7 +313,7 @@ class Admin {
 	 * Add the meta boxes on the single order page
 	 */
 	public function add_meta_boxes() {
-		if ( class_exists( '\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController' ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
+		if ( class_exists( CustomOrdersTableController::class ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
 			$screen = wc_get_page_screen_id( 'shop-order' );
 		} else {
 			$screen = 'shop_order';
