@@ -84,7 +84,7 @@ class Main {
 		}
 
 		// WooCommerce Booking compatibility
-		if ( get_post_type( $order_id ) == 'wc_booking' && isset( $order->order ) ) {
+		if ( get_post_type( $order_id ) == 'wc_booking' && isset( $order->order ) && ! empty( $order->order ) ) {
 			// $order is actually a WC_Booking object!
 			$order = $order->order;
 			$order_id = $order->get_id();
