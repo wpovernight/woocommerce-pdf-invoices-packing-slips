@@ -251,6 +251,9 @@ class Admin {
 	 */
 	public function invoice_columns_data( $column, $post_or_order_object ) {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		if ( ! is_object( $order ) && is_numeric( $order ) ) {
+			$order = wc_get_order( absint( $order ) );
+		}
 
 		$this->disable_storing_document_settings();
 		
