@@ -70,7 +70,6 @@ class Endpoint {
 		}
 
 		// handle access key
-		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		if ( is_user_logged_in() ) {
 			$access_key = wp_create_nonce( $this->action );
 		} elseif ( ! is_user_logged_in() && WPO_WCPDF()->settings->is_guest_access_enabled() ) {
