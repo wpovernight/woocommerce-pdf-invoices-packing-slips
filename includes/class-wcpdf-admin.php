@@ -202,15 +202,18 @@ class Admin {
 
 		foreach ( $listing_actions as $action => $data ) {
 			if ( ! isset( $data['class'] ) ) {
-				$data['class'] = $data['exists'] ? "exists {$action}" : $action;
+				$data['class']  = $data['exists'] ? "exists {$action}" : $action;
 			}
 
+			$exists = $data['exists'] ? '<span class="exists"></span>' : '';
+
 			printf(
-				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s"><img src="%4$s" alt="%3$s" width="16"></a>',
+				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s</a>',
 				esc_attr( $data['url'] ),
 				esc_attr( $data['class'] ),
 				esc_attr( $data['alt'] ),
-				esc_attr( $data['img'] )
+				esc_attr( $data['img'] ),
+				wp_kses_post( $exists )
 			);
 		}
 	}
