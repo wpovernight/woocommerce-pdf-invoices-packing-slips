@@ -251,13 +251,13 @@ class Settings_General {
 	}
 
 	public function attachment_settings_hint( $active_tab, $active_section ) {
+		// validate nonce
+		if ( isset( $_REQUEST['_wpnonce'] ) && ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_attachments_hint_nonce' ) ) {
+			wp_die( esc_attr__( 'You do not have sufficient permissions to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+		
 		// save or check option to hide attachments settings hint
-		if ( isset( $_GET['wpo_wcpdf_hide_attachments_hint'] ) ) {
-			// Check if the nonce value we received is the same we created
-			if ( ! wp_verify_nonce( $_GET['_wpononce'], 'hide_attachments_hint_nonce' ) ) {
-				wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
-			}
-
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_attachments_hint'] ) ) {
 			update_option( 'wpo_wcpdf_hide_attachments_hint', true );
 			$hide_hint = true;
 		} else {
