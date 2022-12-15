@@ -255,7 +255,7 @@ class Settings_General {
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_attachments_hint'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
 			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_attachments_hint_nonce' ) ) {
-				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: hide_attachments_hint_nonce' );
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_attachments_hint' );
 				$hide_hint = false;
 			} else {
 				update_option( 'wpo_wcpdf_hide_attachments_hint', true );
