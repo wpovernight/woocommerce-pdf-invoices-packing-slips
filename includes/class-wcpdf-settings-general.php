@@ -255,11 +255,12 @@ class Settings_General {
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_attachments_hint'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
 			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_attachments_hint_nonce' ) ) {
-				wp_die( esc_attr__( 'You do not have sufficient permissions to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) );
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: hide_attachments_hint_nonce' );
+				$hide_hint = false;
+			} else {
+				update_option( 'wpo_wcpdf_hide_attachments_hint', true );
+				$hide_hint = true;
 			}
-
-			update_option( 'wpo_wcpdf_hide_attachments_hint', true );
-			$hide_hint = true;
 		} else {
 			$hide_hint = get_option( 'wpo_wcpdf_hide_attachments_hint' );
 		}
