@@ -202,10 +202,10 @@ class Admin {
 
 		foreach ( $listing_actions as $action => $data ) {
 			if ( ! isset( $data['class'] ) ) {
-				$data['class']  = $data['exists'] ? "exists {$action}" : $action;
+				$data['class'] = $data['exists'] ? "exists {$action}" : $action;
 			}
 
-			$exists = $data['exists'] ? '<span class="exists"></span>' : '';
+			$exists = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 
 			printf(
 				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s</a>',
@@ -213,7 +213,7 @@ class Admin {
 				esc_attr( $data['class'] ),
 				esc_attr( $data['alt'] ),
 				esc_attr( $data['img'] ),
-				wp_kses_post( $exists )
+				$exists
 			);
 		}
 	}
@@ -425,12 +425,15 @@ class Admin {
 			<?php
 			foreach ( $meta_box_actions as $document_type => $data ) {
 				$data['class'] = ( isset( $data['exists'] ) && $data['exists'] == true ) ? 'exists' : '';
+				
+				$exists = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 				printf(
-					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s</a></li>',
+					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
 					esc_attr( $data['url'] ),
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
-					esc_html( $data['title'] )
+					esc_html( $data['title'] ),
+					$exists
 				);
 			}
 			?>
