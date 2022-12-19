@@ -148,6 +148,7 @@ if( ! $server_configs['PHP version']['result'] ) {
 
 </table>
 
+<br />
 <h3 id="system"><?php esc_html_e( 'Documents status', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 <table cellspacing="1px" cellpadding="4px" style="background-color: white; padding: 5px; border: 1px solid #ccc;">
 	<tr>
