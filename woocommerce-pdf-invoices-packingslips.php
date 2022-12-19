@@ -25,6 +25,11 @@ class WPO_WCPDF {
 	public $plugin_basename;
 	public $legacy_mode;
 	public $legacy_textdomain;
+	public $settings;
+	public $documents;
+	public $main;
+	public $endpoint;
+	public $admin;
 
 	protected static $_instance = null;
 
