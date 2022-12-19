@@ -781,7 +781,7 @@ class Settings {
 				// log reset number events
 				if ( ! empty( $number_stores ) ) {
 					foreach( $number_stores as $document_type => $number_store ) {
-						if ( $number_store->is_new ) {
+						if ( $number_store->get_next() === 1 ) {
 							wcpdf_log_error(
 								"Yearly number reset succeed for '{$document_type}' with database table name: {$number_store->table_name}",
 								'info'
