@@ -39,7 +39,7 @@ class Settings {
 		$this->lock_name        = 'wpo_wcpdf_semaphore_lock';
 		$this->lock_context     = array('source' => 'wpo-wcpdf-semaphore');
 		$this->lock_time        = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 300 );
-		$this->lock_retries     = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 2 );
+		$this->lock_retries     = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
 
 
 		// Settings menu item
@@ -721,6 +721,7 @@ class Settings {
 		
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
 		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
+		$lock      = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
 		
 		// checks if there are pending actions
 		$scheduled_actions = as_get_scheduled_actions( array(
@@ -730,21 +731,34 @@ class Settings {
 		
 		// if no concurrent actions sets the action
 		if ( empty( $scheduled_actions ) ) {
-			$action_id = as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_numbers' );
-			if ( ! empty( $action_id ) ) {
-				wcpdf_log_error(
-					"Yearly document numbers reset scheduled with the action id: {$action_id}",
-					'info'
-				);
+			if ( $lock->lock( $this->lock_retries ) ) {
+				try {
+					$action_id = as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+					if ( ! empty( $action_id ) ) {
+						wcpdf_log_error(
+							"Yearly document numbers reset scheduled with the action id: {$action_id}",
+							'info'
+						);
+					} else {
+						wcpdf_log_error(
+							'The yearly document numbers reset action schedule failed!',
+							'critical'
+						);
+					}
+				} catch ( \Exception $e ) {
+					$lock->log( $e, 'critical' );
+				} catch ( \Error $e ) {
+					$lock->log( $e, 'critical' );
+				}
+	
+				$lock->release();
 			} else {
-				wcpdf_log_error(
-					'The yearly document numbers reset action schedule failed!',
-					'critical'
-				);
+				$lock->log( "Couldn't get the lock!", 'critical' );
 			}
 		} else {
+			$concurrent_total = count( $scheduled_actions );
 			wcpdf_log_error(
-				"Concurrent yearly document numbers reset action found: {$scheduled_actions}",
+				"Number of concurrent yearly document numbers reset actions found: {$concurrent_total}",
 				'error'
 			);
 		}
@@ -767,10 +781,17 @@ class Settings {
 				// log reset number events
 				if ( ! empty( $number_stores ) ) {
 					foreach( $number_stores as $document_type => $number_store ) {
-						wcpdf_log_error(
-							"Yearly number reset succeed for '{$document_type}' with database table name: {$number_store->table_name}",
-							'info'
-						);
+						if ( $number_store->is_new ) {
+							wcpdf_log_error(
+								"Yearly number reset succeed for '{$document_type}' with database table name: {$number_store->table_name}",
+								'info'
+							);
+						} else {
+							wcpdf_log_error(
+								"An error ocurred while trying to reset yearly number for '{$document_type}' with database table name: {$number_store->table_name}",
+								'error'
+							);
+						}
 					}
 				}
 			} catch ( \Exception $e ) {

@@ -2,7 +2,11 @@
 
 namespace WPO\WC\PDF_Invoices;
 
-if ( ! defined( 'ABSPATH' ) ) die( 'No direct access.' );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' ) ) :
 
 /**
  * Class Updraft_Semaphore_3_0
@@ -192,9 +196,9 @@ class Updraft_Semaphore_3_0 {
 		if ( isset( $this->loggers ) ) {
 			foreach ( $this->loggers as $logger ) {
 				if ( ! empty( $context ) ) {
-					$logger->log( $message, $level, $context );
+					$logger->log( $level, $message, $context );
 				} else {
-					$logger->log( $message, $level );
+					$logger->log( $level, $message );
 				}
 			}
 		}
@@ -231,3 +235,5 @@ class Updraft_Semaphore_3_0 {
 	}
 	
 }
+
+endif; // class_exists

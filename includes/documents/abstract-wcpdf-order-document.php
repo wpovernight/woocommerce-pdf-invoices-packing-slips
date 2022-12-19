@@ -1028,10 +1028,12 @@ abstract class Order_Document {
 		$now                 = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
 	
 		// reset: on
-		if( $reset_number_yearly ) {
-			if( ! ( $date = $this->get_date() ) ) {
+		if ( $reset_number_yearly ) {
+			if ( ! ( $date = $this->get_date() ) ) {
 				$date = $now;
 			}
+			// for yearly reset debugging only
+			//$date         = new \WC_DateTime( '1st January Next Year' );
 			$store_name   = $this->get_sequential_number_store_name( $date, $method, $reset_number_yearly );
 			$number_store = new Sequential_Number_Store( $store_name, $method );	
 	
