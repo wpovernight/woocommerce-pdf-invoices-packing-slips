@@ -1,8 +1,8 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) die( 'No direct access.' );
-
 namespace WPO\WC\PDF_Invoices;
+
+if ( ! defined( 'ABSPATH' ) ) die( 'No direct access.' );
 
 /**
  * Class Updraft_Semaphore_3_0
