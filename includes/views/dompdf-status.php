@@ -167,53 +167,54 @@ if( ! $server_configs['PHP version']['result'] ) {
 			<td style="<?= $is_reset_enabled ? 'background-color:#9e4; color:black;' : 'background-color:#f43; color:white;' ?>"><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
 		</tr>
 	<?php endforeach; ?>
-	<?php
-		if ( function_exists( 'as_get_scheduled_actions' ) ) {
-			$scheduled_actions = as_get_scheduled_actions( array(
-				'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
-				'status' => \ActionScheduler_Store::STATUS_PENDING,
-			) );
-		
-			$yearly_reset = array(
-				'required' => __( 'Required to reset documents numeration', 'woocommerce-pdf-invoices-packing-slips' ),
-				'fallback' => __( 'Yearly reset action not found', 'woocommerce-pdf-invoices-packing-slips' ),
-			);
+	<?php 
+		if ( WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) :
+			if ( function_exists( 'as_get_scheduled_actions' ) ) {
+				$scheduled_actions = as_get_scheduled_actions( array(
+					'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
+					'status' => \ActionScheduler_Store::STATUS_PENDING,
+				) );
 			
-			if ( ! empty( $scheduled_actions ) ) {
-				$total_actions = count( $scheduled_actions );
-				if ( $total_actions === 1 ) {
-					$action      = reset( $scheduled_actions );
-					$action_date = is_callable( array( $action->get_schedule(), 'get_date' ) ) ? $action->get_schedule()->get_date() : $action->get_schedule()->get_next( as_get_datetime_object() );
-					/* translators: action date */
-					$yearly_reset['value']  = sprintf(
-						__( 'Scheduled to: %s' ), date( wcpdf_date_format( null, 'yearly_reset_schedule' ),
-						$action_date->getTimeStamp() )
-					);
-					$yearly_reset['result'] = true;
+				$yearly_reset = array(
+					'required' => __( 'Required to reset documents numeration', 'woocommerce-pdf-invoices-packing-slips' ),
+					'fallback' => __( 'Yearly reset action not found', 'woocommerce-pdf-invoices-packing-slips' ),
+				);
+				
+				if ( ! empty( $scheduled_actions ) ) {
+					$total_actions = count( $scheduled_actions );
+					if ( $total_actions === 1 ) {
+						$action      = reset( $scheduled_actions );
+						$action_date = is_callable( array( $action->get_schedule(), 'get_date' ) ) ? $action->get_schedule()->get_date() : $action->get_schedule()->get_next( as_get_datetime_object() );
+						/* translators: action date */
+						$yearly_reset['value']  = sprintf(
+							__( 'Scheduled to: %s' ), date( wcpdf_date_format( null, 'yearly_reset_schedule' ),
+							$action_date->getTimeStamp() )
+						);
+						$yearly_reset['result'] = true;
+					} else {
+						/* translators: total actions */
+						$yearly_reset['value']  = sprintf(
+							__( 'Only 1 scheduled action should exist, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
+							$total_actions
+						);
+						$yearly_reset['result'] = false;
+					}
 				} else {
-					/* translators: total actions */
-					$yearly_reset['value']  = sprintf(
-						__( 'Only 1 scheduled action should exist, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
-						$total_actions
-					);
+					$yearly_reset['value']  = __( 'Scheduled action not found', 'woocommerce-pdf-invoices-packing-slips' );
 					$yearly_reset['result'] = false;
 				}
-			} else {
-				$yearly_reset['value']  = __( 'Scheduled action not found', 'woocommerce-pdf-invoices-packing-slips' );
-				$yearly_reset['result'] = false;
 			}
-		}
-		
-		$label = __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' );
+			
+			$label = __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' );
 
-		if ( $yearly_reset['result'] ) {
-			$background = '#9e4';
-			$color      = 'black';
-		} else {
-			$background = '#f43';
-			$color      = 'white';
-		}
-		?>
+			if ( $yearly_reset['result'] ) {
+				$background = '#9e4';
+				$color      = 'black';
+			} else {
+				$background = '#f43';
+				$color      = 'white';
+			}
+	?>
 		<tfoot>
 			<tr>
 				<td class="title"><strong><?php echo esc_html( $label ); ?></strong></td>
@@ -225,6 +226,7 @@ if( ! $server_configs['PHP version']['result'] ) {
 				</td>
 			</tr>
 		</tfoot>
+	<?php endif; ?>
 </table>
 
 <?php

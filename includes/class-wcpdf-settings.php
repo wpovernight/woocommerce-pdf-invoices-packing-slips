@@ -831,6 +831,11 @@ class Settings {
 			}
 		}
 		
+		// unschedule existing actions
+		if ( ! $schedule && function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+		}
+		
 		return $schedule;
 	}
 
