@@ -79,6 +79,7 @@ class Settings_Debug {
 					?>
 				</form>
 			</p>
+			<?php if ( WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) : ?>
 			<p>
 				<form method="post">
 					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
@@ -97,6 +98,7 @@ class Settings_Debug {
 					?>
 				</form>
 			</p>
+			<?php endif; ?>
 			<p>
 				<form method="post">
 					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>

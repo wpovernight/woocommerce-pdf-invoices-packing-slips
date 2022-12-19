@@ -719,6 +719,10 @@ class Settings {
 			return;
 		}
 		
+		if ( ! $this->maybe_schedule_yearly_reset_numbers() ) {
+			return;
+		}
+		
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
 		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
 		$lock      = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
@@ -815,6 +819,19 @@ class Settings {
 		
 		// reschedule the action for the next year
 		$this->schedule_yearly_reset_numbers();
+	}
+	
+	public function maybe_schedule_yearly_reset_numbers() {
+		$schedule = false;
+		
+		foreach ( WPO_WCPDF()->documents->get_documents( 'all' ) as $document ) {
+			if ( isset( $document->settings['reset_number_yearly'] ) ) {
+				$schedule = true;
+				break;
+			}
+		}
+		
+		return $schedule;
 	}
 
 	public function get_media_upload_setting_html() {
