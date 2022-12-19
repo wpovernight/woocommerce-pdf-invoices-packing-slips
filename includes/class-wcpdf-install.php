@@ -376,13 +376,6 @@ class Install {
 			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
 		}
 
-		// 2.12.1: schedule the yearly reset invoice number action
-		if ( version_compare( $installed_version, '2.12.1-dev-1', '<' ) ) {
-			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
-				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
-			}
-		}
-
 		// 2.12.2-dev-1: change 'date' database table default value to '1000-01-01 00:00:00'
 		if ( version_compare( $installed_version, '2.12.2-dev-1', '<' ) ) {
 			global $wpdb;
@@ -422,6 +415,13 @@ class Install {
 			if ( ! empty( $debug_settings['use_html5_parser'] ) ) {
 				unset( $debug_settings['use_html5_parser'] );
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
+		
+		// 3.3.0-dev-1: schedule the yearly reset invoice number action
+		if ( version_compare( $installed_version, '3.3.0-dev-1', '<' ) ) {
+			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
+				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
 			}
 		}
 	}

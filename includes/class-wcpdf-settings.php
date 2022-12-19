@@ -784,6 +784,9 @@ class Settings {
 		} else {
 			$lock->log( "Couldn't get the lock!", 'critical' );
 		}
+		
+		// reschedule the action for the next year
+		$this->schedule_yearly_reset_numbers();
 	}
 
 	public function get_media_upload_setting_html() {
