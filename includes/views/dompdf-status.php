@@ -162,8 +162,8 @@ if( ! $server_configs['PHP version']['result'] ) {
 	?>
 		<tr>
 			<td class="title"><?php echo esc_html( $document->get_title() ); ?></td>
-			<td><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
-			<td><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td style="<?= $is_enabled ? 'background-color:#9e4; color:black;' : 'background-color:#f43; color:white;' ?>"><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td style="<?= $is_reset_enabled ? 'background-color:#9e4; color:black;' : 'background-color:#f43; color:white;' ?>"><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
 		</tr>
 	<?php endforeach; ?>
 	<?php
@@ -213,15 +213,17 @@ if( ! $server_configs['PHP version']['result'] ) {
 			$color      = 'white';
 		}
 		?>
-		<tr>
-			<td class="title" style="border-top:1px solid black;"><?php echo esc_html( $label ); ?></td>
-			<td colspan="2" style="border-top:1px solid black; background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
-				<?php
-					echo wp_kses_post( $yearly_reset['value'] );
-					if ( $yearly_reset['result'] && ! $yearly_reset['value'] ) echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
-				?>
-			</td>
-		</tr>
+		<tfoot>
+			<tr>
+				<td class="title"><strong><?php echo esc_html( $label ); ?></strong></td>
+				<td colspan="2" style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
+					<?php
+						echo wp_kses_post( $yearly_reset['value'] );
+						if ( $yearly_reset['result'] && ! $yearly_reset['value'] ) echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
+					?>
+				</td>
+			</tr>
+		</tfoot>
 </table>
 
 <?php
