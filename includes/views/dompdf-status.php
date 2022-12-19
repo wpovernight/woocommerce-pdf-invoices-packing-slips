@@ -107,7 +107,6 @@ if( ! $server_configs['PHP version']['result'] ) {
 ?>
 
 <h3 id="system"><?php esc_html_e( 'System Configuration', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-
 <table cellspacing="1px" cellpadding="4px" style="background-color: white; padding: 5px; border: 1px solid #ccc;">
 	<tr>
 		<th align="left">&nbsp;</th>
@@ -147,6 +146,82 @@ if( ! $server_configs['PHP version']['result'] ) {
 		</tr>
 	<?php } ?>
 
+</table>
+
+<h3 id="system"><?php esc_html_e( 'Documents status', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+<table cellspacing="1px" cellpadding="4px" style="background-color: white; padding: 5px; border: 1px solid #ccc;">
+	<tr>
+		<th align="left">&nbsp;</th>
+		<th align="left"><?php esc_html_e( 'Enabled', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left"><?php esc_html_e( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+	</tr>
+	<?php
+		foreach ( WPO_WCPDF()->documents->get_documents( 'all' ) as $document ) :
+			$is_reset_enabled = isset( $document->settings['reset_number_yearly'] ) ? true : false;
+	    	$is_enabled       = $document->is_enabled() ? true : false;
+	?>
+		<tr>
+			<td class="title"><?php echo esc_html( $document->get_title() ); ?></td>
+			<td><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+		</tr>
+	<?php endforeach; ?>
+	<?php
+		if ( function_exists( 'as_get_scheduled_actions' ) ) {
+			$scheduled_actions = as_get_scheduled_actions( array(
+				'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
+				'status' => \ActionScheduler_Store::STATUS_PENDING,
+			) );
+		
+			$yearly_reset = array(
+				'required' => __( 'Required to reset documents numeration', 'woocommerce-pdf-invoices-packing-slips' ),
+				'fallback' => __( 'Yearly reset action not found', 'woocommerce-pdf-invoices-packing-slips' ),
+			);
+			
+			if ( ! empty( $scheduled_actions ) ) {
+				$total_actions = count( $scheduled_actions );
+				if ( $total_actions === 1 ) {
+					$action      = reset( $scheduled_actions );
+					$action_date = is_callable( array( $action->get_schedule(), 'get_date' ) ) ? $action->get_schedule()->get_date() : $action->get_schedule()->get_next( as_get_datetime_object() );
+					/* translators: action date */
+					$yearly_reset['value']  = sprintf(
+						__( 'Scheduled to: %s' ), date( wcpdf_date_format( null, 'yearly_reset_schedule' ),
+						$action_date->getTimeStamp() )
+					);
+					$yearly_reset['result'] = true;
+				} else {
+					/* translators: total actions */
+					$yearly_reset['value']  = sprintf(
+						__( 'Only 1 scheduled action should exist, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
+						$total_actions
+					);
+					$yearly_reset['result'] = false;
+				}
+			} else {
+				$yearly_reset['value']  = __( 'Scheduled action not found', 'woocommerce-pdf-invoices-packing-slips' );
+				$yearly_reset['result'] = false;
+			}
+		}
+		
+		$label = __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' );
+
+		if ( $yearly_reset['result'] ) {
+			$background = '#9e4';
+			$color      = 'black';
+		} else {
+			$background = '#f43';
+			$color      = 'white';
+		}
+		?>
+		<tr>
+			<td class="title" style="border-top:1px solid black;"><?php echo esc_html( $label ); ?></td>
+			<td colspan="2" style="border-top:1px solid black; background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
+				<?php
+					echo wp_kses_post( $yearly_reset['value'] );
+					if ( $yearly_reset['result'] && ! $yearly_reset['value'] ) echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
+				?>
+			</td>
+		</tr>
 </table>
 
 <?php

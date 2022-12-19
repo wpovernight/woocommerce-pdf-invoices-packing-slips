@@ -722,18 +722,19 @@ class Settings {
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
 		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
 		$lock      = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
 		
 		// checks if there are pending actions
-		$scheduled_actions = as_get_scheduled_actions( array(
-			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
+		$scheduled_actions = count( as_get_scheduled_actions( array(
+			'hook'   => $hook,
 			'status' => \ActionScheduler_Store::STATUS_PENDING,
-		) );
+		) ) );
 		
 		// if no concurrent actions sets the action
-		if ( empty( $scheduled_actions ) ) {
+		if ( $scheduled_actions < 1 ) {
 			if ( $lock->lock( $this->lock_retries ) ) {
 				try {
-					$action_id = as_schedule_single_action( $datetime->getTimestamp(), 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+					$action_id = as_schedule_single_action( $datetime->getTimestamp(), $hook );
 					if ( ! empty( $action_id ) ) {
 						wcpdf_log_error(
 							"Yearly document numbers reset scheduled with the action id: {$action_id}",
@@ -756,11 +757,17 @@ class Settings {
 				$lock->log( "Couldn't get the lock!", 'critical' );
 			}
 		} else {
-			$concurrent_total = count( $scheduled_actions );
 			wcpdf_log_error(
-				"Number of concurrent yearly document numbers reset actions found: {$concurrent_total}",
+				"Number of concurrent yearly document numbers reset actions found: {$scheduled_actions}",
 				'error'
 			);
+			
+			if ( function_exists( 'as_unschedule_all_actions' ) ) {
+				as_unschedule_all_actions( $hook );
+			}
+
+			// reschedule
+			$this->schedule_yearly_reset_numbers();
 		}
 	}
 
