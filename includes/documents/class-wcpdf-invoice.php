@@ -1,10 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -62,7 +58,7 @@ class Invoice extends Order_Document_Methods {
 		$this->save_settings();
 
 		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
-			$this->set_date( WCX_Order::get_prop( $this->order, 'date_created' ) );
+			$this->set_date( $this->order->get_date_created() );
 		} elseif( empty( $this->get_date() ) ) {
 			$this->set_date( current_time( 'timestamp', true ) );
 		}
@@ -118,7 +114,7 @@ class Invoice extends Order_Document_Methods {
 				$suffix = (string) $this->get_number();
 			} else {
 				if ( empty( $this->order ) && isset( $args['order_ids'][0] ) ) {
-					$order = WCX::get_order ( $args['order_ids'][0] );
+					$order = wc_get_order( $args['order_ids'][0] );
 					$suffix = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
 				} else {
 					$suffix = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';

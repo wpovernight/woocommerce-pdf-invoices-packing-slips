@@ -1,10 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -25,23 +21,11 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods'
 
 abstract class Order_Document_Methods extends Order_Document {
 	public function is_refund( $order ) {
-		if ( is_callable( array( $order, 'get_type' ) ) ) { // WC 3.0+
-			$is_refund = $order->get_type() == 'shop_order_refund';
-		} else {
-			$is_refund = get_post_type( WCX_Order::get_id( $order ) ) == 'shop_order_refund';
-		}
-
-		return $is_refund;
+		return $order->get_type() == 'shop_order_refund';
 	}
 
 	public function get_refund_parent_id( $order ) {
-		if ( is_callable( array( $order, 'get_parent_id' ) ) ) { // WC3.0+
-			$parent_order_id = $order->get_parent_id();
-		} else {
-			$parent_order_id = wp_get_post_parent_id( WCX_Order::get_id( $order ) );
-		}
-
-		return $parent_order_id;
+		return $order->get_parent_id();
 	}
 
 
@@ -52,7 +36,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$parent_order_id = $this->get_refund_parent_id( $order );
-		$order = WCX::get_order( $parent_order_id );
+		$order = wc_get_order( $parent_order_id );
 		return $order;
 	}
 
@@ -81,9 +65,9 @@ abstract class Order_Document_Methods extends Order_Document {
 				'country'
 			), $this );
 			
-			foreach ($address_comparison_fields as $address_field) {
-				$billing_field = WCX_Order::get_prop( $order, "billing_{$address_field}", 'view');
-				$shipping_field = WCX_Order::get_prop( $order, "shipping_{$address_field}", 'view');
+			foreach ( $address_comparison_fields as $address_field ) {
+				$billing_field  = call_user_func( array( $order, "get_billing_{$address_field}" ) );
+				$shipping_field = call_user_func( array( $order, "get_shipping_{$address_field}" ) );
 				if ( $shipping_field != $billing_field ) {
 					// this address field is different -> ships to different address!
 					return true;
@@ -137,12 +121,14 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show billing email
 	 */
 	public function get_billing_email() {
-		$billing_email = WCX_Order::get_prop( $this->order, 'billing_email', 'view' );
-
-		if ( !$billing_email && $this->is_refund( $this->order ) ) {
+		// normal order
+		if ( ! $this->is_refund( $this->order ) && is_callable( array( $this->order, 'get_billing_email' ) ) ) {
+			$billing_email = $this->order->get_billing_email();
+		// refund order
+		} else {
 			// try parent
-			$parent_order = $this->get_refund_parent( $this->order );
-			$billing_email = WCX_Order::get_prop( $parent_order, 'billing_email', 'view' );
+			$parent_order  = $this->get_refund_parent( $this->order );
+			$billing_email = $parent_order->get_billing_email();
 		}
 
 		return apply_filters( 'wpo_wcpdf_billing_email', $billing_email, $this );
@@ -155,16 +141,11 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show phone by type
 	 */
 	public function get_phone( $phone_type = 'billing' ) {
-		$phone_type = "{$phone_type}_phone";
-		$phone      = WCX_Order::get_prop( $this->order, $phone_type, 'view' );
-
-		// on refund orders
-		if ( ! $phone && $this->is_refund( $this->order ) ) {
-			// try parent
-			$parent_order = $this->get_refund_parent( $this->order );
-			$phone        = WCX_Order::get_prop( $parent_order, $phone_type, 'view' );
+		$phone = '';
+		if ( ! empty( $order = $this->is_refund( $this->order ) ? $this->get_refund_parent( $this->order ) : $this->order ) ) {
+			$getter = "get_{$phone_type}_phone";
+			$phone  = is_callable( array( $order, $getter ) ) ? call_user_func( array( $order, $getter ) ) : $phone;
 		}
-
 		return $phone;
 	}
 
@@ -241,11 +222,11 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */		
 	public function get_custom_field( $field_name ) {
 		if ( !$this->is_order_prop( $field_name ) ) {
-			$custom_field = WCX_Order::get_meta( $this->order, $field_name, true );
+			$custom_field = $this->order->get_meta( $field_name );
 		}
 		// if not found, try prefixed with underscore (not when ACF is active!)
 		if ( empty( $custom_field ) && substr( $field_name, 0, 1 ) !== '_' && !$this->is_order_prop( "_{$field_name}" ) && !class_exists('ACF') ) {
-			$custom_field = WCX_Order::get_meta( $this->order, "_{$field_name}", true );
+			$custom_field = $this->order->get_meta( "_{$field_name}" );
 		}
 
 		// WC3.0 fallback to properties
@@ -258,7 +239,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		if ( empty( $custom_field ) && $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
 			if ( !$this->is_order_prop( $field_name ) ) {
-				$custom_field = WCX_Order::get_meta( $parent_order, $field_name, true );
+				$custom_field = $parent_order->get_meta( $field_name );
 			}
 
 			// WC3.0 fallback to properties
@@ -282,9 +263,6 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	public function is_order_prop( $key ) {
-		if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '<' ) ) {
-			return false; // WC 2.X didn't have CRUD
-		}
 		// Taken from WC class
 		$order_props = array(
 			// Abstract order props
@@ -360,7 +338,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		if (empty($attribute)) {
 			// not a text attribute, try attribute taxonomy
 			$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
-			$product_id = WCX_Product::get_prop($product, 'id');
+			$product_id    = $product->get_id();
 			$product_terms = @wc_get_product_terms( $product_id, $attribute_key, array( 'fields' => 'names' ) );
 			// check if not empty, then display
 			if ( !empty($product_terms) ) {
@@ -369,8 +347,8 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		// WC3.0+ fallback parent product for variations
-		if ( empty($attribute) && version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) && $product->is_type( 'variation' ) ) {
-			$product = wc_get_product( $product->get_parent_id() );
+		if ( empty( $attribute ) && $product->is_type( 'variation' ) ) {
+			$product   = wc_get_product( $product->get_parent_id() );
 			$attribute = $this->get_product_attribute( $attribute_name, $product );
 		}
 
@@ -471,13 +449,11 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show payment method  
 	 */
 	public function get_payment_method() {
-		$payment_method_label = __( 'Payment method', 'woocommerce-pdf-invoices-packing-slips' );
-
 		if ( $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
-			$payment_method_title = WCX_Order::get_prop( $parent_order, 'payment_method_title', 'view' );
+			$payment_method_title = $parent_order->get_payment_method_title();
 		} else {
-			$payment_method_title = WCX_Order::get_prop( $this->order, 'payment_method_title', 'view' );
+			$payment_method_title = $this->order->get_payment_method_title();
 		}
 
 		$payment_method = __( $payment_method_title, 'woocommerce' );
@@ -492,7 +468,6 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show shipping method  
 	 */
 	public function get_shipping_method() {
-		$shipping_method_label = __( 'Shipping method', 'woocommerce-pdf-invoices-packing-slips' );
 		$shipping_method = __( $this->order->get_shipping_method(), 'woocommerce' );
 		return apply_filters( 'wpo_wcpdf_shipping_method', $shipping_method, $this );
 	}
@@ -527,9 +502,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function get_order_date() {
 		if ( $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
-			$order_date = WCX_Order::get_prop( $parent_order, 'date_created' );
+			$order_date = $parent_order->get_date_created();
 		} else {
-			$order_date = WCX_Order::get_prop( $this->order, 'date_created' );
+			$order_date = $this->order->get_date_created();
 		}
 
 		$date = $order_date->date_i18n( wcpdf_date_format( $this, 'order_date' ) );
@@ -616,8 +591,12 @@ abstract class Order_Document_Methods extends Order_Document {
 					$data['weight'] = is_callable( array( $product, 'get_weight' ) ) ? $product->get_weight() : '';
 					
 					// Set item dimensions
-					$data['dimensions'] = $product instanceof \WC_Product ? WCX_Product::get_dimensions( $product ) : '';
-				
+					if ( function_exists( 'wc_format_dimensions' ) && is_callable( array( $product, 'get_dimensions' ) ) ) {
+						$data['dimensions'] = wc_format_dimensions( $product->get_dimensions( false ) );
+					} else {
+						$data['dimensions'] = '';
+					}
+									
 					// Pass complete product object
 					$data['product'] = $product;
 				
@@ -626,18 +605,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				}
 				
 				// Set item meta
-				if (function_exists('wc_display_item_meta')) { // WC3.0+
-					$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array(
-						'echo'      => false,
-					), $this ) );
-				} else {
-					if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '<' ) ) {
-						$meta = new \WC_Order_Item_Meta( $item['item_meta'], $product );
-					} else { // pass complete item for WC2.4+
-						$meta = new \WC_Order_Item_Meta( $item, $product );
-					}
-					$data['meta'] = $meta->display( false, true );
-				}
+				$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
 
 				$data_list[$item_id] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
 			}
@@ -654,23 +622,15 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @return string $tax_rates imploded list of tax rates
 	 */
 	public function get_tax_rate( $item, $order, $force_calculation = false ) {
-		if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) ) {
-			$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-			$tax_data_key = ( $item['type'] == 'line_item' ) ? 'subtotal' : 'total';
-			$line_total_key = ( $item['type'] == 'line_item' ) ? 'line_total' : 'total';
-			$line_tax_key = ( $item['type'] == 'shipping' ) ? 'total_tax' : 'line_tax';
+		$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
+		$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal' : 'total';
+		$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total' : 'total';
+		$line_tax_key       = ( $item['type'] == 'shipping' ) ? 'total_tax' : 'line_tax';
 
-			$tax_class = isset($item['tax_class']) ? $item['tax_class'] : '';
-			$line_tax = $item[$line_tax_key];
-			$line_total = $item[$line_total_key];
-			$line_tax_data = $item[$tax_data_container];
-		} else {
-			$tax_data_key = ( $item['type'] == 'line_item' ) ? 'subtotal' : 'total';
-			$tax_class = $item['tax_class'];
-			$line_total = $item['line_total'];
-			$line_tax = $item['line_tax'];
-			$line_tax_data = maybe_unserialize( isset( $item['line_tax_data'] ) ? $item['line_tax_data'] : '' );
-		}
+		$tax_class          = isset($item['tax_class']) ? $item['tax_class'] : '';
+		$line_tax           = $item[$line_tax_key];
+		$line_total         = $item[$line_total_key];
+		$line_tax_data      = $item[$tax_data_container];
 
 		// first try the easy wc2.2+ way, using line_tax_data
 		if ( !empty( $line_tax_data ) && isset($line_tax_data[$tax_data_key]) ) {
@@ -703,8 +663,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			return '-'; // no need to determine tax rate...
 		}
 
-		if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 && !apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
-			// WC 2.1 or newer is used
+		if ( ! apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
 			$tax = new \WC_Tax();
 			$taxes = $tax->get_rates( $tax_class );
 
@@ -720,9 +679,6 @@ abstract class Order_Document_Methods extends Order_Document {
 			}
 
 			$tax_rates = implode(' ,', $tax_rates );
-		} else {
-			// Backwards compatibility/fallback: calculate tax from line items
-			$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
 		}
 		
 		return $tax_rates;
@@ -818,7 +774,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @return string
 	 */
 	public function get_thumbnail_id ( $product ) {
-		$product_id = WCX_Product::get_id( $product );
+		$product_id = $product->get_id();
 
 		if ( has_post_thumbnail( $product_id ) ) {
 			$thumbnail_id = get_post_thumbnail_id ( $product_id );
@@ -924,20 +880,14 @@ abstract class Order_Document_Methods extends Order_Document {
 			$totals[$key]['label'] = $label;
 		}
 
-		// WC2.4 fix order_total for refunded orders
+		// Fix order_total for refunded orders
 		// not if this is the actual refund!
 		if ( ! $this->is_refund( $this->order ) && apply_filters( 'wpo_wcpdf_remove_refund_totals', true, $this ) ) {
 			$total_refunded = is_callable( array( $this->order, 'get_total_refunded' ) ) ? $this->order->get_total_refunded() : 0;
-			if ( version_compare( WOOCOMMERCE_VERSION, '2.4', '>=' ) && isset($totals['order_total']) && $total_refunded ) {
-				if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) ) {
-					$tax_display = get_option( 'woocommerce_tax_display_cart' );
-				} else {
-					$tax_display = WCX_Order::get_prop( $this->order, 'tax_display_cart' );
-				}
-
-				$totals['order_total']['value'] = wc_price( $this->order->get_total(), array( 'currency' => WCX_Order::get_prop( $this->order, 'currency' ) ) );
-				$order_total    = $this->order->get_total();
-				$tax_string     = '';
+			if ( isset($totals['order_total']) && $total_refunded ) {
+				$tax_display = get_option( 'woocommerce_tax_display_cart' );
+				$totals['order_total']['value'] = wc_price( $this->order->get_total(), array( 'currency' => $this->order->get_currency() ) );
+				$tax_string = '';
 
 				// Tax for inclusive prices
 				if ( wc_tax_enabled() && 'incl' == $tax_display ) {
@@ -948,15 +898,10 @@ abstract class Order_Document_Methods extends Order_Document {
 							$tax_string_array[] = sprintf( '%s %s', $tax_amount, $tax->label );
 						}
 					} else {
-						$tax_string_array[] = sprintf( '%s %s', wc_price( $this->order->get_total_tax(), array( 'currency' => WCX_Order::get_prop( $this->order, 'currency' ) ) ), WC()->countries->tax_or_vat() );
+						$tax_string_array[] = sprintf( '%s %s', wc_price( $this->order->get_total_tax(), array( 'currency' => $this->order->get_currency() ) ), WC()->countries->tax_or_vat() );
 					}
 					if ( ! empty( $tax_string_array ) ) {
-						if ( version_compare( WOOCOMMERCE_VERSION, '2.6', '>=' ) ) {
-							$tax_string = ' ' . sprintf( __( '(includes %s)', 'woocommerce' ), implode( ', ', $tax_string_array ) );
-						} else {
-							// use old capitalized string
-							$tax_string = ' ' . sprintf( __( '(Includes %s)', 'woocommerce' ), implode( ', ', $tax_string_array ) );
-						}
+						$tax_string = ' ' . sprintf( __( '(includes %s)', 'woocommerce' ), implode( ', ', $tax_string_array ) );
 					}
 				}
 
@@ -1000,8 +945,8 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/show the order shipping costs
 	 */
 	public function get_order_shipping( $tax = 'excl' ) { // set $tax to 'incl' to include tax
-		$shipping_cost = WCX_Order::get_prop( $this->order, 'shipping_total', 'view' );
-		$shipping_tax = WCX_Order::get_prop( $this->order, 'shipping_tax', 'view' );
+		$shipping_cost = $this->order->get_shipping_total();
+		$shipping_tax  = $this->order->get_shipping_tax();
 
 		if ($tax == 'excl' ) {
 			$formatted_shipping_cost = $this->format_price( $shipping_cost );
@@ -1037,19 +982,7 @@ abstract class Order_Document_Methods extends Order_Document {
 					break;
 				case 'total':
 					// Total Discount
-					if ( version_compare( WOOCOMMERCE_VERSION, '2.3' ) >= 0 ) {
-						$discount_value = $this->order->get_total_discount( false ); // $ex_tax = false
-					} else {
-						// WC2.2 and older: recalculate to include tax
-						$discount_value = 0;
-						$items = $this->order->get_items();;
-						if( sizeof( $items ) > 0 ) {
-							foreach( $items as $item ) {
-								$discount_value += ($item['line_subtotal'] + $item['line_subtotal_tax']) - ($item['line_total'] + $item['line_tax']);
-							}
-						}
-					}
-
+					$discount_value = $this->order->get_total_discount( false ); // $ex_tax = false
 					break;
 				default:
 					// Total Discount - Cart & Order Discounts combined
@@ -1057,19 +990,7 @@ abstract class Order_Document_Methods extends Order_Document {
 					break;
 			}
 		} else { // calculate discount excluding tax
-			if ( version_compare( WOOCOMMERCE_VERSION, '2.3' ) >= 0 ) {
-				$discount_value = $this->order->get_total_discount( true ); // $ex_tax = true
-			} else {
-				// WC2.2 and older: recalculate to exclude tax
-				$discount_value = 0;
-
-				$items = $this->order->get_items();;
-				if( sizeof( $items ) > 0 ) {
-					foreach( $items as $item ) {
-						$discount_value += ($item['line_subtotal'] - $item['line_total']);
-					}
-				}
-			}
+			$discount_value = $this->order->get_total_discount( true ); // $ex_tax = true
 		}
 
 		$discount = array (
@@ -1114,30 +1035,17 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return the order taxes
 	 */
 	public function get_order_taxes() {
-		$tax_label = __( 'VAT', 'woocommerce-pdf-invoices-packing-slips' ); // register alternate label translation
-		$tax_label = __( 'Tax rate', 'woocommerce-pdf-invoices-packing-slips' );
 		$tax_rate_ids = $this->get_tax_rate_ids();
 		if ( $order_taxes = $this->order->get_taxes() ) {
 			foreach ( $order_taxes as $key => $tax ) {
-				if ( WCX::is_wc_version_gte_3_0() ) {
-					$taxes[ $key ] = array(
-						'label'					=> $tax->get_label(),
-						'value'					=> $this->format_price( $tax->get_tax_total() + $tax->get_shipping_tax_total() ),
-						'rate_id'				=> $tax->get_rate_id(),
-						'tax_amount'			=> $tax->get_tax_total(),
-						'shipping_tax_amount'	=> $tax->get_shipping_tax_total(),
-						'rate'					=> isset( $tax_rate_ids[ $tax->get_rate_id() ] ) ? ( (float) $tax_rate_ids[$tax->get_rate_id()]['tax_rate'] ) . ' %': '',
-					);
-				} else {
-					$taxes[ $key ] = array(
-						'label'					=> isset( $tax[ 'label' ] ) ? $tax[ 'label' ] : $tax[ 'name' ],
-						'value'					=> $this->format_price( ( $tax[ 'tax_amount' ] + $tax[ 'shipping_tax_amount' ] ) ),
-						'rate_id'				=> $tax['rate_id'],
-						'tax_amount'			=> $tax['tax_amount'],
-						'shipping_tax_amount'	=> $tax['shipping_tax_amount'],
-						'rate'					=> isset( $tax_rate_ids[ $tax['rate_id'] ] ) ? ( (float) $tax_rate_ids[$tax['rate_id']]['tax_rate'] ) . ' %': '',
-					);
-				}
+				$taxes[$key] = array(
+					'label'               => $tax->get_label(),
+					'value'               => $this->format_price( $tax->get_tax_total() + $tax->get_shipping_tax_total() ),
+					'rate_id'             => $tax->get_rate_id(),
+					'tax_amount'          => $tax->get_tax_total(),
+					'shipping_tax_amount' => $tax->get_shipping_tax_total(),
+					'rate'                => isset( $tax_rate_ids[ $tax->get_rate_id() ] ) ? ( (float) $tax_rate_ids[$tax->get_rate_id()]['tax_rate'] ) . ' %': '',
+				);
 
 			}
 			
@@ -1149,13 +1057,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/show the order grand total
 	 */
 	public function get_order_grand_total( $tax = 'incl' ) {
-		if ( version_compare( WOOCOMMERCE_VERSION, '2.1' ) >= 0 ) {
-			// WC 2.1 or newer is used
-			$total_unformatted = $this->order->get_total();
-		} else {
-			// Backwards compatibility
-			$total_unformatted = $this->order->get_order_total();
-		}
+		$total_unformatted = $this->order->get_total();
 
 		if ($tax == 'excl' ) {
 			$total = $this->format_price( $total_unformatted - $this->order->get_total_tax() );
@@ -1183,16 +1085,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_shipping_notes() {
 		if ( $this->is_refund( $this->order ) ) {
-			// return reason for refund if order is a refund
-			if ( version_compare( WOOCOMMERCE_VERSION, '3.0', '>=' ) ) {
-				$shipping_notes = $this->order->get_reason();
-			} elseif ( is_callable( array( $this->order, 'get_refund_reason' ) ) ) {
-				$shipping_notes = $this->order->get_refund_reason();
-			} else {
-				$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( $this->order, 'customer_note', 'view' ) ) );
-			}
+			$shipping_notes = $this->order->get_reason();
 		} else {
-			$shipping_notes = wpautop( wptexturize( WCX_Order::get_prop( $this->order, 'customer_note', 'view' ) ) );
+			$shipping_notes = wpautop( wptexturize( $this->order->get_customer_note() ) );
 		}
 
 		// check document specific setting
@@ -1210,12 +1105,8 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * wrapper for wc_price, ensuring currency is always passed
 	 */
 	public function format_price( $price, $args = array() ) {
-		if ( function_exists( 'wc_price' ) ) { // WC 2.1+
-			$args['currency'] = WCX_Order::get_prop( $this->order, 'currency' );
-			$formatted_price = wc_price( $price, $args );
-		} else {
-			$formatted_price = woocommerce_price( $price );
-		}
+		$args['currency'] = $this->order->get_currency();
+		$formatted_price  = wc_price( $price, $args );
 
 		return $formatted_price;
 	}
@@ -1287,7 +1178,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function document_notes() {
 		$document_notes = $this->get_document_notes();
 		if( $document_notes == strip_tags( $document_notes ) ) {
-			echo nl2br($document_notes);
+			echo nl2br( $document_notes );
 		} else {
 			echo $document_notes;
 		}

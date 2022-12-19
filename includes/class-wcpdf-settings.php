@@ -680,7 +680,7 @@ class Settings {
 		$number_store_method = $this->get_sequential_number_store_method();
 		$number_store = new Sequential_Number_Store( $_POST['store'], $number_store_method );
 		$number_store->set_next( $number );
-		echo "next number ({$_POST['store']}) set to {$number}";
+		echo wp_kses_post( "next number ({$_POST['store']}) set to {$number}" );
 		die();
 	}
 
@@ -810,6 +810,16 @@ class Settings {
 		return $new_settings;
 	}
 
+	/**
+	 * Checks if guest access is enabled
+	 * 
+	 * @return bool
+	 */
+	public function is_guest_access_enabled() {
+		$guest_access = isset( $this->debug_settings['guest_access'] ) ? true : false;
+
+		return apply_filters( 'wpo_wcpdf_guest_access_enabled', $guest_access, $this );
+	}
 }
 
 endif; // class_exists

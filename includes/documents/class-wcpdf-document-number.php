@@ -1,10 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -88,7 +84,7 @@ class Document_Number {
 			$this->document_type = $document->get_type();
 		}
 		if (!empty($order)) {
-			$this->order_id = WCX_Order::get_id( $order );
+			$this->order_id = $order->get_id();
 		}
 	}
 
@@ -116,7 +112,7 @@ class Document_Number {
 		$number = $this->number;
 
 		// get dates
-		$order_date = WCX_Order::get_prop( $order, 'date_created' );
+		$order_date = $order->get_date_created();
 		// order date can be empty when order is being saved, fallback to current time
 		if ( empty( $order_date ) && function_exists('wc_string_to_datetime') ) {
 			$order_date = wc_string_to_datetime( date_i18n('Y-m-d H:i:s') );

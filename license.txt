@@ -1,4 +1,4 @@
-WooCommerce PDF Invoices & Packing Slips
+PDF Invoices & Packing Slips for WooCommerce
 
 Copyright 2013 by the contributors
 
@@ -19,14 +19,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 This program incorporates work covered by the following copyright and
 permission notices:
 
-  WooCommerce WooCommerce Print Invoices & Delivery Notes is created by Deckerweb & Piffpaffpuff
-  WooCommerce WooCommerce Print Invoices & Delivery Notes is released under the GPL v3 or later (http://www.opensource.org/licenses/gpl-license.php)
+  WooCommerce Print Invoices & Delivery Notes is created by Deckerweb & Piffpaffpuff
+  WooCommerce Print Invoices & Delivery Notes is released under the GPL v3 or later (http://www.opensource.org/licenses/gpl-license.php)
   
 and
 
   WP Overnight
 
-  WooCommerce PDF Invoices & Packing Slips is released under the GPL
+  PDF Invoices & Packing Slips for WooCommerce is released under the GPL
 
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 

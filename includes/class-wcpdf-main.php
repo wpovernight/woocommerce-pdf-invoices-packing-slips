@@ -2,9 +2,6 @@
 namespace WPO\WC\PDF_Invoices;
 
 use WPO\WC\PDF_Invoices\Font_Synchronizer;
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -80,17 +77,17 @@ class Main {
 			return $attachments;
 		}
 
-		$order_id = WCX_Order::get_id( $order );
+		$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : false;
 
 		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) && $order_id == false ) {
 			return $attachments;
 		}
 
 		// WooCommerce Booking compatibility
-		if ( get_post_type( $order_id ) == 'wc_booking' && isset( $order->order ) ) {
+		if ( get_post_type( $order_id ) == 'wc_booking' && isset( $order->order ) && ! empty( $order->order ) ) {
 			// $order is actually a WC_Booking object!
 			$order = $order->order;
-			$order_id = WCX_Order::get_id( $order );
+			$order_id = $order->get_id();
 		}
 
 		// do not process low stock notifications, user emails etc!
@@ -123,7 +120,7 @@ class Main {
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		foreach ( $attach_to_document_types as $document_type ) {
 			$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
-			$email_order_id = WCX_Order::get_id( $email_order );
+			$email_order_id = $email_order->get_id();
 
 			do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
 
@@ -256,7 +253,7 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_pdf_ajax() {
-		$guest_access = isset( WPO_WCPDF()->settings->debug_settings['guest_access'] );
+		$guest_access = WPO_WCPDF()->settings->is_guest_access_enabled();
 		if ( ! $guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf' ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
@@ -304,6 +301,19 @@ class Main {
 		$document_type = sanitize_text_field( $_REQUEST['document_type'] );
 
 		$order_ids = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
+		
+		// solo order
+		$order = false;
+		if ( count( $order_ids ) === 1 ) {
+			$order_id = reset( $order_ids );
+			$order    = wc_get_order( $order_id );
+			if ( $order && $order->get_status() == 'auto-draft' ) {
+				wp_die( esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			} elseif ( ! $order ) {
+				/* translators: %s: Order ID */
+				wp_die( sprintf( esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) );
+			}
+		}
 
 		// Process oldest first: reverse $order_ids array if required
 		$sort_order         = apply_filters( 'wpo_wcpdf_bulk_document_sort_order', 'ASC' );
@@ -320,7 +330,6 @@ class Main {
 			if ( count( $order_ids ) > 1 ) {
 				$allowed = false;
 			} else {
-				$order = wc_get_order( $order_ids[0] );
 				if ( ! $order || ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
 				}
@@ -526,6 +535,91 @@ class Main {
 	}
 
 	/**
+	 * Checks if the tmp subfolder has files
+	 * 
+	 * @param string $subfolder  can be 'attachments', 'fonts' or 'dompdf'
+	 * 
+	 * @return bool
+	 */
+	public function tmp_subfolder_has_files( $subfolder ) {
+		$has_files = false;
+
+		if ( empty( $subfolder ) || ! in_array( $subfolder, $this->subfolders ) ) {
+			wcpdf_log_error( sprintf( 'The directory %s is not a default tmp subfolder from this plugin.', $subfolder ), 'critical' );
+			return $has_files;
+		}
+
+		// we have a cached value
+		if ( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) !== false ) {
+			return wc_string_to_bool( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) );
+		}
+
+		if ( ! function_exists( 'glob' ) ) {
+			wcpdf_log_error( 'PHP glob function not found.', 'critical' );
+			return $has_files;
+		}
+
+		$tmp_path = untrailingslashit( $this->get_tmp_path( $subfolder ) );
+
+		switch ( $subfolder ) {
+			case 'attachments':
+				if ( ! empty( glob( $tmp_path.'/*.pdf' ) ) ) {
+					$has_files = true;
+				}
+				break;
+			case 'fonts':
+				if ( ! empty( glob( $tmp_path.'/*.ttf' ) ) ) {
+					$has_files = true;
+				}
+				break;
+			case 'dompdf':
+				if ( ! empty( glob( $tmp_path.'/*.*' ) ) ) {
+					$has_files = true;
+				}
+				break;
+		}
+
+		// save value to cache
+		set_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files", ( true === $has_files ) ? 'yes' : 'no' , DAY_IN_SECONDS );
+
+		return $has_files;
+	}
+
+	/**
+	 * Maybe reinstall fonts
+	 * 
+	 * @param bool $force  force fonts reinstall
+	 * 
+	 * @return void
+	 */
+	public function maybe_reinstall_fonts( $force = false ) {
+		if ( false === $this->tmp_subfolder_has_files( 'fonts' ) || true === $force ) {
+			$fonts_path = untrailingslashit( $this->get_tmp_path( 'fonts' ) );
+
+			// clear folder first
+			if ( function_exists( 'glob' ) && $files = glob( $fonts_path.'/*.*' ) ) {
+				$exclude_files = array( 'index.php', '.htaccess' );
+				foreach ( $files as $file ) {
+					if ( is_file( $file ) && ! in_array( basename( $file ), $exclude_files ) ) {
+						unlink( $file );
+					}
+				}
+			} else {
+				wcpdf_log_error( "Couldn't clear fonts tmp subfolder before copy fonts.", 'critical' );
+			}
+
+			// copy fonts
+			$this->copy_fonts( $fonts_path );
+
+			// save to cache
+			if ( get_transient( 'wpo_wcpdf_subfolder_fonts_has_files' ) !== false ) {
+				delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
+			}
+			set_transient( 'wpo_wcpdf_subfolder_fonts_has_files', 'yes' , DAY_IN_SECONDS );
+		}
+	}
+
+	/**
 	 * Generate random string
 	 */
 	public function generate_random_string () {
@@ -619,7 +713,7 @@ class Main {
 					?>
 					<div class="error">
 					<?php /* translators: 1. plugin name, 2. directory path */ ?>
-						<p><?php printf( esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>WooCommerce PDF Invoices & Packing Slips</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+						<p><?php printf( esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>PDF Invoices & Packing Slips for WooCommerce</strong>' ,'<code>' . $path . '</code>' ); ?></p>
 						<p><?php esc_html_e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 						<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ) ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					</div>
@@ -909,7 +1003,9 @@ class Main {
 			if ( ! function_exists( 'list_files' ) ) {
 				include_once( ABSPATH.'wp-admin/includes/file.php' );
 			}
-			$files = array_merge( $files, list_files( $path, $folders_level ) );
+			if ( $listed_files = list_files( $path, $folders_level ) ) {
+				$files = array_merge( $files, $listed_files );
+			}
 		}
 
 		if ( ! empty( $files ) ) {

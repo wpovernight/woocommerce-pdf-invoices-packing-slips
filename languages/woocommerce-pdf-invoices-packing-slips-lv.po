@@ -3,30 +3,34 @@ msgstr ""
 "Project-Id-Version: WooCommerce PDF Invoices & Packing Slips\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
 "invoices-packing-slips\n"
-"POT-Creation-Date: 2021-10-26T18:14:01+00:00\n"
-"PO-Revision-Date: 2021-10-27 01:24-0400\n"
+"POT-Creation-Date: 2022-11-04T13:51:03+00:00\n"
+"PO-Revision-Date: 2022-11-04 14:00+0000\n"
 "Last-Translator: WP Overnight <support@wpovernight.com>\n"
 "Language-Team: WP Overnight <support@wpovernight.com>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0\n"
-"X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=3; plural=(n%10==0 || (n%100>=11 && n%100<=19) ? 0 : n"
 "%10==1 && n%100!=11 ? 1 : 2);\n"
+"X-Generator: Poedit 3.2\n"
+"X-Poedit-Basepath: ..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_x;_n:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #. Plugin Name of the plugin
-msgid "WooCommerce PDF Invoices & Packing Slips"
-msgstr "WooCommerce PDF Invoices & Packing Slips"
+#: includes/views/wcpdf-settings-page.php:18
+msgid "PDF Invoices & Packing Slips for WooCommerce"
+msgstr "PDF Invoices & Packing Slips for WooCommerce"
 
 #. Plugin URI of the plugin
-#. Author URI of the plugin
-msgid "http://www.wpovernight.com"
-msgstr "http://www.wpovernight.com"
+msgid ""
+"https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-"
+"bundle/"
+msgstr ""
+"https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-"
+"bundle/"
 
 #. Description of the plugin
 #, fuzzy
@@ -37,16 +41,22 @@ msgstr ""
 "WooCommerce pasūtījumiem."
 
 #. Author of the plugin
-msgid "Ewout Fernhout"
-msgstr "Ewout Fernhout"
+#| msgid "Weight:"
+msgid "WP Overnight"
+msgstr "WP Overnight"
+
+#. Author URI of the plugin
+#| msgid "http://www.wpovernight.com"
+msgid "https://www.wpovernight.com"
+msgstr "https://www.wpovernight.com"
 
 #. translators: rounded count
-#: includes/class-wcpdf-admin.php:92
+#: includes/class-wcpdf-admin.php:84
 #, fuzzy
 msgid "Wow, you have created more than %d invoices with our plugin!"
 msgstr "Vau, jūs esat izveidojis vairāk nekā %d rēķinus ar mūsu spraudni!"
 
-#: includes/class-wcpdf-admin.php:93
+#: includes/class-wcpdf-admin.php:85
 #, fuzzy
 msgid ""
 "It would mean a lot to us if you would quickly give our plugin a 5-star "
@@ -56,204 +66,214 @@ msgstr ""
 "zvaigžņu vērtējumu. Palīdziet mums izplatīt šo vārdu un palielināt mūsu "
 "motivāciju!"
 
-#: includes/class-wcpdf-admin.php:95
+#: includes/class-wcpdf-admin.php:87
 #, fuzzy
 msgid "Yes you deserve it!"
 msgstr "Jā, jūs to esat pelnījuši!"
 
-#: includes/class-wcpdf-admin.php:96 includes/class-wcpdf-main.php:605
-#: includes/views/attachment-settings-hint.php:24
-#: includes/views/wcpdf-extensions.php:131
-#: woocommerce-pdf-invoices-packingslips.php:377
-#: woocommerce-pdf-invoices-packingslips.php:423
+#: includes/class-wcpdf-admin.php:88 includes/class-wcpdf-main.php:718
+#: includes/views/attachment-settings-hint.php:12
+#: includes/views/wcpdf-extensions.php:121
+#: woocommerce-pdf-invoices-packingslips.php:396
+#: woocommerce-pdf-invoices-packingslips.php:440
 #, fuzzy
 msgid "Hide this message"
 msgstr "Paslēpt šo ziņojumu"
 
-#: includes/class-wcpdf-admin.php:96
+#: includes/class-wcpdf-admin.php:88
 #, fuzzy
 msgid "Already did!"
 msgstr "Jau ir!"
 
-#: includes/class-wcpdf-admin.php:97
+#: includes/class-wcpdf-admin.php:89
 #, fuzzy
 msgid "Actually, I have a complaint..."
 msgstr "Patiesībā man ir sūdzība..."
 
-#: includes/class-wcpdf-admin.php:132
+#: includes/class-wcpdf-admin.php:124
 #, fuzzy
-msgid "New to WooCommerce PDF Invoices & Packing Slips?"
+msgid "New to PDF Invoices & Packing Slips for WooCommerce?"
 msgstr "Jauni WooCommerce PDF rēķini un pavadzīmes?"
 
-#: includes/class-wcpdf-admin.php:132
+#: includes/class-wcpdf-admin.php:124
 #, fuzzy
 msgid "Jumpstart the plugin by following our wizard!"
 msgstr "Uzsāciet spraudņa darbību, sekojot mūsu vednim!"
 
-#: includes/class-wcpdf-admin.php:133
+#: includes/class-wcpdf-admin.php:125
+#: includes/class-wcpdf-settings-debug.php:127
 #, fuzzy
 msgid "Run the Setup Wizard"
 msgstr "Palaidiet iestatīšanas veidni"
 
-#: includes/class-wcpdf-admin.php:133
+#: includes/class-wcpdf-admin.php:125
 #, fuzzy
 msgid "I am the wizard"
 msgstr "Es esmu burvis"
 
-#: includes/class-wcpdf-admin.php:224 includes/class-wcpdf-main.php:918
-#: includes/documents/class-wcpdf-invoice.php:302
+#: includes/class-wcpdf-admin.php:218 includes/class-wcpdf-main.php:1077
+#: includes/documents/class-wcpdf-invoice.php:281
+#: includes/views/setup-wizard/display-options.php:81
 msgid "Invoice Number"
 msgstr "Pavadzīmes Numurs"
 
-#: includes/class-wcpdf-admin.php:261
+#: includes/class-wcpdf-admin.php:219 includes/class-wcpdf-main.php:1078
+#: includes/documents/class-wcpdf-invoice.php:265
+#: includes/views/setup-wizard/display-options.php:60
+#, fuzzy
+msgid "Invoice Date"
+msgstr "Rēķina datums"
+
+#: includes/class-wcpdf-admin.php:317
 #, fuzzy
 msgid "Send order email"
 msgstr "Nosūtīt pasūtījuma e-pastu"
 
-#: includes/class-wcpdf-admin.php:272
+#: includes/class-wcpdf-admin.php:328
 msgid "Create PDF"
 msgstr "Izveidot PDF"
 
-#: includes/class-wcpdf-admin.php:282
+#: includes/class-wcpdf-admin.php:338
 #, fuzzy
 msgid "PDF document data"
 msgstr "PDF dokumenta dati"
 
-#: includes/class-wcpdf-admin.php:304
+#: includes/class-wcpdf-admin.php:360
 #, fuzzy
 msgid "Choose an email to send&hellip;"
 msgstr "Izvēlieties e-pasta vēstuli, ko sūtīt.."
 
-#: includes/class-wcpdf-admin.php:320
+#: includes/class-wcpdf-admin.php:376
 #, fuzzy
 msgid "Save order & send email"
 msgstr "Saglabāt pasūtījumu un nosūtīt e-pastu"
 
-#: includes/class-wcpdf-admin.php:322
-#, fuzzy
-msgid "Send email"
-msgstr "Sūtīt e-pastu"
-
-#: includes/class-wcpdf-admin.php:378
+#: includes/class-wcpdf-admin.php:440
 #: includes/documents/class-wcpdf-invoice.php:460
 msgid "Invoice Number:"
 msgstr "Pavadzīmes Numurs:"
 
-#: includes/class-wcpdf-admin.php:381
+#: includes/class-wcpdf-admin.php:443
 #: includes/documents/class-wcpdf-invoice.php:468
 msgid "Invoice Date:"
 msgstr "Pavadzīmes Datums:"
 
-#: includes/class-wcpdf-admin.php:384
+#: includes/class-wcpdf-admin.php:446
 #, fuzzy
 msgid "Notes (printed in the invoice):"
 msgstr "Piezīmes (iespiestas rēķinā):"
 
 #. translators: document title
-#: includes/class-wcpdf-admin.php:469
+#: includes/class-wcpdf-admin.php:537
 #, fuzzy
 msgid "Set %s number & date"
 msgstr "Iestatīt %s numuru un datumu"
 
-#: includes/class-wcpdf-admin.php:478
+#: includes/class-wcpdf-admin.php:542
+#, fuzzy
+#| msgid "You do not have sufficient permissions to access this page."
+msgid "You do not have sufficient permissions to edit this document."
+msgstr "Jums nav tiesību piekļūt šai lapai."
+
+#: includes/class-wcpdf-admin.php:554
 #, fuzzy
 msgid "unformatted!"
 msgstr "neformatēts!"
 
-#: includes/class-wcpdf-admin.php:518
+#: includes/class-wcpdf-admin.php:596
 #, fuzzy
 msgid "Save changes"
 msgstr "Saglabāt izmaiņas"
 
-#: includes/class-wcpdf-admin.php:519
+#: includes/class-wcpdf-admin.php:597
 #, fuzzy
 msgid "Cancel"
 msgstr "Atcelt"
 
 #. translators: name/description of the context for document creation logs
-#: includes/class-wcpdf-admin.php:598 includes/class-wcpdf-admin.php:832
+#: includes/class-wcpdf-admin.php:680 includes/class-wcpdf-admin.php:877
 #, fuzzy
 msgid "order details (number and/or date set manually)"
 msgstr "pasūtījuma informāciju (manuāli iestatīts numurs un/vai datums)"
 
 #. translators: %s: email title
-#: includes/class-wcpdf-admin.php:647
+#: includes/class-wcpdf-admin.php:731
 #, fuzzy
 msgid "%s email notification manually sent."
 msgstr "% S e-pasta paziņojums ir nosūtīts manuāli."
 
-#: includes/class-wcpdf-admin.php:734
+#: includes/class-wcpdf-admin.php:779
 #, fuzzy
 msgid "Nonce expired!"
 msgstr "Nonce beidzās!"
 
-#: includes/class-wcpdf-admin.php:740
+#: includes/class-wcpdf-admin.php:785
 #, fuzzy
 msgid "Bad action!"
 msgstr "Slikta rīcība!"
 
-#: includes/class-wcpdf-admin.php:746
+#: includes/class-wcpdf-admin.php:791
 #, fuzzy
 msgid "Incomplete request!"
 msgstr "Nepilnīgs pieprasījums!"
 
-#: includes/class-wcpdf-admin.php:752
+#: includes/class-wcpdf-admin.php:797
 #, fuzzy
 msgid "No permissions!"
 msgstr "Nav atļauju!"
 
-#: includes/class-wcpdf-admin.php:776
+#: includes/class-wcpdf-admin.php:821
 #, fuzzy
 msgid "Document data saved!"
 msgstr "Dokumenta dati saglabāti!"
 
-#: includes/class-wcpdf-admin.php:777
+#: includes/class-wcpdf-admin.php:822
 #, fuzzy
 msgid "An error occurred while saving the document data!"
 msgstr "Dokumenta datu saglabāšanas laikā notika kļūda!"
 
-#: includes/class-wcpdf-admin.php:780
+#: includes/class-wcpdf-admin.php:825
 #, fuzzy
 msgid "Document regenerated!"
 msgstr "Dokuments reģenerēts!"
 
-#: includes/class-wcpdf-admin.php:781
+#: includes/class-wcpdf-admin.php:826
 #, fuzzy
 msgid "An error occurred while regenerating the document!"
 msgstr "Reģenerējot dokumentu, notika kļūda!"
 
-#: includes/class-wcpdf-admin.php:784
+#: includes/class-wcpdf-admin.php:829
 #, fuzzy
 msgid "Document deleted!"
 msgstr "Dokuments dzēsts!"
 
-#: includes/class-wcpdf-admin.php:785
+#: includes/class-wcpdf-admin.php:830
 #, fuzzy
 msgid "An error occurred while deleting the document!"
 msgstr "Dokumenta dzēšanas laikā notika kļūda!"
 
-#: includes/class-wcpdf-admin.php:841
+#: includes/class-wcpdf-admin.php:886
 #, fuzzy
 msgid "Document does not exist."
 msgstr "Dokumenta nav."
 
-#: includes/class-wcpdf-admin.php:850
+#: includes/class-wcpdf-admin.php:900
 #, fuzzy
 msgid "Document is empty."
 msgstr "Dokuments ir tukšs."
 
-#: includes/class-wcpdf-admin.php:881
+#: includes/class-wcpdf-admin.php:931
 #, fuzzy
 msgid "DEBUG output enabled"
 msgstr "Ieslēgta DEBUG izeja"
 
-#: includes/class-wcpdf-assets.php:94
+#: includes/class-wcpdf-assets.php:84
 #, fuzzy
 msgid "Are you sure you want to delete this document? This cannot be undone."
 msgstr ""
 "Vai esat pārliecināts, ka vēlaties dzēst šo dokumentu? To nevar atcelt."
 
-#: includes/class-wcpdf-assets.php:95
+#: includes/class-wcpdf-assets.php:85
 #, fuzzy
 msgid ""
 "Are you sure you want to regenerate this document? This will make the "
@@ -264,38 +284,57 @@ msgstr ""
 "dokumentā tiks atspoguļoti aktuālākie iestatījumi (piemēram, pēdas teksts, "
 "dokumenta nosaukums u. c.), nevis izmantoti vēsturiskie iestatījumi."
 
-#: includes/class-wcpdf-frontend.php:129
+#: includes/class-wcpdf-assets.php:147
+#, fuzzy
+msgid "Document settings"
+msgstr "Dokumentācija"
+
+#: includes/class-wcpdf-assets.php:148
+msgid "Select a document in the dropdown menu above to edit its settings."
+msgstr ""
+
+#: includes/class-wcpdf-frontend.php:146
 msgid "Download invoice (PDF)"
 msgstr "Lejuplādēt pavadzīmi (PDF)"
 
-#: includes/class-wcpdf-main.php:258 includes/class-wcpdf-main.php:263
-#: includes/class-wcpdf-main.php:337
+#: includes/class-wcpdf-main.php:258 includes/class-wcpdf-main.php:274
+#: includes/class-wcpdf-main.php:279 includes/class-wcpdf-main.php:365
+#: includes/class-wcpdf-settings.php:162 includes/class-wcpdf-settings.php:282
 msgid "You do not have sufficient permissions to access this page."
 msgstr "Jums nav tiesību piekļūt šai lapai."
 
-#: includes/class-wcpdf-main.php:272
+#: includes/class-wcpdf-main.php:288
 #, fuzzy
 msgid "You haven't selected any orders"
 msgstr "Jūs neesat izvēlējies nevienu pasūtījumu"
 
-#: includes/class-wcpdf-main.php:276
+#: includes/class-wcpdf-main.php:292
 #, fuzzy
 msgid "Some of the export parameters are missing."
 msgstr "Trūkst dažu eksporta parametru."
 
+#: includes/class-wcpdf-main.php:311
+msgid "You have to save the order before generating a PDF document for it."
+msgstr ""
+
+#. translators: %s: Order ID
+#: includes/class-wcpdf-main.php:314
+msgid "Could not find the order #%s."
+msgstr ""
+
 #. translators: document type
-#: includes/class-wcpdf-main.php:378
+#: includes/class-wcpdf-main.php:406
 #, fuzzy
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr "Izvēlētā(-o) rīkojuma(-u) \"%s\" tipa dokumentu nav iespējams ģenerēt"
 
 #. translators: 1. plugin name, 2. directory path
-#: includes/class-wcpdf-main.php:603
+#: includes/class-wcpdf-main.php:716
 #, fuzzy
 msgid "The %1$s directory %2$s couldn't be created or is not writable!"
 msgstr "%1$s direktoriju %2$s neizdevās izveidot vai tā nav rakstāma!"
 
-#: includes/class-wcpdf-main.php:604
+#: includes/class-wcpdf-main.php:717
 #, fuzzy
 msgid ""
 "Please check your directories write permissions or contact your hosting "
@@ -304,44 +343,55 @@ msgstr ""
 "Lūdzu, pārbaudiet direktoriju rakstīšanas atļaujas vai sazinieties ar "
 "hostinga pakalpojumu sniedzēju."
 
-#: includes/class-wcpdf-main.php:919
-#: includes/documents/class-wcpdf-invoice.php:286
+#. translators: 1,2. file count
+#: includes/class-wcpdf-main.php:1030
 #, fuzzy
-msgid "Invoice Date"
-msgstr "Rēķina datums"
+msgid "Unable to delete %1$d files! (deleted %2$d)"
+msgstr "Nevar dzēst %1$d failus! (izdzēsts %2$d)"
+
+#. translators: file count
+#: includes/class-wcpdf-main.php:1034
+#, fuzzy
+msgid "Successfully deleted %d files!"
+msgstr "Veiksmīgi dzēsti %d failus!"
+
+#: includes/class-wcpdf-main.php:1038
+#, fuzzy
+msgid "Nothing to delete!"
+msgstr "Nav ko dzēst!"
 
 #. translators: name/description of the context for document creation logs
-#: includes/class-wcpdf-main.php:949
+#: includes/class-wcpdf-main.php:1108
 #, fuzzy
 msgid "bulk order action"
 msgstr "masveida pasūtījuma darbība"
 
 #. translators: name/description of the context for document creation logs
-#: includes/class-wcpdf-main.php:957
+#: includes/class-wcpdf-main.php:1116
 #, fuzzy
 msgid "single order action"
 msgstr "viena pasūtījuma darbība"
 
 #. translators: name/description of the context for document creation logs
-#: includes/class-wcpdf-main.php:965
+#: includes/class-wcpdf-main.php:1124
 #, fuzzy
 msgid "my account"
 msgstr "mans konts"
 
 #. translators: name/description of the context for document creation logs
-#: includes/class-wcpdf-main.php:973
+#: includes/class-wcpdf-main.php:1132
 #, fuzzy
 msgid "email attachment"
 msgstr "e-pasta pielikums"
 
 #. translators: 1. document title, 2. creation source
-#: includes/class-wcpdf-main.php:982
+#: includes/class-wcpdf-main.php:1141
 #, fuzzy
 msgid "PDF %1$s created via %2$s."
 msgstr "PDF %1$s, kas izveidots, izmantojot %2$s."
 
 #. translators: document title
-#: includes/class-wcpdf-main.php:1026
+#: includes/class-wcpdf-main.php:1185
 #, fuzzy
 msgid "Order %s Saved"
 msgstr "Saglabāts %s pasūtījums"
@@ -365,17 +415,24 @@ msgstr ""
 "formā, bet var tikt izmantoti arī citiem elementiem individuāli radītajā "
 "formā"
 
-#: includes/class-wcpdf-settings-callbacks.php:384
+#: includes/class-wcpdf-settings-callbacks.php:426
 msgid "Image resolution"
 msgstr "Attēla izšķirtspēja"
 
-#: includes/class-wcpdf-settings-callbacks.php:411
+#: includes/class-wcpdf-settings-callbacks.php:434
+msgid ""
+"The image resolution exceeds the recommended maximum of 600dpi. This will "
+"unnecessarily increase the size of your PDF files and could negatively "
+"affect performance."
+msgstr ""
+
+#: includes/class-wcpdf-settings-callbacks.php:482
 #, fuzzy
 msgid "Save"
 msgstr "Saglabāt"
 
 #: includes/class-wcpdf-settings-debug.php:45
-#: woocommerce-pdf-invoices-packingslips.php:376
+#: woocommerce-pdf-invoices-packingslips.php:395
 #, fuzzy
 msgid "Generate random temporary folder name"
 msgstr "Izlases pagaidu mapes nosaukuma ģenerēšana"
@@ -391,59 +448,37 @@ msgstr "Pagaidu mape pārvietota uz %s"
 msgid "Reinstall fonts"
 msgstr "Fontu pārinstalēšana"
 
-#: includes/class-wcpdf-settings-debug.php:89
+#: includes/class-wcpdf-settings-debug.php:77
 #, fuzzy
 msgid "Fonts reinstalled!"
 msgstr "Fonti instalēti no jauna!"
 
-#: includes/class-wcpdf-settings-debug.php:98
+#: includes/class-wcpdf-settings-debug.php:86
 #, fuzzy
 msgid "Remove temporary files"
 msgstr "Pagaidu failu noņemšana"
 
-#: includes/class-wcpdf-settings-debug.php:109
-#, fuzzy
-msgid "Unable to read temporary folder contents!"
-msgstr "Nevar nolasīt pagaidu mapes saturu!"
-
-#. translators: 1,2. file count
-#: includes/class-wcpdf-settings-debug.php:127
-#, fuzzy
-msgid "Unable to delete %1$d files! (deleted %2$d)"
-msgstr "Nevar dzēst %1$d failus! (izdzēsts %2$d)"
-
-#. translators: file count
-#: includes/class-wcpdf-settings-debug.php:131
-#, fuzzy
-msgid "Successfully deleted %d files!"
-msgstr "Veiksmīgi dzēsti %d failus!"
-
-#: includes/class-wcpdf-settings-debug.php:135
-#, fuzzy
-msgid "Nothing to delete!"
-msgstr "Nav ko dzēst!"
-
-#: includes/class-wcpdf-settings-debug.php:146
+#: includes/class-wcpdf-settings-debug.php:105
 #, fuzzy
 msgid "Delete legacy (1.X) settings"
 msgstr "Veco (1.X) iestatījumu dzēšana"
 
-#: includes/class-wcpdf-settings-debug.php:162
+#: includes/class-wcpdf-settings-debug.php:121
 #, fuzzy
 msgid "Legacy settings deleted!"
 msgstr "Dzēsti mantotie iestatījumi!"
 
-#: includes/class-wcpdf-settings-debug.php:192
+#: includes/class-wcpdf-settings-debug.php:154
 #, fuzzy
 msgid "Debug settings"
 msgstr "Dzesēšanas iestatījumi"
 
-#: includes/class-wcpdf-settings-debug.php:198
+#: includes/class-wcpdf-settings-debug.php:160
 #, fuzzy
 msgid "Legacy mode"
 msgstr "Pārmantotais režīms"
 
-#: includes/class-wcpdf-settings-debug.php:204
+#: includes/class-wcpdf-settings-debug.php:166
 #, fuzzy
 msgid ""
 "Legacy mode ensures compatibility with templates and filters from previous "
@@ -452,12 +487,12 @@ msgstr ""
 "Vecākais režīms nodrošina savietojamību ar iepriekšējo versiju veidnēm un "
 "filtriem."
 
-#: includes/class-wcpdf-settings-debug.php:210
+#: includes/class-wcpdf-settings-debug.php:172
 #, fuzzy
 msgid "Legacy textdomain fallback"
 msgstr "Iepriekšējais teksta domēna atteikums"
 
-#: includes/class-wcpdf-settings-debug.php:216
+#: includes/class-wcpdf-settings-debug.php:178
 #, fuzzy
 msgid ""
 "Legacy textdomain fallback ensures compatibility with translation files from "
@@ -466,12 +501,12 @@ msgstr ""
 "Līdzšinējā teksta domēna atkāpšanās nodrošina savietojamību ar tulkošanas "
 "failiem, kas iegūti pirms 2017-05-15 versijas."
 
-#: includes/class-wcpdf-settings-debug.php:222
+#: includes/class-wcpdf-settings-debug.php:184
 #, fuzzy
 msgid "Allow guest access"
 msgstr "Atļaut viesu piekļuvi"
 
-#: includes/class-wcpdf-settings-debug.php:228
+#: includes/class-wcpdf-settings-debug.php:190
 #, fuzzy
 msgid ""
 "Enable this to allow customers that purchase without an account to access "
@@ -480,12 +515,20 @@ msgstr ""
 "Iespējot to, lai klientiem, kas iegādājas bez konta, ļautu piekļūt savam PDF "
 "formātam ar unikālu atslēgu"
 
-#: includes/class-wcpdf-settings-debug.php:234
+#: includes/class-wcpdf-settings-debug.php:196
+msgid "Pretty document links"
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:202
+msgid "Changes the document links to a prettier URL scheme."
+msgstr ""
+
+#: includes/class-wcpdf-settings-debug.php:208
 #, fuzzy
 msgid "Calculate document numbers (slow)"
 msgstr "Aprēķināt dokumentu numurus (lēni)"
 
-#: includes/class-wcpdf-settings-debug.php:240
+#: includes/class-wcpdf-settings-debug.php:214
 #, fuzzy
 msgid ""
 "Document numbers (such as invoice numbers) are generated using "
@@ -496,12 +539,12 @@ msgstr ""
 "izmantojot AUTO_INCREMENT. Izmantojiet šo iestatījumu, ja jūsu datubāzē "
 "automātiskā inkrementācija ir lielāka par 1."
 
-#: includes/class-wcpdf-settings-debug.php:246
+#: includes/class-wcpdf-settings-debug.php:220
 #, fuzzy
 msgid "Enable debug output"
 msgstr "Ieslēgt atkļūdošanas izvadi"
 
-#: includes/class-wcpdf-settings-debug.php:252
+#: includes/class-wcpdf-settings-debug.php:226
 #, fuzzy
 msgid ""
 "Enable this option to output plugin errors if you're getting a blank page or "
@@ -510,7 +553,7 @@ msgstr ""
 "Ieslēdziet šo opciju, lai izvadītu spraudņa kļūdas, ja tiek ģenerēta tukša "
 "lapa vai rodas citas PDF ģenerēšanas problēmas"
 
-#: includes/class-wcpdf-settings-debug.php:253
+#: includes/class-wcpdf-settings-debug.php:227
 #, fuzzy
 msgid ""
 "<b>Caution!</b> This setting may reveal errors (from other plugins) in other "
@@ -521,7 +564,7 @@ msgstr ""
 "arī citās jūsu vietnes vietās, tāpēc to nav ieteicams atstāt ieslēgtu dzīvās "
 "vietnēs."
 
-#: includes/class-wcpdf-settings-debug.php:254
+#: includes/class-wcpdf-settings-debug.php:228
 #, fuzzy
 msgid ""
 "You can also add <code>&debug=true</code> to the URL to apply this on a per-"
@@ -530,18 +573,18 @@ msgstr ""
 "Varat arī URL pievienot <code>&amp;debug=true</code>, lai to piemērotu "
 "katram pasūtījumam atsevišķi."
 
-#: includes/class-wcpdf-settings-debug.php:260
+#: includes/class-wcpdf-settings-debug.php:234
 #, fuzzy
 msgid "Enable automatic cleanup"
 msgstr "Ieslēgt automātisko tīrīšanu"
 
 #. translators: number of days
-#: includes/class-wcpdf-settings-debug.php:268
+#: includes/class-wcpdf-settings-debug.php:241
 #, fuzzy
 msgid "every %s days"
 msgstr "ik pēc %s dienām"
 
-#: includes/class-wcpdf-settings-debug.php:273
+#: includes/class-wcpdf-settings-debug.php:245
 #, fuzzy
 msgid ""
 "Automatically clean up PDF files stored in the temporary folder (used for "
@@ -550,21 +593,12 @@ msgstr ""
 "Automātiska pagaidu mapē (kas tiek izmantota e-pasta pielikumiem) saglabāto "
 "PDF failu attīrīšana"
 
-#: includes/class-wcpdf-settings-debug.php:274
-#, fuzzy
-msgid ""
-"<b>Disabled:</b> The PHP functions glob and filemtime are required for "
-"automatic cleanup but not enabled on your server."
-msgstr ""
-"<b>Invalīds:</b> PHP funkcijas glob un filemtime ir nepieciešamas "
-"automātiskai tīrīšanai, bet nav iespējotas jūsu serverī."
-
-#: includes/class-wcpdf-settings-debug.php:280
+#: includes/class-wcpdf-settings-debug.php:251
 #, fuzzy
 msgid "Output to HTML"
 msgstr "Izvades HTML formātā"
 
-#: includes/class-wcpdf-settings-debug.php:286
+#: includes/class-wcpdf-settings-debug.php:257
 #, fuzzy
 msgid ""
 "Send the template output as HTML to the browser instead of creating a PDF."
@@ -572,7 +606,7 @@ msgstr ""
 "Tā vietā, lai veidotu PDF failu, nosūtiet veidnes izvades HTML formātā uz "
 "pārlūkprogrammu."
 
-#: includes/class-wcpdf-settings-debug.php:287
+#: includes/class-wcpdf-settings-debug.php:258
 #, fuzzy
 msgid ""
 "You can also add <code>&output=html</code> to the URL to apply this on a per-"
@@ -581,41 +615,29 @@ msgstr ""
 "Varat arī URL pievienot <code>&amp;output=html</code>, lai to piemērotu "
 "katram pasūtījumam atsevišķi."
 
-#: includes/class-wcpdf-settings-debug.php:293
-#, fuzzy
-msgid "Use alternative HTML5 parser to parse HTML"
-msgstr "Alternatīva HTML5 analizatora izmantošana HTML analizēšanai"
-
-#: includes/class-wcpdf-settings-debug.php:304
+#: includes/class-wcpdf-settings-debug.php:264
 #, fuzzy
 msgid "Log to order notes"
 msgstr "Piesakieties piezīmju pasūtījumam"
 
-#: includes/class-wcpdf-settings-debug.php:310
+#: includes/class-wcpdf-settings-debug.php:270
 #, fuzzy
 msgid "Log PDF document creation to order notes."
 msgstr "Reģistrēt PDF dokumenta izveidi pasūtījuma piezīmēs."
 
-#: includes/class-wcpdf-settings-documents.php:30
-#: includes/class-wcpdf-settings.php:104
-#, fuzzy
-msgid "Documents"
-msgstr "Dokumenti"
+#: includes/class-wcpdf-settings-debug.php:276
+msgid "Disable document preview"
+msgstr ""
 
-#: includes/class-wcpdf-settings-documents.php:36
-#: includes/class-wcpdf-settings-documents.php:57
+#: includes/class-wcpdf-settings-debug.php:282
+#, fuzzy
+msgid "Disables the document preview on the plugin settings pages."
+msgstr "Atslēgt dokumentu, ja pasūtījuma kopsumma ir %s"
+
+#: includes/class-wcpdf-settings-documents.php:44
 #, fuzzy
 msgid "untitled"
 msgstr "bez nosaukuma"
-
-#: includes/class-wcpdf-settings-documents.php:50
-#, fuzzy
-msgid ""
-"All available documents are listed below. Click on a document to configure "
-"it."
-msgstr ""
-"Visi pieejamie dokumenti ir uzskaitīti turpmāk. Noklikšķiniet uz dokumenta, "
-"lai to konfigurētu."
 
 #: includes/class-wcpdf-settings-general.php:40
 msgid "General settings"
@@ -652,12 +674,12 @@ msgid "Paper size"
 msgstr "Lapas izmērs"
 
 #: includes/class-wcpdf-settings-general.php:82
-#: includes/views/setup-wizard/paper-format.php:12
+#: includes/views/setup-wizard/paper-format.php:13
 msgid "A4"
 msgstr "A4"
 
 #: includes/class-wcpdf-settings-general.php:83
-#: includes/views/setup-wizard/paper-format.php:13
+#: includes/views/setup-wizard/paper-format.php:14
 msgid "Letter"
 msgstr "Vēstule"
 
@@ -717,17 +739,17 @@ msgid "Shop header/logo"
 msgstr "Veikala galvene/logo"
 
 #: includes/class-wcpdf-settings-general.php:132
-#: includes/views/setup-wizard/logo.php:20
+#: includes/views/setup-wizard/logo.php:13
 msgid "Select or upload your invoice header/logo"
 msgstr "Izvēlieties vai augšup lādējiet Jūsu pavadzīmes galveni/logo"
 
 #: includes/class-wcpdf-settings-general.php:133
-#: includes/views/setup-wizard/logo.php:20
+#: includes/views/setup-wizard/logo.php:14
 msgid "Set image"
 msgstr "Iestatīt attēlu"
 
 #: includes/class-wcpdf-settings-general.php:134
-#: includes/views/setup-wizard/logo.php:20
+#: includes/views/setup-wizard/logo.php:15
 msgid "Remove image"
 msgstr "Izņemt attēlu"
 
@@ -750,66 +772,66 @@ msgstr ""
 msgid "Shop Name"
 msgstr "Veikala Nosaukums"
 
-#: includes/class-wcpdf-settings-general.php:168
+#: includes/class-wcpdf-settings-general.php:167
 msgid "Shop Address"
 msgstr "Veikala Adrese"
 
-#: includes/class-wcpdf-settings-general.php:183
+#: includes/class-wcpdf-settings-general.php:182
 msgid "Footer: terms & conditions, policies, etc."
 msgstr "Kājene: lietošanas noteikumi, privātuma politika, u.c."
 
-#: includes/class-wcpdf-settings-general.php:198
+#: includes/class-wcpdf-settings-general.php:197
 msgid "Extra template fields"
 msgstr "Papildus formas lauki"
 
-#: includes/class-wcpdf-settings-general.php:204
+#: includes/class-wcpdf-settings-general.php:203
 msgid "Extra field 1"
 msgstr "Papildus lauks 1"
 
-#: includes/class-wcpdf-settings-general.php:212
+#: includes/class-wcpdf-settings-general.php:211
 msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
 msgstr "Šī  <i>Modernās (Premium)</i> formas kājenes kolonna nr. 1"
 
-#: includes/class-wcpdf-settings-general.php:219
+#: includes/class-wcpdf-settings-general.php:218
 msgid "Extra field 2"
 msgstr "Papildus lauks 2"
 
-#: includes/class-wcpdf-settings-general.php:227
+#: includes/class-wcpdf-settings-general.php:226
 msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
 msgstr "Šī  <i>Modernās (Premium)</i> formas kājenes kolonna nr. 2"
 
-#: includes/class-wcpdf-settings-general.php:234
+#: includes/class-wcpdf-settings-general.php:233
 msgid "Extra field 3"
 msgstr "Papildus lauks 3"
 
-#: includes/class-wcpdf-settings-general.php:242
+#: includes/class-wcpdf-settings-general.php:241
 msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
 msgstr "Šī  <i>Modernās (Premium)</i> formas kājenes kolonna nr. 3"
 
-#: includes/class-wcpdf-settings-general.php:290
+#: includes/class-wcpdf-settings-general.php:289
 msgid "Custom"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:55 includes/class-wcpdf-settings.php:56
+#: includes/class-wcpdf-settings.php:66 includes/class-wcpdf-settings.php:67
 msgid "PDF Invoices"
 msgstr "PDF Pavadzīmes"
 
-#: includes/class-wcpdf-settings.php:81
+#: includes/class-wcpdf-settings.php:92
 #, fuzzy
 msgid "Documentation"
 msgstr "Dokumentācija"
 
-#: includes/class-wcpdf-settings.php:82
+#: includes/class-wcpdf-settings.php:93
 #, fuzzy
 msgid "Support Forum"
 msgstr "Atbalsts Forums"
 
 #. translators: database row value
-#: includes/class-wcpdf-settings.php:95
+#: includes/class-wcpdf-settings.php:106
 #, fuzzy
 msgid ""
 "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of "
-"%s, your invoice numbers may not be sequential. Enable the 'Calculate "
+"%d, your invoice numbers may not be sequential. Enable the 'Calculate "
 "document numbers (slow)' setting in the Status tab to use an alternate "
 "method."
 msgstr ""
@@ -817,17 +839,65 @@ msgstr ""
 "%s, rēķinu numuri var nebūt secīgi. Lai izmantotu alternatīvu metodi, "
 "iespējojiet iestatījumu \"Aprēķināt dokumentu numurus (lēni)\" cilnē Statuss."
 
-#: includes/class-wcpdf-settings.php:103
+#: includes/class-wcpdf-settings.php:118
 msgid "General"
 msgstr "Vispārīgā informācija"
 
-#: includes/class-wcpdf-settings.php:109 includes/views/dompdf-status.php:188
+#: includes/class-wcpdf-settings.php:122
+#, fuzzy
+msgid "Documents"
+msgstr "Dokumenti"
+
+#: includes/class-wcpdf-settings.php:129 includes/views/dompdf-status.php:194
 msgid "Status"
 msgstr "Statuss"
 
-#. translators: 1. path, 2. template ID
-#: includes/class-wcpdf-settings.php:396
-msgid "Template setting migrated from %1$s to %2$s"
+#: includes/class-wcpdf-settings.php:190
+msgid "Order not found!"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:193
+msgid "Object found is not an order!"
+msgstr ""
+
+#. translators: order ID
+#: includes/class-wcpdf-settings.php:251
+msgid "Document not available for order #%s, try selecting a different order."
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:258
+msgid ""
+"No WooCommerce orders found! Please consider adding your first order to see "
+"this preview."
+msgstr ""
+
+#. translators: error message
+#: includes/class-wcpdf-settings.php:266
+msgid "Error trying to generate document: %s"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:340
+#, fuzzy
+msgid "Date"
+msgstr "%s Datums:"
+
+#: includes/class-wcpdf-settings.php:341
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1067
+msgid "Total"
+msgstr "Kopā"
+
+#: includes/class-wcpdf-settings.php:348
+msgid "No order(s) found!"
+msgstr ""
+
+#: includes/class-wcpdf-settings.php:351
+#, fuzzy
+msgid "An error occurred when trying to process your request!"
+msgstr "Dokumenta dzēšanas laikā notika kļūda!"
+
+#. translators: error message
+#: includes/class-wcpdf-settings.php:358
+msgid "Error trying to get orders: %s"
 msgstr ""
 
 #: includes/class-wcpdf-setup-wizard.php:53
@@ -864,135 +934,126 @@ msgstr "Darbības pogas"
 msgid "Ready!"
 msgstr "Gatavs!"
 
-#: includes/class-wcpdf-setup-wizard.php:135
+#: includes/class-wcpdf-setup-wizard.php:134
 #, fuzzy
-msgid "WooCommerce PDF Invoices & Packing Slips &rsaquo; Setup Wizard"
+msgid "PDF Invoices & Packing Slips for WooCommerce &rsaquo; Setup Wizard"
 msgstr "WooCommerce PDF rēķini un pavadzīmes ' Iestatīšanas vednis"
 
-#: includes/class-wcpdf-setup-wizard.php:187
+#: includes/class-wcpdf-setup-wizard.php:154
+#, fuzzy
+msgid "PDF Invoices & Packing Slips"
+msgstr "Rēķini un iesaiņojuma kvītis"
+
+#: includes/class-wcpdf-setup-wizard.php:186
 #, fuzzy
 msgid "Previous"
 msgstr "Iepriekšējais"
 
-#: includes/class-wcpdf-setup-wizard.php:192
+#: includes/class-wcpdf-setup-wizard.php:191
 #, fuzzy
 msgid "Next"
 msgstr "Nākamais"
 
-#: includes/class-wcpdf-setup-wizard.php:193
+#: includes/class-wcpdf-setup-wizard.php:192
 #, fuzzy
 msgid "Skip this step"
 msgstr "Izlaist šo soli"
 
-#: includes/class-wcpdf-setup-wizard.php:195
+#: includes/class-wcpdf-setup-wizard.php:194
 #, fuzzy
 msgid "Finish"
 msgstr "Pabeigts"
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:116
-#: includes/documents/abstract-wcpdf-order-document-methods.php:183
+#: includes/documents/abstract-wcpdf-order-document-methods.php:100
+#: includes/documents/abstract-wcpdf-order-document-methods.php:198
 msgid "N/A"
 msgstr "Nav Pieejams"
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:424
-msgid "Payment method"
-msgstr "Maksājuma veids"
-
-#: includes/documents/abstract-wcpdf-order-document-methods.php:445
-msgid "Shipping method"
-msgstr "Piegādes veids"
-
-#: includes/documents/abstract-wcpdf-order-document-methods.php:927
+#: includes/documents/abstract-wcpdf-order-document-methods.php:933
 msgid "Subtotal"
 msgstr "Starpsumma"
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:952
+#: includes/documents/abstract-wcpdf-order-document-methods.php:958
 msgid "Shipping"
 msgstr "Piegāde"
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1015
+#: includes/documents/abstract-wcpdf-order-document-methods.php:997
 msgid "Discount"
 msgstr "Atlaide"
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1056
-msgid "VAT"
-msgstr "PVN"
-
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1057
-#, fuzzy
-msgid "Tax rate"
-msgstr "Nodokļu likme"
-
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1101
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1064
 msgid "Total ex. VAT"
 msgstr "Kopā, bez PVN"
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1104
-msgid "Total"
-msgstr "Kopā"
-
 #. translators: 1. credit note title, 2. refund id
-#: includes/documents/abstract-wcpdf-order-document.php:336
+#: includes/documents/abstract-wcpdf-order-document.php:368
 #, fuzzy
 msgid "%1$s (refund #%2$s) was regenerated."
 msgstr "%1$s (kompensācija #%2$s) tika reģenerēts."
 
 #. translators: 1. credit note title, 2. refund id
-#: includes/documents/abstract-wcpdf-order-document.php:336
+#: includes/documents/abstract-wcpdf-order-document.php:368
 #, fuzzy
 msgid "%s was regenerated"
 msgstr "%s tika reģenerēts"
 
 #. translators: %s: document name
-#: includes/documents/abstract-wcpdf-order-document.php:422
+#: includes/documents/abstract-wcpdf-order-document.php:459
 #, fuzzy
 msgid "%s Number:"
 msgstr "%s Skaits:"
 
 #. translators: %s: document name
-#: includes/documents/abstract-wcpdf-order-document.php:428
+#: includes/documents/abstract-wcpdf-order-document.php:465
 #, fuzzy
 msgid "%s Date:"
 msgstr "%s Datums:"
 
-#: includes/documents/abstract-wcpdf-order-document.php:904
+#: includes/documents/abstract-wcpdf-order-document.php:992
 #, fuzzy
 msgid "Admin email"
 msgstr "Administratora e-pasts"
 
-#: includes/documents/abstract-wcpdf-order-document.php:907
+#: includes/documents/abstract-wcpdf-order-document.php:995
 #, fuzzy
 msgid "Manual email"
 msgstr "Manuālais e-pasts"
 
-#: includes/documents/class-wcpdf-invoice.php:32
-#: includes/documents/class-wcpdf-invoice.php:56
-#: includes/legacy/class-wcpdf-legacy-functions.php:22
+#: includes/documents/class-wcpdf-invoice.php:28
+#: includes/documents/class-wcpdf-invoice.php:52
+#: includes/legacy/class-wcpdf-legacy-functions.php:18
+#: includes/views/wcpdf-settings-page.php:106
 msgid "Invoice"
 msgstr "Pavadzīme"
 
 # This is a filename (prefix). do not use spaces or special characters!
-#: includes/documents/class-wcpdf-invoice.php:131
+#. translators: document type
+#: includes/documents/class-wcpdf-invoice.php:110
+#: includes/documents/class-wcpdf-invoice.php:320
+#: includes/documents/class-wcpdf-invoice.php:329
+#: includes/documents/class-wcpdf-invoice.php:337
+#: includes/documents/class-wcpdf-invoice.php:341
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] "pavadzīme"
 msgstr[1] "pavadzīmes"
 msgstr[2] "pavadzīmju"
 
-#: includes/documents/class-wcpdf-invoice.php:186
-#: includes/documents/class-wcpdf-packing-slip.php:88
+#: includes/documents/class-wcpdf-invoice.php:165
+#: includes/documents/class-wcpdf-packing-slip.php:84
 #, fuzzy
 msgid "Enable"
 msgstr "Iespējot"
 
-#: includes/documents/class-wcpdf-invoice.php:197
+#: includes/documents/class-wcpdf-invoice.php:176
+#: includes/documents/class-wcpdf-packing-slip.php:159
 #, fuzzy
 #| msgid "Attach invoice to:"
 msgid "Attach to:"
 msgstr "Pievienot pavadzīmi:"
 
 #. translators: directory path
-#: includes/documents/class-wcpdf-invoice.php:205
+#: includes/documents/class-wcpdf-invoice.php:184
 msgid ""
 "It looks like the temp folder (<code>%s</code>) is not writable, check the "
 "permissions for this folder! Without having write access to this folder, the "
@@ -1002,90 +1063,93 @@ msgstr ""
 "piekļuves atļaujas šai mapei. Bez iespējas piekļūt šai mapei, spraudnis "
 "pavadzīmes izmantojot e-pastu neizsūtīs."
 
-#: includes/documents/class-wcpdf-invoice.php:211
+#: includes/documents/class-wcpdf-invoice.php:190
 #, fuzzy
 msgid "Disable for:"
 msgstr "Izslēgt, lai:"
 
-#: includes/documents/class-wcpdf-invoice.php:220
+#: includes/documents/class-wcpdf-invoice.php:199
 #, fuzzy
 msgid "Select one or more statuses"
 msgstr "Izvēlieties vienu vai vairākus statusus"
 
-#: includes/documents/class-wcpdf-invoice.php:226
-#: includes/views/setup-wizard/display-options.php:17
+#: includes/documents/class-wcpdf-invoice.php:205
 #, fuzzy
 msgid "Display shipping address"
 msgstr "Rādīt piegādes adresi"
 
-#: includes/documents/class-wcpdf-invoice.php:233
-#: includes/documents/class-wcpdf-invoice.php:285
-#: includes/documents/class-wcpdf-invoice.php:301
-#: includes/documents/class-wcpdf-packing-slip.php:106
+#: includes/documents/class-wcpdf-invoice.php:212
+#: includes/documents/class-wcpdf-invoice.php:264
+#: includes/documents/class-wcpdf-invoice.php:280
+#: includes/documents/class-wcpdf-packing-slip.php:102
+#: includes/views/dompdf-status.php:139
+#: includes/views/setup-wizard/display-options.php:20
+#: includes/views/setup-wizard/display-options.php:59
+#: includes/views/setup-wizard/display-options.php:80
 #, fuzzy
 msgid "No"
 msgstr "Nē"
 
-#: includes/documents/class-wcpdf-invoice.php:234
+#: includes/documents/class-wcpdf-invoice.php:213
+#: includes/views/setup-wizard/display-options.php:21
 #, fuzzy
 msgid "Only when different from billing address"
 msgstr "Tikai tad, ja atšķiras no rēķina adreses"
 
-#: includes/documents/class-wcpdf-invoice.php:235
-#: includes/documents/class-wcpdf-invoice.php:378
-#: includes/documents/class-wcpdf-packing-slip.php:108
+#: includes/documents/class-wcpdf-invoice.php:214
+#: includes/documents/class-wcpdf-invoice.php:367
+#: includes/documents/class-wcpdf-packing-slip.php:104
+#: includes/views/setup-wizard/display-options.php:22
 #, fuzzy
 msgid "Always"
 msgstr "Vienmēr"
 
-#: includes/documents/class-wcpdf-invoice.php:243
-#: includes/documents/class-wcpdf-packing-slip.php:116
-#: includes/views/setup-wizard/display-options.php:26
+#: includes/documents/class-wcpdf-invoice.php:222
+#: includes/documents/class-wcpdf-packing-slip.php:112
 #, fuzzy
 msgid "Display email address"
 msgstr "Rādīt e-pasta adresi"
 
-#: includes/documents/class-wcpdf-invoice.php:254
-#: includes/documents/class-wcpdf-packing-slip.php:127
-#: includes/views/setup-wizard/display-options.php:35
+#: includes/documents/class-wcpdf-invoice.php:233
+#: includes/documents/class-wcpdf-packing-slip.php:123
 #, fuzzy
 msgid "Display phone number"
 msgstr "Rādīt tālruņa numuru"
 
-#: includes/documents/class-wcpdf-invoice.php:265
-#: includes/documents/class-wcpdf-packing-slip.php:138
+#: includes/documents/class-wcpdf-invoice.php:244
+#: includes/documents/class-wcpdf-packing-slip.php:134
 #, fuzzy
 msgid "Display customer notes"
 msgstr "Parādiet klientu piezīmes"
 
-#: includes/documents/class-wcpdf-invoice.php:278
-#: includes/views/setup-wizard/display-options.php:44
+#: includes/documents/class-wcpdf-invoice.php:257
 #, fuzzy
 msgid "Display invoice date"
 msgstr "Rādīt rēķina datumu"
 
-#: includes/documents/class-wcpdf-invoice.php:287
+#: includes/documents/class-wcpdf-invoice.php:266
+#: includes/views/setup-wizard/display-options.php:61
 #, fuzzy
 msgid "Order Date"
 msgstr "Pasūtījuma Datums"
 
-#: includes/documents/class-wcpdf-invoice.php:294
-#: includes/views/setup-wizard/display-options.php:53
+#: includes/documents/class-wcpdf-invoice.php:273
 #, fuzzy
 msgid "Display invoice number"
 msgstr "Rādīt rēķina numuru"
 
-#: includes/documents/class-wcpdf-invoice.php:303
+#: includes/documents/class-wcpdf-invoice.php:282
+#: includes/views/setup-wizard/display-options.php:82
 #, fuzzy
 msgid "Order Number"
 msgstr "Pasūtījuma numurs"
 
-#: includes/documents/class-wcpdf-invoice.php:307
+#: includes/documents/class-wcpdf-invoice.php:286
 #, fuzzy
 msgid "Warning!"
 msgstr "Brīdinājums!"
 
-#: includes/documents/class-wcpdf-invoice.php:308
+#: includes/documents/class-wcpdf-invoice.php:287
 #, fuzzy
 msgid ""
 "Using the Order Number as invoice number is not recommended as this may lead "
@@ -1095,16 +1159,16 @@ msgstr ""
 "Nav ieteicams izmantot pasūtījuma numuru kā rēķina numuru, jo tas var radīt "
 "nepilnības rēķina numuru secībā (pat tad, ja pasūtījuma numuri ir secīgi)."
 
-#: includes/documents/class-wcpdf-invoice.php:309
+#: includes/documents/class-wcpdf-invoice.php:288
 #, fuzzy
 msgid "More information"
 msgstr "Vairāk informācijas"
 
-#: includes/documents/class-wcpdf-invoice.php:316
+#: includes/documents/class-wcpdf-invoice.php:295
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr "Nākamais pavadzīmes numurs (bez priedēkļa/piedēkļa u.c.)"
 
-#: includes/documents/class-wcpdf-invoice.php:322
+#: includes/documents/class-wcpdf-invoice.php:301
 #, fuzzy
 #| msgid ""
 #| "This is the number that will be used on the next invoice that is created. "
@@ -1124,76 +1188,113 @@ msgstr ""
 "numuru uz mazāku kā lielākais (PDF) pavadzīmes numurs, iespējams var tikt "
 "radīta pavadzīmju numuru dublēšanās!"
 
-#: includes/documents/class-wcpdf-invoice.php:328
+#: includes/documents/class-wcpdf-invoice.php:307
 #, fuzzy
 msgid "Number format"
 msgstr "Numura formāts"
 
-#: includes/documents/class-wcpdf-invoice.php:336
+#: includes/documents/class-wcpdf-invoice.php:315
 msgid "Prefix"
 msgstr "Priedēklis"
 
-#: includes/documents/class-wcpdf-invoice.php:338
-#, fuzzy
-#| msgid ""
-#| "to use the order year and/or month, use [order_year] or [order_month] "
-#| "respectively"
-msgid ""
-"to use the invoice year and/or month, use [invoice_year] or [invoice_month] "
-"respectively"
+#: includes/documents/class-wcpdf-invoice.php:317
+msgid "If set, this value will be used as number prefix."
 msgstr ""
-"izmantojiet [order_year] vai [order_month], lai tiktu attēlots gads vai "
-"mēnesis"
 
-#: includes/documents/class-wcpdf-invoice.php:341
+#. translators: 1. document type, 2-3 placeholders
+#: includes/documents/class-wcpdf-invoice.php:319
+#: includes/documents/class-wcpdf-invoice.php:328
+msgid ""
+"You can use the %1$s year and/or month with the %2$s or %3$s placeholders "
+"respectively."
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:321
+#: includes/documents/class-wcpdf-invoice.php:330
+msgid ""
+"Check the Docs article below to see all the available placeholders for "
+"prefix/suffix."
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:324
 msgid "Suffix"
 msgstr "Piedēklis"
 
-#: includes/documents/class-wcpdf-invoice.php:346
+#: includes/documents/class-wcpdf-invoice.php:326
+msgid "If set, this value will be used as number suffix."
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:333
 msgid "Padding"
 msgstr "Numura garums"
 
-#: includes/documents/class-wcpdf-invoice.php:349
-msgid "enter the number of digits here - enter \"6\" to display 42 as 000042"
-msgstr ""
-"ievadiet pavadzīmes numura vēlamo garumu - ievadiet \"6\" lai pavadzīmes "
-"numuru 42 attēlotu kā 000042"
-
-#: includes/documents/class-wcpdf-invoice.php:352
+#. translators: document type
+#: includes/documents/class-wcpdf-invoice.php:337
 msgid ""
-"note: if you have already created a custom invoice number format with a "
-"filter, the above settings will be ignored"
+"Enter the number of digits you want to use as padding. For instance, enter "
+"<code>6</code> to display the %s number <code>123</code> as <code>000123</"
+"code>, filling it with zeros until the number set as padding is reached."
+msgstr ""
+
+#. translators: document type
+#: includes/documents/class-wcpdf-invoice.php:341
+msgid ""
+"For more information about setting up the number format and see the "
+"available placeholders for the prefix and suffix, check this article:"
+msgstr ""
+
+#. translators: document type
+#: includes/documents/class-wcpdf-invoice.php:341
+#, fuzzy
+msgid "Number format explained"
+msgstr "Numura formāts"
+
+#. translators: document type
+#: includes/documents/class-wcpdf-invoice.php:341
+#, fuzzy
+#| msgid ""
+#| "note: if you have already created a custom invoice number format with a "
+#| "filter, the above settings will be ignored"
+msgid ""
+"<strong>Note</strong>: if you have already created a custom %s number format "
+"with a filter, the above settings will be ignored."
 msgstr ""
 "svarīgi: ja Jūs jau esat izveidojis savu pavadzīmes numerāciju ar filtru, "
 "tad augstākminētie iestatījumi tiks ignorēti"
 
-#: includes/documents/class-wcpdf-invoice.php:358
+#: includes/documents/class-wcpdf-invoice.php:347
 #, fuzzy
 msgid "Reset invoice number yearly"
 msgstr "Ikgadēja rēķina numura atiestatīšana"
 
-#: includes/documents/class-wcpdf-invoice.php:369
+#: includes/documents/class-wcpdf-invoice.php:358
 #, fuzzy
 msgid "Allow My Account invoice download"
 msgstr "Atļaut mana konta rēķina lejupielādi"
 
-#: includes/documents/class-wcpdf-invoice.php:376
+#: includes/documents/class-wcpdf-invoice.php:365
 #, fuzzy
 msgid "Only when an invoice is already created/emailed"
 msgstr "Tikai tad, ja rēķins jau ir izveidots/nosūtīts"
 
-#: includes/documents/class-wcpdf-invoice.php:377
+#: includes/documents/class-wcpdf-invoice.php:366
 #, fuzzy
 msgid "Only for specific order statuses (define below)"
 msgstr "Tikai konkrētiem pasūtījumu statusiem (definēts tālāk)"
 
-#: includes/documents/class-wcpdf-invoice.php:379
+#: includes/documents/class-wcpdf-invoice.php:368
 #, fuzzy
 msgid "Never"
 msgstr "Nekad"
 
-#: includes/documents/class-wcpdf-invoice.php:394
+#: includes/documents/class-wcpdf-invoice.php:383
 msgid "Enable invoice number column in the orders list"
+msgstr "Iespējot pavadzīmes numura kolonnu pasūtījuma sarakstā"
+
+#: includes/documents/class-wcpdf-invoice.php:394
+#, fuzzy
+#| msgid "Enable invoice number column in the orders list"
+msgid "Enable invoice date column in the orders list"
 msgstr "Iespējot pavadzīmes numura kolonnu pasūtījuma sarakstā"
 
 #: includes/documents/class-wcpdf-invoice.php:405
@@ -1244,41 +1345,46 @@ msgstr "Rēķinu numurus izveido trešās puses paplašinājums."
 msgid "Configure it <a href=\"%s\">here</a>."
 msgstr "Konfigurējiet to <a href=\"%s\">šeit.</a>"
 
-#: includes/documents/class-wcpdf-packing-slip.php:32
-#: includes/documents/class-wcpdf-packing-slip.php:41
-#: includes/legacy/class-wcpdf-legacy-functions.php:25
+#: includes/documents/class-wcpdf-packing-slip.php:28
+#: includes/documents/class-wcpdf-packing-slip.php:37
+#: includes/legacy/class-wcpdf-legacy-functions.php:21
 msgid "Packing Slip"
 msgstr "Piegādes Forma"
 
 # This is a filename (prefix). do not use spaces or special characters!
-#: includes/documents/class-wcpdf-packing-slip.php:47
+#: includes/documents/class-wcpdf-packing-slip.php:43
 msgid "packing-slip"
 msgid_plural "packing-slips"
 msgstr[0] "piegādes-forma"
 msgstr[1] "piegādes-formas"
 msgstr[2] "piegādes-formu"
 
-#: includes/documents/class-wcpdf-packing-slip.php:99
+#: includes/documents/class-wcpdf-packing-slip.php:95
 #, fuzzy
 msgid "Display billing address"
 msgstr "Rādīt norēķinu adresi"
 
-#: includes/documents/class-wcpdf-packing-slip.php:107
+#: includes/documents/class-wcpdf-packing-slip.php:103
 #, fuzzy
 msgid "Only when different from shipping address"
 msgstr "Tikai tad, ja atšķiras no piegādes adreses"
 
-#: includes/documents/class-wcpdf-packing-slip.php:162
+#: includes/documents/class-wcpdf-packing-slip.php:150
+msgid ""
+"Upgrade to our Professional extension to attach packing slips to any email!"
+msgstr ""
+
+#: includes/documents/class-wcpdf-packing-slip.php:183
 #, fuzzy
 msgid "Packing Slip Number:"
 msgstr "Iepakojuma veidlapas numurs:"
 
-#: includes/documents/class-wcpdf-packing-slip.php:170
+#: includes/documents/class-wcpdf-packing-slip.php:191
 #, fuzzy
 msgid "Packing Slip Date:"
 msgstr "Iepakošanas kvīts datums:"
 
-#: includes/legacy/class-wcpdf-legacy-document.php:32
+#: includes/legacy/class-wcpdf-legacy-document.php:28
 #, fuzzy
 msgid "Legacy Document"
 msgstr "Mantojuma dokuments"
@@ -1303,7 +1409,7 @@ msgid "The following function was called"
 msgstr "Tika izsaukta šāda funkcija"
 
 #. translators: <a> tags
-#: includes/views/attachment-settings-hint.php:23
+#: includes/views/attachment-settings-hint.php:11
 #, fuzzy
 msgid ""
 "It looks like you haven't setup any email attachments yet, check the "
@@ -1327,32 +1433,41 @@ msgstr "Ieteicams, tiks izmantotas rezerves funkcijas"
 msgid "Required if you have images in your documents"
 msgstr "Nepieciešams, ja dokumentos ir attēli"
 
-#: includes/views/dompdf-status.php:39
+#: includes/views/dompdf-status.php:33
+msgid "Required when using .webp images"
+msgstr ""
+
+#: includes/views/dompdf-status.php:36
+#, fuzzy
+msgid "Required if you have .webp images in your documents"
+msgstr "Nepieciešams, ja dokumentos ir attēli"
+
+#: includes/views/dompdf-status.php:45
 #, fuzzy
 msgid "To compress PDF documents"
 msgstr "PDF dokumentu saspiešana"
 
-#: includes/views/dompdf-status.php:42
+#: includes/views/dompdf-status.php:48
 #, fuzzy
 msgid "Recommended to compress PDF documents"
 msgstr "Ieteicams saspiest PDF dokumentus"
 
-#: includes/views/dompdf-status.php:45
+#: includes/views/dompdf-status.php:51
 #, fuzzy
 msgid "For better performances"
 msgstr "Lai uzlabotu sniegumu"
 
-#: includes/views/dompdf-status.php:48 includes/views/dompdf-status.php:54
+#: includes/views/dompdf-status.php:54 includes/views/dompdf-status.php:60
 #, fuzzy
 msgid "Recommended for better performances"
 msgstr "Ieteicams labākai veiktspējai"
 
-#: includes/views/dompdf-status.php:51
+#: includes/views/dompdf-status.php:57
 #, fuzzy
 msgid "Better with transparent PNG images"
 msgstr "Labāk ar caurspīdīgiem PNG attēliem"
 
-#: includes/views/dompdf-status.php:57
+#: includes/views/dompdf-status.php:63
 #, fuzzy
 msgid ""
 "Required to detect custom templates and to clear the temp folder periodically"
@@ -1360,13 +1475,13 @@ msgstr ""
 "Nepieciešams, lai noteiktu pielāgotās veidnes un periodiski notīrītu pagaidu "
 "mapi"
 
-#: includes/views/dompdf-status.php:60
+#: includes/views/dompdf-status.php:66
 #, fuzzy
 msgid "Check PHP disable_functions"
 msgstr "Pārbaudiet PHP disable_functions"
 
 #. translators: <a> tags
-#: includes/views/dompdf-status.php:64
+#: includes/views/dompdf-status.php:70
 #, fuzzy
 msgid ""
 "Recommended: 128MB (more for plugin-heavy setups<br/>See: %1$sIncreasing the "
@@ -1375,96 +1490,100 @@ msgstr ""
 "Ieteicams: 128 MB (vairāk spraudņu ietilpīgām konfigurācijām<br/>Skatīt: "
 "%1$sPalielinot WordPress atmiņas limitu%2$s"
 
-#: includes/views/dompdf-status.php:69
+#: includes/views/dompdf-status.php:75
 #, fuzzy
 msgid "Allow remote stylesheets and images"
 msgstr "Atļaut attālās stila lapas un attēlus"
 
-#: includes/views/dompdf-status.php:72
+#: includes/views/dompdf-status.php:78
 #, fuzzy
 msgid "allow_url_fopen disabled"
 msgstr "allow_url_fopen atspējots"
 
-#: includes/views/dompdf-status.php:75
+#: includes/views/dompdf-status.php:81
 msgid "To compress and decompress font data"
 msgstr ""
 
-#: includes/views/dompdf-status.php:78
+#: includes/views/dompdf-status.php:84
 msgid "base64_decode disabled"
 msgstr ""
 
 #. translators: <a> tags
-#: includes/views/dompdf-status.php:98
+#: includes/views/dompdf-status.php:104
 #, fuzzy
-msgid "<br/>Download %1$sthis addon%2$s to enable backwards compatibility."
+msgid "Download %1$sthis addon%2$s to enable backwards compatibility."
 msgstr ""
 "<br/>Lejupielādēt %1$sšo papildinājumu%2$s, lai iespējotu atpakaļejošu "
 "savietojamību."
 
-#: includes/views/dompdf-status.php:103
+#: includes/views/dompdf-status.php:109
 #, fuzzy
 msgid "System Configuration"
 msgstr "Sistēmas konfigurācija"
 
-#: includes/views/dompdf-status.php:108
+#: includes/views/dompdf-status.php:114
 #, fuzzy
 msgid "Required"
 msgstr "Nepieciešams"
 
-#: includes/views/dompdf-status.php:109
+#: includes/views/dompdf-status.php:115
 #, fuzzy
 msgid "Present"
 msgstr "Pašreizējais"
 
-#: includes/views/dompdf-status.php:148
+#: includes/views/dompdf-status.php:132 includes/views/dompdf-status.php:136
+msgid "Yes"
+msgstr ""
+
+#: includes/views/dompdf-status.php:154
 #, fuzzy
 msgid "Writable"
 msgstr "Rakstāms"
 
-#: includes/views/dompdf-status.php:149
+#: includes/views/dompdf-status.php:155
 #, fuzzy
 msgid "Not writable"
 msgstr "Nav rakstāms"
 
-#: includes/views/dompdf-status.php:154
+#: includes/views/dompdf-status.php:160
 #, fuzzy
 msgid "Central temporary plugin folder"
 msgstr "Centrālā pagaidu spraudņu mape"
 
-#: includes/views/dompdf-status.php:160
+#: includes/views/dompdf-status.php:166
 #, fuzzy
 msgid "Temporary attachments folder"
 msgstr "Pagaidu pielikumu mape"
 
-#: includes/views/dompdf-status.php:166
+#: includes/views/dompdf-status.php:172
 #, fuzzy
 msgid "Temporary DOMPDF folder"
 msgstr "Pagaidu DOMPDF mape"
 
-#: includes/views/dompdf-status.php:172
+#: includes/views/dompdf-status.php:178
 #, fuzzy
 msgid "DOMPDF fonts folder (needs to be writable for custom/remote fonts)"
 msgstr ""
 "DOMPDF fontu mape (tai jābūt ierakstāmai, lai varētu izmantot pielāgotus/"
 "attālinātus fontus)"
 
-#: includes/views/dompdf-status.php:183
+#: includes/views/dompdf-status.php:189
 #, fuzzy
 msgid "Write Permissions"
 msgstr "Rakstīšanas atļaujas"
 
-#: includes/views/dompdf-status.php:186 templates/Simple/invoice.php:101
-#: templates/Simple/packing-slip.php:88
+#: includes/views/dompdf-status.php:192 templates/Simple/invoice.php:111
+#: templates/Simple/packing-slip.php:98
 msgid "Description"
 msgstr "Apraksts"
 
-#: includes/views/dompdf-status.php:187
+#: includes/views/dompdf-status.php:193
 #, fuzzy
 msgid "Value"
 msgstr "Value"
 
 #. translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts
-#: includes/views/dompdf-status.php:213
+#: includes/views/dompdf-status.php:219
 #, fuzzy
 msgid ""
 "The central temp folder is %1$s. By default, this folder is created in the "
@@ -1482,7 +1601,7 @@ msgstr ""
 "rakstāma)."
 
 #. translators: directory path
-#: includes/views/dompdf-status.php:226
+#: includes/views/dompdf-status.php:232
 #, fuzzy
 msgid ""
 "If the temporary folders were not automatically created by the plugin, "
@@ -1499,7 +1618,7 @@ msgstr ""
 
 #: includes/views/setup-wizard/attach-to.php:3
 #, fuzzy
-msgid "Attach too..."
+msgid "Attach to..."
 msgstr "Pievienojiet arī..."
 
 #: includes/views/setup-wizard/attach-to.php:4
@@ -1511,6 +1630,32 @@ msgstr "Izvēlieties, kuriem e-pasta ziņojumiem vēlaties pievienot rēķinu."
 #, fuzzy
 msgid "Select some additional display options for your invoice."
 msgstr "Izvēlieties dažas papildu faktūrrēķina rādīšanas opcijas."
+
+#: includes/views/setup-wizard/display-options.php:13
+#, fuzzy
+msgid "Shipping address"
+msgstr "Veikala adrese:"
+
+#: includes/views/setup-wizard/display-options.php:34
+#, fuzzy
+msgid "Email address"
+msgstr "Rādīt e-pasta adresi"
+
+#: includes/views/setup-wizard/display-options.php:43
+#, fuzzy
+msgid "Phone number"
+msgstr "Rādīt tālruņa numuru"
+
+#: includes/views/setup-wizard/display-options.php:52
+#, fuzzy
+msgid "Invoice date"
+msgstr "Rēķina datums"
+
+#: includes/views/setup-wizard/display-options.php:73
+#, fuzzy
+#| msgid "Invoice Number"
+msgid "Invoice number"
+msgstr "Pavadzīmes Numurs"
 
 #: includes/views/setup-wizard/good-to-go.php:3
 #, fuzzy
@@ -1555,6 +1700,18 @@ msgstr ""
 "Ļauj ātri iestatīt rēķinu. Lūdzu, ievadiet sava veikala nosaukumu un adresi "
 "lauciņos labajā pusē."
 
+#: includes/views/setup-wizard/shop-name.php:13
+#, fuzzy
+#| msgid "Shop Name"
+msgid "Shop name"
+msgstr "Veikala Nosaukums"
+
+#: includes/views/setup-wizard/shop-name.php:14
+#, fuzzy
+#| msgid "Shop Address"
+msgid "Shop address"
+msgstr "Veikala Adrese"
+
 #: includes/views/setup-wizard/show-action-buttons.php:4
 #, fuzzy
 msgid ""
@@ -1576,17 +1733,17 @@ msgstr ""
 msgid "Show action buttons"
 msgstr "Rādīt darbības pogas"
 
-#: includes/views/wcpdf-extensions.php:16
+#: includes/views/wcpdf-extensions.php:6
 #, fuzzy
 msgid "Check out these premium extensions!"
 msgstr "Pārbaudiet šos premium paplašinājumus!"
 
-#: includes/views/wcpdf-extensions.php:17
+#: includes/views/wcpdf-extensions.php:7
 #, fuzzy
 msgid "click items to read more"
 msgstr "noklikšķiniet uz vienumiem, lai uzzinātu vairāk"
 
-#: includes/views/wcpdf-extensions.php:22
+#: includes/views/wcpdf-extensions.php:12
 #, fuzzy
 msgid ""
 "Premium PDF Invoice bundle: Everything you need for a perfect invoicing "
@@ -1595,30 +1752,30 @@ msgstr ""
 "Premium PDF rēķinu komplekts: Viss, kas nepieciešams ideālai rēķinu "
 "izrakstīšanas sistēmai"
 
-#: includes/views/wcpdf-extensions.php:24
+#: includes/views/wcpdf-extensions.php:14
 #, fuzzy
 msgid ""
-"Supercharge WooCommerce PDF Invoices & Packing Slips with the all our "
+"Supercharge PDF Invoices & Packing Slips for WooCommerce with the all our "
 "premium extensions:"
 msgstr ""
 "Uzlabojiet WooCommerce PDF rēķinus un pavadzīmes ar visiem mūsu premium "
 "paplašinājumiem:"
 
-#: includes/views/wcpdf-extensions.php:25
+#: includes/views/wcpdf-extensions.php:15
 #, fuzzy
 msgid "Professional features:"
 msgstr "Profesionālās funkcijas:"
 
-#: includes/views/wcpdf-extensions.php:27
-#: includes/views/wcpdf-extensions.php:57
+#: includes/views/wcpdf-extensions.php:17
+#: includes/views/wcpdf-extensions.php:47
 #, fuzzy
 msgid "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
 msgstr ""
 "E-pasts/ drukāšana/izsūtīšana <b>PDF kredītrēķinu un proforma rēķinu "
 "formātā</b>"
 
-#: includes/views/wcpdf-extensions.php:28
-#: includes/views/wcpdf-extensions.php:58
+#: includes/views/wcpdf-extensions.php:18
+#: includes/views/wcpdf-extensions.php:48
 #, fuzzy
 msgid ""
 "Send out a separate <b>notification email</b> with (or without) PDF invoices/"
@@ -1627,8 +1784,8 @@ msgstr ""
 "Nosūtiet atsevišķu <b>paziņojuma e-pasta vēstuli</b> ar (vai bez) PDF "
 "rēķiniem/iepakojuma pavadzīmēm, piemēram, drop-shipperim vai piegādātājam."
 
-#: includes/views/wcpdf-extensions.php:29
-#: includes/views/wcpdf-extensions.php:59
+#: includes/views/wcpdf-extensions.php:19
+#: includes/views/wcpdf-extensions.php:49
 #, fuzzy
 msgid ""
 "Attach <b>up to 3 static files</b> (for example a terms & conditions "
@@ -1637,8 +1794,8 @@ msgstr ""
 "Pievienojiet <b>līdz 3 statiskiem failiem</b> (piemēram, noteikumu un "
 "nosacījumu dokumentu) WooCommerce e-pasta ziņojumiem pēc savas izvēles."
 
-#: includes/views/wcpdf-extensions.php:30
-#: includes/views/wcpdf-extensions.php:60
+#: includes/views/wcpdf-extensions.php:20
+#: includes/views/wcpdf-extensions.php:50
 #, fuzzy
 msgid ""
 "Use <b>separate numbering systems</b> and/or format for proforma invoices "
@@ -1648,8 +1805,8 @@ msgstr ""
 "priekšrēķiniem un kredītrēķiniem vai izmantojiet galveno rēķinu numerācijas "
 "sistēmu"
 
-#: includes/views/wcpdf-extensions.php:31
-#: includes/views/wcpdf-extensions.php:61
+#: includes/views/wcpdf-extensions.php:21
+#: includes/views/wcpdf-extensions.php:51
 #, fuzzy
 msgid ""
 "<b>Customize</b> the <b>shipping & billing address</b> format to include "
@@ -1660,20 +1817,20 @@ msgstr ""
 "papildu pielāgotus laukus, fontu izmērus u. c. bez nepieciešamības izveidot "
 "pielāgotu veidni."
 
-#: includes/views/wcpdf-extensions.php:32
-#: includes/views/wcpdf-extensions.php:62
+#: includes/views/wcpdf-extensions.php:22
+#: includes/views/wcpdf-extensions.php:52
 #, fuzzy
 msgid "Use the plugin in multilingual <b>WPML</b> setups"
 msgstr "Izmantojiet spraudni daudzvalodu <b>WPML</b> iestatījumos"
 
-#: includes/views/wcpdf-extensions.php:34
-#: includes/views/wcpdf-extensions.php:114
+#: includes/views/wcpdf-extensions.php:24
+#: includes/views/wcpdf-extensions.php:104
 #, fuzzy
 msgid "Advanced, customizable templates"
 msgstr "Uzlabotas, pielāgojamas veidnes"
 
-#: includes/views/wcpdf-extensions.php:36
-#: includes/views/wcpdf-extensions.php:117
+#: includes/views/wcpdf-extensions.php:26
+#: includes/views/wcpdf-extensions.php:107
 #, fuzzy
 msgid ""
 "Completely customize the invoice contents (prices, taxes, thumbnails) to "
@@ -1682,19 +1839,19 @@ msgstr ""
 "Pilnībā pielāgojiet rēķina saturu (cenas, nodokļus, sīktēlus) savām "
 "vajadzībām, izmantojot vilkšanas un nomešanas pielāgojamo programmu"
 
-#: includes/views/wcpdf-extensions.php:37
-#: includes/views/wcpdf-extensions.php:118
+#: includes/views/wcpdf-extensions.php:27
+#: includes/views/wcpdf-extensions.php:108
 #, fuzzy
 msgid "Two extra stylish premade templates (Modern & Business)"
 msgstr "Divas īpaši stilīgas iepriekš sagatavotas veidnes (Modern & Business)"
 
-#: includes/views/wcpdf-extensions.php:39
-#: includes/views/wcpdf-extensions.php:63
+#: includes/views/wcpdf-extensions.php:29
+#: includes/views/wcpdf-extensions.php:53
 #, fuzzy
 msgid "Upload automatically to dropbox"
 msgstr "Automātiska augšupielāde uz Dropbox"
 
-#: includes/views/wcpdf-extensions.php:41
+#: includes/views/wcpdf-extensions.php:31
 #, fuzzy
 msgid ""
 "This extension conveniently uploads all the invoices (and other pdf "
@@ -1706,44 +1863,44 @@ msgstr ""
 "no profesionālā paplašinājuma), kas tiek nosūtīti jūsu klientiem pa e-pastu "
 "uz Dropbox. Labākais veids, kā uzturēt rēķinu administrēšanu atjauninātu!"
 
-#: includes/views/wcpdf-extensions.php:44
+#: includes/views/wcpdf-extensions.php:34
 #, fuzzy
-msgid "Get WooCommerce PDF Invoices & Packing Slips Bundle"
+msgid "Get PDF Invoices & Packing Slips for WooCommerce Bundle"
 msgstr "Iegūstiet WooCommerce PDF rēķinu un iepakojuma lapu paketi"
 
-#: includes/views/wcpdf-extensions.php:53
+#: includes/views/wcpdf-extensions.php:43
 #, fuzzy
 msgid "Go Pro: Proforma invoices, credit notes (=refunds) & more!"
 msgstr "Go Pro: Proforma rēķini, kredīta atzīmes (=atmaksas) un vairāk!"
 
-#: includes/views/wcpdf-extensions.php:55
+#: includes/views/wcpdf-extensions.php:45
 #, fuzzy
 msgid ""
-"Supercharge WooCommerce PDF Invoices & Packing Slips with the following "
+"Supercharge PDF Invoices & Packing Slips for WooCommerce with the following "
 "features:"
 msgstr "Papildiniet WooCommerce PDF rēķinus un pavadzīmes ar šādām funkcijām:"
 
-#: includes/views/wcpdf-extensions.php:65
+#: includes/views/wcpdf-extensions.php:55
 #, fuzzy
-msgid "Get WooCommerce PDF Invoices & Packing Slips Professional!"
+msgid "Get PDF Invoices & Packing Slips for WooCommerce Professional!"
 msgstr "Iegūstiet WooCommerce PDF rēķinus un pavadzīmes Professional!"
 
-#: includes/views/wcpdf-extensions.php:73
+#: includes/views/wcpdf-extensions.php:63
 #, fuzzy
 msgid "Automatically send payment reminders to your customers"
 msgstr "Automātiski nosūtiet klientiem atgādinājumus par maksājumiem"
 
-#: includes/views/wcpdf-extensions.php:75
+#: includes/views/wcpdf-extensions.php:65
 #, fuzzy
 msgid "WooCommerce Smart Reminder emails"
 msgstr "WooCommerce Smart Reminder emails"
 
-#: includes/views/wcpdf-extensions.php:77
+#: includes/views/wcpdf-extensions.php:67
 #, fuzzy
 msgid "<b>Completely automatic</b> scheduled emails"
 msgstr "<b>Pilnīgi automātiski</b> plānotie e-pasta ziņojumi"
 
-#: includes/views/wcpdf-extensions.php:78
+#: includes/views/wcpdf-extensions.php:68
 #, fuzzy
 msgid ""
 "<b>Rich text editor</b> for the email text, including placeholders for data "
@@ -1752,7 +1909,7 @@ msgstr ""
 "<b>Teksta redaktors</b> e-pasta vēstules tekstam, tostarp pasūtījuma datu "
 "(vārds, pasūtījuma kopsumma u. c.) aizvietotājzīmes"
 
-#: includes/views/wcpdf-extensions.php:79
+#: includes/views/wcpdf-extensions.php:69
 #, fuzzy
 msgid ""
 "Configure the exact requirements for sending an email (time after order, "
@@ -1761,7 +1918,7 @@ msgstr ""
 "Konfigurējiet precīzas prasības e-pasta vēstules nosūtīšanai (laiks pēc "
 "pasūtījuma, pasūtījuma statuss, maksājuma metode)"
 
-#: includes/views/wcpdf-extensions.php:80
+#: includes/views/wcpdf-extensions.php:70
 #, fuzzy
 msgid ""
 "Fully <b>WPML Compatible</b> – emails will be automatically sent in the "
@@ -1770,7 +1927,7 @@ msgstr ""
 "Pilnībā <b>saderīgs ar WPML</b> - e-pasti tiks automātiski nosūtīti "
 "pasūtījuma valodā."
 
-#: includes/views/wcpdf-extensions.php:81
+#: includes/views/wcpdf-extensions.php:71
 #, fuzzy
 msgid ""
 "<b>Super versatile!</b> Can be used for any kind of reminder email (review "
@@ -1779,17 +1936,17 @@ msgstr ""
 "<b>Īpaši daudzpusīgs!</b> Var izmantot jebkura veida atgādinājuma e-pasta "
 "sūtīšanai (atgādinājumi par pārskatīšanu, atkārtotiem pirkumiem)"
 
-#: includes/views/wcpdf-extensions.php:82
+#: includes/views/wcpdf-extensions.php:72
 #, fuzzy
 msgid "Integrates seamlessly with the PDF Invoices & Packing Slips plugin"
 msgstr "Nevainojama integrācija ar PDF rēķinu un pavadzīmju spraudni"
 
-#: includes/views/wcpdf-extensions.php:84
+#: includes/views/wcpdf-extensions.php:74
 #, fuzzy
 msgid "Get WooCommerce Smart Reminder Emails"
 msgstr "Iegūt WooCommerce Smart atgādinājuma e-pasta vēstules"
 
-#: includes/views/wcpdf-extensions.php:93
+#: includes/views/wcpdf-extensions.php:83
 #, fuzzy
 msgid ""
 "Automatically send new orders or packing slips to your printer, as soon as "
@@ -1798,7 +1955,7 @@ msgstr ""
 "Automātiski nosūtiet jaunus pasūtījumus vai iesaiņojuma veidlapas uz "
 "printeri, tiklīdz klients veic pasūtījumu!"
 
-#: includes/views/wcpdf-extensions.php:99
+#: includes/views/wcpdf-extensions.php:89
 #, fuzzy
 msgid ""
 "Check out the WooCommerce Automatic Order Printing extension from our "
@@ -1807,123 +1964,179 @@ msgstr ""
 "Apskatiet WooCommerce automātiskās pasūtījumu drukāšanas paplašinājumu no "
 "mūsu partneriem Simba Hosting"
 
-#: includes/views/wcpdf-extensions.php:100
+#: includes/views/wcpdf-extensions.php:90
 #, fuzzy
 msgid "WooCommerce Automatic Order Printing"
 msgstr "WooCommerce Automatic Order Printing"
 
 #. translators: Premium Templates link
-#: includes/views/wcpdf-extensions.php:120
+#: includes/views/wcpdf-extensions.php:110
 #, fuzzy
 msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
 msgstr "Pārbaudiet Premium PDF rēķinu un pavadzīmju veidnes vietnē %s."
 
 #. translators: email link
-#: includes/views/wcpdf-extensions.php:122
+#: includes/views/wcpdf-extensions.php:112
 msgid "For custom templates, contact us at %s."
 msgstr "Lai iegūtu personificētas formas, sazinieties ar mums %s."
 
-#: includes/views/wcpdf-settings-page.php:9
-msgid "WooCommerce PDF Invoices"
-msgstr "WooCommerce PDF Pavadzīmes"
+#. translators: ★★★★★ (5-star)
+#: includes/views/wcpdf-settings-page.php:7
+msgid ""
+"If you like <strong>PDF Invoices & Packing Slips for WooCommerce</strong> "
+"please leave us a %s rating. A huge thank you in advance!"
+msgstr ""
 
-#: includes/wcpdf-functions.php:209
+#: includes/views/wcpdf-settings-page.php:88
+msgid "ID, email or name"
+msgstr ""
+
+#: includes/views/wcpdf-settings-page.php:89
+msgid "Clear search text"
+msgstr ""
+
+#: includes/views/wcpdf-settings-page.php:91
+msgid "Currently showing last order"
+msgstr ""
+
+#: includes/views/wcpdf-settings-page.php:92
+#: includes/views/wcpdf-settings-page.php:95
+msgid "Search for an order"
+msgstr ""
+
+#: includes/views/wcpdf-settings-page.php:94
+msgid "Show last order"
+msgstr ""
+
+#: includes/wcpdf-functions.php:222
 #, fuzzy
 msgid "Error creating PDF, please contact the site owner."
 msgstr "Kļūda, izveidojot PDF, lūdzu, sazinieties ar vietnes īpašnieku."
 
-#: templates/Simple/invoice.php:35 templates/Simple/packing-slip.php:48
+#: languages/strings.php:3
+msgid "VAT"
+msgstr "PVN"
+
+#: languages/strings.php:4
+#, fuzzy
+msgid "Tax rate"
+msgstr "Nodokļu likme"
+
+#: languages/strings.php:5
+msgid "Payment method"
+msgstr "Maksājuma veids"
+
+#: languages/strings.php:6
+msgid "Shipping method"
+msgstr "Piegādes veids"
+
+#: languages/strings.php:7
+#, fuzzy
+msgid "Send email"
+msgstr "Sūtīt e-pastu"
+
+#: templates/Simple/invoice.php:40 templates/Simple/packing-slip.php:53
 #, fuzzy
 msgid "Billing Address:"
 msgstr "Norēķinu adrese:"
 
-#: templates/Simple/invoice.php:48
+#: templates/Simple/invoice.php:53
 #, fuzzy
 msgid "Ship To:"
 msgstr "Nosūtiet uz:"
 
-#: templates/Simple/invoice.php:70 templates/Simple/packing-slip.php:58
+#: templates/Simple/invoice.php:78 templates/Simple/packing-slip.php:66
 msgid "Order Number:"
 msgstr "Pasūtījuma Numurs:"
 
-#: templates/Simple/invoice.php:74 templates/Simple/packing-slip.php:62
+#: templates/Simple/invoice.php:82 templates/Simple/packing-slip.php:70
 msgid "Order Date:"
 msgstr "Pasūtījuma Datums:"
 
-#: templates/Simple/invoice.php:78
+#: templates/Simple/invoice.php:87
 msgid "Payment Method:"
 msgstr "Maksājuma Veids:"
 
-#: templates/Simple/invoice.php:92 templates/Simple/packing-slip.php:80
+#: templates/Simple/invoice.php:102 templates/Simple/packing-slip.php:90
 msgid "Product"
 msgstr "Produkts"
 
-#: templates/Simple/invoice.php:93 templates/Simple/packing-slip.php:81
+#: templates/Simple/invoice.php:103 templates/Simple/packing-slip.php:91
 msgid "Quantity"
 msgstr "Daudzums"
 
-#: templates/Simple/invoice.php:94
+#: templates/Simple/invoice.php:104
 msgid "Price"
 msgstr "Cena"
 
-#: templates/Simple/invoice.php:106 templates/Simple/packing-slip.php:93
+#: templates/Simple/invoice.php:116 templates/Simple/packing-slip.php:103
 msgid "SKU"
 msgstr "SKU"
 
-#: templates/Simple/invoice.php:107 templates/Simple/packing-slip.php:94
+#: templates/Simple/invoice.php:117 templates/Simple/packing-slip.php:104
 msgid "SKU:"
 msgstr "SKU:"
 
-#: templates/Simple/invoice.php:108 templates/Simple/packing-slip.php:95
+#: templates/Simple/invoice.php:118 templates/Simple/packing-slip.php:105
 msgid "Weight:"
 msgstr "Svars:"
 
-#: templates/Simple/invoice.php:123
+#: templates/Simple/invoice.php:133
 #, fuzzy
 msgid "Notes"
 msgstr "Piezīmes"
 
-#: templates/Simple/invoice.php:131 templates/Simple/packing-slip.php:112
+#: templates/Simple/invoice.php:141 templates/Simple/packing-slip.php:123
 msgid "Customer Notes"
 msgstr "Klienta Piezīmes"
 
-#: templates/Simple/packing-slip.php:35
+#: templates/Simple/packing-slip.php:40
 #, fuzzy
 msgid "Shipping Address:"
 msgstr "Veikala adrese:"
 
-#: templates/Simple/packing-slip.php:66
+#: templates/Simple/packing-slip.php:75
 #, fuzzy
 msgid "Shipping Method:"
 msgstr "Piegādes veids:"
 
 #. translators: <a> tags
-#: woocommerce-pdf-invoices-packingslips.php:271
+#: woocommerce-pdf-invoices-packingslips.php:262
 #, fuzzy
 msgid ""
-"WooCommerce PDF Invoices & Packing Slips requires %1$sWooCommerce%2$s to be "
-"installed & activated!"
+"PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s "
+"version 3.0 or higher!"
 msgstr ""
 "WooCommerce PDF faktūrrēķiniem un pavadzīmēm nepieciešama %1$sWooCommerce"
 "%2$s instalēšana un aktivizēšana!"
 
-#: woocommerce-pdf-invoices-packingslips.php:282
+#. translators: <a> tags
+#: woocommerce-pdf-invoices-packingslips.php:290
 #, fuzzy
 msgid ""
-"WooCommerce PDF Invoices & Packing Slips requires PHP 7.1 (7.4 or higher "
+"PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s to "
+"be installed & activated!"
+msgstr ""
+"WooCommerce PDF faktūrrēķiniem un pavadzīmēm nepieciešama %1$sWooCommerce"
+"%2$s instalēšana un aktivizēšana!"
+
+#: woocommerce-pdf-invoices-packingslips.php:301
+#, fuzzy
+msgid ""
+"PDF Invoices & Packing Slips for WooCommerce requires PHP 7.1 (7.4 or higher "
 "recommended)."
 msgstr ""
 "WooCommerce PDF rēķiniem un pavadzīmēm nepieciešama PHP 7.1 (ieteicamā "
 "versija 7.4 vai jaunāka)."
 
 #. translators: <a> tags
-#: woocommerce-pdf-invoices-packingslips.php:284
+#: woocommerce-pdf-invoices-packingslips.php:303
 #, fuzzy
 msgid "We strongly recommend to %1$supdate your PHP version%2$s."
 msgstr "Mēs iesakām %1$satjaunināt PHP versiju %2$s."
 
 #. translators: <a> tags
-#: woocommerce-pdf-invoices-packingslips.php:286
+#: woocommerce-pdf-invoices-packingslips.php:305
 #, fuzzy
 msgid ""
 "If you cannot upgrade your PHP version, you can download %1$sthis addon%2$s "
@@ -1933,7 +2146,7 @@ msgstr ""
 "%2$s, lai nodrošinātu atpakaļejošu savietojamību ar PHP5.6."
 
 #. translators: directory path
-#: woocommerce-pdf-invoices-packingslips.php:374
+#: woocommerce-pdf-invoices-packingslips.php:393
 #, fuzzy
 msgid ""
 "The PDF files in %s are not currently protected due to your site running on "
@@ -1942,36 +2155,30 @@ msgstr ""
 "PDF faili vietnē %s pašlaik nav aizsargāti, jo jūsu vietnē darbojas "
 "<strong>NGINX</strong>."
 
-#: woocommerce-pdf-invoices-packingslips.php:375
+#: woocommerce-pdf-invoices-packingslips.php:394
 #, fuzzy
 msgid "To protect them, you must click the button below."
 msgstr "Lai tos aizsargātu, ir jānoklikšķina uz tālāk redzamās pogas."
 
-#. translators: plugin name
-#: woocommerce-pdf-invoices-packingslips.php:419
+#: woocommerce-pdf-invoices-packingslips.php:437
 #, fuzzy
 msgid ""
 "When sending emails with MailPoet 3 and the active sending method is "
-"MailPoet Sending Service, MailPoet does not include the %s attachments in "
-"the emails."
+"<strong>MailPoet Sending Service</strong> or <strong>Your web host / web "
+"server</strong>, MailPoet does not include the <strong>PDF Invoices & "
+"Packing Slips for WooCommerce</strong> attachments in the emails."
 msgstr ""
 "Kad e-pasta vēstules tiek sūtītas ar MailPoet 3 un aktīvā sūtīšanas metode "
 "ir MailPoet Sūtīšanas pakalpojums, MailPoet e-pasta vēstulēs neiekļauj %s "
 "pielikumus."
 
-#. translators: "Your web host / web server"
-#: woocommerce-pdf-invoices-packingslips.php:421
-#, fuzzy
-msgid "To fix this you should select other method like %1$s or %2$s."
-msgstr "Lai to novērstu, jāizvēlas cita metode, piemēram, %1$s vai %2$s."
+#: woocommerce-pdf-invoices-packingslips.php:438
+msgid ""
+"To fix this you should select <strong>The default WordPress sending method "
+"(default)</strong> on the <strong>Advanced tab</strong>."
+msgstr ""
 
-#. translators: "Your web host / web server"
-#: woocommerce-pdf-invoices-packingslips.php:421
+#: woocommerce-pdf-invoices-packingslips.php:439
 #, fuzzy
-msgid "Your web host / web server"
-msgstr "Jūsu tīmekļa mitinātājs / tīmekļa serveris"
-
-#: woocommerce-pdf-invoices-packingslips.php:422
-#, fuzzy
-msgid "Change MailPoet sending method"
+msgid "Change MailPoet sending method to WordPress (default)"
 msgstr "Mainīt MailPoet sūtīšanas metodi"

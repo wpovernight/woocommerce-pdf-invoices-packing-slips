@@ -1,11 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-use WPO\WC\PDF_Invoices\Compatibility\WC_DateTime;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -105,10 +100,10 @@ abstract class Order_Document {
 	public function __construct( $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = $order;
-			$this->order = WCX::get_order( $this->order_id );
+			$this->order    = wc_get_order( $this->order_id );
 		} elseif ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) {
-			$this->order_id = WCX_Order::get_id( $order );
-			$this->order = $order;
+			$this->order_id = $order->get_id();
+			$this->order    = $order;
 		}
 
 		// set properties
@@ -146,7 +141,7 @@ abstract class Order_Document {
 		$order_settings = array();
 
 		if ( ! empty( $this->order ) ) {
-			$order_settings = WCX_Order::get_meta( $this->order, "_wcpdf_{$this->slug}_settings" );
+			$order_settings = $this->order->get_meta( "_wcpdf_{$this->slug}_settings" );
 			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
 				$order_settings = maybe_unserialize( $order_settings );
 			}
@@ -199,7 +194,8 @@ abstract class Order_Document {
 			// this is either the first time the document is generated, or historical settings are disabled
 			// in both cases, we store the document settings
 			// exclude non historical settings from being saved in order meta
-			WCX_Order::update_meta_data( $this->order, "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
+			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
+			$this->order->save_meta_data();
 		}
 	}
 
@@ -254,11 +250,11 @@ abstract class Order_Document {
 	}
 
 	public function read_data( $order ) {
-		$number = WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_number_data", true );
+		$number = $order->get_meta( "_wcpdf_{$this->slug}_number_data" );
 		// fallback to legacy data for number
 		if ( empty( $number ) ) {
-			$number = WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_number", true );
-			$formatted_number = WCX_Order::get_meta( $order, "_wcpdf_formatted_{$this->slug}_number", true );
+			$number = $order->get_meta( "_wcpdf_{$this->slug}_number" );
+			$formatted_number = $order->get_meta( "_wcpdf_formatted_{$this->slug}_number" );
 			if (!empty($formatted_number)) {
 				$number = compact( 'number', 'formatted_number' );
 			}
@@ -267,9 +263,9 @@ abstract class Order_Document {
 		// pass data to setter functions
 		$this->set_data( array(
 			// always load date before number, because date is used in number formatting
-			'date'   => WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_date", true ),
+			'date'   => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
 			'number' => $number,
-			'notes'  => WCX_Order::get_meta( $order, "_wcpdf_{$this->slug}_notes", true ),
+			'notes'  => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
 		), $order );
 
 		return;
@@ -292,31 +288,33 @@ abstract class Order_Document {
 
 		foreach ( $this->data as $key => $value ) {
 			if ( empty( $value ) ) {
-				WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}" );
+				$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}" );
 				if ( $key == 'date' ) {
-					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_formatted" );
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}_formatted" );
 				} elseif ( $key == 'number' ) {
-					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_data" );
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}_data" );
 					// deleting the number = deleting the document, so also delete document settings
-					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_settings" );
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_settings" );
 				} elseif ( $key == 'notes' ) {
-					WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$key}" );
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}" );
 				}
 			} else {
 				if ( $key == 'date' ) {
 					// store dates as timestamp and formatted as mysql time
-					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}", $value->getTimestamp() );
-					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_formatted", $value->date( 'Y-m-d H:i:s' ) );
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value->getTimestamp() );
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}_formatted", $value->date( 'Y-m-d H:i:s' ) );
 				} elseif ( $key == 'number' ) {
 					// store both formatted number and number data
-					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}", $value->formatted_number );
-					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}_data", $value->to_array() );
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value->formatted_number );
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}_data", $value->to_array() );
 				} elseif ( $key == 'notes' ) {
 					// store notes
-					WCX_Order::update_meta_data( $order, "_wcpdf_{$this->slug}_{$key}", $value );
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value );
 				}
 			}
 		}
+
+		$order->save_meta_data();
 
 		do_action( 'wpo_wcpdf_save_document', $this, $order );
 	}
@@ -335,9 +333,11 @@ abstract class Order_Document {
 			'number_data',
 			'notes',
 		), $this );
-		foreach ($data_to_remove as $data_key) {
-			WCX_Order::delete_meta_data( $order, "_wcpdf_{$this->slug}_{$data_key}" );
+		foreach ( $data_to_remove as $data_key ) {
+			$order->delete_meta_data( "_wcpdf_{$this->slug}_{$data_key}" );
 		}
+
+		$order->save_meta_data();
 
 		do_action( 'wpo_wcpdf_delete_document', $this, $order );
 	}
@@ -450,6 +450,10 @@ abstract class Order_Document {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
 	}
 
+	public function title() {
+		echo $this->get_title(); 
+	}
+
 	public function get_number_title() {
 		/* translators: %s: document name */
 		$number_title = sprintf( __( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
@@ -496,7 +500,7 @@ abstract class Order_Document {
 				$datetime = $value;
 			} elseif ( is_numeric( $value ) ) {
 				// Timestamps are handled as UTC timestamps in all cases.
-				$datetime = new WC_DateTime( "@{$value}", new \DateTimeZone( 'UTC' ) );
+				$datetime = new \WC_DateTime( "@{$value}", new \DateTimeZone( 'UTC' ) );
 			} else {
 				// Strings are defined in local WP timezone. Convert to UTC.
 				if ( 1 === preg_match( '/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|((-|\+)\d{2}:\d{2}))$/', $value, $date_bits ) ) {
@@ -505,7 +509,7 @@ abstract class Order_Document {
 				} else {
 					$timestamp = wc_string_to_timestamp( get_gmt_from_date( gmdate( 'Y-m-d H:i:s', wc_string_to_timestamp( $value ) ) ) );
 				}
-				$datetime  = new WC_DateTime( "@{$timestamp}", new \DateTimeZone( 'UTC' ) );
+				$datetime  = new \WC_DateTime( "@{$timestamp}", new \DateTimeZone( 'UTC' ) );
 			}
 
 			// Set local timezone or offset.
@@ -624,27 +628,40 @@ abstract class Order_Document {
 	 * Show logo html
 	 */
 	public function header_logo() {
-		if ($this->get_header_logo_id()) {
+		if ( $this->get_header_logo_id() ) {
 			$attachment_id = $this->get_header_logo_id();
-			$company = $this->get_shop_name();
-			if( $attachment_id ) {
-				$attachment = wp_get_attachment_image_src( $attachment_id, 'full', false );
+			$company       = $this->get_shop_name();
+
+			if ( $attachment_id ) {
+				$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
 				$attachment_path = get_attached_file( $attachment_id );
+
 				if ( empty( $attachment ) || empty( $attachment_path ) ) {
 					return;
 				}
 				
-				$attachment_src = $attachment[0];
-				$attachment_width = $attachment[1];
+				$attachment_src    = $attachment[0];
+				$attachment_width  = $attachment[1];
 				$attachment_height = $attachment[2];
 
 				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 					$src = $attachment_path;
 				} else {
-					$src = $attachment_src;
+					$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
+					if ( is_wp_error( $head ) ) {
+						$errors = $head->get_error_messages();
+						foreach ( $errors as $error ) {
+							wcpdf_log_error( $error, 'critical' );
+						}
+						return;
+					} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
+						$src = $attachment_src;
+					} else {
+						return;
+					}
 				}
 				
-				$img_element = sprintf('<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
+				$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
 				
 				echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 			}
@@ -755,6 +772,9 @@ abstract class Order_Document {
 	*/
 
 	public function get_pdf() {
+		// maybe we need to reinstall fonts first?
+		WPO_WCPDF()->main->maybe_reinstall_fonts();
+
 		$pdf = null;
 		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
 			$pdf = file_get_contents( $pdf_file );
@@ -789,6 +809,9 @@ abstract class Order_Document {
 	}
 
 	public function preview_pdf() {
+		// maybe we need to reinstall fonts first?
+		WPO_WCPDF()->main->maybe_reinstall_fonts();
+
 		// get last settings
 		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
 
@@ -984,18 +1007,13 @@ abstract class Order_Document {
 	// get list of WooCommerce statuses
 	public function get_wc_order_status_list() {
 		$order_statuses = array();
-		if ( version_compare( WOOCOMMERCE_VERSION, '2.2', '<' ) ) {
-			$statuses = (array) get_terms( 'shop_order_status', array( 'hide_empty' => 0, 'orderby' => 'id' ) );
-			foreach ( $statuses as $status ) {
-				$order_statuses[esc_attr( $status->slug )] = esc_html__( $status->name, 'woocommerce' );
-			}
-		} else {
-			$statuses = function_exists('wc_get_order_statuses') ? wc_get_order_statuses() : array();
-			foreach ( $statuses as $status_slug => $status ) {
-				$status_slug   = 'wc-' === substr( $status_slug, 0, 3 ) ? substr( $status_slug, 3 ) : $status_slug;
-				$order_statuses[$status_slug] = $status;
-			}
+		$statuses       = function_exists('wc_get_order_statuses') ? wc_get_order_statuses() : array();
+		
+		foreach ( $statuses as $status_slug => $status ) {
+			$status_slug   = 'wc-' === substr( $status_slug, 0, 3 ) ? substr( $status_slug, 3 ) : $status_slug;
+			$order_statuses[$status_slug] = $status;
 		}
+
 		return $order_statuses;
 	}
 

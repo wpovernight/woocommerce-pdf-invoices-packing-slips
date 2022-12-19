@@ -1,11 +1,11 @@
-=== WooCommerce PDF Invoices & Packing Slips ===
-Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou
+=== PDF Invoices & Packing Slips for WooCommerce ===
+Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, jhosagid
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
-Tested up to: 6.0
+Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 3.2.0
+Stable tag: 3.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,13 +22,13 @@ This WooCommerce extension automatically adds a PDF invoice to the order confirm
 * **Fully customizable** HTML/CSS invoice templates
 * Download invoices from the My Account page
 * Sequential invoice numbers - with custom formatting
-* **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian**
+* **Available in: Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Portuguese, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian**
 
 In addition to this, we offer several premium extensions:
 
-* Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [WooCommerce PDF Invoices & Packing Slips Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
+* Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [PDF Invoices & Packing Slips for WooCommerce Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
 * Automatically send new orders or packing slips to your printer, as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
-* More advanced & stylish templates with [WooCommerce PDF Invoices & Packing Slips Premium Templates](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)
+* More advanced & stylish templates with [PDF Invoices & Packing Slips for WooCommerce Premium Templates](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)
 
 = Fully customizable =
 In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS based templates that allow for customization & full control over the PDF output. Copy the templates to your theme folder and you don't have to worry that your customizations will be overwritten when you update the plugin.
@@ -42,13 +42,13 @@ In addition to a number of default settings (including a custom header/logo) and
 
 = Minimum Requirements =
 
-* WooCommerce 2.2 or later
+* WooCommerce 3.0 or later
 * WordPress 3.5 or later
 
 = Automatic installation =
-Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser. To do an automatic install of WooCommerce PDF Invoices & Packing Slips, log in to your WordPress admin panel, navigate to the Plugins menu and click Add New.
+Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser. To do an automatic install of PDF Invoices & Packing Slips for WooCommerce, log in to your WordPress admin panel, navigate to the Plugins menu and click Add New.
 
-In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Search Plugins. You can install it by simply clicking Install Now. After clicking that link you will be asked if you're sure you want to install the plugin. Click yes and WordPress will automatically complete the installation. After installation has finished, click the 'activate plugin' link.
+In the search field type "PDF Invoices & Packing Slips for WooCommerce" and click Search Plugins. You can install it by simply clicking Install Now. After clicking that link you will be asked if you're sure you want to install the plugin. Click yes and WordPress will automatically complete the installation. After installation has finished, click the 'activate plugin' link.
 
 = Manual installation via the WordPress interface =
 1. Download the plugin zip file to your computer
@@ -66,7 +66,7 @@ In the search field type "WooCommerce PDF Invoices & Packing Slips" and click Se
 
 = Where can I find the documentation? =
 
-[WooCommerce PDF Invoices & Packing Slips documentation](https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/)
+[PDF Invoices & Packing Slips for WooCommerce documentation](https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/)
 
 = It's not working! =
 
@@ -102,10 +102,45 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 3.2.6 (2022-12-15) =
+* Fix: adds nonce check in hide link for attachments hint in admin
+* Tested up to WooCommerce 7.2
+
+= 3.2.5 (2022-11-22) =
+* Fix: allow for WooCommerce Booking without order
+
+= 3.2.4 (2022-11-07) =
+* Tweak: update translation template and files
+* Fix: break long URLs in different lines if it reaches the available space in Simple template
+* Fix: restore deleted strings and load them using standalone strings.php file 
+* Fix: warning on deprecated argument from product get_dimentions() method
+* Tested up to WooCommerce 7.1
+
+= 3.2.3 (2022-10-28) =
+* Fix: check if the order is unsaved or doesn't exist before rendering the PDF document
+* Fix: bug on getting the order ID from third party objects when attaching PDF to email
+* Fix: reverts documents functions/templates escaping that caused issues on version 3.2.2
+* Fix: billing/shipping phone getter functions for refund orders
+* Tested up to WordPress 6.1
+
+= 3.2.2 (2022-10-25) =
+* New: filter to allow customers to access your PDF with a unique key
+* Fix: check if the shop logo exists
+* Fix: check if HTML is escaped properly before echoing
+* Fix: maybe reinstall fonts (if are missing) before PDF output
+* Fix: bug on automatic cleanup cron job
+* Fix: removes WC legacy versions compatibility classes. Bumps WC minimum version to 3.0
+* Fix: allow manually resending new order email
+* Fix: run action hooks within invoice columns under order list
+* Marked tested up to WooCommerce 7.0
+
+= 3.2.1 (2022-10-06) =
+* Renames the plugin to comply with trademark rules
+
 = 3.2.0 (2022-09-26) =
 * New: setting to display the Invoice date column in the WooCommerce orders list
 * New: updated Dompdf to version 2.0.1, which fixes a security vulnerability.
-* New: filter 'wpo_wcpdf_document_link_additional_vars' to add additional query variables to the document link
+* New: filter `wpo_wcpdf_document_link_additional_vars` to add additional query variables to the document link
 * Tweak: improved document settings data init/save
 * Tweak: improved wizard display settings
 * Tweak: improved styles and descriptions for the document 'Number format' settings
@@ -116,7 +151,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 3.1.0 (2022-09-06) =
 * New: custom document links feature available from the Status settings page. Changes the document links to a prettier URL scheme
-* New: action hooks before and after the shop logo: 'wpo_wcpdf_before_shop_logo' and'wpo_wcpdf_after_shop_logo'
+* New: action hooks before and after the shop logo: `wpo_wcpdf_before_shop_logo` and `wpo_wcpdf_after_shop_logo`
 * Fix: replaces WP_Filesystem with PHP functions to delete temporary files
 * Marked tested up to WooCommerce 6.8
 

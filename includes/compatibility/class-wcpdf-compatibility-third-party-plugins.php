@@ -1,11 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Compatibility;
 
-use WPO\WC\PDF_Invoices\Compatibility\WC_Core as WCX;
-use WPO\WC\PDF_Invoices\Compatibility\Order as WCX_Order;
-use WPO\WC\PDF_Invoices\Compatibility\Product as WCX_Product;
-use WPO\WC\PDF_Invoices\Compatibility\WC_DateTime;
-
 defined( 'ABSPATH' ) or exit;
 
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\Third_Party_Plugins' ) ) :
@@ -71,11 +66,13 @@ class Third_Party_Plugins {
 			$order = wc_get_order( $order );
 		}
 		// delete invoice number, invoice date & invoice exists meta
-		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_number' );
-		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_number_data' );
-		WCX_Order::delete_meta_data( $order, '_wcpdf_formatted_invoice_number' );
-		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_date' );
-		WCX_Order::delete_meta_data( $order, '_wcpdf_invoice_exists' );
+		$order->delete_meta_data( $order, '_wcpdf_invoice_number' );
+		$order->delete_meta_data( $order, '_wcpdf_invoice_number_data' );
+		$order->delete_meta_data( $order, '_wcpdf_formatted_invoice_number' );
+		$order->delete_meta_data( $order, '_wcpdf_invoice_date' );
+		$order->delete_meta_data( $order, '_wcpdf_invoice_exists' );
+
+		$order->save_meta_data();
 	}
 
 	/**
@@ -130,16 +127,16 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
-		if ( $bundled_by = WCX_Order::get_item_meta( $order, $item_id, '_bundled_by', true ) ) {
+		if ( $bundled_by = wc_get_order_item_meta( $item_id, '_bundled_by', true ) ) {
 			$classes = $classes . ' bundled-item';
 
 			// check bundled item visibility
-			if ( $hidden = WCX_Order::get_item_meta( $order, $item_id, '_bundled_item_hidden', true ) ) {
+			if ( $hidden = wc_get_order_item_meta( $item_id, '_bundled_item_hidden', true ) ) {
 				$classes = $classes . ' hidden';
 			}
 
 			return $classes;
-		} elseif ( $bundled_items = WCX_Order::get_item_meta( $order, $item_id, '_bundled_items', true ) ) {
+		} elseif ( $bundled_items = wc_get_order_item_meta( $item_id, '_bundled_items', true ) ) {
 			return  $classes . ' product-bundle';
 		}
 
@@ -164,12 +161,12 @@ class Third_Party_Plugins {
 		}
 
 		// Add row classes
-		$refunded_item_id = WCX_Order::get_item_meta( $order, $item_id, '_refunded_item_id', true );
+		$refunded_item_id = wc_get_order_item_meta( $item_id, '_refunded_item_id', true );
 		$class_item_id = ! empty( $refunded_item_id ) ? $refunded_item_id : $item_id;
 
-		if ( $bundled_by = WCX_Order::get_item_meta( $order, $class_item_id, '_woosb_parent_id', true ) ) {
+		if ( $bundled_by = wc_get_order_item_meta( $class_item_id, '_woosb_parent_id', true ) ) {
 			$classes = $classes . ' bundled-item';
-		} elseif ( $bundled_items = WCX_Order::get_item_meta( $order, $class_item_id, '_woosb_ids', true ) ) {
+		} elseif ( $bundled_items = wc_get_order_item_meta( $class_item_id, '_woosb_ids', true ) ) {
 			$classes = $classes . ' product-bundle';
 		}
 
@@ -193,7 +190,7 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
-		if ( $chained_product_of = WCX_Order::get_item_meta( $order, $item_id, '_chained_product_of', true ) ) {
+		if ( $chained_product_of = wc_get_order_item_meta( $item_id, '_chained_product_of', true ) ) {
 			return  $classes . ' chained-product';
 		}
 
