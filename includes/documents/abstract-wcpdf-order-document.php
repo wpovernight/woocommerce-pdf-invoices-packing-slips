@@ -1034,6 +1034,7 @@ abstract class Order_Document {
 			}
 			// for yearly reset debugging only
 			//$date         = new \WC_DateTime( '1st January Next Year' );
+			
 			$store_name   = $this->get_sequential_number_store_name( $date, $method, $reset_number_yearly );
 			$number_store = new Sequential_Number_Store( $store_name, $method );	
 	
@@ -1068,13 +1069,13 @@ abstract class Order_Document {
 		} else {
 			// if the current store year doesn't match the year requested, check if we need to retire the store
 			// (meaning that we have entered a new year)
-			if( $requested_year !== $current_store_year ) {
+			if ( $requested_year !== $current_store_year ) {
 				$current_store_year = $this->maybe_retire_number_store( $date, $store_base_name, $method );
 			}
 
-			// If it's a non-current year (future or past), append the year to the store name, otherwise use default
-			if( $requested_year !== $current_store_year ) {
-				$number_store_name = "{$store_base_name}_{$requested_year}";
+			// if it's a non-current year (future or past), append the year to the store name, otherwise use default
+			if ( $requested_year !== $current_store_year ) {
+				$number_store_name = "{$store_base_name}_{$current_store_year}";
 			} else {
 				$number_store_name = $store_base_name;
 			}
@@ -1116,12 +1117,18 @@ abstract class Order_Document {
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 		// for yearly reset debugging only
 		//$now                = new \WC_DateTime( '1st January Next Year' );
+		
 		$current_year       = intval( $now->date_i18n( 'Y' ) );
 		$current_store_year = intval( $this->get_number_store_year( $default_table_name ) );
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
-
+		$order_year         = intval( $this->order->get_date_created()->date_i18n( 'Y' ) );
+		
+		// check if the order year is in the past
+		if ( $order_year < $current_year ) {
+			return $order_year;
+			
 		// nothing to retire if requested year matches current store year or if current store year is not in the past
-		if ( empty( $current_store_year ) || $requested_year == $current_store_year || ! ( $current_store_year < $current_year ) ) {
+		} elseif ( empty( $current_store_year ) || $requested_year == $current_store_year || ! ( $current_store_year < $current_year ) ) {
 			return $current_store_year;
 		}
 		
