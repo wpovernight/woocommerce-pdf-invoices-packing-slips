@@ -1182,6 +1182,10 @@ abstract class Order_Document {
 		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
 
 		$current_year = date_i18n( 'Y' );
+		// for yearly reset debugging only
+		//$next_year    = new \WC_DateTime( '1st January Next Year' );
+		//$current_year = intval( $next_year->date_i18n( 'Y' ) );
+		
 		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'") == $table_name; 
 		if( $table_exists ) {
 			// get year for the last row
