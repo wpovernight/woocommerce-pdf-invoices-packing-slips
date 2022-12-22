@@ -22,6 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 class WPO_WCPDF {
 
 	public $version = '3.2.6';
+	public $yearly_reset_debug = false; // set 'true' only for debugging
 	public $plugin_basename;
 	public $legacy_mode;
 	public $legacy_textdomain;
