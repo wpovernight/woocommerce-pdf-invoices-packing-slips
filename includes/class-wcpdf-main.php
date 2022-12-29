@@ -728,7 +728,7 @@ class Main {
 							wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 							exit;
 						} else {
-							delete_option( 'wpo_wcpdf_no_dir_error', true );
+							delete_option( 'wpo_wcpdf_no_dir_error' );
 							wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 							exit;
 						}
