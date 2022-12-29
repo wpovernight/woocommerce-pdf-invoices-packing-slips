@@ -392,30 +392,45 @@ class WPO_WCPDF {
 				<?php /* translators: directory path */ ?>
 				<p><?php printf( __( 'The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>' . $tmp_path . '</strong>' ); ?></p>
 				<p><?php _e( 'To protect them, you must click the button below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-				<p><a class="button" href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_protect_pdf_directory', 'true' ) ); ?>"><?php _e( 'Generate random temporary folder name', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-				<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_nginx_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+				<p><a class="button" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_protect_pdf_directory', 'true' ), 'protect_pdf_directory_nonce' ) ); ?>"><?php _e( 'Generate random temporary folder name', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_nginx_notice', 'true' ), 'hide_nginx_notice_nonce' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
 			<?php
+			
 			echo wp_kses_post( ob_get_clean() );
 		}
 
 		// protect PDF directory
-		if ( isset( $_GET['wpo_wcpdf_protect_pdf_directory'] ) ) {
-			$this->main->generate_random_string();
-			$old_path = $this->main->get_tmp_base( false );
-			$new_path = $this->main->get_tmp_base();
-			$this->main->copy_directory( $old_path, $new_path );
-			// save option to hide nginx notice
-			update_option( 'wpo_wcpdf_hide_nginx_notice', true );
-			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-			exit;
+		if ( isset( $_REQUEST['wpo_wcpdf_protect_pdf_directory'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'protect_pdf_directory_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_protect_pdf_directory' );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			} else {
+				$this->main->generate_random_string();
+				$old_path = $this->main->get_tmp_base( false );
+				$new_path = $this->main->get_tmp_base();
+				$this->main->copy_directory( $old_path, $new_path );
+				// save option to hide nginx notice
+				update_option( 'wpo_wcpdf_hide_nginx_notice', true );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			}
 		}
 
 		// save option to hide nginx notice
-		if ( isset( $_GET['wpo_wcpdf_hide_nginx_notice'] ) ) {
-			update_option( 'wpo_wcpdf_hide_nginx_notice', true );
-			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-			exit;
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_nginx_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_nginx_notice_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_nginx_notice' );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			} else {
+				update_option( 'wpo_wcpdf_hide_nginx_notice', true );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			}
 		}
 	}
 
@@ -437,7 +452,7 @@ class WPO_WCPDF {
 					<p><?php _e( 'When sending emails with MailPoet 3 and the active sending method is <strong>MailPoet Sending Service</strong> or <strong>Your web host / web server</strong>, MailPoet does not include the <strong>PDF Invoices & Packing Slips for WooCommerce</strong> attachments in the emails.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<p><?php _e( 'To fix this you should select <strong>The default WordPress sending method (default)</strong> on the <strong>Advanced tab</strong>.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=mailpoet-settings#/advanced' ) ); ?>"><?php _e( 'Change MailPoet sending method to WordPress (default)', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-					<p><a href="<?php echo esc_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+					<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_mailpoet_notice', 'true' ), 'hide_mailpoet_notice_nonce' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
 				<?php
 				echo wp_kses_post( ob_get_clean() );
@@ -445,10 +460,17 @@ class WPO_WCPDF {
 		}
 
 		// save option to hide mailpoet notice
-		if ( isset( $_GET['wpo_wcpdf_hide_mailpoet_notice'] ) ) {
-			update_option( 'wpo_wcpdf_hide_mailpoet_notice', true );
-			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-			exit;
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_mailpoet_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_mailpoet_notice_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_mailpoet_notice' );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			} else {
+				update_option( 'wpo_wcpdf_hide_mailpoet_notice', true );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			}
 		}
 	}
 
