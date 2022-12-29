@@ -119,10 +119,10 @@ class Admin {
 		if ( get_option( 'wpo_wcpdf_install_notice_dismissed' ) !== false ) {
 			return;
 		} else {
-			if ( isset( $_REQUEST['wpo_wcpdf_dismis_install'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			if ( isset( $_REQUEST['wpo_wcpdf_dismiss_install'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 				// validate nonce
-				if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'dismis_install_nonce' ) ) {
-					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_dismis_install' );
+				if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'dismiss_install_nonce' ) ) {
+					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_dismiss_install' );
 					return;
 				} else {
 					update_option( 'wpo_wcpdf_install_notice_dismissed', true );
@@ -134,7 +134,7 @@ class Admin {
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-install-notice">
 					<p><strong><?php esc_html_e( 'New to PDF Invoices & Packing Slips for WooCommerce?', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong> &#8211; <?php esc_html_e( 'Jumpstart the plugin by following our wizard!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-					<p class="submit"><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button-primary"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_dismis_install', true ), 'dismis_install_nonce' ) ); ?>" class="wpo-wcpdf-dismiss-wizard"><?php esc_html_e( 'I am the wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+					<p class="submit"><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button-primary"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_dismiss_install', true ), 'dismiss_install_nonce' ) ); ?>" class="wpo-wcpdf-dismiss-wizard"><?php esc_html_e( 'I am the wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
 				<script type="text/javascript">
 				jQuery( function( $ ) {
