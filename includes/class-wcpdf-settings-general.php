@@ -252,9 +252,15 @@ class Settings_General {
 
 	public function attachment_settings_hint( $active_tab, $active_section ) {
 		// save or check option to hide attachments settings hint
-		if ( isset( $_GET['wpo_wcpdf_hide_attachments_hint'] ) ) {
-			update_option( 'wpo_wcpdf_hide_attachments_hint', true );
-			$hide_hint = true;
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_attachments_hint'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_attachments_hint_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_attachments_hint' );
+				$hide_hint = false;
+			} else {
+				update_option( 'wpo_wcpdf_hide_attachments_hint', true );
+				$hide_hint = true;
+			}
 		} else {
 			$hide_hint = get_option( 'wpo_wcpdf_hide_attachments_hint' );
 		}

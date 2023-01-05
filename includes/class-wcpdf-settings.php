@@ -2,26 +2,44 @@
 namespace WPO\WC\PDF_Invoices;
 
 use WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store;
+use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings' ) ) :
 
 class Settings {
+	
 	public $options_page_hook;
+	public $callbacks;
+	public $general;
+	public $documents;
+	public $debug;
+	public $general_settings;
+	public $debug_settings;
+	public $lock_name;
+	public $lock_context;
+	public $lock_time;
+	public $lock_retries;
 	private $installed_templates = array();
-	private $installed_templates_cache = array();
+	private $template_list_cache = array();
+
 	
 	function __construct()	{
-		$this->callbacks = include( 'class-wcpdf-settings-callbacks.php' );
-
-		// include settings classes
-		$this->general = include( 'class-wcpdf-settings-general.php' );
-		$this->documents = include( 'class-wcpdf-settings-documents.php' );
-		$this->debug = include( 'class-wcpdf-settings-debug.php' );
-
+		$this->callbacks        = include( 'class-wcpdf-settings-callbacks.php' );
+		$this->general          = include( 'class-wcpdf-settings-general.php' );
+		$this->documents        = include( 'class-wcpdf-settings-documents.php' );
+		$this->debug            = include( 'class-wcpdf-settings-debug.php' );
+		
+		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
+		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+		
+		$this->lock_name        = 'wpo_wcpdf_semaphore_lock';
+		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
+		$this->lock_time        = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 300 );
+		$this->lock_retries     = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -31,9 +49,6 @@ class Settings {
 
 		// settings capabilities
 		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'settings_capabilities' ) );
-
-		$this->general_settings		= get_option('wpo_wcpdf_settings_general');
-		$this->debug_settings		= get_option('wpo_wcpdf_settings_debug');
 
 		// admin notice for auto_increment_increment
 		// add_action( 'admin_notices', array( $this, 'check_auto_increment_increment') );
@@ -56,6 +71,9 @@ class Settings {
 		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
 		// AJAX preview order search
 		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
+		
+		// schedule yearly reset numbers
+		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
 	}
 
 	public function menu() {
@@ -692,6 +710,132 @@ class Settings {
 		}
 
 		return $method;		
+	}
+	
+	public function schedule_yearly_reset_numbers() {
+		if ( ! $this->maybe_schedule_yearly_reset_numbers() ) {
+			return;
+		}
+		
+		// checks AS functions existence
+		if ( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_get_scheduled_actions' ) ) {
+			return;
+		}
+		
+		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
+		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
+		$lock      = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
+		
+		// checks if there are pending actions
+		$scheduled_actions = count( as_get_scheduled_actions( array(
+			'hook'   => $hook,
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+		) ) );
+		
+		// if no concurrent actions sets the action
+		if ( $scheduled_actions < 1 ) {
+			if ( $lock->lock( $this->lock_retries ) ) {
+				try {
+					$action_id = as_schedule_single_action( $datetime->getTimestamp(), $hook );
+					if ( ! empty( $action_id ) ) {
+						wcpdf_log_error(
+							"Yearly document numbers reset scheduled with the action id: {$action_id}",
+							'info'
+						);
+					} else {
+						wcpdf_log_error(
+							'The yearly document numbers reset action schedule failed!',
+							'critical'
+						);
+					}
+				} catch ( \Exception $e ) {
+					$lock->log( $e, 'critical' );
+				} catch ( \Error $e ) {
+					$lock->log( $e, 'critical' );
+				}
+	
+				$lock->release();
+			} else {
+				$lock->log( "Couldn't get the lock!", 'critical' );
+			}
+		} else {
+			wcpdf_log_error(
+				"Number of concurrent yearly document numbers reset actions found: {$scheduled_actions}",
+				'error'
+			);
+			
+			if ( function_exists( 'as_unschedule_all_actions' ) ) {
+				as_unschedule_all_actions( $hook );
+			}
+
+			// reschedule
+			$this->schedule_yearly_reset_numbers();
+		}
+	}
+
+	public function yearly_reset_numbers() {
+		$lock = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+
+		if ( $lock->lock( $this->lock_retries ) ) {
+			try {
+				// reset numbers
+				$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
+				$number_stores = array();
+				foreach ( $documents as $document ) {
+					if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
+						$number_stores[$document->get_type()] = $document->get_sequential_number_store();
+					}
+				}
+
+				// log reset number events
+				if ( ! empty( $number_stores ) ) {
+					foreach( $number_stores as $document_type => $number_store ) {
+						if ( $number_store->get_next() === 1 ) {
+							wcpdf_log_error(
+								"Yearly number reset succeed for '{$document_type}' with database table name: {$number_store->table_name}",
+								'info'
+							);
+						} else {
+							wcpdf_log_error(
+								"An error ocurred while trying to reset yearly number for '{$document_type}' with database table name: {$number_store->table_name}",
+								'error'
+							);
+						}
+					}
+				}
+			} catch ( \Exception $e ) {
+				$lock->log( $e, 'critical' );
+			} catch ( \Error $e ) {
+				$lock->log( $e, 'critical' );
+			}
+
+			$lock->release();
+			
+		} else {
+			$lock->log( "Couldn't get the lock!", 'critical' );
+		}
+		
+		// reschedule the action for the next year
+		$this->schedule_yearly_reset_numbers();
+	}
+	
+	public function maybe_schedule_yearly_reset_numbers() {
+		$schedule = false;
+		
+		foreach ( WPO_WCPDF()->documents->get_documents( 'all' ) as $document ) {
+			if ( isset( $document->settings['reset_number_yearly'] ) ) {
+				$schedule = true;
+				break;
+			}
+		}
+		
+		// unschedule existing actions
+		if ( ! $schedule && function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+		}
+		
+		return $schedule;
 	}
 
 	public function get_media_upload_setting_html() {

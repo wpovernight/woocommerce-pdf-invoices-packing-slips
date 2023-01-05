@@ -1029,10 +1029,16 @@ abstract class Order_Document {
 		$now                 = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
 	
 		// reset: on
-		if( $reset_number_yearly ) {
-			if( ! ( $date = $this->get_date() ) ) {
+		if ( $reset_number_yearly ) {
+			if ( ! ( $date = $this->get_date() ) ) {
 				$date = $now;
 			}
+			
+			// for yearly reset debugging only
+			if ( WPO_WCPDF()->yearly_reset_debug ) {
+				$date = new \WC_DateTime( '1st January Next Year' );
+			}
+			
 			$store_name   = $this->get_sequential_number_store_name( $date, $method, $reset_number_yearly );
 			$number_store = new Sequential_Number_Store( $store_name, $method );	
 	
@@ -1113,6 +1119,12 @@ abstract class Order_Document {
 		
 		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		
+		// for yearly reset debugging only
+		if ( WPO_WCPDF()->yearly_reset_debug ) {
+			$now = new \WC_DateTime( '1st January Next Year' );
+		}
+		
 		$current_year       = intval( $now->date_i18n( 'Y' ) );
 		$current_store_year = intval( $this->get_number_store_year( $default_table_name ) );
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
@@ -1179,6 +1191,13 @@ abstract class Order_Document {
 		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
 
 		$current_year = date_i18n( 'Y' );
+		
+		// for yearly reset debugging only
+		if ( WPO_WCPDF()->yearly_reset_debug ) {
+			$next_year    = new \WC_DateTime( '1st January Next Year' );
+			$current_year = intval( $next_year->date_i18n( 'Y' ) );
+		}
+		
 		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'") == $table_name; 
 		if( $table_exists ) {
 			// get year for the last row
