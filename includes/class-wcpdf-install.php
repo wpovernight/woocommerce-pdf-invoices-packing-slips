@@ -186,6 +186,11 @@ class Install {
 
 		// set transient for wizard notification
 		set_transient( 'wpo_wcpdf_new_install', 'yes', DAY_IN_SECONDS * 2 );
+
+		// schedule the yearly reset number action
+		if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
+			WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
+		}
 	}
 
 	/**
@@ -410,6 +415,13 @@ class Install {
 			if ( ! empty( $debug_settings['use_html5_parser'] ) ) {
 				unset( $debug_settings['use_html5_parser'] );
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
+		
+		// 3.3.0-dev-1: schedule the yearly reset number action
+		if ( version_compare( $installed_version, '3.3.0-dev-1', '<' ) ) {
+			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
+				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
 			}
 		}
 	}

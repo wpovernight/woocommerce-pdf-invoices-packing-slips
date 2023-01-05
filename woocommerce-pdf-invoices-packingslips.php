@@ -22,9 +22,15 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 class WPO_WCPDF {
 
 	public $version = '3.2.6';
+	public $yearly_reset_debug = false; // set 'true' only for debugging
 	public $plugin_basename;
 	public $legacy_mode;
 	public $legacy_textdomain;
+	public $settings;
+	public $documents;
+	public $main;
+	public $endpoint;
+	public $admin;
 
 	protected static $_instance = null;
 
@@ -177,6 +183,7 @@ class WPO_WCPDF {
 
 		// Plugin classes
 		include_once( $this->plugin_path() . '/includes/wcpdf-functions.php' );
+		include_once( $this->plugin_path() . '/includes/class-wcpdf-updraft-semaphore.php' );
 		$this->settings  = include_once( $this->plugin_path() . '/includes/class-wcpdf-settings.php' );
 		$this->documents = include_once( $this->plugin_path() . '/includes/class-wcpdf-documents.php' );
 		$this->main      = include_once( $this->plugin_path() . '/includes/class-wcpdf-main.php' );

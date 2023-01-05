@@ -132,6 +132,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 			// get next auto_increment value
 			$table_status = $wpdb->get_row("SHOW TABLE STATUS LIKE '{$this->table_name}'");
 			$next = $table_status->Auto_increment;
+			
 		} elseif ( $this->method == 'calculate' ) {
 			$last_row = $wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
 			if ( empty( $last_row ) ) {

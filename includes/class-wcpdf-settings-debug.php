@@ -79,6 +79,26 @@ class Settings_Debug {
 					?>
 				</form>
 			</p>
+			<?php if ( WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) : ?>
+			<p>
+				<form method="post">
+					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
+					<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="reschedule_yearly_reset">
+					<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Reschedule the yearly reset of the numbering system', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+					<?php
+					if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'reschedule_yearly_reset' ) {
+						// check permissions
+						if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
+							return;
+						}
+
+						WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
+						printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' ) );
+					}
+					?>
+				</form>
+			</p>
+			<?php endif; ?>
 			<p>
 				<form method="post">
 					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
