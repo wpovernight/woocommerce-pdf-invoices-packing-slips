@@ -28,7 +28,7 @@ class Admin {
 
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
-			add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 );
+			add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
 		} else {
 			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
 		}
