@@ -20,30 +20,30 @@ class Sequential_Number_Store {
 	
 	/**
 	 * WordPress database object
-	 * @var Object
+	 * @var object
 	 */
 	private $wpdb;
 	/**
 	 * Name of the number store (used for table_name)
-	 * @var String
+	 * @var string
 	 */
 	public $store_name;
 
 	/**
 	 * Number store method, either 'auto_increment' or 'calculate'
-	 * @var String
+	 * @var string
 	 */
 	public $method;
 
 	/**
 	 * Name of the table that stores the number sequence (including the wp_wcpdf_ table prefix)
-	 * @var String
+	 * @var string
 	 */
 	public $table_name;
 
 	/**
 	 * If table name not found in database, is new table
-	 * @var Bool
+	 * @var bool
 	 */
 	public $is_new = false;
 
