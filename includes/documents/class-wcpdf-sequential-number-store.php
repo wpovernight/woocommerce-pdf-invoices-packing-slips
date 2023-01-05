@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Store' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Store' ) ) :
 
 /**
  * Class handling database interaction for sequential numbers
