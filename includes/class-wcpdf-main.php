@@ -1054,13 +1054,13 @@ class Main {
 	 * Remove all invoice data when requested
 	 */
 	public function remove_order_personal_data_meta( $meta_to_remove ) {
-			$wcpdf_private_meta = array(
-				'_wcpdf_invoice_number'         => 'numeric_id',
-				'_wcpdf_invoice_number_data'    => 'array',
-				'_wcpdf_invoice_date'           => 'timestamp',
-				'_wcpdf_invoice_date_formatted' => 'date',
-			);
-		return $meta_to_remove;
+		$wcpdf_private_meta = array(
+			'_wcpdf_invoice_number'         => 'numeric_id',
+			'_wcpdf_invoice_number_data'    => 'array',
+			'_wcpdf_invoice_date'           => 'timestamp',
+			'_wcpdf_invoice_date_formatted' => 'date',
+		);
+		return $meta_to_remove + $wcpdf_private_meta;
 	}
 
 	/**
