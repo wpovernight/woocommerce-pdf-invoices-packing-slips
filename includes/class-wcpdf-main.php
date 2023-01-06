@@ -42,7 +42,7 @@ class Main {
 		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 
 		// remove private data
-		if ( true === apply_filters( 'wpo_wcpdf_remove_order_personal_data_meta', true ) ) {
+		if ( apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
 			add_action( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
 			add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'remove_order_personal_data' ), 10, 1 );
 		}
