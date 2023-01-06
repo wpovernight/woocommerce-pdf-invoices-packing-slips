@@ -42,8 +42,10 @@ class Main {
 		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 
 		// remove private data
-		add_action( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
-		add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'remove_order_personal_data' ), 10, 1 );
+		if ( true === apply_filters( 'wpo_wcpdf_remove_order_personal_data_meta', true ) ) {
+			add_action( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
+			add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'remove_order_personal_data' ), 10, 1 );
+		}
 		// export private data
 		add_action( 'woocommerce_privacy_export_order_personal_data_meta', array( $this, 'export_order_personal_data_meta' ), 10, 1 );
 
@@ -1052,15 +1054,12 @@ class Main {
 	 * Remove all invoice data when requested
 	 */
 	public function remove_order_personal_data_meta( $meta_to_remove ) {
-		if ( true === apply_filters( 'wpo_wcpdf_remove_order_personal_data_meta', true ) ) {
 			$wcpdf_private_meta = array(
 				'_wcpdf_invoice_number'         => 'numeric_id',
 				'_wcpdf_invoice_number_data'    => 'array',
 				'_wcpdf_invoice_date'           => 'timestamp',
 				'_wcpdf_invoice_date_formatted' => 'date',
 			);
-			return $meta_to_remove + $wcpdf_private_meta;
-		}
 		return $meta_to_remove;
 	}
 
