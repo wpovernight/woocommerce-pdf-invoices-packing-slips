@@ -1034,7 +1034,7 @@ abstract class Order_Document {
 			}
 			
 			// for yearly reset debugging only
-			if ( apply_filters( 'wpo_wcpdf_yearly_reset_debug_enable', false ) ) {
+			if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 				$date = new \WC_DateTime( '1st January Next Year' );
 			}
 			
@@ -1120,7 +1120,7 @@ abstract class Order_Document {
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 		
 		// for yearly reset debugging only
-		if ( apply_filters( 'wpo_wcpdf_yearly_reset_debug_enable', false ) ) {
+		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 			$now = new \WC_DateTime( '1st January Next Year' );
 		}
 		
@@ -1192,7 +1192,7 @@ abstract class Order_Document {
 		$current_year = date_i18n( 'Y' );
 		
 		// for yearly reset debugging only
-		if ( apply_filters( 'wpo_wcpdf_yearly_reset_debug_enable', false ) ) {
+		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 			$next_year    = new \WC_DateTime( '1st January Next Year' );
 			$current_year = intval( $next_year->date_i18n( 'Y' ) );
 		}
