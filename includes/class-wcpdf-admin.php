@@ -675,9 +675,13 @@ class Admin {
 
 			$order = wc_get_order( $post_id );
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				$is_new = false === $invoice->exists();
-				$_POST = stripslashes_deep( $_POST );
-				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
+				$is_new        = false === $invoice->exists();
+				$request_data  = stripslashes_deep( $_POST );
+				$document_data = $this->process_order_document_form_data( $request_data, $invoice->slug );
+				if ( empty( $document_data ) ) {
+					return;
+				}
+				
 				$invoice->set_data( $document_data, $order );
 
 				// check if we have number, and if not generate one
@@ -694,7 +698,7 @@ class Admin {
 			}
 
 			// allow other documents to hook here and save their form data
-			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $_POST, $order, $this );
+			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $request_data, $order, $this );
 		}
 	}
 
