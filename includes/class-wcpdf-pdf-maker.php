@@ -50,9 +50,9 @@ class PDF_Maker {
 		$dompdf = new Dompdf( $options );
 		$dompdf->loadHtml( $this->html );
 		$dompdf->setPaper( $this->settings['paper_size'], $this->settings['paper_orientation'] );
-		$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $this->html );
+		$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $this->html, $options, $this->document );
 		$dompdf->render();
-		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html );
+		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html, $options, $this->document );
 
 		return $dompdf->output();
 	}
