@@ -663,25 +663,33 @@ class Admin {
 	 */
 	public function save_invoice_number_date($post_id, $post) {
 		$post_type = get_post_type( $post_id );
-		if( $post_type == 'shop_order' ) {
+		if ( $post_type == 'shop_order' ) {
+			
 			// bail if this is not an actual 'Save order' action
-			if ( ! isset($_POST['action']) || $_POST['action'] != 'editpost' ) {
+			if ( ! isset( $_POST['action'] ) || $_POST['action'] != 'editpost' ) {
 				return;
 			}
+			
 			// Check if user is allowed to change invoice data
 			if ( ! $this->user_can_manage_document( 'invoice' ) ) {
 				return;
 			}
 
-			$order = wc_get_order( $post_id );
+			$form_data = [];
+			$order     = wc_get_order( $post_id );
+			
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				$is_new = false === $invoice->exists();
-				$_POST = stripslashes_deep( $_POST );
-				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
+				$is_new        = false === $invoice->exists();
+				$form_data     = stripslashes_deep( $_POST );
+				$document_data = $this->process_order_document_form_data( $form_data, $invoice->slug );
+				if ( empty( $document_data ) ) {
+					return;
+				}
+				
 				$invoice->set_data( $document_data, $order );
 
 				// check if we have number, and if not generate one
-				if( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
+				if ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
 					$invoice->init_number();
 				}
 
@@ -694,7 +702,7 @@ class Admin {
 			}
 
 			// allow other documents to hook here and save their form data
-			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $_POST, $order, $this );
+			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $form_data, $order, $this );
 		}
 	}
 
