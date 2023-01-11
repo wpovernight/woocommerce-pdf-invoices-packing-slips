@@ -13,9 +13,11 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) :
 class PDF_Maker {
 	public $html;
 	public $settings;
+	public $document;
 
-	public function __construct( $html, $settings = array() ) {
-		$this->html = $html;
+	public function __construct( $html, $settings = array(), $document = null ) {
+		$this->html     = $html;
+		$this->document = $document;
 
 		$default_settings = array(
 			'paper_size'		=> 'A4',
