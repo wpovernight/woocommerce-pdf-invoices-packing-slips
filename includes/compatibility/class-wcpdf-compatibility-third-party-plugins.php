@@ -23,8 +23,8 @@ class Third_Party_Plugins {
 				add_action( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			} else {
 				// Replace the use of the deprecated wcs_renewal_order_meta hook
-				add_action( 'wc_subscription_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
-				add_action( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_filter( 'wc_subscription_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			}
 		}
 
