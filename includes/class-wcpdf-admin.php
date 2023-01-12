@@ -693,20 +693,27 @@ class Admin {
 			if ( ! isset( $_POST['action'] ) || $_POST['action'] != 'editpost' ) {
 				return;
 			}
+			
 			// Check if user is allowed to change invoice data
 			if ( ! $this->user_can_manage_document( 'invoice' ) ) {
 				return;
 			}
 
+			$form_data = [];
+			
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
 				$is_new        = false === $invoice->exists();
-				$_POST         = stripslashes_deep( $_POST );
-				$document_data = $this->process_order_document_form_data( $_POST, $invoice->slug );
+				$form_data     = stripslashes_deep( $_POST );
+				$document_data = $this->process_order_document_form_data( $form_data, $invoice->slug );
+				if ( empty( $document_data ) ) {
+					return;
+				}
+				
 				
 				$invoice->set_data( $document_data, $order );
 
 				// check if we have number, and if not generate one
-				if ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
+				if  ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
 					$invoice->init_number();
 				}
 
@@ -719,7 +726,7 @@ class Admin {
 			}
 
 			// allow other documents to hook here and save their form data
-			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $_POST, $order, $this );
+			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $form_data, $order, $this );
 		}
 	}
 

@@ -795,7 +795,7 @@ abstract class Order_Document {
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
 			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
-		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
+		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
 		$pdf          = $pdf_maker->output();
 		
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
@@ -820,7 +820,7 @@ abstract class Order_Document {
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
 			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
-		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings );
+		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
 		$pdf          = $pdf_maker->output();
 		
 		return $pdf;
@@ -1035,7 +1035,7 @@ abstract class Order_Document {
 			}
 			
 			// for yearly reset debugging only
-			if ( WPO_WCPDF()->yearly_reset_debug ) {
+			if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 				$date = new \WC_DateTime( '1st January Next Year' );
 			}
 			
@@ -1121,7 +1121,7 @@ abstract class Order_Document {
 		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 		
 		// for yearly reset debugging only
-		if ( WPO_WCPDF()->yearly_reset_debug ) {
+		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 			$now = new \WC_DateTime( '1st January Next Year' );
 		}
 		
@@ -1193,7 +1193,7 @@ abstract class Order_Document {
 		$current_year = date_i18n( 'Y' );
 		
 		// for yearly reset debugging only
-		if ( WPO_WCPDF()->yearly_reset_debug ) {
+		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 			$next_year    = new \WC_DateTime( '1st January Next Year' );
 			$current_year = intval( $next_year->date_i18n( 'Y' ) );
 		}
