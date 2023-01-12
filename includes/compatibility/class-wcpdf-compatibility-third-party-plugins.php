@@ -13,12 +13,15 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\Third_Party_Plugin
 class Third_Party_Plugins {
 	function __construct()	{
 		// WooCommerce Subscriptions compatibility
-		if ( class_exists('WC_Subscriptions') ) {
+		if ( class_exists( 'WC_Subscriptions' ) ) {
 			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
+			} elseif ( version_compare( \WC_Subscriptions::$version, '2.5', '<' ) ) {
+				add_filter( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_filter( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			} else {
-				add_action( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
-				add_action( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_filter( 'wc_subscription_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			}
 		}
 
