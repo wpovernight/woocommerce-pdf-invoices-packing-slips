@@ -16,8 +16,14 @@ class Third_Party_Plugins {
 		if ( class_exists('WC_Subscriptions') ) {
 			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
-			} else {
+			} 
+
+			if ( version_compare( \WC_Subscriptions::$version, '2.0', '>=' ) && version_compare( \WC_Subscriptions::$version, '2.5', '<' ) ) {
 				add_action( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_action( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+			} else {
+				// Replace the use of the deprecated wcs_renewal_order_meta hook
+				add_action( 'wc_subscription_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 				add_action( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			}
 		}
