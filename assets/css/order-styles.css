@@ -1,29 +1,34 @@
-/* Order list buttons: */
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf {
-	padding: 3px 2px 1px 1px !important;
+/* wc orders list */
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf,
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf:hover,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf:hover {
+	background-repeat: no-repeat;
+	background-position: center;
+	text-align: center;
+	background-size: 16px 16px;
 }
 
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf.exists::after {
-	content: "\f147";
-	position:absolute;
-	font-size:16px;
-	left:7px;
-	color:#2aad2a;
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf > svg,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf > svg {
+	display: block;
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	bottom: 1px;
+	right: 2px;
+	fill: #2aad2a;
+	background: #f6f7f7;
 }
 
-.wpo_wcpdf-actions a.button.exists::after {
-	font-family: Dashicons;
-	content: "\f147";
-	font-size: 125%;
-	line-height: 80%;
+.wpo_wcpdf-actions a.button.exists > svg {
+	width: 14px;
+	height: 14px;
+	line-height: 30px;
 	margin-left: 4px;
-	color: #2aad2a;
+	margin-bottom: 3px;
+	fill: #2aad2a;
 	vertical-align: middle;
-}
-
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf img,
-.type-shop_order .column-order_actions a.button.wpo_wcpdf img /* legacy: 3.2 & older */ {
-	width: 16px;
 }
 
 .widefat .column-pdf_invoice_number {

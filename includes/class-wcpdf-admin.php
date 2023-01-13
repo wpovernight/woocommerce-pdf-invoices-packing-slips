@@ -1,24 +1,34 @@
 <?php
+
 namespace WPO\WC\PDF_Invoices;
+
+use \Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
 
 class Admin {
+
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
+		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 ); // WC 7.1+
+		add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
+		add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
 		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
-		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 2 );
+		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
+
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
-		add_action( 'add_meta_boxes_shop_order', array( $this, 'add_meta_boxes' ) );
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
+			add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
 		} else {
 			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
 		}
@@ -203,17 +213,20 @@ class Admin {
 
 		$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );
 
-		foreach ($listing_actions as $action => $data) {
-			if ( !isset( $data['class'] ) ) {
-				$data['class'] = $data['exists'] ? "exists " . $action : $action;
+		foreach ( $listing_actions as $action => $data ) {
+			if ( ! isset( $data['class'] ) ) {
+				$data['class'] = $data['exists'] ? "exists {$action}" : $action;
 			}
 
+			$exists = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
+
 			printf(
-				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s"><img src="%4$s" alt="%3$s" width="16"></a>',
+				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s</a>',
 				esc_attr( $data['url'] ),
 				esc_attr( $data['class'] ),
 				esc_attr( $data['alt'] ),
-				esc_attr( $data['img'] )
+				esc_attr( $data['img'] ),
+				$exists
 			);
 		}
 	}
@@ -249,20 +262,17 @@ class Admin {
 
 	/**
 	 * Display Invoice Number/Date in Shop Order column (if available)
-	 * @param  string $column column slug
+	 * @param  string $column                 column slug
+	 * @param  string $post_or_order_object   object
 	 */
-	public function invoice_columns_data( $column ) {
-		global $post, $the_order;
-
-		$this->disable_storing_document_settings();
-
-		$order = '';
-		if ( empty( $the_order ) || $the_order->get_id() != $post->ID ) {
-			$order = wc_get_order( $post->ID );
-		} else {
-			$order = $the_order;
+	public function invoice_columns_data( $column, $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		if ( ! is_object( $order ) && is_numeric( $order ) ) {
+			$order = wc_get_order( absint( $order ) );
 		}
 
+		$this->disable_storing_document_settings();
+		
 		$invoice = wcpdf_get_invoice( $order );
 
 		switch ( $column ) {
@@ -319,16 +329,22 @@ class Admin {
 	}
 
 	/**
-	 * Add the meta box on the single order page
+	 * Add the meta boxes on the single order page
 	 */
 	public function add_meta_boxes() {
+		if ( class_exists( CustomOrdersTableController::class ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
+			$screen = wc_get_page_screen_id( 'shop-order' );
+		} else {
+			$screen = 'shop_order';
+		}
+
 		// resend order emails
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.2', '>=' ) ) {
 			add_meta_box(
 				'wpo_wcpdf_send_emails',
 				__( 'Send order email', 'woocommerce-pdf-invoices-packing-slips' ),
 				array( $this, 'send_order_email_meta_box' ),
-				'shop_order',
+				$screen,
 				'side',
 				'high'
 			);
@@ -339,7 +355,7 @@ class Admin {
 			'wpo_wcpdf-box',
 			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'pdf_actions_meta_box' ),
-			'shop_order',
+			$screen,
 			'side',
 			'default'
 		);
@@ -349,7 +365,7 @@ class Admin {
 			'wpo_wcpdf-data-input-box',
 			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'data_input_box_content' ),
-			'shop_order',
+			$screen,
 			'normal',
 			'default'
 		);
@@ -358,16 +374,11 @@ class Admin {
 	/**
 	 * Resend order emails
 	 */
-	public function send_order_email_meta_box( $post ) {
-		global $theorder;
-		// This is used by some callbacks attached to hooks such as woocommerce_resend_order_emails_available
-		// which rely on the global to determine if emails should be displayed for certain orders.
-		if ( ! is_object( $theorder ) ) {
-			$theorder = wc_get_order( $post->ID );
-		}
+	public function send_order_email_meta_box( $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 		?>
-		<ul class="wpo_wcpdf_send_emails submitbox">
-			<li class="wide" id="actions">
+		<ul class="wpo_wcpdf_send_emails order_actions submitbox">
+			<li class="wide" id="actions" style="padding-left:0; padding-right:0; border:0;">
 				<select name="wpo_wcpdf_send_emails">
 					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
 					<?php
@@ -385,6 +396,8 @@ class Admin {
 					}
 					?>
 				</select>
+			</li>
+			<li class="wide" style="border:0; padding-left:0; padding-right:0; padding-bottom:0; float:left;">
 				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
 				<?php
 				$url = esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' ) );
@@ -397,40 +410,43 @@ class Admin {
 	/**
 	 * Create the meta box content on the single order page
 	 */
-	public function pdf_actions_meta_box( $post ) {
-		global $post_id;
+	public function pdf_actions_meta_box( $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents = WPO_WCPDF()->documents->get_documents();
-		$order = wc_get_order( $post->ID );
+		$documents        = WPO_WCPDF()->documents->get_documents();
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
 				$pdf_url        = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
 				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$meta_box_actions[$document->get_type()] = array(
-					'url'		=> esc_url( $pdf_url ),
-					'alt'		=> "PDF " . $document_title,
-					'title'		=> "PDF " . $document_title,
-					'exists'	=> is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
+					'url'    => esc_url( $pdf_url ),
+					'alt'    => "PDF " . $document_title,
+					'title'  => "PDF " . $document_title,
+					'exists' => is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
 				);
 			}
 		}
 
-		$meta_box_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_box_actions, $post_id );
+		$meta_box_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_box_actions, $order->get_id() );
 
 		?>
 		<ul class="wpo_wcpdf-actions">
 			<?php
-			foreach ($meta_box_actions as $document_type => $data) {
+			foreach ( $meta_box_actions as $document_type => $data ) {
 				$data['class'] = ( isset( $data['exists'] ) && $data['exists'] == true ) ? 'exists' : '';
+				
+				$exists = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 				printf(
-					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s</a></li>',
+					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
 					esc_attr( $data['url'] ),
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
-					esc_html( $data['title'] )
+					esc_html( $data['title'] ),
+					$exists
 				);
 			}
 			?>
@@ -438,9 +454,11 @@ class Admin {
 		<?php
 	}
 
-	public function data_input_box_content( $post ) {
-		$order = wc_get_order( $post->ID );
+	public function data_input_box_content( $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+
 		$this->disable_storing_document_settings();
+
 		$invoice = wcpdf_get_document( 'invoice', $order );
 
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
@@ -659,12 +677,18 @@ class Admin {
 	}
 
 	/**
-	 * Save invoice number
+	 * Save invoice number date
 	 */
-	public function save_invoice_number_date($post_id, $post) {
-		$post_type = get_post_type( $post_id );
-		if ( $post_type == 'shop_order' ) {
-			
+	public function save_invoice_number_date( $order_id, $order ) {
+		if ( ( empty( $order ) || ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) ) && ! empty( $order_id ) ) {
+			$order = wc_get_order( $order_id );
+		} else {
+			return;
+		}
+
+		$order_type = $order->get_type();
+
+		if ( $order_type == 'shop_order' ) {
 			// bail if this is not an actual 'Save order' action
 			if ( ! isset( $_POST['action'] ) || $_POST['action'] != 'editpost' ) {
 				return;
@@ -676,7 +700,6 @@ class Admin {
 			}
 
 			$form_data = [];
-			$order     = wc_get_order( $post_id );
 			
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
 				$is_new        = false === $invoice->exists();
@@ -686,10 +709,11 @@ class Admin {
 					return;
 				}
 				
+				
 				$invoice->set_data( $document_data, $order );
 
 				// check if we have number, and if not generate one
-				if ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
+				if  ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
 					$invoice->init_number();
 				}
 
@@ -726,9 +750,10 @@ class Admin {
 	/**
 	 * Send emails manually
 	 */
-	public function send_emails( $post_id, $post ) {
+	public function send_emails( $post_or_order_object_id, $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+
 		if ( ! empty( $_POST['wpo_wcpdf_send_emails'] ) ) {
-			$order = wc_get_order( $post_id );
 			$action = wc_clean( $_POST['wpo_wcpdf_send_emails'] );
 			if ( strstr( $action, 'send_email_' ) ) {
 				$email_to_send = str_replace( 'send_email_', '', $action );
@@ -740,7 +765,7 @@ class Admin {
 				WC()->shipping();
 				// Load mailer.
 				$mailer = WC()->mailer();
-				$mails = $mailer->get_emails();
+				$mails  = $mailer->get_emails();
 				if ( ! empty( $mails ) ) {
 					foreach ( $mails as $mail ) {
 						if ( $mail->id == $email_to_send ) {
@@ -778,8 +803,8 @@ class Admin {
 	 * Check if this is a shop_order page (edit or list)
 	 */
 	public function is_order_page() {
-		global $post_type;
-		if( $post_type == 'shop_order' ) {
+		$screen = get_current_screen();
+		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ) ) ) {
 			return true;
 		} else {
 			return false;
@@ -868,7 +893,7 @@ class Admin {
 				if( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
 
-					$response      = array(
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
@@ -876,7 +901,7 @@ class Admin {
 				} elseif( $action_type == 'delete' && $document->exists() ) {
 					$document->delete();
 
-					$response      = array(
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 

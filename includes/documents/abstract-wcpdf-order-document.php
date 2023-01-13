@@ -888,7 +888,8 @@ abstract class Order_Document {
 		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;
 
 		$name = $this->get_type();
-		if ( get_post_type( $this->order_id ) == 'shop_order_refund' ) {
+
+		if ( is_callable( array( $this->order, 'get_type' ) ) && $this->order->get_type() == 'shop_order_refund' ) {
 			$number = $this->order_id;
 		} else {
 			$number = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
