@@ -194,6 +194,7 @@ if( ! $server_configs['PHP version']['result'] ) {
 					} else {
 						/* translators: total actions */
 						$yearly_reset['value']  = sprintf(
+							/* translators: total scheduled actions */
 							__( 'Only 1 scheduled action should exist, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
 							$total_actions
 						);
