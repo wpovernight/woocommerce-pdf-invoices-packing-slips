@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 3.2.6
+Stable tag: 3.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,19 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.3.0 (2022-01-16) =
+* New: WooCommerce HPOS compatibility (beta)
+* New: reschedule the yearly reset of the numbering system on a button from the Status page
+* New: document status table in the Status page
+* New: adds document object argument to PDF maker class constructor
+* New: filter to allow user to disable the documents private data removal: `wpo_wcpdf_remove_order_personal_data`
+* Tweak: optimizes `$wpdb` use on `Sequential_Number_store` class
+* Tweak: improves yearly reset number with Action Scheduler and Updraft Plus Semaphore
+* Fix: replaces the use of the deprecated `wcs_` filter hooks from WooCommerce Subscriptions plugin
+* Fix: bail if document data is empty when saving order
+* Fix: add nonces to several admin unsecure requests
+* Tested up to WooCommerce 7.3
 
 = 3.2.6 (2022-12-15) =
 * Fix: adds nonce check in hide link for attachments hint in admin
