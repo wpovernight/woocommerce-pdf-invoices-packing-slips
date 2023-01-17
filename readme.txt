@@ -102,7 +102,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 3.3.0 (2022-01-16) =
+= 3.3.0 (2023-01-16) =
 * New: WooCommerce HPOS compatibility (beta)
 * New: reschedule the yearly reset of the numbering system on a button from the Status page
 * New: document status table in the Status page
