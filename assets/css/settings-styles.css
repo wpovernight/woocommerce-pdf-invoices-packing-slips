@@ -296,7 +296,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form {
-	background: white;
+	background: transparent !important;
 	overflow: visible;
 	padding: 0;
 	margin-left: 2em;
@@ -798,7 +798,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper .slider.slide-left:after {
-	content: 'Preview';
 	position: absolute;
 	top: 1.55em;
 	right: 2em;
@@ -807,7 +806,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper .slider.slide-right:after {
-	content: 'Settings';
 	position: absolute;
 	top: 1.55em;
 	left: 2em;
