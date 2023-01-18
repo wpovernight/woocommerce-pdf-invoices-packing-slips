@@ -156,6 +156,10 @@ class Assets {
 						),
 					),
 					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
+					'preview_gutters'           => [
+						'left'  => __( 'Preview', 'woocommerce-pdf-invoices-packing-slips' ),
+						'right' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+					],
 				)
 			);
 
