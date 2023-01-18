@@ -296,7 +296,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form {
-	background: white;
+	background: transparent !important;
 	overflow: visible;
 	padding: 0;
 	margin-left: 2em;
