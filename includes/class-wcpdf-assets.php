@@ -156,6 +156,7 @@ class Assets {
 						),
 					),
 					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
+					'mysql_int_size_limit'      => __( "The typed number is superior to the MySQL allowed INT size, which is 2147483647. Perhaps your number includes the current year? If that's the case you should use the prefix/suffix fields for that.", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			);
 
