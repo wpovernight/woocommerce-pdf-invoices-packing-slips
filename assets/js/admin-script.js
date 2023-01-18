@@ -17,12 +17,20 @@ jQuery( function( $ ) {
 	$( '.save-next-number' ).on( 'click', function( event ) {
 		$input = $( this ).siblings( 'input' );
 		$input.addClass( 'ajax-waiting' );
+		let number = $input.val();
+		
+		if ( number.length > 0 && number > 2147483647 ) {
+			alert( wpo_wcpdf_admin.mysql_int_size_limit );
+			$input.removeClass( 'ajax-waiting' );
+			return;
+		}
+		
 
 		let data = {
 			security: $input.data( 'nonce' ),
 			action:   'wpo_wcpdf_set_next_number',
 			store:    $input.data( 'store' ),
-			number:   $input.val(), 
+			number:   number, 
 		};
 
 		xhr = $.ajax( {

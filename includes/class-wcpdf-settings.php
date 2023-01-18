@@ -691,11 +691,13 @@ class Settings {
 			die(); 
 		}
 
-		$number = isset( $_POST['number'] ) ? (int) $_POST['number'] : 0;
-		$number_store_method = $this->get_sequential_number_store_method();
-		$number_store = new Sequential_Number_Store( $_POST['store'], $number_store_method );
-		$number_store->set_next( $number );
-		echo wp_kses_post( "next number ({$_POST['store']}) set to {$number}" );
+		$number = ! empty( $_POST['number'] ) ? (int) $_POST['number'] : 0;
+		if ( $number > 0 ) {
+			$number_store_method = $this->get_sequential_number_store_method();
+			$number_store = new Sequential_Number_Store( $_POST['store'], $number_store_method );
+			$number_store->set_next( $number );
+			echo wp_kses_post( "next number ({$_POST['store']}) set to {$number}" );
+		}
 		die();
 	}
 

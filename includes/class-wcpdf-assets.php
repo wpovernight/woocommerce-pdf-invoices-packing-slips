@@ -156,6 +156,7 @@ class Assets {
 						),
 					),
 					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
+					'mysql_int_size_limit'      => __( 'The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'preview_gutters'           => [
 						'left'  => __( 'Preview', 'woocommerce-pdf-invoices-packing-slips' ),
 						'right' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),

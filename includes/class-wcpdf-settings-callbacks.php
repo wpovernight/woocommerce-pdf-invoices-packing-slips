@@ -474,7 +474,7 @@ class Settings_Callbacks {
 
 		$nonce = wp_create_nonce( "wpo_wcpdf_next_{$store}" );
 		printf(
-			'<input id="next_%1$s" class="next-number-input" type="text" size="%2$s" value="%3$s" disabled="disabled" data-store="%1$s" data-nonce="%4$s"/> <span class="edit-next-number dashicons dashicons-edit"></span><span class="save-next-number button secondary" style="display:none;">%5$s</span>',
+			'<input id="next_%1$s" class="next-number-input" type="number" size="%2$s" value="%3$s" disabled="disabled" data-store="%1$s" data-nonce="%4$s"/> <span class="edit-next-number dashicons dashicons-edit"></span><span class="save-next-number button secondary" style="display:none;">%5$s</span>',
 			esc_attr( $store ),
 			esc_attr( $size ),
 			esc_attr( $next_number ),
