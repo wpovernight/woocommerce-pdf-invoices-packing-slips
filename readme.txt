@@ -103,6 +103,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 == Changelog ==
 
 = 3.3.1 (2023-01-19) =
+* Fix: applies `overflow-wrap:anywhere;` to the Simple template `body` in CSS styles
 * Fix: displays a message if the typed next number is superior to MySQL INT max
 * Fix: allow preview gutters text to be translated
 * Fix: settings forms background color issue
