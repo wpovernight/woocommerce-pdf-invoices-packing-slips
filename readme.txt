@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 3.3.0
+Stable tag: 3.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,13 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.3.1 (2023-01-19) =
+* Fix: displays a message if the typed next number is superior to MySQL INT max
+* Fix: allow preview gutters text to be translated
+* Fix: settings forms background color issue
+* Fix: PHP notice for undefined index `exists`
+* Fix the year in the date release of v3.3.0 in readme.txt
 
 = 3.3.0 (2023-01-16) =
 * New: WooCommerce HPOS compatibility (beta)
