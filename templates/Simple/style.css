@@ -13,6 +13,7 @@ body {
 	/* want to use custom fonts? http://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-custom-fonts/ */
 	font-size: 9pt;
 	line-height: 100%; /* fixes inherit dompdf bug */
+	overflow-wrap: anywhere;
 }
 
 h1, h2, h3, h4 {
