@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.2.6\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.3.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-01-13T12:21:52+01:00\n"
+"POT-Creation-Date: 2023-01-23T09:43:44+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -228,6 +228,18 @@ msgstr ""
 
 #: includes/class-wcpdf-assets.php:148
 msgid "Select a document in the dropdown menu above to edit its settings."
+msgstr ""
+
+#: includes/class-wcpdf-assets.php:159
+msgid "The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding."
+msgstr ""
+
+#: includes/class-wcpdf-assets.php:161
+msgid "Preview"
+msgstr ""
+
+#: includes/class-wcpdf-assets.php:162
+msgid "Settings"
 msgstr ""
 
 #: includes/class-wcpdf-frontend.php:146
