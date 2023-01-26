@@ -104,12 +104,6 @@ jQuery( function( $ ) {
 	} );
 
 	//----------> Preview <----------//
-
-	// preview gutters text
-	$( document.head ).append(
-		$( '<style>#wpo-wcpdf-preview-wrapper .slider.slide-left:after { content: "'+wpo_wcpdf_admin.preview_gutters.left+'" } #wpo-wcpdf-preview-wrapper .slider.slide-right:after { content: "'+wpo_wcpdf_admin.preview_gutters.right+'" }</style>' )
-	);
-	
 	// objects
 	let $previewWrapper           = $( '#wpo-wcpdf-preview-wrapper' );
 	let $preview                  = $( '#wpo-wcpdf-preview-wrapper .preview' );
