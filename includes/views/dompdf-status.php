@@ -315,3 +315,69 @@ if( ! $server_configs['PHP version']['result'] ) {
 	);
 	?>
 </p>
+
+<br />
+<h3><?php _e( 'Import/Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+<div class="wrap">
+	<div class="metabox-holder">
+		<?php
+			$settings_types = [
+				'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+				'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
+			];
+			$documents = WPO_WCPDF()->documents->get_documents();
+			foreach ( $documents as $document ) {
+				$settings_types[$document->get_type()] = $document->get_title();
+			}
+		?>
+		<div class="postbox">
+			<h3><span><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h3>
+			<div class="inside">
+				<p><?php _e( 'Emit the settings of the plugin for this website as a .json file. This allows for effortless importation of the configuration into another site.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<form method="post">
+					<fieldset>
+						<select name="export_settings_type">
+							<?php
+								foreach ( $settings_types as $type => $name ) {
+									?>
+									<option value="<?= $type; ?>"><?php printf( /* translators: type of settings */ __( "%s Settings", 'woocommerce-pdf-invoices-packing-slips' ), $name ); ?></option>
+									<?php
+								}
+							?>
+						</select>
+					</fieldset>
+					<fieldset>
+						<input type="hidden" name="wpo_wcpdf_export_settings" value="export_settings" />
+						<?php submit_button( __( 'Export', 'woocommerce-pdf-invoices-packing-slips' ), 'secondary', 'submit', false ); ?>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+		<div class="postbox">
+			<h3><span><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h3>
+			<div class="inside">
+				<p><?php _e( 'Bring in the plugin settings from a .json file. This file can be obtained by transmitting the settings on another site via the form provided.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<form method="post" enctype="multipart/form-data">
+					<fieldset>
+						<select name="import_settings_type">
+							<?php
+								foreach ( $settings_types as $type => $name ) {
+									?>
+									<option value="<?= $type; ?>"><?php printf( /* translators: type of settings */ __( "%s Settings", 'woocommerce-pdf-invoices-packing-slips' ), $name ); ?></option>
+									<?php
+								}
+							?>
+						</select>
+					</fieldset>
+					<fieldset>
+						<input type="file" name="import_file"/>
+					</fieldset>
+					<fieldset>
+						<input type="hidden" name="wpo_wcpdf_import_settings" value="import_settings" />
+						<?php submit_button( __( 'Import', 'woocommerce-pdf-invoices-packing-slips' ), 'secondary', 'submit', false ); ?>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

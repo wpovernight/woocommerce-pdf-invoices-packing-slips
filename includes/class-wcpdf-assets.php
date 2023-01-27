@@ -183,6 +183,26 @@ class Assets {
 			}
 
 		}
+		
+		// status/debug page scripts
+		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'debug' ) {
+			
+			wp_enqueue_script(
+				'wpo-wcpdf-debug',
+				WPO_WCPDF()->plugin_url() . '/assets/js/debug-script'.$suffix.'.js',
+				[ 'jquery', 'jquery-blockui' ],
+				WPO_WCPDF_VERSION
+			);
+			wp_localize_script(
+				'wpo-wcpdf-debug',
+				'wpo_wcpdf_debug',
+				[
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'wpo_wcpdf_debug' ),
+				]
+			);
+			
+		}
 	}
 
 }
