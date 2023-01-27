@@ -198,7 +198,7 @@ class Assets {
 				'wpo_wcpdf_debug',
 				[
 					'ajaxurl' => admin_url( 'admin-ajax.php' ),
-					'nonce'   => wp_create_nonce( 'wpo_wcpdf_debug' ),
+					'nonce'   => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
 				]
 			);
 			

@@ -22,6 +22,8 @@ class Settings_Debug {
 		}
 
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'dompdf_status' ), 20, 2 );
+		
+		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_debug_tools' ) );
 	}
 
 	public function output( $section ) {
@@ -147,8 +149,74 @@ class Settings_Debug {
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 			</p>
 		</div>
-		<br>
+		<br />
+		<h3><?php _e( 'Import/Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+		<div class="metabox-holder">
+			<?php
+				$settings_types = [
+					'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+					'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
+				];
+				$documents = WPO_WCPDF()->documents->get_documents();
+				foreach ( $documents as $document ) {
+					$settings_types[$document->get_type()] = $document->get_title();
+				}
+			?>
+			<div class="postbox">
+				<h3><span><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h3>
+				<div class="inside">
+					<p><?php _e( 'Download the settings of the plugin for this website as a .json file. This allows for effortless importation of the configuration into another site.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form class="wpo_wcpdf_debug_tools_form" method="post">
+						<fieldset>
+							<select name="export_settings_type" required>
+								<?php
+									foreach ( $settings_types as $type => $name ) {
+										?>
+										<option value="<?= $type; ?>"><?php printf( /* translators: type of settings */ __( "%s Settings", 'woocommerce-pdf-invoices-packing-slips' ), $name ); ?></option>
+										<?php
+									}
+								?>
+							</select>
+						</fieldset>
+						<fieldset>
+							<input type="hidden" name="debug_tool" value="export_settings">
+							<a href="" class="button button-secondary submit"><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+			<div class="postbox">
+				<h3><span><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h3>
+				<div class="inside">
+					<p><?php _e( 'Bring in the plugin settings from a .json file. This file can be obtained by downloading the settings on another site via the form above.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form class="wpo_wcpdf_debug_tools_form" method="post" enctype="multipart/form-data">
+						<fieldset>
+							<select name="import_settings_type" required>
+								<?php
+									foreach ( $settings_types as $type => $name ) {
+										?>
+										<option value="<?= $type; ?>"><?php printf( /* translators: type of settings */ __( "%s Settings", 'woocommerce-pdf-invoices-packing-slips' ), $name ); ?></option>
+										<?php
+									}
+								?>
+							</select>
+						</fieldset>
+						<fieldset>
+							<input type="file" name="import_settings_file" accept="application/json" required>
+						</fieldset>
+						<fieldset>
+							<input type="hidden" name="debug_tool" value="import_settings">
+							<a href="" class="button button-secondary submit"><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div>
 		<?php
+	}
+	
+	public function ajax_debug_tools() {
+		// TODO: debug tools
 	}
 
 	public function work_at_wpovernight( $tab, $section ) {
