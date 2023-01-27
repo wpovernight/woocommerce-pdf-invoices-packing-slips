@@ -2,7 +2,7 @@ jQuery( function( $ ) {
 	
 	$( document.body ).on( 'click', '.wpo_wcpdf_debug_tools_form a.submit', function( e ) {
 		e.preventDefault();
-		let $form = $( this );
+		let $form = $( this ).closest( 'form' );
 		
 		// block ui
 		$form.block( {
@@ -23,7 +23,7 @@ jQuery( function( $ ) {
 			type:  'POST',
 			cache: false,
 			success ( response ) {
-				//console.log( response );
+				console.log( response );
 			},
 			error ( xhr, error, status ) {
 				//console.log( error, status );

@@ -179,7 +179,7 @@ class Settings_Debug {
 							</select>
 						</fieldset>
 						<fieldset>
-							<input type="hidden" name="debug_tool" value="export_settings">
+							<input type="hidden" name="debug_tool" value="export-settings">
 							<a href="" class="button button-secondary submit"><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</fieldset>
 					</form>
@@ -205,7 +205,7 @@ class Settings_Debug {
 							<input type="file" name="import_settings_file" accept="application/json" required>
 						</fieldset>
 						<fieldset>
-							<input type="hidden" name="debug_tool" value="import_settings">
+							<input type="hidden" name="debug_tool" value="import-settings">
 							<a href="" class="button button-secondary submit"><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</fieldset>
 					</form>
@@ -216,7 +216,76 @@ class Settings_Debug {
 	}
 	
 	public function ajax_debug_tools() {
-		// TODO: debug tools
+		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+		
+		$request     = stripslashes_deep( $_REQUEST );
+		$debug_tools = [ 'export-settings', 'import-settings' ];
+		
+		if ( empty( $request['data'] ) || empty( $request['action'] ) || $request['action'] != 'wpo_wcpdf_debug_tools' ) {
+			return;
+		}
+		
+		// parse form data
+		parse_str( $request['data'], $data );
+		
+		if ( empty( $data['debug_tool'] ) || ! in_array( $data['debug_tool'], $debug_tools ) ) {
+			return;
+		}
+		
+		$debug_tool = esc_attr( $data['debug_tool'] );
+		
+		switch ( $debug_tool ) {
+			case 'export-settings':
+				$this->export_settings( $data );
+				break;
+			case 'import-settings':
+				$this->import_settings( $data );
+				break;
+		}
+		
+		wp_die();
+	}
+	
+	public function export_settings( $data ) {
+		extract( $data );
+		
+		if ( empty( $export_settings_type ) ) {
+			return;
+		}
+		
+		$settings = [];
+		
+		switch ( $export_settings_type ) {
+			default:
+			case 'general':
+				$settings = WPO_WCPDF()->settings->general_settings;
+				break;
+			case 'debug':
+				$settings = WPO_WCPDF()->settings->debug_settings;
+				break;
+		}
+		
+		// maybe it's a document type settings request
+		if ( empty( $settings ) ) {
+			$documents = WPO_WCPDF()->documents->get_documents();
+			foreach ( $documents as $document ) {
+				if ( $export_settings_type == $document->get_type() ) {
+					$settings = $document->get_settings( true );
+				}
+			}
+			
+			if ( empty( $settings ) ) {
+				return;
+			}
+		}
+		
+		$filename = sprintf( "{$export_settings_type}-settings-export_%s.json", date( 'Y-m-d' ) );
+		
+		wp_send_json_success( compact( 'filename', 'settings' ) );
+	}
+	
+	public function import_settings( $data ) {
+		
 	}
 
 	public function work_at_wpovernight( $tab, $section ) {
