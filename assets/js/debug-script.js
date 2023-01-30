@@ -40,9 +40,8 @@ jQuery( function( $ ) {
 		switch ( tool ) {
 			case 'export-settings':
 				$form.find( 'a.export-settings-download-file' ).remove();
-				let type = $form.find( 'select[name="export_settings_type"' ).val();
 				let data = {
-					type:     type,
+					type:     $form.find( 'select[name="'+tool+'_type"' ).val(),
 					settings: tool_data.settings
 				}
 				data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
