@@ -159,7 +159,7 @@ class Settings_Debug {
 				];
 				$documents = WPO_WCPDF()->documents->get_documents();
 				foreach ( $documents as $document ) {
-					$settings_types[$document->get_type()] = $document->get_title();
+					$settings_types[$document->slug] = $document->get_title();
 				}
 			?>
 			<div class="postbox">
@@ -269,7 +269,7 @@ class Settings_Debug {
 		if ( empty( $settings ) ) {
 			$documents = WPO_WCPDF()->documents->get_documents();
 			foreach ( $documents as $document ) {
-				if ( $export_settings_type == $document->get_type() ) {
+				if ( $export_settings_type == $document->slug ) {
 					$settings = $document->get_settings( true );
 				}
 			}
