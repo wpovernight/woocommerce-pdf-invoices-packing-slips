@@ -172,6 +172,9 @@ class Settings_Debug {
 							<input type="hidden" name="debug_tool" value="export-settings">
 							<a href="" class="button button-secondary submit"><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</fieldset>
+						<fieldset>
+							<div class="notice inline" style="display:none;"><p></p></div>
+						</fieldset>
 					</form>
 				</div>
 			</div>
@@ -186,6 +189,9 @@ class Settings_Debug {
 						<fieldset>
 							<input type="hidden" name="debug_tool" value="import-settings">
 							<a href="" class="button button-secondary submit"><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						</fieldset>
+						<fieldset>
+							<div class="notice inline" style="display:none;"><p></p></div>
 						</fieldset>
 					</form>
 				</div>
@@ -248,12 +254,14 @@ class Settings_Debug {
 			foreach ( $documents as $document ) {
 				if ( $type == $document->slug ) {
 					$settings = $document->get_settings( true );
+					break;
 				}
 			}
 			
 			if ( empty( $settings ) ) {
-				wcpdf_log_error( 'Exported settings data is empty!' );
-				wp_send_json_error();
+				$message = __( 'Exported settings data is empty!', 'woocommerce-pdf-invoices-packing-slips' );
+				wcpdf_log_error( $message );
+				wp_send_json_error( compact( 'message' ) );
 			}
 		}
 		
@@ -267,19 +275,21 @@ class Settings_Debug {
 		
 		$file_data = [];
 		
-		if ( ! empty( $_FILES['file'] ) && ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
+		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
 			$json_data = file_get_contents( $_FILES['file']['tmp_name'], $_FILES['file']['name'] );
 			if ( false === $json_data ) {
-				wcpdf_log_error( 'Failed to parse JSON file!' );
-				wp_send_json_error();
+				$message = __( 'Failed to get contents from JSON file!', 'woocommerce-pdf-invoices-packing-slips' );
+				wcpdf_log_error( $message );
+				wp_send_json_error( compact( 'message' ) );
 			} else {
 				$file_data = json_decode( $json_data, true );
 			}
 		}
 		
-		if ( empty( $file_data ) ||  empty( $file_data['type'] ) || empty( $file_data['settings'] ) ) {
-			wcpdf_log_error( 'The JSON file data is corrupted!' );
-			wp_send_json_error();
+		if ( empty( $file_data ) || empty( $file_data['type'] ) || empty( $file_data['settings'] ) ) {
+			$message = __( 'The JSON file data is corrupted!', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 		
 		$setting_types   = $this->get_setting_types();
@@ -288,8 +298,9 @@ class Settings_Debug {
 		$settings_option = '';
 		
 		if ( ! in_array( $type, array_keys( $setting_types ) ) ) {
-			wcpdf_log_error( 'The JSON file settings type is not supported on this store!' );
-			wp_send_json_error();
+			$message = __( 'The JSON file settings type is not supported on this store!', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 		
 		if ( in_array( $type, [ 'general', 'debug' ] ) ) {
@@ -304,11 +315,13 @@ class Settings_Debug {
 			}
 		}
 		
+		// used for extension settings
 		$settings_option = apply_filters( 'wpo_wcpdf_import_settings_option', $settings_option, $type, $settings );
 		
 		if ( empty( $settings_option ) ) {
-			wcpdf_log_error( "Couldn't determine the settings option for the import!" );
-			wp_send_json_error();
+			$message = __( "Couldn't determine the settings option for the import!", 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 		
 		$updated = update_option( $settings_option, $setings );
@@ -326,7 +339,7 @@ class Settings_Debug {
 				$setting_types[$type]
 			);
 			wcpdf_log_error( $message );
-			wp_send_json_error();
+			wp_send_json_error( compact( 'message' ) );
 		}
 	}
 	

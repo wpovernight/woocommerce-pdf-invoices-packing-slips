@@ -25,9 +25,7 @@ jQuery( function( $ ) {
 			processData: false,
 			contentType: false,
 			success ( response ) {
-				if ( response.data ) {
-					process_response_data( tool, response.data, $form );
-				}
+				process_form_response( tool, response, $form );
 			},
 			error ( xhr, error, status ) {
 				//console.log( error, status );
@@ -37,16 +35,36 @@ jQuery( function( $ ) {
 		$form.unblock();
 	} );
 	
-	function process_response_data( tool, tool_data, $form ) {
+	function process_form_response( tool, response, $form ) {
+		let $notice = $form.find( '.notice' );
+		$notice.hide();
+		$notice.removeClass( 'notice-error' );
+		$notice.removeClass( 'notice-success' );
+		
 		switch ( tool ) {
 			case 'export-settings':
-				$form.find( 'a.export-settings-download-file' ).remove();
-				let data = {
-					'type':     $form.find( 'select[name="type"' ).val(),
-					'settings': tool_data.settings,
+				if ( response.data.success && response.data.filename && response.data.settings ) {
+					$form.find( 'a.export-settings-download-file' ).remove();
+					let data = {
+						'type':     $form.find( 'select[name="type"' ).val(),
+						'settings': response.data.settings,
+					}
+					data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
+					$form.append( $('<a href="data:' + data + '" download="'+response.data.filename+'" class="export-settings-download-file">'+response.data.filename+'</a>') );
+				} else if ( ! response.data.success && response.data.message ) {
+					$notice.addClass( 'notice-error' );
+					$notice.find( 'p' ).text( response.data.message );
+					$notice.show();
 				}
-				data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
-				$form.append( $('<a href="data:' + data + '" download="'+tool_data.filename+'" class="export-settings-download-file">'+tool_data.filename+'</a>') );
+				break;
+			case 'import-settings':
+				if ( response.data.success && response.data.message ) {
+					$notice.addClass( 'notice-success' );
+				} else if ( ! response.data.success && response.data.message ) {
+					$notice.addClass( 'notice-error' );
+				}
+				$notice.find( 'p' ).text( response.data.message );
+				$notice.show();
 				break;
 		}
 	}
