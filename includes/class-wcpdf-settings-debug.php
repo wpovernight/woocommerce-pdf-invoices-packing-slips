@@ -286,7 +286,7 @@ class Settings_Debug {
 			}
 		}
 		
-		if ( empty( $file_data ) || empty( $file_data['type'] ) || empty( $file_data['settings'] ) ) {
+		if ( empty( $file_data ) || empty( $file_data['type'] ) || empty( $file_data['settings'] ) || ! is_array( $file_data['settings'] ) ) {
 			$message = __( 'The JSON file data is corrupted!', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_log_error( $message );
 			wp_send_json_error( compact( 'message' ) );
