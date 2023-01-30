@@ -197,9 +197,8 @@ class Assets {
 				'wpo-wcpdf-debug',
 				'wpo_wcpdf_debug',
 				[
-					'ajaxurl'       => admin_url( 'admin-ajax.php' ),
-					'nonce'         => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
-					'download_json' => __( 'Download JSON', 'woocommerce-pdf-invoices-packing-slips' ),
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
 				]
 			);
 			

@@ -40,8 +40,13 @@ jQuery( function( $ ) {
 		switch ( tool ) {
 			case 'export-settings':
 				$form.find( 'a.export-settings-download-file' ).remove();
-				let data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( tool_data.settings ) );
-				$form.append( $('<a href="data:' + data + '" download="'+tool_data.filename+'" class="export-settings-download-file">'+wpo_wcpdf_debug.download_json+'</a>') );
+				let type = $form.find( 'select[name="export_settings_type"' ).val();
+				let data = {
+					type:     type,
+					settings: tool_data.settings
+				}
+				data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
+				$form.append( $('<a href="data:' + data + '" download="'+tool_data.filename+'" class="export-settings-download-file">'+tool_data.filename+'</a>') );
 				break;
 		}
 	}
