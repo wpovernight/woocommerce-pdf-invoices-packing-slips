@@ -152,25 +152,15 @@ class Settings_Debug {
 		<br />
 		<h3><?php _e( 'Import/Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<div class="metabox-holder">
-			<?php
-				$settings_types = [
-					'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
-					'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
-				];
-				$documents = WPO_WCPDF()->documents->get_documents();
-				foreach ( $documents as $document ) {
-					$settings_types[$document->slug] = $document->get_title();
-				}
-			?>
 			<div class="postbox">
 				<h3><span><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h3>
 				<div class="inside">
 					<p><?php _e( 'Download the settings of the plugin for this website as a .json file. This allows for effortless importation of the configuration into another site.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post">
 						<fieldset>
-							<select name="export_settings_type" required>
+							<select name="type" required>
 								<?php
-									foreach ( $settings_types as $type => $name ) {
+									foreach ( $this->get_setting_types() as $type => $name ) {
 										?>
 										<option value="<?= $type; ?>"><?php printf( /* translators: type of settings */ __( "%s Settings", 'woocommerce-pdf-invoices-packing-slips' ), $name ); ?></option>
 										<?php
@@ -191,18 +181,7 @@ class Settings_Debug {
 					<p><?php _e( 'Bring in the plugin settings from a .json file. This file can be obtained by downloading the settings on another site via the form above.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post" enctype="multipart/form-data">
 						<fieldset>
-							<select name="import_settings_type" required>
-								<?php
-									foreach ( $settings_types as $type => $name ) {
-										?>
-										<option value="<?= $type; ?>"><?php printf( /* translators: type of settings */ __( "%s Settings", 'woocommerce-pdf-invoices-packing-slips' ), $name ); ?></option>
-										<?php
-									}
-								?>
-							</select>
-						</fieldset>
-						<fieldset>
-							<input type="file" name="import_settings_file" accept="application/json" required>
+							<input type="file" name="file" accept="application/json" required>
 						</fieldset>
 						<fieldset>
 							<input type="hidden" name="debug_tool" value="import-settings">
@@ -218,15 +197,12 @@ class Settings_Debug {
 	public function ajax_debug_tools() {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 		
-		$request     = stripslashes_deep( $_REQUEST );
+		$data        = stripslashes_deep( $_REQUEST );
 		$debug_tools = [ 'export-settings', 'import-settings' ];
 		
-		if ( empty( $request['data'] ) || empty( $request['action'] ) || $request['action'] != 'wpo_wcpdf_debug_tools' ) {
+		if ( empty( $data['action'] ) || $data['action'] != 'wpo_wcpdf_debug_tools' ) {
 			return;
 		}
-		
-		// parse form data
-		parse_str( $request['data'], $data );
 		
 		if ( empty( $data['debug_tool'] ) || ! in_array( $data['debug_tool'], $debug_tools ) ) {
 			return;
@@ -249,13 +225,14 @@ class Settings_Debug {
 	public function export_settings( $data ) {
 		extract( $data );
 		
-		if ( empty( $export_settings_type ) ) {
-			return;
+		if ( empty( $type ) ) {
+			wcpdf_log_error( 'Export settings type is empty!' );
+			wp_send_json_error();
 		}
 		
 		$settings = [];
 		
-		switch ( $export_settings_type ) {
+		switch ( $type ) {
 			default:
 			case 'general':
 				$settings = WPO_WCPDF()->settings->general_settings;
@@ -269,23 +246,101 @@ class Settings_Debug {
 		if ( empty( $settings ) ) {
 			$documents = WPO_WCPDF()->documents->get_documents();
 			foreach ( $documents as $document ) {
-				if ( $export_settings_type == $document->slug ) {
+				if ( $type == $document->slug ) {
 					$settings = $document->get_settings( true );
 				}
 			}
 			
 			if ( empty( $settings ) ) {
-				return;
+				wcpdf_log_error( 'Exported settings data is empty!' );
+				wp_send_json_error();
 			}
 		}
 		
-		$filename = sprintf( "{$export_settings_type}-settings-export_%s.json", date( 'Y-m-d' ) );
+		$filename = sprintf( "{$type}-settings-export_%s.json", date( 'Y-m-d' ) );
 		
 		wp_send_json_success( compact( 'filename', 'settings' ) );
 	}
 	
 	public function import_settings( $data ) {
+		extract( $data );
 		
+		$file_data = [];
+		
+		if ( ! empty( $_FILES['file'] ) && ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
+			$json_data = file_get_contents( $_FILES['file']['tmp_name'], $_FILES['file']['name'] );
+			if ( false === $json_data ) {
+				wcpdf_log_error( 'Failed to parse JSON file!' );
+				wp_send_json_error();
+			} else {
+				$file_data = json_decode( $json_data, true );
+			}
+		}
+		
+		if ( empty( $file_data ) ||  empty( $file_data['type'] ) || empty( $file_data['settings'] ) ) {
+			wcpdf_log_error( 'The JSON file data is corrupted!' );
+			wp_send_json_error();
+		}
+		
+		$setting_types   = $this->get_setting_types();
+		$type            = esc_attr( $file_data['type'] );
+		$settings        = stripslashes_deep( $file_data['settings'] );
+		$settings_option = '';
+		
+		if ( ! in_array( $type, array_keys( $setting_types ) ) ) {
+			wcpdf_log_error( 'The JSON file settings type is not supported on this store!' );
+			wp_send_json_error();
+		}
+		
+		if ( in_array( $type, [ 'general', 'debug' ] ) ) {
+			$settings_option = "wpo_wcpdf_settings_{$type}";
+		} else {
+			$documents = WPO_WCPDF()->documents->get_documents();
+			foreach ( $documents as $document ) {
+				if ( $type == $document->slug ) {
+					$settings_option = "wpo_wcpdf_documents_settings_{$document->get_type()}";
+					break;
+				}
+			}
+		}
+		
+		$settings_option = apply_filters( 'wpo_wcpdf_import_settings_option', $settings_option, $type, $settings );
+		
+		if ( empty( $settings_option ) ) {
+			wcpdf_log_error( "Couldn't determine the settings option for the import!" );
+			wp_send_json_error();
+		}
+		
+		$updated = update_option( $settings_option, $setings );
+		if ( $updated ) {
+			$message = sprintf(
+				/* translators: settings type */
+				__( '%s settings imported successfully!', 'woocommerce-pdf-invoices-packing-slips' ),
+				$setting_types[$type]
+			);
+			wp_send_json_success( compact( 'type', 'message' ) );
+		} else {
+			$message = sprintf(
+				/* translators: settings type */
+				__( 'An error ocurred while importing %s settings file!', 'woocommerce-pdf-invoices-packing-slips' ),
+				$setting_types[$type]
+			);
+			wcpdf_log_error( $message );
+			wp_send_json_error();
+		}
+	}
+	
+	public function get_setting_types() {
+		$setting_types = [
+			'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+			'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
+		];
+		$documents = WPO_WCPDF()->documents->get_documents();
+		foreach ( $documents as $document ) {
+			$setting_types[$document->slug] = $document->get_title();
+		}
+		
+		return apply_filters( 'wpo_wcpdf_setting_types', $setting_types );
 	}
 
 	public function work_at_wpovernight( $tab, $section ) {
