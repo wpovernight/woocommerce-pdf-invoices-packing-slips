@@ -265,7 +265,7 @@ class Settings_Debug {
 			}
 		}
 		
-		$filename = sprintf( "{$type}-settings-export_%s.json", date( 'Y-m-d' ) );
+		$filename = apply_filters( 'wpo_wcpdf_export_settings_filename', sprintf( "{$type}-settings-export_%s.json", date( 'Y-m-d_H-i-s' ) ), $type );
 		
 		wp_send_json_success( compact( 'filename', 'settings' ) );
 	}
@@ -294,7 +294,7 @@ class Settings_Debug {
 		
 		$setting_types   = $this->get_setting_types();
 		$type            = esc_attr( $file_data['type'] );
-		$settings        = stripslashes_deep( $file_data['settings'] );
+		$new_settings    = stripslashes_deep( $file_data['settings'] );
 		$settings_option = '';
 		
 		if ( ! in_array( $type, array_keys( $setting_types ) ) ) {
@@ -316,7 +316,7 @@ class Settings_Debug {
 		}
 		
 		// used for extension settings
-		$settings_option = apply_filters( 'wpo_wcpdf_import_settings_option', $settings_option, $type, $settings );
+		$settings_option = apply_filters( 'wpo_wcpdf_import_settings_option', $settings_option, $type, $new_settings );
 		
 		if ( empty( $settings_option ) ) {
 			$message = __( "Couldn't determine the settings option for the import!", 'woocommerce-pdf-invoices-packing-slips' );
@@ -324,7 +324,17 @@ class Settings_Debug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 		
-		$updated = update_option( $settings_option, $setings );
+		$current_settings = get_option( $settings_option, [] );
+		$diff             = array_diff( array_keys( $current_settings ), array_keys( $new_settings ) );
+		
+		// settings are equal, bail here
+		if ( is_array( $diff ) && empty( $diff ) ) {
+			$message = __( 'The imported settings are the same of the existing ones, no need to be updated.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
+		}
+		
+		$updated = update_option( $settings_option, $new_settings );
 		if ( $updated ) {
 			$message = sprintf(
 				/* translators: settings type */

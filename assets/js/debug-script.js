@@ -43,7 +43,7 @@ jQuery( function( $ ) {
 		
 		switch ( tool ) {
 			case 'export-settings':
-				if ( response.data.success && response.data.filename && response.data.settings ) {
+				if ( response.success && response.data.filename && response.data.settings ) {
 					$form.find( 'a.export-settings-download-file' ).remove();
 					let data = {
 						'type':     $form.find( 'select[name="type"' ).val(),
@@ -51,16 +51,16 @@ jQuery( function( $ ) {
 					}
 					data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
 					$form.append( $('<a href="data:' + data + '" download="'+response.data.filename+'" class="export-settings-download-file">'+response.data.filename+'</a>') );
-				} else if ( ! response.data.success && response.data.message ) {
+				} else if ( ! response.success && response.data.message ) {
 					$notice.addClass( 'notice-error' );
 					$notice.find( 'p' ).text( response.data.message );
 					$notice.show();
 				}
 				break;
 			case 'import-settings':
-				if ( response.data.success && response.data.message ) {
+				if ( response.success && response.data.message ) {
 					$notice.addClass( 'notice-success' );
-				} else if ( ! response.data.success && response.data.message ) {
+				} else if ( ! response.success && response.data.message ) {
 					$notice.addClass( 'notice-error' );
 				}
 				$notice.find( 'p' ).text( response.data.message );
