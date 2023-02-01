@@ -244,7 +244,6 @@ class Settings_Debug {
 		$settings = [];
 		
 		switch ( $type ) {
-			default:
 			case 'general':
 				$settings = WPO_WCPDF()->settings->general_settings;
 				break;
@@ -258,7 +257,7 @@ class Settings_Debug {
 			$documents = WPO_WCPDF()->documents->get_documents();
 			foreach ( $documents as $document ) {
 				if ( $type == $document->slug ) {
-					$settings = $document->get_settings( true );
+					$settings = get_option( "wpo_wcpdf_documents_settings_{$document->get_type()}", [] );
 					break;
 				}
 			}
