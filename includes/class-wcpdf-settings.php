@@ -854,7 +854,7 @@ class Settings {
 			} else {
 				$message = sprintf(
 					/* translators: total scheduled actions */
-					__( 'Only 1 scheduled action should exist, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( 'Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
 					$total_actions
 				);
 				wcpdf_log_error( $message );

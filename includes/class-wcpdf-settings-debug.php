@@ -200,6 +200,7 @@ class Settings_Debug {
 				</div>
 			</div>
 		</div>
+		<br>
 		<?php
 	}
 	
