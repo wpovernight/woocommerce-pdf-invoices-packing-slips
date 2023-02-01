@@ -232,8 +232,9 @@ class Settings_Debug {
 		extract( $data );
 		
 		if ( empty( $type ) ) {
-			wcpdf_log_error( 'Export settings type is empty!' );
-			wp_send_json_error();
+			$message = __( 'Export settings type is empty!', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 		
 		$settings = [];
@@ -284,6 +285,10 @@ class Settings_Debug {
 			} else {
 				$file_data = json_decode( $json_data, true );
 			}
+		} else {
+			$message = __( 'JSON file not found!', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 		
 		if ( empty( $file_data ) || empty( $file_data['type'] ) || empty( $file_data['settings'] ) || ! is_array( $file_data['settings'] ) ) {
@@ -327,7 +332,7 @@ class Settings_Debug {
 		$current_settings = get_option( $settings_option, [] );
 		$diff             = array_diff( array_keys( $current_settings ), array_keys( $new_settings ) );
 		
-		// settings are equal, bail here
+		// settings are equal, nothing to update
 		if ( is_array( $diff ) && empty( $diff ) ) {
 			$message = __( 'The imported settings are the same of the existing ones, no need to be updated.', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_log_error( $message );
