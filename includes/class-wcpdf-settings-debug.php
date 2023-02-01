@@ -38,125 +38,135 @@ class Settings_Debug {
 			return;
 		}
 		?>
-		<div>
-			<?php if( ! WPO_WCPDF()->main->get_random_string() ) : ?>
-			<p>
-				<form method="post">
-					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
-					<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="generate_random_string">
-					<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Generate random temporary folder name', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-					<?php
-					if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'generate_random_string' ) {
-						// check permissions
-						if ( !check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-							return;
-						}
+		<h3><?php _e( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+		<div id="debug-tools">
+			<div class="wrapper">
+				<?php if( ! WPO_WCPDF()->main->get_random_string() ) : ?>
+				<div class="tool">
+					<h4><?php _e( 'Generate random temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+					<p><?php _e( 'For security reasons, it is preferable to use a random name for the temporary directory.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form method="post">
+						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
+						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="generate_random_string">
+						<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Generate temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+						<?php
+						if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'generate_random_string' ) {
+							// check permissions
+							if ( !check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
+								return;
+							}
 
-						WPO_WCPDF()->main->generate_random_string();
-						$old_path = WPO_WCPDF()->main->get_tmp_base( false );
-						$new_path = WPO_WCPDF()->main->get_tmp_base();
-						WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
-						/* translators: directory path */
-						printf('<div class="notice notice-success"><p>%s</p></div>', sprintf( esc_html__( 'Temporary folder moved to %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$new_path.'</code>' ) ); 
-					}
-					?>
-				</form>
-			</p>
-			<?php endif; ?>
-			<p>
-				<form method="post">
-					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
-					<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="install_fonts">
-					<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Reinstall fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-					<?php
-					if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'install_fonts' ) {
-						// check permissions
-						if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-							return;
+							WPO_WCPDF()->main->generate_random_string();
+							$old_path = WPO_WCPDF()->main->get_tmp_base( false );
+							$new_path = WPO_WCPDF()->main->get_tmp_base();
+							WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
+							/* translators: directory path */
+							printf('<div class="notice notice-success"><p>%s</p></div>', sprintf( esc_html__( 'Temporary folder moved to %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$new_path.'</code>' ) ); 
 						}
+						?>
+					</form>
+				</div>
+				<?php endif; ?>
+				<div class="tool">
+					<h4><?php _e( 'Reinstall plugin fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+					<p><?php _e( "If you're having issues on PDF rendering fonts, try to reinstall them here.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form method="post">
+						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
+						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="install_fonts">
+						<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Reinstall fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+						<?php
+						if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'install_fonts' ) {
+							// check permissions
+							if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
+								return;
+							}
 
-						WPO_WCPDF()->main->maybe_reinstall_fonts( true );
-						printf('<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' ) );
-					}
-					?>
-				</form>
-			</p>
-			<?php if ( WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) : ?>
-			<p>
-				<form method="post">
-					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
-					<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="reschedule_yearly_reset">
-					<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Reschedule the yearly reset of the numbering system', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-					<?php
-					if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'reschedule_yearly_reset' ) {
-						// check permissions
-						if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-							return;
+							WPO_WCPDF()->main->maybe_reinstall_fonts( true );
+							printf('<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' ) );
 						}
+						?>
+					</form>
+				</div>
+				<?php if ( ! WPO_WCPDF()->settings->yearly_reset_action_is_scheduled() ) : ?>
+				<div class="tool">
+					<h4><?php _e( 'Reschedule the yearly reset of the numbering system', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+					<p><?php _e( "You seem to have the yearly reset enabled for one of your documents but the action that performs this isn't scheduled yet.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form method="post">
+						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
+						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="reschedule_yearly_reset">
+						<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Reschedule yearly reset', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+						<?php
+						if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'reschedule_yearly_reset' ) {
+							// check permissions
+							if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
+								return;
+							}
 
-						WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
-						printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' ) );
-					}
-					?>
-				</form>
-			</p>
-			<?php endif; ?>
-			<p>
-				<form method="post">
-					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
-					<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="clear_tmp">
-					<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Remove temporary files', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-					<?php
-					if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'clear_tmp' ) {
-						// check permissions
-						if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-							return;
+							WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
+							printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' ) );
 						}
+						?>
+					</form>
+				</div>
+				<?php endif; ?>
+				<div class="tool">
+					<h4><?php _e( 'Remove temporary files', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+					<p><?php _e( 'Clear the temporary files directory pressing the button below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form method="post">
+						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
+						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="clear_tmp">
+						<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Remove temporary files', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+						<?php
+						if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'clear_tmp' ) {
+							// check permissions
+							if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
+								return;
+							}
 
-						// clean files
-						$output = WPO_WCPDF()->main->temporary_files_cleanup( time() );
-						printf( '<div class="notice notice-%1$s"><p>%2$s</p></div>', key( $output ), reset( $output ) );
-					}
-					?>
-				</form>
-			</p>
-			<p>
-				<form method="post">
-					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
-					<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="delete_legacy_settings">
-					<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Delete legacy (1.X) settings', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-					<?php
-					if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'delete_legacy_settings' ) {
-						// check permissions
-						if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-							return;
+							// clean files
+							$output = WPO_WCPDF()->main->temporary_files_cleanup( time() );
+							printf( '<div class="notice notice-%1$s"><p>%2$s</p></div>', key( $output ), reset( $output ) );
 						}
-						// delete options
-						delete_option( 'wpo_wcpdf_general_settings' );
-						delete_option( 'wpo_wcpdf_template_settings' );
-						delete_option( 'wpo_wcpdf_debug_settings' );
-						// and delete cache of these options, just in case...
-						wp_cache_delete( 'wpo_wcpdf_general_settings','options' );
-						wp_cache_delete( 'wpo_wcpdf_template_settings','options' );
-						wp_cache_delete( 'wpo_wcpdf_debug_settings','options' );
+						?>
+					</form>
+				</div>
+				<div class="tool">
+					<h4><?php _e( 'Delete legacy (1.X) settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+					<p><?php _e( "If your store used to run on legacy version 1.x you could delete those settings safely pressing the button below.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form method="post">
+						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
+						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="delete_legacy_settings">
+						<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Delete legacy settings', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+						<?php
+						if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'delete_legacy_settings' ) {
+							// check permissions
+							if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
+								return;
+							}
+							// delete options
+							delete_option( 'wpo_wcpdf_general_settings' );
+							delete_option( 'wpo_wcpdf_template_settings' );
+							delete_option( 'wpo_wcpdf_debug_settings' );
+							// and delete cache of these options, just in case...
+							wp_cache_delete( 'wpo_wcpdf_general_settings','options' );
+							wp_cache_delete( 'wpo_wcpdf_template_settings','options' );
+							wp_cache_delete( 'wpo_wcpdf_debug_settings','options' );
 
-						printf('<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Legacy settings deleted!', 'woocommerce-pdf-invoices-packing-slips' ) );
-					}
-					?>
-				</form>
-			</p>
-			<p>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-			</p>
-		</div>
-		<br />
-		<h3><?php _e( 'Import/Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-		<div class="metabox-holder">
-			<div class="postbox">
-				<h3><span><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h3>
-				<div class="inside">
+							printf('<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Legacy settings deleted!', 'woocommerce-pdf-invoices-packing-slips' ) );
+						}
+						?>
+					</form>
+				</div>
+				<div class="tool">
+					<h4><?php _e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+					<p><?php _e( 'If you miss the initial configuration of this plugin when you installed it, you could do it again below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				</div>
+				<div class="tool">
+					<h4><span><?php _e( 'Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
 					<p><?php _e( 'Download the settings of the plugin for this website as a .json file. This allows for effortless importation of the configuration into another site.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post">
+						<input type="hidden" name="debug_tool" value="export-settings">
 						<fieldset>
 							<select name="type" required>
 								<?php
@@ -167,9 +177,6 @@ class Settings_Debug {
 									}
 								?>
 							</select>
-						</fieldset>
-						<fieldset>
-							<input type="hidden" name="debug_tool" value="export-settings">
 							<a href="" class="button button-secondary submit"><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</fieldset>
 						<fieldset>
@@ -177,17 +184,13 @@ class Settings_Debug {
 						</fieldset>
 					</form>
 				</div>
-			</div>
-			<div class="postbox">
-				<h3><span><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h3>
-				<div class="inside">
+				<div class="tool">
+					<h4><span><?php _e( 'Import Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
 					<p><?php _e( 'Bring in the plugin settings from a .json file. This file can be obtained by downloading the settings on another site via the form above.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post" enctype="multipart/form-data">
+						<input type="hidden" name="debug_tool" value="import-settings">
 						<fieldset>
 							<input type="file" name="file" accept="application/json" required>
-						</fieldset>
-						<fieldset>
-							<input type="hidden" name="debug_tool" value="import-settings">
 							<a href="" class="button button-secondary submit"><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</fieldset>
 						<fieldset>

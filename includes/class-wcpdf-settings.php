@@ -839,6 +839,33 @@ class Settings {
 		
 		return $schedule;
 	}
+	
+	public function yearly_reset_action_is_scheduled() {
+		$is_scheduled      = false;
+		$scheduled_actions = as_get_scheduled_actions( array(
+			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+		) );
+		
+		if ( ! empty( $scheduled_actions ) ) {
+			$total_actions = count( $scheduled_actions );
+			if ( $total_actions === 1 ) {
+				$is_scheduled = true;
+			} else {
+				$message = sprintf(
+					/* translators: total scheduled actions */
+					__( 'Only 1 scheduled action should exist, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
+					$total_actions
+				);
+				wcpdf_log_error( $message );
+				$is_scheduled = false;
+			}
+		} else {
+			$is_scheduled = false;
+		}
+		
+		return $is_scheduled;
+	}
 
 	public function get_media_upload_setting_html() {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
