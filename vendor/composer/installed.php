@@ -5,9 +5,9 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '3f2d2ca3e91b1f04365739ee9247db9593b8a22d',
+        'reference' => '2d7da4ab617b2c10b020c792c64eb83e430fa3fa',
         'name' => '__root__',
-        'dev' => false,
+        'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
@@ -16,16 +16,16 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '3f2d2ca3e91b1f04365739ee9247db9593b8a22d',
+            'reference' => '2d7da4ab617b2c10b020c792c64eb83e430fa3fa',
             'dev_requirement' => false,
         ),
         'dompdf/dompdf' => array(
-            'pretty_version' => 'v2.0.1',
-            'version' => '2.0.1.0',
+            'pretty_version' => 'v2.0.2',
+            'version' => '2.0.2.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../dompdf/dompdf',
             'aliases' => array(),
-            'reference' => 'c5310df0e22c758c85ea5288175fc6cd777bc085',
+            'reference' => 'ad4c631bf8897fc1ca7b566468a969cfd71a558a',
             'dev_requirement' => false,
         ),
         'masterminds/html5' => array(
