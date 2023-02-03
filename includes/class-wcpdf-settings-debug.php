@@ -339,6 +339,7 @@ class Settings_Debug {
 				__( '%s settings imported successfully!', 'woocommerce-pdf-invoices-packing-slips' ),
 				$setting_types[$type]
 			);
+			wcpdf_log_error( $message, 'info' );
 			wp_send_json_success( compact( 'type', 'message' ) );
 		} else {
 			$message = sprintf(
