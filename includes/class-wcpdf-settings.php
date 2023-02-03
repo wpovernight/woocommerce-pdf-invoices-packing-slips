@@ -858,10 +858,7 @@ class Settings {
 					$total_actions
 				);
 				wcpdf_log_error( $message );
-				$is_scheduled = false;
 			}
-		} else {
-			$is_scheduled = false;
 		}
 		
 		return $is_scheduled;
