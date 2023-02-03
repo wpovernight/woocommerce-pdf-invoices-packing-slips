@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "dompdf/dompdf",
-            "version": "v2.0.1",
-            "version_normalized": "2.0.1.0",
+            "version": "v2.0.2",
+            "version_normalized": "2.0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "c5310df0e22c758c85ea5288175fc6cd777bc085"
+                "reference": "ad4c631bf8897fc1ca7b566468a969cfd71a558a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/c5310df0e22c758c85ea5288175fc6cd777bc085",
-                "reference": "c5310df0e22c758c85ea5288175fc6cd777bc085",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/ad4c631bf8897fc1ca7b566468a969cfd71a558a",
+                "reference": "ad4c631bf8897fc1ca7b566468a969cfd71a558a",
                 "shasum": ""
             },
             "require": {
@@ -36,7 +36,7 @@
                 "ext-imagick": "Improves image processing performance",
                 "ext-zlib": "Needed for pdf stream compression"
             },
-            "time": "2022-09-22T13:43:41+00:00",
+            "time": "2023-01-31T13:30:40+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -61,7 +61,7 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/v2.0.1"
+                "source": "https://github.com/dompdf/dompdf/tree/v2.0.2"
             },
             "install-path": "../dompdf/dompdf"
         },
@@ -456,6 +456,6 @@
             "install-path": "../symfony/polyfill-mbstring"
         }
     ],
-    "dev": false,
+    "dev": true,
     "dev-package-names": []
 }
