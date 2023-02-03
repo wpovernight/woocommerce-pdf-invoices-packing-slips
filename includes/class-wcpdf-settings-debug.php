@@ -343,7 +343,7 @@ class Settings_Debug {
 		} else {
 			$message = sprintf(
 				/* translators: settings type */
-				__( 'An error ocurred while importing %s settings file!', 'woocommerce-pdf-invoices-packing-slips' ),
+				__( 'The %s settings file you are trying to import is identical to your current settings, therefore, the settings were not imported.', 'woocommerce-pdf-invoices-packing-slips' ),
 				$setting_types[$type]
 			);
 			wcpdf_log_error( $message );
