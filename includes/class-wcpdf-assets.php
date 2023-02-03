@@ -202,8 +202,9 @@ class Assets {
 				'wpo-wcpdf-debug',
 				'wpo_wcpdf_debug',
 				[
-					'ajaxurl' => admin_url( 'admin-ajax.php' ),
-					'nonce'   => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
+					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
+					'nonce'          => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
+					'download_label' => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
 				]
 			);
 			

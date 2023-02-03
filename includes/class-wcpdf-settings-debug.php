@@ -172,7 +172,7 @@ class Settings_Debug {
 								<?php
 									foreach ( $this->get_setting_types() as $type => $name ) {
 										?>
-										<option value="<?= $type; ?>"><?php printf( /* translators: type of settings */ __( "%s Settings", 'woocommerce-pdf-invoices-packing-slips' ), $name ); ?></option>
+										<option value="<?= $type; ?>"><?= $name; ?></option>
 										<?php
 									}
 								?>
@@ -254,7 +254,7 @@ class Settings_Debug {
 		
 		// maybe it's a document type settings request
 		if ( empty( $settings ) ) {
-			$documents = WPO_WCPDF()->documents->get_documents();
+			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				if ( $type == $document->slug ) {
 					$settings = get_option( "wpo_wcpdf_documents_settings_{$document->get_type()}", [] );
@@ -356,7 +356,7 @@ class Settings_Debug {
 			'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 			'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
-		$documents = WPO_WCPDF()->documents->get_documents();
+		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 		foreach ( $documents as $document ) {
 			$setting_types[$document->slug] = $document->get_title();
 		}
