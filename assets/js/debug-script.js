@@ -50,7 +50,7 @@ jQuery( function( $ ) {
 						'settings': response.data.settings,
 					}
 					data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
-					$form.append( $('<div class="download_file"><label>'+wpo_wcpdf_debug.download_label+':</label> <a href="data:' + data + '" download="'+response.data.filename+'" class="export-settings-download-file">'+response.data.filename+'</a></div>') );
+					$form.append( $('<div class="download_file"><label>'+wpo_wcpdf_debug.download_label+':</label> <a href="data:' + data + '" download="'+response.data.filename+'">'+response.data.filename+'</a></div>') );
 				} else if ( ! response.success && response.data.message ) {
 					$notice.addClass( 'notice-error' );
 					$notice.find( 'p' ).text( response.data.message );
