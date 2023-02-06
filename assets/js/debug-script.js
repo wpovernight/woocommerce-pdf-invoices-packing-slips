@@ -44,13 +44,13 @@ jQuery( function( $ ) {
 		switch ( tool ) {
 			case 'export-settings':
 				if ( response.success && response.data.filename && response.data.settings ) {
-					$form.find( 'a.export-settings-download-file' ).remove();
+					$form.find( '.download_file' ).remove();
 					let data = {
 						'type':     $form.find( 'select[name="type"' ).val(),
 						'settings': response.data.settings,
 					}
 					data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
-					$form.append( $('<label>'+wpo_wcpdf_debug.download_label+':</label> <a href="data:' + data + '" download="'+response.data.filename+'" class="export-settings-download-file">'+response.data.filename+'</a>') );
+					$form.append( $('<div class="download_file"><label>'+wpo_wcpdf_debug.download_label+':</label> <a href="data:' + data + '" download="'+response.data.filename+'" class="export-settings-download-file">'+response.data.filename+'</a></div>') );
 				} else if ( ! response.success && response.data.message ) {
 					$notice.addClass( 'notice-error' );
 					$notice.find( 'p' ).text( response.data.message );
