@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 3.3.1
+Stable tag: 3.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.3.2 (2023-02-03) =
+* New: dompdf upgrade to v2.0.2
+* New: filter to control the value returned by `is_woocommerce_activated()`
+* Fix: JS undefined error when trying to retrieve preview gutter texts
 
 = 3.3.1 (2023-01-20) =
 * Fix: applies `overflow-wrap:anywhere;` to the Simple template `body` in CSS styles
