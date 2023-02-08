@@ -9,7 +9,7 @@ jQuery( function( $ ) {
 		formData.append( 'nonce', wpo_wcpdf_debug.nonce );
 		
 		// block ui
-		$form.block( {
+		$form.closest( '.tool' ).block( {
 			message: null,
 			overlayCSS: {
 				background: '#fff',
@@ -32,7 +32,7 @@ jQuery( function( $ ) {
 			}
 		} );
 		
-		$form.unblock();
+		$form.closest( '.tool' ).unblock();
 	} );
 	
 	function process_form_response( tool, response, $form ) {
