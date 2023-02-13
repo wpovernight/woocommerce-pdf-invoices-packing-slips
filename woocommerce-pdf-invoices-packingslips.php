@@ -399,15 +399,16 @@ class WPO_WCPDF {
 		if ( empty( $this->main ) ) {
 			return;
 		}
-		$tmp_path = $this->main->get_tmp_path('attachments');
-		$server_software   = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
-		$random_string = $this->main->get_random_string();
+		
+		$tmp_path        = $this->main->get_tmp_path( 'attachments' );
+		$server_software = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
+		$random_string   = $this->main->get_random_string();
 
-		if ( stristr( $server_software, 'nginx' ) && $this->settings->user_can_manage_settings() && ! get_option('wpo_wcpdf_hide_nginx_notice') && ! $random_string ) {
+		if ( stristr( $server_software, 'nginx' ) && $this->settings->user_can_manage_settings() && ! get_option( 'wpo_wcpdf_hide_nginx_notice' ) && ! $random_string ) {
 			ob_start();
 			?>
 			<div class="error">
-				<img src="<?php echo $this->plugin_url() . "/assets/images/nginx.svg"; ?>" style="margin-top:10px;">
+				<img src="<?php echo $this->plugin_url() . '/assets/images/nginx.svg'; ?>" style="margin-top:10px;">
 				<?php /* translators: directory path */ ?>
 				<p><?php printf( __( 'The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>.', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>' . $tmp_path . '</strong>' ); ?></p>
 				<p><?php _e( 'To protect them, you must click the button below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
