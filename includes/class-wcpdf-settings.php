@@ -127,7 +127,7 @@ class Settings {
 		foreach ( $capabilities as $capability ) {
 			$permission = current_user_can( $capability );
 			if ( $permission ) {
-				return $permission;
+				break;
 			}
 		}
 		
