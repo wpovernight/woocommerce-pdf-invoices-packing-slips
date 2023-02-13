@@ -115,6 +115,24 @@ class Settings {
 		}
 		return (array) $links;
 	}
+	
+	/**
+	 * Check if user role can manage settings.
+	 * @return bool
+	 */
+	public function user_can_manage_settings() {
+		$capabilities = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', [ 'manage_woocommerce' ] );
+		$permission   = false;
+		
+		foreach ( $capabilities as $capability ) {
+			$permission = current_user_can( $capability );
+			if ( $permission ) {
+				return $permission;
+			}
+		}
+		
+		return $permission;
+	}
 
 	function check_auto_increment_increment() {
 		global $wpdb;
@@ -176,7 +194,7 @@ class Settings {
 
 		try {
 			// check permissions
-			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			if ( ! $this->user_can_manage_settings() ) {
 				throw new \Exception( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), 403 );
 			}
 
@@ -296,7 +314,7 @@ class Settings {
 
 		try {
 			// check permissions
-			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			if ( ! $this->user_can_manage_settings() ) {
 				throw new \Exception( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), 403 );
 			}
 
@@ -687,7 +705,7 @@ class Settings {
 	public function set_number_store() {
 		check_ajax_referer( "wpo_wcpdf_next_{$_POST['store']}", 'security' );
 		// check permissions
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->user_can_manage_settings() ) {
 			die(); 
 		}
 
@@ -843,7 +861,7 @@ class Settings {
 	public function get_media_upload_setting_html() {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
 		// check permissions
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->user_can_manage_settings() ) {
 			wp_send_json_error(); 
 		}
 

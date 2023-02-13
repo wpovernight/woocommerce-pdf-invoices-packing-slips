@@ -403,7 +403,7 @@ class WPO_WCPDF {
 		$server_software   = isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
 		$random_string = $this->main->get_random_string();
 
-		if ( stristr( $server_software, 'nginx' ) && ( current_user_can( 'manage_shop_settings' ) || current_user_can( 'manage_woocommerce' ) ) && ! get_option('wpo_wcpdf_hide_nginx_notice') && ! $random_string ) {
+		if ( stristr( $server_software, 'nginx' ) && $this->settings->user_can_manage_settings() && ! get_option('wpo_wcpdf_hide_nginx_notice') && ! $random_string ) {
 			ob_start();
 			?>
 			<div class="error">

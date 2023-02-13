@@ -16,7 +16,7 @@ class Setup_Wizard {
 	private $steps  = array();
 	
 	public function __construct() {
-		if ( current_user_can( 'manage_woocommerce' ) ) {
+		if ( WPO_WCPDF()->settings->user_can_manage_settings() ) {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );
 		}
