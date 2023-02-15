@@ -359,7 +359,7 @@ class Settings_Debug {
 		];
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 		foreach ( $documents as $document ) {
-			if (  $document->title != $document->get_title() ) {
+			if ( $document->title != $document->get_title() ) {
 				$title = $document->title . ' ('.$document->get_title().')';
 			} else {
 				$title = $document->get_title();
