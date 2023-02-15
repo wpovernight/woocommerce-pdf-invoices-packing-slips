@@ -83,7 +83,7 @@ class Settings {
 			$parent_slug,
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
-			'manage_woocommerce',
+			$this->settings_capabilities(),
 			'wpo_wcpdf_options_page',
 			array( $this, 'settings_page' )
 		);
@@ -117,21 +117,19 @@ class Settings {
 	}
 	
 	/**
+	 * Get current settings user role capabilities.
+	 * @return string
+	 */
+	public function settings_capabilities() {
+		return apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', 'manage_woocommerce' );
+	}
+	
+	/**
 	 * Check if user role can manage settings.
 	 * @return bool
 	 */
-	public function user_can_manage_settings() {
-		$capabilities = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', [ 'manage_woocommerce' ] );
-		$permission   = false;
-		
-		foreach ( $capabilities as $capability ) {
-			$permission = current_user_can( $capability );
-			if ( $permission ) {
-				break;
-			}
-		}
-		
-		return $permission;
+	public function user_can_manage_settings() {		
+		return current_user_can( $this->settings_capabilities() );
 	}
 
 	function check_auto_increment_increment() {
@@ -439,13 +437,6 @@ class Settings {
 		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) );
 		add_filter( 'option_page_capability_'.$page, array( $this, 'settings_capabilities' ) );
 
-	}
-
-	/**
-	 * Set capability for settings page
-	 */
-	public function settings_capabilities() {
-		return 'manage_woocommerce';
 	}
 
 	public function get_common_document_settings() {
