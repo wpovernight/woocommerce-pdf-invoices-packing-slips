@@ -69,7 +69,7 @@ class Settings_Debug {
 				<?php endif; ?>
 				<div class="tool">
 					<h4><?php _e( 'Reinstall plugin fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
-					<p><?php _e( "If you're having issues on PDF rendering fonts, try to reinstall them here.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'If you are experiencing issues with rendering fonts there might have been an issue during installation or upgrade.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form method="post">
 						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
 						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="install_fonts">
@@ -111,7 +111,7 @@ class Settings_Debug {
 				<?php endif; ?>
 				<div class="tool">
 					<h4><?php _e( 'Remove temporary files', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
-					<p><?php _e( 'Clear the temporary files directory pressing the button below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'Clean up the PDF files stored in the temporary folder (used for email attachments).', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form method="post">
 						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
 						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="clear_tmp">
@@ -132,7 +132,7 @@ class Settings_Debug {
 				</div>
 				<div class="tool">
 					<h4><?php _e( 'Delete legacy (1.X) settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
-					<p><?php _e( "If your store used to run on legacy version 1.x you could delete those settings safely pressing the button below.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'Safely remove deprecated settings from version 1.x of the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form method="post">
 						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
 						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="delete_legacy_settings">
@@ -159,12 +159,12 @@ class Settings_Debug {
 				</div>
 				<div class="tool">
 					<h4><?php _e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
-					<p><?php _e( 'If you miss the initial configuration of this plugin when you installed it, you could do it again below.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'Set up your basic invoice workflow via our Wizard.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 				</div>
 				<div class="tool">
 					<h4><span><?php _e( 'Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
-					<p><?php _e( 'Download the settings of the plugin for this website as a .json file. This allows for effortless importation of the configuration into another site.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'Download plugin settings in JSON format to easily export your current setup.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post">
 						<input type="hidden" name="debug_tool" value="export-settings">
 						<fieldset>
@@ -186,7 +186,7 @@ class Settings_Debug {
 				</div>
 				<div class="tool">
 					<h4><span><?php _e( 'Import Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
-					<p><?php _e( 'Bring in the plugin settings from a .json file. This file can be obtained by downloading the settings on another site via the form above.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php _e( 'Import plugin settings in JSON format.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post" enctype="multipart/form-data">
 						<input type="hidden" name="debug_tool" value="import-settings">
 						<fieldset>
