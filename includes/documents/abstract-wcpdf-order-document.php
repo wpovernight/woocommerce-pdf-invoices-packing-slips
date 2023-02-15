@@ -272,8 +272,7 @@ abstract class Order_Document {
 	}
 
 	public function init() {
-		// init settings
-		$this->init_settings_data();
+		// save settings
 		$this->save_settings();
 
 		$this->set_date( current_time( 'timestamp', true ) );
@@ -354,8 +353,7 @@ abstract class Order_Document {
 			$this->save();
 		}
 
-		// init settings
-		$this->init_settings_data();
+		// save settings
 		$this->save_settings( true );
 
 		//Add order note
