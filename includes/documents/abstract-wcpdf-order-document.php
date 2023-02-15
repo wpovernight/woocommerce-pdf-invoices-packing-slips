@@ -123,7 +123,7 @@ abstract class Order_Document {
 
 		// load settings
 		$this->init_settings_data();
-		$this->save_settings();
+		// check enable
 		$this->enabled = $this->get_setting( 'enabled', false );
 	}
 
