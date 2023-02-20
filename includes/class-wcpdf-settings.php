@@ -48,7 +48,7 @@ class Settings {
 		add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
 
 		// settings capabilities
-		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'settings_capabilities' ) );
+		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
 
 		// admin notice for auto_increment_increment
 		// add_action( 'admin_notices', array( $this, 'check_auto_increment_increment') );
@@ -83,7 +83,7 @@ class Settings {
 			$parent_slug,
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
-			'manage_woocommerce',
+			$this->user_settings_capability(),
 			'wpo_wcpdf_options_page',
 			array( $this, 'settings_page' )
 		);
@@ -114,6 +114,32 @@ class Settings {
 			return array_merge( $links, $row_meta );
 		}
 		return (array) $links;
+	}
+	
+	/**
+	 * Get a valid user role settings capability.
+	 * @return string
+	 */
+	public function user_settings_capability() {
+		$user_capability       = 'manage_woocommerce';
+		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $user_capability ) );
+
+		foreach ( $capabilities_to_check as $capability ) {
+			if ( current_user_can( $capability ) ) {
+				$user_capability = $capability;
+				break;
+			}
+		}
+		
+		return $user_capability;
+	}
+	
+	/**
+	 * Check if user role can manage settings.
+	 * @return bool
+	 */
+	public function user_can_manage_settings() {
+		return current_user_can( $this->user_settings_capability() );
 	}
 
 	function check_auto_increment_increment() {
@@ -176,7 +202,7 @@ class Settings {
 
 		try {
 			// check permissions
-			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			if ( ! $this->user_can_manage_settings() ) {
 				throw new \Exception( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), 403 );
 			}
 
@@ -296,7 +322,7 @@ class Settings {
 
 		try {
 			// check permissions
-			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			if ( ! $this->user_can_manage_settings() ) {
 				throw new \Exception( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), 403 );
 			}
 
@@ -419,15 +445,8 @@ class Settings {
 		}
 		// $page, $option_group & $option_name are all the same...
 		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) );
-		add_filter( 'option_page_capability_'.$page, array( $this, 'settings_capabilities' ) );
+		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
-	}
-
-	/**
-	 * Set capability for settings page
-	 */
-	public function settings_capabilities() {
-		return 'manage_woocommerce';
 	}
 
 	public function get_common_document_settings() {
@@ -687,7 +706,7 @@ class Settings {
 	public function set_number_store() {
 		check_ajax_referer( "wpo_wcpdf_next_{$_POST['store']}", 'security' );
 		// check permissions
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->user_can_manage_settings() ) {
 			die(); 
 		}
 
@@ -839,11 +858,35 @@ class Settings {
 		
 		return $schedule;
 	}
+	
+	public function yearly_reset_action_is_scheduled() {
+		$is_scheduled      = false;
+		$scheduled_actions = as_get_scheduled_actions( array(
+			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+		) );
+		
+		if ( ! empty( $scheduled_actions ) ) {
+			$total_actions = count( $scheduled_actions );
+			if ( $total_actions === 1 ) {
+				$is_scheduled = true;
+			} else {
+				$message = sprintf(
+					/* translators: total scheduled actions */
+					__( 'Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
+					$total_actions
+				);
+				wcpdf_log_error( $message );
+			}
+		}
+		
+		return $is_scheduled;
+	}
 
 	public function get_media_upload_setting_html() {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
 		// check permissions
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->user_can_manage_settings() ) {
 			wp_send_json_error(); 
 		}
 
