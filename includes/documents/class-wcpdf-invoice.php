@@ -53,8 +53,7 @@ class Invoice extends Order_Document_Methods {
 	}
 
 	public function init() {
-		// init settings
-		$this->init_settings_data();
+		// save settings
 		$this->save_settings();
 
 		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
