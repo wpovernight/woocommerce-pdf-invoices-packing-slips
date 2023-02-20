@@ -250,6 +250,9 @@ class Settings_Debug {
 			case 'debug':
 				$settings = WPO_WCPDF()->settings->debug_settings;
 				break;
+			default:
+				$settings = apply_filters( 'wpo_wcpdf_export_settings', $settings, $type );
+				break;
 		}
 		
 		// maybe it's a document type settings request
