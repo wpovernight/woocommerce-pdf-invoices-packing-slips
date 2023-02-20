@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 	
-	$( document.body ).on( 'click', '.wpo_wcpdf_debug_tools_form a.submit', function( e ) {
+	$( '.wpo_wcpdf_debug_tools_form a.submit' ).on( 'click', function( e ) {
 		e.preventDefault();
 		let $form    = $( this ).closest( 'form' );
 		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
