@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.1
 Requires PHP: 7.1
-Stable tag: 3.3.2
+Stable tag: 3.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.4.0 (2023-02-20) =
+* New: filter `wpo_wcpdf_settings_user_role_capabilities` to change role capabilities to access plugin settings
+* New: improved debug tools UI
+* New: import/export settings tools
+* New: dompdf upgrade to v2.0.3
+* Fix: save document settings in order meta only on document init
+* Tested up to WooCommerce 7.4
 
 = 3.3.2 (2023-02-03) =
 * New: dompdf upgrade to v2.0.2
