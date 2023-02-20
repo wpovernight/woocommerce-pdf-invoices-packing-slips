@@ -48,7 +48,7 @@ class Settings {
 		add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
 
 		// settings capabilities
-		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'settings_capabilities' ) );
+		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
 
 		// admin notice for auto_increment_increment
 		// add_action( 'admin_notices', array( $this, 'check_auto_increment_increment') );
@@ -83,7 +83,7 @@ class Settings {
 			$parent_slug,
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
-			$this->settings_capabilities(),
+			$this->user_settings_capability(),
 			'wpo_wcpdf_options_page',
 			array( $this, 'settings_page' )
 		);
@@ -117,19 +117,29 @@ class Settings {
 	}
 	
 	/**
-	 * Get current settings user role capabilities.
+	 * Get a valid user role settings capability.
 	 * @return string
 	 */
-	public function settings_capabilities() {
-		return apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', 'manage_woocommerce' );
+	public function user_settings_capability() {
+		$user_capability       = 'manage_woocommerce';
+		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $user_capability ) );
+
+		foreach ( $capabilities_to_check as $capability ) {
+			if ( current_user_can( $capability ) ) {
+				$user_capability = $capability;
+				break;
+			}
+		}
+		
+		return $user_capability;
 	}
 	
 	/**
 	 * Check if user role can manage settings.
 	 * @return bool
 	 */
-	public function user_can_manage_settings() {		
-		return current_user_can( $this->settings_capabilities() );
+	public function user_can_manage_settings() {
+		return current_user_can( $this->user_settings_capability() );
 	}
 
 	function check_auto_increment_increment() {
@@ -435,7 +445,7 @@ class Settings {
 		}
 		// $page, $option_group & $option_name are all the same...
 		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) );
-		add_filter( 'option_page_capability_'.$page, array( $this, 'settings_capabilities' ) );
+		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
 	}
 
