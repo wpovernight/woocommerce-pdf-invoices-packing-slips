@@ -424,6 +424,11 @@ class Install {
 				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
 			}
 		}
+		
+		// 3.5.0-dev-1: deactivate UBL extension
+		if ( version_compare( $installed_version, '3.5.0-dev-1', '<' ) ) {
+			$this->deactivate_ubl_extension();
+		}
 	}
 
 	/**
@@ -449,6 +454,27 @@ class Install {
 			WPO_WCPDF()->main->init_tmp();
 		} else {
 			WPO_WCPDF()->main->copy_fonts( $font_path );
+		}
+	}
+	
+	/**
+	 * Deactivate UBL extension
+	 *
+	 * @return void
+	 */
+	public function deactivate_ubl_extension() {
+		$active_plugins = WPO_WCPDF()->get_active_plugins();
+		$ubl_extension  = [];
+		
+		foreach ( $active_plugins as $plugin ) {
+			if ( strpos( $plugin, 'ubl-woocommerce-pdf-invoices.php' ) !== false ) {
+				$ubl_extension[] = $plugin;
+				break;
+			}
+		}
+
+		if ( function_exists( 'deactivate_plugins' ) && ! empty( $ubl_extension ) ) {
+			deactivate_plugins( $ubl_extension );
 		}
 	}
 

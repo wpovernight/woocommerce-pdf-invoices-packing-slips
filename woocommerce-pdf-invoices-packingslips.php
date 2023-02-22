@@ -277,14 +277,14 @@ class WPO_WCPDF {
 	 * Check if woocommerce is activated
 	 */
 	public function is_woocommerce_activated() {
-		$blog_plugins = get_option( 'active_plugins', array() );
-		$site_plugins = is_multisite() ? (array) maybe_unserialize( get_site_option('active_sitewide_plugins' ) ) : array();
+		$active_plugins = $this->get_active_plugins();
 
-		if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
+		if ( in_array( 'woocommerce/woocommerce.php', $active_plugins ) || isset( $active_plugins['woocommerce/woocommerce.php'] ) ) {
 			$is_wc_activated = true;
 		} else {
 			$is_wc_activated = false;
 		}
+		
 		return apply_filters( 'wpo_wcpdf_is_woocommerce_activated', $is_wc_activated );
 	}
 
@@ -492,6 +492,25 @@ class WPO_WCPDF {
 				exit;
 			}
 		}
+	}
+	
+	/**
+	 * Get active plugins
+	 *
+	 * @return array
+	 */
+	public function get_active_plugins() {
+		$active_plugins = (array) apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+		if ( is_multisite() ) {
+			// get_site_option( 'active_sitewide_plugins', array() ) returns a 'reversed list'
+			// like [hello-dolly/hello.php] => 1369572703 so we do array_keys to make the array
+			// compatible with $active_plugins
+			$active_sitewide_plugins = (array) array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
+			// merge arrays and remove doubles
+			$active_plugins = (array) array_unique( array_merge( $active_plugins, $active_sitewide_plugins ) );
+		}
+
+		return $active_plugins;
 	}
 
 	/**
