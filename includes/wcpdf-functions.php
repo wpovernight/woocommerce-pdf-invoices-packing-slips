@@ -290,3 +290,16 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 
 	return $errors;
 }
+
+/**
+ * Determine the site locale
+ */
+function wcpdf_determine_locale() {
+	if ( function_exists( 'determine_locale' ) ) { // WP5.0+
+		$locale = determine_locale();
+	} else {
+		$locale = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
+	}
+	
+	return apply_filters( 'plugin_locale', $locale, 'woocommerce-pdf-invoices-packing-slips' );
+}
