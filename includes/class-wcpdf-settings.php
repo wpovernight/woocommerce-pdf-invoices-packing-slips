@@ -260,6 +260,8 @@ class Settings {
 					// reload settings
 					$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 					$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+					
+					do_action( 'wpo_wcpdf_preview_after_reload_settings', $this );
 				}
 
 				$document = wcpdf_get_document( $document_type, $order );
