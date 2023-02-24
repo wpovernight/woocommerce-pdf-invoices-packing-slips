@@ -1215,8 +1215,10 @@ class Main {
 		$data = [];
 		
 		if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
-			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {				
-				$data = $printed_data;
+			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {	
+				if ( is_array( $printed_data ) && array_key_exists( 'date', $printed_data ) && array_key_exists( 'trigger', $printed_data ) ) {
+					$data = $printed_data;
+				}
 			}
 		}
 		
