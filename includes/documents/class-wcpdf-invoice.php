@@ -30,6 +30,8 @@ class Invoice extends Order_Document_Methods {
 
 		// Call parent constructor
 		parent::__construct( $order );
+		
+		add_filter( 'wpo_wcpdf_document_triggers', array( $this, 'filter_document_triggers' ), 999, 1 );
 	}
 
 	public function use_historical_settings() {
@@ -413,6 +415,21 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'mark_printed',
+				'title'			=> __( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'select',
+				'section'		=> 'invoice',
+				'args'			=> array(
+					'option_name' => $option_name,
+					'id'          => 'mark_printed',
+					'options'     => array_merge(
+						[ '' => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ],
+						WPO_WCPDF()->main->get_document_triggers()
+					),
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'use_latest_settings',
 				'title'			=> __( 'Always use most current settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
@@ -466,6 +483,14 @@ class Invoice extends Order_Document_Methods {
 	public function get_date_title() {
 		$date_title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
+	}
+	
+	public function filter_document_triggers( $triggers ) {
+		foreach ( $triggers as $slug => $name ) {
+			/* translators: trigger name */
+			$triggers[$slug] = sprintf( __( 'On %s' ), $name );
+		}
+		return $triggers;
 	}
 
 }

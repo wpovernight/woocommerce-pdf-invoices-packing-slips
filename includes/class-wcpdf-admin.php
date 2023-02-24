@@ -720,8 +720,7 @@ class Admin {
 				$invoice->save();
 
 				if ( $is_new ) {
-					/* translators: name/description of the context for document creation logs */
-					WPO_WCPDF()->main->log_to_order_notes( $invoice, esc_html__( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
+					WPO_WCPDF()->main->log_to_order_notes( $invoice, 'document_data' );
 				}
 			}
 
@@ -918,8 +917,7 @@ class Admin {
 					$document->save();
 
 					if ( $is_new ) {
-						/* translators: name/description of the context for document creation logs */
-						WPO_WCPDF()->main->log_to_order_notes( $document, esc_html__( 'order details (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ) );
+						WPO_WCPDF()->main->log_to_order_notes( $document, 'document_data' );
 					}
 
 					$response      = array(
