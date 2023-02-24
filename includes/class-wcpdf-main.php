@@ -130,6 +130,7 @@ class Main {
 				// log document generation to order notes
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_to_order_notes( $document, 'email_attachment' );
+					$this->mark_document_printed( $document, 'email_attachment' );
 				} );
 				
 				// prepare document
@@ -375,14 +376,17 @@ class Main {
 			if ( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_to_order_notes( $document, 'bulk' );
+					$this->mark_document_printed( $document, 'bulk' );
 				} );
 			} elseif ( isset( $_REQUEST['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_to_order_notes( $document, 'my_account' );
+					$this->mark_document_printed( $document, 'my_account' );
 				} );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_to_order_notes( $document, 'single' );
+					$this->mark_document_printed( $document, 'single' );
 				} );
 			}
 
@@ -1122,7 +1126,7 @@ class Main {
 	 */
 	public function log_to_order_notes( $document, $trigger ) {
 		$triggers = $this->get_document_triggers();
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {			
+		if ( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {			
 			/* translators: 1. document title, 2. creation trigger */
 			$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $triggers[$trigger] );
@@ -1159,15 +1163,17 @@ class Main {
 	 * @return void
 	 */
 	public function mark_document_printed( $document, $trigger ) {
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $trigger ) && in_array( $trigger, $this->get_document_triggers() ) && isset( $document->settings['mark_printed'] ) ) {
-			if ( 'shop_order' === $order->get_type() ) {
-				$data = [
-					'date'    => time(),
-					'trigger' => $trigger,
-				];
-				
-				$order->update_meta_data( "_wcpdf_{$document->slug}_printed", $data );
-				$order->save_meta_data();
+		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
+			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $this->get_document_triggers() ) && isset( $document->settings['mark_printed'] ) ) {
+				if ( 'shop_order' === $order->get_type() ) {
+					$data = [
+						'date'    => time(),
+						'trigger' => $trigger,
+					];
+					
+					$order->update_meta_data( "_wcpdf_{$document->slug}_printed", $data );
+					$order->save_meta_data();
+				}
 			}
 		}
 	}
@@ -1178,11 +1184,13 @@ class Main {
 	 * @return void
 	 */
 	public function mark_document_unprinted( $document ) {
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
-			$meta_key = "_wcpdf_{$document->slug}_printed";
-			if ( 'shop_order' === $order->get_type() && ! empty( $order->get_meta( $meta_key ) ) ) {				
-				$order->delete_meta_data( $meta_key );
-				$order->save_meta_data();
+		if ( ! empty( $document ) && $this->is_document_printed( $document ) ) {
+			if ( ! empty( $order = $document->order ) ) {
+				$meta_key = "_wcpdf_{$document->slug}_printed";
+				if ( 'shop_order' === $order->get_type() && ! empty( $order->get_meta( $meta_key ) ) ) {				
+					$order->delete_meta_data( $meta_key );
+					$order->save_meta_data();
+				}
 			}
 		}
 	}
@@ -1214,11 +1222,9 @@ class Main {
 	public function get_document_printed_data( $document ) {
 		$data = [];
 		
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
+		if ( ! empty( $document ) && $this->is_document_printed( $document ) && ! empty( $order = $document->order ) ) {
 			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {	
-				if ( is_array( $printed_data ) && array_key_exists( 'date', $printed_data ) && array_key_exists( 'trigger', $printed_data ) ) {
-					$data = $printed_data;
-				}
+				$data = $printed_data;
 			}
 		}
 		

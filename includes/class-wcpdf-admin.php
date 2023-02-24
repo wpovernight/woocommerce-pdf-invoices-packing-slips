@@ -197,16 +197,26 @@ class Admin {
 			$document_title = $document->get_title();
 			$icon = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url         = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
-				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+				$pdf_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+				$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$document_exists  = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+				$document_printed = is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+				$class            = [ $document->get_type() ];
+				
+				if ( $document_exists ) {
+					$class[] = 'exists';
+				}
+				if ( $document_printed ) {
+					$class[] = 'printed';
+				}
 
 				$listing_actions[$document->get_type()] = array(
-					'url'    => esc_url( $pdf_url ),
-					'img'    => $icon,
-					'alt'    => "PDF " . $document_title,
-					'exists' => $document_exists,
-					'class'  => apply_filters( 'wpo_wcpdf_action_button_class', $document_exists ? "exists " . $document->get_type() : $document->get_type(), $document ),
+					'url'     => esc_url( $pdf_url ),
+					'img'     => $icon,
+					'alt'     => "PDF " . $document_title,
+					'exists'  => $document_exists,
+					'printed' => $document_printed,
+					'class'   => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
 				);
 			}
 		}
@@ -218,15 +228,17 @@ class Admin {
 				$data['class'] = $data['exists'] ? "exists {$action}" : $action;
 			}
 
-			$exists = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
+			$exists  = $data['exists'] ? '<svg class="icon-exists" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
+			$printed = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 
 			printf(
-				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s</a>',
+				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
 				esc_attr( $data['url'] ),
 				esc_attr( $data['class'] ),
 				esc_attr( $data['alt'] ),
 				esc_attr( $data['img'] ),
-				$exists
+				$exists,
+				$printed
 			);
 		}
 	}
@@ -420,13 +432,28 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url        = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
-				$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$pdf_url               = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+				$document_printed      = is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+				$document_printed_data = is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
+				$class                 = [ $document->get_type() ];
+				
+				if ( $document_exists ) {
+					$class[] = 'exists';
+				}
+				if ( $document_printed ) {
+					$class[] = 'printed';
+				}
+				
 				$meta_box_actions[$document->get_type()] = array(
-					'url'    => esc_url( $pdf_url ),
-					'alt'    => "PDF " . $document_title,
-					'title'  => "PDF " . $document_title,
-					'exists' => is_callable( array( $document, 'exists' ) ) ? $document->exists() : false,
+					'url'          => esc_url( $pdf_url ),
+					'alt'          => "PDF " . $document_title,
+					'title'        => "PDF " . $document_title,
+					'exists'       => $document_exists,
+					'printed'      => $document_printed,
+					'printed_data' => $document_printed_data,
+					'class'        => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
 				);
 			}
 		}
@@ -437,16 +464,18 @@ class Admin {
 		<ul class="wpo_wcpdf-actions">
 			<?php
 			foreach ( $meta_box_actions as $document_type => $data ) {
-				$data['class'] = ( isset( $data['exists'] ) && $data['exists'] == true ) ? 'exists' : '';
+				$exists       = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
+				$printed      = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
+				$printed_data = $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-date">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).'</p>' : '';
 				
-				$exists = ( isset( $data['exists'] ) && $data['exists'] == true ) ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 				printf(
-					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
+					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s</li>',
 					esc_attr( $data['url'] ),
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
 					esc_html( $data['title'] ),
-					$exists
+					$exists,
+					$printed_data
 				);
 			}
 			?>
@@ -721,6 +750,7 @@ class Admin {
 
 				if ( $is_new ) {
 					WPO_WCPDF()->main->log_to_order_notes( $invoice, 'document_data' );
+					WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
 				}
 			}
 
@@ -918,6 +948,7 @@ class Admin {
 
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_to_order_notes( $document, 'document_data' );
+						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
 
 					$response      = array(
