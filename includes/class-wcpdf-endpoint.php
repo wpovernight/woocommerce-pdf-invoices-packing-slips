@@ -104,6 +104,21 @@ class Endpoint {
 		return esc_url( $document_link );
 	}
 	
+	public function get_document_unprint_link( $order, $document_type ) {
+		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
+			return '';
+		}
+		
+		$unprint_link = add_query_arg( array(
+			'action'        => 'wcpdf_unprint_document',
+			'document_type' => $document_type,
+			'order_ids'     => $order->get_id(),
+			'security'      => wp_create_nonce( 'wcpdf_unprint_document' ),
+		), admin_url( 'admin-ajax.php' ) );
+
+		return esc_url( $unprint_link );
+	}
+	
 }
 
 endif; // class_exists

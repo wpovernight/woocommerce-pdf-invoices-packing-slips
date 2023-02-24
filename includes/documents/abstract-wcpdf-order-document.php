@@ -331,6 +331,7 @@ abstract class Order_Document {
 			'number',
 			'number_data',
 			'notes',
+			'printed',
 		), $this );
 		foreach ( $data_to_remove as $data_key ) {
 			$order->delete_meta_data( "_wcpdf_{$this->slug}_{$data_key}" );

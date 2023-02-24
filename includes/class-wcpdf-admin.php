@@ -435,7 +435,9 @@ class Admin {
 				$pdf_url               = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
 				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-				$document_printed      = is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+				$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+				$document_unprint      = $document_exists && $document_printed && isset( $document->settings['unprint'] ) ? true : false;
+				$unprint_url           = WPO_WCPDF()->endpoint->get_document_unprint_link( $order, $document->get_type() );
 				$document_printed_data = is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
 				$class                 = [ $document->get_type() ];
 				
@@ -452,6 +454,8 @@ class Admin {
 					'title'        => "PDF " . $document_title,
 					'exists'       => $document_exists,
 					'printed'      => $document_printed,
+					'unprint'      => apply_filters( 'wpo_wcpdf_allow_document_unprint', $document_unprint, $document ),
+					'unprint_url'  => $unprint_url,
 					'printed_data' => $document_printed_data,
 					'class'        => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
 				);
@@ -466,7 +470,8 @@ class Admin {
 			foreach ( $meta_box_actions as $document_type => $data ) {
 				$exists       = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 				$printed      = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
-				$printed_data = $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-date">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).'</p>' : '';
+				$unprint      = $data['unprint'] ? '<a class="unprint" href="'.$data['unprint_url'].'">'.__( 'Unprint', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
+				$printed_data = $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-date">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unprint.'</p>' : '';
 				
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s</li>',
@@ -561,11 +566,13 @@ class Admin {
 						<?php
 							// printed date
 							if ( $document->printed() && is_callable( [ $document, 'get_printed_data' ] ) ) {
+								$unprint_url  = WPO_WCPDF()->endpoint->get_document_unprint_link( $document->order, $document->get_type() );
+								$unprint      = apply_filters( 'wpo_wcpdf_allow_document_unprint', isset( $document->settings['unprint'] ) ? true : false, $document ) ? '<a class="unprint" href="'.$unprint_url.'">'.__( 'Unprint', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
 								$printed_data = $document->get_printed_data();
 								$printed_date = ! empty( $printed_data['date'] ) ? date_i18n( 'Y/m/d g:i:s a', strtotime( $printed_data['date'] ) ) : '';
 								$printed_icon = '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>';
 								if ( ! empty( $printed_date ) ) {
-									echo '<span class="printed-date">'.$printed_icon.''.$printed_date.'</span>';
+									echo '<span class="printed-date">'.$printed_icon.''.$printed_date.''.$unprint.'</span>';
 								}
 							}
 						?>

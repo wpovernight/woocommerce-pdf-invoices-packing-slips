@@ -1179,11 +1179,11 @@ class Main {
 	}
 	
 	/**
-	 * Mark document unprinted
+	 * Unprint document
 	 *
 	 * @return void
 	 */
-	public function mark_document_unprinted( $document ) {
+	public function unprint_document( $document ) {
 		if ( ! empty( $document ) && $this->is_document_printed( $document ) ) {
 			if ( ! empty( $order = $document->order ) ) {
 				$meta_key = "_wcpdf_{$document->slug}_printed";

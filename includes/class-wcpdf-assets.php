@@ -144,6 +144,8 @@ class Assets {
 						'invoice_date_column',
 						'disable_free',
 						'use_latest_settings',
+						'mark_printed',
+						'unprint'
 					) ),
 					'pointers'                  => array(
 						'wcpdf_document_settings_sections' => array(

@@ -46,7 +46,7 @@
 .wpo_wcpdf-actions .printed-date,
 .wcpdf-data-fields .printed-date {
 	font-size: 8pt;
-	color: #51266b;
+	color: #999;
 	margin-left: 5px;
 	vertical-align: middle;
 	margin-top: 3px;
@@ -56,10 +56,16 @@
 .wcpdf-data-fields .printed-date > svg {
 	width: 14px;
 	height: 14px;
-	background: #f6f7f7;
-	fill: #51266b;
+	background: #fff;
+	fill: #999;
 	vertical-align: middle;
 	margin-right: 3px;
+}
+
+.wpo_wcpdf-actions a.unprint,
+.wcpdf-data-fields a.unprint {
+	margin-left: 4px;
+	color: #a00;;
 }
 
 .widefat .column-pdf_invoice_number {
