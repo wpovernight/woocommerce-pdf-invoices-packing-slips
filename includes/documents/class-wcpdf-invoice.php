@@ -423,7 +423,10 @@ class Invoice extends Order_Document_Methods {
 					'option_name' => $option_name,
 					'id'          => 'mark_printed',
 					'options'     => array_merge(
-						[ '' => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ],
+						[
+							''         => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ),
+							'manually' => __( 'Manually', 'woocommerce-pdf-invoices-packing-slips' )
+						],
 						WPO_WCPDF()->main->get_document_triggers()
 					),
 				)
