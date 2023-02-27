@@ -133,7 +133,7 @@ class Main {
 			try {
 				// log document generation to order notes
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
-					$this->log_to_order_notes( $document, 'email_attachment' );
+					$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
 					$this->mark_document_printed( $document, 'email_attachment' );
 				} );
 				
@@ -379,17 +379,17 @@ class Main {
 			// log document creation to order notes
 			if ( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
-					$this->log_to_order_notes( $document, 'bulk' );
+					$this->log_document_creation_to_order_notes( $document, 'bulk' );
 					$this->mark_document_printed( $document, 'bulk' );
 				} );
 			} elseif ( isset( $_REQUEST['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
-					$this->log_to_order_notes( $document, 'my_account' );
+					$this->log_document_creation_to_order_notes( $document, 'my_account' );
 					$this->mark_document_printed( $document, 'my_account' );
 				} );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
-					$this->log_to_order_notes( $document, 'single' );
+					$this->log_document_creation_to_order_notes( $document, 'single' );
 					$this->mark_document_printed( $document, 'single' );
 				} );
 			}
@@ -1124,22 +1124,75 @@ class Main {
 
 		return $mailArray;
 	}
-
+	
 	/**
-	 * Logs the document creation to the order notes
+	 * Log document creation to order notes
+	 *
+	 * @param object $document
+	 * @param string $trigger
+	 * @return void
 	 */
-	public function log_to_order_notes( $document, $trigger ) {
+	public function log_document_creation_to_order_notes( $document, $trigger ) {
 		$triggers = $this->get_document_triggers();
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {			
+		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
 			/* translators: 1. document title, 2. creation trigger */
 			$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $triggers[$trigger] );
+			$this->log_to_order_notes( $note, $document );
+		}
+	}
+	
+	/**
+	 * Log document printed to order notes
+	 *
+	 * @param object $document
+	 * @param string $trigger
+	 * @return void
+	 */
+	public function log_document_printed_to_order_notes( $document, $trigger ) {
+		$triggers = array_merge(
+			[ 'manually' => __( 'manually', 'woocommerce-pdf-invoices-packing-slips' ) ],
+			$this->get_document_triggers()
+		);
+		
+		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
+			/* translators: 1. document title, 2. creation trigger */
+			$message = __( '%1$s document marked as printed via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title(), $triggers[$trigger] );
+			$this->log_to_order_notes( $note, $document );
+		}
+	}
+	
+	/**
+	 * Log document unprint to order notes
+	 *
+	 * @param object $document
+	 * @param string $trigger
+	 * @return void
+	 */
+	public function log_document_unprint_to_order_notes( $document ) {
+		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+			/* translators: 1. document title, 2. creation trigger */
+			$message = __( '%1$s document unprint.', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title() );
+			$this->log_to_order_notes( $note, $document );
+		}
+	}
 
-			if( is_callable( array( $order, 'add_order_note' ) ) ) { // order
+	/**
+	 * Logs to the order notes
+	 *
+	 * @param string $note
+	 * @param object $document
+	 * @return void
+	 */
+	public function log_to_order_notes( $note, $document ) {
+		if ( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $note ) ) {			
+			if ( is_callable( array( $order, 'add_order_note' ) ) ) { // order
 				$order->add_order_note( strip_tags( $note ) );
 			} elseif ( $document->is_refund( $order ) ) {            // refund order
 				$parent_order = $document->get_refund_parent( $order );
-				if( ! empty( $parent_order ) && is_callable( array( $parent_order, 'add_order_note' ) ) ) {
+				if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'add_order_note' ) ) ) {
 					$parent_order->add_order_note( strip_tags( $note ) );
 				}
 			}
@@ -1182,6 +1235,7 @@ class Main {
 					
 					$order->update_meta_data( "_wcpdf_{$document->slug}_printed", $data );
 					$order->save_meta_data();
+					$this->log_document_printed_to_order_notes( $document, $trigger );
 				}
 			}
 		}
@@ -1232,6 +1286,7 @@ class Main {
 				if ( 'shop_order' === $order->get_type() && ! empty( $order->get_meta( $meta_key ) ) ) {				
 					$order->delete_meta_data( $meta_key );
 					$order->save_meta_data();
+					$this->log_document_unprint_to_order_notes( $document );
 				}
 			}
 		}

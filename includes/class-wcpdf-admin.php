@@ -760,7 +760,7 @@ class Admin {
 				$invoice->save();
 
 				if ( $is_new ) {
-					WPO_WCPDF()->main->log_to_order_notes( $invoice, 'document_data' );
+					WPO_WCPDF()->main->log_document_creation_to_order_notes( $invoice, 'document_data' );
 					WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
 				}
 			}
@@ -958,7 +958,7 @@ class Admin {
 					$document->save();
 
 					if ( $is_new ) {
-						WPO_WCPDF()->main->log_to_order_notes( $document, 'document_data' );
+						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
 
