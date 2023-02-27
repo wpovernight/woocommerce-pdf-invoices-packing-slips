@@ -1221,7 +1221,7 @@ class Main {
 	 */
 	public function mark_document_printed( $document, $trigger ) {
 		$triggers = array_merge(
-			[ 'manually' => 'Manually' ],
+			[ 'manually' => __( 'manually', 'woocommerce-pdf-invoices-packing-slips' ) ],
 			$this->get_document_triggers()
 		);
 		
