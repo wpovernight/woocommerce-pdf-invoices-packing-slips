@@ -62,8 +62,8 @@
 	margin-right: 3px;
 }
 
-.wpo_wcpdf-actions a.unprint,
-.wcpdf-data-fields a.unprint {
+.wpo_wcpdf-actions a.unmark_printed,
+.wcpdf-data-fields a.unmark_printed {
 	margin-left: 4px;
 	color: #a00;;
 }

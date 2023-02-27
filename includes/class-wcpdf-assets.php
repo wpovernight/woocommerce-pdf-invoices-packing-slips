@@ -145,7 +145,7 @@ class Assets {
 						'disable_free',
 						'use_latest_settings',
 						'mark_printed',
-						'unprint'
+						'unmark_printed'
 					) ),
 					'pointers'                  => array(
 						'wcpdf_document_settings_sections' => array(

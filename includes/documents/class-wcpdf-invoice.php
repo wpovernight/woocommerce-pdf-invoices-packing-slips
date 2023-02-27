@@ -433,15 +433,15 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
-				'id'			=> 'unprint',
-				'title'			=> __( 'Allow unprint', 'woocommerce-pdf-invoices-packing-slips' ),
+				'id'			=> 'unmark_printed',
+				'title'			=> __( 'Unmark printed', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
 				'section'		=> 'invoice',
 				'args'			=> array(
 					'option_name'	=> $option_name,
-					'id'			=> 'unprint',
+					'id'			=> 'unmark_printed',
 					/* translators: zero number */
-					'description'	=> __( 'Allow document to be unprinted.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'	=> __( 'Allow document to be unmark as printed.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(

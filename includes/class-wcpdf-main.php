@@ -17,9 +17,9 @@ class Main {
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
 		
-		// mark print & unprint
+		// mark/unmark printed
 		add_action( 'wp_ajax_mark_printed_wpo_wcpdf', array( $this, 'mark_document_printed_ajax' ) );
-		add_action( 'wp_ajax_unprint_wpo_wcpdf', array( $this, 'unprint_document_ajax' ) );
+		add_action( 'wp_ajax_unmark_printed_wpo_wcpdf', array( $this, 'unmark_document_printed_ajax' ) );
 
 		// email
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 4 );
@@ -1164,16 +1164,16 @@ class Main {
 	}
 	
 	/**
-	 * Log document unprint to order notes
+	 * Log document unmark printed to order notes
 	 *
 	 * @param object $document
 	 * @param string $trigger
 	 * @return void
 	 */
-	public function log_document_unprint_to_order_notes( $document ) {
+	public function log_unmark_document_printed_to_order_notes( $document ) {
 		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
 			/* translators: 1. document title, 2. creation trigger */
-			$message = __( '%1$s document unprint.', 'woocommerce-pdf-invoices-packing-slips' );
+			$message = __( '%1$s document unmark printed.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title() );
 			$this->log_to_order_notes( $note, $document );
 		}
@@ -1275,38 +1275,38 @@ class Main {
 	}
 	
 	/**
-	 * Unprint document
+	 * Unmark document printed
 	 *
 	 * @return void
 	 */
-	public function unprint_document( $document ) {
+	public function unmark_document_printed( $document ) {
 		if ( ! empty( $document ) && $this->is_document_printed( $document ) ) {
-			if ( ! empty( $order = $document->order ) && apply_filters( 'wpo_wcpdf_allow_unprint_document', true, $document ) ) {
+			if ( ! empty( $order = $document->order ) && apply_filters( 'wpo_wcpdf_allow_unmark_document_printed', true, $document ) ) {
 				$meta_key = "_wcpdf_{$document->slug}_printed";
 				if ( 'shop_order' === $order->get_type() && ! empty( $order->get_meta( $meta_key ) ) ) {				
 					$order->delete_meta_data( $meta_key );
 					$order->save_meta_data();
-					$this->log_document_unprint_to_order_notes( $document );
+					$this->log_unmark_document_printed_to_order_notes( $document );
 				}
 			}
 		}
 	}
 	
 	/**
-	 * AJAX request to unprint document
+	 * AJAX request to unmark document printed
 	 *
 	 * @return void
 	 */
-	public function unprint_document_ajax() {
-		check_ajax_referer( 'unprint_wpo_wcpdf', 'security' );
+	public function unmark_document_printed_ajax() {
+		check_ajax_referer( 'unmark_printed_wpo_wcpdf', 'security' );
 		
 		$data  = stripslashes_deep( $_REQUEST );
 		$error = 0;
 		
-		if ( ! empty( $data['action'] ) && $data['action'] == 'unprint_wpo_wcpdf' && ! empty( $data['order_id'] ) && ! empty( $data['document_type'] ) ) {
+		if ( ! empty( $data['action'] ) && $data['action'] == 'unmark_printed_wpo_wcpdf' && ! empty( $data['order_id'] ) && ! empty( $data['document_type'] ) ) {
 			$document = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
 			if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
-				$this->unprint_document( $document );
+				$this->unmark_document_printed( $document );
 				if ( is_callable( [ $order, 'get_edit_order_url' ] ) ) {
 					wp_redirect( $order->get_edit_order_url() );
 				} else {
@@ -1321,7 +1321,7 @@ class Main {
 		
 		if ( $error > 0 ) {
 			/* translators: document type */
-			wp_die( sprintf( esc_html__( "Document of type '%s' for the selected order could not be unprinted.", 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $data['document_type'] ) ) );
+			wp_die( sprintf( esc_html__( "Document of type '%s' for the selected order could not be unmark printed.", 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $data['document_type'] ) ) );
 		}
 	}
 	

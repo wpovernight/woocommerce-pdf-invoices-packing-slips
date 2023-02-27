@@ -437,7 +437,7 @@ class Admin {
 				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 				$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
 				$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
-				$unprint_url           = $document_exists && $document_printed && isset( $document->settings['unprint'] ) ? WPO_WCPDF()->endpoint->get_document_unprint_link( $order, $document->get_type() ) : false;
+				$unmark_printed_url    = $document_exists && $document_printed && isset( $document->settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_unmark_document_printed_link( $order, $document->get_type() ) : false;
 				$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
 				$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_mark_printed_link( $order, $document->get_type() ) : false;
 				$class                 = [ $document->get_type() ];
@@ -456,7 +456,7 @@ class Admin {
 					'exists'                => $document_exists,
 					'printed'               => $document_printed,
 					'printed_data'          => $document_printed_data,
-					'unprint_url'           => $unprint_url,
+					'unmark_printed_url'    => $unmark_printed_url,
 					'manually_mark_printed' => $manually_mark_printed,
 					'mark_printed_url'      => $mark_printed_url,
 					'class'                 => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
@@ -475,8 +475,8 @@ class Admin {
 				$manually_mark_printed = $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="'.$data['mark_printed_url'].'">'.__( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ).'</a></p>' : '';
 				
 				$printed               = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
-				$unprint               = $data['unprint_url'] ? '<a class="unprint" href="'.$data['unprint_url'].'">'.__( 'Unprint', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
-				$printed_data          = $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unprint.'</p>' : '';
+				$unmark_printed        = $data['unmark_printed_url'] ? '<a class="unmark_printed" href="'.$data['unmark_printed_url'].'">'.__( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
+				$printed_data          = $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unmark_printed.'</p>' : '';
 				
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',

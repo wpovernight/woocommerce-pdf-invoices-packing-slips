@@ -10,7 +10,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Endpoint' ) ) :
 class Endpoint {
 
 	public $action_suffix = '_wpo_wcpdf';
-	public $events        = [ 'generate', 'unprint', 'mark_printed' ];
+	public $events        = [ 'generate', 'unmark_printed', 'mark_printed' ];
 	public $actions;
 
 	public function __construct() {
@@ -116,19 +116,19 @@ class Endpoint {
 		return esc_url( $document_link );
 	}
 	
-	public function get_document_unprint_link( $order, $document_type ) {
+	public function get_unmark_document_printed_link( $order, $document_type ) {
 		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
 			return '';
 		}
 		
-		$unprint_link = add_query_arg( array(
-			'action'        => $this->actions['unprint'],
+		$unmark_printed_link = add_query_arg( array(
+			'action'        => $this->actions['unmark_printed'],
 			'document_type' => $document_type,
 			'order_id'      => $order->get_id(),
-			'security'      => wp_create_nonce( $this->actions['unprint'] ),
+			'security'      => wp_create_nonce( $this->actions['unmark_printed'] ),
 		), admin_url( 'admin-ajax.php' ) );
 
-		return esc_url( $unprint_link );
+		return esc_url( $unmark_printed_link );
 	}
 	
 	public function get_document_mark_printed_link( $order, $document_type, $trigger = 'manually' ) {
