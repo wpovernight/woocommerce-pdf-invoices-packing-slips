@@ -10,7 +10,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Endpoint' ) ) :
 class Endpoint {
 
 	public $action_suffix = '_wpo_wcpdf';
-	public $events        = [ 'generate', 'unmark_printed', 'mark_printed' ];
+	public $events        = [ 'generate', 'mark_printed', 'unmark_printed' ];
 	public $actions;
 
 	public function __construct() {
