@@ -43,8 +43,8 @@
 	vertical-align: middle;
 }
 
-.wpo_wcpdf-actions .printed-date,
-.wcpdf-data-fields .printed-date {
+.wpo_wcpdf-actions .printed-data,
+.wcpdf-data-fields .printed-data {
 	font-size: 8pt;
 	color: #999;
 	margin-left: 5px;
@@ -52,8 +52,8 @@
 	margin-top: 3px;
 }
 
-.wpo_wcpdf-actions .printed-date > svg,
-.wcpdf-data-fields .printed-date > svg {
+.wpo_wcpdf-actions .printed-data > svg,
+.wcpdf-data-fields .printed-data > svg {
 	width: 14px;
 	height: 14px;
 	background: #fff;
@@ -163,11 +163,6 @@
  	-webkit-animation: spin 1.6s linear infinite; /* Safari */
  	animation: spin 1.6s linear infinite;
  	pointer-events: none;
-}
-
-.wcpdf-data-fields .printed-date {
-	float: right;
-	font-weight: normal;
 }
 
 /* Safari */

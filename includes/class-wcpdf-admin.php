@@ -200,7 +200,7 @@ class Admin {
 				$pdf_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
 				$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists  = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-				$document_printed = is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+				$document_printed = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
 				$class            = [ $document->get_type() ];
 				
 				if ( $document_exists ) {
@@ -436,9 +436,10 @@ class Admin {
 				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 				$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
-				$document_unprint      = $document_exists && $document_printed && isset( $document->settings['unprint'] ) ? true : false;
-				$unprint_url           = WPO_WCPDF()->endpoint->get_document_unprint_link( $order, $document->get_type() );
-				$document_printed_data = is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
+				$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
+				$unprint_url           = $document_exists && $document_printed && isset( $document->settings['unprint'] ) ? WPO_WCPDF()->endpoint->get_document_unprint_link( $order, $document->get_type() ) : false;
+				$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
+				$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_mark_printed_link( $order, $document->get_type() ) : false;
 				$class                 = [ $document->get_type() ];
 				
 				if ( $document_exists ) {
@@ -449,15 +450,16 @@ class Admin {
 				}
 				
 				$meta_box_actions[$document->get_type()] = array(
-					'url'          => esc_url( $pdf_url ),
-					'alt'          => "PDF " . $document_title,
-					'title'        => "PDF " . $document_title,
-					'exists'       => $document_exists,
-					'printed'      => $document_printed,
-					'unprint'      => apply_filters( 'wpo_wcpdf_allow_document_unprint', $document_unprint, $document ),
-					'unprint_url'  => $unprint_url,
-					'printed_data' => $document_printed_data,
-					'class'        => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
+					'url'                   => esc_url( $pdf_url ),
+					'alt'                   => "PDF " . $document_title,
+					'title'                 => "PDF " . $document_title,
+					'exists'                => $document_exists,
+					'printed'               => $document_printed,
+					'printed_data'          => $document_printed_data,
+					'unprint_url'           => $unprint_url,
+					'manually_mark_printed' => $manually_mark_printed,
+					'mark_printed_url'      => $mark_printed_url,
+					'class'                 => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
 				);
 			}
 		}
@@ -468,18 +470,22 @@ class Admin {
 		<ul class="wpo_wcpdf-actions">
 			<?php
 			foreach ( $meta_box_actions as $document_type => $data ) {
-				$exists       = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
-				$printed      = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
-				$unprint      = $data['unprint'] ? '<a class="unprint" href="'.$data['unprint_url'].'">'.__( 'Unprint', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
-				$printed_data = $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-date">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unprint.'</p>' : '';
+				$exists                = $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
+				
+				$manually_mark_printed = $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="'.$data['mark_printed_url'].'">'.__( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ).'</a></p>' : '';
+				
+				$printed               = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
+				$unprint               = $data['unprint_url'] ? '<a class="unprint" href="'.$data['unprint_url'].'">'.__( 'Unprint', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
+				$printed_data          = $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unprint.'</p>' : '';
 				
 				printf(
-					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s</li>',
+					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',
 					esc_attr( $data['url'] ),
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
 					esc_html( $data['title'] ),
 					$exists,
+					$manually_mark_printed,
 					$printed_data
 				);
 			}
@@ -563,19 +569,6 @@ class Admin {
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
 						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
-						<?php
-							// printed date
-							if ( $document->printed() && is_callable( [ $document, 'get_printed_data' ] ) ) {
-								$unprint_url  = WPO_WCPDF()->endpoint->get_document_unprint_link( $document->order, $document->get_type() );
-								$unprint      = apply_filters( 'wpo_wcpdf_allow_document_unprint', isset( $document->settings['unprint'] ) ? true : false, $document ) ? '<a class="unprint" href="'.$unprint_url.'">'.__( 'Unprint', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
-								$printed_data = $document->get_printed_data();
-								$printed_date = ! empty( $printed_data['date'] ) ? date_i18n( 'Y/m/d g:i:s a', strtotime( $printed_data['date'] ) ) : '';
-								$printed_icon = '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>';
-								if ( ! empty( $printed_date ) ) {
-									echo '<span class="printed-date">'.$printed_icon.''.$printed_date.''.$unprint.'</span>';
-								}
-							}
-						?>
 					<?php endif; ?>
 				</h4>
 

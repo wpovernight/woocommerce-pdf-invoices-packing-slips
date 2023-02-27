@@ -14,8 +14,12 @@ class Main {
 	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
 
 	public function __construct() {
-		add_action( 'wp_ajax_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
-		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array($this, 'generate_pdf_ajax' ) );
+		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
+		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
+		
+		// mark print & unprint
+		add_action( 'wp_ajax_mark_printed_wpo_wcpdf', array( $this, 'mark_document_printed_ajax' ) );
+		add_action( 'wp_ajax_unprint_wpo_wcpdf', array( $this, 'unprint_document_ajax' ) );
 
 		// email
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 4 );
@@ -1163,8 +1167,13 @@ class Main {
 	 * @return void
 	 */
 	public function mark_document_printed( $document, $trigger ) {
+		$triggers = array_merge(
+			[ 'manually' => 'Manually' ],
+			$this->get_document_triggers()
+		);
+		
 		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
-			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $this->get_document_triggers() ) && isset( $document->settings['mark_printed'] ) ) {
+			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) && isset( $document->settings['mark_printed'] ) ) {
 				if ( 'shop_order' === $order->get_type() ) {
 					$data = [
 						'date'    => time(),
@@ -1175,6 +1184,39 @@ class Main {
 					$order->save_meta_data();
 				}
 			}
+		}
+	}
+	
+	/**
+	 * AJAX request to mark document printed
+	 *
+	 * @return void
+	 */
+	public function mark_document_printed_ajax() {
+		check_ajax_referer( 'mark_printed_wpo_wcpdf', 'security' );
+		
+		$data  = stripslashes_deep( $_REQUEST );
+		$error = 0;
+		
+		if ( ! empty( $data['action'] ) && $data['action'] == 'mark_printed_wpo_wcpdf' && ! empty( $data['order_id'] ) && ! empty( $data['document_type'] ) && ! empty( $data['trigger'] ) ) {
+			$document = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
+			if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
+				$this->mark_document_printed( $document, esc_attr( $data['trigger'] ) );
+				if ( is_callable( [ $order, 'get_edit_order_url' ] ) ) {
+					wp_redirect( $order->get_edit_order_url() );
+				} else {
+					wp_redirect( admin_url( 'post.php?action=edit&post=' . esc_attr( $data['order_id'] ) ) );
+				}
+			} else {
+				$error++;
+			}
+		} else {
+			$error++;
+		}
+		
+		if ( $error > 0 ) {
+			/* translators: document type */
+			wp_die( sprintf( esc_html__( "Document of type '%s' for the selected order could not be marked as printed.", 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $data['document_type'] ) ) );
 		}
 	}
 	
@@ -1196,6 +1238,39 @@ class Main {
 	}
 	
 	/**
+	 * AJAX request to unprint document
+	 *
+	 * @return void
+	 */
+	public function unprint_document_ajax() {
+		check_ajax_referer( 'unprint_wpo_wcpdf', 'security' );
+		
+		$data  = stripslashes_deep( $_REQUEST );
+		$error = 0;
+		
+		if ( ! empty( $data['action'] ) && $data['action'] == 'unprint_wpo_wcpdf' && ! empty( $data['order_id'] ) && ! empty( $data['document_type'] ) ) {
+			$document = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
+			if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
+				$this->unprint_document( $document );
+				if ( is_callable( [ $order, 'get_edit_order_url' ] ) ) {
+					wp_redirect( $order->get_edit_order_url() );
+				} else {
+					wp_redirect( admin_url( 'post.php?action=edit&post=' . esc_attr( $data['order_id'] ) ) );
+				}
+			} else {
+				$error++;
+			}
+		} else {
+			$error++;
+		}
+		
+		if ( $error > 0 ) {
+			/* translators: document type */
+			wp_die( sprintf( esc_html__( "Document of type '%s' for the selected order could not be unprinted.", 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $data['document_type'] ) ) );
+		}
+	}
+	
+	/**
 	 * Check if a document is printed
 	 *
 	 * @return bool
@@ -1212,6 +1287,30 @@ class Main {
 		}
 		
 		return $is_printed;
+	}
+	
+	/**
+	 * Check if a document can be manually marked as printed
+	 *
+	 * @return bool
+	 */
+	public function document_can_be_manually_marked_printed( $document ) {
+		$can_be_manually_marked_printed = false;
+		
+		if ( empty( $document ) ) {
+			return $can_be_manually_marked_printed;
+		}
+		
+		$can_be_manually_marked_printed = false;
+		$document_exists                = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+		$document_printed               = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+		$manually_print_enabled         = isset( $document->settings['mark_printed'] ) && $document->settings['mark_printed'] == 'manually' ? true : false;
+		
+		if ( $document_exists && ! $document_printed && $manually_print_enabled ) {
+			$can_be_manually_marked_printed = true;
+		}
+		
+		return $can_be_manually_marked_printed;
 	}
 	
 	/**
