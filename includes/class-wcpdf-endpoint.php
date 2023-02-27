@@ -116,22 +116,7 @@ class Endpoint {
 		return esc_url( $document_link );
 	}
 	
-	public function get_unmark_document_printed_link( $order, $document_type ) {
-		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
-			return '';
-		}
-		
-		$unmark_printed_link = add_query_arg( array(
-			'action'        => $this->actions['unmark_printed'],
-			'document_type' => $document_type,
-			'order_id'      => $order->get_id(),
-			'security'      => wp_create_nonce( $this->actions['unmark_printed'] ),
-		), admin_url( 'admin-ajax.php' ) );
-
-		return esc_url( $unmark_printed_link );
-	}
-	
-	public function get_document_mark_printed_link( $order, $document_type, $trigger = 'manually' ) {
+	public function get_mark_document_printed_link( $order, $document_type, $trigger = 'manually' ) {
 		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
 			return '';
 		}
@@ -145,6 +130,21 @@ class Endpoint {
 		), admin_url( 'admin-ajax.php' ) );
 
 		return esc_url( $mark_printed_link );
+	}
+	
+	public function get_unmark_document_printed_link( $order, $document_type ) {
+		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
+			return '';
+		}
+		
+		$unmark_printed_link = add_query_arg( array(
+			'action'        => $this->actions['unmark_printed'],
+			'document_type' => $document_type,
+			'order_id'      => $order->get_id(),
+			'security'      => wp_create_nonce( $this->actions['unmark_printed'] ),
+		), admin_url( 'admin-ajax.php' ) );
+
+		return esc_url( $unmark_printed_link );
 	}
 	
 }

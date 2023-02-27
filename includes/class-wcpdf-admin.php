@@ -439,7 +439,7 @@ class Admin {
 				$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
 				$unmark_printed_url    = $document_exists && $document_printed && isset( $document->settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_unmark_document_printed_link( $order, $document->get_type() ) : false;
 				$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
-				$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_mark_printed_link( $order, $document->get_type() ) : false;
+				$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_mark_document_printed_link( $order, $document->get_type() ) : false;
 				$class                 = [ $document->get_type() ];
 				
 				if ( $document_exists ) {
