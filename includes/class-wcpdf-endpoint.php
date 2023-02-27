@@ -10,7 +10,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Endpoint' ) ) :
 class Endpoint {
 
 	public $action_suffix = '_wpo_wcpdf';
-	public $events        = [ 'generate', 'mark_printed', 'unmark_printed' ];
+	public $events        = [ 'generate', 'printed' ];
 	public $actions;
 
 	public function __construct() {
@@ -116,35 +116,34 @@ class Endpoint {
 		return esc_url( $document_link );
 	}
 	
-	public function get_mark_document_printed_link( $order, $document_type, $trigger = 'manually' ) {
+	/**
+	 * Get mark/unmark document printed link
+	 *
+	 * @param string $event          Can be 'mark' or 'unmark'
+	 * @param object $order
+	 * @param string $document_type
+	 * @param string $trigger
+	 * @return void
+	 */
+	public function get_document_printed_link( $event, $order, $document_type, $trigger = 'manually' ) {
+		if ( empty( $event ) || ! in_array( $event, [ 'mark', 'unmark' ] ) ) {
+			return '';
+		}
+		
 		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
 			return '';
 		}
 		
-		$mark_printed_link = add_query_arg( array(
-			'action'        => $this->actions['mark_printed'],
+		$printed_link = add_query_arg( array(
+			'action'        => $this->actions['printed'],
+			'event'         => $event,
 			'document_type' => $document_type,
 			'order_id'      => $order->get_id(),
 			'trigger'       => $trigger,
-			'security'      => wp_create_nonce( $this->actions['mark_printed'] ),
+			'security'      => wp_create_nonce( $this->actions['printed'] ),
 		), admin_url( 'admin-ajax.php' ) );
 
-		return esc_url( $mark_printed_link );
-	}
-	
-	public function get_unmark_document_printed_link( $order, $document_type ) {
-		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
-			return '';
-		}
-		
-		$unmark_printed_link = add_query_arg( array(
-			'action'        => $this->actions['unmark_printed'],
-			'document_type' => $document_type,
-			'order_id'      => $order->get_id(),
-			'security'      => wp_create_nonce( $this->actions['unmark_printed'] ),
-		), admin_url( 'admin-ajax.php' ) );
-
-		return esc_url( $unmark_printed_link );
+		return esc_url( $printed_link );
 	}
 	
 }
