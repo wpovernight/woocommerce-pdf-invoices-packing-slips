@@ -18,7 +18,7 @@ class Main {
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
 		
 		// mark/unmark printed
-		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'mark_unmark_document_printed_ajax' ) );
+		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
 
 		// email
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_pdf_to_email' ), 99, 4 );
@@ -1263,7 +1263,7 @@ class Main {
 	 *
 	 * @return void
 	 */
-	public function mark_unmark_document_printed_ajax() {
+	public function document_printed_ajax() {
 		check_ajax_referer( 'printed_wpo_wcpdf', 'security' );
 		
 		$data  = stripslashes_deep( $_REQUEST );
