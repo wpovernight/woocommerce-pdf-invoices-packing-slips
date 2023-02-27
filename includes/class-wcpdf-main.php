@@ -1173,7 +1173,7 @@ class Main {
 		);
 		
 		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
-			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) && isset( $document->settings['mark_printed'] ) ) {
+			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) && isset( $document->settings['mark_printed'] ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
 				if ( 'shop_order' === $order->get_type() ) {
 					$data = [
 						'date'    => time(),
@@ -1227,7 +1227,7 @@ class Main {
 	 */
 	public function unprint_document( $document ) {
 		if ( ! empty( $document ) && $this->is_document_printed( $document ) ) {
-			if ( ! empty( $order = $document->order ) ) {
+			if ( ! empty( $order = $document->order ) && apply_filters( 'wpo_wcpdf_allow_unprint_document', true, $document ) ) {
 				$meta_key = "_wcpdf_{$document->slug}_printed";
 				if ( 'shop_order' === $order->get_type() && ! empty( $order->get_meta( $meta_key ) ) ) {				
 					$order->delete_meta_data( $meta_key );
@@ -1310,7 +1310,7 @@ class Main {
 			$can_be_manually_marked_printed = true;
 		}
 		
-		return $can_be_manually_marked_printed;
+		return apply_filters( 'wpo_wcpdf_document_can_be_manually_marked_printed', $can_be_manually_marked_printed, $document );
 	}
 	
 	/**
@@ -1327,7 +1327,7 @@ class Main {
 			}
 		}
 		
-		return $data;
+		return apply_filters( 'wpo_wcpdf_document_printed_data', $data, $document );
 	}
 
 	/**
