@@ -30,8 +30,6 @@ class Invoice extends Order_Document_Methods {
 
 		// Call parent constructor
 		parent::__construct( $order );
-		
-		add_filter( 'wpo_wcpdf_document_triggers', array( $this, 'filter_document_triggers' ), 999, 1 );
 	}
 
 	public function use_historical_settings() {
@@ -150,6 +148,8 @@ class Invoice extends Order_Document_Methods {
 	 * Initialise settings
 	 */
 	public function init_settings() {
+		add_filter( 'wpo_wcpdf_document_triggers', array( $this, 'filter_document_triggers' ), 999, 1 );
+		
 		// Register settings.
 		$page = $option_group = $option_name = 'wpo_wcpdf_documents_settings_invoice';
 
