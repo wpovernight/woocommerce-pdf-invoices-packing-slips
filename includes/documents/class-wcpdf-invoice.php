@@ -412,12 +412,12 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'mark_printed',
-				'title'			=> __( 'Mark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'select',
-				'section'		=> 'invoice',
-				'args'			=> array(
+				'type'     => 'setting',
+				'id'       => 'mark_printed',
+				'title'    => __( 'Mark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'invoice',
+				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'mark_printed',
 					'options'     => array_merge(
@@ -437,16 +437,15 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'unmark_printed',
-				'title'			=> __( 'Unmark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'unmark_printed',
-					/* translators: zero number */
-					'description'	=> __( 'Adds a link in the order page to allow to remove the printed mark.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'unmark_printed',
+				'title'    => __( 'Unmark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'invoice',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'unmark_printed',
+					'description' => __( 'Adds a link in the order page to allow to remove the printed mark.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
