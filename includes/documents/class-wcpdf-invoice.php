@@ -431,7 +431,7 @@ class Invoice extends Order_Document_Methods {
 							'my_account'       => __( 'On my account', 'woocommerce-pdf-invoices-packing-slips' ),
 							'email_attachment' => __( 'On email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
 							'document_data'    => __( 'On order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
-						] ),
+						] )
 					),
 					'description' => __( 'If enabled, allows you to mark the document as printed, manually (in the order page) or automatically (based on the document creation context you have selected).', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
