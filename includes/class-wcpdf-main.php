@@ -1208,7 +1208,7 @@ class Main {
 			'single'           => __( 'single order action', 'woocommerce-pdf-invoices-packing-slips' ),
 			'bulk'             => __( 'bulk order action', 'woocommerce-pdf-invoices-packing-slips' ),
 			'my_account'       => __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ),
-			'email attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
+			'email_attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
 			'document_data'    => __( 'order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 		] );
 	}
