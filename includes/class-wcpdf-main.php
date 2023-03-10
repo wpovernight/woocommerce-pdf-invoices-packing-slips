@@ -1219,13 +1219,9 @@ class Main {
 	 * @return void
 	 */
 	public function mark_document_printed( $document, $trigger ) {
-		$triggers = array_merge(
-			[ 'manually' => __( 'manually', 'woocommerce-pdf-invoices-packing-slips' ) ],
-			$this->get_document_triggers()
-		);
-		
+		$triggers = isset( $document->settings['mark_printed'] ) && is_array( $document->settings['mark_printed'] ) ? $document->settings['mark_printed'] : [];
 		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
-			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) && isset( $document->settings['mark_printed'] ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
+			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
 				if ( 'shop_order' === $order->get_type() ) {
 					$data = [
 						'date'    => time(),
@@ -1308,8 +1304,9 @@ class Main {
 		$is_printed = false;
 		
 		if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
-			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {				
-				if ( ! empty( $printed_data['trigger'] ) && $printed_data['trigger'] == $document->settings['mark_printed'] ) {
+			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {	
+				$triggers = isset( $document->settings['mark_printed'] ) && is_array( $document->settings['mark_printed'] ) ? $document->settings['mark_printed'] : [];
+				if ( ! empty( $printed_data['trigger'] ) && in_array( $printed_data['trigger'], $triggers ) ) {
 					$is_printed = true;
 				}
 			}
@@ -1333,7 +1330,8 @@ class Main {
 		$can_be_manually_marked_printed = false;
 		$document_exists                = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 		$document_printed               = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
-		$manually_print_enabled         = isset( $document->settings['mark_printed'] ) && $document->settings['mark_printed'] == 'manually' ? true : false;
+		$triggers                       = isset( $document->settings['mark_printed'] ) && is_array( $document->settings['mark_printed'] ) ? $document->settings['mark_printed'] : [];
+		$manually_print_enabled         = in_array( 'manually', $triggers ) ? true : false;
 		
 		if ( $document_exists && ! $document_printed && $manually_print_enabled ) {
 			$can_be_manually_marked_printed = true;

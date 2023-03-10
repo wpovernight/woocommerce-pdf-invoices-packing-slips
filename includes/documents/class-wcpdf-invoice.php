@@ -422,7 +422,6 @@ class Invoice extends Order_Document_Methods {
 					'id'          => 'mark_printed',
 					'options'     => array_merge(
 						[
-							''         => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ),
 							'manually' => __( 'Manually', 'woocommerce-pdf-invoices-packing-slips' ),
 						],
 						apply_filters( 'wpo_wcpdf_document_triggers', [
@@ -433,7 +432,9 @@ class Invoice extends Order_Document_Methods {
 							'document_data'    => __( 'On order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 						] )
 					),
-					'description' => __( 'If enabled, allows you to mark the document as printed, manually (in the order page) or automatically (based on the document creation context you have selected).', 'woocommerce-pdf-invoices-packing-slips' ),
+					'multiple'         => true,
+					'enhanced_select'  => true,
+					'description'      => __( 'If enabled, allows you to mark the document as printed, manually (in the order page) or automatically (based on the document creation context you have selected).', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
