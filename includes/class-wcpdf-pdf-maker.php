@@ -8,9 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) :
 
 class PDF_Maker {
+	
 	public $html;
 	public $settings;
 	public $document;
@@ -50,9 +51,9 @@ class PDF_Maker {
 		$dompdf = new Dompdf( $options );
 		$dompdf->loadHtml( $this->html );
 		$dompdf->setPaper( $this->settings['paper_size'], $this->settings['paper_orientation'] );
-		$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $this->html, $options, $this->document );
+		$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $this->html, $options, $this->document, $this );
 		$dompdf->render();
-		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html, $options, $this->document );
+		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html, $options, $this->document, $this );
 
 		return $dompdf->output();
 	}
