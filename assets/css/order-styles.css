@@ -49,7 +49,7 @@
 	color: #999;
 	margin-left: 5px;
 	vertical-align: middle;
-	margin-top: 3px;
+	margin-top: 3px !important;
 }
 
 .wpo_wcpdf-actions .printed-data > svg,
