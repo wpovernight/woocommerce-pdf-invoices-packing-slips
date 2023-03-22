@@ -3,7 +3,6 @@
 namespace WPO\WC\PDF_Invoices;
 
 use \Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
-use Automattic\WooCommerce\Utilities\OrderUtil;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -237,7 +236,7 @@ class Admin {
 	 * @param array $columns shop order columns
 	 */
 	public function add_invoice_columns( $columns ) {
-		if ( OrderUtil::custom_orders_table_usage_is_enabled() && isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wc-orders' && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'edit' ) {
+		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() && isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wc-orders' && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'edit' ) {
 			return $columns;
 		}
 		
