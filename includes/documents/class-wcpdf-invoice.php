@@ -27,7 +27,7 @@ class Invoice extends Order_Document_Methods {
 		$this->type		= 'invoice';
 		$this->title	= __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$this->icon		= WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-
+		$this->date_preference = '';
 		// Call parent constructor
 		parent::__construct( $order );
 	}
@@ -58,8 +58,11 @@ class Invoice extends Order_Document_Methods {
 
 		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
 			$this->set_date( $this->order->get_date_created() );
+			$this->set_display_date( 'Order Date' );
+			
 		} elseif( empty( $this->get_date() ) ) {
 			$this->set_date( current_time( 'timestamp', true ) );
+			$this->set_display_date( 'Invoice Date' );
 		}
 
 		$this->init_number();
