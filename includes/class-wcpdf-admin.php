@@ -236,6 +236,10 @@ class Admin {
 	 * @param array $columns shop order columns
 	 */
 	public function add_invoice_columns( $columns ) {
+		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() && isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wc-orders' && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'edit' ) {
+			return $columns;
+		}
+		
 		// get invoice settings
 		$invoice          = wcpdf_get_invoice( null );
 		$invoice_settings = $invoice->get_settings();
