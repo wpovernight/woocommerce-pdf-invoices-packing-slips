@@ -1305,10 +1305,7 @@ class Main {
 		
 		if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
 			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {	
-				$triggers = isset( $document->latest_settings['mark_printed'] ) && is_array( $document->latest_settings['mark_printed'] ) ? $document->latest_settings['mark_printed'] : [];
-				if ( ! empty( $printed_data['trigger'] ) && in_array( $printed_data['trigger'], $triggers ) ) {
-					$is_printed = true;
-				}
+				$is_printed = true;
 			}
 		}
 		
