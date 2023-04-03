@@ -415,6 +415,44 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			array(
+				'type'     => 'setting',
+				'id'       => 'mark_printed',
+				'title'    => __( 'Mark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'invoice',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'mark_printed',
+					'options'     => array_merge(
+						[
+							'manually' => __( 'Manually', 'woocommerce-pdf-invoices-packing-slips' ),
+						],
+						apply_filters( 'wpo_wcpdf_document_triggers', [
+							'single'           => __( 'On single order action', 'woocommerce-pdf-invoices-packing-slips' ),
+							'bulk'             => __( 'On bulk order action', 'woocommerce-pdf-invoices-packing-slips' ),
+							'my_account'       => __( 'On my account', 'woocommerce-pdf-invoices-packing-slips' ),
+							'email_attachment' => __( 'On email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
+							'document_data'    => __( 'On order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
+						] )
+					),
+					'multiple'         => true,
+					'enhanced_select'  => true,
+					'description'      => __( 'Allows you to mark the document as printed, manually (in the order page) or automatically (based on the document creation context you have selected).', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'unmark_printed',
+				'title'    => __( 'Unmark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'invoice',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'unmark_printed',
+					'description' => __( 'Adds a link in the order page to allow to remove the printed mark.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
 				'type'			=> 'setting',
 				'id'			=> 'use_latest_settings',
 				'title'			=> __( 'Always use most current settings', 'woocommerce-pdf-invoices-packing-slips' ),

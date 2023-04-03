@@ -334,6 +334,7 @@ abstract class Order_Document {
 			'number',
 			'number_data',
 			'notes',
+			'printed',
 			'display_date',
 		), $this );
 		foreach ( $data_to_remove as $data_key ) {
@@ -398,12 +399,20 @@ abstract class Order_Document {
 	public function exists() {
 		return !empty( $this->data['date'] );
 	}
+	
+	public function printed() {
+		return WPO_WCPDF()->main->is_document_printed( $this );
+	}
 
 	/*
 	|--------------------------------------------------------------------------
 	| Data getters
 	|--------------------------------------------------------------------------
 	*/
+	
+	public function get_printed_data() {
+		return WPO_WCPDF()->main->get_document_printed_data( $this );
+	}
 
 	public function get_data( $key, $document_type = '', $order = null, $context = 'view' ) {
 		$document_type = empty( $document_type ) ? $this->type : $document_type;

@@ -9,7 +9,9 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Endpoint' ) ) :
 
 class Endpoint {
 
-	public $action = 'generate_wpo_wcpdf';
+	public $action_suffix = '_wpo_wcpdf';
+	public $events        = [ 'generate', 'printed' ];
+	public $actions;
 
 	public function __construct() {
 		if ( $this->is_enabled() ) {
@@ -17,6 +19,16 @@ class Endpoint {
 			add_action( 'query_vars', array( $this, 'add_query_vars' ) );
 			add_action( 'parse_request', array( $this, 'handle_document_requests' ) );
 		}
+		
+		$this->actions = $this->get_actions();
+	}
+	
+	public function get_actions() {
+		$actions = [];
+		foreach ( $this->events as $event ) {
+			$actions[$event] = $event.$this->action_suffix;
+		}
+		return $actions;
 	}
 
 	public function is_enabled() {
@@ -36,7 +48,7 @@ class Endpoint {
 	public function add_endpoint() {
 		add_rewrite_rule(
 			'^'.$this->get_identifier().'/([^/]*)/([^/]*)/([^/]*)?',
-			'index.php?action=generate_wpo_wcpdf&document_type=$matches[1]&order_ids=$matches[2]&access_key=$matches[3]',
+			'index.php?action='.$this->actions['generate'].'&document_type=$matches[1]&order_ids=$matches[2]&access_key=$matches[3]',
 			'top'
 		);
 	}
@@ -52,14 +64,14 @@ class Endpoint {
 	public function handle_document_requests() {
 		global $wp;
 
-		if ( ! empty( $wp->query_vars['action'] ) && $this->action == $wp->query_vars['action'] ) {
+		if ( ! empty( $wp->query_vars['action'] ) && $this->actions['generate'] == $wp->query_vars['action'] ) {
 			if ( ! empty( $wp->query_vars['document_type'] ) && ! empty( $wp->query_vars['order_ids'] ) && ! empty( $wp->query_vars['access_key'] ) ) {
-				$_REQUEST['action']        = $this->action;
+				$_REQUEST['action']        = $this->actions['generate'];
 				$_REQUEST['document_type'] = sanitize_text_field( $wp->query_vars['document_type'] );
 				$_REQUEST['order_ids']     = sanitize_text_field( $wp->query_vars['order_ids'] );
 				$_REQUEST['access_key']    = sanitize_text_field( $wp->query_vars['access_key'] );
 				
-				do_action( 'wp_ajax_' . $this->action );
+				do_action( 'wp_ajax_' . $this->actions['generate'] );
 			}
 		}
 	}
@@ -71,7 +83,7 @@ class Endpoint {
 
 		// handle access key
 		if ( is_user_logged_in() ) {
-			$access_key = wp_create_nonce( $this->action );
+			$access_key = wp_create_nonce( $this->actions['generate'] );
 		} elseif ( ! is_user_logged_in() && WPO_WCPDF()->settings->is_guest_access_enabled() ) {
 			$access_key = $order->get_order_key();
 		} else {
@@ -88,7 +100,7 @@ class Endpoint {
 			$document_link = trailingslashit( get_home_url() ) . implode( '/', $parameters );
 		} else {
 			$document_link = add_query_arg( array(
-				'action'        => $this->action,
+				'action'        => $this->actions['generate'],
 				'document_type' => $document_type,
 				'order_ids'     => $order->get_id(),
 				'access_key'    => $access_key,
@@ -102,6 +114,36 @@ class Endpoint {
 		}
 
 		return esc_url( $document_link );
+	}
+	
+	/**
+	 * Get mark/unmark document printed link
+	 *
+	 * @param string $event          Can be 'mark' or 'unmark'
+	 * @param object $order
+	 * @param string $document_type
+	 * @param string $trigger
+	 * @return void
+	 */
+	public function get_document_printed_link( $event, $order, $document_type, $trigger = 'manually' ) {
+		if ( empty( $event ) || ! in_array( $event, [ 'mark', 'unmark' ] ) ) {
+			return '';
+		}
+		
+		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
+			return '';
+		}
+		
+		$printed_link = add_query_arg( array(
+			'action'        => $this->actions['printed'],
+			'event'         => $event,
+			'document_type' => $document_type,
+			'order_id'      => $order->get_id(),
+			'trigger'       => $trigger,
+			'security'      => wp_create_nonce( $this->actions['printed'] ),
+		), admin_url( 'admin-ajax.php' ) );
+
+		return esc_url( $printed_link );
 	}
 	
 }

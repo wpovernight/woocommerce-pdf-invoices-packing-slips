@@ -69,11 +69,11 @@ class Third_Party_Plugins {
 			$order = wc_get_order( $order );
 		}
 		// delete invoice number, invoice date & invoice exists meta
-		$order->delete_meta_data( $order, '_wcpdf_invoice_number' );
-		$order->delete_meta_data( $order, '_wcpdf_invoice_number_data' );
-		$order->delete_meta_data( $order, '_wcpdf_formatted_invoice_number' );
-		$order->delete_meta_data( $order, '_wcpdf_invoice_date' );
-		$order->delete_meta_data( $order, '_wcpdf_invoice_exists' );
+		$order->delete_meta_data( '_wcpdf_invoice_number' );
+		$order->delete_meta_data( '_wcpdf_invoice_number_data' );
+		$order->delete_meta_data( '_wcpdf_formatted_invoice_number' );
+		$order->delete_meta_data( '_wcpdf_invoice_date' );
+		$order->delete_meta_data( '_wcpdf_invoice_exists' );
 
 		$order->save_meta_data();
 	}
