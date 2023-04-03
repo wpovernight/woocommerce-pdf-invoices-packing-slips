@@ -86,7 +86,7 @@ class WPO_WCPDF {
 	 * Note: the first-loaded translation file overrides any following ones if the same translation is present
 	 */
 	public function translations() {
-		$locale = wcpdf_determine_locale();
+		$locale = $this->wcpdf_determine_locale();
 		$dir    = trailingslashit( WP_LANG_DIR );
 
 		$textdomains = array( 'woocommerce-pdf-invoices-packing-slips' );
@@ -176,8 +176,6 @@ class WPO_WCPDF {
 	public function includes() {
 		// Third party compatibility
 		include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-compatibility-third-party-plugins.php' );
-		// WC OrderUtil compatibility
-		$this->order_util = include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-order-util.php' );
 
 		// Plugin classes
 		include_once( $this->plugin_path() . '/includes/wcpdf-functions.php' );
@@ -269,7 +267,7 @@ class WPO_WCPDF {
 		$message = '<div class="error"><p>' . $error . '</p></div>';
 	
 		echo $message;
-}
+	}
 
 	/**
 	 * Check if woocommerce is activated
@@ -543,6 +541,19 @@ class WPO_WCPDF {
 	 */
 	public function plugin_path() {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
+	}
+
+	/**
+	 * Determine the site locale
+	 */
+	public function wcpdf_determine_locale() {
+		if ( function_exists( 'determine_locale' ) ) { // WP5.0+
+			$locale = determine_locale();
+		} else {
+			$locale = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
+		}
+		
+		return apply_filters( 'plugin_locale', $locale, 'woocommerce-pdf-invoices-packing-slips' );
 	}
 
 } // class WPO_WCPDF
