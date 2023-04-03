@@ -16,9 +16,21 @@
 	width: 10px;
 	height: 10px;
 	bottom: 1px;
+	background: #f6f7f7;
+}
+
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf.exists > svg.icon-exists,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.exists > svg.icon-exists {
+	left: auto;
 	right: 2px;
 	fill: #2aad2a;
-	background: #f6f7f7;
+}
+
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf.printed > svg.icon-printed,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.printed > svg.icon-printed {
+	left: 2px;
+	right: auto;
+	fill: #51266b;
 }
 
 .wpo_wcpdf-actions a.button.exists > svg {
@@ -29,6 +41,31 @@
 	margin-bottom: 3px;
 	fill: #2aad2a;
 	vertical-align: middle;
+}
+
+.wpo_wcpdf-actions .printed-data,
+.wcpdf-data-fields .printed-data {
+	font-size: 8pt;
+	color: #999;
+	margin-left: 5px;
+	vertical-align: middle;
+	margin-top: 3px !important;
+}
+
+.wpo_wcpdf-actions .printed-data > svg,
+.wcpdf-data-fields .printed-data > svg {
+	width: 14px;
+	height: 14px;
+	background: #fff;
+	fill: #999;
+	vertical-align: middle;
+	margin-right: 3px;
+}
+
+.wpo_wcpdf-actions a.unmark_printed,
+.wcpdf-data-fields a.unmark_printed {
+	margin-left: 4px;
+	color: #a00;;
 }
 
 .widefat .column-pdf_invoice_number {

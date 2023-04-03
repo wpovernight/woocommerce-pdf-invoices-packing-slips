@@ -509,7 +509,7 @@ class Settings_Debug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'log_to_order_notes',
-					'description' => __( 'Log PDF document creation to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Log PDF document creation and mark/unmark as printed to order notes.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
