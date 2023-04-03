@@ -176,6 +176,8 @@ class WPO_WCPDF {
 	public function includes() {
 		// Third party compatibility
 		include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-compatibility-third-party-plugins.php' );
+		// WC OrderUtil compatibility
+		$this->order_util = include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-order-util.php' );
 
 		// Plugin classes
 		include_once( $this->plugin_path() . '/includes/wcpdf-functions.php' );
