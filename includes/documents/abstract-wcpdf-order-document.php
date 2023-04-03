@@ -266,6 +266,7 @@ abstract class Order_Document {
 			'date'   => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
 			'number' => $number,
 			'notes'  => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
+			'display_date'	=> $order->get_meta( "_wcpdf_{$this->slug}_display_date" ),
 		), $order );
 
 		return;
@@ -445,6 +446,10 @@ abstract class Order_Document {
 
 	public function get_notes( $document_type = '', $order = null, $context = 'view'  ) {
 		return $this->get_data( 'notes', $document_type, $order, $context );
+	}
+
+	public function get_display_date( $document_type = '', $order = null, $context = 'view'  ) {
+		return $this->get_data( 'display_date', $document_type, $order, $context );
 	}
 
 	public function get_title() {

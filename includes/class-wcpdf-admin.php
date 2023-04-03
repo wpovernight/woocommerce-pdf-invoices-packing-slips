@@ -472,9 +472,13 @@ class Admin {
 				'date'   => array(
 					'label'  => __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
+				'display_date' =>  array(
+					'label'  => __( 'Display Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
 				'notes'  => array(
 					'label'  => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
+
 			);
 			// output
 			$this->output_number_date_edit_fields( $invoice, $data );
@@ -507,6 +511,13 @@ class Admin {
 			);
 		}
 
+		if ( !empty( $data['display_date'] ) ) {
+			$current['display_date'] = array(
+				'value' => $document->document_display_date(),
+				'name'  =>"_wcpdf_{$document->slug}_display_date",
+			);
+		}
+
 		foreach ( $data as $key => $value ) {
 			if ( isset( $current[$key] ) ) {
 				$data[$key] = array_merge( $current[$key], $value );
@@ -519,6 +530,7 @@ class Admin {
 	public function output_number_date_edit_fields( $document, $data ) {
 		if( empty( $document ) || empty( $data ) ) return;
 		$data = $this->get_current_values_for_document( $document, $data );
+		
 		?>
 		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
@@ -555,6 +567,17 @@ class Admin {
 							</p>
 						</div>
 						<?php endif; ?>
+						<?php if( isset( $data['display_date'] ) ) : ?>
+						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
+							<p class="form-field form-field-wide">
+								<p>
+									<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
+									<span><?= esc_attr( $data['display_date']['value'] ); ?></span>
+								</p>
+							</p>
+						</div>
+						<?php endif; ?>
+											
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<?php /* translators: document title */ ?>
