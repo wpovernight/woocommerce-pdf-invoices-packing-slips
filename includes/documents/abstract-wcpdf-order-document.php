@@ -196,8 +196,7 @@ abstract class Order_Document {
 			// exclude non historical settings from being saved in order meta
 			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
 
-			if( 'invoice' === $this->slug ) {
-
+			if ( 'invoice' == $this->slug ) {
 				if ( isset( $settings['display_date'] ) && $settings['display_date'] == 'order_date' ) {
 					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
 				} else {
