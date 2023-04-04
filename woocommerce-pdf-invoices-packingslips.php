@@ -86,7 +86,7 @@ class WPO_WCPDF {
 	 * Note: the first-loaded translation file overrides any following ones if the same translation is present
 	 */
 	public function translations() {
-		$locale = $this->wcpdf_determine_locale();
+		$locale = $this->determine_locale();
 		$dir    = trailingslashit( WP_LANG_DIR );
 
 		$textdomains = array( 'woocommerce-pdf-invoices-packing-slips' );
@@ -548,7 +548,7 @@ class WPO_WCPDF {
 	/**
 	 * Determine the site locale
 	 */
-	public function wcpdf_determine_locale() {
+	public function determine_locale() {
 		if ( function_exists( 'determine_locale' ) ) { // WP5.0+
 			$locale = determine_locale();
 		} else {
