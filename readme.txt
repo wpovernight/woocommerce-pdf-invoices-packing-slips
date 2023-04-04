@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.4.0
+Stable tag: 3.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,16 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.5.0 (2023-04-04) =
+* New: save invoice display date option
+* New: mark/unmark Invoice as printed
+* New: adds notice when RTL is detected
+* New: `wpo_wcpdf_preview_after_reload_settings` action
+* New: `wpo_wcpdf_export_settings` filter
+* Fix: fatal error on WC deactivation
+* Fix: invoice number/date screen options bug with HPOS enabled
+* Tested up to WooCommerce 7.6 & WordPress 6.2
 
 = 3.4.0 (2023-02-20) =
 * New: filter `wpo_wcpdf_settings_user_role_capabilities` to change role capabilities to access plugin settings
