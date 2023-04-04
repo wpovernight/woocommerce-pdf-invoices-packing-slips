@@ -195,6 +195,15 @@ abstract class Order_Document {
 			// in both cases, we store the document settings
 			// exclude non historical settings from being saved in order meta
 			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
+
+			if ( 'invoice' == $this->slug ) {
+				if ( isset( $settings['display_date'] ) && $settings['display_date'] == 'order_date' ) {
+					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
+				} else {
+					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'invoice_date' );
+				}
+			}
+			
 			$this->order->save_meta_data();
 		}
 	}
@@ -266,6 +275,7 @@ abstract class Order_Document {
 			'date'   => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
 			'number' => $number,
 			'notes'  => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
+			'display_date'	=> $order->get_meta( "_wcpdf_{$this->slug}_display_date" ),
 		), $order );
 
 		return;
@@ -294,9 +304,10 @@ abstract class Order_Document {
 					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}_data" );
 					// deleting the number = deleting the document, so also delete document settings
 					$order->delete_meta_data( "_wcpdf_{$this->slug}_settings" );
-				} elseif ( $key == 'notes' ) {
+				} elseif ( $key == 'notes' || $key == 'display_date') {
 					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}" );
 				}
+				
 			} else {
 				if ( $key == 'date' ) {
 					// store dates as timestamp and formatted as mysql time
@@ -306,10 +317,11 @@ abstract class Order_Document {
 					// store both formatted number and number data
 					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value->formatted_number );
 					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}_data", $value->to_array() );
-				} elseif ( $key == 'notes' ) {
+				} elseif ( $key == 'notes' || $key == 'display_date' ) {
 					// store notes
 					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value );
 				}
+				
 			}
 		}
 
@@ -332,6 +344,7 @@ abstract class Order_Document {
 			'number_data',
 			'notes',
 			'printed',
+			'display_date',
 		), $this );
 		foreach ( $data_to_remove as $data_key ) {
 			$order->delete_meta_data( "_wcpdf_{$this->slug}_{$data_key}" );
@@ -453,6 +466,10 @@ abstract class Order_Document {
 		return $this->get_data( 'notes', $document_type, $order, $context );
 	}
 
+	public function get_display_date( $document_type = '', $order = null, $context = 'view'  ) {
+		return $this->get_data( 'display_date', $document_type, $order, $context );
+	}
+
 	public function get_title() {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
 	}
@@ -570,6 +587,23 @@ abstract class Order_Document {
 			}
 
 			$this->data[ 'notes' ] = $value;
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		} catch ( \Error $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		}
+	}
+
+	public function set_display_date( $value, $order = null ) {
+		$order = empty( $order ) ? $this->order : $order;
+
+		try {
+			if ( empty( $value ) ) {
+				$this->data['display_date'] = null;
+				return;
+			}
+			
+			$this->data['display_date'] = $value;
 		} catch ( \Exception $e ) {
 			wcpdf_log_error( $e->getMessage() );
 		} catch ( \Error $e ) {

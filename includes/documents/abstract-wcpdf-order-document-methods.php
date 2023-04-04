@@ -1184,7 +1184,38 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 	}
 
+	
+	public function document_display_date() {
+		$document_display_date = $this->get_display_date( $this->get_type() );
 
+		//If display date data is not available in order meta (for older orders), get the display date information from document settings order meta.
+		if ( empty( $document_display_date ) ) {
+			$document_settings = $this->settings;
+			if( isset( $document_settings['display_date'] ) ) {
+				$document_display_date = $document_settings['display_date'];
+			}
+			else {
+				$document_display_date = 'invoice_date';	
+			}
+		} 
+
+		$formatted_value = $this->get_display_date_label( $document_display_date );
+		return $formatted_value;
+	}
+
+	public function get_display_date_label( $date_string ) {
+		
+		$date_labels = array(
+			'invoice_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
+			'order_date'	=> __( 'Order Date' , 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+		if( isset( $date_labels[$date_string] ) ) {
+			return $date_labels[ $date_string ];	
+		} else {
+			return '';
+		}
+		
+	}
 }
 
 endif; // class_exists
