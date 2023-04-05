@@ -102,7 +102,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 3.5.0 (2023-04-04) =
+= 3.5.0 (2023-04-05) =
 * New: save invoice display date option
 * New: mark/unmark Invoice as printed
 * New: adds notice when RTL is detected
