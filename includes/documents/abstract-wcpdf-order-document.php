@@ -387,13 +387,13 @@ abstract class Order_Document {
 	public function is_allowed() {
 		$allowed = true;
 		// Check if document is enabled
-		if ( !$this->is_enabled() ) {
+		if ( ! $this->is_enabled() ) {
 			$allowed = false;
 		// Check disabled for statuses
-		} elseif ( !$this->exists() && !empty( $this->settings['disable_for_statuses'] ) && !empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
+		} elseif ( ! $this->exists() && ! empty( $this->settings['disable_for_statuses'] ) && ! empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
 			$status = $this->order->get_status();
 
-			$disabled_statuses = array_map( function($status){
+			$disabled_statuses = array_map( function ( $status ) {
 				$status = 'wc-' === substr( $status, 0, 3 ) ? substr( $status, 3 ) : $status;
 				return $status;
 			}, $this->settings['disable_for_statuses'] );
