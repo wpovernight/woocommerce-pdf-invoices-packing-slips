@@ -1266,8 +1266,10 @@ class Main {
 		$error = 0;
 		
 		if ( ! empty( $data['action'] ) && $data['action'] == "printed_wpo_wcpdf" && ! empty( $data['event'] ) && ! empty( $data['document_type'] ) && ! empty( $data['order_id'] ) && ! empty( $data['trigger'] ) ) {
-			$document = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
-			if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
+			$document        = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
+			$full_permission = WPO_WCPDF()->admin->user_can_manage_document( esc_attr( $data['document_type'] ) );
+			
+			if ( ! empty( $document ) && ! empty( $order = $document->order ) && $full_permission ) {
 				switch ( esc_attr( $data['event'] ) ) {
 					case 'mark':
 						$this->mark_document_printed( $document, esc_attr( $data['trigger'] ) );
