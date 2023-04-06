@@ -38,9 +38,9 @@ class Bulk_Document {
 	public $order_ids;
 
 	public function __construct( $document_type, $order_ids = array() ) {
-		$this->type = $document_type;
+		$this->type      = $document_type;
 		$this->order_ids = $order_ids;
-		$this->is_bulk = true;
+		$this->is_bulk   = true;
 	}
 
 	public function get_type() {
