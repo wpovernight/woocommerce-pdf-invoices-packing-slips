@@ -1332,7 +1332,7 @@ class Main {
 	public function document_can_be_manually_marked_printed( $document ) {
 		$can_be_manually_marked_printed = false;
 		
-		if ( empty( $document ) ) {
+		if ( empty( $document ) || ( property_exists( $document, 'is_bulk' ) && $document->is_bulk ) ) {
 			return $can_be_manually_marked_printed;
 		}
 		
