@@ -102,6 +102,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 3.5.1 (2023-04-07) =
+* Tweak: adds user permission check on AJAX document printed
+* Fix: bug on trying to save bulk document setting on `document_can_be_manually_marked_printed()`
+* Fix: disallow document creation for anonymized orders
+
 = 3.5.0 (2023-04-05) =
 * New: save invoice display date option
 * New: mark/unmark Invoice as printed
