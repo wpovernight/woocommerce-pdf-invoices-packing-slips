@@ -112,6 +112,9 @@ class Assets {
 				#wpo-wcpdf-preview-wrapper .slider.slide-right:after {
 					content: '".__( 'Settings', 'woocommerce-pdf-invoices-packing-slips' )."';
 			}" );
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', "#upgrade-table td span.feature-available {
+				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/checkmark.svg'.") !important;
+			}" );
 
 			// SCRIPTS
 			wp_enqueue_script( 'wc-enhanced-select' );
