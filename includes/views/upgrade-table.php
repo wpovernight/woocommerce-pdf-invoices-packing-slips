@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<th class="first" align="left">&nbsp;</th>
 		<th align="left"><?php esc_html_e( 'Professional', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left"><?php esc_html_e( 'Premium Templates', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-		<th align="left"><?php esc_html_e( 'PDF Invoices Bundle', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left"><?php esc_html_e( 'Bundle', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left" class="last">&nbsp;</td>
 	</tr>
 

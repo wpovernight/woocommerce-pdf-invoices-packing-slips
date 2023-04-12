@@ -19,12 +19,17 @@ class Settings_Upgrade {
 			$features = array(
 				array( 
 					'label' => __( 'Proforma invoice & Credit note', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Update your workflow and handle refunds.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Update your workflow and handle refunds. Both documents can either follow the main invoice numbering or have their own separate number sequence.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['pro', 'bundle'],
 				),
 				array( 
-					'label' => __( 'Dropbox / FTP upload', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Automatically upload your documents.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label' => __( 'Attach to email', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Also attach the packing slip, proforma invoice and credit note to any of the outgoing emails.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'extensions' => ['pro', 'bundle'],
+				),
+				array( 
+					'label' => __( 'Cloud storage upload', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Automatically upload your documents via FTP/SFTP or Dropbox.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['pro', 'bundle'],
 				),
 				array( 
@@ -45,6 +50,11 @@ class Settings_Upgrade {
 				array( 
 					'label' => __( 'Custom document titles and filenames', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Customize document titles and filenames right in the plugin settings.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'extensions' => ['pro', 'bundle'],
+				),
+				array( 
+					'label' => __( 'Custom address format', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Customize the address format of the billing and shipping addresses.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['pro', 'bundle'],
 				),
 				array( 
@@ -80,6 +90,11 @@ class Settings_Upgrade {
 				array( 
 					'label' => __( 'Additional PDF templates', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Make use of our Business or Modern template designs.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'extensions' => ['templates', 'bundle'],
+				),
+				array( 
+					'label' => __( 'Add styling', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Easily change the look and feel of your documents by addding some custom CSS.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['templates', 'bundle'],
 				),
 			);
