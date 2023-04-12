@@ -18,18 +18,18 @@ class Settings_Upgrade {
 			
 			$features = array(
 				array( 
-					'label' => __( 'Proforma invoice & Credit note', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label' => __( 'Proforma Invoice & Credit Note', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Update your workflow and handle refunds. Both documents can either follow the main invoice numbering or have their own separate number sequence.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['pro', 'bundle'],
 				),
 				array( 
 					'label' => __( 'Attach to email', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Also attach the packing slip, proforma invoice and credit note to any of the outgoing emails.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Also attach the Packing Slip, Proforma Invoice and Credit Note to any of the outgoing emails.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['pro', 'bundle'],
 				),
 				array( 
 					'label' => __( 'Cloud storage upload', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Automatically upload your documents via FTP/SFTP or Dropbox.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Automatically upload your documents via FTP/SFTP or to Dropbox.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['pro', 'bundle'],
 				),
 				array( 
