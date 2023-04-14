@@ -1216,6 +1216,27 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 		
 	}
+
+	public function document_creation_status() {
+		$document_creation_status = $this->get_document_status( $this->get_type() );
+
+		$formatted_value = $this->get_document_status_label( $document_creation_status );
+		return $formatted_value;
+	}
+
+	public function get_document_status_label( $status ) {
+
+		$status_labels = array(
+			'manual'	=> __( 'Manually' , 'woocommerce-pdf-invoices-packing-slips' ),
+			'automatic'	=> __( 'Automatically' , 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+		if( isset( $status_labels[$status] ) ) {
+			return $status_labels[$status];	
+		} else {
+			return '';
+		}
+
+	}
 }
 
 endif; // class_exists

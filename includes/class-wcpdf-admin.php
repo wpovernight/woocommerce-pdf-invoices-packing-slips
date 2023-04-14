@@ -523,6 +523,9 @@ class Admin {
 				'display_date' =>  array(
 					'label'  => __( 'Display Date:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
+				'status' =>  array(
+					'label'  => __( 'Invoice Created:', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
 				'notes'  => array(
 					'label'  => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
@@ -566,6 +569,13 @@ class Admin {
 			);
 		}
 
+		if ( !empty( $data['status'] ) ) {
+			$current['status'] = array(
+				'value' => $document->document_creation_status(),
+				'name'  =>"_wcpdf_{$document->slug}_status",
+			);
+		}
+		
 		foreach ( $data as $key => $value ) {
 			if ( isset( $current[$key] ) ) {
 				$data[$key] = array_merge( $current[$key], $value );
@@ -625,6 +635,17 @@ class Admin {
 							</p>
 						</div>
 						<?php endif; ?>
+						<!-- Display document creation status -->
+						<?php if( isset( $data['status'] ) && ! empty( $data['status']['value'] ) ) : ?>
+						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
+							<p class="form-field form-field-wide">
+								<p>
+									<span><strong><?= wp_kses_post( $data['status']['label'] ); ?></strong></span>
+									<span><?= esc_attr( $data['status']['value'] ); ?></span>
+								</p>
+							</p>
+						</div>
+						<?php endif; ?>	
 											
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
@@ -963,7 +984,7 @@ class Admin {
 				// on regenerate
 				if( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
-
+					WPO_WCPDF()->main->save_document_creation_status( $document, (array) $order_id, 'manual', true );
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
@@ -992,7 +1013,7 @@ class Admin {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
-
+					WPO_WCPDF()->main->save_document_creation_status( $document, (array) $order_id, 'manual', true );
 					$response      = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
