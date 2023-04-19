@@ -272,11 +272,11 @@ abstract class Order_Document {
 		// pass data to setter functions
 		$this->set_data( array(
 			// always load date before number, because date is used in number formatting
-			'date'   => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
-			'number' => $number,
-			'notes'  => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
-			'display_date'	=> $order->get_meta( "_wcpdf_{$this->slug}_display_date" ),
-			'status' => $order->get_meta( "_wcpdf_{$this->slug}_status" ),
+			'date'            => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
+			'number'          => $number,
+			'notes'           => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
+			'display_date'	  => $order->get_meta( "_wcpdf_{$this->slug}_display_date" ),
+			'creation_status' => $order->get_meta( "_wcpdf_{$this->slug}_creation_status" ),
 		), $order );
 
 		return;
@@ -346,6 +346,7 @@ abstract class Order_Document {
 			'notes',
 			'printed',
 			'display_date',
+			'creation_status',
 		), $this );
 		foreach ( $data_to_remove as $data_key ) {
 			$order->delete_meta_data( "_wcpdf_{$this->slug}_{$data_key}" );
@@ -471,10 +472,9 @@ abstract class Order_Document {
 		return $this->get_data( 'display_date', $document_type, $order, $context );
 	}
 
-	public function get_document_status( $document_type = '', $order = null, $context = 'view'  ) {
-		return $this->get_data( 'status', $document_type, $order, $context );
+	public function get_creation_status( $document_type = '', $order = null, $context = 'view'  ) {
+		return $this->get_data( 'creation_status', $document_type, $order, $context );
 	}
-	
 	
 	public function get_title() {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );

@@ -134,9 +134,8 @@ class Main {
 				// log document generation to order notes
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
+					$this->log_document_creation_status_to_order_meta( $document, 'email_attachment' );
 					$this->mark_document_printed( $document, 'email_attachment' );
-					$order_id = $document->order->get_id();
-					$this->save_document_creation_status( $document, (array) $order_id, 'automatic' );
 				} );
 				
 				// prepare document
@@ -382,16 +381,19 @@ class Main {
 			if ( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'bulk' );
+					$this->log_document_creation_status_to_order_meta( $document, 'bulk' );
 					$this->mark_document_printed( $document, 'bulk' );
 				} );
 			} elseif ( isset( $_REQUEST['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'my_account' );
+					$this->log_document_creation_status_to_order_meta( $document, 'my_account' );
 					$this->mark_document_printed( $document, 'my_account' );
 				} );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'single' );
+					$this->log_document_creation_status_to_order_meta( $document, 'single' );
 					$this->mark_document_printed( $document, 'single' );
 				} );
 			}
@@ -401,8 +403,6 @@ class Main {
 
 			if ( $document ) {
 				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself with $document->order_ids)
-
-				$this->save_document_creation_status( $document, $order_ids, 'manual' );
 
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document_type );
 				// allow URL override
@@ -1176,16 +1176,6 @@ class Main {
 		}
 	}
 	
-	public function log_document_creation_status_to_order_notes( $document, $trigger ) {
-		$triggers = $this->get_document_triggers();
-		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
-			/* translators: 1. document title, 2. creation trigger */
-			$message = __( 'PDF %1$s created %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
-			$note    = sprintf( $message, $document->get_title(), $triggers[$trigger] );
-			$this->log_to_order_notes( $note, $document );
-		}
-	}
-	
 	/**
 	 * Log document unmark printed to order notes
 	 *
@@ -1210,13 +1200,52 @@ class Main {
 	 * @return void
 	 */
 	public function log_to_order_notes( $note, $document ) {
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $note ) ) {			
+		if ( property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
+			$order_ids = $document->order_ids;
+		} else {
+			$order_ids = [ $document->order->get_id() ];
+		}
+		
+		foreach ( $order_ids as $order_id ) {
+			$order = wc_get_order( $order_id );
+			if ( empty( $order ) ) {
+				continue;
+			}
 			if ( is_callable( array( $order, 'add_order_note' ) ) ) { // order
 				$order->add_order_note( strip_tags( $note ) );
 			} elseif ( $document->is_refund( $order ) ) {            // refund order
 				$parent_order = $document->get_refund_parent( $order );
 				if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'add_order_note' ) ) ) {
 					$parent_order->add_order_note( strip_tags( $note ) );
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Logs to the order meta
+	 *
+	 * @param object  $document
+	 * @param string  $trigger
+	 * @param boolean $force
+	 * @return void
+	 */
+	public function log_document_creation_status_to_order_meta( $document, $trigger, $force = false ) {
+		if ( $trigger == 'bulk' && property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
+			$order_ids = $document->order_ids;
+		} else {
+			$order_ids = [ $document->order->get_id() ];
+		}
+		
+		foreach ( $order_ids as $order_id ) {
+			$order = wc_get_order( $order_id );
+			if ( ! empty( $order ) ) { 
+				$type   = $document->get_type();
+				$status = $order->get_meta( "_wcpdf_{$type}_creation_status" );
+				 
+				if ( true == $force || empty( $status ) ) {
+					$order->update_meta_data( "_wcpdf_{$type}_creation_status", $trigger );
+					$order->save_meta_data();
 				}
 			}
 		}
@@ -1234,8 +1263,7 @@ class Main {
 			'my_account'       => __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ),
 			'email_attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
 			'document_data'    => __( 'order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'manual_document'  => __( 'manually', 'woocommerce-pdf-invoices-packing-slips' ),
-			'automatic_document'  => __( 'automatically', 'woocommerce-pdf-invoices-packing-slips' ),
+			'automatically'    => __( 'automatically', 'woocommerce-pdf-invoices-packing-slips' ),
 		] );
 	}
 	
@@ -1423,32 +1451,6 @@ class Main {
 		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
 	}
 	
-	public function save_document_creation_status( $document, $order_ids, $document_status, $force = false ) {
-		
-		if( is_array( $order_ids ) && count( $order_ids ) > 0 ) {
-
-			foreach( $order_ids as $order_id) {
-				$order = wc_get_order( $order_id );
-				if( ! empty( $order ) ) { 
-					$type = $document->type;
-					$status = $order->get_meta( "_wcpdf_{$type}_status" );
-					 
-					if( true == $force || empty($status) ) {
-						$order->update_meta_data( "_wcpdf_{$type}_status", $document_status );
-
-						$trigger = 'manual_document';
-						if( 'automatic' === $document_status ) {
-							$trigger = 'automatic_document';
-						}
-						$this->log_document_creation_status_to_order_notes( $document, $trigger );
-					}
-					$order->save_meta_data();
-
-
-				}
-			}
-		}
-	}
 }
 
 endif; // class_exists
