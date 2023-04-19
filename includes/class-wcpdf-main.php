@@ -1263,7 +1263,6 @@ class Main {
 			'my_account'       => __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ),
 			'email_attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
 			'document_data'    => __( 'order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'automatically'    => __( 'automatically', 'woocommerce-pdf-invoices-packing-slips' ),
 		] );
 	}
 	
