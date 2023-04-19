@@ -1012,8 +1012,8 @@ class Admin {
 
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
-						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 						WPO_WCPDF()->main->log_document_creation_status_to_order_meta( $document, 'document_data' );
+						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
 					$response      = array(
 						'message' => $notice_messages[$notice]['success'],
