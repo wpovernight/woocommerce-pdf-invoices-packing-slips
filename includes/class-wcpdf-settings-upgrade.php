@@ -118,6 +118,8 @@ class Settings_Upgrade {
 				
 				if ( $extension_license_statuses['pro']['license'] == 'valid' && $extension_license_statuses['templates']['license'] == 'valid' ) {
 					$extension_license_statuses['bundle']['license'] = 'valid';
+				} elseif ( ( $extension_license_statuses['pro']['license'] == 'valid' && $extension_license_statuses['templates']['license'] == 'inactive' ) || ( $extension_license_statuses['pro']['license'] == 'inactive' && $extension_license_statuses['templates']['license'] == 'valid' ) ) {
+					$extension_license_statuses['bundle']['license'] = 'inactive';
 				}
 				
 				set_transient( $transient_name, $extension_license_statuses, DAY_IN_SECONDS );
