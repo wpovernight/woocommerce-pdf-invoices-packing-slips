@@ -182,11 +182,6 @@ class Settings_Upgrade {
 		return $license_info;
 	}
 	
-	public function include_license_id_in_edd_response( $response, $args, $license_id ) {
-		$response['license_id'] = $license_id;
-		return $response;
-	}
-	
 }
 
 endif; // class_exists
