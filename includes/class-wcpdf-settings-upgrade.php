@@ -159,7 +159,7 @@ class Settings_Upgrade {
 			$activation_status       = 'inactive';
 			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
 			
-			if ( $extension == 'templates' && version_compare( $extension_main_function()->version, '2.19.0', '<=' ) ) { // 'updater' property had 'private' visibility
+			if ( $extension == 'templates' && version_compare( $extension_main_function()->version, '2.20.0', '<=' ) ) { // 'updater' property had 'private' visibility
 				return $activation_status;
 			}
 			
