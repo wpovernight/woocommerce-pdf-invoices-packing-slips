@@ -99,30 +99,15 @@ class Settings_Upgrade {
 				),
 			);
 			
-			$transient_name = 'wpo_wcpdf_extension_license_statuses';
-			if ( false === ( $extension_license_statuses = get_transient( $transient_name ) ) ) {
-				$extension_license_statuses = [
-					'pro' => [
-						'license' => $this->get_extension_license_status( 'pro' ),
-						'url'     => 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/',
-					],
-					'templates' => [
-						'license' => $this->get_extension_license_status( 'templates' ),
-						'url'     => 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/',
-					],
-					'bundle' => [
-						'license' => null,
-						'url'     => 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/',
-					]
-				];
-				
-				if ( $extension_license_statuses['pro']['license'] == 'valid' && $extension_license_statuses['templates']['license'] == 'valid' ) {
-					$extension_license_statuses['bundle']['license'] = 'valid';
-				} elseif ( ( $extension_license_statuses['pro']['license'] == 'valid' && $extension_license_statuses['templates']['license'] == 'inactive' ) || ( $extension_license_statuses['pro']['license'] == 'inactive' && $extension_license_statuses['templates']['license'] == 'valid' ) ) {
-					$extension_license_statuses['bundle']['license'] = 'inactive';
+			$transient_name = 'wpo_wcpdf_extension_license_infos';
+			//delete_transient( $transient_name );
+			if ( false === ( $extension_license_infos = get_transient( $transient_name ) ) ) {
+				$extension_license_infos = [];
+				foreach ( [ 'pro', 'templates' ] as $extension ) {
+					$extension_license_infos[$extension] = $this->get_extension_license_info( $extension );
 				}
 				
-				set_transient( $transient_name, $extension_license_statuses, DAY_IN_SECONDS );
+				set_transient( $transient_name, $extension_license_infos, DAY_IN_SECONDS );
 			}
 
 			include( WPO_WCPDF()->plugin_path() . '/includes/views/upgrade-table.php' );
@@ -149,20 +134,22 @@ class Settings_Upgrade {
 	}
 	
 	/**
-	 * Get PDF extension license status
+	 * Get PDF extension license info
 	 *
-	 * @param  string       $extension  can be 'pro' or 'templates'
-	 * @return string|null
+	 * @param  string  $extension  can be 'pro' or 'templates'
+	 * @return array
 	 */
-	public function get_extension_license_status( $extension ) {
-		$activation_status = null;
+	public function get_extension_license_info( $extension ) {
+		$license_info = [
+			'enabled' => false
+		];
 		
 		if ( $this->extension_is_enabled( $extension ) ) {
-			$activation_status       = 'inactive';
+			$license_info['enabled'] = true;
 			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
 			
 			if ( $extension == 'templates' && version_compare( $extension_main_function()->version, '2.20.0', '<=' ) ) { // 'updater' property had 'private' visibility
-				return $activation_status;
+				return $license_info;
 			}
 			
 			if ( is_callable( [ $extension_main_function()->updater, 'remote_license_actions' ] ) ) {
@@ -177,14 +164,27 @@ class Settings_Upgrade {
 				
 				$request = $extension_main_function()->updater->remote_license_actions( $args );
 				if ( is_object( $request ) && isset( $request->license ) ) {
-					$activation_status = $request->license;
-				} elseif ( is_string( $request ) ) {
-					$activation_status = $request;
+					$license_info['status']       = $request->license_state;
+					$license_info['upgrade_link'] = ''; // TODO: need to catch the correct bundle upgrade link from the response
+					
+					switch ( $extension ) {
+						case 'pro':
+							$license_info['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/';
+							break;
+						case 'templates':
+							$license_info['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/';
+							break;
+					}
 				}
 			}
 		}
 		
-		return $activation_status;
+		return $license_info;
+	}
+	
+	public function include_license_id_in_edd_response( $response, $args, $license_id ) {
+		$response['license_id'] = $license_id;
+		return $response;
 	}
 	
 }
