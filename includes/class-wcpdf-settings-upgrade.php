@@ -98,9 +98,91 @@ class Settings_Upgrade {
 					'extensions' => ['templates', 'bundle'],
 				),
 			);
+			
+			$transient_name = 'wpo_wcpdf_extension_license_statuses';
+			if ( false === ( $extension_license_statuses = get_transient( $transient_name ) ) ) {
+				$extension_license_statuses = [
+					'pro' => [
+						'license' => $this->get_extension_license_status( 'pro' ),
+						'url'     => 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/',
+					],
+					'templates' => [
+						'license' => $this->get_extension_license_status( 'templates' ),
+						'url'     => 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/',
+					],
+					'bundle' => [
+						'license' => null,
+						'url'     => 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/',
+					]
+				];
+				
+				if ( $extension_license_statuses['pro']['license'] == 'valid' && $extension_license_statuses['templates']['license'] == 'valid' ) {
+					$extension_license_statuses['bundle']['license'] = 'valid';
+				}
+				
+				set_transient( $transient_name, $extension_license_statuses, DAY_IN_SECONDS );
+			}
 
 			include( WPO_WCPDF()->plugin_path() . '/includes/views/upgrade-table.php' );
 		}
+	}
+	
+	/**
+	 * Check if a PDF extension is enabled
+	 *
+	 * @param  string  $extension  can be 'pro' or 'templates'
+	 * @return boolean
+	 */
+	public function extension_is_enabled( $extension ) {
+		$is_enabled = false;
+		
+		if ( ! empty( $extension ) || ! in_array( $extension, [ 'pro', 'templates' ] ) ) {
+			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
+			if ( function_exists( $extension_main_function ) ) {
+				$is_enabled = true;
+			}
+		}
+		
+		return $is_enabled;
+	}
+	
+	/**
+	 * Get PDF extension license status
+	 *
+	 * @param  string       $extension  can be 'pro' or 'templates'
+	 * @return string|null
+	 */
+	public function get_extension_license_status( $extension ) {
+		$activation_status = null;
+		
+		if ( $this->extension_is_enabled( $extension ) ) {
+			$activation_status       = 'inactive';
+			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
+			
+			if ( $extension == 'templates' && version_compare( $extension_main_function()->version, '2.19.0', '<=' ) ) { // 'updater' property had 'private' visibility
+				return $activation_status;
+			}
+			
+			if ( is_callable( [ $extension_main_function()->updater, 'remote_license_actions' ] ) ) {
+				if ( ! empty( $license_key = $extension_main_function()->updater->get_license_key() ) ) {
+					$args = array(
+						'edd_action'  => 'check_license',
+						'license_key' => trim( $license_key ),
+					);
+				} else {
+					$args = array();
+				}
+				
+				$request = $extension_main_function()->updater->remote_license_actions( $args );
+				if ( is_object( $request ) && isset( $request->license ) ) {
+					$activation_status = $request->license;
+				} elseif ( is_string( $request ) ) {
+					$activation_status = $request;
+				}
+			}
+		}
+		
+		return $activation_status;
 	}
 	
 }

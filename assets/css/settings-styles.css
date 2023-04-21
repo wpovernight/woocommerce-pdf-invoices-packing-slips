@@ -1011,7 +1011,8 @@ div.upgrade-table-description a,
 
 }
 
-#upgrade-table .upgrade-links a {
+#upgrade-table .upgrade-links a,
+#upgrade-table .upgrade-links .valid {
 	display: inline-block;
 	background: white;
 	padding: 1em 3em 1em 2em;
@@ -1022,7 +1023,8 @@ div.upgrade-table-description a,
 	position: relative;
 }
 
-#upgrade-table .upgrade-links a:after {
+#upgrade-table .upgrade-links a:after,
+#upgrade-table .upgrade-links .valid:after {
 	content: ' \2192'; /* ASCII code for right arrow */
 	display: block;
 	position: absolute;
@@ -1041,6 +1043,16 @@ div.upgrade-table-description a,
 #upgrade-table .upgrade-links a:hover {
 	background: #6e1edc;
 	color: #fcfbf7;
+}
+
+#upgrade-table .upgrade-links .valid {
+	background: #b8e6bf;
+	border: 1px solid #68de7c;
+	color: #00a32a;
+}
+
+#upgrade-table .upgrade-links .valid:after {
+	content: ' \2713'; /* ASCII code for check mark */
 }
 
 @media screen and (max-width: 1100px) {

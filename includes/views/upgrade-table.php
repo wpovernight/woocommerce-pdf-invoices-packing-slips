@@ -38,21 +38,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tr class="upgrade-links">
 		<td class="first" align="left">&nbsp;</td>
 		<?php
-		printf(
-			'<td><a href="%s" target="_blank">%s</a></td>', 
-			'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/', 
-			__( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' ) 
-		);
-		printf(
-			'<td><a href="%s" target="_blank">%s</a></td>', 
-			'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/', 
-			__( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' ) 
-		);
-		printf(
-			'<td><a href="%s" target="_blank">%s</a></td>', 
-			'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/', 
-			__( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' ) 
-		);
+			foreach  ( $extension_license_statuses as $slug => $data ) {
+				if ( $data['license'] == 'valid' ) {
+					$label = __( 'Activated', 'woocommerce-pdf-invoices-packing-slips' );
+					printf(
+						'<td><span class="valid">%s</span></td>', 
+						$label 
+					);
+				} elseif ( $data['license'] == 'inactive' ) {
+					$label = __( 'Inactive', 'woocommerce-pdf-invoices-packing-slips' );
+					printf(
+						'<td><a href="%s" target="_blank">%s</a></td>', 
+						esc_url_raw( $data['url'] ), 
+						$label 
+					);
+				} else {
+					$label = __( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' );
+					printf(
+						'<td><a href="%s" target="_blank">%s</a></td>', 
+						esc_url_raw( $data['url'] ), 
+						$label 
+					);
+				}
+			}
 		?>
 		<td align="left" class="last">&nbsp;</td>
 	</tr>	
