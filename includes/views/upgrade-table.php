@@ -76,24 +76,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 				}
 			}
 			
-			// bundle column + maybe disable 1 extension column
-			if ( count( $extensions_disabled ) == 1 ) {
-				$extension_enabled                      = reset( $extensions_enabled );
-				$extension_disabled                     = reset( $extensions_disabled );
-				$extension_columns[$extension_disabled] = '<td align="left">&nbsp;</td>';
-				
-				// set bundle to upgrade
-				$extension_columns['bundle'] = sprintf(
-					'<td><a class="buy_button" href="%s" target="_blank">%s</a></td>', 
-					esc_url_raw( $extension_license_infos[$extension_enabled]['bundle_upgrade'] ), 
-					__( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' )
-				);
-			} elseif ( count( $extensions_disabled ) != 0 ) {
-				$extension_columns['bundle'] = sprintf(
-					'<td><a class="buy_button" href="%s" target="_blank">%s</a></td>', 
-					esc_url_raw( 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/' ), 
-					__( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' )
-				);
+			// maybe disable 1 extension or bundle column
+			foreach ( $extensions_disabled as $extension_disabled ) {
+				if ( ( count( $extensions_disabled ) < 3 && $extension_disabled != 'bundle' ) || ( count( $extensions_disabled ) == 1 && $extension_disabled == 'bundle' ) ) {
+					$extension_columns[$extension_disabled] = '<td align="left">&nbsp;</td>';
+				}
 			}
 			
 			foreach ( $extension_columns as $column ) {
