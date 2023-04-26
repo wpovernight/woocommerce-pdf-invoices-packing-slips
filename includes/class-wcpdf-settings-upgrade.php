@@ -100,7 +100,7 @@ class Settings_Upgrade {
 			);
 			
 			$transient_name = 'wpo_wcpdf_extension_license_infos';
-			//delete_transient( $transient_name );
+			//delete_transient( $transient_name ); for debug only
 			if ( false === ( $extension_license_infos = get_transient( $transient_name ) ) ) {
 				$extension_license_infos = [];
 				foreach ( [ 'pro', 'templates' ] as $extension ) {
@@ -164,8 +164,8 @@ class Settings_Upgrade {
 				
 				$request = $extension_main_function()->updater->remote_license_actions( $args );
 				if ( is_object( $request ) && isset( $request->license ) ) {
-					$license_info['status']       = $request->license_state;
-					$license_info['upgrade_link'] = ''; // TODO: need to catch the correct bundle upgrade link from the response
+					$license_info['status']         = $request->license;
+					$license_info['bundle_upgrade'] = ! empty( $request->lowest_bundle_upgrade ) && is_string( $request->lowest_bundle_upgrade ) ? $request->lowest_bundle_upgrade : ''; // provided by a snippet in the WPO website
 					
 					switch ( $extension ) {
 						case 'pro':

@@ -1011,6 +1011,15 @@ div.upgrade-table-description a,
 
 }
 
+#upgrade-table .upgrade-links h4 {
+	margin: 1em 0 0.5em 0;
+}
+
+#upgrade-table .upgrade-links p {
+	margin: 0;
+	font-style: oblique;
+}
+
 #upgrade-table .upgrade-links a.buy_button {
 	display: inline-block;
 	background: white;
