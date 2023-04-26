@@ -1018,6 +1018,7 @@ div.upgrade-table-description a,
 #upgrade-table .upgrade-links p {
 	margin: 0;
 	font-style: oblique;
+	font-size: 0.8em;
 }
 
 #upgrade-table .upgrade-links a.buy_button {

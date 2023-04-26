@@ -100,7 +100,7 @@ class Settings_Upgrade {
 			);
 			
 			$transient_name = 'wpo_wcpdf_extension_license_infos';
-			//delete_transient( $transient_name ); for debug only
+			//delete_transient( $transient_name ); // for debug only
 			if ( false === ( $extension_license_infos = get_transient( $transient_name ) ) ) {
 				$extension_license_infos = [];
 				foreach ( [ 'pro', 'templates' ] as $extension ) {
@@ -140,19 +140,16 @@ class Settings_Upgrade {
 	 * @return array
 	 */
 	public function get_extension_license_info( $extension ) {
-		$license_info = [
-			'enabled' => false
-		];
+		$license_info = [];
 		
 		if ( $this->extension_is_enabled( $extension ) ) {
-			$license_info['enabled'] = true;
 			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
 			
 			if ( $extension == 'templates' && version_compare( $extension_main_function()->version, '2.20.0', '<=' ) ) { // 'updater' property had 'private' visibility
 				return $license_info;
 			}
 			
-			if ( is_callable( [ $extension_main_function()->updater, 'remote_license_actions' ] ) ) {
+			if ( is_callable( [ $extension_main_function()->updater, 'get_license_key' ] ) && is_callable( [ $extension_main_function()->updater, 'remote_license_actions' ] ) ) {
 				if ( ! empty( $license_key = $extension_main_function()->updater->get_license_key() ) ) {
 					$args = array(
 						'edd_action'  => 'check_license',

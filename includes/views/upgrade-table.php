@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// pro & templates columns
 			foreach ( $extension_license_infos as $extension => $info ) {
 				// enabled
-				if ( $info['enabled'] ) {
+				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) ) {
 					$extensions_enabled[] = $extension;
 					
 					$title = __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' );
@@ -56,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							'<a href="https://docs.wpovernight.com/general/installing-wp-overnight-plugins/" target="_blank">'.__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
 						);
 					} else {
-						$subtitle = __( 'License activated!', 'woocommerce-pdf-invoices-packing-slips' );
+						$subtitle = '';
 					}
 					
 					$extension_columns[$extension] = sprintf(
