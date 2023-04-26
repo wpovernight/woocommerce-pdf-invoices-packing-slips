@@ -165,7 +165,7 @@ class Settings_Upgrade {
 				$request = $extension_main_function()->updater->remote_license_actions( $args );
 				if ( is_object( $request ) && isset( $request->license ) ) {
 					$license_info['status']         = $request->license;
-					$license_info['bundle_upgrade'] = ! empty( $request->lowest_bundle_upgrade ) && is_string( $request->lowest_bundle_upgrade ) ? $request->lowest_bundle_upgrade : ''; // provided by a snippet in the WPO website
+					$license_info['bundle_upgrade'] = ! empty( $request->lowest_bundle_upgrade ) && is_string( $request->lowest_bundle_upgrade ) ? $request->lowest_bundle_upgrade : ''; // https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/503#issuecomment-1523066696
 					
 					switch ( $extension ) {
 						case 'pro':
