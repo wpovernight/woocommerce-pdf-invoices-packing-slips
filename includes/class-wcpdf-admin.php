@@ -346,15 +346,19 @@ class Admin {
 
 	/**
 	 * Add the meta boxes on the single order page
+	 *
+	 * @param string $wc_screen_id  Can be also $post_type
+	 * @param object $wc_order      Can be also $post
+	 * @return void
 	 */
-	public function add_meta_boxes( $wc_screen, $wc_order ) {
+	public function add_meta_boxes( $wc_screen_id, $wc_order ) {
 		if ( class_exists( CustomOrdersTableController::class ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
-			$screen = wc_get_page_screen_id( 'shop-order' );
+			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
-			$screen = 'shop_order';
+			$screen_id = 'shop_order';
 		}
 		
-		if ( $wc_screen != $screen ) {
+		if ( $wc_screen_id != $screen_id ) {
 			return;
 		}
 
@@ -364,7 +368,7 @@ class Admin {
 				'wpo_wcpdf_send_emails',
 				__( 'Send order email', 'woocommerce-pdf-invoices-packing-slips' ),
 				array( $this, 'send_order_email_meta_box' ),
-				$screen,
+				$screen_id,
 				'side',
 				'high'
 			);
@@ -375,7 +379,7 @@ class Admin {
 			'wpo_wcpdf-box',
 			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'pdf_actions_meta_box' ),
-			$screen,
+			$screen_id,
 			'side',
 			'default'
 		);
@@ -385,7 +389,7 @@ class Admin {
 			'wpo_wcpdf-data-input-box',
 			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'data_input_box_content' ),
-			$screen,
+			$screen_id,
 			'normal',
 			'default'
 		);
