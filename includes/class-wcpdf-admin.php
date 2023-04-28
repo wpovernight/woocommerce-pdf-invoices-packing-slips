@@ -22,7 +22,7 @@ class Admin {
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
 
-		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
 
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
@@ -347,11 +347,15 @@ class Admin {
 	/**
 	 * Add the meta boxes on the single order page
 	 */
-	public function add_meta_boxes() {
+	public function add_meta_boxes( $wc_screen, $wc_order ) {
 		if ( class_exists( CustomOrdersTableController::class ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
 			$screen = wc_get_page_screen_id( 'shop-order' );
 		} else {
 			$screen = 'shop_order';
+		}
+		
+		if ( $wc_screen != $screen ) {
+			return;
 		}
 
 		// resend order emails
