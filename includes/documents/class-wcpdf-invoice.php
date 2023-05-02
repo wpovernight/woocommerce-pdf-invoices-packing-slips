@@ -1,6 +1,8 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
+use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -17,6 +19,15 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Invoice' ) ) :
  */
 
 class Invoice extends Order_Document_Methods {
+	
+	public $type;
+	public $title;
+	public $icon;
+	public $lock_name;
+	public $lock_context;
+	public $lock_time;
+	public $lock_retries;
+	
 	/**
 	 * Init/load the order object.
 	 *
@@ -24,9 +35,15 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type		= 'invoice';
-		$this->title	= __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon		= WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->type		    = 'invoice';
+		$this->title	    = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon		    = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		
+		// semaphore
+		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
+		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
+		$this->lock_time    = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 300 );
+		$this->lock_retries = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
 		
 		// Call parent constructor
 		parent::__construct( $order );
@@ -75,34 +92,49 @@ class Invoice extends Order_Document_Methods {
 	}
 
 	public function init_number() {
-		global $wpdb;
-		// If a third-party plugin claims to generate invoice numbers, trigger this instead
-		if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) || apply_filters( 'wpo_wcpdf_external_invoice_number_enabled', false, $this ) ) {
-			$invoice_number = apply_filters( 'woocommerce_generate_invoice_number', null, $this->order );
-			$invoice_number = apply_filters( 'wpo_wcpdf_external_invoice_number', $invoice_number, $this );
-		} elseif ( isset( $this->settings['display_number'] ) && $this->settings['display_number'] == 'order_number' && !empty( $this->order ) ) {
-			$invoice_number = $this->order->get_order_number();
-		}
+		$lock           = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$invoice_number = null;
+		
+		if ( $lock->lock( $this->lock_retries ) ) {
+			
+			try {
+				// If a third-party plugin claims to generate invoice numbers, trigger this instead
+				if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) || apply_filters( 'wpo_wcpdf_external_invoice_number_enabled', false, $this ) ) {
+					$invoice_number = apply_filters( 'woocommerce_generate_invoice_number', null, $this->order );
+					$invoice_number = apply_filters( 'wpo_wcpdf_external_invoice_number', $invoice_number, $this );
+				} elseif ( isset( $this->settings['display_number'] ) && $this->settings['display_number'] == 'order_number' && ! empty( $this->order ) ) {
+					$invoice_number = $this->order->get_order_number();
+				}
 
-		if ( !empty( $invoice_number ) ) { // overriden by plugin or set to order number
-			if ( is_numeric($invoice_number) || $invoice_number instanceof Document_Number ) {
-				$this->set_number( $invoice_number );
-			} else {
-				// invoice number is not numeric, treat as formatted
-				// try to extract meaningful number data
-				$formatted_number = $invoice_number;
-				$number = (int) preg_replace('/\D/', '', $invoice_number);
-				$invoice_number = compact( 'number', 'formatted_number' );
-				$this->set_number( $invoice_number );
+				if ( ! empty( $invoice_number ) ) { // overriden by plugin or set to order number
+					if ( ! is_numeric( $invoice_number ) || ! $invoice_number instanceof Document_Number ) {
+						// invoice number is not numeric, treat as formatted
+						// try to extract meaningful number data
+						$formatted_number = $invoice_number;
+						$number           = (int) preg_replace('/\D/', '', $invoice_number);
+						$invoice_number   = compact( 'number', 'formatted_number' );
+					}
+				} else {
+					$number_store   = $this->get_sequential_number_store();
+					$invoice_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
+				}
+				
+				if ( ! is_null( $invoice_number ) ) {
+					$this->set_number( $invoice_number );
+				}
+				
+			} catch ( \Exception $e ) {
+				$lock->log( $e, 'critical' );
+			} catch ( \Error $e ) {
+				$lock->log( $e, 'critical' );
 			}
-			return $invoice_number;
+
+			$lock->release();
+			
+		} else {
+			$lock->log( "Couldn't get the Invoice Number lock!", 'critical' );
 		}
-
-		$number_store   = $this->get_sequential_number_store();
-		$invoice_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
-
-		$this->set_number( $invoice_number );
-
+		
 		return $invoice_number;
 	}
 
