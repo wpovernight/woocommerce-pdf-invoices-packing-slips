@@ -35,9 +35,9 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type		    = 'invoice';
-		$this->title	    = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon		    = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->type         = 'invoice';
+		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
 		
 		// semaphore
 		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
@@ -111,7 +111,7 @@ class Invoice extends Order_Document_Methods {
 						// invoice number is not numeric, treat as formatted
 						// try to extract meaningful number data
 						$formatted_number = $invoice_number;
-						$number           = (int) preg_replace('/\D/', '', $invoice_number);
+						$number           = (int) preg_replace( '/\D/', '', $invoice_number );
 						$invoice_number   = compact( 'number', 'formatted_number' );
 					}
 				} else {
