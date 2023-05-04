@@ -22,7 +22,6 @@ class Admin {
 			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
 			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
-			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 		}
 
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
@@ -34,6 +33,10 @@ class Admin {
 			add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
 		} else {
 			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
+		}
+		
+		if ( $this->invoice_number_search_enabled() ) { // prevents slowing down the orders list search
+			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 		}
 
 		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 35, 2 );
@@ -326,6 +329,21 @@ class Admin {
 				$is_enabled = true;
 				break;
 			}
+		}
+		
+		return $is_enabled;
+	}
+	
+	/**
+	 * Check if the invoice number search is enabled.
+	 */
+	public function invoice_number_search_enabled() {
+		$is_enabled       = false;
+		$invoice          = wcpdf_get_invoice( null );
+		$invoice_settings = $invoice->get_settings();
+		
+		if ( isset( $invoice_settings['invoice_number_search'] ) ) {
+			$is_enabled = true;
 		}
 		
 		return $is_enabled;
