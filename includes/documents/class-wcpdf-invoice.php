@@ -107,7 +107,7 @@ class Invoice extends Order_Document_Methods {
 				}
 
 				if ( ! empty( $invoice_number ) ) { // overriden by plugin or set to order number
-					if ( ! is_numeric( $invoice_number ) || ! ( $invoice_number instanceof Document_Number ) ) {
+					if ( ! is_numeric( $invoice_number ) && ! ( $invoice_number instanceof Document_Number ) ) {
 						// invoice number is not numeric, treat as formatted
 						// try to extract meaningful number data
 						$formatted_number = $invoice_number;
