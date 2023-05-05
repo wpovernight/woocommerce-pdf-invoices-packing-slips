@@ -60,22 +60,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 					}
 					
 					$extension_columns[$extension] = sprintf(
-						'<td><h4>%s</h4><p>%s</p></td>',
+						'<td align="left"><h4>%s</h4><p>%s</p></td>',
 						$title,
 						$subtitle
 					);
 				
-				// is bundled
-				} elseif ( $info['url'] == 'is_bundled' ) {
-					$extension_columns[$extension] = '<td align="left">&nbsp;</td>';
 				// buy
 				} else {
-					$extensions_disabled[]         = $extension;
-					$extension_columns[$extension] = sprintf(
-						'<td><a class="buy_button" href="%s" target="_blank">%s</a></td>', 
-						esc_url_raw( $info['url'] ), 
-						__( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' )
-					);
+					$extensions_disabled[] = $extension;
+					if ( $info['url'] == 'is_bundled' ) { // extension license is bundled
+						$extension_columns[$extension] = '<td align="left">&nbsp;</td>';
+					} else {
+						$extension_columns[$extension] = sprintf(
+							'<td align="left"><a class="buy_button" href="%s" target="_blank">%s</a></td>', 
+							esc_url_raw( $info['url'] ), 
+							__( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' )
+						);
+					}
 				}
 			}
 			
