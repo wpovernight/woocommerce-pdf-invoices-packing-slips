@@ -42,7 +42,7 @@ class Invoice extends Order_Document_Methods {
 		// semaphore
 		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
 		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
-		$this->lock_time    = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 300 );
+		$this->lock_time    = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 1 );
 		$this->lock_retries = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
 		
 		// Call parent constructor
