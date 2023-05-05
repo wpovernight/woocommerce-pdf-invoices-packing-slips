@@ -64,7 +64,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$title,
 						$subtitle
 					);
-					
+				
+				// is bundled
+				} elseif ( $info['url'] == 'is_bundled' ) {
+					$extension_columns[$extension] = '<td align="left">&nbsp;</td>';
 				// buy
 				} else {
 					$extensions_disabled[]         = $extension;
