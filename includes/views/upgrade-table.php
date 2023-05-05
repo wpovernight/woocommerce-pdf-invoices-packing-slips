@@ -65,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$subtitle
 					);
 				
-				// buy
+				// disabled (includes bundle)
 				} else {
 					$extensions_disabled[] = $extension;
 					if ( $info['url'] == 'is_bundled' ) { // extension license is bundled, no need to buy
