@@ -68,7 +68,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				// buy
 				} else {
 					$extensions_disabled[] = $extension;
-					if ( $info['url'] == 'is_bundled' ) { // extension license is bundled
+					if ( $info['url'] == 'is_bundled' ) { // extension license is bundled, no need to buy
 						$extension_columns[$extension] = '<td align="left">&nbsp;</td>';
 					} else {
 						$extension_columns[$extension] = sprintf(
