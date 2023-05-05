@@ -174,16 +174,20 @@ class Settings_Upgrade {
 		
 		$extensions[] = 'bundle';
 		foreach ( $extensions as $extension ) {
-			switch ( $extension ) {
-				case 'pro':
-					$license_info[$extension]['url'] = ! empty( $bundle_upgrade_link ) && $license_status == 'valid' ? $bundle_upgrade_link : 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/';
-					break;
-				case 'templates':
-					$license_info[$extension]['url'] = ! empty( $bundle_upgrade_link ) && $license_status == 'valid' ? $bundle_upgrade_link : 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/';
-					break;
-				case 'bundle':
-					$license_info[$extension]['url'] = ! empty( $bundle_upgrade_link ) && $license_status == 'valid' ? $bundle_upgrade_link : 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/';
-					break;
+			if ( ! empty( $bundle_upgrade_link ) && $license_status == 'valid' ) {
+				$license_info[$extension]['url'] = $bundle_upgrade_link;
+			} else {
+				switch ( $extension ) {
+					case 'pro':
+						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/';
+						break;
+					case 'templates':
+						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/';
+						break;
+					case 'bundle':
+						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/';
+						break;
+				}
 			}
 		}
 		
