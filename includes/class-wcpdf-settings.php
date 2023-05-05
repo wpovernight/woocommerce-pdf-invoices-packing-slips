@@ -39,7 +39,7 @@ class Settings {
 		
 		$this->lock_name        = 'wpo_wcpdf_semaphore_lock';
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
-		$this->lock_time        = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 1 );
+		$this->lock_time        = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 2 );
 		$this->lock_retries     = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
 
 		// Settings menu item
