@@ -8,6 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings_Upgrade' ) ) :
 
 class Settings_Upgrade {
+	
+	public $valid_license = false;
 
 	function __construct()	{
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
@@ -99,11 +101,13 @@ class Settings_Upgrade {
 				),
 			);
 			
-			$transient_name = 'wpo_wcpdf_extension_license_infos';
-			//delete_transient( $transient_name ); // for debug only
-			if ( false === ( $extension_license_infos = get_transient( $transient_name ) ) ) {
+			$transient = 'wpo_wcpdf_extension_license_infos';
+			//delete_transient( $transient ); // for debug only
+			if ( false === ( $extension_license_infos = get_transient( $transient ) ) ) {
 				$extension_license_infos = $this->get_extension_license_infos();
-				set_transient( $transient_name, $extension_license_infos, DAY_IN_SECONDS );
+				if ( $this->valid_license ) {
+					set_transient( $transient, $extension_license_infos, DAY_IN_SECONDS );	
+				}
 			}
 
 			include( WPO_WCPDF()->plugin_path() . '/includes/views/upgrade-table.php' );
@@ -175,6 +179,7 @@ class Settings_Upgrade {
 		$extensions[] = 'bundle';
 		foreach ( $extensions as $extension ) {
 			if ( ! empty( $bundle_upgrade_link ) && $license_status == 'valid' ) {
+				$this->valid_license             = true;
 				$license_info[$extension]['url'] = $bundle_upgrade_link;
 			} else {
 				switch ( $extension ) {
