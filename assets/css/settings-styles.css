@@ -1021,7 +1021,7 @@ div.upgrade-table-description a,
 	font-size: 0.8em;
 }
 
-#upgrade-table .upgrade-links a.buy_button {
+#upgrade-table .upgrade-links a.upgrade_button {
 	display: inline-block;
 	background: white;
 	padding: 1em 3em 1em 2em;
@@ -1032,7 +1032,7 @@ div.upgrade-table-description a,
 	position: relative;
 }
 
-#upgrade-table .upgrade-links a.buy_button:after {
+#upgrade-table .upgrade-links a.upgrade_button:after {
 	content: ' \2192'; /* ASCII code for right arrow */
 	display: block;
 	position: absolute;
@@ -1041,14 +1041,14 @@ div.upgrade-table-description a,
 	transition: 0.5s;
 }
 
-#upgrade-table .upgrade-links a.buy_button:hover:after {
+#upgrade-table .upgrade-links a.upgrade_button:hover:after {
 	right: 1.1em;
 	font-weight: bold;
 }
 
 
-#upgrade-table .upgrade-links a.buy_button:focus,
-#upgrade-table .upgrade-links a.buy_button:hover {
+#upgrade-table .upgrade-links a.upgrade_button:focus,
+#upgrade-table .upgrade-links a.upgrade_button:hover {
 	background: #6e1edc;
 	color: #fcfbf7;
 }

@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$subtitle = sprintf(
 							/* translators: learn more link */
 							__( 'License not yet activated: %s', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="https://docs.wpovernight.com/general/installing-wp-overnight-plugins/" target="_blank">'.__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
+							'<a href="https://docs.wpovernight.com/general/installing-wp-overnight-plugins/#activating-your-license" target="_blank">'.__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
 						);
 					} else {
 						$subtitle = '';
@@ -72,9 +72,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$extension_columns[$extension] = '<td align="left">&nbsp;</td>';
 					} else {
 						$extension_columns[$extension] = sprintf(
-							'<td align="left"><a class="buy_button" href="%s" target="_blank">%s</a></td>', 
+							'<td align="left"><a class="upgrade_button" href="%s" target="_blank">%s</a></td>', 
 							esc_url_raw( $info['url'] ), 
-							__( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' )
+							__( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' )
 						);
 					}
 				}
