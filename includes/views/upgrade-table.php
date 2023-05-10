@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$extensions_enabled  = [];
 			$extension_columns   = [];
 			
-			// pro & templates columns
+			// pro, templates & bundle columns
 			foreach ( $extension_license_infos as $extension => $info ) {
 				// enabled
 				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) ) {
