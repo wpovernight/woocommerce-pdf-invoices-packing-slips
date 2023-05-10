@@ -160,7 +160,7 @@ class Settings_Upgrade {
 						$license_info[$extension]['status'] = $license_status = $request->license;
 						
 						if ( empty( $bundle_upgrade_link ) && ! empty( $request->bundle_upgrade ) && is_string( $request->bundle_upgrade ) ) {
-							$bundle_upgrade_link = $request->bundle_upgrade; // https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/503#issuecomment-1523066696
+							$bundle_upgrade_link = $request->bundle_upgrade; // https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/503#issue-1678203436
 						}
 					}
 				}
