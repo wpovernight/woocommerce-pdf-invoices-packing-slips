@@ -1011,7 +1011,17 @@ div.upgrade-table-description a,
 
 }
 
-#upgrade-table .upgrade-links a {
+#upgrade-table .upgrade-links h4 {
+	margin: 1em 0 0.5em 0;
+}
+
+#upgrade-table .upgrade-links p {
+	margin: 0;
+	font-style: oblique;
+	font-size: 0.8em;
+}
+
+#upgrade-table .upgrade-links a.upgrade_button {
 	display: inline-block;
 	background: white;
 	padding: 1em 3em 1em 2em;
@@ -1022,7 +1032,7 @@ div.upgrade-table-description a,
 	position: relative;
 }
 
-#upgrade-table .upgrade-links a:after {
+#upgrade-table .upgrade-links a.upgrade_button:after {
 	content: ' \2192'; /* ASCII code for right arrow */
 	display: block;
 	position: absolute;
@@ -1031,14 +1041,14 @@ div.upgrade-table-description a,
 	transition: 0.5s;
 }
 
-#upgrade-table .upgrade-links a:hover:after {
+#upgrade-table .upgrade-links a.upgrade_button:hover:after {
 	right: 1.1em;
 	font-weight: bold;
 }
 
 
-#upgrade-table .upgrade-links a:focus,
-#upgrade-table .upgrade-links a:hover {
+#upgrade-table .upgrade-links a.upgrade_button:focus,
+#upgrade-table .upgrade-links a.upgrade_button:hover {
 	background: #6e1edc;
 	color: #fcfbf7;
 }

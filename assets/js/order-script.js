@@ -32,7 +32,9 @@ jQuery( function( $ ) {
 		}
 	} );
 
-	$( '#wpo_wcpdf-data-input-box' ).insertAfter('#woocommerce-order-data');
+	if ( wpo_wcpdf_ajax.sticky_document_data_metabox ) {
+		$( '#wpo_wcpdf-data-input-box' ).insertAfter('#woocommerce-order-data');
+	}
 	
 	// enable invoice number edit if user initiated
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes', function() {

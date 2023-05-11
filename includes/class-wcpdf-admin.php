@@ -15,14 +15,16 @@ class Admin {
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
-		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 ); // WC 7.1+
-		add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
-		add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
-		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
-		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
-		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed
+			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 ); // WC 7.1+
+			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
+			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
+			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
+			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
+			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+		}
 
-		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
 
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
@@ -32,7 +34,10 @@ class Admin {
 		} else {
 			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
 		}
-		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
+		
+		if ( $this->invoice_number_search_enabled() ) { // prevents slowing down the orders list search
+			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
+		}
 
 		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 35, 2 );
 
@@ -306,6 +311,44 @@ class Admin {
 				return;
 		}
 	}
+	
+	/**
+	 * Check if at least 1 of the invoice columns is enabled.
+	 */
+	public function invoice_columns_enabled() {
+		$is_enabled       = false;
+		$invoice          = wcpdf_get_invoice( null );
+		$invoice_settings = $invoice->get_settings();
+		$invoice_columns  = [
+			'invoice_number_column',
+			'invoice_date_column',
+		];
+		
+		foreach ( $invoice_columns as $column ) {
+			if ( isset( $invoice_settings[$column] ) ) {
+				$is_enabled = true;
+				break;
+			}
+		}
+		
+		return $is_enabled;
+	}
+	
+	/**
+	 * Check if the invoice number search is enabled.
+	 */
+	public function invoice_number_search_enabled() {
+		$is_enabled       = false;
+		$invoice          = wcpdf_get_invoice( null );
+		$invoice_settings = $invoice->get_settings();
+		
+		if ( isset( $invoice_settings['invoice_number_search'] ) ) {
+			$is_enabled = true;
+		}
+		
+		return $is_enabled;
+	}
+	
 
 	/**
 	 * Makes invoice columns sortable
@@ -346,12 +389,20 @@ class Admin {
 
 	/**
 	 * Add the meta boxes on the single order page
+	 *
+	 * @param string $wc_screen_id  Can be also $post_type
+	 * @param object $wc_order      Can be also $post
+	 * @return void
 	 */
-	public function add_meta_boxes() {
+	public function add_meta_boxes( $wc_screen_id, $wc_order ) {
 		if ( class_exists( CustomOrdersTableController::class ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
-			$screen = wc_get_page_screen_id( 'shop-order' );
+			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
-			$screen = 'shop_order';
+			$screen_id = 'shop_order';
+		}
+		
+		if ( $wc_screen_id != $screen_id ) {
+			return;
 		}
 
 		// resend order emails
@@ -360,7 +411,7 @@ class Admin {
 				'wpo_wcpdf_send_emails',
 				__( 'Send order email', 'woocommerce-pdf-invoices-packing-slips' ),
 				array( $this, 'send_order_email_meta_box' ),
-				$screen,
+				$screen_id,
 				'side',
 				'high'
 			);
@@ -371,7 +422,7 @@ class Admin {
 			'wpo_wcpdf-box',
 			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'pdf_actions_meta_box' ),
-			$screen,
+			$screen_id,
 			'side',
 			'default'
 		);
@@ -381,7 +432,7 @@ class Admin {
 			'wpo_wcpdf-data-input-box',
 			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
 			array( $this, 'data_input_box_content' ),
-			$screen,
+			$screen_id,
 			'normal',
 			'default'
 		);
