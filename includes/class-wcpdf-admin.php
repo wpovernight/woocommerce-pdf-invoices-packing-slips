@@ -566,18 +566,18 @@ class Admin {
 			// data
 			$data = array(
 				'number' => array(
-					'label' => __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label' => __( 'Invoice number:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
-				'date'   => array(
-					'label' => __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date' => array(
+					'label' => __( 'Invoice date:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 				'display_date' =>  array(
-					'label' => __( 'Invoice Display Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label' => __( 'Invoice display date:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
-				'creation_status' =>  array(
-					'label' => __( 'Invoice Created:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'creation_trigger' =>  array(
+					'label' => __( 'Invoice created via:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
-				'notes'  => array(
+				'notes' => array(
 					'label' => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 
@@ -620,12 +620,12 @@ class Admin {
 			);
 		}
 
-		if ( ! empty( $data['creation_status'] ) ) {
+		if ( ! empty( $data['creation_trigger'] ) ) {
 			$document_triggers = WPO_WCPDF()->main->get_document_triggers();
-			$creation_status   = $document->get_creation_status();			
-			$current['creation_status'] = array(
-				'value' => isset( $document_triggers[$creation_status] ) ? ucwords( $document_triggers[$creation_status] ) : '',
-				'name'  => "_wcpdf_{$document->slug}_creation_status",
+			$creation_trigger  = $document->get_creation_trigger();
+			$current['creation_trigger'] = array(
+				'value' => isset( $document_triggers[$creation_trigger] ) ? $document_triggers[$creation_trigger] : '',
+				'name'  => "_wcpdf_{$document->slug}_creation_trigger",
 			);
 		}
 		
@@ -688,12 +688,12 @@ class Admin {
 							</p>
 						</div>
 						<?php endif; ?>
-						<?php if ( isset( $data['creation_status'] ) && ! empty( $data['creation_status']['value'] ) ) : ?>
+						<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
 						<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
 							<p class="form-field form-field-wide">
 								<p>
-									<span><strong><?= wp_kses_post( $data['creation_status']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['creation_status']['value'] ); ?></span>
+									<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
+									<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
 								</p>
 							</p>
 						</div>
@@ -1036,7 +1036,7 @@ class Admin {
 				// on regenerate
 				if( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
-					WPO_WCPDF()->main->log_document_creation_status_to_order_meta( $document, 'document_data', true );
+					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true );
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
@@ -1063,7 +1063,7 @@ class Admin {
 
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
-						WPO_WCPDF()->main->log_document_creation_status_to_order_meta( $document, 'document_data' );
+						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data' );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
 					$response      = array(
