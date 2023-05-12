@@ -566,16 +566,19 @@ class Admin {
 			// data
 			$data = array(
 				'number' => array(
-					'label'  => __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label' => __( 'Invoice number:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
-				'date'   => array(
-					'label'  => __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date' => array(
+					'label' => __( 'Invoice date:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 				'display_date' =>  array(
-					'label'  => __( 'Display Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+					'label' => __( 'Invoice display date:', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
-				'notes'  => array(
-					'label'  => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
+				'creation_trigger' =>  array(
+					'label' => __( 'Invoice created via:', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				'notes' => array(
+					'label' => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 
 			);
@@ -603,20 +606,29 @@ class Admin {
 			),
 		);
 
-		if ( !empty( $data['notes'] ) ) {
+		if ( ! empty( $data['notes'] ) ) {
 			$current['notes'] = array(
 				'value' => $document->get_document_notes(),
-				'name'  =>"_wcpdf_{$document->slug}_notes",
+				'name'  => "_wcpdf_{$document->slug}_notes",
 			);
 		}
 
-		if ( !empty( $data['display_date'] ) ) {
+		if ( ! empty( $data['display_date'] ) ) {
 			$current['display_date'] = array(
 				'value' => $document->document_display_date(),
-				'name'  =>"_wcpdf_{$document->slug}_display_date",
+				'name'  => "_wcpdf_{$document->slug}_display_date",
 			);
 		}
 
+		if ( ! empty( $data['creation_trigger'] ) ) {
+			$document_triggers = WPO_WCPDF()->main->get_document_triggers();
+			$creation_trigger  = $document->get_creation_trigger();
+			$current['creation_trigger'] = array(
+				'value' => isset( $document_triggers[$creation_trigger] ) ? $document_triggers[$creation_trigger] : '',
+				'name'  => "_wcpdf_{$document->slug}_creation_trigger",
+			);
+		}
+		
 		foreach ( $data as $key => $value ) {
 			if ( isset( $current[$key] ) ) {
 				$data[$key] = array_merge( $current[$key], $value );
@@ -657,7 +669,7 @@ class Admin {
 						</div>
 						<?php endif; ?>
 						<?php if( isset( $data['date'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
+						<div class="<?= esc_attr( $document->get_type() ); ?>-date">
 							<p class="form-field form-field-wide">
 								<p>
 									<span><strong><?= wp_kses_post( $data['date']['label'] ); ?></strong></span>
@@ -667,7 +679,7 @@ class Admin {
 						</div>
 						<?php endif; ?>
 						<?php if( isset( $data['display_date'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
+						<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
 							<p class="form-field form-field-wide">
 								<p>
 									<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
@@ -676,6 +688,16 @@ class Admin {
 							</p>
 						</div>
 						<?php endif; ?>
+						<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
+						<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
+							<p class="form-field form-field-wide">
+								<p>
+									<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
+									<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
+								</p>
+							</p>
+						</div>
+						<?php endif; ?>	
 											
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
@@ -1014,7 +1036,7 @@ class Admin {
 				// on regenerate
 				if( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
-
+					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true );
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
@@ -1041,9 +1063,9 @@ class Admin {
 
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
+						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data' );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
-
 					$response      = array(
 						'message' => $notice_messages[$notice]['success'],
 					);

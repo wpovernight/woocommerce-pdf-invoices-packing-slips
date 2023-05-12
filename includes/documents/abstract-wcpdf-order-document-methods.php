@@ -1183,7 +1183,6 @@ abstract class Order_Document_Methods extends Order_Document {
 			echo $document_notes;
 		}
 	}
-
 	
 	public function document_display_date() {
 		$document_display_date = $this->get_display_date( $this->get_type() );
@@ -1216,6 +1215,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 		
 	}
+	
 }
 
 endif; // class_exists

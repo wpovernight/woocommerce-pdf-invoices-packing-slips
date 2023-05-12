@@ -134,6 +134,7 @@ class Main {
 				// log document generation to order notes
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
+					$this->log_document_creation_trigger_to_order_meta( $document, 'email_attachment' );
 					$this->mark_document_printed( $document, 'email_attachment' );
 				} );
 				
@@ -380,16 +381,19 @@ class Main {
 			if ( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'bulk' );
+					$this->log_document_creation_trigger_to_order_meta( $document, 'bulk' );
 					$this->mark_document_printed( $document, 'bulk' );
 				} );
 			} elseif ( isset( $_REQUEST['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'my_account' );
+					$this->log_document_creation_trigger_to_order_meta( $document, 'my_account' );
 					$this->mark_document_printed( $document, 'my_account' );
 				} );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'single' );
+					$this->log_document_creation_trigger_to_order_meta( $document, 'single' );
 					$this->mark_document_printed( $document, 'single' );
 				} );
 			}
@@ -1196,13 +1200,52 @@ class Main {
 	 * @return void
 	 */
 	public function log_to_order_notes( $note, $document ) {
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) && ! empty( $note ) ) {			
+		if ( property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
+			$order_ids = $document->order_ids;
+		} else {
+			$order_ids = [ $document->order->get_id() ];
+		}
+		
+		foreach ( $order_ids as $order_id ) {
+			$order = wc_get_order( $order_id );
+			if ( empty( $order ) ) {
+				continue;
+			}
 			if ( is_callable( array( $order, 'add_order_note' ) ) ) { // order
 				$order->add_order_note( strip_tags( $note ) );
 			} elseif ( $document->is_refund( $order ) ) {            // refund order
 				$parent_order = $document->get_refund_parent( $order );
 				if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'add_order_note' ) ) ) {
 					$parent_order->add_order_note( strip_tags( $note ) );
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Logs to the order meta
+	 *
+	 * @param object  $document
+	 * @param string  $trigger
+	 * @param boolean $force
+	 * @return void
+	 */
+	public function log_document_creation_trigger_to_order_meta( $document, $trigger, $force = false ) {
+		if ( $trigger == 'bulk' && property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
+			$order_ids = $document->order_ids;
+		} else {
+			$order_ids = [ $document->order->get_id() ];
+		}
+		
+		foreach ( $order_ids as $order_id ) {
+			$order = wc_get_order( $order_id );
+			if ( ! empty( $order ) ) { 
+				$type   = $document->get_type();
+				$status = $order->get_meta( "_wcpdf_{$type}_creation_trigger" );
+				 
+				if ( true == $force || empty( $status ) ) {
+					$order->update_meta_data( "_wcpdf_{$type}_creation_trigger", $trigger );
+					$order->save_meta_data();
 				}
 			}
 		}
