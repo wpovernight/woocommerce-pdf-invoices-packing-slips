@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.5.2
+Stable tag: 3.5.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,15 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.5.3 (2023-05-15) =
+* New: display creation trigger in document data and order meta
+* New: detects the extension license status in the Upgrade tab
+* New: invoice number search document setting
+* New: adds new filter to stick Document data metabox: `wpo_wcpdf_sticky_document_data_metabox`
+* Fix: adds semaphore to Invoice number init to prevent concurrent number issues
+* Fix: invoice column hooks only on setting condition
+* Tested up to WooCommerce 7.7
 
 = 3.5.2 (2023-04-12) =
 * New: added upgrade tab
