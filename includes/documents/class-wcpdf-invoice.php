@@ -23,6 +23,7 @@ class Invoice extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
+	public $slug;
 	public $lock_name;
 	public $lock_context;
 	public $lock_time;
@@ -38,6 +39,7 @@ class Invoice extends Order_Document_Methods {
 		$this->type         = 'invoice';
 		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->slug         = str_replace( '-', '_', $this->type );
 		
 		// semaphore
 		$this->lock_name    = "wpo_wcpdf_{$this->slug}_number_lock";
