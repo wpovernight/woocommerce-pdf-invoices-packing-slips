@@ -1346,7 +1346,7 @@ class Main {
 		
 		if ( $error > 0 ) {
 			/* translators: 1. document type, 2. mark/unmark */
-			wp_die( sprintf( esc_html__( "Document of type '$1%s' for the selected order could not be $2%s as printed.", 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $data['document_type'] ), $event_type ) );
+			wp_die( sprintf( esc_html__( 'Document of type %1$s for the selected order could not be %2$s as printed.', 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $data['document_type'] ), $event_type ) );
 		}
 	}
 	
