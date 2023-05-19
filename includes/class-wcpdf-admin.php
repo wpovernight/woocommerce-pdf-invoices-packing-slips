@@ -317,8 +317,7 @@ class Admin {
 	 */
 	public function invoice_columns_enabled() {
 		$is_enabled       = false;
-		$invoice          = wcpdf_get_invoice( null );
-		$invoice_settings = $invoice->get_settings();
+		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
 		$invoice_columns  = [
 			'invoice_number_column',
 			'invoice_date_column',
@@ -339,8 +338,7 @@ class Admin {
 	 */
 	public function invoice_number_search_enabled() {
 		$is_enabled       = false;
-		$invoice          = wcpdf_get_invoice( null );
-		$invoice_settings = $invoice->get_settings();
+		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
 		
 		if ( isset( $invoice_settings['invoice_number_search'] ) ) {
 			$is_enabled = true;
