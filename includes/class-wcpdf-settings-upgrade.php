@@ -137,6 +137,9 @@ class Settings_Upgrade {
 		
 		foreach ( $extensions as $extension ) {
 			$license_info[$extension] = [];
+			$args                     = [ 'edd_action'  => 'check_license' ];
+			$request                  = null;
+			$license_key              = '';
 			
 			if ( $this->extension_is_enabled( $extension ) ) {
 				$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
@@ -146,11 +149,10 @@ class Settings_Upgrade {
 				}
 				
 				if ( is_callable( [ $extension_main_function()->updater, 'get_license_key' ] ) && is_callable( [ $extension_main_function()->updater, 'remote_license_actions' ] ) ) {
-					if ( ! empty( $license_key = $extension_main_function()->updater->get_license_key() ) ) {
-						$args = array(
-							'edd_action'  => 'check_license',
-							'license_key' => trim( $license_key ),
-						);
+					$license_key = $extension_main_function()->updater->get_license_key();
+					
+					if ( ! empty( $license_key ) ) {
+						$args['license_key'] = trim( $license_key );
 					} else {
 						continue;
 					}
