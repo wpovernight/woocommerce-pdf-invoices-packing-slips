@@ -398,7 +398,11 @@ class Invoice extends Order_Document_Methods {
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'log_number_generation',
-					'description'	=> __( 'Enables the invoice number generation logs. Helpful for debugging numbering issues.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'	=> sprintf(
+						/* translators: here link */
+						__( 'Enables the invoice number generation logs %s. Helpful for debugging numbering issues.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="'.esc_url( admin_url( 'admin.php?page=wc-status&tab=logs' ) ).'">'.__( 'here', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
+					),
 				)
 			),
 			array(
