@@ -136,28 +136,65 @@ class Settings_Upgrade {
 		$license_status      = 'inactive';
 		
 		foreach ( $extensions as $extension ) {
-			$license_info[$extension] = [];
-			$args                     = [ 'edd_action'  => 'check_license' ];
-			$request                  = null;
-			$license_key              = '';
+			$license_info[$extension]   = [];
+			$args                       = [];
+			$request                    = null;
+			$license_key                = '';
+			$sidekick                   = false;
+			$updater                    = null;
 			
 			if ( $this->extension_is_enabled( $extension ) ) {
 				$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
+				$updater                 = $extension_main_function()->updater;
 				
 				if ( $extension == 'templates' && version_compare( $extension_main_function()->version, '2.20.0', '<=' ) ) { // 'updater' property had 'private' visibility
 					continue;
 				}
 				
-				if ( is_callable( [ $extension_main_function()->updater, 'get_license_key' ] ) && is_callable( [ $extension_main_function()->updater, 'remote_license_actions' ] ) ) {
-					$license_key = $extension_main_function()->updater->get_license_key();
+				// built-in updater
+				if ( is_callable( [ $updater, 'get_license_key' ] ) ) {
+					$license_key = $updater->get_license_key();
+				// sidekick (legacy)
+				} elseif ( property_exists( $updater, 'license_key' ) ) {
+					$license_slug     = "wpo_wcpdf_{$extension}_license";
+					$wpo_license_keys = get_option( 'wpocore_settings', array() );
+					$license_key      = isset( $wpo_license_keys[$license_slug] ) ? $wpo_license_keys[$license_slug] : $license_key;
+					$sidekick         = true;
+				}
+				
+				if ( ! empty( $license_key ) ) {
+					$args['edd_action']  = 'check_license';
+					$args['license_key'] = trim( $license_key );
 					
-					if ( ! empty( $license_key ) ) {
-						$args['license_key'] = trim( $license_key );
-					} else {
-						continue;
+					// legacy
+					if ( $sidekick ) {
+						if ( ! class_exists( 'WPO_Update_Helper' ) ) {
+							include_once( $extension_main_function()->plugin_path() . '/updater/update-helper.php' );
+						}
+						
+						$item_name = 'PDF Invoices & Packing Slips for WooCommerce - ';
+						$file      = $extension_main_function()->plugin_path();
+						$version   = $extension_main_function()->version;
+						$author    = 'WP Overnight';
+						
+						switch ( $extension ) {
+							case 'pro':
+								$item_name = "{$item_name}Professional";
+								break;
+							case 'templates':
+								$item_name = "{$item_name}Premium Templates";
+								break;
+						}
+						
+						$updater = new \WPO_Update_Helper( $item_name, $file, $license_slug, $version, $author );
 					}
 					
-					$request = $extension_main_function()->updater->remote_license_actions( $args );
+				} else {
+					continue;
+				}
+				
+				if ( $updater && is_callable( [ $updater, 'remote_license_actions' ] ) && ! empty( $args ) ) {
+					$request = $updater->remote_license_actions( $args );
 					if ( is_object( $request ) && isset( $request->license ) ) {
 						$license_info[$extension]['status'] = $license_status = $request->license;
 						
