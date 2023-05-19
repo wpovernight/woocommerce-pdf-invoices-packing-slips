@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.5.3
+Stable tag: 3.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.5.4 (2023-05-19) =
+- Tweak: improves code for the upgrade tab get license info function
+- Fix: bug on templates using legacy versions of the Premium Templates extension
+- Fix: string translation issues & updated POT
+- Fix: bug in slug property not set when defining the document number lock name
 
 = 3.5.3 (2023-05-15) =
 * New: display creation trigger in document data and order meta
