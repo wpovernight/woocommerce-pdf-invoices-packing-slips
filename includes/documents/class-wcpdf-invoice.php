@@ -94,7 +94,8 @@ class Invoice extends Order_Document_Methods {
 	}
 
 	public function init_number() {
-		$lock           = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$logger         = isset( $this->settings['log_number_generation'] ) ? [ wc_get_logger() ] : [];
+		$lock           = new Semaphore( $this->lock_name, $this->lock_time, $logger, $this->lock_context );
 		$invoice_number = null;
 		
 		if ( $lock->lock( $this->lock_retries ) ) {
@@ -386,6 +387,22 @@ class Invoice extends Order_Document_Methods {
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'reset_number_yearly',
+				)
+			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'log_number_generation',
+				'title'			=> __( 'Log invoice number generation', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'invoice',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'log_number_generation',
+					'description'	=> sprintf(
+						/* translators: here link */
+						__( 'Enables the invoice number generation logs %s. Helpful for debugging numbering issues.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="'.esc_url( admin_url( 'admin.php?page=wc-status&tab=logs' ) ).'">'.__( 'here', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
+					),
 				)
 			),
 			array(
