@@ -49,7 +49,7 @@ class Invoice extends Order_Document_Methods {
 		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
 		
 		// outputs
-		$this->outputs      = apply_filters( "wpo_wcpdf_{$this->type}_outputs", [ 'pdf', 'ubl' ] );
+		$this->outputs      = apply_filters( "wpo_wcpdf_{$this->type}_outputs", [ 'pdf', 'ubl' ], $this );
 		
 		// Call parent constructor
 		parent::__construct( $order );

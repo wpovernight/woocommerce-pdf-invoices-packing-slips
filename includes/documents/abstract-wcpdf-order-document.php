@@ -125,6 +125,11 @@ abstract class Order_Document {
 		$this->init_settings_data();
 		// check enable
 		$this->enabled = $this->get_setting( 'enabled', false );
+		
+		// outputs
+		if ( ! isset( $this->outputs ) ) {
+			$this->outputs = apply_filters( "wpo_wcpdf_{$this->type}_outputs", [ 'pdf' ], $this );
+		}
 	}
 
 	public function init_settings() {
