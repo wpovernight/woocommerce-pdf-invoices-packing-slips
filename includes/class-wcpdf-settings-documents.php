@@ -26,6 +26,7 @@ class Settings_Documents {
 	public function output( $section ) {
 		$section   = ! empty( $section ) ? $section : 'invoice';
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+		$output    = isset( $_REQUEST['output'] ) ? esc_attr( $_REQUEST['output'] ) : 'pdf';
 		?>
 		<div class="wcpdf_document_settings_sections">
 			<?php 
@@ -50,10 +51,28 @@ class Settings_Documents {
 				?>
 			</ul>
 		</div>
+		<div class="wcpdf_document_settings_document_outputs">
+		<?php 
+			foreach ( $documents as $document ) {
+				if ( $document->get_type() == $section && ! empty( $document->outputs ) ) {
+					?>
+					<h2 class="nav-tab-wrapper">
+						<?php
+							foreach( $document->outputs as $document_output ) {
+								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output', $document_output ) ), esc_attr( $document_output ), ( ( $output == $document_output ) ? 'nav-tab-active' : '' ), strtoupper( esc_html( $document_output ) ) );
+							}
+						?>
+					</h2>
+					<?php
+				}
+			}
+		?>
+		</div>
 		<?php
-		settings_fields( "wpo_wcpdf_documents_settings_{$section}" );
-		do_settings_sections( "wpo_wcpdf_documents_settings_{$section}" );
-		submit_button();
+			$option_name = ( $output == 'pdf' ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output}";
+			settings_fields( $option_name );
+			do_settings_sections( $option_name );
+			submit_button();
 	}
 
 }

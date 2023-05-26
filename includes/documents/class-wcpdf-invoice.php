@@ -28,6 +28,7 @@ class Invoice extends Order_Document_Methods {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
+	public $outputs;
 	
 	/**
 	 * Init/load the order object.
@@ -46,6 +47,9 @@ class Invoice extends Order_Document_Methods {
 		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
 		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
 		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
+		
+		// outputs
+		$this->outputs      = apply_filters( "wpo_wcpdf_{$this->type}_outputs", [ 'pdf', 'ubl' ] );
 		
 		// Call parent constructor
 		parent::__construct( $order );
