@@ -24,18 +24,24 @@ class Settings_Documents {
 	}
 
 	public function output( $section ) {
-		$section   = ! empty( $section ) ? $section : 'invoice';
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
-		$output    = isset( $_REQUEST['output'] ) ? esc_attr( $_REQUEST['output'] ) : 'pdf';
+		$section          = ! empty( $section ) ? $section : 'invoice';
+		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
+		$output           = isset( $_REQUEST['output'] ) ? esc_attr( $_REQUEST['output'] ) : 'pdf';
+		$section_document = null;
+		
+		foreach ( $documents as $document ) {
+			if ( $document->get_type() == $section ) {
+				$section_document = $document;
+				break;
+			}
+		}
+		
+		if ( empty( $section_document ) ) {
+			return;
+		}
 		?>
 		<div class="wcpdf_document_settings_sections">
-			<?php 
-			foreach ( $documents as $document ) {
-				if ( $document->get_type() == $section ) {
-					echo '<h2>'.esc_html( $document->get_title() ).'<span class="arrow-down">&#9660;</span></h2>';
-				}
-			}
-			?>
+			<?php echo '<h2>'.esc_html( $section_document->get_title() ).'<span class="arrow-down">&#9660;</span></h2>'; ?>
 			<ul>
 				<?php
 				foreach ( $documents as $document ) {
@@ -53,29 +59,24 @@ class Settings_Documents {
 		</div>
 		<div class="wcpdf_document_settings_document_outputs">
 			<?php 
-				foreach ( $documents as $document ) {
-					if ( $document->get_type() == $section && ! empty( $document->outputs ) ) {
-						?>
-						<h2 class="nav-tab-wrapper">
-							<?php
-								foreach ( $document->outputs as $document_output ) {
-									$active = ( $output == $document_output ) || ( $output != 'pdf' && ! in_array( $output, $document->outputs ) ) ? 'nav-tab-active' : '';
-									printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output', $document_output ) ), esc_attr( $document_output ), $active, strtoupper( esc_html( $document_output ) ) );
-								}
-							?>
-						</h2>
+				if ( ! empty( $section_document->outputs ) ) {
+					?>
+					<h2 class="nav-tab-wrapper">
 						<?php
-					}
+							foreach ( $section_document->outputs as $document_output ) {
+								$active = ( $output == $document_output ) || ( $output != 'pdf' && ! in_array( $output, $section_document->outputs ) ) ? 'nav-tab-active' : '';
+								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output', $document_output ) ), esc_attr( $document_output ), $active, strtoupper( esc_html( $document_output ) ) );
+							}
+						?>
+					</h2>
+					<?php
 				}
 			?>
 		</div>
 		<?php
 			$output_compatible = false;
-			foreach ( $documents as $document ) {
-				if ( $document->get_type() == $section && $output != 'pdf' && in_array( $output, $document->outputs ) ) {
-					$output_compatible = true;
-					break;
-				}
+			if ( $output != 'pdf' && in_array( $output, $section_document->outputs ) ) {
+				$output_compatible = true;
 			}
 			
 			$option_name = ( $output == 'pdf' || ! $output_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output}";
