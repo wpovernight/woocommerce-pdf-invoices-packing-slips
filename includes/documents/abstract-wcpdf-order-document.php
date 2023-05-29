@@ -1,8 +1,8 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
-use WPO\WC\PDF_Invoices\Makers\UBL\Builders\SabreBuilder;
-use WPO\WC\PDF_Invoices\Makers\UBL\Documents\UblDocument;
+use \WPO\WC\UBL\Builders\SabreBuilder;
+use \WPO\WC\UBL\Documents\UblDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -942,7 +942,7 @@ abstract class Order_Document {
 
 		$builder      = new SabreBuilder();
 		$contents     = $builder->build( $ubl_document );
-		$filename     = $document->get_filename( 'download', [ 'ubl' => 'yes' ] );
+		$filename     = $order_document->get_filename( 'download', [ 'ubl' => 'yes' ] );
 		$fullFileName = $ubl_maker->write( $filename, $contents );
 		$quoted       = sprintf( '"%s"', addcslashes( basename( $fullFileName ), '"\\' ) );
 		$size         = filesize( $fullFileName );

@@ -53,7 +53,7 @@ class WPO_WCPDF {
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
 		
-		
+		require $this->plugin_path() . '/vendor/autoload.php';
 
 		// load the localisation & classes
 		add_action( 'plugins_loaded', array( $this, 'translations' ) );

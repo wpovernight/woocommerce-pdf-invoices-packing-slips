@@ -440,7 +440,7 @@ class Main {
 			$message = 'DOMPDF Exception: '.$e->getMessage();
 			wcpdf_log_error( $message, 'critical', $e );
 			wcpdf_output_error( $message, 'critical', $e );
-		} catch ( \WPO\WC\PDF_Invoices\Makers\UBL\Exceptions\FileWriteException $e ) {
+		} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
 			$message = 'UBL Exception: '.$e->getMessage();
 			wcpdf_log_error( $message, 'critical', $e );
 			wcpdf_output_error( $message, 'critical', $e );
@@ -845,7 +845,7 @@ class Main {
 	 */
 	public function copy_fonts( $path = '', $merge_with_local = true ) {
 		// only copy fonts if the bundled dompdf library is used!
-		$default_pdf_maker = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.6.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF\\PDF_Maker';
+		$default_pdf_maker = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.6.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker';
 		if ( $default_pdf_maker !== apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker ) ) {
 			return;
 		}
