@@ -1,5 +1,5 @@
 <?php
-namespace WPO\WC\PDF_Invoices\Outputs\PDF;
+namespace WPO\WC\PDF_Invoices\Makers\PDF;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Outputs\\PDF\\PDF_Maker' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF\\PDF_Maker' ) ) :
 
 class PDF_Maker {
 	

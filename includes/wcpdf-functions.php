@@ -116,14 +116,14 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
  * @param string       $html
  * @param array        $settings
  * @param null|object  $document
- * @return WPO\WC\PDF_Invoices\Output\PDF\PDF_Maker
+ * @return WPO\WC\PDF_Invoices\Makers\PDF\PDF_Maker
  */
 function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
-	$class = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.6.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Outputs\\PDF\\PDF_Maker';
+	$class = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.6.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF\\PDF_Maker';
 	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
 	
 	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/outputs/pdf/class-wcpdf-pdf-maker.php' );
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/pdf/class-wcpdf-pdf-maker.php' );
 	}
 	
 	return new $class( $html, $settings, $document );
@@ -135,7 +135,7 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
  * @return bool whether the PDF maker is the default or not
  */
 function wcpdf_pdf_maker_is_default() {
-	$default_pdf_maker = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.6.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Outputs\\PDF\\PDF_Maker';
+	$default_pdf_maker = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.6.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF\\PDF_Maker';
 	return $default_pdf_maker == apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker );
 }
 
