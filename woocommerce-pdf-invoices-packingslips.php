@@ -52,6 +52,8 @@ class WPO_WCPDF {
 		$this->plugin_basename = plugin_basename(__FILE__);
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
+		
+		
 
 		// load the localisation & classes
 		add_action( 'plugins_loaded', array( $this, 'translations' ) );

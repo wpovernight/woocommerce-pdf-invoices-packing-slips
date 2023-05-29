@@ -1,6 +1,9 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
+use WPO\WC\PDF_Invoices\Makers\UBL\Builders\SabreBuilder;
+use WPO\WC\PDF_Invoices\Makers\UBL\Documents\UblDocument;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -923,6 +926,36 @@ abstract class Order_Document {
 		echo $this->get_html();
 		die();
 	}
+	
+	public function output_ubl() {
+		$ubl_maker    = wcpdf_get_ubl_maker();
+		$ubl_document = new UblDocument();
+		
+		$ubl_document->setOrder( $this->order );
+		
+		if ( $order_document = wcpdf_get_document( $this->get_type(), $this->order, true ) ) {
+			$ubl_document->setOrderDocument( $order_document );
+		} else {
+			wcpdf_log_error( 'Error generating order document!', 'error', null, $ubl_maker->context );
+			die();
+		}
+
+		$builder      = new SabreBuilder();
+		$contents     = $builder->build( $ubl_document );
+		$filename     = $document->get_filename( 'download', [ 'ubl' => 'yes' ] );
+		$fullFileName = $ubl_maker->write( $filename, $contents );
+		$quoted       = sprintf( '"%s"', addcslashes( basename( $fullFileName ), '"\\' ) );
+		$size         = filesize( $fullFileName );
+
+		wcpdf_ubl_headers( $quoted, $size );
+
+		ob_clean();
+		flush();
+		readfile( $fullFileName );
+		unlink( $fullFileName );
+
+		die();
+	}
 
 	public function wrap_html_content( $content ) {
 		if ( WPO_WCPDF()->legacy_mode_enabled() ) {
@@ -952,8 +985,14 @@ abstract class Order_Document {
 		} else {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
+		
+		if ( isset( $args['ubl'] ) ) {
+			$extension = '.xml';
+		} else {
+			$extension = '.pdf';
+		}
 
-		$filename = $name . '-' . $suffix . '.pdf';
+		$filename = $name . '-' . $suffix . $extension;
 
 		// Filter filename
 		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );

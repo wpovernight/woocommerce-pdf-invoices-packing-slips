@@ -16,6 +16,7 @@ class Main {
 	public function __construct() {
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
+		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_ubl_ajax' ) );
 		
 		// mark/unmark printed
 		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
@@ -409,7 +410,15 @@ class Main {
 				if ( isset( $_REQUEST['output'] ) && in_array( $_REQUEST['output'], array( 'html', 'pdf' ) ) ) {
 					$output_format = $_REQUEST['output'];
 				}
+				
+				if ( isset( $_REQUEST['ubl'] ) ) {
+					$output_format = 'ubl';
+				}
+				
 				switch ( $output_format ) {
+					case 'ubl':
+						$document->output_ubl();
+						break;
 					case 'html':
 						add_filter( 'wpo_wcpdf_use_path', '__return_false' );
 						$document->output_html();
@@ -429,6 +438,10 @@ class Main {
 			}
 		} catch ( \Dompdf\Exception $e ) {
 			$message = 'DOMPDF Exception: '.$e->getMessage();
+			wcpdf_log_error( $message, 'critical', $e );
+			wcpdf_output_error( $message, 'critical', $e );
+		} catch ( \WPO\WC\PDF_Invoices\Makers\UBL\Exceptions\FileWriteException $e ) {
+			$message = 'UBL Exception: '.$e->getMessage();
 			wcpdf_log_error( $message, 'critical', $e );
 			wcpdf_output_error( $message, 'critical', $e );
 		} catch ( \Exception $e ) {

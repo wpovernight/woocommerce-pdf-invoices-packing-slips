@@ -424,6 +424,16 @@ class Admin {
 			'side',
 			'default'
 		);
+		
+		// create UBL buttons
+		add_meta_box(
+			'wpo_wcpdf-ubl-box',
+			__( 'Create UBL', 'woocommerce-pdf-invoices-packing-slips' ),
+			array( $this, 'ubl_actions_meta_box' ),
+			$screen_id,
+			'side',
+			'default'
+		);
 
 		// Invoice number & date
 		add_meta_box(
@@ -473,7 +483,7 @@ class Admin {
 	}
 
 	/**
-	 * Create the meta box content on the single order page
+	 * Create the PDF meta box content on the single order page
 	 */
 	public function pdf_actions_meta_box( $post_or_order_object ) {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
@@ -482,10 +492,11 @@ class Admin {
 
 		$meta_box_actions = array();
 		$documents        = WPO_WCPDF()->documents->get_documents();
+		
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-				$pdf_url               = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+				$document_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
 				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 				$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
@@ -504,7 +515,7 @@ class Admin {
 				}
 				
 				$meta_box_actions[$document->get_type()] = array(
-					'url'                   => esc_url( $pdf_url ),
+					'url'                   => esc_url( $document_url ),
 					'alt'                   => "PDF " . $document_title,
 					'title'                 => "PDF " . $document_title,
 					'exists'                => $document_exists,
@@ -546,6 +557,65 @@ class Admin {
 					$printed_data
 				);
 			}
+			?>
+		</ul>
+		<?php
+	}
+	
+	/**
+	 * Create the UBL meta box content on the single order page
+	 */
+	public function ubl_actions_meta_box( $post_or_order_object ) {
+		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		
+		$this->disable_storing_document_settings();
+
+		$meta_box_actions = array();
+		$documents        = WPO_WCPDF()->documents->get_documents();
+		
+		foreach ( $documents as $document ) {
+			if ( in_array( 'ubl', $document->outputs ) ) {
+				$document_title = $document->get_title();
+				if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+					$document_url      = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'ubl' => 'yes' ] );
+					$document_title    = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+					$document_settings = get_option( "wpo_wcpdf_documents_settings_{$document->get_type()}_ubl" ); // $document-settings might be not updated with the last settings
+					$enabled           = ( $document_settings && isset( $document_settings['enabled'] ) ) ? true : false;
+					$class             = [ $document->get_type() ];
+					
+					if ( $enabled ) {
+						$meta_box_actions[$document->get_type()] = array(
+							'url'   => esc_url( $document_url ),
+							'alt'   => "UBL " . $document_title,
+							'title' => "UBL " . $document_title,
+							'class' => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
+						);
+					}
+				}
+			}
+		}
+		
+		$meta_box_actions = apply_filters( 'wpo_wcpdf_ubl_meta_box_actions', $meta_box_actions, $order->get_id() );
+		if ( empty( $meta_box_actions ) ) {
+			return;
+		}
+		?>
+		<ul class="wpo_wcpdf-ubl-actions">
+			<?php
+				foreach ( $meta_box_actions as $document_type => $data ) {
+					$url   = isset( $data['url'] ) ? esc_attr( $data['url'] ) : '';
+					$class = isset( $data['class'] ) ? esc_attr( $data['class'] ) : '';
+					$alt   = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
+					$title = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
+					
+					printf(
+						'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s</a></li>',
+						$url,
+						$class,
+						$alt,
+						$title
+					);
+				}
 			?>
 		</ul>
 		<?php

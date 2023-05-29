@@ -174,8 +174,14 @@ class Invoice extends Order_Document_Methods {
 		} else {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
+		
+		if ( isset( $args['ubl'] ) ) {
+			$extension = '.xml';
+		} else {
+			$extension = '.pdf';
+		}
 
-		$filename = $name . '-' . $suffix . '.pdf';
+		$filename = $name . '-' . $suffix . $extension;
 
 		// Filter filename
 		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );
@@ -199,11 +205,11 @@ class Invoice extends Order_Document_Methods {
 			switch ( $output ) {
 				default:
 				case 'pdf':
-					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->slug}";
-					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
+					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
+					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
 					break;
 				case 'ubl':
-					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->slug}_{$output}";
+					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output}";
 					$settings_fields = $this->get_ubl_settings_fields( $option_name );
 					break;
 			}

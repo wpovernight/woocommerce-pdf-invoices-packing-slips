@@ -56,8 +56,14 @@ class Packing_Slip extends Order_Document_Methods {
 		} else {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
+		
+		if ( isset( $args['ubl'] ) ) {
+			$extension = '.xml';
+		} else {
+			$extension = '.pdf';
+		}
 
-		$filename = $name . '-' . $suffix . '.pdf';
+		$filename = $name . '-' . $suffix . $extension;
 
 		// Filter filename
 		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );

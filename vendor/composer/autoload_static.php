@@ -7,6 +7,9 @@ namespace Composer\Autoload;
 class ComposerStaticInita44f2cb79329ce99e54227132018137a
 {
     public static $files = array (
+        '383eaff206634a77a1be54e64e6459c7' => __DIR__ . '/..' . '/sabre/uri/lib/functions.php',
+        '3569eecfeed3bcf0bad3c998a494ecb8' => __DIR__ . '/..' . '/sabre/xml/lib/Deserializer/functions.php',
+        '93aa591bc4ca510c520999e34229ee79' => __DIR__ . '/..' . '/sabre/xml/lib/Serializer/functions.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
     );
@@ -17,6 +20,8 @@ class ComposerStaticInita44f2cb79329ce99e54227132018137a
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
             'Svg\\' => 4,
+            'Sabre\\Xml\\' => 10,
+            'Sabre\\Uri\\' => 10,
             'Sabberworm\\CSS\\' => 15,
         ),
         'M' => 
@@ -45,6 +50,14 @@ class ComposerStaticInita44f2cb79329ce99e54227132018137a
         'Svg\\' => 
         array (
             0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg',
+        ),
+        'Sabre\\Xml\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sabre/xml/lib',
+        ),
+        'Sabre\\Uri\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sabre/uri/lib',
         ),
         'Sabberworm\\CSS\\' => 
         array (

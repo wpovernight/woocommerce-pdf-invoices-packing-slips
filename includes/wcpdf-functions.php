@@ -123,10 +123,27 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
 	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
 	
 	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/pdf/class-wcpdf-pdf-maker.php' );
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/pdf/class-pdf-maker.php' );
 	}
 	
 	return new $class( $html, $settings, $document );
+}
+
+/**
+ * Get UBL Maker
+ * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
+ * 
+ * @return WPO\WC\PDF_Invoices\Makers\UBL\UBL_Maker
+ */
+function wcpdf_get_ubl_maker() {
+	$class = '\\WPO\\WC\\PDF_Invoices\\Makers\\UBL\\UBL_Maker';
+	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
+	
+	if ( ! class_exists( $class ) ) {
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/ubl/class-ubl-maker.php' );
+	}
+	
+	return new $class();
 }
 
 /**
@@ -158,6 +175,19 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 			break;
 	}
 	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
+}
+
+function wcpdf_ubl_headers( $filename, $size ) {
+	header( 'Content-Description: File Transfer ');
+	header( 'Content-Type: application/xml ');
+	header( 'Content-Disposition: attachment; filename=' . $filename );
+	header( 'Content-Transfer-Encoding: binary ');
+	header( 'Connection: Keep-Alive ');
+	header( 'Expires: 0 ');
+	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0 ');
+	header( 'Pragma: public ');
+	header( 'Content-Length: ' . $size );
+	do_action( 'wpo_after_ubl_headers', $filename, $size );
 }
 
 /**
@@ -194,10 +224,9 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 /**
  * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
  */
-function wcpdf_log_error( $message, $level = 'error', $e = null ) {
+function wcpdf_log_error( $message, $level = 'error', $e = null, $context = array( 'source' => 'wpo-wcpdf' ) ) {
 	if ( function_exists( 'wc_get_logger' ) ) {
 		$logger = wc_get_logger();
-		$context = array( 'source' => 'wpo-wcpdf' );
 
 		if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ) {
 			$message = sprintf( '%s (%s:%d)', $message, $e->getFile(), $e->getLine() );
