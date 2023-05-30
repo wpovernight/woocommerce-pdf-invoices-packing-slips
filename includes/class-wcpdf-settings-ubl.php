@@ -22,6 +22,9 @@ class Settings_UBL {
 		add_action( 'admin_init', array( $this, 'init_general_settings' ) );
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_ubl', array( $this, 'output' ), 10, 1 );
+		
+		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
+		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
 	}
 
 	public function output( $active_section ) {
@@ -155,6 +158,68 @@ class Settings_UBL {
 		);
 
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+	}
+	
+	public function save_taxes_on_order_totals( $and_taxes, $order ) {
+		// it seems $and taxes is mostly false, meaning taxes are calculated separately,
+		// but we still update just in case anything changed
+		if ( ! empty( $order ) ) {
+			$this->save_order_taxes( $order );
+		}
+	}
+	
+	public function save_taxes_on_checkout( $order_id, $posted_data, $order ) {
+		if ( empty( $order ) && ! empty( $order_id ) ) {
+			$order = wc_get_order( $order_id );
+		}
+		
+		if ( $order ) {
+			$this->save_order_taxes( $order );
+		}
+	}
+	
+	public function save_order_taxes( $order ) {
+		foreach ( $order->get_taxes() as $item_id => $tax_item ) {
+			if ( is_a( $tax_item, '\WC_Order_Item_Tax' ) && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
+				// get tax rate id from item
+				$tax_rate_id = $tax_item->get_rate_id();
+				
+				// read tax rate data from db
+				if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
+					$tax_rate = \WC_Tax::_get_tax_rate( $tax_rate_id, OBJECT );
+					if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
+						// store percentage in tax item meta
+						wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
+
+						$ubl_tax_settings = get_option('wpo_wcpdf_settings_ubl_taxes');
+
+						$category       = isset( $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] ) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] : '';
+						$scheme         = isset( $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] ) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] : '';
+						$tax_rate_class = $tax_rate->tax_rate_class;
+						
+						if ( empty( $tax_rate_class ) ) {
+							$tax_rate_class = 'standard';
+						}
+
+						if ( empty( $category ) ) {
+							$category = isset( $ubl_tax_settings['class'][$tax_rate_class]['category'] ) ? $ubl_tax_settings['class'][$tax_rate_class]['category'] : '';
+						}
+
+						if ( empty( $scheme ) ) {
+							$scheme = isset( $ubl_tax_settings['class'][$tax_rate_class]['scheme'] ) ? $ubl_tax_settings['class'][$tax_rate_class]['scheme'] : '';
+						}
+
+						if ( ! empty( $category ) ) {
+							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_category', $category );
+						}
+
+						if ( ! empty( $scheme ) ) {
+							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_scheme', $scheme );
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

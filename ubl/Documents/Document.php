@@ -93,18 +93,18 @@ abstract class Document
 					wc_update_order_item_meta($tax_item_key, '_wcpdf_rate_percentage', $percentage);
 				}
 
-				$category = wc_get_order_item_meta($tax_item_key, '_wcpdf_rate_category', true);
+				$category = wc_get_order_item_meta($tax_item_key, '_wcpdf_ubl_tax_category', true);
 
 				if ( empty( $category ) ) {
 					$category = $this->getCategoryFromFallback($tax_data, $tax_item['rate_id']);
-					wc_update_order_item_meta($tax_item_key, '_wcpdf_rate_category', $category);
+					wc_update_order_item_meta($tax_item_key, '_wcpdf_ubl_tax_category', $category);
 				}
 
-				$scheme = wc_get_order_item_meta($tax_item_key, '_wcpdf_rate_scheme', true);
+				$scheme = wc_get_order_item_meta($tax_item_key, '_wcpdf_ubl_tax_scheme', true);
 
 				if ( empty( $scheme ) ) {
 					$scheme = $this->getSchemeFromFallback($tax_data, $tax_item['rate_id']);
-					wc_update_order_item_meta($tax_item_key, '_wcpdf_rate_scheme', $scheme);
+					wc_update_order_item_meta($tax_item_key, '_wcpdf_ubl_tax_scheme', $scheme);
 				}
 			}
 

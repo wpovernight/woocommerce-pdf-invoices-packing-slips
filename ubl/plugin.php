@@ -12,18 +12,18 @@ class Plugin { // to remove
 		// add_action( 'admin_init', [ $this, 'generateUbl' ], 20 );
 		// add_filter( 'wpo_wcpdf_meta_box_actions', [ $this, 'metaBoxActions'], 10, 2 );
 
-		add_action( 'wpo_wcpdf_export_bulk_template_type_options', [ $this, 'addUblOptions' ], 10 );
-		add_filter( 'wpo_wcpdf_export_bulk_create_file', [ $this, 'ublBulkHandler' ], 10, 3 );
-		add_action( 'wpo_wcpdf_export_bulk_get_orders_args', [ $this, 'ublBulkArgs' ], 10, 1 );
-		add_action( 'wpo_wcpdf_cloud_storage_upload_by_status', [ $this, 'uploadByStatus' ], 10, 4 );
+		add_action( 'wpo_wcpdf_export_bulk_template_type_options', [ $this, 'addUblOptions' ], 10 );  // Pro
+		add_filter( 'wpo_wcpdf_export_bulk_create_file', [ $this, 'ublBulkHandler' ], 10, 3 );        // Pro
+		add_action( 'wpo_wcpdf_export_bulk_get_orders_args', [ $this, 'ublBulkArgs' ], 10, 1 );       // Pro
+		add_action( 'wpo_wcpdf_cloud_storage_upload_by_status', [ $this, 'uploadByStatus' ], 10, 4 ); // Pro
 		
 		//add_action( 'woocommerce_admin_order_actions_end', [ $this, 'addListingAction' ] );
 		// if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 		// 	add_filter( 'bulk_actions-edit-shop_order', array( $this, 'addBulkAction' ), 30 );
 		// }
 
-		add_action( 'woocommerce_checkout_order_processed', [ $this, 'saveTaxRateDetailsRecalculateFrontend' ], 10, 2 );
-		add_action( 'woocommerce_order_after_calculate_totals', [ $this, 'saveTaxRateDetailsRecalculate' ], 10, 2 );
+		//add_action( 'woocommerce_checkout_order_processed', [ $this, 'saveTaxRateDetailsRecalculateFrontend' ], 10, 2 );
+		//add_action( 'woocommerce_order_after_calculate_totals', [ $this, 'saveTaxRateDetailsRecalculate' ], 10, 2 );
 		
 		add_action( 'woocommerce_email_attachments', [ $this, 'attachToEmail' ], 10, 3 );
 
@@ -33,7 +33,7 @@ class Plugin { // to remove
 		//add_action( 'admin_init', [ $this, 'init_general_settings' ] );
 		//add_action( 'admin_init', [ $this, 'initTaxSettings' ] );
 		
-		add_action( 'admin_enqueue_scripts', [ $this, 'loadAdminAssets' ] );
+		//add_action( 'admin_enqueue_scripts', [ $this, 'loadAdminAssets' ] );
 	}
 
 	// public function init_general_settings() {
@@ -372,67 +372,67 @@ class Plugin { // to remove
 		return $args;
 	}
 
-	/**
-	 * Save specific tax rate details in tax meta every time totals are calculated
-	 * @param  bool $and_taxes Calc taxes if true.
-	 * @param  WC_Order $order Order object.
-	 * @return void
-	 */
-	public function saveTaxRateDetailsRecalculate( $and_taxes, $order ) {
-		// it seems $and taxes is mostly false, meaning taxes are calculated separately,
-		// but we still update just in case anything changed
-		$this->saveTaxRateDetails( $order );
-	}
+	// /**
+	//  * Save specific tax rate details in tax meta every time totals are calculated
+	//  * @param  bool $and_taxes Calc taxes if true.
+	//  * @param  WC_Order $order Order object.
+	//  * @return void
+	//  */
+	// public function saveTaxRateDetailsRecalculate( $and_taxes, $order ) {
+	// 	// it seems $and taxes is mostly false, meaning taxes are calculated separately,
+	// 	// but we still update just in case anything changed
+	// 	$this->saveTaxRateDetails( $order );
+	// }
 
-	public function saveTaxRateDetailsRecalculateFrontend( $order_id, $posted ) {
-		if ( $order = wc_get_order( $order_id ) ) {
-			$this->saveTaxRateDetails( $order );
-		}
-	}
+	// public function saveTaxRateDetailsRecalculateFrontend( $order_id, $posted ) {
+	// 	if ( $order = wc_get_order( $order_id ) ) {
+	// 		$this->saveTaxRateDetails( $order );
+	// 	}
+	// }
 
-	public function saveTaxRateDetails( $order ) {
-		foreach ( $order->get_taxes() as $item_id => $tax_item ) {
-			if ( is_a( $tax_item, '\WC_Order_Item_Tax' ) && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
-				// get tax rate id from item
-				$tax_rate_id = $tax_item->get_rate_id();
+	// public function saveTaxRateDetails( $order ) {
+	// 	foreach ( $order->get_taxes() as $item_id => $tax_item ) {
+	// 		if ( is_a( $tax_item, '\WC_Order_Item_Tax' ) && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
+	// 			// get tax rate id from item
+	// 			$tax_rate_id = $tax_item->get_rate_id();
 				
-				// read tax rate data from db
-				if ( class_exists('\WC_TAX') && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
-					$tax_rate = \WC_Tax::_get_tax_rate( $tax_rate_id, OBJECT );
-					if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-						// store percentage in tax item meta
-						wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
+	// 			// read tax rate data from db
+	// 			if ( class_exists('\WC_TAX') && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
+	// 				$tax_rate = \WC_Tax::_get_tax_rate( $tax_rate_id, OBJECT );
+	// 				if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
+	// 					// store percentage in tax item meta
+	// 					wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
 
-						$ubl_tax_settings = get_option('wpo_wcpdf_settings_ubl_taxes');
+	// 					$ubl_tax_settings = get_option('wpo_wcpdf_settings_ubl_taxes');
 
-						$category = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] : '';
-						$scheme = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] : '';
+	// 					$category = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] : '';
+	// 					$scheme = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] : '';
 
-						$tax_rate_class = $tax_rate->tax_rate_class;
-						if ( empty($tax_rate_class) ) {
-							$tax_rate_class = 'standard';
-						}
+	// 					$tax_rate_class = $tax_rate->tax_rate_class;
+	// 					if ( empty($tax_rate_class) ) {
+	// 						$tax_rate_class = 'standard';
+	// 					}
 
-						if ( empty( $category ) ) {
-							$category = isset($ubl_tax_settings['class'][$tax_rate_class]['category']) ? $ubl_tax_settings['class'][$tax_rate_class]['category'] : '';
-						}
+	// 					if ( empty( $category ) ) {
+	// 						$category = isset($ubl_tax_settings['class'][$tax_rate_class]['category']) ? $ubl_tax_settings['class'][$tax_rate_class]['category'] : '';
+	// 					}
 
-						if ( empty( $scheme ) ) {
-							$scheme = isset($ubl_tax_settings['class'][$tax_rate_class]['scheme']) ? $ubl_tax_settings['class'][$tax_rate_class]['scheme'] : '';
-						}
+	// 					if ( empty( $scheme ) ) {
+	// 						$scheme = isset($ubl_tax_settings['class'][$tax_rate_class]['scheme']) ? $ubl_tax_settings['class'][$tax_rate_class]['scheme'] : '';
+	// 					}
 
-						if ( ! empty( $category ) ) {
-							wc_update_order_item_meta( $item_id, '_wcpdf_rate_category', $category );
-						}
+	// 					if ( ! empty( $category ) ) {
+	// 						wc_update_order_item_meta( $item_id, '_wcpdf_rate_category', $category );
+	// 					}
 
-						if ( ! empty( $scheme ) ) {
-							wc_update_order_item_meta( $item_id, '_wcpdf_rate_scheme', $scheme );
-						}
-					}
-				}
-			}
-		}
-	}
+	// 					if ( ! empty( $scheme ) ) {
+	// 						wc_update_order_item_meta( $item_id, '_wcpdf_rate_scheme', $scheme );
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	// public function addTaxesSettingTab($tabs) {
 	// 	$tabs['ubl'] = __('UBL', 'woocommerce-pdf-invoices-packing-slips');
@@ -474,33 +474,33 @@ class Plugin { // to remove
 	// 	}
 	// }
 	
-	public function isOrderPage() {
-		$screen = get_current_screen();
-		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ) ) ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	// public function isOrderPage() {
+	// 	$screen = get_current_screen();
+	// 	if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ) ) ) {
+	// 		return true;
+	// 	} else {
+	// 		return false;
+	// 	}
+	// }
 	
-	public function loadAdminAssets() {
-		if ( $this->isOrderPage() ) {
-			wp_enqueue_script(
-				'wpo-wcpdf-ubl',
-				WPO_WCPDF()->plugin_url() . '/assets/js/ubl-scripts.js',
-				[ 'jquery' ],
-				$this->version,
-				true
-			);
-			wp_localize_script(
-				'wpo-wcpdf-ubl',
-				'wpo_wcpdf_ubl',
-				[
-					'adminUrl'         => admin_url( 'post.php' ),
-					'noSelectedOrders' => __( 'You have to select order(s) first!' )
-				]
-			);
-		}
-	}
+	// public function loadAdminAssets() {
+	// 	if ( $this->isOrderPage() ) {
+	// 		wp_enqueue_script(
+	// 			'wpo-wcpdf-ubl',
+	// 			WPO_WCPDF()->plugin_url() . '/assets/js/ubl-scripts.js',
+	// 			[ 'jquery' ],
+	// 			$this->version,
+	// 			true
+	// 		);
+	// 		wp_localize_script(
+	// 			'wpo-wcpdf-ubl',
+	// 			'wpo_wcpdf_ubl',
+	// 			[
+	// 				'adminUrl'         => admin_url( 'post.php' ),
+	// 				'noSelectedOrders' => __( 'You have to select order(s) first!' )
+	// 			]
+	// 		);
+	// 	}
+	// }
 
 }
