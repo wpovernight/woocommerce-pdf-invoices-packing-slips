@@ -25,7 +25,7 @@ class Plugin { // to remove
 		//add_action( 'woocommerce_checkout_order_processed', [ $this, 'saveTaxRateDetailsRecalculateFrontend' ], 10, 2 );
 		//add_action( 'woocommerce_order_after_calculate_totals', [ $this, 'saveTaxRateDetailsRecalculate' ], 10, 2 );
 		
-		add_action( 'woocommerce_email_attachments', [ $this, 'attachToEmail' ], 10, 3 );
+		//add_action( 'woocommerce_email_attachments', [ $this, 'attachToEmail' ], 10, 3 );
 
 		//add_filter( 'wpo_wcpdf_settings_tabs', [ $this, 'addTaxesSettingTab' ], 10, 1 );
 		//add_action( 'wpo_wcpdf_settings_output_ubl', [ $this, 'taxesSettingTabOutput' ], 10, 1 );
@@ -140,79 +140,79 @@ class Plugin { // to remove
 	// 	WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	// }
 
-	public function attachToEmail( $attachments, $email_id, $order ) {
-		// check if all variables properly set
-		if ( !is_object( $order ) || !isset( $email_id ) ) {
-			return $attachments;
-		}
+	// public function attachToEmail( $attachments, $email_id, $order ) {
+	// 	// check if all variables properly set
+	// 	if ( !is_object( $order ) || !isset( $email_id ) ) {
+	// 		return $attachments;
+	// 	}
 
-		// Skip User emails
-		if ( get_class( $order ) == 'WP_User' ) {
-			return $attachments;
-		}
+	// 	// Skip User emails
+	// 	if ( get_class( $order ) == 'WP_User' ) {
+	// 		return $attachments;
+	// 	}
 
-		$order_id = $order->get_id();
+	// 	$order_id = $order->get_id();
 
-		if ( get_class( $order ) !== 'WC_Order' && $order_id == false ) {
-			return $attachments;
-		}
+	// 	if ( get_class( $order ) !== 'WC_Order' && $order_id == false ) {
+	// 		return $attachments;
+	// 	}
 
-		// WooCommerce Booking compatibility
-		if ( get_post_type( $order_id ) == 'wc_booking' && isset($order->order) ) {
-			// $order is actually a WC_Booking object!
-			$order = $order->order;
-		}
+	// 	// WooCommerce Booking compatibility
+	// 	if ( get_post_type( $order_id ) == 'wc_booking' && isset($order->order) ) {
+	// 		// $order is actually a WC_Booking object!
+	// 		$order = $order->order;
+	// 	}
 
-		// do not process low stock notifications, user emails etc!
-		if ( in_array( $email_id, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) || get_post_type( $order_id ) != 'shop_order' ) {
-			return $attachments;
-		}
+	// 	// do not process low stock notifications, user emails etc!
+	// 	if ( in_array( $email_id, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) || get_post_type( $order_id ) != 'shop_order' ) {
+	// 		return $attachments;
+	// 	}
 
-		$settings = get_option( 'ubl_wc_general', array() );
-		if (empty($settings['attach_to_email_ids'])) {
-			return $attachments;
-		}
+	// 	$settings = get_option( 'ubl_wc_general', array() );
+	// 	if (empty($settings['attach_to_email_ids'])) {
+	// 		return $attachments;
+	// 	}
 
-		if ( in_array( $email_id, array_keys( $settings['attach_to_email_ids'] ) ) ) {
-			$writer = wcpdf_get_ubl_maker();
-			$writer->setFilePath( WPO_WCPDF()->main->get_tmp_path('attachments') );
+	// 	if ( in_array( $email_id, array_keys( $settings['attach_to_email_ids'] ) ) ) {
+	// 		$writer = wcpdf_get_ubl_maker();
+	// 		$writer->setFilePath( WPO_WCPDF()->main->get_tmp_path('attachments') );
 
-			$document = new UblDocument();
-			$document->setOrder($order);
-			if ( $invoice = wcpdf_get_invoice( $document->order, true ) ) {
-				$document->setInvoice( $invoice );
-			} else {
-				$message = 'Error generating invoice';
-				wcpdf_log_error( $message, 'error', null, $this->context );
-				return $attachments;
-			}
+	// 		$document = new UblDocument();
+	// 		$document->setOrder($order);
+	// 		if ( $invoice = wcpdf_get_invoice( $document->order, true ) ) {
+	// 			$document->setInvoice( $invoice );
+	// 		} else {
+	// 			$message = 'Error generating invoice';
+	// 			wcpdf_log_error( $message, 'error', null, $this->context );
+	// 			return $attachments;
+	// 		}
 
-			$builder  = new SabreBuilder();
-			$contents = $builder->build($document);
-			$filename = str_ireplace( '.pdf', '.xml', $document->order_document->get_filename() );
+	// 		$builder  = new SabreBuilder();
+	// 		$contents = $builder->build($document);
+	// 		$filename = str_ireplace( '.pdf', '.xml', $document->order_document->get_filename() );
 
-			try {
-				$fullFileName = $writer->write($filename, $contents);
+	// 		try {
+	// 			$fullFileName = $writer->write($filename, $contents);
 
-				// custom attachment condition
-				if ( true === apply_filters( 'wpo_wcpdf_custom_ubl_attachment_condition', true, $order, $email_id, $document ) ) {
-					// $success[$order_id] = $fullFileName;
-					$attachments[] = $fullFileName;
-				}
-			} catch( FileWriteException $e ) {
-				wcpdf_log_error( $e, 'error', $e, $this->context );
-			}
+	// 			// custom attachment condition
+	// 			if ( true === apply_filters( 'wpo_wcpdf_custom_ubl_attachment_condition', true, $order, $email_id, $document ) ) {
+	// 				// $success[$order_id] = $fullFileName;
+	// 				$attachments[] = $fullFileName;
+	// 			}
+	// 		} catch( FileWriteException $e ) {
+	// 			wcpdf_log_error( $e, 'error', $e, $this->context );
+	// 		}
 
-			try {
-				// hook used to upload UBL do cloud service
-				do_action( 'wpo_wc_ubl_attachment_file', $fullFileName, $order );
-			} catch( \Throwable $e ) {
-				wcpdf_log_error( $e, 'error', $e, $this->context );
-			}
-		}
+	// 		try {
+	// 			// hook used to upload UBL do cloud service
+	// 			do_action( 'wpo_wc_ubl_attachment_file', $fullFileName, $order );
+	// 		} catch( \Throwable $e ) {
+	// 			wcpdf_log_error( $e, 'error', $e, $this->context );
+	// 		}
+	// 	}
 
-		return $attachments;
-	}
+	// 	return $attachments;
+	// }
 
 	// public function generateUbl() {
 	// 	if ( ! isset($_GET['ubl'] ) || $_GET['ubl'] !== 'yes' ) {

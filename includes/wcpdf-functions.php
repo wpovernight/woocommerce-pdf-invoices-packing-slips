@@ -117,11 +117,8 @@ function wcpdf_get_bulk_actions() {
 		$actions[$document->get_type()] = "PDF " . $document->get_title();
 		
 		// ubl
-		if ( in_array( 'ubl', $document->output_formats ) ) {
-			$document_settings = $document->get_settings( true, 'ubl' );
-			if ( isset( $document_settings['enabled'] ) ) {
-				$actions[$document->get_type().'_ubl'] = "UBL " . $document->get_title();
-			}
+		if ( $document->is_enabled( 'ubl' ) ) {
+			$actions[$document->get_type().'_ubl'] = "UBL " . $document->get_title();
 		}
 	}
 

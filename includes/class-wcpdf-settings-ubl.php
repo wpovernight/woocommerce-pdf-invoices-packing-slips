@@ -191,7 +191,7 @@ class Settings_UBL {
 						// store percentage in tax item meta
 						wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
 
-						$ubl_tax_settings = get_option('wpo_wcpdf_settings_ubl_taxes');
+						$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
 
 						$category       = isset( $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] ) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] : '';
 						$scheme         = isset( $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] ) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] : '';

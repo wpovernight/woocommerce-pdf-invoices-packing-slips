@@ -577,13 +577,11 @@ class Admin {
 			if ( in_array( 'ubl', $document->output_formats ) ) {
 				$document_title = $document->get_title();
 				if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-					$document_url      = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => 'ubl' ] );
-					$document_title    = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-					$document_settings = get_option( "wpo_wcpdf_documents_settings_{$document->get_type()}_ubl" ); // $document-settings might be not updated with the last settings
-					$enabled           = ( $document_settings && isset( $document_settings['enabled'] ) ) ? true : false;
-					$class             = [ $document->get_type() ];
+					$document_url   = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => 'ubl' ] );
+					$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+					$class          = [ $document->get_type(), 'ubl' ];
 					
-					if ( $enabled ) {
+					if ( $document->is_enabled( 'ubl' ) ) {
 						$meta_box_actions[$document->get_type()] = array(
 							'url'   => esc_url( $document_url ),
 							'alt'   => "UBL " . $document_title,

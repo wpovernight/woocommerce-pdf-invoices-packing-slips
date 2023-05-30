@@ -60,7 +60,7 @@ abstract class Order_Document {
 	public $order_id;
 
 	/**
-	 * Document settings.
+	 * PDF document settings.
 	 * @var array
 	 */
 	public $settings;
@@ -78,7 +78,7 @@ abstract class Order_Document {
 	public $order_settings;
 
 	/**
-	 * TRUE if document is enabled.
+	 * TRUE if PDF document is enabled.
 	 * @var bool
 	 */
 	public $enabled;
@@ -132,6 +132,7 @@ abstract class Order_Document {
 
 		// load settings
 		$this->init_settings_data();
+		
 		// check enable
 		$this->enabled = $this->get_setting( 'enabled', false );
 		
@@ -146,9 +147,11 @@ abstract class Order_Document {
 	}
 
 	public function init_settings_data() {
-		$this->order_settings  = $this->get_order_settings();
-		$this->settings        = $this->get_settings();
-		$this->latest_settings = $this->get_settings( true );
+		// order
+		$this->order_settings      = $this->get_order_settings();
+		// pdf
+		$this->settings            = $this->get_settings();
+		$this->latest_settings     = $this->get_settings( true );
 	}
 
 	public function get_order_settings() {
@@ -246,27 +249,48 @@ abstract class Order_Document {
 		), $this );
 	}
 
-	public function get_setting( $key, $default = '' ) {
-		$non_historical_settings = $this->get_non_historical_settings();
-		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
-			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
+	public function get_setting( $key, $default = '', $format = 'pdf' ) {
+		if ( in_array( $format, $this->output_formats ) ) {
+			$settings        = $this->get_settings( false, $format );
+			$latest_settings = $this->get_settings( true, $format );
 		} else {
-			$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
+			$settings        = $this->settings;
+			$settings        = $this->latest_settings;
 		}
+		
+		$non_historical_settings = $this->get_non_historical_settings();
+		
+		if ( in_array( $key, $non_historical_settings ) && isset( $latest_settings ) ) {
+			$setting = isset( $latest_settings[$key] ) ? $latest_settings[$key] : $default;
+		} else {
+			$setting = isset( $settings[$key] ) ? $settings[$key] : $default;
+		}
+		
 		return $setting;
 	}
 
-	public function get_attach_to_email_ids() {
-		$email_ids = isset( $this->settings['attach_to_email_ids'] ) ? array_keys( array_filter( $this->settings['attach_to_email_ids'] ) ) : array();
-		return $email_ids;  
+	public function get_attach_to_email_ids( $format = 'pdf' ) {
+		if ( in_array( $format, $this->output_formats ) ) {
+			$settings = $this->get_settings( false, $format );
+		} else {
+			$settings = $this->settings;
+		}
+		
+		return isset( $settings['attach_to_email_ids'] ) ? array_keys( array_filter( $settings['attach_to_email_ids'] ) ) : array();
 	}
 
 	public function get_type() {
 		return $this->type;
 	}
 
-	public function is_enabled() {
-		return apply_filters( 'wpo_wcpdf_document_is_enabled', $this->enabled, $this->type );
+	public function is_enabled( $format = 'pdf' ) {
+		if ( in_array( $format, $this->output_formats ) ) {
+			$is_enabled = $this->get_setting( 'enabled', false, $format );
+		} else {
+			$is_enabled = $this->get_setting( 'enabled', false );
+		}
+		
+		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $format );
 	}
 
 	public function get_hook_prefix() {
@@ -947,19 +971,19 @@ abstract class Order_Document {
 			die();
 		}
 
-		$builder      = new SabreBuilder();
-		$contents     = $builder->build( $ubl_document );
-		$filename     = $order_document->get_filename( 'download', [ 'output' => 'ubl' ] );
-		$fullFileName = $ubl_maker->write( $filename, $contents );
-		$quoted       = sprintf( '"%s"', addcslashes( basename( $fullFileName ), '"\\' ) );
-		$size         = filesize( $fullFileName );
+		$builder       = new SabreBuilder();
+		$contents      = $builder->build( $ubl_document );
+		$filename      = $order_document->get_filename( 'download', [ 'output' => 'ubl' ] );
+		$full_filename = $ubl_maker->write( $filename, $contents );
+		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
+		$size          = filesize( $full_filename );
 
 		wcpdf_ubl_headers( $quoted, $size );
 
 		ob_clean();
 		flush();
-		readfile( $fullFileName );
-		unlink( $fullFileName );
+		readfile( $full_filename );
+		unlink( $full_filename );
 
 		die();
 	}
