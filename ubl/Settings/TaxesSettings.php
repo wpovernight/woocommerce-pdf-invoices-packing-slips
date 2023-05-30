@@ -11,12 +11,12 @@ class TaxesSettings
 
 	public function __construct()
 	{
-		$this->settings = get_option('ubl_wc_taxes');
+		$this->settings = get_option('wpo_wcpdf_settings_ubl_taxes');
 	}
 
 	public function output()
 	{
-		settings_fields( 'ubl_wc_taxes' );
+		settings_fields( 'wpo_wcpdf_settings_ubl_taxes' );
 
 		$rates = ['standard'];
 

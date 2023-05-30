@@ -27,7 +27,7 @@ class Plugin { // to remove
 		
 		add_action( 'woocommerce_email_attachments', [ $this, 'attachToEmail' ], 10, 3 );
 
-		add_filter( 'wpo_wcpdf_settings_tabs', [ $this, 'addTaxesSettingTab' ], 10, 1 );
+		//add_filter( 'wpo_wcpdf_settings_tabs', [ $this, 'addTaxesSettingTab' ], 10, 1 );
 		add_action( 'wpo_wcpdf_settings_output_ubl', [ $this, 'taxesSettingTabOutput' ], 10, 1 );
 
 		add_action( 'admin_init', [ $this, 'init_general_settings' ] );
@@ -403,7 +403,7 @@ class Plugin { // to remove
 						// store percentage in tax item meta
 						wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
 
-						$ubl_tax_settings = get_option('ubl_wc_taxes');
+						$ubl_tax_settings = get_option('wpo_wcpdf_settings_ubl_taxes');
 
 						$category = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] : '';
 						$scheme = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] : '';
@@ -434,10 +434,10 @@ class Plugin { // to remove
 		}
 	}
 
-	public function addTaxesSettingTab($tabs) {
-		$tabs['ubl'] = __('UBL', 'ubl-woocommerce-pdf-invoices');
-		return $tabs;
-	}
+	// public function addTaxesSettingTab($tabs) {
+	// 	$tabs['ubl'] = __('UBL', 'ubl-woocommerce-pdf-invoices');
+	// 	return $tabs;
+	// }
 
 	public function taxesSettingTabOutput( $active_section = '' ) {
 		if ( empty($active_section) ) {

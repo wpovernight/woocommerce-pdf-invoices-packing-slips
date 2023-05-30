@@ -17,8 +17,10 @@ class Settings {
 	public $general;
 	public $documents;
 	public $debug;
+	public $ubl;
 	public $general_settings;
 	public $debug_settings;
+	public $ubl_settings;
 	public $lock_name;
 	public $lock_context;
 	public $lock_time;
@@ -32,10 +34,12 @@ class Settings {
 		$this->general          = include( 'class-wcpdf-settings-general.php' );
 		$this->documents        = include( 'class-wcpdf-settings-documents.php' );
 		$this->debug            = include( 'class-wcpdf-settings-debug.php' );
+		$this->ubl              = include( 'class-wcpdf-settings-ubl.php' );
 		$this->upgrade          = include( 'class-wcpdf-settings-upgrade.php' );
 		
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+		$this->ubl_settings     = get_option( 'wpo_wcpdf_settings_ubl' );
 		
 		$this->lock_name        = 'wpo_wcpdf_semaphore_lock';
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
@@ -159,13 +163,17 @@ class Settings {
 		settings_errors();
 
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
-			'general'   => array(
+			'general' => array(
 				'title'          => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
-			'documents'	=> array(
+			'documents' => array(
 				'title'          => __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
+			),
+			'ubl' => array(
+				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
+				'preview_states' => 1,
 			),
 		) );
 

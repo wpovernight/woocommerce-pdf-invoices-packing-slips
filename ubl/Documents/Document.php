@@ -150,7 +150,7 @@ abstract class Document
 			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
 			if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-				$ubl_tax_settings = get_option('ubl_wc_taxes');
+				$ubl_tax_settings = get_option('wpo_wcpdf_settings_ubl_taxes');
 
 				$category = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] : '';
 
@@ -176,7 +176,7 @@ abstract class Document
 			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
 			if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-				$ubl_tax_settings = get_option('ubl_wc_taxes');
+				$ubl_tax_settings = get_option('wpo_wcpdf_settings_ubl_taxes');
 
 				$scheme = isset($ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme']) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] : '';
 
