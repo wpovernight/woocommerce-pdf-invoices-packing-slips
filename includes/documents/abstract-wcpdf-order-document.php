@@ -82,6 +82,12 @@ abstract class Order_Document {
 	 * @var bool
 	 */
 	public $enabled;
+	
+	/**
+	 * Linked output formats.
+	 * @var array
+	 */
+	public $output_formats = array();
 
 	/**
 	 * Linked documents, used for data retrieval
@@ -129,9 +135,9 @@ abstract class Order_Document {
 		// check enable
 		$this->enabled = $this->get_setting( 'enabled', false );
 		
-		// outputs
-		if ( ! isset( $this->outputs ) ) {
-			$this->outputs = apply_filters( "wpo_wcpdf_{$this->type}_outputs", [ 'pdf' ], $this );
+		// output formats
+		if ( ! isset( $this->output_formats ) ) {
+			$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf' ], $this );
 		}
 	}
 
@@ -942,7 +948,7 @@ abstract class Order_Document {
 
 		$builder      = new SabreBuilder();
 		$contents     = $builder->build( $ubl_document );
-		$filename     = $order_document->get_filename( 'download', [ 'ubl' => 'yes' ] );
+		$filename     = $order_document->get_filename( 'download', [ 'output' => 'ubl' ] );
 		$fullFileName = $ubl_maker->write( $filename, $contents );
 		$quoted       = sprintf( '"%s"', addcslashes( basename( $fullFileName ), '"\\' ) );
 		$size         = filesize( $fullFileName );
@@ -986,10 +992,18 @@ abstract class Order_Document {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
 		
-		if ( isset( $args['ubl'] ) ) {
-			$extension = '.xml';
-		} else {
-			$extension = '.pdf';
+		if ( empty( $args['output'] ) ) {
+			$args['output'] = 'pdf';
+		}
+		
+		switch ( $args['output'] ) {
+			default:
+			case 'pdf':
+				$extension = '.pdf';
+				break;
+			case 'ubl':
+				$extension = '.xml';
+				break;
 		}
 
 		$filename = $name . '-' . $suffix . $extension;

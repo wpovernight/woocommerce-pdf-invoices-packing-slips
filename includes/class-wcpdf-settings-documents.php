@@ -26,7 +26,7 @@ class Settings_Documents {
 	public function output( $section ) {
 		$section          = ! empty( $section ) ? $section : 'invoice';
 		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
-		$output           = isset( $_REQUEST['output'] ) ? esc_attr( $_REQUEST['output'] ) : 'pdf';
+		$output_format    = isset( $_REQUEST['output_format'] ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
 		$section_document = null;
 		
 		foreach ( $documents as $document ) {
@@ -57,15 +57,15 @@ class Settings_Documents {
 				?>
 			</ul>
 		</div>
-		<div class="wcpdf_document_settings_document_outputs">
+		<div class="wcpdf_document_settings_document_output_formats">
 			<?php 
-				if ( ! empty( $section_document->outputs ) ) {
+				if ( ! empty( $section_document->output_formats ) ) {
 					?>
 					<h2 class="nav-tab-wrapper">
 						<?php
-							foreach ( $section_document->outputs as $document_output ) {
-								$active = ( $output == $document_output ) || ( $output != 'pdf' && ! in_array( $output, $section_document->outputs ) ) ? 'nav-tab-active' : '';
-								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output', $document_output ) ), esc_attr( $document_output ), $active, strtoupper( esc_html( $document_output ) ) );
+							foreach ( $section_document->output_formats as $document_output_format ) {
+								$active = ( $output_format == $document_output_format ) || ( $output_format != 'pdf' && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
+								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), $active, strtoupper( esc_html( $document_output_format ) ) );
 							}
 						?>
 					</h2>
@@ -74,12 +74,12 @@ class Settings_Documents {
 			?>
 		</div>
 		<?php
-			$output_compatible = false;
-			if ( $output != 'pdf' && in_array( $output, $section_document->outputs ) ) {
-				$output_compatible = true;
+			$output_format_compatible = false;
+			if ( $output_format != 'pdf' && in_array( $output_format, $section_document->output_formats ) ) {
+				$output_format_compatible = true;
 			}
 			
-			$option_name = ( $output == 'pdf' || ! $output_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output}";
+			$option_name = ( $output_format == 'pdf' || ! $output_format_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output_format}";
 			settings_fields( $option_name );
 			do_settings_sections( $option_name );
 			submit_button();

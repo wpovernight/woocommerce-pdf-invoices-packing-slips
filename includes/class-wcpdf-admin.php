@@ -574,10 +574,10 @@ class Admin {
 		$documents        = WPO_WCPDF()->documents->get_documents();
 		
 		foreach ( $documents as $document ) {
-			if ( in_array( 'ubl', $document->outputs ) ) {
+			if ( in_array( 'ubl', $document->output_formats ) ) {
 				$document_title = $document->get_title();
 				if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
-					$document_url      = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'ubl' => 'yes' ] );
+					$document_url      = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => 'ubl' ] );
 					$document_title    = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 					$document_settings = get_option( "wpo_wcpdf_documents_settings_{$document->get_type()}_ubl" ); // $document-settings might be not updated with the last settings
 					$enabled           = ( $document_settings && isset( $document_settings['enabled'] ) ) ? true : false;
@@ -855,7 +855,7 @@ class Admin {
 	 * Add actions to menu, WP3.5+
 	 */
 	public function bulk_actions( $actions ) {
-		foreach ($this->get_bulk_actions() as $action => $title) {
+		foreach ( $this->get_bulk_actions() as $action => $title ) {
 			$actions[$action] = $title;
 		}
 		return $actions;
@@ -879,9 +879,9 @@ class Admin {
 	}
 
 	public function get_bulk_actions() {
-		$actions = array();
+		$actions   = array();
 		$documents = WPO_WCPDF()->documents->get_documents();
-		foreach ($documents as $document) {
+		foreach ( $documents as $document ) {
 			$actions[$document->get_type()] = "PDF " . $document->get_title();
 		}
 

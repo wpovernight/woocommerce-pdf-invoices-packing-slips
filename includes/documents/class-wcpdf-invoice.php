@@ -28,7 +28,7 @@ class Invoice extends Order_Document_Methods {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
-	public $outputs;
+	public $output_formats;
 	
 	/**
 	 * Init/load the order object.
@@ -37,19 +37,19 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type         = 'invoice';
-		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-		$this->slug         = str_replace( '-', '_', $this->type );
+		$this->type           = 'invoice';
+		$this->title          = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon           = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->slug           = str_replace( '-', '_', $this->type );
 		
 		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_number_lock";
-		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
+		$this->lock_name      = "wpo_wcpdf_{$this->slug}_number_lock";
+		$this->lock_context   = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
+		$this->lock_time      = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
+		$this->lock_retries   = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
 		
-		// outputs
-		$this->outputs      = apply_filters( "wpo_wcpdf_{$this->type}_outputs", [ 'pdf', 'ubl' ], $this );
+		// output formats
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf', 'ubl' ], $this );
 		
 		// Call parent constructor
 		parent::__construct( $order );
@@ -175,10 +175,18 @@ class Invoice extends Order_Document_Methods {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
 		
-		if ( isset( $args['ubl'] ) ) {
-			$extension = '.xml';
-		} else {
-			$extension = '.pdf';
+		if ( empty( $args['output'] ) ) {
+			$args['output'] = 'pdf';
+		}
+		
+		switch ( $args['output'] ) {
+			default:
+			case 'pdf':
+				$extension = '.pdf';
+				break;
+			case 'ubl':
+				$extension = '.xml';
+				break;
 		}
 
 		$filename = $name . '-' . $suffix . $extension;
@@ -198,25 +206,25 @@ class Invoice extends Order_Document_Methods {
 	public function init_settings() {
 		do_action( "wpo_wcpdf_before_{$this->type}_init_settings", $this );
 		
-		foreach ( $this->outputs as $output ) {
+		foreach ( $this->output_formats as $output_format ) {
 			$page = $option_group = $option_name = '';
 			$settings_fields = [];
 			
-			switch ( $output ) {
+			switch ( $output_format ) {
 				default:
 				case 'pdf':
 					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
 					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
 					break;
 				case 'ubl':
-					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output}";
+					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output_format}";
 					$settings_fields = $this->get_ubl_settings_fields( $option_name );
 					break;
 			}
 			
 			if ( ! empty( $settings_fields ) ) {
 				// allow plugins to alter settings fields
-				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_{$output}", $settings_fields, $page, $option_group, $option_name, $this );
+				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_{$output_format}", $settings_fields, $page, $option_group, $option_name, $this );
 				WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 			}
 		}

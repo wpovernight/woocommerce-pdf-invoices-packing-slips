@@ -524,6 +524,18 @@ class Settings_Debug {
 					'description' => __( 'Disables the document preview on the plugin settings pages.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'disable_ubl',
+				'title'    => __( 'Disable UBL format', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'disable_ubl',
+					'description' => __( 'Disables the UBL document format.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
 		);
 
 		// allow plugins to alter settings fields
