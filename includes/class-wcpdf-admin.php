@@ -676,27 +676,38 @@ class Admin {
 							</p>
 						</div>
 						<?php endif; ?>
-						<?php if( isset( $data['display_date'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
-							<p class="form-field form-field-wide">
-								<p>
-									<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['display_date']['value'] ); ?></span>
+						<div class='pdf-hide pdf-more-details'>
+							<?php if( isset( $data['display_date'] ) ) : ?>
+							<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
+								<p class="form-field form-field-wide">
+									<p>
+										<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
+										<span><?= esc_attr( $data['display_date']['value'] ); ?></span>
+									</p>
 								</p>
-							</p>
-						</div>
-						<?php endif; ?>
-						<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
-							<p class="form-field form-field-wide">
-								<p>
-									<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
+							</div>
+							<?php endif; ?>
+							<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
+							<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
+								<p class="form-field form-field-wide">
+									<p>
+										<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
+										<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
+									</p>
 								</p>
-							</p>
+							</div>
+							<?php endif; ?>
 						</div>
-						<?php endif; ?>	
-											
+						<?php if ( isset( $data['display_date'] ) || isset( $data['creation_trigger'] ) ) : ?>
+							<div>
+								<a href='#' class='view-more'>
+									<?php _e( 'View more details', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+								</a>
+								<a href='#' class='hide-details pdf-hide'>
+									<?php _e( 'Hide details', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+								</a>
+							</div>
+						<?php endif; ?>										
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<?php /* translators: document title */ ?>

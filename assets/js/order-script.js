@@ -154,4 +154,17 @@ jQuery( function( $ ) {
 		}
 	}
 
+	jQuery('.view-more').click( function(e) {
+		e.preventDefault();
+		jQuery(this).addClass('pdf-hide');
+		jQuery('.pdf-more-details').slideDown('slow');
+		jQuery('.hide-details').removeClass('pdf-hide');
+	});
+	jQuery('.hide-details').click( function(e) {
+		e.preventDefault();
+		jQuery(this).addClass('pdf-hide');
+		jQuery('.pdf-more-details').slideUp('slow');
+		jQuery('.view-more').removeClass('pdf-hide');
+	});
+
 } );
