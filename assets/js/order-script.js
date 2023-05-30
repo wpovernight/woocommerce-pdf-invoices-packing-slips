@@ -154,13 +154,13 @@ jQuery( function( $ ) {
 		}
 	}
 
-	jQuery('.view-more').click( function(e) {
+	jQuery('.wcpdf-data-fields-section').on('click', '.view-more', function(e) {
 		e.preventDefault();
 		jQuery(this).addClass('pdf-hide');
 		jQuery('.pdf-more-details').slideDown('slow');
 		jQuery('.hide-details').removeClass('pdf-hide');
 	});
-	jQuery('.hide-details').click( function(e) {
+	jQuery('.wcpdf-data-fields-section').on('click', '.hide-details', function(e) {
 		e.preventDefault();
 		jQuery(this).addClass('pdf-hide');
 		jQuery('.pdf-more-details').slideUp('slow');
