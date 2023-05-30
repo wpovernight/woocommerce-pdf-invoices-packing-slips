@@ -164,10 +164,11 @@ abstract class Order_Document {
 		return $order_settings;
 	}
 
-	public function get_settings( $latest = false ) {
+	public function get_settings( $latest = false, $output_format = 'pdf' ) {
 		// get most current settings
 		$common_settings   = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		$option_name       = ( $output_format == 'pdf' ) ? "wpo_wcpdf_documents_settings_{$this->get_type()}" : "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output_format}";
+		$document_settings = get_option( $option_name, array() );
 		$settings          = (array) $document_settings + (array) $common_settings;
 
 		if ( $latest != true ) {

@@ -18,9 +18,9 @@ class Plugin { // to remove
 		add_action( 'wpo_wcpdf_cloud_storage_upload_by_status', [ $this, 'uploadByStatus' ], 10, 4 );
 		
 		add_action( 'woocommerce_admin_order_actions_end', [ $this, 'addListingAction' ] );
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
-			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'addBulkAction' ), 30 );
-		}
+		// if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
+		// 	add_filter( 'bulk_actions-edit-shop_order', array( $this, 'addBulkAction' ), 30 );
+		// }
 
 		add_action( 'woocommerce_checkout_order_processed', [ $this, 'saveTaxRateDetailsRecalculateFrontend' ], 10, 2 );
 		add_action( 'woocommerce_order_after_calculate_totals', [ $this, 'saveTaxRateDetailsRecalculate' ], 10, 2 );
@@ -315,10 +315,10 @@ class Plugin { // to remove
 		);
 	}
 	
-	public function addBulkAction( $actions ) {
-		$actions['ubl_invoice'] = __( 'UBL Invoice' );
-		return $actions;
-	}
+	// public function addBulkAction( $actions ) {
+	// 	$actions['ubl_invoice'] = __( 'UBL Invoice' );
+	// 	return $actions;
+	// }
 
 	public function createUblFile( $order, $args = [] ) {
 		$file = '';

@@ -883,6 +883,14 @@ class Admin {
 		$documents = WPO_WCPDF()->documents->get_documents();
 		foreach ( $documents as $document ) {
 			$actions[$document->get_type()] = "PDF " . $document->get_title();
+			
+			// ubl
+			if ( in_array( 'ubl', $document->output_formats ) ) {
+				$document_settings = $document->get_settings( true, 'ubl' );
+				if ( isset( $document_settings['enabled'] ) ) {
+					$actions[$document->get_type().'_ubl'] = "UBL " . $document->get_title();
+				}
+			}
 		}
 
 		return apply_filters( 'wpo_wcpdf_bulk_actions', $actions );
