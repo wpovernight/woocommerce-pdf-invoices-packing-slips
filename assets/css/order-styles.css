@@ -175,4 +175,6 @@
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(-360deg); }
 }
-.pdf-hide{display: none}
+.pdf-hide {
+	display: none
+}
