@@ -146,10 +146,10 @@ class Main {
 					// get attachment
 					switch ( $output_format ) {
 						case 'pdf':
-							$attachment = $this->get_pdf_attachment( $document );
+							$attachment = $this->get_document_pdf_attachment( $document );
 							break;
 						case 'ubl':
-							$attachment = $this->get_ubl_attachment( $document );
+							$attachment = $this->get_document_ubl_attachment( $document );
 							break;
 					}
 					
@@ -169,6 +169,7 @@ class Main {
 					continue;
 				} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
 					wcpdf_log_error( 'UBL FileWrite exception: '.$e->getMessage(), 'critical', $e );
+					continue;
 				} catch ( \Error $e ) {
 					wcpdf_log_error( $e->getMessage(), 'critical', $e );
 					continue;
@@ -181,7 +182,7 @@ class Main {
 		return $attachments;
 	}
 	
-	public function get_pdf_attachment( $document ) {
+	public function get_document_pdf_attachment( $document ) {
 		$tmp_path = $this->get_tmp_path( 'attachments' );
 		if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
 			return false;
@@ -195,7 +196,7 @@ class Main {
 		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
 		if ( file_exists( $pdf_path ) && $max_reuse_age > 0 ) {
 			// get last modification date
-			if ($filemtime = filemtime( $pdf_path )) {
+			if ( $filemtime = filemtime( $pdf_path ) ) {
 				$time_difference = time() - $filemtime;
 				if ( $time_difference < $max_reuse_age ) {
 					// check if file is still being written to
@@ -226,7 +227,7 @@ class Main {
 		return $pdf_path;
 	}
 	
-	public function get_ubl_attachment( $document ) {
+	public function get_document_ubl_attachment( $document ) {
 		$tmp_path = $this->get_tmp_path( 'attachments' );
 		if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
 			return false;
@@ -237,17 +238,11 @@ class Main {
 
 		$ubl_document = new UblDocument();
 		$ubl_document->setOrder( $document->order );
-		
-		if ( $order_document = wcpdf_get_document( $document->get_type(), $document->order, true ) ) {
-			$ubl_document->setOrderDocument( $order_document );
-		} else {
-			wcpdf_log_error( 'Error generating order document!', 'error', null, $ubl_maker->context );
-			return false;
-		}
+		$ubl_document->setOrderDocument( $document );
 
 		$builder       = new SabreBuilder();
 		$contents      = $builder->build( $ubl_document );
-		$filename      = $order_document->get_filename( 'download', [ 'output' => 'ubl' ] );
+		$filename      = $document->get_filename( 'download', [ 'output' => 'ubl' ] );
 		$full_filename = $ubl_maker->write( $filename, $contents );
 
 		if ( true === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
