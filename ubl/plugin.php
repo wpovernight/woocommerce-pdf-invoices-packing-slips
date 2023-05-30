@@ -17,7 +17,7 @@ class Plugin { // to remove
 		add_action( 'wpo_wcpdf_export_bulk_get_orders_args', [ $this, 'ublBulkArgs' ], 10, 1 );
 		add_action( 'wpo_wcpdf_cloud_storage_upload_by_status', [ $this, 'uploadByStatus' ], 10, 4 );
 		
-		add_action( 'woocommerce_admin_order_actions_end', [ $this, 'addListingAction' ] );
+		//add_action( 'woocommerce_admin_order_actions_end', [ $this, 'addListingAction' ] );
 		// if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
 		// 	add_filter( 'bulk_actions-edit-shop_order', array( $this, 'addBulkAction' ), 30 );
 		// }
@@ -28,117 +28,117 @@ class Plugin { // to remove
 		add_action( 'woocommerce_email_attachments', [ $this, 'attachToEmail' ], 10, 3 );
 
 		//add_filter( 'wpo_wcpdf_settings_tabs', [ $this, 'addTaxesSettingTab' ], 10, 1 );
-		add_action( 'wpo_wcpdf_settings_output_ubl', [ $this, 'taxesSettingTabOutput' ], 10, 1 );
+		//add_action( 'wpo_wcpdf_settings_output_ubl', [ $this, 'taxesSettingTabOutput' ], 10, 1 );
 
-		add_action( 'admin_init', [ $this, 'init_general_settings' ] );
-		add_action( 'admin_init', [ $this, 'initTaxSettings' ] );
+		//add_action( 'admin_init', [ $this, 'init_general_settings' ] );
+		//add_action( 'admin_init', [ $this, 'initTaxSettings' ] );
 		
 		add_action( 'admin_enqueue_scripts', [ $this, 'loadAdminAssets' ] );
 	}
 
-	public function init_general_settings() {
-		// Register settings.
-		$page = $option_group = $option_name = 'ubl_wc_general';
+	// public function init_general_settings() {
+	// 	// Register settings.
+	// 	$page = $option_group = $option_name = 'ubl_wc_general';
 
-		$settings_fields = array(
-			array(
-				'type'      => 'section',
-				'id'        => 'general',
-				'title'     => '',
-				'callback'  => 'section',
-			),
-			array(
-				'type'          => 'setting',
-				'id'            => 'company_name',
-				'title'         => __( 'Company Name', 'ubl-woocommerce-pdf-invoices' ),
-				'callback'      => 'text_input',
-				'section'       => 'general',
-				'args'          => array(
-					'option_name'   => $option_name,
-					'id'            => 'company_name',
-					'size'         => '42',
-				)
-			),
-			array(
-				'type'          => 'setting',
-				'id'            => 'vat_number',
-				'title'         => __( 'VAT Number', 'ubl-woocommerce-pdf-invoices' ),
-				'callback'      => 'text_input',
-				'section'       => 'general',
-				'args'          => array(
-					'option_name'   => $option_name,
-					'id'            => 'vat_number',
-					'size'         => '42',
-				)
-			),
-			array(
-				'type'          => 'setting',
-				'id'            => 'coc_number',
-				'title'         => __( 'Chamber of Commerce Number', 'ubl-woocommerce-pdf-invoices' ),
-				'callback'      => 'text_input',
-				'section'       => 'general',
-				'args'          => array(
-					'option_name'   => $option_name,
-					'id'            => 'coc_number',
-					'size'         => '42',
-				)
-			),
-		);
+	// 	$settings_fields = array(
+	// 		array(
+	// 			'type'      => 'section',
+	// 			'id'        => 'general',
+	// 			'title'     => '',
+	// 			'callback'  => 'section',
+	// 		),
+	// 		array(
+	// 			'type'          => 'setting',
+	// 			'id'            => 'company_name',
+	// 			'title'         => __( 'Company Name', 'woocommerce-pdf-invoices-packing-slips' ),
+	// 			'callback'      => 'text_input',
+	// 			'section'       => 'general',
+	// 			'args'          => array(
+	// 				'option_name'   => $option_name,
+	// 				'id'            => 'company_name',
+	// 				'size'         => '42',
+	// 			)
+	// 		),
+	// 		array(
+	// 			'type'          => 'setting',
+	// 			'id'            => 'vat_number',
+	// 			'title'         => __( 'VAT Number', 'woocommerce-pdf-invoices-packing-slips' ),
+	// 			'callback'      => 'text_input',
+	// 			'section'       => 'general',
+	// 			'args'          => array(
+	// 				'option_name'   => $option_name,
+	// 				'id'            => 'vat_number',
+	// 				'size'         => '42',
+	// 			)
+	// 		),
+	// 		array(
+	// 			'type'          => 'setting',
+	// 			'id'            => 'coc_number',
+	// 			'title'         => __( 'Chamber of Commerce Number', 'woocommerce-pdf-invoices-packing-slips' ),
+	// 			'callback'      => 'text_input',
+	// 			'section'       => 'general',
+	// 			'args'          => array(
+	// 				'option_name'   => $option_name,
+	// 				'id'            => 'coc_number',
+	// 				'size'         => '42',
+	// 			)
+	// 		),
+	// 	);
 
-		// load invoice to reuse method to get wc emails
-		$invoice = wcpdf_get_invoice( null );
+	// 	// load invoice to reuse method to get wc emails
+	// 	$invoice = wcpdf_get_invoice( null );
 
-		$settings_fields[] = array(
-			'type'          => 'setting',
-			'id'            => 'attach_to_email_ids',
-			'title'         => __( 'Attach UBL to:', 'ubl-woocommerce-pdf-invoices' ),
-			'callback'      => 'multiple_checkboxes',
-			'section'       => 'general',
-			'args'          => array(
-				'option_name'   => $option_name,
-				'id'            => 'attach_to_email_ids',
-				'fields'        => $invoice->get_wc_emails(),
-			)
-		);
+	// 	$settings_fields[] = array(
+	// 		'type'          => 'setting',
+	// 		'id'            => 'attach_to_email_ids',
+	// 		'title'         => __( 'Attach UBL to:', 'woocommerce-pdf-invoices-packing-slips' ),
+	// 		'callback'      => 'multiple_checkboxes',
+	// 		'section'       => 'general',
+	// 		'args'          => array(
+	// 			'option_name'   => $option_name,
+	// 			'id'            => 'attach_to_email_ids',
+	// 			'fields'        => $invoice->get_wc_emails(),
+	// 		)
+	// 	);
 		
-		$settings_fields[] = array(
-			'type'          => 'setting',
-			'id'            => 'include_encrypted_pdf',
-			'title'         => __( 'Include encrypted PDF:', 'ubl-woocommerce-pdf-invoices' ),
-			'callback'      => 'checkbox',
-			'section'       => 'general',
-			'args'          => array(
-				'option_name'   => $option_name,
-				'id'            => 'include_encrypted_pdf',
-				'description'   => __( 'Include the PDF Invoice file encrypted in the UBL file.', 'ubl-woocommerce-pdf-invoices' ),
-			)
-		);
+	// 	$settings_fields[] = array(
+	// 		'type'          => 'setting',
+	// 		'id'            => 'include_encrypted_pdf',
+	// 		'title'         => __( 'Include encrypted PDF:', 'woocommerce-pdf-invoices-packing-slips' ),
+	// 		'callback'      => 'checkbox',
+	// 		'section'       => 'general',
+	// 		'args'          => array(
+	// 			'option_name'   => $option_name,
+	// 			'id'            => 'include_encrypted_pdf',
+	// 			'description'   => __( 'Include the PDF Invoice file encrypted in the UBL file.', 'woocommerce-pdf-invoices-packing-slips' ),
+	// 		)
+	// 	);
 
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-	}
+	// 	WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+	// }
 
-	public function initTaxSettings() {
-		$page = $option_group = $option_name = 'ubl_wc_taxes';
+	// public function initTaxSettings() {
+	// 	$page = $option_group = $option_name = 'ubl_wc_taxes';
 
-		$settings_fields = array(
-			array(
-				'type'          => 'section',
-				'id'            => 'ubl_wc_taxes_settings',
-				'title'         => '',
-				'callback'      => 'section',
-			),
-			array(
-				'type'          => 'setting',
-				'id'            => 'ubl_wc_taxes',
-				'title'         => 'Taxes settings for UBL',
-				'callback'      => 'string',
-				'section'       => 'ubl_wc_taxes_settings',
-				'args'          => [],
-			),
-		);
+	// 	$settings_fields = array(
+	// 		array(
+	// 			'type'          => 'section',
+	// 			'id'            => 'ubl_wc_taxes_settings',
+	// 			'title'         => '',
+	// 			'callback'      => 'section',
+	// 		),
+	// 		array(
+	// 			'type'          => 'setting',
+	// 			'id'            => 'ubl_wc_taxes',
+	// 			'title'         => 'Taxes settings for UBL',
+	// 			'callback'      => 'string',
+	// 			'section'       => 'ubl_wc_taxes_settings',
+	// 			'args'          => [],
+	// 		),
+	// 	);
 
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-	}
+	// 	WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+	// }
 
 	public function attachToEmail( $attachments, $email_id, $order ) {
 		// check if all variables properly set
@@ -300,20 +300,20 @@ class Plugin { // to remove
 		}
 	}
 	
-	public function addListingAction( $order ) {
-		// do not show button for trashed orders
-		if ( $order->get_status() == 'trash' ) {
-			return;
-		}
+	// public function addListingAction( $order ) {
+	// 	// do not show button for trashed orders
+	// 	if ( $order->get_status() == 'trash' ) {
+	// 		return;
+	// 	}
 		
-		printf(
-			'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);"></a>',
-			esc_attr( admin_url( 'post.php?post='.$order->get_id().'&action=edit&ubl=yes' ) ),
-			esc_attr( 'ubl-invoice' ),
-			esc_attr(__( 'UBL Invoice' ) ),
-			esc_attr( WPO_WCPDF()->plugin_url() . '/assets/images/ubl.svg' )
-		);
-	}
+	// 	printf(
+	// 		'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);"></a>',
+	// 		esc_attr( admin_url( 'post.php?post='.$order->get_id().'&action=edit&ubl=yes' ) ),
+	// 		esc_attr( 'ubl-invoice' ),
+	// 		esc_attr(__( 'UBL Invoice' ) ),
+	// 		esc_attr( WPO_WCPDF()->plugin_url() . '/assets/images/ubl.svg' )
+	// 	);
+	// }
 	
 	// public function addBulkAction( $actions ) {
 	// 	$actions['ubl_invoice'] = __( 'UBL Invoice' );
@@ -435,44 +435,44 @@ class Plugin { // to remove
 	}
 
 	// public function addTaxesSettingTab($tabs) {
-	// 	$tabs['ubl'] = __('UBL', 'ubl-woocommerce-pdf-invoices');
+	// 	$tabs['ubl'] = __('UBL', 'woocommerce-pdf-invoices-packing-slips');
 	// 	return $tabs;
 	// }
 
-	public function taxesSettingTabOutput( $active_section = '' ) {
-		if ( empty($active_section) ) {
-			$active_section = 'general';
-		}
-		$sections = [
-			'general' => __('General', 'ubl-woocommerce-pdf-invoices'),
-			'taxes'   => __('Taxes', 'ubl-woocommerce-pdf-invoices'),
-		];
-		?>
-		<div class="wcpdf-settings-sections">
-			<ul>
-				<?php
-				foreach ($sections as $section => $title) {
-					printf('<li><a href="%s" class="%s">%s</a></li>', esc_url( add_query_arg( 'section', $section ) ), $section == $active_section ? 'active' : '', $title );
-				}
-				?>
-			</ul>
-		</div>
+	// public function taxesSettingTabOutput( $active_section = '' ) {
+	// 	if ( empty($active_section) ) {
+	// 		$active_section = 'general';
+	// 	}
+	// 	$sections = [
+	// 		'general' => __('General', 'woocommerce-pdf-invoices-packing-slips'),
+	// 		'taxes'   => __('Taxes', 'woocommerce-pdf-invoices-packing-slips'),
+	// 	];
+	// 	?>
+	// 	<div class="wcpdf-settings-sections">
+	// 		<ul>
+	// 			<?php
+	// 			foreach ($sections as $section => $title) {
+	// 				printf('<li><a href="%s" class="%s">%s</a></li>', esc_url( add_query_arg( 'section', $section ) ), $section == $active_section ? 'active' : '', $title );
+	// 			}
+	// 			?>
+	// 		</ul>
+	// 	</div>
 
-		<?php
-		switch ( $active_section ) {
-			case 'general':
-			default:
-				settings_fields( "ubl_wc_general" );
-				do_settings_sections( "ubl_wc_general" );
+	// 	<?php
+	// 	switch ( $active_section ) {
+	// 		case 'general':
+	// 		default:
+	// 			settings_fields( "ubl_wc_general" );
+	// 			do_settings_sections( "ubl_wc_general" );
 
-				submit_button();
-				break;
-			case 'taxes':
-				$setting = new \WPO\WC\UBL\Settings\TaxesSettings();
-				$setting->output();
-				break;
-		}
-	}
+	// 			submit_button();
+	// 			break;
+	// 		case 'taxes':
+	// 			$setting = new \WPO\WC\UBL\Settings\TaxesSettings();
+	// 			$setting->output();
+	// 			break;
+	// 	}
+	// }
 	
 	public function isOrderPage() {
 		$screen = get_current_screen();

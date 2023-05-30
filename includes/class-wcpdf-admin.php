@@ -855,7 +855,7 @@ class Admin {
 	 * Add actions to menu, WP3.5+
 	 */
 	public function bulk_actions( $actions ) {
-		foreach ( $this->get_bulk_actions() as $action => $title ) {
+		foreach ( wcpdf_get_bulk_actions() as $action => $title ) {
 			$actions[$action] = $title;
 		}
 		return $actions;
@@ -869,31 +869,13 @@ class Admin {
 			?>
 			<script type="text/javascript">
 			jQuery(document).ready(function() {
-				<?php foreach ($this->get_bulk_actions() as $action => $title) { ?>
+				<?php foreach (wcpdf_get_bulk_actions() as $action => $title) { ?>
 				jQuery('<option>').val('<?php echo esc_attr( $action ); ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
 				<?php }	?>
 			});
 			</script>
 			<?php
 		}
-	}
-
-	public function get_bulk_actions() {
-		$actions   = array();
-		$documents = WPO_WCPDF()->documents->get_documents();
-		foreach ( $documents as $document ) {
-			$actions[$document->get_type()] = "PDF " . $document->get_title();
-			
-			// ubl
-			if ( in_array( 'ubl', $document->output_formats ) ) {
-				$document_settings = $document->get_settings( true, 'ubl' );
-				if ( isset( $document_settings['enabled'] ) ) {
-					$actions[$document->get_type().'_ubl'] = "UBL " . $document->get_title();
-				}
-			}
-		}
-
-		return apply_filters( 'wpo_wcpdf_bulk_actions', $actions );
 	}
 
 	/**

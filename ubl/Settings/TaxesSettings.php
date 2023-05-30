@@ -50,8 +50,8 @@ class TaxesSettings
 				<th><?php _e( 'Postcode / ZIP', 'woocommerce' ); ?></th>
 				<th><?php _e( 'City', 'woocommerce' ); ?></th>
 				<th width="8%"><?php _e( 'Rate&nbsp;%', 'woocommerce' ); ?></th>
-				<th width="20%"><a href="http://www.unece.org/trade/untdid/d13b/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'ubl-woocommerce-pdf-invoices' ); ?></a></th>
-				<th width="20%"><a href="http://www.unece.org/trade/untdid/d97a/uncl/uncl5305.htm" target="_blank"><?php _e( 'Tax Category', 'ubl-woocommerce-pdf-invoices' ); ?></a></th>
+				<th width="20%"><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+				<th width="20%"><a href="https://service.unece.org/trade/untdid/d97a/uncl/uncl5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
 			</tr>
 		</thead>
 		<tfoot>

@@ -6,8 +6,15 @@ jQuery( function( $ ) {
 
 		if ( $.inArray(action, wpo_wcpdf_ajax.bulk_actions) !== -1 ) {
 			e.preventDefault();
-			let template = action;
-			let checked  = [];
+			let template   = action;
+			let checked    = [];
+			let ubl_output = false;
+			
+			// is UBL action
+			if ( action.indexOf( 'ubl' ) != -1 ) {
+				template   = template.replace( '_ubl', '' );
+				ubl_output = true;
+			}
 
 			$('tbody th.check-column input[type="checkbox"]:checked').each(
 				function() {
@@ -26,6 +33,10 @@ jQuery( function( $ ) {
 				url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			} else {
 				url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+			}
+			
+			if ( ubl_output ) {
+				url += '&output=ubl';
 			}
 
 			window.open(url,'_blank');

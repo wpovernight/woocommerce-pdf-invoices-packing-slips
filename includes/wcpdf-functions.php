@@ -109,6 +109,25 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 	return wcpdf_get_document( 'packing-slip', $order, $init );
 }
 
+function wcpdf_get_bulk_actions() {
+	$actions   = [];
+	$documents = WPO_WCPDF()->documents->get_documents();
+	
+	foreach ( $documents as $document ) {
+		$actions[$document->get_type()] = "PDF " . $document->get_title();
+		
+		// ubl
+		if ( in_array( 'ubl', $document->output_formats ) ) {
+			$document_settings = $document->get_settings( true, 'ubl' );
+			if ( isset( $document_settings['enabled'] ) ) {
+				$actions[$document->get_type().'_ubl'] = "UBL " . $document->get_title();
+			}
+		}
+	}
+
+	return apply_filters( 'wpo_wcpdf_bulk_actions', $actions );
+}
+
 /**
  * Load HTML into (pluggable) PDF library, DomPDF 1.0.2 by default
  * Use wpo_wcpdf_pdf_maker filter to change the PDF class (which can wrap another PDF library).
