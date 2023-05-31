@@ -48,11 +48,11 @@ class Invoice extends Order_Document_Methods {
 		$this->lock_time      = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
 		$this->lock_retries   = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
 		
-		// output formats
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf', 'ubl' ], $this );
-		
-		// Call parent constructor
+		// call parent constructor
 		parent::__construct( $order );
+		
+		// output formats (placed after parent construct to override the abstract default)
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf', 'ubl' ], $this );
 	}
 
 	public function use_historical_settings() {

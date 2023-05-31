@@ -116,7 +116,10 @@ abstract class Order_Document {
 		}
 
 		// set properties
-		$this->slug = str_replace('-', '_', $this->type);
+		$this->slug = str_replace( '-', '_', $this->type );
+		
+		// output formats
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf' ], $this );
 
 		// load data
 		if ( $this->order ) {
@@ -135,11 +138,6 @@ abstract class Order_Document {
 		
 		// check enable
 		$this->enabled = $this->get_setting( 'enabled', false );
-		
-		// output formats
-		if ( ! isset( $this->output_formats ) ) {
-			$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf' ], $this );
-		}
 	}
 
 	public function init_settings() {

@@ -576,19 +576,19 @@ class Admin {
 		foreach ( $documents as $document ) {
 			if ( in_array( 'ubl', $document->output_formats ) ) {
 				$document_title = $document->get_title();
-				if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+				$document       = wcpdf_get_document( $document->get_type(), $order );
+				
+				if ( $document && $document->is_enabled( 'ubl' ) ) {
 					$document_url   = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => 'ubl' ] );
 					$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 					$class          = [ $document->get_type(), 'ubl' ];
 					
-					if ( $document->is_enabled( 'ubl' ) ) {
-						$meta_box_actions[$document->get_type()] = array(
-							'url'   => esc_url( $document_url ),
-							'alt'   => "UBL " . $document_title,
-							'title' => "UBL " . $document_title,
-							'class' => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
-						);
-					}
+					$meta_box_actions[$document->get_type()] = array(
+						'url'   => esc_url( $document_url ),
+						'alt'   => "UBL " . $document_title,
+						'title' => "UBL " . $document_title,
+						'class' => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
+					);
 				}
 			}
 		}
