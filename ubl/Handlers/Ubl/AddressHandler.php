@@ -41,45 +41,55 @@ class AddressHandler extends UblHandler
 
 	public function returnSupplierPartyDetails()
 	{
-		$supplierPartyDetails = [ [
-			'name' => 'cac:PartyName',
-			'value' => [
-				'name' => 'cbc:Name',
-				'value' => get_option('woocommerce_email_from_name'),
-			],
-			], [
-			'name' => 'cac:PostalAddress',
-			'value' => [ [
-				'name' => 'cbc:StreetName',
-				'value' => get_option('woocommerce_store_address'),
-			], [
-				'name' => 'cbc:CityName',
-				'value' => get_option('woocommerce_store_city'),
-			], [
-				'name' => 'cbc:PostalZone',
-				'value' => get_option('woocommerce_store_postcode'),
-			], [
-				'name' => 'cac:AddressLine',
-				'value' => [
-					'name' => 'cbc:Line',
-					'value' => get_option('woocommerce_store_address'),
-				],
-			], [
-				'name' => 'cac:Country',
-				'value' => [
-					'name' => 'cbc:IdentificationCode',
-					'value' => get_option('woocommerce_default_country'),
-					'attributes' => [
-						'listID' => 'ISO3166-1:Alpha2',
-						'listAgencyID' => '6',
-					],
-				],
-			] ],
-		] ];
-		
 		$company    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_name()  : '';
-		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_vat_number() : '';
-		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_coc_number() : '';
+		$address    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_address()  : get_option( 'woocommerce_store_address' );
+		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
+		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_coc_number() : '';
+		
+		$supplierPartyDetails = [
+			[
+				'name' => 'cac:PartyName',
+				'value' => [
+					'name' => 'cbc:Name',
+					'value' => $company,
+				],
+			],
+			[
+				'name' => 'cac:PostalAddress',
+				'value' => [
+					[
+						'name' => 'cbc:StreetName',
+						'value' => get_option( 'woocommerce_store_address' ),
+					],
+					[
+						'name' => 'cbc:CityName',
+						'value' => get_option( 'woocommerce_store_city' ),
+					],
+					[
+						'name' => 'cbc:PostalZone',
+						'value' => get_option( 'woocommerce_store_postcode' ),
+					],
+					[
+						'name' => 'cac:AddressLine',
+						'value' => [
+							'name' => 'cbc:Line',
+							'value' => $address,
+						],
+					],
+					[
+						'name' => 'cac:Country',
+						'value' => [
+							'name' => 'cbc:IdentificationCode',
+							'value' => get_option( 'woocommerce_default_country' ),
+							'attributes' => [
+								'listID' => 'ISO3166-1:Alpha2',
+								'listAgencyID' => '6',
+							],
+						],
+					]
+				],
+			]
+		];
 
 		if (!empty($vat_number)) {
 			$supplierPartyDetails[] = [
@@ -147,7 +157,7 @@ class AddressHandler extends UblHandler
 				'_shipping_vat_id'          // Germanized Pro (alternative)
 			];
 
-			foreach ($vat_meta_keys as $meta_key) {
+			foreach ( $vat_meta_keys as $meta_key ) {
 				if ( $vat_number = $this->document->order->get_meta( $meta_key ) ) {
 					break;
 				}
@@ -190,7 +200,7 @@ class AddressHandler extends UblHandler
 						'name' => 'cac:AddressLine',
 						'value' => [
 							'name' => 'cbc:Line',
-							'value' => $this->document->order->get_billing_address_1(),
+							'value' => $this->document->order->get_billing_address_1() .'<br/>'.$this->document->order->get_billing_address_2(),
 						],
 					], [
 						'name' => 'cac:Country',
