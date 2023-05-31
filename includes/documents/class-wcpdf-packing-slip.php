@@ -30,6 +30,9 @@ class Packing_Slip extends Order_Document_Methods {
 		
 		// call parent constructor
 		parent::__construct( $order );
+		
+		// output formats (placed after parent construct to override the abstract default)
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf' ], $this );
 	}
 
 	public function get_title() {
