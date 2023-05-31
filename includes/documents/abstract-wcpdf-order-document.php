@@ -795,6 +795,26 @@ abstract class Order_Document {
 	}
 	
 	/**
+	 * Return/Show company VAT number
+	 */
+	public function get_shop_vat_number() {
+		return $this->get_settings_text( 'vat_number', '', false );
+	}
+	public function shop_vat_number() {
+		echo $this->get_shop_vat_number();
+	}
+	
+	/**
+	 * Return/Show company COC number
+	 */
+	public function get_shop_coc_number() {
+		return $this->get_settings_text( 'coc_number', '', false );
+	}
+	public function shop_coc_number() {
+		echo $this->get_shop_coc_number();
+	}
+	
+	/**
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address() {

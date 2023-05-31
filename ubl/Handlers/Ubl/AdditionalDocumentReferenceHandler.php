@@ -11,8 +11,7 @@ class AdditionalDocumentReferenceHandler extends UblHandler
 {
 	public function handle( $data, $options = [] )
 	{
-		$settings = get_option( 'ubl_wc_general', array() );
-		if ( isset( $settings['include_encrypted_pdf'] ) && $this->document->order_document && $this->document->order_document->exists() ) {
+		if ( $this->document->order_document && $this->document->order_document->exists() && $this->document->order_document->get_setting( 'include_encrypted_pdf', false, 'ubl' ) ) {
 			$additionalDocumentReference = [
 				'name'  => 'cac:AdditionalDocumentReference',
 				'value' => [

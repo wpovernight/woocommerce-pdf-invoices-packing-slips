@@ -76,11 +76,10 @@ class AddressHandler extends UblHandler
 				],
 			] ],
 		] ];
-
-		$settings = get_option( 'ubl_wc_general', array() );
-		$company = !empty($settings['company_name']) ? $settings['company_name'] : '';
-		$vat_number = !empty($settings['vat_number']) ? $settings['vat_number'] : '';
-		$coc_number = !empty($settings['coc_number']) ? $settings['coc_number'] : '';
+		
+		$company    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_name()  : '';
+		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_vat_number() : '';
+		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_coc_number() : '';
 
 		if (!empty($vat_number)) {
 			$supplierPartyDetails[] = [
