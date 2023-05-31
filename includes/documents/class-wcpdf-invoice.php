@@ -605,20 +605,46 @@ class Invoice extends Order_Document_Methods {
 	public function get_ubl_settings_fields( $option_name ) {
 		$settings_fields = array(
 			array(
-				'type'			=> 'section',
-				'id'			=> $this->type.'_ubl',
-				'title'			=> '',
-				'callback'		=> 'section',
+				'type'     => 'section',
+				'id'       => $this->type.'_ubl',
+				'title'    => '',
+				'callback' => 'section',
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'enabled',
-				'title'			=> __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> $this->type.'_ubl',
-				'args'			=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'enabled',
+				'type'     => 'setting',
+				'id'       => 'enabled',
+				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $this->type.'_ubl',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'enabled',
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'attach_to_email_ids',
+				'title'    => __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'multiple_checkboxes',
+				'section'  => $this->type.'_ubl',
+				'args'     => array(
+					'option_name'     => $option_name,
+					'id'              => 'attach_to_email_ids',
+					'fields_callback' => array( $this, 'get_wc_emails' ),
+					/* translators: directory path */
+					'description'     => ! is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'include_encrypted_pdf',
+				'title'    => __( 'Include encrypted PDF:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $this->type.'_ubl',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'include_encrypted_pdf',
+					'description' => __( 'Include the PDF Invoice file encrypted in the UBL file.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);
