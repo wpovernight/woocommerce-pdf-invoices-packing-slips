@@ -676,7 +676,7 @@ class Admin {
 							</p>
 						</div>
 						<?php endif; ?>
-						<div class='pdf-hide pdf-more-details'>
+						<div class='pdf-more-details' style='display: none'>
 							<?php if ( isset( $data['display_date'] ) ) : ?>
 							<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
 								<p class="form-field form-field-wide">
@@ -701,7 +701,7 @@ class Admin {
 						<?php if ( isset( $data['display_date'] ) || isset( $data['creation_trigger'] ) ) : ?>
 							<div>
 								<a href='#' class='view-more'><?php _e( 'View more details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-								<a href='#' class='hide-details pdf-hide'><?php _e( 'Hide details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href='#' class='hide-details' style='display: none'><?php _e( 'Hide details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							</div>
 						<?php endif; ?>										
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
