@@ -154,17 +154,16 @@ jQuery( function( $ ) {
 		}
 	}
 
-	jQuery('#wpo_wcpdf-data-input-box').on('click', '.view-more', function(e) {
+	$('#wpo_wcpdf-data-input-box').on( 'click', '.view-more, .hide-details', function(e) {
 		e.preventDefault();
-		jQuery(this).addClass('pdf-hide');
-		jQuery('.pdf-more-details').slideDown('slow');
-		jQuery('.hide-details').removeClass('pdf-hide');
+		jQuery(this).hide();
+		jQuery('.pdf-more-details').slideToggle('slow');
+		if( $(this).hasClass('view-more') ) {
+			jQuery('.hide-details').show();
+		}
+		else {
+			jQuery('.view-more').show();
+		}
 	});
-	jQuery('#wpo_wcpdf-data-input-box').on('click', '.hide-details', function(e) {
-		e.preventDefault();
-		jQuery(this).addClass('pdf-hide');
-		jQuery('.pdf-more-details').slideUp('slow');
-		jQuery('.view-more').removeClass('pdf-hide');
-	});
-
+	
 } );
