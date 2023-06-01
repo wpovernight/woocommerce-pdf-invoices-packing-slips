@@ -154,16 +154,17 @@ jQuery( function( $ ) {
 		}
 	}
 
-	$('#wpo_wcpdf-data-input-box').on( 'click', '.view-more, .hide-details', function(e) {
+	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.view-more, .hide-details', function( e ) {
 		e.preventDefault();
-		$(this).hide();
-		$('.pdf-more-details').slideToggle('slow');
-		if( $(this).hasClass('view-more') ) {
-			$('.hide-details').show();
+		
+		$( this ).hide();
+		$( '.pdf-more-details' ).slideToggle( 'slow' );
+		
+		if ( $( this ).hasClass( 'view-more' ) ) {
+			$( '.hide-details' ).show();
+		} else {
+			$( '.view-more' ).show();
 		}
-		else {
-			$('.view-more').show();
-		}
-	});
+	} );
 	
 } );
