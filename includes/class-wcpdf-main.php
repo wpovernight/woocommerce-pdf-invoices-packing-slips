@@ -2,6 +2,8 @@
 namespace WPO\WC\PDF_Invoices;
 
 use WPO\WC\PDF_Invoices\Font_Synchronizer;
+use \WPO\WC\UBL\Builders\SabreBuilder;
+use \WPO\WC\UBL\Documents\UblDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -144,12 +146,16 @@ class Main {
 					}
 					
 					// get attachment
+					$attachment = false;
 					switch ( $output_format ) {
+						default:
 						case 'pdf':
 							$attachment = $this->get_document_pdf_attachment( $document );
 							break;
 						case 'ubl':
-							$attachment = $this->get_document_ubl_attachment( $document );
+							if ( true === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
+								$attachment = $this->get_document_ubl_attachment( $document );
+							}
 							break;
 					}
 					
@@ -245,11 +251,7 @@ class Main {
 		$filename      = $document->get_filename( 'download', [ 'output' => 'ubl' ] );
 		$full_filename = $ubl_maker->write( $filename, $contents );
 
-		if ( true === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
-			return $full_filename;
-		} else {
-			return false;
-		}
+		return $full_filename;
 	}
 
 	public function file_is_locked( $fp ) {
