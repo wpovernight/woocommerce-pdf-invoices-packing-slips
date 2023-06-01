@@ -41,6 +41,9 @@ class Bulk_Document {
 		$this->type      = $document_type;
 		$this->order_ids = $order_ids;
 		$this->is_bulk   = true;
+		
+		// output formats (placed after parent construct to override the abstract default)
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf' ], $this );
 	}
 
 	public function get_type() {
