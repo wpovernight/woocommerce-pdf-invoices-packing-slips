@@ -300,9 +300,18 @@ class Settings {
 					}
 
 					// preview
-					$pdf_data = $document->preview_pdf();
+					$output_format = ! empty( $_REQUEST['output_format'] ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
+					switch ( $output_format ) {
+						default:
+						case 'pdf':
+							$preview_data = base64_encode( $document->preview_pdf() );
+							break;
+						case 'ubl':
+							$preview_data = $document->preview_ubl();
+							break;
+					}
 
-					wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
+					wp_send_json_success( array( 'preview_data' => $preview_data ) );
 				} else {
 					wp_send_json_error(
 						array(

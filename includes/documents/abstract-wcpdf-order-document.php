@@ -976,21 +976,12 @@ abstract class Order_Document {
 		die();
 	}
 	
+	public function preview_ubl() {
+		return $this->get_ubl_contents();
+	}
+	
 	public function output_ubl() {
-		$ubl_maker    = wcpdf_get_ubl_maker();
-		$ubl_document = new UblDocument();
-		
-		$ubl_document->setOrder( $this->order );
-		
-		if ( $order_document = wcpdf_get_document( $this->get_type(), $this->order, true ) ) {
-			$ubl_document->setOrderDocument( $order_document );
-		} else {
-			wcpdf_log_error( 'Error generating order document!', 'error', null, $ubl_maker->context );
-			die();
-		}
-
-		$builder       = new SabreBuilder();
-		$contents      = $builder->build( $ubl_document );
+		$contents      = $this->get_ubl_contents();
 		$filename      = $order_document->get_filename( 'download', [ 'output' => 'ubl' ] );
 		$full_filename = $ubl_maker->write( $filename, $contents );
 		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
@@ -1004,6 +995,25 @@ abstract class Order_Document {
 		unlink( $full_filename );
 
 		die();
+	}
+	
+	public function get_ubl_contents() {
+		$ubl_maker    = wcpdf_get_ubl_maker();
+		$ubl_document = new UblDocument();
+		
+		$ubl_document->setOrder( $this->order );
+		
+		if ( $order_document = wcpdf_get_document( $this->get_type(), $this->order, true ) ) {
+			$ubl_document->setOrderDocument( $order_document );
+		} else {
+			wcpdf_log_error( 'Error generating order document!', 'error', null, $ubl_maker->context );
+			die();
+		}
+
+		$builder  = new SabreBuilder();
+		$contents = $builder->build( $ubl_document );
+		
+		return $contents;
 	}
 
 	public function wrap_html_content( $content ) {

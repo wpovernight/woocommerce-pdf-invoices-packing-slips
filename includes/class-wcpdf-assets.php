@@ -142,7 +142,8 @@ class Assets {
 						'disable_free',
 						'use_latest_settings',
 						'mark_printed',
-						'unmark_printed'
+						'unmark_printed',
+						'include_encrypted_pdf'
 					) ),
 					'pointers'                  => array(
 						'wcpdf_document_settings_sections' => array(

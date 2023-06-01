@@ -490,6 +490,15 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding-right: 5%;
 }
 
+.preview-document .preview > #preview-ubl {
+	width: 100%;
+	height: 100%;
+	overflow-wrap: anywhere;
+	background-color: #222;
+	color: white;
+	padding: 2em;
+}
+
 .preview-document .preview > #preview-canvas {
 	display: block;
 	max-width: 800px;
