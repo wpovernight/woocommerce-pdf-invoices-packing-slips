@@ -23,7 +23,7 @@ jQuery( function( $ ) {
 			);
 			
 			if ( ! checked.length ) {
-				alert( 'You have to select order(s) first!' );
+				alert( wpo_wcpdf_ajax.select_orders );
 				return;
 			}
 			
@@ -38,14 +38,14 @@ jQuery( function( $ ) {
 			if ( ubl_output ) {
 				$.each( checked, function( i, order_id ) {
 					url += '&order_ids='+order_id+'&output=ubl';
-					window.open( url,'_blank' );
+					window.open( url, '_blank' );
 				} );
 				
 			// pdf
 			} else {
 				let order_ids = checked.join( 'x' );
 				url += '&order_ids='+order_ids;
-				window.open( url,'_blank' );
+				window.open( url, '_blank' );
 			}
 
 		}
