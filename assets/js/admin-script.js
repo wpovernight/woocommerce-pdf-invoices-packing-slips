@@ -465,8 +465,8 @@ jQuery( function( $ ) {
 							renderPdf( worker, canvasId, response.data.preview_data );
 							break;
 						case 'ubl':
-							xml_formatted = formatXml( response.data.preview_data );
-							xml_escaped   = xml_formatted.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
+							let xml         = response.data.preview_data;
+							let xml_escaped = xml.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
 							$preview.html( '<div id="preview-ubl">'+xml_escaped+'</div>' );
 							break;
 					}
@@ -527,36 +527,6 @@ jQuery( function( $ ) {
 			// PDF loading error
 			console.error( reason );
 		} );
-	}
-	
-	function formatXml( xml ) {
-		let formatted = '';
-		let pad       = 0;
-		
-		$.each( xml.split( '\r\n' ), function( index, node ) {
-			let indent = 0;
-			if ( node.match( /.+<\/\w[^>]*>$/ ) ) {
-				indent = 0;
-			} else if ( node.match( /^<\/\w/ ) ) {
-				if ( pad != 0 ) {
-					pad -= 1;
-				}
-			} else if ( node.match( /^<\w[^>]*[^\/]>.*$/ ) ) {
-				indent = 1;
-			} else {
-				indent = 0;
-			}
-	
-			let padding = '';
-			for ( let i = 0; i < pad; i++ ) {
-				padding += '    ';
-			}
-	
-			formatted += padding + node + '\r\n';
-			pad       += indent;
-		} );
-	
-		return formatted;
 	}
 
 	// Preview on user input
