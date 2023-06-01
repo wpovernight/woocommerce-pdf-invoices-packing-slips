@@ -156,13 +156,13 @@ jQuery( function( $ ) {
 
 	$('#wpo_wcpdf-data-input-box').on( 'click', '.view-more, .hide-details', function(e) {
 		e.preventDefault();
-		jQuery(this).hide();
-		jQuery('.pdf-more-details').slideToggle('slow');
+		$(this).hide();
+		$('.pdf-more-details').slideToggle('slow');
 		if( $(this).hasClass('view-more') ) {
-			jQuery('.hide-details').show();
+			$('.hide-details').show();
 		}
 		else {
-			jQuery('.view-more').show();
+			$('.view-more').show();
 		}
 	});
 	
