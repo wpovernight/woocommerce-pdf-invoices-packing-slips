@@ -637,16 +637,17 @@ class Admin {
 	}
 
 	public function output_number_date_edit_fields( $document, $data ) {
-		if( empty( $document ) || empty( $data ) ) return;
+		if ( empty( $document ) || empty( $data ) ) {
+			return;
+		}
 		$data = $this->get_current_values_for_document( $document, $data );
-		
 		?>
 		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
 				<!-- Title -->
 				<h4>
 					<?php echo wp_kses_post( $document->get_title() ); ?>
-					<?php if( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) && $this->user_can_manage_document( $document->get_type() ) ) : ?>
+					<?php if ( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) && $this->user_can_manage_document( $document->get_type() ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
 						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
@@ -655,8 +656,8 @@ class Admin {
 
 				<!-- Read only -->
 				<div class="read-only">
-					<?php if( $document->exists() ) : ?>
-						<?php if( isset( $data['number'] ) ) : ?>
+					<?php if ( $document->exists() ) : ?>
+						<?php if ( isset( $data['number'] ) ) : ?>
 						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
 							<p class="form-field <?= esc_attr( $data['number']['name'] ); ?>_field">	
 								<p>
@@ -676,27 +677,34 @@ class Admin {
 							</p>
 						</div>
 						<?php endif; ?>
-						<?php if( isset( $data['display_date'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
-							<p class="form-field form-field-wide">
-								<p>
-									<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['display_date']['value'] ); ?></span>
+						<div class="pdf-more-details" style="display:none;">
+							<?php if ( isset( $data['display_date'] ) ) : ?>
+							<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
+								<p class="form-field form-field-wide">
+									<p>
+										<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
+										<span><?= esc_attr( $data['display_date']['value'] ); ?></span>
+									</p>
 								</p>
-							</p>
-						</div>
-						<?php endif; ?>
-						<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
-							<p class="form-field form-field-wide">
-								<p>
-									<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
+							</div>
+							<?php endif; ?>
+							<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
+							<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
+								<p class="form-field form-field-wide">
+									<p>
+										<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
+										<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
+									</p>
 								</p>
-							</p>
+							</div>
+							<?php endif; ?>
 						</div>
-						<?php endif; ?>	
-											
+						<?php if ( isset( $data['display_date'] ) || isset( $data['creation_trigger'] ) ) : ?>
+							<div>
+								<a href="#" class="view-more"><?php _e( 'View more details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="#" class="hide-details" style="display:none;"><?php _e( 'Hide details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							</div>
+						<?php endif; ?>										
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
 						<?php /* translators: document title */ ?>
