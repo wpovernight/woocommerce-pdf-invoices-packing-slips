@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.5.4
+Stable tag: 3.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.5.5 (2023-06-01) =
+- New: toggle display date and created via on document data
+- New: adds support for legacy Sidekick activated licenses in Upgrade tab
+- Tweak: log invoice number generation on setting
 
 = 3.5.4 (2023-05-19) =
 - Tweak: improves code for the upgrade tab get license info function
