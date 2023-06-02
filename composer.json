@@ -3,7 +3,7 @@
         "dompdf/dompdf": "^2.0",
         "symfony/polyfill-mbstring": "1.20",
         "symfony/polyfill-iconv": "1.20.0",
-		"sabre/xml": "^1.5"
+		"sabre/xml": "^2.2.5"
     },
     "config": {
         "platform-check": false
