@@ -26,7 +26,7 @@ class Settings_UBL {
 	}
 
 	public function output( $active_section ) {
-		$active_section = ! empty( $active_section ) ? $active_section : 'general';
+		$active_section = ! empty( $active_section ) ? $active_section : 'taxes';
 		?>
 		<div class="wcpdf_ubl_settings_sections">
 			<h2 class="nav-tab-wrapper">

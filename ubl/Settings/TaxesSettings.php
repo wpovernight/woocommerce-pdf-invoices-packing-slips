@@ -18,88 +18,91 @@ class TaxesSettings
 	{
 		settings_fields( 'wpo_wcpdf_settings_ubl_taxes' );
 
-		$rates = ['standard'];
-
-		$rates = array_merge($rates, \WC_Tax::get_tax_class_slugs());
-
+		$rates                       = \WC_Tax::get_tax_rate_classes();
+		$formatted_rates             = [];
+		$formatted_rates['standard'] = __( 'Standard', 'woocommerce' );
+		
 		foreach( $rates as $rate ) {
-			$this->outputTableForTaxClass($rate);
+			if ( empty( $rate->slug ) ) {
+				continue;
+			}
+			$formatted_rates[$rate->slug] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
+		}
+		
+		foreach ( $formatted_rates as $slug => $name ) {
+			$this->outputTableForTaxClass( $slug, $name );
 		}
 
 		submit_button();
 	}
 
-	public function outputTableForTaxClass($taxClass)
+	public function outputTableForTaxClass( $slug, $name )
 	{
-		$slug = $taxClass;
-
-		if ( $slug == 'standard' ) {
-			$slug = '';
-		}
-
 		global $wpdb;
-		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", $slug ) );
-
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
 		?>
-		<h3><?php echo $taxClass ?></h3>
-		<table class="ubl_woocommerce_tax_rates wc_input_table widefat">
+		
+		<h3><?php echo $name; ?></h3>
+		<table class="widefat">
 			<thead>
-			<tr>
-				<th width="8%"><?php _e( 'Country&nbsp;code', 'woocommerce' ); ?></th>
-				<th width="8%"><?php _e( 'State code', 'woocommerce' ); ?></th>
-				<th><?php _e( 'Postcode / ZIP', 'woocommerce' ); ?></th>
-				<th><?php _e( 'City', 'woocommerce' ); ?></th>
-				<th width="8%"><?php _e( 'Rate&nbsp;%', 'woocommerce' ); ?></th>
-				<th width="20%"><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-				<th width="20%"><a href="https://service.unece.org/trade/untdid/d97a/uncl/uncl5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-			</tr>
-		</thead>
-		<tfoot>
-			<tr>
-				<th colspan="5" style="text-align: right;">Tax class default:</th>
-
+				<tr>
+					<th width="8%"><?php _e( 'Country&nbsp;code', 'woocommerce' ); ?></th>
+					<th width="8%"><?php _e( 'State code', 'woocommerce' ); ?></th>
+					<th><?php _e( 'Postcode / ZIP', 'woocommerce' ); ?></th>
+					<th><?php _e( 'City', 'woocommerce' ); ?></th>
+					<th width="8%"><?php _e( 'Rate&nbsp;%', 'woocommerce' ); ?></th>
+					<th width="20%"><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th width="20%"><a href="https://service.unece.org/trade/untdid/d97a/uncl/uncl5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+				</tr>
+			</thead>
+			<tbody id="rates">
 				<?php
-				$scheme = isset($this->settings['class'][$taxClass]['scheme']) ? $this->settings['class'][$taxClass]['scheme'] : '';
-				$category = isset($this->settings['class'][$taxClass]['category']) ? $this->settings['class'][$taxClass]['category'] : '';
-				?>
-
-				<th><?php echo $this->getSchemeSelect('class', $taxClass, $scheme); ?></th>
-				<th><?php echo $this->getCategorySelect('class', $taxClass, $category); ?></th>
-			</tr>
-		</tfoot>
-		<tbody id="rates">
-				<?php foreach ($results as $result) {
-					$locationResults = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;", $result->tax_rate_id ) );
-					
-					$postcode = $city = '';
-
-					foreach( $locationResults as $locationResult ) {
-						if ( $locationResult->location_type == 'postcode' ) {
-							$postcode = $locationResult->location_code;
-							continue;
-						}
-
-						if ( $locationResult->location_type == 'city' ) {
-							$city = $locationResult->location_code;
-							continue;
-						}
+					if ( ! empty( $results ) ) {
+						foreach ( $results as $result ) {
+							$locationResults = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;", $result->tax_rate_id ) );
+							$postcode = $city = '';
+	
+							foreach ( $locationResults as $locationResult ) {
+								if ( $locationResult->location_type == 'postcode' ) {
+									$postcode = $locationResult->location_code;
+									continue;
+								}
+	
+								if ( $locationResult->location_type == 'city' ) {
+									$city = $locationResult->location_code;
+									continue;
+								}
+							}
+	
+							$scheme   = isset( $this->settings['rate'][$result->tax_rate_id]['scheme'] ) ? $this->settings['rate'][$result->tax_rate_id]['scheme'] : '';
+							$category = isset( $this->settings['rate'][$result->tax_rate_id]['category'] ) ? $this->settings['rate'][$result->tax_rate_id]['category'] : '';
+							
+							echo '<tr>';
+							echo '<td>'.$result->tax_rate_country.'</td>';
+							echo '<td>'.$result->tax_rate_state.'</td>';
+							echo '<td>'.$postcode.'</td>';
+							echo '<td>'.$city.'</td>';
+							echo '<td>'.$result->tax_rate.'</td>';
+							echo '<td>'.$this->getSchemeSelect( 'rate', $result->tax_rate_id, $scheme ).'</td>';
+							echo '<td>'.$this->getCategorySelect( 'rate', $result->tax_rate_id, $category ).'</td>';
+							echo '</tr>';
+						}	
+					} else {
+						echo '<tr><td colspan="7">'.__( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ).'</td></tr>';
 					}
-
-					$scheme = isset($this->settings['rate'][$result->tax_rate_id]['scheme']) ? $this->settings['rate'][$result->tax_rate_id]['scheme'] : '';
-					$category = isset($this->settings['rate'][$result->tax_rate_id]['category']) ? $this->settings['rate'][$result->tax_rate_id]['category'] : '';
-					
-					echo '<tr>';
-					echo '<td>'.$result->tax_rate_country.'</td>';
-					echo '<td>'.$result->tax_rate_state.'</td>';
-					echo '<td>'.$postcode.'</td>';
-					echo '<td>'.$city.'</td>';
-					echo '<td>'.$result->tax_rate.'</td>';
-					echo '<td>'.$this->getSchemeSelect('rate', $result->tax_rate_id, $scheme).'</td>';
-					echo '<td>'.$this->getCategorySelect('rate', $result->tax_rate_id, $category).'</td>';
-					echo '</tr>';
-				}
 				?>
-		</tbody>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colspan="5" style="text-align: right;"><?php _e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
+					<?php
+						$scheme   = isset( $this->settings['class'][$slug]['scheme'] ) ? $this->settings['class'][$slug]['scheme'] : '';
+						$category = isset( $this->settings['class'][$slug]['category'] ) ? $this->settings['class'][$slug]['category'] : '';
+					?>
+					<th><?php echo $this->getSchemeSelect( 'class', $slug, $scheme ); ?></th>
+					<th><?php echo $this->getCategorySelect( 'class', $slug, $category ); ?></th>
+				</tr>
+			</tfoot>
 		</table>
 		<?php
 	}
