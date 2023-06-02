@@ -42,7 +42,7 @@ class TaxesSettings
 		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
 		?>
 		
-		<h3><?php echo $name; ?></h3>
+		<h4><?php echo $name; ?></h4>
 		<table class="widefat">
 			<thead>
 				<tr>

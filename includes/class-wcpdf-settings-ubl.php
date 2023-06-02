@@ -15,7 +15,7 @@ class Settings_UBL {
 
 	function __construct()	{
 		$this->sections = [
-			'taxes' => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+			'taxes' => __( 'Taxes classification', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 		
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
@@ -29,6 +29,7 @@ class Settings_UBL {
 		$active_section = ! empty( $active_section ) ? $active_section : 'taxes';
 		?>
 		<div class="wcpdf_ubl_settings_sections">
+			<?php if ( count( $this->sections ) > 1 ) : ?>
 			<h2 class="nav-tab-wrapper">
 				<?php
 					foreach ( $this->sections as $section => $title ) {
@@ -37,6 +38,9 @@ class Settings_UBL {
 					}
 				?>
 			</h2>
+			<?php else : ?>
+			<h3><?php echo $this->sections[$active_section]; ?></h3>
+			<?php endif; ?>
 		</div>
 		<?php
 		

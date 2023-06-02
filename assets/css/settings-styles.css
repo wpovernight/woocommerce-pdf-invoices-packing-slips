@@ -862,6 +862,10 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 100%!important;
 }
 
+.wcpdf_ubl_settings_sections {
+	margin-bottom: 4em;
+}
+
 sup.wcpdf_beta {
 	background-color: #51266b;
 	color: white;
