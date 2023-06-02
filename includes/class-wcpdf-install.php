@@ -433,7 +433,7 @@ class Install {
 				set_transient( 'wpo_wcpdf_ubl_addon_detected', 'yes', DAY_IN_SECONDS );
 			}
 			
-			// legacy ubl general settings
+			// legacy ubl general/invoice settings
 			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );
 			$general_settings            = get_option( 'wpo_wcpdf_settings_general', [] );
 			$invoice_ubl_settings        = get_option( 'wpo_wcpdf_documents_settings_invoice_ubl', [] );
