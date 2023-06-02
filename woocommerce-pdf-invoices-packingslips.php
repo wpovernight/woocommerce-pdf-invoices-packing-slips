@@ -530,6 +530,65 @@ class WPO_WCPDF {
 			}
 		}
 	}
+	
+	/**
+	 * Get an array of all active plugins, including multisite
+	 * @return array active plugin paths
+	 */
+	public function get_active_plugins() {
+		$active_plugins = (array) apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+		if ( is_multisite() ) {
+			// get_site_option( 'active_sitewide_plugins', array() ) returns a 'reversed list'
+			// like [hello-dolly/hello.php] => 1369572703 so we do array_keys to make the array
+			// compatible with $active_plugins
+			$active_sitewide_plugins = (array) array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
+			// merge arrays and remove doubles
+			$active_plugins = (array) array_unique( array_merge( $active_plugins, $active_sitewide_plugins ) );
+		}
+
+		return $active_plugins;
+	}
+	
+	public function ubl_addon_detected() {
+		$active_plugins = $this->get_active_plugins();
+		$ubl_addon      = '';
+		
+		foreach ( $active_plugins as $plugin ) {
+			if ( strpos( $plugin, 'ubl-woocommerce-pdf-invoices.php' ) !== false ) {
+				$ubl_addon = $plugin;
+				break;
+			}
+		}			
+		
+		return $ubl_addon;
+	}
+	
+	public function ubl_addon_active() {
+		if ( get_transient( 'wpo_wcpdf_ubl_addon_detected' ) ) {
+			ob_start();
+			?>
+			<div class="notice notice-warning">
+				<p><?php _e( 'The UBL addon was installed in your store but is no longer needed. We have disable it when you upgraded the PDF Invoices & Packing Slips for WooCommerce plugin. You are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_ubl_addon_active_notice', 'true' ), 'ubl_addon_active_notice' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo wp_kses_post( ob_get_clean() );
+		}
+		
+		// save option to hide mailpoet notice
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_ubl_addon_active_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ubl_addon_active_notice' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_ubl_addon_active_notice' );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			} else {
+				delete_transient( 'wpo_wcpdf_ubl_addon_detected' );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			}
+		}
+	}
 
 	/**
 	 * Get the plugin url.

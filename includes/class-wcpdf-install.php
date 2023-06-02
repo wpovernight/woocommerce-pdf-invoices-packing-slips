@@ -424,6 +424,14 @@ class Install {
 				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
 			}
 		}
+		
+		// 3.6.0-beta-1: deactivate ubl addon
+		if ( version_compare( $installed_version, '3.6.0-beta-1', '<' ) ) {
+			if ( ! empty( $addon = WPO_WCPDF()->ubl_addon_detected() ) ) {
+				deactivate_plugins( $addon );
+				set_transient( 'wpo_wcpdf_ubl_addon_detected', 'yes', DAY_IN_SECONDS );
+			}
+		}
 	}
 
 	/**
