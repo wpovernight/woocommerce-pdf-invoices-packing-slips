@@ -425,11 +425,65 @@ class Install {
 			}
 		}
 		
-		// 3.6.0-beta-1: deactivate ubl addon
+		// 3.6.0-beta-1: deactivate legacy ubl addon and migrate settings
 		if ( version_compare( $installed_version, '3.6.0-beta-1', '<' ) ) {
-			if ( ! empty( $addon = WPO_WCPDF()->ubl_addon_detected() ) ) {
-				deactivate_plugins( $addon );
+			// legacy ubl addon
+			if ( ! empty( $legacy_addon = WPO_WCPDF()->ubl_addon_detected() ) ) {
+				deactivate_plugins( $legacy_addon );
 				set_transient( 'wpo_wcpdf_ubl_addon_detected', 'yes', DAY_IN_SECONDS );
+			}
+			
+			// legacy ubl general settings
+			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );
+			$general_settings            = get_option( 'wpo_wcpdf_settings_general', [] );
+			$invoice_ubl_settings        = get_option( 'wpo_wcpdf_documents_settings_invoice_ubl', [] );
+			
+			$settings_to_migrate = [
+				'vat_number'            => 'general',
+				'coc_number'            => 'general',
+				'attach_to_email_ids'   => 'invoice_ubl',
+				'include_encrypted_pdf' => 'invoice_ubl',
+			];
+			
+			foreach ( $settings_to_migrate as $setting => $type ) {
+				$update = [];
+				
+				switch ( $type ) {
+					case 'general':
+						if ( isset( $legacy_ubl_general_settings[$setting] ) ) {
+							$general_settings[$setting] = $legacy_ubl_general_settings[$setting];
+							$update[]                   = $type;
+						}
+						break;
+					case 'invoice_ubl':
+						if ( isset( $legacy_ubl_general_settings[$setting] ) ) {
+							$invoice_ubl_settings[$setting] = $legacy_ubl_general_settings[$setting];
+							$update[]                       = $type;
+						}
+						break;
+				}
+				
+				if ( ! empty( $update ) ) {
+					$update = array_unique( $update );
+					foreach ( $update as $type ) {
+						switch ( $type ) {
+							case 'general':
+								update_option( 'wpo_wcpdf_settings_general', $general_settings );
+								break;
+							case 'invoice_ubl':
+								$invoice_ubl_settings['enabled'] = '1';
+								update_option( 'wpo_wcpdf_documents_settings_invoice_ubl', $invoice_ubl_settings );
+								break;
+						}
+					}
+				}
+			}
+			
+			
+			// legacy ubl tax settings
+			$legacy_ubl_tax_setings = get_option( 'ubl_wc_taxes', [] );
+			if ( ! empty( $legacy_ubl_tax_setings ) ) {
+				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_setings );
 			}
 		}
 	}
