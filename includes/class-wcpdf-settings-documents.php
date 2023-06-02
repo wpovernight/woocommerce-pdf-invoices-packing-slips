@@ -64,8 +64,12 @@ class Settings_Documents {
 					<h2 class="nav-tab-wrapper">
 						<?php
 							foreach ( $section_document->output_formats as $document_output_format ) {
-								$active = ( $output_format == $document_output_format ) || ( $output_format != 'pdf' && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
-								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), $active, strtoupper( esc_html( $document_output_format ) ) );
+								$active    = ( $output_format == $document_output_format ) || ( $output_format != 'pdf' && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
+								$tab_title = strtoupper( esc_html( $document_output_format ) );
+								if ( $document_output_format == 'ubl' ) {
+									$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
+								}
+								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), $active, $tab_title );
 							}
 						?>
 					</h2>

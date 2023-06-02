@@ -174,6 +174,7 @@ class Settings {
 			'ubl' => array(
 				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 1,
+				'beta'           => true,
 			),
 		) );
 

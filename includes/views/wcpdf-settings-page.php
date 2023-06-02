@@ -19,9 +19,13 @@ $review_invitation = sprintf(
 	<h2 class="nav-tab-wrapper">
 	<?php
 	foreach ( $settings_tabs as $tab_slug => $tab_data ) {
-		$tab_title = is_array( $tab_data ) ? $tab_data['title'] : $tab_data;
-		$tab_link = esc_url("?page=wpo_wcpdf_options_page&tab={$tab_slug}");
-		printf('<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', $tab_link, esc_attr( $tab_slug ), ( ( $active_tab == $tab_slug ) ? 'nav-tab-active' : '' ), esc_html( $tab_title ) );
+		$tab_title = is_array( $tab_data ) ? esc_html( $tab_data['title'] ) : esc_html( $tab_data );
+		$tab_link  = esc_url( "?page=wpo_wcpdf_options_page&tab={$tab_slug}" );
+		$tab_beta  = isset( $tab_data['beta'] ) ? true : false;
+		if ( $tab_beta ) {
+			$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
+		}
+		printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', $tab_link, esc_attr( $tab_slug ), ( ( $active_tab == $tab_slug ) ? 'nav-tab-active' : '' ), $tab_title );
 	}
 	?>
 	</h2>

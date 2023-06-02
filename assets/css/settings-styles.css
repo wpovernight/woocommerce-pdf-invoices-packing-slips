@@ -862,6 +862,14 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 100%!important;
 }
 
+sup.wcpdf_beta {
+	background-color: #51266b;
+	color: white;
+	font-size: 7pt;
+	padding: 1px 2px;
+	border-radius: 2px;
+}
+
 @media screen and (min-width: 1920px) {
 	.preview-document .preview > #preview-canvas {
 		max-width: 900px;
