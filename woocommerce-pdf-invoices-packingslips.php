@@ -63,6 +63,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
+		add_action( 'admin_notices', array( $this, 'ubl_addon_active' ) );
 
 		// legacy textdomain fallback
 		if ( $this->legacy_textdomain_enabled() === true ) {
