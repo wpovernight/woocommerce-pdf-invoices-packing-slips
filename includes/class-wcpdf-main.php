@@ -145,16 +145,22 @@ class Main {
 						continue;
 					}
 					
+					$tmp_path = $this->get_tmp_path( 'attachments' );
+					if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
+						wcpdf_log_error( "Couldn't get the attachments temporary folder path.", 'critical', $e );
+						return $attachments;
+					}
+					
 					// get attachment
 					$attachment = false;
 					switch ( $output_format ) {
 						default:
 						case 'pdf':
-							$attachment = $this->get_document_pdf_attachment( $document );
+							$attachment = $this->get_document_pdf_attachment( $document, $tmp_path );
 							break;
 						case 'ubl':
 							if ( true === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
-								$attachment = $this->get_document_ubl_attachment( $document );
+								$attachment = $this->get_document_ubl_attachment( $document, $tmp_path );
 							}
 							break;
 					}
@@ -188,12 +194,7 @@ class Main {
 		return $attachments;
 	}
 	
-	public function get_document_pdf_attachment( $document ) {
-		$tmp_path = $this->get_tmp_path( 'attachments' );
-		if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
-			return false;
-		}
-		
+	public function get_document_pdf_attachment( $document, $tmp_path ) {
 		$filename  = $document->get_filename();
 		$pdf_path  = $tmp_path . $filename;
 		$lock_file = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
@@ -233,12 +234,7 @@ class Main {
 		return $pdf_path;
 	}
 	
-	public function get_document_ubl_attachment( $document ) {
-		$tmp_path = $this->get_tmp_path( 'attachments' );
-		if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
-			return false;
-		}
-		
+	public function get_document_ubl_attachment( $document, $tmp_path ) {
 		$ubl_maker = wcpdf_get_ubl_maker();
 		$ubl_maker->setFilePath( $tmp_path );
 
@@ -287,13 +283,15 @@ class Main {
 		$attach_documents = array();
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {
-				$attach_documents[$output_format][$document->get_type()] = $document->get_attach_to_email_ids( $output_format );
+				if ( $document->is_enabled( $output_format ) ) {
+					$attach_documents[$output_format][$document->get_type()] = $document->get_attach_to_email_ids( $output_format );
+				}
 			}
 		}
 		
 		$attach_documents = apply_filters( 'wpo_wcpdf_attach_documents', $attach_documents );
 		$document_types   = array();
-		foreach ( $attach_documents as $format => $documents ) {
+		foreach ( $attach_documents as $output_format => $documents ) {
 			foreach ( $documents as $document_type => $attach_to_email_ids ) {
 				// legacy settings: convert abbreviated email_ids
 				foreach ( $attach_to_email_ids as $key => $attach_to_email_id ) {
@@ -302,9 +300,9 @@ class Main {
 					}
 				}
 
-				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $format );
+				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $output_format );
 				if ( in_array( $email_id, $attach_to_email_ids ) && $extra_condition === true ) {
-					$document_types[$format][] = $document_type;
+					$document_types[$output_format][] = $document_type;
 				}
 			}
 		}
@@ -536,6 +534,9 @@ class Main {
 		switch ( $type ) {
 			case 'dompdf':
 				$tmp_path = $tmp_base . 'dompdf';
+				break;
+			case 'ubl':
+				$tmp_path = $tmp_base . 'ubl';
 				break;
 			case 'font_cache':
 			case 'fonts':

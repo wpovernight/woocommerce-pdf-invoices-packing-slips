@@ -111,7 +111,7 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 
 function wcpdf_get_bulk_actions() {
 	$actions   = [];
-	$documents = WPO_WCPDF()->documents->get_documents();
+	$documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
 	
 	foreach ( $documents as $document ) {
 		$actions[$document->get_type()] = "PDF " . $document->get_title();

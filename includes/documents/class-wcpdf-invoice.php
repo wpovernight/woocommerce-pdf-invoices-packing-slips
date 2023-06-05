@@ -37,16 +37,16 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type           = 'invoice';
-		$this->title          = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon           = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-		$this->slug           = str_replace( '-', '_', $this->type );
+		$this->type         = 'invoice';
+		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->slug         = str_replace( '-', '_', $this->type );
 		
 		// semaphore
-		$this->lock_name      = "wpo_wcpdf_{$this->slug}_number_lock";
-		$this->lock_context   = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
-		$this->lock_time      = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
-		$this->lock_retries   = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
+		$this->lock_name    = "wpo_wcpdf_{$this->slug}_number_lock";
+		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
+		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
+		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
 		
 		// call parent constructor
 		parent::__construct( $order );
@@ -172,28 +172,16 @@ class Invoice extends Order_Document_Methods {
 				}
 			}
 		} else {
-			$suffix = date('Y-m-d'); // 2020-11-11
+			$suffix = date( 'Y-m-d' ); // 2020-11-11
 		}
 		
-		if ( empty( $args['output'] ) ) {
-			$args['output'] = 'pdf';
-		}
-		
-		switch ( $args['output'] ) {
-			default:
-			case 'pdf':
-				$extension = '.pdf';
-				break;
-			case 'ubl':
-				$extension = '.xml';
-				break;
-		}
-
-		$filename = $name . '-' . $suffix . $extension;
+		// get filename
+		$output_format = ! empty( empty( $args['output'] ) ) ? esc_attr( empty( $args['output'] ) ) : 'pdf';
+		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
 
 		// Filter filename
-		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );
-		$filename = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
+		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
+		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
 
 		// sanitize filename (after filters to prevent human errors)!
 		return sanitize_file_name( $filename );

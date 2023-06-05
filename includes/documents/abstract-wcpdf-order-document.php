@@ -247,10 +247,10 @@ abstract class Order_Document {
 		), $this );
 	}
 
-	public function get_setting( $key, $default = '', $format = 'pdf' ) {
-		if ( in_array( $format, $this->output_formats ) ) {
-			$settings        = $this->get_settings( false, $format );
-			$latest_settings = $this->get_settings( true, $format );
+	public function get_setting( $key, $default = '', $output_format = 'pdf' ) {
+		if ( in_array( $output_format, $this->output_formats ) ) {
+			$settings        = $this->get_settings( false, $output_format );
+			$latest_settings = $this->get_settings( true, $output_format );
 		} else {
 			$settings        = $this->settings;
 			$settings        = $this->latest_settings;
@@ -267,9 +267,9 @@ abstract class Order_Document {
 		return $setting;
 	}
 
-	public function get_attach_to_email_ids( $format = 'pdf' ) {
-		if ( in_array( $format, $this->output_formats ) ) {
-			$settings = $this->get_settings( false, $format );
+	public function get_attach_to_email_ids( $output_format = 'pdf' ) {
+		if ( in_array( $output_format, $this->output_formats ) ) {
+			$settings = $this->get_settings( false, $output_format );
 		} else {
 			$settings = $this->settings;
 		}
@@ -281,14 +281,14 @@ abstract class Order_Document {
 		return $this->type;
 	}
 
-	public function is_enabled( $format = 'pdf' ) {
-		if ( in_array( $format, $this->output_formats ) ) {
-			$is_enabled = $this->get_setting( 'enabled', false, $format );
+	public function is_enabled( $output_format = 'pdf' ) {
+		if ( in_array( $output_format, $this->output_formats ) ) {
+			$is_enabled = $this->get_setting( 'enabled', false, $output_format );
 		} else {
 			$is_enabled = $this->get_setting( 'enabled', false );
 		}
 		
-		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $format );
+		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
 
 	public function get_hook_prefix() {
@@ -989,7 +989,7 @@ abstract class Order_Document {
 		if ( $order_document = wcpdf_get_document( $this->get_type(), $this->order, true ) ) {
 			$ubl_document->setOrderDocument( $order_document );
 		} else {
-			wcpdf_log_error( 'Error generating order document!', 'error', null, $ubl_maker->context );
+			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
 			die();
 		}
 
@@ -1042,11 +1042,20 @@ abstract class Order_Document {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
 		
-		if ( empty( $args['output'] ) ) {
-			$args['output'] = 'pdf';
-		}
-		
-		switch ( $args['output'] ) {
+		// get filename
+		$output_format = ! empty( empty( $args['output'] ) ) ? esc_attr( empty( $args['output'] ) ) : 'pdf';
+		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
+
+		// Filter filename
+		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
+		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
+
+		// sanitize filename (after filters to prevent human errors)!
+		return sanitize_file_name( $filename );
+	}
+	
+	public function get_output_format_extension( $output_format ) {
+		switch ( $output_format ) {
 			default:
 			case 'pdf':
 				$extension = '.pdf';
@@ -1055,15 +1064,8 @@ abstract class Order_Document {
 				$extension = '.xml';
 				break;
 		}
-
-		$filename = $name . '-' . $suffix . $extension;
-
-		// Filter filename
-		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );
-		$filename = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
-
-		// sanitize filename (after filters to prevent human errors)!
-		return sanitize_file_name( $filename );
+		
+		return $extension;
 	}
 
 	public function get_template_path() {

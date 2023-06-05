@@ -57,28 +57,16 @@ class Packing_Slip extends Order_Document_Methods {
 				}
 			}
 		} else {
-			$suffix = date('Y-m-d'); // 2020-11-11
+			$suffix = date( 'Y-m-d' ); // 2020-11-11
 		}
 		
-		if ( empty( $args['output'] ) ) {
-			$args['output'] = 'pdf';
-		}
-		
-		switch ( $args['output'] ) {
-			default:
-			case 'pdf':
-				$extension = '.pdf';
-				break;
-			case 'ubl':
-				$extension = '.xml';
-				break;
-		}
-
-		$filename = $name . '-' . $suffix . $extension;
+		// get filename
+		$output_format = ! empty( empty( $args['output'] ) ) ? esc_attr( empty( $args['output'] ) ) : 'pdf';
+		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
 
 		// Filter filename
-		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );
-		$filename = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
+		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
+		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
 
 		// sanitize filename (after filters to prevent human errors)!
 		return sanitize_file_name( $filename );

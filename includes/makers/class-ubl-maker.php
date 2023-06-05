@@ -10,8 +10,6 @@ class UBL_Maker
 {
 	/** @var string */
 	protected $tmp_base;
-	
-	public $context = [ 'source' => 'wpo-wcpdf-ubl' ];
 
 	public function setup()
 	{
@@ -24,7 +22,7 @@ class UBL_Maker
 		$status = file_put_contents($fullFileName, $contents);
 
 		if ( $status === false ) {
-			throw new FileWriteException('Error writing file');
+			throw new FileWriteException( 'Error writing UBL file' );
 		}
 
 		return $fullFileName;
