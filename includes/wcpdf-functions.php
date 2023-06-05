@@ -114,11 +114,15 @@ function wcpdf_get_bulk_actions() {
 	$documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
 	
 	foreach ( $documents as $document ) {
-		$actions[$document->get_type()] = "PDF " . $document->get_title();
-		
-		// ubl
-		if ( $document->is_enabled( 'ubl' ) ) {
-			$actions[$document->get_type().'_ubl'] = "UBL " . $document->get_title();
+		foreach ( $document->output_formats as $output_format ) {
+			$slug = $document->get_type();
+			if ( $output_format != 'pdf' ) {
+				$slug .= "_{$output_format}";
+			}
+			
+			if ( $document->is_enabled( $output_format ) ) {
+				$actions[$slug] = strtoupper( $output_format ) . ' ' . $document->get_title();
+			}
 		}
 	}
 
