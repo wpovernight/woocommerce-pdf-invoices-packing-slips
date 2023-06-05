@@ -82,7 +82,7 @@ $review_invitation = sprintf(
 
 		<div class="preview-document">
 			<?php
-				$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
+				$documents     = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
 				$document_type = 'invoice';
 
 				if ( ! empty( $_REQUEST['section'] ) ) {

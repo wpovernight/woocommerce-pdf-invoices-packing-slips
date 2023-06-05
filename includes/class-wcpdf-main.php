@@ -283,7 +283,7 @@ class Main {
 	}
 
 	public function get_documents_for_email( $email_id, $order ) {
-		$documents        = WPO_WCPDF()->documents->get_documents();
+		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
 		$attach_documents = array();
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {

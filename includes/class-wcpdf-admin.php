@@ -608,14 +608,14 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->documents->get_documents();
+		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
 		
 		foreach ( $documents as $document ) {
 			if ( in_array( 'ubl', $document->output_formats ) ) {
 				$document_title = $document->get_title();
 				$document       = wcpdf_get_document( $document->get_type(), $order );
 				
-				if ( $document && $document->is_enabled( 'ubl' ) ) {
+				if ( $document ) {
 					$document_url   = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => 'ubl' ] );
 					$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 					$class          = [ $document->get_type(), 'ubl' ];

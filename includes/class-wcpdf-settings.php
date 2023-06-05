@@ -491,11 +491,11 @@ class Settings {
 		return $common_settings;
 	}
 
-	public function get_document_settings( $document_type ) {
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+	public function get_document_settings( $document_type, $output_format = 'pdf' ) {
+		$documents = WPO_WCPDF()->documents->get_documents( 'enabled', $output_format );
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() == $document_type ) {
-				return $document->settings;
+				return $document->get_settings( false, $output_format );
 			}
 		}
 		return false;

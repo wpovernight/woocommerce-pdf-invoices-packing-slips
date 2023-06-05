@@ -65,10 +65,13 @@ class Documents {
 
 	/**
 	 * Return the document classes - used in admin to load settings.
+	 * 
+	 * @param $filter
+	 * @param $output_format  Can be 'pdf', 'ubl' or 'any'
 	 *
 	 * @return array
 	 */
-	public function get_documents( $filter = 'enabled', $output_format = 'any' ) {
+	public function get_documents( $filter = 'enabled', $output_format = 'pdf' ) {
 		if ( empty( $this->documents ) ) {
 			$this->init();
 		}
