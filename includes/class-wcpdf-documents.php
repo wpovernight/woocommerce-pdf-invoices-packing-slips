@@ -68,7 +68,7 @@ class Documents {
 	 *
 	 * @return array
 	 */
-	public function get_documents( $filter = 'enabled' ) {
+	public function get_documents( $filter = 'enabled', $output_format = 'any' ) {
 		if ( empty( $this->documents ) ) {
 			$this->init();
 		}
@@ -76,10 +76,16 @@ class Documents {
 		if ( $filter == 'enabled' ) {
 			$documents = array();
 			foreach ( $this->documents as $class_name => $document ) {
-				foreach ( $document->output_formats as $output_format ) {
-					if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+				if ( $output_format == 'any' ) {
+					foreach ( $document->output_formats as $output_format ) {
+						if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+							$documents[$class_name] = $document;
+							break;
+						}
+					}
+				} else {
+					if ( in_array( $output_format, $document->output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
 						$documents[$class_name] = $document;
-						break;
 					}
 				}
 			}

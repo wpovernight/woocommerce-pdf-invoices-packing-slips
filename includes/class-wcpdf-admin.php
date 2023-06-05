@@ -458,15 +458,19 @@ class Admin {
 			'default'
 		);
 		
-		// create UBL buttons
-		add_meta_box(
-			'wpo_wcpdf-ubl-box',
-			__( 'Create UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'ubl_actions_meta_box' ),
-			$screen_id,
-			'side',
-			'default'
-		);
+		
+		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
+		if ( count( $ubl_documents ) > 0 ) {
+			// create UBL buttons
+			add_meta_box(
+				'wpo_wcpdf-ubl-box',
+				__( 'Create UBL', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'ubl_actions_meta_box' ),
+				$screen_id,
+				'side',
+				'default'
+			);	
+		}
 
 		// Invoice number & date
 		add_meta_box(
