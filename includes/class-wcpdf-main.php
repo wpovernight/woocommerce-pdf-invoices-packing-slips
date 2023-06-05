@@ -16,9 +16,8 @@ class Main {
 	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
 
 	public function __construct() {
-		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
-		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
-		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_ubl_ajax' ) );
+		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
+		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		
 		// mark/unmark printed
 		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
@@ -313,7 +312,7 @@ class Main {
 	/**
 	 * Load and generate the template output with ajax
 	 */
-	public function generate_pdf_ajax() {
+	public function generate_document_ajax() {
 		$guest_access = WPO_WCPDF()->settings->is_guest_access_enabled();
 		if ( ! $guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf' ) {
 			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );

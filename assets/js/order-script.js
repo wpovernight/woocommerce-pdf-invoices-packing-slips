@@ -27,25 +27,27 @@ jQuery( function( $ ) {
 				return;
 			}
 			
-			let url = '';
+			let partial_url = '';
+			let full_url    = '';
+			
 			if ( wpo_wcpdf_ajax.ajaxurl.indexOf ("?" ) != -1 ) {
-				url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			} else {
-				url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			}
 			
 			// ubl
 			if ( ubl_output ) {
 				$.each( checked, function( i, order_id ) {
-					url += '&order_ids='+order_id+'&output=ubl';
-					window.open( url, '_blank' );
+					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
+					window.open( full_url, '_blank' );
 				} );
 				
 			// pdf
 			} else {
 				let order_ids = checked.join( 'x' );
-				url += '&order_ids='+order_ids;
-				window.open( url, '_blank' );
+				full_url      = partial_url + '&order_ids='+order_ids;
+				window.open( full_url, '_blank' );
 			}
 
 		}

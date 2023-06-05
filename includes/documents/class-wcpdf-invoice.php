@@ -176,7 +176,7 @@ class Invoice extends Order_Document_Methods {
 		}
 		
 		// get filename
-		$output_format = ! empty( empty( $args['output'] ) ) ? esc_attr( empty( $args['output'] ) ) : 'pdf';
+		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
 		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
 
 		// Filter filename

@@ -20,6 +20,7 @@ if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods'
  */
 
 abstract class Order_Document_Methods extends Order_Document {
+	
 	public function is_refund( $order ) {
 		return $order->get_type() == 'shop_order_refund';
 	}
