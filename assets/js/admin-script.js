@@ -455,10 +455,10 @@ jQuery( function( $ ) {
 				if ( response.data.error ) {
 					$( '#'+canvasId ).remove();
 					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
-				} else if ( response.data.preview_data ) {
+				} else if ( response.data.preview_data && response.data.output_format ) {
 					$( '#'+canvasId ).remove();
 					
-					switch ( previewOutputFormat ) {
+					switch ( response.data.output_format ) {
 						default:
 						case 'pdf':
 							$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );

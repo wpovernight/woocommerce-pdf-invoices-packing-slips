@@ -301,7 +301,7 @@ class Settings {
 					}
 
 					// preview
-					$output_format = ! empty( $_REQUEST['output_format'] ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
+					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats ) ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
 					switch ( $output_format ) {
 						default:
 						case 'pdf':
@@ -312,7 +312,10 @@ class Settings {
 							break;
 					}
 
-					wp_send_json_success( array( 'preview_data' => $preview_data ) );
+					wp_send_json_success( array(
+						'preview_data'  => $preview_data,
+						'output_format' => $output_format,
+					) );
 				} else {
 					wp_send_json_error(
 						array(
