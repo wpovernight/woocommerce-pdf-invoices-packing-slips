@@ -259,8 +259,9 @@ class Settings_Debug {
 		if ( empty( $settings ) ) {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
-				if ( $type == $document->slug ) {
-					$settings = get_option( "wpo_wcpdf_documents_settings_{$document->get_type()}", [] );
+				$document_type = $document->get_type();
+				if ( substr( $type, 0, strlen( $document_type ) ) === $document_type ) {
+					$settings = get_option( "wpo_wcpdf_documents_settings_{$type}", [] );
 					break;
 				}
 			}
@@ -317,10 +318,11 @@ class Settings_Debug {
 		if ( in_array( $type, [ 'general', 'debug' ] ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
 		} else {
-			$documents = WPO_WCPDF()->documents->get_documents();
+			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
-				if ( $type == $document->slug ) {
-					$settings_option = "wpo_wcpdf_documents_settings_{$document->get_type()}";
+				$document_type = $document->get_type();
+				if ( substr( $type, 0, strlen( $document_type ) ) === $document_type ) {
+					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
 				}
 			}
@@ -367,7 +369,14 @@ class Settings_Debug {
 			} else {
 				$title = $document->get_title();
 			}
-			$setting_types[$document->slug] = $title;
+			
+			foreach ( $document->output_formats as $output_format ) {
+				$slug = $document->get_type();
+				if ( $output_format != 'pdf' ) {
+					$slug .= "_{$output_format}";
+				}
+				$setting_types[$slug] = strtoupper( $output_format ) . ' ' .  $title;
+			}
 		}
 		
 		return apply_filters( 'wpo_wcpdf_setting_types', $setting_types );
