@@ -686,6 +686,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	padding: 20px 0;
 	background-color: white;
+	z-index: 99;
 }
 
 .preview-document .preview-data #preview-order-search-results a {
