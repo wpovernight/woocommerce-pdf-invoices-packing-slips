@@ -67,7 +67,7 @@ class Documents {
 	 * Return the document classes - used in admin to load settings.
 	 * 
 	 * @param $filter
-	 * @param $output_format  Can be 'pdf', 'ubl' or 'any'
+	 * @param $output_format  Can be 'pdf', 'ubl' or anything for all
 	 *
 	 * @return array
 	 */
@@ -79,16 +79,16 @@ class Documents {
 		if ( $filter == 'enabled' ) {
 			$documents = array();
 			foreach ( $this->documents as $class_name => $document ) {
-				if ( $output_format == 'any' ) {
+				if ( in_array( $output_format, $document->output_formats ) ) {
+					if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+						$documents[$class_name] = $document;
+					}
+				} else {
 					foreach ( $document->output_formats as $output_format ) {
 						if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
 							$documents[$class_name] = $document;
 							break;
 						}
-					}
-				} else {
-					if ( in_array( $output_format, $document->output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
-						$documents[$class_name] = $document;
 					}
 				}
 			}
