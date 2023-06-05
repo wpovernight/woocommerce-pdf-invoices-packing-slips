@@ -1235,7 +1235,7 @@ class Main {
 			$order_ids = $document->order_ids;
 		} elseif ( ! is_null( $document->order ) && is_callable( [ $document->order, 'get_id' ] ) ) {
 			$order_ids = [ $document->order->get_id() ];
-		} elseif ( $_REQUEST['order_id'] ) {
+		} elseif ( isset( $_REQUEST['order_id'] ) ) {
 			$order_ids = [ absint( $_REQUEST['order_id'] ) ];
 		} else {
 			$order_ids = [];
