@@ -273,6 +273,8 @@ class Settings {
 				do_action( 'wpo_wcpdf_preview_before_get_document', $document_type, $order );
 
 				$document = wcpdf_get_document( $document_type, $order );
+				
+				do_action( 'wpo_wcpdf_preview_after_get_document', $document_type, $order );
 
 				if ( $document ) {
 					if ( ! $document->exists() ) {
