@@ -269,6 +269,8 @@ class Settings {
 					
 					do_action( 'wpo_wcpdf_preview_after_reload_settings' );
 				}
+				
+				do_action( 'wpo_wcpdf_preview_before_get_document', $document_type, $order );
 
 				$document = wcpdf_get_document( $document_type, $order );
 
