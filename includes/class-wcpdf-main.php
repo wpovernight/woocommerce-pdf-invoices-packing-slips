@@ -1245,7 +1245,7 @@ class Main {
 			foreach ( $order_ids as $order_id ) {
 				$order = wc_get_order( $order_id );				
 				if ( ! empty( $order ) ) { 					
-					if ( $document->get_type() == 'credit-note' && is_callable( [ $order, 'get_parent_id' ] ) ) {
+					if ( is_callable( [ $document, 'get_type' ] ) && $document->get_type() == 'credit-note' && is_callable( [ $order, 'get_parent_id' ] ) ) {
 						$order = wc_get_order( $order->get_parent_id() );
 					}
 					
