@@ -512,6 +512,31 @@ class Settings_Debug {
 				)
 			),
 		);
+		
+		if ( apply_filters( 'wpo_wcpdf_beta_settings_debug_enabled', false ) ) {
+			$beta_settings = array(
+				array(
+					'type'     => 'section',
+					'id'       => 'beta_settings',
+					'title'    => __( 'Beta settings', 'woocommerce-pdf-invoices-packing-slips' ),
+					'callback' => 'section',
+				),
+				array(
+					'type'     => 'setting',
+					'id'       => 'enable_translate',
+					'title'    => __( 'Enable translate', 'woocommerce-pdf-invoices-packing-slips' ),
+					'callback' => 'checkbox',
+					'section'  => 'beta_settings',
+					'args'     => array(
+						'option_name' => $option_name,
+						'id'          => 'enable_translate',
+						'description' => __( 'Enables a simplified translation method for a small group of multilingual third party plugins.', 'woocommerce-pdf-invoices-packing-slips' ),
+					)
+				),
+			);
+			
+			$settings_fields = array_merge( $settings_fields, $beta_settings );
+		}
 
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_debug', $settings_fields, $page, $option_group, $option_name );

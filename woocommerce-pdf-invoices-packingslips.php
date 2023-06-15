@@ -191,6 +191,7 @@ class WPO_WCPDF {
 		include_once( $this->plugin_path() . '/includes/class-wcpdf-frontend.php' );
 		include_once( $this->plugin_path() . '/includes/class-wcpdf-install.php' );
 		include_once( $this->plugin_path() . '/includes/class-wcpdf-font-synchronizer.php' );
+		$this->translate = include_once( $this->plugin_path() . '/includes/class-wcpdf-translate.php' );
 
 		// Backwards compatibility with self
 		include_once( $this->plugin_path() . '/includes/legacy/class-wcpdf-legacy.php' );
