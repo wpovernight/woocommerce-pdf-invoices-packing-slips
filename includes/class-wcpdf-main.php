@@ -1253,10 +1253,10 @@ class Main {
 						continue;
 					}
 					
-					$status = $order->get_meta( "_wcpdf_{$type}_creation_trigger" );
+					$status = $order->get_meta( "_wcpdf_{$document->slug}_creation_trigger" );
 					 
 					if ( true == $force || empty( $status ) ) {
-						$order->update_meta_data( "_wcpdf_{$type}_creation_trigger", $trigger );
+						$order->update_meta_data( "_wcpdf_{$document->slug}_creation_trigger", $trigger );
 						$order->save_meta_data();
 					}
 				}
