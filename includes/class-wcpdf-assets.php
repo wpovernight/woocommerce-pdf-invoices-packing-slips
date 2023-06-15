@@ -131,7 +131,7 @@ class Assets {
 				array(
 					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
 					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
-					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.js',
+					'pdfjs_worker'              => 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.worker.min.js',
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
 						// general
 						'download_display',
@@ -170,6 +170,14 @@ class Assets {
 					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
 					'mysql_int_size_limit'      => __( 'The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
+			);
+			
+			// preview PDFJS
+			wp_enqueue_script(
+				'wpo-wcpdf-pdfjs',
+				'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.min.js',
+				array(),
+				'3.7.107'
 			);
 
 			wp_enqueue_media();
