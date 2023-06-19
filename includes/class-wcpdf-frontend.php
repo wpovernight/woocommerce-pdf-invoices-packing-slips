@@ -118,7 +118,7 @@ class Frontend {
 		), $atts );
 
 		$is_document_type_valid = false;
-		$documents = WPO_WCPDF()->documents->get_documents();
+		$documents              = WPO_WCPDF()->documents->get_documents();
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
 				$is_document_type_valid = true;
@@ -126,7 +126,7 @@ class Frontend {
 			}
 		}
 
-		if (!$is_document_type_valid) {
+		if ( ! $is_document_type_valid ) {
 			return;
 		}
 
