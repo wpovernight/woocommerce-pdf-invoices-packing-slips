@@ -110,10 +110,7 @@ class Frontend {
 		// Default values
 		$values = shortcode_atts( array(
 			'order_id'      => '',
-			'link_text'     => __(
-				'Download ' . str_replace( '-', ' ', $atts['document_type'] ?? 'invoice' ) . ' (PDF)',
-				'woocommerce-pdf-invoices-packing-slips'
-			),
+			'link_text'     => '',
 			'document_type' => 'invoice'
 		), $atts );
 
@@ -122,6 +119,17 @@ class Frontend {
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
 				$is_document_type_valid = true;
+
+				if ( ! empty( $values['link_text'] ) ) {
+					$link_text = $values['link_text'];
+				} else {
+					$link_text = sprintf(
+						/* translators: %s: Document type */
+						__( 'Download %s (PDF)', 'woocommerce-pdf-invoices-packing-slips' ),
+						wp_kses_post( $document->get_type() )
+					);
+				}
+
 				break;
 			}
 		}
@@ -153,7 +161,7 @@ class Frontend {
 
 		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
 
-		return sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $values['link_text'] ) );
+		return sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $link_text ) );
 	}
 
 	/**
