@@ -173,12 +173,15 @@ class Assets {
 			);
 			
 			// preview PDFJS
-			wp_enqueue_script(
-				'wpo-wcpdf-pdfjs',
-				WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.js',
-				array(),
-				'3.7.107'
-			);
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! isset( $debug_settings['disable_preview'] ) ) {
+				wp_enqueue_script(
+					'wpo-wcpdf-pdfjs',
+					WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.js',
+					array(),
+					'3.7.107'
+				);
+			}
 
 			wp_enqueue_media();
 			wp_enqueue_script(
