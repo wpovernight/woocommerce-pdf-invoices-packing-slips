@@ -14,7 +14,7 @@ class Frontend {
 		add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_number' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'download_invoice_shortcode' ) );
-		add_shortcode( 'wcpdf_download_packing_slip', array( $this, 'download_packing_slip_shortcode' ) );
+		add_shortcode( 'wcpdf_download_pdf', array( $this, 'download_pdf_shortcode' ) );
 	}
 
 	/**
@@ -104,17 +104,17 @@ class Frontend {
 	 * Download invoice frontend shortcode
 	 */
 	public function download_invoice_shortcode( $atts ) {
-		return $this->generate_document_link_shortcode($atts,'invoice');
+		return $this->generate_document_link_shortcode( $atts );
 	}
 
-    /**
-	 * Download packing slip frontend shortcode
+	/**
+	 * Download pdf frontend general shortcode
 	 */
-	public function download_packing_slip_shortcode( $atts ) {
-		return $this->generate_document_link_shortcode($atts, 'packing-slip');
+	public function download_pdf_shortcode( $atts ) {
+		return $this->generate_document_link_shortcode( $atts );
 	}
 
-	private function generate_document_link_shortcode( $atts, $document_type ) {
+	private function generate_document_link_shortcode( $atts ) {
 		global $wp;
 
 		if ( is_admin() ) {
@@ -123,9 +123,17 @@ class Frontend {
 
 		// Default values
 		$values = shortcode_atts( array(
-			'order_id'  => '',
-			'link_text' => ''
+			'order_id'      => '',
+			'link_text'     => __(
+				'Download ' . str_replace( '-', ' ', $atts['document_type'] ?? 'invoice' ) . ' (PDF)',
+				'woocommerce-pdf-invoices-packing-slips'
+			),
+			'document_type' => 'invoice'
 		), $atts );
+
+		if ( ! in_array( $values['document_type'], [ 'invoice', 'packing-slip', 'credit-note', 'proforma' ] ) ) {
+			return;
+		}
 
 		// Get $order
 		if ( empty( $values['order_id'] ) ) {
@@ -142,28 +150,15 @@ class Frontend {
 			return;
 		}
 
-		$document = $this->get_document( $order, $document_type );
+		$document = wcpdf_get_document( $values['document_type'], $order );
 
 		if ( ! $document || ! $document->is_allowed() ) {
 			return;
 		}
 
-		$link_text = ! empty( $values['link_text'] ) ?
-			$values['link_text'] :
-			__( 'Download ' . str_replace( '-', ' ', $document_type ) . ' (PDF)', 'woocommerce-pdf-invoices-packing-slips' );
+		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
 
-		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, [ 'shortcode' => 'true' ] );
-
-		return sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $link_text ) );
-	}
-
-	private function get_document($order, $document_type) {
-		$document_types = [
-			'invoice' => 'wcpdf_get_invoice',
-			'packing-slip' => 'wcpdf_get_packing_slip',
-		];
-
-		return isset($document_types[$document_type]) ? call_user_func($document_types[$document_type], $order) : null;
+		return sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $values['link_text'] ) );
 	}
 
 	/**
