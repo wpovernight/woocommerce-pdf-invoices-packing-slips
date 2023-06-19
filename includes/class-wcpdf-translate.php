@@ -125,7 +125,7 @@ class Translate {
 				break;
 		}
 		
-		if ( empty( $translated_html  ) ) {
+		if ( empty( $translated_html ) || ! is_string( $translated_html ) ) {
 			return $engine;
 		}
 
