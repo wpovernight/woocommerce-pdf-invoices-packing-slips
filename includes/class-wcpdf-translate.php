@@ -77,13 +77,19 @@ class Translate {
 			return $engine;
 		}
 		
-		// get order language
-		$woocommerce_order_language = '';
+		$lang_meta_key = '';
 		switch ( $this->active_plugin ) {
 			case 'translatepress':
-				$woocommerce_order_language = $order->get_meta( 'trp_language', true );
+				$lang_meta_key = 'trp_language';
 				break;
 		}
+		
+		if ( ! apply_filters( 'wpo_wcpdf_translate_plugin_args', $lang_meta_key, $this ) ) {
+			return $engine;
+		}
+		
+		// get order language
+		$woocommerce_order_language = $order->get_meta( $lang_meta_key, true );
 		
 		if ( empty( $woocommerce_order_language ) ) {
 			return $engine;
