@@ -13,8 +13,8 @@ class Frontend {
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
 		add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_number' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
-		add_shortcode( 'wcpdf_download_invoice', array( $this, 'download_invoice_shortcode' ) );
-		add_shortcode( 'wcpdf_download_pdf', array( $this, 'download_pdf_shortcode' ) );
+		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_link_shortcode' ) );
+		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_link_shortcode' ) );
 	}
 
 	/**
@@ -100,21 +100,7 @@ class Frontend {
 		return $data;
 	}
 
-	/**
-	 * Download invoice frontend shortcode
-	 */
-	public function download_invoice_shortcode( $atts ) {
-		return $this->generate_document_link_shortcode( $atts );
-	}
-
-	/**
-	 * Download pdf frontend general shortcode
-	 */
-	public function download_pdf_shortcode( $atts ) {
-		return $this->generate_document_link_shortcode( $atts );
-	}
-
-	private function generate_document_link_shortcode( $atts ) {
+	public function generate_document_link_shortcode( $atts ) {
 		global $wp;
 
 		if ( is_admin() ) {
@@ -131,7 +117,16 @@ class Frontend {
 			'document_type' => 'invoice'
 		), $atts );
 
-		if ( ! in_array( $values['document_type'], [ 'invoice', 'packing-slip', 'credit-note', 'proforma' ] ) ) {
+		$is_document_type_valid = false;
+		$documents = WPO_WCPDF()->documents->get_documents();
+		foreach ( $documents as $document ) {
+			if ( $document->get_type() === $values['document_type'] ) {
+				$is_document_type_valid = true;
+				break;
+			}
+		}
+
+		if (!$is_document_type_valid) {
 			return;
 		}
 
