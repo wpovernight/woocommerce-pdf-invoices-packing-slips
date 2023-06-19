@@ -116,16 +116,16 @@ class Translate {
 			return $engine;
 		}
 
-		$translated_output = '';
+		$translated_html = '';
 		switch ( $this->active_plugin ) {
 			case 'translatepress':
 				if ( function_exists( 'trp_translate' ) ) {
-					$translated_output = trp_translate( $html, $woocommerce_order_language, false );
+					$translated_html = trp_translate( $html, $woocommerce_order_language, false );
 				}
 				break;
 		}
 		
-		if ( empty( $translated_output  ) ) {
+		if ( empty( $translated_html  ) ) {
 			return $engine;
 		}
 
