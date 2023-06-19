@@ -77,22 +77,13 @@ class Translate {
 			return $engine;
 		}
 		
-		$plugin_args = [];
+		// get order language
+		$woocommerce_order_language = '';
 		switch ( $this->active_plugin ) {
 			case 'translatepress':
-				$plugin_args['meta_key'] = 'trp_language';
-				$plugin_args['callback'] = 'trp_translate';
+				$woocommerce_order_language = $order->get_meta( 'trp_language', true );
 				break;
 		}
-		
-		$plugin_args = apply_filters( 'wpo_wcpdf_translate_plugin_args', $plugin_args, $this );
-		
-		if ( empty( $plugin_args['meta_key'] ) || empty( $plugin_args['callback'] ) ) {
-			return $engine;
-		}
-
-		// get order language
-		$woocommerce_order_language = $order->get_meta( $plugin_args['meta_key'], true );
 		
 		if ( empty( $woocommerce_order_language ) ) {
 			return $engine;
@@ -119,14 +110,16 @@ class Translate {
 			return $engine;
 		}
 
-		$translated_output     = $plugin_args['callback']( $html, $woocommerce_order_language );
-		$translated_output_key = apply_filters( 'wpo_wcpdf_translate_html_translated_output_key', 'content', $this );
+		$translated_output = '';
+		switch ( $this->active_plugin ) {
+			case 'translatepress':
+				if ( function_exists( 'trp_translate' ) ) {
+					$translated_output = trp_translate( $html, $woocommerce_order_language, false );
+				}
+				break;
+		}
 		
-		if ( isset( $translated_output[$translated_output_key] ) && is_string( $translated_output[$translated_output_key] ) ) {
-			$translated_html = $translated_output[$translated_output_key];
-		} elseif ( is_string( $translated_output ) ) {
-			$translated_html = $translated_output;
-		} else {
+		if ( empty( $translated_output  ) ) {
 			return $engine;
 		}
 
