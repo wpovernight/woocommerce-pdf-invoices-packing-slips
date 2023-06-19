@@ -131,7 +131,6 @@ $review_invitation = sprintf(
 			<input type="hidden" name="output_format" value="<?php echo ( isset( $_REQUEST['output_format'] ) && ! empty( $_REQUEST['output_format'] ) ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf'; ?>">
 			<input type="hidden" name="order_id" value="">
 			<input type="hidden" name="nonce" value="<?php echo wp_create_nonce( 'wpo_wcpdf_preview' ); ?>">
-			<script src="<?php echo WPO_WCPDF()->plugin_url() ?>/assets/js/pdf_js/pdf.js"></script>
 			<div class="preview"></div>
 		</div>
 
