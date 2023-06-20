@@ -106,6 +106,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * New: adds a generic shortcode `[wcpdf_download_pdf]` for PDF download links 
 * New: bump preview PDFJS library to v3.7.107
 * Tweak: remove WPO hiring banner from the Status tab
+* Tweak: composer dependencies update
 * Fix: font deletion bug after plugin upgrade
 * Fix: bug on previewing Credit Note if the order has multiple refunds
 * Fix: PHP error on `log_document_creation_trigger_to_order_meta()` function when trying to get order ID and type
