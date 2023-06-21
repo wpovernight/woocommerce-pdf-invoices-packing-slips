@@ -102,7 +102,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 3.5.6 (2023-06-20) =
+= 3.5.6 (2023-06-21) =
 * New: adds a generic shortcode `[wcpdf_download_pdf]` for PDF download links 
 * New: bump preview PDFJS library to v3.7.107
 * Tweak: optimize PDFJS library size
