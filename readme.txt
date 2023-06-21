@@ -105,6 +105,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 = 3.5.6 (2023-06-20) =
 * New: adds a generic shortcode `[wcpdf_download_pdf]` for PDF download links 
 * New: bump preview PDFJS library to v3.7.107
+* Tweak: optimize PDFJS library size
 * Tweak: remove WPO hiring banner from the Status tab
 * Tweak: composer dependencies update
 * Fix: font deletion bug after plugin upgrade
