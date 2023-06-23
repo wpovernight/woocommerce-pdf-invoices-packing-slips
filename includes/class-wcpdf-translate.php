@@ -67,15 +67,12 @@ class Translate {
 			return $engine;
 		}
 		
-		if ( ! empty( sanitize_key( $_GET['order_ids'] ) ) ) { // phpcs:ignore
-			$order_id = sanitize_key( $_GET['order_ids'] );    // phpcs:ignore
-		}
-
-		if ( empty( $order_id ) ) {
+		if ( ! isset( $_GET['order_ids'] ) || empty( $_GET['order_ids'] ) ) {
 			return $engine;
 		}
 		
-		$order = wc_get_order( $order_id );
+		$order_id = sanitize_key( $_GET['order_ids'] );    // phpcs:ignore
+		$order    = wc_get_order( $order_id );
 		
 		if ( empty( $order ) ) {
 			return $engine;
