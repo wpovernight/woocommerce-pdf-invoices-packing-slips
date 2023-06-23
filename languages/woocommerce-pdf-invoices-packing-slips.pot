@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.5.3\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.5.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-05-17T10:33:52+02:00\n"
+"POT-Creation-Date: 2023-06-19T15:00:00+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -75,8 +75,8 @@ msgid "Jumpstart the plugin by following our wizard!"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:152
-#: includes/class-wcpdf-settings-debug.php:161
-#: includes/class-wcpdf-settings-debug.php:163
+#: includes/class-wcpdf-settings-debug.php:154
+#: includes/class-wcpdf-settings-debug.php:156
 msgid "Run the Setup Wizard"
 msgstr ""
 
@@ -86,7 +86,7 @@ msgstr ""
 
 #: includes/class-wcpdf-admin.php:264
 #: includes/class-wcpdf-main.php:1115
-#: includes/documents/class-wcpdf-invoice.php:315
+#: includes/documents/class-wcpdf-invoice.php:318
 #: includes/views/setup-wizard/display-options.php:81
 msgid "Invoice Number"
 msgstr ""
@@ -94,134 +94,142 @@ msgstr ""
 #: includes/class-wcpdf-admin.php:265
 #: includes/class-wcpdf-main.php:1116
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1208
-#: includes/documents/class-wcpdf-invoice.php:299
+#: includes/documents/class-wcpdf-invoice.php:302
 #: includes/views/setup-wizard/display-options.php:60
 msgid "Invoice Date"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:412
+#: includes/class-wcpdf-admin.php:410
 msgid "Send order email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:423
+#: includes/class-wcpdf-admin.php:421
 msgid "Create PDF"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:433
+#: includes/class-wcpdf-admin.php:431
 msgid "PDF document data"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:450
+#: includes/class-wcpdf-admin.php:448
 msgid "Choose an email to send&hellip;"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:468
+#: includes/class-wcpdf-admin.php:466
 msgid "Save order & send email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:534
+#: includes/class-wcpdf-admin.php:532
 msgid "Mark printed"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:536
+#: includes/class-wcpdf-admin.php:534
 msgid "Unmark"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:569
+#: includes/class-wcpdf-admin.php:567
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:572
+#: includes/class-wcpdf-admin.php:570
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:575
+#: includes/class-wcpdf-admin.php:573
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:578
+#: includes/class-wcpdf-admin.php:576
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:581
+#: includes/class-wcpdf-admin.php:579
 msgid "Notes (printed in the invoice):"
 msgstr ""
 
+#: includes/class-wcpdf-admin.php:704
+msgid "View more details"
+msgstr ""
+
+#: includes/class-wcpdf-admin.php:705
+msgid "Hide details"
+msgstr ""
+
 #. translators: document title
-#: includes/class-wcpdf-admin.php:711
+#: includes/class-wcpdf-admin.php:717
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:716
+#: includes/class-wcpdf-admin.php:722
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:728
+#: includes/class-wcpdf-admin.php:734
 msgid "unformatted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:770
+#: includes/class-wcpdf-admin.php:776
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:771
+#: includes/class-wcpdf-admin.php:777
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/class-wcpdf-admin.php:920
+#: includes/class-wcpdf-admin.php:926
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:968
+#: includes/class-wcpdf-admin.php:974
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:974
+#: includes/class-wcpdf-admin.php:980
 msgid "Bad action!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:980
+#: includes/class-wcpdf-admin.php:986
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:986
+#: includes/class-wcpdf-admin.php:992
 msgid "No permissions!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1010
+#: includes/class-wcpdf-admin.php:1016
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1011
+#: includes/class-wcpdf-admin.php:1017
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1014
+#: includes/class-wcpdf-admin.php:1020
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1015
+#: includes/class-wcpdf-admin.php:1021
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1018
+#: includes/class-wcpdf-admin.php:1024
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1019
+#: includes/class-wcpdf-admin.php:1025
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1075
+#: includes/class-wcpdf-admin.php:1081
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1089
+#: includes/class-wcpdf-admin.php:1095
 msgid "Document is empty."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1120
+#: includes/class-wcpdf-admin.php:1126
 msgid "DEBUG output enabled"
 msgstr ""
 
@@ -253,12 +261,13 @@ msgstr ""
 msgid "The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding."
 msgstr ""
 
-#: includes/class-wcpdf-assets.php:213
+#: includes/class-wcpdf-assets.php:224
 msgid "Download"
 msgstr ""
 
-#: includes/class-wcpdf-frontend.php:146
-msgid "Download invoice (PDF)"
+#. translators: %s: Document type
+#: includes/class-wcpdf-frontend.php:128
+msgid "Download %s (PDF)"
 msgstr ""
 
 #: includes/class-wcpdf-main.php:268
@@ -266,7 +275,7 @@ msgstr ""
 #: includes/class-wcpdf-main.php:289
 #: includes/class-wcpdf-main.php:375
 #: includes/class-wcpdf-settings.php:212
-#: includes/class-wcpdf-settings.php:334
+#: includes/class-wcpdf-settings.php:338
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -334,33 +343,33 @@ msgstr ""
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/class-wcpdf-main.php:1261
+#: includes/class-wcpdf-main.php:1274
 msgid "single order action"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:1262
+#: includes/class-wcpdf-main.php:1275
 msgid "bulk order action"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:1263
+#: includes/class-wcpdf-main.php:1276
 msgid "my account"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:1264
+#: includes/class-wcpdf-main.php:1277
 msgid "email attachment"
 msgstr ""
 
-#: includes/class-wcpdf-main.php:1265
+#: includes/class-wcpdf-main.php:1278
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/class-wcpdf-main.php:1349
+#: includes/class-wcpdf-main.php:1362
 msgid "Document of type %1$s for the selected order could not be %2$s as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/class-wcpdf-main.php:1444
+#: includes/class-wcpdf-main.php:1457
 msgid "Order %s Saved"
 msgstr ""
 
@@ -384,257 +393,257 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:41
+#: includes/class-wcpdf-settings-debug.php:34
 msgid "Tools"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:46
+#: includes/class-wcpdf-settings-debug.php:39
 msgid "Generate random temporary directory"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:47
+#: includes/class-wcpdf-settings-debug.php:40
 msgid "For security reasons, it is preferable to use a random name for the temporary directory."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:51
+#: includes/class-wcpdf-settings-debug.php:44
 msgid "Generate temporary directory"
 msgstr ""
 
 #. translators: directory path
-#: includes/class-wcpdf-settings-debug.php:64
+#: includes/class-wcpdf-settings-debug.php:57
 msgid "Temporary folder moved to %s"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:71
+#: includes/class-wcpdf-settings-debug.php:64
 msgid "Reinstall plugin fonts"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:72
+#: includes/class-wcpdf-settings-debug.php:65
 msgid "If you are experiencing issues with rendering fonts there might have been an issue during installation or upgrade."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:76
+#: includes/class-wcpdf-settings-debug.php:69
 msgid "Reinstall fonts"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:85
+#: includes/class-wcpdf-settings-debug.php:78
 msgid "Fonts reinstalled!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:92
+#: includes/class-wcpdf-settings-debug.php:85
 msgid "Reschedule the yearly reset of the numbering system"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:93
+#: includes/class-wcpdf-settings-debug.php:86
 msgid "You seem to have the yearly reset enabled for one of your documents but the action that performs this isn't scheduled yet."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:97
+#: includes/class-wcpdf-settings-debug.php:90
 msgid "Reschedule yearly reset"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:106
+#: includes/class-wcpdf-settings-debug.php:99
 msgid "Yearly reset numbering system rescheduled!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:113
-#: includes/class-wcpdf-settings-debug.php:118
+#: includes/class-wcpdf-settings-debug.php:106
+#: includes/class-wcpdf-settings-debug.php:111
 msgid "Remove temporary files"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:114
+#: includes/class-wcpdf-settings-debug.php:107
 msgid "Clean up the PDF files stored in the temporary folder (used for email attachments)."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:134
+#: includes/class-wcpdf-settings-debug.php:127
 msgid "Delete legacy (1.X) settings"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:135
+#: includes/class-wcpdf-settings-debug.php:128
 msgid "Safely remove deprecated settings from version 1.x of the plugin."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:139
+#: includes/class-wcpdf-settings-debug.php:132
 msgid "Delete legacy settings"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:155
+#: includes/class-wcpdf-settings-debug.php:148
 msgid "Legacy settings deleted!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:162
+#: includes/class-wcpdf-settings-debug.php:155
 msgid "Set up your basic invoice workflow via our Wizard."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:166
+#: includes/class-wcpdf-settings-debug.php:159
 msgid "Export Settings"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:167
+#: includes/class-wcpdf-settings-debug.php:160
 msgid "Download plugin settings in JSON format to easily export your current setup."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:180
+#: includes/class-wcpdf-settings-debug.php:173
 msgid "Export"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:188
+#: includes/class-wcpdf-settings-debug.php:181
 msgid "Import Settings"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:189
+#: includes/class-wcpdf-settings-debug.php:182
 msgid "Import plugin settings in JSON format."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:194
+#: includes/class-wcpdf-settings-debug.php:187
 msgid "Import"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:239
+#: includes/class-wcpdf-settings-debug.php:232
 msgid "Export settings type is empty!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:269
+#: includes/class-wcpdf-settings-debug.php:262
 msgid "Exported settings data is empty!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:288
+#: includes/class-wcpdf-settings-debug.php:281
 msgid "Failed to get contents from JSON file!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:295
+#: includes/class-wcpdf-settings-debug.php:288
 msgid "JSON file not found!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:301
+#: includes/class-wcpdf-settings-debug.php:294
 msgid "The JSON file data is corrupted!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:312
+#: includes/class-wcpdf-settings-debug.php:305
 msgid "The JSON file settings type is not supported on this store!"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:333
+#: includes/class-wcpdf-settings-debug.php:326
 msgid "Couldn't determine the settings option for the import!"
 msgstr ""
 
 #. translators: settings type
-#: includes/class-wcpdf-settings-debug.php:342
+#: includes/class-wcpdf-settings-debug.php:335
 msgid "%s settings imported successfully!"
 msgstr ""
 
 #. translators: settings type
-#: includes/class-wcpdf-settings-debug.php:350
+#: includes/class-wcpdf-settings-debug.php:343
 msgid "The %s settings file you are trying to import is identical to your current settings, therefore, the settings were not imported."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:360
+#: includes/class-wcpdf-settings-debug.php:353
 #: includes/class-wcpdf-settings.php:163
 msgid "General"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:361
+#: includes/class-wcpdf-settings-debug.php:354
 msgid "Debug"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:396
+#: includes/class-wcpdf-settings-debug.php:383
 msgid "Debug settings"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:402
+#: includes/class-wcpdf-settings-debug.php:389
 msgid "Legacy mode"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:408
+#: includes/class-wcpdf-settings-debug.php:395
 msgid "Legacy mode ensures compatibility with templates and filters from previous versions."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:414
+#: includes/class-wcpdf-settings-debug.php:401
 msgid "Legacy textdomain fallback"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:420
+#: includes/class-wcpdf-settings-debug.php:407
 msgid "Legacy textdomain fallback ensures compatibility with translation files from versions prior to 2017-05-15."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:426
+#: includes/class-wcpdf-settings-debug.php:413
 msgid "Allow guest access"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:432
+#: includes/class-wcpdf-settings-debug.php:419
 msgid "Enable this to allow customers that purchase without an account to access their PDF with a unique key"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:438
+#: includes/class-wcpdf-settings-debug.php:425
 msgid "Pretty document links"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:444
+#: includes/class-wcpdf-settings-debug.php:431
 msgid "Changes the document links to a prettier URL scheme."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:450
+#: includes/class-wcpdf-settings-debug.php:437
 msgid "Calculate document numbers (slow)"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:456
+#: includes/class-wcpdf-settings-debug.php:443
 msgid "Document numbers (such as invoice numbers) are generated using AUTO_INCREMENT by default. Use this setting if your database auto increments with more than 1."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:462
+#: includes/class-wcpdf-settings-debug.php:449
 msgid "Enable debug output"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:468
+#: includes/class-wcpdf-settings-debug.php:455
 msgid "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:469
+#: includes/class-wcpdf-settings-debug.php:456
 msgid "<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefor this is not recommended to leave it enabled on live sites."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:470
+#: includes/class-wcpdf-settings-debug.php:457
 msgid "You can also add <code>&debug=true</code> to the URL to apply this on a per-order basis."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:476
+#: includes/class-wcpdf-settings-debug.php:463
 msgid "Enable automatic cleanup"
 msgstr ""
 
 #. translators: number of days
-#: includes/class-wcpdf-settings-debug.php:483
+#: includes/class-wcpdf-settings-debug.php:470
 msgid "every %s days"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:487
+#: includes/class-wcpdf-settings-debug.php:474
 msgid "Automatically clean up PDF files stored in the temporary folder (used for email attachments)"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:493
+#: includes/class-wcpdf-settings-debug.php:480
 msgid "Output to HTML"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:499
+#: includes/class-wcpdf-settings-debug.php:486
 msgid "Send the template output as HTML to the browser instead of creating a PDF."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:500
+#: includes/class-wcpdf-settings-debug.php:487
 msgid "You can also add <code>&output=html</code> to the URL to apply this on a per-order basis."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:506
+#: includes/class-wcpdf-settings-debug.php:493
 msgid "Log to order notes"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:512
+#: includes/class-wcpdf-settings-debug.php:499
 msgid "Log PDF document creation and mark/unmark as printed to order notes."
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:518
+#: includes/class-wcpdf-settings-debug.php:505
 msgid "Disable document preview"
 msgstr ""
 
-#: includes/class-wcpdf-settings-debug.php:524
+#: includes/class-wcpdf-settings-debug.php:511
 msgid "Disables the document preview on the plugin settings pages."
 msgstr ""
 
@@ -932,43 +941,43 @@ msgid "Object found is not an order!"
 msgstr ""
 
 #. translators: order ID
-#: includes/class-wcpdf-settings.php:303
+#: includes/class-wcpdf-settings.php:307
 msgid "Document not available for order #%s, try selecting a different order."
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:310
+#: includes/class-wcpdf-settings.php:314
 msgid "No WooCommerce orders found! Please consider adding your first order to see this preview."
 msgstr ""
 
 #. translators: error message
-#: includes/class-wcpdf-settings.php:318
+#: includes/class-wcpdf-settings.php:322
 msgid "Error trying to generate document: %s"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:392
+#: includes/class-wcpdf-settings.php:396
 msgid "Date"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:393
+#: includes/class-wcpdf-settings.php:397
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1067
 msgid "Total"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:400
+#: includes/class-wcpdf-settings.php:404
 msgid "No order(s) found!"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:403
+#: includes/class-wcpdf-settings.php:407
 msgid "An error occurred when trying to process your request!"
 msgstr ""
 
 #. translators: error message
-#: includes/class-wcpdf-settings.php:410
+#: includes/class-wcpdf-settings.php:414
 msgid "Error trying to get orders: %s"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/class-wcpdf-settings.php:884
+#: includes/class-wcpdf-settings.php:888
 msgid "Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found"
 msgstr ""
 
@@ -1046,7 +1055,7 @@ msgid "Total ex. VAT"
 msgstr ""
 
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1209
-#: includes/documents/class-wcpdf-invoice.php:300
+#: includes/documents/class-wcpdf-invoice.php:303
 #: includes/views/setup-wizard/display-options.php:61
 msgid "Order Date"
 msgstr ""
@@ -1079,54 +1088,54 @@ msgstr ""
 msgid "Manual email"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:39
-#: includes/documents/class-wcpdf-invoice.php:69
+#: includes/documents/class-wcpdf-invoice.php:40
+#: includes/documents/class-wcpdf-invoice.php:71
 #: includes/legacy/class-wcpdf-legacy-functions.php:18
 #: includes/views/wcpdf-settings-page.php:112
 msgid "Invoice"
 msgstr ""
 
 #. translators: document type
-#: includes/documents/class-wcpdf-invoice.php:144
-#: includes/documents/class-wcpdf-invoice.php:354
-#: includes/documents/class-wcpdf-invoice.php:363
-#: includes/documents/class-wcpdf-invoice.php:371
-#: includes/documents/class-wcpdf-invoice.php:375
+#: includes/documents/class-wcpdf-invoice.php:147
+#: includes/documents/class-wcpdf-invoice.php:357
+#: includes/documents/class-wcpdf-invoice.php:366
+#: includes/documents/class-wcpdf-invoice.php:374
+#: includes/documents/class-wcpdf-invoice.php:378
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/documents/class-wcpdf-invoice.php:199
+#: includes/documents/class-wcpdf-invoice.php:202
 #: includes/documents/class-wcpdf-packing-slip.php:84
 msgid "Enable"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:210
+#: includes/documents/class-wcpdf-invoice.php:213
 #: includes/documents/class-wcpdf-packing-slip.php:159
 msgid "Attach to:"
 msgstr ""
 
 #. translators: directory path
-#: includes/documents/class-wcpdf-invoice.php:218
+#: includes/documents/class-wcpdf-invoice.php:221
 msgid "It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:224
+#: includes/documents/class-wcpdf-invoice.php:227
 msgid "Disable for:"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:233
+#: includes/documents/class-wcpdf-invoice.php:236
 msgid "Select one or more statuses"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:239
+#: includes/documents/class-wcpdf-invoice.php:242
 msgid "Display shipping address"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:246
-#: includes/documents/class-wcpdf-invoice.php:298
-#: includes/documents/class-wcpdf-invoice.php:314
+#: includes/documents/class-wcpdf-invoice.php:249
+#: includes/documents/class-wcpdf-invoice.php:301
+#: includes/documents/class-wcpdf-invoice.php:317
 #: includes/documents/class-wcpdf-packing-slip.php:102
 #: includes/views/dompdf-status.php:138
 #: includes/views/dompdf-status.php:166
@@ -1137,232 +1146,245 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:247
+#: includes/documents/class-wcpdf-invoice.php:250
 #: includes/views/setup-wizard/display-options.php:21
 msgid "Only when different from billing address"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:248
-#: includes/documents/class-wcpdf-invoice.php:401
+#: includes/documents/class-wcpdf-invoice.php:251
+#: includes/documents/class-wcpdf-invoice.php:420
 #: includes/documents/class-wcpdf-packing-slip.php:104
 #: includes/views/setup-wizard/display-options.php:22
 msgid "Always"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:256
+#: includes/documents/class-wcpdf-invoice.php:259
 #: includes/documents/class-wcpdf-packing-slip.php:112
 msgid "Display email address"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:267
+#: includes/documents/class-wcpdf-invoice.php:270
 #: includes/documents/class-wcpdf-packing-slip.php:123
 msgid "Display phone number"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:278
+#: includes/documents/class-wcpdf-invoice.php:281
 #: includes/documents/class-wcpdf-packing-slip.php:134
 msgid "Display customer notes"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:291
+#: includes/documents/class-wcpdf-invoice.php:294
 msgid "Display invoice date"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:307
+#: includes/documents/class-wcpdf-invoice.php:310
 msgid "Display invoice number"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:316
+#: includes/documents/class-wcpdf-invoice.php:319
 #: includes/views/setup-wizard/display-options.php:82
 msgid "Order Number"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:320
+#: includes/documents/class-wcpdf-invoice.php:323
 msgid "Warning!"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:321
+#: includes/documents/class-wcpdf-invoice.php:324
 msgid "Using the Order Number as invoice number is not recommended as this may lead to gaps in the invoice number sequence (even when order numbers are sequential)."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:322
+#: includes/documents/class-wcpdf-invoice.php:325
 msgid "More information"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:329
+#: includes/documents/class-wcpdf-invoice.php:332
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:335
+#: includes/documents/class-wcpdf-invoice.php:338
 msgid "This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:341
+#: includes/documents/class-wcpdf-invoice.php:344
 msgid "Number format"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:349
+#: includes/documents/class-wcpdf-invoice.php:352
 msgid "Prefix"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:351
+#: includes/documents/class-wcpdf-invoice.php:354
 msgid "If set, this value will be used as number prefix."
 msgstr ""
 
 #. translators: 1. document type, 2-3 placeholders
-#: includes/documents/class-wcpdf-invoice.php:353
-#: includes/documents/class-wcpdf-invoice.php:362
+#: includes/documents/class-wcpdf-invoice.php:356
+#: includes/documents/class-wcpdf-invoice.php:365
 msgid "You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:355
-#: includes/documents/class-wcpdf-invoice.php:364
+#: includes/documents/class-wcpdf-invoice.php:358
+#: includes/documents/class-wcpdf-invoice.php:367
 msgid "Check the Docs article below to see all the available placeholders for prefix/suffix."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:358
+#: includes/documents/class-wcpdf-invoice.php:361
 msgid "Suffix"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:360
+#: includes/documents/class-wcpdf-invoice.php:363
 msgid "If set, this value will be used as number suffix."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:367
+#: includes/documents/class-wcpdf-invoice.php:370
 msgid "Padding"
 msgstr ""
 
 #. translators: document type
-#: includes/documents/class-wcpdf-invoice.php:371
+#: includes/documents/class-wcpdf-invoice.php:374
 msgid "Enter the number of digits you want to use as padding. For instance, enter <code>6</code> to display the %s number <code>123</code> as <code>000123</code>, filling it with zeros until the number set as padding is reached."
 msgstr ""
 
 #. translators: document type
-#: includes/documents/class-wcpdf-invoice.php:375
+#: includes/documents/class-wcpdf-invoice.php:378
 msgid "For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article:"
 msgstr ""
 
 #. translators: document type
-#: includes/documents/class-wcpdf-invoice.php:375
+#: includes/documents/class-wcpdf-invoice.php:378
 msgid "Number format explained"
 msgstr ""
 
 #. translators: document type
-#: includes/documents/class-wcpdf-invoice.php:375
+#: includes/documents/class-wcpdf-invoice.php:378
 msgid "<strong>Note</strong>: if you have already created a custom %s number format with a filter, the above settings will be ignored."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:381
+#: includes/documents/class-wcpdf-invoice.php:384
 msgid "Reset invoice number yearly"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:392
+#: includes/documents/class-wcpdf-invoice.php:395
+msgid "Log invoice number generation"
+msgstr ""
+
+#. translators: here link
+#: includes/documents/class-wcpdf-invoice.php:403
+msgid "Enables the invoice number generation logs %s. Helpful for debugging numbering issues."
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:404
+msgid "here"
+msgstr ""
+
+#: includes/documents/class-wcpdf-invoice.php:411
 msgid "Allow My Account invoice download"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:399
+#: includes/documents/class-wcpdf-invoice.php:418
 msgid "Only when an invoice is already created/emailed"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:400
+#: includes/documents/class-wcpdf-invoice.php:419
 msgid "Only for specific order statuses (define below)"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:402
+#: includes/documents/class-wcpdf-invoice.php:421
 msgid "Never"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:417
+#: includes/documents/class-wcpdf-invoice.php:436
 msgid "Enable invoice number column in the orders list"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:428
+#: includes/documents/class-wcpdf-invoice.php:447
 msgid "Enable invoice date column in the orders list"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:439
+#: includes/documents/class-wcpdf-invoice.php:458
 msgid "Enable invoice number search in the orders list"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:445
+#: includes/documents/class-wcpdf-invoice.php:464
 msgid "Can potentially slow down the search process."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:451
+#: includes/documents/class-wcpdf-invoice.php:470
 msgid "Disable for free orders"
 msgstr ""
 
 #. translators: zero number
-#: includes/documents/class-wcpdf-invoice.php:458
+#: includes/documents/class-wcpdf-invoice.php:477
 msgid "Disable document when the order total is %s"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:464
+#: includes/documents/class-wcpdf-invoice.php:483
 msgid "Mark as printed"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:472
+#: includes/documents/class-wcpdf-invoice.php:491
 msgid "Manually"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:475
+#: includes/documents/class-wcpdf-invoice.php:494
 msgid "On single order action"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:476
+#: includes/documents/class-wcpdf-invoice.php:495
 msgid "On bulk order action"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:477
+#: includes/documents/class-wcpdf-invoice.php:496
 msgid "On my account"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:478
+#: includes/documents/class-wcpdf-invoice.php:497
 msgid "On email attachment"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:479
+#: includes/documents/class-wcpdf-invoice.php:498
 msgid "On order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:484
+#: includes/documents/class-wcpdf-invoice.php:503
 msgid "Allows you to mark the document as printed, manually (in the order page) or automatically (based on the document creation context you have selected)."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:490
+#: includes/documents/class-wcpdf-invoice.php:509
 msgid "Unmark as printed"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:496
+#: includes/documents/class-wcpdf-invoice.php:515
 msgid "Adds a link in the order page to allow to remove the printed mark."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:502
+#: includes/documents/class-wcpdf-invoice.php:521
 msgid "Always use most current settings"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:508
+#: includes/documents/class-wcpdf-invoice.php:527
 msgid "When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:510
+#: includes/documents/class-wcpdf-invoice.php:529
 msgid "<strong>Caution:</strong> enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:523
+#: includes/documents/class-wcpdf-invoice.php:542
 msgid "Invoice numbers are created by a third-party extension."
 msgstr ""
 
 #. translators: link
-#: includes/documents/class-wcpdf-invoice.php:526
+#: includes/documents/class-wcpdf-invoice.php:545
 msgid "Configure it <a href=\"%s\">here</a>."
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:544
+#: includes/documents/class-wcpdf-invoice.php:563
 msgid "Invoice Number:"
 msgstr ""
 
-#: includes/documents/class-wcpdf-invoice.php:552
+#: includes/documents/class-wcpdf-invoice.php:571
 msgid "Invoice Date:"
 msgstr ""
 
