@@ -28,6 +28,10 @@ class Translate {
 				case 'weglot':
 					add_filter( 'weglot_translate_pdf', '__return_true' );
 					break;
+				case 'translatepress':
+					add_filter( 'wpo_wcpdf_before_dompdf_render', array( $this, 'translate_html' ), 99, 4 );
+					add_filter( 'wpo_wcpdf_after_mpdf_write', array( $this, 'translate_html' ), 99, 4 );
+					add_filter( 'trp_stop_translating_page', '__return_false', 99, 2 ); // they have a custom function 'trp_woo_pdf_invoices_and_packing_slips_compatibility_dont_translate_pdf()' which disables our PDF to be translated.
 				default:
 					add_filter( 'wpo_wcpdf_before_dompdf_render', array( $this, 'translate_html' ), 99, 4 );
 					add_filter( 'wpo_wcpdf_after_mpdf_write', array( $this, 'translate_html' ), 99, 4 );
