@@ -524,7 +524,7 @@ class Settings_Debug {
 				array(
 					'type'     => 'setting',
 					'id'       => 'translate_pdf_plugin',
-					'title'    => __( 'Translate PDF plugin', 'woocommerce-pdf-invoices-packing-slips' ),
+					'title'    => __( 'Translate PDF with', 'woocommerce-pdf-invoices-packing-slips' ),
 					'callback' => 'select',
 					'section'  => 'beta_settings',
 					'args'     => array(
