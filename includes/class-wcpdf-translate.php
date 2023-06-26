@@ -93,7 +93,7 @@ class Translate {
 		$woocommerce_order_language = '';
 		
 		// check if HTML needs translation (different language)
-		$needs_translation          = false;
+		$needs_translation = false;
 		switch ( $this->selected_plugin ) {
 			case 'translatepress':
 				$woocommerce_order_language = $order->get_meta( 'trp_language', true );
