@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 3.5.5
+Stable tag: 3.5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,16 +102,28 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 3.5.6 (2023-06-21) =
+* New: adds a generic shortcode `[wcpdf_download_pdf]` for PDF download links 
+* New: bump preview PDFJS library to v3.7.107
+* Tweak: optimize PDFJS library size
+* Tweak: remove WPO hiring banner from the Status tab
+* Tweak: composer dependencies update
+* Fix: font deletion bug after plugin upgrade
+* Fix: bug on previewing Credit Note if the order has multiple refunds
+* Fix: PHP error on `log_document_creation_trigger_to_order_meta()` function when trying to get order ID and type
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 7.8
+
 = 3.5.5 (2023-06-01) =
-- New: toggle display date and created via on document data
-- New: adds support for legacy Sidekick activated licenses in Upgrade tab
-- Tweak: log invoice number generation on setting
+* New: toggle display date and created via on document data
+* New: adds support for legacy Sidekick activated licenses in Upgrade tab
+* Tweak: log invoice number generation on setting
 
 = 3.5.4 (2023-05-19) =
-- Tweak: improves code for the upgrade tab get license info function
-- Fix: bug on templates using legacy versions of the Premium Templates extension
-- Fix: string translation issues & updated POT
-- Fix: bug in slug property not set when defining the document number lock name
+* Tweak: improves code for the upgrade tab get license info function
+* Fix: bug on templates using legacy versions of the Premium Templates extension
+* Fix: string translation issues & updated POT
+* Fix: bug in slug property not set when defining the document number lock name
 
 = 3.5.3 (2023-05-15) =
 * New: display creation trigger in document data and order meta
