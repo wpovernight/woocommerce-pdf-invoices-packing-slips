@@ -523,14 +523,18 @@ class Settings_Debug {
 				),
 				array(
 					'type'     => 'setting',
-					'id'       => 'enable_translate',
-					'title'    => __( 'Enable translate', 'woocommerce-pdf-invoices-packing-slips' ),
-					'callback' => 'checkbox',
+					'id'       => 'translate_pdf_plugin',
+					'title'    => __( 'Translate PDF plugin', 'woocommerce-pdf-invoices-packing-slips' ),
+					'callback' => 'select',
 					'section'  => 'beta_settings',
 					'args'     => array(
 						'option_name' => $option_name,
-						'id'          => 'enable_translate',
-						'description' => __( 'Enables a simplified translation method for a small group of multilingual third party plugins.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'id'          => 'translate_pdf_plugin',
+						'options'     => array_merge(
+							[ '' => __( 'Select...', 'woocommerce-pdf-invoices-packing-slips' ) ],
+							WPO_WCPDF()->translate->active_plugins
+						),
+						'description'=> __( 'Enables a simplified PDF translation method for a small group of multilingual third party plugins.', 'woocommerce-pdf-invoices-packing-slips' ),
 					)
 				),
 			);
