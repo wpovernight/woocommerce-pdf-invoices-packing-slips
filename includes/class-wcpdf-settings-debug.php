@@ -534,7 +534,10 @@ class Settings_Debug {
 							[ '' => __( 'Select...', 'woocommerce-pdf-invoices-packing-slips' ) ],
 							WPO_WCPDF()->translate->active_plugins
 						),
-						'description'=> __( 'Enables a simplified PDF translation method for a small group of multilingual third party plugins.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'description'=> sprintf(
+							__( 'Enables a simplified PDF translation method for a small group of multilingual third party plugins. This translations are not handled by the PDF plugin. To have more control over them, please contact the support team of the plugin you choosed on this setting, or consider our %s for full multilingual compatibility using WPML or Polylang.', 'woocommerce-pdf-invoices-packing-slips' ),
+							'<a href="'.esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ).'">'.__( 'Professional extension', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
+						)
 					)
 				),
 			);
