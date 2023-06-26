@@ -523,13 +523,13 @@ class Settings_Debug {
 				),
 				array(
 					'type'     => 'setting',
-					'id'       => 'translate_pdf_plugin',
+					'id'       => 'translate_pdf_with',
 					'title'    => __( 'Translate PDF with', 'woocommerce-pdf-invoices-packing-slips' ),
 					'callback' => 'select',
 					'section'  => 'beta_settings',
 					'args'     => array(
 						'option_name' => $option_name,
-						'id'          => 'translate_pdf_plugin',
+						'id'          => 'translate_pdf_with',
 						'options'     => array_merge(
 							[ '' => __( 'Select...', 'woocommerce-pdf-invoices-packing-slips' ) ],
 							WPO_WCPDF()->translate->active_plugins

@@ -9,19 +9,21 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Translate' ) ) :
 
 class Translate {
 	
-	public  $debug_settings    = null;
 	public  $active_plugins    = [];
 	public  $selected_plugin   = '';
 	private $supported_plugins = [];
 
 	public function __construct() {
-		$this->debug_settings    = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$this->supported_plugins = $this->get_supported_plugins();
 		$this->active_plugins    = $this->get_active_plugins();
 		
-		if ( isset( $this->debug_settings['translate_pdf_plugin'] ) && ! empty( $this->debug_settings['translate_pdf_plugin'] ) ) {
-			$this->selected_plugin = sanitize_text_field( $this->debug_settings['translate_pdf_plugin'] );
-			$this->init();
+		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+		if ( ! empty( $this->debug_settings['translate_pdf_with'] ) ) {
+			$this->selected_plugin = sanitize_text_field( $this->debug_settings['translate_pdf_with'] );
+			
+			if ( $this->is_plugin_still_active( $this->selected_plugin ) ) {
+				$this->init();
+			}
 		}
 	}
 	
@@ -46,16 +48,16 @@ class Translate {
 	private function get_supported_plugins() {
 		return apply_filters( 'wpo_wcpdf_translate_supported_plugins', [
 			'weglot' => [
-				'class' => 'Bootstrap_Weglot',
-				'name'  => 'Weglot'
+				'function' => 'weglot_plugin_loaded',
+				'name'     => 'Weglot'
 			],
 			'translatepress' => [
-				'class' => 'TRP_Translate_Press',
-				'name'  => 'TranslatePress'
+				'function' => 'trp_translate',
+				'name'     => 'TranslatePress'
 			],
 			'gtranslate' => [
-				'class' => 'GTranslate',
-				'name'  => 'GTranslate'
+				'function' => 'gt_translate_invoice_pdf', 
+				'name'     => 'GTranslate'
 			],
 		] );
 	}
@@ -65,13 +67,38 @@ class Translate {
 		
 		if ( ! empty( $this->supported_plugins ) ) {
 			foreach ( $this->supported_plugins as $slug => $plugin ) {
-				if ( class_exists( $plugin['class'] ) ) {
+				if ( function_exists( $plugin['function'] ) ) {
 					$active_plugins[$slug] = $plugin['name'];
 				}
 			}
 		}
 		
 		return $active_plugins;
+	}
+	
+	private function is_plugin_still_active( $slug ) {
+		$is_active = false;
+		
+		if ( empty( $slug ) ) {
+			return $is_active;
+		}
+		
+		if ( ! empty( $this->supported_plugins[$slug]['function'] ) ) {
+			if ( function_exists( $this->supported_plugins[$slug]['function'] ) ) {
+				$is_active = true;
+			}
+		}
+		
+		if ( ! $is_active ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['translate_pdf_with'] ) && $slug == $debug_settings['translate_pdf_with'] ) {
+				unset( $debug_settings['translate_pdf_with'] );
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+				$this->selected_plugin = '';
+			}
+		}
+		
+		return $is_active;
 	}
 	
 	public function translate_html( $engine, $html, $options, $document ) {
