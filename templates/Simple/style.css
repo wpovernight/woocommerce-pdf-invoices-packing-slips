@@ -125,7 +125,7 @@ table.order-data-addresses {
 
 table.order-data-addresses td.address,
 table.order-data-addresses td.order-data {
-	overflow-wrap: anywhere;
+	overflow-wrap: break-word;
 }
 
 td.order-data {
