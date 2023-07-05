@@ -140,6 +140,7 @@ td.order-data table th {
 	font-weight: normal;
 	padding-right: 2mm;
 	width: 50%;
+	overflow-wrap: break-word;
 }
 
 .invoice .shipping-address {
