@@ -125,7 +125,7 @@ table.order-data-addresses {
 
 table.order-data-addresses td.address,
 table.order-data-addresses td.order-data {
-	overflow-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 
 td.order-data {
@@ -140,6 +140,7 @@ td.order-data table th {
 	font-weight: normal;
 	padding-right: 2mm;
 	width: 50%;
+	overflow-wrap: break-word;
 }
 
 .invoice .shipping-address {
