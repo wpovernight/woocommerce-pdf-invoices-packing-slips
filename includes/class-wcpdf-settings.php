@@ -17,14 +17,16 @@ class Settings {
 	public $general;
 	public $documents;
 	public $debug;
+	public $upgrade;
 	public $general_settings;
 	public $debug_settings;
 	public $lock_name;
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
-	private $installed_templates = array();
-	private $template_list_cache = array();
+	private $installed_templates       = array();
+	private $installed_templates_cache = array();
+	private $template_list_cache       = array();
 
 	
 	function __construct()	{
