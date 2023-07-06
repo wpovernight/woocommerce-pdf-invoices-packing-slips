@@ -197,7 +197,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Tweak: update translation template and files
 * Fix: break long URLs in different lines if it reaches the available space in Simple template
 * Fix: restore deleted strings and load them using standalone strings.php file 
-* Fix: warning on deprecated argument from product get_dimentions() method
+* Fix: warning on deprecated argument from product get_dimensions() method
 * Tested up to WooCommerce 7.1
 
 = 3.2.3 (2022-10-28) =
@@ -493,7 +493,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 2.5.4 =
 * Fix: check for existence of WooCommerce functions preventing incidental crashes in specific deployment setups
-* Fix: documents could still be generated programmatically when document disabled and not specifically checking for `$documment->is_allowed()`
+* Fix: documents could still be generated programmatically when document disabled and not specifically checking for `$document->is_allowed()`
 * Dev: Filter to disable reloading attachment translations
 * Tested up to WooCommerce 4.4 & WP 5.5
 
@@ -672,7 +672,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Feature: Test mode to automatically apply updated settings to existing documents
 * Feature: Admin bar indicator for debug mode setting
 * Fix: always use latest email settings
-* Fix: WooCommerce Composit Products item name compatibility
+* Fix: WooCommerce Composite Products item name compatibility
 * Fix: Use woocommerce_thumbnail for WC3.3+
 * Tweak: apply woocommerce_order_item_name filter (fixes compatibility with WooCommerce Product Addons 3.0)
 * Tweak: Use WooCommerce date format instead of WP date format
@@ -707,7 +707,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Feature: Include invoice number and date in WooCommerce data remover and exporter 
 * Fix: Row class for Chained Products compatibility
 * Fix: Improved compatibility with Advanced Custom Fields
-* Fix: Setting for diabling for free invoices should be applied even when other plugins are applying rules
+* Fix: Setting for disabling for free invoices should be applied even when other plugins are applying rules
 
 = 2.1.9 =
 * Feature: Automatic cleanup of temporary attachments folder (settings in Status tab)

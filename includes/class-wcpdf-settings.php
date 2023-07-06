@@ -841,7 +841,7 @@ class Settings {
 							);
 						} else {
 							wcpdf_log_error(
-								"An error ocurred while trying to reset yearly number for '{$document_type}' with database table name: {$number_store->table_name}",
+								"An error occurred while trying to reset yearly number for '{$document_type}' with database table name: {$number_store->table_name}",
 								'error'
 							);
 						}

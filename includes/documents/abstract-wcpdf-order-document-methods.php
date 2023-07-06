@@ -534,7 +534,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['product_id'] = $item['product_id'];
 				$data['variation_id'] = $item['variation_id'];
 
-				// Compatibility: WooCommerce Composit Products uses a workaround for
+				// Compatibility: WooCommerce Composite Products uses a workaround for
 				// setting the order before the item name filter, so we run this first
 				if ( class_exists('WC_Composite_Products') ) {
 					$order_item_class = apply_filters( 'woocommerce_order_item_class', '', $item, $this->order );
@@ -579,7 +579,7 @@ abstract class Order_Document_Methods extends Order_Document {
 					$product = null;
 				}
 				
-				// Checking fo existance, thanks to MDesigner0 
+				// Checking for existence, thanks to MDesigner0
 				if( !empty( $product ) ) {
 					// Thumbnail (full img tag)
 					$data['thumbnail'] = $this->get_thumbnail( $product );
