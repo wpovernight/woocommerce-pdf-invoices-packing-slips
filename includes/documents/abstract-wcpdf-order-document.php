@@ -1249,7 +1249,7 @@ abstract class Order_Document {
 		if( $table_exists ) {
 			// get year for the last row
 			$year = $wpdb->get_var( "SELECT YEAR(date) FROM {$table_name} ORDER BY id DESC LIMIT 1" );
-			// default to currently year if no results
+			// default to current year if no results
 			if( ! $year ) {
 				$year = $current_year;
 				// if we don't get a result, this could either mean there's an error,
