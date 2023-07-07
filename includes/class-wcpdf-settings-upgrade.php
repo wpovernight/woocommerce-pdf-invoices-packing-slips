@@ -94,7 +94,7 @@ class Settings_Upgrade {
 				),
 				array( 
 					'label' => __( 'Add styling', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Easily change the look and feel of your documents by addding some custom CSS.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Easily change the look and feel of your documents by adding some custom CSS.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions' => ['templates', 'bundle'],
 				),
 			);
