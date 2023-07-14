@@ -5,9 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Deprecated_Hooks' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Deprecated_Hooks' ) ) :
 
 class Deprecated_Hooks {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	/**
 	 * Constructor.
@@ -34,5 +43,3 @@ class Deprecated_Hooks {
 }
 
 endif; // class_exists
-
-return new Deprecated_Hooks();

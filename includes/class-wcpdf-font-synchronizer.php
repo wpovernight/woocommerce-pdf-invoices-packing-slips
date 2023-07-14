@@ -25,6 +25,15 @@ class Font_Synchronizer {
 	 * @var \Dompdf\Dompdf
 	 */
 	public $dompdf;
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	/**
 	 * Constructor

@@ -1,24 +1,15 @@
 <?php return array(
     'root' => array(
-        'name' => '__root__',
+        'name' => 'wpovernight/woocommerce-pdf-invoices-packingslips',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'a74f56208ae3b0353262515d744b89ff8c1dd616',
+        'reference' => 'e4d69034f97da4ab9bbd2aa9fa058a4fa9bb4586',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
-        '__root__' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => 'a74f56208ae3b0353262515d744b89ff8c1dd616',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../../',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
         'dompdf/dompdf' => array(
             'pretty_version' => 'v2.0.3',
             'version' => '2.0.3.0',
@@ -79,6 +70,15 @@
             'reference' => '39d483bdf39be819deabf04ec872eb0b2410b531',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-mbstring',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'wpovernight/woocommerce-pdf-invoices-packingslips' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'e4d69034f97da4ab9bbd2aa9fa058a4fa9bb4586',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

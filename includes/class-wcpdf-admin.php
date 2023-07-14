@@ -11,6 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
 
 class Admin {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
@@ -169,7 +178,7 @@ class Admin {
 		// Setup/welcome
 		if ( ! empty( $_GET['page'] ) && $_GET['page'] == 'wpo-wcpdf-setup' ) {
 			delete_transient( 'wpo_wcpdf_new_install' );
-			include_once( WPO_WCPDF()->plugin_path() . '/includes/class-wcpdf-setup-wizard.php' );
+			Setup_Wizard::instance();
 		}
 	}
 
@@ -1197,5 +1206,3 @@ class Admin {
 }
 
 endif; // class_exists
-
-return new Admin();

@@ -8,9 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) :
 
 class PDF_Maker {
+	
 	public $html;
 	public $settings;
 	public $document;

@@ -14,6 +14,14 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\Order_Util' ) ) :
 class Order_Util {
 	
 	public $wc_order_util_class_object;
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 	
 	function __construct() {
 		$this->wc_order_util_class_object = $this->get_wc_order_util_class();
@@ -46,5 +54,3 @@ class Order_Util {
 }
 
 endif; // Class exists check
-
-return new Order_Util();

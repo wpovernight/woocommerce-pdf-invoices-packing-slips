@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Setup_Wizard' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Setup_Wizard' ) ) :
 
 class Setup_Wizard {
 
@@ -14,6 +14,15 @@ class Setup_Wizard {
 
 	/** @var array Steps for the setup wizard */
 	private $steps  = array();
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 	
 	public function __construct() {
 		if ( WPO_WCPDF()->settings->user_can_manage_settings() ) {
@@ -270,5 +279,3 @@ class Setup_Wizard {
 }
 
 endif; // class_exists
-
-return new Setup_Wizard();

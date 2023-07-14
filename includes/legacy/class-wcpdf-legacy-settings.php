@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Settings' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Settings' ) ) :
 
 class Legacy_Settings {
 
@@ -14,6 +14,15 @@ class Legacy_Settings {
 	public $debug_settings;
 
 	public $options_page_hook = 'woocommerce_page_wpo_wcpdf_options_page';
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	public function __construct() {
 		$this->load_legacy_settings();
@@ -152,5 +161,3 @@ class Legacy_Settings {
 }
 
 endif; // class_exists
-
-return new Legacy_Settings();

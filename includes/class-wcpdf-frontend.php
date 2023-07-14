@@ -5,9 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Frontend' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Frontend' ) ) :
 
 class Frontend {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 	
 	function __construct()	{
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
@@ -183,5 +192,3 @@ class Frontend {
 }
 
 endif; // class_exists
-
-return new Frontend();

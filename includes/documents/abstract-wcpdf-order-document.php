@@ -5,21 +5,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document' ) ) :
 
 /**
  * Abstract Document
  *
  * Handles generic pdf document & order data and database interaction
  * which is extended by both Invoices & Packing Slips
- *
- * @class       \WPO\WC\PDF_Invoices\Documents\Order_Document
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
  */
 
 abstract class Order_Document {
+	
 	/**
 	 * Document type.
 	 * @var String

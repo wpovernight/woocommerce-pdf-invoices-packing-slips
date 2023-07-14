@@ -5,9 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Assets' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Assets' ) ) :
 
 class Assets {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 	
 	function __construct()	{
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_scripts_styles' ) );
@@ -231,5 +240,3 @@ class Assets {
 }
 
 endif; // class_exists
-
-return new Assets();

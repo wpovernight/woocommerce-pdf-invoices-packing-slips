@@ -5,21 +5,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods' ) ) :
 
 /**
  * Abstract Order Methods
  *
  * Collection of methods to be used on orders within a Document
  * Created as abstract rather than traits to support PHP versions older than 5.4
- *
- * @class       \WPO\WC\PDF_Invoices\Documents\Order_Document_Methods
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
  */
 
 abstract class Order_Document_Methods extends Order_Document {
+	
 	public function is_refund( $order ) {
 		return $order->get_type() == 'shop_order_refund';
 	}

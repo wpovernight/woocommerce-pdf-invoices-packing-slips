@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Export' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Export' ) ) :
 
 class Legacy_Export {
 
@@ -17,6 +17,15 @@ class Legacy_Export {
 	public $order_id;
 	public $output_body;
 	public $document;
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	public function __construct() {
 		$this->template_path = WPO_WCPDF()->settings->get_template_path();
@@ -87,5 +96,3 @@ class Legacy_Export {
 }
 
 endif; // class_exists
-
-return new Legacy_Export();
