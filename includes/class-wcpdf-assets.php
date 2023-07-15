@@ -203,15 +203,20 @@ class Assets {
 
 		if (
 			$hook === 'woocommerce_page_wc-admin' &&
-			class_exists( 'Automattic\WooCommerce\Admin\PageController' ) &&
-			\Automattic\WooCommerce\Admin\PageController::is_admin_page()
+			WPO_WCPDF()->order_util->is_wc_admin_page()
 		) {
 			wp_enqueue_script(
 				'wpo-wcpdf-analytics-order',
-				WPO_WCPDF()->plugin_url() . '/assets/js/analytics-order.build.js',
-				array( 'wp-hooks' ),
+				WPO_WCPDF()->plugin_url() . '/assets/js/analytics-order' . $suffix . '.js',
+				array( 'wp-hooks', 'wp-i18n' ),
 				WPO_WCPDF_VERSION,
 				true
+			);
+
+			wp_set_script_translations(
+				'wpo-wcpdf-analytics-order',
+				'woocommerce-pdf-invoices-packing-slips',
+				plugin_dir_path( dirname(__FILE__) ) . 'languages'
 			);
 		}
 
