@@ -88,6 +88,7 @@ msgstr ""
 #: includes/class-wcpdf-main.php:1115
 #: includes/documents/class-wcpdf-invoice.php:318
 #: includes/views/setup-wizard/display-options.php:81
+#: assets/js/analytics-order.js:34
 msgid "Invoice Number"
 msgstr ""
 
