@@ -208,15 +208,17 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf-analytics-order',
 				WPO_WCPDF()->plugin_url() . '/assets/js/analytics-order' . $suffix . '.js',
-				array( 'wp-hooks', 'wp-i18n' ),
+				array( 'wp-hooks' ),
 				WPO_WCPDF_VERSION,
 				true
 			);
 
-			wp_set_script_translations(
+			wp_localize_script(
 				'wpo-wcpdf-analytics-order',
-				'woocommerce-pdf-invoices-packing-slips',
-				plugin_dir_path( dirname(__FILE__) ) . 'languages'
+				'wpo_wcpdf_analytics_order',
+				array(
+					'label' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
 			);
 		}
 
