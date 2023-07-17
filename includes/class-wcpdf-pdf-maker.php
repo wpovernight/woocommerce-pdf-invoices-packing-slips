@@ -32,8 +32,6 @@ class PDF_Maker {
 		if ( empty( $this->html ) ) {
 			return;
 		}
-		
-		require WPO_WCPDF()->plugin_path() . '/vendor/autoload.php';
 
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(

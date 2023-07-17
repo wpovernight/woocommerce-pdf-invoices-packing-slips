@@ -20,8 +20,6 @@ class Settings_Callbacks {
 		return self::$_instance;
 	}
 	
-	function __construct() {}
-	
 	/**
 	 * Section null callback.
 	 *

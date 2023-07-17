@@ -18,8 +18,6 @@ class Legacy_Functions {
 		return self::$_instance;
 	}
 
-	public function __construct() {}
-
 	/**
 	 * Get template name from slug
 	 */

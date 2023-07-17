@@ -39,9 +39,6 @@ class Font_Synchronizer {
 	 * Constructor
 	 */
 	function __construct() {
-		if ( ! class_exists( '\\Dompdf\\Dompdf' ) ) {
-			require WPO_WCPDF()->plugin_path() . '/vendor/autoload.php';
-		}
 		$this->dompdf = new Dompdf();
 	}
 

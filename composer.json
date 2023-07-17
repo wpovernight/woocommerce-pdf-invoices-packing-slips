@@ -1,5 +1,5 @@
 {
-	"name": "wpovernight/woocommerce-pdf-invoices-packingslips",
+	"name": "wpovernight/woocommerce-pdf-invoices-packing-slips",
 		"description": "PDF Invoices & Packing Slips for WooCommerce",
 		"autoload": {
 			"psr-4": {
