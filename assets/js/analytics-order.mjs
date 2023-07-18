@@ -2,7 +2,7 @@ import { addFilter } from '@wordpress/hooks';
 
 addFilter(
     'woocommerce_admin_report_table',
-    'wpo-',
+    'wpo-wc-admin-invoice-column',
     (reportTableData) => {
         if (reportTableData.endpoint !== 'orders') {
             return reportTableData;
@@ -11,9 +11,9 @@ addFilter(
         reportTableData.headers = [
             ...reportTableData.headers,
             {
-                label: 'Invoice Number',
+                label: wpo_wcpdf_analytics_order.label,
                 key: 'order_invoice_number',
-                screenReaderLabel: 'Invoice Number',
+                screenReaderLabel: wpo_wcpdf_analytics_order.label,
                 isSortable: false,
             },
         ];
