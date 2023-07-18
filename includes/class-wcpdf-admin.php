@@ -1198,7 +1198,8 @@ class Admin {
 	}
 
 	public function add_invoice_number_to_order_report( $response ) {
-		if ( ! empty( $order = wc_get_order( $response->data['order_id'] ) ) ) {
+		$order = wc_get_order( $response->data['order_id'] );
+		if ( ! empty( $order ) ) {
 			$response->data['invoice_number'] = $order->get_meta( '_wcpdf_invoice_number' );
 		}
 
