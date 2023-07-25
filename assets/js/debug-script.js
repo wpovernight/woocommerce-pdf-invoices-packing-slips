@@ -18,7 +18,7 @@ jQuery( function( $ ) {
 		} );
 		
 		let reset = false;
-		if ( 'reset-settings' == tool ) {
+		if ( 'reset-settings' === tool ) {
 			reset = window.confirm( wpo_wcpdf_debug.confirm_reset );
 		} else {
 			reset = true;

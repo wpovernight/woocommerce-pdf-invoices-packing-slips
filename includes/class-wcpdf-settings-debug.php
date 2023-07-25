@@ -165,7 +165,7 @@ class Settings_Debug {
 								<?php
 									foreach ( $this->get_setting_types() as $type => $name ) {
 										?>
-										<option value="<?= $type; ?>"><?= $name; ?></option>
+										<option value="<?php echo $type; ?>"><?php echo $name; ?></option>
 										<?php
 									}
 								?>
@@ -201,7 +201,7 @@ class Settings_Debug {
 								<?php
 									foreach ( $this->get_setting_types() as $type => $name ) {
 										?>
-										<option value="<?= $type; ?>"><?= $name; ?></option>
+										<option value="<?php echo $type; ?>"><?php echo $name; ?></option>
 										<?php
 									}
 								?>
@@ -418,7 +418,7 @@ class Settings_Debug {
 			$message = sprintf(
 				/* translators: settings type */
 				__( '%s settings reset successfully!', 'woocommerce-pdf-invoices-packing-slips' ),
-				$setting_types[$type]
+				$type
 			);
 			wcpdf_log_error( $message, 'info' );
 			wp_send_json_success( compact( 'type', 'message' ) );
@@ -426,7 +426,7 @@ class Settings_Debug {
 			$message = sprintf(
 				/* translators: settings type */
 				__( 'An error occurred when trying to reset the %s settings.', 'woocommerce-pdf-invoices-packing-slips' ),
-				$setting_types[$type]
+				$type
 			);
 			wcpdf_log_error( $message );
 			wp_send_json_error( compact( 'message' ) );
