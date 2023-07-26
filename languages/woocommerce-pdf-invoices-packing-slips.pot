@@ -898,7 +898,7 @@ msgid "Add styling"
 msgstr ""
 
 #: includes/class-wcpdf-settings-upgrade.php:97
-msgid "Easily change the look and feel of your documents by addding some custom CSS."
+msgid "Easily change the look and feel of your documents by adding some custom CSS."
 msgstr ""
 
 #: includes/class-wcpdf-settings.php:85

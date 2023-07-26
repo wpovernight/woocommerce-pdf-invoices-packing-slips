@@ -17,6 +17,7 @@ class Settings {
 	public $general;
 	public $documents;
 	public $debug;
+	public $upgrade;
 	public $ubl;
 	public $general_settings;
 	public $debug_settings;
@@ -25,8 +26,9 @@ class Settings {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
-	private $installed_templates = array();
-	private $template_list_cache = array();
+	private $installed_templates       = array();
+	private $installed_templates_cache = array();
+	private $template_list_cache       = array();
 
 	
 	function __construct()	{
@@ -863,7 +865,7 @@ class Settings {
 							);
 						} else {
 							wcpdf_log_error(
-								"An error ocurred while trying to reset yearly number for '{$document_type}' with database table name: {$number_store->table_name}",
+								"An error occurred while trying to reset yearly number for '{$document_type}' with database table name: {$number_store->table_name}",
 								'error'
 							);
 						}

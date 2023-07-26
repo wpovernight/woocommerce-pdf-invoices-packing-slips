@@ -91,7 +91,7 @@
 * Feature: Add invoice number to WC REST API
 * Fix: Allow positive 'discounts' (price corrections)
 * Fix: Discounts rounding
-* Translations: Updated Finnish & Portugese & POT
+* Translations: Updated Finnish & Portuguese & POT
 
 = 1.5.26 =
 * Feature: Automatically list all emails registered in WooCommerce
@@ -108,7 +108,7 @@
 * Hotfix: Subscriptions renewal filter arguments
 
 = 1.5.23 =
-* Fix: WooCommerce Subscriptons 2.0 deprecation notice.
+* Fix: WooCommerce Subscriptions 2.0 deprecation notice.
 * Tweak: better qTranslate-X support
 * Tweak: filter for user privileges check (wpo_wcpdf_check_privs)
 * Translations: French translations fix
@@ -258,13 +258,13 @@
 = 1.4.10 =
 * Fix: Invoice not attaching
 * Translations: Updated POT file
-* Translations: Updated Dutch, Norwegian, Polish, Brazilian Portugese, Romanian, Russian, Slovak, Spanish & Ukrainian (Many thanks to all the translators!)
+* Translations: Updated Dutch, Norwegian, Polish, Brazilian Portuguese, Romanian, Russian, Slovak, Spanish & Ukrainian (Many thanks to all the translators!)
 * Templates: added action hooks for easier customizations (`wpo_wcpdf_before_order_details`,  `wpo_wcpdf_after_order_details`, `wpo_wcpdf_invoice_title` & `wpo_wcpdf_packing_slip_title`)
 
 = 1.4.9 =
 * Feature: Order number and date are now displayed by default in the Simple template (invoice number and date still optional)
 * Feature: Display Customer/Order notes with a simple shorthand (see FAQ)
-* Translations: Added Brazilian Portugese (thanks Victor Debone!)
+* Translations: Added Brazilian Portuguese (thanks Victor Debone!)
 * Tweak: Fail more gracefully when there are errors during PDF generation
 * Tweak: added template type class to template output body
 * Tweak: cleaned up Simple template style.css

@@ -495,7 +495,9 @@ class Admin {
 					<option value=""><?php esc_html_e( 'Choose an email to send&hellip;', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
 					<?php
 					$mailer           = WC()->mailer();
-					$available_emails = apply_filters( 'woocommerce_resend_order_emails_available', array( 'new_order', 'cancelled_order', 'customer_processing_order', 'customer_completed_order', 'customer_invoice' ) );
+					$order_emails     = array( 'new_order', 'cancelled_order', 'customer_processing_order', 'customer_completed_order', 'customer_invoice' );
+					$available_emails = apply_filters_deprecated( 'woocommerce_resend_order_emails_available', array( $order_emails ), '3.5.7', 'wpo_wcpdf_resend_order_emails_available' );
+					$available_emails = apply_filters( 'wpo_wcpdf_resend_order_emails_available', $order_emails, $order->get_id() );
 					$mails            = $mailer->get_emails();
 					if ( ! empty( $mails ) && ! empty( $available_emails ) ) { ?>
 						<?php

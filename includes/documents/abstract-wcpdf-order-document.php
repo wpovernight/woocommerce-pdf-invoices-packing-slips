@@ -180,7 +180,7 @@ abstract class Order_Document {
 					// automatically be applied to existing orders too. However, doing this by combining arrays is not
 					// possible because the way settings are currently stored means unchecked options are not included.
 					// This means there is no way to tell whether an option didn't exist yet (in which case the new
-					// option should be added) or whether the option was simly unchecked (in which case it should not
+					// option should be added) or whether the option was simply unchecked (in which case it should not
 					// be overwritten). This can only be address by storing unchecked checkboxes too.
 					$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
 				}
@@ -1248,7 +1248,7 @@ abstract class Order_Document {
 	/**
 	 * Get the default table name of the Sequential Number Store
 	 * @param  string $store_base_name
-	 * @param  string $metod
+	 * @param  string $method
 	 * 
 	 * @return string $table_name
 	 */
@@ -1359,7 +1359,7 @@ abstract class Order_Document {
 		if( $table_exists ) {
 			// get year for the last row
 			$year = $wpdb->get_var( "SELECT YEAR(date) FROM {$table_name} ORDER BY id DESC LIMIT 1" );
-			// default to currenty year if no results
+			// default to current year if no results
 			if( ! $year ) {
 				$year = $current_year;
 				// if we don't get a result, this could either mean there's an error,

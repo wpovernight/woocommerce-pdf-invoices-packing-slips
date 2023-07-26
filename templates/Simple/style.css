@@ -101,7 +101,7 @@ table.head {
 }
 
 td.header img {
-	max-height: 3cm; /* may be overriden by the settings */
+	max-height: 3cm; /* may be overridden by the settings */
 	width: auto;
 }
 
@@ -117,7 +117,7 @@ td.shop-info {
 	text-transform: uppercase;
 }
 
-/* Recipient addressses & order data */
+/* Recipient addresses & order data */
 table.order-data-addresses {
 	width: 100%;
 	margin-bottom: 10mm;
@@ -140,6 +140,7 @@ td.order-data table th {
 	font-weight: normal;
 	padding-right: 2mm;
 	width: 50%;
+	overflow-wrap: break-word;
 }
 
 .invoice .shipping-address {
