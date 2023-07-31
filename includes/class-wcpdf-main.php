@@ -1046,7 +1046,7 @@ class Main {
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $file ) {
 				$basename = wp_basename( $file );
-				if ( ! in_array( $basename, $excluded_files ) && file_exists( $file ) ) {
+				if ( ! in_array( $basename, $excluded_files ) && file_exists( $file ) && ! is_dir( $file ) ) {
 					$file_timestamp = filemtime( $file );
 
 					// delete file
