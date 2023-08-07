@@ -302,6 +302,11 @@ function wcpdf_utf8_decode( $string ) {
 		return $string;
 	}
 	
+	// provided by composer 'symfony/polyfill-mbstring' library
+	if ( class_exists( '\\Symfony\\Polyfill\\Mbstring\\Mbstring' ) ) {
+		return \Symfony\Polyfill\Mbstring\Mbstring::mb_convert_encoding( $string, 'ISO-8859-1', 'UTF-8' );
+	}
+	
 	// 'utf8_decode()' is deprecated in PHP 8.2 and set to be removed on PHP 9.0.
 	if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
 		return utf8_decode( $string );
