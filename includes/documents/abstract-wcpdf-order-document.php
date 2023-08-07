@@ -890,13 +890,13 @@ abstract class Order_Document {
 				'order_id' => $this->order_id,
 			)
 		);
-		if ( $args['wrap_html_content'] ) {
+		if ($args['wrap_html_content']) {
 			$html = $this->wrap_html_content( $html );
 		}
 
 		// clean up special characters
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) && function_exists( 'iconv' ) && function_exists( 'htmlentities' ) ) ) {
-			$html = htmlspecialchars_decode( iconv( 'UTF-8', 'ISO-8859-1', htmlentities( $html, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES );
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists('utf8_decode') && function_exists('mb_convert_encoding') ) ) {
+			$html = utf8_decode(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 		}
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
