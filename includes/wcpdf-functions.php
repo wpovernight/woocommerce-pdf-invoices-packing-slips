@@ -314,7 +314,7 @@ function wcpdf_utf8_decode( $string ) {
 
 	// preferred fallback method for PHP 8.2+
 	if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) ) {
-		return UConverter::transcode( $string, 'ISO-8859-1', 'UTF8' );
+		return UConverter::transcode( $string, 'ISO-8859-1', 'UTF-8' );
 	}
 	
 	// provided by composer 'symfony/polyfill-iconv' library.
