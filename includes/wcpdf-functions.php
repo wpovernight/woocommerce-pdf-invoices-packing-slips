@@ -291,3 +291,30 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 	return $errors;
 }
 
+/**
+ * UTF8 string decode
+ * 
+ * 'utf8_decode()' is deprecated in PHP 8.2 and set to be removed on PHP 9.0
+ *
+ * @param  string $string
+ * @return string
+ */
+function wcpdf_utf8_decode( $string ) {
+	if ( empty( $string ) ) {
+		return $string;
+	}
+	
+	if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
+		return utf8_decode( $string );
+	}
+
+	if ( class_exists( 'UConverter' ) ) {
+		return UConverter::transcode( $string, 'ISO-8859-1', 'UTF8' );
+	}
+
+	// PHP must have 'libiconv' configured instead of 'glibc' library.
+	if ( function_exists( 'iconv' ) ) {
+		return iconv( 'UTF-8', 'ISO-8859-1', $string );
+	}
+}
+
