@@ -316,7 +316,13 @@ function wcpdf_utf8_decode( $string ) {
 	if ( class_exists( 'UConverter' ) ) {
 		return UConverter::transcode( $string, 'ISO-8859-1', 'UTF8' );
 	}
+	
+	// provided by composer 'symfony/polyfill-iconv' library
+	if ( class_exists( '\\Symfony\\Polyfill\\Iconv\\Iconv' ) ) {
+		return \Symfony\Polyfill\Iconv\Iconv::iconv( 'UTF-8', 'ISO-8859-1', $string );
+	}
 
+	// default server library.
 	// PHP must have 'libiconv' configured instead of 'glibc' library.
 	if ( function_exists( 'iconv' ) ) {
 		return iconv( 'UTF-8', 'ISO-8859-1', $string );
