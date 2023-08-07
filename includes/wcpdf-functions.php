@@ -292,7 +292,7 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 }
 
 /**
- * UTF8 string decode
+ * UTF8 string decode.
  *
  * @param  string $string
  * @return string
@@ -312,7 +312,7 @@ function wcpdf_utf8_decode( $string ) {
 		return utf8_decode( $string );
 	}
 
-	// preferred fallback method for PHP 8.2+
+	// preferred fallback method for PHP 8.2+.
 	if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) ) {
 		return UConverter::transcode( $string, 'ISO-8859-1', 'UTF-8' );
 	}
