@@ -308,7 +308,7 @@ function wcpdf_utf8_decode( $string ) {
 	}
 	
 	// 'utf8_decode()' is deprecated in PHP 8.2 and set to be removed on PHP 9.0.
-	if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '8.2', '<' ) && function_exists( 'utf8_decode' ) ) {
 		return utf8_decode( $string );
 	}
 
