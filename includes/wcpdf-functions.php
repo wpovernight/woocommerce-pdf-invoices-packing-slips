@@ -327,5 +327,7 @@ function wcpdf_utf8_decode( $string ) {
 	if ( function_exists( 'iconv' ) ) {
 		return iconv( 'UTF-8', 'ISO-8859-1', $string );
 	}
+	
+	return $string;
 }
 
