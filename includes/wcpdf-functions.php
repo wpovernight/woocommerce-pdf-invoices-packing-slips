@@ -302,7 +302,7 @@ function wcpdf_utf8_decode( $string ) {
 		return $string;
 	}
 	
-	// provided by composer 'symfony/polyfill-mbstring' library
+	// provided by composer 'symfony/polyfill-mbstring' library.
 	if ( class_exists( '\\Symfony\\Polyfill\\Mbstring\\Mbstring' ) ) {
 		return \Symfony\Polyfill\Mbstring\Mbstring::mb_convert_encoding( $string, 'ISO-8859-1', 'UTF-8' );
 	}
@@ -317,7 +317,7 @@ function wcpdf_utf8_decode( $string ) {
 		return UConverter::transcode( $string, 'ISO-8859-1', 'UTF8' );
 	}
 	
-	// provided by composer 'symfony/polyfill-iconv' library
+	// provided by composer 'symfony/polyfill-iconv' library.
 	if ( class_exists( '\\Symfony\\Polyfill\\Iconv\\Iconv' ) ) {
 		return \Symfony\Polyfill\Iconv\Iconv::iconv( 'UTF-8', 'ISO-8859-1', $string );
 	}
