@@ -60,6 +60,8 @@ class Admin {
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
+
+		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -1193,6 +1195,15 @@ class Admin {
 		}
 
 		return $data;
+	}
+
+	public function add_invoice_number_to_order_report( $response ) {
+		$order = wc_get_order( $response->data['order_id'] );
+		if ( ! empty( $order ) ) {
+			$response->data['invoice_number'] = $order->get_meta( '_wcpdf_invoice_number' );
+		}
+
+		return $response;
 	}
 }
 

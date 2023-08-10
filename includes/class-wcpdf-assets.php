@@ -200,7 +200,28 @@ class Assets {
 			}
 
 		}
-		
+
+		if (
+			$hook === 'woocommerce_page_wc-admin' &&
+			WPO_WCPDF()->order_util->is_wc_admin_page()
+		) {
+			wp_enqueue_script(
+				'wpo-wcpdf-analytics-order',
+				WPO_WCPDF()->plugin_url() . '/assets/js/analytics-order' . $suffix . '.js',
+				array( 'wp-hooks' ),
+				WPO_WCPDF_VERSION,
+				true
+			);
+
+			wp_localize_script(
+				'wpo-wcpdf-analytics-order',
+				'wpo_wcpdf_analytics_order',
+				array(
+					'label' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
 		// status/debug page scripts
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'debug' ) {
 			
