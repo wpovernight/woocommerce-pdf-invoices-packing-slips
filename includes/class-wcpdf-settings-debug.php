@@ -165,7 +165,7 @@ class Settings_Debug {
 								<?php
 									foreach ( $this->get_setting_types() as $type => $name ) {
 										?>
-										<option value="<?= $type; ?>"><?= $name; ?></option>
+										<option value="<?php echo $type; ?>"><?php echo $name; ?></option>
 										<?php
 									}
 								?>
@@ -191,6 +191,28 @@ class Settings_Debug {
 						</fieldset>
 					</form>
 				</div>
+				<div class="tool">
+					<h4><span><?php _e( 'Reset Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<p><?php _e( 'This will clear all your selected settings data. Please do a backup first using the export tool above.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<form class="wpo_wcpdf_debug_tools_form" method="post">
+						<input type="hidden" name="debug_tool" value="reset-settings">
+						<fieldset>
+							<select name="type" required>
+								<?php
+									foreach ( $this->get_setting_types() as $type => $name ) {
+										?>
+										<option value="<?php echo $type; ?>"><?php echo $name; ?></option>
+										<?php
+									}
+								?>
+							</select>
+							<a href="" class="button button-secondary submit"><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						</fieldset>
+						<fieldset>
+							<div class="notice inline" style="display:none;"><p></p></div>
+						</fieldset>
+					</form>
+				</div>
 			</div>
 		</div>
 		<br>
@@ -201,7 +223,7 @@ class Settings_Debug {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 		
 		$data        = stripslashes_deep( $_REQUEST );
-		$debug_tools = [ 'export-settings', 'import-settings' ];
+		$debug_tools = [ 'export-settings', 'import-settings', 'reset-settings' ];
 		
 		if ( empty( $data['action'] ) || $data['action'] != 'wpo_wcpdf_debug_tools' ) {
 			return;
@@ -219,6 +241,9 @@ class Settings_Debug {
 				break;
 			case 'import-settings':
 				$this->import_settings( $data );
+				break;
+			case 'reset-settings':
+				$this->reset_settings( $data );
 				break;
 		}
 		
@@ -342,6 +367,83 @@ class Settings_Debug {
 				/* translators: settings type */
 				__( 'The %s settings file you are trying to import is identical to your current settings, therefore, the settings were not imported.', 'woocommerce-pdf-invoices-packing-slips' ),
 				$setting_types[$type]
+			);
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
+		}
+	}
+	
+	public function reset_settings( $data ) {
+		extract( $data );
+		
+		if ( empty( $type ) ) {
+			$message = __( 'Reset settings type is empty!', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
+		}
+		
+		$settings_option = '';
+		
+		switch ( $type ) {
+			case 'general':
+				$settings_option = 'wpo_wcpdf_settings_general';
+				break;
+			case 'debug':
+				$settings_option = 'wpo_wcpdf_settings_debug';
+				break;
+			default:
+				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
+				break;
+		}
+		
+		// maybe it's a document type settings request
+		if ( empty( $settings_option ) ) {
+			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+			foreach ( $documents as $document ) {
+				if ( $type == $document->slug ) {
+					$settings_option = "wpo_wcpdf_documents_settings_{$document->get_type()}";
+					break;
+				}
+			}
+			
+			if ( empty( $settings_option ) ) {
+				$message = sprintf(
+					/* translators: settings type */
+					__( '%s settings reset not supported!', 'woocommerce-pdf-invoices-packing-slips' ),
+					$type
+				);
+				wcpdf_log_error( $message );
+				wp_send_json_error( compact( 'message' ) );
+			}
+		}
+		
+		// settings already reset
+		$current_settings = get_option( $settings_option, [] );
+		if ( empty( $current_settings ) ) {
+			$message = sprintf(
+				/* translators: settings type */
+				__( '%s settings are already reset!', 'woocommerce-pdf-invoices-packing-slips' ),
+				$type
+			);
+			wcpdf_log_error( $message, 'info' );
+			wp_send_json_success( compact( 'type', 'message' ) );
+		}
+		
+		// reset settings
+		$updated = update_option( $settings_option, [] );
+		if ( $updated ) {
+			$message = sprintf(
+				/* translators: settings type */
+				__( '%s settings reset successfully!', 'woocommerce-pdf-invoices-packing-slips' ),
+				$type
+			);
+			wcpdf_log_error( $message, 'info' );
+			wp_send_json_success( compact( 'type', 'message' ) );
+		} else {
+			$message = sprintf(
+				/* translators: settings type */
+				__( 'An error occurred when trying to reset the %s settings.', 'woocommerce-pdf-invoices-packing-slips' ),
+				$type
 			);
 			wcpdf_log_error( $message );
 			wp_send_json_error( compact( 'message' ) );

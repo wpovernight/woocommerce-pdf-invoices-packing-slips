@@ -17,20 +17,29 @@ jQuery( function( $ ) {
 			}
 		} );
 		
-		$.ajax( {
-			url:         wpo_wcpdf_debug.ajaxurl,
-			data:        formData,
-			type:        'POST',
-			cache:       false,
-			processData: false,
-			contentType: false,
-			success ( response ) {
-				process_form_response( tool, response, $form );
-			},
-			error ( xhr, error, status ) {
-				//console.log( error, status );
-			}
-		} );
+		let reset = false;
+		if ( 'reset-settings' === tool ) {
+			reset = window.confirm( wpo_wcpdf_debug.confirm_reset );
+		} else {
+			reset = true;
+		}
+		
+		if ( reset ) {
+			$.ajax( {
+				url:         wpo_wcpdf_debug.ajaxurl,
+				data:        formData,
+				type:        'POST',
+				cache:       false,
+				processData: false,
+				contentType: false,
+				success ( response ) {
+					process_form_response( tool, response, $form );
+				},
+				error ( xhr, error, status ) {
+					//console.log( error, status );
+				}
+			} );
+		}
 		
 		$form.closest( '.tool' ).unblock();
 	} );
@@ -58,6 +67,7 @@ jQuery( function( $ ) {
 				}
 				break;
 			case 'import-settings':
+			case 'reset-settings':
 				if ( response.success && response.data.message ) {
 					$notice.addClass( 'notice-success' );
 				} else if ( ! response.success && response.data.message ) {
