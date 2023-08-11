@@ -407,7 +407,11 @@ class Settings_Debug {
 			}
 			
 			if ( empty( $settings_option ) ) {
-				$message = __( 'Reset settings key is empty!', 'woocommerce-pdf-invoices-packing-slips' );
+				$message = sprintf(
+					/* translators: settings type */
+					__( '%s settings reset not supported!', 'woocommerce-pdf-invoices-packing-slips' ),
+					$type
+				);
 				wcpdf_log_error( $message );
 				wp_send_json_error( compact( 'message' ) );
 			}
