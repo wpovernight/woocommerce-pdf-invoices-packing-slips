@@ -291,3 +291,46 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 	return $errors;
 }
 
+/**
+ * UTF8 string decode.
+ *
+ * @param  string $string
+ * @return string
+ */
+function wcpdf_utf8_decode( $string ) {
+	if ( empty( $string ) ) {
+		return $string;
+	}
+	
+	// provided by composer 'symfony/polyfill-mbstring' library.
+	if ( class_exists( '\\Symfony\\Polyfill\\Mbstring\\Mbstring' ) ) {
+		return \Symfony\Polyfill\Mbstring\Mbstring::mb_convert_encoding( $string, 'ISO-8859-1', 'UTF-8' );
+	}
+	
+	// 'utf8_decode()' is deprecated in PHP 8.2 and set to be removed on PHP 9.0.
+	if ( version_compare( PHP_VERSION, '8.2', '<' ) && function_exists( 'utf8_decode' ) ) {
+		return utf8_decode( $string );
+	}
+
+	// preferred fallback method for PHP 8.2+.
+	if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) ) {
+		return UConverter::transcode( $string, 'ISO-8859-1', 'UTF-8' );
+	}
+	
+	// provided by composer 'symfony/polyfill-iconv' library.
+	if ( class_exists( '\\Symfony\\Polyfill\\Iconv\\Iconv' ) ) {
+		return \Symfony\Polyfill\Iconv\Iconv::iconv( 'UTF-8', 'ISO-8859-1', $string );
+	}
+
+	// default server library.
+	// PHP must have 'libiconv' configured instead of 'glibc' library.
+	if ( function_exists( 'iconv' ) ) {
+		return iconv( 'UTF-8', 'ISO-8859-1', $string );
+	}
+	
+	return $string;
+}
+
+function WPO_WCPDF_Legacy() {
+	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
+}

@@ -5,18 +5,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Packing_Slip' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Packing_Slip' ) ) :
 
 /**
  * Packing Slip Document
- * 
- * @class       \WPO\WC\PDF_Invoices\Documents\Packing_Slip
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
  */
 
 class Packing_Slip extends Order_Document_Methods {
+	
 	/**
 	 * Init/load the order object.
 	 *
@@ -195,5 +191,3 @@ class Packing_Slip extends Order_Document_Methods {
 }
 
 endif; // class_exists
-
-return new Packing_Slip();

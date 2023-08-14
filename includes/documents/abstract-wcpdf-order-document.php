@@ -5,21 +5,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document' ) ) :
 
 /**
  * Abstract Document
  *
  * Handles generic pdf document & order data and database interaction
  * which is extended by both Invoices & Packing Slips
- *
- * @class       \WPO\WC\PDF_Invoices\Documents\Order_Document
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
  */
 
 abstract class Order_Document {
+	
 	/**
 	 * Document type.
 	 * @var String
@@ -890,13 +886,14 @@ abstract class Order_Document {
 				'order_id' => $this->order_id,
 			)
 		);
-		if ($args['wrap_html_content']) {
+		
+		if ( $args['wrap_html_content'] ) {
 			$html = $this->wrap_html_content( $html );
 		}
 
 		// clean up special characters
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists('utf8_decode') && function_exists('mb_convert_encoding') ) ) {
-			$html = utf8_decode(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) && function_exists( 'htmlentities' ) ) ) {
+			$html = htmlspecialchars_decode( wcpdf_utf8_decode( htmlentities( $html, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES );
 		}
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );

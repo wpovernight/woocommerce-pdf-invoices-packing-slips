@@ -9,11 +9,6 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Stor
 
 /**
  * Class handling database interaction for sequential numbers
- * 
- * @class       \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
  */
 
 class Sequential_Number_Store {

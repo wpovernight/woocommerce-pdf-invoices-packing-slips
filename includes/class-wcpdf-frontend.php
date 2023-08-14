@@ -5,11 +5,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Frontend' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Frontend' ) ) :
 
 class Frontend {
 	
-	function __construct()	{
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+	
+	public function __construct()	{
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_pdf_link' ), 10, 2 );
 		add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_number' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
@@ -183,5 +192,3 @@ class Frontend {
 }
 
 endif; // class_exists
-
-return new Frontend();

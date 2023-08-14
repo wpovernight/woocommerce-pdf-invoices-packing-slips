@@ -11,7 +11,17 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\Third_Party_Plugin
  * @since 2.0
  */
 class Third_Party_Plugins {
-	function __construct()	{
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+	
+	public function __construct()	{
 		// WooCommerce Subscriptions compatibility
 		if ( class_exists( 'WC_Subscriptions' ) ) {
 			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
@@ -305,5 +315,3 @@ class Third_Party_Plugins {
 
 
 endif; // Class exists check
-
-return new Third_Party_Plugins();

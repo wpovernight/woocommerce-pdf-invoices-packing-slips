@@ -14,12 +14,20 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\Order_Util' ) ) :
 class Order_Util {
 
 	public $wc_order_util_class_object;
-
-	function __construct() {
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+	
+	public function __construct() {
 		$this->wc_order_util_class_object = $this->get_wc_order_util_class();
 	}
 
-	function get_wc_order_util_class() {
+	public function get_wc_order_util_class() {
 		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) ) {
 			return \Automattic\WooCommerce\Utilities\OrderUtil::class;
 		} else {
@@ -27,7 +35,7 @@ class Order_Util {
 		}
 	}
 
-	function get_order_type( $order_id ) {
+	public function get_order_type( $order_id ) {
 		if ( $this->wc_order_util_class_object && is_callable( [ $this->wc_order_util_class_object, 'get_order_type' ] ) ) {
 			return $this->wc_order_util_class_object::get_order_type( intval( $order_id ) );
 		} else {
@@ -35,7 +43,7 @@ class Order_Util {
 		}
 	}
 
-	function custom_orders_table_usage_is_enabled() {
+	public function custom_orders_table_usage_is_enabled() {
 		if ( $this->wc_order_util_class_object && is_callable( [ $this->wc_order_util_class_object, 'custom_orders_table_usage_is_enabled' ] ) ) {
 			return $this->wc_order_util_class_object::custom_orders_table_usage_is_enabled();
 		} else {
@@ -43,12 +51,10 @@ class Order_Util {
 		}
 	}
 
-	function is_wc_admin_page() {
+	public function is_wc_admin_page() {
 		return class_exists( 'Automattic\WooCommerce\Admin\PageController' ) &&
 		       \Automattic\WooCommerce\Admin\PageController::is_admin_page();
 	}
 }
 
 endif; // Class exists check
-
-return new Order_Util();

@@ -5,20 +5,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Bulk_Document' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Bulk_Document' ) ) :
 
 /**
  * Bulk Document
  *
  * Wraps single documents in a bulk document
- *
- * @class       \WPO\WC\PDF_Invoices\Documents\Bulk_Document
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
  */
 
 class Bulk_Document {
+	
 	/**
 	 * Document type.
 	 * @var String

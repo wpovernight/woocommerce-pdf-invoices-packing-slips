@@ -1,15 +1,24 @@
 <?php
-namespace WPO\WC\PDF_Invoices;
+namespace WPO\WC\PDF_Invoices\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings_Debug' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug' ) ) :
 
 class Settings_Debug {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
-	function __construct()	{
+	public function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'debug_tools' ), 10, 2 );
@@ -630,5 +639,3 @@ class Settings_Debug {
 }
 
 endif; // class_exists
-
-return new Settings_Debug();

@@ -5,18 +5,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Document_Number' ) ) :
-
-/**
- * Document Number class
- * 
- * @class       \WPO\WC\PDF_Invoices\Documents\Document_Number
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
- */
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Document_Number' ) ) :
 
 class Document_Number {
+	
 	/**
 	 * The raw, unformatted number
 	 * @var int

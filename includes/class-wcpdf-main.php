@@ -1,17 +1,24 @@
 <?php
 namespace WPO\WC\PDF_Invoices;
 
-use WPO\WC\PDF_Invoices\Font_Synchronizer;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
 
 class Main {
 
 	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	public function __construct() {
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_pdf_ajax' ) );
@@ -881,7 +888,7 @@ class Main {
 		) );
 		$fontDir = $dompdf_options['fontDir'];
 
-		$synchronizer = new Font_Synchronizer();
+		$synchronizer = WPO_WCPDF()->font_synchronizer;
 		$synchronizer->sync( $fontDir, $merge_with_local );
 	}
 
@@ -1493,4 +1500,3 @@ class Main {
 
 endif; // class_exists
 
-return new Main();
