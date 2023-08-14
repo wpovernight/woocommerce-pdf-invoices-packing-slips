@@ -5,9 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Functions' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Functions' ) ) :
 
 class Legacy_Functions {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	/**
 	 * Get template name from slug
@@ -46,5 +55,3 @@ class Legacy_Functions {
 }
 
 endif; // class_exists
-
-return new Legacy_Functions();

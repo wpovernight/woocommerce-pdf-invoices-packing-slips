@@ -12,6 +12,15 @@ class Endpoint {
 	public $action_suffix = '_wpo_wcpdf';
 	public $events        = [ 'generate', 'printed' ];
 	public $actions;
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	public function __construct() {
 		if ( $this->is_enabled() ) {
@@ -149,5 +158,3 @@ class Endpoint {
 }
 
 endif; // class_exists
-
-return new Endpoint();

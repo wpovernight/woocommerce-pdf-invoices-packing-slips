@@ -331,3 +331,6 @@ function wcpdf_utf8_decode( $string ) {
 	return $string;
 }
 
+function WPO_WCPDF_Legacy() {
+	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
+}

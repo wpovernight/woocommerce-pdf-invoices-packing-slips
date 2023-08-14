@@ -1,4 +1,12 @@
 {
+	"name": "wpovernight/woocommerce-pdf-invoices-packing-slips",
+		"description": "PDF Invoices & Packing Slips for WooCommerce",
+		"autoload": {
+			"psr-4": {
+				"WPO\\WC\\PDF_Invoices\\": "includes/"
+			},
+			"classmap": ["includes/"]
+	},
     "require": {
         "dompdf/dompdf": "^2.0",
         "symfony/polyfill-mbstring": "1.27",

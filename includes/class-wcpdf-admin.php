@@ -11,8 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Admin' ) ) :
 
 class Admin {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
-	function __construct()	{
+	public function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
 		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed
@@ -60,6 +69,8 @@ class Admin {
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
+
+		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -169,7 +180,7 @@ class Admin {
 		// Setup/welcome
 		if ( ! empty( $_GET['page'] ) && $_GET['page'] == 'wpo-wcpdf-setup' ) {
 			delete_transient( 'wpo_wcpdf_new_install' );
-			include_once( WPO_WCPDF()->plugin_path() . '/includes/class-wcpdf-setup-wizard.php' );
+			Setup_Wizard::instance();
 		}
 	}
 
@@ -1194,8 +1205,15 @@ class Admin {
 
 		return $data;
 	}
+
+	public function add_invoice_number_to_order_report( $response ) {
+		$order = wc_get_order( $response->data['order_id'] );
+		if ( ! empty( $order ) ) {
+			$response->data['invoice_number'] = $order->get_meta( '_wcpdf_invoice_number' );
+		}
+
+		return $response;
+	}
 }
 
 endif; // class_exists
-
-return new Admin();

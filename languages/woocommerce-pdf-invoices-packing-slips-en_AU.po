@@ -99,6 +99,7 @@ msgstr ""
 #: includes/class-wcpdf-admin.php:218 includes/class-wcpdf-main.php:1077
 #: includes/documents/class-wcpdf-invoice.php:281
 #: includes/views/setup-wizard/display-options.php:81
+#: includes/class-wcpdf-assets.php:220
 msgid "Invoice Number"
 msgstr ""
 
