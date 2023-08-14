@@ -511,14 +511,20 @@ class Settings_Debug {
 			),
 			array(
 				'type'     => 'setting',
-				'id'       => 'guest_access',
-				'title'    => __( 'Allow guest access', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
+				'id'	   => 'document_link_access_type',
+				'title'	   => __( 'Document link access type', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
 				'section'  => 'debug_settings',
-				'args'     => array(
+				'args'	   => array(
 					'option_name' => $option_name,
-					'id'          => 'guest_access',
-					'description' => __( 'Enable this to allow customers that purchase without an account to access their PDF with a unique key', 'woocommerce-pdf-invoices-packing-slips' ),
+					'id'          => 'document_link_access_type',
+					'default'     => 'logged_in',
+					'options'     => array(
+						'logged_in' => __( 'Logged in (recommended)' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'guest'     => __( 'Guest' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'full'      => __( 'Full' , 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+					'description' => __( 'By default, documents can only be accessed when logged in, from admin panel or customer account. You could also give access permissions to guest customers, or full permission to everyone with a document link.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
