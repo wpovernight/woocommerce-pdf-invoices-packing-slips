@@ -21,7 +21,7 @@ class Admin {
 		return self::$_instance;
 	}
 
-	function __construct()	{
+	public function __construct()	{
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
 		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed

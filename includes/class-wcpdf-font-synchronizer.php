@@ -38,7 +38,7 @@ class Font_Synchronizer {
 	/**
 	 * Constructor
 	 */
-	function __construct() {
+	public function __construct() {
 		$this->dompdf = new Dompdf();
 	}
 

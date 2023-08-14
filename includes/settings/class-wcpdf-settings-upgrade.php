@@ -18,7 +18,7 @@ class Settings_Upgrade {
 		return self::$_instance;
 	}
 
-	function __construct()	{
+	public function __construct()	{
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
 	}
 

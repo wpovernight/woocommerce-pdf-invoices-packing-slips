@@ -37,7 +37,7 @@ class Settings {
 		return self::$_instance;
 	}
 	
-	function __construct() {
+	public function __construct() {
 		$this->callbacks        = \WPO\WC\PDF_Invoices\Settings\Settings_Callbacks::instance();
 		$this->general          = \WPO\WC\PDF_Invoices\Settings\Settings_General::instance();
 		$this->documents        = \WPO\WC\PDF_Invoices\Settings\Settings_Documents::instance();

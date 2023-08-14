@@ -18,7 +18,7 @@ class Settings_Documents {
 		return self::$_instance;
 	}
 
-	function __construct()	{
+	public function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_documents', array( $this, 'output' ), 10, 1 );
 	}
