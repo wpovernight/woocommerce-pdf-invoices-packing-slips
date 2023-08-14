@@ -44,8 +44,8 @@ class Documents {
 	 */
 	public function init() {
 		// Load Invoice & Packing Slip
-		$this->documents['\WPO\WC\PDF_Invoices\Documents\Invoice']		= \WPO\WC\PDF_Invoices\Documents\Invoice::instance();
-		$this->documents['\WPO\WC\PDF_Invoices\Documents\Packing_Slip']	= \WPO\WC\PDF_Invoices\Documents\Packing_Slip::instance();
+		$this->documents['\WPO\WC\PDF_Invoices\Documents\Invoice']      = new \WPO\WC\PDF_Invoices\Documents\Invoice();
+		$this->documents['\WPO\WC\PDF_Invoices\Documents\Packing_Slip'] = new \WPO\WC\PDF_Invoices\Documents\Packing_Slip();
 
 		// Allow plugins to add their own documents
 		$this->documents = apply_filters( 'wpo_wcpdf_document_classes', $this->documents );

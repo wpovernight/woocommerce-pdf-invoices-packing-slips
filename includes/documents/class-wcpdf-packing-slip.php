@@ -13,15 +13,6 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Packing_Slip' ) ) :
 
 class Packing_Slip extends Order_Document_Methods {
 	
-	protected static $_instance = null;
-		
-	public static function instance() {
-		if ( is_null( self::$_instance ) ) {
-			self::$_instance = new self();
-		}
-		return self::$_instance;
-	}
-	
 	/**
 	 * Init/load the order object.
 	 *
