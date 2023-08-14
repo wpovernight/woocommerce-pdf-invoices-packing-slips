@@ -25,14 +25,20 @@ class Font_Synchronizer {
 	 * @var \Dompdf\Dompdf
 	 */
 	public $dompdf;
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	/**
 	 * Constructor
 	 */
-	function __construct() {
-		if ( ! class_exists( '\\Dompdf\\Dompdf' ) ) {
-			require WPO_WCPDF()->plugin_path() . '/vendor/autoload.php';
-		}
+	public function __construct() {
 		$this->dompdf = new Dompdf();
 	}
 

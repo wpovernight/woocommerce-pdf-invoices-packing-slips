@@ -3,9 +3,10 @@ namespace WPO\WC\PDF_Invoices\Legacy;
 
 defined( 'ABSPATH' ) or exit;
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\WPO_WCPDF_Legacy' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\WPO_WCPDF_Legacy' ) ) :
 
 class WPO_WCPDF_Legacy {
+	
 	public static $version;
 	public $enabled;
 	public $settings;
@@ -32,9 +33,9 @@ class WPO_WCPDF_Legacy {
 	public function __construct() {
 		self::$version   = WPO_WCPDF()->version;
 		$this->enabled   = WPO_WCPDF()->legacy_mode_enabled();
-		$this->settings  = include_once( 'class-wcpdf-legacy-settings.php' );
-		$this->export    = include_once( 'class-wcpdf-legacy-export.php' );
-		$this->functions = include_once( 'class-wcpdf-legacy-functions.php' );
+		$this->settings  = Legacy_Settings::instance();
+		$this->export    = Legacy_Export::instance();
+		$this->functions = Legacy_Functions::instance();
 	}
 
 	/**
@@ -81,10 +82,3 @@ class WPO_WCPDF_Legacy {
 }
 
 endif; // Class exists check
-
-function WPO_WCPDF_Legacy() {
-	return WPO_WCPDF_Legacy::instance();
-}
-
-// Global for backwards compatibility.
-$GLOBALS['wpo_wcpdf'] = WPO_WCPDF_Legacy();

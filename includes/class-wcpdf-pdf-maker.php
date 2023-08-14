@@ -8,9 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) :
 
 class PDF_Maker {
+	
 	public $html;
 	public $settings;
 	public $document;
@@ -31,8 +32,6 @@ class PDF_Maker {
 		if ( empty( $this->html ) ) {
 			return;
 		}
-		
-		require WPO_WCPDF()->plugin_path() . '/vendor/autoload.php';
 
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(

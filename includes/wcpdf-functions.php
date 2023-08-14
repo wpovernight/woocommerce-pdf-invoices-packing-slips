@@ -291,3 +291,6 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 	return $errors;
 }
 
+function WPO_WCPDF_Legacy() {
+	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
+}

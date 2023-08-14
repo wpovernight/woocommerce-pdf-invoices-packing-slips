@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents' ) ) :
 
 class Documents {
 
@@ -36,16 +36,6 @@ class Documents {
 	 *
 	 */
 	public function __construct() {
-		// Include document abstracts
-		include_once( dirname( __FILE__ ) . '/documents/abstract-wcpdf-order-document.php' );
-		include_once( dirname( __FILE__ ) . '/documents/abstract-wcpdf-order-document-methods.php' );
-		// Include bulk document
-		include_once( dirname( __FILE__ ) . '/documents/class-wcpdf-bulk-document.php' );
-		// Document number formatting class
-		include_once( dirname( __FILE__ ) . '/documents/class-wcpdf-document-number.php' );
-		// Sequential number handler
-		include_once( dirname( __FILE__ ) . '/documents/class-wcpdf-sequential-number-store.php' );
-
 		add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
 	}
 
@@ -54,8 +44,8 @@ class Documents {
 	 */
 	public function init() {
 		// Load Invoice & Packing Slip
-		$this->documents['\WPO\WC\PDF_Invoices\Documents\Invoice']		= include( 'documents/class-wcpdf-invoice.php' );
-		$this->documents['\WPO\WC\PDF_Invoices\Documents\Packing_Slip']	= include( 'documents/class-wcpdf-packing-slip.php' );
+		$this->documents['\WPO\WC\PDF_Invoices\Documents\Invoice']      = new \WPO\WC\PDF_Invoices\Documents\Invoice();
+		$this->documents['\WPO\WC\PDF_Invoices\Documents\Packing_Slip'] = new \WPO\WC\PDF_Invoices\Documents\Packing_Slip();
 
 		// Allow plugins to add their own documents
 		$this->documents = apply_filters( 'wpo_wcpdf_document_classes', $this->documents );
@@ -94,7 +84,7 @@ class Documents {
 			}
 		}
 		// document not known, inject into legacy document
-		$document = include( WPO_WCPDF()->plugin_path() . '/includes/legacy/class-wcpdf-legacy-document.php' );
+		$document = new \WPO\WC\PDF_Invoices\Legacy\Legacy_Document();
 		// set document properties, which will trigger parent construct and load data correctly
 		$document->set_props( array(
 			'type'	=> $document_type,
@@ -108,5 +98,3 @@ class Documents {
 }
 
 endif; // class_exists
-
-return new Documents();
