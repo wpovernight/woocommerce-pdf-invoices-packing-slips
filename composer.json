@@ -9,8 +9,8 @@
 	},
     "require": {
         "dompdf/dompdf": "^2.0",
-        "symfony/polyfill-mbstring": "1.20",
-        "symfony/polyfill-iconv": "1.20.0"
+        "symfony/polyfill-mbstring": "1.27",
+        "symfony/polyfill-iconv": "1.27"
     },
     "config": {
         "platform-check": false
