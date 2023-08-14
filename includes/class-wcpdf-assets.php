@@ -90,8 +90,8 @@ class Assets {
 					'ajaxurl'			           => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
 					'nonce'				           => wp_create_nonce('generate_wpo_wcpdf'),
 					'bulk_actions'		           => array_keys( $bulk_actions ),
-					'confirm_delete'	           => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
+					'confirm_delete'	           => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
 				)
 			);
@@ -209,7 +209,28 @@ class Assets {
 			}
 
 		}
-		
+
+		if (
+			$hook === 'woocommerce_page_wc-admin' &&
+			WPO_WCPDF()->order_util->is_wc_admin_page()
+		) {
+			wp_enqueue_script(
+				'wpo-wcpdf-analytics-order',
+				WPO_WCPDF()->plugin_url() . '/assets/js/analytics-order' . $suffix . '.js',
+				array( 'wp-hooks' ),
+				WPO_WCPDF_VERSION,
+				true
+			);
+
+			wp_localize_script(
+				'wpo-wcpdf-analytics-order',
+				'wpo_wcpdf_analytics_order',
+				array(
+					'label' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
 		// status/debug page scripts
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'debug' ) {
 			
@@ -231,6 +252,7 @@ class Assets {
 					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
 					'nonce'          => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
 					'download_label' => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_reset'  => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
 				]
 			);
 			

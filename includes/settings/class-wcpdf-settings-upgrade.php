@@ -160,6 +160,10 @@ class Settings_Upgrade {
 					continue;
 				}
 				
+				if ( is_null( $updater ) ) {
+					continue;
+				}
+				
 				// built-in updater
 				if ( is_callable( [ $updater, 'get_license_key' ] ) ) {
 					$license_key = $updater->get_license_key();
