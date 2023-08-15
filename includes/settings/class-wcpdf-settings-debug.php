@@ -533,8 +533,14 @@ class Settings_Debug {
 						'guest'     => __( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ),
 						'full'      => __( 'Full', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					'description' => __( 'By default, documents can only be accessed when logged in, from the admin panel or customer account. You could also give access permissions to guest customers, or full permission to everyone with a document link.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'document_link_access_type_table',
+				'title'    => '',
+				'callback' => array( $this, 'document_link_access_type_table' ),
+				'section'  => 'debug_settings',
 			),
 			array(
 				'type'     => 'setting',
@@ -634,6 +640,25 @@ class Settings_Debug {
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_debug', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
+	}
+	
+	public function document_link_access_type_table() {
+		?>
+		<table id="document-link-access-type">
+			<tr>
+				<td class="option"><strong><?php _e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php _e( "Document can be accessed by logged in users only.", 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			</tr>
+			<tr>
+				<td class="option"><strong><?php _e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php _e( 'Document can be accessed by logged in or guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			</tr>
+			<tr>
+				<td class="option"><strong><?php _e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php _e( 'Document can be accessed by everyone with the link.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			</tr>
+		</table>
+		<?php
 	}
 
 }
