@@ -533,7 +533,7 @@ class Settings_Debug {
 						'guest'     => __( 'Guest' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'full'      => __( 'Full' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					'description' => __( 'By default, documents can only be accessed when logged in, from admin panel or customer account. You could also give access permissions to guest customers, or full permission to everyone with a document link.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'By default, documents can only be accessed when logged in, from the admin panel or customer account. You could also give access permissions to guest customers, or full permission to everyone with a document link.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
