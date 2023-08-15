@@ -651,7 +651,7 @@ class Settings_Debug {
 			</tr>
 			<tr>
 				<td class="option"><strong><?php _e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php _e( 'Document can be accessed by logged in or guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td><?php _e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
 				<td class="option"><strong><?php _e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
