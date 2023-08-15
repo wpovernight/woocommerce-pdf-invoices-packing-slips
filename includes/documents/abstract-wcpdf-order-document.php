@@ -892,8 +892,8 @@ abstract class Order_Document {
 		}
 
 		// clean up special characters
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) && function_exists( 'htmlentities' ) ) ) {
-			$html = htmlspecialchars_decode( wcpdf_utf8_decode( htmlentities( $html, ENT_COMPAT, 'UTF-8' ) ), ENT_QUOTES );
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
+			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
 		}
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
