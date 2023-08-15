@@ -520,15 +520,30 @@ class Settings_Debug {
 			),
 			array(
 				'type'     => 'setting',
-				'id'       => 'guest_access',
-				'title'    => __( 'Allow guest access', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
+				'id'	   => 'document_link_access_type',
+				'title'	   => __( 'Document link access type', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'debug_settings',
+				'args'	   => array(
+					'option_name' => $option_name,
+					'id'          => 'document_link_access_type',
+					'default'     => 'logged_in',
+					'options'     => array(
+						'logged_in' => __( 'Logged in (recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'guest'     => __( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ),
+						'full'      => __( 'Full', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'document_link_access_type_table',
+				'title'    => '',
+				'callback' => array( $this, 'document_link_access_type_table' ),
 				'section'  => 'debug_settings',
 				'args'     => array(
 					'option_name' => $option_name,
-					'id'          => 'guest_access',
-					'description' => __( 'Enable this to allow customers that purchase without an account to access their PDF with a unique key', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -628,6 +643,25 @@ class Settings_Debug {
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_debug', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
+	}
+	
+	public function document_link_access_type_table() {
+		?>
+		<table id="document-link-access-type">
+			<tr>
+				<td class="option"><strong><?php _e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php _e( "Document can be accessed by logged in users only.", 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			</tr>
+			<tr>
+				<td class="option"><strong><?php _e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php _e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			</tr>
+			<tr>
+				<td class="option"><strong><?php _e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php _e( 'Document can be accessed by everyone with the link.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			</tr>
+		</table>
+		<?php
 	}
 
 }

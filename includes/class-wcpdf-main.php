@@ -270,16 +270,13 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_pdf_ajax() {
-		$guest_access = WPO_WCPDF()->settings->is_guest_access_enabled();
-		if ( ! $guest_access && current_filter() == 'wp_ajax_nopriv_generate_wpo_wcpdf' ) {
-			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
-		}
+		$access_type = WPO_WCPDF()->endpoint->get_document_link_access_type();
 
 		// handle legacy access keys
 		if ( empty( $_REQUEST['access_key'] ) ) {
 			foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
-				if ( ! empty( $_REQUEST[$legacy_key] ) ) {
-					$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST[$legacy_key] );
+				if ( ! empty( $_REQUEST[ $legacy_key ] ) ) {
+					$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST[ $legacy_key ] );
 				}
 			}
 		}
@@ -288,16 +285,21 @@ class Main {
 
 		// check if we have the access key set
 		if ( empty( $_REQUEST['access_key'] ) ) {
-			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty access key', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
-		// Check the nonce - guest access doesn't use nonces but checks the unique order key (hash)
-		if ( empty( $_REQUEST['action'] ) || ( ! $guest_access && ! $valid_nonce ) ) {
-			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		// check if we have the action
+		if ( empty( $_REQUEST['action'] ) ) {
+			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty action', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+		
+		// Check the nonce - guest access can use nonce if user is logged in
+		if ( is_user_logged_in() && in_array( $access_type, array( 'logged_in', 'guest' ) ) && ! $valid_nonce ) {
+			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page. Reason: invalid nonce', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// Check if all parameters are set
-		if ( empty( $_REQUEST['document_type'] ) && !empty( $_REQUEST['template_type'] ) ) {
+		if ( empty( $_REQUEST['document_type'] ) && ! empty( $_REQUEST['template_type'] ) ) {
 			$_REQUEST['document_type'] = $_REQUEST['template_type'];
 		}
 
@@ -305,25 +307,24 @@ class Main {
 			wp_die( esc_attr__( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
-		if( empty( $_REQUEST['document_type'] ) ) {
+		if ( empty( $_REQUEST['document_type'] ) ) {
 			wp_die( esc_attr__( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		// debug enabled by URL
-		if ( isset( $_REQUEST['debug'] ) && !( $guest_access || isset( $_REQUEST['my-account'] ) ) ) {
+		if ( isset( $_REQUEST['debug'] ) && ! ( is_user_logged_in() || isset( $_REQUEST['my-account'] ) ) ) {
 			$this->enable_debug();
 		}
 
-		// Generate the output
 		$document_type = sanitize_text_field( $_REQUEST['document_type'] );
-
-		$order_ids = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
+		$order_ids     = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
+		$order         = false;
 		
-		// solo order
-		$order = false;
+		// single order
 		if ( count( $order_ids ) === 1 ) {
 			$order_id = reset( $order_ids );
 			$order    = wc_get_order( $order_id );
+			
 			if ( $order && $order->get_status() == 'auto-draft' ) {
 				wp_die( esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' ) );
 			} elseif ( ! $order ) {
@@ -341,39 +342,62 @@ class Main {
 
 		// set default is allowed
 		$allowed = true;
-
-		if ( $guest_access && ! $valid_nonce ) { // if nonce is invalid maybe we are dealing with the order key
-			// Guest access with order key
-			if ( count( $order_ids ) > 1 ) {
-				$allowed = false;
-			} else {
-				if ( ! $order || ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
-					$allowed = false;
-				}
-			}
-		} else {
-			// check if user is logged in
-			if ( ! is_user_logged_in() ) {
-				$allowed = false;
-			}
-
-			// Check the user privileges
-			$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
-			if ( ! $full_permission ) {
-				if ( ! isset( $_GET['my-account'] ) && ! isset( $_GET['shortcode'] ) ) {
-					$allowed = false;
-				} else { // User call from my-account page or via shortcode
-					// Only for single orders!
-					if ( count( $order_ids ) > 1 ) {
-						$allowed = false;
-					}
 		
-					// Check if current user is owner of order IMPORTANT!!!
-					if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+		// 'guest' is hybrid, it can behave as 'logged_in' if the user is logged in, but if not, behaves as 'full'
+		if ( 'guest' === $access_type ) {
+			$access_type = is_user_logged_in() ? 'logged_in' : 'full';
+		}
+		
+		switch ( $access_type ) {
+			case 'logged_in':
+				if ( ! is_user_logged_in() || ! $valid_nonce ) {
+					$allowed = false;
+					break;
+				}
+				
+				// check the user privileges
+				$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
+				
+				if ( ! $full_permission ) {
+					if ( ! isset( $_REQUEST['my-account'] ) && ! isset( $_REQUEST['shortcode'] ) ) {
 						$allowed = false;
+						break;
+					
+					// user call from 'my-account' page or via 'shortcode'
+					} else {
+						// single order only
+						if ( count( $order_ids ) > 1 ) {
+							$allowed = false;
+							break;
+						}
+			
+						// check if current user is owner of order IMPORTANT!!!
+						if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+							$allowed = false;
+							break;
+						}
 					}
 				}
-			}
+				break;
+			case 'full':
+				// no order
+				if ( ! $order ) {
+					$allowed = false;
+					break;
+				}
+				
+				// check if we have a valid access key
+				if ( ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
+					$allowed = false;
+					break;
+				}
+				
+				// single order only
+				if ( count( $order_ids ) > 1 ) {
+					$allowed = false;
+					break;
+				}
+				break;
 		}
 
 		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );

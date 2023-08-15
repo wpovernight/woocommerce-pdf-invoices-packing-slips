@@ -415,6 +415,20 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-left-color: #51266b;
 }
 
+#wpo-wcpdf-settings table#document-link-access-type {
+	margin-top: -15px;
+}
+
+#wpo-wcpdf-settings table#document-link-access-type td.option {
+	padding-left: 0;
+}
+
+#wpo-wcpdf-settings table#document-link-access-type td {
+	padding-top: 0;
+	padding-bottom: 6px;
+	font-size: 12px;
+}
+
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar {
 	flex: 0 0 100%;
 }

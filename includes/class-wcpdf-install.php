@@ -433,6 +433,16 @@ class Install {
 				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
 			}
 		}
+		
+		// 3.5.7-dev-1: migrate 'guest_access' setting to 'document_link_access_type'
+		if ( version_compare( $installed_version, '3.5.7-dev-1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['guest_access'] ) ) {
+				unset( $debug_settings['guest_access'] );
+				$debug_settings['document_link_access_type'] = 'guest';
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
 	}
 
 	/**
