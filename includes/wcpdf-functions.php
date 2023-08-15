@@ -319,7 +319,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 		case 'uconverter':
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
 			
-			// preferred fallback method for PHP 8.2+.
+			// only for PHP 8.2+.
 			if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
 				return UConverter::transcode( $string, $to_encoding, $from_encoding );
 			}
