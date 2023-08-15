@@ -350,12 +350,7 @@ class Main {
 		
 		switch ( $access_type ) {
 			case 'logged_in':
-				if ( ! is_user_logged_in() ) {
-					$allowed = false;
-					break;
-				}
-				
-				if ( ! $valid_nonce ) {
+				if ( ! is_user_logged_in() || ! $valid_nonce ) {
 					$allowed = false;
 					break;
 				}
@@ -385,6 +380,12 @@ class Main {
 				}
 				break;
 			case 'full':
+				// no order
+				if ( ! $order ) {
+					$allowed = false;
+					break;
+				}
+				
 				// check if we have a valid access key
 				if ( ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
@@ -393,12 +394,6 @@ class Main {
 				
 				// single order only
 				if ( count( $order_ids ) > 1 ) {
-					$allowed = false;
-					break;
-				}
-				
-				// no order
-				if ( ! $order ) {
 					$allowed = false;
 					break;
 				}

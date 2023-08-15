@@ -529,9 +529,9 @@ class Settings_Debug {
 					'id'          => 'document_link_access_type',
 					'default'     => 'logged_in',
 					'options'     => array(
-						'logged_in' => __( 'Logged in (recommended)' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'guest'     => __( 'Guest' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'full'      => __( 'Full' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'logged_in' => __( 'Logged in (recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'guest'     => __( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ),
+						'full'      => __( 'Full', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 					'description' => __( 'By default, documents can only be accessed when logged in, from the admin panel or customer account. You could also give access permissions to guest customers, or full permission to everyone with a document link.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
