@@ -330,11 +330,10 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			// provided by composer 'symfony/polyfill-iconv' library.
 			if ( class_exists( '\\Symfony\\Polyfill\\Iconv\\Iconv' ) ) {
 				$string = \Symfony\Polyfill\Iconv\Iconv::iconv( $from_encoding, $to_encoding, $string );
-			}
-
+				
 			// default server library.
 			// must have 'libiconv' configured instead of 'glibc' library.
-			if ( function_exists( 'iconv' ) ) {
+			} elseif ( function_exists( 'iconv' ) ) {
 				$string = iconv( $from_encoding, $to_encoding, $string );
 			}
 			break;
