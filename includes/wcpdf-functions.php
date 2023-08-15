@@ -313,7 +313,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			// provided by composer 'symfony/polyfill-mbstring' library.
 			// it uses 'iconv()', must have 'libiconv' configured instead of 'glibc' library.
 			if ( class_exists( '\\Symfony\\Polyfill\\Mbstring\\Mbstring' ) ) {
-				return \Symfony\Polyfill\Mbstring\Mbstring::mb_convert_encoding( $string, $to_encoding, $from_encoding );
+				$string = \Symfony\Polyfill\Mbstring\Mbstring::mb_convert_encoding( $string, $to_encoding, $from_encoding );
 			}
 			break;
 		case 'uconverter':
@@ -321,7 +321,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			
 			// only for PHP 8.2+.
 			if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
-				return UConverter::transcode( $string, $to_encoding, $from_encoding );
+				$string = UConverter::transcode( $string, $to_encoding, $from_encoding );
 			}
 			break;
 		case 'iconv':
@@ -329,13 +329,13 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			
 			// provided by composer 'symfony/polyfill-iconv' library.
 			if ( class_exists( '\\Symfony\\Polyfill\\Iconv\\Iconv' ) ) {
-				return \Symfony\Polyfill\Iconv\Iconv::iconv( $from_encoding, $to_encoding, $string );
+				$string = \Symfony\Polyfill\Iconv\Iconv::iconv( $from_encoding, $to_encoding, $string );
 			}
 
 			// default server library.
 			// must have 'libiconv' configured instead of 'glibc' library.
 			if ( function_exists( 'iconv' ) ) {
-				return iconv( $from_encoding, $to_encoding, $string );
+				$string = iconv( $from_encoding, $to_encoding, $string );
 			}
 			break;
 	}
