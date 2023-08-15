@@ -541,6 +541,9 @@ class Settings_Debug {
 				'title'    => '',
 				'callback' => array( $this, 'document_link_access_type_table' ),
 				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+				),
 			),
 			array(
 				'type'     => 'setting',
