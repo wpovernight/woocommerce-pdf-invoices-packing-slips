@@ -234,7 +234,7 @@ class Admin {
 								if ( $document_printed ) {
 									$class[] = 'printed';
 								}
-				
+								
 								$listing_actions[$document->get_type()] = array(
 									'url'           => esc_url( $document_url ),
 									'img'           => $icon,

@@ -41,6 +41,24 @@ class Bulk_Document {
 		// output formats (placed after parent construct to override the abstract default)
 		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf' ], $this );
 	}
+	
+	public function exists() {
+		$exists = false;
+		
+		foreach ( $this->order_ids as $order_id ) {
+			$document = wcpdf_get_document( $this->type, $order_id );
+			if ( $document && is_callable( array( $document, 'exists' ) ) && $document->exists() ) {
+				$exists = true;
+				break;
+			}
+		}
+		
+		return $exists;
+	}
+	
+	public function is_enabled() {
+		return true;
+	}
 
 	public function get_type() {
 		return $this->type;
