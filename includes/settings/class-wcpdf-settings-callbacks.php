@@ -1,5 +1,5 @@
 <?php
-namespace WPO\WC\PDF_Invoices;
+namespace WPO\WC\PDF_Invoices\Settings;
 
 use WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store;
 
@@ -7,9 +7,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings_Callbacks' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks' ) ) :
 
 class Settings_Callbacks {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+	
 	/**
 	 * Section null callback.
 	 *
@@ -680,4 +690,3 @@ class Settings_Callbacks {
 
 endif; // class_exists
 
-return new Settings_Callbacks();

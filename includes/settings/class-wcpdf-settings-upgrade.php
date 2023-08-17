@@ -1,15 +1,24 @@
 <?php
-namespace WPO\WC\PDF_Invoices;
+namespace WPO\WC\PDF_Invoices\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings_Upgrade' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade' ) ) :
 
 class Settings_Upgrade {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
-	function __construct()	{
+	public function __construct()	{
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
 	}
 
@@ -151,6 +160,10 @@ class Settings_Upgrade {
 					continue;
 				}
 				
+				if ( is_null( $updater ) ) {
+					continue;
+				}
+				
 				// built-in updater
 				if ( is_callable( [ $updater, 'get_license_key' ] ) ) {
 					$license_key = $updater->get_license_key();
@@ -231,5 +244,3 @@ class Settings_Upgrade {
 }
 
 endif; // class_exists
-
-return new Settings_Upgrade();

@@ -5,11 +5,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Assets' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Assets' ) ) :
 
 class Assets {
 	
-	function __construct()	{
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+	
+	public function __construct()	{
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_scripts_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
 	}
@@ -195,7 +204,28 @@ class Assets {
 			}
 
 		}
-		
+
+		if (
+			$hook === 'woocommerce_page_wc-admin' &&
+			WPO_WCPDF()->order_util->is_wc_admin_page()
+		) {
+			wp_enqueue_script(
+				'wpo-wcpdf-analytics-order',
+				WPO_WCPDF()->plugin_url() . '/assets/js/analytics-order' . $suffix . '.js',
+				array( 'wp-hooks' ),
+				WPO_WCPDF_VERSION,
+				true
+			);
+
+			wp_localize_script(
+				'wpo-wcpdf-analytics-order',
+				'wpo_wcpdf_analytics_order',
+				array(
+					'label' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
 		// status/debug page scripts
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'debug' ) {
 			
@@ -217,6 +247,7 @@ class Assets {
 					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
 					'nonce'          => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
 					'download_label' => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_reset'  => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
 				]
 			);
 			
@@ -226,5 +257,3 @@ class Assets {
 }
 
 endif; // class_exists
-
-return new Assets();

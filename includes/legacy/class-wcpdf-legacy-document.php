@@ -1,22 +1,18 @@
 <?php
-namespace WPO\WC\PDF_Invoices\Documents;
+namespace WPO\WC\PDF_Invoices\Legacy;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Legacy_Document' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Document' ) ) :
 
 /**
  * Packing Slip Document
- * 
- * @class       \WPO\WC\PDF_Invoices\Documents\Legacy_Document
- * @version     2.0
- * @category    Class
- * @author      Ewout Fernhout
  */
 
-class Legacy_Document extends Order_Document_Methods {
+class Legacy_Document extends \WPO\WC\PDF_Invoices\Documents\Order_Document_Methods {
+	
 	/**
 	 * Init/load the order object.
 	 *
@@ -44,5 +40,3 @@ class Legacy_Document extends Order_Document_Methods {
 }
 
 endif; // class_exists
-
-return new Legacy_Document();

@@ -5,9 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( !class_exists( '\\WPO\\WC\\PDF_Invoices\\Install' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Install' ) ) :
 
 class Install {
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 	
 	public function __construct() {
 		// run lifecycle methods
@@ -345,11 +354,8 @@ class Install {
 
 		// 2.0-beta-2 update: copy next number to separate db store
 		if ( version_compare( $installed_version, '2.0-beta-2', '<' ) ) {
-			// load number store class (just in case)
-			include_once( WPO_WCPDF()->plugin_path() . '/includes/documents/class-wcpdf-sequential-number-store.php' );
-
 			$next_number = get_option( 'wpo_wcpdf_next_invoice_number' );
-			if (!empty($next_number)) {
+			if ( ! empty( $next_number ) ) {
 				$number_store = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( 'invoice_number' );
 				$number_store->set_next( (int) $next_number );
 			}
@@ -489,6 +495,16 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_setings );
 			}
 		}
+		
+		// 3.6.1-dev-1: migrate 'guest_access' setting to 'document_link_access_type'
+		if ( version_compare( $installed_version, '3.6.1-dev-1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['guest_access'] ) ) {
+				unset( $debug_settings['guest_access'] );
+				$debug_settings['document_link_access_type'] = 'guest';
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
 	}
 
 	/**
@@ -521,4 +537,3 @@ class Install {
 
 endif; // class_exists
 
-return new Install();

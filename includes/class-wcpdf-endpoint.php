@@ -12,6 +12,15 @@ class Endpoint {
 	public $action_suffix = '_wpo_wcpdf';
 	public $events        = [ 'generate', 'printed' ];
 	public $actions;
+	
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 	public function __construct() {
 		if ( $this->is_enabled() ) {
@@ -80,13 +89,23 @@ class Endpoint {
 		if ( empty( $order ) || empty( $document_type ) ) {
 			return '';
 		}
-
-		// handle access key
-		if ( is_user_logged_in() ) {
-			$access_key = wp_create_nonce( $this->actions['generate'] );
-		} elseif ( ! is_user_logged_in() && WPO_WCPDF()->settings->is_guest_access_enabled() ) {
-			$access_key = $order->get_order_key();
-		} else {
+		
+		$access_type = $this->get_document_link_access_type();
+		
+		switch ( $access_type ) {
+			case 'logged_in':
+			default:
+				$access_key = is_user_logged_in() ? wp_create_nonce( $this->actions['generate'] ) : '';
+				break;
+			case 'guest': // 'guest' is hybrid, it can behave as 'logged_in' if the user is logged in, but if not, behaves as 'full'
+				$access_key = ! is_user_logged_in() ? $order->get_order_key() : wp_create_nonce( $this->actions['generate'] );
+				break;
+			case 'full':
+				$access_key = $order->get_order_key();
+				break;
+		}
+		
+		if ( empty( $access_key ) ) {
 			return '';
 		}
 
@@ -146,8 +165,18 @@ class Endpoint {
 		return esc_url( $printed_link );
 	}
 	
+	/**
+	 * Get document link access type from debug settings
+	 *
+	 * @return string
+	 */
+	public function get_document_link_access_type() {
+		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$access_type    = isset( $debug_settings['document_link_access_type'] ) ? $debug_settings['document_link_access_type'] : 'logged_in';
+		
+		return apply_filters( 'wpo_wcpdf_document_link_access_type', $access_type, $this );
+	}
+	
 }
 
 endif; // class_exists
-
-return new Endpoint();

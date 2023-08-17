@@ -29,15 +29,23 @@ class Settings {
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
 	private $template_list_cache       = array();
-
 	
-	function __construct()	{
-		$this->callbacks        = include( 'class-wcpdf-settings-callbacks.php' );
-		$this->general          = include( 'class-wcpdf-settings-general.php' );
-		$this->documents        = include( 'class-wcpdf-settings-documents.php' );
-		$this->debug            = include( 'class-wcpdf-settings-debug.php' );
+	protected static $_instance = null;
+		
+	public static function instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+	
+	public function __construct() {
+		$this->callbacks        = \WPO\WC\PDF_Invoices\Settings\Settings_Callbacks::instance();
+		$this->general          = \WPO\WC\PDF_Invoices\Settings\Settings_General::instance();
+		$this->documents        = \WPO\WC\PDF_Invoices\Settings\Settings_Documents::instance();
+		$this->debug            = \WPO\WC\PDF_Invoices\Settings\Settings_Debug::instance();
 		$this->ubl              = include( 'class-wcpdf-settings-ubl.php' );
-		$this->upgrade          = include( 'class-wcpdf-settings-upgrade.php' );
+		$this->upgrade          = \WPO\WC\PDF_Invoices\Settings\Settings_Upgrade::instance();
 		
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
@@ -300,7 +308,7 @@ class Settings {
 						$document->set_date( current_time( 'timestamp', true ) );
 						$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
 						$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
-						$number_store        = new \WPO\WC\PDF_Invoices\Documents\Sequential_Number_Store( $number_store_name, $number_store_method );
+						$number_store        = new Sequential_Number_Store( $number_store_name, $number_store_method );
 						$document->set_number( $number_store->get_next() );
 					}
 
@@ -981,18 +989,6 @@ class Settings {
 		return $new_settings;
 	}
 
-	/**
-	 * Checks if guest access is enabled
-	 * 
-	 * @return bool
-	 */
-	public function is_guest_access_enabled() {
-		$guest_access = isset( $this->debug_settings['guest_access'] ) ? true : false;
-
-		return apply_filters( 'wpo_wcpdf_guest_access_enabled', $guest_access, $this );
-	}
 }
 
 endif; // class_exists
-
-return new Settings();

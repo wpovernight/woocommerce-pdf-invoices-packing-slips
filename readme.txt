@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.3
 Requires PHP: 7.1
-Stable tag: 3.5.6
+Stable tag: 3.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,25 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.6.1 (2023-08-16) =
+* Fix: string encoding issues in PDF
+
+= 3.6.0 (2023-08-15) =
+* New: setting for improved document link access type
+* New: implemented autoloader for plugin classes
+* New: adds a new Status tool to reset plugin settings
+* New: invoice number column added to the WooCommerce order analytics
+* Fix: replaces `utf8_decode()` which is deprecated in PHP 8.2 
+* Fix: allows the translation for the Shipping Notes strings
+* Fix: bug when trying to delete temporary files when using mPDF extension
+* Fix: bug on `$updater` returning `null` in Upgrade tab function
+* Fix: deprecates `woocommerce_resend_order_emails_available` filter
+* Fix: several string typos
+* Fix: revert breaking long characters in order data labels
+* Fix: PHP8.2 creation of dynamic property deprecated warnings
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 8.0 & WordPress 6.3
 
 = 3.5.6 (2023-06-21) =
 * New: adds a generic shortcode `[wcpdf_download_pdf]` for PDF download links 

@@ -3,14 +3,14 @@
  * Plugin Name:          PDF Invoices & Packing Slips for WooCommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF invoices & packing slips for WooCommerce orders.
- * Version:              3.6.0-beta-1
+ * Version:              3.6.1-beta-1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 3.0
- * WC tested up to:      7.8
+ * WC tested up to:      8.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,16 +21,23 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '3.6.0-beta-1';
+	public $version = '3.6.1-beta-1';
 	public $plugin_basename;
 	public $legacy_mode;
 	public $legacy_textdomain;
+	public $third_party_plugins;
 	public $order_util;
 	public $settings;
 	public $documents;
 	public $main;
 	public $endpoint;
+	public $assets;
 	public $admin;
+	public $frontend;
+	public $install;
+	public $font_synchronizer;
+	public $legacy;
+	public $deprecated_hooks;
 
 	protected static $_instance = null;
 
@@ -42,6 +49,7 @@ class WPO_WCPDF {
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
+			self::$_instance->autoloaders();
 		}
 		return self::$_instance;
 	}
@@ -70,6 +78,11 @@ class WPO_WCPDF {
 		if ( $this->legacy_textdomain_enabled() === true ) {
 			add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
 		}
+	}
+	
+	private function autoloaders() {
+		// main plugin autoloader
+		require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 	}
 
 	/**
@@ -178,29 +191,28 @@ class WPO_WCPDF {
 	 * Load the main plugin classes and functions
 	 */
 	public function includes() {
-		// Third party compatibility
-		include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-compatibility-third-party-plugins.php' );
-		// WC OrderUtil compatibility
-		$this->order_util = include_once( $this->plugin_path() . '/includes/compatibility/class-wcpdf-order-util.php' );
-
-		// Plugin classes
+		// plugin functions
 		include_once( $this->plugin_path() . '/includes/wcpdf-functions.php' );
-		include_once( $this->plugin_path() . '/includes/class-wcpdf-updraft-semaphore.php' );
-		$this->settings  = include_once( $this->plugin_path() . '/includes/class-wcpdf-settings.php' );
-		$this->documents = include_once( $this->plugin_path() . '/includes/class-wcpdf-documents.php' );
-		$this->main      = include_once( $this->plugin_path() . '/includes/class-wcpdf-main.php' );
-		$this->endpoint  = include_once( $this->plugin_path() . '/includes/class-wcpdf-endpoint.php' );
-		include_once( $this->plugin_path() . '/includes/class-wcpdf-assets.php' );
-		$this->admin     = include_once( $this->plugin_path() . '/includes/class-wcpdf-admin.php' );
-		include_once( $this->plugin_path() . '/includes/class-wcpdf-frontend.php' );
-		include_once( $this->plugin_path() . '/includes/class-wcpdf-install.php' );
-		include_once( $this->plugin_path() . '/includes/class-wcpdf-font-synchronizer.php' );
-
-		// Backwards compatibility with self
-		include_once( $this->plugin_path() . '/includes/legacy/class-wcpdf-legacy.php' );
-		include_once( $this->plugin_path() . '/includes/legacy/class-wcpdf-legacy-deprecated-hooks.php' );
+		
+		// Third party compatibility
+		$this->third_party_plugins = \WPO\WC\PDF_Invoices\Compatibility\Third_Party_Plugins::instance();
+		// WC OrderUtil compatibility
+		$this->order_util          = \WPO\WC\PDF_Invoices\Compatibility\Order_Util::instance();
+		// Plugin classes
+		$this->settings            = \WPO\WC\PDF_Invoices\Settings::instance();
+		$this->documents           = \WPO\WC\PDF_Invoices\Documents::instance();
+		$this->main                = \WPO\WC\PDF_Invoices\Main::instance();
+		$this->endpoint            = \WPO\WC\PDF_Invoices\Endpoint::instance();
+		$this->assets              = \WPO\WC\PDF_Invoices\Assets::instance();
+		$this->admin               = \WPO\WC\PDF_Invoices\Admin::instance();
+		$this->frontend            = \WPO\WC\PDF_Invoices\Frontend::instance();
+		$this->install             = \WPO\WC\PDF_Invoices\Install::instance();
+		$this->font_synchronizer   = \WPO\WC\PDF_Invoices\Font_Synchronizer::instance();
+		
+		// Global for backwards compatibility.
+		$this->legacy              = $GLOBALS['wpo_wcpdf'] = WPO_WCPDF_Legacy();
+		$this->deprecated_hooks    = \WPO\WC\PDF_Invoices\Legacy\Deprecated_Hooks::instance();
 	}
-	
 
 	/**
 	 * Instantiate classes when woocommerce is activated
