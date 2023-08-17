@@ -32,6 +32,10 @@ class Bulk_Document {
 	 * @var array
 	 */
 	public $order_ids;
+	
+	public $is_bulk;
+	
+	public $output_formats;
 
 	public function __construct( $document_type, $order_ids = array() ) {
 		$this->type      = $document_type;
@@ -56,8 +60,11 @@ class Bulk_Document {
 		return $exists;
 	}
 	
-	public function is_enabled() {
-		return true;
+	public function is_enabled( $output_format = 'pdf' ) {
+		if ( in_array( $output_format, $this->output_formats ) ) {
+			return true;
+		}
+		return false;
 	}
 
 	public function get_type() {
