@@ -36,8 +36,9 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		if ( is_object( $order ) ) {
 			// we filter order_ids for objects too:
 			// an order object may need to be converted to several refunds for example.
-			$order_ids = array( $order->get_id() );
+			$order_ids          = array( $order->get_id() );
 			$filtered_order_ids = wcpdf_filter_order_ids( $order_ids, $document_type );
+			
 			// check if something has changed.
 			$order_id_diff = array_diff( $filtered_order_ids, $order_ids );
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {

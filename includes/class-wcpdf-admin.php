@@ -202,18 +202,21 @@ class Admin {
 	 */
 	public function add_listing_actions( $order ) {
 		// do not show buttons for trashed orders
-		if ( $order->get_status() == 'trash' ) {
+		if ( 'trash' === $order->get_status() ) {
 			return;
 		}
+		
 		$this->disable_storing_document_settings();
 
 		$listing_actions = array();
-		$documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
+		$documents       = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
+		
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
+			$document_type  = $document->get_type();
 			$icon           = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
 			
-			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+			if ( $document = wcpdf_get_document( $document_type, $order ) ) {
 				foreach ( $document->output_formats as $output_format ) {
 					switch ( $output_format ) {
 						default:
