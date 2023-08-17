@@ -434,8 +434,18 @@ class Install {
 			}
 		}
 		
-		// 3.6.0-beta-1: deactivate legacy ubl addon and migrate settings
-		if ( version_compare( $installed_version, '3.6.0-beta-1', '<' ) ) {
+		// 3.5.7-dev-1: migrate 'guest_access' setting to 'document_link_access_type'
+		if ( version_compare( $installed_version, '3.5.7-dev-1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['guest_access'] ) ) {
+				unset( $debug_settings['guest_access'] );
+				$debug_settings['document_link_access_type'] = 'guest';
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
+		
+		// 3.6.1-beta-1: deactivate legacy ubl addon and migrate settings
+		if ( version_compare( $installed_version, '3.6.1-beta-1', '<' ) ) {
 			// legacy ubl addon
 			if ( ! empty( $legacy_addon = WPO_WCPDF()->ubl_addon_detected() ) ) {
 				deactivate_plugins( $legacy_addon );
@@ -496,15 +506,6 @@ class Install {
 			}
 		}
 		
-		// 3.6.1-dev-1: migrate 'guest_access' setting to 'document_link_access_type'
-		if ( version_compare( $installed_version, '3.6.1-dev-1', '<' ) ) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-			if ( ! empty( $debug_settings['guest_access'] ) ) {
-				unset( $debug_settings['guest_access'] );
-				$debug_settings['document_link_access_type'] = 'guest';
-				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
-			}
-		}
 	}
 
 	/**
