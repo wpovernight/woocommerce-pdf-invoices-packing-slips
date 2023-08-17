@@ -141,11 +141,12 @@ function wcpdf_get_bulk_actions() {
  */
 function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
 	$class = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.6.1-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker';
-	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
 	
 	if ( ! class_exists( $class ) ) {
 		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/class-pdf-maker.php' );
 	}
+	
+	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
 	
 	return new $class( $html, $settings, $document );
 }
