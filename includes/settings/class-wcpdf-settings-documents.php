@@ -35,8 +35,12 @@ class Settings_Documents {
 	public function output( $section ) {
 		$section          = ! empty( $section ) ? $section : 'invoice';
 		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
-		$output_format    = isset( $_REQUEST['output_format'] ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
+		$output_format    = 'pdf';
 		$section_document = null;
+		
+		if ( isset( $_REQUEST['output_format'] ) && in_array( esc_attr( $_REQUEST['output_format'] ), array( 'pdf', 'ubl' ) ) ) {
+			$output_format = esc_attr( $_REQUEST['output_format'] );
+		}
 		
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() == $section ) {
