@@ -14,8 +14,6 @@ class UBL_Maker {
 	
 	protected $tmp_base;
 
-	public function setup() {}
-
 	public function write( $filename, $contents ) {
 		$fullFileName = $this->getFilePath() . $filename;
 		$status = file_put_contents($fullFileName, $contents);
