@@ -1,7 +1,7 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Settings;
 
-use \WPO\WC\UBL\Settings\TaxesSettings;
+use WPO\WC\UBL\Settings\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

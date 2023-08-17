@@ -2,7 +2,7 @@
 
 namespace WPO\WC\PDF_Invoices\Makers;
 
-use \WPO\WC\UBL\Exceptions\FileWriteException;
+use WPO\WC\UBL\Exceptions\FileWriteException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

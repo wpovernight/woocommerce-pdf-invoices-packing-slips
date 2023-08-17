@@ -1,8 +1,8 @@
 <?php
 namespace WPO\WC\PDF_Invoices;
 
-use \WPO\WC\UBL\Builders\SabreBuilder;
-use \WPO\WC\UBL\Documents\UblDocument;
+use WPO\WC\UBL\Builders\SabreBuilder;
+use WPO\WC\UBL\Documents\UblDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
