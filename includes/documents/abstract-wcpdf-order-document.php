@@ -264,11 +264,7 @@ abstract class Order_Document {
 	}
 
 	public function get_attach_to_email_ids( $output_format = 'pdf' ) {
-		if ( in_array( $output_format, $this->output_formats ) ) {
-			$settings = $this->get_settings( false, $output_format );
-		} else {
-			$settings = $this->settings;
-		}
+		$settings = $this->get_settings( false, $output_format );
 		
 		return isset( $settings['attach_to_email_ids'] ) ? array_keys( array_filter( $settings['attach_to_email_ids'] ) ) : array();
 	}
@@ -278,11 +274,7 @@ abstract class Order_Document {
 	}
 
 	public function is_enabled( $output_format = 'pdf' ) {
-		if ( in_array( $output_format, $this->output_formats ) ) {
-			$is_enabled = $this->get_setting( 'enabled', false, $output_format );
-		} else {
-			$is_enabled = $this->get_setting( 'enabled', false );
-		}
+		$is_enabled = $this->get_setting( 'enabled', false, $output_format );
 		
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
