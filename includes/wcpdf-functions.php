@@ -159,11 +159,12 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
  */
 function wcpdf_get_ubl_maker() {
 	$class = '\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker';
-	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
 	
 	if ( ! class_exists( $class ) ) {
 		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/class-ubl-maker.php' );
 	}
+	
+	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
 	
 	return new $class();
 }
