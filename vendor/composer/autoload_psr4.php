@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'WPO\\WC\\UBL\\' => array($baseDir . '/ubl'),
+    'WPO\\WC\\PDF_Invoices\\' => array($baseDir . '/includes'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Iconv\\' => array($vendorDir . '/symfony/polyfill-iconv'),
     'Svg\\' => array($vendorDir . '/phenx/php-svg-lib/src/Svg'),

@@ -3,9 +3,10 @@
 		"description": "PDF Invoices & Packing Slips for WooCommerce",
 		"autoload": {
 			"psr-4": {
-				"WPO\\WC\\PDF_Invoices\\": "includes/"
+				"WPO\\WC\\PDF_Invoices\\": "includes/",
+				"WPO\\WC\\UBL\\": "ubl/"
 			},
-			"classmap": ["includes/"]
+			"classmap": [ "includes/", "ubl/" ]
 	},
     "require": {
         "dompdf/dompdf": "^2.0",
@@ -15,11 +16,5 @@
     },
     "config": {
         "platform-check": false
-    },
-	"autoload": {
-		"psr-4": {
-			"WPO\\WC\\UBL\\": "ubl/"
-		},
-        "classmap": ["ubl/"]
-	}
+    }
 }
