@@ -2,22 +2,21 @@
 
 namespace WPO\WC\PDF_Invoices\Makers;
 
-use WPO\WC\UBL\Exceptions\FileWriteException;
+use \WPO\WC\UBL\Exceptions\FileWriteException;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-class UBL_Maker
-{
-	/** @var string */
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker' ) ) :
+
+class UBL_Maker {
+	
 	protected $tmp_base;
 
-	public function setup()
-	{
-		
-	}
+	public function setup() {}
 
-	public function write( $filename, $contents )
-	{
+	public function write( $filename, $contents ) {
 		$fullFileName = $this->getFilePath() . $filename;
 		$status = file_put_contents($fullFileName, $contents);
 
@@ -28,13 +27,11 @@ class UBL_Maker
 		return $fullFileName;
 	}
 
-	public function setFilePath( $filePath )
-	{
+	public function setFilePath( $filePath ) {
 		$this->tmp_base = $filePath;
 	}
 
-	public function getFilePath()
-	{
+	public function getFilePath() {
 		if ( ! empty( $this->tmp_base ) ) {
 			return $this->tmp_base;
 		}
@@ -43,3 +40,5 @@ class UBL_Maker
 		return $this->tmp_base;
 	}
 }
+
+endif; // class_exists

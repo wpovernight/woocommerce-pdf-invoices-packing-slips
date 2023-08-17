@@ -44,7 +44,7 @@ class Settings {
 		$this->general          = \WPO\WC\PDF_Invoices\Settings\Settings_General::instance();
 		$this->documents        = \WPO\WC\PDF_Invoices\Settings\Settings_Documents::instance();
 		$this->debug            = \WPO\WC\PDF_Invoices\Settings\Settings_Debug::instance();
-		$this->ubl              = include( 'class-wcpdf-settings-ubl.php' );
+		$this->ubl              = \WPO\WC\PDF_Invoices\Settings\Settings_UBL::instance();
 		$this->upgrade          = \WPO\WC\PDF_Invoices\Settings\Settings_Upgrade::instance();
 		
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
