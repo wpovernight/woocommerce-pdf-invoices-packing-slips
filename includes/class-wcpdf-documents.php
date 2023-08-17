@@ -65,26 +65,38 @@ class Documents {
 		if ( empty( $this->documents ) ) {
 			$this->init();
 		}
+		
+		if ( empty( $output_format ) ) {
+			return $this->documents;
+		}
 
-		if ( $filter == 'enabled' ) {
+		// enabled
+		if ( 'enabled' === $filter ) {
 			$documents = array();
+			
 			foreach ( $this->documents as $class_name => $document ) {
-				if ( in_array( $output_format, $document->output_formats ) ) {
-					if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
-						$documents[$class_name] = $document;
-					}
-				} else {
-					foreach ( $document->output_formats as $output_format ) {
-						if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+				switch ( $output_format ) {
+					case 'pdf':
+					case 'ubl':
+						if ( in_array( $output_format, $document->output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
 							$documents[$class_name] = $document;
-							break;
 						}
-					}
+						break;
+					default:
+						foreach ( $document->output_formats as $document_output_format ) {
+							if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $document_output_format ) ) {
+								$documents[$class_name] = $document;
+								break; // prevents adding the same document twice or more
+							}
+						}
+						break;
 				}
 			}
+			
 			return $documents;
+			
+		// enabled or disabled
 		} else {
-			// return all documents
 			return $this->documents;
 		}
 	}
