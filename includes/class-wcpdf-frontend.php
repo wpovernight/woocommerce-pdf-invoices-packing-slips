@@ -24,6 +24,7 @@ class Frontend {
 		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_link_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_link_shortcode' ) );
+		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_link_shortcode' ) );
 	}
 
 	/**
@@ -109,7 +110,7 @@ class Frontend {
 		return $data;
 	}
 
-	public function generate_document_link_shortcode( $atts ) {
+	public function generate_document_link_shortcode( $atts, $content = null, $tag = '' ) {
 		global $wp;
 
 		if ( is_admin() ) {
@@ -120,7 +121,9 @@ class Frontend {
 		$values = shortcode_atts( array(
 			'order_id'      => '',
 			'link_text'     => '',
-			'document_type' => 'invoice'
+			'id'            => '',
+			'class'         => 'wpo_wcpdf_document_link',
+			'document_type' => 'invoice',
 		), $atts );
 
 		$is_document_type_valid = false;
@@ -170,7 +173,17 @@ class Frontend {
 
 		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
 
-		return sprintf( '<p><a href="%s" target="_blank">%s</a></p>', esc_url( $pdf_url ), esc_html( $link_text ) );
+		if ( 'wcpdf_document_link' === $tag ) {
+			return esc_url( $pdf_url );
+		}
+
+		return sprintf(
+			'<p><a %s class="%s" href="%s" target="_blank">%s</a></p>',
+			( ! empty( $values['id'] ) ? 'id="' . esc_attr( $values['id'] ) . '"' : '' ),
+			esc_attr( $values['class'] ),
+			esc_url( $pdf_url ),
+			esc_html( $link_text )
+		);
 	}
 
 	/**
