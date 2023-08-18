@@ -444,8 +444,8 @@ class Install {
 			}
 		}
 		
-		// 3.6.1-beta-1: deactivate legacy ubl addon and migrate settings
-		if ( version_compare( $installed_version, '3.6.1-beta-1', '<' ) ) {
+		// 3.7.0-beta-1: deactivate legacy ubl addon and migrate settings
+		if ( version_compare( $installed_version, '3.7.0-beta-1', '<' ) ) {
 			// legacy ubl addon
 			if ( ! empty( $legacy_addon = WPO_WCPDF()->ubl_addon_detected() ) ) {
 				deactivate_plugins( $legacy_addon );
