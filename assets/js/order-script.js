@@ -40,15 +40,15 @@ jQuery( function( $ ) {
 			if ( ubl_output ) {
 				$.each( checked, function( i, order_id ) {
 					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
-					window.open( full_url, '_blank' );
 				} );
 				
 			// pdf
 			} else {
 				let order_ids = checked.join( 'x' );
 				full_url      = partial_url + '&order_ids='+order_ids;
-				window.open( full_url, '_blank' );
 			}
+			
+			window.open( full_url, '_blank' );
 
 		}
 	} );
