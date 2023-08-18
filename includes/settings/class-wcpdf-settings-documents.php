@@ -38,8 +38,8 @@ class Settings_Documents {
 		$output_format    = 'pdf';
 		$section_document = null;
 		
-		if ( isset( $_REQUEST['output_format'] ) && in_array( $_REQUEST['output_format'], array( 'pdf', 'ubl' ) ) ) {
-			$output_format = esc_attr( $_REQUEST['output_format'] );
+		if ( isset( $_REQUEST['output_format'] ) && 'ubl' === $_REQUEST['output_format'] ) {
+			$output_format = 'ubl';
 		}
 		
 		foreach ( $documents as $document ) {
