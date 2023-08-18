@@ -338,11 +338,6 @@ class Install {
 					${$new_option}['enabled'] = 1;
 				}
 
-				// auto enable legacy mode
-				if ( $new_option == 'wpo_wcpdf_settings_debug' ) {
-					${$new_option}['legacy_mode'] = 1;
-				}
-
 				// merge with existing settings
 				${$new_option."_old"} = get_option( $new_option, ${$new_option} ); // second argument loads new as default in case the settings did not exist yet
 				${$new_option} = (array) ${$new_option} + (array) ${$new_option."_old"}; // duplicate options take new options as default

@@ -108,13 +108,6 @@ abstract class Order_Document {
 		// load data
 		if ( $this->order ) {
 			$this->read_data( $this->order );
-			if ( WPO_WCPDF()->legacy_mode_enabled() ) {
-				global $wpo_wcpdf;
-				$wpo_wcpdf->export->order = $this->order;
-				$wpo_wcpdf->export->document = $this;
-				$wpo_wcpdf->export->order_id = $this->order_id;
-				$wpo_wcpdf->export->template_type = $this->type;
-			}
 		}
 
 		// load settings
@@ -917,10 +910,6 @@ abstract class Order_Document {
 	}
 
 	public function wrap_html_content( $content ) {
-		if ( WPO_WCPDF()->legacy_mode_enabled() ) {
-			$GLOBALS['wpo_wcpdf']->export->output_body = $content;
-		}
-
 		$html = $this->render_template( $this->locate_template_file( "html-document-wrapper.php" ), array(
 				'content' => apply_filters( 'wpo_wcpdf_html_content', $content ),
 			)

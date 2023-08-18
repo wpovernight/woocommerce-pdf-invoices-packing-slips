@@ -23,7 +23,6 @@ class WPO_WCPDF {
 
 	public $version = '3.6.1';
 	public $plugin_basename;
-	public $legacy_mode;
 	public $third_party_plugins;
 	public $order_util;
 	public $settings;
@@ -196,10 +195,7 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\WC\PDF_Invoices\Frontend::instance();
 		$this->install             = \WPO\WC\PDF_Invoices\Install::instance();
 		$this->font_synchronizer   = \WPO\WC\PDF_Invoices\Font_Synchronizer::instance();
-		
-		// Global for backwards compatibility.
-		$this->legacy              = $GLOBALS['wpo_wcpdf'] = WPO_WCPDF_Legacy();
-		$this->deprecated_hooks    = \WPO\WC\PDF_Invoices\Legacy\Deprecated_Hooks::instance();
+		$this->legacy              = \WPO\WC\PDF_Invoices\Legacy::instance();
 	}
 
 	/**
@@ -228,17 +224,6 @@ class WPO_WCPDF {
 
 		// all systems ready - GO!
 		$this->includes();
-	}
-
-	/**
-	 * Check if legacy mode is enabled
-	 */
-	public function legacy_mode_enabled() {
-		if (!isset($this->legacy_mode)) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-			$this->legacy_mode = isset($debug_settings['legacy_mode']);
-		}
-		return $this->legacy_mode;
 	}
 
 	/**
@@ -568,7 +553,7 @@ function WPO_WCPDF() {
 WPO_WCPDF(); // load plugin
 
 // legacy class for plugin detecting
-if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
+if ( ! class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 	class WooCommerce_PDF_Invoices{
 		public static $version;
 
