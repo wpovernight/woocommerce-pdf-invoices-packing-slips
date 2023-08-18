@@ -444,6 +444,15 @@ class Install {
 			}
 		}
 		
+		// 3.6-2-dev-1: check if 'legacy_mode' is enabled, and disable it
+		if ( version_compare( $installed_version, '3.6.2-dev-1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['legacy_mode'] ) ) {
+				unset( $debug_settings['legacy_mode'] );
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
+		
 	}
 
 	/**
