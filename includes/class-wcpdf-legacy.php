@@ -9,7 +9,7 @@ class Legacy {
 	
 	public static $version;
 	public $functions;
-	public $deprecated_hooks;
+	public $hooks;
 
 	protected static $_instance = null;
 
@@ -29,9 +29,9 @@ class Legacy {
 	 * Constructor
 	 */
 	public function __construct() {
-		self::$version          = WPO_WCPDF()->version;
-		$this->functions        = \WPO\WC\PDF_Invoices\Legacy\Legacy_Functions::instance();
-		$this->deprecated_hooks = \WPO\WC\PDF_Invoices\Legacy\Deprecated_Hooks::instance();
+		self::$version   = WPO_WCPDF()->version;
+		$this->functions = \WPO\WC\PDF_Invoices\Legacy\Legacy_Functions::instance();
+		$this->hooks     = \WPO\WC\PDF_Invoices\Legacy\Legacy_Hooks::instance();
 	}
 
 	/**

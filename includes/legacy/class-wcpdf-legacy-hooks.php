@@ -5,9 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Deprecated_Hooks' ) ) :
+if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Legacy\\Legacy_Hooks' ) ) :
 
-class Deprecated_Hooks {
+class Legacy_Hooks {
 	
 	protected static $_instance = null;
 		
