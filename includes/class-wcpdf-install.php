@@ -443,6 +443,30 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
 		}
+		
+		// 3.6-2-dev-1: check if not using a custom template and 'legacy_mode' is enabled, and disable it
+		if ( version_compare( $installed_version, '3.6.2-dev-1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! empty( $debug_settings['legacy_mode'] ) ) {
+				$templates_list        = WPO_WCPDF()->settings->general->get_installed_templates_list();
+				$using_custom_template = false;
+				
+				if ( ! empty( $templates_list ) ) {
+					foreach ( $templates_list as $template_id => $template_name ) {
+						if ( strpos( $template_name, '(Custom)' ) !== false ) {
+							$using_custom_template = true;
+							break;
+						}
+					}
+				}
+				
+				if ( ! $using_custom_template ) {
+					unset( $debug_settings['legacy_mode'] );
+					update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+				}
+			}
+		}
+		
 	}
 
 	/**

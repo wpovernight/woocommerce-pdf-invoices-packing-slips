@@ -494,30 +494,18 @@ class Settings_Debug {
 				'title'    => __( 'Debug settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'section',
 			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'legacy_mode',
-				'title'    => __( 'Legacy mode', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'legacy_mode',
-					'description' => __( "Legacy mode ensures compatibility with templates and filters from previous versions.", 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'legacy_textdomain',
-				'title'    => __( 'Legacy textdomain fallback', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'legacy_textdomain',
-					'description' => __( "Legacy textdomain fallback ensures compatibility with translation files from versions prior to 2017-05-15.", 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
+			// array(
+			// 	'type'     => 'setting',
+			// 	'id'       => 'legacy_mode',
+			// 	'title'    => __( 'Legacy mode', 'woocommerce-pdf-invoices-packing-slips' ),
+			// 	'callback' => 'checkbox',
+			// 	'section'  => 'debug_settings',
+			// 	'args'     => array(
+			// 		'option_name' => $option_name,
+			// 		'id'          => 'legacy_mode',
+			// 		'description' => __( "Legacy mode ensures compatibility with templates and filters from previous versions.", 'woocommerce-pdf-invoices-packing-slips' ),
+			// 	)
+			// ),
 			array(
 				'type'     => 'setting',
 				'id'	   => 'document_link_access_type',

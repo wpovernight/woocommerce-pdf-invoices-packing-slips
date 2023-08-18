@@ -24,7 +24,6 @@ class WPO_WCPDF {
 	public $version = '3.6.1';
 	public $plugin_basename;
 	public $legacy_mode;
-	public $legacy_textdomain;
 	public $third_party_plugins;
 	public $order_util;
 	public $settings;
@@ -70,11 +69,6 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
-
-		// legacy textdomain fallback
-		if ( $this->legacy_textdomain_enabled() === true ) {
-			add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
-		}
 	}
 	
 	private function autoloaders() {
@@ -104,9 +98,6 @@ class WPO_WCPDF {
 		$dir    = trailingslashit( WP_LANG_DIR );
 
 		$textdomains = array( 'woocommerce-pdf-invoices-packing-slips' );
-		if ( $this->legacy_mode_enabled() === true ) {
-			$textdomains[] = 'wpo_wcpdf';
-		}
 
 		/**
 		 * Frontend/global Locale. Looks in:
@@ -248,17 +239,6 @@ class WPO_WCPDF {
 			$this->legacy_mode = isset($debug_settings['legacy_mode']);
 		}
 		return $this->legacy_mode;
-	}
-
-	/**
-	 * Check if legacy textdomain fallback is enabled
-	 */
-	public function legacy_textdomain_enabled() {
-		if (!isset($this->legacy_textdomain)) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-			$this->legacy_textdomain = isset($debug_settings['legacy_textdomain']);
-		}
-		return $this->legacy_textdomain;
 	}
 
 	/**
