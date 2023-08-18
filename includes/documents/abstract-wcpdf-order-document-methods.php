@@ -1091,7 +1091,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$shipping_notes = '';
 		}
 		
-		if ( apply_filters( 'wpo_wcpdf_shipping_notes_strip_all_tags', true ) ) {
+		if ( apply_filters( 'wpo_wcpdf_shipping_notes_strip_all_tags', false ) ) {
 			$shipping_notes = wp_strip_all_tags( $shipping_notes );
 		}
 		
