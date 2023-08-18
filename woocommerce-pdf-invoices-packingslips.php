@@ -135,7 +135,6 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\WC\PDF_Invoices\Frontend::instance();
 		$this->install             = \WPO\WC\PDF_Invoices\Install::instance();
 		$this->font_synchronizer   = \WPO\WC\PDF_Invoices\Font_Synchronizer::instance();
-		$this->legacy              = \WPO\WC\PDF_Invoices\Legacy::instance();
 	}
 
 	/**
