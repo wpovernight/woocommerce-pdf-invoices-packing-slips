@@ -34,8 +34,6 @@ class WPO_WCPDF {
 	public $frontend;
 	public $install;
 	public $font_synchronizer;
-	public $legacy;
-	public $deprecated_hooks;
 
 	protected static $_instance = null;
 
