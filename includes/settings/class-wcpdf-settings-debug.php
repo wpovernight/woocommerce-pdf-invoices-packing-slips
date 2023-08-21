@@ -57,10 +57,16 @@ class Settings_Debug {
 								return;
 							}
 
+							if ( ! empty( WPO_WCPDF()->main->get_random_string() ) ) {
+								$old_path = WPO_WCPDF()->main->get_tmp_base();
+							} else {
+								$old_path = WPO_WCPDF()->main->get_tmp_base( false );
+							}
+							
 							WPO_WCPDF()->main->generate_random_string();
-							$old_path = WPO_WCPDF()->main->get_tmp_base( false );
 							$new_path = WPO_WCPDF()->main->get_tmp_base();
 							WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
+							WPO_WCPDF()->main->maybe_reinstall_fonts( true );
 							/* translators: directory path */
 							printf('<div class="notice notice-success"><p>%s</p></div>', sprintf( esc_html__( 'Temporary folder moved to %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$new_path.'</code>' ) ); 
 						}
