@@ -542,7 +542,7 @@ class Settings {
 		if ( in_array( $selected_template, $installed_templates ) ) {
 			return array_search( $selected_template, $installed_templates );
 		} else {
-			// unknown template or full template path (legacy settings or filter override)
+			// unknown template or full template path (filter override)
 			$template_path = $this->normalize_path( $selected_template );
 			
 			// add base path, checking if it's not already there
