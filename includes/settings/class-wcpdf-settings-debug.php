@@ -43,7 +43,6 @@ class Settings_Debug {
 		<h3><?php _e( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<div id="debug-tools">
 			<div class="wrapper">
-				<?php if( ! WPO_WCPDF()->main->get_random_string() ) : ?>
 				<div class="tool">
 					<h4><?php _e( 'Generate random temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'For security reasons, it is preferable to use a random name for the temporary directory.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
@@ -68,7 +67,6 @@ class Settings_Debug {
 						?>
 					</form>
 				</div>
-				<?php endif; ?>
 				<div class="tool">
 					<h4><?php _e( 'Reinstall plugin fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'If you are experiencing issues with rendering fonts there might have been an issue during installation or upgrade.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>

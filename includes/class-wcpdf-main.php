@@ -686,9 +686,9 @@ class Main {
 	 * Get random string
 	 */
 	public function get_random_string () {
-		$code = sanitize_text_field( get_option( 'wpo_wcpdf_random_string' ) );
-		if( $code ) {
-			return $code;
+		$code = get_option( 'wpo_wcpdf_random_string', '' );
+		if ( ! empty( $code ) ) {
+			return esc_attr( $code );
 		} else {
 			return false;
 		}
