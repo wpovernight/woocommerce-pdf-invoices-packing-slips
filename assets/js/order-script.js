@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 
-	$( '#doaction, #doaction2' ).on( 'click', function( e ) {
+	$( document.body ).on( 'click', '#doaction, #doaction2', function( e ) {
 		let actionselected = $( this ).attr( "id" ).substr( 2 );
 		let action         = $( 'select[name="' + actionselected + '"]' ).val();
 
@@ -40,15 +40,15 @@ jQuery( function( $ ) {
 			if ( ubl_output ) {
 				$.each( checked, function( i, order_id ) {
 					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
+					window.open( full_url, '_blank' );
 				} );
 				
 			// pdf
 			} else {
 				let order_ids = checked.join( 'x' );
 				full_url      = partial_url + '&order_ids='+order_ids;
+				window.open( full_url, '_blank' );
 			}
-			
-			window.open( full_url, '_blank' );
 
 		}
 	} );
