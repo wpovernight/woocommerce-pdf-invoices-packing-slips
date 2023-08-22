@@ -248,15 +248,20 @@ class Admin {
 							break;
 						case 'ubl':
 							if ( $document->is_enabled( $output_format ) ) {
-								$document_url   = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => $output_format ] );
-								$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-								$class          = [ $document->get_type(), $output_format ];
+								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => $output_format ] );
+								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+								$class           = [ $document->get_type(), $output_format ];
+								
+								if ( $document_exists ) {
+									$class[] = 'exists';
+								}
 								
 								$listing_actions[$document->get_type()."_{$output_format}"] = array(
 									'url'           => esc_url( $document_url ),
 									'img'           => $icon,
 									'alt'           => "UBL " . $document_title,
-									'exists'        => true,
+									'exists'        => $document_exists,
 									'printed'       => false,
 									'ubl'           => true,
 									'class'         => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
@@ -281,7 +286,7 @@ class Admin {
 			$printed = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 			
 			// ubl replaces exists
-			$exists  = isset( $data['output_format'] ) && $data['output_format'] == 'ubl' ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
+			$exists  = isset( $data['output_format'] ) && $data['output_format'] == 'ubl' && $exists ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
 			
 			printf(
 				'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
@@ -598,7 +603,6 @@ class Admin {
 				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="'.$data['unmark_printed_url'].'">'.__( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
 				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unmark_printed.'</p>' : '';
 				
-				
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',
 					$url,
@@ -632,15 +636,21 @@ class Admin {
 				$document       = wcpdf_get_document( $document->get_type(), $order );
 				
 				if ( $document ) {
-					$document_url   = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => 'ubl' ] );
-					$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-					$class          = [ $document->get_type(), 'ubl' ];
+					$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), [ 'output' => 'ubl' ] );
+					$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+					$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+					$class           = [ $document->get_type(), 'ubl' ];
+					
+					if ( $document_exists ) {
+						$class[] = 'exists';
+					}
 					
 					$meta_box_actions[$document->get_type()] = array(
-						'url'   => esc_url( $document_url ),
-						'alt'   => "UBL " . $document_title,
-						'title' => "UBL " . $document_title,
-						'class' => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
+						'url'    => esc_url( $document_url ),
+						'alt'    => "UBL " . $document_title,
+						'title'  => "UBL " . $document_title,
+						'exists' => $document_exists,
+						'class'  => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
 					);
 				}
 			}
@@ -653,19 +663,31 @@ class Admin {
 		?>
 		<ul class="wpo_wcpdf-ubl-actions">
 			<?php
+				$ubl_documents = 0;
+				
 				foreach ( $meta_box_actions as $document_type => $data ) {
-					$url   = isset( $data['url'] ) ? esc_attr( $data['url'] ) : '';
-					$class = isset( $data['class'] ) ? esc_attr( $data['class'] ) : '';
-					$alt   = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
-					$title = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
+					$url    = isset( $data['url'] ) ? esc_attr( $data['url'] ) : '';
+					$class  = isset( $data['class'] ) ? esc_attr( $data['class'] ) : '';
+					$alt    = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
+					$title  = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
+					$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 					
-					printf(
-						'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s</a></li>',
-						$url,
-						$class,
-						$alt,
-						$title
-					);
+					if ( ! empty( $exists ) ) {
+						printf(
+							'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
+							$url,
+							$class,
+							$alt,
+							$title,
+							$exists
+						);
+						
+						$ubl_documents++;
+					}
+				}
+				
+				if ( $ubl_documents == 0 ) {
+					_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 			?>
 		</ul>

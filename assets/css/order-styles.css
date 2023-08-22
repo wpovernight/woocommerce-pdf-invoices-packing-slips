@@ -40,7 +40,8 @@
 	fill: #51266b;
 }
 
-.wpo_wcpdf-actions a.button.exists > svg {
+.wpo_wcpdf-actions a.button.exists > svg,
+.wpo_wcpdf-ubl-actions a.button.exists > svg {
 	width: 14px;
 	height: 14px;
 	line-height: 30px;
