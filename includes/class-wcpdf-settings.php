@@ -21,7 +21,7 @@ class Settings {
 	public $ubl;
 	public $general_settings;
 	public $debug_settings;
-	public $ubl_settings;
+	public $ubl_tax_settings;
 	public $lock_name;
 	public $lock_context;
 	public $lock_time;
@@ -49,7 +49,7 @@ class Settings {
 		
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
-		$this->ubl_settings     = get_option( 'wpo_wcpdf_settings_ubl' );
+		$this->ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
 		
 		$this->lock_name        = 'wpo_wcpdf_semaphore_lock';
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );

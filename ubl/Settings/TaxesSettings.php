@@ -4,19 +4,18 @@ namespace WPO\WC\UBL\Settings;
 
 defined( 'ABSPATH' ) or exit;
 
-class TaxesSettings
-{
+class TaxesSettings {
+	
 	/** @var array */
 	public $settings;
 
-	public function __construct()
-	{
-		$this->settings = get_option('wpo_wcpdf_settings_ubl_taxes');
+	public function __construct() {
+		$this->settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 	}
 
-	public function output()
-	{
+	public function output() {
 		settings_fields( 'wpo_wcpdf_settings_ubl_taxes' );
+		do_settings_sections( 'wpo_wcpdf_settings_ubl_taxes' );
 
 		$rates                       = \WC_Tax::get_tax_rate_classes();
 		$formatted_rates             = [];
@@ -26,7 +25,7 @@ class TaxesSettings
 			if ( empty( $rate->slug ) ) {
 				continue;
 			}
-			$formatted_rates[$rate->slug] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
+			$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
 		}
 		
 		foreach ( $formatted_rates as $slug => $name ) {
@@ -36,8 +35,7 @@ class TaxesSettings
 		submit_button();
 	}
 
-	public function outputTableForTaxClass( $slug, $name )
-	{
+	public function outputTableForTaxClass( $slug, $name ) {
 		global $wpdb;
 		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
 		?>
@@ -88,7 +86,7 @@ class TaxesSettings
 							echo '</tr>';
 						}	
 					} else {
-						echo '<tr><td colspan="7">'.__( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ).'</td></tr>';
+						echo '<tr><td colspan="7">' . __( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
 					}
 				?>
 			</tbody>
@@ -107,101 +105,97 @@ class TaxesSettings
 		<?php
 	}
 
-	public function getSchemeSelect($type, $id, $selected)
-	{
-		$select = '<select name="ubl_wc_taxes['.$type.']['.$id.'][scheme]"><option value="">Default</option>';
-		foreach ($this->getAvailableSchemes() as $key => $value ) {
-			$select .= '<option '.selected($key, $selected, false).' value="'.$key.'">'.$value.'</option>';
+	public function getSchemeSelect( $type, $id, $selected ) {
+		$select = '<select name="wpo_wcpdf_settings_ubl_taxes['.$type.']['.$id.'][scheme]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
+		foreach ( $this->getAvailableSchemes() as $key => $value ) {
+			$select .= '<option '.selected( $key, $selected, false ).' value="'.$key.'">'.$value.'</option>';
 		}
 		$select .= '</select>';
 		return $select;
 	}
 
-	public function getAvailableSchemes()
-	{
+	public function getAvailableSchemes() {
 		return [
-			'vat' => 'Value added tax (VAT)',
-			'gst' => 'Goods and services tax (GST)',
-			'aaa' => 'Petroleum tax',
-			'aab' => 'Provisional countervailing duty cash',
-			'aac' => 'Provisional countervailing duty bond',
-			'aad' => 'Tobacco tax',
-			'aae' => 'Energy fee',
-			'aaf' => 'Coffee tax',
-			'aag' => 'Harmonised sales tax, Canadian',
-			'aah' => 'Quebec sales tax',
-			'aai' => 'Canadian provincial sales tax',
-			'aaj' => 'Tax on replacement part',
-			'aak' => 'Mineral oil tax',
-			'aal' => 'Special tax',
-			'add' => 'Anti-dumping duty',
-			'bol' => 'Stamp duty (Imposta di Bollo)',
-			'cap' => 'Agricultural levy',
-			'car' => 'Car tax',
-			'coc' => 'Paper consortium tax (Italy)',
-			'cst' => 'Commodity specific tax',
-			'cud' => 'Customs duty',
-			'cvd' => 'Countervailing duty',
-			'env' => 'Environmental tax',
-			'exc' => 'Excise duty',
-			'exp' => 'Agricultural export rebate',
-			'fet' => 'Federal excise tax',
-			'fre' => 'Free',
-			'gnc' => 'General construction tax',
-			'ill' => 'Illuminants tax',
-			'imp' => 'Import tax',
-			'ind' => 'Individual tax',
-			'lac' => 'Business license fee',
-			'lcn' => 'Local construction tax',
-			'ldp' => 'Light dues payable',
-			'loc' => 'Local sales tax',
-			'lst' => 'Lust tax',
-			'mca' => 'Monetary compensatory amount',
-			'mcd' => 'Miscellaneous cash deposit',
-			'oth' => 'Other taxes',
-			'pdb' => 'Provisional duty bond',
-			'pdc' => 'Provisional duty cash',
-			'prf' => 'Preference duty',
-			'scn' => 'Special construction tax',
-			'sss' => 'Shifted social securities',
-			'stt' => 'State/provincial sales tax',
-			'sup' => 'Suspended duty',
-			'sur' => 'Surtax',
-			'swt' => 'Shifted wage tax',
-			'tac' => 'Alcohol mark tax',
-			'tot' => 'Total',
-			'tox' => 'Turnover tax',
-			'tta' => 'Tonnage taxes',
-			'vad' => 'Valuation deposit',
+			'vat' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'gst' => __( 'Goods and services tax (GST)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aaa' => __( 'Petroleum tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aab' => __( 'Provisional countervailing duty cash', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aac' => __( 'Provisional countervailing duty bond', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aad' => __( 'Tobacco tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aae' => __( 'Energy fee', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aaf' => __( 'Coffee tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aag' => __( 'Harmonised sales tax, Canadian', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aah' => __( 'Quebec sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aai' => __( 'Canadian provincial sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aaj' => __( 'Tax on replacement part', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aak' => __( 'Mineral oil tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aal' => __( 'Special tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'add' => __( 'Anti-dumping duty', 'woocommerce-pdf-invoices-packing-slips' ),
+			'bol' => __( 'Stamp duty (Imposta di Bollo)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'cap' => __( 'Agricultural levy', 'woocommerce-pdf-invoices-packing-slips' ),
+			'car' => __( 'Car tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'coc' => __( 'Paper consortium tax (Italy)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'cst' => __( 'Commodity specific tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'cud' => __( 'Customs duty', 'woocommerce-pdf-invoices-packing-slips' ),
+			'cvd' => __( 'Countervailing duty', 'woocommerce-pdf-invoices-packing-slips' ),
+			'env' => __( 'Environmental tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'exc' => __( 'Excise duty', 'woocommerce-pdf-invoices-packing-slips' ),
+			'exp' => __( 'Agricultural export rebate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'fet' => __( 'Federal excise tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'fre' => __( 'Free', 'woocommerce-pdf-invoices-packing-slips' ),
+			'gnc' => __( 'General construction tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'ill' => __( 'Illuminants tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'imp' => __( 'Import tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'ind' => __( 'Individual tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'lac' => __( 'Business license fee', 'woocommerce-pdf-invoices-packing-slips' ),
+			'lcn' => __( 'Local construction tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'ldp' => __( 'Light dues payable', 'woocommerce-pdf-invoices-packing-slips' ),
+			'loc' => __( 'Local sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'lst' => __( 'Lust tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'mca' => __( 'Monetary compensatory amount', 'woocommerce-pdf-invoices-packing-slips' ),
+			'mcd' => __( 'Miscellaneous cash deposit', 'woocommerce-pdf-invoices-packing-slips' ),
+			'oth' => __( 'Other taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+			'pdb' => __( 'Provisional duty bond', 'woocommerce-pdf-invoices-packing-slips' ),
+			'pdc' => __( 'Provisional duty cash', 'woocommerce-pdf-invoices-packing-slips' ),
+			'prf' => __( 'Preference duty', 'woocommerce-pdf-invoices-packing-slips' ),
+			'scn' => __( 'Special construction tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'sss' => __( 'Shifted social securities', 'woocommerce-pdf-invoices-packing-slips' ),
+			'stt' => __( 'State/provincial sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'sup' => __( 'Suspended duty', 'woocommerce-pdf-invoices-packing-slips' ),
+			'sur' => __( 'Surtax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'swt' => __( 'Shifted wage tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'tac' => __( 'Alcohol mark tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'tot' => __( 'Total', 'woocommerce-pdf-invoices-packing-slips' ),
+			'tox' => __( 'Turnover tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'tta' => __( 'Tonnage taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+			'vad' => __( 'Valuation deposit', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 	}
 
-	public function getCategorySelect($type, $id, $selected)
-	{
-		$select = '<select name="ubl_wc_taxes['.$type.']['.$id.'][category]"><option value="">Default</option>';
-		foreach ($this->getAvailableCategories() as $key => $value ) {
+	public function getCategorySelect( $type, $id, $selected ) {
+		$select = '<select name="wpo_wcpdf_settings_ubl_taxes['.$type.']['.$id.'][category]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
+		foreach ( $this->getAvailableCategories() as $key => $value ) {
 			$select .= '<option '.selected($key, $selected, false).' value="'.$key.'">'.$value.'</option>';
 		}
 		$select .= '</select>';
 		return $select;
 	}
 
-	public function getAvailableCategories()
-	{
+	public function getAvailableCategories() {
 		return [
-			's'  => 'Standard rate',
-			'aa' => 'Lower rate',
-			'z'  => 'Zero rated goods',
-			'a'  => 'Mixed tax rate',
-			'ab' => 'Exempt for resale',
-			'ac' => 'Value Added Tax (VAT) not now due for payment',
-			'ad' => 'Value Added Tax (VAT) due from a previous invoice',
-			'b'  => 'Transferred (VAT)',
-			'c'  => 'Duty paid by supplier',
-			'e'  => 'Exempt from tax',
-			'g'  => 'Free export item, tax not charged',
-			'h'  => 'Higher rate',
-			'o'  => 'Services outside scope of tax',
+			's'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'aa' => __( 'Lower rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
+			'a'  => __( 'Mixed tax rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'ab' => __( 'Exempt for resale', 'woocommerce-pdf-invoices-packing-slips' ),
+			'ac' => __( 'Value Added Tax (VAT) not now due for payment', 'woocommerce-pdf-invoices-packing-slips' ),
+			'ad' => __( 'Value Added Tax (VAT) due from a previous invoice', 'woocommerce-pdf-invoices-packing-slips' ),
+			'b'  => __( 'Transferred (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'c'  => __( 'Duty paid by supplier', 'woocommerce-pdf-invoices-packing-slips' ),
+			'e'  => __( 'Exempt from tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'g'  => __( 'Free export item, tax not charged', 'woocommerce-pdf-invoices-packing-slips' ),
+			'h'  => __( 'Higher rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'o'  => __( 'Services outside scope of tax', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 	}
 }

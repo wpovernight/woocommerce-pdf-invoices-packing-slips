@@ -1,7 +1,7 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Settings;
 
-use WPO\WC\UBL\Settings\TaxesSettings;
+use WPO\WC\UBL\Settings\TaxesSettings as UBL_Tax_Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -48,7 +48,7 @@ class Settings_UBL {
 				?>
 			</h2>
 			<?php else : ?>
-			<h3><?php echo $this->sections[$active_section]; ?></h3>
+			<h3><?php echo $this->sections[ $active_section ]; ?></h3>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -56,7 +56,7 @@ class Settings_UBL {
 		switch ( $active_section ) {
 			default:
 			case 'taxes':
-				$setting = new TaxesSettings();
+				$setting = new UBL_Tax_Settings();
 				$setting->output();
 				break;
 		}
@@ -72,16 +72,9 @@ class Settings_UBL {
 				'title'    => '',
 				'callback' => 'section',
 			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'ubl_wc_taxes',
-				'title'    => __( 'Taxes settings for UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'string',
-				'section'  => 'taxes',
-				'args'     => [],
-			),
 		);
 
+		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_ubl_taxes', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 	
