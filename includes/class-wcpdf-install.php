@@ -474,8 +474,10 @@ class Install {
 							$legacy_ubl_setting_value = $legacy_ubl_general_settings[$setting];
 							$setting                  = ( 'company_name' === $setting && ! isset( $general_settings['shop_name'] ) ) ? 'shop_name' : $setting;
 							
-							$general_settings[$setting] = $legacy_ubl_setting_value;
-							$update[]                   = $type;
+							if ( 'company_name' !== $setting ) {
+								$general_settings[$setting] = $legacy_ubl_setting_value;
+								$update[]                   = $type;
+							}
 						}
 						break;
 					case 'invoice_ubl':
