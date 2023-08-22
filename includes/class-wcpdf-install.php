@@ -36,11 +36,11 @@ class Install {
 	 */
 	public function do_install() {
 		// only install when woocommerce is active
-		if ( !WPO_WCPDF()->is_woocommerce_activated() ) {
+		if ( ! WPO_WCPDF()->is_woocommerce_activated() ) {
 			return;
 		}
 
-		$version_setting = 'wpo_wcpdf_version';
+		$version_setting   = 'wpo_wcpdf_version';
 		$installed_version = get_option( $version_setting );
 
 		// installed version lower than plugin version?
@@ -71,6 +71,9 @@ class Install {
 			// downgrade version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
+		
+		// deactivate ubl addon
+		add_action( 'admin_init', array( WPO_WCPDF(), 'deactivate_ubl_addon') );
 	}
 
 
@@ -446,11 +449,8 @@ class Install {
 		
 		// 3.7.0-beta-1: deactivate legacy ubl addon and migrate settings
 		if ( version_compare( $installed_version, '3.7.0-beta-1', '<' ) ) {
-			// legacy ubl addon
-			if ( ! empty( $legacy_addon = WPO_WCPDF()->ubl_addon_detected() ) ) {
-				deactivate_plugins( $legacy_addon );
-				set_transient( 'wpo_wcpdf_ubl_addon_detected', 'yes', DAY_IN_SECONDS );
-			}
+			// deactivate legacy ubl addon
+			WPO_WCPDF()->deactivate_ubl_addon();
 			
 			// legacy ubl general/invoice settings
 			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );

@@ -78,6 +78,9 @@ class WPO_WCPDF {
 		if ( $this->legacy_textdomain_enabled() === true ) {
 			add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
 		}
+		
+		// deactivate ubl extension if activated
+		register_activation_hook( __FILE__, array( $this, 'deactivate_ubl_addon' ) );
 	}
 	
 	private function autoloaders() {
@@ -241,6 +244,8 @@ class WPO_WCPDF {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 		}
+		
+		add_action( 'admin_init', array( $this, 'deactivate_ubl_addon') );
 
 		// all systems ready - GO!
 		$this->includes();
@@ -582,6 +587,14 @@ class WPO_WCPDF {
 		}
 
 		return $active_plugins;
+	}
+	
+	public function deactivate_ubl_addon() {
+		$legacy_addon = $this->ubl_addon_detected();
+		if ( ! empty( $legacy_addon ) ) {
+			deactivate_plugins( $legacy_addon );
+			set_transient( 'wpo_wcpdf_ubl_addon_detected', 'yes', DAY_IN_SECONDS );
+		}
 	}
 	
 	public function ubl_addon_detected() {
