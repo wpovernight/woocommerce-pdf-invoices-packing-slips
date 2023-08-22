@@ -460,6 +460,7 @@ class Install {
 			$settings_to_migrate = [
 				'vat_number'            => 'general',
 				'coc_number'            => 'general',
+				'company_name'          => 'general', // corresponds to 'shop_name' in the General Settings
 				'attach_to_email_ids'   => 'invoice_ubl',
 				'include_encrypted_pdf' => 'invoice_ubl',
 			];
@@ -470,7 +471,10 @@ class Install {
 				switch ( $type ) {
 					case 'general':
 						if ( isset( $legacy_ubl_general_settings[$setting] ) ) {
-							$general_settings[$setting] = $legacy_ubl_general_settings[$setting];
+							$legacy_ubl_setting_value = $legacy_ubl_general_settings[$setting];
+							$setting                  = ( 'company_name' === $setting && ! isset( $general_settings['shop_name'] ) ) ? 'shop_name' : $setting;
+							
+							$general_settings[$setting] = $legacy_ubl_setting_value;
 							$update[]                   = $type;
 						}
 						break;
