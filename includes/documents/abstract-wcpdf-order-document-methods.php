@@ -1091,9 +1091,12 @@ abstract class Order_Document_Methods extends Order_Document {
 			$shipping_notes = '';
 		}
 		
-		$shipping_notes = wp_strip_all_tags( $shipping_notes );
+		if ( apply_filters( 'wpo_wcpdf_shipping_notes_strip_all_tags', false ) ) {
+			$shipping_notes = wp_strip_all_tags( $shipping_notes );
+		}
+		
 		$shipping_notes = ! empty( $shipping_notes ) ? __( $shipping_notes, 'woocommerce-pdf-invoices-packing-slips' ) : false;
-
+		
 		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this );
 	}
 	public function shipping_notes() {
