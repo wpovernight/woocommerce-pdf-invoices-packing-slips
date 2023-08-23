@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.3
 Requires PHP: 7.1
-Stable tag: 3.6.1
+Stable tag: 3.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,7 +108,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * New: adds notice for the upcoming PHP 7.2 requirement
 * New: filter hook to strip HTML tags from Shipping Notes `wpo_wcpdf_shipping_notes_strip_all_tags`
 * Fix: bug of passing the wrong variable for the filtered order emails
-* Fix: remove old temp dir when generating new one from status tool
+* Fix: remove old temporary directory when generating new one from status tool
 * Fix: displays always the Generate random temporary directory tool
 * Fix: issue with Shipping Notes line breaks
 
