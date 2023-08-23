@@ -15,18 +15,18 @@ class UBL_Maker {
 	protected $tmp_base;
 
 	public function write( $filename, $contents ) {
-		$fullFileName = $this->getFilePath() . $filename;
-		$status = file_put_contents($fullFileName, $contents);
+		$full_file_name = $this->getFilePath() . $filename;
+		$status         = file_put_contents( $full_file_name, $contents );
 
 		if ( $status === false ) {
 			throw new FileWriteException( 'Error writing UBL file' );
 		}
 
-		return $fullFileName;
+		return $full_file_name;
 	}
 
-	public function setFilePath( $filePath ) {
-		$this->tmp_base = $filePath;
+	public function setFilePath( $file_path ) {
+		$this->tmp_base = $file_path;
 	}
 
 	public function getFilePath() {
