@@ -18,7 +18,7 @@ class UBL_Maker {
 		$full_file_name = $this->getFilePath() . $filename;
 		$status         = file_put_contents( $full_file_name, $contents );
 
-		if ( $status === false ) {
+		if ( false === $status ) {
 			throw new FileWriteException( 'Error writing UBL file' );
 		}
 
