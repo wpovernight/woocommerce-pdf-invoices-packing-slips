@@ -2,12 +2,14 @@
 
 namespace WPO\WC\UBL\Collections;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-class OrderCollection extends Collection
-{
-	public function addOrder( Order $order )
-	{
+class OrderCollection extends Collection {
+	
+	public function addOrder( Order $order ) {
 		$this->items[] = $order;
 	}
+	
 }

@@ -2,9 +2,12 @@
 
 namespace WPO\WC\UBL\Repositories\Contracts;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-interface OrderRepository
-{
+interface OrderRepository {
+	
 	public function getById( $id );
+	
 }

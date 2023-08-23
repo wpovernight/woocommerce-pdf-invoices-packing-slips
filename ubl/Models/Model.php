@@ -2,9 +2,10 @@
 
 namespace WPO\WC\UBL\Models;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-abstract class Model
-{
+abstract class Model {
 	
 }

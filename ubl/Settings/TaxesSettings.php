@@ -2,7 +2,9 @@
 
 namespace WPO\WC\UBL\Settings;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 class TaxesSettings {
 	
@@ -18,10 +20,10 @@ class TaxesSettings {
 		do_settings_sections( 'wpo_wcpdf_settings_ubl_taxes' );
 
 		$rates                       = \WC_Tax::get_tax_rate_classes();
-		$formatted_rates             = [];
+		$formatted_rates             = array();
 		$formatted_rates['standard'] = __( 'Standard', 'woocommerce' );
 		
-		foreach( $rates as $rate ) {
+		foreach ( $rates as $rate ) {
 			if ( empty( $rate->slug ) ) {
 				continue;
 			}
@@ -61,19 +63,19 @@ class TaxesSettings {
 							$postcode = $city = '';
 	
 							foreach ( $locationResults as $locationResult ) {
-								if ( $locationResult->location_type == 'postcode' ) {
+								if ( 'postcode' === $locationResult->location_type ) {
 									$postcode = $locationResult->location_code;
 									continue;
 								}
 	
-								if ( $locationResult->location_type == 'city' ) {
+								if ( 'city' === $locationResult->location_type ) {
 									$city = $locationResult->location_code;
 									continue;
 								}
 							}
 	
-							$scheme   = isset( $this->settings['rate'][$result->tax_rate_id]['scheme'] ) ? $this->settings['rate'][$result->tax_rate_id]['scheme'] : '';
-							$category = isset( $this->settings['rate'][$result->tax_rate_id]['category'] ) ? $this->settings['rate'][$result->tax_rate_id]['category'] : '';
+							$scheme   = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : '';
+							$category = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : '';
 							
 							echo '<tr>';
 							echo '<td>'.$result->tax_rate_country.'</td>';
@@ -94,8 +96,8 @@ class TaxesSettings {
 				<tr>
 					<th colspan="5" style="text-align: right;"><?php _e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
 					<?php
-						$scheme   = isset( $this->settings['class'][$slug]['scheme'] ) ? $this->settings['class'][$slug]['scheme'] : '';
-						$category = isset( $this->settings['class'][$slug]['category'] ) ? $this->settings['class'][$slug]['category'] : '';
+						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] ) ? $this->settings['class'][ $slug ]['scheme'] : '';
+						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : '';
 					?>
 					<th><?php echo $this->getSchemeSelect( 'class', $slug, $scheme ); ?></th>
 					<th><?php echo $this->getCategorySelect( 'class', $slug, $category ); ?></th>
@@ -175,7 +177,7 @@ class TaxesSettings {
 	public function getCategorySelect( $type, $id, $selected ) {
 		$select = '<select name="wpo_wcpdf_settings_ubl_taxes['.$type.']['.$id.'][category]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
 		foreach ( $this->getAvailableCategories() as $key => $value ) {
-			$select .= '<option '.selected($key, $selected, false).' value="'.$key.'">'.$value.'</option>';
+			$select .= '<option '.selected( $key, $selected, false ).' value="'.$key.'">'.$value.'</option>';
 		}
 		$select .= '</select>';
 		return $select;

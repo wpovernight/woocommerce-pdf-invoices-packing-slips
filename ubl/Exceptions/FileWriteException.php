@@ -4,9 +4,10 @@ namespace WPO\WC\UBL\Exceptions;
 
 use Exception;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-class FileWriteException extends Exception
-{
+class FileWriteException extends Exception {
 	
 }

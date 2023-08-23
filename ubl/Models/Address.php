@@ -2,10 +2,11 @@
 
 namespace WPO\WC\UBL\Models;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-class Address extends Model
-{
+class Address extends Model {
 	public $first_name;
 	public $last_name;
 	public $address_1;
