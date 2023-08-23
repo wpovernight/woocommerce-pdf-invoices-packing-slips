@@ -102,6 +102,16 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
+= 3.6.2 (2023-08-23) =
+* New `wcpdf_document_link` shortcode
+* New: parameters to download PDF shortcode
+* New: adds notice for the upcoming PHP 7.2 requirement
+* New: filter hook to strip HTML tags from Shipping Notes `wpo_wcpdf_shipping_notes_strip_all_tags`
+* Fix: bug of passing the wrong variable for the filtered order emails
+* Fix: remove old temp dir when generating new one from status tool
+* Fix: displays always the Generate random temporary directory tool
+* Fix: issue with Shipping Notes line breaks
+
 = 3.6.1 (2023-08-16) =
 * Fix: string encoding issues in PDF
 
