@@ -65,13 +65,9 @@ class Documents {
 		if ( empty( $this->documents ) ) {
 			$this->init();
 		}
-		
-		if ( empty( $output_format ) ) {
-			return $this->documents;
-		}
 
 		// enabled
-		if ( 'enabled' === $filter ) {
+		if ( 'enabled' === $filter && ! empty( $output_format ) ) {
 			$documents = array();
 			
 			foreach ( $this->documents as $class_name => $document ) {
@@ -93,12 +89,12 @@ class Documents {
 				}
 			}
 			
-			return $documents;
-			
-		// enabled or disabled
+		// enabled and disabled
 		} else {
-			return $this->documents;
+			$documents = $this->documents;
 		}
+		
+		return apply_filters( 'wpo_wcpdf_get_documents', $documents, $filter, $output_format, $this );
 	}
 
 	public function get_document( $document_type, $order ) {
