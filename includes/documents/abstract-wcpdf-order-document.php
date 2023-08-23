@@ -250,7 +250,7 @@ abstract class Order_Document {
 			$latest_settings = $this->get_settings( true, $output_format );
 		} else {
 			$settings        = $this->settings;
-			$settings        = $this->latest_settings;
+			$latest_settings = $this->latest_settings;
 		}
 		
 		$non_historical_settings = $this->get_non_historical_settings();
