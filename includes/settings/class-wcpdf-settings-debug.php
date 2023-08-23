@@ -349,7 +349,7 @@ class Settings_Debug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 		
-		if ( in_array( $type, [ 'general', 'debug' ] ) ) {
+		if ( in_array( $type, [ 'general', 'debug', 'ubl_taxes' ] ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
@@ -408,6 +408,9 @@ class Settings_Debug {
 				break;
 			case 'debug':
 				$settings_option = 'wpo_wcpdf_settings_debug';
+				break;
+			case 'ubl_taxes':
+				$settings_option = 'wpo_wcpdf_settings_ubl_taxes';
 				break;
 			default:
 				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
