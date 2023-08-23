@@ -997,8 +997,8 @@ abstract class Order_Document {
 
 		ob_clean();
 		flush();
-		readfile( $full_filename );
-		unlink( $full_filename );
+		@readfile( $full_filename );
+		@unlink( $full_filename );
 
 		wp_die();
 	}
