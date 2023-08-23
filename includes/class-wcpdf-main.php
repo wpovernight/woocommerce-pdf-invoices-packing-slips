@@ -243,7 +243,7 @@ class Main {
 	
 	public function get_document_ubl_attachment( $document, $tmp_path ) {
 		$ubl_maker = wcpdf_get_ubl_maker();
-		$ubl_maker->setFilePath( $tmp_path );
+		$ubl_maker->set_file_path( $tmp_path );
 
 		$ubl_document = new UblDocument();
 		$ubl_document->setOrder( $document->order );

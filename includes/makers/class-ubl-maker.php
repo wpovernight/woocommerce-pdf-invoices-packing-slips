@@ -15,7 +15,7 @@ class UBL_Maker {
 	protected $tmp_base;
 
 	public function write( $filename, $contents ) {
-		$full_file_name = $this->getFilePath() . $filename;
+		$full_file_name = $this->get_file_path() . $filename;
 		$status         = file_put_contents( $full_file_name, $contents );
 
 		if ( false === $status ) {
@@ -25,11 +25,11 @@ class UBL_Maker {
 		return $full_file_name;
 	}
 
-	public function setFilePath( $file_path ) {
+	public function set_file_path( $file_path ) {
 		$this->tmp_base = $file_path;
 	}
 
-	public function getFilePath() {
+	public function get_file_path() {
 		if ( ! empty( $this->tmp_base ) ) {
 			return $this->tmp_base;
 		}
