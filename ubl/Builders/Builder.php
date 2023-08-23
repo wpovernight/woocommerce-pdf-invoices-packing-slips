@@ -9,5 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Builder {
+	
 	abstract public function build( Document $document );
+	
 }

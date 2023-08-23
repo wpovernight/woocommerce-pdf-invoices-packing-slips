@@ -78,9 +78,9 @@ class UblDocument extends Document {
 	}
 
 	public function getData() {
-		$data = [];
+		$data = array();
 
-		foreach( $this->getFormat() as $key => $value ) {
+		foreach ( $this->getFormat() as $key => $value ) {
 			$handler = new $value['handler']($this);
 			$options = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : [];
 			$data    = $handler->handle( $data, $options );
