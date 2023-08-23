@@ -34,7 +34,7 @@ class UBL_Maker {
 			return $this->tmp_base;
 		}
 
-		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path('ubl') );
+		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'ubl' ) );
 		return $this->tmp_base;
 	}
 }
