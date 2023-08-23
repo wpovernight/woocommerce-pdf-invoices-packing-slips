@@ -958,12 +958,12 @@ abstract class Order_Document {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf;
-		die();
+		wp_die();
 	}
 
 	public function output_html() {
 		echo $this->get_html();
-		die();
+		wp_die();
 	}
 	
 	public function preview_ubl() {
@@ -980,7 +980,7 @@ abstract class Order_Document {
 			$ubl_document->setOrderDocument( $order_document );
 		} else {
 			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
-			die();
+			wp_die();
 		}
 
 		$builder       = new SabreBuilder();
@@ -1000,7 +1000,7 @@ abstract class Order_Document {
 		readfile( $full_filename );
 		unlink( $full_filename );
 
-		die();
+		wp_die();
 	}
 
 	public function wrap_html_content( $content ) {
