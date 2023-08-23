@@ -362,7 +362,7 @@ class WPO_WCPDF {
 	 */
 	public function next_php_version_bump() {
 		$error_message	= sprintf(
-			__( 'PDF Invoices & Packing Slips for WooCommerce will require PHP 7.2 very soon, please %1$supdate your PHP version%2$s or the plugin will stop working.', 'woocommerce-pdf-invoices-packing-slips' ),
+			__( 'PDF Invoices & Packing Slips for WooCommerce will require PHP 7.2 soon for future releases. Please %1$supdate your PHP version%2$s so that you will be able to use our plugin in the future.', 'woocommerce-pdf-invoices-packing-slips' ),
 			'<a href="https://docs.wpovernight.com/general/how-to-update-your-php-version/" target="_blank">',
 			'</a>'
 		);
