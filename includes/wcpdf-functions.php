@@ -342,6 +342,22 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 	return $string;
 }
 
+/**
+ * Safe redirect or die.
+ *
+ * @param  string          $url
+ * @param  string|WP_Error $message
+ * @return void
+ */
+function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
+	if ( ! empty( $url ) ) {
+		wp_safe_redirect( $url );
+		exit;
+	} else {
+		wp_die( $message );
+	}
+}
+
 function WPO_WCPDF_Legacy() {
 	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
 }

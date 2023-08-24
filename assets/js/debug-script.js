@@ -79,4 +79,15 @@ jQuery( function( $ ) {
 		}
 	}
 	
+	// toggle custom redirect page	
+	$( "[name='wpo_wcpdf_settings_debug[document_access_denied_redirect_page]']" ).on( 'change', function( event ) {
+		let $custom_page_field = $( this ).closest( 'table' ).find( '#document_custom_redirect_page' );
+		
+		if ( 'custom_page' === $( this ).val() ) {
+			$custom_page_field.show();
+		} else {
+			$custom_page_field.hide();
+		}
+	} ).trigger( 'change' );
+	
 } );

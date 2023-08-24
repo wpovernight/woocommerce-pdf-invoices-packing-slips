@@ -551,6 +551,37 @@ class Settings_Debug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'	   => 'document_access_denied_redirect_page',
+				'title'	   => __( 'Document access denied redirect page', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'debug_settings',
+				'args'	   => array(
+					'option_name' => $option_name,
+					'id'          => 'document_access_denied_redirect_page',
+					'default'     => 'blank',
+					'options'     => array(
+						'blank_page'     => __( 'Blank page with message (default)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'login_page'     => __( 'Login page', 'woocommerce-pdf-invoices-packing-slips' ),
+						'myaccount_page' => __( 'My Account page', 'woocommerce-pdf-invoices-packing-slips' ),
+						'custom_page'    => __( 'Custom page (enter below)', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+					'description' => __( 'Select a frontend page to be used to redirect users when the document access is denied.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'document_custom_redirect_page',
+				'title'    => '',
+				'callback' => 'url_input',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'document_custom_redirect_page',
+					'placeholder' => 'https://',
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'pretty_document_links',
 				'title'    => __( 'Pretty document links', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
