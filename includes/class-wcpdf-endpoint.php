@@ -200,7 +200,7 @@ class Endpoint {
 					}
 					break;
 				case 'blank_page':
-					default:
+				default:
 					break;
 			}
 		}
