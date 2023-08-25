@@ -23,8 +23,6 @@ class WPO_WCPDF {
 
 	public $version = '3.6.2';
 	public $plugin_basename;
-	public $legacy_mode;
-	public $legacy_textdomain;
 	public $third_party_plugins;
 	public $order_util;
 	public $settings;
@@ -36,8 +34,6 @@ class WPO_WCPDF {
 	public $frontend;
 	public $install;
 	public $font_synchronizer;
-	public $legacy;
-	public $deprecated_hooks;
 
 	protected static $_instance = null;
 
@@ -70,11 +66,6 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
-
-		// legacy textdomain fallback
-		if ( $this->legacy_textdomain_enabled() === true ) {
-			add_filter( 'load_textdomain_mofile', array( $this, 'textdomain_fallback' ), 10, 2 );
-		}
 	}
 	
 	private function autoloaders() {
@@ -104,9 +95,6 @@ class WPO_WCPDF {
 		$dir    = trailingslashit( WP_LANG_DIR );
 
 		$textdomains = array( 'woocommerce-pdf-invoices-packing-slips' );
-		if ( $this->legacy_mode_enabled() === true ) {
-			$textdomains[] = 'wpo_wcpdf';
-		}
 
 		/**
 		 * Frontend/global Locale. Looks in:
@@ -122,66 +110,6 @@ class WPO_WCPDF {
 			load_textdomain( $textdomain, $dir . 'plugins/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
 			load_plugin_textdomain( $textdomain, false, dirname( plugin_basename(__FILE__) ) . '/languages' );
 		}
-	}
-
-	/**
-	 * Maintain backwards compatibility with old translation files
-	 * Uses old .mo file if it exists in any of the override locations
-	 */
-	public function textdomain_fallback( $mo, $textdomain ) {
-		$plugin_domain = 'woocommerce-pdf-invoices-packing-slips';
-		$old_domain = 'wpo_wcpdf';
-
-		if ( $textdomain !== $plugin_domain && $textdomain !== $old_domain ) {
-			return $mo;
-		}
-
-		$mopath = trailingslashit( dirname( $mo ) );
-		$mofile = basename( $mo );
-
-		if ( $textdomain == $old_domain ) {
-			$textdomain = $plugin_domain;
-			$mofile = str_replace( $old_domain, $textdomain, $mofile );
-		}
-
-		if ( $textdomain === $plugin_domain ) {
-			$old_mofile = str_replace( $textdomain, $old_domain, $mofile );
-			if ( file_exists( $mopath.$old_mofile ) ) {
-				// we have an old override - use it
-				return $mopath.$old_mofile;
-			}
-
-			// prevent loading outdated language packs
-			$pofile = str_replace( '.mo', '.po', $mofile );
-			if ( file_exists( $mopath.$pofile ) ) {
-				// load po file
-				$podata = file_get_contents( $mopath.$pofile );
-				// set revision date threshold
-				$block_before = strtotime( '2017-05-15' );
-				// read revision date
-				preg_match( '~PO-Revision-Date: (.*?)\\\n~s', $podata, $matches );
-				if ( isset( $matches[1] ) ) {
-					$revision_date = $matches[1];
-					if ( $revision_timestamp = strtotime( $revision_date ) ) {
-						// check if revision is before threshold date
-						if ( $revision_timestamp < $block_before ) {
-							// try bundled
-							$bundled_file = $this->plugin_path() . '/languages/'. $mofile;
-							if ( file_exists( $bundled_file ) ) {
-								return $bundled_file;
-							} else {
-								return '';
-							}
-							// delete po & mo file if possible
-							// @unlink($pofile);
-							// @unlink($mofile);
-						}
-					}
-				}
-			}
-		}
-
-		return $mopath.$mofile;
 	}
 
 	/**
@@ -205,10 +133,6 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\WC\PDF_Invoices\Frontend::instance();
 		$this->install             = \WPO\WC\PDF_Invoices\Install::instance();
 		$this->font_synchronizer   = \WPO\WC\PDF_Invoices\Font_Synchronizer::instance();
-		
-		// Global for backwards compatibility.
-		$this->legacy              = $GLOBALS['wpo_wcpdf'] = WPO_WCPDF_Legacy();
-		$this->deprecated_hooks    = \WPO\WC\PDF_Invoices\Legacy\Deprecated_Hooks::instance();
 	}
 
 	/**
@@ -241,28 +165,6 @@ class WPO_WCPDF {
 
 		// all systems ready - GO!
 		$this->includes();
-	}
-
-	/**
-	 * Check if legacy mode is enabled
-	 */
-	public function legacy_mode_enabled() {
-		if (!isset($this->legacy_mode)) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-			$this->legacy_mode = isset($debug_settings['legacy_mode']);
-		}
-		return $this->legacy_mode;
-	}
-
-	/**
-	 * Check if legacy textdomain fallback is enabled
-	 */
-	public function legacy_textdomain_enabled() {
-		if (!isset($this->legacy_textdomain)) {
-			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-			$this->legacy_textdomain = isset($debug_settings['legacy_textdomain']);
-		}
-		return $this->legacy_textdomain;
 	}
 
 	/**
@@ -609,7 +511,7 @@ function WPO_WCPDF() {
 WPO_WCPDF(); // load plugin
 
 // legacy class for plugin detecting
-if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
+if ( ! class_exists( 'WooCommerce_PDF_Invoices' ) ) {
 	class WooCommerce_PDF_Invoices{
 		public static $version;
 

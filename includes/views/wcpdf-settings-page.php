@@ -56,10 +56,10 @@ $review_invitation = sprintf(
 			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 				<?php
 					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
-					if ( has_action( 'wpo_wcpdf_settings_output_'.$active_tab ) ) {
-						do_action( 'wpo_wcpdf_settings_output_'.$active_tab, $active_section );
+					if ( has_action( "wpo_wcpdf_settings_output_{$active_tab}" ) ) {
+						do_action( "wpo_wcpdf_settings_output_{$active_tab}", $active_section );
 					} else {
-						// legacy settings
+						// legacy settings (still being used in Pro and Templates extensions)
 						settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
 						do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
 
