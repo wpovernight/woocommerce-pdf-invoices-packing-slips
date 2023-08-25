@@ -53,7 +53,8 @@ class Order_Util {
 
 	public function is_wc_admin_page() {
 		return class_exists( 'Automattic\WooCommerce\Admin\PageController' ) &&
-		       \Automattic\WooCommerce\Admin\PageController::is_admin_page();
+		       is_callable( array( '\\Automattic\\WooCommerce\\Admin\\PageController', 'is_admin_or_embed_page' ) ) &&
+		       \Automattic\WooCommerce\Admin\PageController::is_admin_or_embed_page();
 	}
 }
 
