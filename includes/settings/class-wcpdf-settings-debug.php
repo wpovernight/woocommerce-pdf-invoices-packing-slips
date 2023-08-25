@@ -400,6 +400,7 @@ class Settings_Debug {
 		if ( empty( $settings_option ) ) {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
+				$document_type = $document->get_type();
 				if (
 					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
 					false !== strpos( $type, '_ubl' )
