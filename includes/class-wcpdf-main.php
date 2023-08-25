@@ -686,9 +686,9 @@ class Main {
 	 * Get random string
 	 */
 	public function get_random_string () {
-		$code = sanitize_text_field( get_option( 'wpo_wcpdf_random_string' ) );
-		if( $code ) {
-			return $code;
+		$code = get_option( 'wpo_wcpdf_random_string', '' );
+		if ( ! empty( $code ) ) {
+			return esc_attr( $code );
 		} else {
 			return false;
 		}
@@ -791,11 +791,17 @@ class Main {
 	/**
 	 * Copy contents from one directory to another
 	 */
-	public function copy_directory ( $old_path, $new_path ) {
-		if( empty($old_path) || empty($new_path) ) return;
-		if( ! is_dir($old_path) ) return;
-		if( ! is_dir($new_path) ) {
-			$dir = mkdir($new_path);
+	public function copy_directory( $old_path, $new_path ) {
+		if ( empty( $old_path ) || empty( $new_path ) ) {
+			return;
+		}
+		
+		if ( ! is_dir( $old_path ) ) {
+			return;
+		}
+		
+		if ( ! is_dir( $new_path ) ) {
+			$dir = mkdir( $new_path );
 
 			// check if we have dir
 			if ( ! $dir ) {
@@ -803,7 +809,7 @@ class Main {
 				wcpdf_log_error( "Unable to create folder {$new_path}", 'critical' );
 				return false;
 			}
-		} elseif( ! wp_is_writable( $new_path ) ) {
+		} elseif ( ! wp_is_writable( $new_path ) ) {
 			update_option( 'wpo_wcpdf_no_dir_error', $new_path );
 			wcpdf_log_error( "Temp folder {$new_path} not writable", 'critical' );
 			return false;

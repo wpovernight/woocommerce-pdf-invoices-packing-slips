@@ -3,7 +3,7 @@
  * Plugin Name:          PDF Invoices & Packing Slips for WooCommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF invoices & packing slips for WooCommerce orders.
- * Version:              3.6.1
+ * Version:              3.6.2
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -21,7 +21,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '3.6.1';
+	public $version = '3.6.2';
 	public $plugin_basename;
 	public $third_party_plugins;
 	public $order_util;
@@ -153,6 +153,10 @@ class WPO_WCPDF {
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 			return;
 		}
+		
+		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+			add_action( 'admin_notices', array ( $this, 'next_php_version_bump' ) );
+		}
 
 		if ( has_filter( 'wpo_wcpdf_pdf_maker' ) === false && version_compare( PHP_VERSION, '7.1', '<' ) ) {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
@@ -242,6 +246,23 @@ class WPO_WCPDF {
 		if ( version_compare( PHP_VERSION, '5.6', '>' ) ) {
 			$message .= sprintf( '<p>'.$add_on_message.'</p>', '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
 		}
+		$message .= '</div>';
+
+		echo wp_kses_post( $message );
+	}
+	
+	/**
+	 * Next PHP version bump requirement notice
+	 */
+	public function next_php_version_bump() {
+		$error_message	= sprintf(
+			__( 'PDF Invoices & Packing Slips for WooCommerce will require PHP 7.2 soon for future releases. Please %1$supdate your PHP version%2$s so that you will be able to use our plugin in the future.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="https://docs.wpovernight.com/general/how-to-update-your-php-version/" target="_blank">',
+			'</a>'
+		);
+
+		$message  = '<div class="notice notice-warning">';
+		$message .= sprintf( '<p>%s</p>', $error_message );
 		$message .= '</div>';
 
 		echo wp_kses_post( $message );
