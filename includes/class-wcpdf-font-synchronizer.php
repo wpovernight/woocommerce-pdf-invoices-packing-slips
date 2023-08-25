@@ -95,7 +95,7 @@ class Font_Synchronizer {
 		$extensions = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
 		foreach ( $filenames as $filename ) {
 			// never delete files in our own plugin folder
-			if ( strpos( $filename, $plugin_folder ) !== false ) {
+			if ( ! empty( $filename ) && false !== strpos( $filename, $plugin_folder ) ) {
 				continue;
 			}
 			foreach ( $extensions as $extension ) {
@@ -218,7 +218,11 @@ class Font_Synchronizer {
 	 * @return string Normalized path.
 	 */
 	public function normalize_path( $path ) {
-		return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace('\\','/', $path );
+		if ( ! empty( $path ) ) {
+			return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace( '\\', '/', $path );
+		} else {
+			return $path;
+		}
 	}
 
 	/**

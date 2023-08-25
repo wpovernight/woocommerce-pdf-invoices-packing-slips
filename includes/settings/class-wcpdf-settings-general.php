@@ -36,10 +36,10 @@ class Settings_General {
 	public function init_settings() {
 		$page = $option_group = $option_name = $this->option_name;
 
-		$template_base_path = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
-		$theme_template_path = get_stylesheet_directory() . '/' . $template_base_path;
-		$wp_content_dir = str_replace( ABSPATH, '', WP_CONTENT_DIR );
-		$theme_template_path = substr($theme_template_path, strpos($theme_template_path, $wp_content_dir)) . 'pdf/yourtemplate';
+		$template_base_path   = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
+		$theme_template_path  = get_stylesheet_directory() . '/' . $template_base_path;
+		$wp_content_dir       = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
+		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
 
 		$settings_fields = array(
@@ -327,7 +327,7 @@ class Settings_General {
 
 		$template_paths = apply_filters( 'wpo_wcpdf_template_paths', $template_paths );
 
-		if ( defined( 'WP_CONTENT_DIR' ) && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
 			$forwardslash_basepath = str_replace( '\\', '/', ABSPATH );
 		} else {
 			$forwardslash_basepath = str_replace( '\\', '/', WP_CONTENT_DIR );
@@ -337,14 +337,17 @@ class Settings_General {
 			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR );
 			
 			foreach ( $dirs as $dir ) {
+				if ( empty( $dir ) ) {
+					continue;
+				}
 				// we're stripping abspath to make the plugin settings more portable
 				$forwardslash_dir = str_replace( '\\', '/', $dir );
-				$installed_templates[ str_replace( $forwardslash_basepath, '', $forwardslash_dir ) ] = basename($dir);
+				$installed_templates[ str_replace( $forwardslash_basepath, '', $forwardslash_dir ) ] = basename( $dir );
 			}
 		}
 
 		// remove parent doubles
-		$installed_templates = array_unique($installed_templates);
+		$installed_templates = array_unique( $installed_templates );
 
 		if ( empty( $installed_templates ) ) {
 			// fallback to Simple template for servers with glob() disabled

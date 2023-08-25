@@ -132,26 +132,31 @@ class Document_Number {
 		$order_number	= is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
 
 		// make replacements
-		foreach ($formats as $key => $value) {
-			$value = str_replace('[order_year]', $order_year, $value);
-			$value = str_replace('[order_month]', $order_month, $value);
-			$value = str_replace('[order_day]', $order_day, $value);
-			$value = str_replace("[{$document->slug}_year]", $document_year, $value);
-			$value = str_replace("[{$document->slug}_month]", $document_month, $value);
-			$value = str_replace("[{$document->slug}_day]", $document_day, $value);
-			$value = str_replace('[order_number]', $order_number, $value);
+		foreach ( $formats as $key => $value ) {
+			if ( empty( $value ) ) {
+				continue;
+			}
+			
+			$value = str_replace( '[order_year]', $order_year, $value );
+			$value = str_replace( '[order_month]', $order_month, $value );
+			$value = str_replace( '[order_day]', $order_day, $value );
+			$value = str_replace( "[{$document->slug}_year]", $document_year, $value );
+			$value = str_replace( "[{$document->slug}_month]", $document_month, $value );
+			$value = str_replace( "[{$document->slug}_day]", $document_day, $value );
+			$value = str_replace( '[order_number]', $order_number, $value );
 
 			// replace date tag in the form [invoice_date="{$date_format}"] or [order_date="{$date_format}"]
 			$date_types = array( 'order', $document->slug );
-			foreach ($date_types as $date_type) {
-				if ( strpos($value, "[{$date_type}_date=") !== false ) {
-					preg_match_all("/\[{$date_type}_date=\"(.*?)\"\]/", $value, $document_date_tags);
-					if (!empty($document_date_tags[1])) {
-						foreach ($document_date_tags[1] as $match_id => $date_format) {
-							if ($date_type == 'order') {
-								$value = str_replace($document_date_tags[0][$match_id], $order_date->date_i18n( $date_format ), $value);
+			foreach ( $date_types as $date_type ) {
+				if ( false !== strpos( $value, "[{$date_type}_date=" ) ) {
+					preg_match_all( "/\[{$date_type}_date=\"(.*?)\"\]/", $value, $document_date_tags );
+					
+					if ( ! empty( $document_date_tags[1] ) ) {
+						foreach ( $document_date_tags[1] as $match_id => $date_format ) {
+							if ( 'order' === $date_type ) {
+								$value = str_replace( $document_date_tags[0][$match_id], $order_date->date_i18n( $date_format ), $value );
 							} else {
-								$value = str_replace($document_date_tags[0][$match_id], $document_date->date_i18n( $date_format ), $value);
+								$value = str_replace( $document_date_tags[0][$match_id], $document_date->date_i18n( $date_format ), $value );
 							}
 						}
 					}
