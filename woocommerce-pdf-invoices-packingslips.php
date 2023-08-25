@@ -320,7 +320,7 @@ class WPO_WCPDF {
 				$upgrade_notice .= '</p><p class="wpo_wcpdf_upgrade_notice">';
 
 				foreach ( $notices as $index => $line ) {
-					$upgrade_notice .= preg_replace( '~\[([^\]]*)\]\(([^\)]*)\)~', '<a href="${2}">${1}</a>', $line );
+					$upgrade_notice .= ! empty( $line ) ? preg_replace( '~\[([^\]]*)\]\(([^\)]*)\)~', '<a href="${2}">${1}</a>', $line ) : $line;
 				}
 			}
 		}
