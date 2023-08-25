@@ -78,21 +78,13 @@ class Documents {
 	}
 
 	public function get_document( $document_type, $order ) {
-		foreach ( $this->get_documents('all') as $class_name => $document) {
+		foreach ( $this->get_documents( 'all' ) as $class_name => $document) {
 			if ( $document->get_type() == $document_type && class_exists( $class_name ) ) {
 				return new $class_name( $order );
 			}
 		}
-		// document not known, inject into legacy document
-		$document = new \WPO\WC\PDF_Invoices\Legacy\Legacy_Document();
-		// set document properties, which will trigger parent construct and load data correctly
-		$document->set_props( array(
-			'type'	=> $document_type,
-			'title'	=> '',
-			'order'	=> $order,
-		) );
-
-		return $document;
+		
+		return false;
 	}
 
 }

@@ -137,33 +137,6 @@ class Settings_Debug {
 					</form>
 				</div>
 				<div class="tool">
-					<h4><?php _e( 'Delete legacy (1.X) settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
-					<p><?php _e( 'Safely remove deprecated settings from version 1.x of the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-					<form method="post">
-						<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
-						<input type="hidden" name="wpo_wcpdf_debug_tools_action" value="delete_legacy_settings">
-						<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Delete legacy settings', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-						<?php
-						if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_tools_action'] ) && $_POST['wpo_wcpdf_debug_tools_action'] == 'delete_legacy_settings' ) {
-							// check permissions
-							if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-								return;
-							}
-							// delete options
-							delete_option( 'wpo_wcpdf_general_settings' );
-							delete_option( 'wpo_wcpdf_template_settings' );
-							delete_option( 'wpo_wcpdf_debug_settings' );
-							// and delete cache of these options, just in case...
-							wp_cache_delete( 'wpo_wcpdf_general_settings','options' );
-							wp_cache_delete( 'wpo_wcpdf_template_settings','options' );
-							wp_cache_delete( 'wpo_wcpdf_debug_settings','options' );
-
-							printf('<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Legacy settings deleted!', 'woocommerce-pdf-invoices-packing-slips' ) );
-						}
-						?>
-					</form>
-				</div>
-				<div class="tool">
 					<h4><?php _e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'Set up your basic invoice workflow via our Wizard.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
@@ -497,30 +470,6 @@ class Settings_Debug {
 				'id'       => 'debug_settings',
 				'title'    => __( 'Debug settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'section',
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'legacy_mode',
-				'title'    => __( 'Legacy mode', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'legacy_mode',
-					'description' => __( "Legacy mode ensures compatibility with templates and filters from previous versions.", 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'legacy_textdomain',
-				'title'    => __( 'Legacy textdomain fallback', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'legacy_textdomain',
-					'description' => __( "Legacy textdomain fallback ensures compatibility with translation files from versions prior to 2017-05-15.", 'woocommerce-pdf-invoices-packing-slips' ),
-				)
 			),
 			array(
 				'type'     => 'setting',
