@@ -439,8 +439,8 @@ class Install {
 			}
 		}
 		
-		// 3.6-2-dev-1: check if 'legacy_mode' is enabled, and disable it
-		if ( version_compare( $installed_version, '3.6.2-dev-1', '<' ) ) {
+		// 3.6.3-dev-1: check if 'legacy_mode' is enabled, and disable it
+		if ( version_compare( $installed_version, '3.6.3-dev-1', '<' ) ) {
 			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 			$update         = false;
 			
