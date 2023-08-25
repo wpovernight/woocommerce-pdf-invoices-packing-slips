@@ -309,12 +309,12 @@ class Main {
 
 		if ( empty( $_REQUEST['order_ids'] ) ) {
 			$message = esc_attr__( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' );
-			wcpdf_safe_redirect_or_die( $redirect_url, $message );
+			wcpdf_safe_redirect_or_die( null, $message );
 		}
 
 		if ( empty( $_REQUEST['document_type'] ) ) {
 			$message = esc_attr__( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' );
-			wcpdf_safe_redirect_or_die( $redirect_url, $message );
+			wcpdf_safe_redirect_or_die( null, $message );
 		}
 
 		// debug enabled by URL
@@ -333,14 +333,14 @@ class Main {
 			
 			if ( $order && $order->get_status() == 'auto-draft' ) {
 				$message = esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' );
-				wcpdf_safe_redirect_or_die( $redirect_url, $message );
+				wcpdf_safe_redirect_or_die( null, $message );
 			} elseif ( ! $order ) {
 				$message = sprintf(
 					/* translators: %s: Order ID */
 					esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ),
 					$order_id
 				);
-				wcpdf_safe_redirect_or_die( $redirect_url, $message );
+				wcpdf_safe_redirect_or_die( null, $message );
 			}
 		}
 
@@ -472,7 +472,7 @@ class Main {
 					esc_html__( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ),
 					$document_type
 				);
-				wcpdf_safe_redirect_or_die( $redirect_url, $message );
+				wcpdf_safe_redirect_or_die( null, $message );
 			}
 		} catch ( \Dompdf\Exception $e ) {
 			$message = 'DOMPDF Exception: '.$e->getMessage();
