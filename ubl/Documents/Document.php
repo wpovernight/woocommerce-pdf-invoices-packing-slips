@@ -22,20 +22,20 @@ abstract class Document {
 	/** @var Order_Document */
 	public $order_document;
 	
-	public function setOrder( \WC_Abstract_Order $order ) {
+	public function set_order( \WC_Abstract_Order $order ) {
 		$this->order          = $order;
-		$this->order_tax_data = $this->getTaxRates();
+		$this->order_tax_data = $this->get_tax_rates();
 	}
 
-	public function setOrderDocument( Order_Document $order_document ) {
+	public function set_order_document( Order_Document $order_document ) {
 		$this->order_document = $order_document;
 	}
 
-	abstract public function getFormat();
-	abstract public function getNamespaces();
-	abstract public function getData();
+	abstract public function get_format();
+	abstract public function get_namespaces();
+	abstract public function get_data();
 
-	public function getTaxRates() {
+	public function get_tax_rates() {
 		$order_tax_data = array();
 		$items          = $this->order->get_items( array( 'fee', 'line_item', 'shipping' ) );
 
@@ -88,21 +88,21 @@ abstract class Document {
 				}
 
 				if ( ! is_numeric( $percentage ) ) {
-					$percentage = $this->getPercentageFromFallback( $tax_data, $tax_item['rate_id'] );
+					$percentage = $this->get_percentage_from_fallback( $tax_data, $tax_item['rate_id'] );
 					wc_update_order_item_meta( $tax_item_key, '_wcpdf_rate_percentage', $percentage );
 				}
 
 				$category = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_category', true );
 
 				if ( empty( $category ) ) {
-					$category = $this->getCategoryFromFallback( $tax_data, $tax_item['rate_id'] );
+					$category = $this->get_category_from_fallback( $tax_data, $tax_item['rate_id'] );
 					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_category', $category );
 				}
 
 				$scheme = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_scheme', true );
 
 				if ( empty( $scheme ) ) {
-					$scheme = $this->getSchemeFromFallback( $tax_data, $tax_item['rate_id'] );
+					$scheme = $this->get_scheme_from_fallback( $tax_data, $tax_item['rate_id'] );
 					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_scheme', $scheme );
 				}
 			}
@@ -116,7 +116,7 @@ abstract class Document {
 		return $order_tax_data;
 	}
 
-	public function getPercentageFromFallback( $tax_data, $rate_id ) {
+	public function get_percentage_from_fallback( $tax_data, $rate_id ) {
 		$percentage = ( $tax_data['total_tax'] / $tax_data['total_ex'] ) * 100;
 
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
@@ -140,7 +140,7 @@ abstract class Document {
 		return $percentage;
 	}
 
-	public function getCategoryFromFallback( $tax_data, $rate_id ) {
+	public function get_category_from_fallback( $tax_data, $rate_id ) {
 		$category = '';
 
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
@@ -164,7 +164,7 @@ abstract class Document {
 		return $category;
 	}
 
-	public function getSchemeFromFallback( $tax_data, $rate_id ) {
+	public function get_scheme_from_fallback( $tax_data, $rate_id ) {
 		$scheme = '';
 		
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {

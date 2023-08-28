@@ -8,6 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 interface OrderRepository {
 	
-	public function getById( $id );
+	public function get_by_id( $id );
 	
 }

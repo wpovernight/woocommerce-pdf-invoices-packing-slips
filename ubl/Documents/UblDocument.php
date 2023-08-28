@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class UblDocument extends Document {
 	
-	public function getFormat() {
+	public function get_format() {
 		return array(
 			'ublversion' => array(
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\UblVersionIdHandler::class,
@@ -69,7 +69,7 @@ class UblDocument extends Document {
 		);
 	}
 
-	public function getNamespaces() {
+	public function get_namespaces() {
 		return apply_filters( 'wpo_wc_ubl_document_namespaces', array(
 			'cac' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
 			'cbc' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
@@ -77,10 +77,10 @@ class UblDocument extends Document {
 		) );
 	}
 
-	public function getData() {
+	public function get_data() {
 		$data = array();
 
-		foreach ( $this->getFormat() as $key => $value ) {
+		foreach ( $this->get_format() as $key => $value ) {
 			$handler = new $value['handler']($this);
 			$options = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
 			$data    = $handler->handle( $data, $options );

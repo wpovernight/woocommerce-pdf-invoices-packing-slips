@@ -967,10 +967,10 @@ abstract class Order_Document {
 		$ubl_maker    = wcpdf_get_ubl_maker();
 		$ubl_document = new UblDocument();
 		
-		$ubl_document->setOrder( $this->order );
+		$ubl_document->set_order( $this->order );
 		
 		if ( $order_document = wcpdf_get_document( $this->get_type(), $this->order, true ) ) {
-			$ubl_document->setOrderDocument( $order_document );
+			$ubl_document->set_order_document( $order_document );
 		} else {
 			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
 			wp_die();

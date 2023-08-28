@@ -18,7 +18,7 @@ class OrderRepository extends Repository implements OrderRepositoryContract {
 		$this->transformer = $transformer;
 	}
 
-	public function getById( $id ) {
+	public function get_by_id( $id ) {
 		/** @var \WC_Abstract_Order */
 		$order = wc_get_order( $id );
 		return $this->transformer->transform( $order );

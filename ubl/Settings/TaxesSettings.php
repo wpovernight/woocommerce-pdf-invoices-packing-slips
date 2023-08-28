@@ -31,13 +31,13 @@ class TaxesSettings {
 		}
 		
 		foreach ( $formatted_rates as $slug => $name ) {
-			$this->outputTableForTaxClass( $slug, $name );
+			$this->output_table_for_tax_class( $slug, $name );
 		}
 
 		submit_button();
 	}
 
-	public function outputTableForTaxClass( $slug, $name ) {
+	public function output_table_for_tax_class( $slug, $name ) {
 		global $wpdb;
 		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
 		?>
@@ -83,8 +83,8 @@ class TaxesSettings {
 							echo '<td>'.$postcode.'</td>';
 							echo '<td>'.$city.'</td>';
 							echo '<td>'.$result->tax_rate.'</td>';
-							echo '<td>'.$this->getSchemeSelect( 'rate', $result->tax_rate_id, $scheme ).'</td>';
-							echo '<td>'.$this->getCategorySelect( 'rate', $result->tax_rate_id, $category ).'</td>';
+							echo '<td>'.$this->get_scheme_select( 'rate', $result->tax_rate_id, $scheme ).'</td>';
+							echo '<td>'.$this->get_category_select( 'rate', $result->tax_rate_id, $category ).'</td>';
 							echo '</tr>';
 						}	
 					} else {
@@ -99,24 +99,24 @@ class TaxesSettings {
 						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] ) ? $this->settings['class'][ $slug ]['scheme'] : '';
 						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : '';
 					?>
-					<th><?php echo $this->getSchemeSelect( 'class', $slug, $scheme ); ?></th>
-					<th><?php echo $this->getCategorySelect( 'class', $slug, $category ); ?></th>
+					<th><?php echo $this->get_scheme_select( 'class', $slug, $scheme ); ?></th>
+					<th><?php echo $this->get_category_select( 'class', $slug, $category ); ?></th>
 				</tr>
 			</tfoot>
 		</table>
 		<?php
 	}
 
-	public function getSchemeSelect( $type, $id, $selected ) {
+	public function get_scheme_select( $type, $id, $selected ) {
 		$select = '<select name="wpo_wcpdf_settings_ubl_taxes['.$type.']['.$id.'][scheme]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
-		foreach ( $this->getAvailableSchemes() as $key => $value ) {
+		foreach ( $this->get_available_schemes() as $key => $value ) {
 			$select .= '<option '.selected( $key, $selected, false ).' value="'.$key.'">'.$value.'</option>';
 		}
 		$select .= '</select>';
 		return $select;
 	}
 
-	public function getAvailableSchemes() {
+	public function get_available_schemes() {
 		return array(
 			'vat' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'gst' => __( 'Goods and services tax (GST)', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -174,16 +174,16 @@ class TaxesSettings {
 		);
 	}
 
-	public function getCategorySelect( $type, $id, $selected ) {
+	public function get_category_select( $type, $id, $selected ) {
 		$select = '<select name="wpo_wcpdf_settings_ubl_taxes['.$type.']['.$id.'][category]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
-		foreach ( $this->getAvailableCategories() as $key => $value ) {
+		foreach ( $this->get_available_categories() as $key => $value ) {
 			$select .= '<option '.selected( $key, $selected, false ).' value="'.$key.'">'.$value.'</option>';
 		}
 		$select .= '</select>';
 		return $select;
 	}
 
-	public function getAvailableCategories() {
+	public function get_available_categories() {
 		return array(
 			's'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
 			'aa' => __( 'Lower rate', 'woocommerce-pdf-invoices-packing-slips' ),

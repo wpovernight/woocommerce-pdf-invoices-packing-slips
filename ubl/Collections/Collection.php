@@ -2,6 +2,8 @@
 
 namespace WPO\WC\UBL\Collections;
 
+use Iterator;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }

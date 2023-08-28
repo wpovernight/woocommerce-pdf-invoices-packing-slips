@@ -246,8 +246,8 @@ class Main {
 		$ubl_maker->set_file_path( $tmp_path );
 
 		$ubl_document = new UblDocument();
-		$ubl_document->setOrder( $document->order );
-		$ubl_document->setOrderDocument( $document );
+		$ubl_document->set_order( $document->order );
+		$ubl_document->set_order_document( $document );
 
 		$builder       = new SabreBuilder();
 		$contents      = $builder->build( $ubl_document );

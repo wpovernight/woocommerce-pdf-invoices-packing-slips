@@ -15,13 +15,13 @@ class AddressHandler extends UblHandler {
 
 		// AccountingSupplierParty or AccountingCustomerParty
 		if ( 'AccountingSupplierParty' === $root ) {
-			return $this->returnSupplierParty( $data, $options );
+			return $this->return_supplier_party( $data, $options );
 		}
 
-		return $this->returnCustomerParty( $data, $options );
+		return $this->return_customer_party( $data, $options );
 	}
 
-	public function returnSupplierParty( $data, $options = array() ) {
+	public function return_supplier_party( $data, $options = array() ) {
 
 		$supplierParty = array(
 			'name'  => 'cac:AccountingSupplierParty',
@@ -32,7 +32,7 @@ class AddressHandler extends UblHandler {
 				),
 				array(
 					'name'  => 'cac:Party',
-					'value' => $this->returnSupplierPartyDetails(),
+					'value' => $this->return_supplier_party_details(),
 				),
 			),
 		);
@@ -42,7 +42,7 @@ class AddressHandler extends UblHandler {
 		return $data;
 	}
 
-	public function returnSupplierPartyDetails() {
+	public function return_supplier_party_details() {
 		$company    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_name()       : '';
 		$address    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_address()    : get_option( 'woocommerce_store_address' );
 		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
@@ -149,7 +149,7 @@ class AddressHandler extends UblHandler {
 		return $supplierPartyDetails;
 	}
 
-	public function returnCustomerParty( $data, $options = array() ) {
+	public function return_customer_party( $data, $options = array() ) {
 		$vat_number = apply_filters( 'wpo_wc_ubl_vat_number', '', $this->document->order );
 		
 		if ( empty( $vat_number ) ) {
