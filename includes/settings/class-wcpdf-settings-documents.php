@@ -77,9 +77,9 @@ class Settings_Documents {
 					<h2 class="nav-tab-wrapper">
 						<?php
 							foreach ( $section_document->output_formats as $document_output_format ) {
-								$active    = ( $output_format == $document_output_format ) || ( $output_format != 'pdf' && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
+								$active    = ( $output_format == $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
 								$tab_title = strtoupper( esc_html( $document_output_format ) );
-								if ( $document_output_format == 'ubl' ) {
+								if ( 'ubl' === $document_output_format ) {
 									$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
 								}
 								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), $active, $tab_title );
@@ -92,11 +92,11 @@ class Settings_Documents {
 		</div>
 		<?php
 			$output_format_compatible = false;
-			if ( $output_format != 'pdf' && in_array( $output_format, $section_document->output_formats ) ) {
+			if ( 'pdf' !== $output_format && in_array( $output_format, $section_document->output_formats ) ) {
 				$output_format_compatible = true;
 			}
 			
-			$option_name = ( $output_format == 'pdf' || ! $output_format_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output_format}";
+			$option_name = ( 'pdf' === $output_format || ! $output_format_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output_format}";
 			settings_fields( $option_name );
 			do_settings_sections( $option_name );
 			submit_button();

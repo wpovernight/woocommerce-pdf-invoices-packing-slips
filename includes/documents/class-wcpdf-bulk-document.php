@@ -43,7 +43,7 @@ class Bulk_Document {
 		$this->is_bulk   = true;
 		
 		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", [ 'pdf' ], $this );
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", array( 'pdf' ), $this );
 	}
 	
 	public function exists() {

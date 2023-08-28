@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Collection implements Iterator {
 	
 	/** @var array */
-	private $items = [];
+	private $items = array();
 
 	/** @var int */
 	private $position = 0;  

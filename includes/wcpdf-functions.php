@@ -111,13 +111,13 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 }
 
 function wcpdf_get_bulk_actions() {
-	$actions   = [];
+	$actions   = array();
 	$documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
 	
 	foreach ( $documents as $document ) {
 		foreach ( $document->output_formats as $output_format ) {
 			$slug = $document->get_type();
-			if ( $output_format != 'pdf' ) {
+			if ( 'pdf' !== $output_format ) {
 				$slug .= "_{$output_format}";
 			}
 			

@@ -325,7 +325,7 @@ class Settings_Debug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 		
-		if ( in_array( $type, [ 'general', 'debug', 'ubl_taxes' ] ) ) {
+		if ( in_array( $type, array( 'general', 'debug', 'ubl_taxes' ) ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
@@ -470,7 +470,7 @@ class Settings_Debug {
 			
 			foreach ( $document->output_formats as $output_format ) {
 				$slug = $document->get_type();
-				if ( $output_format != 'pdf' ) {
+				if ( 'pdf' !== $output_format ) {
 					$slug .= "_{$output_format}";
 				}
 				$setting_types[$slug] = strtoupper( $output_format ) . ' ' .  $title;

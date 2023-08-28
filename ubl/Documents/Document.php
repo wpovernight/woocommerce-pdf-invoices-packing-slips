@@ -36,7 +36,7 @@ abstract class Document {
 	abstract public function getData();
 
 	public function getTaxRates() {
-		$order_tax_data = [];
+		$order_tax_data = array();
 		$items          = $this->order->get_items( array( 'fee', 'line_item', 'shipping' ) );
 
 		// Build the tax totals array

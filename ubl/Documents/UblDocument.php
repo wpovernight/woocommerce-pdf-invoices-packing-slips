@@ -82,7 +82,7 @@ class UblDocument extends Document {
 
 		foreach ( $this->getFormat() as $key => $value ) {
 			$handler = new $value['handler']($this);
-			$options = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : [];
+			$options = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
 			$data    = $handler->handle( $data, $options );
 		}
 

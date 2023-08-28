@@ -117,7 +117,7 @@ class TaxesSettings {
 	}
 
 	public function getAvailableSchemes() {
-		return [
+		return array(
 			'vat' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'gst' => __( 'Goods and services tax (GST)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'aaa' => __( 'Petroleum tax', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -171,7 +171,7 @@ class TaxesSettings {
 			'tox' => __( 'Turnover tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'tta' => __( 'Tonnage taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 			'vad' => __( 'Valuation deposit', 'woocommerce-pdf-invoices-packing-slips' ),
-		];
+		);
 	}
 
 	public function getCategorySelect( $type, $id, $selected ) {
@@ -184,7 +184,7 @@ class TaxesSettings {
 	}
 
 	public function getAvailableCategories() {
-		return [
+		return array(
 			's'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
 			'aa' => __( 'Lower rate', 'woocommerce-pdf-invoices-packing-slips' ),
 			'z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -198,6 +198,6 @@ class TaxesSettings {
 			'g'  => __( 'Free export item, tax not charged', 'woocommerce-pdf-invoices-packing-slips' ),
 			'h'  => __( 'Higher rate', 'woocommerce-pdf-invoices-packing-slips' ),
 			'o'  => __( 'Services outside scope of tax', 'woocommerce-pdf-invoices-packing-slips' ),
-		];
+		);
 	}
 }
