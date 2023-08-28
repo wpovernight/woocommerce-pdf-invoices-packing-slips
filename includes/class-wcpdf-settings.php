@@ -553,7 +553,7 @@ class Settings {
 				$base_path = $this->normalize_path( WP_CONTENT_DIR );
 			}
 			
-			if ( ! emppty( $template_path ) && false === strpos( $template_path, $base_path ) ) {
+			if ( ! empty( $template_path ) && false === strpos( $template_path, $base_path ) ) {
 				$template_path = $this->normalize_path( $base_path . $template_path );
 			}
 		}

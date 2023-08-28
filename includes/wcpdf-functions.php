@@ -175,7 +175,7 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 	$global_wcpdf_filters = array( 'wp_ajax_generate_wpo_wcpdf' );
 	
 	if ( ! empty( $filter ) && ! empty( $replacement ) && ! in_array( $filter, $global_wcpdf_filters ) && false !== strpos( $filter, 'wpo_wcpdf' ) && false !== strpos( $replacement, '$this' ) ) {
-		$replacement = ! empty( $replacement ) ? str_replace( '$this', '$document', $replacement ) : $replacement;
+		$replacement =  str_replace( '$this', '$document', $replacement );
 		$replacement = "{$replacement} - check that the \$document parameter is included in your action or filter ($filter)!";
 	}
 	
