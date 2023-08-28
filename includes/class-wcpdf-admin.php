@@ -918,8 +918,8 @@ class Admin {
 
 		if ( ! empty( $_POST['wpo_wcpdf_send_emails'] ) ) {
 			$action = wc_clean( $_POST['wpo_wcpdf_send_emails'] );
-			if ( strstr( $action, 'send_email_' ) ) {
-				$email_to_send = ! empty( $action ) ? str_replace( 'send_email_', '', $action ) : $action;
+			if ( ! empty( $action ) && strstr( $action, 'send_email_' ) ) {
+				$email_to_send = str_replace( 'send_email_', '', $action );
 				// Switch back to the site locale.
 				wc_switch_to_site_locale();
 				do_action( 'woocommerce_before_resend_order_emails', $order, $email_to_send );
