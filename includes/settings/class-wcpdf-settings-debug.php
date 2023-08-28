@@ -514,7 +514,7 @@ class Settings_Debug {
 						'myaccount_page' => __( 'My Account page', 'woocommerce-pdf-invoices-packing-slips' ),
 						'custom_page'    => __( 'Custom page (enter below)', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					'description' => __( 'Select a frontend page to be used to redirect users when the document access is denied.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Select a frontend page to be used to redirect users when the document access is denied. Custom external URLs not allowed.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -526,7 +526,7 @@ class Settings_Debug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'document_custom_redirect_page',
-					'placeholder' => 'https://',
+					'placeholder' => esc_url_raw( wc_get_page_permalink( 'shop' ) ),
 				)
 			),
 			array(
