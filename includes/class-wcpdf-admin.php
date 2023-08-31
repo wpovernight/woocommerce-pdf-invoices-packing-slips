@@ -70,7 +70,10 @@ class Admin {
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
 
+        // add "invoice number" column to WooCommerce Analytic - Orders
 		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
+		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
+		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -1213,6 +1216,20 @@ class Admin {
 		}
 
 		return $response;
+	}
+
+	public function add_invoice_number_header_to_order_export( $export_columns ) {
+		$export_columns['invoice_number'] = __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' );
+
+		return $export_columns;
+	}
+
+	public function add_invoice_number_value_to_order_export( $export_item, $item ) {
+		if ( ! empty( $item['invoice_number'] ) ) {
+			$export_item['invoice_number'] = $item['invoice_number'];
+		}
+
+		return $export_item;
 	}
 }
 
