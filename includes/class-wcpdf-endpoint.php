@@ -192,7 +192,7 @@ class Endpoint {
 					$redirect_url = wp_sanitize_redirect( wp_login_url() );
 					break;
 				case 'myaccount_page':
-					$redirect_url = wp_sanitize_redirect( wp_login_url( wc_get_page_permalink( 'myaccount' ) ) );
+					$redirect_url = wp_sanitize_redirect( wc_get_page_permalink( 'myaccount' ) );
 					break;
 				case 'custom_page':
 					if ( isset( $debug_settings['document_custom_redirect_page'] ) && ! empty( $debug_settings['document_custom_redirect_page'] ) ) {
