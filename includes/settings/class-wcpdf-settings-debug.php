@@ -43,6 +43,7 @@ class Settings_Debug {
 		<h3><?php _e( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<div id="debug-tools">
 			<div class="wrapper">
+				<?php do_action( 'wpo_wcpdf_before_debug_tools', $this ); ?>
 				<div class="tool">
 					<h4><?php _e( 'Generate random temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'For security reasons, it is preferable to use a random name for the temporary directory.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
@@ -199,6 +200,7 @@ class Settings_Debug {
 						</fieldset>
 					</form>
 				</div>
+				<?php do_action( 'wpo_wcpdf_after_debug_tools', $this ); ?>
 			</div>
 		</div>
 		<br>

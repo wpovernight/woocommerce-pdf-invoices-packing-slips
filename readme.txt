@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.3
 Requires PHP: 7.1
-Stable tag: 3.6.2
+Stable tag: 3.6.3-beta-1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.6.3-beta-1 (2023-08-29) =
+* Fix: undefined WC PageController method `is_admin_page` bug and replace it with `is_admin_or_embed_page`
+* Tweak: removes legacy mode & textdomain from debug settings
 
 = 3.6.2 (2023-08-23) =
 * New `wcpdf_document_link` shortcode
