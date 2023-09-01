@@ -84,8 +84,6 @@ jQuery( function( $ ) {
 		let $custom_page_field = $( this ).closest( 'table' ).find( '#document_custom_redirect_page' );
 		let $field_description = $custom_page_field.closest( 'td' ).find( '.description' );
 		
-		$field_description.hide();
-		
 		if ( 'custom_page' === $( this ).val() ) {
 			$custom_page_field.show();
 			$field_description.show();
