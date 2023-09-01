@@ -177,6 +177,37 @@ class Endpoint {
 		return apply_filters( 'wpo_wcpdf_document_link_access_type', $access_type, $this );
 	}
 	
+	/**
+	 * Get document denied frontend redirect URL
+	 *
+	 * @return string
+	 */
+	public function get_document_denied_frontend_redirect_url() {
+		$redirect_url   = '';
+		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+		
+		if ( isset( $debug_settings['document_access_denied_redirect_page'] ) ) {
+			switch ( $debug_settings['document_access_denied_redirect_page'] ) {
+				case 'login_page':
+					$redirect_url = wp_sanitize_redirect( wp_login_url() );
+					break;
+				case 'myaccount_page':
+					$redirect_url = wp_sanitize_redirect( wc_get_page_permalink( 'myaccount' ) );
+					break;
+				case 'custom_page':
+					if ( isset( $debug_settings['document_custom_redirect_page'] ) && ! empty( $debug_settings['document_custom_redirect_page'] ) ) {
+						$redirect_url = wp_sanitize_redirect( $debug_settings['document_custom_redirect_page'] );
+					}
+					break;
+				case 'blank_page':
+				default:
+					break;
+			}
+		}
+		
+		return apply_filters( 'wpo_wcpdf_document_denied_frontend_redirect_url', $redirect_url, $debug_settings, $this );
+	}
+	
 }
 
 endif; // class_exists

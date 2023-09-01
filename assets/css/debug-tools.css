@@ -33,3 +33,8 @@ form#wpo-wcpdf-settings {
 	min-height: 30px;
 	max-width: 25rem;
 }
+
+#document_custom_redirect_page,
+#document_custom_redirect_page + .description {
+	display: none;
+}

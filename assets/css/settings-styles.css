@@ -340,6 +340,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > input[type="text"],
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input[type="text"],
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > input[type="url"],
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input[type="url"],
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > select,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > select,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > textarea,
@@ -348,7 +350,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 100%;
 }
 
-#wpo-wcpdf-preview-wrapper input[type="text"][size] {
+#wpo-wcpdf-preview-wrapper input[type="text"][size],
+#wpo-wcpdf-preview-wrapper input[type="url"][size] {
 	width: auto !important;
 	max-width: 100% !important;
 }
