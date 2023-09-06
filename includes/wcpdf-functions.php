@@ -169,14 +169,18 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 	if ( apply_filters( 'wcpdf_disable_deprecation_notices', false ) ) {
 		return;
 	}
+	
 	// if the deprecated function is called from one of our filters, $this should be $document.
-	$filter = current_filter();
+	$filter               = current_filter();
 	$global_wcpdf_filters = array( 'wp_ajax_generate_wpo_wcpdf' );
-	if ( ! in_array( $filter, $global_wcpdf_filters ) && strpos( $filter, 'wpo_wcpdf' ) !== false && strpos( $replacement, '$this' ) !== false ) {
-		$replacement = str_replace( '$this', '$document', $replacement );
+	
+	if ( ! empty( $filter ) && ! empty( $replacement ) && ! in_array( $filter, $global_wcpdf_filters ) && false !== strpos( $filter, 'wpo_wcpdf' ) && false !== strpos( $replacement, '$this' ) ) {
+		$replacement =  str_replace( '$this', '$document', $replacement );
 		$replacement = "{$replacement} - check that the \$document parameter is included in your action or filter ($filter)!";
 	}
+	
 	$is_ajax = function_exists( 'wp_doing_ajax' ) ? wp_doing_ajax() : defined( 'DOING_AJAX' ) && DOING_AJAX;
+	
 	if ( $is_ajax ) {
 		do_action( 'deprecated_function_run', $function, $replacement, $version );
 		$log_string  = "The {$function} function is deprecated since version {$version}.";

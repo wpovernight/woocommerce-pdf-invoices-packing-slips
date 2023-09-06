@@ -946,8 +946,10 @@ class Main {
 	 * Adds spans around placeholders to be able to make replacement (page count) and css (page number)
 	 */
 	public function format_page_number_placeholders ( $html, $document ) {
-		$html = str_replace('{{PAGE_COUNT}}', '<span class="pagecount">^C^</span>', $html);
-		$html = str_replace('{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
+		if ( ! empty( $html ) ) {
+			$html = str_replace( '{{PAGE_COUNT}}', '<span class="pagecount">^C^</span>', $html );
+			$html = str_replace( '{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
+		}
 		return $html;
 	}
 
@@ -964,12 +966,12 @@ class Main {
 		}
 
 		// check if placeholder is used
-		if (strpos($html, $placeholder) !== false ) {
-			foreach ($dompdf->get_canvas()->get_cpdf()->objects as &$object) {
-				if (array_key_exists("c", $object) && strpos($object["c"], $placeholder) !== false ) {
-					$object["c"] = str_replace( array($placeholder,$placeholder_0) , $dompdf->get_canvas()->get_page_count() , $object["c"] );
-				} elseif (array_key_exists("c", $object) && strpos($object["c"], $placeholder_0) !== false ) {
-					$object["c"] = str_replace( array($placeholder,$placeholder_0) , chr(0).$dompdf->get_canvas()->get_page_count() , $object["c"] );
+		if ( ! empty( $html ) && false !== strpos( $html, $placeholder ) ) {
+			foreach ( $dompdf->get_canvas()->get_cpdf()->objects as &$object ) {
+				if ( array_key_exists( "c", $object ) && ! empty( $object["c"] ) && false !== strpos( $object["c"], $placeholder ) ) {
+					$object["c"] = str_replace( array( $placeholder, $placeholder_0 ) , $dompdf->get_canvas()->get_page_count() , $object["c"] );
+				} elseif ( array_key_exists( "c", $object ) && ! empty( $object["c"] ) && false !== strpos( $object["c"], $placeholder_0 ) ) {
+					$object["c"] = str_replace( array( $placeholder, $placeholder_0 ) , chr(0).$dompdf->get_canvas()->get_page_count() , $object["c"] );
 				}
 			}
 		}

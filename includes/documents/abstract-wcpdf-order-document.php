@@ -103,7 +103,7 @@ abstract class Order_Document {
 		}
 
 		// set properties
-		$this->slug = str_replace('-', '_', $this->type);
+		$this->slug = ! empty( $this->type ) ? str_replace( '-', '_', $this->type ) : '';
 
 		// load data
 		if ( $this->order ) {
@@ -655,7 +655,7 @@ abstract class Order_Document {
 	 * Return logo height
 	 */
 	public function get_header_logo_height() {
-		if ( !empty( $this->settings['header_logo_height'] ) ) {
+		if ( ! empty( $this->settings['header_logo_height'] ) ) {
 			return apply_filters( 'wpo_wcpdf_header_logo_height', str_replace( ' ', '', $this->settings['header_logo_height'] ), $this );
 		}
 	}

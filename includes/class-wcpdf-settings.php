@@ -272,7 +272,7 @@ class Settings {
 					$form_data = stripslashes_deep( $form_data );
 
 					foreach ( $form_data as $option_key => $form_settings ) {
-						if ( apply_filters( 'wpo_wcpdf_preview_filter_option', strpos( $option_key, 'wpo_wcpdf' ) === 0, $option_key ) === false ) {
+						if ( ! empty( $option_key ) && false === apply_filters( 'wpo_wcpdf_preview_filter_option', 0 === strpos( $option_key, 'wpo_wcpdf' ), $option_key ) ) {
 							continue; // not our business
 						}
 
@@ -547,13 +547,13 @@ class Settings {
 			
 			// add base path, checking if it's not already there
 			// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
-			if ( defined( 'WP_CONTENT_DIR' ) && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+			if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
 				$base_path = $this->normalize_path( ABSPATH );
 			} else {
 				$base_path = $this->normalize_path( WP_CONTENT_DIR );
 			}
 			
-			if ( strpos( $template_path, $base_path ) === false ) {
+			if ( ! empty( $template_path ) && false === strpos( $template_path, $base_path ) ) {
 				$template_path = $this->normalize_path( $base_path . $template_path );
 			}
 		}
@@ -630,7 +630,7 @@ class Settings {
 				$outdated = true;
 				// folder does not exist, try replacing base if we can locate wp-content
 				$wp_content_folder = 'wp-content';
-				if ( strpos( $path, $wp_content_folder ) !== false && defined( WP_CONTENT_DIR ) ) {
+				if ( ! empty( $path ) && false !== strpos( $path, $wp_content_folder ) && defined( WP_CONTENT_DIR ) ) {
 					// try wp-content
 					$relative_path = substr( $path, strrpos( $path, $wp_content_folder ) + strlen( $wp_content_folder ) );
 					$new_path = WP_CONTENT_DIR . $relative_path;
@@ -682,7 +682,7 @@ class Settings {
 	}
 
 	public function get_relative_template_path( $absolute_path ) {
-		if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
+		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
 			$base_path = $this->normalize_path( ABSPATH );
 		} else {
 			$base_path = $this->normalize_path( WP_CONTENT_DIR );
@@ -691,7 +691,11 @@ class Settings {
 	}
 
 	public function normalize_path( $path ) {
-		return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace('\\','/', $path );
+		if ( ! empty( $path ) ) {
+			return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace( '\\', '/', $path );
+		} else {
+			return $path;
+		}
 	}
 
 	public function maybe_migrate_template_paths( $settings_section = null ) {

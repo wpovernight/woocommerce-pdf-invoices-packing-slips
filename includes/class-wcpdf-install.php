@@ -268,12 +268,14 @@ class Install {
 
 			// Migrate template path
 			// forward slash for consistency/compatibility
-			$template_path = str_replace('\\','/', $old_settings['wpo_wcpdf_template_settings']['template_path']);
-			// strip abspath (forward slashed) if included
-			$template_path = str_replace( str_replace('\\','/', ABSPATH), '', $template_path );
-			// strip pdf subfolder from templates path
-			$template_path = str_replace( '/templates/pdf/', '/templates/', $template_path );
-			$old_settings['wpo_wcpdf_template_settings']['template_path'] = $template_path;
+			if ( ! empty( $old_settings['wpo_wcpdf_template_settings']['template_path'] ) ) {
+				$template_path = str_replace( '\\', '/', $old_settings['wpo_wcpdf_template_settings']['template_path'] );
+				// strip abspath (forward slashed) if included
+				$template_path = str_replace( str_replace('\\','/', ABSPATH), '', $template_path );
+				// strip pdf subfolder from templates path
+				$template_path = str_replace( '/templates/pdf/', '/templates/', $template_path );
+				$old_settings['wpo_wcpdf_template_settings']['template_path'] = $template_path;
+			}
 
 			// map new settings to old
 			$settings_map = array(
