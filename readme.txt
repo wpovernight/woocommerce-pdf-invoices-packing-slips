@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice,
 Requires at least: 3.5
 Tested up to: 6.3
 Requires PHP: 7.1
-Stable tag: 3.6.2
+Stable tag: 3.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.6.3 (2023-09-04) =
+* New: adds Invoice Number column to the orders export of WooCommerce Analytics
+* New: adds a document access denied redirect page setting
+* New: hooks before and after debug tools: `wpo_wcpdf_before_debug_tools`, `wpo_wcpdf_after_debug_tools`
+* Tweak: add a note to make clear that updating the number format only affects new orders
+* Tweak: removes legacy mode & textdomain from debug settings
+* Fix: undefined WC PageController method `is_admin_page` bug and replace it with `is_admin_or_embed_page`
 
 = 3.6.2 (2023-08-23) =
 * New `wcpdf_document_link` shortcode

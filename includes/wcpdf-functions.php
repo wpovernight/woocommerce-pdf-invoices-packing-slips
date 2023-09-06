@@ -225,14 +225,18 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 	if ( apply_filters( 'wcpdf_disable_deprecation_notices', false ) ) {
 		return;
 	}
+	
 	// if the deprecated function is called from one of our filters, $this should be $document.
-	$filter = current_filter();
+	$filter               = current_filter();
 	$global_wcpdf_filters = array( 'wp_ajax_generate_wpo_wcpdf' );
-	if ( ! in_array( $filter, $global_wcpdf_filters ) && strpos( $filter, 'wpo_wcpdf' ) !== false && strpos( $replacement, '$this' ) !== false ) {
-		$replacement = str_replace( '$this', '$document', $replacement );
+	
+	if ( ! empty( $filter ) && ! empty( $replacement ) && ! in_array( $filter, $global_wcpdf_filters ) && false !== strpos( $filter, 'wpo_wcpdf' ) && false !== strpos( $replacement, '$this' ) ) {
+		$replacement =  str_replace( '$this', '$document', $replacement );
 		$replacement = "{$replacement} - check that the \$document parameter is included in your action or filter ($filter)!";
 	}
+	
 	$is_ajax = function_exists( 'wp_doing_ajax' ) ? wp_doing_ajax() : defined( 'DOING_AJAX' ) && DOING_AJAX;
+	
 	if ( $is_ajax ) {
 		do_action( 'deprecated_function_run', $function, $replacement, $version );
 		$log_string  = "The {$function} function is deprecated since version {$version}.";
@@ -396,4 +400,24 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 	}
 	
 	return $string;
+}
+
+/**
+ * Safe redirect or die.
+ *
+ * @param  string          $url
+ * @param  string|WP_Error $message
+ * @return void
+ */
+function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
+	if ( ! empty( $url ) ) {
+		wp_safe_redirect( $url );
+		exit;
+	} else {
+		wp_die( $message );
+	}
+}
+
+function WPO_WCPDF_Legacy() {
+	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
 }

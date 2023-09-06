@@ -286,7 +286,7 @@ if( ! $server_configs['PHP version']['result'] ) {
 		?>
 	<tr>
 		<td><?php echo wp_kses_post( $permission['description'] ); ?></td>
-		<td><?php echo str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ), wp_kses_post( $permission['value'] ) ); ?></td>
+		<td><?php echo ! empty( $permission['value'] ) ? str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ), wp_kses_post( $permission['value'] ) ) : ''; ?></td>
 		<td style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>"><?php echo wp_kses_post( $permission['status_message'] ); ?></td>
 	</tr>
 

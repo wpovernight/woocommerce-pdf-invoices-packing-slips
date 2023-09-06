@@ -645,9 +645,9 @@ abstract class Order_Document_Methods extends Order_Document {
 			}
 
 			// apply decimal setting
-			if (function_exists('wc_get_price_decimal_separator')) {
-				foreach ($tax_rates as &$tax_rate) {
-					$tax_rate = str_replace('.', wc_get_price_decimal_separator(), strval($tax_rate) );
+			if ( function_exists( 'wc_get_price_decimal_separator' ) ) {
+				foreach ( $tax_rates as &$tax_rate ) {
+					$tax_rate = ! empty( $tax_rate ) ? str_replace( '.', wc_get_price_decimal_separator(), strval( $tax_rate ) ) : $tax_rate;
 				}
 			}
 
@@ -800,25 +800,27 @@ abstract class Order_Document_Methods extends Order_Document {
 		} else {
 			$thumbnail_size = 'shop_thumbnail';
 		}
-		$size = apply_filters( 'wpo_wcpdf_thumbnail_size', $thumbnail_size );
+		$size                  = apply_filters( 'wpo_wcpdf_thumbnail_size', $thumbnail_size );
 		$thumbnail_img_tag_url = $product->get_image( $size, array( 'title' => '' ) );
 		
 		// Extract the url from img
-		preg_match('/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
-		$thumbnail_url = array_pop($thumbnail_url);
+		preg_match( '/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
+		$thumbnail_url = array_pop( $thumbnail_url );
 		// remove http/https from image tag url to avoid mixed origin conflicts
-		$contextless_thumbnail_url = ltrim( str_replace(array('http://','https://'), '', $thumbnail_url ), '/' );
+		$contextless_thumbnail_url = ! empty( $thumbnail_url ) ? ltrim( str_replace( array( 'http://', 'https://' ), '', $thumbnail_url ), '/' ) : $thumbnail_url;
 
 		// convert url to path
-		if ( defined('WP_CONTENT_DIR') && strpos( WP_CONTENT_DIR, ABSPATH ) !== false ) {
-			$forwardslash_basepath = str_replace('\\','/', ABSPATH);
-			$contextless_site_url = str_replace(array('http://','https://'), '', trailingslashit(get_site_url()));
+		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
+			$forwardslash_basepath = ! empty( ABSPATH ) ? str_replace( '\\', '/', ABSPATH ) : '';
+			$site_url              = trailingslashit( get_site_url() );
 		} else {
 			// bedrock e.a
-			$forwardslash_basepath = str_replace('\\','/', WP_CONTENT_DIR);
-			$contextless_site_url = str_replace(array('http://','https://'), '', trailingslashit(WP_CONTENT_URL));
+			$forwardslash_basepath = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( '\\', '/', WP_CONTENT_DIR ) : '';
+			$site_url              = defined( 'WP_CONTENT_URL' ) && ! empty( WP_CONTENT_URL ) ? trailingslashit( WP_CONTENT_URL ) : '';
 		}
-		$thumbnail_path = str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url);
+		
+		$contextless_site_url  = ! empty( $site_url ) ? str_replace( array( 'http://', 'https://' ), '', $site_url ) : $site_url;
+		$thumbnail_path        = ! empty( $contextless_site_url ) ? str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url ) : $contextless_site_url;
 
 		// fallback if thumbnail file doesn't exist
 		if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
@@ -828,15 +830,16 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		// Thumbnail (full img tag)
-		if ( apply_filters('wpo_wcpdf_use_path', true) && file_exists($thumbnail_path) ) {
+		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $thumbnail_path ) ) {
 			// load img with server path by default
-			$thumbnail = sprintf('<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
-		} elseif ( apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path) ) {
+			$thumbnail = sprintf( '<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
+			
+		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! file_exists( $thumbnail_path ) ) {
 			// should use paths but file not found, replace // with http(s):// for dompdf compatibility
 			if ( substr( $thumbnail_url, 0, 2 ) === "//" ) {
-				$prefix = is_ssl() ? 'https://' : 'http://';
-				$https_thumbnail_url = $prefix . ltrim( $thumbnail_url, '/' );
-				$thumbnail_img_tag_url = str_replace($thumbnail_url, $https_thumbnail_url, $thumbnail_img_tag_url);
+				$prefix                = is_ssl() ? 'https://' : 'http://';
+				$https_thumbnail_url   = $prefix . ltrim( $thumbnail_url, '/' );
+				$thumbnail_img_tag_url = ! empty( $thumbnail_img_tag_url ) ? str_replace( $thumbnail_url, $https_thumbnail_url, $thumbnail_img_tag_url ) : $thumbnail_img_tag_url;
 			}
 			$thumbnail = $thumbnail_img_tag_url;
 		} else {
@@ -906,7 +909,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 			// remove refund lines (shouldn't be in invoice)
 			foreach ( $totals as $key => $total ) {
-				if ( strpos($key, 'refund_') !== false ) {
+				if ( ! empty( $key ) && false !== strpos( $key, 'refund_' ) ) {
 					unset( $totals[$key] );
 				}
 			}
@@ -923,7 +926,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		//$compound = ($discount == 'incl')?true:false;
 		$subtotal = $this->order->get_subtotal_to_display( false, $tax );
 
-		$subtotal = ($pos = strpos($subtotal, ' <small')) ? substr($subtotal, 0, $pos) : $subtotal; //removing the 'excluding tax' text			
+		$subtotal = ! empty( $subtotal ) && ( $pos = strpos( $subtotal, ' <small' ) ) ? substr( $subtotal, 0, $pos ) : $subtotal; //removing the 'excluding tax' text			
 		
 		$subtotal = array (
 			'label'	=> __('Subtotal', 'woocommerce-pdf-invoices-packing-slips' ),

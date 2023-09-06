@@ -321,7 +321,8 @@ class Main {
 	 * Load and generate the template output with ajax
 	 */
 	public function generate_document_ajax() {
-		$access_type = WPO_WCPDF()->endpoint->get_document_link_access_type();
+		$access_type  = WPO_WCPDF()->endpoint->get_document_link_access_type();
+		$redirect_url = WPO_WCPDF()->endpoint->get_document_denied_frontend_redirect_url();
 
 		// handle legacy access keys
 		if ( empty( $_REQUEST['access_key'] ) ) {
@@ -336,17 +337,20 @@ class Main {
 
 		// check if we have the access key set
 		if ( empty( $_REQUEST['access_key'] ) ) {
-			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty access key', 'woocommerce-pdf-invoices-packing-slips' ) );
+			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty access key', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
 		// check if we have the action
 		if ( empty( $_REQUEST['action'] ) ) {
-			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty action', 'woocommerce-pdf-invoices-packing-slips' ) );
+			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty action', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 		
 		// Check the nonce - guest access can use nonce if user is logged in
 		if ( is_user_logged_in() && in_array( $access_type, array( 'logged_in', 'guest' ) ) && ! $valid_nonce ) {
-			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page. Reason: invalid nonce', 'woocommerce-pdf-invoices-packing-slips' ) );
+			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: invalid nonce', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
 		// Check if all parameters are set
@@ -355,11 +359,13 @@ class Main {
 		}
 
 		if ( empty( $_REQUEST['order_ids'] ) ) {
-			wp_die( esc_attr__( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' ) );
+			$message = esc_attr__( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_safe_redirect_or_die( null, $message );
 		}
 
 		if ( empty( $_REQUEST['document_type'] ) ) {
-			wp_die( esc_attr__( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			$message = esc_attr__( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_safe_redirect_or_die( null, $message );
 		}
 
 		// debug enabled by URL
@@ -377,10 +383,15 @@ class Main {
 			$order    = wc_get_order( $order_id );
 			
 			if ( $order && $order->get_status() == 'auto-draft' ) {
-				wp_die( esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' ) );
+				$message = esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' );
+				wcpdf_safe_redirect_or_die( null, $message );
 			} elseif ( ! $order ) {
-				/* translators: %s: Order ID */
-				wp_die( sprintf( esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ), $order_id ) );
+				$message = sprintf(
+					/* translators: %s: Order ID */
+					esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					$order_id
+				);
+				wcpdf_safe_redirect_or_die( null, $message );
 			}
 		}
 
@@ -454,7 +465,8 @@ class Main {
 		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
 
 		if ( ! $allowed ) {
-			wp_die( esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
 		// if we got here, we're safe to go!
@@ -506,8 +518,12 @@ class Main {
 						break;
 				}
 			} else {
-				/* translators: document type */
-				wp_die( sprintf( esc_html__( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ), $document_type ) );
+				$message = sprintf(
+					/* translators: document type */
+					esc_html__( "Document of type '%s' for the selected order(s) could not be generated", 'woocommerce-pdf-invoices-packing-slips' ),
+					$document_type
+				);
+				wcpdf_safe_redirect_or_die( null, $message );
 			}
 		} catch ( \Dompdf\Exception $e ) {
 			$message = 'DOMPDF Exception: '.$e->getMessage();
@@ -988,8 +1004,10 @@ class Main {
 	 * Adds spans around placeholders to be able to make replacement (page count) and css (page number)
 	 */
 	public function format_page_number_placeholders ( $html, $document ) {
-		$html = str_replace('{{PAGE_COUNT}}', '<span class="pagecount">^C^</span>', $html);
-		$html = str_replace('{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
+		if ( ! empty( $html ) ) {
+			$html = str_replace( '{{PAGE_COUNT}}', '<span class="pagecount">^C^</span>', $html );
+			$html = str_replace( '{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
+		}
 		return $html;
 	}
 
@@ -1006,12 +1024,12 @@ class Main {
 		}
 
 		// check if placeholder is used
-		if (strpos($html, $placeholder) !== false ) {
-			foreach ($dompdf->get_canvas()->get_cpdf()->objects as &$object) {
-				if (array_key_exists("c", $object) && strpos($object["c"], $placeholder) !== false ) {
-					$object["c"] = str_replace( array($placeholder,$placeholder_0) , $dompdf->get_canvas()->get_page_count() , $object["c"] );
-				} elseif (array_key_exists("c", $object) && strpos($object["c"], $placeholder_0) !== false ) {
-					$object["c"] = str_replace( array($placeholder,$placeholder_0) , chr(0).$dompdf->get_canvas()->get_page_count() , $object["c"] );
+		if ( ! empty( $html ) && false !== strpos( $html, $placeholder ) ) {
+			foreach ( $dompdf->get_canvas()->get_cpdf()->objects as &$object ) {
+				if ( array_key_exists( "c", $object ) && ! empty( $object["c"] ) && false !== strpos( $object["c"], $placeholder ) ) {
+					$object["c"] = str_replace( array( $placeholder, $placeholder_0 ) , $dompdf->get_canvas()->get_page_count() , $object["c"] );
+				} elseif ( array_key_exists( "c", $object ) && ! empty( $object["c"] ) && false !== strpos( $object["c"], $placeholder_0 ) ) {
+					$object["c"] = str_replace( array( $placeholder, $placeholder_0 ) , chr(0).$dompdf->get_canvas()->get_page_count() , $object["c"] );
 				}
 			}
 		}
