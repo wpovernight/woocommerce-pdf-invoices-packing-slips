@@ -154,9 +154,9 @@ class WPO_WCPDF {
 			return;
 		}
 		
-		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
-			add_action( 'admin_notices', array ( $this, 'next_php_version_bump' ) );
-		}
+		// if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		// 	add_action( 'admin_notices', array ( $this, 'next_php_version_bump' ) );
+		// }
 
 		if ( has_filter( 'wpo_wcpdf_pdf_maker' ) === false && version_compare( PHP_VERSION, '7.2', '<' ) ) {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
