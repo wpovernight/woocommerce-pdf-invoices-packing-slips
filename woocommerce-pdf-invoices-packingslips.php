@@ -160,11 +160,11 @@ class WPO_WCPDF {
 			return;
 		}
 		
-		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
-			add_action( 'admin_notices', array ( $this, 'next_php_version_bump' ) );
-		}
+		// if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		// 	add_action( 'admin_notices', array ( $this, 'next_php_version_bump' ) );
+		// }
 
-		if ( has_filter( 'wpo_wcpdf_pdf_maker' ) === false && version_compare( PHP_VERSION, '7.1', '<' ) ) {
+		if ( has_filter( 'wpo_wcpdf_pdf_maker' ) === false && version_compare( PHP_VERSION, '7.2', '<' ) ) {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 		}
@@ -242,7 +242,7 @@ class WPO_WCPDF {
 	 * PHP version requirement notice
 	 */
 	public function required_php_version() {
-		$error_message	= __( 'PDF Invoices & Packing Slips for WooCommerce requires PHP 7.1 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
+		$error_message	= __( 'PDF Invoices & Packing Slips for WooCommerce requires PHP 7.2 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
 		/* translators: <a> tags */
 		$php_message	= __( 'We strongly recommend to %1$supdate your PHP version%2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 		/* translators: <a> tags */
