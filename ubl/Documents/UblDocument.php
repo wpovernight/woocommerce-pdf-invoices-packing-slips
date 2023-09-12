@@ -11,62 +11,86 @@ if ( ! defined( 'ABSPATH' ) ) {
 class UblDocument extends Document {
 	
 	public function get_format() {
-		return array(
+		$format = apply_filters( 'wpo_wc_ubl_document_fornat' , array(
 			'ublversion' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\UblVersionIdHandler::class,
 			),
 			'id' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\IdHandler::class,
 			),
 			'issuedate' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\IssueDateHandler::class,
 			),
 			'invoicetype' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\InvoiceTypeCodeHandler::class,
 			),
 			'documentcurrencycode' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\DocumentCurrencyCodeHandler::class,
 			),
 			'orderreference' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\OrderReferenceHandler::class,
 			),
 			'additionaldocumentreference' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\AdditionalDocumentReferenceHandler::class,
 			),
 			'accountsupplierparty' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\AddressHandler::class,
 				'options' => array(
 					'root' => 'AccountingSupplierParty',
 				),
 			),
 			'accountingcustomerparty' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\AddressHandler::class,
 				'options' => array(
 					'root' => 'AccountingCustomerParty',
 				),
 			),
-			// 'delivery' => array(
-			//     'handler' => \WPO\WC\UBL\Handlers\Ubl\DeliveryHandler::class,
-			// ),
-			// 'paymentmeans' => array(
-			//     'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentMeansHandler::class,
-			// ),
-			// 'paymentterms' => array(
-			//     'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentTermsHandler::class,
-			// ),
-			// 'allowancecharge' => array(
-			//     'handler' => \WPO\WC\UBL\Handlers\Ubl\AllowanceChargeHandler::class,
-			// ),
+			'delivery' => array(
+				'enabled' => false,
+			    'handler' => \WPO\WC\UBL\Handlers\Ubl\DeliveryHandler::class,
+			),
+			'paymentmeans' => array(
+				'enabled' => false,
+			    'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentMeansHandler::class,
+			),
+			'paymentterms' => array(
+				'enabled' => false,
+			    'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentTermsHandler::class,
+			),
+			'allowancecharge' => array(
+				'enabled' => false,
+			    'handler' => \WPO\WC\UBL\Handlers\Ubl\AllowanceChargeHandler::class,
+			),
 			'taxtotal' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\TaxTotalHandler::class,
 			),
 			'legalmonetarytotal' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\LegalMonetaryTotalHandler::class,
 			),
 			'invoicelines' => array(
+				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\InvoiceLineHandler::class,
 			),
-		);
+		) );
+		
+		foreach ( $format as $key => $element ) {
+			if ( false === $element['enabled'] ) {
+				unset( $format[ $key ] );
+			}
+		}
+		
+		return $format;
 	}
 
 	public function get_namespaces() {
