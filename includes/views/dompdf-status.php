@@ -8,9 +8,9 @@ $php_mem_limit  = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limi
 
 $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	'PHP version' => array(
-		'required' => __( '7.1+ (7.4 or higher recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
+		'required' => __( '7.2+ (7.4 or higher recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => PHP_VERSION,
-		'result'   => version_compare( PHP_VERSION, '7.1', '>' ),
+		'result'   => version_compare( PHP_VERSION, '7.2', '>' ),
 	),
 	'DOMDocument extension' => array(
 		'required' => true,
