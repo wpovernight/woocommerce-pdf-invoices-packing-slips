@@ -9,7 +9,7 @@ Stable tag: 3.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create, print & automatically email PDF & UBL Invoices & PDF Packing Slips for WooCommerce orders.
+Create, print & automatically email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
 
 == Description ==
 
