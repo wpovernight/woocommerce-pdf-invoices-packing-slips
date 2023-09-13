@@ -1,7 +1,7 @@
 === PDF Invoices & Packing Slips for WooCommerce ===
 Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, jhosagid
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
-Tags: woocommerce, pdf, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
+Tags: woocommerce, pdf, ubl, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
 Requires at least: 3.5
 Tested up to: 6.3
 Requires PHP: 7.2
@@ -9,15 +9,15 @@ Stable tag: 3.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create, print & automatically email PDF invoices & packing slips for WooCommerce orders.
+Create, print & automatically email PDF & UBL Invoices & PDF Packing Slips for WooCommerce orders.
 
 == Description ==
 
-This WooCommerce extension automatically adds a PDF invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
+This WooCommerce extension automatically adds a PDF or UBL invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
-* Automatically attach invoice PDF to WooCommerce emails of your choice
-* Download the PDF invoice / packing slip from the order admin page
+* Automatically attach invoice PDF or UBL to WooCommerce emails of your choice
+* Download the PDF or UBL Invoice / PDF Packing Slip from the order admin page
 * Generate PDF invoices / packings slips in bulk
 * **Fully customizable** HTML/CSS invoice templates
 * Download invoices from the My Account page
