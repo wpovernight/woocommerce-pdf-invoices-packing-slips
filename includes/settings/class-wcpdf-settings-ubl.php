@@ -32,6 +32,9 @@ class Settings_UBL {
 		
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
+		
+		// VAT number or COC number is empty
+		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
 	}
 
 	public function output( $active_section ) {
@@ -137,6 +140,21 @@ class Settings_UBL {
 					}
 				}
 			}
+		}
+	}
+	
+	public function vat_coc_required_for_ubl_invoice() {
+		$invoice_ubl_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice', 'ubl' );
+		
+		if ( isset( $invoice_ubl_settings['enabled'] ) && ( ! isset( $this->general_settings['vat_number'] ) || ! isset( $this->general_settings['coc_number'] ) ) ) {
+			$message = sprintf(
+				/* translators: 1. General Settings, 2. UBL Tab  */
+				__( 'You\'ve enabled UBL output for a document, but some essential details are missing. Please ensure you\'ve added your VAT and CoC numbers in the %1$s. Also, specify your tax rates in the %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) ) . '" target="_blank">' . __( 'General Settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
+				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '" target="_blank">' . __( 'UBL Tab', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+			);
+			
+			echo '<div class="notice notice-warning"><p>' . $message . '</p></div>';
 		}
 	}
 
