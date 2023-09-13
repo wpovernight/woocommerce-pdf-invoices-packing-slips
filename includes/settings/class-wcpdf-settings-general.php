@@ -180,7 +180,6 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'vat_number',
 					'translatable' => true,
-					'description'  => __( 'Required by the UBL format.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -193,7 +192,6 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'coc_number',
 					'translatable' => true,
-					'description'  => __( 'Required by the UBL format.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
