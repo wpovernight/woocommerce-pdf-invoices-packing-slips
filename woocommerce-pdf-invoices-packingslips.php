@@ -521,7 +521,7 @@ class WPO_WCPDF {
 			ob_start();
 			?>
 			<div class="notice notice-warning">
-				<p><?php _e( 'The UBL addon was installed in your store but is no longer needed. We have disable it when you upgraded the PDF Invoices & Packing Slips for WooCommerce plugin. You are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><?php _e( 'While updating the PDF Invoices & Packing Slips for WooCommerce plugin we\'ve noticed our UBL add-on was active on your site. This functionality is now incorporated into the core plugin. We\'ve deactivated the add-on for you, and you are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_ubl_addon_active_notice', 'true' ), 'ubl_addon_active_notice' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
 			<?php
