@@ -55,26 +55,46 @@ class Documents {
 
 	/**
 	 * Return the document classes - used in admin to load settings.
+	 * 
+	 * @param $filter
+	 * @param $output_format  Can be 'pdf', 'ubl' or anything for all
 	 *
 	 * @return array
 	 */
-	public function get_documents( $filter = 'enabled' ) {
-		if ( empty($this->documents) ) {
+	public function get_documents( $filter = 'enabled', $output_format = 'pdf' ) {
+		if ( empty( $this->documents ) ) {
 			$this->init();
 		}
 
-		if ( $filter == 'enabled' ) {
+		// enabled
+		if ( 'enabled' === $filter && ! empty( $output_format ) ) {
 			$documents = array();
-			foreach ($this->documents as $class_name => $document) {
-				if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled() ) {
-					$documents[$class_name] = $document;
+			
+			foreach ( $this->documents as $class_name => $document ) {
+				switch ( $output_format ) {
+					case 'pdf':
+					case 'ubl':
+						if ( in_array( $output_format, $document->output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+							$documents[$class_name] = $document;
+						}
+						break;
+					default:
+						foreach ( $document->output_formats as $document_output_format ) {
+							if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $document_output_format ) ) {
+								$documents[$class_name] = $document;
+								break; // prevents adding the same document twice or more
+							}
+						}
+						break;
 				}
 			}
-			return $documents;
+			
+		// enabled and disabled
 		} else {
-			// return all documents
-			return $this->documents;
+			$documents = $this->documents;
 		}
+		
+		return apply_filters( 'wpo_wcpdf_get_documents', $documents, $filter, $output_format, $this );
 	}
 
 	public function get_document( $document_type, $order ) {

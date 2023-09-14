@@ -75,23 +75,17 @@ class Assets {
 				array( 'jquery', 'jquery-blockui' ),
 				WPO_WCPDF_VERSION
 			);
-
-			$bulk_actions = array();
-			$documents    = WPO_WCPDF()->documents->get_documents();
-			foreach ( $documents as $document ) {
-				$bulk_actions[$document->get_type()] = "PDF " . $document->get_title();
-			}
-			$bulk_actions = apply_filters( 'wpo_wcpdf_bulk_actions', $bulk_actions );
 			
 			wp_localize_script(
 				'wpo-wcpdf',
 				'wpo_wcpdf_ajax',
 				array(
 					'ajaxurl'			           => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
-					'nonce'				           => wp_create_nonce('generate_wpo_wcpdf'),
-					'bulk_actions'		           => array_keys( $bulk_actions ),
-					'confirm_delete'	           => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'nonce'				           => wp_create_nonce( 'generate_wpo_wcpdf' ),
+					'bulk_actions'		           => array_keys( wcpdf_get_bulk_actions() ),
+					'select_orders'	               => __( 'You have to select order(s) first!', 'woocommerce-pdf-invoices-packing-slips'),
+					'confirm_delete'	           => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
+					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
 					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
 				)
 			);
@@ -158,7 +152,8 @@ class Assets {
 						'disable_free',
 						'use_latest_settings',
 						'mark_printed',
-						'unmark_printed'
+						'unmark_printed',
+						'include_encrypted_pdf'
 					) ),
 					'pointers'                  => array(
 						'wcpdf_document_settings_sections' => array(

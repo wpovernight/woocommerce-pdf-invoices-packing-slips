@@ -2,8 +2,8 @@
 /**
  * Plugin Name:          PDF Invoices & Packing Slips for WooCommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
- * Description:          Create, print & email PDF invoices & packing slips for WooCommerce orders.
- * Version:              3.6.3
+ * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
+ * Version:              3.7.0-beta-1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -21,7 +21,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '3.6.3';
+	public $version = '3.7.0-beta-1';
 	public $plugin_basename;
 	public $third_party_plugins;
 	public $order_util;
@@ -57,6 +57,8 @@ class WPO_WCPDF {
 		$this->plugin_basename = plugin_basename(__FILE__);
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
+		
+		require $this->plugin_path() . '/vendor/autoload.php';
 
 		// load the localisation & classes
 		add_action( 'plugins_loaded', array( $this, 'translations' ) );
@@ -66,6 +68,10 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
+		add_action( 'admin_notices', array( $this, 'ubl_addon_active' ) );
+		
+		// deactivate ubl extension if activated
+		register_activation_hook( __FILE__, array( $this, 'deactivate_ubl_addon' ) );
 	}
 	
 	private function autoloaders() {
@@ -162,6 +168,8 @@ class WPO_WCPDF {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 		}
+		
+		add_action( 'admin_init', array( $this, 'deactivate_ubl_addon') );
 
 		// all systems ready - GO!
 		$this->includes();
@@ -462,6 +470,73 @@ class WPO_WCPDF {
 				exit;
 			} else {
 				update_option( 'wpo_wcpdf_hide_rtl_notice', true );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			}
+		}
+	}
+	
+	/**
+	 * Get an array of all active plugins, including multisite
+	 * @return array active plugin paths
+	 */
+	public function get_active_plugins() {
+		$active_plugins = (array) apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+		if ( is_multisite() ) {
+			// get_site_option( 'active_sitewide_plugins', array() ) returns a 'reversed list'
+			// like [hello-dolly/hello.php] => 1369572703 so we do array_keys to make the array
+			// compatible with $active_plugins
+			$active_sitewide_plugins = (array) array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
+			// merge arrays and remove doubles
+			$active_plugins = (array) array_unique( array_merge( $active_plugins, $active_sitewide_plugins ) );
+		}
+
+		return $active_plugins;
+	}
+	
+	public function deactivate_ubl_addon() {
+		$legacy_addon = $this->ubl_addon_detected();
+		if ( ! empty( $legacy_addon ) ) {
+			deactivate_plugins( $legacy_addon );
+			set_transient( 'wpo_wcpdf_ubl_addon_detected', 'yes', DAY_IN_SECONDS );
+		}
+	}
+	
+	public function ubl_addon_detected() {
+		$active_plugins = $this->get_active_plugins();
+		$ubl_addon      = '';
+		
+		foreach ( $active_plugins as $plugin ) {
+			if ( strpos( $plugin, 'ubl-woocommerce-pdf-invoices.php' ) !== false ) {
+				$ubl_addon = $plugin;
+				break;
+			}
+		}			
+		
+		return $ubl_addon;
+	}
+	
+	public function ubl_addon_active() {
+		if ( get_transient( 'wpo_wcpdf_ubl_addon_detected' ) ) {
+			ob_start();
+			?>
+			<div class="notice notice-warning">
+				<p><?php _e( 'While updating the PDF Invoices & Packing Slips for WooCommerce plugin we\'ve noticed our UBL add-on was active on your site. This functionality is now incorporated into the core plugin. We\'ve deactivated the add-on for you, and you are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_ubl_addon_active_notice', 'true' ), 'ubl_addon_active_notice' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo wp_kses_post( ob_get_clean() );
+		}
+		
+		// save option to hide mailpoet notice
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_ubl_addon_active_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ubl_addon_active_notice' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_ubl_addon_active_notice' );
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
+			} else {
+				delete_transient( 'wpo_wcpdf_ubl_addon_detected' );
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
 			}

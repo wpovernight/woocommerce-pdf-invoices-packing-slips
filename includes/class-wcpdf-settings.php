@@ -18,8 +18,10 @@ class Settings {
 	public $documents;
 	public $debug;
 	public $upgrade;
+	public $ubl;
 	public $general_settings;
 	public $debug_settings;
+	public $ubl_tax_settings;
 	public $lock_name;
 	public $lock_context;
 	public $lock_time;
@@ -42,10 +44,12 @@ class Settings {
 		$this->general          = \WPO\WC\PDF_Invoices\Settings\Settings_General::instance();
 		$this->documents        = \WPO\WC\PDF_Invoices\Settings\Settings_Documents::instance();
 		$this->debug            = \WPO\WC\PDF_Invoices\Settings\Settings_Debug::instance();
+		$this->ubl              = \WPO\WC\PDF_Invoices\Settings\Settings_UBL::instance();
 		$this->upgrade          = \WPO\WC\PDF_Invoices\Settings\Settings_Upgrade::instance();
 		
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+		$this->ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
 		
 		$this->lock_name        = 'wpo_wcpdf_semaphore_lock';
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
@@ -169,13 +173,18 @@ class Settings {
 		settings_errors();
 
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
-			'general'   => array(
+			'general' => array(
 				'title'          => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
-			'documents'	=> array(
+			'documents' => array(
 				'title'          => __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
+			),
+			'ubl' => array(
+				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
+				'preview_states' => 1,
+				'beta'           => true,
 			),
 		) );
 
@@ -314,9 +323,21 @@ class Settings {
 					}
 
 					// preview
-					$pdf_data = $document->preview_pdf();
+					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats ) ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
+					switch ( $output_format ) {
+						default:
+						case 'pdf':
+							$preview_data = base64_encode( $document->preview_pdf() );
+							break;
+						case 'ubl':
+							$preview_data = $document->preview_ubl();
+							break;
+					}
 
-					wp_send_json_success( array( 'pdf_data' => base64_encode( $pdf_data ) ) );
+					wp_send_json_success( array(
+						'preview_data'  => $preview_data,
+						'output_format' => $output_format,
+					) );
 				} else {
 					wp_send_json_error(
 						array(
@@ -481,37 +502,39 @@ class Settings {
 
 	public function get_common_document_settings() {
 		$common_settings = array(
-			'paper_size'			=> isset( $this->general_settings['paper_size'] ) ? $this->general_settings['paper_size'] : '',
-			'font_subsetting'		=> isset( $this->general_settings['font_subsetting'] ) || ( defined("DOMPDF_ENABLE_FONTSUBSETTING") && DOMPDF_ENABLE_FONTSUBSETTING === true ) ? true : false,
-			'header_logo'			=> isset( $this->general_settings['header_logo'] ) ? $this->general_settings['header_logo'] : '',
-			'header_logo_height'	=> isset( $this->general_settings['header_logo_height'] ) ? $this->general_settings['header_logo_height'] : '',
-			'shop_name'				=> isset( $this->general_settings['shop_name'] ) ? $this->general_settings['shop_name'] : '',
-			'shop_address'			=> isset( $this->general_settings['shop_address'] ) ? $this->general_settings['shop_address'] : '',
-			'footer'				=> isset( $this->general_settings['footer'] ) ? $this->general_settings['footer'] : '',
-			'extra_1'				=> isset( $this->general_settings['extra_1'] ) ? $this->general_settings['extra_1'] : '',
-			'extra_2'				=> isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
-			'extra_3'				=> isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
+			'paper_size'         => isset( $this->general_settings['paper_size'] ) ? $this->general_settings['paper_size'] : '',
+			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined("DOMPDF_ENABLE_FONTSUBSETTING") && DOMPDF_ENABLE_FONTSUBSETTING === true ) ? true : false,
+			'header_logo'        => isset( $this->general_settings['header_logo'] ) ? $this->general_settings['header_logo'] : '',
+			'header_logo_height' => isset( $this->general_settings['header_logo_height'] ) ? $this->general_settings['header_logo_height'] : '',
+			'shop_name'          => isset( $this->general_settings['shop_name'] ) ? $this->general_settings['shop_name'] : '',
+			'shop_address'       => isset( $this->general_settings['shop_address'] ) ? $this->general_settings['shop_address'] : '',
+			'footer'             => isset( $this->general_settings['footer'] ) ? $this->general_settings['footer'] : '',
+			'extra_1'            => isset( $this->general_settings['extra_1'] ) ? $this->general_settings['extra_1'] : '',
+			'extra_2'            => isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
+			'extra_3'            => isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
 		);
 		return $common_settings;
 	}
 
-	public function get_document_settings( $document_type ) {
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
-		foreach ( $documents as $document ) {
-			if ( $document->get_type() == $document_type ) {
-				return $document->settings;
-			}
+	public function get_document_settings( $document_type, $output_format = 'pdf' ) {
+		if ( ! empty( $document_type ) ) {
+			$option_name = ( 'pdf' === $output_format ) ? "wpo_wcpdf_documents_settings_{$document_type}" : "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
+			return get_option( $option_name, array() );	
+		} else {
+			return false;
 		}
-		return false;
 	}
 
-	public function get_output_format( $document_type = null ) {
+	public function get_output_format( $document = null ) {
 		if ( isset( $this->debug_settings['html_output'] ) ) {
 			$output_format = 'html';
+		} elseif ( isset( $_REQUEST['output'] ) && ! empty( $_REQUEST['output'] ) && ! empty( $document ) && in_array( $_REQUEST['output'], $document->output_formats ) ) {
+			$output_format = sanitize_text_field( $_REQUEST['output'] );
 		} else {
 			$output_format = 'pdf';
 		}
-		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document_type );
+		
+		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document );
 	}
 
 	public function get_output_mode() {

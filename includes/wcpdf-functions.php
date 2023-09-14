@@ -36,8 +36,9 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		if ( is_object( $order ) ) {
 			// we filter order_ids for objects too:
 			// an order object may need to be converted to several refunds for example.
-			$order_ids = array( $order->get_id() );
+			$order_ids          = array( $order->get_id() );
 			$filtered_order_ids = wcpdf_filter_order_ids( $order_ids, $document_type );
+			
 			// check if something has changed.
 			$order_id_diff = array_diff( $filtered_order_ids, $order_ids );
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
@@ -109,6 +110,26 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 	return wcpdf_get_document( 'packing-slip', $order, $init );
 }
 
+function wcpdf_get_bulk_actions() {
+	$actions   = array();
+	$documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
+	
+	foreach ( $documents as $document ) {
+		foreach ( $document->output_formats as $output_format ) {
+			$slug = $document->get_type();
+			if ( 'pdf' !== $output_format ) {
+				$slug .= "_{$output_format}";
+			}
+			
+			if ( $document->is_enabled( $output_format ) ) {
+				$actions[$slug] = strtoupper( $output_format ) . ' ' . $document->get_title();
+			}
+		}
+	}
+
+	return apply_filters( 'wpo_wcpdf_bulk_actions', $actions );
+}
+
 /**
  * Load HTML into (pluggable) PDF library, DomPDF 1.0.2 by default
  * Use wpo_wcpdf_pdf_maker filter to change the PDF class (which can wrap another PDF library).
@@ -116,14 +137,36 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
  * @param string       $html
  * @param array        $settings
  * @param null|object  $document
- * @return WPO\WC\PDF_Invoices\PDF_Maker
+ * @return WPO\WC\PDF_Invoices\Makers\PDF_Maker
  */
 function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
-	if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/class-wcpdf-pdf-maker.php' );
+	$class = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.7.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker';
+	
+	if ( ! class_exists( $class ) ) {
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/class-pdf-maker.php' );
 	}
-	$class = apply_filters( 'wpo_wcpdf_pdf_maker', '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' );
+	
+	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
+	
 	return new $class( $html, $settings, $document );
+}
+
+/**
+ * Get UBL Maker
+ * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
+ * 
+ * @return WPO\WC\PDF_Invoices\Makers\UBL_Maker
+ */
+function wcpdf_get_ubl_maker() {
+	$class = '\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker';
+	
+	if ( ! class_exists( $class ) ) {
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/class-ubl-maker.php' );
+	}
+	
+	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
+	
+	return new $class();
 }
 
 /**
@@ -132,7 +175,7 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
  * @return bool whether the PDF maker is the default or not
  */
 function wcpdf_pdf_maker_is_default() {
-	$default_pdf_maker = '\\WPO\\WC\\PDF_Invoices\\PDF_Maker';
+	$default_pdf_maker = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.7.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker';
 	return $default_pdf_maker == apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker );
 }
 
@@ -155,6 +198,19 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 			break;
 	}
 	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
+}
+
+function wcpdf_ubl_headers( $filename, $size ) {
+	header( 'Content-Description: File Transfer ');
+	header( 'Content-Type: application/xml ');
+	header( 'Content-Disposition: attachment; filename=' . $filename );
+	header( 'Content-Transfer-Encoding: binary ');
+	header( 'Connection: Keep-Alive ');
+	header( 'Expires: 0 ');
+	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0 ');
+	header( 'Pragma: public ');
+	header( 'Content-Length: ' . $size );
+	do_action( 'wpo_after_ubl_headers', $filename, $size );
 }
 
 /**
@@ -197,7 +253,7 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
  */
 function wcpdf_log_error( $message, $level = 'error', $e = null ) {
 	if ( function_exists( 'wc_get_logger' ) ) {
-		$logger = wc_get_logger();
+		$logger  = wc_get_logger();
 		$context = array( 'source' => 'wpo-wcpdf' );
 
 		if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ) {

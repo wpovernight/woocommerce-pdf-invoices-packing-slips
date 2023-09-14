@@ -4,9 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1
+class ComposerStaticInit1066d81cd8f355258ef5165247019e8a
 {
     public static $files = array (
+        '383eaff206634a77a1be54e64e6459c7' => __DIR__ . '/..' . '/sabre/uri/lib/functions.php',
+        '3569eecfeed3bcf0bad3c998a494ecb8' => __DIR__ . '/..' . '/sabre/xml/lib/Deserializer/functions.php',
+        '93aa591bc4ca510c520999e34229ee79' => __DIR__ . '/..' . '/sabre/xml/lib/Serializer/functions.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
     );
@@ -14,6 +17,7 @@ class ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
+            'WPO\\WC\\UBL\\' => 11,
             'WPO\\WC\\PDF_Invoices\\' => 20,
         ),
         'S' => 
@@ -21,6 +25,8 @@ class ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
             'Svg\\' => 4,
+            'Sabre\\Xml\\' => 10,
+            'Sabre\\Uri\\' => 10,
             'Sabberworm\\CSS\\' => 15,
         ),
         'M' => 
@@ -38,6 +44,10 @@ class ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1
     );
 
     public static $prefixDirsPsr4 = array (
+        'WPO\\WC\\UBL\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/ubl',
+        ),
         'WPO\\WC\\PDF_Invoices\\' => 
         array (
             0 => __DIR__ . '/../..' . '/includes',
@@ -53,6 +63,14 @@ class ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1
         'Svg\\' => 
         array (
             0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg',
+        ),
+        'Sabre\\Xml\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sabre/xml/lib',
+        ),
+        'Sabre\\Uri\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sabre/uri/lib',
         ),
         'Sabberworm\\CSS\\' => 
         array (
@@ -238,6 +256,24 @@ class ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1
         'Sabberworm\\CSS\\Value\\URL' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/URL.php',
         'Sabberworm\\CSS\\Value\\Value' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/Value.php',
         'Sabberworm\\CSS\\Value\\ValueList' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/ValueList.php',
+        'Sabre\\Uri\\InvalidUriException' => __DIR__ . '/..' . '/sabre/uri/lib/InvalidUriException.php',
+        'Sabre\\Uri\\Version' => __DIR__ . '/..' . '/sabre/uri/lib/Version.php',
+        'Sabre\\Xml\\ContextStackTrait' => __DIR__ . '/..' . '/sabre/xml/lib/ContextStackTrait.php',
+        'Sabre\\Xml\\Element' => __DIR__ . '/..' . '/sabre/xml/lib/Element.php',
+        'Sabre\\Xml\\Element\\Base' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Base.php',
+        'Sabre\\Xml\\Element\\Cdata' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Cdata.php',
+        'Sabre\\Xml\\Element\\Elements' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Elements.php',
+        'Sabre\\Xml\\Element\\KeyValue' => __DIR__ . '/..' . '/sabre/xml/lib/Element/KeyValue.php',
+        'Sabre\\Xml\\Element\\Uri' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Uri.php',
+        'Sabre\\Xml\\Element\\XmlFragment' => __DIR__ . '/..' . '/sabre/xml/lib/Element/XmlFragment.php',
+        'Sabre\\Xml\\LibXMLException' => __DIR__ . '/..' . '/sabre/xml/lib/LibXMLException.php',
+        'Sabre\\Xml\\ParseException' => __DIR__ . '/..' . '/sabre/xml/lib/ParseException.php',
+        'Sabre\\Xml\\Reader' => __DIR__ . '/..' . '/sabre/xml/lib/Reader.php',
+        'Sabre\\Xml\\Service' => __DIR__ . '/..' . '/sabre/xml/lib/Service.php',
+        'Sabre\\Xml\\Version' => __DIR__ . '/..' . '/sabre/xml/lib/Version.php',
+        'Sabre\\Xml\\Writer' => __DIR__ . '/..' . '/sabre/xml/lib/Writer.php',
+        'Sabre\\Xml\\XmlDeserializable' => __DIR__ . '/..' . '/sabre/xml/lib/XmlDeserializable.php',
+        'Sabre\\Xml\\XmlSerializable' => __DIR__ . '/..' . '/sabre/xml/lib/XmlSerializable.php',
         'Svg\\CssLength' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/CssLength.php',
         'Svg\\DefaultStyle' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/DefaultStyle.php',
         'Svg\\Document' => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg/Document.php',
@@ -285,23 +321,60 @@ class ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1
         'WPO\\WC\\PDF_Invoices\\Frontend' => __DIR__ . '/../..' . '/includes/class-wcpdf-frontend.php',
         'WPO\\WC\\PDF_Invoices\\Install' => __DIR__ . '/../..' . '/includes/class-wcpdf-install.php',
         'WPO\\WC\\PDF_Invoices\\Main' => __DIR__ . '/../..' . '/includes/class-wcpdf-main.php',
-        'WPO\\WC\\PDF_Invoices\\PDF_Maker' => __DIR__ . '/../..' . '/includes/class-wcpdf-pdf-maker.php',
+        'WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker' => __DIR__ . '/../..' . '/includes/makers/class-pdf-maker.php',
+        'WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker' => __DIR__ . '/../..' . '/includes/makers/class-ubl-maker.php',
         'WPO\\WC\\PDF_Invoices\\Settings' => __DIR__ . '/../..' . '/includes/class-wcpdf-settings.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-callbacks.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-debug.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Documents' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-documents.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_General' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-general.php',
+        'WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-ubl.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-upgrade.php',
         'WPO\\WC\\PDF_Invoices\\Setup_Wizard' => __DIR__ . '/../..' . '/includes/class-wcpdf-setup-wizard.php',
         'WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' => __DIR__ . '/../..' . '/includes/class-wcpdf-updraft-semaphore.php',
+        'WPO\\WC\\UBL\\Builders\\Builder' => __DIR__ . '/../..' . '/ubl/Builders/Builder.php',
+        'WPO\\WC\\UBL\\Builders\\SabreBuilder' => __DIR__ . '/../..' . '/ubl/Builders/SabreBuilder.php',
+        'WPO\\WC\\UBL\\Collections\\Collection' => __DIR__ . '/../..' . '/ubl/Collections/Collection.php',
+        'WPO\\WC\\UBL\\Collections\\OrderCollection' => __DIR__ . '/../..' . '/ubl/Collections/OrderCollection.php',
+        'WPO\\WC\\UBL\\Documents\\Document' => __DIR__ . '/../..' . '/ubl/Documents/Document.php',
+        'WPO\\WC\\UBL\\Documents\\UblDocument' => __DIR__ . '/../..' . '/ubl/Documents/UblDocument.php',
+        'WPO\\WC\\UBL\\Exceptions\\FileWriteException' => __DIR__ . '/../..' . '/ubl/Exceptions/FileWriteException.php',
+        'WPO\\WC\\UBL\\Handlers\\Handler' => __DIR__ . '/../..' . '/ubl/Handlers/Handler.php',
+        'WPO\\WC\\UBL\\Handlers\\UblHandler' => __DIR__ . '/../..' . '/ubl/Handlers/UblHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\AdditionalDocumentReferenceHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/AdditionalDocumentReferenceHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\AddressHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/AddressHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\AllowanceChargeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/AllowanceChargeHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\DeliveryHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/DeliveryHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\DocumentCurrencyCodeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/DocumentCurrencyCodeHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\IdHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/IdHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\InvoiceLineHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/InvoiceLineHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\InvoiceTypeCodeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/InvoiceTypeCodeHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\IssueDateHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/IssueDateHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\LegalMonetaryTotalHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/LegalMonetaryTotalHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\OrderReferenceHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/OrderReferenceHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\PaymentMeansHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/PaymentMeansHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\PaymentTermsHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/PaymentTermsHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\TaxTotalHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/TaxTotalHandler.php',
+        'WPO\\WC\\UBL\\Handlers\\Ubl\\UblVersionIdHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/UblVersionIdHandler.php',
+        'WPO\\WC\\UBL\\Models\\Address' => __DIR__ . '/../..' . '/ubl/Models/Address.php',
+        'WPO\\WC\\UBL\\Models\\DateTime' => __DIR__ . '/../..' . '/ubl/Models/DateTime.php',
+        'WPO\\WC\\UBL\\Models\\Model' => __DIR__ . '/../..' . '/ubl/Models/Model.php',
+        'WPO\\WC\\UBL\\Models\\Order' => __DIR__ . '/../..' . '/ubl/Models/Order.php',
+        'WPO\\WC\\UBL\\Repositories\\Contracts\\OrderRepository' => __DIR__ . '/../..' . '/ubl/Repositories/Contracts/OrderRepository.php',
+        'WPO\\WC\\UBL\\Repositories\\OrderRepository' => __DIR__ . '/../..' . '/ubl/Repositories/OrderRepository.php',
+        'WPO\\WC\\UBL\\Repositories\\Repository' => __DIR__ . '/../..' . '/ubl/Repositories/Repository.php',
+        'WPO\\WC\\UBL\\Settings\\TaxesSettings' => __DIR__ . '/../..' . '/ubl/Settings/TaxesSettings.php',
+        'WPO\\WC\\UBL\\Transformers\\AddressTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/AddressTransformer.php',
+        'WPO\\WC\\UBL\\Transformers\\DateTimeTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/DateTimeTransformer.php',
+        'WPO\\WC\\UBL\\Transformers\\OrderTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/OrderTransformer.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit5be117af0982c9d6598ff91a21c4f1d1::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1066d81cd8f355258ef5165247019e8a::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1066d81cd8f355258ef5165247019e8a::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit1066d81cd8f355258ef5165247019e8a::$classMap;
 
         }, null, ClassLoader::class);
     }

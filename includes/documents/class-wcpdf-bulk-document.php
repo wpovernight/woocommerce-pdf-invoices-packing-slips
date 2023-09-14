@@ -32,11 +32,39 @@ class Bulk_Document {
 	 * @var array
 	 */
 	public $order_ids;
+	
+	public $is_bulk;
+	
+	public $output_formats;
 
 	public function __construct( $document_type, $order_ids = array() ) {
 		$this->type      = $document_type;
 		$this->order_ids = $order_ids;
 		$this->is_bulk   = true;
+		
+		// output formats (placed after parent construct to override the abstract default)
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", array( 'pdf' ), $this );
+	}
+	
+	public function exists() {
+		$exists = false;
+		
+		foreach ( $this->order_ids as $order_id ) {
+			$document = wcpdf_get_document( $this->type, $order_id );
+			if ( $document && is_callable( array( $document, 'exists' ) ) && $document->exists() ) {
+				$exists = true;
+				break;
+			}
+		}
+		
+		return $exists;
+	}
+	
+	public function is_enabled( $output_format = 'pdf' ) {
+		if ( in_array( $output_format, $this->output_formats ) ) {
+			return true;
+		}
+		return false;
 	}
 
 	public function get_type() {

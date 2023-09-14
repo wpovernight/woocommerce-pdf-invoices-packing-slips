@@ -171,6 +171,30 @@ class Settings_General {
 				)
 			),
 			array(
+				'type'     => 'setting',
+				'id'       => 'vat_number',
+				'title'    => __( 'Shop VAT Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'vat_number',
+					'translatable' => true,
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'coc_number',
+				'title'    => __( 'Shop Chamber of Commerce Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'coc_number',
+					'translatable' => true,
+				)
+			),
+			array(
 				'type'		=> 'setting',
 				'id'		=> 'shop_address',
 				'title'		=> __( 'Shop Address', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -184,7 +208,7 @@ class Settings_General {
 					'translatable'	=> true,
 					//'description'			=> __( '...', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
-			),	
+			),
 			array(
 				'type'		=> 'setting',
 				'id'		=> 'footer',

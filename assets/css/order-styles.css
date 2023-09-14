@@ -26,6 +26,13 @@
 	fill: #2aad2a;
 }
 
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf.ubl > svg.icon-ubl,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.ubl > svg.icon-ubl {
+	left: auto;
+	right: 2px;
+	fill: black;
+}
+
 .type-shop_order .column-wc_actions a.button.wpo_wcpdf.printed > svg.icon-printed,
 .woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.printed > svg.icon-printed {
 	left: 2px;
@@ -33,7 +40,8 @@
 	fill: #51266b;
 }
 
-.wpo_wcpdf-actions a.button.exists > svg {
+.wpo_wcpdf-actions a.button.exists > svg,
+.wpo_wcpdf-ubl-actions a.button.exists > svg {
 	width: 14px;
 	height: 14px;
 	line-height: 30px;

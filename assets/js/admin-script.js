@@ -109,16 +109,18 @@ jQuery( function( $ ) {
 	let $preview                  = $( '#wpo-wcpdf-preview-wrapper .preview' );
 	let $previewOrderIdInput      = $( '#wpo-wcpdf-preview-wrapper input[name="order_id"]' );
 	let $previewDocumentTypeInput = $( '#wpo-wcpdf-preview-wrapper input[name="document_type"]' );
+	let $previewOutputFormatInput = $( '#wpo-wcpdf-preview-wrapper input[name="output_format"]' );
 	let $previewNonceInput        = $( '#wpo-wcpdf-preview-wrapper input[name="nonce"]' );
 	let $previewSettingsForm      = $( '#wpo-wcpdf-settings' );
 	let previewXhr                = null;
 
 	// variables
-	let previewOrderId, previewDocumentType, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout, previousWindowWidth;
+	let previewOrderId, previewDocumentType, previewOutputFormat, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout, previousWindowWidth;
 
 	function loadPreviewData() {
 		previewOrderId          = $previewOrderIdInput.val();
 		previewDocumentType     = $previewDocumentTypeInput.val();
+		previewOutputFormat     = $previewOutputFormatInput.val();
 		previewNonce            = $previewNonceInput.val();
 		previewSettingsFormData = $previewSettingsForm.serialize();
 	}
@@ -424,6 +426,7 @@ jQuery( function( $ ) {
 			security:      previewNonce,
 			order_id:      previewOrderId,
 			document_type: previewDocumentType,
+			output_format: previewOutputFormat,
 			data:          previewSettingsFormData,
 		};
 
@@ -452,10 +455,21 @@ jQuery( function( $ ) {
 				if ( response.data.error ) {
 					$( '#'+canvasId ).remove();
 					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
-				} else if ( response.data.pdf_data ) {
+				} else if ( response.data.preview_data && response.data.output_format ) {
 					$( '#'+canvasId ).remove();
-					$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );
-					renderPdf( worker, canvasId, response.data.pdf_data );
+					
+					switch ( response.data.output_format ) {
+						default:
+						case 'pdf':
+							$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );
+							renderPdf( worker, canvasId, response.data.preview_data );
+							break;
+						case 'ubl':
+							let xml         = response.data.preview_data;
+							let xml_escaped = xml.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
+							$preview.html( '<div id="preview-ubl">'+xml_escaped+'</div>' );
+							break;
+					}
 				}
 
 				$preview.unblock();

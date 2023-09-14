@@ -23,6 +23,7 @@ class Invoice extends Order_Document_Methods {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
+	public $output_formats;
 	
 	/**
 	 * Init/load the order object.
@@ -42,8 +43,11 @@ class Invoice extends Order_Document_Methods {
 		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
 		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
 		
-		// Call parent constructor
+		// call parent constructor
 		parent::__construct( $order );
+		
+		// output formats (placed after parent construct to override the abstract default)
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", array( 'pdf', 'ubl' ), $this );
 	}
 
 	public function use_historical_settings() {
@@ -163,14 +167,16 @@ class Invoice extends Order_Document_Methods {
 				}
 			}
 		} else {
-			$suffix = date('Y-m-d'); // 2020-11-11
+			$suffix = date( 'Y-m-d' ); // 2020-11-11
 		}
-
-		$filename = $name . '-' . $suffix . '.pdf';
+		
+		// get filename
+		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
+		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
 
 		// Filter filename
-		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );
-		$filename = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
+		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
+		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
 
 		// sanitize filename (after filters to prevent human errors)!
 		return sanitize_file_name( $filename );
@@ -181,13 +187,41 @@ class Invoice extends Order_Document_Methods {
 	 * Initialise settings
 	 */
 	public function init_settings() {
-		// Register settings.
-		$page = $option_group = $option_name = 'wpo_wcpdf_documents_settings_invoice';
-
+		do_action( "wpo_wcpdf_before_{$this->type}_init_settings", $this );
+		
+		foreach ( $this->output_formats as $output_format ) {
+			$settings_fields = array();
+			
+			switch ( $output_format ) {
+				default:
+				case 'pdf':
+					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
+					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
+					break;
+				case 'ubl':
+					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output_format}";
+					$settings_fields = $this->get_ubl_settings_fields( $option_name );
+					break;
+			}
+			
+			if ( ! empty( $settings_fields ) ) {
+				// allow plugins to alter settings fields
+				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_{$output_format}", $settings_fields, $page, $option_group, $option_name, $this );
+				WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+			}
+		}
+		
+		do_action( "wpo_wcpdf_after_{$this->type}_init_settings", $this );
+	}
+	
+	/**
+	 * PDF settings fields
+	 */
+	public function get_pdf_settings_fields( $option_name ) {
 		$settings_fields = array(
 			array(
 				'type'			=> 'section',
-				'id'			=> 'invoice',
+				'id'			=> $this->type,
 				'title'			=> '',
 				'callback'		=> 'section',
 			),
@@ -196,7 +230,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'enabled',
 				'title'			=> __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'enabled',
@@ -207,7 +241,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'attach_to_email_ids',
 				'title'			=> __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'multiple_checkboxes',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	  => $option_name,
 					'id'			  => 'attach_to_email_ids',
@@ -221,7 +255,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'disable_for_statuses',
 				'title'			=> __( 'Disable for:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'      => $option_name,
 					'id'               => 'disable_for_statuses',
@@ -236,7 +270,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'display_shipping_address',
 				'title'			=> __( 'Display shipping address', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'display_shipping_address',
@@ -253,7 +287,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'display_email',
 				'title'			=> __( 'Display email address', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'display_email',
@@ -264,7 +298,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'display_phone',
 				'title'			=> __( 'Display phone number', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'display_phone',
@@ -275,7 +309,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'display_customer_notes',
 				'title'			=> __( 'Display customer notes', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'display_customer_notes',
@@ -288,7 +322,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'display_date',
 				'title'			=> __( 'Display invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'display_date',
@@ -304,7 +338,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'display_number',
 				'title'			=> __( 'Display invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'display_number',
@@ -326,7 +360,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'next_invoice_number',
 				'title'			=> __( 'Next invoice number (without prefix/suffix etc.)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'next_number_edit',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'store_callback' => array( $this, 'get_sequential_number_store' ),
 					'size'           => '10',
@@ -338,7 +372,7 @@ class Invoice extends Order_Document_Methods {
 				'id'       => 'number_format',
 				'title'    => __( 'Number format', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'multiple_text_input',
-				'section'  => 'invoice',
+				'section'  => $this->type,
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'number_format',
@@ -378,7 +412,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'reset_number_yearly',
 				'title'			=> __( 'Reset invoice number yearly', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'reset_number_yearly',
@@ -389,7 +423,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'log_number_generation',
 				'title'			=> __( 'Log invoice number generation', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'log_number_generation',
@@ -405,7 +439,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'my_account_buttons',
 				'title'			=> __( 'Allow My Account invoice download', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'my_account_buttons',
@@ -430,7 +464,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'invoice_number_column',
 				'title'			=> __( 'Enable invoice number column in the orders list', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'invoice_number_column',
@@ -441,7 +475,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'invoice_date_column',
 				'title'			=> __( 'Enable invoice date column in the orders list', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'invoice_date_column',
@@ -452,7 +486,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'invoice_number_search',
 				'title'			=> __( 'Enable invoice number search in the orders list', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'invoice_number_search',
@@ -464,7 +498,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'disable_free',
 				'title'			=> __( 'Disable for free orders', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'disable_free',
@@ -477,7 +511,7 @@ class Invoice extends Order_Document_Methods {
 				'id'       => 'mark_printed',
 				'title'    => __( 'Mark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
-				'section'  => 'invoice',
+				'section'  => $this->type,
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'mark_printed',
@@ -503,7 +537,7 @@ class Invoice extends Order_Document_Methods {
 				'id'       => 'unmark_printed',
 				'title'    => __( 'Unmark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
-				'section'  => 'invoice',
+				'section'  => $this->type,
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'unmark_printed',
@@ -515,7 +549,7 @@ class Invoice extends Order_Document_Methods {
 				'id'			=> 'use_latest_settings',
 				'title'			=> __( 'Always use most current settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'invoice',
+				'section'		=> $this->type,
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'use_latest_settings',
@@ -527,11 +561,11 @@ class Invoice extends Order_Document_Methods {
 		);
 
 		// remove/rename some fields when invoice number is controlled externally
-		if( apply_filters('woocommerce_invoice_number_by_plugin', false) ) {
+		if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) ) {
 			$remove_settings = array( 'next_invoice_number', 'number_format', 'reset_number_yearly' );
-			foreach ($settings_fields as $key => $settings_field) {
-				if (in_array($settings_field['id'], $remove_settings)) {
-					unset($settings_fields[$key]);
+			foreach ( $settings_fields as $key => $settings_field ) {
+				if ( in_array( $settings_field['id'], $remove_settings ) ) {
+					unset( $settings_fields[$key] );
 				} elseif ( $settings_field['id'] == 'display_number' ) {
 					// alternate description for invoice number
 					$invoice_number_desc = __( 'Invoice numbers are created by a third-party extension.', 'woocommerce-pdf-invoices-packing-slips' );
@@ -543,12 +577,61 @@ class Invoice extends Order_Document_Methods {
 				}
 			}
 		}
-
-		// allow plugins to alter settings fields
-		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_documents_invoice', $settings_fields, $page, $option_group, $option_name );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-		return;
-
+		
+		return apply_filters( "wpo_wcpdf_{$this->type}_pdf_settings_fields", $settings_fields, $option_name, $this );
+	}
+	
+	/**
+	 * UBL settings fields
+	 */
+	public function get_ubl_settings_fields( $option_name ) {
+		$settings_fields = array(
+			array(
+				'type'     => 'section',
+				'id'       => $this->type.'_ubl',
+				'title'    => '',
+				'callback' => 'section',
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'enabled',
+				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $this->type.'_ubl',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'enabled',
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'attach_to_email_ids',
+				'title'    => __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'multiple_checkboxes',
+				'section'  => $this->type.'_ubl',
+				'args'     => array(
+					'option_name'     => $option_name,
+					'id'              => 'attach_to_email_ids',
+					'fields_callback' => array( $this, 'get_wc_emails' ),
+					/* translators: directory path */
+					'description'     => ! is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'include_encrypted_pdf',
+				'title'    => __( 'Include encrypted PDF:', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $this->type.'_ubl',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'include_encrypted_pdf',
+					'description' => __( 'Include the PDF Invoice file encrypted in the UBL file.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+		);
+		
+		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );
 	}
 
 	/**

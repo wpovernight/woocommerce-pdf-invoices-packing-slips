@@ -1,34 +1,55 @@
 jQuery( function( $ ) {
 
-	$( '#doaction, #doaction2' ).on( 'click', function( e ) {
-		let actionselected = $(this).attr("id").substr(2);
-		let action         = $('select[name="' + actionselected + '"]').val();
+	$( document.body ).on( 'click', '#doaction, #doaction2', function( e ) {
+		let actionselected = $( this ).attr( "id" ).substr( 2 );
+		let action         = $( 'select[name="' + actionselected + '"]' ).val();
 
-		if ( $.inArray(action, wpo_wcpdf_ajax.bulk_actions) !== -1 ) {
+		if ( $.inArray( action, wpo_wcpdf_ajax.bulk_actions ) !== -1 ) {
 			e.preventDefault();
-			let template = action;
-			let checked  = [];
+			let template   = action;
+			let checked    = [];
+			let ubl_output = false;
+			
+			// is UBL action
+			if ( action.indexOf( 'ubl' ) != -1 ) {
+				template   = template.replace( '_ubl', '' );
+				ubl_output = true;
+			}
 
-			$('tbody th.check-column input[type="checkbox"]:checked').each(
+			$( 'tbody th.check-column input[type="checkbox"]:checked' ).each(
 				function() {
-					checked.push($(this).val());
+					checked.push( $( this ).val() );
 				}
 			);
 			
-			if (!checked.length) {
-				alert('You have to select order(s) first!');
+			if ( ! checked.length ) {
+				alert( wpo_wcpdf_ajax.select_orders );
 				return;
 			}
 			
-			let order_ids = checked.join('x');
-
-			if (wpo_wcpdf_ajax.ajaxurl.indexOf("?") != -1) {
-				url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+			let partial_url = '';
+			let full_url    = '';
+			
+			if ( wpo_wcpdf_ajax.ajaxurl.indexOf ("?" ) != -1 ) {
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			} else {
-				url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&order_ids='+order_ids+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+			}
+			
+			// ubl
+			if ( ubl_output ) {
+				$.each( checked, function( i, order_id ) {
+					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
+					window.open( full_url, '_blank' );
+				} );
+				
+			// pdf
+			} else {
+				let order_ids = checked.join( 'x' );
+				full_url      = partial_url + '&order_ids='+order_ids;
+				window.open( full_url, '_blank' );
 			}
 
-			window.open(url,'_blank');
 		}
 	} );
 

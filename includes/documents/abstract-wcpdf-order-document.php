@@ -1,6 +1,9 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
+use WPO\WC\UBL\Builders\SabreBuilder;
+use WPO\WC\UBL\Documents\UblDocument;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -53,7 +56,7 @@ abstract class Order_Document {
 	public $order_id;
 
 	/**
-	 * Document settings.
+	 * PDF document settings.
 	 * @var array
 	 */
 	public $settings;
@@ -71,10 +74,16 @@ abstract class Order_Document {
 	public $order_settings;
 
 	/**
-	 * TRUE if document is enabled.
+	 * TRUE if PDF document is enabled.
 	 * @var bool
 	 */
 	public $enabled;
+	
+	/**
+	 * Linked output formats.
+	 * @var array
+	 */
+	public $output_formats = array();
 
 	/**
 	 * Linked documents, used for data retrieval
@@ -103,7 +112,10 @@ abstract class Order_Document {
 		}
 
 		// set properties
-		$this->slug = ! empty( $this->type ) ? str_replace( '-', '_', $this->type ) : '';
+		$this->slug = ! empty( $this->type ) ? str_replace(  '-', '_', $this->type ) : '';
+		
+		// output formats
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", array( 'pdf' ), $this  );
 
 		// load data
 		if ( $this->order ) {
@@ -112,6 +124,7 @@ abstract class Order_Document {
 
 		// load settings
 		$this->init_settings_data();
+		
 		// check enable
 		$this->enabled = $this->get_setting( 'enabled', false );
 	}
@@ -121,9 +134,11 @@ abstract class Order_Document {
 	}
 
 	public function init_settings_data() {
-		$this->order_settings  = $this->get_order_settings();
-		$this->settings        = $this->get_settings();
-		$this->latest_settings = $this->get_settings( true );
+		// order
+		$this->order_settings      = $this->get_order_settings();
+		// pdf
+		$this->settings            = $this->get_settings();
+		$this->latest_settings     = $this->get_settings( true );
 	}
 
 	public function get_order_settings() {
@@ -139,10 +154,10 @@ abstract class Order_Document {
 		return $order_settings;
 	}
 
-	public function get_settings( $latest = false ) {
+	public function get_settings( $latest = false, $output_format = 'pdf' ) {
 		// get most current settings
 		$common_settings   = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
+		$document_settings = WPO_WCPDF()->settings->get_document_settings( $this->get_type(), $output_format );
 		$settings          = (array) $document_settings + (array) $common_settings;
 
 		if ( $latest != true ) {
@@ -217,30 +232,44 @@ abstract class Order_Document {
 			'invoice_date_column',
 			'paper_size',
 			'font_subsetting',
+			'include_encrypted_pdf',
 		), $this );
 	}
 
-	public function get_setting( $key, $default = '' ) {
-		$non_historical_settings = $this->get_non_historical_settings();
-		if ( in_array( $key, $non_historical_settings ) && isset( $this->latest_settings ) ) {
-			$setting = isset( $this->latest_settings[$key] ) ? $this->latest_settings[$key] : $default;
+	public function get_setting( $key, $default = '', $output_format = 'pdf' ) {
+		if ( in_array( $output_format, $this->output_formats ) ) {
+			$settings        = $this->get_settings( false, $output_format );
+			$latest_settings = $this->get_settings( true, $output_format );
 		} else {
-			$setting = isset( $this->settings[$key] ) ? $this->settings[$key] : $default;
+			$settings        = $this->settings;
+			$latest_settings = $this->latest_settings;
 		}
+		
+		$non_historical_settings = $this->get_non_historical_settings();
+		
+		if ( in_array( $key, $non_historical_settings ) && isset( $latest_settings ) ) {
+			$setting = isset( $latest_settings[$key] ) ? $latest_settings[$key] : $default;
+		} else {
+			$setting = isset( $settings[$key] ) ? $settings[$key] : $default;
+		}
+		
 		return $setting;
 	}
 
-	public function get_attach_to_email_ids() {
-		$email_ids = isset( $this->settings['attach_to_email_ids'] ) ? array_keys( array_filter( $this->settings['attach_to_email_ids'] ) ) : array();
-		return $email_ids;  
+	public function get_attach_to_email_ids( $output_format = 'pdf' ) {
+		$settings = $this->get_settings( false, $output_format );
+		
+		return isset( $settings['attach_to_email_ids'] ) ? array_keys( array_filter( $settings['attach_to_email_ids'] ) ) : array();
 	}
 
 	public function get_type() {
 		return $this->type;
 	}
 
-	public function is_enabled() {
-		return apply_filters( 'wpo_wcpdf_document_is_enabled', $this->enabled, $this->type );
+	public function is_enabled( $output_format = 'pdf' ) {
+		$is_enabled = $this->get_setting( 'enabled', false, $output_format );
+		
+		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
 
 	public function get_hook_prefix() {
@@ -747,6 +776,26 @@ abstract class Order_Document {
 	}
 	
 	/**
+	 * Return/Show company VAT number
+	 */
+	public function get_shop_vat_number() {
+		return $this->get_settings_text( 'vat_number', '', false );
+	}
+	public function shop_vat_number() {
+		echo $this->get_shop_vat_number();
+	}
+	
+	/**
+	 * Return/Show company COC number
+	 */
+	public function get_shop_coc_number() {
+		return $this->get_settings_text( 'coc_number', '', false );
+	}
+	public function shop_coc_number() {
+		echo $this->get_shop_coc_number();
+	}
+	
+	/**
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address() {
@@ -856,8 +905,8 @@ abstract class Order_Document {
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
 			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
-		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
-		$pdf          = $pdf_maker->output();
+		$pdf_maker = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
+		$pdf       = $pdf_maker->output();
 		
 		return $pdf;
 	}
@@ -901,12 +950,49 @@ abstract class Order_Document {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf;
-		die();
+		wp_die();
 	}
 
 	public function output_html() {
 		echo $this->get_html();
-		die();
+		wp_die();
+	}
+	
+	public function preview_ubl() {
+		return $this->output_ubl( true );
+	}
+	
+	public function output_ubl( $contents_only = false ) {
+		$ubl_maker    = wcpdf_get_ubl_maker();
+		$ubl_document = new UblDocument();
+		
+		$ubl_document->set_order( $this->order );
+		
+		if ( $order_document = wcpdf_get_document( $this->get_type(), $this->order, true ) ) {
+			$ubl_document->set_order_document( $order_document );
+		} else {
+			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
+			wp_die();
+		}
+
+		$builder       = new SabreBuilder();
+		$contents      = $builder->build( $ubl_document );
+		if ( $contents_only ) {
+			return $contents;
+		}
+		$filename      = $order_document->get_filename( 'download', [ 'output' => 'ubl' ] );
+		$full_filename = $ubl_maker->write( $filename, $contents );
+		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
+		$size          = filesize( $full_filename );
+
+		wcpdf_ubl_headers( $quoted, $size );
+
+		ob_clean();
+		flush();
+		@readfile( $full_filename );
+		@unlink( $full_filename );
+
+		wp_die();
 	}
 
 	public function wrap_html_content( $content ) {
@@ -933,15 +1019,31 @@ abstract class Order_Document {
 		} else {
 			$suffix = date('Y-m-d'); // 2020-11-11
 		}
-
-		$filename = $name . '-' . $suffix . '.pdf';
+		
+		// get filename
+		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
+		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
 
 		// Filter filename
-		$order_ids = isset($args['order_ids']) ? $args['order_ids'] : array( $this->order_id );
-		$filename = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
+		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
+		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
 
 		// sanitize filename (after filters to prevent human errors)!
 		return sanitize_file_name( $filename );
+	}
+	
+	public function get_output_format_extension( $output_format ) {
+		switch ( $output_format ) {
+			default:
+			case 'pdf':
+				$extension = '.pdf';
+				break;
+			case 'ubl':
+				$extension = '.xml';
+				break;
+		}
+		
+		return $extension;
 	}
 
 	public function get_template_path() {

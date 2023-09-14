@@ -36,11 +36,11 @@ class Install {
 	 */
 	public function do_install() {
 		// only install when woocommerce is active
-		if ( !WPO_WCPDF()->is_woocommerce_activated() ) {
+		if ( ! WPO_WCPDF()->is_woocommerce_activated() ) {
 			return;
 		}
 
-		$version_setting = 'wpo_wcpdf_version';
+		$version_setting   = 'wpo_wcpdf_version';
 		$installed_version = get_option( $version_setting );
 
 		// installed version lower than plugin version?
@@ -71,6 +71,9 @@ class Install {
 			// downgrade version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
+		
+		// deactivate ubl addon
+		add_action( 'admin_init', array( WPO_WCPDF(), 'deactivate_ubl_addon') );
 	}
 
 
@@ -458,6 +461,72 @@ class Install {
 			
 			if ( $update ) {
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
+		
+		
+		// 3.7.0-beta-1: deactivate legacy ubl addon and migrate settings
+		if ( version_compare( $installed_version, '3.7.0-beta-1', '<' ) ) {
+			// deactivate legacy ubl addon
+			WPO_WCPDF()->deactivate_ubl_addon();
+			
+			// legacy ubl general/invoice settings
+			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );
+			$general_settings            = get_option( 'wpo_wcpdf_settings_general', [] );
+			$invoice_ubl_settings        = get_option( 'wpo_wcpdf_documents_settings_invoice_ubl', [] );
+			
+			$settings_to_migrate = [
+				'vat_number'            => 'general',
+				'coc_number'            => 'general',
+				'company_name'          => 'general', // corresponds to 'shop_name' in the General Settings
+				'attach_to_email_ids'   => 'invoice_ubl',
+				'include_encrypted_pdf' => 'invoice_ubl',
+			];
+			
+			foreach ( $settings_to_migrate as $setting => $type ) {
+				$update = [];
+				
+				switch ( $type ) {
+					case 'general':
+						if ( isset( $legacy_ubl_general_settings[$setting] ) ) {
+							$legacy_ubl_setting_value = $legacy_ubl_general_settings[$setting];
+							$setting                  = ( 'company_name' === $setting && ! isset( $general_settings['shop_name'] ) ) ? 'shop_name' : $setting;
+							
+							if ( 'company_name' !== $setting ) {
+								$general_settings[$setting] = $legacy_ubl_setting_value;
+								$update[]                   = $type;
+							}
+						}
+						break;
+					case 'invoice_ubl':
+						if ( isset( $legacy_ubl_general_settings[$setting] ) ) {
+							$invoice_ubl_settings[$setting] = $legacy_ubl_general_settings[$setting];
+							$update[]                       = $type;
+						}
+						break;
+				}
+				
+				if ( ! empty( $update ) ) {
+					$update = array_unique( $update );
+					foreach ( $update as $type ) {
+						switch ( $type ) {
+							case 'general':
+								update_option( 'wpo_wcpdf_settings_general', $general_settings );
+								break;
+							case 'invoice_ubl':
+								$invoice_ubl_settings['enabled'] = '1';
+								update_option( 'wpo_wcpdf_documents_settings_invoice_ubl', $invoice_ubl_settings );
+								break;
+						}
+					}
+				}
+			}
+			
+			
+			// legacy ubl tax settings
+			$legacy_ubl_tax_setings = get_option( 'ubl_wc_taxes', [] );
+			if ( ! empty( $legacy_ubl_tax_setings ) ) {
+				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_setings );
 			}
 		}
 		
