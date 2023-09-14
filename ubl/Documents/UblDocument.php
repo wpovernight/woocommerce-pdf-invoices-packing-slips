@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class UblDocument extends Document {
 	
 	public function get_format() {
-		$format = apply_filters( 'wpo_wc_ubl_document_fornat' , array(
+		$format = apply_filters( 'wpo_wc_ubl_document_format' , array(
 			'ublversion' => array(
 				'enabled' => true,
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\UblVersionIdHandler::class,
