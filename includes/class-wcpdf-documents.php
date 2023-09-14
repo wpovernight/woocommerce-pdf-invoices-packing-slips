@@ -78,7 +78,7 @@ class Documents {
 	}
 
 	public function get_document( $document_type, $order ) {
-		foreach ( $this->get_documents( 'all' ) as $class_name => $document) {
+		foreach ( $this->get_documents( 'all' ) as $class_name => $document ) {
 			if ( $document->get_type() == $document_type && class_exists( $class_name ) ) {
 				return new $class_name( $order );
 			}
