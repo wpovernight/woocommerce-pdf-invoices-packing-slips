@@ -49,8 +49,10 @@ jQuery( function( $ ) {
 	$( "[name='wpo_wcpdf_documents_settings_invoice[display_number]']" ).on( 'change', function( event ) {
 		if ( $( this ).val() == 'order_number' ) {
 			$( this ).closest( 'td' ).find( '.description' ).slideDown();
+			$( this ).closest( 'tr' ).next( 'tr' ).hide();
 		} else {
 			$( this ).closest( 'td' ).find( '.description' ).hide();
+			$( this ).closest( 'tr' ).next( 'tr' ).show();
 		}
 	} ).trigger( 'change' );
 
