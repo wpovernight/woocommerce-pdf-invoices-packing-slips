@@ -526,7 +526,7 @@ class Settings {
 	}
 
 	public function get_output_format( $document = null ) {
-		if ( isset( $this->debug_settings['html_output'] ) ) {
+		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $_REQUEST['output'] ) && 'html' === $_REQUEST['output'] ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $_REQUEST['output'] ) && ! empty( $_REQUEST['output'] ) && ! empty( $document ) && in_array( $_REQUEST['output'], $document->output_formats ) ) {
 			$output_format = sanitize_text_field( $_REQUEST['output'] );

@@ -498,7 +498,7 @@ class Main {
 			if ( $document ) {
 				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself with $document->order_ids)
 
-				$output_format = isset( $_REQUEST['output'] ) && in_array( $_REQUEST['output'], array( 'html', 'pdf', 'ubl' ) ) ? esc_attr( $_REQUEST['output'] ) : WPO_WCPDF()->settings->get_output_format( $document );
+				$output_format = WPO_WCPDF()->settings->get_output_format( $document );
 				
 				switch ( $output_format ) {
 					case 'ubl':
