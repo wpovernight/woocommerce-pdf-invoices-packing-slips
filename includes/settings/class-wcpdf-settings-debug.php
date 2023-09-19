@@ -10,6 +10,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug' ) ) :
 class Settings_Debug {
 	
 	protected static $_instance = null;
+	public $sections;
 		
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
@@ -19,28 +20,61 @@ class Settings_Debug {
 	}
 
 	public function __construct()	{
+		$this->sections = array(
+			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+			'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
+			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+		
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
-		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'debug_tools' ), 10, 2 );
-
-		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'dompdf_status' ), 20, 2 );
 		
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_debug_tools' ) );
 	}
 
-	public function output( $section ) {
-		settings_fields( "wpo_wcpdf_settings_debug" );
-		do_settings_sections( "wpo_wcpdf_settings_debug" );
+	public function output( $active_section ) {
+		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
+		
+		?>
+		<div class="wcpdf_debug_settings_sections">
+			<h2 class="nav-tab-wrapper">
+				<?php
+					foreach ( $this->sections as $section => $title ) {
+						$active = ( $section == $active_section ) ? 'nav-tab-active' : '';
+						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), $active, esc_html( $title ) );
+					}
+				?>
+			</h2>
+		</div>
+		<?php
+		
+		switch ( $active_section ) {
+			case 'settings':
+				$this->display_settings();
+				break;
+			case 'status':
+				$this->display_status();
+				break;
+			case 'tools':
+				$this->display_tools();
+				break;
+		}
+	}
+	
+	public function display_settings() {
+		settings_fields( 'wpo_wcpdf_settings_debug' );
+		do_settings_sections( 'wpo_wcpdf_settings_debug' );
 
 		submit_button();
 	}
+	
+	public function display_status() {
+		include( WPO_WCPDF()->plugin_path() . '/includes/views/advanced-status.php' );
+	}
 
-	public function debug_tools( $tab, $section ) {
-		if ( $tab !== 'debug' ) {
-			return;
-		}
+	public function display_tools() {
 		?>
-		<h3><?php _e( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<div id="debug-tools">
 			<div class="wrapper">
 				<?php do_action( 'wpo_wcpdf_before_debug_tools', $this ); ?>
@@ -482,12 +516,6 @@ class Settings_Debug {
 		return apply_filters( 'wpo_wcpdf_setting_types', $setting_types );
 	}
 
-	public function dompdf_status( $tab, $section ) {
-		if ( $tab === 'debug' ) {
-			include( WPO_WCPDF()->plugin_path() . '/includes/views/dompdf-status.php' );
-		}
-	}
-
 	public function init_settings() {
 		// Register settings.
 		$page = $option_group = $option_name = 'wpo_wcpdf_settings_debug';
@@ -496,7 +524,7 @@ class Settings_Debug {
 			array(
 				'type'     => 'section',
 				'id'       => 'debug_settings',
-				'title'    => __( 'Debug settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => '',
 				'callback' => 'section',
 			),
 			array(

@@ -852,7 +852,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		 * which turns the function 'imagecreatefromwebp()' inexistent,
 		 * leading to display an error in DOMPDF.
 		 * 
-		 * Check 'System configuration' in the Status tab for 'webp' support.
+		 * Check 'System configuration' in the Advanced tab for 'webp' support.
 		 */
 		if ( 'webp' === wp_check_filetype( $thumbnail_path )['ext'] && ! function_exists( 'imagecreatefromwebp' ) ) {
 			$thumbnail = '';

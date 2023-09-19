@@ -88,7 +88,7 @@ You're more than welcome! This plugin is hosted on github, where you can post is
 https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips
 
 = How can I display the HTML/CSS source for debugging/developing templates? =
-There's a setting on the Status tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
+There's a setting on the Advanced tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
 
 
 == Screenshots ==
@@ -134,7 +134,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 = 3.6.0 (2023-08-15) =
 * New: setting for improved document link access type
 * New: implemented autoloader for plugin classes
-* New: adds a new Status tool to reset plugin settings
+* New: adds a new Advanced tool to reset plugin settings
 * New: invoice number column added to the WooCommerce order analytics
 * Fix: replaces `utf8_decode()` which is deprecated in PHP 8.2 
 * Fix: allows the translation for the Shipping Notes strings
@@ -151,7 +151,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * New: adds a generic shortcode `[wcpdf_download_pdf]` for PDF download links 
 * New: bump preview PDFJS library to v3.7.107
 * Tweak: optimize PDFJS library size
-* Tweak: remove WPO hiring banner from the Status tab
+* Tweak: remove WPO hiring banner from the Advanced tab
 * Tweak: composer dependencies update
 * Fix: font deletion bug after plugin upgrade
 * Fix: bug on previewing Credit Note if the order has multiple refunds
@@ -220,8 +220,8 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 = 3.3.0 (2023-01-16) =
 * New: WooCommerce HPOS compatibility (beta)
-* New: reschedule the yearly reset of the numbering system on a button from the Status page
-* New: document status table in the Status page
+* New: reschedule the yearly reset of the numbering system on a button from the Advanced page
+* New: document status table in the Advanced page
 * New: adds document object argument to PDF maker class constructor
 * New: filter to allow user to disable the documents private data removal: `wpo_wcpdf_remove_order_personal_data`
 * Tweak: optimizes `$wpdb` use on `Sequential_Number_store` class
@@ -279,7 +279,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: fatal error caused by list_files() function missing
 
 = 3.1.0 (2022-09-06) =
-* New: custom document links feature available from the Status settings page. Changes the document links to a prettier URL scheme
+* New: custom document links feature available from the Advanced tab debug settings page. Changes the document links to a prettier URL scheme
 * New: action hooks before and after the shop logo: `wpo_wcpdf_before_shop_logo` and `wpo_wcpdf_after_shop_logo`
 * Fix: replaces WP_Filesystem with PHP functions to delete temporary files
 * Marked tested up to WooCommerce 6.8
@@ -329,7 +329,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Marked tested up to WooCommerce 6.4
 
 = 2.14.1 =
-* New: Relaunch the Setup Wizard manually from the Status tab
+* New: Relaunch the Setup Wizard manually from the Advanced tab
 * Fix: Dynamic `wpo_wcpdf_tmp_path_{$type}` filter hook name parsing
 * Fix: removing inline preview for media upload
 * UI: Show sticky save button on settings change
@@ -499,7 +499,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * New: Support for line breaks in invoice notes
 * Fix: Only pass opened edit fields when regenerating document
 * Fix: Words in table headers could be broken up
-* Deprecated: legacy translations (pre-2.0) are no longer read automatically (can be enabled in the Status tab)
+* Deprecated: legacy translations (pre-2.0) are no longer read automatically (can be enabled in the Advanced tab)
 
 = 2.7.2 =
 * Fix: Update invoice number and date when regenerating document from edit mode
@@ -755,7 +755,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: Setting for disabling for free invoices should be applied even when other plugins are applying rules
 
 = 2.1.9 =
-* Feature: Automatic cleanup of temporary attachments folder (settings in Status tab)
+* Feature: Automatic cleanup of temporary attachments folder (settings in Advanced tab)
 * Fix: prevent infinite loop on sites without uploads folder
 * Fix: tag replacements for externally hosted images (CDN)
 
@@ -827,7 +827,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 = 2.0.11 =
 * Fix: Improved fonts update routine (now preserves custom fonts)
 * Fix: Enable HTML5 parser by default (fixes issues with libxml)
-* Tweak: Show both PHP & WP Memory limit in Status tab
+* Tweak: Show both PHP & WP Memory limit in Advanced tab
 
 = 2.0.10 =
 * Fix: Set invoice number backend button
@@ -859,7 +859,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Tweak: Clear fonts folder when manually reinstalling fonts
 
 = 2.0.5 =
-* Feature: Remove temporary files (Status tab)
+* Feature: Remove temporary files (Advanced tab)
 * Fix: Page number replacement
 * Tweak: Fallback functions for MB String extension
 * Tweak: Improved wpo_wcpdf_check_privs usability for my account privileges

@@ -2,7 +2,8 @@ form#wpo-wcpdf-settings {
 	margin-left: 0 !important;
 }
 #debug-tools {
-	width: 50%;
+	width: 100%;
+	margin-top: 2em;
 }
 
 #debug-tools .wrapper {
