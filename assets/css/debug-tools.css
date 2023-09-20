@@ -35,6 +35,15 @@ form#wpo-wcpdf-settings {
 	max-width: 25rem;
 }
 
+#debug-tools #nuke {
+	margin-top: 20px;
+	background-color: #fcf9e8;
+}
+
+#debug-tools #nuke .notice {
+	margin: 0;
+}
+
 #document_custom_redirect_page,
 #document_custom_redirect_page + .description {
 	display: none;

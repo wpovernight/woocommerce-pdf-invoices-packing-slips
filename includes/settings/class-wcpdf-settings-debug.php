@@ -59,6 +59,8 @@ class Settings_Debug {
 			case 'tools':
 				$this->process_debug_tools();
 				$this->display_tools();
+			case 'numbers':
+				$this->display_numbers();
 				break;
 		}
 	}
@@ -198,9 +200,37 @@ class Settings_Debug {
 				<!-- /reset_settings -->
 				<?php do_action( 'wpo_wcpdf_after_debug_tools', $this ); ?>
 			</div>
+			<!-- nuke (admin access only) -->
+			<?php if ( current_user_can( 'administrator' ) ) : ?>
+			<div id="nuke" class="wrapper">
+				<div class="tool">
+					<div class="notice notice-warning inline">
+						<p><?php _e( '<strong>DANGER ZONE:</strong> Create a backup before using this tools, the actions they performs are irreversible!', 'woocommerce-pdf-ips-number-tools' ); ?></p>
+					</div>
+				</div>
+				<div class="tool">
+					<h4><span><?php _e( 'Renumber existing documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<p><?php _e( 'This tool will renumber existing documents within the selected order date range, while keeping the assigned document date.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php printf(
+						/* translators: step-by-step instructions */
+						__( 'Set the <strong>next document number</strong> setting %s to the number you want to use for the first document. ', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>WooCommerce > PDF Invoices > Documents > Select document</code>'
+					); ?></p>
+				</div>
+				<div class="tool">
+					<h4><span><?php _e( 'Delete existing documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<p><?php _e( 'This tool will delete existing documents within the selected order date range.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				</div>
+			</div>
+			<?php endif; ?>
+			<!-- /nuke (admin access only) -->
 		</div>
 		<br>
 		<?php
+	}
+	
+	public function display_numbers() {
+		// numbers code here
 	}
 	
 	public function process_debug_tools() {
