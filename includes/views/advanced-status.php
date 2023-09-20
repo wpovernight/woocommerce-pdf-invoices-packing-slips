@@ -122,14 +122,14 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		<?php
 			foreach ( $server_configs as $label => $server_config ) :
 				if ( $server_config['result'] ) {
-					$background = '#9e4';
+					$background = '#68de7c'; // green
 					$color      = 'black';
 				} elseif ( isset( $server_config['fallback'] ) ) {
-					$background = '#FCC612';
+					$background = '#f2d675'; // yellow
 					$color      = 'black';
 				} else {
-					$background = '#f43';
-					$color      = 'white';
+					$background = '#ffabaf'; // red
+					$color      = 'black';
 				}
 				?>
 				<tr>
@@ -173,8 +173,8 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		?>
 		<tr>
 			<td class="title"><?php echo esc_html( $document->get_title() ); ?></td>
-			<td style="<?= $is_enabled ? 'background-color:#9e4; color:black;' : 'background-color:#f43; color:white;' ?>"><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
-			<td style="<?= $is_reset_enabled ? 'background-color:#9e4; color:black;' : 'background-color:#f43; color:white;' ?>"><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td style="<?= $is_enabled ? 'background-color:#68de7c; color:black;' : 'background-color:#ffabaf; color:black;' ?>"><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td style="<?= $is_reset_enabled ? 'background-color:#68de7c; color:black;' : 'background-color:#ffabaf; color:black;' ?>"><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
 		</tr>
 	</tbody>
 	<?php endforeach; ?>
@@ -212,7 +212,12 @@ if ( ! $server_configs['PHP version']['result'] ) {
 						$yearly_reset['result'] = false;
 					}
 				} else {
-					$yearly_reset['value']  = __( 'Scheduled action not found', 'woocommerce-pdf-invoices-packing-slips' );
+					$yearly_reset['value']  = sprintf(
+						/* translators: <a></a> tags */
+						__( 'Scheduled action not found. Please reschedule it %shere%s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '" style="color:black; text-decoration:underline;">',
+						'</a>'
+					);
 					$yearly_reset['result'] = false;
 				}
 			}
@@ -220,11 +225,11 @@ if ( ! $server_configs['PHP version']['result'] ) {
 			$label = __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' );
 
 			if ( $yearly_reset['result'] ) {
-				$background = '#9e4';
+				$background = '#68de7c'; // green
 				$color      = 'black';
 			} else {
-				$background = '#f43';
-				$color      = 'white';
+				$background = '#ffabaf'; // red
+				$color      = 'black';
 			}
 	?>
 		<tfoot>
@@ -233,7 +238,9 @@ if ( ! $server_configs['PHP version']['result'] ) {
 				<td colspan="2" style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
 					<?php
 						echo wp_kses_post( $yearly_reset['value'] );
-						if ( $yearly_reset['result'] && ! $yearly_reset['value'] ) echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
+						if ( $yearly_reset['result'] && ! $yearly_reset['value'] ) {
+							echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
+						}
 					?>
 				</td>
 			</tr>
@@ -292,11 +299,11 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		<?php
 			foreach ( $permissions as $permission ) {
 				if ( $permission['status'] == 'ok' ) {
-					$background = '#9e4';
+					$background = '#68de7c'; // green
 					$color      = 'black';
 				} else {
-					$background = '#f43';
-					$color      = 'white';
+					$background = '#ffabaf'; // red
+					$color      = 'black';
 				}
 		?>
 		<tr>
