@@ -30,7 +30,7 @@ class Settings_Debug {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 		
-		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_debug_tools' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 	}
 
 	public function output( $active_section ) {
@@ -242,7 +242,7 @@ class Settings_Debug {
 		printf( '<div class="notice notice-%1$s"><p>%2$s</p></div>', key( $output ), reset( $output ) );
 	}
 	
-	public function ajax_debug_tools() {
+	public function ajax_process_settings_debug_tools() {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 		
 		$data = stripslashes_deep( $_REQUEST );
