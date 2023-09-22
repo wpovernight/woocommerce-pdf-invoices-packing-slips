@@ -97,7 +97,7 @@ jQuery( function( $ ) {
 	$( document.body ).on( 'click', '#wpo-wcpdf-settings a.number-search-button', function( e ) {
 		e.preventDefault();
 		
-		let search_val = $( this ).closest( 'div' ).find( ':input' ).val();
+		let search_val = $( this ).closest( 'div' ).find( ':input[name="number_search_input"]' ).val();
 		window.location.href = window.location.href + '&s=' + search_val;
 	} );
 	
