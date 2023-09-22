@@ -213,9 +213,11 @@ class Number_Store_List_Table extends \WP_List_Table {
 				if ( isset( $result['order_id'] ) && ! empty( $document_type ) ) {
 					$document = wcpdf_get_document( $document_type, wc_get_order( absint( $result['order_id'] ) ) );
 					
-					if ( $document && empty( $document->get_number() ) ) {
-						unset( $results[ $key ] );
-					}	
+					if ( $document && is_callable( array( $document, 'get_number' ) ) ) {
+						if ( empty( $document->get_number() ) ) {
+							unset( $results[ $key ] );
+						}
+					}
 				}
 			}
 		}
