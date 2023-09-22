@@ -382,13 +382,12 @@ class Settings_Debug {
 					
 					// strip '_number' and other remaining suffixes
 					$suffix       = substr( $full_store_name, strpos( $full_store_name, '_number' ) + strlen( '_number' ) );
-					$clean_suffix = trim( str_replace( '_number', '', $suffix ), '_' );
+					$clean_suffix = ! empty( $suffix ) ? trim( str_replace( '_number', '', $suffix ), '_' ) : $suffix;
 					$name         = substr( $store_name, 0, strpos( $store_name, '_number' ) );
+					$title        = '';
 					
-					if ( ! empty ( $document_titles[ $name ] ) ) {
-						$title = $document_titles[ $name ];
-					} else {
-						$title = ucwords( str_replace( array( "__", "_", "-" ), ' ', $name ) );
+					if ( ! empty( $name ) ) {
+						$title = ! empty( $document_titles[ $name ] ) ? $document_titles[ $name ] : ucwords( str_replace( array( "__", "_", "-" ), ' ', $name ) );
 					}
 					
 					if ( ! empty ( $suffix ) ) {
@@ -453,6 +452,10 @@ class Settings_Debug {
 			return;
 		}
 		
+		if ( empty( $data['debug_tool'] ) ) {
+			return;
+		}
+		
 		$debug_tool = str_replace( '-', '_', esc_attr( $data['debug_tool'] ) );
 		
 		if ( is_callable( array( $this, $debug_tool,  ) ) ) {
@@ -464,15 +467,22 @@ class Settings_Debug {
 	
 	public function ajax_process_danger_zone_tools() {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+		
+		$request = stripslashes_deep( $_REQUEST );
+		
+		if ( ! isset( $request['document_type'] ) || ! isset( $request['date_from'] ) || ! isset( $request['date_to'] ) ) {
+			$message = 'One or more request parameters missing.';
+			wp_send_json_error( compact( $message ) );
+		}
 	
-		$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
-		$to_date            = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
-		$document_type      = esc_attr( $_POST['document_type'] );
-		$document_types     = ( 'all' !== $document_type ) ? array( $document_type ) : array();
-		$document_title     = ( 'all' !== $document_type ) ? ' ' . ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
-		$page_count         = absint( $_POST['page_count'] );
-		$document_count     = absint( $_POST['document_count'] );
-		$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
+		$from_date          = date_i18n( 'Y-m-d', strtotime( $request['date_from'] ) );
+		$to_date            = date_i18n( 'Y-m-d', strtotime( $request['date_to'] ) );
+		$document_type      = esc_attr( $request['document_type'] );
+		$document_types     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? array( $document_type ) : array();
+		$document_title     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? ' ' . ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
+		$page_count         = absint( $request['page_count'] );
+		$document_count     = absint( $request['document_count'] );
+		$delete_or_renumber = esc_attr( $request['delete_or_renumber'] );
 		$message            = ( 'delete' === $delete_or_renumber ) ? $document_title . __( 'documents deleted.', 'woocommerce-pdf-invoices-packing-slips' ) : $document_title . __( 'documents renumbered.', 'woocommerce-pdf-invoices-packing-slips' );
 		$finished           = false;
 	
