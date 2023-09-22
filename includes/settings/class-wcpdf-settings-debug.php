@@ -261,7 +261,7 @@ class Settings_Debug {
 					foreach ( $number_store_tables as $table_name => $title ) {
 						if ( isset( $_GET['table_name'] ) && $table_name !== $_GET['table_name'] ) {
 							if ( empty( trim( $title ) ) ) {
-								$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
+								$title = '[' . __( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ) . ']';
 							}
 							printf( '<li><a href="%1$s">%2$s</a></li>', esc_url( add_query_arg( 'table_name', esc_attr( $table_name ) ) ), esc_html( $title ) );
 						}
