@@ -283,11 +283,8 @@ class Settings_Debug {
 				<div class="number-search" style="text-align:right;">
 					<input type="search" id="number_search_input" name="number_search_input" value="<?php echo isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : ''; ?>">
 					<a href="#" class="button button-primary number-search-button"><?php _e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-					<?php if( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) : ?>
-						<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary"><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-					<?php else : ?>
-						<a href="#" class="button button-secondary" disabled><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-					<?php endif; ?>
+					<?php $disabled = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? '' : 'disabled'; ?>
+					<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 				</div>
 				<?php $list_table->display(); ?>	
 			<?php else : ?>
