@@ -506,7 +506,8 @@ class WPO_WCPDF {
 		
 			if ( ! empty( $legacy_addon ) ) {
 				deactivate_plugins( $legacy_addon );
-				set_transient( $this->get_legacy_addon_transient_name( $filename ), 'yes', DAY_IN_SECONDS );
+				$transient_name = $this->get_legacy_addon_transient_name( $filename );
+				set_transient( $transient_name, 'yes', DAY_IN_SECONDS );
 			}
 		}
 	}
