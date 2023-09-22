@@ -203,19 +203,33 @@ class Number_Store_List_Table extends \WP_List_Table {
 		
 		// remove db document numbers that don't exist more in the orders meta (documents were deleted)
 		if ( ! empty( $results ) && ! empty( $table_name ) ) {
-			$document_type = str_replace( "{$wpdb->prefix}wcpdf_", '', $table_name );
-			$document_type = str_replace( '_number', '', $document_type );
-			$document_type = str_replace( '_', '-', $document_type );
-			
-			foreach ( $results as $key => $result ) {
-				$result = (array) $result;
-				
-				if ( isset( $result['order_id'] ) && ! empty( $document_type ) ) {
-					$document = wcpdf_get_document( $document_type, wc_get_order( absint( $result['order_id'] ) ) );
+			// strip the default prefix
+			$store_name = $full_store_name = substr( $table_name, strpos( $table_name, 'wcpdf_' ) + strlen( 'wcpdf_' ) );
 					
-					if ( $document && is_callable( array( $document, 'get_number' ) ) ) {
-						if ( empty( $document->get_number() ) ) {
-							unset( $results[ $key ] );
+			// strip year suffix, if present
+			if ( is_numeric( substr( $full_store_name, -4 ) ) ) {
+				$store_name = trim( substr( $full_store_name, 0, -4 ), '_' );
+			}
+			
+			if ( ! empty( $store_name ) && ! empty( $full_store_name ) ) {
+				// strip '_number' and other remaining suffixes
+				$suffix        = substr( $full_store_name, strpos( $full_store_name, '_number' ) + strlen( '_number' ) );
+				$clean_suffix  = ! empty( $suffix ) ? trim( str_replace( '_number', '', $suffix ), '_' ) : $suffix;
+				$name          = substr( $store_name, 0, strpos( $store_name, '_number' ) );
+				$document_type = ! empty( $name ) ? str_replace( '_', '-', $name ) : '';
+				
+				if ( ! empty( $document_type ) ) {
+					foreach ( $results as $key => $result ) {
+						$result = (array) $result;
+						
+						if ( isset( $result['order_id'] ) ) {
+							$document = wcpdf_get_document( $document_type, wc_get_order( absint( $result['order_id'] ) ) );
+							
+							if ( $document && is_callable( array( $document, 'get_number' ) ) ) {
+								if ( empty( $document->get_number() ) ) {
+									unset( $results[ $key ] );
+								}
+							}
 						}
 					}
 				}
