@@ -235,17 +235,15 @@ class Number_Store_List_Table extends \WP_List_Table {
 	public function prepare_items() {
 		global $wpdb;
 		
-		$per_page = apply_filters( 'wpo_wcpdf_number_store_list_table_per_page', $this->per_page );
-		
 		$this->_column_headers = array(
 			$this->get_columns(),
 			array(),
 			$this->get_sortable_columns()
 		);
 
-		$table_name  = isset( $_GET['table_name'] ) ? sanitize_key( $_GET['table_name'] ) : null;
 		$this->items = $this->get_numbers();
 		$total_items = count( $this->items );
+		$per_page    = apply_filters( 'wpo_wcpdf_number_store_list_table_per_page', $this->per_page );
 
 		// Setup pagination
 		$this->set_pagination_args( array(
