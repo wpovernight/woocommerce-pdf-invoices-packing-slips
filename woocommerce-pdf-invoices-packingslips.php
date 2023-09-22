@@ -547,11 +547,11 @@ class WPO_WCPDF {
 							printf(
 								/* translators: legacy addon name */
 								__( 'While updating the PDF Invoices & Packing Slips for WooCommerce plugin we\'ve noticed our legacy %s add-on was active on your site. This functionality is now incorporated into the core plugin. We\'ve deactivated the add-on for you, and you are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ),
-								esc_attr( $name )
+								'<strong>' . esc_attr( $name ) . '</strong>'
 							);
 						?>
 					</p>
-					<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( $query_arg ), 'wcpdf_legacy_addon_notice' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+					<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $query_arg => true ) ), 'wcpdf_legacy_addon_notice' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
 				<?php
 				echo wp_kses_post( ob_get_clean() );
