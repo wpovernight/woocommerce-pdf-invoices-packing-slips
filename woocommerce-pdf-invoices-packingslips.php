@@ -558,16 +558,14 @@ class WPO_WCPDF {
 			
 			// save option to hide mailpoet notice
 			if ( isset( $_REQUEST[ $query_arg ] ) && isset( $_REQUEST['_wpnonce'] ) ) {
-				// validate nonce
 				if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'wcpdf_legacy_addon_notice' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: ' . $query_arg );
-					wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-					exit;
 				} else {
 					delete_transient( $transient_name );
-					wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-					exit;
 				}
+				
+				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				exit;
 			}
 		}
 	}
