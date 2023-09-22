@@ -557,7 +557,7 @@ class WPO_WCPDF {
 				echo wp_kses_post( ob_get_clean() );
 			}
 			
-			// save option to hide mailpoet notice
+			// save option to hide legacy addon notice
 			if ( isset( $_REQUEST[ $query_arg ] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 				if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'wcpdf_legacy_addon_notice' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: ' . $query_arg );
