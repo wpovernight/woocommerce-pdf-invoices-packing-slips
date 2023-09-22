@@ -35,13 +35,17 @@ form#wpo-wcpdf-settings {
 	max-width: 25rem;
 }
 
-#debug-tools #nuke {
+#debug-tools #danger_zone {
 	margin-top: 20px;
 	background-color: #fcf9e8;
 }
 
-#debug-tools #nuke .notice {
+#debug-tools #danger_zone .notice {
 	margin: 0;
+}
+
+#debug-tools .add-info {
+	margin-left: 6px;
 }
 
 #document_custom_redirect_page,

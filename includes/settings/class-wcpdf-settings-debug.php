@@ -33,6 +33,7 @@ class Settings_Debug {
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 		
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 	}
 
 	public function output( $active_section ) {
@@ -139,7 +140,7 @@ class Settings_Debug {
 				<!-- /run_wizard -->
 				<!-- export_settings -->
 				<div class="tool">
-					<h4><span><?php _e( 'Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<h4><?php _e( 'Export Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'Download plugin settings in JSON format to easily export your current setup.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post">
 						<input type="hidden" name="debug_tool" value="export-settings">
@@ -163,7 +164,7 @@ class Settings_Debug {
 				<!-- /export_settings -->
 				<!-- import_settings -->
 				<div class="tool">
-					<h4><span><?php _e( 'Import Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<h4><?php _e( 'Import Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'Import plugin settings in JSON format.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post" enctype="multipart/form-data">
 						<input type="hidden" name="debug_tool" value="import-settings">
@@ -179,7 +180,7 @@ class Settings_Debug {
 				<!-- /import_settings -->
 				<!-- reset_settings -->
 				<div class="tool">
-					<h4><span><?php _e( 'Reset Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<h4><?php _e( 'Reset Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'This will clear all your selected settings data. Please do a backup first using the export tool above.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<form class="wpo_wcpdf_debug_tools_form" method="post">
 						<input type="hidden" name="debug_tool" value="reset-settings">
@@ -203,30 +204,96 @@ class Settings_Debug {
 				<!-- /reset_settings -->
 				<?php do_action( 'wpo_wcpdf_after_debug_tools', $this ); ?>
 			</div>
-			<!-- nuke (admin access only) -->
-			<?php if ( current_user_can( 'administrator' ) ) : ?>
-			<div id="nuke" class="wrapper">
+			<!-- danger_zone (admin access only) -->
+			<?php if ( current_user_can( 'administrator' ) && isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ) : ?>
+			<?php $documents = WPO_WCPDF()->documents->get_documents( 'all' ); ?>
+			<div id="danger_zone" class="wrapper">
 				<div class="tool">
 					<div class="notice notice-warning inline">
 						<p><?php _e( '<strong>DANGER ZONE:</strong> Create a backup before using this tools, the actions they performs are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					</div>
 				</div>
+				<!-- renumber_documents -->
 				<div class="tool">
-					<h4><span><?php _e( 'Renumber existing documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<h4><?php _e( 'Renumber existing documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'This tool will renumber existing documents within the selected order date range, while keeping the assigned document date.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-					<p><?php printf(
-						/* translators: step-by-step instructions */
-						__( 'Set the <strong>next document number</strong> setting %s to the number you want to use for the first document. ', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>WooCommerce > PDF Invoices > Documents > Select document</code>'
-					); ?></p>
+					<p>
+						<?php
+							printf(
+								/* translators: step-by-step instructions */
+								__( 'Set the <strong>next document number</strong> setting %s to the number you want to use for the first document. ', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<code>WooCommerce > PDF Invoices > Documents > Select document</code>'
+							);
+						?>
+					</p>
+					<table>
+						<tr>
+							<td><?php _e( 'Document type:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td>
+								<select id="renumber-document-type" name="renumber-document-type">
+									<option value=""><?php _e( 'Select', 'woocommerce-pdf-invoices-packing-slips' ); ?>...</option>
+									<?php foreach ( $documents as $document ) : ?>
+										<option value="<?php echo $document->get_type(); ?>"><?php echo $document->get_title(); ?></option>
+									<?php endforeach; ?>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td><?php _e( 'From:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td><input type="text" id="renumber-date-from" name="renumber-date-from" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></td>
+						</tr>
+						<tr>
+							<td><?php _e( 'To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td><input type="text" id="renumber-date-to" name="renumber-date-to" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>
+								<button class="button button-large number-tools-btn" id="renumber-documents-btn"><?php _e( 'Renumber documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
+								<div class="spinner renumber-spinner"></div>
+							</td>
+						</tr>
+					</table>
 				</div>
+				<!-- /renumber_documents -->
+				<!-- delete_documents -->
 				<div class="tool">
-					<h4><span><?php _e( 'Delete existing documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></h4>
+					<h4><?php _e( 'Delete existing documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 					<p><?php _e( 'This tool will delete existing documents within the selected order date range.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<table>
+						<tr>
+							<td><?php _e( 'Document type:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td>
+								<select id="delete-document-type" name="delete-document-type">
+									<option value=""><?php _e( 'Select', 'woocommerce-pdf-invoices-packing-slips' ); ?>...</option>
+									<?php foreach ( $documents as $document ) : ?>
+										<option value="<?php echo $document->get_type(); ?>"><?php echo $document->get_title(); ?></option>
+									<?php endforeach; ?>
+									<option value="all"><?php _e( 'All', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td><?php _e( 'From:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td><input type="text" id="delete-date-from" name="delete-date-from" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></td>
+						</tr>
+						<tr>
+							<td><?php _e( 'To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td><input type="text" id="delete-date-to" name="delete-date-to" value="<?php echo date( 'Y-m-d' ); ?>" size="10"><span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>
+								<button class="button button-large number-tools-btn" id="delete-documents-btn"><?php _e( 'Delete documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
+								<div class="spinner delete-spinner"></div>
+							</td>
+						</tr>
+					</table>
 				</div>
+				<!-- /delete_documents -->
 			</div>
 			<?php endif; ?>
-			<!-- /nuke (admin access only) -->
+			<!-- /danger_zone (admin access only) -->
 		</div>
 		<br>
 		<?php
@@ -393,6 +460,108 @@ class Settings_Debug {
 		}
 		
 		wp_die();
+	}
+	
+	public function ajax_process_danger_zone_tools() {
+		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+	
+		$from_date          = date_i18n( 'Y-m-d', strtotime( $_POST['date_from'] ) );
+		$to_date            = date_i18n( 'Y-m-d', strtotime( $_POST['date_to'] ) );
+		$document_type      = esc_attr( $_POST['document_type'] );
+		$document_types     = ( 'all' !== $document_type ) ? array( $document_type ) : array();
+		$document_title     = ( 'all' !== $document_type ) ? ' ' . ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
+		$page_count         = absint( $_POST['page_count'] );
+		$document_count     = absint( $_POST['document_count'] );
+		$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
+		$message            = ( 'delete' === $delete_or_renumber ) ? $document_title . __( 'documents deleted.', 'woocommerce-pdf-ips-number-tools' ) : $document_title . __( 'documents renumbered.', 'woocommerce-pdf-ips-number-tools' );
+		$finished           = false;
+	
+		$args = array(
+			'return'         => 'ids',
+			'type'           => 'shop_order',
+			'limit'          => -1,
+			'order'          => 'ASC',
+			'paginate'       => true,
+			'posts_per_page' => 50,
+			'page'           => $page_count,
+			'date_created'   => $from_date . '...' . $to_date,
+		);
+	
+		$results   = wc_get_orders( $args );
+		$order_ids = $results->orders;
+		
+		if ( ! empty( $order_ids ) && ! empty( $document_type ) ) {
+			foreach ( $order_ids as $order_id ) {
+				$order = wc_get_order( $order_id );
+				
+				if ( empty( $order ) ) {
+					continue;
+				}
+				
+				if ( 'all' === $document_type ) {
+					$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+					foreach ( $documents as $document ) {
+						$document_types[] = $document->get_type();
+					}
+				}
+				
+				foreach ( $document_types as $type ) {
+					$document = wcpdf_get_document( $type, $order );
+					$return   = $this->renumber_or_delete_document( $document, $delete_or_renumber );
+					if ( $return ) {
+						$document_count++;
+					}
+				}
+			}
+			$page_count++;
+	
+		// no more order IDs
+		} else {
+			$finished = true;
+		}
+	
+		$response = array(
+			'finished'      => $finished,
+			'pageCount'     => $page_count,
+			'documentCount' => $document_count,
+			'message'       => $message,
+		);
+		
+		wp_send_json_success( $response );	
+			
+		wp_die(); // this is required to terminate immediately and return a proper response
+	}
+	
+	private function renumber_or_delete_document( $document, $delete_or_renumber ) {
+		$return = false;
+		
+		if ( $document && $document->exists() ) {
+			switch ( $delete_or_renumber ) {
+				case 'renumber':
+					if ( is_callable( array( $document, 'init_number' ) ) ) {
+						$document->init_number();
+						$return = true;
+					} elseif ( 'packing-slip' === $document->get_type() && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
+						WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document );
+						$return = true;
+					}
+					
+					if ( $return ) {
+						$document->save();
+					}
+					break;
+				case 'delete':
+					if ( is_callable( array( $document, 'delete' ) ) ) {
+						$document->delete();
+						$return = true;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		
+		return $return;
 	}
 	
 	private function export_settings( $data ) {
@@ -799,6 +968,23 @@ class Settings_Debug {
 					'option_name' => $option_name,
 					'id'          => 'disable_preview',
 					'description' => __( 'Disables the document preview on the plugin settings pages.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'enable_danger_zone_tools',
+				'title'    => __( 'Enable danger zone tools', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'enable_danger_zone_tools',
+					'description' => sprintf(
+						/* translators: <a> tags */
+						__( 'Enables the danger zone tools %shere%s. The actions performed by this tools are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '">',
+						'</a>'
+					),
 				)
 			),
 		);

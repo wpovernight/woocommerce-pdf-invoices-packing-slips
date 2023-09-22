@@ -237,18 +237,19 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf-debug',
 				WPO_WCPDF()->plugin_url() . '/assets/js/debug-script'.$suffix.'.js',
-				[ 'jquery', 'jquery-blockui' ],
+				array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
 				WPO_WCPDF_VERSION
 			);
 			wp_localize_script(
 				'wpo-wcpdf-debug',
 				'wpo_wcpdf_debug',
-				[
-					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
-					'nonce'          => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
-					'download_label' => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
-					'confirm_reset'  => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
-				]
+				array(
+					'ajaxurl'              => admin_url( 'admin-ajax.php' ),
+					'nonce'                => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
+					'download_label'       => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_reset'        => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'select_document_type' => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
 			);
 			
 		}
