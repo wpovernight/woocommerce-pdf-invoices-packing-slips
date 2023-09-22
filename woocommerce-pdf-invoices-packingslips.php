@@ -174,7 +174,7 @@ class WPO_WCPDF {
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 		}
 		
-		add_action( 'admin_init', array( $this, 'deactivate_ubl_addon') );
+		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
 
 		// all systems ready - GO!
 		$this->includes();
