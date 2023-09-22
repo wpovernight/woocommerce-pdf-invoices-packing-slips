@@ -253,10 +253,7 @@ class Settings_Debug {
 		?>
 		<div class="wcpdf_document_settings_sections wcpdf_advanced_numbers_choose_table">
 			<?php
-				$choose_table_title = __( 'Choose a number store', 'woocommerce-pdf-invoices-packing-slips' );
-				if ( isset( $number_store_tables[ $selected_table_name ] ) ) {
-					$choose_table_title = esc_attr( $number_store_tables[ $selected_table_name ] );
-				}
+				$choose_table_title = isset( $number_store_tables[ $selected_table_name ] ) ? esc_attr( $number_store_tables[ $selected_table_name ] ) : __( 'Choose a number store', 'woocommerce-pdf-invoices-packing-slips' );
 				echo '<h2>' . esc_html( $choose_table_title ) . '<span class="arrow-down">&#9660;</span></h2>';
 			?>
 			<ul>
@@ -273,10 +270,11 @@ class Settings_Debug {
 			</ul>
 			<?php if ( ! empty( $selected_table_name ) && ! empty( $number_store_tables[ $selected_table_name ] ) ) : ?>
 				<p>
-					<?php printf(
-						/* translators: document title */
-						__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
-						esc_attr( $number_store_tables[ $selected_table_name ] )
+					<?php
+						printf(
+							/* translators: choosed table title */
+							__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
+							$choose_table_title
 						);
 					?>
 				</p>
