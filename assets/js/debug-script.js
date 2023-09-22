@@ -93,4 +93,12 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 	
+	// number search
+	$( document.body ).on( 'click', '#wpo-wcpdf-settings a.number-search-button', function( e ) {
+		e.preventDefault();
+		
+		let search_val = $( this ).closest( 'div' ).find( ':input' ).val();
+		window.location.href = window.location.href + '&s=' + search_val;
+	} );
+	
 } );

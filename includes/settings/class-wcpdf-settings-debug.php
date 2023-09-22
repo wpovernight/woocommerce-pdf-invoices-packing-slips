@@ -1,6 +1,8 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Settings;
 
+use WPO\WC\PDF_Invoices\Tables\Number_Store_List_Table;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -205,7 +207,7 @@ class Settings_Debug {
 			<div id="nuke" class="wrapper">
 				<div class="tool">
 					<div class="notice notice-warning inline">
-						<p><?php _e( '<strong>DANGER ZONE:</strong> Create a backup before using this tools, the actions they performs are irreversible!', 'woocommerce-pdf-ips-number-tools' ); ?></p>
+						<p><?php _e( '<strong>DANGER ZONE:</strong> Create a backup before using this tools, the actions they performs are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					</div>
 				</div>
 				<div class="tool">
@@ -230,7 +232,109 @@ class Settings_Debug {
 	}
 	
 	public function display_numbers() {
-		// numbers code here
+		global $wpdb;
+
+		$number_store_tables = $this->get_number_store_tables();
+		$store_name          = 'invoice_number';
+		
+		if ( isset( $_GET['table_name'] ) ) {
+			$selected_table_name = esc_attr( $_GET['table_name'] );
+		} else {
+			$_GET['table_name'] = $selected_table_name = apply_filters( 'wpo_wcpdf_number_store_table_name', "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
+			
+			if ( ! isset( $number_store_tables[ $_GET['table_name'] ] ) ) {
+				$_GET['table_name'] = $selected_table_name = null;
+			}
+		}
+
+		$list_table = new Number_Store_List_Table();
+		$list_table->prepare_items();
+		?>
+		<div class="wcpdf_document_settings_sections wcpdf_advanced_numbers_choose_table">
+			<?php
+				$choose_table_title = __( 'Choose a number store', 'woocommerce-pdf-invoices-packing-slips' );
+				if ( isset( $number_store_tables[ $selected_table_name ] ) ) {
+					$choose_table_title = esc_attr( $number_store_tables[ $selected_table_name ] );
+				}
+				echo '<h2>' . esc_html( $choose_table_title ) . '<span class="arrow-down">&#9660;</span></h2>';
+			?>
+			<ul>
+				<?php
+				foreach ( $number_store_tables as $table_name => $title ) {
+					if ( isset( $_GET['table_name'] ) && $table_name !== $_GET['table_name'] ) {
+						if ( empty( trim( $title ) ) ) {
+							$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
+						}
+						printf( '<li><a href="%1$s">%2$s</a></li>', esc_url( add_query_arg( 'table_name', $table_name ) ), esc_html( $title ) );
+					}
+				}
+				?>
+			</ul>
+			<?php if ( ! empty( $selected_table_name ) && ! empty( $number_store_tables[ $selected_table_name ] ) ) : ?>
+				<p>
+					<?php printf(
+						/* translators: document title */
+						__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_attr( $number_store_tables[ $selected_table_name ] )
+						);
+					?>
+				</p>
+				<p><?php _e( 'Numbers may have been assigned to orders before this.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<div class="number-search" style="text-align:right;">
+					<input type="search" id="number_search" name="s" value="">
+					<a href="#" class="button number-search-button"><?php _e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				</div>
+				<?php $list_table->display(); ?>	
+			<?php else : ?>
+				<div class="notice notice-info inline">
+					<p><?php _e( 'Please select a number store!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				</div>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+	
+	private function get_number_store_tables() {
+		global $wpdb;
+		
+		$tables          = $wpdb->get_results( "SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'" );
+		$document_titles = WPO_WCPDF()->documents->get_document_titles();
+		$table_names     = array();
+		
+		foreach ( $tables as $table ) {
+			foreach ( $table as $table_name ) {
+				if ( ! empty ( $table_name ) ) {
+					// strip the default prefix
+					$store_name = $full_store_name = substr( $table_name, strpos( $table_name, 'wcpdf_' ) + strlen( 'wcpdf_' ) );
+					
+					// strip year suffix, if present
+					if ( is_numeric( substr( $full_store_name, -4 ) ) ) {
+						$store_name = trim( substr( $full_store_name, 0, -4 ), '_' );
+					}
+					
+					// strip '_number' and other remaining suffixes
+					$suffix       = substr( $full_store_name, strpos( $full_store_name, '_number' ) + strlen( '_number' ) );
+					$clean_suffix = trim( str_replace( '_number', '', $suffix ), '_' );
+					$name         = substr( $store_name, 0, strpos( $store_name, '_number' ) );
+					
+					if ( ! empty ( $document_titles[ $name ] ) ) {
+						$title = $document_titles[ $name ];
+					} else {
+						$title = ucwords( str_replace( array( "__", "_", "-" ), ' ', $name ) );
+					}
+					
+					if ( ! empty ( $suffix ) ) {
+						$title = "{$title} ({$clean_suffix})";
+					}
+					
+					$table_names[ $table_name ] = $title;
+				}
+			}
+		}
+
+		ksort( $table_names );
+
+		return $table_names;
 	}
 	
 	public function process_debug_tools() {
@@ -639,7 +743,7 @@ class Settings_Debug {
 					'id'          => 'enable_debug',
 					'description' => __( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues", 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
 									 __( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefor this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
-					                 __( 'You can also add <code>&debug=true</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
+									 __( 'You can also add <code>&debug=true</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -669,7 +773,7 @@ class Settings_Debug {
 					'option_name' => $option_name,
 					'id'          => 'html_output',
 					'description' => __( 'Send the template output as HTML to the browser instead of creating a PDF.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
-					                 __( 'You can also add <code>&output=html</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
+									 __( 'You can also add <code>&output=html</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(

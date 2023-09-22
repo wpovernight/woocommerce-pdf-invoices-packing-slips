@@ -220,6 +220,10 @@ table.wcpdf_documents_settings_list td.title {
 	color: #222;
 }
 
+.wcpdf_advanced_numbers_choose_table {
+	margin-top: 20px;
+}
+
 .wcpdf_document_settings_document_output_formats {
 	margin-bottom: 30px;
 }
