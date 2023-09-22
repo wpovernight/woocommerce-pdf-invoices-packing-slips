@@ -473,7 +473,7 @@ class Settings_Debug {
 		$page_count         = absint( $_POST['page_count'] );
 		$document_count     = absint( $_POST['document_count'] );
 		$delete_or_renumber = esc_attr( $_POST['delete_or_renumber'] );
-		$message            = ( 'delete' === $delete_or_renumber ) ? $document_title . __( 'documents deleted.', 'woocommerce-pdf-ips-number-tools' ) : $document_title . __( 'documents renumbered.', 'woocommerce-pdf-ips-number-tools' );
+		$message            = ( 'delete' === $delete_or_renumber ) ? $document_title . __( 'documents deleted.', 'woocommerce-pdf-invoices-packing-slips' ) : $document_title . __( 'documents renumbered.', 'woocommerce-pdf-invoices-packing-slips' );
 		$finished           = false;
 	
 		$args = array(
