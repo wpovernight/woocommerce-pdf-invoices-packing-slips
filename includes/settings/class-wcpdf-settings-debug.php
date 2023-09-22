@@ -380,6 +380,10 @@ class Settings_Debug {
 						$store_name = trim( substr( $full_store_name, 0, -4 ), '_' );
 					}
 					
+					if ( empty( $store_name ) || empty( $full_store_name ) ) {
+						continue;
+					}
+					
 					// strip '_number' and other remaining suffixes
 					$suffix       = substr( $full_store_name, strpos( $full_store_name, '_number' ) + strlen( '_number' ) );
 					$clean_suffix = ! empty( $suffix ) ? trim( str_replace( '_number', '', $suffix ), '_' ) : $suffix;
