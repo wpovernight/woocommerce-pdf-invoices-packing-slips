@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips, print, delivery notes, inv
 Requires at least: 3.5
 Tested up to: 6.3
 Requires PHP: 7.2
-Stable tag: 3.7.0-beta-2
+Stable tag: 3.7.0-beta-3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,14 +101,6 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
-
-= 3.7.0-beta-1 (2023-09-14) =
-* New: adds UBL as additional output format for Invoice
-* New: bump min required PHP version to 7.2
-* Fix: PHP error on calling `get_title()` document method on bool
-* Fix: `strpos()` and `str_replace()` null parameter deprecated warnings
-* Translations: Updated translation template (POT)
-* Tested up to WooCommerce 8.1
 
 = 3.6.3 (2023-09-04) =
 * New: adds Invoice Number column to the orders export of WooCommerce Analytics
