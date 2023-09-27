@@ -210,7 +210,7 @@ class Settings_Debug {
 			<div id="danger_zone" class="wrapper">
 				<div class="tool">
 					<div class="notice notice-warning inline">
-						<p><?php _e( '<strong>DANGER ZONE:</strong> Create a backup before using this tools, the actions they performs are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+						<p><?php _e( '<strong>DANGER ZONE:</strong> Create a backup before using these tools, the actions they perform are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					</div>
 				</div>
 				<!-- renumber_documents -->
@@ -309,10 +309,10 @@ class Settings_Debug {
 			$selected_table_name = esc_attr( $_GET['table_name'] );
 		} else {
 			$_GET['table_name'] = $selected_table_name = apply_filters( 'wpo_wcpdf_number_store_table_name', "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
-			
-			if ( ! isset( $number_store_tables[ $_GET['table_name'] ] ) ) {
-				$_GET['table_name'] = $selected_table_name = null;
-			}
+		}
+		
+		if ( ! isset( $number_store_tables[ $_GET['table_name'] ] ) ) {
+			$_GET['table_name'] = $selected_table_name = null;
 		}
 
 		$list_table = new Number_Store_List_Table();
@@ -339,7 +339,7 @@ class Settings_Debug {
 				<p>
 					<?php
 						printf(
-							/* translators: choosed table title */
+							/* translators: chose table title */
 							__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
 							$choose_table_title
 						);
@@ -452,11 +452,7 @@ class Settings_Debug {
 		
 		$data = stripslashes_deep( $_REQUEST );
 		
-		if ( empty( $data['action'] ) || 'wpo_wcpdf_debug_tools' !== $data['action'] ) {
-			return;
-		}
-		
-		if ( empty( $data['debug_tool'] ) ) {
+		if ( empty( $data['action'] ) || empty( $data['debug_tool'] ) || 'wpo_wcpdf_debug_tools' !== $data['action'] ) {
 			return;
 		}
 		
@@ -475,7 +471,7 @@ class Settings_Debug {
 		$request = stripslashes_deep( $_REQUEST );
 		
 		if ( ! isset( $request['document_type'] ) || ! isset( $request['date_from'] ) || ! isset( $request['date_to'] ) ) {
-			$message = 'One or more request parameters missing.';
+			$message = __( 'One or more request parameters missing.', 'woocommerce-pdf-invoices-packing-slips' );
 			wp_send_json_error( compact( $message ) );
 		}
 	
@@ -542,8 +538,6 @@ class Settings_Debug {
 		);
 		
 		wp_send_json_success( $response );	
-			
-		wp_die(); // this is required to terminate immediately and return a proper response
 	}
 	
 	private function renumber_or_delete_document( $document, $delete_or_renumber ) {
@@ -995,7 +989,7 @@ class Settings_Debug {
 					'id'          => 'enable_danger_zone_tools',
 					'description' => sprintf(
 						/* translators: <a> tags */
-						__( 'Enables the danger zone tools %shere%s. The actions performed by this tools are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Enables the danger zone tools %shere%s. The actions performed by these tools are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '">',
 						'</a>'
 					),

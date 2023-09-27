@@ -75,7 +75,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		
-		// deactivate ubl extension if activated
+		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
 	}
 	

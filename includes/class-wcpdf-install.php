@@ -72,7 +72,7 @@ class Install {
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
 		
-		// deactivate ubl addon
+		// deactivate legacy addons
 		add_action( 'admin_init', array( WPO_WCPDF(), 'deactivate_legacy_addons') );
 	}
 

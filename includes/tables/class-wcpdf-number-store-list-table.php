@@ -212,9 +212,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 			}
 			
 			if ( ! empty( $store_name ) && ! empty( $full_store_name ) ) {
-				// strip '_number' and other remaining suffixes
-				$suffix        = substr( $full_store_name, strpos( $full_store_name, '_number' ) + strlen( '_number' ) );
-				$clean_suffix  = ! empty( $suffix ) ? trim( str_replace( '_number', '', $suffix ), '_' ) : $suffix;
 				$name          = substr( $store_name, 0, strpos( $store_name, '_number' ) );
 				$document_type = ! empty( $name ) ? str_replace( '_', '-', $name ) : '';
 				
@@ -249,8 +246,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 	 * @return void
 	 */
 	public function prepare_items() {
-		global $wpdb;
-		
 		$this->_column_headers = array(
 			$this->get_columns(),
 			array(),

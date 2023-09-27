@@ -184,6 +184,6 @@ jQuery( function( $ ) {
 				alert( xhr.status + ':'+ thrownError );
 			}
 		} );
-	};
+	}
 	
 } );
