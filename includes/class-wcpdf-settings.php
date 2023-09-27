@@ -204,7 +204,7 @@ class Settings {
 		$active_tab     = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : $default_tab;
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
 
-		include( 'views/wcpdf-settings-page.php' );
+		include( 'views/settings-page.php' );
 	}
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
