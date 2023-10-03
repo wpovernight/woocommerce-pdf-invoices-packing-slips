@@ -446,7 +446,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_payment_method() {
 		if ( $this->is_refund( $this->order ) ) {
-			$parent_order = $this->get_refund_parent( $this->order );
+			$parent_order         = $this->get_refund_parent( $this->order );
 			$payment_method_title = $parent_order->get_payment_method_title();
 		} else {
 			$payment_method_title = $this->order->get_payment_method_title();
@@ -458,6 +458,25 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	public function payment_method() {
 		echo $this->get_payment_method();
+	}
+	
+	/**
+	 * Return/Show payment date  
+	 */
+	public function get_payment_date() {
+		if ( $this->is_refund( $this->order ) ) {
+			$parent_order = $this->get_refund_parent( $this->order );
+			$payment_date = $parent_order->get_date_paid();
+		} else {
+			$payment_date = $this->order->get_date_paid();
+		}
+		
+		$payment_date = apply_filters( 'wpo_wcpdf_date', date_i18n( wcpdf_date_format( $this, 'order_date_paid' ), $payment_date ) );
+
+		return apply_filters( 'wpo_wcpdf_payment_date', $payment_date, $this );
+	}
+	public function payment_date() {
+		echo $this->get_payment_date();
 	}
 
 	/**

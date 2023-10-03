@@ -344,7 +344,12 @@ class Admin {
 	 * @param  string $post_or_order_object   object
 	 */
 	public function invoice_columns_data( $column, $post_or_order_object ) {
+		if ( ! in_array( $column, array( 'invoice_number_column', 'invoice_date_column' ) ) ) {
+			return;
+		}
+		
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		
 		if ( ! is_object( $order ) && is_numeric( $order ) ) {
 			$order = wc_get_order( absint( $order ) );
 		}

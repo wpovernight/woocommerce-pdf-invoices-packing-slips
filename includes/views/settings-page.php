@@ -63,7 +63,7 @@ $review_invitation = sprintf(
 					if ( has_action( "wpo_wcpdf_settings_output_{$active_tab}" ) ) {
 						do_action( "wpo_wcpdf_settings_output_{$active_tab}", $active_section );
 					} else {
-						// legacy settings (still being used in Pro and Templates extensions)
+						// legacy settings
 						settings_fields( "wpo_wcpdf_{$active_tab}_settings" );
 						do_settings_sections( "wpo_wcpdf_{$active_tab}_settings" );
 
