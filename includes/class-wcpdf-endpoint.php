@@ -10,7 +10,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Endpoint' ) ) :
 class Endpoint {
 
 	public $action_suffix = '_wpo_wcpdf';
-	public $events        = [ 'generate', 'printed' ];
+	public $events        = array( 'generate', 'printed' );
 	public $actions;
 	
 	protected static $_instance = null;
@@ -56,8 +56,8 @@ class Endpoint {
 	
 	public function add_endpoint() {
 		add_rewrite_rule(
-			'^'.$this->get_identifier().'/([^/]*)/([^/]*)/([^/]*)/([^/]*)?',
-			'index.php?action='.$this->actions['generate'].'&document_type=$matches[1]&order_ids=$matches[2]&access_key=$matches[3]&output=$matches[4]',
+			'^' . $this->get_identifier() . '/([^/]*)/([^/]*)/([^/]*)/([^/]*)?',
+			'index.php?action=' . $this->actions['generate'] . '&document_type=$matches[1]&order_ids=$matches[2]&access_key=$matches[3]&output=$matches[4]',
 			'top'
 		);
 	}
