@@ -955,7 +955,6 @@ abstract class Order_Document {
 
 	public function output_html() {
 		echo $this->get_html();
-		wp_die();
 	}
 	
 	public function preview_ubl() {
