@@ -133,9 +133,6 @@ class Endpoint {
 		// handle additional query vars
 		$additional_vars = apply_filters( 'wpo_wcpdf_document_link_additional_vars', $additional_vars, $order, $document_type );
 		if ( ! empty( $additional_vars ) && is_array( $additional_vars ) ) {
-			if ( isset( $additional_vars['output'] ) && $this->pretty_links_enabled() ) {
-				unset( $additional_vars['output'] );
-			}
 			$document_link = add_query_arg( $additional_vars, $document_link );
 		}
 
