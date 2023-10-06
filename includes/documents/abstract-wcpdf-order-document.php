@@ -912,11 +912,11 @@ abstract class Order_Document {
 	}
 
 	public function get_html( $args = array() ) {
-		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
-
 		// temporarily apply filters that need to be removed again after the html is generated
 		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
 		$this->add_filters( $html_filters );
+
+		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
 
 		$default_args = array (
 			'wrap_html_content'	=> true,

@@ -96,11 +96,11 @@ class Bulk_Document {
 	}
 
 	public function get_html() {
-		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
-
 		// temporarily apply filters that need to be removed again after the html is generated
 		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
 		$this->add_filters( $html_filters );
+
+		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
 
 		$html_content = array();
 		foreach ( $this->order_ids as $key => $order_id ) {
@@ -116,6 +116,7 @@ class Bulk_Document {
 		// get wrapper document & insert body content
 		$this->wrapper_document = wcpdf_get_document( $this->get_type(), null );
 		$html = $this->wrapper_document->wrap_html_content( $this->merge_documents( $html_content ) );
+		
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 
 		// remove temporary filters
