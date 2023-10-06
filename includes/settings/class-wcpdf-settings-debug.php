@@ -733,12 +733,7 @@ class Settings_Debug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'enable_danger_zone_tools',
-					'description' => sprintf(
-						/* translators: <a> tags */
-						__( 'Enables the danger zone tools %shere%s. The actions performed by these tools are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '">',
-						'</a>'
-					),
+					'description' => __( 'Enables the danger zone tools. The actions performed by these tools are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);

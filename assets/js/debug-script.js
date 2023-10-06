@@ -93,6 +93,12 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 	
+	// danger zone enabled notice
+	if ( true === wpo_wcpdf_debug.danger_zone['enabled'] ) {
+		let notice = '<div class="notice notice-warning inline"><p>' + wpo_wcpdf_debug.danger_zone['message'] + '</p></div>';
+		$( "input#enable_danger_zone_tools" ).closest( 'td' ).find( '.description' ).append( notice );
+	}
+	
 	// number search
 	$( document.body ).on( 'click', '#wpo-wcpdf-settings a.number-search-button', function( e ) {
 		e.preventDefault();
