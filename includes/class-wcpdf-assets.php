@@ -228,18 +228,26 @@ class Assets {
 
 		// status/debug page scripts
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'debug' ) {
+			wp_enqueue_style(
+				'wpo-wcpdf-jquery-ui-styles',
+				'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css'
+			);
+			
+			wp_enqueue_script( 'jquery-ui-datepicker' );
 			
 			wp_enqueue_style(
 				'wpo-wcpdf-debug-tools-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools'.$suffix.'.css',
 				WPO_WCPDF_VERSION
 			);
+			
 			wp_enqueue_script(
 				'wpo-wcpdf-debug',
 				WPO_WCPDF()->plugin_url() . '/assets/js/debug-script'.$suffix.'.js',
 				array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
 				WPO_WCPDF_VERSION
 			);
+			
 			wp_localize_script(
 				'wpo-wcpdf-debug',
 				'wpo_wcpdf_debug',
