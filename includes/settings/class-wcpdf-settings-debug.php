@@ -87,8 +87,9 @@ class Settings_Debug {
 	public function display_numbers() {
 		global $wpdb;
 
-		$number_store_tables = $this->get_number_store_tables();
-		$store_name          = 'invoice_number';
+		$number_store_tables            = $this->get_number_store_tables();
+		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
+		$store_name                     = 'invoice_number';
 		
 		if ( isset( $_GET['table_name'] ) ) {
 			$selected_table_name = esc_attr( $_GET['table_name'] );
@@ -99,6 +100,8 @@ class Settings_Debug {
 		if ( ! isset( $number_store_tables[ $_GET['table_name'] ] ) ) {
 			$_GET['table_name'] = $selected_table_name = null;
 		}
+		
+		$document_type = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( esc_attr( $_GET['table_name'] ) );
 
 		$list_table = new Number_Store_List_Table();
 		$list_table->prepare_items();
@@ -150,6 +153,45 @@ class Settings_Debug {
 		ksort( $table_names );
 
 		return $table_names;
+	}
+	
+	public function get_document_type_from_store_table_name( $table_name ) {
+		$document_type = '';
+		
+		if ( empty( $table_name ) ) {
+			return $document_type;
+		}
+		
+		// strip the default prefix
+		$store_name = $full_store_name = substr( $table_name, strpos( $table_name, 'wcpdf_' ) + strlen( 'wcpdf_' ) );
+					
+		// strip year suffix, if present
+		if ( is_numeric( substr( $full_store_name, -4 ) ) ) {
+			$store_name = trim( substr( $full_store_name, 0, -4 ), '_' );
+		}
+		
+		if ( ! empty( $store_name ) && ! empty( $full_store_name ) ) {
+			$name          = substr( $store_name, 0, strpos( $store_name, '_number' ) );
+			$document_type = ! empty( $name ) ? str_replace( '_', '-', $name ) : '';
+		}
+		
+		return $document_type;
+	}
+	
+	public function get_additional_invoice_number_store_document_types() {
+		$additional_doc_types = array();
+		$documents            = WPO_WCPDF()->documents->get_documents();
+		
+		foreach ( $documents as $document ) {
+			if ( in_array( $document->get_type(), array( 'proforma', 'credit-note' ) ) && $document->is_enabled() && is_callable( array( $document, 'get_number_sequence' ) ) ) {
+				$number_sequence = $document->get_number_sequence( '', $document );
+				if ( 'invoice_number' === $number_sequence ) {
+					$additional_doc_types[] = $document->get_type();
+				}
+			}
+		}
+		
+		return $additional_doc_types;
 	}
 	
 	public function process_debug_tools() {
