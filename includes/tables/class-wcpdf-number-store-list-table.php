@@ -246,10 +246,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 						}
 					}
 				}
-				
-				if ( ! isset( $results[ $key ]->document_title ) ) {
-					$results[ $key ]->document_title = __( 'Deleted', 'woocommerce-pdf-invoices-packing-slips' );
-				}
 			}
 		}
 
