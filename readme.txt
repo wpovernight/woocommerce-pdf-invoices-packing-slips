@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips, print, delivery notes, inv
 Requires at least: 3.5
 Tested up to: 6.3
 Requires PHP: 7.2
-Stable tag: 3.7.0-beta-5
+Stable tag: 3.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,20 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.0 (2023-10-16) =
+* New: adds `payment_date()` function to be used in templates
+* New: adds UBL as additional output format for documents
+* New: bump min required PHP version to 7.2
+* Tweak: switch `wpo_wcpdf_before_html` and `wpo_wcpdf_before_html` hooks positions
+* Tweak: hide next Invoice number if displaying order number
+* Fix: potential fatal error if document is `false` in order list action buttons
+* Fix: error when calling order ID on `null` under `output_number_date_edit_fields` method
+* Fix: bug when displaying the Invoice number/date columns, causing significant drop of performance
+* Fix: my account PDF link conflict with Jetpack analytics module
+* Fix: PHP error on calling `get_title()` document method on bool
+* Fix: `strpos()` and `str_replace()` `null` parameter deprecated warnings
+* Tested up to WooCommerce 8.2
 
 = 3.6.3 (2023-09-04) =
 * New: adds Invoice Number column to the orders export of WooCommerce Analytics
