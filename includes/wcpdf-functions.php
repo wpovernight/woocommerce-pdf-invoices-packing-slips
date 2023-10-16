@@ -46,7 +46,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, $order->get_id() );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-				if ( ! $document->is_allowed() ) {
+				if ( ! $document || ! is_callable( array( $document, 'is_allowed' ) ) || ! $document->is_allowed() ) {
 					return false;
 				}
 
