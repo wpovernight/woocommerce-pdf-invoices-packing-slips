@@ -4,6 +4,7 @@
 /node_modules/*
 /*/.git
 /*/.github
+**/.github
 
 .distignore
 .gitignore
