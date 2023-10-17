@@ -950,12 +950,11 @@ abstract class Order_Document {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf;
-		wp_die();
+		exit();
 	}
 
 	public function output_html() {
 		echo $this->get_html();
-		wp_die();
 	}
 	
 	public function preview_ubl() {
@@ -972,15 +971,17 @@ abstract class Order_Document {
 			$ubl_document->set_order_document( $order_document );
 		} else {
 			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
-			wp_die();
+			exit();
 		}
 
-		$builder       = new SabreBuilder();
-		$contents      = $builder->build( $ubl_document );
+		$builder  = new SabreBuilder();
+		$contents = $builder->build( $ubl_document );
+		
 		if ( $contents_only ) {
 			return $contents;
 		}
-		$filename      = $order_document->get_filename( 'download', [ 'output' => 'ubl' ] );
+		
+		$filename      = $order_document->get_filename( 'download', array( 'output' => 'ubl' ) );
 		$full_filename = $ubl_maker->write( $filename, $contents );
 		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
 		$size          = filesize( $full_filename );
@@ -992,7 +993,7 @@ abstract class Order_Document {
 		@readfile( $full_filename );
 		@unlink( $full_filename );
 
-		wp_die();
+		exit();
 	}
 
 	public function wrap_html_content( $content ) {

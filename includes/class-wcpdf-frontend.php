@@ -82,7 +82,7 @@ class Frontend {
 
 					if ( function_exists( 'file_get_contents' ) && $script = file_get_contents( WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link'.$suffix.'.js' ) ) {
 
-						if ( WPO_WCPDF()->endpoint->is_enabled() ) {
+						if ( WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
 							$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
 						}
 						
