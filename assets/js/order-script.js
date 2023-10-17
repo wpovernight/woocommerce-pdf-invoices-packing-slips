@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 
-	$( '.tablenav' ).on( 'click', '#doaction, #doaction2', function( e ) {
+	$( '.post-type-shop_order .tablenav' ).on( 'click', '#doaction, #doaction2', function( e ) {
 		let actionselected = $( this ).attr( "id" ).substr( 2 );
 		let action         = $( 'select[name="' + actionselected + '"]' ).val();
 
