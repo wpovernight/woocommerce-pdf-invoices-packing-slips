@@ -286,7 +286,7 @@ class Settings {
 						}
 
 						// validate option values
-						$form_settings = WPO_WCPDF()->settings->callbacks->validate( $form_settings );
+						$form_settings = $this->callbacks->validate( $form_settings );
 
 						// filter the options
 						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
@@ -306,7 +306,7 @@ class Settings {
 				if ( $document ) {
 					if ( ! $document->exists() ) {
 						$document->set_date( current_time( 'timestamp', true ) );
-						$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+						$number_store_method = $this->get_sequential_number_store_method();
 						$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
 						$number_store        = new Sequential_Number_Store( $number_store_name, $number_store_method );
 						$document->set_number( $number_store->get_next() );
@@ -526,20 +526,23 @@ class Settings {
 	}
 
 	public function get_output_format( $document = null ) {
+		$output_format = 'pdf'; // default
+		
 		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $_REQUEST['output'] ) && 'html' === $_REQUEST['output'] ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $_REQUEST['output'] ) && ! empty( $_REQUEST['output'] ) && ! empty( $document ) && in_array( $_REQUEST['output'], $document->output_formats ) ) {
-			$output_format = sanitize_text_field( $_REQUEST['output'] );
-		} else {
-			$output_format = 'pdf';
+			$document_settings = $this->get_document_settings( $document->get_type(), esc_attr( $_REQUEST['output'] ) );
+			if ( isset( $document_settings['enabled'] ) ) {
+				$output_format = esc_attr( $_REQUEST['output'] );
+			}
 		}
 		
 		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document );
 	}
 
 	public function get_output_mode() {
-		if ( isset( WPO_WCPDF()->settings->general_settings['download_display'] ) ) {
-			switch ( WPO_WCPDF()->settings->general_settings['download_display'] ) {
+		if ( isset( $this->general_settings['download_display'] ) ) {
+			switch ( $this->general_settings['download_display'] ) {
 				case 'display':
 					$output_mode = 'inline';
 					break;

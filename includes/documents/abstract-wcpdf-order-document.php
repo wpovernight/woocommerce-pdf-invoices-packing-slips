@@ -950,7 +950,7 @@ abstract class Order_Document {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf;
-		wp_die();
+		exit();
 	}
 
 	public function output_html() {
