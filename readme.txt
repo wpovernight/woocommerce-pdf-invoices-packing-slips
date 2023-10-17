@@ -102,12 +102,13 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 3.7.0 (2023-10-16) =
+= 3.7.0 (2023-10-17) =
 * New: adds `payment_date()` function to be used in templates
 * New: adds UBL as additional output format for documents
 * New: bump min required PHP version to 7.2
 * Tweak: switch `wpo_wcpdf_before_html` and `wpo_wcpdf_before_html` hooks positions
 * Tweak: hide next Invoice number if displaying order number
+* Fix: bug with HTML output using pretty links. Improved endpoint.
 * Fix: potential fatal error if document is `false` in order list action buttons
 * Fix: error when calling order ID on `null` under `output_number_date_edit_fields` method
 * Fix: bug when displaying the Invoice number/date columns, causing significant drop of performance
