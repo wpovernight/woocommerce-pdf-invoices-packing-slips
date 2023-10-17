@@ -974,8 +974,8 @@ abstract class Order_Document {
 			exit();
 		}
 
-		$builder       = new SabreBuilder();
-		$contents      = $builder->build( $ubl_document );
+		$builder  = new SabreBuilder();
+		$contents = $builder->build( $ubl_document );
 		
 		if ( $contents_only ) {
 			return $contents;
