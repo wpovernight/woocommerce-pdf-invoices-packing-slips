@@ -102,11 +102,11 @@ There's a setting on the Status tab of the settings page that allows you to togg
 
 == Changelog ==
 
-= 3.7.0 (2023-10-17) =
+= 3.7.0 (2023-10-18) =
 * New: adds `payment_date()` function to be used in templates
 * New: adds UBL as additional output format for documents
 * New: bump min required PHP version to 7.2
-* New: bump min required WordPress version to 4.4 (which was already implicitly required by the minimum required WooCommerce version)
+* New: bump min required WordPress version to 4.4 (which was already implicitly by the minimum required WooCommerce version)
 * Tweak: switch `wpo_wcpdf_before_html` and `wpo_wcpdf_before_html` hooks positions
 * Tweak: hide next Invoice number if displaying order number
 * Tweak: removed legacy `normalize_path` functions and replaced with `wp_normalize_path`
@@ -115,7 +115,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: error when calling order ID on `null` under `output_number_date_edit_fields` method
 * Fix: bug when displaying the Invoice number/date columns, causing significant drop of performance
 * Fix: my account PDF link conflict with Jetpack analytics module
-* Fix: PHP error on calling `get_title()` document method on bool
+* Fix: PHP error on calling `get_title()` document method on `bool`
 * Fix: `strpos()` and `str_replace()` `null` parameter deprecated warnings
 * Tested up to WooCommerce 8.2
 
