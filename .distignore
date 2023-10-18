@@ -1,11 +1,17 @@
-/.wordpress-org/*
-/.git/*
-/.github/*
-/node_modules/*
-/*/.git
-/*/.github
-/**/.*/
+# root directories
+.wordpress-org/*
+.git/*
+.github/*
+node_modules/*
 
+# sub directories
+/**/.*/
+/*/.git/
+/**/.git/
+/*/.github/
+/**/.github/
+
+# root files
 .distignore
 .gitignore
 .gitattributes
