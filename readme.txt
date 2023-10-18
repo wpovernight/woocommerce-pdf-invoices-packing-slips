@@ -1,8 +1,8 @@
 === PDF Invoices & Packing Slips for WooCommerce ===
 Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, jhosagid
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
-Tags: woocommerce, pdf, ubl, invoices, packing slips, print, delivery notes, invoice, packing slip, export, email, bulk, automatic
-Requires at least: 3.5
+Tags: woocommerce, pdf, ubl, invoices, packing slips
+Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
 Stable tag: 3.7.0
@@ -43,7 +43,7 @@ In addition to a number of default settings (including a custom header/logo) and
 = Minimum Requirements =
 
 * WooCommerce 3.0 or later
-* WordPress 3.5 or later
+* WordPress 4.4 or later
 
 = Automatic installation =
 Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser. To do an automatic install of PDF Invoices & Packing Slips for WooCommerce, log in to your WordPress admin panel, navigate to the Plugins menu and click Add New.
@@ -106,8 +106,10 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * New: adds `payment_date()` function to be used in templates
 * New: adds UBL as additional output format for documents
 * New: bump min required PHP version to 7.2
+* New: bump min required WordPress version to 4.4 (which was already implicitly required by the minimum required WooCommerce version)
 * Tweak: switch `wpo_wcpdf_before_html` and `wpo_wcpdf_before_html` hooks positions
 * Tweak: hide next Invoice number if displaying order number
+* Tweak: removed legacy `normalize_path` functions and replaced with `wp_normalize_path`
 * Fix: bug with HTML output using pretty links. Improved endpoint.
 * Fix: potential fatal error if document is `false` in order list action buttons
 * Fix: error when calling order ID on `null` under `output_number_date_edit_fields` method

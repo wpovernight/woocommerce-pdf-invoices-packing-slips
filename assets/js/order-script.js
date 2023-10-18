@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 
-	$( document.body ).on( 'click', '#doaction, #doaction2', function( e ) {
+	$( '#doaction, #doaction2' ).on( 'click', function( e ) {
 		let actionselected = $( this ).attr( "id" ).substr( 2 );
 		let action         = $( 'select[name="' + actionselected + '"]' ).val();
 
