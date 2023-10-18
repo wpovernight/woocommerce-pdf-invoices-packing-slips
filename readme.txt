@@ -117,7 +117,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: my account PDF link conflict with Jetpack analytics module
 * Fix: PHP error on calling `get_title()` document method on `bool`
 * Fix: `strpos()` and `str_replace()` `null` parameter deprecated warnings
-* Tested up to WooCommerce 8.2
+* Tested up to WooCommerce 8.2 & WordPress 6.4
 
 = 3.6.3 (2023-09-04) =
 * New: adds Invoice Number column to the orders export of WooCommerce Analytics
