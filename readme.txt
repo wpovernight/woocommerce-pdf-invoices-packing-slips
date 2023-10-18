@@ -3,7 +3,7 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, jhosa
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
-Tested up to: 6.3
+Tested up to: 6.4
 Requires PHP: 7.2
 Stable tag: 3.7.0
 License: GPLv2 or later
