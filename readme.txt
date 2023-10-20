@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.0
+Stable tag: 3.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,9 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.1 (2023-10-20) =
+* Fix: bug on UBL preview that forces the invoice creation
 
 = 3.7.0 (2023-10-18) =
 * New: adds `payment_date()` function to be used in templates
