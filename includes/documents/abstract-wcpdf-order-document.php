@@ -986,7 +986,7 @@ abstract class Order_Document {
 			return $contents;
 		}
 		
-		$filename      = $order_document->get_filename( 'download', array( 'output' => 'ubl' ) );
+		$filename      = $document->get_filename( 'download', array( 'output' => 'ubl' ) );
 		$full_filename = $ubl_maker->write( $filename, $contents );
 		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
 		$size          = filesize( $full_filename );
