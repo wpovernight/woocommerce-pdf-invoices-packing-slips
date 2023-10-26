@@ -507,6 +507,38 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			array(
+				'type'			=> 'setting',
+				'id'			=> 'due_date',
+				'title'			=> __( 'Due date', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'select',
+				'section'		=> $this->type,
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'due_date',
+					'options'       => apply_filters( 'wpo_wcpdf_due_date_options', array(
+						// For predefined dates, use this format: "{number_of_days}_day(s)".
+						'0_day'   => __( 'None', 'wpo_wcpdf_pro' ),
+						'1_day'   => __( '1 day', 'wpo_wcpdf_pro' ),
+						'7_days'  => __( '7 days', 'wpo_wcpdf_pro' ),
+						'30_days' => __( '30 days', 'wpo_wcpdf_pro' ),
+						'custom'  => __( 'Custom date', 'wpo_wcpdf_pro' ),
+					) ),
+					'description'	=> __( 'Select a due date to display in the invoice.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'due_date_custom_days',
+				'title'			=> __( 'Custom Due Date (Days)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'text_input',
+				'section'		=> $this->type,
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'due_date_custom_days',
+					'description'	=> __( 'Enter the number of days for the due date.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
 				'type'     => 'setting',
 				'id'       => 'mark_printed',
 				'title'    => __( 'Mark as printed', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -648,6 +680,27 @@ class Invoice extends Order_Document_Methods {
 	public function get_date_title() {
 		$date_title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
+	}
+
+	/**
+	 * @param \WC_Order|\WC_Order_Refund $order
+	 *
+	 * @return false|string
+	 */
+	public function get_due_date( $order ) {
+		if ( empty( $this->settings['due_date'] ) ) {
+			return false;
+		}
+
+		$due_days = ( 'custom' === $this->settings['due_date'] ) ? intval( $this->settings['due_date_custom_days'] ?? 0 ) : absint( strtok( $this->settings['due_date'], '_' ) );
+
+		if ( 0 >= $due_days ) {
+			return false;
+		}
+
+		$due_date_datetime = $order->get_date_created()->modify( "+$due_days days" );
+
+		return apply_filters( "wpo_wcpdf_{$this->slug}_invoice_due_date", date( 'Y-m-d', $due_date_datetime->getTimestamp() ), $due_date_datetime->getTimestamp(), $order );
 	}
 
 }
