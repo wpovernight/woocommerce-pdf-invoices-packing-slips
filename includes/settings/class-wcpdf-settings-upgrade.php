@@ -47,7 +47,7 @@ class Settings_Upgrade {
 				),
 				array(
 					'label'       => __( 'Multilingual support', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Handle document translations via either WPML, Polylang, Weglot, TranslatePress or GTranslate.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Handle document translations with WPML, Polylang, Weglot, TranslatePress or GTranslate.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions'  => array( 'pro', 'bundle' ),
 				),
 				array(
