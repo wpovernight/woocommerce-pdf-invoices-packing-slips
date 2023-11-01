@@ -23,8 +23,7 @@ class Settings_Upgrade {
 	}
 
 	public function extension_overview( $tab, $section ) {
-		if ( $tab === 'upgrade' ) {
-			
+		if ( 'upgrade' === $tab ) {
 			$features = array(
 				array(
 					'label'       => __( 'Proforma Invoice, Credit Note & Receipt', 'woocommerce-pdf-invoices-packing-slips' ),
