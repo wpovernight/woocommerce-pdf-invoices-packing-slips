@@ -88,12 +88,6 @@
 					<td><?php echo $payment_method; ?></td>
 				</tr>
 				<?php endif; ?>
-                <?php if ( $due_date = $this->get_due_date( $this->order ) ) : ?>
-				<tr class="due-date">
-					<th><?php _e( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<td><?php echo $due_date; ?></td>
-				</tr>
-				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
 			</table>			
 		</td>

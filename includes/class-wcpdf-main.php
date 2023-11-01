@@ -74,6 +74,8 @@ class Main {
 		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
 		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
+
+		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date' ), 10, 2 );
 	}
 
 	/**
@@ -1572,7 +1574,40 @@ class Main {
 	public function wc_webhook_trigger( $document, $order ) {
 		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
 	}
-	
+
+	/**
+	 * @param string $document_type
+	 * @param \WC_Order|\WC_Order_Refund $order
+	 *
+	 * @return void
+	 */
+	public function display_due_date( string $document_type, $order ): void {
+		if ( 'invoice' !== $document_type ) {
+			return;
+		}
+
+		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+
+		if ( empty( $invoice_settings['due_date'] ) ) {
+			return;
+		}
+
+		$due_days = ( 'custom' === $invoice_settings['due_date'] ) ? intval( $invoice_settings['due_date_custom_days'] ?? 0 ) : absint( $invoice_settings['due_date'] );
+
+		if ( 0 >= $due_days ) {
+			return;
+		}
+
+		$due_date_datetime = $order->get_date_created()->modify( "+$due_days days" );
+		$due_date          = apply_filters( "wpo_wcpdf_invoice_due_date", date( wcpdf_date_format( $this, 'due_date' ), $due_date_datetime->getTimestamp() ), $due_date_datetime->getTimestamp(), $order );
+
+		if ( ! empty( $due_date ) ) {
+			echo '<tr class="due-date">
+                <th>', __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' ), '</th>
+                <td>', $due_date, '</td>
+            </tr>';
+		}
+	}
 }
 
 endif; // class_exists
