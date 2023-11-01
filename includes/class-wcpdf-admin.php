@@ -790,7 +790,7 @@ class Admin {
 	}
 
 	public function output_number_date_edit_fields( $document, $data ) {
-		if ( empty( $document ) || empty( $data ) ) {
+		if ( empty( $document ) || empty( $data ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
 			return;
 		}
 		$data = $this->get_current_values_for_document( $document, $data );

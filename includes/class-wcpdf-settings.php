@@ -286,7 +286,7 @@ class Settings {
 						}
 
 						// validate option values
-						$form_settings = WPO_WCPDF()->settings->callbacks->validate( $form_settings );
+						$form_settings = $this->callbacks->validate( $form_settings );
 
 						// filter the options
 						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
@@ -306,7 +306,7 @@ class Settings {
 				if ( $document ) {
 					if ( ! $document->exists() ) {
 						$document->set_date( current_time( 'timestamp', true ) );
-						$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+						$number_store_method = $this->get_sequential_number_store_method();
 						$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
 						$number_store        = new Sequential_Number_Store( $number_store_name, $number_store_method );
 						$document->set_number( $number_store->get_next() );
@@ -526,20 +526,23 @@ class Settings {
 	}
 
 	public function get_output_format( $document = null ) {
+		$output_format = 'pdf'; // default
+		
 		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $_REQUEST['output'] ) && 'html' === $_REQUEST['output'] ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $_REQUEST['output'] ) && ! empty( $_REQUEST['output'] ) && ! empty( $document ) && in_array( $_REQUEST['output'], $document->output_formats ) ) {
-			$output_format = sanitize_text_field( $_REQUEST['output'] );
-		} else {
-			$output_format = 'pdf';
+			$document_settings = $this->get_document_settings( $document->get_type(), esc_attr( $_REQUEST['output'] ) );
+			if ( isset( $document_settings['enabled'] ) ) {
+				$output_format = esc_attr( $_REQUEST['output'] );
+			}
 		}
 		
 		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document );
 	}
 
 	public function get_output_mode() {
-		if ( isset( WPO_WCPDF()->settings->general_settings['download_display'] ) ) {
-			switch ( WPO_WCPDF()->settings->general_settings['download_display'] ) {
+		if ( isset( $this->general_settings['download_display'] ) ) {
+			switch ( $this->general_settings['download_display'] ) {
 				case 'display':
 					$output_mode = 'inline';
 					break;
@@ -557,7 +560,7 @@ class Settings {
 	public function get_template_path() {
 		// return default path if no template selected
 		if ( empty( $this->general_settings['template_path'] ) ) {
-			return $this->normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
+			return wp_normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
 		}
 
 		$installed_templates = $this->get_installed_templates();
@@ -566,18 +569,18 @@ class Settings {
 			return array_search( $selected_template, $installed_templates );
 		} else {
 			// unknown template or full template path (filter override)
-			$template_path = $this->normalize_path( $selected_template );
+			$template_path = wp_normalize_path( $selected_template );
 			
 			// add base path, checking if it's not already there
 			// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
 			if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
-				$base_path = $this->normalize_path( ABSPATH );
+				$base_path = wp_normalize_path( ABSPATH );
 			} else {
-				$base_path = $this->normalize_path( WP_CONTENT_DIR );
+				$base_path = wp_normalize_path( WP_CONTENT_DIR );
 			}
 			
 			if ( ! empty( $template_path ) && false === strpos( $template_path, $base_path ) ) {
-				$template_path = $this->normalize_path( $base_path . $template_path );
+				$template_path = wp_normalize_path( $base_path . $template_path );
 			}
 		}
 
@@ -613,7 +616,7 @@ class Settings {
 			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR );
 			
 			foreach ( $dirs as $dir ) {
-				$clean_dir     = $this->normalize_path( $dir );
+				$clean_dir     = wp_normalize_path( $dir );
 				$template_name = basename( $clean_dir );
 				// let child theme override parent theme
 				$group = ( $template_source == 'child-theme' ) ? 'theme' : $template_source;
@@ -623,7 +626,7 @@ class Settings {
 
 		if ( empty( $installed_templates ) ) {
 			// fallback to Simple template for servers with glob() disabled
-			$simple_template_path = $this->normalize_path( $template_paths['default'] . 'Simple' );
+			$simple_template_path = wp_normalize_path( $template_paths['default'] . 'Simple' );
 			$installed_templates[$simple_template_path] = 'default/Simple';
 		}
 
@@ -706,19 +709,11 @@ class Settings {
 
 	public function get_relative_template_path( $absolute_path ) {
 		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
-			$base_path = $this->normalize_path( ABSPATH );
+			$base_path = wp_normalize_path( ABSPATH );
 		} else {
-			$base_path = $this->normalize_path( WP_CONTENT_DIR );
+			$base_path = wp_normalize_path( WP_CONTENT_DIR );
 		}
-		return str_replace( $base_path, '', $this->normalize_path( $absolute_path ) );
-	}
-
-	public function normalize_path( $path ) {
-		if ( ! empty( $path ) ) {
-			return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace( '\\', '/', $path );
-		} else {
-			return $path;
-		}
+		return str_replace( $base_path, '', wp_normalize_path( $absolute_path ) );
 	}
 
 	public function maybe_migrate_template_paths( $settings_section = null ) {
@@ -728,12 +723,12 @@ class Settings {
 		}
 
 		$installed_templates = $this->get_installed_templates( true );
-		$selected_template = $this->normalize_path( $this->general_settings['template_path'] );
+		$selected_template = wp_normalize_path( $this->general_settings['template_path'] );
 		$template_match = '';
 		if ( ! in_array( $selected_template, $installed_templates ) && substr_count( $selected_template, '/' ) > 1 ) {
 			// search for path match
 			foreach ( $installed_templates as $path => $template_id ) {
-				$path = $this->normalize_path( $path );
+				$path = wp_normalize_path( $path );
 				// check if the last part of the path matches
 				if ( substr( $path, -strlen( $selected_template ) ) === $selected_template ) {
 					$template_match = $template_id;

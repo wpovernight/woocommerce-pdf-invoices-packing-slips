@@ -49,7 +49,7 @@ class Font_Synchronizer {
 	 * @return void
 	 */
 	public function sync( $destination, $merge_with_local = true ) {
-		$destination = trailingslashit( $this->normalize_path( $destination ) );
+		$destination = trailingslashit( wp_normalize_path( $destination ) );
 
 		$plugin_fonts = $this->get_plugin_fonts();
 		$dompdf_fonts = $this->get_dompdf_fonts();
@@ -91,7 +91,7 @@ class Font_Synchronizer {
 	 * @return void
 	 */
 	public function delete_font_files( $filenames ) {
-		$plugin_folder = $this->normalize_path( WPO_WCPDF()->plugin_path() );
+		$plugin_folder = wp_normalize_path( WPO_WCPDF()->plugin_path() );
 		$extensions = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
 		foreach ( $filenames as $filename ) {
 			// never delete files in our own plugin folder
@@ -212,20 +212,6 @@ class Font_Synchronizer {
 	}
 
 	/**
-	 * Normalize a filesystem path.
-	 * 
-	 * @param  string $path Path to normalize.
-	 * @return string Normalized path.
-	 */
-	public function normalize_path( $path ) {
-		if ( ! empty( $path ) ) {
-			return function_exists( 'wp_normalize_path' ) ? wp_normalize_path( $path ) : str_replace( '\\', '/', $path );
-		} else {
-			return $path;
-		}
-	}
-
-	/**
 	 * Apply path normalization to a font list
 	 * 
 	 * @param  array  $fonts array of font entries
@@ -237,7 +223,7 @@ class Font_Synchronizer {
 				continue;
 			}
 			foreach ( $filenames as $variant => $filename ) {
-				$fonts[$font_name][$variant] = $this->normalize_path( $filename );
+				$fonts[$font_name][$variant] = wp_normalize_path( $filename );
 			}
 		}
 		return $fonts;

@@ -10,7 +10,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Endpoint' ) ) :
 class Endpoint {
 
 	public $action_suffix = '_wpo_wcpdf';
-	public $events        = [ 'generate', 'printed' ];
+	public $events        = array( 'generate', 'printed' );
 	public $actions;
 	
 	protected static $_instance = null;
@@ -23,7 +23,7 @@ class Endpoint {
 	}
 
 	public function __construct() {
-		if ( $this->is_enabled() ) {
+		if ( $this->pretty_links_enabled() ) {
 			add_action( 'init', array( $this, 'add_endpoint' ) );
 			add_action( 'query_vars', array( $this, 'add_query_vars' ) );
 			add_action( 'parse_request', array( $this, 'handle_document_requests' ) );
@@ -35,12 +35,12 @@ class Endpoint {
 	public function get_actions() {
 		$actions = [];
 		foreach ( $this->events as $event ) {
-			$actions[$event] = $event.$this->action_suffix;
+			$actions[ $event ] = $event . $this->action_suffix;
 		}
 		return $actions;
 	}
 
-	public function is_enabled() {
+	public function pretty_links_enabled() {
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 
 		if ( isset( $debug_settings['pretty_document_links'] ) ) {
@@ -56,8 +56,8 @@ class Endpoint {
 	
 	public function add_endpoint() {
 		add_rewrite_rule(
-			'^'.$this->get_identifier().'/([^/]*)/([^/]*)/([^/]*)?',
-			'index.php?action='.$this->actions['generate'].'&document_type=$matches[1]&order_ids=$matches[2]&access_key=$matches[3]',
+			'^' . $this->get_identifier() . '/([^/]*)/([^/]*)/([^/]*)/([^/]*)?',
+			'index.php?action=' . $this->actions['generate'] . '&document_type=$matches[1]&order_ids=$matches[2]&access_key=$matches[3]&output=$matches[4]',
 			'top'
 		);
 	}
@@ -67,6 +67,7 @@ class Endpoint {
 		$vars[] = 'document_type';
 		$vars[] = 'order_ids';
 		$vars[] = 'access_key';
+		$vars[] = 'output';
 		return $vars;
 	}
 
@@ -74,11 +75,12 @@ class Endpoint {
 		global $wp;
 
 		if ( ! empty( $wp->query_vars['action'] ) && $this->actions['generate'] == $wp->query_vars['action'] ) {
-			if ( ! empty( $wp->query_vars['document_type'] ) && ! empty( $wp->query_vars['order_ids'] ) && ! empty( $wp->query_vars['access_key'] ) ) {
+			if ( ! empty( $wp->query_vars['document_type'] ) && ! empty( $wp->query_vars['order_ids'] ) && ! empty( $wp->query_vars['access_key'] ) && ! empty( $wp->query_vars['output'] ) ) {
 				$_REQUEST['action']        = $this->actions['generate'];
 				$_REQUEST['document_type'] = sanitize_text_field( $wp->query_vars['document_type'] );
 				$_REQUEST['order_ids']     = sanitize_text_field( $wp->query_vars['order_ids'] );
 				$_REQUEST['access_key']    = sanitize_text_field( $wp->query_vars['access_key'] );
+				$_REQUEST['output']        = sanitize_text_field( $wp->query_vars['output'] );
 				
 				do_action( 'wp_ajax_' . $this->actions['generate'] );
 			}
@@ -109,12 +111,14 @@ class Endpoint {
 			return '';
 		}
 
-		if ( $this->is_enabled() ) {
+		if ( $this->pretty_links_enabled() ) {
+			$output     = isset( $additional_vars['output'] ) ? esc_attr( $additional_vars['output'] ) : 'pdf';
 			$parameters = array(
 				$this->get_identifier(),
 				$document_type,
 				$order->get_id(),
 				$access_key,
+				$output
 			);
 			$document_link = trailingslashit( get_home_url() ) . implode( '/', $parameters );
 		} else {
@@ -129,6 +133,9 @@ class Endpoint {
 		// handle additional query vars
 		$additional_vars = apply_filters( 'wpo_wcpdf_document_link_additional_vars', $additional_vars, $order, $document_type );
 		if ( ! empty( $additional_vars ) && is_array( $additional_vars ) ) {
+			if ( isset( $additional_vars['output'] ) && $this->pretty_links_enabled() ) {
+				unset( $additional_vars['output'] );
+			}
 			$document_link = add_query_arg( $additional_vars, $document_link );
 		}
 

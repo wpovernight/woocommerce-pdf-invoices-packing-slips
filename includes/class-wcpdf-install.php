@@ -465,8 +465,8 @@ class Install {
 		}
 		
 		
-		// 3.7.0-beta-1: deactivate legacy ubl addon and migrate settings
-		if ( version_compare( $installed_version, '3.7.0-beta-1', '<' ) ) {
+		// 3.7.0-beta-4: deactivate legacy ubl addon and migrate settings
+		if ( version_compare( $installed_version, '3.7.0-beta-4', '<' ) ) {
 			// deactivate legacy ubl addon
 			WPO_WCPDF()->deactivate_ubl_addon();
 			
@@ -527,6 +527,11 @@ class Install {
 			$legacy_ubl_tax_setings = get_option( 'ubl_wc_taxes', [] );
 			if ( ! empty( $legacy_ubl_tax_setings ) ) {
 				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_setings );
+			}
+			
+			// set transient to flush rewrite rules if pretty links are enabled
+			if ( WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
+				set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
 			}
 		}
 		

@@ -46,7 +46,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, $order->get_id() );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-				if ( ! $document->is_allowed() ) {
+				if ( ! $document || ! is_callable( array( $document, 'is_allowed' ) ) || ! $document->is_allowed() ) {
 					return false;
 				}
 
@@ -201,14 +201,14 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 }
 
 function wcpdf_ubl_headers( $filename, $size ) {
-	header( 'Content-Description: File Transfer ');
-	header( 'Content-Type: application/xml ');
+	header( 'Content-Description: File Transfer' );
+	header( 'Content-Type: text/xml' );
 	header( 'Content-Disposition: attachment; filename=' . $filename );
-	header( 'Content-Transfer-Encoding: binary ');
-	header( 'Connection: Keep-Alive ');
-	header( 'Expires: 0 ');
-	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0 ');
-	header( 'Pragma: public ');
+	header( 'Content-Transfer-Encoding: binary' );
+	header( 'Connection: Keep-Alive' );
+	header( 'Expires: 0' );
+	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+	header( 'Pragma: public' );
 	header( 'Content-Length: ' . $size );
 	do_action( 'wpo_after_ubl_headers', $filename, $size );
 }
