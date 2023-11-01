@@ -19,7 +19,7 @@
 	</ul>
 	<?php if ( ! empty( $document_type ) && 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) : ?>
 		<div class="notice notice-warning inline">
-			<p><?php _e( 'Using invoice number!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+			<p><?php _e( 'This document is currently using the main invoice number sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		</div>
 	<?php elseif ( ! empty( $selected_table_name ) && ! empty( $number_store_tables[ $selected_table_name ] ) ) : ?>
 		<p>
