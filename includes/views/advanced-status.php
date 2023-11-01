@@ -254,7 +254,7 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		'failed' => __( 'Not writable', 'woocommerce-pdf-invoices-packing-slips' ),
 	);
 
-	$permissions = array(
+	$permissions = apply_filters( 'wpo_wcpdf_plugin_directories', array(
 		'WCPDF_TEMP_DIR' => array (
 			'description'    => __( 'Central temporary plugin folder', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'          => WPO_WCPDF()->main->get_tmp_path(),
@@ -279,7 +279,7 @@ if ( ! $server_configs['PHP version']['result'] ) {
 			'status'         => is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? 'ok' : 'failed',			
 			'status_message' => is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? $status['ok'] : $status['failed'],
 		),
-	);
+	), $status );
 
 	$upload_dir  = wp_upload_dir();
 	$upload_base = trailingslashit( $upload_dir['basedir'] );
