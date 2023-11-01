@@ -1,8 +1,10 @@
 form#wpo-wcpdf-settings {
 	margin-left: 0 !important;
+	min-height: 600px;
 }
 #debug-tools {
-	width: 50%;
+	width: 100%;
+	margin-top: 2em;
 }
 
 #debug-tools .wrapper {
@@ -32,6 +34,19 @@ form#wpo-wcpdf-settings {
 	padding: 0 24px 0 8px;
 	min-height: 30px;
 	max-width: 25rem;
+}
+
+#debug-tools #danger_zone {
+	margin-top: 20px;
+	background-color: #fcf9e8;
+}
+
+#debug-tools #danger_zone .notice {
+	margin: 0;
+}
+
+#debug-tools .add-info {
+	margin-left: 6px;
 }
 
 #document_custom_redirect_page,

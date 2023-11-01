@@ -246,6 +246,7 @@ return array(
     'WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL' => $baseDir . '/includes/settings/class-wcpdf-settings-ubl.php',
     'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade' => $baseDir . '/includes/settings/class-wcpdf-settings-upgrade.php',
     'WPO\\WC\\PDF_Invoices\\Setup_Wizard' => $baseDir . '/includes/class-wcpdf-setup-wizard.php',
+    'WPO\\WC\\PDF_Invoices\\Tables\\Number_Store_List_Table' => $baseDir . '/includes/tables/class-wcpdf-number-store-list-table.php',
     'WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' => $baseDir . '/includes/class-wcpdf-updraft-semaphore.php',
     'WPO\\WC\\UBL\\Builders\\Builder' => $baseDir . '/ubl/Builders/Builder.php',
     'WPO\\WC\\UBL\\Builders\\SabreBuilder' => $baseDir . '/ubl/Builders/SabreBuilder.php',

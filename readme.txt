@@ -88,7 +88,7 @@ You're more than welcome! This plugin is hosted on github, where you can post is
 https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips
 
 = How can I display the HTML/CSS source for debugging/developing templates? =
-There's a setting on the Status tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
+There's a setting on the Advanced tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
 
 
 == Screenshots ==
@@ -291,7 +291,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: fatal error caused by list_files() function missing
 
 = 3.1.0 (2022-09-06) =
-* New: custom document links feature available from the Status settings page. Changes the document links to a prettier URL scheme
+* New: custom document links feature available from the Status tab debug settings page. Changes the document links to a prettier URL scheme
 * New: action hooks before and after the shop logo: `wpo_wcpdf_before_shop_logo` and `wpo_wcpdf_after_shop_logo`
 * Fix: replaces WP_Filesystem with PHP functions to delete temporary files
 * Marked tested up to WooCommerce 6.8

@@ -331,6 +331,7 @@ class ComposerStaticInit1066d81cd8f355258ef5165247019e8a
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-ubl.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-upgrade.php',
         'WPO\\WC\\PDF_Invoices\\Setup_Wizard' => __DIR__ . '/../..' . '/includes/class-wcpdf-setup-wizard.php',
+        'WPO\\WC\\PDF_Invoices\\Tables\\Number_Store_List_Table' => __DIR__ . '/../..' . '/includes/tables/class-wcpdf-number-store-list-table.php',
         'WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' => __DIR__ . '/../..' . '/includes/class-wcpdf-updraft-semaphore.php',
         'WPO\\WC\\UBL\\Builders\\Builder' => __DIR__ . '/../..' . '/ubl/Builders/Builder.php',
         'WPO\\WC\\UBL\\Builders\\SabreBuilder' => __DIR__ . '/../..' . '/ubl/Builders/SabreBuilder.php',

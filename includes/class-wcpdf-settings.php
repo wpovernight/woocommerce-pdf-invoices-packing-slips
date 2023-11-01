@@ -162,7 +162,7 @@ class Settings {
 		$row = $wpdb->get_row( "SHOW VARIABLES LIKE 'auto_increment_increment'" );
 		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			/* translators: database row value */
-			$error = wp_kses_post( sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %d, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Status tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), intval( $row->Value ) ) );
+			$error = wp_kses_post( sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %d, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Advanced tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), intval( $row->Value ) ) );
 			printf( '<div class="error"><p>%s</p></div>', $error );
 		}
 	}
@@ -190,7 +190,7 @@ class Settings {
 
 		// add status and upgrade tabs last in row
 		$settings_tabs['debug'] = array(
-			'title'          => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title'          => __( 'Advanced', 'woocommerce-pdf-invoices-packing-slips' ),
 			'preview_states' => 1,
 		);
 
@@ -204,7 +204,7 @@ class Settings {
 		$active_tab     = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : $default_tab;
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
 
-		include( 'views/wcpdf-settings-page.php' );
+		include( 'views/settings-page.php' );
 	}
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {

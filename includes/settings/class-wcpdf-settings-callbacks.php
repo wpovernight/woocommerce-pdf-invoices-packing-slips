@@ -453,7 +453,7 @@ class Settings_Callbacks {
 			if ( 'webp' === wp_check_filetype( $attachment_src )['ext'] && ! function_exists( 'imagecreatefromwebp' ) ) {
 				printf(
 					'<div class="notice notice-warning inline" style="display:inline-block; width:auto;"><p>%s</p></div>',
-					wp_kses_post( 'File type <strong>webp</strong> is not supported by your server! Please check your <strong>System Configurations</strong> under the <strong>Status</strong> tab.', 'woocommerce-pdf-invoices-packing-slips' )
+					wp_kses_post( 'File type <strong>webp</strong> is not supported by your server! Please check your <strong>System Configurations</strong> under the <strong>Advanced</strong> tab.', 'woocommerce-pdf-invoices-packing-slips' )
 				);
 			}
 
