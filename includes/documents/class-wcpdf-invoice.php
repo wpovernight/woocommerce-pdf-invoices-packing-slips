@@ -349,13 +349,13 @@ class Invoice extends Order_Document_Methods {
 						'30'     => __( '30 days', 'wpo_wcpdf_pro' ),
 						'custom' => __( 'Custom days', 'wpo_wcpdf_pro' ),
 					) ),
-					'description'	=> __( 'Select a due date to display in the invoice.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'	=> __( 'Displays a due date below the order data (invoice number, order date, etc.).', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
 				'type'			=> 'setting',
 				'id'			=> 'due_date_custom_days',
-				'title'			=> __( 'Custom Due Date (Days)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'			=> __( 'Custom due date (days)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'text_input',
 				'section'		=> $this->type,
 				'args'			=> array(
@@ -363,6 +363,22 @@ class Invoice extends Order_Document_Methods {
 					'id'			=> 'due_date_custom_days',
 					'description'	=> __( 'Enter the number of days for the due date.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
+			),
+			array(
+				'type'          => 'setting',
+				'id'            => 'due_date_base_date',
+                'title'         => __( 'Due date base date', 'woocommerce-pdf-invoices-packing-slips' ),
+                'callback'      => 'select',
+                'section'       => $this->type,
+                'args'          => array(
+					'option_name'   => $option_name,
+	                'id'            => 'due_date_base_date',
+                    'options'       => array(
+	                    'order_date'   => __( 'Order date', 'woocommerce-pdf-invoices-packing-slips' ),
+	                    'invoice_date' => __( 'Invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
+                    ),
+	                'description'   => __( 'Choose the initial date from which the due date will be calculated.', 'woocommerce-pdf-invoices-packing-slips')
+                )
 			),
 			array(
 				'type'			=> 'setting',

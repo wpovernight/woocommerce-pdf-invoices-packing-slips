@@ -1582,11 +1582,11 @@ class Main {
 	 * @return void
 	 */
 	public function display_due_date( string $document_type, $order ): void {
-		if ( 'invoice' !== $document_type ) {
+		if ( 'invoice' !== $document_type || empty( $order ) ) {
 			return;
 		}
 
-		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
 
 		if ( empty( $invoice_settings['due_date'] ) ) {
 			return;
@@ -1598,7 +1598,21 @@ class Main {
 			return;
 		}
 
-		$due_date_datetime = $order->get_date_created()->modify( "+$due_days days" );
+		$base_date_option = $invoice_settings['due_date_base_date'] ?? 'order_date';
+
+		if ( 'invoice_date' === $base_date_option ) {
+			$invoice = wcpdf_get_invoice( $order );
+			if ( $invoice && $invoice->exists() ) {
+				$base_date = $invoice->get_date( 'invoice' );
+			}
+		}
+
+		if ( empty( $base_date ) ) {
+			$base_date = $order->get_date_created();
+		}
+
+		$base_date         = apply_filters( 'wpo_wcpdf_due_date_base_date', $base_date, $base_date->getTimestamp(), $order );
+		$due_date_datetime = $base_date->modify( "+$due_days days" );
 		$due_date          = apply_filters( "wpo_wcpdf_invoice_due_date", date( wcpdf_date_format( $this, 'due_date' ), $due_date_datetime->getTimestamp() ), $due_date_datetime->getTimestamp(), $order );
 
 		if ( ! empty( $due_date ) ) {
