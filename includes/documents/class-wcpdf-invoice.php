@@ -335,6 +335,54 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'due_date',
+				'title'			=> __( 'Display due date', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'select',
+				'section'		=> $this->type,
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'due_date',
+					'options'       => apply_filters( 'wpo_wcpdf_due_date_options', array(
+						''       => __( 'No', 'wpo_wcpdf_pro' ),
+						'1'      => __( '1 day', 'wpo_wcpdf_pro' ),
+						'7'      => __( '7 days', 'wpo_wcpdf_pro' ),
+						'30'     => __( '30 days', 'wpo_wcpdf_pro' ),
+						'custom' => __( 'Custom days', 'wpo_wcpdf_pro' ),
+					) ),
+					'description'	=> __( 'Displays a due date below the order data.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'due_date_custom_days',
+				'title'			=> __( 'Custom due date (days)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'text_input',
+				'section'		=> $this->type,
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'due_date_custom_days',
+					'type'          => 'number',
+					'description'	=> __( 'Enter the number of days for the due date.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'          => 'setting',
+				'id'            => 'due_date_base_date',
+                'title'         => __( 'Due date base', 'woocommerce-pdf-invoices-packing-slips' ),
+                'callback'      => 'select',
+                'section'       => $this->type,
+                'args'          => array(
+					'option_name'   => $option_name,
+	                'id'            => 'due_date_base_date',
+                    'options'       => apply_filters( 'wpo_wcpdf_due_date_base_date_options', array(
+	                    'order_date'   => __( 'Order date', 'woocommerce-pdf-invoices-packing-slips' ),
+	                    'invoice_date' => __( 'Invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
+                    ) ),
+					'description'   => __( 'Choose the initial date from which the due date will be calculated.', 'woocommerce-pdf-invoices-packing-slips' )
+                )
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'display_number',
 				'title'			=> __( 'Display invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
@@ -650,6 +698,37 @@ class Invoice extends Order_Document_Methods {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
+	/**
+	 * Returns the due date timestamp.
+	 *
+	 * @return int
+	 */
+	public function get_due_date(): int {
+		if ( empty( $this->order ) || empty( $this->settings['due_date'] ) ) {
+			return 0;
+		}
+
+		$due_date_days = ( 'custom' === $this->settings['due_date'] ) ? intval( $this->settings['due_date_custom_days'] ?? 0 ) : absint( $this->settings['due_date'] );
+		$due_date_days = apply_filters( "wpo_wcpdf_{$this->slug}_due_date_days", $due_date_days, $this );
+
+		if ( 0 >= $due_date_days ) {
+			return 0;
+		}
+
+		if ( isset( $this->settings['due_date_base_date'] ) && 'invoice_date' === $this->settings['due_date_base_date'] && $this->exists() ) {
+			// The `get_date()` method has been used to get the date as a WC_DateTime object.
+			$base_date = $this->get_date( 'invoice' );
+		}
+
+		if ( empty( $base_date ) ) {
+			$base_date = $this->order->get_date_created();
+		}
+
+		$base_date         = apply_filters( "wpo_wcpdf_{$this->slug}_due_date_base_date", $base_date, $this );
+		$due_date_datetime = $base_date->modify( "+$due_date_days days" );
+
+		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date", $due_date_datetime->getTimestamp() ?? 0, $this );
+	}
 }
 
 endif; // class_exists
