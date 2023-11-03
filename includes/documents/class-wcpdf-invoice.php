@@ -708,7 +708,7 @@ class Invoice extends Order_Document_Methods {
 			return 0;
 		}
 
-		$due_date_days = ( 'custom' === $this->settings['due_date'] ) ? intval( $invoice_settings['due_date_custom_days'] ?? 0 ) : absint( $this->settings['due_date'] );
+		$due_date_days = ( 'custom' === $this->settings['due_date'] ) ? intval( $this->settings['due_date_custom_days'] ?? 0 ) : absint( $this->settings['due_date'] );
 		$due_date_days = apply_filters( "wpo_wcpdf_{$this->slug}_due_date_days", $due_date_days, $this );
 
 		if ( 0 >= $due_date_days ) {
