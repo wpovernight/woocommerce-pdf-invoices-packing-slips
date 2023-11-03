@@ -958,6 +958,9 @@ abstract class Order_Document {
 	}
 	
 	public function preview_ubl() {
+		// get last settings
+		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
+		
 		return $this->output_ubl( true );
 	}
 	
@@ -967,8 +970,10 @@ abstract class Order_Document {
 		
 		$ubl_document->set_order( $this->order );
 		
-		if ( $order_document = wcpdf_get_document( $this->get_type(), $this->order, true ) ) {
-			$ubl_document->set_order_document( $order_document );
+		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
+		
+		if ( $document ) {
+			$ubl_document->set_order_document( $document );
 		} else {
 			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
 			exit();
@@ -981,7 +986,7 @@ abstract class Order_Document {
 			return $contents;
 		}
 		
-		$filename      = $order_document->get_filename( 'download', array( 'output' => 'ubl' ) );
+		$filename      = $document->get_filename( 'download', array( 'output' => 'ubl' ) );
 		$full_filename = $ubl_maker->write( $filename, $contents );
 		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
 		$size          = filesize( $full_filename );

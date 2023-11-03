@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.0
+Stable tag: 3.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,7 +88,7 @@ You're more than welcome! This plugin is hosted on github, where you can post is
 https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips
 
 = How can I display the HTML/CSS source for debugging/developing templates? =
-There's a setting on the Status tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
+There's a setting on the Advanced tab of the settings page that allows you to toggle HTML output. Don't forget to turn if off after you're done testing!
 
 
 == Screenshots ==
@@ -101,6 +101,9 @@ There's a setting on the Status tab of the settings page that allows you to togg
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.1 (2023-10-20) =
+* Fix: bug on UBL preview that forces the invoice creation
 
 = 3.7.0 (2023-10-18) =
 * New: adds `payment_date()` function to be used in templates
@@ -288,7 +291,7 @@ There's a setting on the Status tab of the settings page that allows you to togg
 * Fix: fatal error caused by list_files() function missing
 
 = 3.1.0 (2022-09-06) =
-* New: custom document links feature available from the Status settings page. Changes the document links to a prettier URL scheme
+* New: custom document links feature available from the Status tab debug settings page. Changes the document links to a prettier URL scheme
 * New: action hooks before and after the shop logo: `wpo_wcpdf_before_shop_logo` and `wpo_wcpdf_after_shop_logo`
 * Fix: replaces WP_Filesystem with PHP functions to delete temporary files
 * Marked tested up to WooCommerce 6.8

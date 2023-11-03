@@ -228,27 +228,45 @@ class Assets {
 
 		// status/debug page scripts
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'debug' ) {
+			wp_enqueue_style(
+				'wpo-wcpdf-jquery-ui-styles',
+				'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css'
+			);
+			
+			wp_enqueue_script( 'jquery-ui-datepicker' );
 			
 			wp_enqueue_style(
 				'wpo-wcpdf-debug-tools-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools'.$suffix.'.css',
 				WPO_WCPDF_VERSION
 			);
+			
 			wp_enqueue_script(
 				'wpo-wcpdf-debug',
 				WPO_WCPDF()->plugin_url() . '/assets/js/debug-script'.$suffix.'.js',
-				[ 'jquery', 'jquery-blockui' ],
+				array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
 				WPO_WCPDF_VERSION
 			);
+			
 			wp_localize_script(
 				'wpo-wcpdf-debug',
 				'wpo_wcpdf_debug',
-				[
-					'ajaxurl'        => admin_url( 'admin-ajax.php' ),
-					'nonce'          => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
-					'download_label' => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
-					'confirm_reset'  => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
-				]
+				array(
+					'ajaxurl'              => admin_url( 'admin-ajax.php' ),
+					'nonce'                => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
+					'download_label'       => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_reset'        => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'select_document_type' => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
+					'danger_zone'          => array(
+						'enabled' => isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ? true : false,
+						'message' => sprintf(
+							/* translators: <a> tags */
+							__( '<strong>Enabled</strong>: %sclick here%s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
+							'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '#danger_zone">',
+							'</a>'
+						),
+					),
+				)
 			);
 			
 		}

@@ -3,7 +3,7 @@
  * Plugin Name:          PDF Invoices & Packing Slips for WooCommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              3.7.0
+ * Version:              3.7.1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -21,8 +21,9 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '3.7.0';
+	public $version = '3.7.1';
 	public $plugin_basename;
+	public $legacy_addons;
 	public $third_party_plugins;
 	public $order_util;
 	public $settings;
@@ -55,6 +56,10 @@ class WPO_WCPDF {
 	 */
 	public function __construct() {
 		$this->plugin_basename = plugin_basename(__FILE__);
+		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
+			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
+			'woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
+		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
 		
@@ -68,10 +73,10 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
-		add_action( 'admin_notices', array( $this, 'ubl_addon_active' ) );
+		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		
-		// deactivate ubl extension if activated
-		register_activation_hook( __FILE__, array( $this, 'deactivate_ubl_addon' ) );
+		// deactivate legacy extensions if activated
+		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
 	}
 	
 	private function autoloaders() {
@@ -169,7 +174,7 @@ class WPO_WCPDF {
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 		}
 		
-		add_action( 'admin_init', array( $this, 'deactivate_ubl_addon') );
+		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
 
 		// all systems ready - GO!
 		$this->includes();
@@ -495,49 +500,71 @@ class WPO_WCPDF {
 		return $active_plugins;
 	}
 	
-	public function deactivate_ubl_addon() {
-		$legacy_addon = $this->ubl_addon_detected();
-		if ( ! empty( $legacy_addon ) ) {
-			deactivate_plugins( $legacy_addon );
-			set_transient( 'wpo_wcpdf_ubl_addon_detected', 'yes', DAY_IN_SECONDS );
+	public function deactivate_legacy_addons() {
+		foreach ( $this->legacy_addons as $filename => $name ) {
+			$legacy_addon = $this->legacy_addon_detected( $filename );
+		
+			if ( ! empty( $legacy_addon ) ) {
+				deactivate_plugins( $legacy_addon );
+				$transient_name = $this->get_legacy_addon_transient_name( $filename );
+				set_transient( $transient_name, 'yes', DAY_IN_SECONDS );
+			}
 		}
 	}
 	
-	public function ubl_addon_detected() {
+	public function legacy_addon_detected( $filename ) {
 		$active_plugins = $this->get_active_plugins();
-		$ubl_addon      = '';
+		$legacy_addon   = '';
 		
 		foreach ( $active_plugins as $plugin ) {
-			if ( strpos( $plugin, 'ubl-woocommerce-pdf-invoices.php' ) !== false ) {
-				$ubl_addon = $plugin;
+			if ( false !== strpos( $plugin, $filename ) ) {
+				$legacy_addon = $plugin;
 				break;
 			}
 		}			
 		
-		return $ubl_addon;
+		return $legacy_addon;
 	}
 	
-	public function ubl_addon_active() {
-		if ( get_transient( 'wpo_wcpdf_ubl_addon_detected' ) ) {
-			ob_start();
-			?>
-			<div class="notice notice-warning">
-				<p><?php _e( 'While updating the PDF Invoices & Packing Slips for WooCommerce plugin we\'ve noticed our UBL add-on was active on your site. This functionality is now incorporated into the core plugin. We\'ve deactivated the add-on for you, and you are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_ubl_addon_active_notice', 'true' ), 'ubl_addon_active_notice' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-			</div>
-			<?php
-			echo wp_kses_post( ob_get_clean() );
-		}
+	public function get_legacy_addon_transient_name( $filename ) {
+		$filename_without_ext = basename( $filename, '.php' );
+		$legacy_addon_name    = str_replace( '-', '_', $filename_without_ext );
 		
-		// save option to hide mailpoet notice
-		if ( isset( $_REQUEST['wpo_wcpdf_hide_ubl_addon_active_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
-			// validate nonce
-			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ubl_addon_active_notice' ) ) {
-				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_ubl_addon_active_notice' );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-				exit;
-			} else {
-				delete_transient( 'wpo_wcpdf_ubl_addon_detected' );
+		return "wpo_wcpdf_legacy_addon_{$legacy_addon_name}";
+	}
+	
+	public function legacy_addon_notices() {
+		foreach ( $this->legacy_addons as $filename => $name ) {
+			$transient_name = $this->get_legacy_addon_transient_name( $filename );
+			$query_arg      = "{$transient_name}_notice";
+			
+			if ( get_transient( $transient_name ) ) {
+				ob_start();
+				?>
+				<div class="notice notice-warning">
+					<p>
+						<?php 
+							printf(
+								/* translators: legacy addon name */
+								__( 'While updating the PDF Invoices & Packing Slips for WooCommerce plugin we\'ve noticed our legacy %s add-on was active on your site. This functionality is now incorporated into the core plugin. We\'ve deactivated the add-on for you, and you are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<strong>' . esc_attr( $name ) . '</strong>'
+							);
+						?>
+					</p>
+					<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $query_arg => true ) ), 'wcpdf_legacy_addon_notice' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+				</div>
+				<?php
+				echo wp_kses_post( ob_get_clean() );
+			}
+			
+			// save option to hide legacy addon notice
+			if ( isset( $_REQUEST[ $query_arg ] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+				if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'wcpdf_legacy_addon_notice' ) ) {
+					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: ' . $query_arg );
+				} else {
+					delete_transient( $transient_name );
+				}
+				
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
 			}

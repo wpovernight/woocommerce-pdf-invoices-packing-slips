@@ -51,7 +51,7 @@ class Main {
 		add_filter( 'wpo_wcpdf_pdf_filters', array( $this, 'pdf_currency_filters' ) );
 		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
 
-		// scheduled attachments cleanup (following settings on Status tab)
+		// scheduled attachments cleanup (following settings on Advanced tab)
 		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 
 		// remove private data

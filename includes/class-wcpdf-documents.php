@@ -106,6 +106,17 @@ class Documents {
 		
 		return false;
 	}
+	
+	public function get_document_titles() {
+		$documents       = $this->get_documents();
+		$document_titles = array();
+		
+		foreach ( $documents as $document ) {
+			$document_titles[ $document->get_type() ] = $document->get_title();
+		}
+
+		return $document_titles;
+	}
 
 }
 
