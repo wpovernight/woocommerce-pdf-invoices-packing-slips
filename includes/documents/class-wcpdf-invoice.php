@@ -367,6 +367,18 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'          => 'setting',
+				'id'            => 'due_date_label',
+				'title'         => 'Due date label',
+				'callback'      => 'text_input',
+				'section'       => $this->type,
+				'args'          => array(
+					'option_name' => $option_name,
+					'id'          => 'due_date_label',
+					'placeholder' => 'Due date:'
+				)
+			),
+			array(
+				'type'          => 'setting',
 				'id'            => 'due_date_base_date',
                 'title'         => __( 'Due date base', 'woocommerce-pdf-invoices-packing-slips' ),
                 'callback'      => 'select',

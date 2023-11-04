@@ -1598,11 +1598,13 @@ class Main {
 			return;
 		}
 
-		$due_date = apply_filters( 'wpo_wcpdf_invoice_due_date_display', date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $order );
+		$due_date         = apply_filters( 'wpo_wcpdf_invoice_due_date_display', date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $order );
+		$invoice_settings = $invoice->get_settings();
+		$due_date_label   = ! empty( $invoice_settings['due_date_label'] ) ? $invoice_settings['due_date_label'] : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">
-                <th>', __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' ), '</th>
+                <th>', $due_date_label, '</th>
                 <td>', $due_date, '</td>
             </tr>';
 		}
