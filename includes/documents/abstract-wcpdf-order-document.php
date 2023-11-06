@@ -146,7 +146,7 @@ abstract class Order_Document {
 		$this->latest_settings = $this->get_settings( true );
 		
 		// save settings
-		$this->save_settings( $this->use_latest_settings() );
+		$this->save_settings( $this->maybe_use_latest_settings() );
 	}
 
 	public function get_order_settings() {
@@ -225,7 +225,7 @@ abstract class Order_Document {
 		}
 	}
 
-	public function use_latest_settings() {
+	public function maybe_use_latest_settings() {
 		return ! $this->use_historical_settings();
 	}
 	
