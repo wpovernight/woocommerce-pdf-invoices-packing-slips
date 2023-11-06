@@ -195,22 +195,29 @@ abstract class Order_Document {
 		}
 
 		$settings = $latest ? $this->latest_settings : $this->settings;
+		$update   = true;
 
 		if ( $this->storing_settings_enabled() && ( empty( $this->order_settings ) || $latest ) && ! empty( $settings ) && ! empty( $this->order ) ) {
-			// this is either the first time the document is generated, or historical settings are disabled
-			// in both cases, we store the document settings
-			// exclude non historical settings from being saved in order meta
-			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) ) );
-
-			if ( 'invoice' === $this->slug ) {
-				if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
-					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
-				} else {
-					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'invoice_date' );
-				}
+			if ( ! empty( $this->order_settings ) ) {
+				$update = 0 !== strcmp( serialize( (array) $this->order_settings ), serialize( (array) $settings ) );
 			}
 			
-			$this->order->save_meta_data();
+			if ( $update ) {
+				// this is either the first time the document is generated, or historical settings are disabled
+				// in both cases, we store the document settings
+				// exclude non historical settings from being saved in order meta
+				$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) ) );
+
+				if ( 'invoice' === $this->slug ) {
+					if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
+					} else {
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'invoice_date' );
+					}
+				}
+				
+				$this->order->save_meta_data();
+			}
 		}
 	}
 
