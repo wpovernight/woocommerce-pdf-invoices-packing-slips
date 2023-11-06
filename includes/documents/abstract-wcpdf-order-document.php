@@ -140,6 +140,11 @@ abstract class Order_Document {
 		$this->settings        = $this->get_settings();
 		$this->latest_settings = $this->get_settings( true );
 		
+		// don't save settings on Preview requests
+		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
+			return;
+		}
+		
 		// save settings
 		$latest = $this->use_historical_settings() ? false : true;
 		$this->save_settings( $latest );
