@@ -1381,9 +1381,9 @@ abstract class Order_Document {
 			return 0;
 		}
 
-		if ( isset( $this->settings['due_date_base_date'] ) && 'invoice_date' === $this->settings['due_date_base_date'] && $this->exists() ) {
+		if ( isset( $this->settings['due_date_base_date'] ) && 'document_date' === $this->settings['due_date_base_date'] && $this->exists() ) {
 			// The `get_date()` method has been used to get the date as a WC_DateTime object.
-			$base_date = $this->get_date( 'invoice' );
+			$base_date = $this->get_date( $this->get_type() );
 		}
 
 		if ( empty( $base_date ) ) {

@@ -386,7 +386,7 @@ class Invoice extends Order_Document_Methods {
 	                'id'            => 'due_date_base_date',
                     'options'       => apply_filters( 'wpo_wcpdf_due_date_base_date_options', array(
 	                    'order_date'   => __( 'Order date', 'woocommerce-pdf-invoices-packing-slips' ),
-	                    'invoice_date' => __( 'Invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
+	                    'document_date' => __( 'Invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
                     ) ),
 					'description'   => __( 'Choose the initial date from which the due date will be calculated.', 'woocommerce-pdf-invoices-packing-slips' )
                 )
