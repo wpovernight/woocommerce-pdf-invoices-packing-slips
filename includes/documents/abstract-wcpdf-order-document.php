@@ -134,16 +134,16 @@ abstract class Order_Document {
 	}
 
 	public function init_settings_data() {
+		// don't override/save settings on Preview requests
+		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
+			return;
+		}
+		
 		// order
 		$this->order_settings  = $this->get_order_settings();
 		// pdf
 		$this->settings        = $this->get_settings();
 		$this->latest_settings = $this->get_settings( true );
-		
-		// don't save settings on Preview requests
-		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
-			return;
-		}
 		
 		// save settings
 		$latest = $this->use_historical_settings() ? false : true;
