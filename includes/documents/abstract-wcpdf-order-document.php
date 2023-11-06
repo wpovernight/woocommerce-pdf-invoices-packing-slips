@@ -134,7 +134,7 @@ abstract class Order_Document {
 	}
 
 	public function init_settings_data() {
-		// don't override/save the filtered settings on Preview requests
+		// don't override/save settings on Preview requests
 		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
 			return;
 		}
