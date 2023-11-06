@@ -135,10 +135,14 @@ abstract class Order_Document {
 
 	public function init_settings_data() {
 		// order
-		$this->order_settings      = $this->get_order_settings();
+		$this->order_settings  = $this->get_order_settings();
 		// pdf
-		$this->settings            = $this->get_settings();
-		$this->latest_settings     = $this->get_settings( true );
+		$this->settings        = $this->get_settings();
+		$this->latest_settings = $this->get_settings( true );
+		
+		// save settings
+		$latest = $this->use_historical_settings() ? false : true;
+		$this->save_settings( $latest );
 	}
 
 	public function get_order_settings() {
@@ -171,18 +175,7 @@ abstract class Order_Document {
 					// option should be added) or whether the option was simply unchecked (in which case it should not
 					// be overwritten). This can only be address by storing unchecked checkboxes too.
 					$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
-				} else {
-					// this is either the first time the document is generated, or historical settings are disabled
-					// in both cases, we store the document settings
-					// exclude non historical settings from being saved in order meta
-					$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
-					$this->order->save_meta_data();
 				}
-			}
-		} else {
-			// delete historical settings, we want the most current settings
-			if ( ! empty( $this->order ) ) {
-				$this->order->delete_meta_data( "_wcpdf_{$this->slug}_settings" );
 			}
 		}
 
@@ -203,15 +196,15 @@ abstract class Order_Document {
 			$this->init_settings_data();
 		}
 
-		$settings = ( $latest === true ) ? $this->latest_settings : $this->settings;
+		$settings = $latest ? $this->latest_settings : $this->settings;
 
 		if ( $this->storing_settings_enabled() && ( empty( $this->order_settings ) || $latest ) && ! empty( $settings ) && ! empty( $this->order ) ) {
 			// this is either the first time the document is generated, or historical settings are disabled
 			// in both cases, we store the document settings
 			// exclude non historical settings from being saved in order meta
-			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
+			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) ) );
 
-			if ( 'invoice' == $this->slug ) {
+			if ( 'invoice' === $this->slug ) {
 				if ( isset( $settings['display_date'] ) && $settings['display_date'] == 'order_date' ) {
 					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
 				} else {
@@ -653,9 +646,9 @@ abstract class Order_Document {
 	*/
 
 	public function get_number_settings() {
-		if (empty($this->settings)) {
-			$settings = $this->get_settings( true ); // we always want the latest settings
-			$number_settings = isset($settings['number_format'])?$settings['number_format']:array();
+		if ( empty( $this->settings ) ) {
+			$settings        = $this->get_settings( true ); // we always want the latest settings
+			$number_settings = isset( $settings['number_format'] ) ? $settings['number_format'] : array();
 		} else {
 			$number_settings = $this->get_setting( 'number_format', array() );
 		}
@@ -970,7 +963,7 @@ abstract class Order_Document {
 	
 	public function preview_ubl() {
 		// get last settings
-		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
+		$this->settings = $this->get_settings( true, 'ubl' );
 		
 		return $this->output_ubl( true );
 	}
