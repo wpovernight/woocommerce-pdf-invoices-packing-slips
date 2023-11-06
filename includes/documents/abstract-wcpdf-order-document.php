@@ -166,16 +166,14 @@ abstract class Order_Document {
 
 		if ( ! $latest ) {
 			// get historical settings if enabled
-			if ( ! empty( $this->order ) && $this->use_historical_settings() ) {
-				if ( ! empty( $this->order_settings ) ) {
-					// ideally we should combine the order settings with the latest settings, so that new settings will
-					// automatically be applied to existing orders too. However, doing this by combining arrays is not
-					// possible because the way settings are currently stored means unchecked options are not included.
-					// This means there is no way to tell whether an option didn't exist yet (in which case the new
-					// option should be added) or whether the option was simply unchecked (in which case it should not
-					// be overwritten). This can only be address by storing unchecked checkboxes too.
-					$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
-				}
+			if ( ! empty( $this->order ) && $this->use_historical_settings() && ! empty( $this->order_settings ) ) {
+				// ideally we should combine the order settings with the latest settings, so that new settings will
+				// automatically be applied to existing orders too. However, doing this by combining arrays is not
+				// possible because the way settings are currently stored means unchecked options are not included.
+				// This means there is no way to tell whether an option didn't exist yet (in which case the new
+				// option should be added) or whether the option was simply unchecked (in which case it should not
+				// be overwritten). This can only be address by storing unchecked checkboxes too.
+				$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
 			}
 		}
 
