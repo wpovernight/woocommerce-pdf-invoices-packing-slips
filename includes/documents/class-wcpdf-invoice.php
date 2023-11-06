@@ -18,7 +18,6 @@ class Invoice extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
-	public $slug;
 	public $lock_name;
 	public $lock_context;
 	public $lock_time;
@@ -35,8 +34,7 @@ class Invoice extends Order_Document_Methods {
 		$this->type         = 'invoice';
 		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-		$this->slug         = ! empty( $this->type ) ? str_replace( '-', '_', $this->type ) : '';
-		
+
 		// semaphore
 		$this->lock_name    = "wpo_wcpdf_{$this->slug}_number_lock";
 		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
@@ -710,37 +708,6 @@ class Invoice extends Order_Document_Methods {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
-	/**
-	 * Returns the due date timestamp.
-	 *
-	 * @return int
-	 */
-	public function get_due_date(): int {
-		if ( empty( $this->order ) || empty( $this->settings['due_date'] ) ) {
-			return 0;
-		}
-
-		$due_date_days = ( 'custom' === $this->settings['due_date'] ) ? intval( $this->settings['due_date_custom_days'] ?? 0 ) : absint( $this->settings['due_date'] );
-		$due_date_days = apply_filters( "wpo_wcpdf_{$this->slug}_due_date_days", $due_date_days, $this );
-
-		if ( 0 >= $due_date_days ) {
-			return 0;
-		}
-
-		if ( isset( $this->settings['due_date_base_date'] ) && 'invoice_date' === $this->settings['due_date_base_date'] && $this->exists() ) {
-			// The `get_date()` method has been used to get the date as a WC_DateTime object.
-			$base_date = $this->get_date( 'invoice' );
-		}
-
-		if ( empty( $base_date ) ) {
-			$base_date = $this->order->get_date_created();
-		}
-
-		$base_date         = apply_filters( "wpo_wcpdf_{$this->slug}_due_date_base_date", $base_date, $this );
-		$due_date_datetime = $base_date->modify( "+$due_date_days days" );
-
-		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date", $due_date_datetime->getTimestamp() ?? 0, $this );
-	}
 }
 
 endif; // class_exists

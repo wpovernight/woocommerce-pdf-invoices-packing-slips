@@ -1586,12 +1586,6 @@ class Main {
 			return;
 		}
 
-		$allowed_document_types = apply_filters( 'wpo_wcpdf_due_date_allowed_document_types', array( 'invoice' ), $order, $document_type );
-
-		if ( ! in_array( $document_type, $allowed_document_types, true ) ) {
-			return;
-		}
-
 		$document = wcpdf_get_document( $document_type, $order );
 
 		if ( ! $document ) {
