@@ -1582,25 +1582,31 @@ class Main {
 	 * @return void
 	 */
 	public function display_due_date( string $document_type, $order ): void {
-		if ( 'invoice' !== $document_type || empty( $order ) ) {
+		if ( empty( $order ) ) {
 			return;
 		}
 
-		$invoice = wcpdf_get_invoice( $order );
+		$allowed_document_types = apply_filters( 'wpo_wcpdf_due_date_allowed_document_types', array( 'invoice' ), $order, $document_type );
 
-		if ( ! $invoice ) {
+		if ( ! in_array( $document_type, $allowed_document_types, true ) ) {
 			return;
 		}
 
-		$due_date_timestamp = $invoice->get_due_date();
+		$document = wcpdf_get_document( $document_type, $order );
+
+		if ( ! $document ) {
+			return;
+		}
+
+		$due_date_timestamp = is_callable( array( $document, 'get_due_date' ) ) ? $document->get_due_date() : 0;
 
 		if ( 0 >= $due_date_timestamp ) {
 			return;
 		}
 
-		$due_date         = apply_filters( 'wpo_wcpdf_invoice_due_date_display', date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $order );
-		$invoice_settings = $invoice->get_settings();
-		$due_date_label   = ! empty( $invoice_settings['due_date_label'] ) ? $invoice_settings['due_date_label'] : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+		$due_date          = apply_filters( "wpo_wcpdf_{$document->slug}_due_date_display", date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $order, $document_type );
+		$document_settings = $document->get_settings();
+		$due_date_label    = ! empty( $document_settings['due_date_label'] ) ? $document_settings['due_date_label'] : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">
