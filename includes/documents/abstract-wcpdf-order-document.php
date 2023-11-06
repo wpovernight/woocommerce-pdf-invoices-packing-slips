@@ -146,8 +146,7 @@ abstract class Order_Document {
 		$this->latest_settings = $this->get_settings( true );
 		
 		// save settings
-		$latest = $this->use_historical_settings() ? false : true;
-		$this->save_settings( $latest );
+		$this->save_settings( $this->use_latest_settings() );
 	}
 
 	public function get_order_settings() {
@@ -226,6 +225,10 @@ abstract class Order_Document {
 		}
 	}
 
+	public function use_latest_settings() {
+		return ! $this->use_historical_settings();
+	}
+	
 	public function use_historical_settings() {
 		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', false, $this );
 	}
