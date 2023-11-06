@@ -160,10 +160,10 @@ abstract class Order_Document {
 		$document_settings = WPO_WCPDF()->settings->get_document_settings( $this->get_type(), $output_format );
 		$settings          = (array) $document_settings + (array) $common_settings;
 
-		if ( $latest != true ) {
+		if ( ! $latest ) {
 			// get historical settings if enabled
-			if ( ! empty( $this->order ) && $this->use_historical_settings() == true ) {
-				if ( ! empty( $this->order_settings ) && is_array( $this->order_settings ) ) {
+			if ( ! empty( $this->order ) && $this->use_historical_settings() ) {
+				if ( ! empty( $this->order_settings ) ) {
 					// ideally we should combine the order settings with the latest settings, so that new settings will
 					// automatically be applied to existing orders too. However, doing this by combining arrays is not
 					// possible because the way settings are currently stored means unchecked options are not included.
@@ -171,7 +171,18 @@ abstract class Order_Document {
 					// option should be added) or whether the option was simply unchecked (in which case it should not
 					// be overwritten). This can only be address by storing unchecked checkboxes too.
 					$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
+				} else {
+					// this is either the first time the document is generated, or historical settings are disabled
+					// in both cases, we store the document settings
+					// exclude non historical settings from being saved in order meta
+					$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
+					$this->order->save_meta_data();
 				}
+			}
+		} else {
+			// delete historical settings, we want the most current settings
+			if ( ! empty( $this->order ) ) {
+				$this->order->delete_meta_data( "_wcpdf_{$this->slug}_settings" );
 			}
 		}
 

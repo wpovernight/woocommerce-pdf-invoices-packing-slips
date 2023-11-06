@@ -82,7 +82,6 @@ class Invoice extends Order_Document_Methods {
 			$this->set_display_date( 'invoice_date' );	
 		}
 
-		
 		$this->init_number();
 
 		do_action( 'wpo_wcpdf_init_document', $this );
