@@ -1604,9 +1604,9 @@ class Main {
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">
-                <th>', $due_date_label, '</th>
-                <td>', $due_date, '</td>
-            </tr>';
+				<th>', $due_date_label, '</th>
+				<td>', $due_date, '</td>
+			</tr>';
 		}
 	}
 }
