@@ -108,22 +108,11 @@ jQuery( function( $ ) {
 	function toggle_due_date_custom_days_field() {
 		const due_date_value 	   = $( '#due_date' ).val();
 		const due_date_custom_days = $( '#due_date_custom_days' );
-		const due_date_base_date   = $( '#due_date_base_date' );
-		const due_date_title	   = $( '#due_date_title' );
 
-		if ( '' === due_date_value ) {
-			due_date_custom_days.closest( 'tr' ).hide();
-			due_date_base_date.closest( 'tr' ).hide();
-			due_date_title.closest( 'tr' ).hide();
-		}
-		else if ( 'custom' === due_date_value ) {
+		if ( 'custom' === due_date_value ) {
 			due_date_custom_days.closest( 'tr' ).show();
-			due_date_base_date.closest( 'tr' ).show();
-			due_date_title.closest( 'tr' ).show();
 		} else {
 			due_date_custom_days.closest( 'tr' ).hide();
-			due_date_base_date.closest( 'tr' ).show();
-			due_date_title.closest( 'tr' ).show();
 		}
 	}
 

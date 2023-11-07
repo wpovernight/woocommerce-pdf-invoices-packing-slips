@@ -1380,25 +1380,16 @@ abstract class Order_Document {
 		}
 
 		$due_date_days = ( 'custom' === $this->settings['due_date'] ) ? intval( $this->settings['due_date_custom_days'] ?? 0 ) : absint( $this->settings['due_date'] );
-		$due_date_days = apply_filters( "wpo_wcpdf_{$this->slug}_due_date_days", $due_date_days, $this );
+		$due_date_days = apply_filters( "wpo_wcpdf_due_date_days", $due_date_days, $this->type, $this );
 
 		if ( 0 >= $due_date_days ) {
 			return 0;
 		}
 
-		if ( isset( $this->settings['due_date_base_date'] ) && 'document_date' === $this->settings['due_date_base_date'] && $this->exists() ) {
-			// The `get_date()` method has been used to get the date as a WC_DateTime object.
-			$base_date = $this->get_date( $this->get_type() );
-		}
-
-		if ( empty( $base_date ) ) {
-			$base_date = $this->order->get_date_created();
-		}
-
-		$base_date         = apply_filters( "wpo_wcpdf_{$this->slug}_due_date_base_date", $base_date, $this );
+		$base_date         = apply_filters( "wpo_wcpdf_due_date_base_date", $this->order->get_date_created(), $this->type, $this );
 		$due_date_datetime = $base_date->modify( "+$due_date_days days" );
 
-		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date", $due_date_datetime->getTimestamp() ?? 0, $this );
+		return apply_filters( "wpo_wcpdf_due_date", $due_date_datetime->getTimestamp() ?? 0, $this->type, $this );
 	}
 
 	protected function add_filters( $filters ) {

@@ -364,35 +364,6 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			array(
-				'type'          => 'setting',
-				'id'            => 'due_date_title',
-				'title'         => 'Due date label',
-				'callback'      => 'i18n_wrap',
-				'section'       => $this->type,
-				'args'          => array(
-					'callback'    => 'text_input',
-					'option_name' => $option_name,
-					'id'          => 'due_date_title',
-					'placeholder' => __( 'Due date:', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'          => 'setting',
-				'id'            => 'due_date_base_date',
-                'title'         => __( 'Due date base', 'woocommerce-pdf-invoices-packing-slips' ),
-                'callback'      => 'select',
-                'section'       => $this->type,
-                'args'          => array(
-					'option_name'   => $option_name,
-	                'id'            => 'due_date_base_date',
-                    'options'       => apply_filters( 'wpo_wcpdf_due_date_base_date_options', array(
-	                    'order_date'    => __( 'Order date', 'woocommerce-pdf-invoices-packing-slips' ),
-	                    'document_date' => __( 'Invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
-                    ), $this->slug ),
-					'description'   => __( 'Choose the initial date from which the due date will be calculated.', 'woocommerce-pdf-invoices-packing-slips' )
-                )
-			),
-			array(
 				'type'			=> 'setting',
 				'id'			=> 'display_number',
 				'title'			=> __( 'Display invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
