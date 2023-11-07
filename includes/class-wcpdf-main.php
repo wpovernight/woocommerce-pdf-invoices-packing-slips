@@ -1586,7 +1586,7 @@ class Main {
 			return;
 		}
 
-        /** @var \WPO\WC\PDF_Invoices\Documents\Order_Document_Methods $document */
+		/** @var \WPO\WC\PDF_Invoices\Documents\Order_Document_Methods $document */
 		$document = wcpdf_get_document( $document_type, $order );
 
 		if ( ! $document ) {
