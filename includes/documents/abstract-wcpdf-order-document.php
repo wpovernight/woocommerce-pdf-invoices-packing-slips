@@ -514,6 +514,11 @@ abstract class Order_Document {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
+	public function get_due_date_title() {
+		$due_date_title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date_title", $due_date_title, $this );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Data setters

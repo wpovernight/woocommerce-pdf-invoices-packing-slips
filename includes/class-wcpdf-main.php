@@ -1586,6 +1586,7 @@ class Main {
 			return;
 		}
 
+        /** @var \WPO\WC\PDF_Invoices\Documents\Order_Document_Methods $document */
 		$document = wcpdf_get_document( $document_type, $order );
 
 		if ( ! $document ) {
@@ -1598,13 +1599,11 @@ class Main {
 			return;
 		}
 
-		$due_date          = apply_filters( "wpo_wcpdf_{$document->slug}_due_date_display", date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $order, $document_type );
-		$document_settings = $document->get_settings();
-		$due_date_label    = ! empty( $document_settings['due_date_label'] ) ? $document_settings['due_date_label'] : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+		$due_date = apply_filters( "wpo_wcpdf_{$document->slug}_due_date_display", date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $order, $document_type );
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">
-				<th>', $due_date_label, '</th>
+				<th>', $document->get_due_date_title(), '</th>
 				<td>', $due_date, '</td>
 			</tr>';
 		}
