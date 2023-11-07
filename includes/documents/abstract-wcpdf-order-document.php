@@ -134,11 +134,19 @@ abstract class Order_Document {
 	}
 
 	public function init_settings_data() {
+		// don't override/save settings on Preview requests
+		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
+			return;
+		}
+		
 		// order
-		$this->order_settings      = $this->get_order_settings();
+		$this->order_settings  = $this->get_order_settings();
 		// pdf
-		$this->settings            = $this->get_settings();
-		$this->latest_settings     = $this->get_settings( true );
+		$this->settings        = $this->get_settings();
+		$this->latest_settings = $this->get_settings( true );
+		
+		// save settings
+		$this->save_settings( $this->maybe_use_latest_settings() );
 	}
 
 	public function get_order_settings() {
@@ -160,18 +168,16 @@ abstract class Order_Document {
 		$document_settings = WPO_WCPDF()->settings->get_document_settings( $this->get_type(), $output_format );
 		$settings          = (array) $document_settings + (array) $common_settings;
 
-		if ( $latest != true ) {
+		if ( ! $latest ) {
 			// get historical settings if enabled
-			if ( ! empty( $this->order ) && $this->use_historical_settings() == true ) {
-				if ( ! empty( $this->order_settings ) && is_array( $this->order_settings ) ) {
-					// ideally we should combine the order settings with the latest settings, so that new settings will
-					// automatically be applied to existing orders too. However, doing this by combining arrays is not
-					// possible because the way settings are currently stored means unchecked options are not included.
-					// This means there is no way to tell whether an option didn't exist yet (in which case the new
-					// option should be added) or whether the option was simply unchecked (in which case it should not
-					// be overwritten). This can only be address by storing unchecked checkboxes too.
-					$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
-				}
+			if ( ! empty( $this->order ) && $this->use_historical_settings() && ! empty( $this->order_settings ) ) {
+				// ideally we should combine the order settings with the latest settings, so that new settings will
+				// automatically be applied to existing orders too. However, doing this by combining arrays is not
+				// possible because the way settings are currently stored means unchecked options are not included.
+				// This means there is no way to tell whether an option didn't exist yet (in which case the new
+				// option should be added) or whether the option was simply unchecked (in which case it should not
+				// be overwritten). This can only be address by storing unchecked checkboxes too.
+				$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
 			}
 		}
 
@@ -192,26 +198,37 @@ abstract class Order_Document {
 			$this->init_settings_data();
 		}
 
-		$settings = ( $latest === true ) ? $this->latest_settings : $this->settings;
+		$settings = $latest ? $this->latest_settings : $this->settings;
+		$update   = true;
 
 		if ( $this->storing_settings_enabled() && ( empty( $this->order_settings ) || $latest ) && ! empty( $settings ) && ! empty( $this->order ) ) {
-			// this is either the first time the document is generated, or historical settings are disabled
-			// in both cases, we store the document settings
-			// exclude non historical settings from being saved in order meta
-			$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( $settings, array_flip( $this->get_non_historical_settings() ) ) );
-
-			if ( 'invoice' == $this->slug ) {
-				if ( isset( $settings['display_date'] ) && $settings['display_date'] == 'order_date' ) {
-					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
-				} else {
-					$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'invoice_date' );
-				}
+			if ( ! empty( $this->order_settings ) ) {
+				$update = 0 !== strcmp( serialize( (array) $this->order_settings ), serialize( (array) $settings ) );
 			}
 			
-			$this->order->save_meta_data();
+			if ( $update ) {
+				// this is either the first time the document is generated, or historical settings are disabled
+				// in both cases, we store the document settings
+				// exclude non historical settings from being saved in order meta
+				$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) ) );
+
+				if ( 'invoice' === $this->slug ) {
+					if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
+					} else {
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'invoice_date' );
+					}
+				}
+				
+				$this->order->save_meta_data();
+			}
 		}
 	}
 
+	public function maybe_use_latest_settings() {
+		return ! $this->use_historical_settings();
+	}
+	
 	public function use_historical_settings() {
 		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', false, $this );
 	}
@@ -642,9 +659,9 @@ abstract class Order_Document {
 	*/
 
 	public function get_number_settings() {
-		if (empty($this->settings)) {
-			$settings = $this->get_settings( true ); // we always want the latest settings
-			$number_settings = isset($settings['number_format'])?$settings['number_format']:array();
+		if ( empty( $this->settings ) ) {
+			$settings        = $this->get_settings( true ); // we always want the latest settings
+			$number_settings = isset( $settings['number_format'] ) ? $settings['number_format'] : array();
 		} else {
 			$number_settings = $this->get_setting( 'number_format', array() );
 		}
@@ -959,7 +976,7 @@ abstract class Order_Document {
 	
 	public function preview_ubl() {
 		// get last settings
-		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
+		$this->settings = $this->get_settings( true, 'ubl' );
 		
 		return $this->output_ubl( true );
 	}
