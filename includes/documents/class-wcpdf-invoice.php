@@ -345,22 +345,8 @@ class Invoice extends Order_Document_Methods {
 						'1'      => __( '1 day', 'wpo_wcpdf_pro' ),
 						'7'      => __( '7 days', 'wpo_wcpdf_pro' ),
 						'30'     => __( '30 days', 'wpo_wcpdf_pro' ),
-						'custom' => __( 'Custom days', 'wpo_wcpdf_pro' ),
 					) ),
 					'description'	=> __( 'Displays a due date below the order data.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'			=> 'setting',
-				'id'			=> 'due_date_custom_days',
-				'title'			=> __( 'Custom due date (days)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'text_input',
-				'section'		=> $this->type,
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'due_date_custom_days',
-					'type'          => 'number',
-					'description'	=> __( 'Enter the number of days for the due date.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(

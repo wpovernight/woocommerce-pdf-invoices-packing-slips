@@ -1379,10 +1379,9 @@ abstract class Order_Document {
 			return 0;
 		}
 
-		$due_date_days = ( 'custom' === $this->settings['due_date'] ) ? intval( $this->settings['due_date_custom_days'] ?? 0 ) : absint( $this->settings['due_date'] );
-		$due_date_days = apply_filters( "wpo_wcpdf_due_date_days", $due_date_days, $this->type, $this );
+		$due_date_days = apply_filters( "wpo_wcpdf_due_date_days", $this->settings['due_date'], $this->type, $this );
 
-		if ( 0 >= $due_date_days ) {
+		if ( 0 >= intval( $due_date_days ) ) {
 			return 0;
 		}
 

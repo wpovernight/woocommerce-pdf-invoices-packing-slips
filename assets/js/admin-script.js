@@ -105,21 +105,6 @@ jQuery( function( $ ) {
 		'delay':     200
 	} );
 
-	function toggle_due_date_custom_days_field() {
-		const due_date_value 	   = $( '#due_date' ).val();
-		const due_date_custom_days = $( '#due_date_custom_days' );
-
-		if ( 'custom' === due_date_value ) {
-			due_date_custom_days.closest( 'tr' ).show();
-		} else {
-			due_date_custom_days.closest( 'tr' ).hide();
-		}
-	}
-
-	toggle_due_date_custom_days_field();
-
-	$( '#due_date' ).change( toggle_due_date_custom_days_field );
-
 	//----------> Preview <----------//
 	// objects
 	let $previewWrapper           = $( '#wpo-wcpdf-preview-wrapper' );
