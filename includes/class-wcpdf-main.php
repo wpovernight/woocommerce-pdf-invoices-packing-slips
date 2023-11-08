@@ -1582,29 +1582,30 @@ class Main {
 	 * @return void
 	 */
 	public function display_due_date( string $document_type, $order ): void {
-		if ( 'invoice' !== $document_type || empty( $order ) ) {
+		if ( empty( $order ) ) {
 			return;
 		}
 
-		$invoice = wcpdf_get_invoice( $order );
+		$document = wcpdf_get_document( $document_type, $order );
 
-		if ( ! $invoice ) {
+		if ( ! $document ) {
 			return;
 		}
 
-		$due_date_timestamp = $invoice->get_due_date();
+		$due_date_timestamp = is_callable( array( $document, 'get_due_date' ) ) ? $document->get_due_date() : 0;
 
 		if ( 0 >= $due_date_timestamp ) {
 			return;
 		}
 
-		$due_date = apply_filters( 'wpo_wcpdf_invoice_due_date_display', date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $order );
+		$due_date       = apply_filters( 'wpo_wcpdf_due_date_display', date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $document_type, $order );
+		$due_date_title = is_callable( array( $document, 'get_due_date_title' ) ) ? $document->get_due_date_title() : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">
-                <th>', __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' ), '</th>
-                <td>', $due_date, '</td>
-            </tr>';
+				<th>', $due_date_title, '</th>
+				<td>', $due_date, '</td>
+			</tr>';
 		}
 	}
 }

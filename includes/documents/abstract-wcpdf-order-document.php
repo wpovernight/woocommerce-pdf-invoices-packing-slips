@@ -531,6 +531,11 @@ abstract class Order_Document {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
+	public function get_due_date_title() {
+		$due_date_title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date_title", $due_date_title, $this );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Data setters
@@ -1379,6 +1384,28 @@ abstract class Order_Document {
 		}
 
 		return intval( $year );
+	}
+
+	/**
+	 * Returns the due date timestamp.
+	 *
+	 * @return int
+	 */
+	public function get_due_date(): int {
+		if ( empty( $this->order ) || empty( $this->settings['due_date'] ) ) {
+			return 0;
+		}
+
+		$due_date_days = apply_filters( 'wpo_wcpdf_due_date_days', $this->settings['due_date'], $this->type, $this );
+
+		if ( 0 >= intval( $due_date_days ) ) {
+			return 0;
+		}
+
+		$base_date         = apply_filters( 'wpo_wcpdf_due_date_base_date', $this->order->get_date_created(), $this->type, $this );
+		$due_date_datetime = $base_date->modify( "+$due_date_days days" );
+
+		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->type, $this );
 	}
 
 	protected function add_filters( $filters ) {
