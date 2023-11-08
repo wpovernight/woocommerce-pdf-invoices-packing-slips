@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.1
+Stable tag: 3.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,15 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.2 (2023-11-08) =
+* New: adds Due Date option to the Invoice settings
+* New: filter for plugin directories in Advanced Status tab: `wpo_wcpdf_plugin_directories`
+* New: advanced tab with Number tools extension code integrated
+* Tweak: updates Upgrade tab extension features
+* Fix: bug on historical settings not being deleted when using most current settings
+* Fix: bug on document variable name on `output_ubl()` method 
+* Tested up to WooCommerce 8.3
 
 = 3.7.1 (2023-10-20) =
 * Fix: bug on UBL preview that forces the invoice creation
