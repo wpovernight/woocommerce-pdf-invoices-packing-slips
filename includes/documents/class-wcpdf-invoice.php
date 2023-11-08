@@ -341,11 +341,11 @@ class Invoice extends Order_Document_Methods {
 					'option_name'	=> $option_name,
 					'id'			=> 'due_date',
 					'options'       => apply_filters( 'wpo_wcpdf_due_date_options', array(
-						''       => __( 'No', 'wpo_wcpdf_pro' ),
-						'1'      => __( '1 day', 'wpo_wcpdf_pro' ),
-						'7'      => __( '7 days', 'wpo_wcpdf_pro' ),
-						'30'     => __( '30 days', 'wpo_wcpdf_pro' ),
-					) ),
+						''   => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ),
+						'1'  => __( '1 day', 'woocommerce-pdf-invoices-packing-slips' ),
+						'7'  => __( '7 days', 'woocommerce-pdf-invoices-packing-slips' ),
+						'30' => __( '30 days', 'woocommerce-pdf-invoices-packing-slips' ),
+					), $this->type ),
 					'description'	=> __( 'Displays a due date below the order data.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
