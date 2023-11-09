@@ -1576,13 +1576,13 @@ class Main {
 	}
 
 	/**
-	 * @param string $document_type
-	 * @param \WC_Order|\WC_Order_Refund $order
+	 * @param null|string $document_type
+	 * @param null|\WC_Order|\WC_Order_Refund $order
 	 *
 	 * @return void
 	 */
-	public function display_due_date( string $document_type, $order ): void {
-		if ( empty( $order ) ) {
+	public function display_due_date( string $document_type = null, $order = null ): void {
+		if ( empty( $order ) || empty( $document_type ) ) {
 			return;
 		}
 
