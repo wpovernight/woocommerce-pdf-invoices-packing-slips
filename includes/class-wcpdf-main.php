@@ -444,8 +444,15 @@ class Main {
 				}
 				break;
 			case 'full':
-				// no order
-				if ( ! $order ) {
+				// check the user privileges
+				$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
+
+				if ( $full_permission ) {
+                    break;
+                }
+
+				// no order, single order only
+				if ( ! $order || count( $order_ids ) > 1 ) {
 					$allowed = false;
 					break;
 				}
@@ -455,12 +462,7 @@ class Main {
 					$allowed = false;
 					break;
 				}
-				
-				// single order only
-				if ( count( $order_ids ) > 1 ) {
-					$allowed = false;
-					break;
-				}
+
 				break;
 		}
 
