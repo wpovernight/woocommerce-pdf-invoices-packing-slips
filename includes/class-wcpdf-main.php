@@ -407,7 +407,7 @@ class Main {
 		$allowed = true;
 
 		// no order when it is a single order
-		if ( ! $order && count( $order_ids ) === 1 ) {
+		if ( ! $order && 1 === count( $order_ids ) ) {
 			$allowed = false;
 		}
 
