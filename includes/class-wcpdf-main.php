@@ -326,9 +326,13 @@ class Main {
 		$access_type  = WPO_WCPDF()->endpoint->get_document_link_access_type();
 		$redirect_url = WPO_WCPDF()->endpoint->get_document_denied_frontend_redirect_url();
 
-		// handle bulk actions access key
-		if ( empty( $_REQUEST['access_key'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
-			$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST['_wpnonce'] );
+		// handle bulk actions access key (_wpnonce) and legacy access key (order_key)
+		if ( empty( $_REQUEST['access_key'] ) ) {
+			foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
+				if ( ! empty( $_REQUEST[ $legacy_key ] ) ) {
+					$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST[ $legacy_key ] );
+				}
+			}
 		}
 
 		$valid_nonce = ! empty( $_REQUEST['access_key'] ) && ! empty( $_REQUEST['action'] ) && wp_verify_nonce( $_REQUEST['access_key'], $_REQUEST['action'] );
