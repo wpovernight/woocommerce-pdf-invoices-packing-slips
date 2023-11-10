@@ -326,13 +326,9 @@ class Main {
 		$access_type  = WPO_WCPDF()->endpoint->get_document_link_access_type();
 		$redirect_url = WPO_WCPDF()->endpoint->get_document_denied_frontend_redirect_url();
 
-		// handle legacy access keys
-		if ( empty( $_REQUEST['access_key'] ) ) {
-			foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
-				if ( ! empty( $_REQUEST[ $legacy_key ] ) ) {
-					$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST[ $legacy_key ] );
-				}
-			}
+		// handle bulk actions access key
+		if ( empty( $_REQUEST['access_key'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
+			$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST['_wpnonce'] );
 		}
 
 		$valid_nonce = ! empty( $_REQUEST['access_key'] ) && ! empty( $_REQUEST['action'] ) && wp_verify_nonce( $_REQUEST['access_key'], $_REQUEST['action'] );
@@ -406,58 +402,46 @@ class Main {
 
 		// set default is allowed
 		$allowed = true;
-		
+
+		// no order when it is a single order
+		if ( ! $order && 1 === count( $order_ids ) ) {
+			$allowed = false;
+		}
+
+		// check the user privileges
+		$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
+
+		// multi-order only allowed with permissions
+		if ( ! $full_permission && 1 < count( $order_ids ) ) {
+			$allowed = false;
+		}
+
 		// 'guest' is hybrid, it can behave as 'logged_in' if the user is logged in, but if not, behaves as 'full'
 		if ( 'guest' === $access_type ) {
 			$access_type = is_user_logged_in() ? 'logged_in' : 'full';
 		}
-		
+
 		switch ( $access_type ) {
 			case 'logged_in':
 				if ( ! is_user_logged_in() || ! $valid_nonce ) {
 					$allowed = false;
 					break;
 				}
-				
-				// check the user privileges
-				$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
-				
-				if ( ! $full_permission ) {
-					if ( ! isset( $_REQUEST['my-account'] ) && ! isset( $_REQUEST['shortcode'] ) ) {
-						$allowed = false;
-						break;
-					
-					// user call from 'my-account' page or via 'shortcode'
-					} else {
-						// single order only
-						if ( count( $order_ids ) > 1 ) {
-							$allowed = false;
-							break;
-						}
-			
-						// check if current user is owner of order IMPORTANT!!!
-						if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
-							$allowed = false;
-							break;
-						}
-					}
+
+				if ( ! $full_permission && ! isset( $_REQUEST['my-account'] ) && ! isset( $_REQUEST['shortcode'] ) ) {
+					$allowed = false;
+					break;
+				}
+
+				// check if current user is owner of order IMPORTANT!!!
+				if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+					$allowed = false;
+					break;
 				}
 				break;
 			case 'full':
-				// no order
-				if ( ! $order ) {
-					$allowed = false;
-					break;
-				}
-				
 				// check if we have a valid access key
-				if ( ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
-					$allowed = false;
-					break;
-				}
-				
-				// single order only
-				if ( count( $order_ids ) > 1 ) {
+				if ( $order && ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
 					break;
 				}
