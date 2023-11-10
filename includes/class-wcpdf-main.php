@@ -326,7 +326,7 @@ class Main {
 		$access_type  = WPO_WCPDF()->endpoint->get_document_link_access_type();
 		$redirect_url = WPO_WCPDF()->endpoint->get_document_denied_frontend_redirect_url();
 
-		// handle the bulk order access key
+		// handle bulk actions access key
 		if ( empty( $_REQUEST['access_key'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
 			$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST['_wpnonce'] );
 		}
