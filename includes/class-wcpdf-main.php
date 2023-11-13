@@ -432,15 +432,17 @@ class Main {
 					break;
 				}
 
-				if ( ! $full_permission && ! isset( $_REQUEST['my-account'] ) && ! isset( $_REQUEST['shortcode'] ) ) {
-					$allowed = false;
-					break;
-				}
+				if ( ! $full_permission ) {
+					if ( ! isset( $_REQUEST['my-account'] ) && ! isset( $_REQUEST['shortcode'] ) ) {
+						$allowed = false;
+						break;
+					}
 
-				// check if current user is owner of order IMPORTANT!!!
-				if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
-					$allowed = false;
-					break;
+					// check if current user is owner of order IMPORTANT!!!
+					if ( ! current_user_can( 'view_order', $order_ids[0] ) ) {
+						$allowed = false;
+						break;
+					}
 				}
 				break;
 			case 'full':
