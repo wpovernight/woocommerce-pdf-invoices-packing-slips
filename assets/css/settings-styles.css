@@ -5,7 +5,8 @@ span.wpo-warning {
 	padding: 5px 15px;
 	background-color: white;
 }
-.wcpdf-extensions-ad {
+.wcpdf-extensions-ad,
+.wcpdf-promo-ad {
 	position: relative;
 	min-height: 90px;
 	border: 1px solid #3D5C99;
@@ -21,11 +22,13 @@ img.wpo-helper {
 	left: 3px;
 }
 
-.wcpdf-extensions-ad h3 {
+.wcpdf-extensions-ad h3,
+.wcpdf-promo-ad h3 {
 	margin: 0;
 }
 
-.wcpdf-extensions-ad ul {
+.wcpdf-extensions-ad ul,
+.wcpdf-promo-ad ul {
 	margin: 0;
 	margin-left: 1.5em;
 }
