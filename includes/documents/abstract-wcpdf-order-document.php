@@ -495,7 +495,15 @@ abstract class Order_Document {
 		return $this->get_data( 'number', $document_type, $order, $context );
 	}
 	
-	public function get_formatted_number( $document_type ) {
+	public function get_formatted_number( $document_type = null ) {
+		if ( empty( $document_type ) && is_callable( array( $this, 'get_type' ) ) ) {
+			$document_type = $this->get-type();
+			
+			if ( empty( $document_type ) ) {
+				return '';
+			}
+		}
+		
 		$number = $this->get_number( $document_type );
 		
 		if ( $number ) {
@@ -514,6 +522,14 @@ abstract class Order_Document {
 	}
 	
 	public function get_formatted_date( $document_type ) {
+		if ( empty( $document_type ) && is_callable( array( $this, 'get_type' ) ) ) {
+			$document_type = $this->get-type();
+			
+			if ( empty( $document_type ) ) {
+				return '';
+			}
+		}
+		
 		$date = $this->get_date( $document_type );
 		
 		if ( $date ) {
