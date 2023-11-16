@@ -571,6 +571,10 @@ abstract class Order_Document {
 		$due_date_title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date_title", $due_date_title, $this );
 	}
+	
+	public function due_date_title() {
+		echo $this->get_due_date_title();
+	}
 
 	/*
 	|--------------------------------------------------------------------------
