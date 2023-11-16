@@ -1160,6 +1160,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		return $item_price;
 	}
 
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->get_number() or $this->get_formatted_number() instead.
+	 */
 	public function get_invoice_number() {
 		// Call the woocommerce_invoice_number filter and let third-party plugins set a number.
 		// Default is null, so we can detect whether a plugin has set the invoice number
@@ -1175,10 +1179,18 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 	}
 
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->number( 'invoice' ) instead.
+	 */
 	public function invoice_number() {
 		echo $this->get_invoice_number();
 	}
 
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->get_date() or $this->get_formatted_date() instead.
+	 */
 	public function get_invoice_date() {
 		if ( $invoice_date = $this->get_date('invoice') ) {
 			return $invoice_date->date_i18n( wcpdf_date_format( $this, 'invoice_date' ) );
@@ -1187,6 +1199,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 	}
 
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->date( 'invoice' ) instead.
+	 */
 	public function invoice_date() {
 		echo $this->get_invoice_date();
 	}

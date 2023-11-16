@@ -64,14 +64,14 @@
 				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order ); ?>
 				<?php if ( isset( $this->settings['display_number'] ) ) : ?>
 					<tr class="invoice-number">
-						<th><?php echo $this->get_number_title(); ?></th>
-						<td><?php $this->invoice_number(); ?></td>
+						<th><?php $this->number_title(); ?></th>
+						<td><?php $this->number( $this->get_type() ); ?></td>
 					</tr>
 				<?php endif; ?>
 				<?php if ( isset( $this->settings['display_date'] ) ) : ?>
 					<tr class="invoice-date">
-						<th><?php echo $this->get_date_title(); ?></th>
-						<td><?php $this->invoice_date(); ?></td>
+						<th><?php $this->date_title(); ?></th>
+						<td><?php $this->date( $this->get_type() ); ?></td>
 					</tr>
 				<?php endif; ?>
 				<tr class="order-number">
@@ -82,10 +82,10 @@
 					<th><?php _e( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<td><?php $this->order_date(); ?></td>
 				</tr>
-				<?php if ( $payment_method = $this->get_payment_method() ) : ?>
+				<?php if ( $this->get_payment_method() ) : ?>
 				<tr class="payment-method">
 					<th><?php _e( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<td><?php echo $payment_method; ?></td>
+					<td><?php $this->payment_method(); ?></td>
 				</tr>
 				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
