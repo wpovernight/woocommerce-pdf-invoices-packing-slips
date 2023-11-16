@@ -491,40 +491,32 @@ abstract class Order_Document {
 		return $value;
 	}
 
-	public function get_number( $document_type = '', $order = null, $context = 'view'  ) {
-		return $this->get_data( 'number', $document_type, $order, $context );
-	}
-	
-	public function get_formatted_number( $document_type ) {
-		$number = $this->get_number( $document_type );
+	public function get_number( $document_type = '', $order = null, $context = 'view', $formatted = false ) {
+		$number = $this->get_data( 'number', $document_type, $order, $context );
 		
-		if ( $number ) {
-			return $number->get_formatted();
-		} else {
-			return '';
+		if ( $number && $formatted ) {
+			$number = $number->get_formatted();
 		}
+		
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number", $number, $document_type, $order, $context, $formatted, $this );
 	}
 
 	public function number( $document_type ) {
-		echo $this->get_formatted_number( $document_type );
+		echo $this->get_number( $document_type, null, 'view', true );
 	}
 
-	public function get_date( $document_type = '', $order = null, $context = 'view'  ) {
-		return $this->get_data( 'date', $document_type, $order, $context );
-	}
-	
-	public function get_formatted_date( $document_type ) {
-		$date = $this->get_date( $document_type );
+	public function get_date( $document_type = '', $order = null, $context = 'view', $formatted = false ) {		
+		$date = $this->get_data( 'date', $document_type, $order, $context );
 		
-		if ( $date ) {
-			return $date->date_i18n( wcpdf_date_format( $this, 'document_date' ) );
-		} else {
-			return '';
+		if ( $date && $formatted ) {
+			$date = $date->date_i18n( wcpdf_date_format( $this, 'document_date' ) );
 		}
+		
+		return apply_filters( "wpo_wcpdf_{$this->slug}_date", $date, $document_type, $order, $context, $formatted, $this );
 	}
 
 	public function date( $document_type ) {
-		echo $this->get_formatted_date( $document_type );
+		echo $this->get_date( $document_type, null, 'view', true );
 	}
 
 	public function get_notes( $document_type = '', $order = null, $context = 'view'  ) {
@@ -542,7 +534,7 @@ abstract class Order_Document {
 	public function get_title() {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
 	}
-
+	
 	public function title() {
 		echo $this->get_title(); 
 	}
