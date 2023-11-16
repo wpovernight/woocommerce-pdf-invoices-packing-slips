@@ -1162,18 +1162,13 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Legacy function (v3.7.2 or inferior)
-	 * Use $this->get_number() or $this->get_formatted_number() instead.
+	 * Use $this->get_formatted_number() instead.
 	 */
 	public function get_invoice_number() {
-		// Call the woocommerce_invoice_number filter and let third-party plugins set a number.
-		// Default is null, so we can detect whether a plugin has set the invoice number
-		$third_party_invoice_number = apply_filters( 'woocommerce_invoice_number', null, $this->order_id );
-		if ($third_party_invoice_number !== null) {
-			return $third_party_invoice_number;
-		}
-
-		if ( $invoice_number = $this->get_number('invoice') ) {
-			return $formatted_invoice_number = $invoice_number->get_formatted();
+		wcpdf_log_error( 'The method get_invoice_number() is deprecated since version 3.7.3, please use the method get_formatted_number() instead.' );
+		
+		if ( is_callable( array( $this, 'get_formatted_number' ) ) ) {
+			return $this->get_formatted_number( 'invoice' );
 		} else {
 			return '';
 		}
@@ -1184,16 +1179,24 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Use $this->number( 'invoice' ) instead.
 	 */
 	public function invoice_number() {
-		echo $this->get_invoice_number();
+		wcpdf_log_error( 'The method invoice_number() is deprecated since version 3.7.3, please use the method number() instead.' );
+		
+		if ( is_callable( array( $this, 'number' ) ) ) {
+			$this->number( 'invoice' );
+		} else {
+			echo '';
+		}
 	}
 
 	/**
 	 * Legacy function (v3.7.2 or inferior)
-	 * Use $this->get_date() or $this->get_formatted_date() instead.
+	 * Use $this->get_formatted_date() instead.
 	 */
 	public function get_invoice_date() {
-		if ( $invoice_date = $this->get_date('invoice') ) {
-			return $invoice_date->date_i18n( wcpdf_date_format( $this, 'invoice_date' ) );
+		wcpdf_log_error( 'The method get_invoice_date() is deprecated since version 3.7.3, please use the method get_formatted_date() instead.' );
+		
+		if ( is_callable( array( $this, 'get_formatted_date' ) ) ) {
+			return $this->get_formatted_date( 'invoice' );
 		} else {
 			return '';
 		}
@@ -1204,7 +1207,13 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Use $this->date( 'invoice' ) instead.
 	 */
 	public function invoice_date() {
-		echo $this->get_invoice_date();
+		wcpdf_log_error( 'The method invoice_date() is deprecated since version 3.7.3, please use the method date() instead.' );
+		
+		if ( is_callable( array( $this, 'date' ) ) ) {
+			$this->date( 'invoice' );
+		} else {
+			echo '';
+		}
 	}
 
 	public function get_document_notes() {
