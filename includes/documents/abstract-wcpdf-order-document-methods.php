@@ -1167,7 +1167,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function get_invoice_number() {
 		wcpdf_log_error( 'The method get_invoice_number() is deprecated since version 3.7.3, please use the method get_number() instead.' );
 		
-		if ( is_callable( array( $this, 'get_formatted_number' ) ) ) {
+		if ( is_callable( array( $this, 'get_number' ) ) ) {
 			return $this->get_number( 'invoice', null, 'view', true );
 		} else {
 			return '';
@@ -1195,7 +1195,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function get_invoice_date() {
 		wcpdf_log_error( 'The method get_invoice_date() is deprecated since version 3.7.3, please use the method get_date() instead.' );
 		
-		if ( is_callable( array( $this, 'get_formatted_date' ) ) ) {
+		if ( is_callable( array( $this, 'get_date' ) ) ) {
 			return $this->get_date( 'invoice', null, 'view', true );
 		} else {
 			return '';
