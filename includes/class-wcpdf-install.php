@@ -467,9 +467,6 @@ class Install {
 		
 		// 3.7.0-beta-4: deactivate legacy ubl addon and migrate settings
 		if ( version_compare( $installed_version, '3.7.0-beta-4', '<' ) ) {
-			// deactivate legacy ubl addon
-			WPO_WCPDF()->deactivate_ubl_addon();
-			
 			// legacy ubl general/invoice settings
 			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );
 			$general_settings            = get_option( 'wpo_wcpdf_settings_general', [] );
