@@ -137,8 +137,12 @@ if ( ! $server_configs['PHP version']['result'] ) {
 					<td><?php echo wp_kses_post( $server_config['required'] === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : $server_config['required'] ); ?></td>
 					<td style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
 						<?php
-						echo wp_kses_post( $server_config['value'] );
-						if ( $server_config['result'] && ! $server_config['value'] ) echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
+						if ( ! empty( $server_config['value'] ) ) {
+							echo wp_kses_post( $server_config['value'] );
+						}
+						if ( $server_config['result'] && ! $server_config['value'] ) {
+							echo esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' );
+						}
 						if ( ! $server_config['result'] ) {
 							if ( isset( $server_config['fallback'] ) ) {
 								printf( '<div>%s. %s</div>', esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ), esc_html( $server_config['fallback'] ) );
