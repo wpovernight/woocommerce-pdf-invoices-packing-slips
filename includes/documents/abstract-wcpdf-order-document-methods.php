@@ -254,7 +254,11 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		if (!empty($custom_field) || $display_empty) {
-			echo $field_label . nl2br ($custom_field);
+			if ( is_array( $custom_field ) ) {
+				echo $field_label . implode( '<br>', $custom_field );				
+			} else {
+				echo $field_label . nl2br( $custom_field );
+			}
 		}
 	}
 
