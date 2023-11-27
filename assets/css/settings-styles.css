@@ -5,14 +5,15 @@ span.wpo-warning {
 	padding: 5px 15px;
 	background-color: white;
 }
-.wcpdf-extensions-ad {
+.wcpdf-extensions-ad,
+.wcpdf-promo-ad {
 	position: relative;
 	min-height: 90px;
-	border: 1px solid #3D5C99;
-	background-color: #EBF5FF;
+	border: 1px solid #6e1edc;
+	background-color: #f1e9fc;
 	padding: 15px;
 	padding-left: 100px;
-	margin-top: 15px;
+	margin-top: 30px;
 }
 
 img.wpo-helper {
@@ -21,13 +22,61 @@ img.wpo-helper {
 	left: 3px;
 }
 
-.wcpdf-extensions-ad h3 {
+.wcpdf-extensions-ad h3,
+.wcpdf-promo-ad h3 {
 	margin: 0;
+	padding: 20px;
+	font-weight: normal;
+	font-family: serif;
+	letter-spacing: -1px;
+	font-size: 2.25em;
 }
 
-.wcpdf-extensions-ad ul {
+.wcpdf-promo-ad p {
 	margin: 0;
-	margin-left: 1.5em;
+	padding: 0 20px;
+	font-size: 1.15em;
+}
+
+.wcpdf-promo-ad p.upgrade-tab {
+	margin-top: 30px;
+	font-style: italic;
+	font-size: 1em;
+}
+
+.wcpdf-promo-ad p.expiration {
+	font-size: 0.8em;
+	padding-top: 8px;
+}
+
+.wcpdf-extensions-ad a,
+.wcpdf-promo-ad a {
+	color: #6e1edc;
+}
+
+.wcpdf-extensions-ad a.dismiss,
+.wcpdf-promo-ad a.dismiss {
+	padding: 10px 20px;
+}
+
+.wcpdf-promo-ad p strong.code {
+	font-size: 1.3em;
+	font-family: serif;
+	padding: 0.1em 0.4em;
+	background: #6e1edc;
+	color: white;
+	border-radius: 5px;
+	font-weight: normal;
+}
+
+.wcpdf-extensions-ad i {
+	padding-left: 20px;
+}
+
+.wcpdf-extensions-ad ul,
+.wcpdf-promo-ad ul {
+	margin: 0;
+	margin-left: 40px;
 }
 
 .wcpdf-extensions li {

@@ -50,6 +50,9 @@ $review_invitation = sprintf(
 	if ( ! $hide_ad && ! ( class_exists( 'WooCommerce_PDF_IPS_Pro' ) && class_exists( 'WooCommerce_PDF_IPS_Templates' ) && class_exists( 'WooCommerce_Ext_PrintOrders' ) ) ) {
 		include( 'extensions.php' );
 	}
+	
+	// special temporary promo
+	include( 'promo.php' );
 
 	$preview_states = isset( $settings_tabs[$active_tab]['preview_states'] ) ? $settings_tabs[$active_tab]['preview_states'] : 1;
 	$preview_states_lock = $preview_states == 3 ? false : true;
