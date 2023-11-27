@@ -133,7 +133,7 @@ class Main {
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		
 		foreach ( $attach_to_document_types as $output_format => $document_types ) {
-			foreach ( $document_types as $document_type ) {				
+			foreach ( $document_types as $document_type ) {
 				$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
 				$email_order_id = $email_order->get_id();
 
