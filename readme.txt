@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.2
+Stable tag: 3.7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,18 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.3 (2023-11-27) =
+* New: temporary promo ad
+* Tweak: improves the templates number/date functions
+* Tweak: update the filter `wpo_wcpdf_due_date_display` arguments
+* Tweak: change the way the setting is retrieved for the due date
+* Fix: Packing Slip attachment when Pro is disabled
+* Fix: modifying order creation date in the `get_due_date` method
+* Fix: PHP 8.1 `preg_replace` warning
+* Fix: fatal error in the `custom_field()` function when custom field is an `array`
+* Fix: multiple document generation with "Full" access type
+* Fix: empty argument bug for `display_due_date` method
 
 = 3.7.2 (2023-11-08) =
 * New: adds Due Date option to the Invoice settings
