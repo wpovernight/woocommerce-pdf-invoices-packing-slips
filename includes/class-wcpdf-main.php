@@ -131,13 +131,9 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
+		
 		foreach ( $attach_to_document_types as $output_format => $document_types ) {
-			foreach ( $document_types as $document_type ) {
-				//If Professional extension is not active, only attach the invoice
-				if ( ! function_exists( 'WPO_WCPDF_Pro' ) && $document_type !== 'invoice' ) {
-					return $attachments;
-				};
-				
+			foreach ( $document_types as $document_type ) {				
 				$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
 				$email_order_id = $email_order->get_id();
 
@@ -295,28 +291,36 @@ class Main {
 	public function get_documents_for_email( $email_id, $order ) {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
 		$attach_documents = array();
+		
 		foreach ( $documents as $document ) {
+			// Pro not activated, only attach Invoice
+			if ( ! function_exists( 'WPO_WCPDF_Pro' ) && 'invoice' !== $document->get_type() ) {
+				continue;
+			};
+			
 			foreach ( $document->output_formats as $output_format ) {
 				if ( $document->is_enabled( $output_format ) ) {
-					$attach_documents[$output_format][$document->get_type()] = $document->get_attach_to_email_ids( $output_format );
+					$attach_documents[ $output_format ][ $document->get_type() ] = $document->get_attach_to_email_ids( $output_format );
 				}
 			}
 		}
 		
 		$attach_documents = apply_filters( 'wpo_wcpdf_attach_documents', $attach_documents );
 		$document_types   = array();
-		foreach ( $attach_documents as $output_format => $documents ) {
-			foreach ( $documents as $document_type => $attach_to_email_ids ) {
+		
+		foreach ( $attach_documents as $output_format => $_documents ) {
+			foreach ( $_documents as $document_type => $attach_to_email_ids ) {
 				// legacy settings: convert abbreviated email_ids
 				foreach ( $attach_to_email_ids as $key => $attach_to_email_id ) {
-					if ( $attach_to_email_id == 'completed' || $attach_to_email_id == 'processing' ) {
-						$attach_to_email_ids[$key] = "customer_" . $attach_to_email_id . "_order";
+					if ( in_array( $attach_to_email_id, array( 'completed', 'processing' ) ) ) {
+						$attach_to_email_ids[ $key ] = "customer_{$attach_to_email_id}_order";
 					}
 				}
 
 				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $output_format );
-				if ( in_array( $email_id, $attach_to_email_ids ) && $extra_condition === true ) {
-					$document_types[$output_format][] = $document_type;
+				
+				if ( in_array( $email_id, $attach_to_email_ids ) && $extra_condition ) {
+					$document_types[ $output_format ][] = $document_type;
 				}
 			}
 		}
