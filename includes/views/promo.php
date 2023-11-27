@@ -27,7 +27,7 @@
 	<h3><?php esc_html_e( 'Last chance to use your Black Friday discount!', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 	<p>Elevate your customer experience and streamline your operations with one of our powerful extensions.</p>
 	<p>Use promocode <strong class="code">blackfriday30</strong> to get a <strong>30% discount</strong> on your upgrade!</p>
-	<?php if ( isset( $_GET['tab'] ) && $_GET['tab'] !== 'upgrade' ) : ?>
+	<?php if ( ( isset( $_GET['tab'] ) && $_GET['tab'] !== 'upgrade' ) || ! isset( $_GET['tab'] ) ) : ?>
 		<p class="upgrade-tab">Check out the <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) ?>">Upgrade tab</a> for a feature overview of our PDF Invoices & Packing Slips extensions.</p>
 	<?php  endif; ?>
 	<p class="expiration">Offer ends on November 29.</p>
