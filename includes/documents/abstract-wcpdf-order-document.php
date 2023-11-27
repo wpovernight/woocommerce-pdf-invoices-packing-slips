@@ -491,12 +491,32 @@ abstract class Order_Document {
 		return $value;
 	}
 
-	public function get_number( $document_type = '', $order = null, $context = 'view'  ) {
-		return $this->get_data( 'number', $document_type, $order, $context );
+	public function get_number( $document_type = '', $order = null, $context = 'view', $formatted = false ) {
+		$number = $this->get_data( 'number', $document_type, $order, $context );
+		
+		if ( $number && $formatted ) {
+			$number = $number->get_formatted();
+		}
+		
+		return apply_filters( "wpo_wcpdf_{$this->slug}_number", $number, $document_type, $order, $context, $formatted, $this );
 	}
 
-	public function get_date( $document_type = '', $order = null, $context = 'view'  ) {
-		return $this->get_data( 'date', $document_type, $order, $context );
+	public function number( $document_type ) {
+		echo $this->get_number( $document_type, null, 'view', true );
+	}
+
+	public function get_date( $document_type = '', $order = null, $context = 'view', $formatted = false ) {		
+		$date = $this->get_data( 'date', $document_type, $order, $context );
+		
+		if ( $date && $formatted ) {
+			$date = $date->date_i18n( wcpdf_date_format( $this, 'document_date' ) );
+		}
+		
+		return apply_filters( "wpo_wcpdf_{$this->slug}_date", $date, $document_type, $order, $context, $formatted, $this );
+	}
+
+	public function date( $document_type ) {
+		echo $this->get_date( $document_type, null, 'view', true );
 	}
 
 	public function get_notes( $document_type = '', $order = null, $context = 'view'  ) {
@@ -514,7 +534,7 @@ abstract class Order_Document {
 	public function get_title() {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
 	}
-
+	
 	public function title() {
 		echo $this->get_title(); 
 	}
@@ -524,16 +544,28 @@ abstract class Order_Document {
 		$number_title = sprintf( __( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
 	}
+	
+	public function number_title() {
+		echo $this->get_number_title(); 
+	}
 
 	public function get_date_title() {
 		/* translators: %s: document name */
 		$date_title = sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
+	
+	public function date_title() {
+		echo $this->get_date_title();
+	}
 
 	public function get_due_date_title() {
 		$due_date_title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date_title", $due_date_title, $this );
+	}
+	
+	public function due_date_title() {
+		echo $this->get_due_date_title();
 	}
 
 	/*
