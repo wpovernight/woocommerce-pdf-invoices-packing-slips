@@ -180,6 +180,7 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'vat_number',
 					'translatable' => true,
+					'description'  => __( 'Required for UBL document creation. To display the VAT number on the invoices, activate the option in the Invoices settings.' ),
 				)
 			),
 			array(
@@ -192,6 +193,7 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'coc_number',
 					'translatable' => true,
+					'description'  => __( 'Required for UBL document creation. To display the COC number on the invoices, activate the option in the Invoices settings.' ),
 				)
 			),
 			array(
