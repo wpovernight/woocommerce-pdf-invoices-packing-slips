@@ -315,6 +315,30 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			array(
+				'type' => 'setting',
+				'id' => 'display_shop_vat',				
+				'title'    => __( 'Display VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'display_shop_vat',
+					'description'  => __( 'Displays the shop VAT number on the invoices. You can set your VAT number under the General settings tab.' ),
+				),
+			),
+			array(
+				'type' => 'setting',
+				'id' => 'display_shop_coc',				
+				'title'    => __( 'Display COC number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'display_shop_coc',
+					'description'  => __( 'Displays the shop Chamber of Commerce number on the invoices. You can set your COC number under the General settings tab.' ),
+				),
+			),
+			array(
 				'type'			=> 'setting',
 				'id'			=> 'display_date',
 				'title'			=> __( 'Display invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
