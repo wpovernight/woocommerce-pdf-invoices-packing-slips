@@ -506,6 +506,8 @@ class Settings {
 			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined("DOMPDF_ENABLE_FONTSUBSETTING") && DOMPDF_ENABLE_FONTSUBSETTING === true ) ? true : false,
 			'header_logo'        => isset( $this->general_settings['header_logo'] ) ? $this->general_settings['header_logo'] : '',
 			'header_logo_height' => isset( $this->general_settings['header_logo_height'] ) ? $this->general_settings['header_logo_height'] : '',
+			'vat_number'         => isset( $this->general_settings['vat_number'] ) ? $this->general_settings['vat_number'] : '',
+			'coc_number'         => isset( $this->general_settings['coc_number'] ) ? $this->general_settings['coc_number'] : '',
 			'shop_name'          => isset( $this->general_settings['shop_name'] ) ? $this->general_settings['shop_name'] : '',
 			'shop_address'       => isset( $this->general_settings['shop_address'] ) ? $this->general_settings['shop_address'] : '',
 			'footer'             => isset( $this->general_settings['footer'] ) ? $this->general_settings['footer'] : '',
