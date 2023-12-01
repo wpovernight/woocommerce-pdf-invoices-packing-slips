@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title><?php echo esc_html( $this->get_title() ); ?></title>
+	<title><?php $this->title(); ?></title>
 	<style type="text/css"><?php $this->template_styles(); ?></style>
 	<style type="text/css"><?php do_action( 'wpo_wcpdf_custom_styles', $this->get_type(), $this ); ?></style>
 </head>
