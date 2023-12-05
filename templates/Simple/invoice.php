@@ -22,12 +22,6 @@
 			<?php do_action( 'wpo_wcpdf_before_shop_address', $this->get_type(), $this->order ); ?>
 			<div class="shop-address"><?php $this->shop_address(); ?></div>
 			<?php do_action( 'wpo_wcpdf_after_shop_address', $this->get_type(), $this->order ); ?>
-			<?php if ( isset( $this->settings['coc_number'] ) && isset( $this->settings['display_shop_coc'] ) ) : ?>
-				<div class="shop-coc-number"><?php echo apply_filters( 'wpo_wcpdf_shop_coc_number_label',  __( 'COC#: ', 'woocommerce-pdf-invoices-packing-slips') ) . $this->get_shop_coc_number(); ?></div>
-			<?php endif; ?>
-			<?php if ( isset( $this->settings['vat_number'] ) && isset( $this->settings['display_shop_vat'] ) ) : ?>
-				<div class="shop-vat-number"><?php echo apply_filters( 'wpo_wcpdf_shop_vat_number_label', __( 'VAT#: ', 'woocommerce-pdf-invoices-packing-slips' ) ) . $this->get_shop_vat_number(); ?></div>
-			<?php endif; ?>
 		</td>
 	</tr>
 </table>
