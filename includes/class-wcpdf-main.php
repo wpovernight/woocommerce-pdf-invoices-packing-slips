@@ -3,6 +3,7 @@ namespace WPO\WC\PDF_Invoices;
 
 use WPO\WC\UBL\Builders\SabreBuilder;
 use WPO\WC\UBL\Documents\UblDocument;
+use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -12,6 +13,11 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
 
 class Main {
 
+	public $lock_name;
+	public $lock_context;
+	public $lock_time;
+	public $lock_retries;
+	
 	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
 	
 	protected static $_instance = null;
@@ -24,6 +30,12 @@ class Main {
 	}
 
 	public function __construct() {
+		// semaphore
+		$this->lock_name    = 'wpo_wcpdf_main_lock';
+		$this->lock_context = array( 'source' => 'wpo-wcpdf-main' );
+		$this->lock_time    = apply_filters( 'wpo_wcpdf_main_lock_time', 300 );
+		$this->lock_retries = apply_filters( 'wpo_wcpdf_main_lock_retries', 0 );
+		
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		
@@ -131,6 +143,7 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
+		$lock                     = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
 		
 		foreach ( $attach_to_document_types as $output_format => $document_types ) {
 			foreach ( $document_types as $document_type ) {
@@ -138,63 +151,71 @@ class Main {
 				$email_order_id = $email_order->get_id();
 
 				do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
+				
+				if ( $lock->lock( $this->lock_retries ) ) {
 
-				try {
-					// log document generation to order notes
-					add_action( 'wpo_wcpdf_init_document', function( $document ) {
-						$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
-						$this->log_document_creation_trigger_to_order_meta( $document, 'email_attachment' );
-						$this->mark_document_printed( $document, 'email_attachment' );
-					} );
-					
-					// prepare document
-					// we use ID to force to reloading the order to make sure that all meta data is up to date.
-					// this is especially important when multiple emails with the PDF document are sent in the same session
-					$document = wcpdf_get_document( $document_type, (array) $email_order_id, true );
-					if ( ! $document ) { // something went wrong, continue trying with other documents
+					try {
+						// log document generation to order notes
+						add_action( 'wpo_wcpdf_init_document', function( $document ) {
+							$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
+							$this->log_document_creation_trigger_to_order_meta( $document, 'email_attachment' );
+							$this->mark_document_printed( $document, 'email_attachment' );
+						} );
+						
+						// prepare document
+						// we use ID to force to reloading the order to make sure that all meta data is up to date.
+						// this is especially important when multiple emails with the PDF document are sent in the same session
+						$document = wcpdf_get_document( $document_type, (array) $email_order_id, true );
+						if ( ! $document ) { // something went wrong, continue trying with other documents
+							continue;
+						}
+						
+						$tmp_path = $this->get_tmp_path( 'attachments' );
+						if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
+							wcpdf_log_error( "Couldn't get the attachments temporary folder path.", 'critical', $e );
+							return $attachments;
+						}
+						
+						// get attachment
+						$attachment = false;
+						switch ( $output_format ) {
+							default:
+							case 'pdf':
+								$attachment = $this->get_document_pdf_attachment( $document, $tmp_path );
+								break;
+							case 'ubl':
+								if ( true === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
+									$attachment = $this->get_document_ubl_attachment( $document, $tmp_path );
+								}
+								break;
+						}
+						
+						if ( $attachment ) {
+							$attachments[] = $attachment;
+						} else {
+							continue;
+						}
+						
+						do_action( 'wpo_wcpdf_email_attachment', $attachment, $document_type, $document, $output_format );
+						
+					} catch ( \Exception $e ) {
+						wcpdf_log_error( $e->getMessage(), 'critical', $e );
+						continue;
+					} catch ( \Dompdf\Exception $e ) {
+						wcpdf_log_error( 'DOMPDF exception: '.$e->getMessage(), 'critical', $e );
+						continue;
+					} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
+						wcpdf_log_error( 'UBL FileWrite exception: '.$e->getMessage(), 'critical', $e );
+						continue;
+					} catch ( \Error $e ) {
+						wcpdf_log_error( $e->getMessage(), 'critical', $e );
 						continue;
 					}
 					
-					$tmp_path = $this->get_tmp_path( 'attachments' );
-					if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
-						wcpdf_log_error( "Couldn't get the attachments temporary folder path.", 'critical', $e );
-						return $attachments;
-					}
+					$lock->release();
 					
-					// get attachment
-					$attachment = false;
-					switch ( $output_format ) {
-						default:
-						case 'pdf':
-							$attachment = $this->get_document_pdf_attachment( $document, $tmp_path );
-							break;
-						case 'ubl':
-							if ( true === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
-								$attachment = $this->get_document_ubl_attachment( $document, $tmp_path );
-							}
-							break;
-					}
-					
-					if ( $attachment ) {
-						$attachments[] = $attachment;
-					} else {
-						continue;
-					}
-					
-					do_action( 'wpo_wcpdf_email_attachment', $attachment, $document_type, $document, $output_format );
-					
-				} catch ( \Exception $e ) {
-					wcpdf_log_error( $e->getMessage(), 'critical', $e );
-					continue;
-				} catch ( \Dompdf\Exception $e ) {
-					wcpdf_log_error( 'DOMPDF exception: '.$e->getMessage(), 'critical', $e );
-					continue;
-				} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
-					wcpdf_log_error( 'UBL FileWrite exception: '.$e->getMessage(), 'critical', $e );
-					continue;
-				} catch ( \Error $e ) {
-					wcpdf_log_error( $e->getMessage(), 'critical', $e );
-					continue;
+				} else {
+					$lock->log( sprintf( 'Couldn\'t get the %1$s attachment lock for the email ID# %2$s from the order ID# %3$s!', $document_type, $email_id, $email_order_id ), 'critical' );
 				}
 			}
 		}

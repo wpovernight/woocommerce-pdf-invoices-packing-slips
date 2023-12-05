@@ -38,7 +38,7 @@ class Invoice extends Order_Document_Methods {
 		// semaphore
 		$this->lock_name    = "wpo_wcpdf_{$this->slug}_number_lock";
 		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 2 );
+		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 300 );
 		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
 		
 		// call parent constructor
@@ -86,15 +86,15 @@ class Invoice extends Order_Document_Methods {
 	}
 
 	public function exists() {
-		return !empty( $this->data['number'] );
+		return ! empty( $this->data['number'] );
 	}
 
 	public function init_number() {
 		$logger         = isset( $this->settings['log_number_generation'] ) ? [ wc_get_logger() ] : [];
 		$lock           = new Semaphore( $this->lock_name, $this->lock_time, $logger, $this->lock_context );
-		$invoice_number = null;
+		$invoice_number = $this->exists() ? $this->data['number'] : null;
 		
-		if ( $lock->lock( $this->lock_retries ) ) {
+		if ( $lock->lock( $this->lock_retries ) && empty( $invoice_number ) ) {
 			
 			try {
 				// If a third-party plugin claims to generate invoice numbers, trigger this instead
