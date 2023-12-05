@@ -13,11 +13,39 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
 
 class Main {
 
+	/**
+	 * Lock name
+	 *
+	 * @var string
+	 */
 	public $lock_name;
+	
+	/**
+	 * Lock context
+	 *
+	 * @var array
+	 */
 	public $lock_context;
+	
+	/**
+	 * Lock time limit if the release doesn't happen before
+	 *
+	 * @var int
+	 */
 	public $lock_time;
+	
+	/**
+	 * Lock retries
+	 *
+	 * @var int
+	 */
 	public $lock_retries;
 	
+	/**
+	 * Temp subfolders
+	 *
+	 * @var array
+	 */
 	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
 	
 	protected static $_instance = null;
