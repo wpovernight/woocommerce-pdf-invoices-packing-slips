@@ -42,6 +42,12 @@ class Settings_General {
 		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
 
+		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
+			$coc_vat_pro_note  = sprintf( __('You can display this number on the invoice from the Invoice settings tab with the %sProfession extension%s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . get_admin_url() . 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade">', '</a>' );
+		} else {
+			$coc_vat_pro_note = __('You can display this number on the invoice from the Invoice settings tab.', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
 		$settings_fields = array(
 			array(
 				'type'		=> 'section',
@@ -180,7 +186,7 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'vat_number',
 					'translatable' => true,
-					'description'  => __( 'Required for UBL document creation. To display the VAT number on the invoices, activate the option in the Invoices settings.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => __( "Required for creating the UBL document. $coc_vat_pro_note", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -193,7 +199,7 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'coc_number',
 					'translatable' => true,
-					'description'  => __( 'Required for UBL document creation. To display the COC number on the invoices, activate the option in the Invoices settings.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => __( "Required for creating the UBL document. $coc_vat_pro_note", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
