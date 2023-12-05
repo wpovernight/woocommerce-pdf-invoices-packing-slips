@@ -184,7 +184,7 @@ class Main {
 		if ( $lock->lock( $this->lock_retries ) ) {
 			
 			if ( $this->lock_log_enabled ) {
-				$lock->log( sprinf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
+				$lock->log( sprintf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
 			}
 		
 			foreach ( $attach_to_document_types as $output_format => $document_types ) {
@@ -258,12 +258,12 @@ class Main {
 			$lock_release = $lock->release();
 			
 			if ( $lock_release && $this->lock_log_enabled ) {
-				$lock->log( sprinf( 'Lock released for attach document to email for order ID# %s.', $order_id ), 'info' );
+				$lock->log( sprintf( 'Lock released for attach document to email for order ID# %s.', $order_id ), 'info' );
 			}
 		
 		} else {
 			if ( $this->lock_log_enabled ) {
-				$lock->log( sprinf( 'Couldn\'t get the lock for attach document to email for order ID# %s.', $order_id ), 'critical' );
+				$lock->log( sprintf( 'Couldn\'t get the lock for attach document to email for order ID# %s.', $order_id ), 'critical' );
 			}
 		}
 
