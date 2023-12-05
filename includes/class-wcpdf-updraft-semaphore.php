@@ -193,7 +193,8 @@ class Updraft_Semaphore_3_0 {
 	 */
 	public function log( $message, $level = 'info', $context = array() ) {
 		$context = ! empty( $context ) ? $context : $this->context;
-		if ( isset( $this->loggers ) && isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ) {
+		
+		if ( ! empty( $this->loggers ) ) {
 			foreach ( $this->loggers as $logger ) {
 				if ( ! empty( $context ) ) {
 					$logger->log( $level, $message, $context );

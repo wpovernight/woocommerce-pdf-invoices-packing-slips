@@ -26,6 +26,8 @@ class Settings {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
+	public $lock_loggers;
+	
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
 	private $template_list_cache       = array();
@@ -55,6 +57,7 @@ class Settings {
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
 		$this->lock_time        = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_time', 60 );
 		$this->lock_retries     = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_retries', 0 );
+		$this->lock_loggers     = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_loggers', isset( $this->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -799,7 +802,7 @@ class Settings {
 		
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
 		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
-		$lock      = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$lock      = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
 		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
 		
 		// checks if there are pending actions
@@ -858,7 +861,7 @@ class Settings {
 	}
 
 	public function yearly_reset_numbers() {
-		$lock = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$lock = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
 
 		if ( $lock->lock( $this->lock_retries ) ) {
 			

@@ -42,6 +42,13 @@ class Main {
 	public $lock_retries;
 	
 	/**
+	 * Lock loggers
+	 *
+	 * @var int
+	 */
+	public $lock_loggers;
+	
+	/**
 	 * Temp subfolders
 	 *
 	 * @var array
@@ -59,10 +66,11 @@ class Main {
 
 	public function __construct() {
 		// semaphore
-		$this->lock_name        = 'wpo_wcpdf_main_semaphore_lock';
-		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
-		$this->lock_time        = apply_filters( 'wpo_wcpdf_main_semaphore_lock_time', 60 );
-		$this->lock_retries     = apply_filters( 'wpo_wcpdf_main_semaphore_lock_retries', 0 );
+		$this->lock_name    = 'wpo_wcpdf_main_semaphore_lock';
+		$this->lock_context = array( 'source' => 'wpo-wcpdf-semaphore' );
+		$this->lock_time    = apply_filters( 'wpo_wcpdf_main_semaphore_lock_time', 60 );
+		$this->lock_retries = apply_filters( 'wpo_wcpdf_main_semaphore_lock_retries', 0 );
+		$this->lock_loggers = apply_filters( 'wpo_wcpdf_main_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 		
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
@@ -171,7 +179,7 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
-		$lock                     = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$lock                     = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
 		
 		if ( $lock->lock( $this->lock_retries ) ) {
 			
