@@ -143,8 +143,7 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
-		$lock_name                = $this->lock_name . '_attach_document_to_email_' . $order_id;
-		$lock                     = new Semaphore( $lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
+		$lock                     = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
 		
 		foreach ( $attach_to_document_types as $output_format => $document_types ) {
 			foreach ( $document_types as $document_type ) {
