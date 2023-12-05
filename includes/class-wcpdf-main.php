@@ -173,15 +173,15 @@ class Main {
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
 		$lock                     = new Semaphore( $this->lock_name, $this->lock_time, array( wc_get_logger() ), $this->lock_context );
 		
-		foreach ( $attach_to_document_types as $output_format => $document_types ) {
-			foreach ( $document_types as $document_type ) {
-				$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
-				$email_order_id = $email_order->get_id();
+		if ( $lock->lock( $this->lock_retries ) ) {
+		
+			foreach ( $attach_to_document_types as $output_format => $document_types ) {
+				foreach ( $document_types as $document_type ) {
+					$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
+					$email_order_id = $email_order->get_id();
 
-				do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
-				
-				if ( $lock->lock( $this->lock_retries ) ) {
-
+					do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
+					
 					try {
 						// log document generation to order notes
 						add_action( 'wpo_wcpdf_init_document', function( $document ) {
@@ -239,13 +239,14 @@ class Main {
 						wcpdf_log_error( $e->getMessage(), 'critical', $e );
 						continue;
 					}
-					
-					$lock->release();
-					
-				} else {
-					$lock->log( sprintf( 'Couldn\'t get the %1$s attachment lock for the email ID# %2$s from the order ID# %3$s!', $document_type, $email_id, $email_order_id ), 'critical' );
+						
 				}
 			}
+			
+			$lock->release();
+		
+		} else {
+			$lock->log( sprintf( 'Couldn\'t get the %1$s attachment lock for the email ID# %2$s from the order ID# %3$s!', $document_type, $email_id, $email_order_id ), 'critical' );
 		}
 
 		remove_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
