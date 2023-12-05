@@ -53,7 +53,7 @@ class Settings {
 		
 		$this->lock_name        = 'wpo_wcpdf_settings_lock';
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-settings' );
-		$this->lock_time        = apply_filters( 'wpo_wcpdf_settings_lock_time', 300 );
+		$this->lock_time        = apply_filters( 'wpo_wcpdf_settings_lock_time', 60 );
 		$this->lock_retries     = apply_filters( 'wpo_wcpdf_settings_lock_retries', 0 );
 
 		// Settings menu item
