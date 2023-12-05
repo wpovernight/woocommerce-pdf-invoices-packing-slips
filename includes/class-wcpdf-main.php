@@ -246,7 +246,7 @@ class Main {
 			$lock->release();
 		
 		} else {
-			$lock->log( sprintf( 'Couldn\'t get the %1$s attachment lock for the email ID# %2$s from the order ID# %3$s!', $document_type, $email_id, $email_order_id ), 'critical' );
+			$lock->log( sprintf( 'Couldn\'t get the lock for the order ID# %s!', $email_order_id ), 'critical' );
 		}
 
 		remove_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
