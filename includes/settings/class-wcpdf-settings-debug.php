@@ -768,6 +768,18 @@ class Settings_Debug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'semaphore_logs',
+				'title'    => __( 'Enable semaphore logs', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'semaphore_logs',
+					'description' => __( 'Our plugin uses a semaphore class that prevents race conditions in multiple places in the code. Enable this setting only if you are having issues with document numbers, yearly reset or documents being assigned to the wrong order.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'enable_danger_zone_tools',
 				'title'    => __( 'Enable danger zone tools', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',

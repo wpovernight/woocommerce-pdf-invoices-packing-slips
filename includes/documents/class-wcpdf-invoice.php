@@ -22,6 +22,7 @@ class Invoice extends Order_Document_Methods {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
+	public $lock_log_enabled;
 	public $output_formats;
 	
 	/**
@@ -31,15 +32,16 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type         = 'invoice';
-		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->type             = 'invoice';
+		$this->title            = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon             = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
 
 		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_number_lock";
-		$this->lock_context = array( 'source' => "wpo-wcpdf-{$this->type}-semaphore" );
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_time", 60 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_number_lock_retries", 0 );
+		$this->lock_name        = "wpo_wcpdf_{$this->slug}_semaphore_lock";
+		$this->lock_context     = array( 'source' => "wpo-wcpdf-semaphore" );
+		$this->lock_time        = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_time", 60 );
+		$this->lock_retries     = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_retries", 0 );
+		$this->lock_log_enabled = isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? true : false;
 		
 		// call parent constructor
 		parent::__construct( $order );
@@ -96,6 +98,10 @@ class Invoice extends Order_Document_Methods {
 		
 		if ( $lock->lock( $this->lock_retries ) && empty( $invoice_number ) ) {
 			
+			if ( $this->lock_log_enabled ) {
+				$lock->log( 'Lock acquired for the invoice number init.', 'info' );
+			}
+			
 			try {
 				// If a third-party plugin claims to generate invoice numbers, trigger this instead
 				if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) || apply_filters( 'wpo_wcpdf_external_invoice_number_enabled', false, $this ) ) {
@@ -128,10 +134,16 @@ class Invoice extends Order_Document_Methods {
 				$lock->log( $e, 'critical' );
 			}
 
-			$lock->release();
+			$lock_release = $lock->release();
+			
+			if ( $lock_release && $this->lock_log_enabled ) {
+				$lock->log( 'Lock released for the invoice number init.', 'info' );
+			}
 			
 		} else {
-			$lock->log( "Couldn't get the Invoice Number lock!", 'critical' );
+			if ( $this->lock_log_enabled ) {
+				$lock->log( 'Couldn\'t get the lock for the invoice number init.', 'critical' );
+			}
 		}
 		
 		return $invoice_number;
