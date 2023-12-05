@@ -42,13 +42,6 @@ class Main {
 	public $lock_retries;
 	
 	/**
-	 * If the lock log is enabled
-	 *
-	 * @var int
-	 */
-	public $lock_log_enabled;
-	
-	/**
 	 * Temp subfolders
 	 *
 	 * @var array
@@ -70,7 +63,6 @@ class Main {
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
 		$this->lock_time        = apply_filters( 'wpo_wcpdf_main_semaphore_lock_time', 60 );
 		$this->lock_retries     = apply_filters( 'wpo_wcpdf_main_semaphore_lock_retries', 0 );
-		$this->lock_log_enabled = isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? true : false;
 		
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
@@ -183,9 +175,7 @@ class Main {
 		
 		if ( $lock->lock( $this->lock_retries ) ) {
 			
-			if ( $this->lock_log_enabled ) {
-				$lock->log( sprintf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
-			}
+			$lock->log( sprintf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
 		
 			foreach ( $attach_to_document_types as $output_format => $document_types ) {
 				foreach ( $document_types as $document_type ) {
@@ -255,16 +245,12 @@ class Main {
 				}
 			}
 			
-			$lock_release = $lock->release();
-			
-			if ( $lock_release && $this->lock_log_enabled ) {
+			if ( $lock->release() ) {
 				$lock->log( sprintf( 'Lock released for attach document to email for order ID# %s.', $order_id ), 'info' );
 			}
 		
 		} else {
-			if ( $this->lock_log_enabled ) {
-				$lock->log( sprintf( 'Couldn\'t get the lock for attach document to email for order ID# %s.', $order_id ), 'critical' );
-			}
+			$lock->log( sprintf( 'Couldn\'t get the lock for attach document to email for order ID# %s.', $order_id ), 'critical' );
 		}
 
 		remove_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );

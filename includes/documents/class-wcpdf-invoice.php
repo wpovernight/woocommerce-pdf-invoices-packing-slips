@@ -22,7 +22,6 @@ class Invoice extends Order_Document_Methods {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
-	public $lock_log_enabled;
 	public $output_formats;
 	
 	/**
@@ -41,7 +40,6 @@ class Invoice extends Order_Document_Methods {
 		$this->lock_context     = array( 'source' => "wpo-wcpdf-semaphore" );
 		$this->lock_time        = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_time", 60 );
 		$this->lock_retries     = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_retries", 0 );
-		$this->lock_log_enabled = isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? true : false;
 		
 		// call parent constructor
 		parent::__construct( $order );
@@ -98,9 +96,7 @@ class Invoice extends Order_Document_Methods {
 		
 		if ( $lock->lock( $this->lock_retries ) && empty( $invoice_number ) ) {
 			
-			if ( $this->lock_log_enabled ) {
-				$lock->log( 'Lock acquired for the invoice number init.', 'info' );
-			}
+			$lock->log( 'Lock acquired for the invoice number init.', 'info' );
 			
 			try {
 				// If a third-party plugin claims to generate invoice numbers, trigger this instead
@@ -133,17 +129,13 @@ class Invoice extends Order_Document_Methods {
 			} catch ( \Error $e ) {
 				$lock->log( $e, 'critical' );
 			}
-
-			$lock_release = $lock->release();
 			
-			if ( $lock_release && $this->lock_log_enabled ) {
+			if ( $lock->release() ) {
 				$lock->log( 'Lock released for the invoice number init.', 'info' );
 			}
 			
 		} else {
-			if ( $this->lock_log_enabled ) {
-				$lock->log( 'Couldn\'t get the lock for the invoice number init.', 'critical' );
-			}
+			$lock->log( 'Couldn\'t get the lock for the invoice number init.', 'critical' );
 		}
 		
 		return $invoice_number;

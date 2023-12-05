@@ -26,7 +26,6 @@ class Settings {
 	public $lock_context;
 	public $lock_time;
 	public $lock_retries;
-	public $lock_log_enabled;
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
 	private $template_list_cache       = array();
@@ -56,7 +55,6 @@ class Settings {
 		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
 		$this->lock_time        = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_time', 60 );
 		$this->lock_retries     = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_retries', 0 );
-		$this->lock_log_enabled = isset( $this->debug_settings['semaphore_logs'] ) ? true : false;
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -815,9 +813,7 @@ class Settings {
 			
 			if ( $lock->lock( $this->lock_retries ) ) {
 				
-				if ( $this->lock_log_enabled ) {
-					$lock->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
-				}
+				$lock->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
 				
 				try {
 					$action_id = as_schedule_single_action( $datetime->getTimestamp(), $hook );
@@ -837,17 +833,13 @@ class Settings {
 				} catch ( \Error $e ) {
 					$lock->log( $e, 'critical' );
 				}
-	
-				$lock_release = $lock->release();
 				
-				if ( $lock_release && $this->lock_log_enabled ) {
+				if ( $lock->release() ) {
 					$lock->log( 'Lock released for yearly reset numbers schedule.', 'info' );
 				}
 				
 			} else {
-				if ( $this->lock_log_enabled ) {
-					$lock->log( 'Couldn\'t get the lock for yearly reset numbers schedule.', 'critical' );
-				}
+				$lock->log( 'Couldn\'t get the lock for yearly reset numbers schedule.', 'critical' );
 			}
 			
 		} else {
@@ -870,9 +862,7 @@ class Settings {
 
 		if ( $lock->lock( $this->lock_retries ) ) {
 			
-			if ( $this->lock_log_enabled ) {
-				$lock->log( 'Lock acquired for yearly reset numbers.', 'info' );
-			}
+			$lock->log( 'Lock acquired for yearly reset numbers.', 'info' );
 			
 			try {
 				// reset numbers
@@ -905,17 +895,13 @@ class Settings {
 			} catch ( \Error $e ) {
 				$lock->log( $e, 'critical' );
 			}
-
-			$lock_release = $lock->release();
 			
-			if ( $lock_release && $this->lock_log_enabled ) {
+			if ( $lock->release() ) {
 				$lock->log( 'Lock release for yearly reset numbers.', 'info' );
 			}
 			
 		} else {
-			if ( $this->lock_log_enabled ) {
-				$lock->log( 'Couldn\'t get the lock for yearly reset numbers.', 'critical' );
-			}
+			$lock->log( 'Couldn\'t get the lock for yearly reset numbers.', 'critical' );
 		}
 		
 		// reschedule the action for the next year
