@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.3
+Stable tag: 3.7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.4 (2023-12-06) =
+* New: adds new setting to enable semaphore logs
+* Tweak: adds descriptions to the COC and VAT settings
+* Tweak: replaces Packing Slip shipping function in the template file
+* Tweak: adds semaphore to email attachment function
+* Fix: bug on getting VAT & CoC number saved values
+* Tested up to WooCommerce 8.4
 
 = 3.7.3 (2023-11-27) =
 * New: temporary promo ad
