@@ -41,8 +41,9 @@ class Settings_General {
 		$wp_content_dir       = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
 		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
+		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: <a> tags */ __( 'Requires the %sProfessional extension%s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 
-		$settings_fields = array(
+		$settings_fields      = array(
 			array(
 				'type'		=> 'section',
 				'id'		=> 'general_settings',
@@ -180,6 +181,7 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'vat_number',
 					'translatable' => true,
+					'description'  => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro        ,
 				)
 			),
 			array(
@@ -192,6 +194,7 @@ class Settings_General {
 					'option_name'  => $option_name,
 					'id'           => 'coc_number',
 					'translatable' => true,
+					'description'  => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro        ,
 				)
 			),
 			array(
