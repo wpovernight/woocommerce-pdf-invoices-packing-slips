@@ -70,10 +70,10 @@
 					<th><?php _e( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<td><?php $this->order_date(); ?></td>
 				</tr>
-				<?php if ( $shipping_method = $this->get_shipping_method() ) : ?>
+				<?php if ( $this->get_shipping_method() ) : ?>
 				<tr class="shipping-method">
 					<th><?php _e( 'Shipping Method:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<td><?php echo $shipping_method; ?></td>
+					<td><?php $this->shipping_method(); ?></td>
 				</tr>
 				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
