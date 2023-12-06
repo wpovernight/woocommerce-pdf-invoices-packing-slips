@@ -102,7 +102,7 @@ class Invoice extends Order_Document_Methods {
 			try {
 				// If a third-party plugin claims to generate invoice numbers, trigger this instead
 				if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) || apply_filters( 'wpo_wcpdf_external_invoice_number_enabled', false, $this ) ) {
-					$invoice_number = apply_filters( 'woocommerce_generate_invoice_number', null, $this->order );             // legacy (backwards compatibility)
+					$invoice_number = apply_filters( 'woocommerce_generate_invoice_number', $invoice_number, $this->order );             // legacy (backwards compatibility)
 					$invoice_number = apply_filters( 'woocommerce_invoice_number', $invoice_number, $this->order->get_id() ); // legacy (backwards compatibility)
 					$invoice_number = apply_filters( 'wpo_wcpdf_external_invoice_number', $invoice_number, $this );
 				} elseif ( isset( $this->settings['display_number'] ) && $this->settings['display_number'] == 'order_number' && ! empty( $this->order ) ) {
