@@ -107,6 +107,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 * Tweak: adds descriptions to the COC and VAT settings
 * Tweak: replaces Packing Slip shipping function in the template file
 * Tweak: adds semaphore to email attachment function
+* Fix: bug on `get_payment_date()`
 * Fix: bug on getting VAT & CoC number saved values
 * Tested up to WooCommerce 8.4
 
