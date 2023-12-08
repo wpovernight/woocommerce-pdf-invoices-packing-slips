@@ -117,7 +117,7 @@ abstract class Document {
 	}
 
 	public function get_percentage_from_fallback( $tax_data, $rate_id ) {
-		$percentage = ( $tax_data['total_tax'] / $tax_data['total_ex'] ) * 100;
+		$percentage = ( 0 != $tax_data['total_ex'] ) ? ( $tax_data['total_tax'] / $tax_data['total_ex'] ) * 100 : 0;
 
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
