@@ -517,8 +517,8 @@ class Main {
 				}
 				break;
 			case 'full':
-				// check if we have a valid access key
-				if ( $order && ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
+				// check if we have a valid access key only when it's not from bulk actions
+				if ( ! isset( $_REQUEST['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
 					break;
 				}
