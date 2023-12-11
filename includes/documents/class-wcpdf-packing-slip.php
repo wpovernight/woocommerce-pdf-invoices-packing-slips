@@ -62,7 +62,7 @@ class Packing_Slip extends Order_Document_Methods {
 
 		// Filter filename
 		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
-		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context );
+		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context, $args );
 
 		// sanitize filename (after filters to prevent human errors)!
 		return sanitize_file_name( $filename );
