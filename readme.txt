@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.4
+Stable tag: 3.7.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.5 (2023-12-13) =
+* Tweak: includes `$args` in filter hook `wpo_wcpdf_filename` parameters
+* Tweak: re-adds the legacy hook `woocommerce_invoice_number` for backwards compatibility
+* Fix: bug in "Full" document access using bulk actions
+* Fix: fatal error in UBL document
 
 = 3.7.4 (2023-12-06) =
 * New: adds new setting to enable semaphore logs
