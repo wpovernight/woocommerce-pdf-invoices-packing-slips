@@ -475,7 +475,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$payment_date = $this->order->get_date_paid();
 		}
 
-		$payment_date = apply_filters( 'wpo_wcpdf_date', date_i18n( wcpdf_date_format( $this, 'order_date_paid' ), $payment_date->getTimestamp() ) );
+		$payment_date = empty( $payment_date ) ? null : apply_filters( 'wpo_wcpdf_date', date_i18n( wcpdf_date_format( $this, 'order_date_paid' ), $payment_date->getTimestamp() ) );
 
 		return apply_filters( 'wpo_wcpdf_payment_date', $payment_date, $this );
 	}
