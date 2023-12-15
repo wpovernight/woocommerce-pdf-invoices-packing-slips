@@ -159,17 +159,12 @@ class WPO_WCPDF {
 			add_action( 'admin_notices', array ( $this, 'need_woocommerce_3_0' ) );
 			return;
 		}
-
-		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
-			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
-			return;
-		}
 		
 		// if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
 		// 	add_action( 'admin_notices', array ( $this, 'next_php_version_bump' ) );
 		// }
 
-		if ( has_filter( 'wpo_wcpdf_pdf_maker' ) === false && version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		if ( false === has_filter( 'wpo_wcpdf_pdf_maker' ) && version_compare( PHP_VERSION, '7.2', '<' ) ) {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 		}
@@ -250,15 +245,10 @@ class WPO_WCPDF {
 		$error_message	= __( 'PDF Invoices & Packing Slips for WooCommerce requires PHP 7.2 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
 		/* translators: <a> tags */
 		$php_message	= __( 'We strongly recommend to %1$supdate your PHP version%2$s.', 'woocommerce-pdf-invoices-packing-slips' );
-		/* translators: <a> tags */
-		$add_on_message	= __( 'If you cannot upgrade your PHP version, you can download %1$sthis addon%2$s to enable backwards compatibility with PHP5.6.', 'woocommerce-pdf-invoices-packing-slips' );
 
 		$message = '<div class="error">';
 		$message .= sprintf( '<p>%s</p>', $error_message );
 		$message .= sprintf( '<p>'.$php_message.'</p>', '<a href="https://docs.wpovernight.com/general/how-to-update-your-php-version/" target="_blank">', '</a>' );
-		if ( version_compare( PHP_VERSION, '5.6', '>' ) ) {
-			$message .= sprintf( '<p>'.$add_on_message.'</p>', '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
-		}
 		$message .= '</div>';
 
 		echo wp_kses_post( $message );

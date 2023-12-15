@@ -81,13 +81,13 @@ class Install {
 	 * Plugin install method. Perform any installation tasks here
 	 */
 	protected function install() {
-		// only install when php 5.6 or higher
-		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
+		// only install when php version or higher
+		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
 			return;
 		}
 
 		// check if upgrading from versionless (1.4.14 and older)
-		if ( get_option('wpo_wcpdf_general_settings') ) {
+		if ( get_option( 'wpo_wcpdf_general_settings' ) ) {
 			$this->upgrade( 'versionless' );
 			return;
 		}
@@ -211,8 +211,8 @@ class Install {
 	 * @param string $installed_version the currently installed ('old') version
 	 */
 	protected function upgrade( $installed_version ) {
-		// only upgrade when php 5.6 or higher
-		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
+		// only upgrade when php version or higher
+		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
 			return;
 		}
 
@@ -232,8 +232,8 @@ class Install {
 			WPO_WCPDF()->main->copy_fonts( $font_path, $merge_with_local );
 		}
 
-        // to ensure fonts will be copied to the upload directory
-        delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
+		// to ensure fonts will be copied to the upload directory
+		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
 		
 		// 1.5.28 update: copy next invoice number to separate setting
 		if ( $installed_version == 'versionless' || version_compare( $installed_version, '1.5.28', '<' ) ) {
