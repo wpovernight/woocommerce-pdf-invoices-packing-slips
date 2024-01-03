@@ -88,7 +88,7 @@ class Settings_Debug {
 		global $wpdb;
 
 		$number_store_tables            = $this->get_number_store_tables();
-		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
+		$invoice_number_store_doc_types = $this->get_additional_invoice_number_store_document_types();
 		$store_name                     = 'invoice_number';
 		
 		if ( isset( $_GET['table_name'] ) ) {
@@ -101,7 +101,7 @@ class Settings_Debug {
 			$_GET['table_name'] = $selected_table_name = null;
 		}
 		
-		$document_type = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( esc_attr( $_GET['table_name'] ) );
+		$document_type = $this->get_document_type_from_store_table_name( esc_attr( $_GET['table_name'] ) );
 
 		$list_table = new Number_Store_List_Table();
 		$list_table->prepare_items();
@@ -109,7 +109,7 @@ class Settings_Debug {
 		include( WPO_WCPDF()->plugin_path() . '/includes/views/advanced-numbers.php' );
 	}
 	
-	private function get_number_store_tables() {
+	public function get_number_store_tables() {
 		global $wpdb;
 		
 		$tables          = $wpdb->get_results( "SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'" );

@@ -199,7 +199,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 		$paged                          = $this->get_paged( $request );
 		$offset                         = $this->per_page * ( $paged - 1 );
 		$search                         = $this->get_search( $request );
-		$table_name                     = isset( $request['table_name'] ) ? sanitize_text_field( $request['table_name'] ) : null;
+		$table_name                     = isset( $request['table_name'] ) && in_array( $request['table_name'], array_keys( WPO_WCPDF()->settings->debug->get_number_store_tables() ) ) ? sanitize_text_field( $request['table_name'] ) : null;
 		$order                          = isset( $request['order'] ) && in_array( $request['order'], array( 'DESC', 'ASC' ) ) ? sanitize_text_field( $request['order'] ) : 'DESC';
 		$orderby                        = isset( $request['orderby'] ) && in_array( $request['orderby'], array( 'id' ) ) ? sanitize_text_field( $request['orderby'] ) : 'id';
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
