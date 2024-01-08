@@ -217,8 +217,8 @@ if ( ! $server_configs['PHP version']['result'] ) {
 					}
 				} else {
 					$yearly_reset['value']  = sprintf(
-						/* translators: <a></a> tags */
-						__( 'Scheduled action not found. Please reschedule it %shere%s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						/* translators: 1. open anchor tag, 2. close anchor tag */
+						__( 'Scheduled action not found. Please reschedule it %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '" style="color:black; text-decoration:underline;">',
 						'</a>'
 					);

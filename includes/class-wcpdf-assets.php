@@ -260,8 +260,8 @@ class Assets {
 					'danger_zone'          => array(
 						'enabled' => isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ? true : false,
 						'message' => sprintf(
-							/* translators: <a> tags */
-							__( '<strong>Enabled</strong>: %sclick here%s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
+							/* translators: 1. open anchor tag, 2. close anchor tag */
+							__( '<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
 							'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '#danger_zone">',
 							'</a>'
 						),

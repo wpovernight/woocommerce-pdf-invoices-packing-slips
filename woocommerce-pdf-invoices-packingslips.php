@@ -188,8 +188,8 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function need_woocommerce() {
-		/* translators: <a> tags, Woo version */
 		$error_message = sprintf(
+			/* translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version */
 			esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version %3$s or higher to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ),
 			'<a href="http://wordpress.org/extend/plugins/woocommerce/">',
 			'</a>',

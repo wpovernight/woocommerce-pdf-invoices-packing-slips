@@ -41,7 +41,7 @@ class Settings_General {
 		$wp_content_dir       = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
 		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
-		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: <a> tags */ __( 'Requires the %sProfessional extension%s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
+		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 
 		$settings_fields      = array(
 			array(
