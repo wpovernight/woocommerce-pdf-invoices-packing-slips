@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.5
+Stable tag: 3.7.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.7.6 (2024-01-08) =
+* New: enforces PHP 7.2 as minimum version
+* New: DOMPDF upgrade to `v2.0.4`
+* Tweak: declare new "Payment date" string for translation
+* Fix: potential SQL injection bug in Number Tools
+* Fix: bug in `get_payment_date()`
+* Translations: Updated translation template (POT)
 
 = 3.7.5 (2023-12-13) =
 * Tweak: includes `$args` in filter hook `wpo_wcpdf_filename` parameters
