@@ -21,7 +21,10 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version = '3.7.5';
+	public $version              = '3.7.5';
+	public $version_php          = '7.2';
+	public $version_woo          = '3.0';
+	public $version_wp           = '4.4';
 	public $plugin_basename;
 	public $legacy_addons;
 	public $third_party_plugins;
@@ -79,6 +82,20 @@ class WPO_WCPDF {
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
 	}
 	
+	public function is_dependency_version_supported( $dependency ) {
+		switch ( $dependency ) {
+			case 'php':
+				return defined( 'PHP_VERSION' ) && version_compare( PHP_VERSION, $this->version_php, '>=' );
+			case 'woo':
+				return defined( 'WC_VERSION' ) && version_compare( WC_VERSION, $this->version_woo, '>=' );
+			case 'wp':
+				global $wp_version;
+				return version_compare( $wp_version, $this->version_wp, '>=' );
+		}
+		
+		return false;
+	}
+	
 	private function autoloaders() {
 		// main plugin autoloader
 		require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
@@ -94,7 +111,6 @@ class WPO_WCPDF {
 			define( $name, $value );
 		}
 	}
-
 
 	/**
 	 * Load the translation / textdomain files
@@ -150,26 +166,12 @@ class WPO_WCPDF {
 	 * Instantiate classes when woocommerce is activated
 	 */
 	public function load_classes() {
-		if ( $this->is_woocommerce_activated() === false ) {
+		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
 			add_action( 'admin_notices', array ( $this, 'need_woocommerce' ) );
 			return;
 		}
 
-		if ( $this->is_woocommerce_version_supported() === false ) {
-			add_action( 'admin_notices', array ( $this, 'need_woocommerce_3_0' ) );
-			return;
-		}
-
-		if ( version_compare( PHP_VERSION, '5.6', '<' ) ) {
-			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
-			return;
-		}
-		
-		// if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
-		// 	add_action( 'admin_notices', array ( $this, 'next_php_version_bump' ) );
-		// }
-
-		if ( has_filter( 'wpo_wcpdf_pdf_maker' ) === false && version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		if ( ! has_filter( 'wpo_wcpdf_pdf_maker' ) && ! $this->is_dependency_version_supported( 'php' ) ) {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
 			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
 		}
@@ -179,28 +181,26 @@ class WPO_WCPDF {
 		// all systems ready - GO!
 		$this->includes();
 	}
-
-	/**
-	 * Check if woocommerce version is supported
-	 */
-	public function is_woocommerce_version_supported() {
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0', '>=' ) ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Woocommerce version < 3.0 notice
-	 */
-	public function need_woocommerce_3_0() {
-		/* translators: <a> tags */
-		$error = sprintf( esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version 3.0 or higher!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
-		
-		$message = '<div class="error"><p>' . $error . '</p></div>';
 	
-		echo $message;
+	/**
+	 * WooCommerce notice.
+	 *
+	 * @return void
+	 */
+	public function need_woocommerce() {
+		/* translators: <a> tags, Woo version */
+		$error_message = sprintf(
+			esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version %3$s or higher to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="http://wordpress.org/extend/plugins/woocommerce/">',
+			'</a>',
+			esc_attr( $this->version_woo )
+		);
+		
+		$message  = '<div class="error">';
+		$message .= sprintf( '<p>%s</p>', $error_message );
+		$message .= '</div>';
+	
+		echo wp_kses_post( $message );
 	}
 
 	/**
@@ -219,20 +219,6 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * WooCommerce not active notice.
-	 *
-	 * @return void
-	 */
-	public function need_woocommerce() {
-		/* translators: <a> tags */
-		$error = sprintf( esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ), '<a href="http://wordpress.org/extend/plugins/woocommerce/">', '</a>' );
-		
-		$message = '<div class="error"><p>' . $error . '</p></div>';
-	
-		echo $message;
-	}
-
-	/**
 	 * Declares WooCommerce HPOS compatibility.
 	 *
 	 * @return void
@@ -247,36 +233,22 @@ class WPO_WCPDF {
 	 * PHP version requirement notice
 	 */
 	public function required_php_version() {
-		$error_message	= __( 'PDF Invoices & Packing Slips for WooCommerce requires PHP 7.2 (7.4 or higher recommended).', 'woocommerce-pdf-invoices-packing-slips' );
-		/* translators: <a> tags */
-		$php_message	= __( 'We strongly recommend to %1$supdate your PHP version%2$s.', 'woocommerce-pdf-invoices-packing-slips' );
-		/* translators: <a> tags */
-		$add_on_message	= __( 'If you cannot upgrade your PHP version, you can download %1$sthis addon%2$s to enable backwards compatibility with PHP5.6.', 'woocommerce-pdf-invoices-packing-slips' );
-
-		$message = '<div class="error">';
-		$message .= sprintf( '<p>%s</p>', $error_message );
-		$message .= sprintf( '<p>'.$php_message.'</p>', '<a href="https://docs.wpovernight.com/general/how-to-update-your-php-version/" target="_blank">', '</a>' );
-		if ( version_compare( PHP_VERSION, '5.6', '>' ) ) {
-			$message .= sprintf( '<p>'.$add_on_message.'</p>', '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
-		}
-		$message .= '</div>';
-
-		echo wp_kses_post( $message );
-	}
-	
-	/**
-	 * Next PHP version bump requirement notice
-	 */
-	public function next_php_version_bump() {
-		$error_message	= sprintf(
+		$error_message = sprintf(
+			/* translators: PHP version */
+			esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires PHP %s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
+			esc_attr( $this->version_php )
+		);
+		
+		$php_message = sprintf(
 			/* translators: <a> tags */
-			__( 'PDF Invoices & Packing Slips for WooCommerce will require PHP 7.2 soon for future releases. Please %1$supdate your PHP version%2$s so that you will be able to use our plugin in the future.', 'woocommerce-pdf-invoices-packing-slips' ),
+			esc_html__( 'We strongly recommend to %1$supdate your PHP version%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 			'<a href="https://docs.wpovernight.com/general/how-to-update-your-php-version/" target="_blank">',
 			'</a>'
 		);
 
-		$message  = '<div class="notice notice-warning">';
+		$message  = '<div class="error">';
 		$message .= sprintf( '<p>%s</p>', $error_message );
+		$message .= sprintf( '<p>%s</p>', $php_message );
 		$message .= '</div>';
 
 		echo wp_kses_post( $message );
