@@ -102,7 +102,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 3.7.6 (2024-01-08) =
+= 3.7.6 (2024-01-09) =
 * New: enforces PHP 7.2 as minimum version
 * New: DOMPDF upgrade to `v2.0.4`
 * Tweak: declare new "Payment date" string for translation
