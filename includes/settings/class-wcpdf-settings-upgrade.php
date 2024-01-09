@@ -139,11 +139,12 @@ class Settings_Upgrade {
 	/**
 	 * Get PDF extensions license info
 	 *
+	 * @param  bool  $ignore_cache
 	 * @return array
 	 */
-	public function get_extension_license_infos() {
+	public function get_extension_license_infos( $ignore_cache = false ) {
 		$extensions          = $this->extensions;
-		$license_info        = $this->get_extensions_license_data();
+		$license_info        = ! $ignore_cache ? $this->get_extensions_license_data( 'cached' ) : array();
 		$bundle_upgrade_link = '';
 		$license_status      = 'inactive';
 		
@@ -281,7 +282,7 @@ class Settings_Upgrade {
 			case 'cached':
 				return get_option( 'wpo_wcpdf_extensions_license_cache', array() );
 			case 'live':
-				return $this->get_extension_license_infos();
+				return $this->get_extension_license_infos( true );
 		}
 	}
 	
