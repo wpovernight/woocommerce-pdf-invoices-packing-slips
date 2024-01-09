@@ -206,6 +206,25 @@ class Settings {
 		$default_tab    = apply_filters( 'wpo_wcpdf_settings_tabs_default', ! empty( $settings_tabs['general'] ) ? 'general' : key( $settings_tabs ) );
 		$active_tab     = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : $default_tab;
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
+		
+		$extension_license_infos = $this->upgrade ? $this->upgrade->get_extension_license_infos() : array();
+		
+		if ( ! empty( $extension_license_infos ) ) {
+			$bundle = true;
+			foreach ( $this->upgrade->extensions as $extension ) {
+				if (
+					( isset( $extension_license_infos[ $extension ]['status'] ) && 'valid' !== $extension_license_infos[ $extension ]['status'] ) ||
+					! isset( $extension_license_infos[ $extension ]['status'] )
+				) {
+					$bundle = false;
+					break;
+				}
+			}
+			
+			if ( $bundle ) {
+				unset( $settings_tabs['upgrade'] );
+			}
+		}
 
 		include( 'views/settings-page.php' );
 	}

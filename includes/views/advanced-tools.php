@@ -120,6 +120,29 @@
 			</form>
 		</div>
 		<!-- /reset_settings -->
+		<!-- clear_extensions_license_cache -->
+		<div class="tool">
+			<h4><?php _e( 'Clear extensions license caching', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+			<p><?php _e( 'This will clear all extensions license caching. This could be required to update the license status in the Upgrade tab or for new Cloud Storage activations (Professional extension).', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+			<form method="post">
+				<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
+				<input type="hidden" name="wpo_wcpdf_debug_clear_extensions_license_cache" value="clear_extensions_license_cache">
+				<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Clear licenses cache', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+				<?php
+					if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_clear_extensions_license_cache'] ) && 'clear_extensions_license_cache' === $_POST['wpo_wcpdf_debug_clear_extensions_license_cache'] ) {
+						// check permissions
+						if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
+							return;
+						}
+
+						WPO_WCPDF()->settings->upgrade->clear_extensions_license_cache();
+						
+						printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Extensions license cache cleared successfully!', 'woocommerce-pdf-invoices-packing-slips' ) ); 
+					}
+				?>
+			</form>
+		</div>
+		<!-- /clear_extensions_license_cache -->
 		<?php do_action( 'wpo_wcpdf_after_debug_tools', $this ); ?>
 	</div>
 	<!-- danger_zone (admin access only) -->

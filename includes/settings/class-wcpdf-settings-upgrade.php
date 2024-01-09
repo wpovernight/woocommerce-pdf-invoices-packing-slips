@@ -9,6 +9,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade' ) ) :
 
 class Settings_Upgrade {
 	
+	public           $extensions;
 	protected static $_instance = null;
 		
 	public static function instance() {
@@ -18,8 +19,11 @@ class Settings_Upgrade {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
+		$this->extensions = array( 'pro', 'templates' );
+		
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
+		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', array( $this, 'clear_extensions_license_cache' ) );
 	}
 
 	public function extension_overview( $tab, $section ) {
@@ -122,7 +126,7 @@ class Settings_Upgrade {
 	public function extension_is_enabled( $extension ) {
 		$is_enabled = false;
 		
-		if ( ! empty( $extension ) || ! in_array( $extension, [ 'pro', 'templates' ] ) ) {
+		if ( ! empty( $extension ) || ! in_array( $extension, $this->extensions ) ) {
 			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
 			if ( function_exists( $extension_main_function ) ) {
 				$is_enabled = true;
@@ -138,14 +142,18 @@ class Settings_Upgrade {
 	 * @return array
 	 */
 	public function get_extension_license_infos() {
-		$extensions          = [ 'pro', 'templates' ];
-		$license_info        = [];
+		$extensions          = $this->extensions;
+		$license_info        = $this->get_extensions_license_data();
 		$bundle_upgrade_link = '';
 		$license_status      = 'inactive';
 		
+		if ( ! empty( $license_info ) ) {
+			return $license_info;
+		}
+		
 		foreach ( $extensions as $extension ) {
-			$license_info[$extension]   = [];
-			$args                       = [];
+			$license_info[ $extension ] = array();
+			$args                       = array();
 			$request                    = null;
 			$license_key                = '';
 			$sidekick                   = false;
@@ -205,8 +213,9 @@ class Settings_Upgrade {
 					continue;
 				}
 				
-				if ( $updater && is_callable( [ $updater, 'remote_license_actions' ] ) && ! empty( $args ) ) {
+				if ( $updater && is_callable( array( $updater, 'remote_license_actions' ) ) && ! empty( $args ) ) {
 					$request = $updater->remote_license_actions( $args );
+					
 					if ( is_object( $request ) && isset( $request->license ) ) {
 						$license_info[$extension]['status'] = $license_status = $request->license;
 						
@@ -237,7 +246,43 @@ class Settings_Upgrade {
 			}
 		}
 		
+		update_option( 'wpo_wcpdf_extensions_license_cache', $license_info );
+					
+		if ( as_next_scheduled_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing' ) ) {
+			as_unschedule_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
+		}
+		
+		as_schedule_single_action( strtotime( "+1 day" ), 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
+		
 		return $license_info;
+	}
+	
+	/**
+	 * Clear extensions license cache
+	 *
+	 * @return void
+	 */
+	public function clear_extensions_license_cache() {
+		delete_option( 'wpo_wcpdf_extensions_license_cache' );
+	}
+	
+	/**
+	 * Get extensions license data
+	 *
+	 * @param  string $type    can be 'cached' or 'live'
+	 * @return array
+	 */
+	public function get_extensions_license_data( $type = 'cached' ) {
+		if ( ! in_array( $type, array( 'cached', 'live' ) ) ) {
+			return array();
+		}
+		
+		switch ( $type ) {
+			case 'cached':
+				return get_option( 'wpo_wcpdf_extensions_license_cache', array() );
+			case 'live':
+				return $this->get_extension_license_infos();
+		}
 	}
 	
 }
