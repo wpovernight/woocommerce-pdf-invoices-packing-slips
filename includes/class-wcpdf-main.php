@@ -423,7 +423,7 @@ class Main {
 		// Check the nonce - guest access can use nonce if user is logged in
 		if ( is_user_logged_in() && in_array( $access_type, array( 'logged_in', 'guest' ) ) && ! $valid_nonce ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: invalid nonce', 'woocommerce-pdf-invoices-packing-slips' );
-			wcpdf_safe_redirect_or_die( $redirect_url, $message );
+			wcpdf_safe_redirect_or_die( null, $message );
 		}
 
 		// Check if all parameters are set

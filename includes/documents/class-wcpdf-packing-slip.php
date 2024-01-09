@@ -69,13 +69,12 @@ class Packing_Slip extends Order_Document_Methods {
 	}
 
 	public function init_settings() {
-		// Register settings.
 		$page = $option_group = $option_name = 'wpo_wcpdf_documents_settings_packing-slip';
 
 		$settings_fields = array(
 			array(
 				'type'			=> 'section',
-				'id'			=> 'packing_slip',
+				'id'			=> 'init',
 				'title'			=> '',
 				'callback'		=> 'section',
 			),
@@ -84,18 +83,64 @@ class Packing_Slip extends Order_Document_Methods {
 				'id'			=> 'enabled',
 				'title'			=> __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
+				'section'		=> 'init',
 				'args'			=> array(
 					'option_name'		=> $option_name,
 					'id'				=> 'enabled',
-				)
+				),
+			),
+			// Display settings
+			array(
+				'type'			=> 'section',
+				'id'			=> 'display',
+				'title'			=> __( 'Display', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'section',
+				'args'			=> array(
+					'before_section' => '<div class="settings_section_title" id="display_settings">',
+					'after_section' => '</div>',
+				),
+			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'display_email',
+				'title'			=> __( 'Email address', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'display',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'display_email',
+				),
+			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'display_phone',
+				'title'			=> __( 'Phone number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'display',
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'display_phone',
+				),
+			),
+			array(
+				'type'			=> 'setting',
+				'id'			=> 'display_customer_notes',
+				'title'			=> __( 'Customer notes', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> 'display',
+				'args'			=> array(
+					'option_name'		=> $option_name,
+					'id'				=> 'display_customer_notes',
+					'store_unchecked'	=> true,
+					'default'			=> 1,
+				),
 			),
 			array(
 				'type'			=> 'setting',
 				'id'			=> 'display_billing_address',
-				'title'			=> __( 'Display billing address', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'			=> __( 'Billing address', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
-				'section'		=> 'packing_slip',
+				'section'		=> 'display',
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'display_billing_address',
@@ -104,43 +149,7 @@ class Packing_Slip extends Order_Document_Methods {
 						'when_different'=> __( 'Only when different from shipping address' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'always'		=> __( 'Always' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					// 'description'	=> __( 'Display billing address (in addition to the default shipping address) if different from shipping address', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'			=> 'setting',
-				'id'			=> 'display_email',
-				'title'			=> __( 'Display email address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'display_email',
-				)
-			),
-			array(
-				'type'			=> 'setting',
-				'id'			=> 'display_phone',
-				'title'			=> __( 'Display phone number', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'display_phone',
-				)
-			),
-			array(
-				'type'			=> 'setting',
-				'id'			=> 'display_customer_notes',
-				'title'			=> __( 'Display customer notes', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'display_customer_notes',
-					'store_unchecked'	=> true,
-					'default'			=> 1,
-				)
+				),
 			),
 		);
 		
@@ -159,12 +168,12 @@ class Packing_Slip extends Order_Document_Methods {
 					'id'			=> 'attach_to_email_ids',
 					'title'			=> __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
 					'callback'		=> 'html_section',
-					'section'		=> 'packing_slip',
+					'section'		=> 'general',
 					'args'			=> array(
 						'option_name' => $option_name,
 						'id'          => 'attach_to_email_ids',
 						'html'        => $html,
-					)
+					),
 				),
 			);
 			$settings_fields = WPO_WCPDF()->settings->move_setting_after_id( $settings_fields, $pro_notice, 'enabled' );
@@ -173,8 +182,6 @@ class Packing_Slip extends Order_Document_Methods {
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_documents_packing_slip', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-		return;
-
 	}
 
 	/**
