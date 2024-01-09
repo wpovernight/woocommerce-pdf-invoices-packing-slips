@@ -141,6 +141,17 @@
 					}
 				?>
 			</form>
+			<?php
+				if ( WPO_WCPDF()->settings->upgrade->get_extensions_license_data() ) {
+					$type    = 'warning';
+					$message = __( 'Licenses data is cached', 'woocommerce-pdf-invoices-packing-slips' );
+				} else {
+					$type    = 'success';
+					$message = __( 'Licenses cache is empty', 'woocommerce-pdf-invoices-packing-slips' );
+				}
+				
+				printf( '<div class="notice inline notice-%s"><p>%s</p></div>', $type, $message );
+			?>
 		</div>
 		<!-- /clear_extensions_license_cache -->
 		<?php do_action( 'wpo_wcpdf_after_debug_tools', $this ); ?>
