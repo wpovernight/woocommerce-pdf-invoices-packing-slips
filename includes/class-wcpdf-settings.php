@@ -480,7 +480,8 @@ class Settings {
 					$settings_field['id'],
 					$settings_field['title'],
 					$callback,
-					$page
+					$page,
+					$settings_field['args'] ?? array()
 				);
 			} else {
 				add_settings_field(

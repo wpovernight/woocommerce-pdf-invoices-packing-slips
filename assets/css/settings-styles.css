@@ -454,6 +454,16 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 300px !important;
 }
 
+#wpo-wcpdf-preview-wrapper .sidebar .settings_section_title > h2 {
+	border-bottom: 1px solid #c3c4c7;
+	padding-bottom: 0.35em;
+	font-weight: normal;
+	color: #222;
+	font-family: serif;
+	font-size: 1.7em;
+	letter-spacing: -0.025em;
+}
+
 /* WPML */
 
 #wpo-wcpdf-settings .form-table .ui-tabs-nav {
