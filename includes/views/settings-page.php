@@ -31,7 +31,6 @@ $review_invitation = sprintf(
 	</h2>
 
 	<?php
-	do_action( 'wpo_wcpdf_before_settings_page', $active_tab, $active_section );
 
 	// save or check option to hide extensions ad
 	if ( isset( $_REQUEST['wpo_wcpdf_hide_extensions_ad'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
@@ -60,6 +59,7 @@ $review_invitation = sprintf(
 	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo esc_attr( $preview_states ); ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo esc_attr( $preview_states_lock ); ?>">
 
 		<div class="sidebar">
+			<?php do_action( 'wpo_wcpdf_before_settings_page', $active_tab, $active_section ); ?>
 			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 				<?php
 					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );

@@ -22,8 +22,21 @@ class Settings_Upgrade {
 	public function __construct() {
 		$this->extensions = array( 'pro', 'templates' );
 		
+		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
 		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', array( $this, 'clear_extensions_license_cache' ) );
+	}
+	
+	public function extensions_license_cache_notice( $tab, $active_section ) {
+		if ( 'upgrade' === $tab && WPO_WCPDF()->settings->upgrade->get_extensions_license_data() ) {
+			$message = sprintf(
+				/* translators: 1. open anchor tag, 2. close anchor tag */
+				__( 'Kindly be aware that the extension\'s license data is currently stored in cache, impeding the instant update of the information displayed below. To access the latest details, we recommend clearing the cache %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=tools' ) ) . '">',
+				'</a>'
+			);
+			printf( '<div class="notice inline notice-warning"><p>%s</p></div>', $message );
+		}
 	}
 
 	public function extension_overview( $tab, $section ) {
