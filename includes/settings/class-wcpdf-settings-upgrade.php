@@ -253,7 +253,7 @@ class Settings_Upgrade {
 			as_unschedule_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
 		}
 		
-		as_schedule_single_action( strtotime( "+1 day" ), 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
+		as_schedule_single_action( strtotime( "+1 week" ), 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
 		
 		return $license_info;
 	}
@@ -284,6 +284,50 @@ class Settings_Upgrade {
 			case 'live':
 				return $this->get_extension_license_infos( true );
 		}
+	}
+	
+	/**
+	 * Check if are any extensions installed
+	 *
+	 * @return void
+	 */
+	public function are_any_extensions_installed() {
+		$installed = false;
+		
+		foreach ( $this->extensions as $extension ) {
+			if ( $this->extension_is_enabled( $extension ) ) {
+				$installed = true;
+				break;
+			}
+		}
+		
+		return $installed;
+	}
+	
+	/**
+	 * Check if bundle (Pro + Templates) is active
+	 *
+	 * @return void
+	 */
+	public function bundle_is_active() {
+		$extension_license_infos = $this->get_extension_license_infos();
+		$bundle                  = false;
+		
+		if ( ! empty( $extension_license_infos ) ) {
+			$bundle = true;
+			
+			foreach ( $this->extensions as $extension ) {
+				if (
+					( isset( $extension_license_infos[ $extension ]['status'] ) && 'valid' !== $extension_license_infos[ $extension ]['status'] ) ||
+					! isset( $extension_license_infos[ $extension ]['status'] )
+				) {
+					$bundle = false;
+					break;
+				}
+			}
+		}
+		
+		return $bundle;
 	}
 	
 }
