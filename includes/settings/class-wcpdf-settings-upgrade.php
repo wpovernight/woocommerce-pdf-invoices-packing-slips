@@ -31,7 +31,7 @@ class Settings_Upgrade {
 		if ( 'upgrade' === $tab && WPO_WCPDF()->settings->upgrade->get_extensions_license_data() ) {
 			$message = sprintf(
 				/* translators: 1. open anchor tag, 2. close anchor tag */
-				__( 'Kindly be aware that the extension\'s license data is currently stored in cache, impeding the instant update of the information displayed below. To access the latest details, we recommend clearing the cache %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				__( 'Kindly be aware that the extensions\' license data is currently stored in cache, impeding the instant update of the information displayed below. To access the latest details, we recommend clearing the cache %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=tools' ) ) . '">',
 				'</a>'
 			);
