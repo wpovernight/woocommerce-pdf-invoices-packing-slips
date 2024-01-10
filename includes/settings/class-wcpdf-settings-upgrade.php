@@ -289,7 +289,7 @@ class Settings_Upgrade {
 	/**
 	 * Check if are any extensions installed
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function are_any_extensions_installed() {
 		$installed = false;
@@ -307,7 +307,7 @@ class Settings_Upgrade {
 	/**
 	 * Check if bundle (Pro + Templates) is active
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function bundle_is_active() {
 		$extension_license_infos = $this->get_extension_license_infos();
