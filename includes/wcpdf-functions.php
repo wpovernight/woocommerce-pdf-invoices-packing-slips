@@ -47,14 +47,14 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
 				if ( ! $document || ! is_callable( array( $document, 'is_allowed' ) ) || ! $document->is_allowed() ) {
-					return false;
+					return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 				}
 
 				if ( $init && ! $document->exists() ) {
 					$document->init();
 					$document->save();
 				}
-				return $document;
+				return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 			} else {
 				// order ids array changed, continue processing that array.
 				$order_ids = $filtered_order_ids;
@@ -62,12 +62,12 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		} elseif ( is_array( $order ) ) {
 			$order_ids = wcpdf_filter_order_ids( $order, $document_type );
 		} else {
-			return false;
+			return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 		}
 
 		if ( empty( $order_ids ) ) {
 			// No orders to export for this document type.
-			return false;
+			return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 		}
 
 		// if we only have one order, it's simple.
@@ -79,7 +79,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
 			if ( ! $document->is_allowed() ) {
-				return false;
+				return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 			}
 
 			if ( $init && ! $document->exists() ) {
