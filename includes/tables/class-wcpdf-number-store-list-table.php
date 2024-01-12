@@ -180,8 +180,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 	 * @return mixed string If search is present, false otherwise
 	 */
 	public function get_search( $request ) {
-		global $wpdb;
-		return ! empty( $request['s'] ) ? $wpdb->_real_escape( $request['s'] ) : false;
+		return ! empty( $request['s'] ) ? absint( $request['s'] ) : false;
 	}
 
 	/**
@@ -212,9 +211,11 @@ class Number_Store_List_Table extends \WP_List_Table {
 
 		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE `id` LIKE '%s' OR `order_id` LIKE '%s' ORDER BY $orderby $order LIMIT %d OFFSET %d", $search, $search, $this->per_page, $offset ) );
+				$query   = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $search, $search, $this->per_page, $offset );
+				$results = $wpdb->get_results( $query );
 			} else {
-				$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset ) );
+				$query   = $wpdb->prepare( "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $this->per_page, $offset );
+				$results = $wpdb->get_results( $query );
 			}
 		} else {
 			$results = array();
