@@ -563,7 +563,9 @@ class Admin {
 		
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
-			if ( $document = wcpdf_get_document( $document->get_type(), $order ) ) {
+			$document       = wcpdf_get_document( $document->get_type(), $order );
+			
+			if ( $document ) {
 				$document_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
 				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
