@@ -95,7 +95,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 	}
 
-	return $document;
+	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 }
 
 function wcpdf_get_bulk_document( $document_type, $order_ids ) {
