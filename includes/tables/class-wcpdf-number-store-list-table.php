@@ -208,6 +208,16 @@ class Number_Store_List_Table extends \WP_List_Table {
 		if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
 			return array(); // using `invoice_number`
 		}
+		
+		// MySQL int range
+		$options = array(
+			'options' => array(
+				'min_range' => 1,
+				'max_range' => 4294967295
+			)
+		);
+		
+		$search = filter_var( $search, FILTER_VALIDATE_INT, $options );
 
 		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
