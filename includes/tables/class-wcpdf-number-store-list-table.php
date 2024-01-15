@@ -180,7 +180,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 	 * @return mixed string If search is present, false otherwise
 	 */
 	public function get_search( $request ) {
-		return ! empty( $request['s'] ) ? sanitize_text_field( $request['s'] ) : false;
+		return ! empty( $request['s'] ) ? absint( $request['s'] ) : false;
 	}
 
 	/**
@@ -204,19 +204,30 @@ class Number_Store_List_Table extends \WP_List_Table {
 		$orderby                        = isset( $request['orderby'] ) && in_array( $request['orderby'], array( 'id' ) ) ? sanitize_text_field( $request['orderby'] ) : 'id';
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
 		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
+		$results                        = array();
 		
 		if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
-			return array(); // using `invoice_number`
+			return $results; // using `invoice_number`
 		}
+		
+		// MySQL int range
+		$options = array(
+			'options' => array(
+				'min_range' => 1,
+				'max_range' => 4294967295
+			)
+		);
+		
+		$search = filter_var( $search, FILTER_VALIDATE_INT, $options );
 
 		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name WHERE `id` LIKE '$search' OR `order_id` LIKE '$search' ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset ) );
+				$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $search, $search, $this->per_page, $offset );
 			} else {
-				$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table_name ORDER BY $orderby $order LIMIT %d OFFSET %d", $this->per_page, $offset ) );
+				$query = $wpdb->prepare( "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $this->per_page, $offset );
 			}
-		} else {
-			$results = array();
+			
+			$results = $wpdb->get_results( $query );
 		}
 		
 		// add document title or 'Deleted'

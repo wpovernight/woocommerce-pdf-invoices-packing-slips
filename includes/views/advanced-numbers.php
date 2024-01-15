@@ -33,7 +33,7 @@
 		</p>
 		<p><?php _e( 'Numbers may have been assigned to orders before this.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="number-search" style="text-align:right;">
-			<input type="search" id="number_search_input" name="number_search_input" value="<?php echo isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : ''; ?>">
+			<input type="number" id="number_search_input" name="number_search_input" min="1" max="4294967295" value="<?php echo isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : ''; ?>">
 			<a href="#" class="button button-primary number-search-button"><?php _e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 			<?php $disabled = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? '' : 'disabled'; ?>
 			<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
