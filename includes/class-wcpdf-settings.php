@@ -206,6 +206,11 @@ class Settings {
 		$default_tab    = apply_filters( 'wpo_wcpdf_settings_tabs_default', ! empty( $settings_tabs['general'] ) ? 'general' : key( $settings_tabs ) );
 		$active_tab     = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : $default_tab;
 		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
+		$bundle         = $this->upgrade ? $this->upgrade->bundle_is_active() : false;
+		
+		if ( $bundle ) {
+			unset( $settings_tabs['upgrade'] );
+		}
 
 		include( 'views/settings-page.php' );
 	}
