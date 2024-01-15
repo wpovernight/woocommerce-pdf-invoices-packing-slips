@@ -102,6 +102,14 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 3.7.7-beta-1 (2024-01-15) =
+* New: extensions license cache system
+* New: hides the Upgrade tab on bundle
+* New: get document filter hook `wcpdf_get_document`
+* Fix: SQL injection bug in Advanced Numbers search
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 8.5
+
 = 3.7.6 (2024-01-09) =
 * New: enforces PHP 7.2 as minimum version
 * New: DOMPDF upgrade to `v2.0.4`
