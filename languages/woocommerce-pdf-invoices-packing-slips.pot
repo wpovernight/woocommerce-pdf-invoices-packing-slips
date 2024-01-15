@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.7.5\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.7.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-01-08T13:04:28+01:00\n"
+"POT-Creation-Date: 2024-01-15T15:23:07+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -87,7 +87,7 @@ msgid "I am the wizard"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:321
-#: includes/class-wcpdf-admin.php:1349
+#: includes/class-wcpdf-admin.php:1351
 #: includes/class-wcpdf-assets.php:224
 #: includes/class-wcpdf-main.php:1288
 #: includes/documents/class-wcpdf-invoice.php:368
@@ -127,121 +127,121 @@ msgstr ""
 msgid "Save order & send email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:611
+#: includes/class-wcpdf-admin.php:613
 msgid "Mark printed"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:613
+#: includes/class-wcpdf-admin.php:615
 msgid "Unmark"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:700
+#: includes/class-wcpdf-admin.php:702
 msgid "UBL documents require the correspondent PDF to be generated first."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:720
+#: includes/class-wcpdf-admin.php:722
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:723
+#: includes/class-wcpdf-admin.php:725
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:726
+#: includes/class-wcpdf-admin.php:728
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:729
+#: includes/class-wcpdf-admin.php:731
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:732
+#: includes/class-wcpdf-admin.php:734
 msgid "Notes (printed in the invoice):"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:857
+#: includes/class-wcpdf-admin.php:859
 msgid "View more details"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:858
+#: includes/class-wcpdf-admin.php:860
 msgid "Hide details"
 msgstr ""
 
 #. translators: document title
-#: includes/class-wcpdf-admin.php:870
+#: includes/class-wcpdf-admin.php:872
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:875
+#: includes/class-wcpdf-admin.php:877
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:887
+#: includes/class-wcpdf-admin.php:889
 msgid "unformatted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:929
+#: includes/class-wcpdf-admin.php:931
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:930
+#: includes/class-wcpdf-admin.php:932
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/class-wcpdf-admin.php:1069
+#: includes/class-wcpdf-admin.php:1071
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1117
+#: includes/class-wcpdf-admin.php:1119
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1123
+#: includes/class-wcpdf-admin.php:1125
 msgid "Bad action!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1129
+#: includes/class-wcpdf-admin.php:1131
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1135
+#: includes/class-wcpdf-admin.php:1137
 msgid "No permissions!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1159
+#: includes/class-wcpdf-admin.php:1161
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1160
+#: includes/class-wcpdf-admin.php:1162
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1163
+#: includes/class-wcpdf-admin.php:1165
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1164
+#: includes/class-wcpdf-admin.php:1166
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1167
+#: includes/class-wcpdf-admin.php:1169
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1168
+#: includes/class-wcpdf-admin.php:1170
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1224
+#: includes/class-wcpdf-admin.php:1226
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1238
+#: includes/class-wcpdf-admin.php:1240
 msgid "Document is empty."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1269
+#: includes/class-wcpdf-admin.php:1271
 msgid "DEBUG output enabled"
 msgstr ""
 
@@ -330,8 +330,8 @@ msgid "Could not find the order #%s."
 msgstr ""
 
 #: includes/class-wcpdf-main.php:531
-#: includes/class-wcpdf-settings.php:234
-#: includes/class-wcpdf-settings.php:380
+#: includes/class-wcpdf-settings.php:239
+#: includes/class-wcpdf-settings.php:385
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -456,54 +456,54 @@ msgstr ""
 msgid "Upgrade"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:274
+#: includes/class-wcpdf-settings.php:279
 msgid "Order not found!"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:277
+#: includes/class-wcpdf-settings.php:282
 msgid "Object found is not an order!"
 msgstr ""
 
 #. translators: order ID
-#: includes/class-wcpdf-settings.php:349
+#: includes/class-wcpdf-settings.php:354
 msgid "Document not available for order #%s, try selecting a different order."
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:356
+#: includes/class-wcpdf-settings.php:361
 msgid "No WooCommerce orders found! Please consider adding your first order to see this preview."
 msgstr ""
 
 #. translators: error message
-#: includes/class-wcpdf-settings.php:364
+#: includes/class-wcpdf-settings.php:369
 msgid "Error trying to generate document: %s"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:438
+#: includes/class-wcpdf-settings.php:443
 #: includes/tables/class-wcpdf-number-store-list-table.php:124
 msgid "Date"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:439
+#: includes/class-wcpdf-settings.php:444
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1089
 #: ubl/Settings/TaxesSettings.php:170
 msgid "Total"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:446
+#: includes/class-wcpdf-settings.php:451
 msgid "No order(s) found!"
 msgstr ""
 
-#: includes/class-wcpdf-settings.php:449
+#: includes/class-wcpdf-settings.php:454
 msgid "An error occurred when trying to process your request!"
 msgstr ""
 
 #. translators: error message
-#: includes/class-wcpdf-settings.php:456
+#: includes/class-wcpdf-settings.php:461
 msgid "Error trying to get orders: %s"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/class-wcpdf-settings.php:946
+#: includes/class-wcpdf-settings.php:951
 msgid "Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found"
 msgstr ""
 
@@ -1431,114 +1431,119 @@ msgstr ""
 msgid "UBL settings"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:29
+#. translators: 1. open anchor tag, 2. close anchor tag
+#: includes/settings/class-wcpdf-settings-upgrade.php:34
+msgid "Kindly be aware that the extensions' license data is currently stored in cache, impeding the instant update of the information displayed below. To access the latest details, we recommend clearing the cache %1$shere%2$s."
+msgstr ""
+
+#: includes/settings/class-wcpdf-settings-upgrade.php:46
 msgid "Proforma Invoice, Credit Note & Receipt"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:30
+#: includes/settings/class-wcpdf-settings-upgrade.php:47
 msgid "Update your workflow and handle refunds. Both Proforma & Credit Note documents can either follow the main invoice numbering or have their own separate number sequence."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:34
+#: includes/settings/class-wcpdf-settings-upgrade.php:51
 msgid "Attach to email"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:35
+#: includes/settings/class-wcpdf-settings-upgrade.php:52
 msgid "Also attach the Packing Slip, Proforma Invoice and Credit Note to any of the outgoing emails."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:39
+#: includes/settings/class-wcpdf-settings-upgrade.php:56
 msgid "Cloud storage upload"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:40
+#: includes/settings/class-wcpdf-settings-upgrade.php:57
 msgid "Automatically upload your documents via FTP/SFTP or to Dropbox."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:44
+#: includes/settings/class-wcpdf-settings-upgrade.php:61
 msgid "Bulk export"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:45
+#: includes/settings/class-wcpdf-settings-upgrade.php:62
 msgid "Easily export documents for a specific date range."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:49
+#: includes/settings/class-wcpdf-settings-upgrade.php:66
 msgid "Multilingual support"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:50
+#: includes/settings/class-wcpdf-settings-upgrade.php:67
 msgid "Handle document translations with WPML, Polylang, Weglot, TranslatePress or GTranslate."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:54
+#: includes/settings/class-wcpdf-settings-upgrade.php:71
 msgid "Attach static files"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:55
+#: includes/settings/class-wcpdf-settings-upgrade.php:72
 msgid "Add up to three static files to your emails."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:59
+#: includes/settings/class-wcpdf-settings-upgrade.php:76
 msgid "Custom document titles and filenames"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:60
+#: includes/settings/class-wcpdf-settings-upgrade.php:77
 msgid "Customize document titles and filenames right in the plugin settings."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:64
+#: includes/settings/class-wcpdf-settings-upgrade.php:81
 msgid "Custom address format"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:65
+#: includes/settings/class-wcpdf-settings-upgrade.php:82
 msgid "Customize the address format of the billing and shipping addresses."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:69
+#: includes/settings/class-wcpdf-settings-upgrade.php:86
 msgid "Order notification email"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:72
+#: includes/settings/class-wcpdf-settings-upgrade.php:89
 msgid "Send a notification email to user specified addresses."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:74
-#: includes/settings/class-wcpdf-settings-upgrade.php:84
-#: includes/settings/class-wcpdf-settings-upgrade.php:94
+#: includes/settings/class-wcpdf-settings-upgrade.php:91
+#: includes/settings/class-wcpdf-settings-upgrade.php:101
+#: includes/settings/class-wcpdf-settings-upgrade.php:111
 #: includes/views/upgrade-table.php:56
 msgid "Learn more"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:79
+#: includes/settings/class-wcpdf-settings-upgrade.php:96
 msgid "PDF Customizer"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:82
+#: includes/settings/class-wcpdf-settings-upgrade.php:99
 msgid "Fully customize the product table and totals table on your documents."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:89
+#: includes/settings/class-wcpdf-settings-upgrade.php:106
 msgid "Add custom data to your documents"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:92
+#: includes/settings/class-wcpdf-settings-upgrade.php:109
 msgid "Display all sorts of data and apply conditional logic using Custom Blocks."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:99
+#: includes/settings/class-wcpdf-settings-upgrade.php:116
 msgid "Additional PDF templates"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:100
+#: includes/settings/class-wcpdf-settings-upgrade.php:117
 msgid "Make use of our Business or Modern template designs."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:104
+#: includes/settings/class-wcpdf-settings-upgrade.php:121
 msgid "Add styling"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-upgrade.php:105
+#: includes/settings/class-wcpdf-settings-upgrade.php:122
 msgid "Easily change the look and feel of your documents by adding some custom CSS."
 msgstr ""
 
@@ -1849,67 +1854,91 @@ msgstr ""
 msgid "This will clear all your selected settings data. Please do a backup first using the export tool above."
 msgstr ""
 
+#: includes/views/advanced-tools.php:126
+msgid "Clear extensions license caching"
+msgstr ""
+
+#: includes/views/advanced-tools.php:127
+msgid "This will clear all extensions' license caching. This could be required to update the license status in the Upgrade tab or for new Cloud Storage activations (Professional extension)."
+msgstr ""
+
 #: includes/views/advanced-tools.php:131
+msgid "Clear licenses cache"
+msgstr ""
+
+#: includes/views/advanced-tools.php:141
+msgid "Extensions' license cache cleared successfully!"
+msgstr ""
+
+#: includes/views/advanced-tools.php:148
+msgid "Licenses data is cached"
+msgstr ""
+
+#: includes/views/advanced-tools.php:151
+msgid "Licenses cache is empty"
+msgstr ""
+
+#: includes/views/advanced-tools.php:167
 msgid "<strong>DANGER ZONE:</strong> Create a backup before using these tools, the actions they perform are irreversible!"
 msgstr ""
 
-#: includes/views/advanced-tools.php:136
+#: includes/views/advanced-tools.php:172
 msgid "Renumber existing documents"
 msgstr ""
 
-#: includes/views/advanced-tools.php:137
+#: includes/views/advanced-tools.php:173
 msgid "This tool will renumber existing documents within the selected order date range, while keeping the assigned document date."
 msgstr ""
 
 #. translators: step-by-step instructions
-#: includes/views/advanced-tools.php:142
+#: includes/views/advanced-tools.php:178
 msgid "Set the <strong>next document number</strong> setting %s to the number you want to use for the first document. "
 msgstr ""
 
-#: includes/views/advanced-tools.php:149
-#: includes/views/advanced-tools.php:183
+#: includes/views/advanced-tools.php:185
+#: includes/views/advanced-tools.php:219
 msgid "Document type:"
 msgstr ""
 
-#: includes/views/advanced-tools.php:152
-#: includes/views/advanced-tools.php:186
+#: includes/views/advanced-tools.php:188
+#: includes/views/advanced-tools.php:222
 msgid "Select"
 msgstr ""
 
-#: includes/views/advanced-tools.php:160
-#: includes/views/advanced-tools.php:195
+#: includes/views/advanced-tools.php:196
+#: includes/views/advanced-tools.php:231
 msgid "From:"
 msgstr ""
 
-#: includes/views/advanced-tools.php:161
-#: includes/views/advanced-tools.php:165
-#: includes/views/advanced-tools.php:196
-#: includes/views/advanced-tools.php:200
+#: includes/views/advanced-tools.php:197
+#: includes/views/advanced-tools.php:201
+#: includes/views/advanced-tools.php:232
+#: includes/views/advanced-tools.php:236
 msgid "(as: yyyy-mm-dd)"
 msgstr ""
 
-#: includes/views/advanced-tools.php:164
-#: includes/views/advanced-tools.php:199
+#: includes/views/advanced-tools.php:200
+#: includes/views/advanced-tools.php:235
 msgid "To:"
 msgstr ""
 
-#: includes/views/advanced-tools.php:170
+#: includes/views/advanced-tools.php:206
 msgid "Renumber documents"
 msgstr ""
 
-#: includes/views/advanced-tools.php:179
+#: includes/views/advanced-tools.php:215
 msgid "Delete existing documents"
 msgstr ""
 
-#: includes/views/advanced-tools.php:180
+#: includes/views/advanced-tools.php:216
 msgid "This tool will delete existing documents within the selected order date range."
 msgstr ""
 
-#: includes/views/advanced-tools.php:190
+#: includes/views/advanced-tools.php:226
 msgid "All"
 msgstr ""
 
-#: includes/views/advanced-tools.php:205
+#: includes/views/advanced-tools.php:241
 msgid "Delete documents"
 msgstr ""
 
