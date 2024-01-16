@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-01-16T11:07:52+01:00\n"
+"POT-Creation-Date: 2024-01-16T11:10:25+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -1118,12 +1118,12 @@ msgid "Logged in (recommended)"
 msgstr ""
 
 #: includes/settings/class-wcpdf-settings-debug.php:630
-#: includes/settings/class-wcpdf-settings-debug.php:809
+#: includes/settings/class-wcpdf-settings-debug.php:818
 msgid "Guest"
 msgstr ""
 
 #: includes/settings/class-wcpdf-settings-debug.php:631
-#: includes/settings/class-wcpdf-settings-debug.php:813
+#: includes/settings/class-wcpdf-settings-debug.php:822
 msgid "Full"
 msgstr ""
 
@@ -1167,96 +1167,98 @@ msgstr ""
 msgid "Calculate document numbers (slow)"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:698
-msgid "Document numbers (such as invoice numbers) are generated using <code>AUTO_INCREMENT</code> by default. Use this setting if your database auto increments with more than <code>1</code>."
+#. translators: 1. AUTO_INCREMENT, 2. one
+#: includes/settings/class-wcpdf-settings-debug.php:700
+msgid "Document numbers (such as invoice numbers) are generated using %1$s by default. Use this setting if your database auto increments with more than %2$s."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:704
+#: includes/settings/class-wcpdf-settings-debug.php:709
 msgid "Enable debug output"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:710
+#: includes/settings/class-wcpdf-settings-debug.php:715
 msgid "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:711
+#: includes/settings/class-wcpdf-settings-debug.php:716
 msgid "<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefore this is not recommended to leave it enabled on live sites."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:712
-msgid "You can also add <code>&debug=true</code> to the URL to apply this on a per-order basis."
+#. translators: &debug=true
+#: includes/settings/class-wcpdf-settings-debug.php:719
+msgid "You can also add %s to the URL to apply this on a per-order basis."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:718
+#: includes/settings/class-wcpdf-settings-debug.php:727
 msgid "Enable automatic cleanup"
 msgstr ""
 
 #. translators: number of days
-#: includes/settings/class-wcpdf-settings-debug.php:725
+#: includes/settings/class-wcpdf-settings-debug.php:734
 msgid "every %s days"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:729
+#: includes/settings/class-wcpdf-settings-debug.php:738
 msgid "Automatically clean up PDF files stored in the temporary folder (used for email attachments)"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:735
+#: includes/settings/class-wcpdf-settings-debug.php:744
 msgid "Output to HTML"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:741
+#: includes/settings/class-wcpdf-settings-debug.php:750
 msgid "Send the template output as HTML to the browser instead of creating a PDF."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:742
+#: includes/settings/class-wcpdf-settings-debug.php:751
 msgid "You can also add <code>&output=html</code> to the URL to apply this on a per-order basis."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:748
+#: includes/settings/class-wcpdf-settings-debug.php:757
 msgid "Log to order notes"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:754
+#: includes/settings/class-wcpdf-settings-debug.php:763
 msgid "Log PDF document creation and mark/unmark as printed to order notes."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:760
+#: includes/settings/class-wcpdf-settings-debug.php:769
 msgid "Disable document preview"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:766
+#: includes/settings/class-wcpdf-settings-debug.php:775
 msgid "Disables the document preview on the plugin settings pages."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:772
+#: includes/settings/class-wcpdf-settings-debug.php:781
 msgid "Enable semaphore logs"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:778
+#: includes/settings/class-wcpdf-settings-debug.php:787
 msgid "Our plugin uses a semaphore class that prevents race conditions in multiple places in the code. Enable this setting only if you are having issues with document numbers, yearly reset or documents being assigned to the wrong order."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:784
+#: includes/settings/class-wcpdf-settings-debug.php:793
 msgid "Enable danger zone tools"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:790
+#: includes/settings/class-wcpdf-settings-debug.php:799
 msgid "Enables the danger zone tools. The actions performed by these tools are irreversible!"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:805
+#: includes/settings/class-wcpdf-settings-debug.php:814
 msgid "Logged in"
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:806
+#: includes/settings/class-wcpdf-settings-debug.php:815
 msgid "Document can be accessed by logged in users only."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:810
+#: includes/settings/class-wcpdf-settings-debug.php:819
 msgid "Document can be accessed by logged in and guest users."
 msgstr ""
 
-#: includes/settings/class-wcpdf-settings-debug.php:814
+#: includes/settings/class-wcpdf-settings-debug.php:823
 msgid "Document can be accessed by everyone with the link."
 msgstr ""
 
