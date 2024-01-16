@@ -695,7 +695,7 @@ class Settings_Debug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'calculate_document_numbers',
-					'description' => __( "Document numbers (such as invoice numbers) are generated using AUTO_INCREMENT by default. Use this setting if your database auto increments with more than 1.", 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Document numbers (such as invoice numbers) are generated using <code>AUTO_INCREMENT</code> by default. Use this setting if your database auto increments with more than <code>1</code>.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -707,8 +707,8 @@ class Settings_Debug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'enable_debug',
-					'description' => __( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues", 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
-									 __( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefor this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+					'description' => __( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues.", 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
+									 __( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefore this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
 									 __( 'You can also add <code>&debug=true</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),

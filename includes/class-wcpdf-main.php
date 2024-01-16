@@ -1284,7 +1284,7 @@ class Main {
 	 */
 	public function export_order_personal_data_meta( $meta_to_export ) {
 		$private_address_meta = array(
-			// _wcpdf_invoice_number_data & _wcpdf_invoice_date are duplicates of the below and therefor not included
+			// _wcpdf_invoice_number_data & _wcpdf_invoice_date are duplicates of the below and therefore not included
 			'_wcpdf_invoice_number'         => esc_html__( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
 			'_wcpdf_invoice_date_formatted' => esc_html__( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
 		);

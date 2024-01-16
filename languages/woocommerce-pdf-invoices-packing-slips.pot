@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.7.6\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.7.7-beta-1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-01-15T15:23:07+01:00\n"
+"POT-Creation-Date: 2024-01-16T11:07:52+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -1168,7 +1168,7 @@ msgid "Calculate document numbers (slow)"
 msgstr ""
 
 #: includes/settings/class-wcpdf-settings-debug.php:698
-msgid "Document numbers (such as invoice numbers) are generated using AUTO_INCREMENT by default. Use this setting if your database auto increments with more than 1."
+msgid "Document numbers (such as invoice numbers) are generated using <code>AUTO_INCREMENT</code> by default. Use this setting if your database auto increments with more than <code>1</code>."
 msgstr ""
 
 #: includes/settings/class-wcpdf-settings-debug.php:704
@@ -1176,11 +1176,11 @@ msgid "Enable debug output"
 msgstr ""
 
 #: includes/settings/class-wcpdf-settings-debug.php:710
-msgid "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues"
+msgid "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues."
 msgstr ""
 
 #: includes/settings/class-wcpdf-settings-debug.php:711
-msgid "<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefor this is not recommended to leave it enabled on live sites."
+msgid "<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefore this is not recommended to leave it enabled on live sites."
 msgstr ""
 
 #: includes/settings/class-wcpdf-settings-debug.php:712
