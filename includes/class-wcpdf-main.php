@@ -1659,7 +1659,7 @@ class Main {
 			return;
 		}
 
-		$due_date       = apply_filters( 'wpo_wcpdf_due_date_display', date( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $document_type, $document );
+		$due_date       = apply_filters( 'wpo_wcpdf_due_date_display', date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $document_type, $document );
 		$due_date_title = is_callable( array( $document, 'get_due_date_title' ) ) ? $document->get_due_date_title() : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( ! empty( $due_date ) ) {
