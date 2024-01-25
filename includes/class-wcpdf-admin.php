@@ -1371,19 +1371,20 @@ class Admin {
 	    return $columns;
     }
 
-    public function modify_woo_query( array $order_query_args ): array {
-	    if ( 'invoice_number_column' === $order_query_args['orderby'] ) {
-		    $order_query_args['meta_query'] = array(
-			    'invoice_number_column' => [
-				    'key'     => '_wcpdf_invoice_number',
-				    'compare' => '!=',
-				    'value'   => 'NULL'
-			    ],
-		    );
-	    }
+	public function modify_woo_query( array $order_query_args ): array {
+		if ( 'invoice_number_column' === $order_query_args['orderby'] ) {
+			$order_query_args['meta_query'] = array(
+				'invoice_number_column' => array(
+					'key'     => '_wcpdf_invoice_number',
+					'compare' => '!=',
+					'value'   => '0',
+					'type'    => 'NUMERIC',
+				),
+			);
+		}
 
-	    return $order_query_args;
-    }
+		return $order_query_args;
+	}
 
 }
 
