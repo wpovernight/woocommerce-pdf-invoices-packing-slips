@@ -77,7 +77,7 @@ class Updraft_Semaphore_3_0 {
 		$sql = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", $this->option_name );
 		
 		if ( 1 === (int) $wpdb->get_var( $sql ) ) {
-			$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') already existed in the database', 'debug ');
+			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') already existed in the database', 'debug' );
 			return 1;
 		}
 		
