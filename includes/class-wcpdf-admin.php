@@ -28,6 +28,10 @@ class Admin {
 			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 ); // WC 7.1+
 			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
 			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
+            // Fix sortable issue when HPOS is on.
+			add_filter( 'woocommerce_shop_order_list_table_sortable_columns', array( $this, 'add_invoice_column_to_sortable_columns' ) );
+			add_filter( 'woocommerce_order_list_table_prepare_items_query_args', array( $this, 'modify_woo_query' ) );
+
 			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
 			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
@@ -1360,6 +1364,27 @@ class Admin {
 
 		return $export_item;
 	}
+
+    public function add_invoice_column_to_sortable_columns( array $columns ): array {
+	    $columns['invoice_number_column'] = 'invoice_number_column';
+
+	    return $columns;
+    }
+
+    public function modify_woo_query( array $order_query_args ): array {
+	    if ( 'invoice_number_column' === $order_query_args['orderby'] ) {
+		    $order_query_args['meta_query'] = array(
+			    'invoice_number_column' => [
+				    'key'     => '_wcpdf_invoice_number',
+				    'compare' => '!=',
+				    'value'   => 'NULL'
+			    ],
+		    );
+	    }
+
+	    return $order_query_args;
+    }
+
 }
 
 endif; // class_exists
