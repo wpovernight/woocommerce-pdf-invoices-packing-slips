@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 3.7.6
+Stable tag: 3.7.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,11 +102,16 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 3.7.7-beta-1 (2024-01-15) =
+= 3.7.7 (2024-01-29) =
 * New: extensions license cache system
 * New: hides the Upgrade tab on bundle
 * New: get document filter hook `wcpdf_get_document`
+* Tweak: improves Simple template files markup
+* Tweak: moves the notes hooks position in template files
+* Fix: sorting orders by invoice number and date issue on the orders listing page
+* Fix: the level parameter sent to the `log()` method in semaphore class
 * Fix: SQL injection bug in Advanced Numbers search
+* Translations: make the due date output translatable
 * Translations: Updated translation template (POT)
 * Tested up to WooCommerce 8.5
 
