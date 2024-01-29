@@ -1374,12 +1374,14 @@ class Admin {
 
 	public function adjust_order_list_query_args( array $order_query_args ): array {
 		if ( 'invoice_number_column' === $order_query_args['orderby'] ) {
+			$is_numeric = $this->is_invoice_number_numeric();
+
 			$order_query_args['meta_query'] = array(
 				'invoice_number_column' => array(
 					'key'     => '_wcpdf_invoice_number',
 					'compare' => '!=',
 					'value'   => '0',
-					'type'    => 'NUMERIC',
+					'type'    => $is_numeric ? 'NUMERIC' : 'CHAR',
 				),
 			);
 		}
@@ -1402,7 +1404,22 @@ class Admin {
 			return;
 		}
 
-		$query->set( 'orderby', 'meta_value_num' );
+		$query->set( 'orderby', $this->is_invoice_number_numeric() ? 'meta_value_num' : 'meta_value' );
+	}
+
+	/**
+     * Determines if the invoice number is numeric.
+     * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
+     *
+	 * @return bool
+	 */
+	private function is_invoice_number_numeric() {
+		$invoice          = wcpdf_get_invoice( null );
+		$invoice_settings = $invoice->get_settings();
+		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
+		                    ( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
+
+		return apply_filters( 'wpo_wcpdf_order_list_invoice_number_column_is_numeric', $is_numeric );
 	}
 
 }
