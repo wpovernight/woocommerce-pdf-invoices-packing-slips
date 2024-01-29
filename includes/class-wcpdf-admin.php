@@ -1414,12 +1414,11 @@ class Admin {
 	 * @return bool
 	 */
 	private function is_invoice_number_numeric() {
-		$invoice          = wcpdf_get_invoice( null );
-		$invoice_settings = $invoice->get_settings();
+		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
 		                    ( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
-		return apply_filters( 'wpo_wcpdf_order_list_invoice_number_column_is_numeric', $is_numeric );
+		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
 	}
 
 }
