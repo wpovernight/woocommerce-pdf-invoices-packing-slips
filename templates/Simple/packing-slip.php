@@ -117,14 +117,12 @@
 <?php do_action( 'wpo_wcpdf_after_order_details', $this->get_type(), $this->order ); ?>
 
 <?php do_action( 'wpo_wcpdf_before_customer_notes', $this->get_type(), $this->order ); ?>
-
 <div class="customer-notes">
 	<?php if ( $this->get_shipping_notes() ) : ?>
 		<h3><?php _e( 'Customer Notes', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 		<?php $this->shipping_notes(); ?>
 	<?php endif; ?>
 </div>
-
 <?php do_action( 'wpo_wcpdf_after_customer_notes', $this->get_type(), $this->order ); ?>
 
 <?php if ( $this->get_footer() ) : ?>
