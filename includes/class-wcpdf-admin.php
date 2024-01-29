@@ -28,9 +28,13 @@ class Admin {
 			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 ); // WC 7.1+
 			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
 			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
+			add_filter( 'woocommerce_shop_order_list_table_sortable_columns', array( $this, 'add_invoice_column_to_sortable_columns' ) );
+			add_filter( 'woocommerce_order_list_table_prepare_items_query_args', array( $this, 'adjust_order_list_query_args' ) );
+
 			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
 			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
+			add_action( 'pre_get_posts', array( $this, 'sort_orders_by_numeric_invoice_number' ) );
 		}
 
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
@@ -1360,6 +1364,63 @@ class Admin {
 
 		return $export_item;
 	}
+
+	public function add_invoice_column_to_sortable_columns( array $columns ): array {
+		$columns['invoice_date_column']   = 'invoice_date_column';
+		$columns['invoice_number_column'] = 'invoice_number_column';
+
+		return $columns;
+	}
+
+	public function adjust_order_list_query_args( array $order_query_args ): array {
+		if ( 'invoice_number_column' === $order_query_args['orderby'] ) {
+			$is_numeric = $this->is_invoice_number_numeric();
+
+			$order_query_args['meta_query'] = array(
+				'invoice_number_column' => array(
+					'key'     => '_wcpdf_invoice_number',
+					'compare' => '!=',
+					'value'   => '0',
+					'type'    => $is_numeric ? 'NUMERIC' : 'CHAR',
+				),
+			);
+		}
+
+		if ( 'invoice_date_column' === $order_query_args['orderby'] ) {
+			$order_query_args['meta_query'] = array(
+				'invoice_date_column' => array(
+					'key'     => '_wcpdf_invoice_date',
+					'compare' => '!=',
+					'value'   => '',
+				),
+			);
+		}
+
+		return $order_query_args;
+	}
+
+	public function sort_orders_by_numeric_invoice_number( $query ): void {
+		if ( ! is_admin() || ! $query->is_main_query() || 'shop_order' !== $query->get( 'post_type' ) && '_wcpdf_invoice_number' !== $query->get( 'meta_key' ) ) {
+			return;
+		}
+
+		$query->set( 'orderby', $this->is_invoice_number_numeric() ? 'meta_value_num' : 'meta_value' );
+	}
+
+	/**
+     * Determines if the invoice number is numeric.
+     * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
+     *
+	 * @return bool
+	 */
+	private function is_invoice_number_numeric() {
+		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
+		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
+		                    ( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
+
+		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
+	}
+
 }
 
 endif; // class_exists
