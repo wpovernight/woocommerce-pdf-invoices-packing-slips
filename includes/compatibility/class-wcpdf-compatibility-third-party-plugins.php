@@ -63,6 +63,11 @@ class Third_Party_Plugins {
 			add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
 			add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
 		}
+
+		// Currency converter implementation.
+		add_action( 'wpo_wcpdf_process_template_order', array( $this, 'add_convert_to_order_currency_filter' ), 11, 2 );
+		add_action( 'wpo_wcpdf_after_html', array( $this, 'remove_convert_to_order_currency_filter' ), 11, 0 );
+		add_action( 'wpo_wcpdf_after_pdf', array( $this, 'remove_convert_to_order_currency_filter' ), 11, 0 );
 	}
 
 	/**
@@ -310,6 +315,41 @@ class Third_Party_Plugins {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
+	}
+
+	public function add_convert_to_order_currency_filter( $document_type, $order_id ) {
+		remove_all_filters( 'raw_woocommerce_price', 999 );
+		add_filter( 'raw_woocommerce_price', function( $raw_price ) use ( $order_id ) {
+			return $this->convert_to_order_currency( $raw_price, $order_id );
+		}, 999, 1 );
+	}
+
+	public function remove_convert_to_order_currency_filter() {
+		remove_all_filters( 'raw_woocommerce_price', 999 );
+	}
+
+	public function convert_to_order_currency( $raw_price, $order_id ) {
+		$order = wc_get_order( $order_id );
+		$price = $raw_price;
+
+		// Filter for enabling or disabling conversion to order currency.
+		$should_convert = apply_filters( 'wpo_wcpdf_should_convert_to_order_currency', true );
+
+		if($should_convert) {
+			// CURCY - Multi Currency for WooCommerce (https://villatheme.com/) implementation
+			if ( function_exists( 'wmc_get_price' ) && method_exists( $order, 'get_currency' ) && function_exists( 'get_woocommerce_currency' ) && get_woocommerce_currency() != $order->get_currency() ) {
+				$price = wmc_get_price( $raw_price, $order->get_currency() );
+			}
+		}
+
+		/**
+		 * Filters the price converted to order currency.
+		 *
+		 * @param float $price     Price after conversion.
+		 * @param float $raw_price Price before conversion.
+		 * @param int   $order_id  The order id from order that is being processed.
+		 */
+		return apply_filters( 'wpo_wcpdf_convert_to_order_currency', $price, $raw_price, $order_id );
 	}
 }
 
