@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-01-16T11:10:25+01:00\n"
+"POT-Creation-Date: 2024-01-29T17:15:40+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -36,19 +36,19 @@ msgid "https://www.wpovernight.com"
 msgstr ""
 
 #. translators: rounded count
-#: includes/class-wcpdf-admin.php:119
+#: includes/class-wcpdf-admin.php:123
 msgid "Wow, you have created more than %d invoices with our plugin!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:120
+#: includes/class-wcpdf-admin.php:124
 msgid "It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:122
+#: includes/class-wcpdf-admin.php:126
 msgid "Yes you deserve it!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:123
+#: includes/class-wcpdf-admin.php:127
 #: includes/class-wcpdf-main.php:905
 #: includes/views/attachment-settings-hint.php:12
 #: includes/views/extensions.php:121
@@ -60,34 +60,34 @@ msgstr ""
 msgid "Hide this message"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:123
+#: includes/class-wcpdf-admin.php:127
 msgid "Already did!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:124
+#: includes/class-wcpdf-admin.php:128
 msgid "Actually, I have a complaint..."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:165
+#: includes/class-wcpdf-admin.php:169
 msgid "New to PDF Invoices & Packing Slips for WooCommerce?"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:165
+#: includes/class-wcpdf-admin.php:169
 msgid "Jumpstart the plugin by following our wizard!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:166
+#: includes/class-wcpdf-admin.php:170
 #: includes/views/advanced-tools.php:54
 #: includes/views/advanced-tools.php:56
 msgid "Run the Setup Wizard"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:166
+#: includes/class-wcpdf-admin.php:170
 msgid "I am the wizard"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:321
-#: includes/class-wcpdf-admin.php:1351
+#: includes/class-wcpdf-admin.php:325
+#: includes/class-wcpdf-admin.php:1355
 #: includes/class-wcpdf-assets.php:224
 #: includes/class-wcpdf-main.php:1288
 #: includes/documents/class-wcpdf-invoice.php:368
@@ -95,7 +95,7 @@ msgstr ""
 msgid "Invoice Number"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:322
+#: includes/class-wcpdf-admin.php:326
 #: includes/class-wcpdf-main.php:1289
 #: includes/documents/abstract-wcpdf-order-document-methods.php:1261
 #: includes/documents/class-wcpdf-invoice.php:334
@@ -103,145 +103,145 @@ msgstr ""
 msgid "Invoice Date"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:472
+#: includes/class-wcpdf-admin.php:476
 msgid "Send order email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:483
+#: includes/class-wcpdf-admin.php:487
 msgid "Create PDF"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:496
+#: includes/class-wcpdf-admin.php:500
 msgid "Create UBL"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:507
+#: includes/class-wcpdf-admin.php:511
 msgid "PDF document data"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:524
+#: includes/class-wcpdf-admin.php:528
 msgid "Choose an email to send&hellip;"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:544
+#: includes/class-wcpdf-admin.php:548
 msgid "Save order & send email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:613
+#: includes/class-wcpdf-admin.php:617
 msgid "Mark printed"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:615
+#: includes/class-wcpdf-admin.php:619
 msgid "Unmark"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:702
+#: includes/class-wcpdf-admin.php:706
 msgid "UBL documents require the correspondent PDF to be generated first."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:722
+#: includes/class-wcpdf-admin.php:726
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:725
+#: includes/class-wcpdf-admin.php:729
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:728
+#: includes/class-wcpdf-admin.php:732
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:731
+#: includes/class-wcpdf-admin.php:735
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:734
+#: includes/class-wcpdf-admin.php:738
 msgid "Notes (printed in the invoice):"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:859
+#: includes/class-wcpdf-admin.php:863
 msgid "View more details"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:860
+#: includes/class-wcpdf-admin.php:864
 msgid "Hide details"
 msgstr ""
 
 #. translators: document title
-#: includes/class-wcpdf-admin.php:872
+#: includes/class-wcpdf-admin.php:876
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:877
+#: includes/class-wcpdf-admin.php:881
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:889
+#: includes/class-wcpdf-admin.php:893
 msgid "unformatted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:931
+#: includes/class-wcpdf-admin.php:935
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:932
+#: includes/class-wcpdf-admin.php:936
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/class-wcpdf-admin.php:1071
+#: includes/class-wcpdf-admin.php:1075
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1119
+#: includes/class-wcpdf-admin.php:1123
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1125
+#: includes/class-wcpdf-admin.php:1129
 msgid "Bad action!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1131
+#: includes/class-wcpdf-admin.php:1135
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1137
+#: includes/class-wcpdf-admin.php:1141
 msgid "No permissions!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1161
+#: includes/class-wcpdf-admin.php:1165
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1162
+#: includes/class-wcpdf-admin.php:1166
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1165
+#: includes/class-wcpdf-admin.php:1169
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1166
+#: includes/class-wcpdf-admin.php:1170
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1169
+#: includes/class-wcpdf-admin.php:1173
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1170
+#: includes/class-wcpdf-admin.php:1174
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1226
+#: includes/class-wcpdf-admin.php:1230
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1240
+#: includes/class-wcpdf-admin.php:1244
 msgid "Document is empty."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1271
+#: includes/class-wcpdf-admin.php:1275
 msgid "DEBUG output enabled"
 msgstr ""
 
@@ -2342,7 +2342,7 @@ msgid "Notes"
 msgstr ""
 
 #: templates/Simple/invoice.php:141
-#: templates/Simple/packing-slip.php:123
+#: templates/Simple/packing-slip.php:122
 msgid "Customer Notes"
 msgstr ""
 
