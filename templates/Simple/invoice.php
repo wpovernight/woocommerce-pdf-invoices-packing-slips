@@ -127,22 +127,22 @@
 	<tfoot>
 		<tr class="no-borders">
 			<td class="no-borders">
+				<?php do_action( 'wpo_wcpdf_before_document_notes', $this->get_type(), $this->order ); ?>
 				<div class="document-notes">
-					<?php do_action( 'wpo_wcpdf_before_document_notes', $this->get_type(), $this->order ); ?>
 					<?php if ( $this->get_document_notes() ) : ?>
 						<h3><?php _e( 'Notes', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 						<?php $this->document_notes(); ?>
 					<?php endif; ?>
-					<?php do_action( 'wpo_wcpdf_after_document_notes', $this->get_type(), $this->order ); ?>
 				</div>
+				<?php do_action( 'wpo_wcpdf_after_document_notes', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_customer_notes', $this->get_type(), $this->order ); ?>
 				<div class="customer-notes">
-					<?php do_action( 'wpo_wcpdf_before_customer_notes', $this->get_type(), $this->order ); ?>
 					<?php if ( $this->get_shipping_notes() ) : ?>
 						<h3><?php _e( 'Customer Notes', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 						<?php $this->shipping_notes(); ?>
 					<?php endif; ?>
-					<?php do_action( 'wpo_wcpdf_after_customer_notes', $this->get_type(), $this->order ); ?>
-				</div>				
+				</div>
+				<?php do_action( 'wpo_wcpdf_after_customer_notes', $this->get_type(), $this->order ); ?>
 			</td>
 			<td class="no-borders" colspan="2">
 				<table class="totals">
