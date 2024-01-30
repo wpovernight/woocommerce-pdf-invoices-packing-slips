@@ -65,9 +65,9 @@ class Third_Party_Plugins {
 		}
 
 		// Currency converter implementation.
-		add_action( 'wpo_wcpdf_process_template_order', array( $this, 'add_convert_to_order_currency_filter' ), 11, 2 );
-		add_action( 'wpo_wcpdf_after_html', array( $this, 'remove_convert_to_order_currency_filter' ), 11, 0 );
-		add_action( 'wpo_wcpdf_after_pdf', array( $this, 'remove_convert_to_order_currency_filter' ), 11, 0 );
+		add_action( 'wpo_wcpdf_process_template_order', array( $this, 'add_convert_price_to_order_currency_filter' ), 11, 2 );
+		add_action( 'wpo_wcpdf_after_html', array( $this, 'remove_convert_price_to_order_currency_filter' ), 11, 0 );
+		add_action( 'wpo_wcpdf_after_pdf', array( $this, 'remove_convert_price_to_order_currency_filter' ), 11, 0 );
 	}
 
 	/**
@@ -317,27 +317,25 @@ class Third_Party_Plugins {
 		}
 	}
 
-	public function add_convert_to_order_currency_filter( $document_type, $order_id ) {
+	public function add_convert_price_to_order_currency_filter( $document_type, $order_id ) {
 		remove_all_filters( 'raw_woocommerce_price', 999 );
 		add_filter( 'raw_woocommerce_price', function( $raw_price ) use ( $order_id ) {
-			return $this->convert_to_order_currency( $raw_price, $order_id );
+			return $this->convert_price_to_order_currency( $raw_price, $order_id );
 		}, 999, 1 );
 	}
 
-	public function remove_convert_to_order_currency_filter() {
+	public function remove_convert_price_to_order_currency_filter() {
 		remove_all_filters( 'raw_woocommerce_price', 999 );
 	}
 
-	public function convert_to_order_currency( $raw_price, $order_id ) {
+	public function convert_price_to_order_currency( $raw_price, $order_id ) {
 		$order = wc_get_order( $order_id );
 		$price = $raw_price;
 
 		// Filter for enabling or disabling conversion to order currency.
-		$should_convert = apply_filters( 'wpo_wcpdf_should_convert_to_order_currency', true );
-
-		if($should_convert) {
+		if( apply_filters( 'wpo_wcpdf_should_convert_price_to_order_currency', '__return_true' ) && $order) {
 			// CURCY - Multi Currency for WooCommerce (https://villatheme.com/) implementation
-			if ( function_exists( 'wmc_get_price' ) && method_exists( $order, 'get_currency' ) && function_exists( 'get_woocommerce_currency' ) && get_woocommerce_currency() != $order->get_currency() ) {
+			if ( function_exists( 'wmc_get_price' ) && method_exists( $order, 'get_currency' ) && function_exists( 'get_woocommerce_currency' ) && get_woocommerce_currency() !== $order->get_currency() ) {
 				$price = wmc_get_price( $raw_price, $order->get_currency() );
 			}
 		}
@@ -349,7 +347,7 @@ class Third_Party_Plugins {
 		 * @param float $raw_price Price before conversion.
 		 * @param int   $order_id  The order id from order that is being processed.
 		 */
-		return apply_filters( 'wpo_wcpdf_convert_to_order_currency', $price, $raw_price, $order_id );
+		return apply_filters( 'wpo_wcpdf_convert_price_to_order_currency', $price, $raw_price, $order_id );
 	}
 }
 
