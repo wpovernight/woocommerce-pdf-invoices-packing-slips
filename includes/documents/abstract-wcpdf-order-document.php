@@ -85,6 +85,36 @@ abstract class Order_Document {
 	 * @var array
 	 */
 	public $output_formats = array();
+	
+	/**
+	 * Semaphore lock name.
+	 * @var string
+	 */
+	private $lock_name;
+	
+	/**
+	 * Semaphore lock context.
+	 * @var array
+	 */
+	private $lock_context = array( 'source' => 'wpo-wcpdf-document-semaphore' );
+	
+	/**
+	 * Semaphore lock time.
+	 * @var int
+	 */
+	private $lock_time;
+	
+	/**
+	 * Semaphore lock retries.
+	 * @var int
+	 */
+	private $lock_retries;
+	
+	/**
+	 * Semaphore lock loggers.
+	 * @var array
+	 */
+	private $lock_loggers;
 
 	/**
 	 * Linked documents, used for data retrieval
@@ -106,10 +136,9 @@ abstract class Order_Document {
 	public function __construct( $order = 0 ) {
 		// semaphore
 		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
-		$this->lock_context = array( 'source' => "wpo-wcpdf-semaphore" );
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_time", 60 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_retries", 0 );
-		$this->lock_loggers = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_loggers", isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
+		$this->lock_time    = apply_filters( 'wpo_wcpdf_document_semaphore_lock_time', 60 );
+		$this->lock_retries = apply_filters( 'wpo_wcpdf_document_semaphore_lock_retries', 0 );
+		$this->lock_loggers = apply_filters( 'wpo_wcpdf_document_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 		
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = $order;
