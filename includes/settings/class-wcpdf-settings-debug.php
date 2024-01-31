@@ -553,11 +553,15 @@ class Settings_Debug {
 			switch ( $delete_or_renumber ) {
 				case 'renumber':
 					if ( is_callable( array( $document, 'init_number' ) ) ) {
-						$document->init_number( true );
+						if ( 'invoice' !== $document->get_type() && function_exists( 'WPO_WCPDF_Pro' ) && version_compare( WPO_WCPDF_Pro()->version, '2.15.7', '<' ) ) { // older versions of Pro don't have the `$force_new_number` parameter
+							$document->init_number();
+						} else {
+							$document->init_number( true );
+						}
 						$return = true;
 					} elseif ( 'packing-slip' === $document->get_type() && function_exists( 'WPO_WCPDF_Pro' ) && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
 						if ( version_compare( WPO_WCPDF_Pro()->version, '2.15.7', '<' ) ) {
-							WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document );
+							WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document ); // older versions of Pro don't have the `$force_new_number` parameter
 						} else {
 							WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document, true );
 						}
