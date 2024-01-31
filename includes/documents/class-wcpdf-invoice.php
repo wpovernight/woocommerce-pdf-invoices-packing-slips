@@ -91,9 +91,10 @@ class Invoice extends Order_Document_Methods {
 		return ! empty( $this->data['number'] );
 	}
 
-	public function init_number() {
+	public function init_number( $force_new_number = false ) {
 		$lock           = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
 		$invoice_number = $this->exists() ? $this->data['number'] : null;
+		$invoice_number = ! empty( $invoice_number ) && $force_new_number ? null : $invoice_number;
 		
 		if ( $lock->lock( $this->lock_retries ) && empty( $invoice_number ) ) {
 			
