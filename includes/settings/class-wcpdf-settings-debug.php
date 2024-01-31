@@ -507,7 +507,7 @@ class Settings_Debug {
 		$order_ids = $results->orders;
 		
 		if ( ! empty( $order_ids ) && ! empty( $document_type ) && $delete_or_renumber ) {
-			foreach ( $order_ids as $key => $order_id ) {
+			foreach ( $order_ids as $order_id ) {
 				$order = wc_get_order( $order_id );
 				
 				if ( empty( $order ) ) {
