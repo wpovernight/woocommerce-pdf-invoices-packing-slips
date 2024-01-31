@@ -552,7 +552,7 @@ class Settings_Debug {
 		if ( $document && $document->exists() ) {
 			switch ( $delete_or_renumber ) {
 				case 'renumber':
-					if ( is_callable( array( $document, 'init_number' ) ) ) {
+					if ( 'packing-slip' !== $document->get_type() && is_callable( array( $document, 'init_number' ) ) ) {
 						if ( 'invoice' !== $document->get_type() && function_exists( 'WPO_WCPDF_Pro' ) && version_compare( WPO_WCPDF_Pro()->version, '2.15.7', '<' ) ) { // older versions of Pro don't have the `$force_new_number` parameter
 							$document->init_number();
 						} else {
