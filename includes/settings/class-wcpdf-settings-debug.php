@@ -555,8 +555,12 @@ class Settings_Debug {
 					if ( is_callable( array( $document, 'init_number' ) ) ) {
 						$document->init_number( true );
 						$return = true;
-					} elseif ( 'packing-slip' === $document->get_type() && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
-						WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document );
+					} elseif ( 'packing-slip' === $document->get_type() && function_exists( 'WPO_WCPDF_Pro' ) && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
+						if ( version_compare( WPO_WCPDF_Pro()->version, '2.15.7', '<' ) ) {
+							WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document );
+						} else {
+							WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document, true );
+						}
 						$return = true;
 					}
 					
