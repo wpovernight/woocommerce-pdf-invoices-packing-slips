@@ -552,19 +552,28 @@ class Settings_Debug {
 		if ( $document && $document->exists() ) {
 			switch ( $delete_or_renumber ) {
 				case 'renumber':
-					if ( 'packing-slip' !== $document->get_type() && is_callable( array( $document, 'init_number' ) ) ) {
-						if ( 'invoice' !== $document->get_type() && function_exists( 'WPO_WCPDF_Pro' ) && version_compare( WPO_WCPDF_Pro()->version, '2.15.7', '<' ) ) { // older versions of Pro don't have the `$force_new_number` parameter
-							$document->init_number();
-						} else {
+					// pro and third party documents
+					if ( 'invoice' !== $document->get_type() ) {
+						// legacy
+						if ( function_exists( 'WPO_WCPDF_Pro' ) && version_compare( WPO_WCPDF_Pro()->version, '2.15.7', '<' ) ) {
+							// packing slip
+							if ( 'packing-slip' === $document->get_type() && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
+								WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document );
+								$return = true;
+							// other documents
+							} elseif ( is_callable( array( $document, 'init_number' ) ) ) {
+								$document->init_number();
+								$return = true;
+							}
+						// current
+						} elseif ( is_callable( array( $document, 'init_number' ) ) ) {
 							$document->init_number( true );
+							$return = true;
 						}
-						$return = true;
-					} elseif ( 'packing-slip' === $document->get_type() && function_exists( 'WPO_WCPDF_Pro' ) && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
-						if ( version_compare( WPO_WCPDF_Pro()->version, '2.15.7', '<' ) ) {
-							WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document ); // older versions of Pro don't have the `$force_new_number` parameter
-						} else {
-							WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document, true );
-						}
+						
+					// invoice from free plugin
+					} elseif ( is_callable( array( $document, 'init_number' ) ) ) {
+						$document->init_number( true );
 						$return = true;
 					}
 					
