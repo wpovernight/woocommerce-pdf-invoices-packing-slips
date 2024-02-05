@@ -532,6 +532,16 @@ class Install {
 			}
 		}
 		
+		// 3.7.8-beta-1: deactivate Proposal plugin if version below 2.0.2 to force update
+		if ( version_compare( $installed_version, '3.7.8-beta-1', '<' ) ) {
+			$installed_version = get_option( 'wpo_order_proposal_version' );
+
+			if ( version_compare( $installed_version, '2.0.2', '<' ) ) {
+				deactivate_plugins( 'woocommerce-order-proposal/woocommerce-order-proposal.php' );
+				set_transient( 'wpo_wcpdf_woocommerce_order_proposal_below_2_0_2_deactivated', 'yes', 7 * DAY_IN_SECONDS );
+			}
+		}
+		
 	}
 
 	/**

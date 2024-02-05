@@ -3,7 +3,7 @@
  * Plugin Name:          PDF Invoices & Packing Slips for WooCommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              3.7.7
+ * Version:              3.7.8-beta-1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -21,7 +21,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '3.7.7';
+	public $version              = '3.7.8-beta-1';
 	public $version_php          = '7.2';
 	public $version_woo          = '3.0';
 	public $version_wp           = '4.4';
@@ -77,6 +77,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
+		add_action( 'admin_notices', array( $this, 'order_proposal_below_2_0_2_notice' ) );
 		
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
@@ -540,6 +541,34 @@ class WPO_WCPDF {
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
 			}
+		}
+	}
+	
+	public function order_proposal_below_2_0_2_notice() {
+		$transient_name = 'wpo_wcpdf_woocommerce_order_proposal_below_2_0_2_deactivated';
+		$query_arg      = "{$transient_name}_notice";
+
+		if ( get_transient( $transient_name ) ) {			
+			ob_start();
+			?>
+			<div class="notice notice-warning">
+				<p><?php _e( 'Attention! We detected that your WooCommerce Order Proposal plugin is running a version below 2.0.2. In the next version of the PDF Invoices & Packing Slips for WooCommerce plugin, we are making a drastic change that requires at least version 2.0.2 of the Proposals plugin. To avoid clashes, we\'ve temporarily deactivated it—feel free to update to version 2.0.2 or higher. Thank you!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $query_arg => true ) ), 'hide_order_proposal_below_2_0_2_notice_nonce' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo wp_kses_post( ob_get_clean() );
+		}
+
+		// save option to hide notice
+		if ( isset( $_REQUEST[ $query_arg ] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_order_proposal_below_2_0_2_notice_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: ' . $query_arg );
+			} else {
+				delete_transient( $transient_name );
+			}
+
+			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+			exit;
 		}
 	}
 
