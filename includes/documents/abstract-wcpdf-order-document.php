@@ -134,12 +134,6 @@ abstract class Order_Document {
 	 * @param  int|object|WC_Order $order Order to init.
 	 */
 	public function __construct( $order = 0 ) {
-		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
-		$this->lock_time    = apply_filters( 'wpo_wcpdf_document_semaphore_lock_time', 60 );
-		$this->lock_retries = apply_filters( 'wpo_wcpdf_document_semaphore_lock_retries', 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_document_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
-		
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = $order;
 			$this->order    = wc_get_order( $this->order_id );
@@ -152,12 +146,18 @@ abstract class Order_Document {
 		$this->slug = ! empty( $this->type ) ? str_replace(  '-', '_', $this->type ) : '';
 		
 		// output formats
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", array( 'pdf' ), $this  );
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf' ), $this  );
 
 		// load data
 		if ( $this->order ) {
 			$this->read_data( $this->order );
 		}
+		
+		// semaphore
+		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
+		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_time", 60 );
+		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_retries", 0 );
+		$this->lock_loggers = apply_filters( 'wpo_wcpdf_document_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		// load settings
 		$this->init_settings_data();
@@ -268,7 +268,6 @@ abstract class Order_Document {
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 		
 		if ( $lock->lock( $this->lock_retries ) && empty( $document_number ) ) {
-			
 			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 			
 			try {
@@ -287,10 +286,10 @@ abstract class Order_Document {
 						// try to extract meaningful number data
 						$formatted_number = $document_number;
 						$number           = (int) preg_replace( '/\D/', '', $document_number );
-						$document_number   = compact( 'number', 'formatted_number' );
+						$document_number  = compact( 'number', 'formatted_number' );
 					}
 				} else {
-					$number_store   = $this->get_sequential_number_store();
+					$number_store    = $this->get_sequential_number_store();
 					$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 				}
 				

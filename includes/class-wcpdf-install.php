@@ -465,7 +465,7 @@ class Install {
 		}
 		
 		
-		// 3.7.0-beta-4: deactivate legacy ubl addon and migrate settings
+		// 3.7.0-beta-4: migrate UBL legacy settings
 		if ( version_compare( $installed_version, '3.7.0-beta-4', '<' ) ) {
 			// legacy ubl general/invoice settings
 			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );
@@ -529,6 +529,18 @@ class Install {
 			// set transient to flush rewrite rules if pretty links are enabled
 			if ( WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
 				set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
+			}
+		}
+		
+		// 3.7.8-beta-1: deactivate Proposal plugin if version below 2.0.2 or store will crash
+		if ( version_compare( $installed_version, '3.7.8-beta-1', '<' ) ) {
+			if ( function_exists( 'wc_order_proposal' ) ) {
+				$installed_version = get_option( 'wpo_order_proposal_version' );
+				
+				if ( version_compare( $installed_version, '2.0.2', '<' ) ) {
+					deactivate_plugins( 'woocommerce-order-proposal/woocommerce-order-proposal.php' );
+					set_transient( 'wpo_wcpdf_woocommerce_order_proposal_below_2_0_2_deactivated', 'yes', 7 * DAY_IN_SECONDS );
+				}
 			}
 		}
 		
