@@ -79,13 +79,11 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		add_action( 'admin_notices', array( $this, 'order_proposal_below_2_0_2_notice' ) );
 		
-		// Add custom error message for WooCommerce Order Proposal below 2.0.2 fatal error
-		add_filter( 'wp_php_error_message', array( $this, 'order_proposal_below_2_0_2_fatal_error_custom_message' ), 10, 2 );
+		// Add custom error message if a third party plugin abstract function `init_number` declaration is incorrect.
+		add_filter( 'wp_php_error_message', array( $this, 'init_number_declaration_error_custom_message' ), 10, 2 );
 		
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
-		// deactivate order proposal below 2.0.2 if activated
-		register_activation_hook( __FILE__, array( $this, 'deactivate_order_proposal_below_2_0_2' ) );
 	}
 	
 	public function is_dependency_version_supported( $dependency ) {
@@ -183,7 +181,6 @@ class WPO_WCPDF {
 		}
 		
 		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
-		add_action( 'admin_init', array( $this, 'deactivate_order_proposal_below_2_0_2') );
 
 		// all systems ready - GO!
 		$this->includes();
@@ -500,7 +497,7 @@ class WPO_WCPDF {
 				$active_plugin = $plugin;
 				break;
 			}
-		}			
+		}
 		
 		return $active_plugin;
 	}
@@ -553,12 +550,12 @@ class WPO_WCPDF {
 	public function order_proposal_below_2_0_2_notice() {
 		$transient_name = 'wpo_wcpdf_woocommerce_order_proposal_below_2_0_2_deactivated';
 		$query_arg      = "{$transient_name}_notice";
-		
-		if ( get_transient( $transient_name ) ) {
+			
+		if ( get_transient( $transient_name ) ) {			
 			ob_start();
 			?>
 			<div class="notice notice-warning">
-				<p><?php _e( 'Attention! While updating the PDF Invoices & Packing Slips for WooCommerce plugin, we detected that your WooCommerce Order Proposal plugin is running a version below 2.0.2. To avoid clashes, we\'ve temporarily deactivated it—feel free to update.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><?php _e( 'Attention! We detected that your WooCommerce Order Proposal plugin is running a version below 2.0.2. In the next version of the PDF Invoices & Packing Slips for WooCommerce plugin, we are making a drastic change that requires at least version 2.0.2 of the Proposals plugin. To avoid clashes, we\'ve temporarily deactivated it—feel free to update to version 2.0.2 or higher. Thank you!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $query_arg => true ) ), 'hide_order_proposal_below_2_0_2_notice_nonce' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
 			<?php
@@ -578,27 +575,14 @@ class WPO_WCPDF {
 		}
 	}
 	
-	public function order_proposal_below_2_0_2_fatal_error_custom_message( $message, $error ) {
+	public function init_number_declaration_error_custom_message( $message, $error ) {
 		if ( isset( $error['message'] ) && false !== strpos( $error['message'], 'Declaration of WPO\WC\PDF_Invoices\Documents\Pro_Document::init_number() must be compatible with' ) ) {
-			$message  = '<p>' . __( 'Attention! While updating the PDF Invoices & Packing Slips for WooCommerce plugin, we detected that your WooCommerce Order Proposal plugin is running a version below 2.0.2. To avoid clashes, we\'ve temporarily deactivated it—feel free to update.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-			$message .= '<p><a href="' . esc_url( '' ) . '">' . __( 'Read this to fix this issue!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
+			$message  = '<p>' . __( 'A plugin extending the document abstract class of the PDF Invoices & Packing Slips for WooCommerce plugin version 3.7.8 or higher may either not be running the latest version or require additional code improvements. Please check the error associated with the affected plugin below.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>'; 
+			$message .= '<p>' . wp_kses_post( $error['message'] ) . '</p>';
+			$message .= '<p><a href="' . esc_url( '' ) . '">' . __( 'Troubleshoot the issue with this helpful guide!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
 		}
 		
 		return $message;
-	}
-	
-	public function deactivate_order_proposal_below_2_0_2() {
-		$filename     = 'woocommerce-order-proposal.php';
-		$legacy_addon = $this->plugin_is_activated( $filename );
-		
-		if ( ! empty( $legacy_addon ) ) {
-			$installed_version = get_option( 'wpo_order_proposal_version' );
-							
-			if ( version_compare( $installed_version, '2.0.2', '<' ) ) {
-				deactivate_plugins( $legacy_addon );
-				set_transient( 'wpo_wcpdf_woocommerce_order_proposal_below_2_0_2_deactivated', 'yes', 7 * DAY_IN_SECONDS );
-			}
-		}
 	}
 
 	/**
