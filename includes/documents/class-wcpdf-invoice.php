@@ -16,11 +16,6 @@ class Invoice extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
-	public $lock_name;
-	public $lock_context;
-	public $lock_time;
-	public $lock_retries;
-	public $lock_loggers;
 	public $output_formats;
 	
 	/**
@@ -30,9 +25,9 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type         = 'invoice';
-		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->type  = 'invoice';
+		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
 		
 		// call parent constructor
 		parent::__construct( $order );
@@ -73,7 +68,7 @@ class Invoice extends Order_Document_Methods {
 			$this->set_display_date( 'invoice_date' );	
 		}
 
-		$this->add_number();
+		$this->initiate_number();
 
 		do_action( 'wpo_wcpdf_init_document', $this );
 	}
@@ -90,7 +85,8 @@ class Invoice extends Order_Document_Methods {
 	 * @return mixed
 	 */
 	public function init_number() {
-		return $this->add_number();
+		wcpdf_deprecated_function( 'init_number', '3.8.0', 'initiate_number' );
+		return $this->initiate_number();
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {

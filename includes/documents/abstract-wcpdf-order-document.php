@@ -262,7 +262,7 @@ abstract class Order_Document {
 		}
 	}
 	
-	public function add_number( $force_new_number = false ) {
+	public function initiate_number( $force_new_number = false ) {
 		$lock            = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
