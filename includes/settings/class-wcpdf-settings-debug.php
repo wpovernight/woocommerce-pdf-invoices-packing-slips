@@ -566,14 +566,17 @@ class Settings_Debug {
 								$return = true;
 							}
 						// current
+						} elseif ( is_callable( array( $document, 'add_number' ) ) ) {
+							$document->add_number( true );
+							$return = true;
+						// third party documents
 						} elseif ( is_callable( array( $document, 'init_number' ) ) ) {
-							$document->init_number( true );
+							$document->init_number();
 							$return = true;
 						}
-						
 					// invoice from free plugin
-					} elseif ( is_callable( array( $document, 'init_number' ) ) ) {
-						$document->init_number( true );
+					} elseif ( is_callable( array( $document, 'add_number' ) ) ) {
+						$document->add_number( true );
 						$return = true;
 					}
 					

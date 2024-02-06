@@ -81,6 +81,17 @@ class Invoice extends Order_Document_Methods {
 	public function exists() {
 		return ! empty( $this->data['number'] );
 	}
+	
+	/**
+	 * Legacy function < v3.8.0
+	 * 
+	 * Still being used by thrid party plugins.
+	 *
+	 * @return mixed
+	 */
+	public function init_number() {
+		return $this->add_number();
+	}
 
 	public function get_filename( $context = 'download', $args = array() ) {
 		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;

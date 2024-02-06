@@ -78,9 +78,6 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		
-		// Add custom error message if a third party plugin abstract function `init_number` declaration is incorrect.
-		add_filter( 'wp_php_error_message', array( $this, 'init_number_declaration_error_custom_message' ), 10, 2 );
-		
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
 	}
@@ -544,16 +541,6 @@ class WPO_WCPDF {
 				exit;
 			}
 		}
-	}
-	
-	public function init_number_declaration_error_custom_message( $message, $error ) {
-		if ( isset( $error['message'] ) && false !== strpos( $error['message'], 'Declaration of WPO\WC\PDF_Invoices\Documents\Pro_Document::init_number() must be compatible with' ) ) {
-			$message  = '<p>' . __( 'A plugin extending the document abstract class of the PDF Invoices & Packing Slips for WooCommerce plugin version 3.7.8 or higher may either not be running the latest version or require additional code improvements. Please check the error associated with the affected plugin below.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>'; 
-			$message .= '<p>' . wp_kses_post( $error['message'] ) . '</p>';
-			$message .= '<p><a href="' . esc_url( '' ) . '">' . __( 'Troubleshoot the issue with this helpful guide!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
-		}
-		
-		return $message;
 	}
 
 	/**
