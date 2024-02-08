@@ -46,9 +46,10 @@ $review_invitation = sprintf(
 		$hide_ad = get_option( 'wpo_wcpdf_hide_extensions_ad' );
 	}
 	
-	if ( ! $hide_ad && ! ( class_exists( 'WooCommerce_PDF_IPS_Pro' ) && class_exists( 'WooCommerce_PDF_IPS_Templates' ) && class_exists( 'WooCommerce_Ext_PrintOrders' ) ) ) {
-		include( 'extensions.php' );
-	}
+	// to improve later: https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/issues/677
+	// if ( ! $hide_ad && ! ( class_exists( 'WooCommerce_PDF_IPS_Pro' ) && class_exists( 'WooCommerce_PDF_IPS_Templates' ) && class_exists( 'WooCommerce_Ext_PrintOrders' ) ) ) {
+	// 	include( 'extensions.php' );
+	// }
 	
 	// special temporary promo
 	include( 'promo.php' );
