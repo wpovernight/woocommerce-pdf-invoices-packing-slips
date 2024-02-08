@@ -42,8 +42,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 			'plural'   => 'numbers',
 			'ajax'     => false
 		) );
-
-		$this->process_bulk_action();
 	}
 
 	/**
@@ -196,8 +194,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 		
 		$request                        = stripslashes_deep( $_GET );
 		$results                        = array();
-		$paged                          = $this->get_paged( $request );
-		$offset                         = $this->per_page * ( $paged - 1 );
 		$search                         = $this->get_search( $request );
 		$table_name                     = isset( $request['table_name'] ) && in_array( $request['table_name'], array_keys( WPO_WCPDF()->settings->debug->get_number_store_tables() ) ) ? sanitize_text_field( $request['table_name'] ) : null;
 		$order                          = isset( $request['order'] ) && in_array( $request['order'], array( 'DESC', 'ASC' ) ) ? sanitize_text_field( $request['order'] ) : 'DESC';
@@ -222,9 +218,9 @@ class Number_Store_List_Table extends \WP_List_Table {
 
 		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $search, $search, $this->per_page, $offset );
+				$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order}", $search, $search );
 			} else {
-				$query = $wpdb->prepare( "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $this->per_page, $offset );
+				$query = "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order}";
 			}
 			
 			$results = $wpdb->get_results( $query );
@@ -279,10 +275,14 @@ class Number_Store_List_Table extends \WP_List_Table {
 			array(),
 			$this->get_sortable_columns()
 		);
+		
+		$this->process_bulk_action();
 
-		$this->items = $this->get_numbers();
-		$total_items = count( $this->items );
-		$per_page    = apply_filters( 'wpo_wcpdf_number_store_list_table_per_page', $this->per_page );
+		$items        = $this->get_numbers();
+		$total_items  = count( $items );
+		$per_page     = apply_filters( 'wpo_wcpdf_number_store_list_table_per_page', $this->per_page );
+		$current_page = $this->get_pagenum();
+		$data         = array_slice( $items, ( ( $current_page - 1 ) * $per_page ), $per_page );
 
 		// Setup pagination
 		$this->set_pagination_args( array(
@@ -290,6 +290,8 @@ class Number_Store_List_Table extends \WP_List_Table {
 			'total_items' => $total_items,
 			'per_page'    => $per_page
 		) );
+		
+		$this->items = $data;
 	}
 
 	/**
