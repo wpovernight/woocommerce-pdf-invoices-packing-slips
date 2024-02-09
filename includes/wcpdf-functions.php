@@ -214,6 +214,45 @@ function wcpdf_ubl_headers( $filename, $size ) {
 }
 
 /**
+ * Get the document file
+ * 
+ * @param  object $document
+ * @param  string $output_format
+ * @return string
+ */
+function wcpdf_get_document_file( object $document, string $output_format = 'pdf' ): string {
+	$default_output_format = 'pdf';
+	
+	if ( ! $document ) {
+		throw new \Exception( 'Invalid document argument provided' );
+	}
+	
+	if ( empty( $output_format ) ) {
+		$output_format = $default_output_format;
+	}
+	
+	if ( ! in_array( $output_format, $document->output_formats ) ) {
+		throw new \Exception( "Invalid output format: {$output_format}. Expected one of: " . implode( ', ', $document->output_formats ) );
+	}
+	
+	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+	
+	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
+		throw new \Exception( "Couldn't get the attachments temporary folder path: {$tmp_path}." );
+	}
+	
+	$function = "get_document_{$output_format}_attachment";
+	
+	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
+		throw new \Exception( "The {$function} method is not callable on WPO_WCPDF()->main." );
+	}
+	
+	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
+	
+	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
+}
+
+/**
  * Wrapper for deprecated functions so we can apply some extra logic.
  *
  * @since  2.0
