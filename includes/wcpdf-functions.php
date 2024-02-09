@@ -224,7 +224,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 	$file_path = false;
 	
 	if ( ! $document ) {
-		throw new InvalidArgumentException( 'Invalid document argument provided' );
+		throw new \Exception( 'Invalid document argument provided' );
 	}
 	
 	if ( empty( $output_format ) ) {
@@ -232,19 +232,19 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 	}
 	
 	if ( ! in_array( $output_format, $document->output_formats ) ) {
-		throw new InvalidArgumentException( 'Invalid output format' );
+		throw new \Exception( 'Invalid output format' );
 	}
 	
 	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
 	
 	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
-		throw new RuntimeException( "Couldn't get the attachments temporary folder path." );
+		throw new \Exception( "Couldn't get the attachments temporary folder path." );
 	}
 	
 	$function = "get_document_{$output_format}_attachment";
 	
 	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
-		throw new RuntimeException( "The {$function} method is not callable." );
+		throw new \Exception( "The {$function} method is not callable." );
 	}
 	
 	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
