@@ -1012,8 +1012,8 @@ class Admin {
 				$invoice->set_data( $document_data, $order );
 
 				// check if we have number, and if not generate one
-				if  ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'init_number' ) ) ) {
-					$invoice->init_number();
+				if  ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'initiate_number' ) ) ) {
+					$invoice->initiate_number();
 				}
 
 				$invoice->save();
@@ -1210,8 +1210,8 @@ class Admin {
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
-					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'init_number' ) ) ) {
-						$document->init_number();
+					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
+						$document->initiate_number();
 					}
 
 					$document->save();

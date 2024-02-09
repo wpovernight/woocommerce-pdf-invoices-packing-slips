@@ -465,7 +465,7 @@ class Install {
 		}
 		
 		
-		// 3.7.0-beta-4: deactivate legacy ubl addon and migrate settings
+		// 3.7.0-beta-4: migrate UBL legacy settings
 		if ( version_compare( $installed_version, '3.7.0-beta-4', '<' ) ) {
 			// legacy ubl general/invoice settings
 			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );

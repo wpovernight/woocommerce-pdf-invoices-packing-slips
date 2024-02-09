@@ -1,8 +1,6 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
-use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -18,11 +16,6 @@ class Invoice extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
-	public $lock_name;
-	public $lock_context;
-	public $lock_time;
-	public $lock_retries;
-	public $lock_loggers;
 	public $output_formats;
 	
 	/**
@@ -32,22 +25,15 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type         = 'invoice';
-		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-
-		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
-		$this->lock_context = array( 'source' => "wpo-wcpdf-semaphore" );
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_time", 60 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_retries", 0 );
-		$this->lock_loggers = apply_filters( "wpo_wcpdf_{$this->type}_semaphore_lock_loggers", isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
+		$this->type  = 'invoice';
+		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
 		
 		// call parent constructor
 		parent::__construct( $order );
 		
 		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->type}_output_formats", array( 'pdf', 'ubl' ), $this );
+		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf', 'ubl' ), $this );
 	}
 
 	public function use_historical_settings() {
@@ -82,7 +68,7 @@ class Invoice extends Order_Document_Methods {
 			$this->set_display_date( 'invoice_date' );	
 		}
 
-		$this->init_number();
+		$this->initiate_number();
 
 		do_action( 'wpo_wcpdf_init_document', $this );
 	}
@@ -90,57 +76,17 @@ class Invoice extends Order_Document_Methods {
 	public function exists() {
 		return ! empty( $this->data['number'] );
 	}
-
+	
+	/**
+	 * Legacy function < v3.8.0
+	 * 
+	 * Still being used by thrid party plugins.
+	 *
+	 * @return mixed
+	 */
 	public function init_number() {
-		$lock           = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
-		$invoice_number = $this->exists() ? $this->data['number'] : null;
-		
-		if ( $lock->lock( $this->lock_retries ) && empty( $invoice_number ) ) {
-			
-			$lock->log( 'Lock acquired for the invoice number init.', 'info' );
-			
-			try {
-				// If a third-party plugin claims to generate invoice numbers, trigger this instead
-				if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) || apply_filters( 'wpo_wcpdf_external_invoice_number_enabled', false, $this ) ) {
-					$invoice_number = apply_filters( 'woocommerce_generate_invoice_number', $invoice_number, $this->order );  // legacy (backwards compatibility)
-					$invoice_number = apply_filters( 'woocommerce_invoice_number', $invoice_number, $this->order->get_id() ); // legacy (backwards compatibility)
-					$invoice_number = apply_filters( 'wpo_wcpdf_external_invoice_number', $invoice_number, $this );
-				} elseif ( isset( $this->settings['display_number'] ) && $this->settings['display_number'] == 'order_number' && ! empty( $this->order ) ) {
-					$invoice_number = $this->order->get_order_number();
-				}
-
-				if ( ! empty( $invoice_number ) ) { // overridden by plugin or set to order number
-					if ( ! is_numeric( $invoice_number ) && ! ( $invoice_number instanceof Document_Number ) ) {
-						// invoice number is not numeric, treat as formatted
-						// try to extract meaningful number data
-						$formatted_number = $invoice_number;
-						$number           = (int) preg_replace( '/\D/', '', $invoice_number );
-						$invoice_number   = compact( 'number', 'formatted_number' );
-					}
-				} else {
-					$number_store   = $this->get_sequential_number_store();
-					$invoice_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
-				}
-				
-				if ( ! is_null( $invoice_number ) ) {
-					$this->set_number( $invoice_number );
-				}
-				
-			} catch ( \Exception $e ) {
-				$lock->log( $e, 'critical' );
-			} catch ( \Error $e ) {
-				$lock->log( $e, 'critical' );
-			}
-			
-			if ( $lock->release() ) {
-				$lock->log( 'Lock released for the invoice number init.', 'info' );
-			}
-			
-		} else {
-			$lock->log( 'Couldn\'t get the lock for the invoice number init.', 'critical' );
-		}
-		
-		return $invoice_number;
+		wcpdf_deprecated_function( 'init_number', '3.8.0', 'initiate_number' );
+		return $this->initiate_number();
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {

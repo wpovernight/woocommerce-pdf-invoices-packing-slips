@@ -485,10 +485,10 @@ class Settings_Debug {
 		$to_date            = date_i18n( 'Y-m-d', strtotime( $request['date_to'] ) );
 		$document_type      = esc_attr( $request['document_type'] );
 		$document_types     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? array( $document_type ) : array();
-		$document_title     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? ' ' . ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
-		$page_count         = absint( $request['page_count'] );
-		$document_count     = absint( $request['document_count'] );
-		$delete_or_renumber = esc_attr( $request['delete_or_renumber'] );
+		$document_title     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
+		$page_count         = isset( $request['page_count'] ) ? absint( $request['page_count'] ) : 1;
+		$document_count     = isset( $request['document_count'] ) ? absint( $request['document_count'] ) : 0;
+		$delete_or_renumber = isset( $request['delete_or_renumber'] ) ? esc_attr( $request['delete_or_renumber'] ) : false;
 		$message            = ( 'delete' === $delete_or_renumber ) ? $document_title . __( 'documents deleted.', 'woocommerce-pdf-invoices-packing-slips' ) : $document_title . __( 'documents renumbered.', 'woocommerce-pdf-invoices-packing-slips' );
 		$finished           = false;
 	
@@ -506,7 +506,7 @@ class Settings_Debug {
 		$results   = wc_get_orders( $args );
 		$order_ids = $results->orders;
 		
-		if ( ! empty( $order_ids ) && ! empty( $document_type ) ) {
+		if ( ! empty( $order_ids ) && ! empty( $document_type ) && $delete_or_renumber ) {
 			foreach ( $order_ids as $order_id ) {
 				$order = wc_get_order( $order_id );
 				
@@ -552,11 +552,11 @@ class Settings_Debug {
 		if ( $document && $document->exists() ) {
 			switch ( $delete_or_renumber ) {
 				case 'renumber':
-					if ( is_callable( array( $document, 'init_number' ) ) ) {
-						$document->init_number();
+					if ( is_callable( array( $document, 'initiate_number' ) ) ) {
+						$document->initiate_number( true );
 						$return = true;
-					} elseif ( 'packing-slip' === $document->get_type() && is_callable( array( WPO_WCPDF_Pro()->functions, 'init_packing_slip_number' ) ) ) {
-						WPO_WCPDF_Pro()->functions->init_packing_slip_number( $document );
+					} elseif ( is_callable( array( $document, 'init_number' ) ) ) {
+						$document->init_number();
 						$return = true;
 					}
 					
@@ -569,8 +569,6 @@ class Settings_Debug {
 						$document->delete();
 						$return = true;
 					}
-					break;
-				default:
 					break;
 			}
 		}
