@@ -218,13 +218,15 @@ function wcpdf_ubl_headers( $filename, $size ) {
  * 
  * @param  object $document
  * @param  string $output_format
+ * @param  string $error_handling
  * @return string
  */
-function wcpdf_get_document_file( object $document, string $output_format = 'pdf' ): string {
+function wcpdf_get_document_file( object $document, string $output_format = 'pdf', $error_handling = 'exception' ): string {
 	$default_output_format = 'pdf';
 	
 	if ( ! $document ) {
-		throw new \Exception( 'Invalid document argument provided' );
+		$error_message = 'No document object provided.';
+		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 	
 	if ( empty( $output_format ) ) {
@@ -232,19 +234,22 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 	}
 	
 	if ( ! in_array( $output_format, $document->output_formats ) ) {
-		throw new \Exception( "Invalid output format: {$output_format}. Expected one of: " . implode( ', ', $document->output_formats ) );
+		$error_message = "Invalid output format: {$output_format}. Expected one of: " . implode( ', ', $document->output_formats );
+		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 	
 	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
 	
 	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
-		throw new \Exception( "Couldn't get the attachments temporary folder path: {$tmp_path}." );
+		$error_message = "Couldn't get the attachments temporary folder path: {$tmp_path}.";
+		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 	
 	$function = "get_document_{$output_format}_attachment";
 	
 	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
-		throw new \Exception( "The {$function} method is not callable on WPO_WCPDF()->main." );
+		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
+		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 	
 	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
@@ -348,6 +353,33 @@ function wcpdf_output_error( $message, $level = 'error', $e = null ) {
 		<?php endif ?>
 	</div>
 	<?php
+}
+
+/**
+ * Error handling function
+ *
+ * @param string $message
+ * @param string $handling_type
+ * @param bool   $log_error
+ * @param string $log_level
+ * @return mixed
+ * @throws Exception
+ */
+function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ) {
+	if ( $log_error ) {
+		wcpdf_log_error( $message, $log_level );
+	}
+	
+	switch ( $handling_type ) {
+		case 'exception':
+			throw new \Exception( $message );
+			break;
+		case 'output':
+			wcpdf_output_error( $message, $log_level );
+			break;
+	}
+	
+	return false;
 }
 
 /**
