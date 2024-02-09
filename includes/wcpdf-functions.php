@@ -253,7 +253,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 }
 
 /**
- * Get the output format extension
+ * Get the document output format extension
  *
  * @param  string $output_format
  * @return string
