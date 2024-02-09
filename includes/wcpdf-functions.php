@@ -233,7 +233,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 	
 	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
 	
-	if ( ! is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
+	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
 		wcpdf_log_error( "Couldn't get the attachments temporary folder path.", 'critical' );
 		return $file_path;
 	}
