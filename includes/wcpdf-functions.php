@@ -222,7 +222,6 @@ function wcpdf_ubl_headers( $filename, $size ) {
  */
 function wcpdf_get_document_file( object $document, string $output_format ) {
 	$default_output_format = 'pdf';
-	$file_path             = false;
 	
 	if ( ! $document ) {
 		throw new \Exception( 'Invalid document argument provided' );
