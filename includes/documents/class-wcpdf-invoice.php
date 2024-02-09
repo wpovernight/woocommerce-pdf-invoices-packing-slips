@@ -121,7 +121,7 @@ class Invoice extends Order_Document_Methods {
 		
 		// get filename
 		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
-		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
+		$filename      = $name . '-' . $suffix . wcpdf_get_document_output_format_extension( $output_format );
 
 		// Filter filename
 		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );

@@ -1171,7 +1171,7 @@ abstract class Order_Document {
 		
 		// get filename
 		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
-		$filename      = $name . '-' . $suffix . $this->get_output_format_extension( $output_format );
+		$filename      = $name . '-' . $suffix . wcpdf_get_document_output_format_extension( $output_format );
 
 		// Filter filename
 		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
@@ -1179,20 +1179,6 @@ abstract class Order_Document {
 
 		// sanitize filename (after filters to prevent human errors)!
 		return sanitize_file_name( $filename );
-	}
-	
-	public function get_output_format_extension( $output_format ) {
-		switch ( $output_format ) {
-			default:
-			case 'pdf':
-				$extension = '.pdf';
-				break;
-			case 'ubl':
-				$extension = '.xml';
-				break;
-		}
-		
-		return $extension;
 	}
 
 	public function get_template_path() {

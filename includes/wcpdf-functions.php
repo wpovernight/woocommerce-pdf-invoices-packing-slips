@@ -253,6 +253,21 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 }
 
 /**
+ * Get the output format extension
+ *
+ * @param  string $output_format
+ * @return string
+ */
+function wcpdf_get_document_output_format_extension( string $output_format ): string {
+	$output_formats = array(
+		'pdf' => '.pdf',
+		'ubl' => '.xml',
+	);
+	
+	return isset( $output_formats[ $output_format ] ) ? $output_formats[ $output_format ] : $output_formats['pdf'];
+}
+
+/**
  * Wrapper for deprecated functions so we can apply some extra logic.
  *
  * @since  2.0
