@@ -205,10 +205,7 @@ class Main {
 						// this is especially important when multiple emails with the PDF document are sent in the same session
 						$document = wcpdf_get_document( $document_type, (array) $email_order_id, true );
 						if ( ! $document ) { // something went wrong, continue trying with other documents
-							continue;
-						}
-						
-						if ( 'ubl' === $output_format && false === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
+							wcpdf_log_error( "Couldn't get the document object for email attachment. document type: {$document_type}, output format: {$output_format}, email order ID: #{$email_order_id}", 'critical' );
 							continue;
 						}
 						
@@ -366,6 +363,9 @@ class Main {
 				}
 
 				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $output_format );
+				if ( 'ubl' === $output_format ) {
+					$extra_condition = apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document_type, $output_format ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' );
+				}
 				
 				if ( in_array( $email_id, $attach_to_email_ids ) && $extra_condition ) {
 					$document_types[ $output_format ][] = $document_type;

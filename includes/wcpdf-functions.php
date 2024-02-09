@@ -223,26 +223,28 @@ function wcpdf_ubl_headers( $filename, $size ) {
 function wcpdf_get_document_file( object $document, string $output_format = 'pdf' ): string {
 	$file_path = false;
 	
-	if ( ! $document || empty( $output_format ) ) {
-		return $file_path;
+	if ( ! $document ) {
+		throw new InvalidArgumentException( 'Invalid document argument provided' );
+	}
+	
+	if ( empty( $output_format ) ) {
+		$output_format = 'pdf';
 	}
 	
 	if ( ! in_array( $output_format, $document->output_formats ) ) {
-		return $file_path;
+		throw new InvalidArgumentException( 'Invalid output format' );
 	}
 	
 	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
 	
 	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
-		wcpdf_log_error( "Couldn't get the attachments temporary folder path.", 'critical' );
-		return $file_path;
+		throw new RuntimeException( "Couldn't get the attachments temporary folder path." );
 	}
 	
 	$function = "get_document_{$output_format}_attachment";
 	
-	if ( ! is_callable( array( $document, $function ) ) ) {
-		wcpdf_log_error( "The {$function} method is not callable.", 'critical' );
-		return $file_path;
+	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
+		throw new RuntimeException( "The {$function} method is not callable." );
 	}
 	
 	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
