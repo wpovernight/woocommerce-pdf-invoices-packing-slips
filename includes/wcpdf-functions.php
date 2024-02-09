@@ -238,7 +238,13 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		return $file_path;
 	}
 	
-	$function  = "get_document_{$output_format}_attachment";
+	$function = "get_document_{$output_format}_attachment";
+	
+	if ( ! is_callable( array( $document, $function ) ) ) {
+		wcpdf_log_error( "The {$function} method is not callable.", 'critical' );
+		return $file_path;
+	}
+	
 	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
 	
 	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
