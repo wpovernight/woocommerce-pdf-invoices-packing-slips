@@ -214,6 +214,37 @@ function wcpdf_ubl_headers( $filename, $size ) {
 }
 
 /**
+ * Get the document file
+ * 
+ * @param  object $document
+ * @param  string $output_format
+ * @return string
+ */
+function wcpdf_get_document_file( object $document, string $output_format = 'pdf' ): string {
+	$file_path = false;
+	
+	if ( ! $document || empty( $output_format ) ) {
+		return $file_path;
+	}
+	
+	if ( ! in_array( $output_format, $document->output_formats ) ) {
+		return $file_path;
+	}
+	
+	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+	
+	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
+		wcpdf_log_error( "Couldn't get the attachments temporary folder path.", 'critical' );
+		return $file_path;
+	}
+	
+	$function  = "get_document_{$output_format}_attachment";
+	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
+	
+	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
+}
+
+/**
  * Wrapper for deprecated functions so we can apply some extra logic.
  *
  * @since  2.0

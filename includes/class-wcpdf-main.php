@@ -208,25 +208,11 @@ class Main {
 							continue;
 						}
 						
-						$tmp_path = $this->get_tmp_path( 'attachments' );
-						if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
-							wcpdf_log_error( "Couldn't get the attachments temporary folder path.", 'critical', $e );
-							return $attachments;
+						if ( 'ubl' === $output_format && false === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
+							continue;
 						}
 						
-						// get attachment
-						$attachment = false;
-						switch ( $output_format ) {
-							default:
-							case 'pdf':
-								$attachment = $this->get_document_pdf_attachment( $document, $tmp_path );
-								break;
-							case 'ubl':
-								if ( true === apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' ) ) {
-									$attachment = $this->get_document_ubl_attachment( $document, $tmp_path );
-								}
-								break;
-						}
+						$attachment = wcpdf_get_document_file( $document, $output_format );
 						
 						if ( $attachment ) {
 							$attachments[] = $attachment;
