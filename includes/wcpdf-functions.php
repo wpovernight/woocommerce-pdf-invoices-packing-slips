@@ -359,28 +359,23 @@ function wcpdf_output_error( $message, $level = 'error', $e = null ) {
  * Error handling function
  *
  * @param string $message
- * @param string $error_handling
+ * @param string $handling_type
  * @param bool   $log_error
  * @param string $log_level
  * @return mixed
+ * @throws Exception
  */
-function wcpdf_error_handling( $message, $error_handling = 'exception', $log_error = false, $log_level = 'error' ) {
+function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ) {
 	if ( $log_error ) {
 		wcpdf_log_error( $message, $log_level );
 	}
 	
-	switch ( $error_handling ) {
+	switch ( $handling_type ) {
 		case 'exception':
 			throw new \Exception( $message );
 			break;
 		case 'output':
 			wcpdf_output_error( $message, $log_level );
-			break;
-		case 'return':
-			return $message;
-			break;
-		case 'false':
-			return false;
 			break;
 	}
 	
