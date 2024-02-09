@@ -218,6 +218,7 @@ function wcpdf_ubl_headers( $filename, $size ) {
  * 
  * @param  object $document
  * @param  string $output_format
+ * @param  string $error_handling
  * @return string
  */
 function wcpdf_get_document_file( object $document, string $output_format = 'pdf', $error_handling = 'exception' ): string {
