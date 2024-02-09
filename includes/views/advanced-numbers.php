@@ -38,7 +38,7 @@
 			<?php $disabled = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? '' : 'disabled'; ?>
 			<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 		</div>
-		<?php $list_table->display(); ?>	
+		<?php $list_table->display(); ?>
 	<?php else : ?>
 		<div class="notice notice-info inline">
 			<p><?php _e( 'Please select a number store!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
