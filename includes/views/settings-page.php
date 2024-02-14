@@ -55,13 +55,15 @@ $review_invitation = sprintf(
 	// special temporary promo
 	include( 'promo.php' );
 
-	$preview_states = isset( $settings_tabs[$active_tab]['preview_states'] ) ? $settings_tabs[$active_tab]['preview_states'] : 1;
+	$preview_states      = isset( $settings_tabs[ $active_tab ]['preview_states'] ) ? $settings_tabs[ $active_tab ]['preview_states'] : 1;
 	$preview_states_lock = $preview_states == 3 ? false : true;
 	?>
 	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo esc_attr( $preview_states ); ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo esc_attr( $preview_states_lock ); ?>">
 
 		<div class="sidebar">
-			<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
+			<?php if ( 'tools' !== $active_section ) : ?>
+				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
+			<?php endif; ?>
 				<?php
 					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
 					if ( has_action( "wpo_wcpdf_settings_output_{$active_tab}" ) ) {
@@ -75,8 +77,10 @@ $review_invitation = sprintf(
 					}
 					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
 				?>
-			</form>
-			<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
+			<?php if ( 'tools' !== $active_tab ) : ?>
+				</form>
+			<?php endif; ?>
+			<?php do_action( 'wpo_wcpdf_after_settings_form', $active_tab, $active_section ); ?>
 		</div>
 
 		<div class="gutter">
@@ -141,5 +145,7 @@ $review_invitation = sprintf(
 		</div>
 
 	</div>
+	
+	<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
 
 </div>

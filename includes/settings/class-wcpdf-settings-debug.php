@@ -60,7 +60,6 @@ class Settings_Debug {
 				$this->display_status();
 				break;
 			case 'tools':
-				$this->process_debug_tools();
 				$this->display_tools();
 				break;
 			case 'numbers':
@@ -194,16 +193,7 @@ class Settings_Debug {
 		return $additional_doc_types;
 	}
 	
-	public function process_debug_tools() {
-		if ( isset( $_REQUEST['wpo_wcpdf_debug_tools_action'] ) && is_callable( array( $this, $_REQUEST['wpo_wcpdf_debug_tools_action'] ) ) ) {
-			if ( check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-				// generate_random_string, install_fonts, reschedule_yearly_reset, clear_tmp
-				call_user_func( array( $this, $_REQUEST['wpo_wcpdf_debug_tools_action'] ) );
-			}
-		}
-	}
-	
-	private function generate_random_string() {
+	private function generate_random_string( $data ) {
 		if ( ! empty( WPO_WCPDF()->main->get_random_string() ) ) {
 			$old_path = WPO_WCPDF()->main->get_tmp_base();
 		} else {
@@ -215,23 +205,44 @@ class Settings_Debug {
 		WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
 		
-		/* translators: directory path */
-		printf( '<div class="notice notice-success"><p>%s</p></div>', sprintf( esc_html__( 'Temporary folder moved to %s', 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$new_path.'</code>' ) );
+		$message = esc_html__( 'Temporary folder moved to', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . $new_path;
+		
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
 	}
 	
-	private function install_fonts() {
+	private function install_fonts( $data ) {
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
-		printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' ) );
+		
+		$message = esc_html__( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
 	}
 	
-	private function reschedule_yearly_reset() {
+	private function reschedule_yearly_reset( $data ) {
 		WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
-		printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' ) );
+		
+		$message = esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
 	}
 	
-	private function clear_tmp() {
-		$output = WPO_WCPDF()->main->temporary_files_cleanup( time() );
-		printf( '<div class="notice notice-%1$s"><p>%2$s</p></div>', key( $output ), reset( $output ) );
+	private function clear_tmp( $data ) {
+		$output  = WPO_WCPDF()->main->temporary_files_cleanup( time() );
+		$message = reset( $output );
+		
+		switch ( key( $output ) ) {
+			case 'error':
+				wcpdf_log_error( $message );
+				wp_send_json_error( compact( 'message' ) );
+				break;
+			case 'success':
+				wcpdf_log_error( $message, 'info' );
+				wp_send_json_success( compact( 'message' ) );
+				break;
+			default:
+				exit;
+		}
 	}
 	
 	public function ajax_process_settings_debug_tools() {
@@ -243,7 +254,7 @@ class Settings_Debug {
 			return;
 		}
 		
-		$debug_tool = str_replace( '-', '_', esc_attr( $data['debug_tool'] ) );
+		$debug_tool = esc_attr( $data['debug_tool'] );
 		
 		if ( is_callable( array( $this, $debug_tool ) ) ) {
 			// export_settings, import_settings, reset_settings
