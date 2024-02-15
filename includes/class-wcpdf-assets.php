@@ -93,7 +93,10 @@ class Assets {
 
 		// only load on our own settings page
 		// maybe find a way to refer directly to WPO\WC\PDF_Invoices\Settings::$options_page_hook ?
-		if ( $hook == 'woocommerce_page_wpo_wcpdf_options_page' || $hook == 'settings_page_wpo_wcpdf_options_page' || ( isset($_GET['page']) && $_GET['page'] == 'wpo_wcpdf_options_page' ) ) {
+		if (
+			in_array( $hook, array( 'woocommerce_page_wpo_wcpdf_options_page', 'settings_page_wpo_wcpdf_options_page' ) ) ||
+			( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === $_GET['page'] )
+		) {
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
@@ -122,12 +125,14 @@ class Assets {
 
 			// SCRIPTS
 			wp_enqueue_script( 'wc-enhanced-select' );
+			
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
 				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip' ),
 				WPO_WCPDF_VERSION
 			);
+			
 			wp_localize_script(
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',

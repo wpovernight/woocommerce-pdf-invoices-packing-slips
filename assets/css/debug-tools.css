@@ -1,7 +1,9 @@
-form#wpo-wcpdf-settings {
-	margin-left: 0 !important;
-	min-height: 600px;
+.wcpdf_debug_settings_sections,
+#debug-tools {
+	width: calc(100% - 4em);
+	max-width: 50vw;
 }
+
 #debug-tools {
 	width: 100%;
 	margin-top: 2em;

@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 	
-	$( '.wpo_wcpdf_debug_tools_form a.submit' ).on( 'click', function( e ) {
+	$( '#debug-tools .tool' ).on( 'click', 'input[type="submit"]', function( e ) {
 		e.preventDefault();
 		let $form    = $( this ).closest( 'form' );
 		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
@@ -45,13 +45,13 @@ jQuery( function( $ ) {
 	} );
 	
 	function process_form_response( tool, response, $form ) {
-		let $notice = $form.find( '.notice' );
+		let $notice = $form.find( 'fieldset > .notice' );
 		$notice.hide();
 		$notice.removeClass( 'notice-error' );
 		$notice.removeClass( 'notice-success' );
 		
 		switch ( tool ) {
-			case 'export-settings':
+			case 'export_settings':
 				if ( response.success && response.data.filename && response.data.settings ) {
 					$form.find( '.download_file' ).remove();
 					let data = {
@@ -66,8 +66,7 @@ jQuery( function( $ ) {
 					$notice.show();
 				}
 				break;
-			case 'import-settings':
-			case 'reset-settings':
+			default:
 				if ( response.success && response.data.message ) {
 					$notice.addClass( 'notice-success' );
 				} else if ( ! response.success && response.data.message ) {
