@@ -61,7 +61,8 @@ $review_invitation = sprintf(
 	<div id="wpo-wcpdf-preview-wrapper" data-preview-states="<?php echo esc_attr( $preview_states ); ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo esc_attr( $preview_states_lock ); ?>">
 
 		<div class="sidebar">
-			<?php if ( 'tools' !== $active_section ) : ?>
+			<?php $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections', array( 'tools' ) ); // tools have their own forms ?>
+			<?php if ( ! in_array( $active_section, $excluded_sections ) ) : ?>
 				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 			<?php endif; ?>
 				<?php
@@ -77,7 +78,7 @@ $review_invitation = sprintf(
 					}
 					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
 				?>
-			<?php if ( 'tools' !== $active_tab ) : ?>
+			<?php if ( ! in_array( $active_section, $excluded_sections ) ) : ?>
 				</form>
 			<?php endif; ?>
 			<?php do_action( 'wpo_wcpdf_after_settings_form', $active_tab, $active_section ); ?>
