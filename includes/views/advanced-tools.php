@@ -9,7 +9,7 @@
 			<p><?php _e( 'For security reasons, it is preferable to use a random name for the temporary directory.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 			<form method="post">
 				<input type="hidden" name="debug_tool" value="generate_random_string">
-				<a class="button button-secondary"><?php _e( 'Generate temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				<a href="" class="button button-secondary submit"><?php _e( 'Generate temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
 				</fieldset>

@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 	
-	$( '#debug-tools .tool' ).on( 'click', 'a.button', function( e ) {
+	$( '#debug-tools .tool' ).on( 'click', 'a.submit', function( e ) {
 		e.preventDefault();
 		let $form    = $( this ).closest( 'form' );
 		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
