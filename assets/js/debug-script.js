@@ -1,6 +1,6 @@
 jQuery( function( $ ) {
 	
-	$( '#debug-tools .tool' ).on( 'click', 'a.submit', function( e ) {
+	$( '#debug-tools .tool' ).on( 'click', 'input[type="submit"]', function( e ) {
 		e.preventDefault();
 		let $form    = $( this ).closest( 'form' );
 		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
@@ -45,7 +45,7 @@ jQuery( function( $ ) {
 	} );
 	
 	function process_form_response( tool, response, $form ) {
-		let $notice = $form.find( '.notice' );
+		let $notice = $form.find( 'fieldset > .notice' );
 		$notice.hide();
 		$notice.removeClass( 'notice-error' );
 		$notice.removeClass( 'notice-success' );

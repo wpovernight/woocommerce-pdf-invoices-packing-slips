@@ -9,7 +9,7 @@
 			<p><?php _e( 'For security reasons, it is preferable to use a random name for the temporary directory.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 			<form method="post">
 				<input type="hidden" name="debug_tool" value="generate_random_string">
-				<a href="" class="button button-secondary submit"><?php _e( 'Generate temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				<input type="submit" class="button button-secondary submit" value="<?php _e( 'Generate temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
 				</fieldset>
@@ -22,7 +22,7 @@
 			<p><?php _e( 'If you are experiencing issues with rendering fonts there might have been an issue during installation or upgrade.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 			<form method="post">
 				<input type="hidden" name="debug_tool" value="install_fonts">
-				<a href="" class="button button-secondary submit"><?php _e( 'Reinstall fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				<input type="submit" class="button button-secondary submit" value="<?php _e( 'Reinstall fonts', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
 				</fieldset>
@@ -36,7 +36,7 @@
 			<p><?php _e( "You seem to have the yearly reset enabled for one of your documents but the action that performs this isn't scheduled yet.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 			<form method="post" id="reschedule_yearly_reset">
 				<input type="hidden" name="debug_tool" value="reschedule_yearly_reset">
-				<a href="" class="button button-secondary submit"><?php _e( 'Reschedule yearly reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				<input type="submit" class="button button-secondary submit" value="<?php _e( 'Reschedule yearly reset', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
 				</fieldset>
@@ -50,7 +50,7 @@
 			<p><?php _e( 'Clean up the PDF files stored in the temporary folder (used for email attachments).', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 			<form method="post" id="clear_tmp">
 				<input type="hidden" name="debug_tool" value="clear_tmp">
-				<a href="" class="button button-secondary submit"><?php _e( 'Remove temporary files', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				<input type="submit" class="button button-secondary submit" value="<?php _e( 'Remove temporary files', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
 				</fieldset>
@@ -80,7 +80,7 @@
 							}
 						?>
 					</select>
-					<a href="" class="button button-secondary submit"><?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<input type="submit" class="button button-secondary submit" value="<?php _e( 'Export', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 				</fieldset>
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
@@ -96,7 +96,7 @@
 				<input type="hidden" name="debug_tool" value="import_settings">
 				<fieldset>
 					<input type="file" name="file" accept="application/json" required>
-					<a href="" class="button button-secondary submit"><?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<input type="submit" class="button button-secondary submit" value="<?php _e( 'Import', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 				</fieldset>
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
@@ -120,7 +120,7 @@
 							}
 						?>
 					</select>
-					<a href="" class="button button-secondary submit"><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<input type="submit" class="button button-secondary submit" value="<?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
 				</fieldset>
 				<fieldset>
 					<div class="notice inline" style="display:none;"><p></p></div>
@@ -134,33 +134,12 @@
 				<h4><?php _e( 'Clear extensions license caching', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 				<p><?php _e( 'This will clear all extensions\' license caching. This could be required to update the license status in the Upgrade tab or for new Cloud Storage activations (Professional extension).', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<form method="post">
-					<?php wp_nonce_field( 'wpo_wcpdf_debug_tools_action', 'security' ); ?>
-					<input type="hidden" name="wpo_wcpdf_debug_clear_extensions_license_cache" value="clear_extensions_license_cache">
-					<input type="submit" name="submit" id="submit" class="button" value="<?php esc_attr_e( 'Clear licenses cache', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
-					<?php
-						if ( ! empty( $_POST ) && isset( $_POST['wpo_wcpdf_debug_clear_extensions_license_cache'] ) && 'clear_extensions_license_cache' === $_POST['wpo_wcpdf_debug_clear_extensions_license_cache'] ) {
-							// check permissions
-							if ( ! check_admin_referer( 'wpo_wcpdf_debug_tools_action', 'security' ) ) {
-								return;
-							}
-
-							WPO_WCPDF()->settings->upgrade->clear_extensions_license_cache();
-							
-							printf( '<div class="notice notice-success"><p>%s</p></div>', esc_html__( 'Extensions\' license cache cleared successfully!', 'woocommerce-pdf-invoices-packing-slips' ) ); 
-						}
-					?>
+					<input type="hidden" name="debug_tool" value="clear_extensions_license_cache">
+					<input type="submit" class="button button-secondary submit" value="<?php _e( 'Clear licenses cache', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+					<fieldset>
+						<div class="notice inline" style="display:none;"><p></p></div>
+					</fieldset>
 				</form>
-				<?php
-					if ( WPO_WCPDF()->settings->upgrade->get_extensions_license_data() ) {
-						$type    = 'warning';
-						$message = __( 'Licenses data is cached', 'woocommerce-pdf-invoices-packing-slips' );
-					} else {
-						$type    = 'success';
-						$message = __( 'Licenses cache is empty', 'woocommerce-pdf-invoices-packing-slips' );
-					}
-					
-					printf( '<div class="notice inline notice-%s"><p>%s</p></div>', $type, $message );
-				?>
 			</div>
 			<!-- /clear_extensions_license_cache -->
 		<?php endif; ?>

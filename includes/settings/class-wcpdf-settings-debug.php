@@ -205,7 +205,7 @@ class Settings_Debug {
 		WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
 		
-		$message = esc_html__( 'Temporary folder moved to', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . $new_path;
+		$message = esc_html__( 'Temporary folder moved to', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . wp_normalize_path( $new_path );
 		
 		wcpdf_log_error( $message, 'info' );
 		wp_send_json_success( compact( 'message' ) );
@@ -243,6 +243,14 @@ class Settings_Debug {
 			default:
 				exit;
 		}
+	}
+	
+	private function clear_extensions_license_cache( $data ) {
+		WPO_WCPDF()->settings->upgrade->clear_extensions_license_cache();
+		
+		$message = __( "Extensions' license cache cleared successfully!", 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
 	}
 	
 	public function ajax_process_settings_debug_tools() {
