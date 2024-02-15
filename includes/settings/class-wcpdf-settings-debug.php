@@ -265,7 +265,7 @@ class Settings_Debug {
 		$debug_tool = esc_attr( $data['debug_tool'] );
 		
 		if ( is_callable( array( $this, $debug_tool ) ) ) {
-			// export_settings, import_settings, reset_settings
+			// all except danger tools and wizard
 			call_user_func_array( array( $this, $debug_tool ), array( $data ) );
 		}
 		
