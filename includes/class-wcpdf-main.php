@@ -1023,7 +1023,8 @@ class Main {
 			}
 			// check order total & setting
 			$order_total = $order->get_total();
-			if ( $order_total == 0 && $document->get_setting('disable_free') ) {
+			$invoice_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type() );
+			if ( $order_total == 0 && isset( $invoice_settings['disable_free'] ) ) {
 				return false;
 			} else {
 				return $allowed;
