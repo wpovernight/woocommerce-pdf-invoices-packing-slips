@@ -89,9 +89,9 @@ class Admin {
 		if ( get_option( 'wpo_wcpdf_review_notice_dismissed' ) !== false ) {
 			return;
 		} else {
-			if ( isset( $_REQUEST['wpo_wcpdf_dismiss_review'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			if ( isset( $_REQUEST['wpo_wcpdf_dismiss_review'] ) && isset( $_REQUEST['_wpdismissnonce'] ) ) {
 				// validate nonce
-				if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'dismiss_review_nonce' ) ) {
+				if ( ! wp_verify_nonce( $_REQUEST['_wpdismissnonce'], 'dismiss_review_nonce' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_dismiss_review' );
 					return;
 				} else {
@@ -105,13 +105,13 @@ class Admin {
 			if ( $invoice_count > 100 ) {
 				// keep track of how many days this notice is show so we can remove it after 7 days
 				$notice_shown_on = get_option( 'wpo_wcpdf_review_notice_shown', array() );
-				$today = date('Y-m-d');
-				if ( !in_array($today, $notice_shown_on) ) {
+				$today           = date('Y-m-d');
+				if ( ! in_array( $today, $notice_shown_on ) ) {
 					$notice_shown_on[] = $today;
 					update_option( 'wpo_wcpdf_review_notice_shown', $notice_shown_on );
 				}
 				// count number of days review is shown, dismiss forever if shown more than 7
-				if (count($notice_shown_on) > 7) {
+				if ( count( $notice_shown_on ) > 7 ) {
 					update_option( 'wpo_wcpdf_review_notice_dismissed', true );
 					return;
 				}
@@ -124,7 +124,7 @@ class Admin {
 					<p><?php esc_html_e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
 						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post" class="button"><?php esc_html_e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></a></li>
-						<li><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_dismiss_review', true ), 'dismiss_review_nonce' ) ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?> / <?php esc_html_e( 'Already did!', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
+						<li><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_dismiss_review', true ), 'dismiss_review_nonce', '_wpdismissnonce' ) ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?> / <?php esc_html_e( 'Already did!', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
 						<li><a href="mailto:support@wpovernight.com?Subject=Here%20is%20how%20I%20think%20you%20can%20do%20better"><?php esc_html_e( 'Actually, I have a complaint...', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></li>
 					</ul>
 				</div>
