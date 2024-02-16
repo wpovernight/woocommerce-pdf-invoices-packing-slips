@@ -786,11 +786,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_thumbnail ( $product ) {
 		// Get default WooCommerce img tag (url/http)
-		if ( version_compare( WOOCOMMERCE_VERSION, '3.3', '>=' ) ) {
-			$thumbnail_size = 'woocommerce_thumbnail';
-		} else {
-			$thumbnail_size = 'shop_thumbnail';
-		}
+		$thumbnail_size        = 'woocommerce_thumbnail';
 		$size                  = apply_filters( 'wpo_wcpdf_thumbnail_size', $thumbnail_size );
 		$thumbnail_img_tag_url = $product->get_image( $size, array( 'title' => '' ) );
 		

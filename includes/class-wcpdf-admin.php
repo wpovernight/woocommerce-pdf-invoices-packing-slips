@@ -41,12 +41,8 @@ class Admin {
 
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.3', '>=' ) ) {
-			add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
-			add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
-		} else {
-			add_action( 'admin_footer', array( $this, 'bulk_actions_js' ) );
-		}
+		add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
+		add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
 		
 		if ( $this->invoice_number_search_enabled() ) { // prevents slowing down the orders list search
 			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
@@ -470,16 +466,14 @@ class Admin {
 		}
 
 		// resend order emails
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.2', '>=' ) ) {
-			add_meta_box(
-				'wpo_wcpdf_send_emails',
-				__( 'Send order email', 'woocommerce-pdf-invoices-packing-slips' ),
-				array( $this, 'send_order_email_meta_box' ),
-				$screen_id,
-				'side',
-				'high'
-			);
-		}
+		add_meta_box(
+			'wpo_wcpdf_send_emails',
+			__( 'Send order email', 'woocommerce-pdf-invoices-packing-slips' ),
+			array( $this, 'send_order_email_meta_box' ),
+			$screen_id,
+			'side',
+			'high'
+		);
 
 		// create PDF buttons
 		add_meta_box(
