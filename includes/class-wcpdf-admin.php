@@ -953,23 +953,6 @@ class Admin {
 	}
 
 	/**
-	 * Add actions to menu, legacy method
-	 */
-	public function bulk_actions_js() {
-		if ( $this->is_order_page() ) {
-			?>
-			<script type="text/javascript">
-			jQuery(document).ready(function() {
-				<?php foreach (wcpdf_get_bulk_actions() as $action => $title) { ?>
-				jQuery('<option>').val('<?php echo esc_attr( $action ); ?>').html('<?php echo esc_attr( $title ); ?>').appendTo("select[name='action'], select[name='action2']");
-				<?php }	?>
-			});
-			</script>
-			<?php
-		}
-	}
-
-	/**
 	 * Save invoice number date
 	 */
 	public function save_invoice_number_date( $order_id, $order ) {
