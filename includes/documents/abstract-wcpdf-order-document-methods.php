@@ -644,7 +644,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_tax_rate( object $item, object $order, bool $force_calculation = false ): string {
 		if ( apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
-			return '';
+			return '-';
 		}
 
 		$line_tax = is_callable( array( $item, 'get_total_tax' ) ) ? $item->get_total_tax() : 0;
