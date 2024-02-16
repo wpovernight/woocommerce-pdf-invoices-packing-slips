@@ -643,50 +643,23 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @return string $tax_rates imploded list of tax rates
 	 */
 	public function get_tax_rate( object $item, $order, bool $force_calculation = false ): string {
-		$tax_class     = is_callable( array( $item, 'get_tax_class' ) ) ? $item->get_tax_class() : '';
-		$line_tax      = is_callable( array( $item, 'get_total_tax' ) ) ? $item->get_total_tax() : 0;
-		$line_total    = is_callable( array( $item, 'get_total' ) ) ? $item->get_total() : 0;
-		$line_tax_data = is_callable( array( $item, 'get_taxes' ) ) ? $item->get_taxes() : 0;
-		$tax_data_key  = ( 'line_item' === $item->get_type() ) ? 'subtotal' : 'total';
-
-		// first try the easy wc2.2+ way, using line_tax_data
-		if ( ! empty( $line_tax_data ) && isset( $line_tax_data[ $tax_data_key ] ) ) {
-			$tax_rates  = array();
-			$line_taxes = $line_tax_data[ $tax_data_key ];
-
-			foreach ( $line_taxes as $tax_id => $tax ) {
-				if ( isset( $tax ) && ! empty ( $tax ) ) {
-					$tax_rate = $this->get_tax_rate_by_id( $tax_id, $order );
-					if ( $tax_rate !== false && $force_calculation === false ) {
-						$tax_rates[] = $tax_rate . ' %';
-					} else {
-						$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
-					}
-				}
-			}
-
-			// apply decimal setting
-			if ( function_exists( 'wc_get_price_decimal_separator' ) ) {
-				foreach ( $tax_rates as &$tax_rate ) {
-					$tax_rate = ! empty( $tax_rate ) ? str_replace( '.', wc_get_price_decimal_separator(), strval( $tax_rate ) ) : $tax_rate;
-				}
-			}
-
-			return implode( ', ', $tax_rates );
-		}
+		$line_tax = is_callable( array( $item, 'get_total_tax' ) ) ? $item->get_total_tax() : 0;
 
 		if ( 0 === $line_tax ) {
-			return '-'; // no need to determine tax rate...
+			return '-'; // no need to determine tax rate.
 		}
 
+		$tax_rates = '';
+
 		if ( ! apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
-			$tax   = new \WC_Tax();
-			$taxes = $tax->get_rates( $tax_class );
+			$tax_class  = is_callable( array( $item, 'get_tax_class' ) ) ? $item->get_tax_class() : '';
+			$line_total = is_callable( array( $item, 'get_total' ) ) ? $item->get_total() : 0;
+			$tax        = new \WC_Tax();
+			$rates      = $tax->get_rates( $tax_class );
+			$tax_rates  = array();
 
-			$tax_rates = array();
-
-			foreach ( $taxes as $tax ) {
-				$tax_rates[ $tax['label'] ] = round( $tax['rate'], 2 ) . ' %';
+			foreach ( $rates as $rate ) {
+				$tax_rates[ $rate['label'] ] = round( $rate['rate'], 2 ) . ' %';
 			}
 
 			if ( empty( $tax_rates ) ) {
