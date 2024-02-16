@@ -929,16 +929,8 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/show the total discount
 	 */
 	public function get_order_discount( $type = 'total', $tax = 'incl' ) {
-		if ( $tax == 'incl' ) {
-			switch ($type) {
-				case 'cart':
-					// Cart Discount - pre-tax discounts. (deprecated in WC2.3)
-					$discount_value = $this->order->get_cart_discount();
-					break;
-				case 'order':
-					// Order Discount - post-tax discounts. (deprecated in WC2.3)
-					$discount_value = $this->order->get_order_discount();
-					break;
+		if ( 'incl' === $tax ) {
+			switch ( $type ) {
 				case 'total':
 					// Total Discount
 					$discount_value = $this->order->get_total_discount( false ); // $ex_tax = false
@@ -953,7 +945,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$discount = array (
-			'label'		=> __('Discount', 'woocommerce-pdf-invoices-packing-slips' ),
+			'label'		=> __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'		=> $this->format_price( $discount_value ),
 			'raw_value'	=> $discount_value,
 		);
