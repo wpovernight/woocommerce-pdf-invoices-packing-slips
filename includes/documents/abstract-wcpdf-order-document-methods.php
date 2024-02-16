@@ -373,48 +373,21 @@ abstract class Order_Document_Methods extends Order_Document {
 			return; // prevent order notes from all orders showing when document is not loaded properly
 		}
 
-		if ( function_exists('wc_get_order_notes') ) { // WC3.2+
-			$type = ( $filter == 'private' ) ? 'internal' : $filter;
-			$notes = wc_get_order_notes( array(
-				'order_id' => $order_id,
-				'type'     => $type, // use 'internal' for admin and system notes, empty for all
-			) );
+		$type = ( $filter == 'private' ) ? 'internal' : $filter;
+		$notes = wc_get_order_notes( array(
+			'order_id' => $order_id,
+			'type'     => $type, // use 'internal' for admin and system notes, empty for all
+		) );
 
-			if ( $include_system_notes === false ) {
-				foreach ($notes as $key => $note) {
-					if ( $note->added_by == 'system' ) {
-						unset($notes[$key]);
-					}
+		if ( ! $include_system_notes ) {
+			foreach ( $notes as $key => $note ) {
+				if ( $note->added_by == 'system' ) {
+					unset( $notes[ $key ] );
 				}
-			}
-
-			return $notes;
-		} else {
-
-			$args = array(
-				'post_id' => $order_id,
-				'approve' => 'approve',
-				'type'    => 'order_note',
-			);
-
-			remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
-
-			$notes = get_comments( $args );
-
-			add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
-
-			if ( $notes ) {
-				foreach( $notes as $key => $note ) {
-					if ( $filter == 'customer' && !get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
-						unset($notes[$key]);
-					}
-					if ( $filter == 'private' && get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
-						unset($notes[$key]);
-					}					
-				}
-				return $notes;
 			}
 		}
+
+		return $notes;
 
 	}
 	public function order_notes( $filter = 'customer', $include_system_notes = true ) {
