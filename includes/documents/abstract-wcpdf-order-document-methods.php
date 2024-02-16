@@ -635,72 +635,40 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Get the tax rates/percentages for an item
-	 * @param  object $item order item
-	 * @param  object $order WC_Order
-	 * @param  bool $force_calculation force calculation of rates rather than retrieving from db
+	 *
+	 * @param object $item order item
+	 * @param WC_Abstract_Order $order WC_Order
+	 * @param bool $force_calculation force calculation of rates rather than retrieving from db
+	 *
 	 * @return string $tax_rates imploded list of tax rates
 	 */
-	public function get_tax_rate( $item, $order, $force_calculation = false ) {
-		$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-		$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal' : 'total';
-		$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total' : 'total';
-		$line_tax_key       = ( $item['type'] == 'shipping' ) ? 'total_tax' : 'line_tax';
-
-		$tax_class          = isset($item['tax_class']) ? $item['tax_class'] : '';
-		$line_tax           = $item[$line_tax_key];
-		$line_total         = $item[$line_total_key];
-		$line_tax_data      = $item[$tax_data_container];
-
-		// first try the easy wc2.2+ way, using line_tax_data
-		if ( !empty( $line_tax_data ) && isset($line_tax_data[$tax_data_key]) ) {
-			$tax_rates = array();
-
-			$line_taxes = $line_tax_data[$tax_data_key];
-			foreach ( $line_taxes as $tax_id => $tax ) {
-				if ( isset($tax) && $tax !== '' ) {
-					$tax_rate = $this->get_tax_rate_by_id( $tax_id, $order );
-					if ( $tax_rate !== false && $force_calculation === false ) {
-						$tax_rates[] = $tax_rate . ' %';
-					} else {
-						$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
-					}
-				}
-			}
-
-			// apply decimal setting
-			if ( function_exists( 'wc_get_price_decimal_separator' ) ) {
-				foreach ( $tax_rates as &$tax_rate ) {
-					$tax_rate = ! empty( $tax_rate ) ? str_replace( '.', wc_get_price_decimal_separator(), strval( $tax_rate ) ) : $tax_rate;
-				}
-			}
-
-			$tax_rates = implode(', ', $tax_rates );
-			return $tax_rates;
+	public function get_tax_rate( object $item, object $order, bool $force_calculation = false ): string {
+		if ( apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
+			return '-';
 		}
 
-		if ( $line_tax == 0 ) {
-			return '-'; // no need to determine tax rate...
+		$line_tax = is_callable( array( $item, 'get_total_tax' ) ) ? $item->get_total_tax() : 0;
+
+		if ( 0 == $line_tax ) {
+			return '-'; // no need to determine tax rate.
 		}
 
-		if ( ! apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
-			$tax = new \WC_Tax();
-			$taxes = $tax->get_rates( $tax_class );
+		$tax_class  = is_callable( array( $item, 'get_tax_class' ) ) ? $item->get_tax_class() : '';
+		$line_total = is_callable( array( $item, 'get_total' ) ) ? $item->get_total() : 0;
+		$tax        = new \WC_Tax();
+		$rates      = $tax->get_rates( $tax_class );
+		$tax_rates  = array();
 
-			$tax_rates = array();
-
-			foreach ($taxes as $tax) {
-				$tax_rates[$tax['label']] = round( $tax['rate'], 2 ).' %';
-			}
-
-			if (empty($tax_rates)) {
-				// one last try: manually calculate
-				$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
-			}
-
-			$tax_rates = implode(' ,', $tax_rates );
+		foreach ( $rates as $rate ) {
+			$tax_rates[ $rate['label'] ] = round( $rate['rate'], 2 ) . ' %';
 		}
-		
-		return $tax_rates;
+
+		if ( empty( $tax_rates ) ) {
+			// one last try: manually calculate
+			$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
+		}
+
+		return implode( ' ,', $tax_rates );
 	}
 
 	public function calculate_tax_rate( $price_ex_tax, $tax ) {
