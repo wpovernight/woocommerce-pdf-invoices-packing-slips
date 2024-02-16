@@ -373,48 +373,21 @@ abstract class Order_Document_Methods extends Order_Document {
 			return; // prevent order notes from all orders showing when document is not loaded properly
 		}
 
-		if ( function_exists('wc_get_order_notes') ) { // WC3.2+
-			$type = ( $filter == 'private' ) ? 'internal' : $filter;
-			$notes = wc_get_order_notes( array(
-				'order_id' => $order_id,
-				'type'     => $type, // use 'internal' for admin and system notes, empty for all
-			) );
+		$type = ( $filter == 'private' ) ? 'internal' : $filter;
+		$notes = wc_get_order_notes( array(
+			'order_id' => $order_id,
+			'type'     => $type, // use 'internal' for admin and system notes, empty for all
+		) );
 
-			if ( $include_system_notes === false ) {
-				foreach ($notes as $key => $note) {
-					if ( $note->added_by == 'system' ) {
-						unset($notes[$key]);
-					}
+		if ( ! $include_system_notes ) {
+			foreach ( $notes as $key => $note ) {
+				if ( $note->added_by == 'system' ) {
+					unset( $notes[ $key ] );
 				}
-			}
-
-			return $notes;
-		} else {
-
-			$args = array(
-				'post_id' => $order_id,
-				'approve' => 'approve',
-				'type'    => 'order_note',
-			);
-
-			remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
-
-			$notes = get_comments( $args );
-
-			add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ), 10, 1 );
-
-			if ( $notes ) {
-				foreach( $notes as $key => $note ) {
-					if ( $filter == 'customer' && !get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
-						unset($notes[$key]);
-					}
-					if ( $filter == 'private' && get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ) {
-						unset($notes[$key]);
-					}					
-				}
-				return $notes;
 			}
 		}
+
+		return $notes;
 
 	}
 	public function order_notes( $filter = 'customer', $include_system_notes = true ) {
@@ -786,11 +759,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_thumbnail ( $product ) {
 		// Get default WooCommerce img tag (url/http)
-		if ( version_compare( WOOCOMMERCE_VERSION, '3.3', '>=' ) ) {
-			$thumbnail_size = 'woocommerce_thumbnail';
-		} else {
-			$thumbnail_size = 'shop_thumbnail';
-		}
+		$thumbnail_size        = 'woocommerce_thumbnail';
 		$size                  = apply_filters( 'wpo_wcpdf_thumbnail_size', $thumbnail_size );
 		$thumbnail_img_tag_url = $product->get_image( $size, array( 'title' => '' ) );
 		
@@ -960,16 +929,8 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/show the total discount
 	 */
 	public function get_order_discount( $type = 'total', $tax = 'incl' ) {
-		if ( $tax == 'incl' ) {
-			switch ($type) {
-				case 'cart':
-					// Cart Discount - pre-tax discounts. (deprecated in WC2.3)
-					$discount_value = $this->order->get_cart_discount();
-					break;
-				case 'order':
-					// Order Discount - post-tax discounts. (deprecated in WC2.3)
-					$discount_value = $this->order->get_order_discount();
-					break;
+		if ( 'incl' === $tax ) {
+			switch ( $type ) {
 				case 'total':
 					// Total Discount
 					$discount_value = $this->order->get_total_discount( false ); // $ex_tax = false
@@ -984,7 +945,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$discount = array (
-			'label'		=> __('Discount', 'woocommerce-pdf-invoices-packing-slips' ),
+			'label'		=> __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'		=> $this->format_price( $discount_value ),
 			'raw_value'	=> $discount_value,
 		);
