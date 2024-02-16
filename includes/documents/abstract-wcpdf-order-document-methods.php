@@ -640,12 +640,12 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * @param WC_Order|WC_Order_Refund $order WC_Order
 	 * @param bool $force_calculation force calculation of rates rather than retrieving from db
 	 *
-	 * @return string $tax_rates imploded list of tax rates
+	 * @return string|float $tax_rates imploded list of tax rates
 	 */
-	public function get_tax_rate( object $item, $order, bool $force_calculation = false ): string {
+	public function get_tax_rate( object $item, $order, bool $force_calculation = false ) {
 		$line_tax = is_callable( array( $item, 'get_total_tax' ) ) ? $item->get_total_tax() : 0;
 
-		if ( 0 === $line_tax ) {
+		if ( 0 == $line_tax ) {
 			return '-'; // no need to determine tax rate.
 		}
 
