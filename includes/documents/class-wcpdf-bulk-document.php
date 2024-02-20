@@ -24,18 +24,21 @@ class Bulk_Document {
 	
 	/**
 	 * Document type.
+	 * 
 	 * @var string
 	 */
 	public $type;
 
 	/**
 	 * Wrapper document - used for filename etc.
+	 * 
 	 * @var string
 	 */
 	public $wrapper_document;
 
 	/**
 	 * Order IDs.
+	 * 
 	 * @var array
 	 */
 	public $order_ids;
