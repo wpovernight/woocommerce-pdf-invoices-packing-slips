@@ -517,7 +517,12 @@ abstract class Order_Document {
 			$allowed = false;
 		// Check disabled for statuses
 		} elseif ( ! $this->exists() && ! empty( $this->settings['disable_for_statuses'] ) && ! empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
-			$status = $this->order->get_status();
+			if ( 'credit-note' === $this->get_type() ) {
+				$parent_order = $this->get_refund_parent( $this->order );
+				$status       = $parent_order->get_status();
+			} else {
+				$status       = $this->order->get_status();
+			}
 
 			$disabled_statuses = array_map( function ( $status ) {
 				$status = 'wc-' === substr( $status, 0, 3 ) ? substr( $status, 3 ) : $status;
