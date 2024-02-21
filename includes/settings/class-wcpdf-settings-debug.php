@@ -508,7 +508,7 @@ class Settings_Debug {
 		$page_count         = isset( $request['page_count'] ) ? absint( $request['page_count'] ) : 1;
 		$document_count     = isset( $request['document_count'] ) ? absint( $request['document_count'] ) : 0;
 		$delete_or_renumber = isset( $request['delete_or_renumber'] ) ? esc_attr( $request['delete_or_renumber'] ) : false;
-		$message            = ( 'delete' === $delete_or_renumber ) ? $document_title . __( 'documents deleted.', 'woocommerce-pdf-invoices-packing-slips' ) : $document_title . __( 'documents renumbered.', 'woocommerce-pdf-invoices-packing-slips' );
+		$message            = ( 'delete' === $delete_or_renumber ) ? ' ' . $document_title . __( 'documents deleted.', 'woocommerce-pdf-invoices-packing-slips' ) : ' ' . $document_title . __( 'documents renumbered.', 'woocommerce-pdf-invoices-packing-slips' );
 		$finished           = false;
 	
 		$args = array(
