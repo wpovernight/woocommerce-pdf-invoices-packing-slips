@@ -110,7 +110,7 @@ jQuery( function( $ ) {
 	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
 	// danger zone tools
-	$( '#wpo-wcpdf-settings .number-tools-btn' ).click( function( event ) {
+	$( '#debug-tools .number-tools-btn' ).click( function( event ) {
 		event.preventDefault();
 
 		let documentType     = '';
