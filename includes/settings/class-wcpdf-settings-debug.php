@@ -544,7 +544,12 @@ class Settings_Debug {
 		}
 		
 		$args[ $date_arg ] = $from_date . '...' . $to_date;
-		$results           = wc_get_orders( $args );
+		
+		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() ) {
+			$args = wpo_wcpdf_custom_document_date_query_var( $args, $args );
+		}
+		
+		$results = wc_get_orders( $args );
 		
 		if ( ! is_object( $results ) ) {
 			$message = __( 'Unexpected results from the orders query.', 'woocommerce-pdf-invoices-packing-slips' );

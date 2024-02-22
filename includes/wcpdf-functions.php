@@ -513,15 +513,22 @@ function WPO_WCPDF_Legacy() {
  * 
  * @param array $wp_query_args
  * @param array $query_args
- * @param \WC_Data_Store_WP $order_store_cpt
  *
  * @return array
  */
-function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $query_vars, \WC_Data_Store_WP $order_store_cpt ): array {
+function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $query_vars ): array {
 	foreach ( WPO_WCPDF()->documents->get_documents() as $document ) {
 		if ( ! empty( $query_vars[ "wcpdf_{$document->slug}_date" ] ) ) {
-			$wp_query_args = $order_store_cpt->parse_date_for_wp_query( $query_vars[ "wcpdf_{$document->slug}_date" ], "_wcpdf_{$document->slug}_date", $wp_query_args );
+			$timestamps = explode( '...', $query_vars[ "wcpdf_{$document->slug}_date" ] );
 			
+			foreach ( $timestamps as $key => $timestamp ) {
+				$wp_query_args['meta_query'][ $key ] = array(
+					'key'     => "_wcpdf_{$document->slug}_date",
+					'value'   => absint( $timestamp ),
+					'compare' => $key === 0 ? '>=' : '<=',
+				);
+			}
+						
 			if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
 				unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
 			}
@@ -530,4 +537,5 @@ function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $
 
 	return $wp_query_args;
 }
-add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_custom_document_date_query_var', 10, 3 );
+
+add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_custom_document_date_query_var', 10, 2 );
