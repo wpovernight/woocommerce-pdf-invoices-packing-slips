@@ -517,20 +517,26 @@ function WPO_WCPDF_Legacy() {
  * @return array
  */
 function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $query_vars ): array {
-	foreach ( WPO_WCPDF()->documents->get_documents() as $document ) {
-		if ( ! empty( $query_vars[ "wcpdf_{$document->slug}_date" ] ) ) {
-			$timestamps = explode( '...', $query_vars[ "wcpdf_{$document->slug}_date" ] );
-			
-			foreach ( $timestamps as $key => $timestamp ) {
-				$wp_query_args['meta_query'][ $key ] = array(
-					'key'     => "_wcpdf_{$document->slug}_date",
-					'value'   => absint( $timestamp ),
-					'compare' => $key === 0 ? '>=' : '<=',
-				);
-			}
-						
-			if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
-				unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
+	$documents = WPO_WCPDF()->documents->get_documents();
+	
+	if ( ! empty( $documents ) ) {
+		foreach ( $documents as $document ) {
+			if ( ! empty( $query_vars[ "wcpdf_{$document->slug}_date" ] ) ) {
+				$timestamps = explode( '...', $query_vars[ "wcpdf_{$document->slug}_date" ] );
+				
+				if ( ! empty( $timestamps ) && count( $timestamps ) === 2 ) {
+					foreach ( $timestamps as $key => $timestamp ) {
+						$wp_query_args['meta_query'][ $key ] = array(
+							'key'     => "_wcpdf_{$document->slug}_date",
+							'value'   => absint( $timestamp ),
+							'compare' => $key === 0 ? '>=' : '<=',
+						);
+					}
+								
+					if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
+						unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
+					}
+				}
 			}
 		}
 	}
