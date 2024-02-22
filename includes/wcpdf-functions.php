@@ -532,10 +532,10 @@ function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $
 							'compare' => $key === 0 ? '>=' : '<=',
 						);
 					}
-								
-					if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
-						unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
-					}
+				}
+				
+				if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
+					unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
 				}
 			}
 		}
