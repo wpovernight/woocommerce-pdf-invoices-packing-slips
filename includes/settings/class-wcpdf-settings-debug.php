@@ -500,8 +500,8 @@ class Settings_Debug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 	
-		$from_date          = date_i18n( 'Y-m-d', strtotime( $request['date_from'] ) );
-		$to_date            = date_i18n( 'Y-m-d', strtotime( $request['date_to'] ) );
+		$from_date          = strtotime( $request['date_from'] );
+		$to_date            = strtotime( $request['date_to'] );
 		$document_type      = esc_attr( $request['document_type'] );
 		$document_types     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? array( $document_type ) : array();
 		$document_title     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
@@ -528,8 +528,6 @@ class Settings_Debug {
 			'date_completed',
 			'date_paid',
 		);
-		
-		
 		
 		if ( in_array( $date_type, $wc_date_types ) ) {
 			$date_arg      = $date_type;

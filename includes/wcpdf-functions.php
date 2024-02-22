@@ -513,14 +513,18 @@ function WPO_WCPDF_Legacy() {
  * 
  * @param array $wp_query_args
  * @param array $query_args
- * @param object $order_store_cpt
+ * @param \WC_Data_Store_WP $order_store_cpt
  *
  * @return array
  */
-function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $query_vars, $order_store_cpt ): array {
+function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $query_vars, \WC_Data_Store_WP $order_store_cpt ): array {
 	foreach ( WPO_WCPDF()->documents->get_documents() as $document ) {
-		if ( isset( $query_vars[ "wcpdf_{$document->slug}_date" ] ) && '' !== $query_vars[ "wcpdf_{$document->slug}_date" ] ) {
+		if ( ! empty( $query_vars[ "wcpdf_{$document->slug}_date" ] ) ) {
 			$wp_query_args = $order_store_cpt->parse_date_for_wp_query( $query_vars[ "wcpdf_{$document->slug}_date" ], "_wcpdf_{$document->slug}_date", $wp_query_args );
+			
+			if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
+				unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
+			}
 		}
 	}
 
