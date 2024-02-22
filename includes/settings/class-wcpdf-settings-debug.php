@@ -547,6 +547,8 @@ class Settings_Debug {
 		
 		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() ) {
 			$args = wpo_wcpdf_custom_document_date_query_var( $args, $args );
+		} else {
+			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_custom_document_date_query_var', 10, 2 );
 		}
 		
 		$results = wc_get_orders( $args );

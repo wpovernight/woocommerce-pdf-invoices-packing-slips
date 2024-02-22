@@ -543,5 +543,3 @@ function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $
 
 	return $wp_query_args;
 }
-
-add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_custom_document_date_query_var', 10, 2 );
