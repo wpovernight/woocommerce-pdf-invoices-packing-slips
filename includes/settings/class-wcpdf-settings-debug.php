@@ -502,6 +502,7 @@ class Settings_Debug {
 	
 		$from_date          = date_i18n( 'Y-m-d', strtotime( $request['date_from'] ) );
 		$to_date            = date_i18n( 'Y-m-d', strtotime( $request['date_to'] ) );
+		$date_type          = apply_filters( 'wpo_wcpdf_process_danger_zone_tools_date_type', 'date_created', $request );
 		$document_type      = esc_attr( $request['document_type'] );
 		$document_types     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? array( $document_type ) : array();
 		$document_title     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
@@ -511,7 +512,7 @@ class Settings_Debug {
 		$message            = ( 'delete' === $delete_or_renumber ) ? ' ' . $document_title . __( 'documents deleted.', 'woocommerce-pdf-invoices-packing-slips' ) : ' ' . $document_title . __( 'documents renumbered.', 'woocommerce-pdf-invoices-packing-slips' );
 		$finished           = false;
 	
-		$args = apply_filters( 'wpo_wcpdf_process_danger_zone_tools_query_args', array(
+		$args = array(
 			'return'         => 'ids',
 			'type'           => 'shop_order',
 			'limit'          => -1,
@@ -519,8 +520,8 @@ class Settings_Debug {
 			'paginate'       => true,
 			'posts_per_page' => 50,
 			'page'           => $page_count,
-			'date_created'   => $from_date . '...' . $to_date,
-		), $request );
+			$date_type       => $from_date . '...' . $to_date,
+		);
 	
 		$results   = wc_get_orders( $args );
 		$order_ids = $results->orders;
