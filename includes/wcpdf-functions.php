@@ -507,3 +507,23 @@ function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
 function WPO_WCPDF_Legacy() {
 	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
 }
+
+/**
+ * Allows `wc_get_orders()` queries to include document dates
+ * 
+ * @param array $wp_query_args
+ * @param array $query_args
+ * @param object $order_store_cpt
+ *
+ * @return array
+ */
+function wpo_wcpdf_custom_document_date_query_var( array $wp_query_args, array $query_vars, $order_store_cpt ): array {
+	foreach ( WPO_WCPDF()->documents->get_documents() as $document ) {
+		if ( isset( $query_vars[ "wcpdf_{$document->slug}_date" ] ) && '' !== $query_vars[ "wcpdf_{$document->slug}_date" ] ) {
+			$wp_query_args = $order_store_cpt->parse_date_for_wp_query( $query_vars[ "wcpdf_{$document->slug}_date" ], "_wcpdf_{$document->slug}_date", $wp_query_args );
+		}
+	}
+
+	return $wp_query_args;
+}
+add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_custom_document_date_query_var', 10, 3 );

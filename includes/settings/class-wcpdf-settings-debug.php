@@ -493,16 +493,15 @@ class Settings_Debug {
 	public function ajax_process_danger_zone_tools() {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 		
-		$request = stripslashes_deep( $_REQUEST );
+		$request = stripslashes_deep( $_POST );
 		
 		if ( ! isset( $request['document_type'] ) || ! isset( $request['date_from'] ) || ! isset( $request['date_to'] ) ) {
 			$message = __( 'One or more request parameters missing.', 'woocommerce-pdf-invoices-packing-slips' );
-			wp_send_json_error( compact( $message ) );
+			wp_send_json_error( compact( 'message' ) );
 		}
 	
 		$from_date          = date_i18n( 'Y-m-d', strtotime( $request['date_from'] ) );
 		$to_date            = date_i18n( 'Y-m-d', strtotime( $request['date_to'] ) );
-		$date_type          = apply_filters( 'wpo_wcpdf_process_danger_zone_tools_date_type', 'date_created', $request );
 		$document_type      = esc_attr( $request['document_type'] );
 		$document_types     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? array( $document_type ) : array();
 		$document_title     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
@@ -520,10 +519,34 @@ class Settings_Debug {
 			'paginate'       => true,
 			'posts_per_page' => 50,
 			'page'           => $page_count,
-			$date_type       => $from_date . '...' . $to_date,
 		);
-	
-		$results   = wc_get_orders( $args );
+		
+		$date_type     = isset( $request['date_type'] ) ? esc_attr( $request['date_type'] ) : '';
+		$wc_date_types = array(
+			'date_created',
+			'date_modified',
+			'date_completed',
+			'date_paid',
+		);
+		
+		if ( in_array( $date_type, $wc_date_types ) ) {
+			$date_arg = $date_type;
+		} elseif ( 'document_date' === $date_type ) {
+			$document_slug = str_replace( '-', '_', $document_type );
+			$date_arg      = "wcpdf_{$document_slug}_date";
+		} else {
+			$message = __( 'Wrong date type selected.', 'woocommerce-pdf-invoices-packing-slips' );
+			wp_send_json_error( compact( 'message' ) );
+		}
+		
+		$args[ $date_arg ] = $from_date . '...' . $to_date;
+		$results           = wc_get_orders( $args );
+		
+		if ( ! is_object( $results ) ) {
+			$message = __( 'Unexpected results from the orders query.', 'woocommerce-pdf-invoices-packing-slips' );
+			wp_send_json_error( compact( 'message' ) );
+		}
+		
 		$order_ids = $results->orders;
 		
 		if ( ! empty( $order_ids ) && ! empty( $document_type ) && $delete_or_renumber ) {
@@ -536,16 +559,27 @@ class Settings_Debug {
 				
 				if ( 'all' === $document_type ) {
 					$documents = WPO_WCPDF()->documents->get_documents( 'all' );
-					foreach ( $documents as $document ) {
-						$document_types[] = $document->get_type();
+					
+					if ( is_array( $documents ) ) {
+						foreach ( $documents as $document ) {
+							$document_types[] = $document->get_type();
+						}
 					}
 				}
 				
-				foreach ( $document_types as $type ) {
-					$document = wcpdf_get_document( $type, $order );
-					$return   = $this->renumber_or_delete_document( $document, $delete_or_renumber );
-					if ( $return ) {
-						$document_count++;
+				if ( ! empty( $document_types ) ) {
+					foreach ( $document_types as $type ) {
+						$document = wcpdf_get_document( $type, $order );
+						
+						if ( ! is_object( $document ) ) {
+							continue;
+						}
+						
+						$return = $this->renumber_or_delete_document( $document, $delete_or_renumber );
+							
+						if ( $return ) {
+							$document_count++;
+						}
 					}
 				}
 			}

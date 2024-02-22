@@ -147,7 +147,16 @@
 	</div>
 	<!-- danger_zone (admin access only) -->
 	<?php if ( current_user_can( 'administrator' ) && isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ) : ?>
-		<?php $documents = WPO_WCPDF()->documents->get_documents( 'all' ); ?>
+		<?php
+			$documents  = WPO_WCPDF()->documents->get_documents( 'all' );
+			$date_types = array(
+				'date_created'   => __( 'Order date created', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date_modified'  => __( 'Order date modified', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date_completed' => __( 'Order date completed', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date_paid'      => __( 'Order date paid', 'woocommerce-pdf-invoices-packing-slips' ),
+				'document_date'  => __( 'Document date', 'woocommerce-pdf-invoices-packing-slips' ),
+			);
+		?>
 		<div id="danger_zone" class="wrapper">
 			<div class="tool">
 				<div class="notice notice-warning inline">
@@ -177,6 +186,18 @@
 									<?php foreach ( $documents as $document ) : ?>
 										<option value="<?php echo $document->get_type(); ?>"><?php echo $document->get_title(); ?></option>
 									<?php endforeach; ?>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td><?php _e( 'Date type:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td>
+								<select id="renumber-date-type" name="renumber-date-type">
+									<?php
+										foreach ( $date_types as $key => $label ) {
+											printf( '<option value="%s">%s</option>', $key, $label );
+										}
+									?>
 								</select>
 							</td>
 						</tr>
@@ -214,6 +235,18 @@
 										<option value="<?php echo $document->get_type(); ?>"><?php echo $document->get_title(); ?></option>
 									<?php endforeach; ?>
 									<option value="all"><?php _e( 'All', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td><?php _e( 'Date type:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td>
+								<select id="delete-date-type" name="renumber-date-type">
+									<?php
+										foreach ( $date_types as $key => $label ) {
+											printf( '<option value="%s">%s</option>', $key, $label );
+										}
+									?>
 								</select>
 							</td>
 						</tr>

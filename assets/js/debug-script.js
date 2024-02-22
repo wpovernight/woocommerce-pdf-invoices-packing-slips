@@ -122,12 +122,14 @@ jQuery( function( $ ) {
 
 		if ( 'renumber-documents-btn' === this.id ) {
 			documentType     = $( '#renumber-document-type' ).val();
+			dateType         = $( '#renumber-date-type' ).val();
 			dateFrom         = $( '#renumber-date-from' ).val();
 			dateTo           = $( '#renumber-date-to' ).val();
 			deleteOrRenumber = 'renumber';
 			
 		} else if ( 'delete-documents-btn' === this.id ) {
 			documentType     = $( '#delete-document-type' ).val();
+			dateType         = $( '#delete-date-type' ).val();
 			dateFrom         = $( '#delete-date-from' ).val();
 			dateTo           = $( '#delete-date-to' ).val();
 			deleteOrRenumber = 'delete';
@@ -148,14 +150,15 @@ jQuery( function( $ ) {
 		$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).prop( 'disabled', true );
 
 		// first call
-		renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
+		renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
 	} );
 	
-	function renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
+	function renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
 		let data = {
 			'action':             'wpo_wcpdf_danger_zone_tools',
 			'delete_or_renumber': deleteOrRenumber,
 			'document_type':      documentType,
+			'date_type':          dateType,
 			'date_from':          dateFrom,
 			'date_to':            dateTo,
 			'page_count':         pageCount,
@@ -175,7 +178,7 @@ jQuery( function( $ ) {
 					documentCount = response.data.documentCount;
 					
 					// recall function
-					renumberOrDeleteDocuments( documentType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
+					renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
 					
 				} else {
 					$( '.renumber-spinner, .delete-spinner' ).css( 'visibility', 'hidden' );
