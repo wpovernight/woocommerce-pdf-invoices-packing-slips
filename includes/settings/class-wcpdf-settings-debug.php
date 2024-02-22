@@ -500,8 +500,8 @@ class Settings_Debug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 	
-		$from_date          = strtotime( $request['date_from'] );
-		$to_date            = strtotime( $request['date_to'] );
+		$from_date          = strtotime( $request['date_from'] . ' 00:00:00' );
+		$to_date            = strtotime( $request['date_to'] . ' 23:59:59' );
 		$document_type      = esc_attr( $request['document_type'] );
 		$document_types     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? array( $document_type ) : array();
 		$document_title     = ! empty( $document_type ) && ( 'all' !== $document_type ) ? ucwords( str_replace( '-', ' ', $document_type ) ) . ' ' : ' ';
