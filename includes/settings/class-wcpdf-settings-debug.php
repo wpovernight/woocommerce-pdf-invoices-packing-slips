@@ -529,12 +529,18 @@ class Settings_Debug {
 			'date_paid',
 		);
 		
+		
+		
 		if ( in_array( $date_type, $wc_date_types ) ) {
-			$date_arg = $date_type;
+			$date_arg      = $date_type;
 		} elseif ( 'document_date' === $date_type ) {
 			$document_slug = str_replace( '-', '_', $document_type );
 			$date_arg      = "wcpdf_{$document_slug}_date";
 		} else {
+			$date_arg      = '';
+		}
+		
+		if ( empty( $date_arg ) ) {
 			$message = __( 'Wrong date type selected.', 'woocommerce-pdf-invoices-packing-slips' );
 			wp_send_json_error( compact( 'message' ) );
 		}
