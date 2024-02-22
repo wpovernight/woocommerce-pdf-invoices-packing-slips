@@ -511,7 +511,7 @@ class Settings_Debug {
 		$message            = ( 'delete' === $delete_or_renumber ) ? ' ' . $document_title . __( 'documents deleted.', 'woocommerce-pdf-invoices-packing-slips' ) : ' ' . $document_title . __( 'documents renumbered.', 'woocommerce-pdf-invoices-packing-slips' );
 		$finished           = false;
 	
-		$args = array(
+		$args = apply_filters( 'wpo_wcpdf_process_danger_zone_tools_query_args', array(
 			'return'         => 'ids',
 			'type'           => 'shop_order',
 			'limit'          => -1,
@@ -520,7 +520,7 @@ class Settings_Debug {
 			'posts_per_page' => 50,
 			'page'           => $page_count,
 			'date_created'   => $from_date . '...' . $to_date,
-		);
+		), $request );
 	
 		$results   = wc_get_orders( $args );
 		$order_ids = $results->orders;
