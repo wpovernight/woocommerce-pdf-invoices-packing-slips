@@ -123,13 +123,20 @@ class Assets {
 				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/checkmark.svg'.") !important;
 			}" );
 
-			// SCRIPTS
 			wp_enqueue_script( 'wc-enhanced-select' );
+			
+			if ( ! wp_script_is( 'wp-pointer', 'enqueued' ) ) {
+				wp_enqueue_script( 'wp-pointer' );
+			}
+
+			if ( ! wp_style_is( 'wp-pointer', 'enqueued' ) ) {
+				wp_enqueue_style( 'wp-pointer' );
+			}
 			
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip' ),
+				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' ),
 				WPO_WCPDF_VERSION
 			);
 			
@@ -199,14 +206,6 @@ class Assets {
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
-
-			if ( wp_script_is( 'wp-pointer', 'enqueued' ) === false ) {
-				wp_enqueue_script( 'wp-pointer' );
-			}
-
-			if ( wp_style_is( 'wp-pointer', 'enqueued' ) === false ) {
-				wp_enqueue_style( 'wp-pointer' );
-			}
 
 		}
 
