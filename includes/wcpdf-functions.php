@@ -523,6 +523,10 @@ function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, mixed
 		foreach ( $documents as $document ) {
 			if ( ! empty( $query_vars[ "wcpdf_{$document->slug}_date" ] ) ) {
 				$wp_query_args = ( new \WC_Order_Data_Store_CPT() )->parse_date_for_wp_query( $query_vars[ "wcpdf_{$document->slug}_date" ], "_wcpdf_{$document->slug}_date", $wp_query_args );
+				
+				if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
+					unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
+				}
 			}
 		}
 	}
