@@ -153,6 +153,17 @@ jQuery( function( $ ) {
 		renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
 	} );
 	
+	// disable `document_date` when selecting `all` documents
+	$( '#debug-tools #delete-document-type' ).on( 'change', function( event ) {
+		event.preventDefault();
+		
+		if ( 'all' === $( this ).val() ) {
+			$( this ).closest( 'form' ).find( '#delete-date-type option[value="document_date"]' ).prop( 'disabled', true );
+		} else {
+			$( this ).closest( 'form' ).find( '#delete-date-type option[value="document_date"]' ).prop( 'disabled', false );
+		}
+	} ).trigger( 'change' );
+	
 	function renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
 		let data = {
 			'action':             'wpo_wcpdf_danger_zone_tools',
