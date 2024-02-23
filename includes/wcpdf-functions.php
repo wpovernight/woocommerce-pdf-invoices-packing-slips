@@ -542,7 +542,7 @@ function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, mixed
  * @param array  $wp_query_args WP_Query args.
  * @return array Modified $wp_query_args
  */
-function wpo_wcpdf_parse_date_for_wp_query( mixed $query_var, string $key, array $wp_query_args = array() ): array {
+function wpo_wcpdf_parse_date_for_wp_query( $query_var, string $key, array $wp_query_args = array() ): array {
 	$query_parse_regex = '/([^.<>]*)(>=|<=|>|<|\.\.\.)([^.<>]+)/';
 	$valid_operators   = array( '>', '>=', '=', '<=', '<', '...' );
 
