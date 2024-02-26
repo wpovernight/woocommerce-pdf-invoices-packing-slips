@@ -580,7 +580,15 @@ class Settings_Debug {
 				
 				if ( ! empty( $document_types ) ) {
 					foreach ( $document_types as $type ) {
+						if ( 'credit-note' === $type && function_exists( 'WPO_WCPDF_Pro' ) ) {
+							remove_filter( 'wpo_wcpdf_document_is_allowed', array( WPO_WCPDF_Pro()->functions, 'is_pro_document_allowed' ), 2, 2 );
+						}
+						
 						$document = wcpdf_get_document( $type, $order );
+						
+						if ( 'credit-note' === $type && function_exists( 'WPO_WCPDF_Pro' ) ) {
+							add_filter( 'wpo_wcpdf_document_is_allowed', array( WPO_WCPDF_Pro()->functions, 'is_pro_document_allowed' ), 2, 2 );
+						}
 						
 						if ( ! is_object( $document ) ) {
 							continue;

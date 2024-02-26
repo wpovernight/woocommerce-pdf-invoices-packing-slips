@@ -73,8 +73,9 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		// if we only have one order, it's simple.
 		if ( count( $order_ids ) == 1 ) {
 			$order_id = array_pop( $order_ids );
+			$order    = wc_get_order( $order_id );
+			
 			do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
-			$order = wc_get_order( $order_id );
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
