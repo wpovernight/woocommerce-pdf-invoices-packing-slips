@@ -241,7 +241,7 @@
 						<tr>
 							<td><?php _e( 'Date type:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 							<td>
-								<select id="delete-date-type" name="renumber-date-type">
+								<select id="delete-date-type" name="delete-date-type">
 									<?php
 										foreach ( $date_types as $key => $label ) {
 											printf( '<option value="%s">%s</option>', $key, $label );

@@ -164,6 +164,19 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 	
+	$( '#debug-tools #delete-date-type' ).on( 'change', function( event ) {
+		event.preventDefault();
+		
+		let $document_type_selector = $( this ).closest( 'form' ).find( '#delete-document-type' );
+		
+		if ( '' === $document_type_selector.val() || 'all' === $document_type_selector.val() ) {
+			$( this ).find( 'option[value="document_date"]' ).prop( 'disabled', true );
+		} else {
+			$( this ).find( 'option[value="document_date"]' ).prop( 'disabled', false );
+		
+		}
+	} ).trigger( 'change' );
+	
 	function renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
 		let data = {
 			'action':             'wpo_wcpdf_danger_zone_tools',
