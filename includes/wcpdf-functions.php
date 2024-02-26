@@ -73,8 +73,9 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		// if we only have one order, it's simple.
 		if ( count( $order_ids ) == 1 ) {
 			$order_id = array_pop( $order_ids );
+			$order    = wc_get_order( $order_id );
+			
 			do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
-			$order = wc_get_order( $order_id );
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
@@ -507,3 +508,30 @@ function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
 function WPO_WCPDF_Legacy() {
 	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
 }
+
+/**
+ * Parse document date for WP_Query.
+ * 
+ * @param array $wp_query_args
+ * @param mixed $query_args
+ *
+ * @return array
+ */
+function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, mixed $query_vars ): array {
+	$documents = WPO_WCPDF()->documents->get_documents();
+	
+	if ( ! empty( $documents ) ) {
+		foreach ( $documents as $document ) {
+			if ( ! empty( $query_vars[ "wcpdf_{$document->slug}_date" ] ) ) {
+				$wp_query_args = ( new \WC_Order_Data_Store_CPT() )->parse_date_for_wp_query( $query_vars[ "wcpdf_{$document->slug}_date" ], "_wcpdf_{$document->slug}_date", $wp_query_args );
+				
+				if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
+					unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
+				}
+			}
+		}
+	}
+
+	return $wp_query_args;
+}
+
