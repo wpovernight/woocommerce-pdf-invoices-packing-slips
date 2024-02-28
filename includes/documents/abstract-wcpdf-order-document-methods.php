@@ -627,6 +627,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$tax_class  = is_callable( array( $item, 'get_tax_class' ) ) ? $item->get_tax_class() : '';
+		$tax_class  = 'inherit' === $tax_class ? '' : $tax_class;
 		$line_total = is_callable( array( $item, 'get_total' ) ) ? $item->get_total() : 0;
 		$tax        = new \WC_Tax();
 		$rates      = $tax->get_rates( $tax_class );
