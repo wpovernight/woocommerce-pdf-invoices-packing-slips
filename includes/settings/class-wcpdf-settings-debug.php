@@ -38,12 +38,13 @@ class Settings_Debug {
 
 	public function output( $active_section ) {
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
-		
+		$sections       = apply_filters( 'wpo_wcpdf_settings_debug_sections', $this->sections, $active_section );
+
 		?>
 		<div class="wcpdf_debug_settings_sections">
 			<h2 class="nav-tab-wrapper">
 				<?php
-					foreach ( $this->sections as $section => $title ) {
+					foreach ( $sections as $section => $title ) {
 						$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
 						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), $active, esc_html( $title ) );
 					}
@@ -66,6 +67,8 @@ class Settings_Debug {
 				$this->display_numbers();
 				break;
 		}
+
+		do_action( 'wpo_wcpdf_settings_debug_after_output', $active_section );
 	}
 	
 	public function display_settings() {
