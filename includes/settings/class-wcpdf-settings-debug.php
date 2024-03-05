@@ -22,13 +22,6 @@ class Settings_Debug {
 	}
 
 	public function __construct()	{
-		$this->sections = array(
-			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
-			'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
-			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
-			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
-		
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 		
@@ -38,12 +31,13 @@ class Settings_Debug {
 
 	public function output( $active_section ) {
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
-		
+		$sections       = $this->get_settings_sections();
+
 		?>
 		<div class="wcpdf_debug_settings_sections">
 			<h2 class="nav-tab-wrapper">
 				<?php
-					foreach ( $this->sections as $section => $title ) {
+					foreach ( $sections as $section => $title ) {
 						$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
 						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), $active, esc_html( $title ) );
 					}
@@ -51,7 +45,7 @@ class Settings_Debug {
 			</h2>
 		</div>
 		<?php
-		
+
 		switch ( $active_section ) {
 			case 'settings':
 				$this->display_settings();
@@ -65,7 +59,12 @@ class Settings_Debug {
 			case 'numbers':
 				$this->display_numbers();
 				break;
+			default:
+				do_action( 'wpo_wcpdf_settings_debug_section_output', $active_section );
+				break;
 		}
+
+		do_action( 'wpo_wcpdf_settings_debug_after_output', $active_section, $sections );
 	}
 	
 	public function display_settings() {
@@ -895,6 +894,15 @@ class Settings_Debug {
 			</tr>
 		</table>
 		<?php
+	}
+
+	private function get_settings_sections(): array {
+		return apply_filters( 'wpo_wcpdf_settings_debug_sections', array(
+			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+			'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
+			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
 	}
 
 }
