@@ -22,13 +22,6 @@ class Settings_Debug {
 	}
 
 	public function __construct()	{
-		$this->sections = array(
-			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
-			'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
-			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
-			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
-		
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 		
@@ -38,7 +31,7 @@ class Settings_Debug {
 
 	public function output( $active_section ) {
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
-		$sections       = apply_filters( 'wpo_wcpdf_settings_debug_sections', $this->sections, $active_section );
+		$sections       = $this->get_settings_sections();
 
 		?>
 		<div class="wcpdf_debug_settings_sections">
@@ -901,6 +894,15 @@ class Settings_Debug {
 			</tr>
 		</table>
 		<?php
+	}
+
+	private function get_settings_sections(): array {
+		return apply_filters( 'wpo_wcpdf_settings_debug_sections', array(
+			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+			'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
+			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
 	}
 
 }
