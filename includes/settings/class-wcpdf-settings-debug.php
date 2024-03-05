@@ -52,7 +52,7 @@ class Settings_Debug {
 			</h2>
 		</div>
 		<?php
-		
+
 		switch ( $active_section ) {
 			case 'settings':
 				$this->display_settings();
@@ -65,6 +65,9 @@ class Settings_Debug {
 				break;
 			case 'numbers':
 				$this->display_numbers();
+				break;
+			default:
+				do_action( 'wpo_wcpdf_settings_debug_section_output', $active_section );
 				break;
 		}
 
