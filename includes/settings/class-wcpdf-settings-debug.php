@@ -64,7 +64,7 @@ class Settings_Debug {
 				break;
 		}
 
-		do_action( 'wpo_wcpdf_settings_debug_after_output', $active_section );
+		do_action( 'wpo_wcpdf_settings_debug_after_output', $active_section, $sections );
 	}
 	
 	public function display_settings() {
