@@ -608,11 +608,9 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Get the tax rates/percentages for an item
-	 *
-	 * @param object $item order item
-	 * @param WC_Abstract_Order $order WC_Order
-	 * @param bool $force_calculation force calculation of rates rather than retrieving from db
-	 *
+	 * @param  object $item order item
+	 * @param  object $order WC_Order
+	 * @param  bool $force_calculation force calculation of rates rather than retrieving from db
 	 * @return string $tax_rates imploded list of tax rates
 	 */
 	public function get_tax_rate( $item, $order, $force_calculation = false ) {
