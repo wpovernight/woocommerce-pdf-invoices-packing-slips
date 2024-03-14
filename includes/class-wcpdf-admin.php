@@ -45,6 +45,7 @@ class Admin {
 		add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
 		
 		if ( $this->invoice_number_search_enabled() ) { // prevents slowing down the orders list search
+			add_filter( 'woocommerce_order_table_search_query_meta_keys', array( $this, 'search_fields' ) ); // HPOS specific filter
 			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
 		}
 
