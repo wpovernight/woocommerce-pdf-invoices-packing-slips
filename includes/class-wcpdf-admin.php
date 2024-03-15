@@ -1378,7 +1378,7 @@ class Admin {
 	}
 
 	public function sort_orders_by_numeric_invoice_number( $query ): void {
-		if ( ! is_admin() || ! $query->is_main_query() || 'shop_order' !== $query->get( 'post_type' ) && '_wcpdf_invoice_number' !== $query->get( 'meta_key' ) ) {
+		if ( ! is_admin() || ! $query->is_main_query() || 'shop_order' !== $query->get( 'post_type' ) || '_wcpdf_invoice_number' !== $query->get( 'meta_key' ) ) {
 			return;
 		}
 
