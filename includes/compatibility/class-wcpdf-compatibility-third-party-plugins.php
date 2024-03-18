@@ -30,7 +30,7 @@ class Third_Party_Plugins {
 				add_filter( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 				add_filter( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			} else {
-				add_filter( 'wc_subscription_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+				add_filter( 'wc_subscriptions_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 				add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			}
 		}
@@ -91,35 +91,41 @@ class Third_Party_Plugins {
 	/**
 	 * Removes documents meta from WooCommerce Subscriptions renewal order
 	 */
-	public function wcs_renewal_order_meta ( $meta, $to_order, $from_order ) {
-		if ( ! empty( $meta ) ) {
-			$documents      = WPO_WCPDF()->documents->get_documents();
-			$documents_meta = array();
-			
-			foreach ( $documents as $document ) {
-				$document_data_keys = apply_filters( 'wpo_wcpdf_delete_document_data_keys', array( 
-					'settings',
-					'date',
-					'date_formatted',
-					'number',
-					'number_data',
-					'notes',
-					'exists',
-				), $document );
-				
-				$document_meta      = array_map( function ( $data_key ) use ( $document ) {
-					return "_wcpdf_{$document->slug}_{$data_key}";
-				}, $document_data_keys );
-				$document_meta[]    = "_wcpdf_formatted_{$document->slug}_number"; // legacy meta key
-				$documents_meta     = array_merge( $documents_meta, $document_meta );
-			}
+	public function wcs_renewal_order_meta( $meta, $to_order, $from_order ) {
+		if ( empty( $meta ) ) {
+			return $meta;
+		}
 
-			foreach ( $meta as $key => $value ) {
-				if ( in_array( $value['meta_key'], $documents_meta ) ) {
-					unset( $meta[$key] );
-				}
+		$documents      = WPO_WCPDF()->documents->get_documents();
+		$documents_meta = array();
+
+		foreach ( $documents as $document ) {
+			$document_data_keys = apply_filters( 'wpo_wcpdf_delete_document_data_keys', array(
+				'settings',
+				'date',
+				'date_formatted',
+				'number',
+				'number_data',
+				'notes',
+				'exists',
+			), $document );
+
+			$document_meta   = array_map( function ( $data_key ) use ( $document ) {
+				return "_wcpdf_{$document->slug}_{$data_key}";
+			}, $document_data_keys );
+			$document_meta[] = "_wcpdf_formatted_{$document->slug}_number"; // legacy meta key
+			$documents_meta  = array_merge( $documents_meta, $document_meta );
+		}
+
+		foreach ( $meta as $key => $value ) {
+			// The old deprecated hook (`wcs_renewal_order_meta`) sends $meta with this data structure: array(... , array( "meta_key":"_wcpdf_invoice_number","meta_value":"158" ), ...)
+			// The new hook (`wc_subscriptions_renewal_order_data`) sends $meta with this data structure: array(... ,"_wcpdf_invoice_number":"158", ...)
+			$meta_key = is_array( $value ) ? ( $value['meta_key'] ?? null ) : $key;
+			if ( in_array( $meta_key, $documents_meta, true ) ) {
+				unset( $meta[ $key ] );
 			}
 		}
+
 		return $meta;
 	}
 
