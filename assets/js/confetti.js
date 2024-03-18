@@ -339,7 +339,7 @@ jQuery(document).ready(function($) {
     }
     var confetti = new confetti.Context('confetti');
     confetti.start();
-    $(window).resize(function() {
-        confetti.resize();
-    });
+    $( window ).on( 'resize', function() {
+        confetti.trigger( 'resize' );
+    } );
 });

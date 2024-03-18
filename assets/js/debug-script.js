@@ -110,7 +110,7 @@ jQuery( function( $ ) {
 	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
 	// danger zone tools
-	$( '#debug-tools .number-tools-btn' ).click( function( event ) {
+	$( document.body ).on( 'click', '#debug-tools .number-tools-btn', function( event ) {
 		event.preventDefault();
 
 		let documentType     = '';
