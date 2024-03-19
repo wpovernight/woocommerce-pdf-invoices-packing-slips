@@ -55,22 +55,43 @@ class Number_Store_List_Table extends \WP_List_Table {
 	 * @return string Column Name
 	 */
 	public function column_default( $item, $column_name ) {
-		switch ( $column_name ) {
-			case 'number' :
-				$value = $item->id;
-				break;
-			case 'type' :
-				$value = isset( $item->document_title ) ? esc_attr( $item->document_title ) : '-';
-				break;
-			case 'calculated_number' :
-				$value = isset( $item->calculated_number ) ? $item->calculated_number : '-';
-				break;
-			case 'date' :
-				$value = $item->date;
-				break;	
-			case 'order' :
-				if ( ! empty( $item->order_id ) ) {
-					$order        = $this->get_base_order( wc_get_order( $item->order_id ) );
+		$order = $this->get_base_order( wc_get_order( $item->order_id ) );
+		$value = '-';
+		
+		if ( ! empty( $order ) ) {
+			switch ( $column_name ) {
+				case 'number':
+					$value = $item->id;
+					break;
+				case 'type':
+					$document_types = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
+					
+					if ( count( $document_types ) > 1 ) {
+						foreach ( $document_types as $key => $doc_type ) {
+							if ( 'invoice' === $doc_type ) {
+								unset( $document_types[ $key ] );
+							}
+						}
+					}
+					
+					$document_type = reset( $document_types );
+					
+					if ( ! empty( $document_type ) ) {
+						$document_slug = str_replace( '-', '_', $document_type );
+						$saved_number  = $order->get_meta( "_wcpdf_{$document_slug}_number", true );
+						
+						if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item->id ) ) {
+							$value = $document_type;
+						}
+					}
+					break;
+				case 'calculated_number':
+					$value = isset( $item->calculated_number ) ? $item->calculated_number : '-';
+					break;
+				case 'date':
+					$value = $item->date;
+					break;	
+				case 'order':
 					$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : $item->order_id;
 					$order_id     = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
 					$url          = sprintf( 'post.php?post=%s&action=edit', $order_id );
@@ -79,30 +100,18 @@ class Number_Store_List_Table extends \WP_List_Table {
 					if ( absint( $order_id ) !== absint( $item->order_id ) ) {
 						$value .= sprintf( ' (%s #%s)', __( 'Refund:', 'woocommerce-pdf-invoices-packing-slips' ), $item->order_id );
 					}
-				} else {
-					$value = '-';
-				}
-				break;
-			case 'order_status' :
-				$order = $this->get_base_order( wc_get_order( $item->order_id ) );
-				
-				if ( ! empty( $order ) ) {
+					break;
+				case 'order_status':
 					$value = sprintf(
 						'<mark class="order-status %s"><span>%s</span></mark>',
 						esc_attr( sanitize_html_class( 'status-' . $order->get_status() ) ),
 						esc_html( wc_get_order_status_name( $order->get_status() ) )
 					);
-				} else {
-					$value = '<strong>' . __( 'Unknown', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>';
-				}
-				break;
-			default:
-				$value = isset( $item->$column_name ) ? $item->$column_name : null;
-				break;
-		}
-		
-		if ( empty( $value ) ) {
-			$value = '-';
+					break;
+				default:
+					$value = isset( $item->$column_name ) ? $item->$column_name : null;
+					break;
+			}
 		}
 		
 		return apply_filters( 'wpo_wcpdf_number_tools_column_content_' . $column_name, $value, $item );
@@ -200,6 +209,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 		$orderby                        = isset( $request['orderby'] ) && in_array( $request['orderby'], array( 'id' ) ) ? sanitize_text_field( $request['orderby'] ) : 'id';
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
 		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
+		$document_titles                = WPO_WCPDF()->documents->get_document_titles();
 		$results                        = array();
 		
 		if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
@@ -241,19 +251,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 					$document_types = array_merge( $document_types, $invoice_number_store_doc_types );
 				}
 				
-				foreach ( $document_types as $doc_type ) {
-					$document = wcpdf_get_document( $doc_type, wc_get_order( $order_id ) );
-					
-					if ( $document && is_callable( array( $document, 'get_number' ) ) ) {
-						$number_obj = $document->get_number();
-						
-						if ( ! empty( $number_obj ) && ! empty( $number_obj->number ) ) {
-							if ( isset( $result['id'] ) && absint( $result['id'] ) === absint( $number_obj->number ) ) {
-								$results[ $key ]->document_title = $document->get_title();
-							}
-						}
-					}
-				}
+				$results[ $key ]->document_types = $document_types;
 			}
 		}
 
