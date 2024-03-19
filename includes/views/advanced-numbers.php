@@ -32,13 +32,37 @@
 			?>
 		</p>
 		<p><?php _e( 'Numbers may have been assigned to orders before this.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+		<hr>
+		<?php
+			if ( ! empty( $as_actions ) ) {
+				echo '<div class="notice notice-info inline"><p>' . __( 'The data fetching process is currently underway. Please consider refreshing the page periodically until it is completed.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
+			} else {
+				echo '<p>' . __( 'Given the potential impact of querying a large volume of orders on site performance, it\'s essential to fetch data each time you need the most current information. This procedure ensures that the site remains efficient and responsive, even when handling substantial order quantities.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+				
+				if ( ! empty( $last_fetch ) ) {
+					echo '<p><strong>' . __( 'Last fetch:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> ' . date_i18n( wcpdf_date_format( null, 'number_data_last_fetch' ), $last_fetch ) . '</p>';
+					
+					if ( $last_fetch > strtotime( 'today 23:59:59' ) ) {
+						echo '<div class="notice notice-warning inline"><p>' . __( 'The displayed data may not be current. To ensure you have the most recent information, you might want to fetch updated data.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
+					}
+				} else {
+					echo '<div class="notice notice-info inline"><p>' . __( 'You haven\'t fetched any data yet. Please consider doing so to view it listed below.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
+				}
+				
+				echo '<p><a href="#" id="fetch-numbers-data" class="button button-secondary" data-table_name="' . $selected_table_name . '">' . __( 'Fetch data', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
+			}
+		?>
+		<hr>
 		<div class="number-search" style="text-align:right;">
 			<input type="number" id="number_search_input" name="number_search_input" min="1" max="4294967295" value="<?php echo isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : ''; ?>">
 			<a href="#" class="button button-primary number-search-button"><?php _e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 			<?php $disabled = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? '' : 'disabled'; ?>
 			<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 		</div>
-		<?php $list_table->display(); ?>
+		<?php			
+			$list_table->prepare_items();
+			$list_table->display();
+		?>
 	<?php else : ?>
 		<div class="notice notice-info inline">
 			<p><?php _e( 'Please select a number store!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>

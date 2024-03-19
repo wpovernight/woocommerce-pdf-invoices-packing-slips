@@ -218,4 +218,31 @@ jQuery( function( $ ) {
 		} );
 	}
 	
+	// fetch numbers data
+	$( '#wpo-wcpdf-settings' ).on( 'click', '#fetch-numbers-data', function( e ) {
+		e.preventDefault();
+		
+		let table_name = $( this ).data( 'table_name' );
+		
+		$.ajax( {
+			url: wpo_wcpdf_debug.ajaxurl,
+			data:     {
+				action:     'wpo_wcpdf_fetch_numbers_data',
+				nonce:      wpo_wcpdf_debug.nonce,
+				table_name: table_name,
+			},
+			type: 'POST',
+			success: function( response ) {
+				if ( response.success ) {
+					window.location.replace( response.data );
+				} else {
+					location.reload();
+				}
+			},
+			error: function( xhr, ajaxOptions, thrownError ) {
+				alert( xhr.status + ':'+ thrownError );
+			}
+		} );
+	} );
+	
 } );

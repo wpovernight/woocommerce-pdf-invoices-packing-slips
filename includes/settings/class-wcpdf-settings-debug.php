@@ -24,9 +24,11 @@ class Settings_Debug {
 	public function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 4 );
 		
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_fetch_numbers_data', array( $this, 'ajax_fetch_numbers_data' ) );
 	}
 
 	public function output( $active_section ) {
@@ -100,9 +102,10 @@ class Settings_Debug {
 		}
 		
 		$document_type = $this->get_document_type_from_store_table_name( esc_attr( $_GET['table_name'] ) );
-
-		$list_table = new Number_Store_List_Table();
-		$list_table->prepare_items();
+		$list_table    = new Number_Store_List_Table();
+		$hook          = 'wpo_wcpdf_number_table_data_fetch';
+		$as_actions    = as_has_scheduled_action( $hook );
+		$last_fetch    = get_option( "wpo_wcpdf_number_data::{$selected_table_name}::last_time" );
 		
 		include( WPO_WCPDF()->plugin_path() . '/includes/views/advanced-numbers.php' );
 	}
@@ -903,6 +906,68 @@ class Settings_Debug {
 			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
 			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
+	}
+	
+	public function fetch_number_table_data( $table_name, $orderby = 'id', $order = 'DESC', $search = false ) {
+		global $wpdb;
+		
+		$chunk_size  = 100;
+		$offset      = 0;
+		$option_name = "wpo_wcpdf_number_data::{$table_name}";
+		$results     = get_option( $option_name, array() );
+		$hook        = 'wpo_wcpdf_number_table_data_fetch';
+
+		while ( true ) {
+			if ( $search ) {
+				$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $search, $search, $chunk_size, $offset );
+			} else {
+				$query = $wpdb->prepare( "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $chunk_size, $offset );
+			}
+
+			$chunk_results = $wpdb->get_results( $query );
+
+			if ( empty( $chunk_results ) ) {
+				as_unschedule_all_actions( $hook );
+				update_option( $option_name . '::last_time', time() );
+				break; // exit the loop if no more results
+			}
+
+			$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
+			
+			update_option( $option_name, $results );
+
+			$offset += $chunk_size; // increase the offset for the next chunk
+			
+			$args = array(
+				'table_name' => $table_name,
+				'orderby'    => $orderby,
+				'order'      => $order,
+				'search'     => $search,
+				'chunk_size' => $chunk_size,
+				'offset'     => $offset,
+			);
+			
+			as_enqueue_async_action( $hook, $args );
+		}
+	}
+	
+	public function ajax_fetch_numbers_data() {
+		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+		
+		$request = stripslashes_deep( $_POST );
+		
+		if ( isset( $request['action'] ) && 'wpo_wcpdf_fetch_numbers_data' === $request['action'] && isset( $request['table_name'] ) ) {
+			$table_name = sanitize_text_field( $request['table_name'] );
+			
+			delete_option( "wpo_wcpdf_number_data::{$table_name}" );
+			delete_option( "wpo_wcpdf_number_data::{$table_name}::last_time" );
+			
+			$this->fetch_number_table_data( $table_name );
+
+			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=id&order=asc&table_name=' . $table_name ) ) ) );
+		} else {
+			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
 	}
 
 }

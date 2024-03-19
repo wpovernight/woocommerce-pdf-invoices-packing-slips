@@ -198,11 +198,8 @@ class Number_Store_List_Table extends \WP_List_Table {
 	 *   Database API
 	 * @return array $numbers All the data for number list table
 	 */
-	public function get_numbers() {
-		global $wpdb;
-		
+	public function get_numbers() {		
 		$request                        = stripslashes_deep( $_GET );
-		$results                        = array();
 		$search                         = $this->get_search( $request );
 		$table_name                     = isset( $request['table_name'] ) && in_array( $request['table_name'], array_keys( WPO_WCPDF()->settings->debug->get_number_store_tables() ) ) ? sanitize_text_field( $request['table_name'] ) : null;
 		$order                          = isset( $request['order'] ) && in_array( $request['order'], array( 'DESC', 'ASC' ) ) ? sanitize_text_field( $request['order'] ) : 'DESC';
@@ -210,10 +207,9 @@ class Number_Store_List_Table extends \WP_List_Table {
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
 		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
 		$document_titles                = WPO_WCPDF()->documents->get_document_titles();
-		$results                        = array();
 		
 		if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
-			return $results; // using `invoice_number`
+			return array(); // using `invoice_number`
 		}
 		
 		// MySQL int range
@@ -226,15 +222,16 @@ class Number_Store_List_Table extends \WP_List_Table {
 		
 		$search = filter_var( $search, FILTER_VALIDATE_INT, $options );
 
-		if ( ! empty( $table_name ) ) {
-			if ( $search ) {
-				$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order}", $search, $search );
-			} else {
-				$query = "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order}";
-			}
-			
-			$results = $wpdb->get_results( $query );
+		if ( empty( $table_name ) ) {
+			return array();
 		}
+		
+		if ( as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' ) ) {
+			return array();
+		}
+		
+		$option_name = "wpo_wcpdf_number_data::{$table_name}";
+		$results     = get_option( $option_name, array() );
 		
 		// add document title or 'Deleted'
 		if ( ! empty( $results ) && ! empty( $document_type ) ) {
