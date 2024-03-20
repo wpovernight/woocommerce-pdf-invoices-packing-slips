@@ -429,6 +429,10 @@ class Settings_Callbacks {
 	public function media_upload( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 
+		if ( isset( $args['translatable'] ) && isset( $args['lang'] ) && true == $args['translatable'] && ! str_ends_with( $id, "[{$args['lang']}]" ) ) {
+			$id .= "[{$args['lang']}]";
+		}
+
 		if( ! empty( $current ) && $attachment = wp_get_attachment_image_src( $current, 'full', false ) ) {
 			$general_settings = get_option('wpo_wcpdf_settings_general');
 			$attachment_src = $attachment[0];
