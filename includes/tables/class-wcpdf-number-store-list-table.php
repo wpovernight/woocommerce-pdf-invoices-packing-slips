@@ -81,9 +81,17 @@ class Number_Store_List_Table extends \WP_List_Table {
 					if ( ! empty( $document_type ) ) {
 						$document_slug = str_replace( '-', '_', $document_type );
 						$saved_number  = $order->get_meta( "_wcpdf_{$document_slug}_number", true );
+						$order_id      = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
 						
 						if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item->id ) ) {
 							$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
+						} elseif ( 'credit-note' === $document_type && absint( $order_id ) !== absint( $item->order_id ) ) {
+							$value = sprintf(
+								'<span class="item-number number-doc-type">%s</span><p style="margin-top:6px;"><span class="item-number number-refund">%s #%s</span></p>',
+								$document_type,
+								__( 'refund:', 'woocommerce-pdf-invoices-packing-slips' ),
+								$item->order_id
+							);
 						}
 					}
 					break;
@@ -98,10 +106,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 					$order_id     = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
 					$url          = sprintf( 'post.php?post=%s&action=edit', $order_id );
 					$value        = sprintf( '<a href="%s">#%s</a>', $url, $order_number );
-					
-					if ( absint( $order_id ) !== absint( $item->order_id ) ) {
-						$value .= sprintf( ' (%s #%s)', __( 'Refund:', 'woocommerce-pdf-invoices-packing-slips' ), $item->order_id );
-					}
 					break;
 				case 'order_status':
 					$value = sprintf(

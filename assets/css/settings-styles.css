@@ -294,6 +294,10 @@ table.wcpdf_documents_settings_list td.title {
 	background-color: #51266b;
 }
 
+.wcpdf_advanced_numbers_choose_table .number-refund {
+	background-color: #2271b1;
+}
+
 .wcpdf_document_settings_document_output_formats {
 	margin-bottom: 30px;
 }
