@@ -181,16 +181,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * Retrieves the search query string
-	 *
-	 * @since 2.0
-	 * @return mixed string If search is present, false otherwise
-	 */
-	public function get_search( $request ) {
-		return ! empty( $request['s'] ) ? absint( $request['s'] ) : false;
-	}
-
-	/**
 	 * Build all the number data
 	 *
 	 * @since 2.0
@@ -200,27 +190,14 @@ class Number_Store_List_Table extends \WP_List_Table {
 	 */
 	public function get_numbers() {		
 		$request                        = stripslashes_deep( $_GET );
-		$search                         = $this->get_search( $request );
-		$table_name                     = isset( $request['table_name'] ) && in_array( $request['table_name'], array_keys( WPO_WCPDF()->settings->debug->get_number_store_tables() ) ) ? sanitize_text_field( $request['table_name'] ) : null;
-		$order                          = isset( $request['order'] ) && in_array( $request['order'], array( 'DESC', 'ASC' ) ) ? sanitize_text_field( $request['order'] ) : 'DESC';
-		$orderby                        = isset( $request['orderby'] ) && in_array( $request['orderby'], array( 'id' ) ) ? sanitize_text_field( $request['orderby'] ) : 'id';
+		extract( WPO_WCPDF()->settings->debug->filter_fetch_request_data( $request ) );
+		
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
 		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
-		$document_titles                = WPO_WCPDF()->documents->get_document_titles();
 		
-		if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
+		if ( empty( $document_type ) || ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) ) {
 			return array(); // using `invoice_number`
 		}
-		
-		// MySQL int range
-		$options = array(
-			'options' => array(
-				'min_range' => 1,
-				'max_range' => 4294967295
-			)
-		);
-		
-		$search = filter_var( $search, FILTER_VALIDATE_INT, $options );
 
 		if ( empty( $table_name ) ) {
 			return array();
@@ -233,8 +210,11 @@ class Number_Store_List_Table extends \WP_List_Table {
 		$option_name = "wpo_wcpdf_number_data::{$table_name}";
 		$results     = get_option( $option_name, array() );
 		
-		// add document title or 'Deleted'
-		if ( ! empty( $results ) && ! empty( $document_type ) ) {
+		if ( ! empty( $results ) ) {
+			if ( isset( $request['s'] ) ) { // we have a search request, return results by search term
+				$results = WPO_WCPDF()->settings->debug->search_number_in_table_data( $table_name, esc_attr( $request['s'] ) );
+			}
+			
 			foreach ( $results as $key => $result ) {
 				$result         = (array) $result;
 				$document_types = array( $document_type );

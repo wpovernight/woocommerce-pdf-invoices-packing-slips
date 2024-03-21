@@ -218,11 +218,24 @@ jQuery( function( $ ) {
 		} );
 	}
 	
-	// fetch numbers data
-	$( '#wpo-wcpdf-settings' ).on( 'click', '#fetch-numbers-data', function( e ) {
+	// fetch/delete number table data
+	$( '#wpo-wcpdf-settings' ).on( 'click', '#fetch-numbers-data, #delete-numbers-data', function( e ) {
 		e.preventDefault();
 		
-		let table_name = $( this ).data( 'table_name' );
+		let $button    = $( this );
+		let table_name = $button.data( 'table_name' );
+		let operation  = $button.data( 'operation' );
+		let order      = get_number_table_url_query_string( 'order' );
+		let orderby    = get_number_table_url_query_string( 'orderby' );
+		
+		// block ui
+		$button.closest( '.wcpdf_advanced_numbers_choose_table' ).block( {
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6
+			}
+		} );
 		
 		$.ajax( {
 			url: wpo_wcpdf_debug.ajaxurl,
@@ -230,6 +243,9 @@ jQuery( function( $ ) {
 				action:     'wpo_wcpdf_fetch_numbers_data',
 				nonce:      wpo_wcpdf_debug.nonce,
 				table_name: table_name,
+				operation:  operation,
+				order:      order,
+				orderby:    orderby,
 			},
 			type: 'POST',
 			success: function( response ) {
@@ -241,8 +257,18 @@ jQuery( function( $ ) {
 			},
 			error: function( xhr, ajaxOptions, thrownError ) {
 				alert( xhr.status + ':'+ thrownError );
+				
+				$button.closest( '.wcpdf_advanced_numbers_choose_table' ).unblock();
 			}
 		} );
+		
 	} );
+	
+	function get_number_table_url_query_string( key ) {
+		let url_string = window.location.href;
+		let url        = new URL( url_string );
+		
+		return url.searchParams.get( key );
+	}
 	
 } );
