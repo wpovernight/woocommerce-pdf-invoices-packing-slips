@@ -279,11 +279,19 @@ table.wcpdf_documents_settings_list td.title {
 	margin-bottom: 20px;
 }
 
-.wcpdf_advanced_numbers_choose_table .gapped {
+.wcpdf_advanced_numbers_choose_table .item-number {
 	background-color: #d63638;
 	color: white;
 	padding: 3px 6px;
 	border-radius: 3px;
+}
+
+.wcpdf_advanced_numbers_choose_table .number-gapped {
+	background-color: #d63638;
+}
+
+.wcpdf_advanced_numbers_choose_table .number-doc-type {
+	background-color: #51266b;
 }
 
 .wcpdf_document_settings_document_output_formats {

@@ -64,7 +64,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 					$value = $item->id;
 					break;
 				case 'type':
-					$value = '<span class="gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
+					$value = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
 					$document_types = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
 					
 					if ( count( $document_types ) > 1 ) {
@@ -82,7 +82,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 						$saved_number  = $order->get_meta( "_wcpdf_{$document_slug}_number", true );
 						
 						if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item->id ) ) {
-							$value = $document_type;
+							$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
 						}
 					}
 					break;
