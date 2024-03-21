@@ -205,10 +205,13 @@ class Number_Store_List_Table extends \WP_List_Table {
 		$results     = get_option( $option_name, array() );
 		
 		if ( ! empty( $results ) ) {
-			if ( isset( $request['s'] ) ) { // we have a search request, return results by search term
+			
+			// we have a search request, return results by search term
+			if ( isset( $request['s'] ) ) {
 				$results = WPO_WCPDF()->settings->debug->search_number_in_table_data( $table_name, esc_attr( $request['s'] ) );
 			}
 			
+			// include document types
 			foreach ( $results as $key => $result ) {
 				$result         = (array) $result;
 				$document_types = array( $document_type );
@@ -224,9 +227,10 @@ class Number_Store_List_Table extends \WP_List_Table {
 				
 				$results[ $key ]->document_types = $document_types;
 			}
+			
+			// maybe sort the data
+			$results = WPO_WCPDF()->settings->debug->sort_number_table_data( $results, $order, $orderby );
 		}
-		
-		$results = WPO_WCPDF()->settings->debug->sort_number_table_data( $results, $order, $orderby );
 
 		return $results;
 	}
