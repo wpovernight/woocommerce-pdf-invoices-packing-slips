@@ -64,6 +64,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 					$value = $item->id;
 					break;
 				case 'type':
+					$value = '<span class="gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
 					$document_types = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
 					
 					if ( count( $document_types ) > 1 ) {
@@ -132,13 +133,6 @@ class Number_Store_List_Table extends \WP_List_Table {
 			'order'             => __( 'Order', 'woocommerce-pdf-invoices-packing-slips' ),
 			'order_status'      => __( 'Order Status', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		
-		$table_name    = isset( $_GET['table_name'] ) ? sanitize_text_field( $_GET['table_name'] ) : null;
-		$document_type = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
-		
-		if ( empty( $document_type ) || 'invoice' !== $document_type ) {
-			unset( $columns['type'] );
-		}
 		
 		if ( ! isset( WPO_WCPDF()->settings->debug_settings['calculate_document_numbers'] ) ) {
 			unset( $columns['calculated_number'] );
