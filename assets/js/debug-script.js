@@ -225,6 +225,7 @@ jQuery( function( $ ) {
 		let $button    = $( this );
 		let table_name = $button.data( 'table_name' );
 		let operation  = $button.data( 'operation' );
+		let limit      = $button.closest( '.number-table-data-info' ).find( '#limit-numbers-data' ).val();
 		let order      = get_number_table_url_query_string( 'order' );
 		let orderby    = get_number_table_url_query_string( 'orderby' );
 		
@@ -246,6 +247,7 @@ jQuery( function( $ ) {
 				operation:  operation,
 				order:      order,
 				orderby:    orderby,
+				limit:      limit,
 			},
 			type: 'POST',
 			success: function( response ) {

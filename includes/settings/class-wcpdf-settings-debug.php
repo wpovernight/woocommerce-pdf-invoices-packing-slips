@@ -24,7 +24,7 @@ class Settings_Debug {
 	public function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
-		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 3 );
+		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 		
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
@@ -907,37 +907,48 @@ class Settings_Debug {
 		) );
 	}
 	
-	public function fetch_number_table_data( $table_name, $orderby = 'id', $order = 'desc' ) {
+	public function fetch_number_table_data( $table_name, $orderby = 'id', $order = 'desc', $limit = 'all', $chunk_size = 100, $offset = 0, $total_fetched = 0 ) {
 		global $wpdb;
 		
-		$chunk_size  = 100;
-		$offset      = 0;
-		$option_name = "wpo_wcpdf_number_data::{$table_name}";
-		$results     = get_option( $option_name, array() );
-		$hook        = 'wpo_wcpdf_number_table_data_fetch';
+		$total_limit   = 'all' !== $limit ? absint( $limit ) : 0;
+		$total_fetched = absint( $total_fetched ?? 0 );
+		$chunk_size    = $total_limit < 100 ? $total_limit : absint( $chunk_size ?? 100 );
+		$offset        = absint( $offset ?? 0 );
+		$option_name   = "wpo_wcpdf_number_data::{$table_name}";
+		$results       = get_option( $option_name, array() );
+		$hook          = 'wpo_wcpdf_number_table_data_fetch';
 
 		while ( true ) {
 			$query         = $wpdb->prepare( "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $chunk_size, $offset );
 			$chunk_results = $wpdb->get_results( $query );
-
+			
 			if ( empty( $chunk_results ) ) {
 				as_unschedule_all_actions( $hook );
 				update_option( $option_name . '::last_time', time() );
 				break; // exit the loop if no more results
 			}
-
-			$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
+			
+			$results        = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
+			$total_fetched += count( $chunk_results );                 // update total fetched rows
 			
 			update_option( $option_name, $results );
-
+			
+			if ( 0 !== $total_limit && $total_fetched >= $total_limit ) {
+				as_unschedule_all_actions( $hook );
+				update_option( $option_name . '::last_time', time() );
+				break; // exit the loop if total limit is reached
+			}
+			
 			$offset += $chunk_size; // increase the offset for the next chunk
 			
 			$args = array(
-				'table_name' => $table_name,
-				'orderby'    => $orderby,
-				'order'      => $order,
-				'chunk_size' => $chunk_size,
-				'offset'     => $offset,
+				'table_name'    => $table_name,
+				'orderby'       => $orderby,
+				'order'         => $order,
+				'limit'         => $limit,
+				'chunk_size'    => $chunk_size,
+				'offset'        => $offset,
+				'total_fetched' => $total_fetched,
 			);
 			
 			as_enqueue_async_action( $hook, $args );
@@ -955,7 +966,7 @@ class Settings_Debug {
 			$this->delete_number_table_data( $table_name ); // both operations require delete
 			
 			if ( 'fetch' === $request['operation'] ) {
-				$this->fetch_number_table_data( $table_name, $orderby, $order );
+				$this->fetch_number_table_data( $table_name, $orderby, $order, $limit );
 			}
 
 			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=' . $orderby . '&order=' . $order . '&table_name=' . $table_name ) ) ) );
@@ -969,6 +980,7 @@ class Settings_Debug {
 			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
 			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
 			'orderby'    => isset( $request_data['orderby'] )    && in_array( strtolower( $request_data['orderby'] ), array( 'id' ) )                       ? sanitize_text_field( strtolower( $request_data['orderby'] ) ) : 'id',
+			'limit'      => isset( $request_data['limit'] )      && is_numeric( $request_data['limit'] ) && $request_data['limit'] > 0                      ? absint( $request_data['limit'] )                              : 'all',
 		);
 	}
 	

@@ -44,6 +44,32 @@
 					<?php endif; ?>
 				<?php endif; ?>
 				<p>
+					<?php
+						$limit_options = array(
+							// value => default
+							'10'   => false,
+							'50'   => false,
+							'100'  => true,
+							'500'  => false,
+							'1000' => false,
+							'all'  => false,
+						);
+					?>
+					<label><?php _e( 'Limit fetch to', 'woocommerce-pdf-invoices-packing-slips' ) ?>:</label>
+					<select id="limit-numbers-data" name="limit-numbers-data">
+						<?php foreach ( $limit_options as $value => $default ) : ?>
+							<?php
+								$name = 'all' !== $value ? sprintf(
+									/* translators: %s: number of items */
+									__( 'The last %s numbers', 'woocommerce-pdf-invoices-packing-slips' ),
+									$value
+								) : __( 'Get all numbers (can be slow)', 'woocommerce-pdf-invoices-packing-slips' );
+							?>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( true, $default ); ?>><?php echo esc_html( $name ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</p>
+				<p>
 					<span><a href="#" id="fetch-numbers-data" class="button button-primary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="fetch"><?php _e( 'Fetch data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
 					<?php if ( $last_fetch ) : ?>
 						<span style="margin-left:6px;"><a href="#" id="delete-numbers-data" class="button button-secondary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="delete"><?php _e( 'Delete cached data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
