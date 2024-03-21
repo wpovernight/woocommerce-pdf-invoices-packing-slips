@@ -38,7 +38,7 @@
 			<?php else : ?>
 				<p><?php _e( 'Given the potential impact of querying a large volume of orders on site performance, it\'s essential to fetch data each time you need the most current information. This procedure ensures that the site remains efficient and responsive, even when handling substantial order quantities.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<?php if ( ! empty( $last_fetch ) ) : ?>
-					<p><strong><?php _e( 'Last fetch', 'woocommerce-pdf-invoices-packing-slips' ); ?>: </strong><?php echo date_i18n( 'Y-m-d H:i:s', $last_fetch ); ?></p>
+					<p><strong><?php _e( 'Last fetch', 'woocommerce-pdf-invoices-packing-slips' ); ?>: </strong><code><?php echo date_i18n( 'Y-m-d H:i:s', $last_fetch ); ?></code></p>
 					<?php if ( $last_fetch > strtotime( 'today 23:59:59' ) ) : ?>
 						<div class="notice notice-warning inline"><p><?php _e( 'The displayed data may not be current. To ensure you have the most recent information, you might want to fetch updated data.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p></div>
 					<?php endif; ?>

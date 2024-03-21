@@ -24,11 +24,11 @@ class Settings_Debug {
 	public function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
-		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 4 );
+		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 3 );
 		
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_fetch_numbers_data', array( $this, 'ajax_fetch_numbers_data' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
 	}
 
 	public function output( $active_section ) {
@@ -103,8 +103,7 @@ class Settings_Debug {
 		
 		$document_type = $this->get_document_type_from_store_table_name( esc_attr( $_GET['table_name'] ) );
 		$list_table    = new Number_Store_List_Table();
-		$hook          = 'wpo_wcpdf_number_table_data_fetch';
-		$as_actions    = as_has_scheduled_action( $hook );
+		$as_actions    = as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' );
 		$last_fetch    = get_option( "wpo_wcpdf_number_data::{$selected_table_name}::last_time" );
 		
 		include( WPO_WCPDF()->plugin_path() . '/includes/views/advanced-numbers.php' );
@@ -908,7 +907,7 @@ class Settings_Debug {
 		) );
 	}
 	
-	public function fetch_number_table_data( $table_name, $orderby = 'id', $order = 'DESC' ) {
+	public function fetch_number_table_data( $table_name, $orderby = 'id', $order = 'desc' ) {
 		global $wpdb;
 		
 		$chunk_size  = 100;
@@ -945,12 +944,12 @@ class Settings_Debug {
 		}
 	}
 	
-	public function ajax_fetch_numbers_data() {
+	public function ajax_numbers_data() {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 		
 		$request = stripslashes_deep( $_POST );
 		
-		if ( isset( $request['action'] ) && 'wpo_wcpdf_fetch_numbers_data' === $request['action'] && isset( $request['operation'] ) && isset( $request['table_name'] ) ) {
+		if ( isset( $request['action'] ) && 'wpo_wcpdf_numbers_data' === $request['action'] && isset( $request['operation'] ) && isset( $request['table_name'] ) ) {
 			extract( $this->filter_fetch_request_data( $request ) );
 			
 			$this->delete_number_table_data( $table_name ); // both operations require delete
@@ -959,7 +958,7 @@ class Settings_Debug {
 				$this->fetch_number_table_data( $table_name, $orderby, $order );
 			}
 
-			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=id&order=asc&table_name=' . $table_name ) ) ) );
+			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=' . $orderby . '&order=' . $order . '&table_name=' . $table_name ) ) ) );
 		} else {
 			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
@@ -967,18 +966,26 @@ class Settings_Debug {
 	
 	public function filter_fetch_request_data( $request_data ) {
 		return array(
-			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )          : null,
-			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) ) : 'desc',
-			'orderby'    => isset( $request_data['orderby'] )    && in_array( $request_data['orderby'], array( 'id' ) )                                     ? sanitize_text_field( $request_data['orderby'] )             : 'id',
+			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
+			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
+			'orderby'    => isset( $request_data['orderby'] )    && in_array( strtolower( $request_data['orderby'] ), array( 'id' ) )                       ? sanitize_text_field( strtolower( $request_data['orderby'] ) ) : 'id',
 		);
 	}
 	
 	public function delete_number_table_data( $table_name ) {
+		if ( empty( $table_name ) ) {
+			return;
+		}
+		
 		delete_option( "wpo_wcpdf_number_data::{$table_name}" );
 		delete_option( "wpo_wcpdf_number_data::{$table_name}::last_time" );
 	}
 	
 	public function search_number_in_table_data( $table_name, $search ) {
+		if ( empty( $table_name ) ) {
+			return array();
+		}
+		
 		$option_name = "wpo_wcpdf_number_data::{$table_name}";
 		$results     = get_option( $option_name, array() );
 		$search      = ! empty( $search ) ? absint( $search ) : false;
@@ -997,29 +1004,31 @@ class Settings_Debug {
 	}
 	
 	public function sort_number_table_data( $results, $order, $orderby ) {
-		if ( ! empty( $results ) ) {
-			usort( $results, function( $a, $b ) use ( $orderby, $order ) {
-				$orderby = esc_attr( $orderby );
-				$order   = esc_attr( $order );
-	
-				switch ( $orderby ) {
-					case 'id':
-						if ( 'desc' === $order ) {
-							return absint( $b->id ) - absint( $a->id );
-						} else {
-							return absint( $a->id ) - absint( $b->id );
-						}
-						break;
-					default:
-						if ( 'desc' === $order ) {
-							return strcmp( $b->$orderby, $a->$orderby );
-						} else {
-							return strcmp( $a->$orderby, $b->$orderby );
-						}
-						break;
-				}
-			} );
+		if ( empty( $results ) ) {
+			return $results;
 		}
+		
+		usort( $results, function( $a, $b ) use ( $orderby, $order ) {
+			$orderby = esc_attr( $orderby );
+			$order   = esc_attr( $order );
+			
+			switch ( $orderby ) {
+				case 'id':
+					if ( 'desc' === $order ) {
+						return absint( $b->id ) - absint( $a->id );
+					} else {
+						return absint( $a->id ) - absint( $b->id );
+					}
+					break;
+				default:
+					if ( 'desc' === $order ) {
+						return strcmp( $b->$orderby, $a->$orderby );
+					} else {
+						return strcmp( $a->$orderby, $b->$orderby );
+					}
+					break;
+			}
+		} );
 	
 		return $results;
 	}

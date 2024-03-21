@@ -64,9 +64,10 @@ class Number_Store_List_Table extends \WP_List_Table {
 					$value = $item->id;
 					break;
 				case 'type':
-					$value = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
+					$value          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
 					$document_types = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
 					
+					// document using invoice number, eg. proforma
 					if ( count( $document_types ) > 1 ) {
 						foreach ( $document_types as $key => $doc_type ) {
 							if ( 'invoice' === $doc_type ) {
