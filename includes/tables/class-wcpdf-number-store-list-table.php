@@ -183,7 +183,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 	 * @return array $numbers All the data for number list table
 	 */
 	public function get_numbers() {		
-		$request                        = stripslashes_deep( $_GET );
+		$request = stripslashes_deep( $_GET );
 		extract( WPO_WCPDF()->settings->debug->filter_fetch_request_data( $request ) );
 		
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
@@ -225,6 +225,8 @@ class Number_Store_List_Table extends \WP_List_Table {
 				$results[ $key ]->document_types = $document_types;
 			}
 		}
+		
+		$results = WPO_WCPDF()->settings->debug->sort_number_table_data( $results, $order, $orderby );
 
 		return $results;
 	}

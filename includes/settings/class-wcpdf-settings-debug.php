@@ -967,9 +967,9 @@ class Settings_Debug {
 	
 	public function filter_fetch_request_data( $request_data ) {
 		return array(
-			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] ) : null,
-			'order'      => isset( $request_data['order'] )      && in_array( $request_data['order'], array( 'DESC', 'ASC' ) )                              ? sanitize_text_field( $request_data['order'] )      : 'DESC',
-			'orderby'    => isset( $request_data['orderby'] )    && in_array( $request_data['orderby'], array( 'id' ) )                                     ? sanitize_text_field( $request_data['orderby'] )    : 'id',
+			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )          : null,
+			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) ) : 'desc',
+			'orderby'    => isset( $request_data['orderby'] )    && in_array( $request_data['orderby'], array( 'id' ) )                                     ? sanitize_text_field( $request_data['orderby'] )             : 'id',
 		);
 	}
 	
@@ -994,6 +994,34 @@ class Settings_Debug {
 		}
 		
 		return $found;
+	}
+	
+	public function sort_number_table_data( $results, $order, $orderby ) {
+		if ( ! empty( $results ) ) {
+			usort( $results, function( $a, $b ) use ( $orderby, $order ) {
+				$orderby = esc_attr( $orderby );
+				$order   = esc_attr( $order );
+	
+				switch ( $orderby ) {
+					case 'id':
+						if ( 'desc' === $order ) {
+							return absint( $b->id ) - absint( $a->id );
+						} else {
+							return absint( $a->id ) - absint( $b->id );
+						}
+						break;
+					default:
+						if ( 'desc' === $order ) {
+							return strcmp( $b->$orderby, $a->$orderby );
+						} else {
+							return strcmp( $a->$orderby, $b->$orderby );
+						}
+						break;
+				}
+			} );
+		}
+	
+		return $results;
 	}
 
 }
