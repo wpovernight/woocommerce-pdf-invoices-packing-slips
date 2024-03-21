@@ -912,7 +912,7 @@ class Settings_Debug {
 		
 		$total_limit   = 'all' !== $limit ? absint( $limit ) : 0;
 		$total_fetched = absint( $total_fetched ?? 0 );
-		$chunk_size    = $total_limit < 100 ? $total_limit : absint( $chunk_size ?? 100 );
+		$chunk_size    = 0 !== $total_limit && $total_limit < 100 ? $total_limit : absint( $chunk_size ?? 100 );
 		$offset        = absint( $offset ?? 0 );
 		$option_name   = "wpo_wcpdf_number_data::{$table_name}";
 		$results       = get_option( $option_name, array() );
