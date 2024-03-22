@@ -26,7 +26,7 @@ class Third_Party_Plugins {
 		if ( class_exists( 'WC_Subscriptions' ) ) {
 			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
 				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
-			} elseif ( version_compare( \WC_Subscriptions::$version, '2.5', '<' ) ) {
+			} elseif ( version_compare( \WC_Subscriptions::$version, '4.7.0', '<' ) ) {
 				add_filter( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 				add_filter( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			} else {
