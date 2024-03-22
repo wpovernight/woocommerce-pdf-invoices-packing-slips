@@ -1,11 +1,11 @@
 === PDF Invoices & Packing Slips for WooCommerce ===
-Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, jhosagid
+Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, mohamadntr
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
-Tested up to: 6.4
+Tested up to: 6.5
 Requires PHP: 7.2
-Stable tag: 3.7.7
+Stable tag: 3.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,30 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.8.0 (2024-03-18) =
+* New: updates composer libraries, specially `php-svg-lib` because of a security issue
+* New: hooks to allow adding new Settings Debug tabs and their contents
+* New: implements date type selector on Danger tools
+* New: filter `wpo_wcpdf_process_danger_zone_tools_date_type`
+* New: bumps WooCommerce min version to 3.3
+* New: function `wcpdf_error_handling()`
+* New: function `wcpdf_get_document_output_format_extension()`
+* New: function `wcpdf_get_document_file()` to get the document file
+* Tweak: adds new filter to include invoice number in HPOS search queries
+* Tweak: replace `date()` with `date_i18n()` on `get_filename()`
+* Tweak: improves number initiation with new function: `init_number()` to `initiate_number()`
+* Tweak: hides the extensions banner temporarily
+* Fix: bug that caused a sorting issue in the orders list
+* Fix: JS error `$(...).pointer` is not a function
+* Fix: danger tools forms not working
+* Fix: bulk document missing slug property
+* Fix: changed default nonce name for wizard dismissal
+* Fix: advanced tools issues like "Generate random temporary directory" not working
+* Fix: number tool pagination
+* Fix: renumbering documents not working
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 8.7 & WordPress 6.5
 
 = 3.7.7 (2024-01-29) =
 * New: extensions license cache system
