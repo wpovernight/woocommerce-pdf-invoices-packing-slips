@@ -34,7 +34,7 @@ class Assets {
 	 * Load styles & scripts
 	 */
 	public function backend_scripts_styles ( $hook ) {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '';
 
 		global $wp_version;
 		if ( WPO_WCPDF()->admin->is_order_page() ) {

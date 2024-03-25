@@ -5,11 +5,12 @@ jQuery(document).ready(function($) {
 		
 	// Uploading files
 	var file_frame;
+	let $settings_wrapper;
 	$( '#wpo-wcpdf-settings, .wpo-wcpdf-setup' ).on( 'click', '.wpo_upload_image_button', function( event ){
 		event.preventDefault();
 
 		// get input wrapper
-		let $settings_wrapper = $(this).parent();
+		$settings_wrapper = $(this).parent();
 	 
 		// If the media frame already exists, reopen it.
 		if ( file_frame ) {
@@ -29,8 +30,17 @@ jQuery(document).ready(function($) {
 		// When an image is selected, run a callback.
 		file_frame.on( 'select', function() {
 			// get target elements
-			let $input   = $settings_wrapper.find( 'input.media-upload-id' );
-			let $preview = $settings_wrapper.find( 'img.media-upload-preview' );
+			let $input   = $( '#wpo-wcpdf-settings' ).find('input.media-upload-id').filter(function() {
+				var parent = $(this).parent('div');
+				return parent.length && parent.attr('aria-hidden') == 'false';
+			});
+			$input = $input.length ? $input : $settings_wrapper.find('input.media-upload-id');
+			
+			let $preview   = $( '#wpo-wcpdf-settings' ).find('img.media-upload-preview').filter(function() {
+				var parent = $(this).parent('div');
+				return parent.length && parent.attr('aria-hidden') == 'false';
+			});
+			$preview = $preview.length ? $preview : $settings_wrapper.find('img.media-upload-preview');
 
 			// We set multiple to false so only get one image from the uploader
 			let attachment = file_frame.state().get( 'selection' ).first().toJSON();
@@ -63,7 +73,11 @@ jQuery(document).ready(function($) {
 					$settings_wrapper.removeAttr( 'style' );
 
 					// custom trigger
-					$input = $settings_wrapper.find( 'input.media-upload-id' );
+					$input   = $( '#wpo-wcpdf-settings' ).find('input.media-upload-id').filter(function() {
+						var parent = $(this).parent('div');
+						return parent.length && parent.attr('aria-hidden') == 'false';
+					});
+					$input = $input.length ? $input : $settings_wrapper.find('input.media-upload-id');
 					$( document.body ).trigger( 'wpo-wcpdf-media-upload-setting-updated', [ $input ] );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
