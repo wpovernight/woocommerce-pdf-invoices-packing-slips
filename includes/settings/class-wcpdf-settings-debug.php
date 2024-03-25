@@ -1065,7 +1065,34 @@ class Settings_Debug {
 			}
 		}
 		
+		// number not found in cached data, try directly
+		if ( empty( $found ) ) {
+			$found = $this->search_number_in_database_table( $table_name, $search );
+		}
+		
 		return $found;
+	}
+	
+	/**
+	 * Search for number in number table database
+	 * 
+	 * @param string $table_name
+	 * @param int    $search
+	 *
+	 * @return array|false
+	 */
+	public function search_number_in_database_table( string $table_name, int $search ) {
+		global $wpdb;
+		
+		if ( empty( $search ) || empty( $table_name ) || ! in_array( $table_name, array_keys( $this->get_number_store_tables() ) ) ) {
+			return array();
+		}
+		
+		$table_name = sanitize_text_field( $table_name );
+		$search     = absint( $search );
+		$query      = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", $search );
+		
+		return $wpdb->get_results( $query );
 	}
 	
 	/**
