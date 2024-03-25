@@ -429,9 +429,8 @@ class Settings_Callbacks {
 	public function media_upload( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 
-		if ( isset( $args['translatable'] ) && isset( $args['lang'] ) && true == $args['translatable'] && ! str_ends_with( $id, "[{$args['lang']}]" ) ) {
-			$id .= "[{$args['lang']}]";
-		}
+		$id           = $this->append_language( $id, $args );
+		$setting_name = $this->append_language( $setting_name, $args );
 
 		if( ! empty( $current ) && $attachment = wp_get_attachment_image_src( $current, 'full', false ) ) {
 			$general_settings = get_option('wpo_wcpdf_settings_general');
@@ -717,6 +716,23 @@ class Settings_Callbacks {
 	
 		// Return the array processing any additional functions filtered by this action.
 		return apply_filters( 'wpo_wcpdf_validate_input', $output, $input );
+	}
+
+	/**
+	 * Appends language at the end of the setting provided, in case the setting is translatable
+	 * and it does not have a language set.
+	 *
+	 * @param string $setting Settings field that needs a language.
+	 * @param array  $args Setting arguments.
+	 *
+	 * @return void
+	 */
+	public function append_language( string $setting, array $args ): string {
+		if ( isset( $args['translatable'] ) && isset( $args['lang'] ) && 'default' !== $args['lang'] && true == $args['translatable'] && ! str_ends_with( $setting, "[{$args['lang']}]" ) ) {
+			return $setting .= "[{$args['lang']}]";
+		} else {
+			return $setting;
+		}
 	}
 }
 

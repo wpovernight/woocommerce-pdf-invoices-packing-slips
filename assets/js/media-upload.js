@@ -6,6 +6,18 @@ jQuery(document).ready(function($) {
 	// Uploading files
 	var file_frame;
 	let $settings_wrapper;
+
+	// This function returns the translatable media input field in case translation is present.
+	// If the translation is not present, the function will return the media input field.
+	let get_media_field = function( self, settings_wrapper ) {
+		let $input = $( '#wpo-wcpdf-settings' ).find( 'input.media-upload-id' ).filter( function() {
+			let parent = self.parent( 'div' );
+			return parent.length && parent.attr( 'aria-hidden' ) == 'false';
+		} );
+		
+		return $input.length ? $input : settings_wrapper.find( 'input.media-upload-id' );
+	};
+
 	$( '#wpo-wcpdf-settings, .wpo-wcpdf-setup' ).on( 'click', '.wpo_upload_image_button', function( event ){
 		event.preventDefault();
 
@@ -30,11 +42,7 @@ jQuery(document).ready(function($) {
 		// When an image is selected, run a callback.
 		file_frame.on( 'select', function() {
 			// get target elements
-			let $input   = $( '#wpo-wcpdf-settings' ).find('input.media-upload-id').filter(function() {
-				var parent = $(this).parent('div');
-				return parent.length && parent.attr('aria-hidden') == 'false';
-			});
-			$input = $input.length ? $input : $settings_wrapper.find('input.media-upload-id');
+			$input = get_media_field( $( this ), $settings_wrapper );
 			
 			let $preview   = $( '#wpo-wcpdf-settings' ).find('img.media-upload-preview').filter(function() {
 				var parent = $(this).parent('div');
@@ -73,11 +81,7 @@ jQuery(document).ready(function($) {
 					$settings_wrapper.removeAttr( 'style' );
 
 					// custom trigger
-					$input   = $( '#wpo-wcpdf-settings' ).find('input.media-upload-id').filter(function() {
-						var parent = $(this).parent('div');
-						return parent.length && parent.attr('aria-hidden') == 'false';
-					});
-					$input = $input.length ? $input : $settings_wrapper.find('input.media-upload-id');
+					$input = get_media_field( $( this ), $settings_wrapper );
 					$( document.body ).trigger( 'wpo-wcpdf-media-upload-setting-updated', [ $input ] );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
@@ -102,5 +106,5 @@ jQuery(document).ready(function($) {
 		$preview.remove();
 		$( this ).remove();
 		$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
-	});		
+	});
 });
