@@ -240,7 +240,7 @@ jQuery( function( $ ) {
 		
 		$.ajax( {
 			url: wpo_wcpdf_debug.ajaxurl,
-			data:     {
+			data: {
 				action:     'wpo_wcpdf_numbers_data',
 				nonce:      wpo_wcpdf_debug.nonce,
 				table_name: table_name,
