@@ -196,16 +196,13 @@ class Number_Store_List_Table extends \WP_List_Table {
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
 		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
 		
-		if ( empty( $document_type ) || ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) ) {
+		if ( 
+			empty( $document_type ) ||
+			( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) ||
+			empty( $table_name ) ||
+			as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' )
+		) {
 			return array(); // using `invoice_number`
-		}
-
-		if ( empty( $table_name ) ) {
-			return array();
-		}
-		
-		if ( as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' ) ) {
-			return array();
 		}
 		
 		$option_name = "wpo_wcpdf_number_data::{$table_name}";

@@ -907,19 +907,46 @@ class Settings_Debug {
 		) );
 	}
 	
-	public function fetch_number_table_data( $table_name, $orderby = 'id', $order = 'desc', $limit = 'all', $chunk_size = 100, $offset = 0, $total_fetched = 0 ) {
+	/**
+	 * Fetch number table data
+	 *
+	 * @param string     $table_name
+	 * @param string     $orderby
+	 * @param string     $order
+	 * @param string|int $limit
+	 * @param integer    $chunk_size
+	 * @param integer    $offset
+	 * @param integer    $total_fetched
+	 * 
+	 * @return void
+	 */
+	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', $limit = 'all', int $chunk_size = 100, int $offset = 0, int $total_fetched = 0 ): void {
 		global $wpdb;
 		
-		$total_limit   = 'all' !== $limit ? absint( $limit ) : 0;
+		$input_data = array(
+			'table_name' => $table_name,
+			'orderby'    => $orderby,
+			'order'      => $order,
+			'limit'      => $limit,
+		);
+		
+		$data = $this->filter_fetch_request_data( $input_data );
+		
+		if ( empty( $data['table_name'] ) ) {
+			return;
+		}
+		
+		$total_limit   = 'all' !== $data['limit'] ? absint( $data['limit'] ) : 0;
 		$total_fetched = absint( $total_fetched ?? 0 );
-		$chunk_size    = 0 !== $total_limit && $total_limit < 100 ? $total_limit : absint( $chunk_size ?? 100 );
+		$chunk_size    = 0 !== $total_limit && $total_limit < $chunk_size ? $total_limit : absint( $chunk_size ?? 100 );
+		$chunk_size    = 0 !== $total_limit ? min( $total_limit - $offset, $chunk_size ) : $chunk_size;
 		$offset        = absint( $offset ?? 0 );
-		$option_name   = "wpo_wcpdf_number_data::{$table_name}";
+		$option_name   = "wpo_wcpdf_number_data::{$data['table_name']}";
 		$results       = get_option( $option_name, array() );
 		$hook          = 'wpo_wcpdf_number_table_data_fetch';
 
 		while ( true ) {
-			$query         = $wpdb->prepare( "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", $chunk_size, $offset );
+			$query         = $wpdb->prepare( "SELECT * FROM {$data['table_name']} ORDER BY {$data['orderby']} {$data['order']} LIMIT %d OFFSET %d", $chunk_size, $offset );
 			$chunk_results = $wpdb->get_results( $query );
 			
 			if ( empty( $chunk_results ) ) {
@@ -942,10 +969,10 @@ class Settings_Debug {
 			$offset += $chunk_size; // increase the offset for the next chunk
 			
 			$args = array(
-				'table_name'    => $table_name,
-				'orderby'       => $orderby,
-				'order'         => $order,
-				'limit'         => $limit,
+				'table_name'    => $data['table_name'],
+				'orderby'       => $data['orderby'],
+				'order'         => $data['order'],
+				'limit'         => $data['limit'],
 				'chunk_size'    => $chunk_size,
 				'offset'        => $offset,
 				'total_fetched' => $total_fetched,
@@ -955,27 +982,39 @@ class Settings_Debug {
 		}
 	}
 	
-	public function ajax_numbers_data() {
+	/**
+	 * Handle AJAX number table data request
+	 *
+	 * @return void
+	 */
+	public function ajax_numbers_data(): void {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 		
 		$request = stripslashes_deep( $_POST );
 		
 		if ( isset( $request['action'] ) && 'wpo_wcpdf_numbers_data' === $request['action'] && isset( $request['operation'] ) && isset( $request['table_name'] ) ) {
-			extract( $this->filter_fetch_request_data( $request ) );
+			$data = $this->filter_fetch_request_data( $request );
 			
-			$this->delete_number_table_data( $table_name ); // both operations require delete
+			$this->delete_number_table_data( $data['table_name'] ); // both operations require delete
 			
 			if ( 'fetch' === $request['operation'] ) {
-				$this->fetch_number_table_data( $table_name, $orderby, $order, $limit );
+				$this->fetch_number_table_data( $data['table_name'], $data['orderby'], $data['order'], $data['limit'] );
 			}
 
-			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=' . $orderby . '&order=' . $order . '&table_name=' . $table_name ) ) ) );
+			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=' . $data['orderby'] . '&order=' . $data['order'] . '&table_name=' . $data['table_name'] ) ) ) );
 		} else {
 			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
 	}
 	
-	public function filter_fetch_request_data( $request_data ) {
+	/**
+	 * Filter data from number table request
+	 * 
+	 * @param array $request_data
+	 *
+	 * @return array
+	 */
+	public function filter_fetch_request_data( array $request_data ): array {
 		return array(
 			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
 			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
@@ -984,7 +1023,14 @@ class Settings_Debug {
 		);
 	}
 	
-	public function delete_number_table_data( $table_name ) {
+	/**
+	 * Delete number table cached data
+	 * 
+	 * @param string $table_name
+	 *
+	 * @return void
+	 */
+	public function delete_number_table_data( string $table_name ): void {
 		if ( empty( $table_name ) ) {
 			return;
 		}
@@ -993,7 +1039,15 @@ class Settings_Debug {
 		delete_option( "wpo_wcpdf_number_data::{$table_name}::last_time" );
 	}
 	
-	public function search_number_in_table_data( $table_name, $search ) {
+	/**
+	 * Search for number in number table data
+	 * 
+	 * @param string $table_name
+	 * @param int    $search
+	 *
+	 * @return array
+	 */
+	public function search_number_in_table_data( string $table_name, int $search ): array {
 		if ( empty( $table_name ) ) {
 			return array();
 		}
@@ -1015,7 +1069,16 @@ class Settings_Debug {
 		return $found;
 	}
 	
-	public function sort_number_table_data( $results, $order, $orderby ) {
+	/**
+	 * Sort number table data
+	 * 
+	 * @param array  $results
+	 * @param string $order
+	 * @param string $orderby
+	 *
+	 * @return array
+	 */
+	public function sort_number_table_data( array $results, string $order, string $orderby ): array {
 		if ( empty( $results ) ) {
 			return $results;
 		}
