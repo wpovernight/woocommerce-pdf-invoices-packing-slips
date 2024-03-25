@@ -938,8 +938,7 @@ class Settings_Debug {
 		
 		$total_limit   = 'all' !== $data['limit'] ? absint( $data['limit'] ) : 0;
 		$total_fetched = absint( $total_fetched ?? 0 );
-		$chunk_size    = 0 !== $total_limit && $total_limit < $chunk_size ? $total_limit : absint( $chunk_size ?? 100 );
-		$chunk_size    = 0 !== $total_limit ? min( $total_limit - $offset, $chunk_size ) : $chunk_size;
+		$chunk_size    = 0 !== $total_limit && $total_limit < $chunk_size ? min( $total_limit - $offset, $chunk_size ) : absint( $chunk_size ?? 100 );
 		$offset        = absint( $offset ?? 0 );
 		$option_name   = "wpo_wcpdf_number_data::{$data['table_name']}";
 		$results       = get_option( $option_name, array() );
