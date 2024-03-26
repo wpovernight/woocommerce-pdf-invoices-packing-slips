@@ -42,7 +42,7 @@ jQuery(document).ready(function($) {
 		// When an image is selected, run a callback.
 		file_frame.on( 'select', function() {
 			// get target elements
-			$input       = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
+			let $input   = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
 			let $preview = get_media_field( $( this ), $settings_wrapper, 'img.media-upload-preview' );
 			
 			// We set multiple to false so only get one image from the uploader

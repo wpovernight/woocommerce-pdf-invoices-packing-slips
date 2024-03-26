@@ -728,7 +728,7 @@ class Settings_Callbacks {
 	 * @return void
 	 */
 	public function append_language( string $setting, array $args ): string {
-		if ( isset( $args['translatable'] ) && isset( $args['lang'] ) && 'default' !== $args['lang'] && true == $args['translatable'] && ! str_ends_with( $setting, "[{$args['lang']}]" ) ) {
+		if ( isset( $args['translatable'] ) && isset( $args['lang'] ) && 'default' !== $args['lang'] && true == $args['translatable'] && ! ( substr( $setting, -strlen( "[{$args['lang']}]" ) ) === "[{$args['lang']}]" ) ) {
 			return $setting .= "[{$args['lang']}]";
 		} else {
 			return $setting;
