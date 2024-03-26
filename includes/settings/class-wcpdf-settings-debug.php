@@ -938,47 +938,46 @@ class Settings_Debug {
 		
 		$total_limit   = 'all' !== $data['limit'] ? absint( $data['limit'] ) : 0;
 		$total_fetched = absint( $total_fetched ?? 0 );
-		$chunk_size    = 0 !== $total_limit && $total_limit < $chunk_size ? min( $total_limit - $offset, $chunk_size ) : absint( $chunk_size ?? 100 );
 		$offset        = absint( $offset ?? 0 );
+		$chunk_size    = 0 !== $total_limit ? min( $total_limit - $offset, $chunk_size ) : absint( $chunk_size ?? 100 );
 		$option_name   = "wpo_wcpdf_number_data::{$data['table_name']}";
 		$results       = get_option( $option_name, array() );
 		$hook          = 'wpo_wcpdf_number_table_data_fetch';
 
-		while ( true ) {
-			$query         = $wpdb->prepare( "SELECT * FROM {$data['table_name']} ORDER BY {$data['orderby']} {$data['order']} LIMIT %d OFFSET %d", $chunk_size, $offset );
-			$chunk_results = $wpdb->get_results( $query );
-			
-			if ( empty( $chunk_results ) ) {
-				as_unschedule_all_actions( $hook );
-				update_option( $option_name . '::last_time', time() );
-				break; // exit the loop if no more results
-			}
-			
-			$results        = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
-			$total_fetched += count( $chunk_results );                 // update total fetched rows
-			
-			update_option( $option_name, $results );
-			
-			if ( 0 !== $total_limit && $total_fetched >= $total_limit ) {
-				as_unschedule_all_actions( $hook );
-				update_option( $option_name . '::last_time', time() );
-				break; // exit the loop if total limit is reached
-			}
-			
-			$offset += $chunk_size; // increase the offset for the next chunk
-			
-			$args = array(
-				'table_name'    => $data['table_name'],
-				'orderby'       => $data['orderby'],
-				'order'         => $data['order'],
-				'limit'         => $data['limit'],
-				'chunk_size'    => $chunk_size,
-				'offset'        => $offset,
-				'total_fetched' => $total_fetched,
-			);
-			
-			as_enqueue_async_action( $hook, $args );
+		// query
+		$query         = $wpdb->prepare( "SELECT * FROM {$data['table_name']} ORDER BY {$data['orderby']} {$data['order']} LIMIT %d OFFSET %d", $chunk_size, $offset );
+		$chunk_results = $wpdb->get_results( $query );
+		
+		if ( empty( $chunk_results ) ) {
+			as_unschedule_all_actions( $hook );
+			update_option( $option_name . '::last_time', time() );
+			return; // exit the loop if no more results
 		}
+		
+		$results        = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
+		$total_fetched += count( $chunk_results );                 // update total fetched rows
+		
+		update_option( $option_name, $results );
+		
+		if ( 0 !== $total_limit && $total_fetched >= $total_limit ) {
+			as_unschedule_all_actions( $hook );
+			update_option( $option_name . '::last_time', time() );
+			return; // exit the loop if total limit is reached
+		}
+		
+		$offset += $chunk_size; // increase the offset for the next chunk
+		
+		$args = array(
+			'table_name'    => $data['table_name'],
+			'orderby'       => $data['orderby'],
+			'order'         => $data['order'],
+			'limit'         => $data['limit'],
+			'chunk_size'    => $chunk_size,
+			'offset'        => $offset,
+			'total_fetched' => $total_fetched,
+		);
+		
+		as_enqueue_async_action( $hook, $args );
 	}
 	
 	/**

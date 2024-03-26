@@ -34,7 +34,18 @@
 		<p><?php _e( 'Numbers may have been assigned to orders before this.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="number-table-data-info">
 			<?php if ( ! empty( $as_actions ) ) : ?>
-				<div class="notice notice-info inline"><p><?php _e( 'The data fetching process is currently underway. Please consider refreshing the page periodically until it is completed.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p></div>
+				<div class="notice notice-info inline">
+					<p>
+						<?php
+							printf(
+								/* translators: %1$s: link to action scheduler, %2$s: closing tag */
+								__( 'The data fetching process is currently underway. Please consider refreshing the page periodically until it is completed or check current status %1$shere%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="' . esc_url( admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=wpo_wcpdf_number_table_data_fetch' ) ) . '">',
+								'</a>'
+							);
+						?>
+					</p>
+				</div>
 			<?php else : ?>
 				<p><?php _e( 'Given the potential impact of querying a large volume of orders on site performance, it\'s essential to fetch data each time you need the most current information. This procedure ensures that the site remains efficient and responsive, even when handling substantial order quantities.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<?php if ( ! empty( $last_fetch ) ) : ?>
@@ -75,21 +86,21 @@
 						<span style="margin-left:6px;"><a href="#" id="delete-numbers-data" class="button button-secondary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="delete"><?php _e( 'Delete cached data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
 					<?php endif; ?>
 				</p>
+				<?php if ( $last_fetch ) : ?>
+					<div class="number-search" style="text-align:right;">
+						<input type="number" id="number_search_input" name="number_search_input" min="1" max="4294967295" value="<?php echo isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : ''; ?>">
+						<a href="#" class="button button-primary number-search-button"><?php _e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						<?php $disabled = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? '' : 'disabled'; ?>
+						<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					</div>
+				<?php $list_table->prepare_items(); $list_table->display(); ?>
+				<?php else : ?>
+					<div class="notice notice-info inline">
+						<p><?php _e( 'Please fetch data to view it listed here.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					</div>
+				<?php endif; ?>
 			<?php endif; ?>
 		</div>
-		<?php if ( $last_fetch ) : ?>
-			<div class="number-search" style="text-align:right;">
-				<input type="number" id="number_search_input" name="number_search_input" min="1" max="4294967295" value="<?php echo isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : ''; ?>">
-				<a href="#" class="button button-primary number-search-button"><?php _e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-				<?php $disabled = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? '' : 'disabled'; ?>
-				<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-			</div>
-		<?php $list_table->prepare_items(); $list_table->display(); ?>
-		<?php else : ?>
-			<div class="notice notice-info inline">
-				<p><?php _e( 'Please fetch data to view it listed here.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-			</div>
-		<?php endif; ?>
 	<?php else : ?>
 		<div class="notice notice-info inline">
 			<p><?php _e( 'Please select a number store!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
