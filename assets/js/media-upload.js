@@ -45,8 +45,6 @@ jQuery(document).ready(function($) {
 			$input       = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
 			let $preview = get_media_field( $( this ), $settings_wrapper, 'img.media-upload-preview' );
 			
-			$preview = $preview.length ? $preview : $settings_wrapper.find('img.media-upload-preview');
-
 			// We set multiple to false so only get one image from the uploader
 			let attachment = file_frame.state().get( 'selection' ).first().toJSON();
 			
