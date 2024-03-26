@@ -9,13 +9,13 @@ jQuery(document).ready(function($) {
 
 	// This function returns the translatable media input field in case translation is present.
 	// If the translation is not present, the function will return the media input field.
-	let get_media_field = function( self, settings_wrapper ) {
-		let $input = $( '#wpo-wcpdf-settings' ).find( 'input.media-upload-id' ).filter( function() {
+	let get_media_field = function( self, settings_wrapper, element_id ) {
+		let $input = $( '#wpo-wcpdf-settings' ).find( element_id ).filter( function() {
 			let parent = self.parent( 'div' );
 			return parent.length && parent.attr( 'aria-hidden' ) == 'false';
 		} );
 		
-		return $input.length ? $input : settings_wrapper.find( 'input.media-upload-id' );
+		return $input.length ? $input : settings_wrapper.find( element_id );
 	};
 
 	$( '#wpo-wcpdf-settings, .wpo-wcpdf-setup' ).on( 'click', '.wpo_upload_image_button', function( event ){
@@ -42,12 +42,9 @@ jQuery(document).ready(function($) {
 		// When an image is selected, run a callback.
 		file_frame.on( 'select', function() {
 			// get target elements
-			$input = get_media_field( $( this ), $settings_wrapper );
+			$input       = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
+			let $preview = get_media_field( $( this ), $settings_wrapper, 'img.media-upload-preview' );
 			
-			let $preview   = $( '#wpo-wcpdf-settings' ).find('img.media-upload-preview').filter(function() {
-				var parent = $(this).parent('div');
-				return parent.length && parent.attr('aria-hidden') == 'false';
-			});
 			$preview = $preview.length ? $preview : $settings_wrapper.find('img.media-upload-preview');
 
 			// We set multiple to false so only get one image from the uploader
@@ -81,7 +78,7 @@ jQuery(document).ready(function($) {
 					$settings_wrapper.removeAttr( 'style' );
 
 					// custom trigger
-					$input = get_media_field( $( this ), $settings_wrapper );
+					$input = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
 					$( document.body ).trigger( 'wpo-wcpdf-media-upload-setting-updated', [ $input ] );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
