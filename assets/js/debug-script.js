@@ -107,7 +107,7 @@ jQuery( function( $ ) {
 	} );
 	
 	// datepicker
-	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
+	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to, #fetch-numbers-data-date-from, #fetch-numbers-data-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
 	// danger zone tools
 	$( '#debug-tools .number-tools-btn' ).click( function( event ) {
@@ -225,7 +225,8 @@ jQuery( function( $ ) {
 		let $button    = $( this );
 		let table_name = $button.data( 'table_name' );
 		let operation  = $button.data( 'operation' );
-		let limit      = $button.closest( '.number-table-data-info' ).find( '#limit-numbers-data' ).val();
+		let from       = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-from' ).val();
+		let to         = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-to' ).val();
 		let order      = get_number_table_url_query_string( 'order' );
 		let orderby    = get_number_table_url_query_string( 'orderby' );
 		
@@ -247,7 +248,8 @@ jQuery( function( $ ) {
 				operation:  operation,
 				order:      order,
 				orderby:    orderby,
-				limit:      limit,
+				from:       from,
+				to:         to,
 			},
 			type: 'POST',
 			success: function( response ) {

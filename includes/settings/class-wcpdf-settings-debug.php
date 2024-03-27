@@ -910,42 +910,41 @@ class Settings_Debug {
 	/**
 	 * Fetch number table data
 	 *
-	 * @param string     $table_name
-	 * @param string     $orderby
-	 * @param string     $order
-	 * @param string|int $limit
-	 * @param integer    $chunk_size
-	 * @param integer    $offset
-	 * @param integer    $total_fetched
+	 * @param string  $table_name
+	 * @param string  $orderby
+	 * @param string  $order
+	 * @param string  $from
+	 * @param string  $to
+	 * @param integer $chunk_size
+	 * @param integer $offset
 	 * 
 	 * @return void
 	 */
-	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', $limit = 'all', int $chunk_size = 100, int $offset = 0, int $total_fetched = 0 ): void {
+	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', string $from = '', string $to = '', int $chunk_size = 100, int $offset = 0 ): void {
 		global $wpdb;
 		
 		$input_data = array(
 			'table_name' => $table_name,
 			'orderby'    => $orderby,
 			'order'      => $order,
-			'limit'      => $limit,
+			'from'       => $from,
+			'to'         => $to,
 		);
 		
 		$data = $this->filter_fetch_request_data( $input_data );
 		
-		if ( empty( $data['table_name'] ) ) {
+		if ( empty( $data['table_name'] ) || empty( $data['from'] || empty( $data['to'] ) ) ) {
 			return;
 		}
 		
-		$total_limit   = 'all' !== $data['limit'] ? absint( $data['limit'] ) : 0;
-		$total_fetched = absint( $total_fetched ?? 0 );
 		$offset        = absint( $offset ?? 0 );
-		$chunk_size    = 0 !== $total_limit ? min( $total_limit - $offset, $chunk_size ) : absint( $chunk_size ?? 100 );
+		$chunk_size    = absint( $chunk_size ?? 100 );
 		$option_name   = "wpo_wcpdf_number_data::{$data['table_name']}";
 		$results       = get_option( $option_name, array() );
 		$hook          = 'wpo_wcpdf_number_table_data_fetch';
 
 		// query
-		$query         = $wpdb->prepare( "SELECT * FROM {$data['table_name']} ORDER BY {$data['orderby']} {$data['order']} LIMIT %d OFFSET %d", $chunk_size, $offset );
+		$query         = $wpdb->prepare( "SELECT * FROM {$data['table_name']} WHERE date BETWEEN %s AND %s ORDER BY {$data['orderby']} {$data['order']} LIMIT %d OFFSET %d", $data['from'], $data['to'], $chunk_size, $offset );
 		$chunk_results = $wpdb->get_results( $query );
 		
 		if ( empty( $chunk_results ) ) {
@@ -954,16 +953,9 @@ class Settings_Debug {
 			return; // exit the loop if no more results
 		}
 		
-		$results        = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
-		$total_fetched += count( $chunk_results );                 // update total fetched rows
+		$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
 		
 		update_option( $option_name, $results );
-		
-		if ( 0 !== $total_limit && $total_fetched >= $total_limit ) {
-			as_unschedule_all_actions( $hook );
-			update_option( $option_name . '::last_time', time() );
-			return; // exit the loop if total limit is reached
-		}
 		
 		$offset += $chunk_size; // increase the offset for the next chunk
 		
@@ -971,10 +963,10 @@ class Settings_Debug {
 			'table_name'    => $data['table_name'],
 			'orderby'       => $data['orderby'],
 			'order'         => $data['order'],
-			'limit'         => $data['limit'],
+			'from'          => $data['from'],
+			'to'            => $data['to'],
 			'chunk_size'    => $chunk_size,
 			'offset'        => $offset,
-			'total_fetched' => $total_fetched,
 		);
 		
 		as_enqueue_async_action( $hook, $args );
@@ -996,7 +988,7 @@ class Settings_Debug {
 			$this->delete_number_table_data( $data['table_name'] ); // both operations require delete
 			
 			if ( 'fetch' === $request['operation'] ) {
-				$this->fetch_number_table_data( $data['table_name'], $data['orderby'], $data['order'], $data['limit'] );
+				$this->fetch_number_table_data( $data['table_name'], $data['orderby'], $data['order'], $data['from'], $data['to'] );
 			}
 
 			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=' . $data['orderby'] . '&order=' . $data['order'] . '&table_name=' . $data['table_name'] ) ) ) );
@@ -1017,7 +1009,8 @@ class Settings_Debug {
 			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
 			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
 			'orderby'    => isset( $request_data['orderby'] )    && in_array( strtolower( $request_data['orderby'] ), array( 'id' ) )                       ? sanitize_text_field( strtolower( $request_data['orderby'] ) ) : 'id',
-			'limit'      => isset( $request_data['limit'] )      && is_numeric( $request_data['limit'] ) && $request_data['limit'] > 0                      ? absint( $request_data['limit'] )                              : 'all',
+			'from'       => isset( $request_data['from'] )       && ! empty( $request_data['from'] )                                                        ? esc_attr( $request_data['from'] ) . ' 00:00:00'               : null,
+			'to'         => isset( $request_data['to'] )         && ! empty( $request_data['to'] )                                                          ? esc_attr( $request_data['to'] ) . ' 23:59:59'                 : null,
 		);
 	}
 	

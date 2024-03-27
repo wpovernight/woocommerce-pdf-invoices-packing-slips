@@ -54,32 +54,24 @@
 						<div class="notice notice-warning inline"><p><?php _e( 'The displayed data may not be current. To ensure you have the most recent information, you might want to fetch updated data.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p></div>
 					<?php endif; ?>
 				<?php endif; ?>
-				<p>
-					<?php
-						$limit_options = array(
-							// value => default
-							'10'   => false,
-							'50'   => false,
-							'100'  => true,
-							'500'  => false,
-							'1000' => false,
-							'all'  => false,
-						);
-					?>
-					<label><?php _e( 'Limit fetch to', 'woocommerce-pdf-invoices-packing-slips' ) ?>:</label>
-					<select id="limit-numbers-data" name="limit-numbers-data">
-						<?php foreach ( $limit_options as $value => $default ) : ?>
-							<?php
-								$name = 'all' !== $value ? sprintf(
-									/* translators: %s: number of items */
-									__( 'The last %s numbers', 'woocommerce-pdf-invoices-packing-slips' ),
-									$value
-								) : __( 'Get all numbers (can be slow)', 'woocommerce-pdf-invoices-packing-slips' );
-							?>
-							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( true, $default ); ?>><?php echo esc_html( $name ); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</p>
+				<table>
+					<tbody>
+						<tr>
+							<td><?php _e( 'From:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td>
+								<input type="text" id="fetch-numbers-data-date-from" name="fetch-numbers-data-date-from" value="<?php echo date( 'Y-m-d' ); ?>" size="10">
+								<span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
+							</td>
+						</tr>
+						<tr>
+							<td><?php _e( 'To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td>
+								<input type="text" id="fetch-numbers-data-date-to" name="fetch-numbers-data-date-to" value="<?php echo date( 'Y-m-d' ); ?>" size="10">
+								<span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 				<p>
 					<span><a href="#" id="fetch-numbers-data" class="button button-primary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="fetch"><?php _e( 'Fetch data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
 					<?php if ( $last_fetch ) : ?>
