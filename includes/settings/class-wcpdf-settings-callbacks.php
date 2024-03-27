@@ -725,7 +725,7 @@ class Settings_Callbacks {
 	 * @param string $setting Settings field that needs a language.
 	 * @param array  $args Setting arguments.
 	 *
-	 * @return void
+	 * @return string
 	 */
 	public function append_language( string $setting, array $args ): string {
 		if ( isset( $args['translatable'] ) && isset( $args['lang'] ) && 'default' !== $args['lang'] && true == $args['translatable'] && ! ( substr( $setting, -strlen( "[{$args['lang']}]" ) ) === "[{$args['lang']}]" ) ) {

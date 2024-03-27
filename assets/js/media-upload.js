@@ -55,8 +55,8 @@ jQuery(document).ready(function($) {
 			}
 			$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
 
-			// dim until we have a response
-			$settings_wrapper.css( 'opacity', '0.25' );
+			// block the UI until we have a response
+			$.blockUI({ message: '' });
 			
 			let data = {
 				security:      $input.data( 'ajax_nonce' ),
@@ -74,13 +74,14 @@ jQuery(document).ready(function($) {
 						$settings_wrapper.html( response.data );
 					}
 					$settings_wrapper.removeAttr( 'style' );
+					$.unblockUI();
 
 					// custom trigger
 					$input = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
 					$( document.body ).trigger( 'wpo-wcpdf-media-upload-setting-updated', [ $input ] );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
-					$settings_wrapper.removeAttr( 'style' );	
+					$.unblockUI();
 				}
 			});
 	
