@@ -950,7 +950,7 @@ class Settings_Debug {
 		if ( empty( $chunk_results ) ) {
 			as_unschedule_all_actions( $hook );
 			update_option( $option_name . '::last_time', time() );
-			return; // exit the loop if no more results
+			return; // exit if no more results
 		}
 		
 		$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
@@ -960,13 +960,13 @@ class Settings_Debug {
 		$offset += $chunk_size; // increase the offset for the next chunk
 		
 		$args = array(
-			'table_name'    => $data['table_name'],
-			'orderby'       => $data['orderby'],
-			'order'         => $data['order'],
-			'from'          => $data['from'],
-			'to'            => $data['to'],
-			'chunk_size'    => $chunk_size,
-			'offset'        => $offset,
+			'table_name' => $data['table_name'],
+			'orderby'    => $data['orderby'],
+			'order'      => $data['order'],
+			'from'       => $data['from'],
+			'to'         => $data['to'],
+			'chunk_size' => $chunk_size,
+			'offset'     => $offset,
 		);
 		
 		as_enqueue_async_action( $hook, $args );
