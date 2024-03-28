@@ -969,6 +969,10 @@ class Settings {
 		$args = $_POST['args'];
 		$args['current'] = absint( $_POST['attachment_id'] );
 
+		if ( isset( $args['translatable'] ) ) {
+			$args['translatable'] = wc_string_to_bool( $args['translatable'] );
+		}
+
 		// get settings HTML
 		ob_start();
 		$this->callbacks->media_upload( $args );

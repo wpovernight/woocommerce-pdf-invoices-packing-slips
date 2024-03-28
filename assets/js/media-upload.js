@@ -5,11 +5,24 @@ jQuery(document).ready(function($) {
 		
 	// Uploading files
 	var file_frame;
+	let $settings_wrapper;
+
+	// This function returns the translatable media input field in case translation is present.
+	// If the translation is not present, the function will return the media input field.
+	let get_media_field = function( self, settings_wrapper, element_id ) {
+		let $input = $( '#wpo-wcpdf-settings' ).find( element_id ).filter( function() {
+			let parent = self.parent( 'div' );
+			return parent.length && parent.attr( 'aria-hidden' ) == 'false';
+		} );
+		
+		return $input.length ? $input : settings_wrapper.find( element_id );
+	};
+
 	$( '#wpo-wcpdf-settings, .wpo-wcpdf-setup' ).on( 'click', '.wpo_upload_image_button', function( event ){
 		event.preventDefault();
 
 		// get input wrapper
-		let $settings_wrapper = $(this).parent();
+		$settings_wrapper = $(this).parent();
 	 
 		// If the media frame already exists, reopen it.
 		if ( file_frame ) {
@@ -29,9 +42,9 @@ jQuery(document).ready(function($) {
 		// When an image is selected, run a callback.
 		file_frame.on( 'select', function() {
 			// get target elements
-			let $input   = $settings_wrapper.find( 'input.media-upload-id' );
-			let $preview = $settings_wrapper.find( 'img.media-upload-preview' );
-
+			let $input   = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
+			let $preview = get_media_field( $( this ), $settings_wrapper, 'img.media-upload-preview' );
+			
 			// We set multiple to false so only get one image from the uploader
 			let attachment = file_frame.state().get( 'selection' ).first().toJSON();
 			
@@ -42,8 +55,8 @@ jQuery(document).ready(function($) {
 			}
 			$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
 
-			// dim until we have a response
-			$settings_wrapper.css( 'opacity', '0.25' );
+			// block the UI until we have a response
+			$.blockUI( { message: '' } );
 			
 			let data = {
 				security:      $input.data( 'ajax_nonce' ),
@@ -61,13 +74,14 @@ jQuery(document).ready(function($) {
 						$settings_wrapper.html( response.data );
 					}
 					$settings_wrapper.removeAttr( 'style' );
+					$.unblockUI();
 
 					// custom trigger
-					$input = $settings_wrapper.find( 'input.media-upload-id' );
+					$input = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
 					$( document.body ).trigger( 'wpo-wcpdf-media-upload-setting-updated', [ $input ] );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
-					$settings_wrapper.removeAttr( 'style' );	
+					$.unblockUI();
 				}
 			});
 	
@@ -88,5 +102,5 @@ jQuery(document).ready(function($) {
 		$preview.remove();
 		$( this ).remove();
 		$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
-	});		
+	});
 });
