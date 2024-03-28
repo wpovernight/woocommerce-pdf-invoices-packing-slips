@@ -56,7 +56,7 @@ jQuery(document).ready(function($) {
 			$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
 
 			// block the UI until we have a response
-			$.blockUI({ message: '' });
+			$.blockUI( { message: '' } );
 			
 			let data = {
 				security:      $input.data( 'ajax_nonce' ),
