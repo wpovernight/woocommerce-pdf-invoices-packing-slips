@@ -1,4 +1,6 @@
-<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
+<?php defined( 'ABSPATH' ) or exit; ?>
+
+<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>" data-is_pending="<?php echo wc_bool_to_string( $in_process ) ?>">
 	<section class="wcpdf-data-fields-section number-date">
 		<!-- Title -->
 		<h4>
@@ -12,24 +14,31 @@
 
 		<!-- Read only -->
 		<div class="read-only">
-			<?php if ( $document->exists() ) : ?>
+			<?php if ( ! $document->exists() && $in_process ) : ?>
+			<p>
+				<?php
+				// translators: document title
+				printf( esc_html__( 'The %s is being generated in the background. Please reload the page to see the document data.', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() );
+				?>
+			</p>
+			<?php elseif ( $document->exists() ) : ?>
 				<?php if ( isset( $data['number'] ) ) : ?>
 					<div class="<?php echo esc_attr( $document->get_type() ); ?>-number">
 						<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
-						<p>
-							<span><strong><?php echo wp_kses_post( $data['number']['label'] ); ?></strong></span>
-							<span><?php echo esc_attr( $data['number']['formatted'] ); ?></span>
-						</p>
+							<p>
+								<span><strong><?php echo wp_kses_post( $data['number']['label'] ); ?></strong></span>
+								<span><?php echo esc_attr( $data['number']['formatted'] ); ?></span>
+							</p>
 						</p>
 					</div>
 				<?php endif; ?>
 				<?php if( isset( $data['date'] ) ) : ?>
 					<div class="<?php echo esc_attr( $document->get_type() ); ?>-date">
 						<p class="form-field form-field-wide">
-						<p>
-							<span><strong><?php echo wp_kses_post( $data['date']['label'] ); ?></strong></span>
-							<span><?php echo esc_attr( $data['date']['formatted'] ); ?></span>
-						</p>
+							<p>
+								<span><strong><?php echo wp_kses_post( $data['date']['label'] ); ?></strong></span>
+								<span><?php echo esc_attr( $data['date']['formatted'] ); ?></span>
+							</p>
 						</p>
 					</div>
 				<?php endif; ?>
@@ -37,20 +46,20 @@
 					<?php if ( isset( $data['display_date'] ) ) : ?>
 						<div class="<?php echo esc_attr( $document->get_type() ); ?>-display-date">
 							<p class="form-field form-field-wide">
-							<p>
-								<span><strong><?php echo wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
-								<span><?php echo esc_attr( $data['display_date']['value'] ); ?></span>
-							</p>
+								<p>
+									<span><strong><?php echo wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
+									<span><?php echo esc_attr( $data['display_date']['value'] ); ?></span>
+								</p>
 							</p>
 						</div>
 					<?php endif; ?>
 					<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
 						<div class="<?php echo esc_attr( $document->get_type() ); ?>-creation-status">
 							<p class="form-field form-field-wide">
-							<p>
-								<span><strong><?php echo wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
-								<span><?php echo esc_attr( $data['creation_trigger']['value'] ); ?></span>
-							</p>
+								<p>
+									<span><strong><?php echo wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
+									<span><?php echo esc_attr( $data['creation_trigger']['value'] ); ?></span>
+								</p>
 							</p>
 						</div>
 					<?php endif; ?>
@@ -62,23 +71,20 @@
 					</div>
 				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
-			<?php else : ?>
-				<?php /* translators: document title */ ?>
-				<?php
-				if ( $this->user_can_manage_document( $document->get_type() ) ) {
+			<?php elseif ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
+				<span class="wpo-wcpdf-set-date-number button">
+					<?php
 					printf(
-						'<span class="wpo-wcpdf-set-date-number button">%s</span>',
-						sprintf(
 						/* translators: document title */
-							esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
-							wp_kses_post( $document->get_title() )
-						)
+						esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
+						wp_kses_post( $document->get_title() )
 					);
-				} else {
-					printf( '<p>%s</p>', esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ) );
-				}
-				?>
-
+					?>
+				</span>
+			<?php else : ?>
+				<p>
+					<?php echo esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</p>
 			<?php endif; ?>
 		</div>
 
@@ -87,7 +93,7 @@
 			<?php if( isset( $data['number'] ) ) : ?>
 				<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
 					<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php echo wp_kses_post( $data['number']['label'] ); ?></label>
-					<input type="text" class="short" style="" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+					<input type="text" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 				</p>
 			<?php endif; ?>
 			<?php if( isset( $data['date'] ) ) : ?>
@@ -99,8 +105,7 @@
 		</div>
 
 		<!-- Document Notes -->
-		<?php if( array_key_exists( 'notes', $data ) ) : ?>
-
+		<?php if ( array_key_exists( 'notes', $data ) && ! $in_process ) : ?>
 			<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
 
 			<!-- Read only -->
@@ -120,7 +125,6 @@
 			</div>
 
 			<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
-
 		<?php endif; ?>
 		<!-- / Document Notes -->
 
