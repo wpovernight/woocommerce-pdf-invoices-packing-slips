@@ -187,5 +187,45 @@ jQuery( function( $ ) {
 			$( '.view-more' ).show();
 		}
 	} );
-	
+
+	// send pending documents with heartbeat to fetch data
+	$( document ).on( 'heartbeat-send', function( e, data ) {
+		let pending_documents = [];
+		$( '.wcpdf-data-fields' ).each( function () {
+			if ( 'yes' === $( this ).attr( 'data-is_pending' ) ) {
+				pending_documents.push( $( this ).data( 'document' ) );
+			}
+		} );
+
+		if ( pending_documents.length > 0 ) {
+			data.wpo_pending_documents = pending_documents;
+		}
+	} );
+
+	// fetch data for pending documents if documents are generated
+	$( document ).on( 'heartbeat-tick', function( e, data ) {
+		if (!data.wpo_ready_documents) {
+			return;
+		}
+
+		$.ajax( {
+			url:     wpo_wcpdf_ajax.ajaxurl,
+			type:    'POST',
+			data:    {
+				action:         'wpo_fetch_document_data',
+				security:       wpo_wcpdf_ajax.nonce,
+				document_types: data.wpo_ready_documents.document_types,
+				order_id:       data.wpo_ready_documents.order_id,
+			},
+			success: function ( response ) {
+				$.each( response.data, function ( key, value ) {
+					$( '.wcpdf-data-fields[data-document="' + key + '"]' ).replaceWith( value );
+				} );
+			},
+			error:   function ( response ) {
+				console.log( response.message );
+			}
+		} );
+	} );
+
 } );

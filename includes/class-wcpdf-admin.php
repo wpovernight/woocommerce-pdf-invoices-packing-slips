@@ -75,6 +75,9 @@ class Admin {
 		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
 		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
 		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
+
+		add_filter( 'heartbeat_received', array( $this, 'handle_heartbeat_received' ), 10, 2 );
+		add_action( 'wp_ajax_wpo_fetch_document_data', array( $this, 'ajax_fetch_pdf_document_data' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -1259,12 +1262,85 @@ class Admin {
      *
 	 * @return bool
 	 */
-	private function is_invoice_number_numeric() {
+	private function is_invoice_number_numeric(): bool {
 		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
 		                    ( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
 		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
+	}
+
+	/**
+	 * Append ready documents to the heartbeat response.
+	 *
+	 * @param array $response
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function handle_heartbeat_received( array $response, array $data ): array {
+		if ( empty( $data['wpo_pending_documents'] ) || empty( $data['wc-refresh-order-lock'] ) ) {
+			return $response;
+		}
+
+		$order_id          = $data['wc-refresh-order-lock'];
+		$pending_documents = $data['wpo_pending_documents'];
+
+		foreach ( $pending_documents as $document_type ) {
+			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
+			if ( $document && $document->exists() ) {
+				$response['wpo_ready_documents']['document_types'][] = $document_type;
+			}
+		}
+
+		if ( ! empty( $response['wpo_ready_documents'] ) ) {
+			$response['wpo_ready_documents']['order_id'] = $order_id;
+		}
+
+		return $response;
+	}
+
+	public function ajax_fetch_pdf_document_data(): void {
+		if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( $_REQUEST['nonce'], 'generate_wpo_wcpdf' ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
+			) );
+		}
+
+		if ( empty( $_REQUEST['document_types'] ) || empty( $_REQUEST['order_id'] ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
+			) );
+		}
+
+		$document_types  = $_REQUEST['document_types'];
+		$data['invoice'] = array(
+			'number'           => array( 'label' => __( 'Invoice number:', 'woocommerce-pdf-invoices-packing-slips' ) ),
+			'date'             => array( 'label' => __( 'Invoice date:', 'woocommerce-pdf-invoices-packing-slips' ) ),
+			'display_date'     => array( 'label' => __( 'Invoice display date:', 'woocommerce-pdf-invoices-packing-slips' ) ),
+			'creation_trigger' => array( 'label' => __( 'Invoice created via:', 'woocommerce-pdf-invoices-packing-slips' ) ),
+			'notes'            => array( 'label' => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ) ),
+		);
+		$data            = apply_filters( 'wpo_wcpdf_ajax_fetch_pdf_document_data_fields', $data, $_REQUEST['order_id'] );
+
+		foreach ( $document_types as $document_type ) {
+			if ( ! in_array( $document_type, array_keys( $data ), true ) ) {
+				continue;
+			}
+
+			$document = wcpdf_get_document( $document_type, wc_get_order( $_REQUEST['order_id'] ) );
+			if ( $document && $document->exists() ) {
+				ob_start();
+				$this->output_number_date_edit_fields( $document, $data[ $document_type ] );
+				$documents_data[ $document_type ] = ob_get_clean();
+			}
+		}
+
+		if ( ! empty ( $documents_data ) ) {
+			wp_send_json_success( $documents_data );
+		}
+
+		wp_die();
 	}
 
 }
