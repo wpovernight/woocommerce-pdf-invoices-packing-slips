@@ -151,6 +151,7 @@ class WPO_WCPDF {
 		// WC OrderUtil compatibility
 		$this->order_util          = \WPO\WC\PDF_Invoices\Compatibility\Order_Util::instance();
 		// Plugin classes
+		$this->sanitizer           = \WPO\WC\PDF_Invoices\Sanitizer::instance();
 		$this->settings            = \WPO\WC\PDF_Invoices\Settings::instance();
 		$this->documents           = \WPO\WC\PDF_Invoices\Documents::instance();
 		$this->main                = \WPO\WC\PDF_Invoices\Main::instance();

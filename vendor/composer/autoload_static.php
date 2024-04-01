@@ -112,6 +112,7 @@ class ComposerStaticInit1066d81cd8f355258ef5165247019e8a
         'WPO\\WC\\PDF_Invoices\\Main' => __DIR__ . '/../..' . '/includes/class-wcpdf-main.php',
         'WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker' => __DIR__ . '/../..' . '/includes/makers/class-pdf-maker.php',
         'WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker' => __DIR__ . '/../..' . '/includes/makers/class-ubl-maker.php',
+        'WPO\\WC\\PDF_Invoices\\Sanitizer' => __DIR__ . '/../..' . '/includes/class-wcpdf-sanitizer.php',
         'WPO\\WC\\PDF_Invoices\\Settings' => __DIR__ . '/../..' . '/includes/class-wcpdf-settings.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-callbacks.php',
         'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug' => __DIR__ . '/../..' . '/includes/settings/class-wcpdf-settings-debug.php',

@@ -27,6 +27,7 @@ return array(
     'WPO\\WC\\PDF_Invoices\\Main' => $baseDir . '/includes/class-wcpdf-main.php',
     'WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker' => $baseDir . '/includes/makers/class-pdf-maker.php',
     'WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker' => $baseDir . '/includes/makers/class-ubl-maker.php',
+    'WPO\\WC\\PDF_Invoices\\Sanitizer' => $baseDir . '/includes/class-wcpdf-sanitizer.php',
     'WPO\\WC\\PDF_Invoices\\Settings' => $baseDir . '/includes/class-wcpdf-settings.php',
     'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks' => $baseDir . '/includes/settings/class-wcpdf-settings-callbacks.php',
     'WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug' => $baseDir . '/includes/settings/class-wcpdf-settings-debug.php',
