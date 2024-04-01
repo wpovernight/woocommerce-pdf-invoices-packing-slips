@@ -167,14 +167,16 @@ class AddressHandler extends UblHandler {
 			);
 
 			foreach ( $vat_meta_keys as $meta_key ) {
-				if ( $vat_number = $this->document->order->get_meta( $meta_key ) ) {
+				$vat_number = WPO_WCPDF()->sanitizer->sanitize_html( $this->document->order->get_meta( $meta_key ) );
+				
+				if ( $vat_number ) {
 					break;
 				}
 			}
 		}
 
-		$customerPartyName = $customerPartyContactName = $this->document->order->get_formatted_billing_full_name();
-		$billing_company   = $this->document->order->get_billing_company();
+		$customerPartyName = $customerPartyContactName = WPO_WCPDF()->sanitizer->sanitize_html( $this->document->order->get_formatted_billing_full_name() );
+		$billing_company   = WPO_WCPDF()->sanitizer->sanitize_html( $this->document->order->get_billing_company() );
 		
 		if ( ! empty( $billing_company ) ) {
 			// $customerPartyName = "{$billing_company} ({$customerPartyName})";
@@ -209,7 +211,7 @@ class AddressHandler extends UblHandler {
 								),
 								array(
 									'name'  => 'cbc:CityName',
-									'value' => $this->document->order->get_billing_city(),
+									'value' => WPO_WCPDF()->sanitizer->sanitize_html( $this->document->order->get_billing_city() ),
 								),
 								array(
 									'name'  => 'cbc:PostalZone',
@@ -266,7 +268,7 @@ class AddressHandler extends UblHandler {
 								),
 								array(
 									'name'  => 'cbc:ElectronicMail',
-									'value' => $this->document->order->get_billing_email(),
+									'value' => WPO_WCPDF()->sanitizer->sanitize_email( $this->document->order->get_billing_email() ),
 								),
 							),
 						),
