@@ -36,7 +36,7 @@ class Sanitizer {
 		$html = $this->run_allow_html_tags( $html, $additional_allowed_html_tags );
 		$html = apply_filters( 'wpo_wcpdf_after_sanitize_html', $html, $exclude_from_sanitize, $exclude_from_strip_tags, $additional_allowed_html_tags, $this );
 		
-		return $html;
+		return esc_html( $html );
 	}
 
 	/**
