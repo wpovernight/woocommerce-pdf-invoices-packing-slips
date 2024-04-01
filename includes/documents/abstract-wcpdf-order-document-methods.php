@@ -98,7 +98,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address ), $this );
+		return apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
 	}
 	public function billing_address() {
 		echo $this->get_billing_address();
@@ -200,7 +200,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address ), $this );
+		return apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
 	}
 	public function shipping_address() {
 		echo $this->get_shipping_address();
@@ -271,11 +271,11 @@ abstract class Order_Document_Methods extends Order_Document {
 			
 			if ( is_array( $custom_field ) ) {
 				$custom_field = array_map( function( $field ) {
-					return wpo_wcpdf_sanitize_html_content( $field, $allow_tags );
+					return wpo_wcpdf_sanitize_html_content( $field, 'custom_field', $allow_tags );
 				}, $custom_field );
 				echo $field_label . implode( '<br>', $custom_field );				
 			} else {
-				$custom_field = wpo_wcpdf_sanitize_html_content( $custom_field, $allow_tags );
+				$custom_field = wpo_wcpdf_sanitize_html_content( $custom_field, 'custom_field', $allow_tags );
 				echo $field_label . nl2br( $custom_field );
 			}
 		}
@@ -420,7 +420,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				$content = isset($note->content) ? $note->content : $note->comment_content; 
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
-					<?php echo wpo_wcpdf_sanitize_html_content( $content ); ?>
+					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); ?>
 				</div>
 				<?php
 			}
@@ -1103,7 +1103,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		
 		$shipping_notes = ! empty( $shipping_notes ) ? __( $shipping_notes, 'woocommerce-pdf-invoices-packing-slips' ) : false;
 		
-		return apply_filters( 'wpo_wcpdf_shipping_notes', wpo_wcpdf_sanitize_html_content( $shipping_notes ), $this );
+		return apply_filters( 'wpo_wcpdf_shipping_notes', wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' ), $this );
 	}
 	public function shipping_notes() {
 		echo $this->get_shipping_notes();

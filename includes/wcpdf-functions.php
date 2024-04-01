@@ -493,11 +493,12 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
  * Sanitize HTML content, prevents XSS attacks.
  *
  * @param string $html
+ * @param string $context
  * @param array  $allowed_tags
  *
  * @return string
  */
-function wpo_wcpdf_sanitize_html_content( string $html, array $allowed_tags = array() ): string {
+function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allowed_tags = array() ): string {
 	if ( empty( $html ) ) {
 		return $html;
 	}
@@ -508,7 +509,7 @@ function wpo_wcpdf_sanitize_html_content( string $html, array $allowed_tags = ar
 		'br'     => array(),
 		'em'     => array(),
 		'strong' => array(),
-	) ), $allowed_tags );
+	), $context ), $allowed_tags );
 
 	$dom = new \DOMDocument();
 	
