@@ -537,6 +537,11 @@ function wpo_wcpdf_sanitize_html_content( string $html, array $allowed_tags = ar
 				}
 			}
 			
+			// no attributes to remove, continue to the next node.
+			if ( empty( $attributes_to_remove ) ) {
+				continue;
+			}
+			
 			// remove the marked attributes.
 			foreach ( $attributes_to_remove as $attr_name ) {
 				$node->removeAttribute( $attr_name );
