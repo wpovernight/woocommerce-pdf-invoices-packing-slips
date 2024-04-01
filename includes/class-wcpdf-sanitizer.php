@@ -168,7 +168,7 @@ class Sanitizer {
 	 *
 	 * @return string
 	 */
-	private function run_sanitizations( string $html, array $exclude_from_sanitize ): string {
+	private function run_sanitizations( string $html, array $exclude_from_sanitize = array() ): string {
 		$sanitizations = apply_filters( 'wpo_wcpdf_valid_html_sanitizations', array( 'script_attributes', 'script_urls', 'css', 'comments' ) );
 	
 		if ( ! empty( $exclude_from_sanitize ) ) {
