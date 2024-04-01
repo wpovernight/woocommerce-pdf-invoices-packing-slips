@@ -47,7 +47,28 @@ class Sanitizer {
 	 * @return string
 	 */
 	public function sanitize_script_attributes( string $text ): string {
-		return preg_replace( '/<[^>]+?on[a-z]+?=[\'"].*?[\'"].*?>/i', '', $text );
+		if ( empty( $text ) ) {
+			return $text;
+		}
+		
+		$dom = new \DOMDocument();
+		
+		libxml_use_internal_errors(true);
+		$dom->loadHTML( $text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		libxml_clear_errors();
+		
+		$xpath = new \DOMXPath( $dom );
+		
+		foreach ( $xpath->query( '//*[@*[starts-with(name(), "on")]]' ) as $node ) {
+			// remove the attribute
+			foreach  ( $node->attributes as $attr ) {
+				if ( strpos( $attr->nodeName, 'on' ) === 0 ) {
+					$node->removeAttribute( $attr->nodeName );
+				}
+			}
+		}
+		
+		return $dom->saveHTML();
 	}
 	
 	/**
