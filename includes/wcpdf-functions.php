@@ -490,6 +490,91 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 }
 
 /**
+ * Sanitize HTML content
+ *
+ * @param string $html
+ * @param array  $allowed_tags
+ *
+ * @return string
+ */
+function wpo_wcpdf_sanitize_html_content( string $html, array $allowed_tags = array() ): string {
+	if ( empty( $html ) ) {
+		return $html;
+	}
+
+	// default allowed tags
+	$allowed_tags = array_merge( apply_filters( 'wpo_wcpdf_sanitize_html_default_allowed_tags', array(
+		// tag   => allowed attributes eg. array( 'href', 'title' ) in case of a <a> tag.
+		'br'     => array(),
+		'em'     => array(),
+		'strong' => array(),
+	) ), $allowed_tags );
+
+	$dom = new \DOMDocument();
+	
+	// clean up special chars
+	if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
+		$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
+	}
+	
+	libxml_use_internal_errors( true ); // suppress malformed HTML errors
+	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	libxml_clear_errors();
+	
+	$xpath = new \DOMXPath( $dom );
+
+	// iterate over all nodes.
+	foreach ( $xpath->query( '//*' ) as $node ) {
+		// check if the node is allowed.
+		if ( array_key_exists( $node->nodeName, $allowed_tags ) ) {
+			// if the node is allowed, check each attribute.
+			$attributes_to_remove = [];
+			
+			foreach ( $node->attributes as $attr ) {
+				if ( ! in_array( $attr->nodeName, $allowed_tags[ $node->nodeName ] ) ) {
+					// mark the attribute for removal if it's not in the list of allowed attributes.
+					$attributes_to_remove[] = $attr->nodeName;
+				}
+			}
+			
+			// remove the marked attributes.
+			foreach ( $attributes_to_remove as $attr_name ) {
+				$node->removeAttribute( $attr_name );
+			}
+			
+		} else {
+			// if the node is not allowed, remove it but try to preserve text.
+			if ( $node->parentNode ) {
+				$fragment = $dom->createDocumentFragment();
+				
+				while ( $node->childNodes->length > 0 ) {
+					$fragment->appendChild( $node->childNodes->item( 0 ) );
+				}
+				
+				if ( $fragment->hasChildNodes() ) {
+					$node->parentNode->replaceChild( $fragment, $node );
+				} else {
+					$node->parentNode->removeChild( $node );
+				}
+			}
+		}
+	}
+
+	return $dom->saveHTML();
+}
+
+/**
+ * Sanitize phone number
+ *
+ * @param string $text
+ *
+ * @return string
+ */
+function wpo_wcpdf_sanitize_phone_number( string $text ): string {
+	return preg_replace( '/[^0-9\+\-\(\)\s\.x]/', '', $text );
+}
+
+/**
  * Safe redirect or die.
  *
  * @param  string          $url
