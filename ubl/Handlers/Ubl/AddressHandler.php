@@ -205,7 +205,7 @@ class AddressHandler extends UblHandler {
 							'value' => array(
 								array(
 									'name'  => 'cbc:StreetName',
-									'value' => $this->document->order->get_billing_address_1(),
+									'value' => WPO_WCPDF()->sanitizer->sanitize_html( $this->document->order->get_billing_address_1() ),
 								),
 								array(
 									'name'  => 'cbc:CityName',
@@ -219,7 +219,7 @@ class AddressHandler extends UblHandler {
 									'name'  => 'cac:AddressLine',
 									'value' => array(
 										'name'  => 'cbc:Line',
-										'value' => $this->document->order->get_billing_address_1() .'<br/>'.$this->document->order->get_billing_address_2(),
+										'value' => WPO_WCPDF()->sanitizer->sanitize_html( $this->document->order->get_billing_address_1() .'<br/>'.$this->document->order->get_billing_address_2() ),
 									),
 								),
 								array(
