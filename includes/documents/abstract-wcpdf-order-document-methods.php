@@ -270,7 +270,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			);
 			
 			if ( is_array( $custom_field ) ) {
-				$custom_field = array_map( function( $field ) {
+				$custom_field = array_map( function( $field ) use ( $allow_tags ) {
 					return wpo_wcpdf_sanitize_html_content( $field, 'custom_field', $allow_tags );
 				}, $custom_field );
 				echo $field_label . implode( '<br>', $custom_field );				

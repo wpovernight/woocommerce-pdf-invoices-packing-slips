@@ -529,25 +529,11 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		// check if the node is allowed.
 		if ( array_key_exists( $node->nodeName, $allowed_tags ) ) {
 			// if the node is allowed, check each attribute.
-			$attributes_to_remove = [];
-			
 			foreach ( $node->attributes as $attr ) {
 				if ( ! in_array( $attr->nodeName, $allowed_tags[ $node->nodeName ] ) ) {
-					// mark the attribute for removal if it's not in the list of allowed attributes.
-					$attributes_to_remove[] = $attr->nodeName;
+					$node->removeAttribute( $attr->nodeName );
 				}
 			}
-			
-			// no attributes to remove, continue to the next node.
-			if ( empty( $attributes_to_remove ) ) {
-				continue;
-			}
-			
-			// remove the marked attributes.
-			foreach ( $attributes_to_remove as $attr_name ) {
-				$node->removeAttribute( $attr_name );
-			}
-			
 		} else {
 			// if the node is not allowed, remove it but try to preserve text.
 			if ( $node->parentNode ) {
