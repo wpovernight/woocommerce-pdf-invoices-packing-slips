@@ -490,7 +490,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 }
 
 /**
- * Sanitize HTML content
+ * Sanitize HTML content, prevents XSS attacks.
  *
  * @param string $html
  * @param array  $allowed_tags
