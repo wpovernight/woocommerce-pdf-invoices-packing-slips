@@ -494,22 +494,50 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
  *
  * @param string $html
  * @param string $context
- * @param array  $allowed_tags
+ * @param array  $allow_tags
  *
  * @return string
  */
-function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allowed_tags = array() ): string {
+function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
 	if ( empty( $html ) ) {
 		return $html;
 	}
 
 	// default allowed tags
-	$allowed_tags = array_merge( apply_filters( 'wpo_wcpdf_sanitize_html_default_allowed_tags', array(
+	$allow_tags = array_merge( apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', array(
 		// tag   => allowed attributes eg. array( 'href', 'title' ) in case of a <a> tag.
 		'br'     => array(),
 		'em'     => array(),
 		'strong' => array(),
-	), $context ), $allowed_tags );
+	), $context ), $allow_tags );
+	
+	$safe_tags = array(
+		'a'          => array( 'href', 'title' ),
+		'b'          => array(),
+		'blockquote' => array(),
+		'br'         => array(),
+		'em'         => array(),
+		'i'          => array(),
+		'li'         => array(),
+		'ol'         => array(),
+		'p'          => array(),
+		'strong'     => array(),
+		'u'          => array(),
+		'ul'         => array(),
+	);
+	
+	$filtered_tags = array();
+
+	foreach ( $allow_tags as $tag => $attributes ) {
+		if ( array_key_exists( $tag, $safe_tags ) ) {
+			$safe_attributes       = array_intersect( $attributes, $safe_tags[ $tag ] );
+			$filtered_tags[ $tag ] = ! empty( $safe_attributes ) ? $safe_attributes : array();
+		}
+	}
+	
+	if ( empty( $filtered_tags ) ) {
+		return $html;
+	}
 
 	$dom = new \DOMDocument();
 	
@@ -527,10 +555,10 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	// iterate over all nodes.
 	foreach ( $xpath->query( '//*' ) as $node ) {
 		// check if the node is allowed.
-		if ( array_key_exists( $node->nodeName, $allowed_tags ) ) {
+		if ( array_key_exists( $node->nodeName, $filtered_tags ) ) {
 			// if the node is allowed, check each attribute.
 			foreach ( $node->attributes as $attr ) {
-				if ( ! in_array( $attr->nodeName, $allowed_tags[ $node->nodeName ] ) ) {
+				if ( ! in_array( $attr->nodeName, $filtered_tags[ $node->nodeName ] ) ) {
 					$node->removeAttribute( $attr->nodeName );
 				}
 			}
