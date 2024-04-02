@@ -512,7 +512,6 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	), $context ), $allow_tags );
 	
 	$safe_tags = array(
-		'a'          => array( 'href', 'title' ),
 		'b'          => array(),
 		'blockquote' => array(),
 		'br'         => array(),
