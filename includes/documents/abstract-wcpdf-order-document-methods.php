@@ -260,8 +260,6 @@ abstract class Order_Document_Methods extends Order_Document {
 
 		if ( ! empty( $custom_field ) || $display_empty ) {
 			$allow_tags = array(
-				'a'    => array( 'href', 'title', 'alt' ),
-				'img'  => array( 'src', 'title', 'alt' ),
 				'p'    => array(),
 				'span' => array(),
 				'ul'   => array(),
