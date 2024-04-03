@@ -204,7 +204,7 @@ jQuery( function( $ ) {
 
 	// fetch data for pending documents if documents are generated
 	$( document ).on( 'heartbeat-tick', function( e, data ) {
-		if (!data.wpo_ready_documents) {
+		if ( ! data.wpo_ready_documents ) {
 			return;
 		}
 
