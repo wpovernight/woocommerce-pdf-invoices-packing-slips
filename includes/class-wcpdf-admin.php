@@ -1307,12 +1307,13 @@ class Admin {
 			) );
 		}
 
-		if ( empty( $_REQUEST['document_types'] ) || empty( $_REQUEST['order_id'] ) ) {
+		if ( empty( $_REQUEST['document_types'] ) || empty( (int) $_REQUEST['order_id'] ) ) {
 			wp_send_json_error( array(
-				'message' => esc_html__( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'message' => esc_html__( 'Incomplete or incorrect request!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
+		$order_id        = (int) $_REQUEST['order_id'];
 		$document_types  = array_map( 'sanitize_text_field', $_REQUEST['document_types'] );
 		$data['invoice'] = array(
 			'number'           => array( 'label' => __( 'Invoice number:', 'woocommerce-pdf-invoices-packing-slips' ) ),
@@ -1321,7 +1322,7 @@ class Admin {
 			'creation_trigger' => array( 'label' => __( 'Invoice created via:', 'woocommerce-pdf-invoices-packing-slips' ) ),
 			'notes'            => array( 'label' => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ) ),
 		);
-		$data            = apply_filters( 'wpo_wcpdf_ajax_fetch_pdf_document_data_fields', $data, $_REQUEST['order_id'] );
+		$data            = apply_filters( 'wpo_wcpdf_ajax_fetch_pdf_document_data_fields', $data, $order_id );
 
 		ob_start();
 		foreach ( $document_types as $document_type ) {
@@ -1329,7 +1330,7 @@ class Admin {
 				continue;
 			}
 
-			$document = wcpdf_get_document( $document_type, wc_get_order( $_REQUEST['order_id'] ) );
+			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 			if ( $document && $document->exists() ) {
 				$this->output_number_date_edit_fields( $document, $data[ $document_type ] );
 				$documents_data[ $document_type ] = ob_get_contents();
@@ -1338,7 +1339,7 @@ class Admin {
 		}
 		ob_end_clean();
 
-		if ( ! empty ( $documents_data ) ) {
+		if ( ! empty( $documents_data ) ) {
 			wp_send_json_success( $documents_data );
 		}
 
