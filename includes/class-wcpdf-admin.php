@@ -1323,6 +1323,7 @@ class Admin {
 		);
 		$data            = apply_filters( 'wpo_wcpdf_ajax_fetch_pdf_document_data_fields', $data, $_REQUEST['order_id'] );
 
+		ob_start();
 		foreach ( $document_types as $document_type ) {
 			if ( ! wpo_wcpdf_is_document_type_valid( $document_type ) || ! in_array( $document_type, array_keys( $data ), true ) ) {
 				continue;
@@ -1330,11 +1331,12 @@ class Admin {
 
 			$document = wcpdf_get_document( $document_type, wc_get_order( $_REQUEST['order_id'] ) );
 			if ( $document && $document->exists() ) {
-				ob_start();
 				$this->output_number_date_edit_fields( $document, $data[ $document_type ] );
-				$documents_data[ $document_type ] = ob_get_clean();
+				$documents_data[ $document_type ] = ob_get_contents();
+				ob_clean();
 			}
 		}
+		ob_end_clean();
 
 		if ( ! empty ( $documents_data ) ) {
 			wp_send_json_success( $documents_data );
