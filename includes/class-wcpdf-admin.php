@@ -71,7 +71,7 @@ class Admin {
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
 
-        // add "invoice number" column to WooCommerce Analytic - Orders
+		// add "invoice number" column to WooCommerce Analytic - Orders
 		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
 		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
 		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
@@ -1257,15 +1257,15 @@ class Admin {
 	}
 
 	/**
-     * Determines if the invoice number is numeric.
-     * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
-     *
+	 * Determines if the invoice number is numeric.
+	 * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
+	 *
 	 * @return bool
 	 */
 	private function is_invoice_number_numeric(): bool {
 		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
-		                    ( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
+							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
 		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
 	}
@@ -1301,8 +1301,8 @@ class Admin {
 	}
 
 	/**
-     * Updates documents data in the "PDF document data" meta box if the generation in the background is finished.
-     *
+	 * Updates documents data in the "PDF document data" meta box if the generation in the background is finished.
+	 *
 	 * @return void
 	 */
 	public function ajax_fetch_pdf_document_data(): void {
