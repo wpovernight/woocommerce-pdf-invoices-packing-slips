@@ -1300,6 +1300,11 @@ class Admin {
 		return $response;
 	}
 
+	/**
+     * Updates documents data in the "PDF document data" meta box if the generation in the background is finished.
+     *
+	 * @return void
+	 */
 	public function ajax_fetch_pdf_document_data(): void {
 		if ( ! isset( $_REQUEST['nonce'] ) || wp_verify_nonce( $_REQUEST['nonce'], 'generate_wpo_wcpdf' ) ) {
 			wp_send_json_error( array(
