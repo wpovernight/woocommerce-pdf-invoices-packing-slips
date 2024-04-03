@@ -1301,9 +1301,9 @@ class Admin {
 	}
 
 	public function ajax_fetch_pdf_document_data(): void {
-		if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( $_REQUEST['nonce'], 'generate_wpo_wcpdf' ) ) {
+		if ( ! isset( $_REQUEST['nonce'] ) || wp_verify_nonce( $_REQUEST['nonce'], 'generate_wpo_wcpdf' ) ) {
 			wp_send_json_error( array(
-				'message' => esc_html__( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'message' => esc_html__( 'Invalid or expired nonce!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
