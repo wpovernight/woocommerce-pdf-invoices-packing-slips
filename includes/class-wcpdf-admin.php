@@ -1348,7 +1348,9 @@ class Admin {
 			wp_send_json_success( $documents_data );
 		}
 
-		wp_die();
+		wp_send_json_error( array(
+			'message' => esc_html__( 'Documents data is empty!', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
 	}
 
 }
