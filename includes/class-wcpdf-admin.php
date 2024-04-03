@@ -1306,7 +1306,7 @@ class Admin {
 	 * @return void
 	 */
 	public function ajax_fetch_pdf_document_data(): void {
-		if ( ! isset( $_REQUEST['nonce'] ) || wp_verify_nonce( $_REQUEST['nonce'], 'generate_wpo_wcpdf' ) ) {
+		if ( ! isset( $_REQUEST['security'] ) || ! wp_verify_nonce( $_REQUEST['security'], 'generate_wpo_wcpdf' ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Invalid or expired nonce!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
@@ -1328,6 +1328,7 @@ class Admin {
 			'notes'            => array( 'label' => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ) ),
 		);
 		$data            = apply_filters( 'wpo_wcpdf_ajax_fetch_pdf_document_data_fields', $data, $order_id );
+		$documents_data  = array();
 
 		ob_start();
 		foreach ( $document_types as $document_type ) {
