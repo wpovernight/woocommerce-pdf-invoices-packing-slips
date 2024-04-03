@@ -1313,7 +1313,7 @@ class Admin {
 			) );
 		}
 
-		$document_types  = $_REQUEST['document_types'];
+		$document_types  = array_map( 'sanitize_text_field', $_REQUEST['document_types'] );
 		$data['invoice'] = array(
 			'number'           => array( 'label' => __( 'Invoice number:', 'woocommerce-pdf-invoices-packing-slips' ) ),
 			'date'             => array( 'label' => __( 'Invoice date:', 'woocommerce-pdf-invoices-packing-slips' ) ),
@@ -1324,7 +1324,7 @@ class Admin {
 		$data            = apply_filters( 'wpo_wcpdf_ajax_fetch_pdf_document_data_fields', $data, $_REQUEST['order_id'] );
 
 		foreach ( $document_types as $document_type ) {
-			if ( ! in_array( $document_type, array_keys( $data ), true ) ) {
+			if ( ! wpo_wcpdf_is_document_type_valid( $document_type ) || ! in_array( $document_type, array_keys( $data ), true ) ) {
 				continue;
 			}
 
