@@ -448,7 +448,7 @@ class Settings_Callbacks {
 				// don't display resolution
 			}
 
-			/*
+			/**
 			 * .webp support can be disabled but still showing the image in settings.
 			 * We should add a notice because this will display an error when redering the PDF using DOMPDF.
 			 */
