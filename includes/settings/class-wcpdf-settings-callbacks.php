@@ -429,7 +429,6 @@ class Settings_Callbacks {
 	public function media_upload( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 
-		$id           = $this->append_language( $id, $args );
 		$setting_name = $this->append_language( $setting_name, $args );
 
 		if( ! empty( $current ) && $attachment = wp_get_attachment_image_src( $current, 'full', false ) ) {

@@ -53,7 +53,8 @@ jQuery(document).ready(function($) {
 			if ( $preview.length ) {
 				$preview.attr( 'src', attachment.url );
 			}
-			$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
+
+			get_media_field( $( this ), $settings_wrapper, '.attachment-resolution, .attachment-resolution-warning' ).remove();
 
 			// Block the media upload UI until we have a response.
 			$settings_wrapper.parent().block( { 
