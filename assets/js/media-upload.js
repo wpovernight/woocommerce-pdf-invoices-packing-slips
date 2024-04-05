@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
 	let get_media_field = function( self, settings_wrapper, element_id ) {
 		let $input = $( '#wpo-wcpdf-settings' ).find( element_id ).filter( function() {
 			let parent = self.parent( 'div' );
-			return parent.length && parent.attr( 'aria-hidden' ) == 'false';
+			return parent.length && parent.attr( 'aria-hidden' ) === 'false';
 		} );
 		
 		return $input.length ? $input : settings_wrapper.find( element_id );
@@ -55,8 +55,14 @@ jQuery(document).ready(function($) {
 			}
 			$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
 
-			// block the UI until we have a response
-			$.blockUI( { message: '' } );
+			// Block the media upload UI until we have a response.
+			$settings_wrapper.parent().block( { 
+				message: null, 
+				overlayCSS: { 
+					background: '#fff', 
+					opacity: 0.6 
+				} 
+			} ); 
 			
 			let data = {
 				security:      $input.data( 'ajax_nonce' ),
@@ -74,14 +80,14 @@ jQuery(document).ready(function($) {
 						$settings_wrapper.html( response.data );
 					}
 					$settings_wrapper.removeAttr( 'style' );
-					$.unblockUI();
+					$settings_wrapper.parent().unblock();
 
 					// custom trigger
 					$input = get_media_field( $( this ), $settings_wrapper, 'input.media-upload-id' );
 					$( document.body ).trigger( 'wpo-wcpdf-media-upload-setting-updated', [ $input ] );	
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
-					$.unblockUI();
+					$settings_wrapper.parent().unblock();
 				}
 			});
 	
