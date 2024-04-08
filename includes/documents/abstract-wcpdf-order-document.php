@@ -818,8 +818,14 @@ abstract class Order_Document {
 	 * Return logo id
 	 */
 	public function get_header_logo_id() {
-		if ( !empty( $this->settings['header_logo'] ) ) {
-			return apply_filters( 'wpo_wcpdf_header_logo_id', $this->settings['header_logo'], $this );
+		if ( ! empty( $this->settings['header_logo'] ) ) {
+			$header_logo_id = $this->get_settings_text( 'header_logo', '', false );
+
+			if ( empty( $header_logo_id ) ) {
+				$header_logo_id = $this->settings['header_logo'];
+			}
+			
+			return apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 		}
 	}
 

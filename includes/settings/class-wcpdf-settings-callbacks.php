@@ -654,6 +654,8 @@ class Settings_Callbacks {
 						$args['current'] = $option[$args['id']][$args['lang']];
 					} elseif (isset( $option[$args['id']]['default'] )) {
 						$args['current'] = $option[$args['id']]['default'];
+					} elseif ( isset( $option[$args['id']] ) ) {
+						$args['current'] = $option[$args['id']];
 					}
 				}
 			} else {
