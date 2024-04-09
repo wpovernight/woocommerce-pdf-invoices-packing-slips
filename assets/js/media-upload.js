@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
 		event.preventDefault();
 
 		// get input wrapper
-		$settings_wrapper = $(this).parent();
+		$settings_wrapper = $( this ).parent();
 	 
 		// If the media frame already exists, reopen it.
 		if ( file_frame ) {
