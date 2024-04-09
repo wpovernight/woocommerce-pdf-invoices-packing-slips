@@ -91,11 +91,11 @@ abstract class Order_Document_Methods extends Order_Document {
 		} else {
 			// regular shop_order
 			$address = $this->order->get_formatted_billing_address();
-			
-			// no address
-			if ( empty( $address ) ) {
-				$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
-			}
+		}
+		
+		// no address
+		if ( empty( $address ) ) {
+			$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
 		return apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
@@ -189,15 +189,15 @@ abstract class Order_Document_Methods extends Order_Document {
 			// regular shop_order
 			$address = $this->order->get_formatted_shipping_address();
 			
-			// no address
-			if ( empty( $address ) ) {
-				// use fallback for packing slip
-				if ( apply_filters( 'wpo_wcpdf_shipping_address_fallback', ( 'packing-slip' === $this->get_type() ), $this ) ) {
-					$address = $this->get_billing_address();
-				} else{
-					$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
-				}
+			// use fallback for packing slip
+			if ( empty( $address ) && apply_filters( 'wpo_wcpdf_shipping_address_fallback', ( 'packing-slip' === $this->get_type() ), $this ) ) {
+				$address = $this->get_billing_address();
 			}
+		}
+		
+		// no address
+		if ( empty( $address ) ) {
+			$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
 		return apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
