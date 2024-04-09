@@ -108,6 +108,6 @@ jQuery(document).ready(function($) {
 		$input.val( '' );
 		$preview.remove();
 		$( this ).remove();
-		$( '.attachment-resolution, .attachment-resolution-warning' ).remove();
+		get_media_field( $( this ), $settings_wrapper, '.attachment-resolution, .attachment-resolution-warning' ).remove();
 	});
 });
