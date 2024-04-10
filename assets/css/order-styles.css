@@ -107,6 +107,7 @@
 
 #wpo_wcpdf-data-input-box .form-field input {
 	width: auto;
+	min-width: 5em;
 }
 
 .wcpdf-data-fields {
