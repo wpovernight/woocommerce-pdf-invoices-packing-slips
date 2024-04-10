@@ -798,14 +798,6 @@ class Admin {
 			return;
 		}
 
-		$independent_documents = apply_filters( 'wpo_wcpdf_document_data_meta_box_independent_documents', array( 'invoice', 'packing-slip' ) );
-
-		// Prevent displaying setup for documents that are not independent and don't exist,
-		// like documents that require an invoice first and don't exist already.
-		if ( ! $document->exists() && ! in_array( $document->get_type(), $independent_documents, true ) ) {
-			return;
-		}
-
 		// Go for default data.
 		if ( empty( $data ) ) {
 			$data = array(
@@ -822,12 +814,19 @@ class Admin {
 			}
 		}
 
-		$data       = apply_filters( 'wpo_wcpdf_document_data_meta_box_document_data_fields', $data, $document );
-		$data       = $this->get_current_values_for_document( $document, $data );
-		$in_process = as_has_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
+		$independent_documents = apply_filters( 'wpo_wcpdf_document_data_meta_box_independent_documents', array( 'invoice', 'packing-slip' ) );
+		$data                  = apply_filters( 'wpo_wcpdf_document_data_meta_box_document_data_fields', $data, $document );
+		$data                  = $this->get_current_values_for_document( $document, $data );
+		$in_process            = as_has_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
 			'document_type' => $document->get_type(),
 			'order_id'      => $document->order->get_id()
 		) );
+
+		// Prevent displaying setup for documents that are not independent, and don't exist, or are not in process,
+		// like documents that require an invoice first and don't exist already or are not in process.
+		if ( ! $in_process && ! $document->exists() && ! in_array( $document->get_type(), $independent_documents, true ) ) {
+			return;
+		}
 
 		// Allow preventing document output.
 		if ( apply_filters( 'wpo_wcpdf_document_data_meta_box_allow_document_output', false, $data, $in_process, $document ) ) {
