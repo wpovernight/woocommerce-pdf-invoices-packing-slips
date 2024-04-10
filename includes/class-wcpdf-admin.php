@@ -1309,11 +1309,14 @@ class Admin {
 	 * @return array
 	 */
 	public function handle_heartbeat_received( array $response, array $data ): array {
-		if ( empty( $data['wpo_wcpdf_pending_documents'] ) || empty( $data['wc-refresh-order-lock'] ) ) {
+		if (
+			empty( $data['wpo_wcpdf_pending_documents'] ) ||
+			( empty( $data['wc-refresh-order-lock'] ) && empty( $data['wp-refresh-post-lock']['post_id'] ) )
+		) {
 			return $response;
 		}
 
-		$order_id          = $data['wc-refresh-order-lock'];
+		$order_id          = $data['wc-refresh-order-lock'] ?? $data['wp-refresh-post-lock']['post_id'];
 		$pending_documents = $data['wpo_wcpdf_pending_documents'];
 
 		foreach ( $pending_documents as $document_type ) {
