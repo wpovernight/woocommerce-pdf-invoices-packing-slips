@@ -179,7 +179,7 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
-		$lock                     = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
+		$lock                     = new Semaphore( $this->lock_name . "_order_{$order_id}_email_{$email_id}", $this->lock_time, $this->lock_loggers, $this->lock_context );
 		
 		if ( $lock->lock( $this->lock_retries ) ) {
 			
