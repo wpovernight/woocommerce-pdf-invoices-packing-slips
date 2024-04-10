@@ -1309,12 +1309,12 @@ class Admin {
 	 * @return array
 	 */
 	public function handle_heartbeat_received( array $response, array $data ): array {
-		if ( empty( $data['wpo_pending_documents'] ) || empty( $data['wc-refresh-order-lock'] ) ) {
+		if ( empty( $data['wpo_wcpdf_pending_documents'] ) || empty( $data['wc-refresh-order-lock'] ) ) {
 			return $response;
 		}
 
 		$order_id          = $data['wc-refresh-order-lock'];
-		$pending_documents = $data['wpo_pending_documents'];
+		$pending_documents = $data['wpo_wcpdf_pending_documents'];
 
 		foreach ( $pending_documents as $document_type ) {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );

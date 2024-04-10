@@ -198,7 +198,7 @@ jQuery( function( $ ) {
 		} );
 
 		if ( pending_documents.length > 0 ) {
-			data.wpo_pending_documents = pending_documents;
+			data.wpo_wcpdf_pending_documents = pending_documents;
 		}
 	} );
 
