@@ -819,10 +819,10 @@ abstract class Order_Document {
 	 */
 	public function get_header_logo_id() {
 		if ( ! empty( $this->settings['header_logo'] ) ) {
-			$header_logo_id = $this->get_settings_text( 'header_logo', '', false );
+			$header_logo_id = intval( $this->get_settings_text( 'header_logo', '', false ) );
 
-			if ( empty( $header_logo_id ) ) {
-				$header_logo_id = $this->settings['header_logo'];
+			if ( 0 === $header_logo_id ) {
+				$header_logo_id = false;
 			}
 			
 			return apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
@@ -888,6 +888,8 @@ abstract class Order_Document {
 		// fallback to first array element if default is not present
 		} elseif( ! empty( $setting ) && is_array( $setting ) ) {
 			$text = reset( $setting );
+		} else {
+			$text = $setting;
 		}
 
 		// fallback to default
