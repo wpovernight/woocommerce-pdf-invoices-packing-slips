@@ -1318,7 +1318,12 @@ class Admin {
 			return $response;
 		}
 
-		$order_id          = $data['wc-refresh-order-lock'] ?? $data['wp-refresh-post-lock']['post_id'];
+		$order_id = $data['wc-refresh-order-lock'] ?? $data['wp-refresh-post-lock']['post_id'];
+
+		if ( empty( $order_id ) ) {
+			return $response;
+		}
+
 		$pending_documents = $data['wpo_wcpdf_pending_documents'];
 
 		foreach ( $pending_documents as $document_type ) {
