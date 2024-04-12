@@ -829,7 +829,7 @@ class Admin {
 		}
 
 		// Allow preventing document output.
-		if ( apply_filters( 'wpo_wcpdf_document_data_meta_box_allow_document_output', false, $data, $in_process, $document ) ) {
+		if ( apply_filters( 'wpo_wcpdf_document_data_meta_box_prevent_document_output', false, $data, $in_process, $document ) ) {
 			return;
 		}
 
