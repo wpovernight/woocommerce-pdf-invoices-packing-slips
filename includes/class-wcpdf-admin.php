@@ -817,7 +817,7 @@ class Admin {
 		$independent_documents = apply_filters( 'wpo_wcpdf_document_data_meta_box_independent_documents', array( 'invoice', 'packing-slip' ) );
 		$data                  = apply_filters( 'wpo_wcpdf_document_data_meta_box_document_data_fields', $data, $document );
 		$data                  = $this->get_current_values_for_document( $document, $data );
-		$in_process            = as_has_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
+		$in_process            = as_next_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
 			'document_type' => $document->get_type(),
 			'order_id'      => $document->order->get_id()
 		) );
