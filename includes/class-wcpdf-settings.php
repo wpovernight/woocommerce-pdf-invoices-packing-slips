@@ -437,9 +437,9 @@ class Settings {
 						}
 						$order_id                              = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : 0;
 						$data[$order_id]['order_number']       = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
-						$data[$order_id]['billing_first_name'] = is_callable( array( $order, 'get_billing_first_name' ) ) ? $order->get_billing_first_name() : '';
-						$data[$order_id]['billing_last_name']  = is_callable( array( $order, 'get_billing_last_name' ) ) ? $order->get_billing_last_name() : '';
-						$data[$order_id]['billing_company']    = is_callable( array( $order, 'get_billing_company' ) ) ? $order->get_billing_company() : '';
+						$data[$order_id]['billing_first_name'] = is_callable( array( $order, 'get_billing_first_name' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_first_name(), 'first_name' ) : '';
+						$data[$order_id]['billing_last_name']  = is_callable( array( $order, 'get_billing_last_name' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_last_name(), 'last_name' ) : '';
+						$data[$order_id]['billing_company']    = is_callable( array( $order, 'get_billing_company' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_company(), 'company' ) : '';
 						$data[$order_id]['date_created']       = is_callable( array( $order, 'get_date_created' ) ) ? '<strong>' . esc_attr__( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . $order->get_date_created()->format( 'Y/m/d' ) : '';
 						$data[$order_id]['total']              = is_callable( array( $order, 'get_total' ) ) ? '<strong>' . esc_attr__( 'Total', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . wc_price( $order->get_total() ) : '';
 					}
