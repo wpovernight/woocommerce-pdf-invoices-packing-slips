@@ -1321,12 +1321,12 @@ class Admin {
 		foreach ( $pending_documents as $document_type ) {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 			if ( $document && $document->exists() ) {
-				$response['wpo_ready_documents']['document_types'][] = $document_type;
+				$response['wpo_wcpdf_ready_documents']['document_types'][] = $document_type;
 			}
 		}
 
-		if ( ! empty( $response['wpo_ready_documents'] ) ) {
-			$response['wpo_ready_documents']['order_id'] = $order_id;
+		if ( ! empty( $response['wpo_wcpdf_ready_documents'] ) ) {
+			$response['wpo_wcpdf_ready_documents']['order_id'] = $order_id;
 		}
 
 		return $response;

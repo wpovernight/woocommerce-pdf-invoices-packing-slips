@@ -204,7 +204,7 @@ jQuery( function( $ ) {
 
 	// fetch data for pending documents if documents are generated
 	$( document ).on( 'heartbeat-tick', function( e, data ) {
-		if ( ! data.wpo_ready_documents ) {
+		if ( ! data.wpo_wcpdf_ready_documents ) {
 			return;
 		}
 
@@ -214,8 +214,8 @@ jQuery( function( $ ) {
 			data:    {
 				action:         'wpo_fetch_document_data',
 				security:       wpo_wcpdf_ajax.nonce,
-				document_types: data.wpo_ready_documents.document_types,
-				order_id:       data.wpo_ready_documents.order_id,
+				document_types: data.wpo_wcpdf_ready_documents.document_types,
+				order_id:       data.wpo_wcpdf_ready_documents.order_id,
 			},
 			success: function ( response ) {
 				$.each( response.data, function ( key, value ) {
