@@ -1,6 +1,6 @@
 <?php defined( 'ABSPATH' ) or exit; ?>
 
-<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>" data-is_pending="<?php echo wc_bool_to_string( $in_process ) ?>">
+<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>" data-document_number="<?php echo esc_attr( $document->get_number() ); ?>" data-is_pending="<?php echo wc_bool_to_string( $in_process ) ?>">
 	<section class="wcpdf-data-fields-section number-date">
 		<!-- Title -->
 		<h4>
