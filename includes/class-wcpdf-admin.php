@@ -784,16 +784,18 @@ class Admin {
 
 		// Go for default data.
 		if ( empty( $data ) ) {
+			$document_title = $document->get_title();
+
 			$data = array(
-				'number' => array( 'label' => __( 'Number', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
-				'date'   => array( 'label' => __( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+				'number' => array( 'label' => $document_title . ' ' . __( 'Number', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+				'date'   => array( 'label' => $document_title . ' ' . __( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
 			);
 
 			if ( 'invoice' === $document->get_type() ) {
 				$data = array_merge( $data, array(
-					'display_date'     => array( 'label' => __( 'Display date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
-					'creation_trigger' => array( 'label' => __( 'Created via', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
-					'notes'            => array( 'label' => __( 'Notes (printed in the invoice)', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+					'display_date'     => array( 'label' => $document_title . ' ' . __( 'Display date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+					'creation_trigger' => array( 'label' => $document_title . ' ' . __( 'Created via', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+					'notes'            => array( 'label' => $document_title . ' ' . __( 'Notes (printed in the invoice)', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
 				) );
 			}
 		}
