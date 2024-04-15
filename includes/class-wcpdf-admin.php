@@ -715,31 +715,15 @@ class Admin {
 
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
 
-		$documents = WPO_WCPDF()->documents->get_documents();
+		$invoice      = wcpdf_get_document( 'invoice', $order );
+		$packing_slip = wcpdf_get_document( 'packing-slip', $order );
 
-		foreach ( $documents as $document ) {
-			// Allow getting documents without invoice.
-			add_filter( 'wpo_wcpdf_allow_document_without_invoice', '__return_true' );
+		if ( $invoice ) {
+			$this->output_number_date_edit_fields( $invoice );
+		}
 
-			$document = wcpdf_get_document( $document->get_type(), $order );
-
-			if ( ! $document ) {
-				continue;
-			}
-
-			// Bulk documents
-			if ( ! empty( $document->order_ids ) ) {
-				foreach ( $document->order_ids as $order_id ) {
-					$sub_order    = wc_get_order( $order_id );
-					$sub_document = wcpdf_get_document( $document->get_type(), $sub_order );
-
-					if ( $sub_document ) {
-						$this->output_number_date_edit_fields( $sub_document );
-					}
-				}
-			} else {
-				$this->output_number_date_edit_fields( $document );
-			}
+		if ( $packing_slip ) {
+			$this->output_number_date_edit_fields( $packing_slip );
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $order, $this );
