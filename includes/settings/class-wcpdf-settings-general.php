@@ -137,12 +137,12 @@ class Settings_General {
 				'callback'	=> 'media_upload',
 				'section'	=> 'general_settings',
 				'args'		=> array(
-					'option_name'					=> $option_name,
-					'id'							=> 'header_logo',
-					'uploader_title'				=> __( 'Select or upload your invoice header/logo', 'woocommerce-pdf-invoices-packing-slips' ),
-					'uploader_button_text'			=> __( 'Set image', 'woocommerce-pdf-invoices-packing-slips' ),
-					'remove_button_text'			=> __( 'Remove image', 'woocommerce-pdf-invoices-packing-slips' ),
-					//'description'					=> __( '...', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'          => $option_name,
+					'id'                   => 'header_logo',
+					'uploader_title'       => __( 'Select or upload your invoice header/logo', 'woocommerce-pdf-invoices-packing-slips' ),
+					'uploader_button_text' => __( 'Set image', 'woocommerce-pdf-invoices-packing-slips' ),
+					'remove_button_text'   => __( 'Remove image', 'woocommerce-pdf-invoices-packing-slips' ),
+					'translatable'         => true,
 				)
 			),
 			array(
