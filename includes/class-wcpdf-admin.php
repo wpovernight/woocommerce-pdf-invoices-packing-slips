@@ -715,15 +715,13 @@ class Admin {
 
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
 
-		$invoice      = wcpdf_get_document( 'invoice', $order );
-		$packing_slip = wcpdf_get_document( 'packing-slip', $order );
+		$document_types = apply_filters( 'wpo_wcpdf_meta_box_documents', array( 'invoice', 'packing-slip' ), $order );
 
-		if ( $invoice ) {
-			$this->output_number_date_edit_fields( $invoice );
-		}
-
-		if ( $packing_slip ) {
-			$this->output_number_date_edit_fields( $packing_slip );
+		foreach ( $document_types as $document_type ) {
+			$document = wcpdf_get_document( $document_type, $order );
+			if ( $document ) {
+				$this->output_number_date_edit_fields( $document );
+			}
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $order, $this );
