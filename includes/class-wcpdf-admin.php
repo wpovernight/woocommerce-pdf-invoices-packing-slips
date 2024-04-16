@@ -1039,7 +1039,7 @@ class Admin {
 
 		try {
 			// Allow getting documents without invoice.
-			add_filter( 'wpo_wcpdf_allow_document_without_invoice', '__return_true' );
+			add_filter( 'wpo_wcpdf_require_invoice_documents', '__return_empty_array()' );
 
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 
