@@ -129,6 +129,12 @@ abstract class Order_Document {
 	protected $data = array();
 
 	/**
+	 * Documents prerequisite
+	 * @var string[]
+	 */
+	protected $prerequisite_documents = array();
+
+	/**
 	 * Init/load the order object.
 	 *
 	 * @param  int|object|WC_Order $order Order to init.
@@ -1526,6 +1532,10 @@ abstract class Order_Document {
 		$due_date_datetime = $due_date_datetime->modify( "+$due_date_days days" );
 
 		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->type, $this );
+	}
+
+	public function get_prerequisite_documents(): array {
+		return apply_filters( 'wpo_wcpdf_prerequisite_documents', $this->prerequisite_documents, $this->type, $this );
 	}
 
 	protected function add_filters( $filters ) {
