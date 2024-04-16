@@ -1045,7 +1045,7 @@ class Admin {
 
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 
-			if( ! empty( $document ) ) {
+			if ( ! empty( $document ) ) {
 
 				// perform legacy date fields replacements check
 				if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
@@ -1304,7 +1304,7 @@ class Admin {
 			return $response;
 		}
 
-		$order_id = $data['wc-refresh-order-lock'] ?? $data['wp-refresh-post-lock']['post_id'];
+		$order_id = (int) ( $data['wc-refresh-order-lock'] ?? $data['wp-refresh-post-lock']['post_id'] );
 
 		if ( empty( $order_id ) ) {
 			return $response;
