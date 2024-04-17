@@ -643,11 +643,11 @@ function WPO_WCPDF_Legacy() {
  * Parse document date for WP_Query.
  * 
  * @param array $wp_query_args
- * @param mixed $query_args
+ * @param array $query_args
  *
  * @return array
  */
-function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, mixed $query_vars ): array {
+function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, array $query_vars ): array {
 	$documents = WPO_WCPDF()->documents->get_documents();
 	
 	if ( ! empty( $documents ) ) {
