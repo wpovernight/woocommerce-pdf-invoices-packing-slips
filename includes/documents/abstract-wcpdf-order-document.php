@@ -535,16 +535,22 @@ abstract class Order_Document {
 			}
 		}
 
-		// Check document prerequisites
+		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
+	}
+
+	public function do_prerequisites_exist(): bool {
+		$prerequisites_exist = true;
+
 		foreach ( $this->get_prerequisite_documents() as $prerequisite_document_type ) {
 			$prerequisite_document = wcpdf_get_document( $prerequisite_document_type, $this->order );
 
 			if ( $prerequisite_document && ! $prerequisite_document->exists() ) {
-				$allowed = false;
+				$prerequisites_exist = false;
+				break;
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
+		return apply_filters( 'wpo_wcpdf_document_do_prerequisites_exist', $prerequisites_exist, $this );
 	}
 
 	public function exists() {

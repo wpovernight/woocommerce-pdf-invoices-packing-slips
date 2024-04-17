@@ -167,7 +167,7 @@ class Frontend {
 
 		$document = wcpdf_get_document( $values['document_type'], $order );
 
-		if ( ! $document || ! $document->is_allowed() ) {
+		if ( ! $document || ! $document->is_allowed() || ! $document->do_prerequisites_exist() ) {
 			return;
 		}
 
