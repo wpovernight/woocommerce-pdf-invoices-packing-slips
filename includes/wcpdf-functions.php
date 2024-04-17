@@ -79,7 +79,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-			if ( ! $document->is_allowed() ) {
+			if ( ! $document || ! $document->is_allowed() ) {
 				return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 			}
 
