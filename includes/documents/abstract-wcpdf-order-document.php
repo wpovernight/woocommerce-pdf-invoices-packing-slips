@@ -516,7 +516,7 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
 	}
 
-	public function is_allowed() {
+	public function is_allowed(): bool {
 		$allowed = true;
 		// Check if document is enabled
 		if ( ! $this->is_enabled() ) {
@@ -533,7 +533,17 @@ abstract class Order_Document {
 			if ( in_array( $status, $disabled_statuses ) ) {
 				$allowed = false;
 			}
-		} 
+		}
+
+		// Check document prerequisites
+		foreach ( $this->get_prerequisite_documents() as $prerequisite_document_type ) {
+			$prerequisite_document = wcpdf_get_document( $prerequisite_document_type, $this->order );
+
+			if ( $prerequisite_document && ! $prerequisite_document->exists() ) {
+				$allowed = false;
+			}
+		}
+
 		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
 	}
 
