@@ -566,7 +566,7 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document = wcpdf_get_document( $document->get_type(), $order );
 
-			if ( ! $document || ! $document->do_prerequisites_exist() ) {
+			if ( ! $document || ( ! $document->exists() && ! $document->do_prerequisites_exist() ) ) {
 				continue;
 			}
 
@@ -718,6 +718,9 @@ class Admin {
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
 
 		$document_types = apply_filters( 'wpo_wcpdf_meta_box_documents', array( 'invoice', 'packing-slip' ), $order );
+
+		// Allow getting documents even if their prerequisite documents doesn't exist.
+		add_filter( 'wpo_wcpdf_document_do_prerequisites_exist', '__return_true' );
 
 		foreach ( $document_types as $document_type ) {
 			$document = wcpdf_get_document( $document_type, $order );
@@ -1040,6 +1043,9 @@ class Admin {
 		);
 
 		try {
+			// Allow getting documents even if their prerequisite documents doesn't exist.
+			add_filter( 'wpo_wcpdf_document_do_prerequisites_exist', '__return_true' );
+
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 
 			if ( ! empty( $document ) ) {
