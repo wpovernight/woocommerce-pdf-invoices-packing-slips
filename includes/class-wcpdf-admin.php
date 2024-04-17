@@ -1038,9 +1038,6 @@ class Admin {
 		);
 
 		try {
-			// Allow getting documents even if their prerequisite documents doesn't exist.
-			add_filter( 'wpo_wcpdf_prerequisite_documents', '__return_empty_array()' );
-
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 
 			if ( ! empty( $document ) ) {
