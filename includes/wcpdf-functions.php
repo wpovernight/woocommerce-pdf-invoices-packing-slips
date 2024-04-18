@@ -46,7 +46,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, $order->get_id() );
 				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-				if ( ! $document || ! $document->is_allowed() || ! $document->do_prerequisites_exist() ) {
+				if ( ! $document || ! $document->is_allowed() ) {
 					return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 				}
 
@@ -79,7 +79,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-			if ( ! $document || ! $document->is_allowed() || ! $document->do_prerequisites_exist() ) {
+			if ( ! $document || ! $document->is_allowed() ) {
 				return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 			}
 

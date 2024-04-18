@@ -566,7 +566,7 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document = wcpdf_get_document( $document->get_type(), $order );
 
-			if ( ! $document || ( ! $document->exists() && ! $document->do_prerequisites_exist() ) ) {
+			if ( ! $document ) {
 				continue;
 			}
 
@@ -1044,7 +1044,7 @@ class Admin {
 
 		try {
 			// Allow getting documents even if their prerequisite documents doesn't exist.
-			add_filter( 'wpo_wcpdf_document_do_prerequisites_exist', '__return_true' );
+			add_filter( 'wpo_wcpdf_bypass_prerequisites_restriction', '__return_true' );
 
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 

@@ -516,7 +516,7 @@ abstract class Order_Document {
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
 	}
 
-	public function is_allowed(): bool {
+	public function is_allowed( $context = ''): bool {
 		$allowed = true;
 		// Check if document is enabled
 		if ( ! $this->is_enabled() ) {
@@ -535,22 +535,18 @@ abstract class Order_Document {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
-	}
+		// Check document prerequisites
+		if ( false === apply_filters( 'wpo_wcpdf_bypass_prerequisites_restriction', false, $context, $this ) && ! empty( $this->get_prerequisite_documents() ) ) {
+			foreach ( $this->get_prerequisite_documents() as $prerequisite_document_type ) {
+				$prerequisite_document = wcpdf_get_document( $prerequisite_document_type, $this->order );
 
-	public function do_prerequisites_exist(): bool {
-		$prerequisites_exist = true;
-
-		foreach ( $this->get_prerequisite_documents() as $prerequisite_document_type ) {
-			$prerequisite_document = wcpdf_get_document( $prerequisite_document_type, $this->order );
-
-			if ( $prerequisite_document && ! $prerequisite_document->exists() ) {
-				$prerequisites_exist = false;
-				break;
+				if ( $prerequisite_document && ! $prerequisite_document->exists() ) {
+					$allowed = false;
+				}
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_do_prerequisites_exist', $prerequisites_exist, $this );
+		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
 	}
 
 	public function exists() {
