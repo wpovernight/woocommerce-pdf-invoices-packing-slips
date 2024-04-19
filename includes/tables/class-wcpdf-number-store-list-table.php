@@ -80,7 +80,8 @@ class Number_Store_List_Table extends \WP_List_Table {
 					
 					if ( ! empty( $document_type ) ) {
 						$document_slug = str_replace( '-', '_', $document_type );
-						$saved_number  = $order->get_meta( "_wcpdf_{$document_slug}_number", true );
+						$number_data   = $order->get_meta( "_wcpdf_{$document_slug}_number_data", true );
+						$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
 						$order_id      = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
 						
 						// all documents using parent order
