@@ -816,11 +816,21 @@ abstract class Order_Document {
 
 	/**
 	 * Return logo id
+	 * 
+	 * @return int|bool
 	 */
 	public function get_header_logo_id() {
-		if ( !empty( $this->settings['header_logo'] ) ) {
-			return apply_filters( 'wpo_wcpdf_header_logo_id', $this->settings['header_logo'], $this );
+		$header_logo_id = false;
+		
+		if ( ! empty( $this->settings['header_logo'] ) ) {
+			$header_logo_id = absint( $this->get_settings_text( 'header_logo', '', false ) );
+
+			if ( 0 === $header_logo_id ) {
+				$header_logo_id = false;
+			}
 		}
+		
+		return apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 	}
 
 	/**
@@ -836,43 +846,41 @@ abstract class Order_Document {
 	 * Show logo html
 	 */
 	public function header_logo() {
-		if ( $this->get_header_logo_id() ) {
-			$attachment_id = $this->get_header_logo_id();
-			$company       = $this->get_shop_name();
+		$attachment_id = $this->get_header_logo_id();
 
-			if ( $attachment_id ) {
-				$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
-				$attachment_path = get_attached_file( $attachment_id );
+		if ( $attachment_id ) {
+			$company         = $this->get_shop_name();
+			$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
+			$attachment_path = get_attached_file( $attachment_id );
 
-				if ( empty( $attachment ) || empty( $attachment_path ) ) {
+			if ( empty( $attachment ) || empty( $attachment_path ) ) {
+				return;
+			}
+			
+			$attachment_src    = $attachment[0];
+			$attachment_width  = $attachment[1];
+			$attachment_height = $attachment[2];
+
+			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
+				$src = $attachment_path;
+			} else {
+				$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
+				if ( is_wp_error( $head ) ) {
+					$errors = $head->get_error_messages();
+					foreach ( $errors as $error ) {
+						wcpdf_log_error( $error, 'critical' );
+					}
+					return;
+				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
+					$src = $attachment_src;
+				} else {
 					return;
 				}
-				
-				$attachment_src    = $attachment[0];
-				$attachment_width  = $attachment[1];
-				$attachment_height = $attachment[2];
-
-				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
-					$src = $attachment_path;
-				} else {
-					$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
-					if ( is_wp_error( $head ) ) {
-						$errors = $head->get_error_messages();
-						foreach ( $errors as $error ) {
-							wcpdf_log_error( $error, 'critical' );
-						}
-						return;
-					} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
-						$src = $attachment_src;
-					} else {
-						return;
-					}
-				}
-				
-				$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
-				
-				echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 			}
+			
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
+			
+			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 		}
 	}
 
@@ -884,6 +892,8 @@ abstract class Order_Document {
 		// fallback to first array element if default is not present
 		} elseif( ! empty( $setting ) && is_array( $setting ) ) {
 			$text = reset( $setting );
+		} else {
+			$text = $setting;
 		}
 
 		// fallback to default

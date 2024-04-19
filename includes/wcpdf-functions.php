@@ -79,7 +79,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-			if ( ! $document->is_allowed() ) {
+			if ( ! $document || ! $document->is_allowed() ) {
 				return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
 			}
 
@@ -490,6 +490,136 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 }
 
 /**
+ * Sanitize HTML content, prevents XSS attacks.
+ *
+ * @param string $html
+ * @param string $context
+ * @param array  $allow_tags
+ *
+ * @return string
+ */
+function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
+	if ( empty( $html ) ) {
+		return $html;
+	}
+
+	// default allowed tags
+	$allow_tags = array_merge( apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', array(
+		// tag   => allowed attributes eg. array( 'href', 'title' ) in case of a <a> tag.
+		'br'     => array(),
+		'em'     => array(),
+		'strong' => array(),
+	), $context ), $allow_tags );
+	
+	$safe_tags = array(
+		'b'          => array(),
+		'blockquote' => array(),
+		'br'         => array(),
+		'em'         => array(),
+		'i'          => array(),
+		'li'         => array(),
+		'ol'         => array(),
+		'p'          => array(),
+		'strong'     => array(),
+		'u'          => array(),
+		'ul'         => array(),
+		'span'       => array( 'style' ),
+		'h1'         => array(),
+		'h2'         => array(),
+		'h3'         => array(),
+		'h4'         => array(),
+		'h5'         => array(),
+		'h6'         => array(),
+		'div'        => array( 'style' ),
+		'table'      => array( 'border', 'cellspacing', 'cellpadding' ),
+		'tr'         => array(),
+		'td'         => array( 'colspan', 'rowspan' ),
+		'th'         => array( 'colspan', 'rowspan', 'scope' ),
+		'thead'      => array(),
+		'tbody'      => array(),
+		'tfoot'      => array(),
+		'code'       => array(),
+		'pre'        => array(),
+		'dl'         => array(),
+		'dt'         => array(),
+		'dd'         => array(),
+		'hr'         => array(),
+		'sup'        => array(),
+		'sub'        => array(),
+		'figure'     => array(),
+		'figcaption' => array(),
+		'abbr'       => array( 'title' ),
+	);
+	
+	$filtered_tags = array();
+
+	foreach ( $allow_tags as $tag => $attributes ) {
+		if ( array_key_exists( $tag, $safe_tags ) ) {
+			$safe_attributes       = array_intersect( $attributes, $safe_tags[ $tag ] );
+			$filtered_tags[ $tag ] = ! empty( $safe_attributes ) ? $safe_attributes : array();
+		}
+	}
+	
+	if ( empty( $filtered_tags ) ) {
+		return $html;
+	}
+
+	$dom = new \DOMDocument();
+	
+	// clean up special chars
+	if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
+		$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
+	}
+	
+	libxml_use_internal_errors( true ); // suppress malformed HTML errors
+	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	libxml_clear_errors();
+	
+	$xpath = new \DOMXPath( $dom );
+
+	// iterate over all nodes.
+	foreach ( $xpath->query( '//*' ) as $node ) {
+		// check if the node is allowed.
+		if ( array_key_exists( $node->nodeName, $filtered_tags ) ) {
+			// if the node is allowed, check each attribute.
+			foreach ( $node->attributes as $attr ) {
+				if ( ! in_array( $attr->nodeName, $filtered_tags[ $node->nodeName ] ) ) {
+					$node->removeAttribute( $attr->nodeName );
+				}
+			}
+		} else {
+			// if the node is not allowed, remove it but try to preserve text.
+			if ( $node->parentNode ) {
+				$fragment = $dom->createDocumentFragment();
+				
+				while ( $node->childNodes->length > 0 ) {
+					$fragment->appendChild( $node->childNodes->item( 0 ) );
+				}
+				
+				if ( $fragment->hasChildNodes() ) {
+					$node->parentNode->replaceChild( $fragment, $node );
+				} else {
+					$node->parentNode->removeChild( $node );
+				}
+			}
+		}
+	}
+
+	return $dom->saveHTML();
+}
+
+/**
+ * Sanitize phone number
+ *
+ * @param string $text
+ *
+ * @return string
+ */
+function wpo_wcpdf_sanitize_phone_number( string $text ): string {
+	return preg_replace( '/[^0-9\+\-\(\)\s\.x]/', '', $text );
+}
+
+/**
  * Safe redirect or die.
  *
  * @param  string          $url
@@ -513,11 +643,11 @@ function WPO_WCPDF_Legacy() {
  * Parse document date for WP_Query.
  * 
  * @param array $wp_query_args
- * @param mixed $query_args
+ * @param array $query_args
  *
  * @return array
  */
-function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, mixed $query_vars ): array {
+function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, array $query_vars ): array {
 	$documents = WPO_WCPDF()->documents->get_documents();
 	
 	if ( ! empty( $documents ) ) {

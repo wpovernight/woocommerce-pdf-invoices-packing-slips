@@ -135,14 +135,12 @@ jQuery( function( $ ) {
 		$previewOrderIdInput.val( '' ).trigger( 'change' );
 	}
 
-	$( document ).ready( function() {
-		resetDocumentType();      // force document type reset
-		resetOrderId();           // force order ID reset
-		loadPreviewData();        // load preview data
+	resetDocumentType();      // force document type reset
+	resetOrderId();           // force order ID reset
+	loadPreviewData();        // load preview data
 
-		previousWindowWidth = $(window).width();
-		determinePreviewStates(); // determine preview states based on screen size
-	} );
+	previousWindowWidth = $( window ).width();
+	determinePreviewStates(); // determine preview states based on screen size
 
 	$( window ).on( 'resize', determinePreviewStates );
 		
@@ -294,7 +292,7 @@ jQuery( function( $ ) {
 	} );
 
 	// Preview on page load
-	$( document ).ready( triggerPreview() );
+	triggerPreview();
 
 	// Custom trigger to signify settings have changed (will show save button and refresh preview)
 	$( document ).on( 'wpo-wcpdf-settings-changed', function( event, delay ) { 
@@ -311,7 +309,7 @@ jQuery( function( $ ) {
 	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
 		$( '.preview-document .order-search-label').text( '#' + $( this ).data( 'order_id' ) );
-		$previewOrderIdInput.val( $( this ).data( 'order_id' ) ).change();
+		$previewOrderIdInput.val( $( this ).data( 'order_id' ) ).trigger( 'change' );
 		$( this ).closest( 'div' ).hide();                   // hide results div
 		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results
 		triggerPreview();
@@ -359,8 +357,8 @@ jQuery( function( $ ) {
 	}
 
 	// Submit settings form when clicking on secondary save button
-	$( document ).on( 'click', '.preview-data-wrapper .save-settings p input', function( event ) {
-		$('#wpo-wcpdf-settings input#submit').click();
+	$( document.body ).on( 'click', '.preview-data-wrapper .save-settings p input', function( event ) {
+		$( '#wpo-wcpdf-settings input#submit' ).trigger( 'click' );
 	} );
 
 	// Trigger the Preview
