@@ -38,11 +38,7 @@ function wcpdf_filter_order_ids( $order_ids, $document_type ) {
  *
  * @return object|false
  */
-function wcpdf_get_document( $document_type, $order, $init = false ) {
-	// $order can be one of the following:
-	// - WC Order object
-	// - array of order ids
-	// - null if order not loaded or loaded later
+function wcpdf_get_document( string $document_type, $order, bool $init = false ) {
 	if ( ! empty( $order ) ) {
 		if ( ! is_object( $order ) && ! is_array( $order ) && is_numeric( $order ) ) {
 			$order = array( absint( $order ) ); // convert single order id to array.
