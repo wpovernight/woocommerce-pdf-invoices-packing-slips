@@ -24,6 +24,20 @@ function wcpdf_filter_order_ids( $order_ids, $document_type ) {
 	return $order_ids;
 }
 
+/**
+ * Get the document object for an order
+ *
+ * @param string $document_type
+ * @param mixed  $order
+ * Passing an order object will return the document object for that order.
+ * Passing an array of order ids will return a Bulk_Document object.
+ * Passing a single order ID within an array retrieves the document object for that order and refreshes the order object to ensure the data is up-to-date.
+ * Passing null will return a document object without an order.
+ * 
+ * @param bool   $init
+ *
+ * @return object|false
+ */
 function wcpdf_get_document( $document_type, $order, $init = false ) {
 	// $order can be one of the following:
 	// - WC Order object
