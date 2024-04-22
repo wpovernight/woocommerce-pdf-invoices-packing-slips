@@ -544,7 +544,7 @@ class Settings_Debug {
 		
 		$args[ $date_arg ] = $from_date . '...' . $to_date;
 		
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '6.8.0', '>=' ) ) {
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '6.8.0', '>=' ) && WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() ) { // Woo >= 6.8.0 + HPOS
 			$args = wpo_wcpdf_parse_document_date_for_wp_query( $args, $args );
 		} else {
 			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_parse_document_date_for_wp_query', 10, 2 );
