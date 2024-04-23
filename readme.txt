@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.5
 Requires PHP: 7.2
-Stable tag: 3.8.0
+Stable tag: 3.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,20 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.8.1 (2024-04-23) =
+* New: updates DOMPDF to `v2.0.7`
+* New: adds `woocommerce` as required plugin
+* New: improvements to shop logo to be translatable in future Professional extension version
+* Fix: document date parse function being called on non HPOS stores
+* Fix: replaces deprecated jQuery functions
+* Fix: bug with type hint in `wpo_wcpdf_parse_document_date_for_wp_query()` function
+* Fix: bug calling `is_allowed()` on `bool` under `wcpdf_get_document()` function
+* Fix: not removing documents meta on Woo subcription renewal
+* Fix: XSS vulnerability on Woo Checkout user input address data
+* Fix: Semaphore attachments issue on concurrent refunds
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 8.8
 
 = 3.8.0 (2024-03-18) =
 * New: updates composer libraries, specially `php-svg-lib` because of a security issue
