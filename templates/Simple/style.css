@@ -271,7 +271,7 @@ table.totals tr.payment_method {
 }
 
 /* Footer Imprint */
-#footer {
+htmlpagefooter {
 	position: absolute;
 	bottom: -2cm;
 	left: 0;
