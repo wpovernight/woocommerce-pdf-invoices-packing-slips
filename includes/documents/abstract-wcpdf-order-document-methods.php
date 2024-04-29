@@ -74,31 +74,29 @@ abstract class Order_Document_Methods extends Order_Document {
 		//if we got here, it means the addresses are equal -> doesn't ship to different address!
 		return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order, $this );
 	}
-	
-	/**
-	 * Return/Show billing address
-	 */
-	public function get_billing_address() {
-		// always prefer parent billing address for refunds
-		if ( $this->is_refund( $this->order ) ) {
-			// temporarily switch order to make all filters / order calls work correctly
-			$refund      = $this->order;
-			$this->order = $this->get_refund_parent( $this->order );
-			$address     = $this->order->get_formatted_billing_address();
-			// switch back & unset
-			$this->order = $refund;
-			unset( $refund );
-		} else {
-			// regular shop_order
+
+	public function get_billing_address(): string {
+		$original_order = $this->order;
+		$address        = '';
+
+		if ( $this->is_refund( $original_order ) ) {
+			$this->order = $this->get_refund_parent( $original_order ) ?: $original_order;
+		}
+
+		if ( is_callable( array( $this->order, 'get_formatted_billing_address' ) ) ) {
 			$address = $this->order->get_formatted_billing_address();
 		}
-		
-		// no address
+
 		if ( empty( $address ) ) {
 			$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		$address = apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+
+		// Restore the original order if modified.
+		$this->order = $original_order;
+
+		return $address;
 	}
 	public function billing_address() {
 		echo $this->get_billing_address();
@@ -176,31 +174,34 @@ abstract class Order_Document_Methods extends Order_Document {
 	 * Return/Show shipping address
 	 */
 	public function get_shipping_address() {
-		// always prefer parent shipping address for refunds
-		if ( $this->is_refund( $this->order ) ) {
-			// temporarily switch order to make all filters / order calls work correctly
-			$refund      = $this->order;
-			$this->order = $this->get_refund_parent( $this->order );
-			$address     = $this->order->get_formatted_shipping_address();
-			// switch back & unset
-			$this->order = $refund;
-			unset( $refund );
-		} else {
-			// regular shop_order
-			$address = $this->order->get_formatted_shipping_address();
-			
-			// use fallback for packing slip
-			if ( empty( $address ) && apply_filters( 'wpo_wcpdf_shipping_address_fallback', ( 'packing-slip' === $this->get_type() ), $this ) ) {
-				$address = $this->get_billing_address();
-			}
-		}
-		
-		// no address
-		if ( empty( $address ) ) {
-			$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
+		$original_order = $this->order;
+		$address        = '';
+
+		if ( $this->is_refund( $original_order ) ) {
+			$this->order = $this->get_refund_parent( $original_order ) ?: $original_order;
 		}
 
-		return apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		if ( is_callable( array( $this->order, 'get_formatted_shipping_address' ) ) ) {
+			$address = $this->order->get_formatted_shipping_address();
+		}
+
+		if ( empty( $address ) ) {
+			if (
+				apply_filters( 'wpo_wcpdf_shipping_address_fallback', ( 'packing-slip' === $this->get_type() ), $this ) &&
+				is_callable( array( $this->order, 'get_formatted_billing_address' ) )
+			) {
+				$address = $this->order->get_formatted_billing_address();
+			} else {
+				$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
+			}
+		}
+
+		$address = apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+
+		// Restore the original order if modified.
+		$this->order = $original_order;
+
+		return $address;
 	}
 	public function shipping_address() {
 		echo $this->get_shipping_address();
