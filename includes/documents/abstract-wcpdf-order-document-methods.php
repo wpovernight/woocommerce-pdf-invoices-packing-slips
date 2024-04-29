@@ -77,9 +77,10 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	public function get_billing_address(): string {
 		$original_order = $this->order;
+		$address        = '';
 
 		if ( $this->is_refund( $original_order ) ) {
-			$this->order = $this->order = $this->get_refund_parent( $original_order ) ?: $original_order;
+			$this->order = $this->get_refund_parent( $original_order ) ?: $original_order;
 		}
 
 		if ( is_callable( array( $this->order, 'get_formatted_billing_address' ) ) ) {
@@ -174,6 +175,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_shipping_address() {
 		$original_order = $this->order;
+		$address        = '';
 
 		if ( $this->is_refund( $original_order ) ) {
 			$this->order = $this->get_refund_parent( $original_order ) ?: $original_order;
