@@ -565,41 +565,43 @@ class Admin {
 		$documents        = WPO_WCPDF()->documents->get_documents();
 		
 		foreach ( $documents as $document ) {
-			$document_title = $document->get_title();
-			$document       = wcpdf_get_document( $document->get_type(), $order );
-			
-			if ( $document ) {
-				$document_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
-				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-				$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
-				$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
-				$document_settings     = get_option( 'wpo_wcpdf_documents_settings_'.$document->get_type() ); // $document-settings might be not updated with the last settings
-				$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
-				$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
-				$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
-				$class                 = [ $document->get_type() ];
-				
-				if ( $document_exists ) {
-					$class[] = 'exists';
-				}
-				if ( $document_printed ) {
-					$class[] = 'printed';
-				}
-				
-				$meta_box_actions[$document->get_type()] = array(
-					'url'                   => esc_url( $document_url ),
-					'alt'                   => "PDF " . $document_title,
-					'title'                 => "PDF " . $document_title,
-					'exists'                => $document_exists,
-					'printed'               => $document_printed,
-					'printed_data'          => $document_printed_data,
-					'unmark_printed_url'    => $unmark_printed_url,
-					'manually_mark_printed' => $manually_mark_printed,
-					'mark_printed_url'      => $mark_printed_url,
-					'class'                 => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
-				);
+			$document = wcpdf_get_document( $document->get_type(), $order );
+
+			if ( ! $document ) {
+				continue;
 			}
+
+			$document_title        = $document->get_title();
+			$document_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+			$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+			$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+			$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+			$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
+			$document_settings     = get_option( 'wpo_wcpdf_documents_settings_'.$document->get_type() ); // $document-settings might be not updated with the last settings
+			$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
+			$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
+			$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
+			$class                 = [ $document->get_type() ];
+
+			if ( $document_exists ) {
+				$class[] = 'exists';
+			}
+			if ( $document_printed ) {
+				$class[] = 'printed';
+			}
+
+			$meta_box_actions[ $document->get_type() ] = array(
+				'url'                   => esc_url( $document_url ),
+				'alt'                   => "PDF " . $document_title,
+				'title'                 => "PDF " . $document_title,
+				'exists'                => $document_exists,
+				'printed'               => $document_printed,
+				'printed_data'          => $document_printed_data,
+				'unmark_printed_url'    => $unmark_printed_url,
+				'manually_mark_printed' => $manually_mark_printed,
+				'mark_printed_url'      => $mark_printed_url,
+				'class'                 => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
+			);
 		}
 
 		$meta_box_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_box_actions, $order->get_id() );
@@ -1268,15 +1270,15 @@ class Admin {
 	}
 
 	/**
-     * Determines if the invoice number is numeric.
-     * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
-     *
+	 * Determines if the invoice number is numeric.
+	 * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
+	 *
 	 * @return bool
 	 */
-	private function is_invoice_number_numeric() {
+	private function is_invoice_number_numeric(): bool {
 		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
-		                    ( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
+							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
 		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
 	}
