@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.5
 Requires PHP: 7.2
-Stable tag: 3.8.1
+Stable tag: 3.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.8.2 (2024-04-29) =
+* Fix: "Customer Invoice" email title under "Send order email" metabox
+* Fix: filter called with a refund object in `get_billing_address()` and `get_shipping_address()`
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 8.9
 
 = 3.8.1 (2024-04-23) =
 * New: updates DOMPDF to `v2.0.7`
