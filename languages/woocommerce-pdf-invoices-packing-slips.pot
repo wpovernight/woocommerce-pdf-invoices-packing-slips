@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.8.1-beta-2\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.8.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-04-23T13:52:32+02:00\n"
+"POT-Creation-Date: 2024-04-29T14:22:45+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -87,7 +87,7 @@ msgid "I am the wizard"
 msgstr ""
 
 #: includes/class-wcpdf-admin.php:322
-#: includes/class-wcpdf-admin.php:1333
+#: includes/class-wcpdf-admin.php:1335
 #: includes/class-wcpdf-assets.php:228
 #: includes/class-wcpdf-main.php:1274
 #: includes/documents/class-wcpdf-invoice.php:314
@@ -97,7 +97,7 @@ msgstr ""
 
 #: includes/class-wcpdf-admin.php:323
 #: includes/class-wcpdf-main.php:1275
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1239
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1240
 #: includes/documents/class-wcpdf-invoice.php:280
 #: includes/views/setup-wizard/display-options.php:60
 msgid "Invoice Date"
@@ -123,125 +123,129 @@ msgstr ""
 msgid "Choose an email to send&hellip;"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:543
+#: includes/class-wcpdf-admin.php:535
+msgid "Customer Invoice"
+msgstr ""
+
+#: includes/class-wcpdf-admin.php:545
 msgid "Save order & send email"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:612
+#: includes/class-wcpdf-admin.php:614
 msgid "Mark printed"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:614
+#: includes/class-wcpdf-admin.php:616
 msgid "Unmark"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:701
+#: includes/class-wcpdf-admin.php:703
 msgid "UBL documents require the correspondent PDF to be generated first."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:721
+#: includes/class-wcpdf-admin.php:723
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:724
+#: includes/class-wcpdf-admin.php:726
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:727
+#: includes/class-wcpdf-admin.php:729
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:730
+#: includes/class-wcpdf-admin.php:732
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:733
+#: includes/class-wcpdf-admin.php:735
 msgid "Notes (printed in the invoice):"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:858
+#: includes/class-wcpdf-admin.php:860
 msgid "View more details"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:859
+#: includes/class-wcpdf-admin.php:861
 msgid "Hide details"
 msgstr ""
 
 #. translators: document title
-#: includes/class-wcpdf-admin.php:871
+#: includes/class-wcpdf-admin.php:873
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:876
+#: includes/class-wcpdf-admin.php:878
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:888
+#: includes/class-wcpdf-admin.php:890
 msgid "unformatted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:930
+#: includes/class-wcpdf-admin.php:932
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:931
+#: includes/class-wcpdf-admin.php:933
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/class-wcpdf-admin.php:1053
+#: includes/class-wcpdf-admin.php:1055
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1101
+#: includes/class-wcpdf-admin.php:1103
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1107
+#: includes/class-wcpdf-admin.php:1109
 msgid "Bad action!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1113
+#: includes/class-wcpdf-admin.php:1115
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1119
+#: includes/class-wcpdf-admin.php:1121
 msgid "No permissions!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1143
+#: includes/class-wcpdf-admin.php:1145
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1144
+#: includes/class-wcpdf-admin.php:1146
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1147
+#: includes/class-wcpdf-admin.php:1149
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1148
+#: includes/class-wcpdf-admin.php:1150
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1151
+#: includes/class-wcpdf-admin.php:1153
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1152
+#: includes/class-wcpdf-admin.php:1154
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1208
+#: includes/class-wcpdf-admin.php:1210
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1222
+#: includes/class-wcpdf-admin.php:1224
 msgid "Document is empty."
 msgstr ""
 
-#: includes/class-wcpdf-admin.php:1253
+#: includes/class-wcpdf-admin.php:1255
 msgid "DEBUG output enabled"
 msgstr ""
 
@@ -484,7 +488,7 @@ msgid "Date"
 msgstr ""
 
 #: includes/class-wcpdf-settings.php:444
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1067
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1068
 #: ubl/Settings/TaxesSettings.php:170
 msgid "Total"
 msgstr ""
@@ -564,28 +568,28 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:98
-#: includes/documents/abstract-wcpdf-order-document-methods.php:200
+#: includes/documents/abstract-wcpdf-order-document-methods.php:91
+#: includes/documents/abstract-wcpdf-order-document-methods.php:195
 msgid "N/A"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:941
+#: includes/documents/abstract-wcpdf-order-document-methods.php:942
 msgid "Subtotal"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:966
+#: includes/documents/abstract-wcpdf-order-document-methods.php:967
 msgid "Shipping"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:997
+#: includes/documents/abstract-wcpdf-order-document-methods.php:998
 msgid "Discount"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1064
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1065
 msgid "Total ex. VAT"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1240
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1241
 #: includes/documents/class-wcpdf-invoice.php:281
 #: includes/views/setup-wizard/display-options.php:61
 msgid "Order Date"
