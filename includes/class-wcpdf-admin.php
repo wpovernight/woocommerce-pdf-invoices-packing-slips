@@ -717,28 +717,7 @@ class Admin {
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
 
 		if ( $invoice ) {
-			// data
-			$data = array(
-				'number' => array(
-					'label' => __( 'Invoice number:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'date' => array(
-					'label' => __( 'Invoice date:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'display_date' =>  array(
-					'label' => __( 'Invoice display date:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'creation_trigger' =>  array(
-					'label' => __( 'Invoice created via:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'notes' => array(
-					'label' => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-
-			);
-			// output
-			$this->output_number_date_edit_fields( $invoice, $data );
-
+			$this->output_number_date_edit_fields( $invoice );
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $order, $this );
@@ -792,11 +771,47 @@ class Admin {
 		return apply_filters( 'wpo_wcpdf_current_values_for_document', $data, $document );
 	}
 
-	public function output_number_date_edit_fields( $document, $data ) {
-		if ( empty( $document ) || empty( $data ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
+	public function output_number_date_edit_fields( object $document, array $data = array() ): void {
+		if ( empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
 			return;
 		}
-		$data = $this->get_current_values_for_document( $document, $data );
+
+		// Go for default data.
+		if ( empty( $data ) ) {
+			$document_title = $document->get_title();
+
+			$data = array(
+				'number' => array( 'label' => $document_title . ' ' . __( 'Number', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+				'date'   => array( 'label' => $document_title . ' ' . __( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+			);
+
+			if ( 'invoice' === $document->get_type() ) {
+				$data = array_merge( $data, array(
+					'display_date'     => array( 'label' => $document_title . ' ' . __( 'Display date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+					'creation_trigger' => array( 'label' => $document_title . ' ' . __( 'Created via', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+					'notes'            => array( 'label' => $document_title . ' ' . __( 'Notes (printed in the invoice)', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+				) );
+			}
+		}
+
+		$independent_documents = apply_filters( 'wpo_wcpdf_document_data_meta_box_independent_documents', array( 'invoice', 'packing-slip' ) );
+		$data                  = apply_filters( 'wpo_wcpdf_document_data_meta_box_document_data_fields', $data, $document );
+		$data                  = $this->get_current_values_for_document( $document, $data );
+		$in_process            = as_next_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
+			'document_type' => $document->get_type(),
+			'order_id'      => $document->order->get_id()
+		) );
+
+		// Prevent displaying setup for documents that are not independent, and don't exist, or are not in process,
+		// like documents that require an invoice first and don't exist already or are not in process.
+		if ( ! $in_process && ! $document->exists() && ! in_array( $document->get_type(), $independent_documents, true ) ) {
+			return;
+		}
+
+		// Allow preventing document output.
+		if ( apply_filters( 'wpo_wcpdf_document_data_meta_box_prevent_document_output', false, $data, $in_process, $document ) ) {
+			return;
+		}
 
 		include WPO_WCPDF()->plugin_path() . '/includes/views/document-data-metabox.php';
 	}
