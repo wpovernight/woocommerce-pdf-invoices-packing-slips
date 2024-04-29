@@ -3,7 +3,7 @@
         'name' => 'wpovernight/woocommerce-pdf-invoices-packing-slips',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'bac99d938a07f16dbb50c11804f497182886b4a8',
+        'reference' => '435a8366cf595c5a54cf87dc8425401df5932d41',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'dompdf/dompdf' => array(
-            'pretty_version' => 'v2.0.7',
-            'version' => '2.0.7.0',
-            'reference' => 'ab0123052b42ad0867348f25df8c228f1ece8f14',
+            'pretty_version' => 'v2.0.8',
+            'version' => '2.0.8.0',
+            'reference' => 'c20247574601700e1f7c8dab39310fca1964dc52',
             'type' => 'library',
             'install_path' => __DIR__ . '/../dompdf/dompdf',
             'aliases' => array(),
@@ -65,9 +65,9 @@
             'dev_requirement' => false,
         ),
         'sabre/xml' => array(
-            'pretty_version' => '2.2.6',
-            'version' => '2.2.6.0',
-            'reference' => '9cde7cdab1e50893cc83b037b40cd47bfde42a2b',
+            'pretty_version' => '2.2.7',
+            'version' => '2.2.7.0',
+            'reference' => 'f1d53d55976bbd4cf3e640dda6ebc31120c71a4e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../sabre/xml',
             'aliases' => array(),
@@ -94,7 +94,7 @@
         'wpovernight/woocommerce-pdf-invoices-packing-slips' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'bac99d938a07f16dbb50c11804f497182886b4a8',
+            'reference' => '435a8366cf595c5a54cf87dc8425401df5932d41',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
