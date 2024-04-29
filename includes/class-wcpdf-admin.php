@@ -71,10 +71,12 @@ class Admin {
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
 
-        // add "invoice number" column to WooCommerce Analytic - Orders
+		// add "invoice number" column to WooCommerce Analytic - Orders
 		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
 		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
 		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
+
+		add_action( 'wp_ajax_wpo_fetch_document_data', array( $this, 'ajax_fetch_pdf_document_data' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -1277,6 +1279,52 @@ class Admin {
 		                    ( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
 		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
+	}
+
+	/**
+	 * Updates documents data in the "PDF document data" meta box if the generation in the background is finished.
+	 *
+	 * @return void
+	 */
+	public function ajax_fetch_pdf_document_data(): void {
+		if ( ! isset( $_REQUEST['security'] ) || ! wp_verify_nonce( $_REQUEST['security'], 'generate_wpo_wcpdf' ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Invalid or expired nonce!', 'woocommerce-pdf-invoices-packing-slips' ),
+			) );
+		}
+
+		if ( empty( $_REQUEST['document_types'] ) || empty( $_REQUEST['order_id'] ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Incomplete or incorrect request!', 'woocommerce-pdf-invoices-packing-slips' ),
+			) );
+		}
+
+		$order_id       = (int) $_REQUEST['order_id'];
+		$document_types = array_map( 'sanitize_text_field', $_REQUEST['document_types'] );
+		$documents_data = array();
+
+		ob_start();
+		foreach ( $document_types as $document_type ) {
+			if ( ! wpo_wcpdf_is_document_type_valid( $document_type ) ) {
+				continue;
+			}
+
+			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
+			if ( $document && $document->exists() ) {
+				$this->output_number_date_edit_fields( $document );
+				$documents_data[ $document_type ] = ob_get_contents();
+				ob_clean();
+			}
+		}
+		ob_end_clean();
+
+		if ( ! empty( $documents_data ) ) {
+			wp_send_json_success( $documents_data );
+		}
+
+		wp_send_json_error( array(
+			'message' => esc_html__( 'Documents data is empty!', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
 	}
 
 }

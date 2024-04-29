@@ -675,3 +675,21 @@ function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, array
 	return $wp_query_args;
 }
 
+/**
+ * Validates the given document type against the currently defined documents.
+ *
+ * @param string $document_type
+ *
+ * @return bool
+ */
+function wpo_wcpdf_is_document_type_valid( string $document_type ): bool {
+	$documents = WPO_WCPDF()->documents->get_documents();
+
+	foreach ( $documents as $document ) {
+		if ( $document_type === $document->get_type() ) {
+			return true;
+		}
+	}
+
+	return false;
+}

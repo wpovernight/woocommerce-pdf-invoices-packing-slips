@@ -187,5 +187,53 @@ jQuery( function( $ ) {
 			$( '.view-more' ).show();
 		}
 	} );
-	
+
+	function get_pending_documents() {
+		let pending_documents = [];
+		$( '.wcpdf-data-fields' ).each( function () {
+			if ( 'yes' === $( this ).attr( 'data-is_pending' ) ) {
+				pending_documents.push( $( this ).data( 'document' ) );
+			}
+		} );
+
+		return pending_documents;
+	}
+
+	// Fetch data for pending documents if documents were pending and now are generated.
+	const pending_documents = get_pending_documents();
+	let ajax_count          = 0;
+	const ajax_max_count    = 3;
+	const ajax_interval     = 2000;
+	const ajax_timer        = function() {
+		if ( pending_documents.length <= 0 ) {
+			return;
+		}
+
+		$.ajax( {
+			url:     wpo_wcpdf_ajax.ajaxurl,
+			type:    'POST',
+			data:    {
+				action:         'wpo_fetch_document_data',
+				security:       wpo_wcpdf_ajax.nonce,
+				document_types: pending_documents,
+				order_id:       woocommerce_admin_meta_boxes.post_id,
+			},
+			success: function ( response ) {
+				$.each( response.data, function ( key, value ) {
+					$( '.wcpdf-data-fields[data-document="' + key + '"]' ).replaceWith( value );
+				} );
+			},
+			error:   function ( response ) {
+				console.log( response.message );
+			}
+		} );
+
+		ajax_count++;
+		if ( ajax_count < ajax_max_count ) {
+			setTimeout( ajax_timer, ajax_interval );
+		}
+	}
+
+	setTimeout( ajax_timer, ajax_interval );
+
 } );
