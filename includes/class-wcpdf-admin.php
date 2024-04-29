@@ -527,11 +527,13 @@ class Admin {
 					$available_emails = apply_filters_deprecated( 'woocommerce_resend_order_emails_available', array( $order_emails ), '3.5.7', 'wpo_wcpdf_resend_order_emails_available' );
 					$available_emails = apply_filters( 'wpo_wcpdf_resend_order_emails_available', $available_emails, $order->get_id() );
 					$mails            = $mailer->get_emails();
+					
 					if ( ! empty( $mails ) && ! empty( $available_emails ) ) { ?>
 						<?php
 						foreach ( $mails as $mail ) {
 							if ( in_array( $mail->id, $available_emails ) && 'no' !== $mail->enabled ) {
-								echo '<option value="send_email_' . esc_attr( $mail->id ) . '">' . esc_html( $mail->title ) . '</option>';
+								$title = ( 'customer_invoice' === $mail->id ) ? __( 'Customer Invoice', 'woocommerce-pdf-invoices-packing-slips' ) : $mail->title; // `customer_invoice` default title is "Order details"
+								echo '<option value="send_email_' . esc_attr( $mail->id ) . '">' . esc_html( $title ) . '</option>';
 							}
 						} ?>
 						<?php
