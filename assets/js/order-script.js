@@ -204,7 +204,7 @@ jQuery( function( $ ) {
 	let ajax_count          = 0;
 	const ajax_max_count    = 3;
 	const ajax_interval     = 2000;
-	const ajax_timer        = function() {
+	const ajax_timer                 = function() {
 		if ( pending_documents.length <= 0 ) {
 			return;
 		}
