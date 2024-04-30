@@ -195,7 +195,7 @@ class Assets {
 					'wpo-wcpdf-pdfjs',
 					WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.min.js', // taken from https://cdnjs.com/libraries/pdf.js
 					array(),
-					'3.7.107'
+					'3.11.174'
 				);
 			}
 
