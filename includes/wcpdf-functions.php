@@ -585,7 +585,7 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 	libxml_clear_errors();
 	
-	if ( false === $dom || null === $dom ) {
+	if ( empty( $dom ) ) {
 		return '';
 	}
 	
@@ -621,7 +621,11 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 
 	$html = $dom->saveHTML();
 	
-	return ( false !== $html && null !== $html ) ? $html : '';
+	if ( empty( $html ) ) {
+		return '';
+	}
+	
+	return $html;
 }
 
 /**
