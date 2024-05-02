@@ -97,6 +97,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$address = apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
 
 		// Restore the original order if modified.
 		$this->order = $original_order;
@@ -204,6 +208,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$address = apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
 
 		// Restore the original order if modified.
 		$this->order = $original_order;
