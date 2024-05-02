@@ -510,7 +510,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
  */
 function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
 	if ( empty( $html ) ) {
-		return $html;
+		return '';
 	}
 
 	// default allowed tags
@@ -585,6 +585,10 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 	libxml_clear_errors();
 	
+	if ( empty( $dom ) ) {
+		return '';
+	}
+	
 	$xpath = new \DOMXPath( $dom );
 
 	// iterate over all nodes.
@@ -615,7 +619,13 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		}
 	}
 
-	return $dom->saveHTML();
+	$html = $dom->saveHTML();
+	
+	if ( empty( $html ) ) {
+		return '';
+	}
+	
+	return $html;
 }
 
 /**

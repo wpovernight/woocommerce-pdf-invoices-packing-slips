@@ -75,6 +75,11 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order, $this );
 	}
 
+	/**
+	 * Get the billing address
+	 * 
+	 * @return string
+	 */
 	public function get_billing_address(): string {
 		$original_order = $this->order;
 		$address        = '';
@@ -92,6 +97,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$address = apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
 
 		// Restore the original order if modified.
 		$this->order = $original_order;
@@ -172,8 +181,10 @@ abstract class Order_Document_Methods extends Order_Document {
 	
 	/**
 	 * Return/Show shipping address
+	 * 
+	 * @return string
 	 */
-	public function get_shipping_address() {
+	public function get_shipping_address(): string {
 		$original_order = $this->order;
 		$address        = '';
 
@@ -197,6 +208,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$address = apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
 
 		// Restore the original order if modified.
 		$this->order = $original_order;
