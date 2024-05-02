@@ -75,6 +75,11 @@ abstract class Order_Document_Methods extends Order_Document {
 		return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order, $this );
 	}
 
+	/**
+	 * Get the billing address
+	 * 
+	 * @return string
+	 */
 	public function get_billing_address(): string {
 		$original_order = $this->order;
 		$address        = '';
@@ -172,8 +177,10 @@ abstract class Order_Document_Methods extends Order_Document {
 	
 	/**
 	 * Return/Show shipping address
+	 * 
+	 * @return string
 	 */
-	public function get_shipping_address() {
+	public function get_shipping_address(): string {
 		$original_order = $this->order;
 		$address        = '';
 
