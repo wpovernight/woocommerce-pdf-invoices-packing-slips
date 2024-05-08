@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Order extends Model {
-	
+
 	/** @var int */
 	public $id;
 
@@ -19,8 +19,8 @@ class Order extends Model {
 
 	/** @var Address */
 	public $billing_address;
-	
+
 	/** @var Address */
 	public $shipping_address;
-	
+
 }

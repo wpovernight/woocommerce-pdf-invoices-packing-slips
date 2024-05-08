@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class AllowanceChargeHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$allowanceCharge = array(
 			'name'  => 'cac:AllowanceCharge',
@@ -20,5 +20,5 @@ class AllowanceChargeHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

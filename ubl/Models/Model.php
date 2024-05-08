@@ -7,5 +7,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Model {
-	
 }

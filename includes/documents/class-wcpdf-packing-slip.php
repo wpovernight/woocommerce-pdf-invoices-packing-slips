@@ -12,7 +12,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Packing_Slip' ) ) :
  */
 
 class Packing_Slip extends Order_Document_Methods {
-	
+
 	/**
 	 * Init/load the order object.
 	 *
@@ -23,10 +23,10 @@ class Packing_Slip extends Order_Document_Methods {
 		$this->type  = 'packing-slip';
 		$this->title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
 		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
-		
+
 		// call parent constructor
 		parent::__construct( $order );
-		
+
 		// output formats (placed after parent construct to override the abstract default)
 		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf' ), $this );
 	}
@@ -55,7 +55,7 @@ class Packing_Slip extends Order_Document_Methods {
 		} else {
 			$suffix = date_i18n( 'Y-m-d' ); // 2024-12-31
 		}
-		
+
 		// get filename
 		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
 		$filename      = $name . '-' . $suffix . wcpdf_get_document_output_format_extension( $output_format );
@@ -143,7 +143,7 @@ class Packing_Slip extends Order_Document_Methods {
 				)
 			),
 		);
-		
+
 		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
 			ob_start();
 			?>
@@ -152,7 +152,7 @@ class Packing_Slip extends Order_Document_Methods {
 			</div>
 			<?php
 			$html = ob_get_clean();
-			
+
 			$pro_notice = array(
 				array(
 					'type'			=> 'setting',

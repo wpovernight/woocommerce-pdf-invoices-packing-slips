@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Address extends Model {
+
 	public $first_name;
 	public $last_name;
 	public $address_1;
@@ -17,4 +18,5 @@ class Address extends Model {
 	public $country;
 	public $email;
 	public $phone;
+
 }

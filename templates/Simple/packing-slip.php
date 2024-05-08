@@ -77,7 +77,7 @@
 					</tr>
 				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
-			</table>			
+			</table>
 		</td>
 	</tr>
 </table>

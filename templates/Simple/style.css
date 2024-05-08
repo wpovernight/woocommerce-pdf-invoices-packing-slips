@@ -56,9 +56,9 @@ p + p {
 	margin-top: 1.25em;
 }
 
-a { 
-	border-bottom: 1px solid; 
-	text-decoration: none; 
+a {
+	border-bottom: 1px solid;
+	text-decoration: none;
 }
 
 /* Basic Table Styling */
@@ -165,7 +165,7 @@ table.order-details {
 
 .order-details tr {
 	page-break-inside: always;
-	page-break-after: auto;	
+	page-break-after: auto;
 }
 
 .order-details td,

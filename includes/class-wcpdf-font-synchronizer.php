@@ -25,9 +25,9 @@ class Font_Synchronizer {
 	 * @var \Dompdf\Dompdf
 	 */
 	public $dompdf;
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
@@ -86,7 +86,7 @@ class Font_Synchronizer {
 
 	/**
 	 * Delete an array of files with all known extensions
-	 * 
+	 *
 	 * @param array $filenames array of filenames without the extension
 	 * @return void
 	 */
@@ -109,7 +109,7 @@ class Font_Synchronizer {
 
 	/**
 	 * Copy font files
-	 * 
+	 *
 	 * @param  array  $filenames   array of filenames without the extension
 	 * @param  string $destination path to the local fonts
 	 * @return array
@@ -133,7 +133,7 @@ class Font_Synchronizer {
 
 	/**
 	 * Get an array of all known local fonts (stored in the cache file)
-	 * 
+	 *
 	 * @param string $path path to the local fonts
 	 * @return array
 	 */
@@ -213,7 +213,7 @@ class Font_Synchronizer {
 
 	/**
 	 * Apply path normalization to a font list
-	 * 
+	 *
 	 * @param  array  $fonts array of font entries
 	 * @return array  Normalized array of font entries
 	 */

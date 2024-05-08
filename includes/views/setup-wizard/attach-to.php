@@ -5,7 +5,7 @@
 </div>
 <div class="wpo-setup-input">
 	<table>
-	<?php 
+	<?php
 	$current_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
 	// load invoice to reuse method to get wc emails
 	$invoice = wcpdf_get_invoice( null );

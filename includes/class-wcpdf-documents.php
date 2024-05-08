@@ -55,7 +55,7 @@ class Documents {
 
 	/**
 	 * Return the document classes - used in admin to load settings.
-	 * 
+	 *
 	 * @param $filter
 	 * @param $output_format  Can be 'pdf', 'ubl' or anything for all
 	 *
@@ -69,7 +69,7 @@ class Documents {
 		// enabled
 		if ( 'enabled' === $filter && ! empty( $output_format ) ) {
 			$documents = array();
-			
+
 			foreach ( $this->documents as $class_name => $document ) {
 				switch ( $output_format ) {
 					case 'pdf':
@@ -88,12 +88,12 @@ class Documents {
 						break;
 				}
 			}
-			
+
 		// enabled and disabled
 		} else {
 			$documents = $this->documents;
 		}
-		
+
 		return apply_filters( 'wpo_wcpdf_get_documents', $documents, $filter, $output_format, $this );
 	}
 
@@ -103,14 +103,14 @@ class Documents {
 				return new $class_name( $order );
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public function get_document_titles() {
 		$documents       = $this->get_documents();
 		$document_titles = array();
-		
+
 		foreach ( $documents as $document ) {
 			$document_titles[ $document->get_type() ] = $document->get_title();
 		}

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class PaymentMeansHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$payment_means = array(
 			'name'  => 'cac:PaymentMeans',
@@ -20,5 +20,5 @@ class PaymentMeansHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

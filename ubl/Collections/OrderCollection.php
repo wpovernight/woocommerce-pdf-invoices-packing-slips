@@ -7,9 +7,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class OrderCollection extends Collection {
-	
+
 	public function add_order( Order $order ) {
 		$this->items[] = $order;
 	}
-	
+
 }

@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Documents' ) ) :
 
 class Settings_Documents {
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
@@ -22,7 +22,7 @@ class Settings_Documents {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_documents', array( $this, 'output' ), 10, 1 );
 	}
-	
+
 	public function init_settings() {
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 		foreach ( $documents as $document ) {
@@ -37,18 +37,18 @@ class Settings_Documents {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
 		$output_format    = 'pdf';
 		$section_document = null;
-		
+
 		if ( isset( $_REQUEST['output_format'] ) && 'ubl' === $_REQUEST['output_format'] ) {
 			$output_format = 'ubl';
 		}
-		
+
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() == $section ) {
 				$section_document = $document;
 				break;
 			}
 		}
-		
+
 		if ( empty( $section_document ) ) {
 			return;
 		}
@@ -71,7 +71,7 @@ class Settings_Documents {
 			</ul>
 		</div>
 		<div class="wcpdf_document_settings_document_output_formats">
-			<?php 
+			<?php
 				if ( ! empty( $section_document->output_formats ) ) {
 					?>
 					<h2 class="nav-tab-wrapper">
@@ -95,7 +95,7 @@ class Settings_Documents {
 			if ( 'pdf' !== $output_format && in_array( $output_format, $section_document->output_formats ) ) {
 				$output_format_compatible = true;
 			}
-			
+
 			$option_name = ( 'pdf' === $output_format || ! $output_format_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output_format}";
 			settings_fields( $option_name );
 			do_settings_sections( $option_name );

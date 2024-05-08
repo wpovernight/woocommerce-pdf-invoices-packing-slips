@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class PaymentTermsHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$paymentTerms = array(
 			'name'  => 'cac:PaymentTerms',
@@ -25,5 +25,5 @@ class PaymentTermsHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

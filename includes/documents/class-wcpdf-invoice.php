@@ -12,12 +12,12 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Invoice' ) ) :
  */
 
 class Invoice extends Order_Document_Methods {
-	
+
 	public $type;
 	public $title;
 	public $icon;
 	public $output_formats;
-	
+
 	/**
 	 * Init/load the order object.
 	 *
@@ -28,10 +28,10 @@ class Invoice extends Order_Document_Methods {
 		$this->type  = 'invoice';
 		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-		
+
 		// call parent constructor
 		parent::__construct( $order );
-		
+
 		// output formats (placed after parent construct to override the abstract default)
 		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf', 'ubl' ), $this );
 	}
@@ -62,10 +62,10 @@ class Invoice extends Order_Document_Methods {
 
 		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
 			$this->set_date( $this->order->get_date_created() );
-			$this->set_display_date( 'order_date' );	
+			$this->set_display_date( 'order_date' );
 		} elseif( empty( $this->get_date() ) ) {
 			$this->set_date( current_time( 'timestamp', true ) );
-			$this->set_display_date( 'invoice_date' );	
+			$this->set_display_date( 'invoice_date' );
 		}
 
 		$this->initiate_number();
@@ -76,10 +76,10 @@ class Invoice extends Order_Document_Methods {
 	public function exists() {
 		return ! empty( $this->data['number'] );
 	}
-	
+
 	/**
 	 * Legacy function < v3.8.0
-	 * 
+	 *
 	 * Still being used by thrid party plugins.
 	 *
 	 * @return mixed
@@ -118,7 +118,7 @@ class Invoice extends Order_Document_Methods {
 		} else {
 			$suffix = date_i18n( 'Y-m-d' ); // 2024-12-31
 		}
-		
+
 		// get filename
 		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
 		$filename      = $name . '-' . $suffix . wcpdf_get_document_output_format_extension( $output_format );
@@ -137,10 +137,10 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function init_settings() {
 		do_action( "wpo_wcpdf_before_{$this->type}_init_settings", $this );
-		
+
 		foreach ( $this->output_formats as $output_format ) {
 			$settings_fields = array();
-			
+
 			switch ( $output_format ) {
 				default:
 				case 'pdf':
@@ -152,17 +152,17 @@ class Invoice extends Order_Document_Methods {
 					$settings_fields = $this->get_ubl_settings_fields( $option_name );
 					break;
 			}
-			
+
 			if ( ! empty( $settings_fields ) ) {
 				// allow plugins to alter settings fields
 				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_{$output_format}", $settings_fields, $page, $option_group, $option_name, $this );
 				WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 			}
 		}
-		
+
 		do_action( "wpo_wcpdf_after_{$this->type}_init_settings", $this );
 	}
-	
+
 	/**
 	 * PDF settings fields
 	 */
@@ -512,17 +512,17 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'use_latest_settings',
-				'title'			=> __( 'Always use most current settings', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> $this->type,
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'use_latest_settings',
-					'description'	=> __( "When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.", 'woocommerce-pdf-invoices-packing-slips' )
-					                   . "<br>"
-					                   . __( "<strong>Caution:</strong> enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected.", 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'use_latest_settings',
+				'title'    => __( 'Always use most current settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'use_latest_settings',
+					'description' => __( "When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.", 'woocommerce-pdf-invoices-packing-slips' )
+									. "<br>"
+									. __( "<strong>Caution:</strong> enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected.", 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);
@@ -544,10 +544,10 @@ class Invoice extends Order_Document_Methods {
 				}
 			}
 		}
-		
+
 		return apply_filters( "wpo_wcpdf_{$this->type}_pdf_settings_fields", $settings_fields, $option_name, $this );
 	}
-	
+
 	/**
 	 * UBL settings fields
 	 */
@@ -597,7 +597,7 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 		);
-		
+
 		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );
 	}
 

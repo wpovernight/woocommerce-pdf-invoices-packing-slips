@@ -46,12 +46,12 @@ $review_invitation = sprintf(
 	} else {
 		$hide_ad = get_option( 'wpo_wcpdf_hide_extensions_ad' );
 	}
-	
+
 	// to improve later: https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/issues/677
 	// if ( ! $hide_ad && ! ( class_exists( 'WooCommerce_PDF_IPS_Pro' ) && class_exists( 'WooCommerce_PDF_IPS_Templates' ) && class_exists( 'WooCommerce_Ext_PrintOrders' ) ) ) {
 	// 	include( 'extensions.php' );
 	// }
-	
+
 	// special temporary promo
 	include( 'promo.php' );
 
@@ -128,7 +128,7 @@ $review_invitation = sprintf(
 						}
 					?>
 					<ul class="preview-data-option-list" data-input-name="document_type">
-						<?php 
+						<?php
 							foreach ( $documents as $document ) {
 								/* translators: 1. document type, 2. document title */
 								printf( '<li data-value="%1$s">%2$s</li>', $document->get_type(), $document->get_title() );
@@ -146,7 +146,7 @@ $review_invitation = sprintf(
 		</div>
 
 	</div>
-	
+
 	<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
 
 </div>

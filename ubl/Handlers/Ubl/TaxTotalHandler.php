@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class TaxTotalHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$formatted_tax_array = array_map( function( $item ) {
 			return array(
@@ -77,5 +77,5 @@ class TaxTotalHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

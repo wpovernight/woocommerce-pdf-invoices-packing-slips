@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class AddressHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$root = isset( $options['root'] ) ? $options['root'] : 'AccountingSupplierParty';
 
@@ -47,7 +47,7 @@ class AddressHandler extends UblHandler {
 		$address    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_address()    : get_option( 'woocommerce_store_address' );
 		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
 		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_coc_number() : '';
-		
+
 		$supplierPartyDetails = array(
 			array(
 				'name'  => 'cac:PartyName',
@@ -151,7 +151,7 @@ class AddressHandler extends UblHandler {
 
 	public function return_customer_party( $data, $options = array() ) {
 		$vat_number = apply_filters( 'wpo_wc_ubl_vat_number', '', $this->document->order );
-		
+
 		if ( empty( $vat_number ) ) {
 			// Try fetching VAT Number from meta
 			$vat_meta_keys = array(
@@ -168,7 +168,7 @@ class AddressHandler extends UblHandler {
 
 			foreach ( $vat_meta_keys as $meta_key ) {
 				$vat_number = wpo_wcpdf_sanitize_html_content( $this->document->order->get_meta( $meta_key ), 'vat_number' );
-				
+
 				if ( $vat_number ) {
 					break;
 				}
@@ -177,7 +177,7 @@ class AddressHandler extends UblHandler {
 
 		$customerPartyName = $customerPartyContactName = wpo_wcpdf_sanitize_html_content( $this->document->order->get_formatted_billing_full_name(), 'full_name' );
 		$billing_company   = wpo_wcpdf_sanitize_html_content( $this->document->order->get_billing_company(), 'company' );
-		
+
 		if ( ! empty( $billing_company ) ) {
 			// $customerPartyName = "{$billing_company} ({$customerPartyName})";
 			// we register customer name separately as Contact too,
@@ -201,7 +201,7 @@ class AddressHandler extends UblHandler {
 								'name'  => 'cbc:Name',
 								'value' => $customerPartyName,
 							),
-						), 
+						),
 						array(
 							'name'  => 'cac:PostalAddress',
 							'value' => array(

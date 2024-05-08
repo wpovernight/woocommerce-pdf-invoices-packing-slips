@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker' ) ) :
 
 class PDF_Maker {
-	
+
 	public $html;
 	public $settings;
 	public $document;

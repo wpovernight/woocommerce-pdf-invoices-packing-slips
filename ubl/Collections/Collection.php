@@ -9,12 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Collection implements Iterator {
-	
+
 	/** @var array */
 	private $items = array();
 
 	/** @var int */
-	private $position = 0;  
+	private $position = 0;
 
 	public function __construct() {
 		$this->position = 0;
@@ -39,5 +39,5 @@ abstract class Collection implements Iterator {
 	public function valid() {
 		return isset( $this->items[ $this->position ] );
 	}
-	
+
 }
