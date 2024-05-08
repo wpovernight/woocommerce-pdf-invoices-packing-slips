@@ -18,7 +18,6 @@ class ComposerStaticInit1066d81cd8f355258ef5165247019e8a
         'W' => 
         array (
             'WPO\\WC\\UBL\\' => 11,
-            'WPO\\WC\\PDF_Invoices\\' => 20,
         ),
         'S' => 
         array (
@@ -47,10 +46,6 @@ class ComposerStaticInit1066d81cd8f355258ef5165247019e8a
         'WPO\\WC\\UBL\\' => 
         array (
             0 => __DIR__ . '/../..' . '/ubl',
-        ),
-        'WPO\\WC\\PDF_Invoices\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/includes',
         ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
@@ -122,41 +117,6 @@ class ComposerStaticInit1066d81cd8f355258ef5165247019e8a
         'WPO\\WC\\PDF_Invoices\\Setup_Wizard' => __DIR__ . '/../..' . '/includes/class-wcpdf-setup-wizard.php',
         'WPO\\WC\\PDF_Invoices\\Tables\\Number_Store_List_Table' => __DIR__ . '/../..' . '/includes/tables/class-wcpdf-number-store-list-table.php',
         'WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' => __DIR__ . '/../..' . '/includes/class-wcpdf-updraft-semaphore.php',
-        'WPO\\WC\\UBL\\Builders\\Builder' => __DIR__ . '/../..' . '/ubl/Builders/Builder.php',
-        'WPO\\WC\\UBL\\Builders\\SabreBuilder' => __DIR__ . '/../..' . '/ubl/Builders/SabreBuilder.php',
-        'WPO\\WC\\UBL\\Collections\\Collection' => __DIR__ . '/../..' . '/ubl/Collections/Collection.php',
-        'WPO\\WC\\UBL\\Collections\\OrderCollection' => __DIR__ . '/../..' . '/ubl/Collections/OrderCollection.php',
-        'WPO\\WC\\UBL\\Documents\\Document' => __DIR__ . '/../..' . '/ubl/Documents/Document.php',
-        'WPO\\WC\\UBL\\Documents\\UblDocument' => __DIR__ . '/../..' . '/ubl/Documents/UblDocument.php',
-        'WPO\\WC\\UBL\\Exceptions\\FileWriteException' => __DIR__ . '/../..' . '/ubl/Exceptions/FileWriteException.php',
-        'WPO\\WC\\UBL\\Handlers\\Handler' => __DIR__ . '/../..' . '/ubl/Handlers/Handler.php',
-        'WPO\\WC\\UBL\\Handlers\\UblHandler' => __DIR__ . '/../..' . '/ubl/Handlers/UblHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\AdditionalDocumentReferenceHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/AdditionalDocumentReferenceHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\AddressHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/AddressHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\AllowanceChargeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/AllowanceChargeHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\DeliveryHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/DeliveryHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\DocumentCurrencyCodeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/DocumentCurrencyCodeHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\IdHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/IdHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\InvoiceLineHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/InvoiceLineHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\InvoiceTypeCodeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/InvoiceTypeCodeHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\IssueDateHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/IssueDateHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\LegalMonetaryTotalHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/LegalMonetaryTotalHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\OrderReferenceHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/OrderReferenceHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\PaymentMeansHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/PaymentMeansHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\PaymentTermsHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/PaymentTermsHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\TaxTotalHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/TaxTotalHandler.php',
-        'WPO\\WC\\UBL\\Handlers\\Ubl\\UblVersionIdHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Ubl/UblVersionIdHandler.php',
-        'WPO\\WC\\UBL\\Models\\Address' => __DIR__ . '/../..' . '/ubl/Models/Address.php',
-        'WPO\\WC\\UBL\\Models\\DateTime' => __DIR__ . '/../..' . '/ubl/Models/DateTime.php',
-        'WPO\\WC\\UBL\\Models\\Model' => __DIR__ . '/../..' . '/ubl/Models/Model.php',
-        'WPO\\WC\\UBL\\Models\\Order' => __DIR__ . '/../..' . '/ubl/Models/Order.php',
-        'WPO\\WC\\UBL\\Repositories\\Contracts\\OrderRepository' => __DIR__ . '/../..' . '/ubl/Repositories/Contracts/OrderRepository.php',
-        'WPO\\WC\\UBL\\Repositories\\OrderRepository' => __DIR__ . '/../..' . '/ubl/Repositories/OrderRepository.php',
-        'WPO\\WC\\UBL\\Repositories\\Repository' => __DIR__ . '/../..' . '/ubl/Repositories/Repository.php',
-        'WPO\\WC\\UBL\\Settings\\TaxesSettings' => __DIR__ . '/../..' . '/ubl/Settings/TaxesSettings.php',
-        'WPO\\WC\\UBL\\Transformers\\AddressTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/AddressTransformer.php',
-        'WPO\\WC\\UBL\\Transformers\\DateTimeTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/DateTimeTransformer.php',
-        'WPO\\WC\\UBL\\Transformers\\OrderTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/OrderTransformer.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
