@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Handler {
-	
+
 	/** @var Document */
 	public $document;
 
@@ -19,5 +19,5 @@ abstract class Handler {
 	}
 
 	abstract public function handle( $data, $options = array() );
-	
+
 }

@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class OrderRepository extends Repository implements OrderRepositoryContract {
-	
+
 	/** @var OrderTransformer */
 	private $transformer;
 
@@ -23,5 +23,5 @@ class OrderRepository extends Repository implements OrderRepositoryContract {
 		$order = wc_get_order( $id );
 		return $this->transformer->transform( $order );
 	}
-	
+
 }

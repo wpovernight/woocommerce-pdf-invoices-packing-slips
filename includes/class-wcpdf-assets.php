@@ -8,16 +8,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Assets' ) ) :
 
 class Assets {
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
-	
+
 	public function __construct()	{
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_scripts_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
@@ -75,12 +75,12 @@ class Assets {
 				array( 'jquery', 'jquery-blockui' ),
 				WPO_WCPDF_VERSION
 			);
-			
+
 			wp_localize_script(
 				'wpo-wcpdf',
 				'wpo_wcpdf_ajax',
 				array(
-					'ajaxurl'			           => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page  
+					'ajaxurl'			           => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page
 					'nonce'				           => wp_create_nonce( 'generate_wpo_wcpdf' ),
 					'bulk_actions'		           => array_keys( wcpdf_get_bulk_actions() ),
 					'select_orders'	               => __( 'You have to select order(s) first!', 'woocommerce-pdf-invoices-packing-slips'),
@@ -124,7 +124,7 @@ class Assets {
 			}" );
 
 			wp_enqueue_script( 'wc-enhanced-select' );
-			
+
 			if ( ! wp_script_is( 'wp-pointer', 'enqueued' ) ) {
 				wp_enqueue_script( 'wp-pointer' );
 			}
@@ -132,14 +132,14 @@ class Assets {
 			if ( ! wp_style_is( 'wp-pointer', 'enqueued' ) ) {
 				wp_enqueue_style( 'wp-pointer' );
 			}
-			
+
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
 				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' ),
 				WPO_WCPDF_VERSION
 			);
-			
+
 			wp_localize_script(
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',
@@ -187,7 +187,7 @@ class Assets {
 					'mysql_int_size_limit'      => __( 'The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			);
-			
+
 			// preview PDFJS
 			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 			if ( ! isset( $debug_settings['disable_preview'] ) ) {
@@ -236,22 +236,22 @@ class Assets {
 				'wpo-wcpdf-jquery-ui-styles',
 				'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css'
 			);
-			
+
 			wp_enqueue_script( 'jquery-ui-datepicker' );
-			
+
 			wp_enqueue_style(
 				'wpo-wcpdf-debug-tools-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools'.$suffix.'.css',
 				WPO_WCPDF_VERSION
 			);
-			
+
 			wp_enqueue_script(
 				'wpo-wcpdf-debug',
 				WPO_WCPDF()->plugin_url() . '/assets/js/debug-script'.$suffix.'.js',
 				array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
 				WPO_WCPDF_VERSION
 			);
-			
+
 			wp_localize_script(
 				'wpo-wcpdf-debug',
 				'wpo_wcpdf_debug',
@@ -272,7 +272,7 @@ class Assets {
 					),
 				)
 			);
-			
+
 		}
 	}
 

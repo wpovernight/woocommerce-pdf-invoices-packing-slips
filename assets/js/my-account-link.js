@@ -9,4 +9,4 @@ jQuery( function( $ ) {
 			};
 		}
 	});
-}); 
+});

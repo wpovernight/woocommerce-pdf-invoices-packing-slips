@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker' ) ) :
 
 class UBL_Maker {
-	
+
 	protected $tmp_base;
 
 	public function write( $filename, $contents ) {

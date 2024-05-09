@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class IdHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$ID = array(
 			'name'  => 'cbc:ID',
@@ -21,5 +21,5 @@ class IdHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

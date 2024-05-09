@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class IssueDateHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$issueDate = array(
 			'name'  => 'cbc:IssueDate',
@@ -20,5 +20,5 @@ class IssueDateHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

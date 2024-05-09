@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class InvoiceTypeCodeHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$invoiceTypeCode = array(
 			'name'       => 'cbc:InvoiceTypeCode',
@@ -24,5 +24,5 @@ class InvoiceTypeCodeHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

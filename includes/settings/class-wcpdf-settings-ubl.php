@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL' ) ) :
 
 class Settings_UBL {
-	
+
 	public $sections;
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
@@ -26,13 +26,13 @@ class Settings_UBL {
 		$this->sections = [
 			'taxes' => __( 'Taxes classification', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
-		
+
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_ubl', array( $this, 'output' ), 10, 1 );
-		
+
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
-		
+
 		// VAT number or COC number is empty
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
 	}
@@ -55,7 +55,7 @@ class Settings_UBL {
 			<?php endif; ?>
 		</div>
 		<?php
-		
+
 		switch ( $active_section ) {
 			default:
 			case 'taxes':
@@ -64,7 +64,7 @@ class Settings_UBL {
 				break;
 		}
 	}
-	
+
 	public function init_tax_settings() {
 		$page = $option_group = $option_name = 'wpo_wcpdf_settings_ubl_taxes';
 
@@ -80,7 +80,7 @@ class Settings_UBL {
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_ubl_taxes', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
-	
+
 	public function save_taxes_on_order_totals( $and_taxes, $order ) {
 		// it seems $and taxes is mostly false, meaning taxes are calculated separately,
 		// but we still update just in case anything changed
@@ -88,23 +88,23 @@ class Settings_UBL {
 			$this->save_order_taxes( $order );
 		}
 	}
-	
+
 	public function save_taxes_on_checkout( $order_id, $posted_data, $order ) {
 		if ( empty( $order ) && ! empty( $order_id ) ) {
 			$order = wc_get_order( $order_id );
 		}
-		
+
 		if ( $order ) {
 			$this->save_order_taxes( $order );
 		}
 	}
-	
+
 	public function save_order_taxes( $order ) {
 		foreach ( $order->get_taxes() as $item_id => $tax_item ) {
 			if ( is_a( $tax_item, '\WC_Order_Item_Tax' ) && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
 				// get tax rate id from item
 				$tax_rate_id = $tax_item->get_rate_id();
-				
+
 				// read tax rate data from db
 				if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 					$tax_rate = \WC_Tax::_get_tax_rate( $tax_rate_id, OBJECT );
@@ -117,7 +117,7 @@ class Settings_UBL {
 						$category       = isset( $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] ) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['category'] : '';
 						$scheme         = isset( $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] ) ? $ubl_tax_settings['rate'][$tax_rate->tax_rate_id]['scheme'] : '';
 						$tax_rate_class = $tax_rate->tax_rate_class;
-						
+
 						if ( empty( $tax_rate_class ) ) {
 							$tax_rate_class = 'standard';
 						}
@@ -142,10 +142,10 @@ class Settings_UBL {
 			}
 		}
 	}
-	
+
 	public function vat_coc_required_for_ubl_invoice() {
 		$invoice_ubl_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice', 'ubl' );
-		
+
 		if ( isset( $invoice_ubl_settings['enabled'] ) && ( ! isset( WPO_WCPDF()->settings->general_settings['vat_number'] ) || ! isset( WPO_WCPDF()->settings->general_settings['coc_number'] ) ) ) {
 			$message = sprintf(
 				/* translators: 1. General Settings, 2. UBL Settings  */
@@ -153,7 +153,7 @@ class Settings_UBL {
 				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) ) . '">' . __( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
 				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '">' . __( 'UBL settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 			);
-			
+
 			echo '<div class="notice notice-warning"><p>' . $message . '</p></div>';
 		}
 	}

@@ -74,13 +74,13 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	'allow_url_fopen' => array (
 		'required' => __( 'Allow remote stylesheets and images', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'	   => null,
-		'result'   => ini_get( 'allow_url_fopen' ),			
+		'result'   => ini_get( 'allow_url_fopen' ),
 		'fallback' => __( 'allow_url_fopen disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'base64_decode'	=> array (
 		'required' => __( 'To compress and decompress font data', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'	   => null,	
-		'result'   => function_exists( 'base64_decode' ),			
+		'value'	   => null,
+		'result'   => function_exists( 'base64_decode' ),
 		'fallback' => __( 'base64_decode disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 ) );
@@ -182,19 +182,19 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		</tr>
 	</tbody>
 	<?php endforeach; ?>
-	<?php 
+	<?php
 		if ( WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) :
 			if ( function_exists( 'as_get_scheduled_actions' ) ) {
 				$scheduled_actions = as_get_scheduled_actions( array(
 					'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
 					'status' => \ActionScheduler_Store::STATUS_PENDING,
 				) );
-			
+
 				$yearly_reset = array(
 					'required' => __( 'Required to reset documents numeration', 'woocommerce-pdf-invoices-packing-slips' ),
 					'fallback' => __( 'Yearly reset action not found', 'woocommerce-pdf-invoices-packing-slips' ),
 				);
-				
+
 				if ( ! empty( $scheduled_actions ) ) {
 					$total_actions = count( $scheduled_actions );
 					if ( $total_actions === 1 ) {
@@ -225,7 +225,7 @@ if ( ! $server_configs['PHP version']['result'] ) {
 					$yearly_reset['result'] = false;
 				}
 			}
-			
+
 			$label = __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' );
 
 			if ( $yearly_reset['result'] ) {
@@ -262,25 +262,25 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		'WCPDF_TEMP_DIR' => array (
 			'description'    => __( 'Central temporary plugin folder', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'          => WPO_WCPDF()->main->get_tmp_path(),
-			'status'         => is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',			
+			'status'         => is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',
 			'status_message' => is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? $status['ok'] : $status['failed'],
 		),
 		'WCPDF_ATTACHMENT_DIR' => array (
 			'description'    => __( 'Temporary attachments folder', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ),
-			'status'         => is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',			
+			'status'         => is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',
 			'status_message' => is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
 		),
 		'DOMPDF_TEMP_DIR' => array (
 			'description'    => __( 'Temporary DOMPDF folder', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'          => trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )),
-			'status'         => is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? 'ok' : 'failed',			
+			'status'         => is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? 'ok' : 'failed',
 			'status_message' => is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? $status['ok'] : $status['failed'],
 		),
 		'DOMPDF_FONT_DIR' => array (
 			'description'    => __( 'DOMPDF fonts folder (needs to be writable for custom/remote fonts)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'          => trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'fonts' )),
-			'status'         => is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? 'ok' : 'failed',			
+			'status'         => is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? 'ok' : 'failed',
 			'status_message' => is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? $status['ok'] : $status['failed'],
 		),
 	), $status );

@@ -3,19 +3,19 @@ name: Auto Minify JS and CSS Files
 on:
   workflow_dispatch:
   push:
-    paths: 
+    paths:
       - 'assets/**/*.js'
       - 'assets/**/*.css'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
-  
+
       - name: Auto Minify
         uses: alexmigf/auto-minify@exclude-dirs
         with:

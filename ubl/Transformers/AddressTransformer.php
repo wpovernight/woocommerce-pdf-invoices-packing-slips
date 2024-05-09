@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class AddressTransformer {
-	
+
 	/**
 	 * @return Address
 	 */
@@ -31,5 +31,5 @@ class AddressTransformer {
 
 		return $model;
 	}
-	
+
 }

@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class TaxesSettings {
-	
+
 	/** @var array */
 	public $settings;
 
@@ -22,14 +22,14 @@ class TaxesSettings {
 		$rates                       = \WC_Tax::get_tax_rate_classes();
 		$formatted_rates             = array();
 		$formatted_rates['standard'] = __( 'Standard', 'woocommerce' );
-		
+
 		foreach ( $rates as $rate ) {
 			if ( empty( $rate->slug ) ) {
 				continue;
 			}
 			$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
 		}
-		
+
 		foreach ( $formatted_rates as $slug => $name ) {
 			$this->output_table_for_tax_class( $slug, $name );
 		}
@@ -41,7 +41,7 @@ class TaxesSettings {
 		global $wpdb;
 		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
 		?>
-		
+
 		<h4><?php echo $name; ?></h4>
 		<table class="widefat">
 			<thead>
@@ -61,22 +61,22 @@ class TaxesSettings {
 						foreach ( $results as $result ) {
 							$locationResults = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;", $result->tax_rate_id ) );
 							$postcode = $city = '';
-	
+
 							foreach ( $locationResults as $locationResult ) {
 								if ( 'postcode' === $locationResult->location_type ) {
 									$postcode = $locationResult->location_code;
 									continue;
 								}
-	
+
 								if ( 'city' === $locationResult->location_type ) {
 									$city = $locationResult->location_code;
 									continue;
 								}
 							}
-	
+
 							$scheme   = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : '';
 							$category = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : '';
-							
+
 							echo '<tr>';
 							echo '<td>'.$result->tax_rate_country.'</td>';
 							echo '<td>'.$result->tax_rate_state.'</td>';
@@ -86,7 +86,7 @@ class TaxesSettings {
 							echo '<td>'.$this->get_scheme_select( 'rate', $result->tax_rate_id, $scheme ).'</td>';
 							echo '<td>'.$this->get_category_select( 'rate', $result->tax_rate_id, $category ).'</td>';
 							echo '</tr>';
-						}	
+						}
 					} else {
 						echo '<tr><td colspan="7">' . __( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
 					}

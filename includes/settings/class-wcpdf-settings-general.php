@@ -10,9 +10,9 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_General' ) ) :
 class Settings_General {
 
 	protected $option_name = 'wpo_wcpdf_settings_general';
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
@@ -232,7 +232,7 @@ class Settings_General {
 				'id'		=> 'extra_template_fields',
 				'title'		=> __( 'Extra template fields', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'	=> 'custom_fields_section',
-			),	
+			),
 			array(
 				'type'		=> 'setting',
 				'id'		=> 'extra_1',
@@ -362,7 +362,7 @@ class Settings_General {
 
 		foreach ( $template_paths as $template_source => $template_path ) {
 			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR );
-			
+
 			foreach ( $dirs as $dir ) {
 				if ( empty( $dir ) ) {
 					continue;
