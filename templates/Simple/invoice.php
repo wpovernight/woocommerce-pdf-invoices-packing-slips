@@ -165,13 +165,13 @@
 <?php do_action( 'wpo_wcpdf_after_order_details', $this->get_type(), $this->order ); ?>
 
 <?php if ( $this->get_footer() ) : ?>
-	<htmlpagefooter name="docFooter"><!-- required for mPDF engine -->
-		<div id="footer">
+	<div id="footer">
+		<htmlpagefooter name="docFooter"><!-- required for mPDF engine -->
 			<!-- hook available: wpo_wcpdf_before_footer -->
 			<?php $this->footer(); ?>
 			<!-- hook available: wpo_wcpdf_after_footer -->
-		</div>
-	</htmlpagefooter><!-- required for mPDF engine -->
+		</htmlpagefooter><!-- required for mPDF engine -->
+	</div>
 <?php endif; ?>
 
 <?php do_action( 'wpo_wcpdf_after_document', $this->get_type(), $this->order ); ?>
