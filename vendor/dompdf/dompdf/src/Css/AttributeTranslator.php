@@ -3,11 +3,13 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Css;
+namespace WPO\IPS\Vendor\Dompdf\Css;
 
-use Dompdf\Frame;
-use Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Helpers;
 
 /**
  * Translates HTML 4.0 attributes into CSS rules
@@ -167,14 +169,14 @@ class AttributeTranslator
         'ol' => [
             'compact' => 'margin: 0.5em 0;',
             'start' => 'counter-reset: -dompdf-default-counter %d;',
-            'type' => 'list-style-type: %s;',
+            'type' => '_set_list_style_type',
         ],
         'ul' => [
             'compact' => 'margin: 0.5em 0;',
-            'type' => 'list-style-type: %s;',
+            'type' => '_set_list_style_type',
         ],
         'li' => [
-            'type' => 'list-style-type: %s;',
+            'type' => '_set_list_style_type',
             'value' => 'counter-reset: -dompdf-default-counter %d;',
         ],
         'pre' => [
@@ -648,5 +650,33 @@ class AttributeTranslator
         }
 
         return ltrim($style, "; ");
+    }
+
+    protected static function _set_list_style_type(\DOMElement $node, string $value): string
+    {
+        $v = trim($value);
+
+        switch ($v) {
+            case "1":
+                $type = "decimal";
+                break;
+            case "a":
+                $type = "lower-alpha";
+                break;
+            case "A":
+                $type = "upper-alpha";
+                break;
+            case "i":
+                $type = "lower-roman";
+                break;
+            case "I":
+                $type = "upper-roman";
+                break;
+            default:
+                $type = $v;
+                break;
+        }
+
+        return "list-style-type: $type;";
     }
 }

@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              3.8.3-beta-1
+ * Version:              3.9.0-beta-1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '3.8.3-beta-1';
+	public $version              = '3.9.0-beta-1';
 	public $version_php          = '7.2';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -50,7 +50,6 @@ class WPO_WCPDF {
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
-			self::$_instance->autoloaders();
 		}
 		return self::$_instance;
 	}
@@ -59,6 +58,8 @@ class WPO_WCPDF {
 	 * Constructor
 	 */
 	public function __construct() {
+		require $this->plugin_path() . '/vendor/autoload.php';
+
 		$this->plugin_basename = plugin_basename(__FILE__);
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
 			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
@@ -66,8 +67,6 @@ class WPO_WCPDF {
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
-
-		require $this->plugin_path() . '/vendor/autoload.php';
 
 		// load the localisation & classes
 		add_action( 'plugins_loaded', array( $this, 'translations' ) );
@@ -95,11 +94,6 @@ class WPO_WCPDF {
 		}
 
 		return false;
-	}
-
-	private function autoloaders() {
-		// main plugin autoloader
-		require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 	}
 
 	/**
@@ -145,22 +139,22 @@ class WPO_WCPDF {
 	 */
 	public function includes() {
 		// plugin functions
-		include_once( $this->plugin_path() . '/includes/wcpdf-functions.php' );
+		include_once( $this->plugin_path() . '/wpo-ips-functions.php' );
 
 		// Third party compatibility
-		$this->third_party_plugins = \WPO\WC\PDF_Invoices\Compatibility\Third_Party_Plugins::instance();
+		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		// WC OrderUtil compatibility
-		$this->order_util          = \WPO\WC\PDF_Invoices\Compatibility\Order_Util::instance();
+		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		// Plugin classes
-		$this->settings            = \WPO\WC\PDF_Invoices\Settings::instance();
-		$this->documents           = \WPO\WC\PDF_Invoices\Documents::instance();
-		$this->main                = \WPO\WC\PDF_Invoices\Main::instance();
-		$this->endpoint            = \WPO\WC\PDF_Invoices\Endpoint::instance();
-		$this->assets              = \WPO\WC\PDF_Invoices\Assets::instance();
-		$this->admin               = \WPO\WC\PDF_Invoices\Admin::instance();
-		$this->frontend            = \WPO\WC\PDF_Invoices\Frontend::instance();
-		$this->install             = \WPO\WC\PDF_Invoices\Install::instance();
-		$this->font_synchronizer   = \WPO\WC\PDF_Invoices\Font_Synchronizer::instance();
+		$this->settings            = \WPO\IPS\Settings::instance();
+		$this->documents           = \WPO\IPS\Documents::instance();
+		$this->main                = \WPO\IPS\Main::instance();
+		$this->endpoint            = \WPO\IPS\Endpoint::instance();
+		$this->assets              = \WPO\IPS\Assets::instance();
+		$this->admin               = \WPO\IPS\Admin::instance();
+		$this->frontend            = \WPO\IPS\Frontend::instance();
+		$this->install             = \WPO\IPS\Install::instance();
+		$this->font_synchronizer   = \WPO\IPS\FontSynchronizer::instance();
 	}
 
 	/**

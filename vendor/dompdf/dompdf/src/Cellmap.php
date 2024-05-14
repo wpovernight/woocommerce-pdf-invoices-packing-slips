@@ -3,12 +3,14 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\AbstractFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Table as TableFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
 
 /**
  * Maps table cells to the table grid.
@@ -591,11 +593,15 @@ class Cellmap
                     $style->set_used("border_bottom_width", $bottom["width"] / 2);
                     $style->set_used("border_left_width", $left["width"] / 2);
                     $style->set_used("border_style", "none");
-                } else {
-                    // Clear borders for rows and row groups
-                    $style->set_used("border_width", 0);
-                    $style->set_used("border_style", "none");
                 }
+            }
+
+            if ($frame !== $this->_table) {
+                // Clear borders for rows and row groups. For the collapsed
+                // model, they have been resolved and are used by the cells now.
+                // For the separated model, they are ignored per spec
+                $style->set_used("border_width", 0);
+                $style->set_used("border_style", "none");
             }
 
             if ($frame === $this->_table) {

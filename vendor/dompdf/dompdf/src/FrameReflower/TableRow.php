@@ -3,13 +3,15 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\FrameReflower;
+namespace WPO\IPS\Vendor\Dompdf\FrameReflower;
 
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableRow as TableRowFrameDecorator;
-use Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Block as BlockFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Table as TableFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\TableRow as TableRowFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\Exception;
 
 /**
  * Reflows table rows
@@ -47,11 +49,11 @@ class TableRow extends AbstractFrameReflower
         // Counters and generated content
         $this->_set_content();
 
-        $this->_frame->position();
-        $style = $this->_frame->get_style();
-        $cb = $this->_frame->get_containing_block();
+        $frame->position();
+        $style = $frame->get_style();
+        $cb = $frame->get_containing_block();
 
-        foreach ($this->_frame->get_children() as $child) {
+        foreach ($frame->get_children() as $child) {
             $child->set_containing_block($cb);
             $child->reflow();
 
@@ -64,12 +66,16 @@ class TableRow extends AbstractFrameReflower
             return;
         }
 
-        $table = TableFrameDecorator::find_parent_table($this->_frame);
+        $table = TableFrameDecorator::find_parent_table($frame);
+        if ($table === null) {
+            throw new Exception("Parent table not found for table row");
+        }
         $cellmap = $table->get_cellmap();
-        $style->set_used("width", $cellmap->get_frame_width($this->_frame));
-        $style->set_used("height", $cellmap->get_frame_height($this->_frame));
 
-        $this->_frame->set_position($cellmap->get_frame_position($this->_frame));
+        $style->set_used("width", $cellmap->get_frame_width($frame));
+        $style->set_used("height", $cellmap->get_frame_height($frame));
+
+        $frame->set_position($cellmap->get_frame_position($frame));
     }
 
     /**

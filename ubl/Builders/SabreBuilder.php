@@ -1,9 +1,9 @@
 <?php
 
-namespace WPO\WC\UBL\Builders;
+namespace WPO\IPS\UBL\Builders;
 
-use Sabre\Xml\Service;
-use WPO\WC\UBL\Documents\Document;
+use WPO\IPS\Vendor\Sabre\Xml\Service;
+use WPO\IPS\UBL\Documents\Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

@@ -1,27 +1,32 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\CSSList;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\CSSList;
 
-use Sabberworm\CSS\Comment\Comment;
-use Sabberworm\CSS\Comment\Commentable;
-use Sabberworm\CSS\OutputFormat;
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\SourceException;
-use Sabberworm\CSS\Parsing\UnexpectedEOFException;
-use Sabberworm\CSS\Parsing\UnexpectedTokenException;
-use Sabberworm\CSS\Property\AtRule;
-use Sabberworm\CSS\Property\Charset;
-use Sabberworm\CSS\Property\CSSNamespace;
-use Sabberworm\CSS\Property\Import;
-use Sabberworm\CSS\Property\Selector;
-use Sabberworm\CSS\Renderable;
-use Sabberworm\CSS\RuleSet\AtRuleSet;
-use Sabberworm\CSS\RuleSet\DeclarationBlock;
-use Sabberworm\CSS\RuleSet\RuleSet;
-use Sabberworm\CSS\Settings;
-use Sabberworm\CSS\Value\CSSString;
-use Sabberworm\CSS\Value\URL;
-use Sabberworm\CSS\Value\Value;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Commentable;
+use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\AtRule;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\Charset;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\CSSNamespace;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\Import;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\Selector;
+use WPO\IPS\Vendor\Sabberworm\CSS\Renderable;
+use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\AtRuleSet;
+use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\DeclarationBlock;
+use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\RuleSet;
+use WPO\IPS\Vendor\Sabberworm\CSS\Settings;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\CSSString;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\URL;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
 
 /**
  * This is the most generic container available. It can contain `DeclarationBlock`s (rule sets with a selector),

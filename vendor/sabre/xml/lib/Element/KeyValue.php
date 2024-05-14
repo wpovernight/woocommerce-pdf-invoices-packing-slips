@@ -1,11 +1,16 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Element;
+namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
-use Sabre\Xml;
-use Sabre\Xml\Deserializer;
+use WPO\IPS\Vendor\Sabre\Xml;
+use WPO\IPS\Vendor\Sabre\Xml\Deserializer;
 
 /**
  * 'KeyValue' parses out all child elements from a single node, and outputs a

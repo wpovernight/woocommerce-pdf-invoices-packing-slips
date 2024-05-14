@@ -1,8 +1,13 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml;
+namespace WPO\IPS\Vendor\Sabre\Xml;
 
 use XMLReader;
 
@@ -283,12 +288,12 @@ class Reader extends XMLReader
             if ('{}' == substr($name, 0, 2) && array_key_exists(substr($name, 2), $this->elementMap)) {
                 $name = substr($name, 2);
             } else {
-                return ['Sabre\\Xml\\Element\\Base', 'xmlDeserialize'];
+                return ['WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Base', 'xmlDeserialize'];
             }
         }
 
         $deserializer = $this->elementMap[$name];
-        if (is_subclass_of($deserializer, 'Sabre\\Xml\\XmlDeserializable')) {
+        if (is_subclass_of($deserializer, 'WPO\\IPS\\Vendor\\Sabre\\Xml\\XmlDeserializable')) {
             return [$deserializer, 'xmlDeserialize'];
         }
 

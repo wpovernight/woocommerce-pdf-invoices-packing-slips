@@ -1,6 +1,11 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Property;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
 class KeyframeSelector extends Selector
 {

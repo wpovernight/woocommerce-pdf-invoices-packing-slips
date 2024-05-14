@@ -1,9 +1,12 @@
 <?php
 /**
  * Provide general element functions.
+ *
+ * @license MIT
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Masterminds\HTML5;
+namespace WPO\IPS\Vendor\Masterminds\HTML5;
 
 /**
  * This class provides general information about HTML5 elements,

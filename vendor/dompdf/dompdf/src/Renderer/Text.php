@@ -3,11 +3,13 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Renderer;
+namespace WPO\IPS\Vendor\Dompdf\Renderer;
 
-use Dompdf\Adapter\CPDF;
-use Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Adapter\CPDF;
+use WPO\IPS\Vendor\Dompdf\Frame;
 
 /**
  * Renders text frames
@@ -38,7 +40,7 @@ class Text extends AbstractRenderer
     const DECO_EXTENSION = 0.0;
 
     /**
-     * @param \Dompdf\FrameDecorator\Text $frame
+     * @param \WPO\IPS\Vendor\Dompdf\FrameDecorator\Text $frame
      */
     function render(Frame $frame)
     {
@@ -51,7 +53,7 @@ class Text extends AbstractRenderer
 
         $this->_set_opacity($frame->get_opacity($style->opacity));
 
-        list($x, $y) = $frame->get_position();
+        [$x, $y] = $frame->get_position();
         $cb = $frame->get_containing_block();
 
         $ml = $style->margin_left;
@@ -150,9 +152,12 @@ class Text extends AbstractRenderer
             $this->_canvas->line($x1, $deco_y, $x2, $deco_y, $color, $line_thickness);
         }
 
-        if ($this->_dompdf->getOptions()->getDebugLayout() && $this->_dompdf->getOptions()->getDebugLayoutLines()) {
-            $text_width = $this->_dompdf->getFontMetrics()->getTextWidth($text, $font, $size, $word_spacing, $letter_spacing);
-            $this->_debug_layout([$x, $y, $text_width, $frame_font_size], "orange", [0.5, 0.5]);
+        $options = $this->_dompdf->getOptions();
+
+        if ($options->getDebugLayout() && $options->getDebugLayoutLines()) {
+            $fontMetrics = $this->_dompdf->getFontMetrics();
+            $textWidth = $fontMetrics->getTextWidth($text, $font, $size, $word_spacing, $letter_spacing);
+            $this->debugLayout([$x, $y, $textWidth, $frame_font_size], "orange", [0.5, 0.5]);
         }
     }
 }

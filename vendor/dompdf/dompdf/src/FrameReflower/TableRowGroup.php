@@ -3,12 +3,15 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\FrameReflower;
+namespace WPO\IPS\Vendor\Dompdf\FrameReflower;
 
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableRowGroup as TableRowGroupFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Block as BlockFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Table as TableFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\TableRowGroup as TableRowGroupFrameDecorator;
 
 /**
  * Reflows table row groups (e.g. tbody tags)
@@ -35,6 +38,8 @@ class TableRowGroup extends AbstractFrameReflower
         /** @var TableRowGroupFrameDecorator */
         $frame = $this->_frame;
         $page = $frame->get_root();
+        $parent = $frame->get_parent();
+        $dompdf_generated = $parent->get_frame()->get_node()->nodeName === "dompdf_generated";
 
         // Counters and generated content
         $this->_set_content();
@@ -54,7 +59,14 @@ class TableRowGroup extends AbstractFrameReflower
             }
         }
 
+        if ($page->is_full() && $dompdf_generated && $frame->get_parent() === null) {
+            return;
+        }
+
         $table = TableFrameDecorator::find_parent_table($frame);
+        if ($table === null) {
+            throw new Exception("Parent table not found for table row group");
+        }
         $cellmap = $table->get_cellmap();
 
         // Stop reflow if a page break has occurred before the frame, in which

@@ -3,18 +3,20 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 // FIXME: Need to sanity check inputs to this class
-namespace Dompdf\Adapter;
+namespace WPO\IPS\Vendor\Dompdf\Adapter;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
-use FontLib\Exception\FontNotFoundException;
+use WPO\IPS\Vendor\Dompdf\Canvas;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FontMetrics;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Image\Cache;
+use WPO\IPS\Vendor\FontLib\Exception\FontNotFoundException;
 
 /**
  * PDF rendering interface
@@ -109,7 +111,7 @@ class CPDF implements Canvas
     /**
      * Instance of Cpdf class
      *
-     * @var \Dompdf\Cpdf
+     * @var \WPO\IPS\Vendor\Dompdf\Cpdf
      */
     protected $_pdf;
 
@@ -174,7 +176,7 @@ class CPDF implements Canvas
             $this->_dompdf = $dompdf;
         }
 
-        $this->_pdf = new \Dompdf\Cpdf(
+        $this->_pdf = new \WPO\IPS\Vendor\Dompdf\Cpdf(
             $size,
             true,
             $this->_dompdf->getOptions()->getFontCache(),
@@ -202,7 +204,7 @@ class CPDF implements Canvas
     /**
      * Returns the Cpdf instance
      *
-     * @return \Dompdf\Cpdf
+     * @return \WPO\IPS\Vendor\Dompdf\Cpdf
      */
     public function get_cpdf()
     {
@@ -598,11 +600,10 @@ class CPDF implements Canvas
 
         set_error_handler([Helpers::class, "record_warnings"]);
 
-        if (!function_exists($func_name)) {
-            if (!method_exists(Helpers::class, $func_name)) {
-                throw new Exception("Function $func_name() not found.  Cannot convert $type image: $image_url.  Please install the image PHP extension.");
-            }
+        if (method_exists(Helpers::class, $func_name)) {
             $func_name = [Helpers::class, $func_name];
+        } elseif (!function_exists($func_name)) {
+            throw new Exception("Function $func_name() not found.  Cannot convert $type image: $image_url.  Please install the image PHP extension.");
         }
 
         try {
@@ -684,15 +685,14 @@ class CPDF implements Canvas
     {
         $pdf = $this->_pdf;
 
-        $font .= ".afm";
         $pdf->selectFont($font);
 
         if (!isset($pdf->acroFormId)) {
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_CHOICE;
-        $ff = \Dompdf\Cpdf::ACROFORM_FIELD_CHOICE_COMBO;
+        $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_CHOICE;
+        $ff = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_CHOICE_COMBO;
 
         $id = $pdf->addFormField($ft, rand(), $x, $this->y($y) - $h, $x + $w, $this->y($y), $ff, $size, $color);
         $pdf->setFormFieldOpt($id, $opts);
@@ -702,15 +702,14 @@ class CPDF implements Canvas
     {
         $pdf = $this->_pdf;
 
-        $font .= ".afm";
         $pdf->selectFont($font);
 
         if (!isset($pdf->acroFormId)) {
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
-        $ff = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT_MULTILINE;
+        $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+        $ff = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT_MULTILINE;
 
         $pdf->addFormField($ft, rand(), $x, $this->y($y) - $h, $x + $w, $this->y($y), $ff, $size, $color);
     }
@@ -719,26 +718,25 @@ class CPDF implements Canvas
     {
         $pdf = $this->_pdf;
 
-        $font .= ".afm";
         $pdf->selectFont($font);
 
         if (!isset($pdf->acroFormId)) {
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+        $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
         $ff = 0;
 
         switch ($type) {
             case 'text':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+                $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
                 break;
             case 'password':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
-                $ff = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT_PASSWORD;
+                $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+                $ff = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT_PASSWORD;
                 break;
             case 'submit':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_BUTTON;
+                $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_BUTTON;
                 break;
         }
 
@@ -752,7 +750,7 @@ class CPDF implements Canvas
         $this->_set_fill_color($color);
 
         $is_font_subsetting = $this->_dompdf->getOptions()->getIsFontSubsettingEnabled();
-        $pdf->selectFont($font . '.afm', '', true, $is_font_subsetting);
+        $pdf->selectFont($font, '', true, $is_font_subsetting);
 
         $pdf->addText($x, $this->y($y) - $pdf->getFontHeight($size), $size, $text, $angle, $word_space, $char_space);
 
@@ -784,6 +782,66 @@ class CPDF implements Canvas
         } else {
             $this->_pdf->addLink($url, $x, $y, $x + $width, $y + $height);
         }
+    }
+
+    public function font_supports_char(string $font, string $char): bool
+    {
+        if ($char === "") {
+            return true;
+        }
+
+        $subsetting = $this->_dompdf->getOptions()->getIsFontSubsettingEnabled();
+        $this->_pdf->selectFont($font, '', false, $subsetting);
+        if (!\array_key_exists($font, $this->_pdf->fonts)) {
+            return false;
+        }
+        $fontInfo = $this->_pdf->fonts[$font];
+        $charCode = Helpers::uniord($char, "UTF-8");
+
+        if (!$fontInfo["isUnicode"]) {
+            // The core fonts use Windows ANSI encoding. The char map uses the
+            // position of the character in the encoding's mapping table in this
+            // case, not the Unicode code point, which is different for the
+            // characters outside ISO-8859-1 (positions 0x80-0x9F)
+            // https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP1252.TXT
+            $mapping = [
+                0x20AC => 0x80,
+                0x201A => 0x82,
+                0x0192 => 0x83,
+                0x201E => 0x84,
+                0x2026 => 0x85,
+                0x2020 => 0x86,
+                0x2021 => 0x87,
+                0x02C6 => 0x88,
+                0x2030 => 0x89,
+                0x0160 => 0x8A,
+                0x2039 => 0x8B,
+                0x0152 => 0x8C,
+                0x017D => 0x8E,
+                0x2018 => 0x91,
+                0x2019 => 0x92,
+                0x201C => 0x93,
+                0x201D => 0x94,
+                0x2022 => 0x95,
+                0x2013 => 0x96,
+                0x2014 => 0x97,
+                0x02DC => 0x98,
+                0x2122 => 0x99,
+                0x0161 => 0x9A,
+                0x203A => 0x9B,
+                0x0153 => 0x9C,
+                0x017E => 0x9E,
+                0x0178 => 0x9F
+            ];
+
+            $charCode = $mapping[$charCode] ?? $charCode;
+
+            if ($charCode > 0xFF) {
+                return false;
+            }
+        }
+
+        return \array_key_exists($charCode, $fontInfo["C"]);
     }
 
     /**

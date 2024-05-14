@@ -3,13 +3,15 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\FrameDecorator;
+namespace WPO\IPS\Vendor\Dompdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Image\Cache;
 
 /**
  * Decorates frames for image layout and rendering
@@ -43,7 +45,9 @@ class Image extends AbstractFrameDecorator
     function __construct(Frame $frame, Dompdf $dompdf)
     {
         parent::__construct($frame, $dompdf);
-        $url = $frame->get_node()->getAttribute("src");
+
+        $node = $frame->get_node();
+        $url = $node->getAttribute("src");
 
         $debug_png = $dompdf->getOptions()->getDebugPng();
         if ($debug_png) {
@@ -58,9 +62,7 @@ class Image extends AbstractFrameDecorator
             $dompdf->getOptions()
         );
 
-        if (Cache::is_broken($this->_image_url) &&
-            $alt = $frame->get_node()->getAttribute("alt")
-        ) {
+        if (Cache::is_broken($this->_image_url) && ($alt = $node->getAttribute("alt")) !== "") {
             $fontMetrics = $dompdf->getFontMetrics();
             $style = $frame->get_style();
             $font = $style->font_family;
@@ -68,7 +70,7 @@ class Image extends AbstractFrameDecorator
             $word_spacing = $style->word_spacing;
             $letter_spacing = $style->letter_spacing;
 
-            $style->width = (4 / 3) * $fontMetrics->getTextWidth($alt, $font, $size, $word_spacing, $letter_spacing);
+            $style->width = $fontMetrics->getTextWidth($alt, $font, $size, $word_spacing, $letter_spacing);
             $style->height = $fontMetrics->getFontHeight($font, $size);
         }
     }

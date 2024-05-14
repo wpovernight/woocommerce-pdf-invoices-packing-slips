@@ -1,9 +1,14 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Property;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
-use Sabberworm\CSS\Comment\Commentable;
-use Sabberworm\CSS\Renderable;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Commentable;
+use WPO\IPS\Vendor\Sabberworm\CSS\Renderable;
 
 interface AtRule extends Renderable, Commentable
 {

@@ -3,13 +3,16 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\FrameDecorator;
+namespace WPO\IPS\Vendor\Dompdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Helpers;
-use Dompdf\Frame;
-use Dompdf\Renderer;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Renderer;
 
 /**
  * Decorates frames for page layout
@@ -492,7 +495,10 @@ class Page extends AbstractFrameDecorator
                     // Check if the page_break_inside property is not 'avoid'
                     // for the parent table or any of its ancestors
                     $table = Table::find_parent_table($frame);
-
+                    if ($table === null) {
+                        throw new Exception("Parent table not found for table row");
+                    }
+            
                     $p = $table;
                     while ($p) {
                         if ($p->get_style()->page_break_inside === "avoid") {
@@ -699,8 +705,6 @@ class Page extends AbstractFrameDecorator
      * Add a floating frame
      *
      * @param Frame $frame
-     *
-     * @return void
      */
     function add_floating_frame(Frame $frame)
     {

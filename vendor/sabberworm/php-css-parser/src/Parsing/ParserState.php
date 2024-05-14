@@ -1,9 +1,14 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Parsing;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Parsing;
 
-use Sabberworm\CSS\Comment\Comment;
-use Sabberworm\CSS\Settings;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
+use WPO\IPS\Vendor\Sabberworm\CSS\Settings;
 
 class ParserState
 {
@@ -113,7 +118,7 @@ class ParserState
     }
 
     /**
-     * @return \Sabberworm\CSS\Parsing\Anchor
+     * @return \WPO\IPS\Vendor\Sabberworm\CSS\Parsing\Anchor
      */
     public function anchor()
     {

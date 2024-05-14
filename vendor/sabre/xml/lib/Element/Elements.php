@@ -1,12 +1,17 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 14-May-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Element;
+namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
-use Sabre\Xml;
-use Sabre\Xml\Deserializer;
-use Sabre\Xml\Serializer;
+use WPO\IPS\Vendor\Sabre\Xml;
+use WPO\IPS\Vendor\Sabre\Xml\Deserializer;
+use WPO\IPS\Vendor\Sabre\Xml\Serializer;
 
 /**
  * 'Elements' is a simple list of elements, without values or attributes.
