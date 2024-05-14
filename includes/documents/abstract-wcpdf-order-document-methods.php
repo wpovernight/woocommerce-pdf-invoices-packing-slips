@@ -270,7 +270,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		$custom_field = $this->get_custom_field( $field_name );
 
 		if ( ! empty( $field_label ) ) {
-			// add a a trailing space to the label
+			// add a trailing space to the label
 			$field_label .= ' ';
 		}
 
