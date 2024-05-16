@@ -10,8 +10,8 @@
 	},
 	"require": {
 		"dompdf/dompdf": "^3.0",
-		"symfony/polyfill-mbstring": "^1.27",
-		"symfony/polyfill-iconv": "^1.27",
+		"symfony/polyfill-mbstring": "^1.2",
+		"symfony/polyfill-iconv": "^1.2",
 		"sabre/xml": "^2.2.5"
 	},
 	"config": {
