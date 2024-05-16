@@ -2,12 +2,12 @@
 	if ( ! defined( 'ABSPATH' ) ) {
 		exit; // Exit if accessed directly
 	}
-	
+
 	$now              = new \DateTime();
 	$end              = new \DateTime( '2023-11-29 23:59:59' ); // Black Friday 2023!
 	$bundle_installed = class_exists( 'WooCommerce_PDF_IPS_Pro' ) && class_exists( 'WPO_WCPDF_Templates' );
 	$hide_ad          = false;
-	
+
 	if ( isset( $_REQUEST['wpo_wcpdf_hide_promo_ad'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 		// validate nonce
 		if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_promo_ad_nonce' ) ) {

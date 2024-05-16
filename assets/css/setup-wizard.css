@@ -130,17 +130,17 @@ body.wpo-wcpdf-setup form {
 }
 
 .wpo-progress-bar {
-  counter-reset: section;
+	counter-reset: section;
 }
 
 .wpo-progress-marker::before {
-  counter-increment: section;
-  content: counter(section);
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: #999;
+	counter-increment: section;
+	content: counter(section);
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	color: #999;
 }
 
 li.active .wpo-progress-marker::before {
@@ -197,8 +197,8 @@ li.completed .wpo-progress-marker::before {
 	box-sizing: border-box;
 }
 
-.wpo-setup-card .wpo-button-next, 
-.wpo-setup-card .wpo-button-previous, 
+.wpo-setup-card .wpo-button-next,
+.wpo-setup-card .wpo-button-previous,
 .wpo-setup-card .wpo-skip-step,
 .wpo-setup-card .wpo-setup-input span.button {
 	padding: 0.5em 1.2em;
@@ -224,7 +224,7 @@ li.completed .wpo-progress-marker::before {
 	color: #1c6c8b;
 }
 
-.wpo-setup-card .wpo-button-next:hover, 
+.wpo-setup-card .wpo-button-next:hover,
 .wpo-setup-card .wpo-button-previous:hover,
 .wpo-setup-input span.button:hover {
 	background-color: #239bb9;
@@ -233,7 +233,7 @@ li.completed .wpo-progress-marker::before {
 	border-color: #239bb9;
 }
 
-.wpo-setup-card .wpo-button-next:focus, 
+.wpo-setup-card .wpo-button-next:focus,
 .wpo-setup-card .wpo-button-previous:focus,
 .wpo-setup-input span.button:focus {
 	background-color: #239bb9;
@@ -241,7 +241,7 @@ li.completed .wpo-progress-marker::before {
 	border-color: #239bb9;
 }
 
-.wpo-setup-card .wpo-button-next, 
+.wpo-setup-card .wpo-button-next,
 .wpo-setup-card .wpo-skip-step {
 	float: right;
 	margin-left: 10px;
@@ -416,8 +416,8 @@ li.completed .wpo-progress-marker::before {
 		padding: 15px 25px;
 	}
 
-	.wpo-setup-card .wpo-button-next, 
-	.wpo-setup-card .wpo-button-previous, 
+	.wpo-setup-card .wpo-button-next,
+	.wpo-setup-card .wpo-button-previous,
 	.wpo-setup-card .wpo-skip-step {
 		padding: 0.5em 0.8em;
 	}
@@ -430,7 +430,3 @@ li.completed .wpo-progress-marker::before {
 
 	#confetti { display: none }
 }
-
-
-
-

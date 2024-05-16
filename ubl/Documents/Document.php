@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class Document {
-	
+
 	/** @var \WC_Abstract_Order */
 	public $order;
 
@@ -21,7 +21,7 @@ abstract class Document {
 
 	/** @var Order_Document */
 	public $order_document;
-	
+
 	public function set_order( \WC_Abstract_Order $order ) {
 		$this->order          = $order;
 		$this->order_tax_data = $this->get_tax_rates();
@@ -150,7 +150,7 @@ abstract class Document {
 				$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
 				$category         = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['category'] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['category'] : '';
 				$tax_rate_class   = $tax_rate->tax_rate_class;
-				
+
 				if ( empty( $tax_rate_class ) ) {
 					$tax_rate_class = 'standard';
 				}
@@ -166,7 +166,7 @@ abstract class Document {
 
 	public function get_scheme_from_fallback( $tax_data, $rate_id ) {
 		$scheme = '';
-		
+
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
@@ -174,7 +174,7 @@ abstract class Document {
 				$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
 				$scheme           = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['scheme'] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['scheme'] : '';
 				$tax_rate_class   = $tax_rate->tax_rate_class;
-				
+
 				if ( empty( $tax_rate_class ) ) {
 					$tax_rate_class = 'standard';
 				}
@@ -187,5 +187,5 @@ abstract class Document {
 
 		return $scheme;
 	}
-	
+
 }

@@ -14,45 +14,45 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Bulk_Document' ) ) :
  */
 
 class Bulk_Document {
-	
+
 	/**
 	 * Document slug
-	 * 
+	 *
 	 * @var string
 	 */
 	public $slug;
-	
+
 	/**
 	 * Document type.
-	 * 
+	 *
 	 * @var string
 	 */
 	public $type;
 
 	/**
 	 * Wrapper document - used for filename etc.
-	 * 
+	 *
 	 * @var string
 	 */
 	public $wrapper_document;
 
 	/**
 	 * Order IDs.
-	 * 
+	 *
 	 * @var array
 	 */
 	public $order_ids;
-	
+
 	/**
 	 * Is bulk document
-	 * 
+	 *
 	 * @var bool
 	 */
 	public $is_bulk;
-	
+
 	/**
 	 * Document output formats
-	 * 
+	 *
 	 * @var array
 	 */
 	public $output_formats;
@@ -62,14 +62,14 @@ class Bulk_Document {
 		$this->type      = $document_type;
 		$this->order_ids = $order_ids;
 		$this->is_bulk   = true;
-		
+
 		// output formats (placed after parent construct to override the abstract default)
 		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf' ), $this );
 	}
-	
+
 	public function exists() {
 		$exists = false;
-		
+
 		foreach ( $this->order_ids as $order_id ) {
 			$document = wcpdf_get_document( $this->type, $order_id );
 			if ( $document && is_callable( array( $document, 'exists' ) ) && $document->exists() ) {
@@ -77,10 +77,10 @@ class Bulk_Document {
 				break;
 			}
 		}
-		
+
 		return $exists;
 	}
-	
+
 	public function is_enabled( $output_format = 'pdf' ) {
 		if ( in_array( $output_format, $this->output_formats ) ) {
 			return true;
@@ -107,7 +107,7 @@ class Bulk_Document {
 		);
 		$pdf_maker = wcpdf_get_pdf_maker( $html, $pdf_settings, $this );
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );
-		
+
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
 
 		// remove temporary filters
@@ -137,12 +137,12 @@ class Bulk_Document {
 		// get wrapper document & insert body content
 		$this->wrapper_document = wcpdf_get_document( $this->get_type(), null );
 		$html = $this->wrapper_document->wrap_html_content( $this->merge_documents( $html_content ) );
-		
+
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 
 		// remove temporary filters
 		$this->remove_filters( $html_filters );
-		
+
 		return $html;
 	}
 
@@ -193,7 +193,7 @@ class Bulk_Document {
 	}
 
 	protected function normalize_filter_args( $filter ) {
-		$filter = array_values( $filter ); 
+		$filter = array_values( $filter );
 		$hook_name = $filter[0];
 		$callback = $filter[1];
 		$priority = isset( $filter[2] ) ? $filter[2] : 10;

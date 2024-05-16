@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class AdditionalDocumentReferenceHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		if ( $this->document->order_document && $this->document->order_document->exists() && $this->document->order_document->get_setting( 'include_encrypted_pdf', false, 'ubl' ) ) {
 			$additionalDocumentReference = array(
@@ -37,11 +37,11 @@ class AdditionalDocumentReferenceHandler extends UblHandler {
 					),
 				),
 			);
-	
+
 			$data[] = apply_filters( 'wpo_wc_ubl_handle_AdditionalDocumentReference', $additionalDocumentReference, $data, $options, $this );
 		}
 
 		return $data;
 	}
-	
+
 }

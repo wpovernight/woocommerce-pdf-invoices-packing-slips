@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class DateTime extends Model {
-	
+
 	/** @var string */
 	public $date;
 
@@ -16,5 +16,5 @@ class DateTime extends Model {
 
 	/** @var string */
 	public $timezone;
-	
+
 }

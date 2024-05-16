@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class DocumentCurrencyCodeHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$documentCurrencyCode = array(
 			'name'       => 'cbc:DocumentCurrencyCode',
@@ -24,5 +24,5 @@ class DocumentCurrencyCodeHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

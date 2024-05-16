@@ -15,7 +15,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods
  */
 
 abstract class Order_Document_Methods extends Order_Document {
-	
+
 	public function is_refund( $order ) {
 		return 'shop_order_refund' === $order->get_type();
 	}
@@ -60,7 +60,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				'postcode',
 				'country'
 			), $this );
-			
+
 			foreach ( $address_comparison_fields as $address_field ) {
 				$billing_field  = call_user_func( array( $order, "get_billing_{$address_field}" ) );
 				$shipping_field = call_user_func( array( $order, "get_shipping_{$address_field}" ) );
@@ -68,13 +68,18 @@ abstract class Order_Document_Methods extends Order_Document {
 					// this address field is different -> ships to different address!
 					return true;
 				}
-			}			
+			}
 		}
 
 		//if we got here, it means the addresses are equal -> doesn't ship to different address!
 		return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order, $this );
 	}
 
+	/**
+	 * Get the billing address
+	 *
+	 * @return string
+	 */
 	public function get_billing_address(): string {
 		$original_order = $this->order;
 		$address        = '';
@@ -92,6 +97,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		$address = apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
 
 		// Restore the original order if modified.
 		$this->order = $original_order;
@@ -132,7 +141,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function billing_email() {
 		echo $this->get_billing_email();
 	}
-	
+
 	/**
 	 * Return/Show phone by type
 	 */
@@ -142,7 +151,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$getter = "get_{$phone_type}_phone";
 			$phone  = is_callable( array( $order, $getter ) ) ? call_user_func( array( $order, $getter ) ) : $phone;
 		}
-		
+
 		return wpo_wcpdf_sanitize_phone_number( $phone );
 	}
 
@@ -169,11 +178,13 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function shipping_phone( $fallback_to_billing = false ) {
 		echo $this->get_shipping_phone( $fallback_to_billing );
 	}
-	
+
 	/**
 	 * Return/Show shipping address
+	 *
+	 * @return string
 	 */
-	public function get_shipping_address() {
+	public function get_shipping_address(): string {
 		$original_order = $this->order;
 		$address        = '';
 
@@ -198,6 +209,10 @@ abstract class Order_Document_Methods extends Order_Document {
 
 		$address = apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
 
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
+
 		// Restore the original order if modified.
 		$this->order = $original_order;
 
@@ -220,7 +235,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Return/Show a custom field
-	 */		
+	 */
 	public function get_custom_field( $field_name ) {
 		if ( !$this->is_order_prop( $field_name ) ) {
 			$custom_field = $this->order->get_meta( $field_name );
@@ -253,7 +268,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	public function custom_field( $field_name, $field_label = '', $display_empty = false ) {
 		$custom_field = $this->get_custom_field( $field_name );
-		
+
 		if ( ! empty( $field_label ) ) {
 			// add a a trailing space to the label
 			$field_label .= ' ';
@@ -267,12 +282,12 @@ abstract class Order_Document_Methods extends Order_Document {
 				'ol'   => array(),
 				'li'   => array(),
 			);
-			
+
 			if ( is_array( $custom_field ) ) {
 				$custom_field = array_map( function( $field ) use ( $allow_tags ) {
 					return wpo_wcpdf_sanitize_html_content( $field, 'custom_field', $allow_tags );
 				}, $custom_field );
-				echo $field_label . implode( '<br>', $custom_field );				
+				echo $field_label . implode( '<br>', $custom_field );
 			} else {
 				$custom_field = wpo_wcpdf_sanitize_html_content( $custom_field, 'custom_field', $allow_tags );
 				echo $field_label . nl2br( $custom_field );
@@ -379,7 +394,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	/**
 	 * Return/Show order notes
 	 * could use $order->get_customer_order_notes(), but that filters out private notes already
-	 */		
+	 */
 	public function get_order_notes( $filter = 'customer', $include_system_notes = true ) {
 		if ( $this->is_refund( $this->order ) ) {
 			$order_id = $this->get_refund_parent_id( $this->order );
@@ -416,7 +431,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				$css_class[] = $note->customer_note ? 'customer-note' : '';
 				$css_class[] = 'system' === $note->added_by ? 'system-note' : '';
 				$css_class   = apply_filters( 'woocommerce_order_note_class', array_filter( $css_class ), $note );
-				$content = isset($note->content) ? $note->content : $note->comment_content; 
+				$content = isset($note->content) ? $note->content : $note->comment_content;
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
 					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); ?>
@@ -437,7 +452,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
-	 * Return/Show payment method  
+	 * Return/Show payment method
 	 */
 	public function get_payment_method() {
 		if ( $this->is_refund( $this->order ) ) {
@@ -454,9 +469,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function payment_method() {
 		echo $this->get_payment_method();
 	}
-	
+
 	/**
-	 * Return/Show payment date  
+	 * Return/Show payment date
 	 */
 	public function get_payment_date() {
 		if ( $this->is_refund( $this->order ) ) {
@@ -475,7 +490,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
-	 * Return/Show shipping method  
+	 * Return/Show shipping method
 	 */
 	public function get_shipping_method() {
 		$shipping_method = __( $this->order->get_shipping_method(), 'woocommerce' );
@@ -497,7 +512,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$order_number = $this->order->get_order_number();
 		}
 
-		// Trim the hash to have a clean number but still 
+		// Trim the hash to have a clean number but still
 		// support any filters that were applied before.
 		$order_number = ltrim($order_number, '#');
 		return apply_filters( 'wpo_wcpdf_order_number', $order_number, $this );
@@ -531,7 +546,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function get_order_items() {
 		$items = $this->order->get_items();
 		$data_list = array();
-	
+
 		if( sizeof( $items ) > 0 ) {
 			foreach ( $items as $item_id => $item ) {
 				// Array with data for the pdf template
@@ -539,7 +554,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 				// Set the item_id
 				$data['item_id'] = $item_id;
-				
+
 				// Set the id
 				$data['product_id'] = $item['product_id'];
 				$data['variation_id'] = $item['variation_id'];
@@ -549,10 +564,10 @@ abstract class Order_Document_Methods extends Order_Document {
 				if ( class_exists('WC_Composite_Products') ) {
 					$order_item_class = apply_filters( 'woocommerce_order_item_class', '', $item, $this->order );
 				}
-				
+
 				// Set item name
 				$data['name'] = apply_filters( 'woocommerce_order_item_name', $item['name'], $item, false );
-				
+
 				// Set item quantity
 				$data['quantity'] = $item['qty'];
 
@@ -561,10 +576,10 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['single_line_total'] = $this->format_price( $item['line_total'] / max( 1, abs( $item['qty'] ) ) );
 				$data['line_tax'] = $this->format_price( $item['line_tax'] );
 				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
-				
+
 				$data['tax_rates'] = $this->get_tax_rate( $item, $this->order, false );
 				$data['calculated_tax_rates'] = $this->get_tax_rate( $item, $this->order, true );
-				
+
 				// Set the line subtotal (=before discount)
 				$data['line_subtotal'] = $this->format_price( $item['line_subtotal'] );
 				$data['line_subtotal_tax'] = $this->format_price( $item['line_subtotal_tax'] );
@@ -579,7 +594,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 				// Pass complete item array
 				$data['item'] = $item;
-				
+
 				// Get the product to add more info
 				if ( is_callable( array( $item, 'get_product' ) ) ) { // WC4.4+
 					$product = $item->get_product();
@@ -588,7 +603,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				} else {
 					$product = null;
 				}
-				
+
 				// Checking for existence, thanks to MDesigner0
 				if( !empty( $product ) ) {
 					// Thumbnail (full img tag)
@@ -596,24 +611,24 @@ abstract class Order_Document_Methods extends Order_Document {
 
 					// Set item SKU
 					$data['sku'] = is_callable( array( $product, 'get_sku' ) ) ? $product->get_sku() : '';
-	
+
 					// Set item weight
 					$data['weight'] = is_callable( array( $product, 'get_weight' ) ) ? $product->get_weight() : '';
-					
+
 					// Set item dimensions
 					if ( function_exists( 'wc_format_dimensions' ) && is_callable( array( $product, 'get_dimensions' ) ) ) {
 						$data['dimensions'] = wc_format_dimensions( $product->get_dimensions( false ) );
 					} else {
 						$data['dimensions'] = '';
 					}
-									
+
 					// Pass complete product object
 					$data['product'] = $product;
-				
+
 				} else {
 					$data['product'] = null;
 				}
-				
+
 				// Set item meta
 				$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
 
@@ -690,7 +705,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 			$tax_rates = implode(' ,', $tax_rates );
 		}
-		
+
 		return $tax_rates;
 	}
 
@@ -799,7 +814,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Returns the thumbnail image tag
-	 * 
+	 *
 	 * uses the internal WooCommerce/WP functions and extracts the image url or path
 	 * rather than the thumbnail ID, to simplify the code and make it possible to
 	 * filter for different thumbnail sizes
@@ -812,7 +827,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		$thumbnail_size        = 'woocommerce_thumbnail';
 		$size                  = apply_filters( 'wpo_wcpdf_thumbnail_size', $thumbnail_size );
 		$thumbnail_img_tag_url = $product->get_image( $size, array( 'title' => '' ) );
-		
+
 		// Extract the url from img
 		preg_match( '/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
 		$thumbnail_url = array_pop( $thumbnail_url );
@@ -828,7 +843,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$forwardslash_basepath = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( '\\', '/', WP_CONTENT_DIR ) : '';
 			$site_url              = defined( 'WP_CONTENT_URL' ) && ! empty( WP_CONTENT_URL ) ? trailingslashit( WP_CONTENT_URL ) : '';
 		}
-		
+
 		$contextless_site_url  = ! empty( $site_url ) ? str_replace( array( 'http://', 'https://' ), '', $site_url ) : $site_url;
 		$thumbnail_path        = ! empty( $contextless_site_url ) ? str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url ) : $contextless_site_url;
 
@@ -843,7 +858,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $thumbnail_path ) ) {
 			// load img with server path by default
 			$thumbnail = sprintf( '<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
-			
+
 		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! file_exists( $thumbnail_path ) ) {
 			// should use paths but file not found, replace // with http(s):// for dompdf compatibility
 			if ( substr( $thumbnail_url, 0, 2 ) === "//" ) {
@@ -861,7 +876,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		 * PHP GD library can be installed but 'webp' support could be disabled,
 		 * which turns the function 'imagecreatefromwebp()' inexistent,
 		 * leading to display an error in DOMPDF.
-		 * 
+		 *
 		 * Check 'System configuration' in the Advanced tab for 'webp' support.
 		 */
 		if ( 'webp' === wp_check_filetype( $thumbnail_path )['ext'] && ! function_exists( 'imagecreatefromwebp' ) ) {
@@ -878,14 +893,14 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function get_woocommerce_totals() {
 		// get totals and remove the semicolon
 		$totals = apply_filters( 'wpo_wcpdf_raw_order_totals', $this->order->get_order_item_totals(), $this->order );
-		
+
 		// remove the colon for every label
 		foreach ( $totals as $key => $total ) {
 			$label = $total['label'];
 			$colon = strrpos( $label, ':' );
 			if( $colon !== false ) {
 				$label = substr_replace( $label, '', $colon, 1 );
-			}		
+			}
 			$totals[$key]['label'] = $label;
 		}
 
@@ -928,7 +943,7 @@ abstract class Order_Document_Methods extends Order_Document {
 
 		return apply_filters( 'wpo_wcpdf_woocommerce_totals', $totals, $this->order, $this->get_type() );
 	}
-	
+
 	/**
 	 * Return/show the order subtotal
 	 */
@@ -936,13 +951,13 @@ abstract class Order_Document_Methods extends Order_Document {
 		//$compound = ($discount == 'incl')?true:false;
 		$subtotal = $this->order->get_subtotal_to_display( false, $tax );
 
-		$subtotal = ! empty( $subtotal ) && ( $pos = strpos( $subtotal, ' <small' ) ) ? substr( $subtotal, 0, $pos ) : $subtotal; //removing the 'excluding tax' text			
-		
+		$subtotal = ! empty( $subtotal ) && ( $pos = strpos( $subtotal, ' <small' ) ) ? substr( $subtotal, 0, $pos ) : $subtotal; //removing the 'excluding tax' text
+
 		$subtotal = array (
 			'label'	=> __('Subtotal', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'	=> $subtotal, 
+			'value'	=> $subtotal,
 		);
-		
+
 		return apply_filters( 'wpo_wcpdf_order_subtotal', $subtotal, $tax, $discount, $this );
 	}
 	public function order_subtotal( $tax = 'excl', $discount = 'incl' ) {
@@ -1031,7 +1046,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			return $fees;
 		}
 	}
-	
+
 	/**
 	 * Return the order taxes
 	 */
@@ -1049,7 +1064,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				);
 
 			}
-			
+
 			return apply_filters( 'wpo_wcpdf_order_taxes', $taxes, $this );
 		}
 	}
@@ -1067,11 +1082,11 @@ abstract class Order_Document_Methods extends Order_Document {
 			$total = $this->format_price( ( $total_unformatted ) );
 			$label = __( 'Total', 'woocommerce-pdf-invoices-packing-slips' );
 		}
-		
+
 		$grand_total = array(
 			'label' => $label,
 			'value'	=> $total,
-		);			
+		);
 
 		return apply_filters( 'wpo_wcpdf_order_grand_total', $grand_total, $tax, $this );
 	}
@@ -1095,13 +1110,13 @@ abstract class Order_Document_Methods extends Order_Document {
 		if ( isset( $this->settings['display_customer_notes'] ) && $this->settings['display_customer_notes'] == 0 ) {
 			$shipping_notes = '';
 		}
-		
+
 		if ( apply_filters( 'wpo_wcpdf_shipping_notes_strip_all_tags', false ) ) {
 			$shipping_notes = wp_strip_all_tags( $shipping_notes );
 		}
-		
+
 		$shipping_notes = ! empty( $shipping_notes ) ? __( $shipping_notes, 'woocommerce-pdf-invoices-packing-slips' ) : false;
-		
+
 		return apply_filters( 'wpo_wcpdf_shipping_notes', wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' ), $this );
 	}
 	public function shipping_notes() {
@@ -1120,7 +1135,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	public function wc_price( $price, $args = array() ) {
 		return $this->format_price( $price, $args );
 	}
-	
+
 	/**
 	 * Gets price - formatted for display.
 	 *
@@ -1149,7 +1164,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_invoice_number() {
 		wcpdf_log_error( 'The method get_invoice_number() is deprecated since version 3.7.3, please use the method get_number() instead.' );
-		
+
 		if ( is_callable( array( $this, 'get_number' ) ) ) {
 			return $this->get_number( 'invoice', null, 'view', true );
 		} else {
@@ -1163,7 +1178,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function invoice_number() {
 		wcpdf_log_error( 'The method invoice_number() is deprecated since version 3.7.3, please use the method number() instead.' );
-		
+
 		if ( is_callable( array( $this, 'number' ) ) ) {
 			$this->number( 'invoice' );
 		} else {
@@ -1177,7 +1192,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function get_invoice_date() {
 		wcpdf_log_error( 'The method get_invoice_date() is deprecated since version 3.7.3, please use the method get_date() instead.' );
-		
+
 		if ( is_callable( array( $this, 'get_date' ) ) ) {
 			return $this->get_date( 'invoice', null, 'view', true );
 		} else {
@@ -1191,7 +1206,7 @@ abstract class Order_Document_Methods extends Order_Document {
 	 */
 	public function invoice_date() {
 		wcpdf_log_error( 'The method invoice_date() is deprecated since version 3.7.3, please use the method date() instead.' );
-		
+
 		if ( is_callable( array( $this, 'date' ) ) ) {
 			$this->date( 'invoice' );
 		} else {
@@ -1215,7 +1230,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			echo $document_notes;
 		}
 	}
-	
+
 	public function document_display_date() {
 		$document_display_date = $this->get_display_date( $this->get_type() );
 
@@ -1226,28 +1241,28 @@ abstract class Order_Document_Methods extends Order_Document {
 				$document_display_date = $document_settings['display_date'];
 			}
 			else {
-				$document_display_date = 'invoice_date';	
+				$document_display_date = 'invoice_date';
 			}
-		} 
+		}
 
 		$formatted_value = $this->get_display_date_label( $document_display_date );
 		return $formatted_value;
 	}
 
 	public function get_display_date_label( $date_string ) {
-		
+
 		$date_labels = array(
 			'invoice_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
 			'order_date'	=> __( 'Order Date' , 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		if( isset( $date_labels[$date_string] ) ) {
-			return $date_labels[ $date_string ];	
+			return $date_labels[ $date_string ];
 		} else {
 			return '';
 		}
-		
+
 	}
-	
+
 }
 
 endif; // class_exists

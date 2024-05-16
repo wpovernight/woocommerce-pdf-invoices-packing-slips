@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Document_Number' ) ) :
 
 class Document_Number {
-	
+
 	/**
 	 * The raw, unformatted number
 	 * @var int
@@ -136,7 +136,7 @@ class Document_Number {
 			if ( empty( $value ) ) {
 				continue;
 			}
-			
+
 			$value = str_replace( '[order_year]', $order_year, $value );
 			$value = str_replace( '[order_month]', $order_month, $value );
 			$value = str_replace( '[order_day]', $order_day, $value );
@@ -150,7 +150,7 @@ class Document_Number {
 			foreach ( $date_types as $date_type ) {
 				if ( false !== strpos( $value, "[{$date_type}_date=" ) ) {
 					preg_match_all( "/\[{$date_type}_date=\"(.*?)\"\]/", $value, $document_date_tags );
-					
+
 					if ( ! empty( $document_date_tags[1] ) ) {
 						foreach ( $document_date_tags[1] as $match_id => $date_format ) {
 							if ( 'order' === $date_type ) {

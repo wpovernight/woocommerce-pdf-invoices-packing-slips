@@ -16,7 +16,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' ) ) :
  * Logging, though, may be noisier, unless your loggers are taking note of the log level and only registering what is required.
  *
  * Example of use (a lock that will expire if not released within 300 seconds)
- * 
+ *
  * See test.php for a longer example (including logging).
  *
  * $my_lock = new Updraft_Semaphore_3_0('my_lock_name', 300);
@@ -38,13 +38,13 @@ class Updraft_Semaphore_3_0 {
 
 	// Time after which the lock will expire (in seconds)
 	protected $locked_for;
-	
+
 	// Name for the lock in the WP options table
 	protected $option_name;
-	
+
 	// Lock status - a boolean
 	protected $acquired = false;
-	
+
 	// An array of loggers
 	protected $loggers = array();
 
@@ -71,26 +71,26 @@ class Updraft_Semaphore_3_0 {
 	 * @return Integer - 0 means 'failed' (which could include that someone else concurrently created it); 1 means 'already existed'; 2 means 'exists, because we created it). The intention is that non-zero results mean that the lock exists.
 	 */
 	private function ensure_database_initialised() {
-	
+
 		global $wpdb;
-		
+
 		$sql = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", $this->option_name );
-		
+
 		if ( 1 === (int) $wpdb->get_var( $sql ) ) {
 			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') already existed in the database', 'debug' );
 			return 1;
 		}
-		
+
 		$sql = $wpdb->prepare( "INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES(%s, '0', 'no');", $this->option_name );
-		
+
 		$rows_affected = $wpdb->query( $sql );
-		
+
 		if ( $rows_affected > 0 ) {
 			$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') was created in the database', 'debug' );
 		} else {
 			$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') failed to be created in the database (could already exist)', 'notice' );
 		}
-		
+
 		return ( $rows_affected > 0 ) ? 2 : 0;
 	}
 
@@ -102,29 +102,29 @@ class Updraft_Semaphore_3_0 {
 	 * @return Boolean - whether the lock was successfully acquired or not
 	 */
 	public function lock($retries = 0) {
-	
+
 		if ( $this->acquired ) {
 			return true;
 		}
-		
+
 		global $wpdb;
-		
+
 		$time_now = time();
 		$acquire_until = $time_now + $this->locked_for;
-		
+
 		$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d", $acquire_until, $this->option_name, $time_now );
-		
+
 		if ( 1 === $wpdb->query( $sql ) ) {
 			$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') acquired', 'info' );
 			$this->acquired = true;
 			return true;
 		}
-		
+
 		// See if the failure was caused by the row not existing (we check this only after failure, because it should only occur once on the site)
 		if ( ! $this->ensure_database_initialised() ) {
 			return false;
 		}
-		
+
 		do {
 			// Now that the row has been created, try again
 			if ( 1 === $wpdb->query( $sql ) ) {
@@ -142,9 +142,9 @@ class Updraft_Semaphore_3_0 {
 				$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d", $acquire_until, $this->option_name, $time_now );
 			}
 		} while ( $retries >= 0 );
-		
+
 		$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') could not be acquired (it is locked)', 'info' );
-		
+
 		return false;
 	}
 
@@ -153,7 +153,7 @@ class Updraft_Semaphore_3_0 {
 	 *
 	 * N.B. We don't attempt to unlock it unless we locked it. i.e. Lost locks are left to expire rather than being forced. (If we want to force them, we'll need to introduce a new parameter).
 	 *
-	 * @return Boolean - if it returns false, then the lock was apparently not locked by us (and the caller will most likely therefore ignore the result, whatever it is). 
+	 * @return Boolean - if it returns false, then the lock was apparently not locked by us (and the caller will most likely therefore ignore the result, whatever it is).
 	 */
 	public function release() {
 		if ( ! $this->acquired ) {
@@ -162,28 +162,28 @@ class Updraft_Semaphore_3_0 {
 
 		global $wpdb;
 		$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = '0' WHERE option_name = %s", $this->option_name );
-		
+
 		$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') released', 'info' );
-		
+
 		$result = (int) $wpdb->query($sql) === 1;
-		
+
 		$this->acquired = false;
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Cleans up the DB of any residual data. This should not be used as part of ordinary unlocking; only as part of deinstalling, or if you otherwise know that the lock will not be used again. If calling this, it's redundant to first unlock (and a no-op to attempt to do so afterwards).
 	 */
 	public function delete() {
 		$this->acquired = false;
-	
+
 		global $wpdb;
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s", $this->option_name ) );
 
 		$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') was deleted from the database' );
 	}
-	
+
 	/**
 	 * Captures and logs any given messages
 	 *
@@ -193,7 +193,7 @@ class Updraft_Semaphore_3_0 {
 	 */
 	public function log( $message, $level = 'info', $context = array() ) {
 		$context = ! empty( $context ) ? $context : $this->context;
-		
+
 		if ( ! empty( $this->loggers ) ) {
 			foreach ( $this->loggers as $logger ) {
 				if ( ! empty( $context ) ) {
@@ -204,7 +204,7 @@ class Updraft_Semaphore_3_0 {
 			}
 		}
 	}
-	
+
 	/**
 	 * Sets the list of loggers for this instance (removing any others).
 	 *
@@ -234,7 +234,7 @@ class Updraft_Semaphore_3_0 {
 	public function get_loggers() {
 		return $this->loggers;
 	}
-	
+
 }
 
 endif; // class_exists

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class UblDocument extends Document {
-	
+
 	public function get_format() {
 		$format = apply_filters( 'wpo_wc_ubl_document_format' , array(
 			'ublversion' => array(
@@ -56,19 +56,19 @@ class UblDocument extends Document {
 			),
 			'delivery' => array(
 				'enabled' => false,
-			    'handler' => \WPO\WC\UBL\Handlers\Ubl\DeliveryHandler::class,
+				'handler' => \WPO\WC\UBL\Handlers\Ubl\DeliveryHandler::class,
 			),
 			'paymentmeans' => array(
 				'enabled' => false,
-			    'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentMeansHandler::class,
+				'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentMeansHandler::class,
 			),
 			'paymentterms' => array(
 				'enabled' => false,
-			    'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentTermsHandler::class,
+				'handler' => \WPO\WC\UBL\Handlers\Ubl\PaymentTermsHandler::class,
 			),
 			'allowancecharge' => array(
 				'enabled' => false,
-			    'handler' => \WPO\WC\UBL\Handlers\Ubl\AllowanceChargeHandler::class,
+				'handler' => \WPO\WC\UBL\Handlers\Ubl\AllowanceChargeHandler::class,
 			),
 			'taxtotal' => array(
 				'enabled' => true,
@@ -83,13 +83,13 @@ class UblDocument extends Document {
 				'handler' => \WPO\WC\UBL\Handlers\Ubl\InvoiceLineHandler::class,
 			),
 		) );
-		
+
 		foreach ( $format as $key => $element ) {
 			if ( false === $element['enabled'] ) {
 				unset( $format[ $key ] );
 			}
 		}
-		
+
 		return $format;
 	}
 

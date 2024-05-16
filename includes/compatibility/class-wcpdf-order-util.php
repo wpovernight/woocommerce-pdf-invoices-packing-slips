@@ -15,14 +15,14 @@ class Order_Util {
 
 	public $wc_order_util_class_object;
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
-	
+
 	public function __construct() {
 		$this->wc_order_util_class_object = $this->get_wc_order_util_class();
 	}
@@ -53,8 +53,8 @@ class Order_Util {
 
 	public function is_wc_admin_page() {
 		return class_exists( 'Automattic\WooCommerce\Admin\PageController' ) &&
-		       is_callable( array( '\\Automattic\\WooCommerce\\Admin\\PageController', 'is_admin_or_embed_page' ) ) &&
-		       \Automattic\WooCommerce\Admin\PageController::is_admin_or_embed_page();
+			is_callable( array( '\\Automattic\\WooCommerce\\Admin\\PageController', 'is_admin_or_embed_page' ) ) &&
+			\Automattic\WooCommerce\Admin\PageController::is_admin_or_embed_page();
 	}
 }
 

@@ -10,14 +10,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class OrderTransformer {
-	
+
 	/**
 	 * @return Order
 	 */
 	public function transform( \WC_Abstract_Order $item ) {
 		$datetime_transformer    = new DateTimeTransformer();
 		$address_transformer     = new AddressTransformer();
-		
+
 		$model                   = new Order();
 		$model->id               = $item->get_id();
 		$model->date             = $datetime_transformer->transform( $item );
@@ -26,5 +26,5 @@ class OrderTransformer {
 
 		return $model;
 	}
-	
+
 }

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class InvoiceLineHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$items = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
@@ -20,7 +20,7 @@ class InvoiceLineHandler extends UblHandler {
 			$taxDataKey       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
 			$lineTotalKey     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
 			$line_tax_data    = $item[ $taxDataContainer ];
-			
+
 			foreach ( $line_tax_data[ $taxDataKey ] as $tax_id => $tax ) {
 				if ( ! is_numeric( $tax ) ) {
 					continue;
@@ -127,5 +127,5 @@ class InvoiceLineHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

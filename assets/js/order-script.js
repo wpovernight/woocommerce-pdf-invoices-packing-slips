@@ -9,7 +9,7 @@ jQuery( function( $ ) {
 			let template   = action;
 			let checked    = [];
 			let ubl_output = false;
-			
+
 			// is UBL action
 			if ( action.indexOf( 'ubl' ) != -1 ) {
 				template   = template.replace( '_ubl', '' );
@@ -21,28 +21,28 @@ jQuery( function( $ ) {
 					checked.push( $( this ).val() );
 				}
 			);
-			
+
 			if ( ! checked.length ) {
 				alert( wpo_wcpdf_ajax.select_orders );
 				return;
 			}
-			
+
 			let partial_url = '';
 			let full_url    = '';
-			
+
 			if ( wpo_wcpdf_ajax.ajaxurl.indexOf ("?" ) != -1 ) {
 				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			} else {
 				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			}
-			
+
 			// ubl
 			if ( ubl_output ) {
 				$.each( checked, function( i, order_id ) {
 					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
 					window.open( full_url, '_blank' );
 				} );
-				
+
 			// pdf
 			} else {
 				let order_ids = checked.join( 'x' );
@@ -56,7 +56,7 @@ jQuery( function( $ ) {
 	if ( wpo_wcpdf_ajax.sticky_document_data_metabox ) {
 		$( '#wpo_wcpdf-data-input-box' ).insertAfter('#woocommerce-order-data');
 	}
-	
+
 	// enable invoice number edit if user initiated
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes', function() {
 		let $form = $(this).closest('.wcpdf-data-fields-section');
@@ -91,7 +91,7 @@ jQuery( function( $ ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
 				return; // having second thoughts
 			}
-	
+
 			$form.find('.wpo-wcpdf-regenerate-document').addClass('wcpdf-regenerate-spin');
 
 		// delete specific
@@ -150,7 +150,7 @@ jQuery( function( $ ) {
 				$form.unblock();
 			}
 		} );
-		
+
 	} );
 
 	function toggle_edit_mode( $form, mode = null ) {
@@ -177,10 +177,10 @@ jQuery( function( $ ) {
 
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.view-more, .hide-details', function( e ) {
 		e.preventDefault();
-		
+
 		$( this ).hide();
 		$( '.pdf-more-details' ).slideToggle( 'slow' );
-		
+
 		if ( $( this ).hasClass( 'view-more' ) ) {
 			$( '.hide-details' ).show();
 		} else {

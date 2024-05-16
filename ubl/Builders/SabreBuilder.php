@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class SabreBuilder extends Builder {
-	
+
 	/** Service */
 	private $service;
 
@@ -25,5 +25,5 @@ class SabreBuilder extends Builder {
 
 		return $this->service->write( 'Invoice', $document->get_data() );
 	}
-	
+
 }
