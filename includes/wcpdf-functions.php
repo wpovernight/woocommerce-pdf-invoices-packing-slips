@@ -587,16 +587,18 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	libxml_clear_errors();
 
 	$extra_wrapper = $dom->getElementsByTagName( 'div' )->item( 0 );
-	$content         = ! empty( $extra_wrapper ) ? $extra_wrapper->parentNode->removeChild( $extra_wrapper ) : $extra_wrapper;
+	$content       = ! empty( $extra_wrapper ) ? $extra_wrapper->parentNode->removeChild( $extra_wrapper ) : null;
 
-	// Clear DOM by removing all nodes from it.
-	while ( $dom->firstChild ) {
-		$dom->removeChild( $dom->firstChild );
-	}
+	if ( ! empty( $content ) ) {
+		// Clear DOM by removing all nodes from it.
+		while ( $dom->firstChild ) {
+			$dom->removeChild( $dom->firstChild );
+		}
 
-	// Append the content to the DOM to remove the extra DIV wrapper.
-	while ( $content->firstChild ) {
-		$dom->appendChild( $content->firstChild );
+		// Append the content to the DOM to remove the extra DIV wrapper.
+		while ( $content->firstChild ) {
+			$dom->appendChild( $content->firstChild );
+		}
 	}
 
 	$xpath = new \DOMXPath( $dom );
