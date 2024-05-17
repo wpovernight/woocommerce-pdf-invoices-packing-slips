@@ -283,7 +283,7 @@ class Settings_Upgrade {
 	/**
 	 * Get extensions license data
 	 *
-	 * @param  string $type    can be 'cached' or 'live'
+	 * @param  string $type can be 'cached' or 'live'
 	 * @return array
 	 */
 	public function get_extensions_license_data( $type = 'cached' ) {
@@ -296,7 +296,7 @@ class Settings_Upgrade {
 		if ( 'live' === $type || empty( $data ) ) {
 			$data = $this->get_extension_license_infos( true );
 
-			if ( $type === 'cached' ) {
+			if ( 'cached' === $type ) {
 				update_option( $option_key, $data );
 			}
 		}
