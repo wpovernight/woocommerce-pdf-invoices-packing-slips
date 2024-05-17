@@ -2,36 +2,41 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.8.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.8.3-beta-1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-04-29T14:22:45+02:00\n"
+"POT-Creation-Date: 2024-05-16T01:11:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.7.1\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
 
 #. Plugin Name of the plugin
+#: C:\Users\Yordan\Documents\GitHub\woocommerce-pdf-invoices-packing-slips\woocommerce-pdf-invoices-packingslips.php
 #: includes/views/settings-page.php:18
 msgid "PDF Invoices & Packing Slips for WooCommerce"
 msgstr ""
 
 #. Plugin URI of the plugin
+#: C:\Users\Yordan\Documents\GitHub\woocommerce-pdf-invoices-packing-slips\woocommerce-pdf-invoices-packingslips.php
 msgid "https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/"
 msgstr ""
 
 #. Description of the plugin
+#: C:\Users\Yordan\Documents\GitHub\woocommerce-pdf-invoices-packing-slips\woocommerce-pdf-invoices-packingslips.php
 msgid "Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders."
 msgstr ""
 
 #. Author of the plugin
+#: C:\Users\Yordan\Documents\GitHub\woocommerce-pdf-invoices-packing-slips\woocommerce-pdf-invoices-packingslips.php
 msgid "WP Overnight"
 msgstr ""
 
 #. Author URI of the plugin
+#: C:\Users\Yordan\Documents\GitHub\woocommerce-pdf-invoices-packing-slips\woocommerce-pdf-invoices-packingslips.php
 msgid "https://www.wpovernight.com"
 msgstr ""
 
@@ -97,7 +102,7 @@ msgstr ""
 
 #: includes/class-wcpdf-admin.php:323
 #: includes/class-wcpdf-main.php:1275
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1240
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1255
 #: includes/documents/class-wcpdf-invoice.php:280
 #: includes/views/setup-wizard/display-options.php:60
 msgid "Invoice Date"
@@ -488,7 +493,7 @@ msgid "Date"
 msgstr ""
 
 #: includes/class-wcpdf-settings.php:444
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1068
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1083
 #: ubl/Settings/TaxesSettings.php:170
 msgid "Total"
 msgstr ""
@@ -568,28 +573,28 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:91
-#: includes/documents/abstract-wcpdf-order-document-methods.php:195
+#: includes/documents/abstract-wcpdf-order-document-methods.php:96
+#: includes/documents/abstract-wcpdf-order-document-methods.php:206
 msgid "N/A"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:942
+#: includes/documents/abstract-wcpdf-order-document-methods.php:957
 msgid "Subtotal"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:967
+#: includes/documents/abstract-wcpdf-order-document-methods.php:982
 msgid "Shipping"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:998
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1013
 msgid "Discount"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1065
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1080
 msgid "Total ex. VAT"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1241
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1256
 #: includes/documents/class-wcpdf-invoice.php:281
 #: includes/views/setup-wizard/display-options.php:61
 msgid "Order Date"
