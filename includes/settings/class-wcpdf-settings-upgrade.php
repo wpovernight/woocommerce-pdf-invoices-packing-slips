@@ -287,10 +287,6 @@ class Settings_Upgrade {
 	 * @return array
 	 */
 	public function get_extensions_license_data( $type = 'cached' ) {
-		if ( ! in_array( $type, array( 'cached', 'live' ) ) ) {
-			return array();
-		}
-
 		switch ( $type ) {
 			case 'cached':
 				$cached_data = get_option( 'wpo_wcpdf_extensions_license_cache', array() );
