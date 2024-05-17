@@ -283,10 +283,10 @@ class Settings_Upgrade {
 	/**
 	 * Get extensions license data
 	 *
-	 * @param  string $type can be 'cached' or 'live'
+	 * @param string $type can be 'cached' or 'live'
 	 * @return array
 	 */
-	public function get_extensions_license_data( $type = 'cached' ) {
+	public function get_extensions_license_data( string $type = 'cached' ): array {
 		$option_key = 'wpo_wcpdf_extensions_license_cache';
 
 		// default to fetching cached data
