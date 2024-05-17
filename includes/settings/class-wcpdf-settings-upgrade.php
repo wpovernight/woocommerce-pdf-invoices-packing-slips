@@ -293,9 +293,16 @@ class Settings_Upgrade {
 
 		switch ( $type ) {
 			case 'cached':
-				return get_option( 'wpo_wcpdf_extensions_license_cache', array() );
+				$cached_data = get_option( 'wpo_wcpdf_extensions_license_cache', array() );
+				if ( empty( $cached_data ) ) {
+					$cached_data = $this->get_extension_license_infos( true );
+					update_option( 'wpo_wcpdf_extensions_license_cache', $cached_data );
+				}
+				return $cached_data;
 			case 'live':
 				return $this->get_extension_license_infos( true );
+			default:
+				return array();
 		}
 	}
 
