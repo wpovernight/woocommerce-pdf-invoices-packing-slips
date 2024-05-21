@@ -180,7 +180,7 @@ class Document_Number {
 		}
 
 		// Add prefix & suffix
-		$this->formatted_number = $formats['prefix'] . $number . $formats['suffix'] ;
+		$this->formatted_number = $formats['prefix'] . $number . $formats['suffix'];
 		// Apply filters and store
 		$this->formatted_number = apply_filters( 'wpo_wcpdf_format_document_number', $this->formatted_number, $this, $document, $order );
 
