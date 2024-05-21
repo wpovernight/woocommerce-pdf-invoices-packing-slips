@@ -129,7 +129,19 @@ class Document_Number {
 		$document_year	= $document_date->date_i18n( 'Y' );
 		$document_month	= $document_date->date_i18n( 'm' );
 		$document_day	= $document_date->date_i18n( 'd' );
-		$order_number	= is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
+
+		// get order number
+		if ( is_callable( array( $order, 'get_order_number' ) ) ) { // order
+			$order_number = $order->get_order_number();
+		} elseif ( $document->is_refund( $order ) ) { // refund order
+			$parent_order = $document->get_refund_parent( $order );
+
+			if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'get_order_number' ) ) ) {
+				$order_number = $parent_order->get_order_number();
+			}
+		} else {
+			$order_number = '';
+		}
 
 		// make replacements
 		foreach ( $formats as $key => $value ) {
