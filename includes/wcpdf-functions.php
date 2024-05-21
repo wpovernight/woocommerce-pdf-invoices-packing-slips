@@ -63,7 +63,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 				}
 
 				if ( $init && ! $document->exists() ) {
-					wcpdf_init_document( $document, $order->get_id() );
+					wcpdf_init_document( $document_type, $order );
 				}
 
 				return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
@@ -96,7 +96,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 			}
 
 			if ( $init && ! $document->exists() ) {
-				wcpdf_init_document( $document, $order_id );
+				wcpdf_init_document( $document_type, $order );
 			}
 
 		// otherwise we use bulk class to wrap multiple documents in one.
@@ -111,15 +111,25 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 }
 
-function wcpdf_init_document( $document, $order_id ) {
-	$document_type = $document->get_type();
-	$lock_name     = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
-	$lock          = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+function wcpdf_init_document( $document_type, $order ) {
+	$order_id  = is_object( $order ) ? $order->get_id() : $order;
+	$lock_name = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
+	$lock      = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 		try {
+			// Re-fetch the document to ensure it is up-to-date
+			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+
+			// Check if the document was created by another process before acquiring the lock
+			if ( $document->exists() ) {
+				$lock->log( sprintf( 'Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
+				$lock->release();
+				return;
+			}
+
 			$document->init();
 			$lock->log( sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
