@@ -3,7 +3,6 @@ namespace WPO\WC\PDF_Invoices;
 
 use WPO\WC\UBL\Builders\SabreBuilder;
 use WPO\WC\UBL\Documents\UblDocument;
-use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -12,41 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
 
 class Main {
-
-	/**
-	 * Lock name
-	 *
-	 * @var string
-	 */
-	public $lock_name;
-
-	/**
-	 * Lock context
-	 *
-	 * @var array
-	 */
-	public $lock_context;
-
-	/**
-	 * Lock time limit if the release doesn't happen before
-	 *
-	 * @var int
-	 */
-	public $lock_time;
-
-	/**
-	 * Lock retries
-	 *
-	 * @var int
-	 */
-	public $lock_retries;
-
-	/**
-	 * Lock loggers
-	 *
-	 * @var int
-	 */
-	public $lock_loggers;
 
 	/**
 	 * Temp subfolders
@@ -65,13 +29,6 @@ class Main {
 	}
 
 	public function __construct() {
-		// semaphore
-		$this->lock_name    = 'wpo_wcpdf_main_semaphore_lock';
-		$this->lock_context = array( 'source' => 'wpo-wcpdf-semaphore' );
-		$this->lock_time    = apply_filters( 'wpo_wcpdf_main_semaphore_lock_time', 60 );
-		$this->lock_retries = apply_filters( 'wpo_wcpdf_main_semaphore_lock_retries', 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_main_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
-
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 
@@ -179,69 +136,56 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
-		$lock                     = new Semaphore( $this->lock_name . "_order_{$order_id}_email_{$email_id}", $this->lock_time, $this->lock_loggers, $this->lock_context );
 
-		if ( $lock->lock( $this->lock_retries ) ) {
+		foreach ( $attach_to_document_types as $output_format => $document_types ) {
+			foreach ( $document_types as $document_type ) {
+				$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
+				$email_order_id = $email_order->get_id();
 
-			$lock->log( sprintf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
+				do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
 
-			foreach ( $attach_to_document_types as $output_format => $document_types ) {
-				foreach ( $document_types as $document_type ) {
-					$email_order    = apply_filters( 'wpo_wcpdf_email_attachment_order', $order, $email, $document_type );
-					$email_order_id = $email_order->get_id();
+				try {
+					// log document generation to order notes
+					add_action( 'wpo_wcpdf_init_document', function( $document ) {
+						$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
+						$this->log_document_creation_trigger_to_order_meta( $document, 'email_attachment' );
+						$this->mark_document_printed( $document, 'email_attachment' );
+					} );
 
-					do_action( 'wpo_wcpdf_before_attachment_creation', $email_order, $email_id, $document_type );
-
-					try {
-						// log document generation to order notes
-						add_action( 'wpo_wcpdf_init_document', function( $document ) {
-							$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
-							$this->log_document_creation_trigger_to_order_meta( $document, 'email_attachment' );
-							$this->mark_document_printed( $document, 'email_attachment' );
-						} );
-
-						// prepare document
-						// we use ID to force to reloading the order to make sure that all meta data is up to date.
-						// this is especially important when multiple emails with the PDF document are sent in the same session
-						$document = wcpdf_get_document( $document_type, (array) $email_order_id, true );
-						if ( ! $document ) { // something went wrong, continue trying with other documents
-							wcpdf_log_error( "Couldn't get the document object for email attachment. document type: {$document_type}, output format: {$output_format}, email order ID: #{$email_order_id}", 'critical' );
-							continue;
-						}
-
-						$attachment = wcpdf_get_document_file( $document, $output_format );
-
-						if ( $attachment ) {
-							$attachments[] = $attachment;
-						} else {
-							continue;
-						}
-
-						do_action( 'wpo_wcpdf_email_attachment', $attachment, $document_type, $document, $output_format );
-
-					} catch ( \Exception $e ) {
-						wcpdf_log_error( $e->getMessage(), 'critical', $e );
-						continue;
-					} catch ( \Dompdf\Exception $e ) {
-						wcpdf_log_error( 'DOMPDF exception: '.$e->getMessage(), 'critical', $e );
-						continue;
-					} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
-						wcpdf_log_error( 'UBL FileWrite exception: '.$e->getMessage(), 'critical', $e );
-						continue;
-					} catch ( \Error $e ) {
-						wcpdf_log_error( $e->getMessage(), 'critical', $e );
+					// prepare document
+					// we use ID to force to reloading the order to make sure that all meta data is up to date.
+					// this is especially important when multiple emails with the PDF document are sent in the same session
+					$document = wcpdf_get_document( $document_type, (array) $email_order_id, true );
+					if ( ! $document ) { // something went wrong, continue trying with other documents
+						wcpdf_log_error( "Couldn't get the document object for email attachment. document type: {$document_type}, output format: {$output_format}, email order ID: #{$email_order_id}", 'critical' );
 						continue;
 					}
 
+					$attachment = wcpdf_get_document_file( $document, $output_format );
+
+					if ( $attachment ) {
+						$attachments[] = $attachment;
+					} else {
+						continue;
+					}
+
+					do_action( 'wpo_wcpdf_email_attachment', $attachment, $document_type, $document, $output_format );
+
+				} catch ( \Exception $e ) {
+					wcpdf_log_error( $e->getMessage(), 'critical', $e );
+					continue;
+				} catch ( \Dompdf\Exception $e ) {
+					wcpdf_log_error( 'DOMPDF exception: '.$e->getMessage(), 'critical', $e );
+					continue;
+				} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
+					wcpdf_log_error( 'UBL FileWrite exception: '.$e->getMessage(), 'critical', $e );
+					continue;
+				} catch ( \Error $e ) {
+					wcpdf_log_error( $e->getMessage(), 'critical', $e );
+					continue;
 				}
-			}
 
-			if ( $lock->release() ) {
-				$lock->log( sprintf( 'Lock released for attach document to email for order ID# %s.', $order_id ), 'info' );
 			}
-
-		} else {
-			$lock->log( sprintf( 'Couldn\'t get the lock for attach document to email for order ID# %s.', $order_id ), 'critical' );
 		}
 
 		remove_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );

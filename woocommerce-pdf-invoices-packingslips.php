@@ -39,6 +39,10 @@ class WPO_WCPDF {
 	public $frontend;
 	public $install;
 	public $font_synchronizer;
+	public $lock_context;
+	public $lock_time;
+	public $lock_retries;
+	public $lock_loggers;
 
 	protected static $_instance = null;
 
@@ -64,6 +68,12 @@ class WPO_WCPDF {
 			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
 			'woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
 		) );
+
+		// semaphore
+		$this->lock_context = array( 'source' => 'wpo-wcpdf-semaphore' );
+		$this->lock_time    = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 90 );
+		$this->lock_retries = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
+		$this->lock_loggers = apply_filters( 'wpo_wcpdf_semaphore_lock_loggers', isset( $this->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
 

@@ -3,7 +3,6 @@ namespace WPO\WC\PDF_Invoices\Documents;
 
 use WPO\WC\UBL\Builders\SabreBuilder;
 use WPO\WC\UBL\Documents\UblDocument;
-use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -87,36 +86,6 @@ abstract class Order_Document {
 	public $output_formats = array();
 
 	/**
-	 * Semaphore lock name.
-	 * @var string
-	 */
-	private $lock_name;
-
-	/**
-	 * Semaphore lock context.
-	 * @var array
-	 */
-	private $lock_context = array( 'source' => 'wpo-wcpdf-document-semaphore' );
-
-	/**
-	 * Semaphore lock time.
-	 * @var int
-	 */
-	private $lock_time;
-
-	/**
-	 * Semaphore lock retries.
-	 * @var int
-	 */
-	private $lock_retries;
-
-	/**
-	 * Semaphore lock loggers.
-	 * @var array
-	 */
-	private $lock_loggers;
-
-	/**
 	 * Linked documents, used for data retrieval
 	 * @var array
 	 */
@@ -152,12 +121,6 @@ abstract class Order_Document {
 		if ( $this->order ) {
 			$this->read_data( $this->order );
 		}
-
-		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_time", 60 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_retries", 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_document_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		// load settings
 		$this->init_settings_data();
@@ -263,52 +226,40 @@ abstract class Order_Document {
 	}
 
 	public function initiate_number( $force_new_number = false ) {
-		$lock            = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 
-		if ( $lock->lock( $this->lock_retries ) && empty( $document_number ) ) {
-			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
-
-			try {
-				// If a third-party plugin claims to generate document numbers, trigger this instead
-				if ( apply_filters( "woocommerce_{$this->slug}_number_by_plugin", false ) || apply_filters( "wpo_wcpdf_external_{$this->slug}_number_enabled", false, $this ) ) {
-					$document_number = apply_filters( "woocommerce_generate_{$this->slug}_number", $document_number, $this->order );  // legacy (backwards compatibility)
-					$document_number = apply_filters( "woocommerce_{$this->slug}_number", $document_number, $this->order->get_id() ); // legacy (backwards compatibility)
-					$document_number = apply_filters( "wpo_wcpdf_external_{$this->slug}_number", $document_number, $this );
-				} elseif ( isset( $this->settings['display_number'] ) && 'order_number' === $this->settings['display_number'] && ! empty( $this->order ) ) {
-					$document_number = $this->order->get_order_number();
-				}
-
-				if ( ! empty( $document_number ) ) { // overridden by plugin or set to order number
-					if ( ! is_numeric( $document_number ) && ! ( $document_number instanceof Document_Number ) ) {
-						// document number is not numeric, treat as formatted
-						// try to extract meaningful number data
-						$formatted_number = $document_number;
-						$number           = (int) preg_replace( '/\D/', '', $document_number );
-						$document_number  = compact( 'number', 'formatted_number' );
-					}
-				} else {
-					$number_store    = $this->get_sequential_number_store();
-					$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
-				}
-
-				if ( ! is_null( $document_number ) ) {
-					$this->set_number( $document_number );
-				}
-
-			} catch ( \Exception $e ) {
-				$lock->log( $e, 'critical' );
-			} catch ( \Error $e ) {
-				$lock->log( $e, 'critical' );
+		try {
+			// If a third-party plugin claims to generate document numbers, trigger this instead
+			if ( apply_filters( "woocommerce_{$this->slug}_number_by_plugin", false ) || apply_filters( "wpo_wcpdf_external_{$this->slug}_number_enabled", false, $this ) ) {
+				$document_number = apply_filters( "woocommerce_generate_{$this->slug}_number", $document_number, $this->order );  // legacy (backwards compatibility)
+				$document_number = apply_filters( "woocommerce_{$this->slug}_number", $document_number, $this->order->get_id() ); // legacy (backwards compatibility)
+				$document_number = apply_filters( "wpo_wcpdf_external_{$this->slug}_number", $document_number, $this );
+			} elseif ( isset( $this->settings['display_number'] ) && 'order_number' === $this->settings['display_number'] && ! empty( $this->order ) ) {
+				$document_number = $this->order->get_order_number();
 			}
 
-			if ( $lock->release() ) {
-				$lock->log( "Lock released for the {$this->slug} number init.", 'info' );
+			if ( ! empty( $document_number ) ) { // overridden by plugin or set to order number
+				if ( ! is_numeric( $document_number ) && ! ( $document_number instanceof Document_Number ) ) {
+					// document number is not numeric, treat as formatted
+					// try to extract meaningful number data
+					$formatted_number = $document_number;
+					$number           = (int) preg_replace( '/\D/', '', $document_number );
+					$document_number  = compact( 'number', 'formatted_number' );
+				}
+			} else {
+				$number_store    = $this->get_sequential_number_store();
+				$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 			}
 
-		} else {
-			$lock->log( "Couldn't get the lock for the {$this->slug} number init.", 'critical' );
+			if ( ! is_null( $document_number ) ) {
+				$this->set_number( $document_number );
+			}
+
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( 'Initiate number exception: '.$e->getMessage(), 'critical', $e );
+		} catch ( \Error $e ) {
+			wcpdf_log_error( 'Initiate number error: '.$e->getMessage(), 'critical', $e );
 		}
 
 		return $document_number;

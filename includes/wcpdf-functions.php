@@ -1,4 +1,6 @@
 <?php
+use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -61,9 +63,9 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 				}
 
 				if ( $init && ! $document->exists() ) {
-					$document->init();
-					$document->save();
+					wcpdf_init_document( $document, $order->get_id() );
 				}
+
 				return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 			} else {
 				// order ids array changed, continue processing that array.
@@ -94,9 +96,9 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 			}
 
 			if ( $init && ! $document->exists() ) {
-				$document->init();
-				$document->save();
+				wcpdf_init_document( $document, $order_id );
 			}
+
 		// otherwise we use bulk class to wrap multiple documents in one.
 		} else {
 			$document = wcpdf_get_bulk_document( $document_type, $order_ids );
@@ -107,6 +109,39 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 	}
 
 	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
+}
+
+function wcpdf_init_document( $document, $order_id ) {
+	$document_type = $document->get_type();
+	$lock_name     = sprintf( 'wcpdf_init_document::%1$s_with_order_%2$s', $document_type, $order_id );
+	$lock          = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+
+	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
+		$lock->log( sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+
+		try {
+			$document->init();
+			$document->save();
+		} catch ( \Exception $e ) {
+			$lock->log( $e->getMessage(), 'critical' );
+			return;
+		} catch ( \Dompdf\Exception $e ) {
+			$lock->log( $e->getMessage(), 'critical' );
+			return;
+		} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
+			$lock->log( $e->getMessage(), 'critical' );
+			return;
+		} catch ( \Error $e ) {
+			$lock->log( $e->getMessage(), 'critical' );
+			return;
+		}
+
+		if ( $lock->release() ) {
+			$lock->log( sprintf( 'Lock released after init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+		}
+	} else {
+		$lock->log( sprintf( 'Couldn\'t get the lock while initiating the document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+	}
 }
 
 function wcpdf_get_bulk_document( $document_type, $order_ids ) {

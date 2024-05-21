@@ -22,11 +22,6 @@ class Settings {
 	public $general_settings;
 	public $debug_settings;
 	public $ubl_tax_settings;
-	public $lock_name;
-	public $lock_context;
-	public $lock_time;
-	public $lock_retries;
-	public $lock_loggers;
 
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
@@ -52,12 +47,6 @@ class Settings {
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
 		$this->ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
-
-		$this->lock_name        = 'wpo_wcpdf_settings_semaphore_lock';
-		$this->lock_context     = array( 'source' => 'wpo-wcpdf-semaphore' );
-		$this->lock_time        = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_time', 60 );
-		$this->lock_retries     = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_retries', 0 );
-		$this->lock_loggers     = apply_filters( 'wpo_wcpdf_settings_semaphore_lock_loggers', isset( $this->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -807,7 +796,7 @@ class Settings {
 
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
 		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
-		$lock      = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
+		$lock      = new Semaphore( 'settings::schedule_yearly_reset_numbers', WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
 
 		// checks if there are pending actions
@@ -818,8 +807,7 @@ class Settings {
 
 		// if no concurrent actions sets the action
 		if ( $scheduled_actions < 1 ) {
-
-			if ( $lock->lock( $this->lock_retries ) ) {
+			if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 
 				$lock->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
 
@@ -837,9 +825,9 @@ class Settings {
 						);
 					}
 				} catch ( \Exception $e ) {
-					$lock->log( $e, 'critical' );
+					$lock->log( $e->getMessage(), 'critical' );
 				} catch ( \Error $e ) {
-					$lock->log( $e, 'critical' );
+					$lock->log( $e->getMessage(), 'critical' );
 				}
 
 				if ( $lock->release() ) {
@@ -866,9 +854,9 @@ class Settings {
 	}
 
 	public function yearly_reset_numbers() {
-		$lock = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
+		$lock = new Semaphore( 'settings::yearly_reset_numbers', WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 
-		if ( $lock->lock( $this->lock_retries ) ) {
+		if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 
 			$lock->log( 'Lock acquired for yearly reset numbers.', 'info' );
 
@@ -899,9 +887,9 @@ class Settings {
 					}
 				}
 			} catch ( \Exception $e ) {
-				$lock->log( $e, 'critical' );
+				$lock->log( $e->getMessage(), 'critical' );
 			} catch ( \Error $e ) {
-				$lock->log( $e, 'critical' );
+				$lock->log( $e->getMessage(), 'critical' );
 			}
 
 			if ( $lock->release() ) {
