@@ -126,7 +126,6 @@ function wcpdf_init_document( $document_type, $order ) {
 			// Check if the document was created by another process before acquiring the lock
 			if ( $document->exists() ) {
 				$lock->log( sprintf( 'Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
-				$lock->release();
 				return;
 			}
 
@@ -137,32 +136,16 @@ function wcpdf_init_document( $document_type, $order ) {
 			$lock->log( sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 		} catch ( \Exception $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
-			if ( $lock->is_locked() ) {
-				$lock->release();
-				$lock->log( sprintf( 'Lock released after exception for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-			}
-			return;
+			throw $e;
 		} catch ( \Dompdf\Exception $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
-			if ( $lock->is_locked() ) {
-				$lock->release();
-				$lock->log( sprintf( 'Lock released after Dompdf exception for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-			}
-			return;
+			throw $e;
 		} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
-			if ( $lock->is_locked() ) {
-				$lock->release();
-				$lock->log( sprintf( 'Lock released after FileWriteException for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-			}
-			return;
+			throw $e;
 		} catch ( \Error $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
-			if ( $lock->is_locked() ) {
-				$lock->release();
-				$lock->log( sprintf( 'Lock released after Error for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-			}
-			return;
+			throw $e;
 		} finally {
 			if ( $lock->is_locked() ) {
 				if ( $lock->release() ) {

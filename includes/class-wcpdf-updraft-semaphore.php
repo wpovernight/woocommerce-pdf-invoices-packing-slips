@@ -54,6 +54,12 @@ class Updraft_Semaphore_3_0 {
 		$time_now      = time();
 		$acquire_until = $time_now + $this->locked_for;
 
+		// Check if the lock is already set
+		if ( $this->is_locked() ) {
+			$this->log( 'Lock (' . $this->option_name . ') is already set.', 'info' );
+			return false;
+		}
+
 		// Attempt to set the transient as the lock
 		if ( $this->set_lock_transient( $acquire_until ) ) {
 			$this->log( 'Lock (' . $this->option_name . ') acquired', 'info' );
@@ -94,10 +100,6 @@ class Updraft_Semaphore_3_0 {
 	 * @return Boolean - whether the lock is currently locked or not
 	 */
 	public function is_locked() {
-		if ( ! $this->acquired ) {
-			return false;
-		}
-
 		$lock_time = (int) wp_cache_get( $this->option_name );
 		return $lock_time > time();
 	}
