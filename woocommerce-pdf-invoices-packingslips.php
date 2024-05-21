@@ -69,12 +69,6 @@ class WPO_WCPDF {
 			'woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
 		) );
 
-		// semaphore
-		$this->lock_context = array( 'source' => 'wpo-wcpdf-semaphore' );
-		$this->lock_time    = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 90 );
-		$this->lock_retries = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_semaphore_lock_loggers', isset( $this->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
-
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
 
 		require $this->plugin_path() . '/vendor/autoload.php';
@@ -171,6 +165,9 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\WC\PDF_Invoices\Frontend::instance();
 		$this->install             = \WPO\WC\PDF_Invoices\Install::instance();
 		$this->font_synchronizer   = \WPO\WC\PDF_Invoices\Font_Synchronizer::instance();
+
+		// set semaphore props
+		$this->set_semaphore_props();
 	}
 
 	/**
@@ -191,6 +188,18 @@ class WPO_WCPDF {
 
 		// all systems ready - GO!
 		$this->includes();
+	}
+
+	/**
+	 * Set the semaphore properties.
+	 *
+	 * @return void
+	 */
+	private function set_semaphore_props(): void {
+		$this->lock_context = array( 'source' => 'wpo-wcpdf-semaphore' );
+		$this->lock_time    = apply_filters( 'wpo_wcpdf_semaphore_lock_time', 90 );
+		$this->lock_retries = apply_filters( 'wpo_wcpdf_semaphore_lock_retries', 0 );
+		$this->lock_loggers = apply_filters( 'wpo_wcpdf_semaphore_lock_loggers', isset( $this->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 	}
 
 	/**

@@ -112,11 +112,9 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 }
 
 function wcpdf_init_document( $document, $order_id ) {
-	$document_type  = $document->get_type();
-	$lock_name      = sprintf( 'wcpdf_init_document::%1$s_with_order_%2$s', $document_type, $order_id );
-	$lock           = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
-	$init_completed = false;
-	$save_completed = false;
+	$document_type = $document->get_type();
+	$lock_name     = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
+	$lock          = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
@@ -124,12 +122,9 @@ function wcpdf_init_document( $document, $order_id ) {
 		try {
 			$document->init();
 			$lock->log( sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-			$init_completed = true;
 
 			$document->save();
 			$lock->log( sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-			$save_completed = true;
-
 		} catch ( \Exception $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
 			if ( $lock->is_locked() ) {
@@ -160,14 +155,10 @@ function wcpdf_init_document( $document, $order_id ) {
 			return;
 		} finally {
 			if ( $lock->is_locked() ) {
-				if ( $init_completed && $save_completed ) {
-					if ( $lock->release() ) {
-						$lock->log( sprintf( 'Lock released after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-					} else {
-						$lock->log( sprintf( 'Failed to release lock after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
-					}
+				if ( $lock->release() ) {
+					$lock->log( sprintf( 'Lock released after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 				} else {
-					$lock->log( sprintf( 'Not releasing lock as init and save were not both completed for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+					$lock->log( sprintf( 'Failed to release lock after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
 				}
 			}
 		}
