@@ -112,32 +112,64 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 }
 
 function wcpdf_init_document( $document, $order_id ) {
-	$document_type = $document->get_type();
-	$lock_name     = sprintf( 'wcpdf_init_document::%1$s_with_order_%2$s', $document_type, $order_id );
-	$lock          = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+	$document_type  = $document->get_type();
+	$lock_name      = sprintf( 'wcpdf_init_document::%1$s_with_order_%2$s', $document_type, $order_id );
+	$lock           = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+	$init_completed = false;
+	$save_completed = false;
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 		try {
 			$document->init();
+			$lock->log( sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			$init_completed = true;
+
 			$document->save();
+			$lock->log( sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			$save_completed = true;
+
 		} catch ( \Exception $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
+			if ( $lock->is_locked() ) {
+				$lock->release();
+				$lock->log( sprintf( 'Lock released after exception for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			}
 			return;
 		} catch ( \Dompdf\Exception $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
+			if ( $lock->is_locked() ) {
+				$lock->release();
+				$lock->log( sprintf( 'Lock released after Dompdf exception for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			}
 			return;
 		} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
+			if ( $lock->is_locked() ) {
+				$lock->release();
+				$lock->log( sprintf( 'Lock released after FileWriteException for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			}
 			return;
 		} catch ( \Error $e ) {
 			$lock->log( $e->getMessage(), 'critical' );
+			if ( $lock->is_locked() ) {
+				$lock->release();
+				$lock->log( sprintf( 'Lock released after Error for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			}
 			return;
-		}
-
-		if ( $lock->release() ) {
-			$lock->log( sprintf( 'Lock released after init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+		} finally {
+			if ( $lock->is_locked() ) {
+				if ( $init_completed && $save_completed ) {
+					if ( $lock->release() ) {
+						$lock->log( sprintf( 'Lock released after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+					} else {
+						$lock->log( sprintf( 'Failed to release lock after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+					}
+				} else {
+					$lock->log( sprintf( 'Not releasing lock as init and save were not both completed for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+				}
+			}
 		}
 	} else {
 		$lock->log( sprintf( 'Couldn\'t get the lock while initiating the document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );

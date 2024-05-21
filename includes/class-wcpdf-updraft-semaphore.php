@@ -149,6 +149,22 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
+	 * Check if the lock is currently locked
+	 *
+	 * @return Boolean - whether the lock is currently locked or not
+	 */
+	public function is_locked(): bool {
+		if ( ! $this->acquired ) {
+			return false;
+		}
+
+		global $wpdb;
+		$sql       = $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $this->option_name );
+		$lock_time = (int) $wpdb->get_var( $sql );
+		return $lock_time > time();
+	}
+
+	/**
 	 * Release the lock
 	 *
 	 * N.B. We don't attempt to unlock it unless we locked it. i.e. Lost locks are left to expire rather than being forced. (If we want to force them, we'll need to introduce a new parameter).
