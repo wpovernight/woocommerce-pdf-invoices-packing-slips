@@ -112,7 +112,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 }
 
 function wcpdf_init_document( $document_type, $order ) {
-	if ( empty( $order ) || ! is_object( $order ) ) {
+	if ( empty( $document_type ) || empty( $order ) || ! is_object( $order ) ) {
 		return;
 	}
 	
