@@ -122,7 +122,7 @@ function wcpdf_init_document( $document_type, $order ) {
 	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
 	
 	// Random delay to reduce race conditions
-	usleep( rand( 500000, 1500000 ) ); // delay between 0.5 to 1.5 seconds
+	usleep( mt_rand( 500000, 1500000 ) ); // delay between 0.5 to 1.5 seconds
 
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
