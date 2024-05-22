@@ -333,7 +333,21 @@ abstract class Order_Document {
 		return 'wpo_wcpdf_' . $this->slug . '_get_';
 	}
 
-	public function read_data( $order ) {
+	public function read_data( $order, $set = false ) {
+		$data = array(
+			// always load date before number, because date is used in number formatting
+			'date'             => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
+			'number'           => $this->get_number_from_order_meta( $order ),
+			'notes'            => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
+			'display_date'	   => $order->get_meta( "_wcpdf_{$this->slug}_display_date" ),
+			'creation_trigger' => $order->get_meta( "_wcpdf_{$this->slug}_creation_trigger" ),
+		);
+
+		// pass data to setter functions
+		$this->set_data( $data, $order );
+	}
+	
+	public function get_number_from_order_meta( $order ) {
 		$number = $order->get_meta( "_wcpdf_{$this->slug}_number_data" );
 		
 		// fallback to legacy data for number
@@ -346,17 +360,7 @@ abstract class Order_Document {
 			}
 		}
 		
-		$data = array(
-			// always load date before number, because date is used in number formatting
-			'date'             => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
-			'number'           => $number,
-			'notes'            => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
-			'display_date'	   => $order->get_meta( "_wcpdf_{$this->slug}_display_date" ),
-			'creation_trigger' => $order->get_meta( "_wcpdf_{$this->slug}_creation_trigger" ),
-		);
-
-		// pass data to setter functions
-		$this->set_data( $data, $order );
+		return $number;
 	}
 
 	public function init() {

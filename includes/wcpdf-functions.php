@@ -115,60 +115,49 @@ function wcpdf_init_document( $document_type, $order ) {
 	$order_id   = is_object( $order ) ? $order->get_id() : $order;
 	$lock_name  = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
 	$lock       = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
-	$request_id = uniqid( 'wcpdf_init_document_', true );
-
-	// Initial check if the document exists
+	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
+	
+	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-	if ( $document->exists() ) {
-		$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Initial check: Document %1$s for order ID# %2$s already exists. No need to generate again.', $document_type, $order_id ), 'info' );
+	// Check if the document was created by another process before proceeding
+	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
+		$lock->log( $request_id . sprintf( 'Post-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
 	}
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
-		$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 		try {
-			// Brief delay to ensure the document state is up-to-date
-			usleep( 200000 ); // 0.2 second
-
-			// Re-fetch the document to ensure it is up-to-date
-			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
-
-			// Check if the document was created by another process before proceeding
-			if ( $document->exists() ) {
-				$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Post-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
-				return;
-			}
-
 			$document->init();
-			$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 			$document->save();
-			$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 		} catch ( \Exception $e ) {
-			$lock->log( $e->getMessage(), 'critical' );
+			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
 		} catch ( \Dompdf\Exception $e ) {
-			$lock->log( $e->getMessage(), 'critical' );
+			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
 		} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
-			$lock->log( $e->getMessage(), 'critical' );
+			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
 		} catch ( \Error $e ) {
-			$lock->log( $e->getMessage(), 'critical' );
+			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
 		} finally {
 			if ( $lock->is_locked() ) {
 				if ( $lock->release() ) {
-					$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Lock released for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+					$lock->log( $request_id . sprintf( 'Lock released for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 				} else {
-					$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Failed to release lock for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+					$lock->log( $request_id . sprintf( 'Failed to release lock for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
 				}
 			}
 		}
 	} else {
-		$lock->log( 'ID#' . $request_id . ':: ' . sprintf( 'Couldn\'t get the lock while initiating the document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+		$lock->log( $request_id . sprintf( 'Couldn\'t get the lock while initiating the document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
 	}
 }
 

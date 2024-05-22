@@ -74,10 +74,6 @@ class Invoice extends Order_Document_Methods {
 	}
 
 	public function exists() {
-		if ( empty( $this->data['number'] ) && ! empty( $this->order ) && $this->order instanceof \WC_Abstract_Order ) {
-			$this->read_data( $this->order );
-		}
-
 		return ! empty( $this->data['number'] );
 	}
 
