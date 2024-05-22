@@ -177,11 +177,7 @@ function wcpdf_init_document( $document_type, $order ) {
 			throw $e;
 		} finally {
 			if ( $lock->is_locked() ) {
-				if ( $lock->release() ) {
-					$lock->log( $request_id . sprintf( 'Lock released for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-				} else {
-					$lock->log( $request_id . sprintf( 'Failed to release lock for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
-				}
+				$lock->release();
 			}
 		}
 	} else {
