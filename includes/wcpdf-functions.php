@@ -123,10 +123,15 @@ function wcpdf_init_document( $document_type, $order ) {
 	
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+	
+	if ( ! $document || ! $document->is_allowed() ) {
+		$lock->log( $request_id . sprintf( 'Before lock check: Document %1$s with order ID# %2$s is not allowed.', $document_type, $order_id ), 'info' );
+		return;
+	}
 
 	// Check if the document was created by another process before proceeding
 	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
-		$lock->log( $request_id . sprintf( 'Post-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
+		$lock->log( $request_id . sprintf( 'Before lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
 	}
 
