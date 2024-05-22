@@ -112,7 +112,11 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 }
 
 function wcpdf_init_document( $document_type, $order ) {
-	$order_id   = is_object( $order ) ? $order->get_id() : $order;
+	if ( empty( $order ) || ! is_object( $order ) ) {
+		return;
+	}
+	
+	$order_id   = $order->get_id();
 	$lock_name  = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
 	$lock       = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
