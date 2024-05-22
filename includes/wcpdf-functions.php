@@ -116,6 +116,14 @@ function wcpdf_init_document( $document_type, $order ) {
 	$lock_name = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
 	$lock      = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 
+	// Initial check if the document exists
+	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+
+	if ( $document->exists() ) {
+		$lock->log( sprintf( 'Document %1$s for order ID# %2$s already exists. No need to generate again.', $document_type, $order_id ), 'info' );
+		return;
+	}
+
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 

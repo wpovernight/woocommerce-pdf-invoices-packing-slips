@@ -31,6 +31,7 @@ class Updraft_Semaphore_3_0 {
 	 * @param String  $name		  - a unique (across the WP site) name for the lock. Should be no more than 51 characters in length (because of the use of the WP options table, with some further characters used internally)
 	 * @param Integer $locked_for - time (in seconds) after which the lock will expire if not released. This needs to be positive if you don't want bad things to happen.
 	 * @param Array	  $loggers	  - an array of loggers
+	 * @param Array   $context    - context for loggers
 	 */
 	public function __construct( $name, $locked_for = 300, $loggers = array(), $context = array() ) {
 		$this->option_name = 'wpo_wcpdf_lock/' . $name;
@@ -54,14 +55,7 @@ class Updraft_Semaphore_3_0 {
 		$time_now      = time();
 		$acquire_until = $time_now + $this->locked_for;
 
-		// Check if the lock is already set
-		if ( $this->is_locked() ) {
-			$this->log( 'Lock (' . $this->option_name . ') is already set.', 'info' );
-			return false;
-		}
-
-		// Attempt to set the transient as the lock
-		if ( $this->set_lock_transient( $acquire_until ) ) {
+		if ( $this->set_lock( $acquire_until, $time_now ) ) {
 			$this->log( 'Lock (' . $this->option_name . ') acquired', 'info' );
 			$this->acquired = true;
 			return true;
@@ -72,7 +66,7 @@ class Updraft_Semaphore_3_0 {
 			$time_now      = time();
 			$acquire_until = $time_now + $this->locked_for;
 
-			if ( $this->set_lock_transient( $acquire_until ) ) {
+			if ( $this->set_lock( $acquire_until, $time_now ) ) {
 				$this->log( 'Lock (' . $this->option_name . ') acquired after retry', 'info' );
 				$this->acquired = true;
 				return true;
@@ -80,18 +74,32 @@ class Updraft_Semaphore_3_0 {
 		}
 
 		$this->log( 'Lock (' . $this->option_name . ') could not be acquired (it is locked)', 'info' );
+
 		return false;
 	}
 
 	/**
-	 * Internal function to set the transient as the lock.
+	 * Set the lock in the database.
 	 *
 	 * @param Integer $acquire_until - timestamp until which the lock is valid
+	 * @param Integer $time_now - current timestamp
 	 *
 	 * @return Boolean - whether the lock was successfully set or not
 	 */
-	private function set_lock_transient( $acquire_until ) {
-		return wp_cache_add( $this->option_name, $acquire_until, '', $this->locked_for );
+	private function set_lock( $acquire_until, $time_now ) {
+		global $wpdb;
+
+		$sql = $wpdb->prepare(
+			"INSERT INTO {$wpdb->options} (option_name, option_value, autoload)
+			 VALUES (%s, %s, 'no')
+			 ON DUPLICATE KEY UPDATE
+			 option_value = IF(option_value < %d, VALUES(option_value), option_value)",
+			$this->option_name,
+			$acquire_until,
+			$time_now
+		);
+
+		return $wpdb->query( $sql );
 	}
 
 	/**
@@ -100,7 +108,13 @@ class Updraft_Semaphore_3_0 {
 	 * @return Boolean - whether the lock is currently locked or not
 	 */
 	public function is_locked() {
-		$lock_time = (int) wp_cache_get( $this->option_name );
+		global $wpdb;
+
+		$lock_time = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
+			$this->option_name
+		) );
+
 		return $lock_time > time();
 	}
 
@@ -114,8 +128,9 @@ class Updraft_Semaphore_3_0 {
 			return false;
 		}
 
-		$this->acquired = false;
-		$result = wp_cache_delete( $this->option_name );
+		global $wpdb;
+
+		$result = $wpdb->delete( $wpdb->options, array( 'option_name' => $this->option_name ) );
 
 		if ( $result ) {
 			$this->log( 'Lock (' . $this->option_name . ') released', 'info' );
@@ -123,7 +138,9 @@ class Updraft_Semaphore_3_0 {
 			$this->log( 'Lock (' . $this->option_name . ') failed to release', 'error' );
 		}
 
-		return $result;
+		$this->acquired = false;
+
+		return (bool) $result;
 	}
 
 	/**
