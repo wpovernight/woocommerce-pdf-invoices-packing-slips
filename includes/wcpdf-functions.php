@@ -120,7 +120,7 @@ function wcpdf_init_document( $document_type, $order ) {
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
 	if ( $document->exists() ) {
-		$lock->log( sprintf( 'Document %1$s for order ID# %2$s already exists. No need to generate again.', $document_type, $order_id ), 'info' );
+		$lock->log( sprintf( 'Initial check: Document %1$s for order ID# %2$s already exists. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
 	}
 
@@ -128,12 +128,15 @@ function wcpdf_init_document( $document_type, $order ) {
 		$lock->log( sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 		try {
+			// Brief delay to ensure the document state is up-to-date
+			usleep( 200000 ); // 0.2 second
+
 			// Re-fetch the document to ensure it is up-to-date
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
-			// Check if the document was created by another process before acquiring the lock
+			// Check if the document was created by another process before proceeding
 			if ( $document->exists() ) {
-				$lock->log( sprintf( 'Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
+				$lock->log( sprintf( 'Post-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 				return;
 			}
 
@@ -157,9 +160,9 @@ function wcpdf_init_document( $document_type, $order ) {
 		} finally {
 			if ( $lock->is_locked() ) {
 				if ( $lock->release() ) {
-					$lock->log( sprintf( 'Lock released after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+					$lock->log( sprintf( 'Lock released for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 				} else {
-					$lock->log( sprintf( 'Failed to release lock after init and save document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+					$lock->log( sprintf( 'Failed to release lock for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
 				}
 			}
 		}
