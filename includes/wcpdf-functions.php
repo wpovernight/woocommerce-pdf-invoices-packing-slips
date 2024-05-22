@@ -121,17 +121,20 @@ function wcpdf_init_document( $document_type, $order ) {
 	$lock       = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
 	
+	// Random delay to reduce race conditions
+	usleep( rand( 500000, 1500000 ) ); // delay between 0.5 to 1.5 seconds
+
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 	
 	if ( ! $document || ! $document->is_allowed() ) {
-		$lock->log( $request_id . sprintf( 'Before lock check: Document %1$s with order ID# %2$s is not allowed.', $document_type, $order_id ), 'info' );
+		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s with order ID# %2$s is not allowed.', $document_type, $order_id ), 'info' );
 		return;
 	}
 
 	// Check if the document was created by another process before proceeding
 	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
-		$lock->log( $request_id . sprintf( 'Before lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
+		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
 	}
 
@@ -139,11 +142,27 @@ function wcpdf_init_document( $document_type, $order ) {
 		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 		try {
+			// Re-fetch the document to ensure it is up-to-date
+			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+
+			// Check if the document was created by another process before proceeding
+			if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
+				$lock->log( $request_id . sprintf( 'Post-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
+				return;
+			}
+
 			$document->init();
 			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 			$document->save();
 			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+
+			// Re-fetch the document to ensure it is up-to-date and exists
+			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+			
+			if ( ! $document->exists() ) {
+				throw new \Exception( sprintf( 'Document %1$s for order ID# %2$s was not properly saved.', $document_type, $order_id ) );
+			}
 		} catch ( \Exception $e ) {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;

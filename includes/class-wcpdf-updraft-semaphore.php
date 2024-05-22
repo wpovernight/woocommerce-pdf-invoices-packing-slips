@@ -41,7 +41,7 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
-	 * Attempt to acquire the lock. If it was already acquired, then nothing extra will be done (the method will be a no-op).
+	 * Attempt to acquire the lock using MySQL's GET_LOCK. If it was already acquired, then nothing extra will be done (the method will be a no-op).
 	 *
 	 * @param Integer $retries - how many times to retry (after a 1 second sleep each time)
 	 *
@@ -52,10 +52,7 @@ class Updraft_Semaphore_3_0 {
 			return true;
 		}
 
-		$time_now      = time();
-		$acquire_until = $time_now + $this->locked_for;
-
-		if ( $this->set_lock( $acquire_until, $time_now ) ) {
+		if ( $this->get_lock() ) {
 			$this->log( 'Lock (' . $this->option_name . ') acquired', 'info' );
 			$this->acquired = true;
 			return true;
@@ -63,10 +60,7 @@ class Updraft_Semaphore_3_0 {
 
 		while ( $retries-- > 0 ) {
 			sleep( 1 );
-			$time_now      = time();
-			$acquire_until = $time_now + $this->locked_for;
-
-			if ( $this->set_lock( $acquire_until, $time_now ) ) {
+			if ( $this->get_lock() ) {
 				$this->log( 'Lock (' . $this->option_name . ') acquired after retry', 'info' );
 				$this->acquired = true;
 				return true;
@@ -79,27 +73,16 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
-	 * Set the lock in the database.
-	 *
-	 * @param Integer $acquire_until - timestamp until which the lock is valid
-	 * @param Integer $time_now - current timestamp
+	 * Get the lock using MySQL's GET_LOCK.
 	 *
 	 * @return Boolean - whether the lock was successfully set or not
 	 */
-	private function set_lock( $acquire_until, $time_now ) {
+	private function get_lock() {
 		global $wpdb;
 
-		$sql = $wpdb->prepare(
-			"INSERT INTO {$wpdb->options} (option_name, option_value, autoload)
-			 VALUES (%s, %s, 'no')
-			 ON DUPLICATE KEY UPDATE
-			 option_value = IF(option_value < %d, VALUES(option_value), option_value)",
-			$this->option_name,
-			$acquire_until,
-			$time_now
-		);
+		$sql = $wpdb->prepare( "SELECT GET_LOCK(%s, %d)", $this->option_name, $this->locked_for );
 
-		return $wpdb->query( $sql );
+		return $wpdb->get_var( $sql ) === '1';
 	}
 
 	/**
@@ -108,18 +91,11 @@ class Updraft_Semaphore_3_0 {
 	 * @return Boolean - whether the lock is currently locked or not
 	 */
 	public function is_locked() {
-		global $wpdb;
-
-		$lock_time = (int) $wpdb->get_var( $wpdb->prepare(
-			"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
-			$this->option_name
-		) );
-
-		return $lock_time > time();
+		return $this->acquired;
 	}
 
 	/**
-	 * Release the lock
+	 * Release the lock using MySQL's RELEASE_LOCK.
 	 *
 	 * @return Boolean - if it returns false, then the lock was apparently not locked by us (and the caller will most likely therefore ignore the result, whatever it is).
 	 */
@@ -130,7 +106,9 @@ class Updraft_Semaphore_3_0 {
 
 		global $wpdb;
 
-		$result = $wpdb->delete( $wpdb->options, array( 'option_name' => $this->option_name ) );
+		$sql = $wpdb->prepare( "SELECT RELEASE_LOCK(%s)", $this->option_name );
+
+		$result = $wpdb->get_var( $sql ) === '1';
 
 		if ( $result ) {
 			$this->log( 'Lock (' . $this->option_name . ') released', 'info' );
@@ -140,7 +118,7 @@ class Updraft_Semaphore_3_0 {
 
 		$this->acquired = false;
 
-		return (bool) $result;
+		return $result;
 	}
 
 	/**
