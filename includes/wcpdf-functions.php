@@ -1,5 +1,8 @@
 <?php
+
 use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
+use Automattic\WooCommerce\Utilities\OrderUtil;
+use Automattic\WooCommerce\Caches\OrderCache;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -64,7 +67,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 
 				if ( $init && ! $document->exists() ) {
 					try {
-						wcpdf_init_document( $document_type, $order );
+						wcpdf_init_document( $document_type, absint( $order->get_id() ) );
 					} catch ( \Exception $e ) {
 						wcpdf_log_error( $e->getMessage(), 'critical' );
 						return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
@@ -102,7 +105,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 
 			if ( $init && ! $document->exists() ) {
 				try {
-					wcpdf_init_document( $document_type, $order );
+					wcpdf_init_document( $document_type, absint( $order_id ) );
 				} catch ( \Exception $e ) {
 					wcpdf_log_error( $e->getMessage(), 'critical' );
 					return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
@@ -125,7 +128,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
  * Initiate a document for an order
  *
  * @param string $document_type
- * @param \WC_Abstract_Order  $order
+ * @param int $order
  * 
  * @throws \Exception
  * @throws \Dompdf\Exception
@@ -133,21 +136,29 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
  * 
  * @return void
  */
-function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order ): void {
-	if ( empty( $document_type ) || empty( $order ) || ! is_object( $order ) ) {
+function wcpdf_init_document( string $document_type, int $order_id ): void {
+	if ( empty( $document_type ) || empty( $order_id ) ) {
 		return;
 	}
 	
-	$order_id   = $order->get_id();
 	$lock_name  = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
 	$lock       = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
 	
 	// Random delay to reduce race conditions
-	usleep( mt_rand( 1000000, 2500000 ) ); // delay between 1.0 to 2.5 seconds
+	usleep( mt_rand( 2000000, 3500000 ) ); // delay between 2.0 to 3.5 seconds
+	
+	// Invalidate cache for the order
+	if ( OrderUtil::orders_cache_usage_is_enabled() ) {
+		$order_cache = wc_get_container()->get( OrderCache::class );
+		$order_cache->remove( $order_id );
+	}
+	
+	// Fetch the order object to get the latest data
+	$order = wc_get_order( $order_id );
 
 	// Re-fetch the document to ensure it is up-to-date
-	$document = WPO_WCPDF()->documents->get_document( $document_type, wc_get_order( $order_id ) );
+	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
 	if ( ! $document || ! $document->is_allowed() ) {
 		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s with order ID# %2$s is not allowed.', $document_type, $order_id ), 'info' );
@@ -155,7 +166,7 @@ function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order )
 	}
 
 	// Check if the document was created by another process before proceeding
-	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( wc_get_order( $order_id ) ) ) ) {
+	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
 		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
 	}
@@ -191,10 +202,10 @@ function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order )
 			} );
 			
 			// Re-fetch the document to ensure it is up-to-date
-			$document = WPO_WCPDF()->documents->get_document( $document_type, wc_get_order( $order_id ) );
+			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 			
 			// Check if the document was created by another process before proceeding
-			if ( $document->exists() || ! empty( $document->get_number_from_order_meta( wc_get_order( $order_id ) ) ) ) {
+			if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
 				$lock->log( $request_id . sprintf( 'Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 				return;
 			}
