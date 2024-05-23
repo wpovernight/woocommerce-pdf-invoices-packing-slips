@@ -160,7 +160,7 @@ function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order )
 		return;
 	}
 	
-	// Last chance, check directly in the database. This will not have any effect if the numbers are reset using the Danger Tools feature.
+	// Last chance, check directly in the database. This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
 	if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
 		$number_store = $document->get_sequential_number_store();
 		if ( ! empty( $number_store ) ) {
