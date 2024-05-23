@@ -164,18 +164,9 @@ function wcpdf_init_document( $document_type, $order ) {
 					$lock->log( $request_id . sprintf( 'Failed to release lock for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
 				}
 			} );
-
-			// Re-fetch the document to ensure it is up-to-date
-			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
-
-			// Check if the document was created by another process before proceeding
-			if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
-				$lock->log( $request_id . sprintf( 'Post-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
-				return;
-			}
 			
-			$number = $document->get_number();
-			$lock->log( $request_id . sprintf( '[1] Document number %1$s generated for %2$s with order ID# %3$s.', $number, $document_type, $order_id ), 'info' );
+			$document->init();
+			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 			$document->save();
 			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
