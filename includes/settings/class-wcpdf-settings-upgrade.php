@@ -283,20 +283,25 @@ class Settings_Upgrade {
 	/**
 	 * Get extensions license data
 	 *
-	 * @param  string $type    can be 'cached' or 'live'
+	 * @param string $type can be 'cached' or 'live'
 	 * @return array
 	 */
-	public function get_extensions_license_data( $type = 'cached' ) {
-		if ( ! in_array( $type, array( 'cached', 'live' ) ) ) {
-			return array();
+	public function get_extensions_license_data( string $type = 'cached' ): array {
+		$option_key = 'wpo_wcpdf_extensions_license_cache';
+
+		// default to fetching cached data
+		$data = get_option( $option_key, array() );
+
+		// if type is 'live' or cached data is empty, fetch live data
+		if ( 'live' === $type || empty( $data ) ) {
+			$data = $this->get_extension_license_infos( true );
+
+			if ( 'cached' === $type ) {
+				update_option( $option_key, $data );
+			}
 		}
 
-		switch ( $type ) {
-			case 'cached':
-				return get_option( 'wpo_wcpdf_extensions_license_cache', array() );
-			case 'live':
-				return $this->get_extension_license_infos( true );
-		}
+		return $data;
 	}
 
 	/**
