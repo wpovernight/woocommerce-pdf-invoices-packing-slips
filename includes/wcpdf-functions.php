@@ -141,15 +141,24 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 		return;
 	}
 	
-	$lock_name  = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
-	$lock       = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
-	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
+	$current_action          = current_action();
+	$transient_actions       = apply_filters( 'wpo_wcpdf_init_document_transient_actions', array( 'woocommerce_order_status_changed', 'wpo_wcpdf_generate_document_on_order_status' ) );
+	$transient_invalid_types = apply_filters( 'wpo_wcpdf_init_document_transient_invalid_types', array( 'credit-note', 'bulk', 'summary' ) );
+	$transient_required      = in_array( $current_action, $transient_actions ) && ! in_array( $document_type, $transient_invalid_types );
+	$lock_name               = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
+	$lock                    = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+	$request_id              = '[' . mt_rand( 10000000, 99999999 ) . '] ';
 	
 	// Random delay to reduce race conditions
 	usleep( mt_rand( 2000000, 3500000 ) ); // delay between 2.0 to 3.5 seconds
 	
 	// Fetch the order object to get the latest data
 	$order = wc_get_order( $order_id );
+	
+	if ( ! $order ) {
+		$lock->log( $request_id . sprintf( 'Pre-lock check: Order ID# %1$s not found.', $order_id ), 'info' );
+		return;
+	}
 
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
@@ -166,7 +175,7 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 	}
 	
 	// Last chance, check transient.
-	if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
+	if ( $transient_required ) {
 		$transient_data = get_transient( $lock_name );
 		$current_number = $document->get_number();
 		
@@ -182,23 +191,6 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 			return;
 		}
 	}
-	
-	// // Last chance, check directly in the database.
-	// // This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
-	// if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
-	// 	$number_store = $document->get_sequential_number_store();
-	// 	if ( ! empty( $number_store ) ) {
-	// 		global $wpdb;
-	// 		$column_name = 'order_id';
-	// 		$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
-	// 		$exists      = $wpdb->get_var( $query );
-
-	// 		if ( $exists ) {
-	// 			$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
-	// 			return;
-	// 		}
-	// 	}
-	// }
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
@@ -229,7 +221,7 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 			
 			// Set a transient to prevent concurrent requests for the same document.
-			if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
+			if ( $transient_required ) {
 				$number = $document->get_number();
 				
 				set_transient( $lock_name, [
