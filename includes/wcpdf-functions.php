@@ -111,7 +111,20 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 }
 
-function wcpdf_init_document( $document_type, $order ) {
+/**
+ * Initiate a document for an order
+ *
+ * @param string $document_type
+ * @param \WC_Abstract_Order  $order
+ * 
+ * @throws \Exception
+ * @throws \Dompdf\Exception
+ * @throws \WPO\WC\UBL\Exceptions\FileWriteException
+ * @throws \Error
+ * 
+ * @return void
+ */
+function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order ): void {
 	if ( empty( $document_type ) || empty( $order ) || ! is_object( $order ) ) {
 		return;
 	}
@@ -139,16 +152,18 @@ function wcpdf_init_document( $document_type, $order ) {
 	}
 	
 	// Last chance, check directly in the database
-	$number_store = $document->get_sequential_number_store();
-	if ( ! empty( $number_store ) ) {
-		global $wpdb;
-		$column_name = 'order_id';
-		$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
-		$exists      = $wpdb->get_var( $query );
+	if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
+		$number_store = $document->get_sequential_number_store();
+		if ( ! empty( $number_store ) ) {
+			global $wpdb;
+			$column_name = 'order_id';
+			$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
+			$exists      = $wpdb->get_var( $query );
 
-		if ( $exists ) {
-			$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
-			return;
+			if ( $exists ) {
+				$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
+				return;
+			}
 		}
 	}
 
