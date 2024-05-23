@@ -185,6 +185,9 @@ function wcpdf_init_document( $document_type, $order ) {
 				$lock->log( $request_id . sprintf( 'Post-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 				return;
 			}
+			
+			$number = $document->get_number();
+			$lock->log( $request_id . sprintf( 'Document number %1$s generated for %2$s with order ID# %3$s.', $number, $document_type, $order_id ), 'info' );
 
 			$document->init();
 			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
