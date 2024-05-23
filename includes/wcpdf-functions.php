@@ -182,22 +182,13 @@ function wcpdf_init_document( $document_type, $order ) {
 			throw $e;
 		} finally {
 			if ( $lock->is_locked() ) {
-				$_REQUEST['wcpdf_init_document_lock'] = $lock;
+				add_action( 'shutdown', function() use ( $lock ) {
+					$lock->release();
+				} );
 			}
 		}
 	} else {
 		$lock->log( $request_id . sprintf( 'Couldn\'t get the lock while initiating the document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
-	}
-}
-
-add_action( 'shutdown', 'wcpdf_release_lock_from_request' );
-function wcpdf_release_lock_from_request() {
-	if ( ! empty( $_REQUEST['wcpdf_init_document_lock'] ) ) {
-		$lock = $_REQUEST['wcpdf_init_document_lock'];
-		
-		if ( is_a( $lock, '\WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0' ) ) {
-			$lock->release();
-		}
 	}
 }
 
