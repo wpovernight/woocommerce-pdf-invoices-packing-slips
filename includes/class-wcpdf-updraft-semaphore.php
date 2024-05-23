@@ -8,6 +8,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' ) ) :
 
+/**
+ * Class Updraft_Semaphore_3_0
+ *
+ * This class is much simpler to use than the the previous series, as it has dropped support for complicated cases that were not being used. It also now only uses a single row in the options database, and takes care of creating it itself internally.
+ *
+ * Logging, though, may be noisier, unless your loggers are taking note of the log level and only registering what is required.
+ *
+ * Example of use (a lock that will expire if not released within 300 seconds)
+ *
+ * See test.php for a longer example (including logging).
+ *
+ * $my_lock = new Updraft_Semaphore_3_0('my_lock_name', 300);
+ * // If getting the lock does not succeed first time, try again up to twice
+ * if ($my_lock->lock(2)) {
+ *   try {
+ *     // do stuff ...
+ *   } catch (Exception $e) {
+ *     // We are making sure we release the lock in case of an error
+ *   } catch (Error $e) {
+ *     // We are making sure we release the lock in case of an error
+ *   }
+ *   $my_lock->release();
+ * } else {
+ *   error_log("Sorry, could not get the lock");
+ * }
+ */
 class Updraft_Semaphore_3_0 {
 
 	// Time after which the lock will expire (in seconds)
@@ -31,7 +57,7 @@ class Updraft_Semaphore_3_0 {
 	 * @param String  $name		  - a unique (across the WP site) name for the lock. Should be no more than 51 characters in length (because of the use of the WP options table, with some further characters used internally)
 	 * @param Integer $locked_for - time (in seconds) after which the lock will expire if not released. This needs to be positive if you don't want bad things to happen.
 	 * @param Array	  $loggers	  - an array of loggers
-	 * @param Array   $context    - context for loggers
+	 * @param Array	  $context	  - Optional. Additional information for log handlers.
 	 */
 	public function __construct( $name, $locked_for = 300, $loggers = array(), $context = array() ) {
 		$this->option_name = 'wpo_wcpdf_lock/' . $name;
@@ -41,61 +67,92 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
-	 * Attempt to acquire the lock using MySQL's GET_LOCK. If it was already acquired, then nothing extra will be done (the method will be a no-op).
+	 * Internal function to make sure that the lock is set up in the database
+	 *
+	 * @return Integer - 0 means 'failed' (which could include that someone else concurrently created it); 1 means 'already existed'; 2 means 'exists, because we created it). The intention is that non-zero results mean that the lock exists.
+	 */
+	private function ensure_database_initialised() {
+
+		global $wpdb;
+
+		$sql = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", $this->option_name );
+
+		if ( 1 === (int) $wpdb->get_var( $sql ) ) {
+			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') already existed in the database', 'debug' );
+			return 1;
+		}
+
+		$sql = $wpdb->prepare( "INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES(%s, '0', 'no');", $this->option_name );
+
+		$rows_affected = $wpdb->query( $sql );
+
+		if ( $rows_affected > 0 ) {
+			$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') was created in the database', 'debug' );
+		} else {
+			$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') failed to be created in the database (could already exist)', 'notice' );
+		}
+
+		return ( $rows_affected > 0 ) ? 2 : 0;
+	}
+
+	/**
+	 * Attempt to acquire the lock. If it was already acquired, then nothing extra will be done (the method will be a no-op).
 	 *
 	 * @param Integer $retries - how many times to retry (after a 1 second sleep each time)
 	 *
 	 * @return Boolean - whether the lock was successfully acquired or not
 	 */
-	public function lock( $retries = 0 ) {
+	public function lock($retries = 0) {
+
 		if ( $this->acquired ) {
 			return true;
 		}
 
-		if ( $this->get_lock() ) {
-			$this->log( 'Lock (' . $this->option_name . ') acquired', 'info' );
+		global $wpdb;
+
+		$time_now = time();
+		$acquire_until = $time_now + $this->locked_for;
+
+		$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d", $acquire_until, $this->option_name, $time_now );
+
+		if ( 1 === $wpdb->query( $sql ) ) {
+			$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') acquired', 'info' );
 			$this->acquired = true;
 			return true;
 		}
 
-		while ( $retries-- > 0 ) {
-			sleep( 1 );
-			if ( $this->get_lock() ) {
-				$this->log( 'Lock (' . $this->option_name . ') acquired after retry', 'info' );
+		// See if the failure was caused by the row not existing (we check this only after failure, because it should only occur once on the site)
+		if ( ! $this->ensure_database_initialised() ) {
+			return false;
+		}
+
+		do {
+			// Now that the row has been created, try again
+			if ( 1 === $wpdb->query( $sql ) ) {
+				$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') acquired after initialising the database', 'info' );
 				$this->acquired = true;
 				return true;
 			}
-		}
+			$retries--;
+			if ( $retries >=0 ) {
+				$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') not yet acquired; sleeping', 'debug' );
+				sleep( 1 );
+				// As a second has passed, update the time we are aiming for
+				$time_now = time();
+				$acquire_until = $time_now + $this->locked_for;
+				$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d", $acquire_until, $this->option_name, $time_now );
+			}
+		} while ( $retries >= 0 );
 
-		$this->log( 'Lock (' . $this->option_name . ') could not be acquired (it is locked)', 'info' );
+		$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') could not be acquired (it is locked)', 'info' );
 
 		return false;
 	}
 
 	/**
-	 * Get the lock using MySQL's GET_LOCK.
+	 * Release the lock
 	 *
-	 * @return Boolean - whether the lock was successfully set or not
-	 */
-	private function get_lock() {
-		global $wpdb;
-
-		$sql = $wpdb->prepare( "SELECT GET_LOCK(%s, %d)", $this->option_name, $this->locked_for );
-
-		return $wpdb->get_var( $sql ) === '1';
-	}
-
-	/**
-	 * Check if the lock is currently locked
-	 *
-	 * @return Boolean - whether the lock is currently locked or not
-	 */
-	public function is_locked() {
-		return $this->acquired;
-	}
-
-	/**
-	 * Release the lock using MySQL's RELEASE_LOCK.
+	 * N.B. We don't attempt to unlock it unless we locked it. i.e. Lost locks are left to expire rather than being forced. (If we want to force them, we'll need to introduce a new parameter).
 	 *
 	 * @return Boolean - if it returns false, then the lock was apparently not locked by us (and the caller will most likely therefore ignore the result, whatever it is).
 	 */
@@ -105,16 +162,11 @@ class Updraft_Semaphore_3_0 {
 		}
 
 		global $wpdb;
+		$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = '0' WHERE option_name = %s", $this->option_name );
 
-		$sql = $wpdb->prepare( "SELECT RELEASE_LOCK(%s)", $this->option_name );
+		$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') released', 'info' );
 
-		$result = $wpdb->get_var( $sql ) === '1';
-
-		if ( $result ) {
-			$this->log( 'Lock (' . $this->option_name . ') released', 'info' );
-		} else {
-			$this->log( 'Lock (' . $this->option_name . ') failed to release', 'error' );
-		}
+		$result = (int) $wpdb->query($sql) === 1;
 
 		$this->acquired = false;
 
@@ -122,17 +174,15 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
-	 * Check if a lock is set in the database without acquiring it.
-	 *
-	 * @return Boolean - whether the lock is currently set or not
+	 * Cleans up the DB of any residual data. This should not be used as part of ordinary unlocking; only as part of deinstalling, or if you otherwise know that the lock will not be used again. If calling this, it's redundant to first unlock (and a no-op to attempt to do so afterwards).
 	 */
-	public function is_lock_set() {
+	public function delete() {
+		$this->acquired = false;
+
 		global $wpdb;
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s", $this->option_name ) );
 
-		$sql         = $wpdb->prepare( "SELECT IS_USED_LOCK(%s)", $this->option_name );
-		$lock_status = $wpdb->get_var( $sql );
-
-		return ! is_null( $lock_status );
+		$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') was deleted from the database' );
 	}
 
 	/**

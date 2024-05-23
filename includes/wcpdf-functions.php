@@ -189,9 +189,6 @@ function wcpdf_init_document( $document_type, $order ) {
 			$number = $document->get_number();
 			$lock->log( $request_id . sprintf( '[1] Document number %1$s generated for %2$s with order ID# %3$s.', $number, $document_type, $order_id ), 'info' );
 
-			$document->init();
-			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-
 			$document->save();
 			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
