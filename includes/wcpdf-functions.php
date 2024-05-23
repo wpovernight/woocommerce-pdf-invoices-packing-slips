@@ -156,6 +156,9 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 	
 	// Fetch the order object to get the latest data
 	$order = wc_get_order( $order_id );
+	$number = $order->get_meta( "_wcpdf_{$this->slug}_number", true );
+	
+	$lock->log( $request_id . sprintf( 'Number found: %s', $number ), 'info' );
 
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
