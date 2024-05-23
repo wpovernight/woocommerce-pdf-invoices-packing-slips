@@ -121,32 +121,8 @@ function wcpdf_init_document( $document_type, $order ) {
 	$lock       = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
 	
-	if ( $lock->is_lock_set() ) {
-		$lock->log( $request_id . sprintf( 'Lock already set for init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
-		return;
-	}
-	
 	// Random delay to reduce race conditions
 	usleep( mt_rand( 500000, 1500000 ) ); // delay between 0.5 to 1.5 seconds
-
-	$current_time    = time();
-	$lock_expiration = $current_time + WPO_WCPDF()->lock_time;
-	$transient_value = get_transient( $lock_name );
-
-	if ( $transient_value ) {
-		$delay          = 60;
-		$new_expiration = $transient_value + $delay;
-		$wait_time      = $new_expiration - $current_time;
-		
-		if ( $wait_time > 0 ) {
-			usleep( $wait_time * 1000000 );
-		}
-		
-		$lock_expiration = $new_expiration;
-	}
-
-	// Set or update the transient
-	set_transient( $lock_name, $lock_expiration, $lock_expiration - $current_time );
 
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
@@ -160,6 +136,19 @@ function wcpdf_init_document( $document_type, $order ) {
 	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
 		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
+	}
+	
+	// Last chance, check directly in the database
+	$number_store = $document->get_sequential_number_store();
+	if ( ! empty( $number_store ) ) {
+		$column_name = 'order_id';
+		$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
+		$exists      = $wpdb->get_var( $query );
+
+		if ( $exists ) {
+			$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
+			return;
+		}
 	}
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
@@ -198,9 +187,6 @@ function wcpdf_init_document( $document_type, $order ) {
 			if ( ! $document->exists() ) {
 				throw new \Exception( sprintf( 'Document %1$s for order ID# %2$s was not properly saved.', $document_type, $order_id ) );
 			}
-			
-			$number = $document->get_number();
-			$lock->log( $request_id . sprintf( '[2] Document number %1$s generated for %2$s with order ID# %3$s.', $number, $document_type, $order_id ), 'info' );
 		} catch ( \Exception $e ) {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
