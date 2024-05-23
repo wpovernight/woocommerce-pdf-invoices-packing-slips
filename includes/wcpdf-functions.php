@@ -147,7 +147,7 @@ function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order )
 	usleep( mt_rand( 500000, 1500000 ) ); // delay between 0.5 to 1.5 seconds
 
 	// Re-fetch the document to ensure it is up-to-date
-	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+	$document = WPO_WCPDF()->documents->get_document( $document_type, wc_get_order( $order_id ) );
 
 	if ( ! $document || ! $document->is_allowed() ) {
 		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s with order ID# %2$s is not allowed.', $document_type, $order_id ), 'info' );
@@ -155,27 +155,27 @@ function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order )
 	}
 
 	// Check if the document was created by another process before proceeding
-	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
+	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( wc_get_order( $order_id ) ) ) ) {
 		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
 	}
 	
 	// Last chance, check directly in the database.
 	// This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
-	if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
-		$number_store = $document->get_sequential_number_store();
-		if ( ! empty( $number_store ) ) {
-			global $wpdb;
-			$column_name = 'order_id';
-			$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
-			$exists      = $wpdb->get_var( $query );
+	// if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
+	// 	$number_store = $document->get_sequential_number_store();
+	// 	if ( ! empty( $number_store ) ) {
+	// 		global $wpdb;
+	// 		$column_name = 'order_id';
+	// 		$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
+	// 		$exists      = $wpdb->get_var( $query );
 
-			if ( $exists ) {
-				$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
-				return;
-			}
-		}
-	}
+	// 		if ( $exists ) {
+	// 			$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
+	// 			return;
+	// 		}
+	// 	}
+	// }
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
@@ -197,11 +197,12 @@ function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order )
 			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 			// Re-fetch the document to ensure it is up-to-date and exists
-			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+			$document = WPO_WCPDF()->documents->get_document( $document_type, wc_get_order( $order_id ) );
 			
 			if ( ! $document->exists() ) {
 				throw new \Exception( sprintf( 'Document %1$s for order ID# %2$s was not properly saved.', $document_type, $order_id ) );
 			}
+			
 		} catch ( \Exception $e ) {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;

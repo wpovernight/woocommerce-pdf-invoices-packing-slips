@@ -333,7 +333,7 @@ abstract class Order_Document {
 		return 'wpo_wcpdf_' . $this->slug . '_get_';
 	}
 
-	public function read_data( $order, $set = false ) {
+	public function read_data( $order ) {
 		$data = array(
 			// always load date before number, because date is used in number formatting
 			'date'             => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
