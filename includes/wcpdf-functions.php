@@ -165,6 +165,24 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 		return;
 	}
 	
+	// Last chance, check transient.
+	if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
+		$transient_data = get_transient( $lock_name );
+		$current_number = $document->get_number();
+		
+		if (
+			$transient_data                                                                                   &&
+			isset( $transient_data['order_id'], $transient_data['document_type'], $transient_data['number'] ) &&
+			$transient_data['order_id'] === $order_id                                                         &&
+			$transient_data['document_type'] === $document_type                                               &&
+			! empty( $transient_data['number'] )                                                              &&
+			( $current_number === $transient_data['number'] || empty( $current_number ) )
+		) {
+			$lock->log( $request_id . sprintf( 'Transient check: Document %1$s for order ID# %2$s already exists with number %3$s. No need to generate again.', $document_type, $order_id, $transient_data['number'] ), 'info' );
+			return;
+		}
+	}
+	
 	// // Last chance, check directly in the database.
 	// // This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
 	// if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
@@ -209,6 +227,17 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 
 			$document->save();
 			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			
+			// Set a transient to prevent concurrent requests for the same document.
+			if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
+				$number = $document->get_number();
+				
+				set_transient( $lock_name, [
+					'document_type' => $document_type,
+					'order_id'      => $order_id,
+					'number'        => $number
+				], WPO_WCPDF()->lock_time );
+			}
 			
 		} catch ( \Exception $e ) {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
