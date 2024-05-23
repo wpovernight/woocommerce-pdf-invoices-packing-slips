@@ -1,8 +1,6 @@
 <?php
 
 use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
-use Automattic\WooCommerce\Utilities\OrderUtil;
-use Automattic\WooCommerce\Caches\OrderCache;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
