@@ -129,9 +129,28 @@ function wcpdf_init_document( $document_type, $order ) {
 	// Random delay to reduce race conditions
 	usleep( mt_rand( 500000, 1500000 ) ); // delay between 0.5 to 1.5 seconds
 
+	$current_time    = time();
+	$lock_expiration = $current_time + WPO_WCPDF()->lock_time;
+	$transient_value = get_transient( $lock_name );
+
+	if ( $transient_value ) {
+		$delay          = 60;
+		$new_expiration = $transient_value + $delay;
+		$wait_time      = $new_expiration - $current_time;
+		
+		if ( $wait_time > 0 ) {
+			usleep( $wait_time * 1000000 );
+		}
+		
+		$lock_expiration = $new_expiration;
+	}
+
+	// Set or update the transient
+	set_transient( $lock_name, $lock_expiration, $lock_expiration - $current_time );
+
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
-	
+
 	if ( ! $document || ! $document->is_allowed() ) {
 		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s with order ID# %2$s is not allowed.', $document_type, $order_id ), 'info' );
 		return;
@@ -147,6 +166,17 @@ function wcpdf_init_document( $document_type, $order ) {
 		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
 		try {
+			// Register a shutdown function to ensure the lock is released
+			register_shutdown_function( function() use ( $lock, $request_id, $document_type, $order_id ) {
+				if ( $lock->is_locked() ) {
+					if ( $lock->release() ) {
+						$lock->log( $request_id . sprintf( 'Lock released for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+					} else {
+						$lock->log( $request_id . sprintf( 'Failed to release lock for document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+					}
+				}
+			} );
+
 			// Re-fetch the document to ensure it is up-to-date
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 
@@ -180,12 +210,6 @@ function wcpdf_init_document( $document_type, $order ) {
 		} catch ( \Error $e ) {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
-		} finally {
-			if ( $lock->is_locked() ) {
-				add_action( 'shutdown', function() use ( $lock ) {
-					$lock->release();
-				} );
-			}
 		}
 	} else {
 		$lock->log( $request_id . sprintf( 'Couldn\'t get the lock while initiating the document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
