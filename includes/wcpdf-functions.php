@@ -63,7 +63,12 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 				}
 
 				if ( $init && ! $document->exists() ) {
-					wcpdf_init_document( $document_type, $order );
+					try {
+						wcpdf_init_document( $document_type, $order );
+					} catch ( \Exception $e ) {
+						wcpdf_log_error( $e->getMessage(), 'critical' );
+						return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+					}
 				}
 
 				return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
@@ -96,7 +101,12 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 			}
 
 			if ( $init && ! $document->exists() ) {
-				wcpdf_init_document( $document_type, $order );
+				try {
+					wcpdf_init_document( $document_type, $order );
+				} catch ( \Exception $e ) {
+					wcpdf_log_error( $e->getMessage(), 'critical' );
+					return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+				}
 			}
 
 		// otherwise we use bulk class to wrap multiple documents in one.
@@ -119,7 +129,6 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
  * 
  * @throws \Exception
  * @throws \Dompdf\Exception
- * @throws \WPO\WC\UBL\Exceptions\FileWriteException
  * @throws \Error
  * 
  * @return void
@@ -196,9 +205,6 @@ function wcpdf_init_document( string $document_type, \WC_Abstract_Order $order )
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
 		} catch ( \Dompdf\Exception $e ) {
-			$lock->log( $request_id . $e->getMessage(), 'critical' );
-			throw $e;
-		} catch ( \WPO\WC\UBL\Exceptions\FileWriteException $e ) {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
 		} catch ( \Error $e ) {
