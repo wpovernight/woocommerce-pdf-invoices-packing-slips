@@ -796,7 +796,7 @@ class Settings {
 
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
 		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
-		$lock      = new Semaphore( 'Settings/schedule_yearly_reset_numbers', WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+		$lock      = new Semaphore( 'settings/schedule_yearly_reset_numbers', WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
 
 		// checks if there are pending actions
@@ -854,7 +854,7 @@ class Settings {
 	}
 
 	public function yearly_reset_numbers() {
-		$lock = new Semaphore( 'Settings/yearly_reset_numbers', WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+		$lock = new Semaphore( 'settings/yearly_reset_numbers', WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 
 		if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 
