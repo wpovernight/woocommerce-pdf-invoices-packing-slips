@@ -148,17 +148,8 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 	// Random delay to reduce race conditions
 	usleep( mt_rand( 2000000, 3500000 ) ); // delay between 2.0 to 3.5 seconds
 	
-	// Invalidate cache for the order
-	if ( OrderUtil::orders_cache_usage_is_enabled() ) {
-		$order_cache = wc_get_container()->get( OrderCache::class );
-		$order_cache->remove( $order_id );
-	}
-	
 	// Fetch the order object to get the latest data
 	$order = wc_get_order( $order_id );
-	$number = $order->get_meta( "_wcpdf_{$this->slug}_number", true );
-	
-	$lock->log( $request_id . sprintf( 'Number found: %s', $number ), 'info' );
 
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
@@ -174,8 +165,8 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 		return;
 	}
 	
-	// Last chance, check directly in the database.
-	// This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
+	// // Last chance, check directly in the database.
+	// // This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
 	// if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
 	// 	$number_store = $document->get_sequential_number_store();
 	// 	if ( ! empty( $number_store ) ) {
