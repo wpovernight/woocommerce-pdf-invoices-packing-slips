@@ -121,6 +121,11 @@ function wcpdf_init_document( $document_type, $order ) {
 	$lock       = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
 	$request_id = '[' . mt_rand( 10000000, 99999999 ) . '] ';
 	
+	if ( $lock->is_lock_set() ) {
+		$lock->log( $request_id . sprintf( 'Lock already set for init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+		return;
+	}
+	
 	// Random delay to reduce race conditions
 	usleep( mt_rand( 500000, 1500000 ) ); // delay between 0.5 to 1.5 seconds
 

@@ -122,6 +122,20 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
+	 * Check if a lock is set in the database without acquiring it.
+	 *
+	 * @return Boolean - whether the lock is currently set or not
+	 */
+	public function is_lock_set() {
+		global $wpdb;
+
+		$sql         = $wpdb->prepare( "SELECT IS_USED_LOCK(%s)", $this->option_name );
+		$lock_status = $wpdb->get_var( $sql );
+
+		return ! is_null( $lock_status );
+	}
+
+	/**
 	 * Captures and logs any given messages
 	 *
 	 * @param String $message - the error message
