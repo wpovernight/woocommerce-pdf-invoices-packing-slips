@@ -187,7 +187,7 @@ function wcpdf_init_document( $document_type, $order ) {
 			}
 			
 			$number = $document->get_number();
-			$lock->log( $request_id . sprintf( 'Document number %1$s generated for %2$s with order ID# %3$s.', $number, $document_type, $order_id ), 'info' );
+			$lock->log( $request_id . sprintf( '[1] Document number %1$s generated for %2$s with order ID# %3$s.', $number, $document_type, $order_id ), 'info' );
 
 			$document->init();
 			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
@@ -201,6 +201,9 @@ function wcpdf_init_document( $document_type, $order ) {
 			if ( ! $document->exists() ) {
 				throw new \Exception( sprintf( 'Document %1$s for order ID# %2$s was not properly saved.', $document_type, $order_id ) );
 			}
+			
+			$number = $document->get_number();
+			$lock->log( $request_id . sprintf( '[2] Document number %1$s generated for %2$s with order ID# %3$s.', $number, $document_type, $order_id ), 'info' );
 		} catch ( \Exception $e ) {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
