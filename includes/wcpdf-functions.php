@@ -141,6 +141,7 @@ function wcpdf_init_document( $document_type, $order ) {
 	// Last chance, check directly in the database
 	$number_store = $document->get_sequential_number_store();
 	if ( ! empty( $number_store ) ) {
+		global $wpdb;
 		$column_name = 'order_id';
 		$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
 		$exists      = $wpdb->get_var( $query );
