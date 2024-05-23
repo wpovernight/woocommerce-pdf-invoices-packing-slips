@@ -128,7 +128,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
  * Initiate a document for an order
  *
  * @param string $document_type
- * @param int $order
+ * @param int $order_id
  * 
  * @throws \Exception
  * @throws \Dompdf\Exception
