@@ -128,7 +128,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
  * Initiate a document for an order
  *
  * @param string $document_type
- * @param int $order
+ * @param int $order_id
  * 
  * @throws \Exception
  * @throws \Dompdf\Exception
@@ -154,11 +154,14 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 		$order_cache->remove( $order_id );
 	}
 	
+	// Clear transients and object cache for the order
+	wc_delete_shop_order_transients( $order_id );
+	wp_cache_delete( $order_id, 'orders' );
+	
 	// Fetch the order object to get the latest data
 	$order = wc_get_order( $order_id );
-	$number = $order->get_meta( "_wcpdf_{$this->slug}_number", true );
 	
-	$lock->log( $request_id . sprintf( 'Number found: %s', $number ), 'info' );
+	$lock->log( $request_id . sprintf( 'Number found: %s', $order->get_meta( "_wcpdf_{$document_type}_number", true ) ), 'info' );
 
 	// Re-fetch the document to ensure it is up-to-date
 	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
@@ -174,23 +177,6 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 		return;
 	}
 	
-	// Last chance, check directly in the database.
-	// This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
-	// if ( ! in_array( $document_type, array( 'credit-note', 'bulk', 'summary' ) ) ) {
-	// 	$number_store = $document->get_sequential_number_store();
-	// 	if ( ! empty( $number_store ) ) {
-	// 		global $wpdb;
-	// 		$column_name = 'order_id';
-	// 		$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
-	// 		$exists      = $wpdb->get_var( $query );
-
-	// 		if ( $exists ) {
-	// 			$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
-	// 			return;
-	// 		}
-	// 	}
-	// }
-
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
@@ -204,7 +190,12 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 				}
 			} );
 			
+			// Clear transients and object cache for the order again just before processing
+			wc_delete_shop_order_transients( $order_id );
+			wp_cache_delete( $order_id, 'orders' );
+
 			// Re-fetch the document to ensure it is up-to-date
+			$order = wc_get_order( $order_id );
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
 			
 			// Check if the document was created by another process before proceeding
