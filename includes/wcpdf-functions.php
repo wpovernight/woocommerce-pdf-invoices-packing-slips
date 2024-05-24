@@ -144,7 +144,7 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 	
 	// lock
 	$lock_time                    = apply_filters( 'wpo_wcpdf_init_document_lock_time', WPO_WCPDF()->lock_time, $current_action );
-	$lock_release_time            = apply_filters( 'wpo_wcpdf_init_document_lock_release_time', $lock_time + 60, $current_action );
+	$lock_release_time            = apply_filters( 'wpo_wcpdf_init_document_lock_release_time', $lock_time + 5, $current_action );
 	$look_release_hook            = 'wpo_wcpdf_init_document_release_lock';
 	$lock_name                    = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
 	$lock                         = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
@@ -160,6 +160,9 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 	if ( $is_race_condition ) {
 		usleep( $race_condition_delay );
 	}
+	
+	// Unschedule the release lock action if it was scheduled before for the same order and document type
+	wcpdf_unschedule_as_actions( $look_release_hook, array( 'order_id' => $order_id, 'document_type' => $document_type ) );	
 	
 	// Fetch the order object to get the latest data
 	$order = wc_get_order( $order_id );
@@ -182,9 +185,23 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
 		return;
 	}
+	
+	// Last chance, check directly in the database.
+	// This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
+	if ( $is_race_condition ) {
+		$number_store = $document->get_sequential_number_store();
+		if ( ! empty( $number_store ) ) {
+			global $wpdb;
+			$column_name = 'order_id';
+			$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
+			$exists      = $wpdb->get_var( $query );
 
-	// Unschedule the release lock action if it was scheduled before for the same order and document type
-	wcpdf_unschedule_as_actions( $look_release_hook, array( 'order_id' => $order_id, 'document_type' => $document_type ) );	
+			if ( $exists ) {
+				$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
+				return;
+			}
+		}
+	}
 
 	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
 		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
