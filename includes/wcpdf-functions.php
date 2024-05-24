@@ -227,6 +227,8 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 			$lock->log( $request_id . $e->getMessage(), 'critical' );
 			throw $e;
 		} finally {
+			$lock->log( $request_id . 'Waiting lock to be released...', 'info' );
+			
 			// Release the lock if not race condition.
 			// This prevents the lock getting acquiring by concurrent requests during the race condition.
 			if ( ! $is_race_condition ) {
