@@ -151,7 +151,7 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 	$lock_release_hook_args       = array( $lock_name, $request_id, $document_type, absint( $order_id ) );
 	
 	// race condition
-	$race_condition_delay         = apply_filters( 'wpo_wcpdf_init_document_race_condition_delay', mt_rand( 2000000, 4000000 ) ); // delay between 2.0 to 4.0 seconds
+	$race_condition_delay         = apply_filters( 'wpo_wcpdf_init_document_race_condition_delay', mt_rand( 1500000, 3500000 ) ); // delay between 1.5 to 3.5 seconds
 	$race_condition_actions       = apply_filters( 'wpo_wcpdf_init_document_race_condition_actions', array( 'woocommerce_order_status_changed', 'wpo_wcpdf_generate_document_on_order_status' ) );
 	$race_condition_invalid_types = apply_filters( 'wpo_wcpdf_init_document_race_condition_invalid_types', array( 'credit-note', 'bulk', 'summary' ) );
 	$is_race_condition            = in_array( $current_action, $race_condition_actions ) && ! in_array( $document_type, $race_condition_invalid_types );
