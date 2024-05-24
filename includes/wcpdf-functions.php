@@ -211,15 +211,6 @@ function wcpdf_init_document( string $document_type, int $order_id ): void {
 			// This is to ensure the lock is released even if the process is killed.
 			as_schedule_single_action( time() + $lock_release_time, $look_release_hook, $lock_release_hook_args );
 			
-			// Re-fetch the document to ensure it is up-to-date
-			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
-			
-			// Check if the document was created by another process before proceeding
-			if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
-				$lock->log( $request_id . sprintf( 'Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
-				return;
-			}
-			
 			$document->init();
 			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
 
