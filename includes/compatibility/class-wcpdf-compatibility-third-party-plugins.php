@@ -63,6 +63,9 @@ class Third_Party_Plugins {
 			add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
 			add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
 		}
+
+		add_filter( 'woocommerce_hpos_admin_search_filters', array( $this, 'wcpdf_hpos_admin_search_filters' ) );
+		add_filter( 'woocommerce_shop_order_list_table_prepare_items_query_args', array( $this, 'wcpdf_invoice_number_query_args' ) );
 	}
 
 	/**
@@ -316,6 +319,37 @@ class Third_Party_Plugins {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
+	}
+
+	/**
+	 * Adds invoice number filter to the search filters available in the admin order search.
+	 * 
+	 * @param array $options List of available filters.
+	 * 
+	 * @return array
+	 */
+	function wcpdf_hpos_admin_search_filters ( array $options ): array {
+		$options['invoice_number'] = __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' );
+	
+		return $options;
+	}
+	
+	/**
+	 * Modifies the arguments passed to `wc_get_orders()` to support 'invoice_number' order search filter.
+	 * 
+	 * @param array $order_query_args Arguments to be passed to `wc_get_orders()`.
+	 * 
+	 * @return array
+	 */
+	function wcpdf_invoice_number_query_args ( array $order_query_args ): array {
+		if ( isset( $order_query_args['search_filter'] ) && 'invoice_number' === $order_query_args['search_filter'] && isset( $order_query_args['s'] ) ) {
+			$order_query_args['meta_key']      = '_wcpdf_invoice_number';
+			$order_query_args['meta_value']    = $order_query_args['s'];
+			$order_query_args['search_filter'] = 'all';
+			unset( $order_query_args['s'] );
+		}
+	
+		return $order_query_args;
 	}
 }
 
