@@ -11,16 +11,16 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Compatibility\\Third_Party_Plugin
  * @since 2.0
  */
 class Third_Party_Plugins {
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
-	
+
 	public function __construct()	{
 		// WooCommerce Subscriptions compatibility
 		if ( class_exists( 'WC_Subscriptions' ) ) {
@@ -47,7 +47,7 @@ class Third_Party_Plugins {
 		// WooCommerce Composite Products compatibility (add row classes)
 		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_composite_product_class' ), 10, 4 );
 
-	 	// WooCommerce Order Status & Actions Manager emails compatibility
+		// WooCommerce Order Status & Actions Manager emails compatibility
 		if (class_exists('WC_Custom_Status')) {
 			add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
 		}
@@ -131,7 +131,7 @@ class Third_Party_Plugins {
 
 	/**
 	 * WooCommerce Product Bundles
-	 * @param string $classes       CSS classes for item row (tr) 
+	 * @param string $classes       CSS classes for item row (tr)
 	 * @param string $document_type PDF Document type
 	 * @param object $order         WC_Order order
 	 * @param int    $item_id       WooCommerce Item ID
@@ -164,7 +164,7 @@ class Third_Party_Plugins {
 
 	/**
 	 * WPC Product Bundles
-	 * @param string $classes       CSS classes for item row (tr) 
+	 * @param string $classes       CSS classes for item row (tr)
 	 * @param string $document_type PDF Document type
 	 * @param object $order         WC_Order order
 	 * @param int    $item_id       WooCommerce Item ID
@@ -190,11 +190,11 @@ class Third_Party_Plugins {
 		}
 
 		return $classes;
-	}	
+	}
 
 	/**
 	 * WooCommerce Chained Products
-	 * @param string $classes       CSS classes for item row (tr) 
+	 * @param string $classes       CSS classes for item row (tr)
 	 * @param string $document_type PDF Document type
 	 * @param object $order         WC_Order order
 	 * @param int    $item_id       WooCommerce Item ID
@@ -218,7 +218,7 @@ class Third_Party_Plugins {
 
 	/**
 	 * WooCommerce Composite Products
-	 * @param string $classes       CSS classes for item row (tr) 
+	 * @param string $classes       CSS classes for item row (tr)
 	 * @param string $document_type PDF Document type
 	 * @param object $order         WC_Order order
 	 * @param int    $item_id       WooCommerce Item ID
@@ -251,7 +251,7 @@ class Third_Party_Plugins {
 
 	/**
 	 * Backwards compatibility helper function: try to get item ID from row class
-	 * @param string $classes       CSS classes for item row (tr) 
+	 * @param string $classes       CSS classes for item row (tr)
 	 */
 	public function get_item_id_from_classes ( $classes ) {
 		$class_array = explode(' ', $classes);

@@ -33,7 +33,7 @@ jobs:
         run: |
           # reformat .distignore: remove all empty lines, leading slashes and prefix with the folder
           sed "/^[[:space:]]*$/d;s#^/##;s#^#${{ env.plugin_slug }}/#" ${{ env.plugin_slug }}/.distignore > .zipignore
-          
+
           # create zip file
           zip -rq ${{ env.zip_file_name }} ${{ env.plugin_slug }} -x@.zipignore
 

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class DateTimeTransformer {
-	
+
 	/**
 	 * @return DateTime
 	 */
@@ -21,5 +21,5 @@ class DateTimeTransformer {
 
 		return $model;
 	}
-	
+
 }

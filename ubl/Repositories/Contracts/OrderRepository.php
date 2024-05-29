@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 interface OrderRepository {
-	
+
 	public function get_by_id( $id );
-	
+
 }

@@ -12,7 +12,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Stor
  */
 
 class Sequential_Number_Store {
-	
+
 	/**
 	 * WordPress database object
 	 * @var object
@@ -80,7 +80,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
-		
+
 		// catch mysql errors
 		wcpdf_catch_db_object_errors( $this->wpdb );
 
@@ -112,7 +112,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 			$number = $data['calculated_number'] = $this->get_next();
 			$this->wpdb->insert( $this->table_name, $data );
 		}
-		
+
 		// return generated number
 		return $number;
 	}
@@ -160,7 +160,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 				'order_id' => 0,
 				'date'     => get_date_from_gmt( date( 'Y-m-d H:i:s' ) ),
 			);
-			
+
 			if ( $this->method == 'calculate' ) {
 				$data['calculated_number'] = $highest_number;
 			}

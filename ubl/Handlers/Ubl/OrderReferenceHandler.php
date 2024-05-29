@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class OrderReferenceHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$orderReference = array(
 			'name'  => 'cac:OrderReference',
@@ -24,5 +24,5 @@ class OrderReferenceHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

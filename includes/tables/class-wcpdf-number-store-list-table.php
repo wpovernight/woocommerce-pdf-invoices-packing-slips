@@ -11,9 +11,9 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 }
 
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Tables\\Number_Store_List_Table' ) ) :
-	
+
 class Number_Store_List_Table extends \WP_List_Table {
-	
+
 	/**
 	 * Number of items per page
 	 *
@@ -122,7 +122,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 					break;
 			}
 		}
-		
+
 		return apply_filters( 'wpo_wcpdf_number_tools_column_content_' . $column_name, $value, $item );
 	}
 
@@ -145,7 +145,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 		if ( ! isset( WPO_WCPDF()->settings->debug_settings['calculate_document_numbers'] ) ) {
 			unset( $columns['calculated_number'] );
 		}
-		
+
 		return apply_filters( 'wpo_wcpdf_number_tools_columns', $columns );
 	}
 
@@ -221,11 +221,11 @@ class Number_Store_List_Table extends \WP_List_Table {
 				$result         = (array) $result;
 				$document_types = array( $document_type );
 				$order_id       = isset( $result['order_id'] ) ? absint( $result['order_id'] ) : 0;
-				
+
 				if ( 0 === $order_id ) {
 					continue;
 				}
-				
+
 				if ( 'invoice' === $document_type && ! empty( $invoice_number_store_doc_types ) ) {
 					$document_types = array_merge( $document_types, $invoice_number_store_doc_types );
 				}
@@ -255,7 +255,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 			array(),
 			$this->get_sortable_columns()
 		);
-		
+
 		$this->process_bulk_action();
 
 		$items        = $this->get_numbers();
@@ -270,7 +270,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 			'total_items' => $total_items,
 			'per_page'    => $per_page
 		) );
-		
+
 		$this->items = $data;
 	}
 
@@ -288,7 +288,7 @@ class Number_Store_List_Table extends \WP_List_Table {
 			return $order;
 		}
 	}
-	
+
 }
 
 endif; // class_exists

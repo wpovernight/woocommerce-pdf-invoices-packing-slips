@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class LegalMonetaryTotalHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$total         = $this->document->order->get_total();
 		$total_inc_tax = $total;
@@ -53,5 +53,5 @@ class LegalMonetaryTotalHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

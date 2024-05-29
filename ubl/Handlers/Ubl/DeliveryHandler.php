@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class DeliveryHandler extends UblHandler {
-	
+
 	public function handle( $data, $options = array() ) {
 		$delivery = array(
 			'name'  => 'cac:Delivery',
@@ -20,5 +20,5 @@ class DeliveryHandler extends UblHandler {
 
 		return $data;
 	}
-	
+
 }

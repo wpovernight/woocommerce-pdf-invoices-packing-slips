@@ -8,16 +8,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Install' ) ) :
 
 class Install {
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
-	
+
 	public function __construct() {
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
@@ -71,7 +71,7 @@ class Install {
 			// downgrade version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
-		
+
 		// deactivate legacy addons
 		add_action( 'admin_init', array( WPO_WCPDF(), 'deactivate_legacy_addons') );
 	}
@@ -95,12 +95,12 @@ class Install {
 		// Get tmp folders
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
-		// check if tmp folder exists => if not, initialize 
+		// check if tmp folder exists => if not, initialize
 		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) ) {
 			WPO_WCPDF()->main->init_tmp();
 		}
 
-		// Unsupported currency symbols 
+		// Unsupported currency symbols
 		$unsupported_symbols = array (
 			'AED',
 			'AFN',
@@ -222,7 +222,7 @@ class Install {
 		// get fonts folder path
 		$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
 
-		// check if tmp folder exists => if not, initialize 
+		// check if tmp folder exists => if not, initialize
 		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) || ! @is_dir( $font_path ) || ! wp_is_writable( $font_path ) ) {
 			WPO_WCPDF()->main->init_tmp();
 		} else {
@@ -234,7 +234,7 @@ class Install {
 
 		// to ensure fonts will be copied to the upload directory
 		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
-		
+
 		// 1.5.28 update: copy next invoice number to separate setting
 		if ( $installed_version == 'versionless' || version_compare( $installed_version, '1.5.28', '<' ) ) {
 			$template_settings = get_option( 'wpo_wcpdf_template_settings' );
@@ -319,7 +319,7 @@ class Install {
 					'html_output'				=> array( 'wpo_wcpdf_debug_settings' => 'html_output' ),
 				),
 			);
-			
+
 			// walk through map
 			foreach ($settings_map as $new_option => $new_settings_keys) {
 				${$new_option} = array();
@@ -426,14 +426,14 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
 		}
-		
+
 		// 3.3.0-dev-1: schedule the yearly reset number action
 		if ( version_compare( $installed_version, '3.3.0-dev-1', '<' ) ) {
 			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
 				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
 			}
 		}
-		
+
 		// 3.5.7-dev-1: migrate 'guest_access' setting to 'document_link_access_type'
 		if ( version_compare( $installed_version, '3.5.7-dev-1', '<' ) ) {
 			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
@@ -443,35 +443,35 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
 		}
-		
+
 		// 3.6.3-dev-1: check if 'legacy_mode' is enabled, and disable it
 		if ( version_compare( $installed_version, '3.6.3-dev-1', '<' ) ) {
 			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 			$update         = false;
-			
+
 			if ( ! empty( $debug_settings['legacy_mode'] ) ) {
 				unset( $debug_settings['legacy_mode'] );
 				$update = true;
 			}
-			
+
 			if ( ! empty( $debug_settings['legacy_textdomain'] ) ) {
 				unset( $debug_settings['legacy_textdomain'] );
 				$update = true;
 			}
-			
+
 			if ( $update ) {
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
 		}
-		
-		
+
+
 		// 3.7.0-beta-4: migrate UBL legacy settings
 		if ( version_compare( $installed_version, '3.7.0-beta-4', '<' ) ) {
 			// legacy ubl general/invoice settings
 			$legacy_ubl_general_settings = get_option( 'ubl_wc_general', [] );
 			$general_settings            = get_option( 'wpo_wcpdf_settings_general', [] );
 			$invoice_ubl_settings        = get_option( 'wpo_wcpdf_documents_settings_invoice_ubl', [] );
-			
+
 			$settings_to_migrate = [
 				'vat_number'            => 'general',
 				'coc_number'            => 'general',
@@ -479,16 +479,16 @@ class Install {
 				'attach_to_email_ids'   => 'invoice_ubl',
 				'include_encrypted_pdf' => 'invoice_ubl',
 			];
-			
+
 			foreach ( $settings_to_migrate as $setting => $type ) {
 				$update = [];
-				
+
 				switch ( $type ) {
 					case 'general':
 						if ( isset( $legacy_ubl_general_settings[$setting] ) ) {
 							$legacy_ubl_setting_value = $legacy_ubl_general_settings[$setting];
 							$setting                  = ( 'company_name' === $setting && ! isset( $general_settings['shop_name'] ) ) ? 'shop_name' : $setting;
-							
+
 							if ( 'company_name' !== $setting ) {
 								$general_settings[$setting] = $legacy_ubl_setting_value;
 								$update[]                   = $type;
@@ -502,7 +502,7 @@ class Install {
 						}
 						break;
 				}
-				
+
 				if ( ! empty( $update ) ) {
 					$update = array_unique( $update );
 					foreach ( $update as $type ) {
@@ -518,25 +518,25 @@ class Install {
 					}
 				}
 			}
-			
-			
+
+
 			// legacy ubl tax settings
 			$legacy_ubl_tax_setings = get_option( 'ubl_wc_taxes', [] );
 			if ( ! empty( $legacy_ubl_tax_setings ) ) {
 				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_setings );
 			}
-			
+
 			// set transient to flush rewrite rules if pretty links are enabled
 			if ( WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
 				set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
 			}
 		}
-		
+
 	}
 
 	/**
 	 * Plugin downgrade method.  Perform any required downgrades here
-	 * 
+	 *
 	 *
 	 * @param string $installed_version the currently installed ('old') version (actually higher since this is a downgrade)
 	 */
@@ -552,7 +552,7 @@ class Install {
 			return false;
 		}
 
-		// check if tmp folder exists => if not, initialize 
+		// check if tmp folder exists => if not, initialize
 		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) || ! @is_dir( $font_path ) || ! wp_is_writable( $font_path ) ) {
 			WPO_WCPDF()->main->init_tmp();
 		} else {

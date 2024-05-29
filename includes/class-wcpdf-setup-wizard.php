@@ -14,16 +14,16 @@ class Setup_Wizard {
 
 	/** @var array Steps for the setup wizard */
 	private $steps  = array();
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
-	
+
 	public function __construct() {
 		if ( WPO_WCPDF()->settings->user_can_manage_settings() ) {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
@@ -52,7 +52,7 @@ class Setup_Wizard {
 		if ( is_null ( get_current_screen() ) ) {
 			set_current_screen();
 		}
-				
+
 		$this->steps = array(
 			'shop-name' => array(
 				'name'	=> __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -88,7 +88,7 @@ class Setup_Wizard {
 		wp_enqueue_style(
 			'wpo-wcpdf-setup',
 			WPO_WCPDF()->plugin_url() . '/assets/css/setup-wizard'.$suffix.'.css',
-			array( 'dashicons', 'install' ), 
+			array( 'dashicons', 'install' ),
 			WPO_WCPDF_VERSION
 		);
 		wp_register_script(
@@ -247,11 +247,11 @@ class Setup_Wizard {
 						if ( $key == 'shop_address' && function_exists( 'sanitize_textarea_field' ) ) {
 							$sanitize_function = 'sanitize_textarea_field';
 						} else {
-							$sanitize_function = 'sanitize_text_field';							
+							$sanitize_function = 'sanitize_text_field';
 						}
-						
+
 						$value = stripslashes_deep( $value );
-						
+
 						if ( is_array( $value ) ) {
 							$settings[$key] = array_map( $sanitize_function, $value );
 						} else {

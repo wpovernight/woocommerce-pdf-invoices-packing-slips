@@ -1,5 +1,5 @@
 jQuery( function( $ ) {
-	
+
 	$( '#debug-tools .tool' ).on( 'click', 'input[type="submit"]', function( e ) {
 		e.preventDefault();
 		let $form    = $( this ).closest( 'form' );
@@ -7,7 +7,7 @@ jQuery( function( $ ) {
 		let formData = new FormData( $form[0] );
 		formData.append( 'action', 'wpo_wcpdf_debug_tools' );
 		formData.append( 'nonce', wpo_wcpdf_debug.nonce );
-		
+
 		// block ui
 		$form.closest( '.tool' ).block( {
 			message: null,
@@ -16,14 +16,14 @@ jQuery( function( $ ) {
 				opacity: 0.6
 			}
 		} );
-		
+
 		let reset = false;
 		if ( 'reset-settings' === tool ) {
 			reset = window.confirm( wpo_wcpdf_debug.confirm_reset );
 		} else {
 			reset = true;
 		}
-		
+
 		if ( reset ) {
 			$.ajax( {
 				url:         wpo_wcpdf_debug.ajaxurl,
@@ -40,16 +40,16 @@ jQuery( function( $ ) {
 				}
 			} );
 		}
-		
+
 		$form.closest( '.tool' ).unblock();
 	} );
-	
+
 	function process_form_response( tool, response, $form ) {
 		let $notice = $form.find( 'fieldset > .notice' );
 		$notice.hide();
 		$notice.removeClass( 'notice-error' );
 		$notice.removeClass( 'notice-success' );
-		
+
 		switch ( tool ) {
 			case 'export_settings':
 				if ( response.success && response.data.filename && response.data.settings ) {
@@ -77,12 +77,12 @@ jQuery( function( $ ) {
 				break;
 		}
 	}
-	
-	// toggle custom redirect page	
+
+	// toggle custom redirect page
 	$( "[name='wpo_wcpdf_settings_debug[document_access_denied_redirect_page]']" ).on( 'change', function( event ) {
 		let $custom_page_field = $( this ).closest( 'table' ).find( '#document_custom_redirect_page' );
 		let $field_description = $custom_page_field.closest( 'td' ).find( '.description' );
-		
+
 		if ( 'custom_page' === $( this ).val() ) {
 			$custom_page_field.show();
 			$field_description.show();
@@ -91,21 +91,21 @@ jQuery( function( $ ) {
 			$field_description.hide();
 		}
 	} ).trigger( 'change' );
-	
+
 	// danger zone enabled notice
 	if ( true === wpo_wcpdf_debug.danger_zone['enabled'] ) {
 		let notice = '<div class="notice notice-warning inline"><p>' + wpo_wcpdf_debug.danger_zone['message'] + '</p></div>';
 		$( "input#enable_danger_zone_tools" ).closest( 'td' ).find( '.description' ).append( notice );
 	}
-	
+
 	// number search
 	$( document.body ).on( 'click', '#wpo-wcpdf-settings a.number-search-button', function( e ) {
 		e.preventDefault();
-		
+
 		let search_val = $( this ).closest( 'div' ).find( ':input[name="number_search_input"]' ).val();
 		window.location.href = window.location.href + '&s=' + search_val;
 	} );
-	
+
 	// datepicker
 	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to, #fetch-numbers-data-date-from, #fetch-numbers-data-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
@@ -126,7 +126,7 @@ jQuery( function( $ ) {
 			dateFrom         = $( '#renumber-date-from' ).val();
 			dateTo           = $( '#renumber-date-to' ).val();
 			deleteOrRenumber = 'renumber';
-			
+
 		} else if ( 'delete-documents-btn' === this.id ) {
 			documentType     = $( '#delete-document-type' ).val();
 			dateType         = $( '#delete-date-type' ).val();
@@ -134,49 +134,49 @@ jQuery( function( $ ) {
 			dateTo           = $( '#delete-date-to' ).val();
 			deleteOrRenumber = 'delete';
 		}
-		
+
 		if ( '' === documentType || 'undefined' === documentType ) {
 			alert( wpo_wcpdf_debug.select_document_type );
 			return;
 		}
-		
+
 		if ( 'renumber' === deleteOrRenumber ) {
 			$( '.renumber-spinner' ).css( 'visibility', 'visible' );
 		} else if ( 'delete' === deleteOrRenumber ) {
 			$( '.delete-spinner' ).css( 'visibility', 'visible' );
 		}
-		
+
 		$( '#renumber-documents-btn, #delete-documents-btn' ).attr( 'disabled', true );
 		$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).prop( 'disabled', true );
 
 		// first call
 		renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
 	} );
-	
+
 	// disable `document_date` when selecting `all` documents
 	$( '#debug-tools #delete-document-type' ).on( 'change', function( event ) {
 		event.preventDefault();
-		
+
 		if ( 'all' === $( this ).val() ) {
 			$( this ).closest( 'form' ).find( '#delete-date-type option[value="document_date"]' ).prop( 'disabled', true );
 		} else {
 			$( this ).closest( 'form' ).find( '#delete-date-type option[value="document_date"]' ).prop( 'disabled', false );
 		}
 	} ).trigger( 'change' );
-	
+
 	$( '#debug-tools #delete-date-type' ).on( 'change', function( event ) {
 		event.preventDefault();
-		
+
 		let $document_type_selector = $( this ).closest( 'form' ).find( '#delete-document-type' );
-		
+
 		if ( '' === $document_type_selector.val() || 'all' === $document_type_selector.val() ) {
 			$( this ).find( 'option[value="document_date"]' ).prop( 'disabled', true );
 		} else {
 			$( this ).find( 'option[value="document_date"]' ).prop( 'disabled', false );
-		
+
 		}
 	} ).trigger( 'change' );
-	
+
 	function renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
 		let data = {
 			'action':             'wpo_wcpdf_danger_zone_tools',
@@ -200,10 +200,10 @@ jQuery( function( $ ) {
 					// update page count and document count
 					pageCount     = response.data.pageCount;
 					documentCount = response.data.documentCount;
-					
+
 					// recall function
 					renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
-					
+
 				} else {
 					$( '.renumber-spinner, .delete-spinner' ).css( 'visibility', 'hidden' );
 					$( '#renumber-documents-btn, #delete-documents-btn' ).removeAttr( 'disabled' );

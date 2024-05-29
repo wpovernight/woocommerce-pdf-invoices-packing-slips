@@ -12,9 +12,9 @@ class Endpoint {
 	public $action_suffix = '_wpo_wcpdf';
 	public $events        = array( 'generate', 'printed' );
 	public $actions;
-	
+
 	protected static $_instance = null;
-		
+
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
@@ -28,10 +28,10 @@ class Endpoint {
 			add_action( 'query_vars', array( $this, 'add_query_vars' ) );
 			add_action( 'parse_request', array( $this, 'handle_document_requests' ) );
 		}
-		
+
 		$this->actions = $this->get_actions();
 	}
-	
+
 	public function get_actions() {
 		$actions = [];
 		foreach ( $this->events as $event ) {
@@ -53,7 +53,7 @@ class Endpoint {
 	public function get_identifier() {
 		return apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' );
 	}
-	
+
 	public function add_endpoint() {
 		add_rewrite_rule(
 			'^' . $this->get_identifier() . '/([^/]*)/([^/]*)/([^/]*)/([^/]*)?',
@@ -81,7 +81,7 @@ class Endpoint {
 				$_REQUEST['order_ids']     = sanitize_text_field( $wp->query_vars['order_ids'] );
 				$_REQUEST['access_key']    = sanitize_text_field( $wp->query_vars['access_key'] );
 				$_REQUEST['output']        = sanitize_text_field( $wp->query_vars['output'] );
-				
+
 				do_action( 'wp_ajax_' . $this->actions['generate'] );
 			}
 		}
@@ -91,9 +91,9 @@ class Endpoint {
 		if ( empty( $order ) || empty( $document_type ) ) {
 			return '';
 		}
-		
+
 		$access_type = $this->get_document_link_access_type();
-		
+
 		switch ( $access_type ) {
 			case 'logged_in':
 			default:
@@ -106,7 +106,7 @@ class Endpoint {
 				$access_key = $order->get_order_key();
 				break;
 		}
-		
+
 		if ( empty( $access_key ) ) {
 			return '';
 		}
@@ -141,7 +141,7 @@ class Endpoint {
 
 		return esc_url( $document_link );
 	}
-	
+
 	/**
 	 * Get mark/unmark document printed link
 	 *
@@ -155,11 +155,11 @@ class Endpoint {
 		if ( empty( $event ) || ! in_array( $event, [ 'mark', 'unmark' ] ) ) {
 			return '';
 		}
-		
+
 		if ( empty( $order ) || empty( $document_type ) || ! is_admin() ) {
 			return '';
 		}
-		
+
 		$printed_link = add_query_arg( array(
 			'action'        => $this->actions['printed'],
 			'event'         => $event,
@@ -171,7 +171,7 @@ class Endpoint {
 
 		return esc_url( $printed_link );
 	}
-	
+
 	/**
 	 * Get document link access type from debug settings
 	 *
@@ -180,10 +180,10 @@ class Endpoint {
 	public function get_document_link_access_type() {
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$access_type    = isset( $debug_settings['document_link_access_type'] ) ? $debug_settings['document_link_access_type'] : 'logged_in';
-		
+
 		return apply_filters( 'wpo_wcpdf_document_link_access_type', $access_type, $this );
 	}
-	
+
 	/**
 	 * Get document denied frontend redirect URL
 	 *
@@ -192,7 +192,7 @@ class Endpoint {
 	public function get_document_denied_frontend_redirect_url() {
 		$redirect_url   = '';
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-		
+
 		if ( isset( $debug_settings['document_access_denied_redirect_page'] ) ) {
 			switch ( $debug_settings['document_access_denied_redirect_page'] ) {
 				case 'login_page':
@@ -211,10 +211,10 @@ class Endpoint {
 					break;
 			}
 		}
-		
+
 		return apply_filters( 'wpo_wcpdf_document_denied_frontend_redirect_url', $redirect_url, $debug_settings, $this );
 	}
-	
+
 }
 
 endif; // class_exists

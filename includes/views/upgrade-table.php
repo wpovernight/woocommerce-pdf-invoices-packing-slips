@@ -41,13 +41,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$extensions_disabled = [];
 			$extensions_enabled  = [];
 			$extension_columns   = [];
-			
+
 			// pro, templates & bundle columns
 			foreach ( $extension_license_infos as $extension => $info ) {
 				// enabled
 				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) ) {
 					$extensions_enabled[] = $extension;
-					
+
 					$title = __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' );
 					if ( empty( $info['status'] ) || $info['status'] != 'valid' ) {
 						$subtitle = sprintf(
@@ -58,13 +58,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 					} else {
 						$subtitle = '';
 					}
-					
+
 					$extension_columns[$extension] = sprintf(
 						'<td align="left"><h4>%s</h4><p>%s</p></td>',
 						$title,
 						$subtitle
 					);
-				
+
 				// disabled (includes bundle)
 				} else {
 					$extensions_disabled[] = $extension;
@@ -72,26 +72,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$extension_columns[$extension] = '<td align="left">&nbsp;</td>';
 					} else {
 						$extension_columns[$extension] = sprintf(
-							'<td align="left"><a class="upgrade_button" href="%s" target="_blank">%s</a></td>', 
-							esc_url_raw( $info['url'] ), 
+							'<td align="left"><a class="upgrade_button" href="%s" target="_blank">%s</a></td>',
+							esc_url_raw( $info['url'] ),
 							__( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' )
 						);
 					}
 				}
 			}
-			
+
 			// maybe disable 1 extension or bundle column
 			foreach ( $extensions_disabled as $extension_disabled ) {
 				if ( ( count( $extensions_disabled ) < 3 && $extension_disabled != 'bundle' ) || ( count( $extensions_disabled ) == 1 && $extension_disabled == 'bundle' ) ) {
 					$extension_columns[$extension_disabled] = '<td align="left">&nbsp;</td>';
 				}
 			}
-			
+
 			foreach ( $extension_columns as $column ) {
 				echo $column;
 			}
-			
+
 		?>
 		<td align="left" class="last">&nbsp;</td>
-	</tr>	
+	</tr>
 </table>

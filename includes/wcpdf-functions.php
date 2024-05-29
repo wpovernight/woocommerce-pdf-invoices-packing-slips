@@ -24,11 +24,21 @@ function wcpdf_filter_order_ids( $order_ids, $document_type ) {
 	return $order_ids;
 }
 
-function wcpdf_get_document( $document_type, $order, $init = false ) {
-	// $order can be one of the following:
-	// - WC Order object
-	// - array of order ids
-	// - null if order not loaded or loaded later
+/**
+ * Get the document object for an order
+ *
+ * @param string $document_type
+ * @param mixed  $order
+ * Passing an order object will return the document object for that order.
+ * Passing an array of order ids will return a Bulk_Document object.
+ * Passing a single order ID within an array retrieves the document object for that order and refreshes the order object to ensure the data is up-to-date.
+ * Passing null will return a document object without an order.
+ *
+ * @param bool   $init
+ *
+ * @return object|false
+ */
+function wcpdf_get_document( string $document_type, $order, bool $init = false ) {
 	if ( ! empty( $order ) ) {
 		if ( ! is_object( $order ) && ! is_array( $order ) && is_numeric( $order ) ) {
 			$order = array( absint( $order ) ); // convert single order id to array.
@@ -38,7 +48,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 			// an order object may need to be converted to several refunds for example.
 			$order_ids          = array( $order->get_id() );
 			$filtered_order_ids = wcpdf_filter_order_ids( $order_ids, $document_type );
-			
+
 			// check if something has changed.
 			$order_id_diff = array_diff( $filtered_order_ids, $order_ids );
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
@@ -74,7 +84,7 @@ function wcpdf_get_document( $document_type, $order, $init = false ) {
 		if ( count( $order_ids ) == 1 ) {
 			$order_id = array_pop( $order_ids );
 			$order    = wc_get_order( $order_id );
-			
+
 			do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
 
 			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
@@ -114,14 +124,14 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 function wcpdf_get_bulk_actions() {
 	$actions   = array();
 	$documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
-	
+
 	foreach ( $documents as $document ) {
 		foreach ( $document->output_formats as $output_format ) {
 			$slug = $document->get_type();
 			if ( 'pdf' !== $output_format ) {
 				$slug .= "_{$output_format}";
 			}
-			
+
 			if ( $document->is_enabled( $output_format ) ) {
 				$actions[$slug] = strtoupper( $output_format ) . ' ' . $document->get_title();
 			}
@@ -134,7 +144,7 @@ function wcpdf_get_bulk_actions() {
 /**
  * Load HTML into (pluggable) PDF library, DomPDF 1.0.2 by default
  * Use wpo_wcpdf_pdf_maker filter to change the PDF class (which can wrap another PDF library).
- * 
+ *
  * @param string       $html
  * @param array        $settings
  * @param null|object  $document
@@ -142,37 +152,37 @@ function wcpdf_get_bulk_actions() {
  */
 function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
 	$class = ( defined( 'WPO_WCPDF_VERSION' ) && version_compare( WPO_WCPDF_VERSION, '3.7.0-beta-1', '<' ) ) ? '\\WPO\\WC\\PDF_Invoices\\PDF_Maker' : '\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker';
-	
+
 	if ( ! class_exists( $class ) ) {
 		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/class-pdf-maker.php' );
 	}
-	
+
 	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
-	
+
 	return new $class( $html, $settings, $document );
 }
 
 /**
  * Get UBL Maker
  * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
- * 
+ *
  * @return WPO\WC\PDF_Invoices\Makers\UBL_Maker
  */
 function wcpdf_get_ubl_maker() {
 	$class = '\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker';
-	
+
 	if ( ! class_exists( $class ) ) {
 		include_once( WPO_WCPDF()->plugin_path() . '/includes/makers/class-ubl-maker.php' );
 	}
-	
+
 	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
-	
+
 	return new $class();
 }
 
 /**
  * Check if the default PDF maker is used for creating PDF
- * 
+ *
  * @return bool whether the PDF maker is the default or not
  */
 function wcpdf_pdf_maker_is_default() {
@@ -216,7 +226,7 @@ function wcpdf_ubl_headers( $filename, $size ) {
 
 /**
  * Get the document file
- * 
+ *
  * @param  object $document
  * @param  string $output_format
  * @param  string $error_handling
@@ -224,37 +234,37 @@ function wcpdf_ubl_headers( $filename, $size ) {
  */
 function wcpdf_get_document_file( object $document, string $output_format = 'pdf', $error_handling = 'exception' ): string {
 	$default_output_format = 'pdf';
-	
+
 	if ( ! $document ) {
 		$error_message = 'No document object provided.';
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
-	
+
 	if ( empty( $output_format ) ) {
 		$output_format = $default_output_format;
 	}
-	
+
 	if ( ! in_array( $output_format, $document->output_formats ) ) {
 		$error_message = "Invalid output format: {$output_format}. Expected one of: " . implode( ', ', $document->output_formats );
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
-	
+
 	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
-	
+
 	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
 		$error_message = "Couldn't get the attachments temporary folder path: {$tmp_path}.";
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
-	
+
 	$function = "get_document_{$output_format}_attachment";
-	
+
 	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
 		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
-	
+
 	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
-	
+
 	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
 }
 
@@ -269,7 +279,7 @@ function wcpdf_get_document_output_format_extension( string $output_format ): st
 		'pdf' => '.pdf',
 		'ubl' => '.xml',
 	);
-	
+
 	return isset( $output_formats[ $output_format ] ) ? $output_formats[ $output_format ] : $output_formats['pdf'];
 }
 
@@ -285,18 +295,18 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 	if ( apply_filters( 'wcpdf_disable_deprecation_notices', false ) ) {
 		return;
 	}
-	
+
 	// if the deprecated function is called from one of our filters, $this should be $document.
 	$filter               = current_filter();
 	$global_wcpdf_filters = array( 'wp_ajax_generate_wpo_wcpdf' );
-	
+
 	if ( ! empty( $filter ) && ! empty( $replacement ) && ! in_array( $filter, $global_wcpdf_filters ) && false !== strpos( $filter, 'wpo_wcpdf' ) && false !== strpos( $replacement, '$this' ) ) {
 		$replacement =  str_replace( '$this', '$document', $replacement );
 		$replacement = "{$replacement} - check that the \$document parameter is included in your action or filter ($filter)!";
 	}
-	
+
 	$is_ajax = function_exists( 'wp_doing_ajax' ) ? wp_doing_ajax() : defined( 'DOING_AJAX' ) && DOING_AJAX;
-	
+
 	if ( $is_ajax ) {
 		do_action( 'deprecated_function_run', $function, $replacement, $version );
 		$log_string  = "The {$function} function is deprecated since version {$version}.";
@@ -370,7 +380,7 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
 	if ( $log_error ) {
 		wcpdf_log_error( $message, $log_level );
 	}
-	
+
 	switch ( $handling_type ) {
 		case 'exception':
 			throw new \Exception( $message );
@@ -379,7 +389,7 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
 			wcpdf_output_error( $message, $log_level );
 			break;
 	}
-	
+
 	return false;
 }
 
@@ -395,9 +405,9 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
 
 /**
  * Catch MySQL errors
- * 
+ *
  * Inspired from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
- * 
+ *
  * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
  * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
  * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
@@ -449,14 +459,14 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 	if ( empty( $string ) ) {
 		return $string;
 	}
-	
+
 	$tool          = apply_filters( 'wpo_wcpdf_convert_encoding_tool', $tool );
 	$from_encoding = apply_filters( 'wpo_wcpdf_convert_from_encoding', 'UTF-8', $tool );
 
 	switch ( $tool ) {
 		case 'mb_convert_encoding':
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
-			
+
 			// provided by composer 'symfony/polyfill-mbstring' library.
 			// it uses 'iconv()', must have 'libiconv' configured instead of 'glibc' library.
 			if ( class_exists( '\\Symfony\\Polyfill\\Mbstring\\Mbstring' ) ) {
@@ -465,7 +475,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			break;
 		case 'uconverter':
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
-			
+
 			// only for PHP 8.2+.
 			if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
 				$string = UConverter::transcode( $string, $to_encoding, $from_encoding );
@@ -473,11 +483,11 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			break;
 		case 'iconv':
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'ISO-8859-1', $tool );
-			
+
 			// provided by composer 'symfony/polyfill-iconv' library.
 			if ( class_exists( '\\Symfony\\Polyfill\\Iconv\\Iconv' ) ) {
 				$string = \Symfony\Polyfill\Iconv\Iconv::iconv( $from_encoding, $to_encoding, $string );
-				
+
 			// default server library.
 			// must have 'libiconv' configured instead of 'glibc' library.
 			} elseif ( function_exists( 'iconv' ) ) {
@@ -485,7 +495,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			}
 			break;
 	}
-	
+
 	return $string;
 }
 
@@ -500,7 +510,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
  */
 function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
 	if ( empty( $html ) ) {
-		return $html;
+		return '';
 	}
 
 	// default allowed tags
@@ -509,8 +519,9 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		'br'     => array(),
 		'em'     => array(),
 		'strong' => array(),
+		'p'      => array(),
 	), $context ), $allow_tags );
-	
+
 	$safe_tags = array(
 		'b'          => array(),
 		'blockquote' => array(),
@@ -550,7 +561,7 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		'figcaption' => array(),
 		'abbr'       => array( 'title' ),
 	);
-	
+
 	$filtered_tags = array();
 
 	foreach ( $allow_tags as $tag => $attributes ) {
@@ -559,22 +570,26 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 			$filtered_tags[ $tag ] = ! empty( $safe_attributes ) ? $safe_attributes : array();
 		}
 	}
-	
+
 	if ( empty( $filtered_tags ) ) {
 		return $html;
 	}
 
 	$dom = new \DOMDocument();
-	
+
 	// clean up special chars
 	if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
 		$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
 	}
-	
+
 	libxml_use_internal_errors( true ); // suppress malformed HTML errors
 	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 	libxml_clear_errors();
-	
+
+	if ( empty( $dom ) ) {
+		return '';
+	}
+
 	$xpath = new \DOMXPath( $dom );
 
 	// iterate over all nodes.
@@ -591,11 +606,11 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 			// if the node is not allowed, remove it but try to preserve text.
 			if ( $node->parentNode ) {
 				$fragment = $dom->createDocumentFragment();
-				
+
 				while ( $node->childNodes->length > 0 ) {
 					$fragment->appendChild( $node->childNodes->item( 0 ) );
 				}
-				
+
 				if ( $fragment->hasChildNodes() ) {
 					$node->parentNode->replaceChild( $fragment, $node );
 				} else {
@@ -605,7 +620,13 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		}
 	}
 
-	return $dom->saveHTML();
+	$html = $dom->saveHTML();
+
+	if ( empty( $html ) ) {
+		return '';
+	}
+
+	return $html;
 }
 
 /**
@@ -641,7 +662,7 @@ function WPO_WCPDF_Legacy() {
 
 /**
  * Parse document date for WP_Query.
- * 
+ *
  * @param array $wp_query_args
  * @param array $query_args
  *
@@ -649,12 +670,12 @@ function WPO_WCPDF_Legacy() {
  */
 function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, array $query_vars ): array {
 	$documents = WPO_WCPDF()->documents->get_documents();
-	
+
 	if ( ! empty( $documents ) ) {
 		foreach ( $documents as $document ) {
 			if ( ! empty( $query_vars[ "wcpdf_{$document->slug}_date" ] ) ) {
 				$wp_query_args = ( new \WC_Order_Data_Store_CPT() )->parse_date_for_wp_query( $query_vars[ "wcpdf_{$document->slug}_date" ], "_wcpdf_{$document->slug}_date", $wp_query_args );
-				
+
 				if ( isset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] ) ) {
 					unset( $wp_query_args[ "wcpdf_{$document->slug}_date" ] );
 				}
