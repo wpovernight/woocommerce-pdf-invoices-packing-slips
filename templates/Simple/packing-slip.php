@@ -17,10 +17,10 @@
 		</td>
 		<td class="shop-info">
 			<?php do_action( 'wpo_wcpdf_before_shop_name', $this->get_type(), $this->order ); ?>
-			<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
+			<span class="shop-name"><h3><?php $this->shop_name(); ?></h3></span>
 			<?php do_action( 'wpo_wcpdf_after_shop_name', $this->get_type(), $this->order ); ?>
 			<?php do_action( 'wpo_wcpdf_before_shop_address', $this->get_type(), $this->order ); ?>
-			<div class="shop-address"><?php $this->shop_address(); ?></div>
+			<span class="shop-address"><?php $this->shop_address(); ?></span>
 			<?php do_action( 'wpo_wcpdf_after_shop_address', $this->get_type(), $this->order ); ?>
 		</td>
 	</tr>
@@ -42,10 +42,10 @@
 			<?php $this->shipping_address(); ?>
 			<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->get_type(), $this->order ); ?>
 			<?php if ( isset( $this->settings['display_email'] ) ) : ?>
-				<div class="billing-email"><?php $this->billing_email(); ?></div>
+				<span class="billing-email"><?php $this->billing_email(); ?></span>
 			<?php endif; ?>
 			<?php if ( isset( $this->settings['display_phone'] ) ) : ?>
-				<div class="shipping-phone"><?php $this->shipping_phone( ! $this->show_billing_address() ); ?></div>
+				<span class="shipping-phone"><?php $this->shipping_phone( ! $this->show_billing_address() ); ?></span>
 			<?php endif; ?>
 		</td>
 		<td class="address billing-address">
@@ -55,7 +55,7 @@
 				<?php $this->billing_address(); ?>
 				<?php do_action( 'wpo_wcpdf_after_billing_address', $this->get_type(), $this->order ); ?>
 				<?php if ( isset( $this->settings['display_phone'] ) && ! empty( $this->get_billing_phone() ) ) : ?>
-					<div class="billing-phone"><?php $this->billing_phone(); ?></div>
+					<span class="billing-phone"><?php $this->billing_phone(); ?></span>
 				<?php endif; ?>
 			<?php endif; ?>
 		</td>
@@ -84,7 +84,7 @@
 
 <?php do_action( 'wpo_wcpdf_before_order_details', $this->get_type(), $this->order ); ?>
 
-<table class="order-details">
+<table class="order-details" topntail="1">
 	<thead>
 		<tr>
 			<th class="product"><?php _e( 'Product', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
@@ -101,8 +101,14 @@
 					<span class="item-meta"><?php echo $item['meta']; ?></span>
 					<dl class="meta">
 						<?php $description_label = __( 'SKU', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
-						<?php if ( ! empty( $item['sku'] ) ) : ?><dt class="sku"><?php _e( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="sku"><?php echo esc_attr( $item['sku'] ); ?></dd><?php endif; ?>
-						<?php if ( ! empty( $item['weight'] ) ) : ?><dt class="weight"><?php _e( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt><dd class="weight"><?php echo esc_attr( $item['weight'] ); ?><?php echo esc_attr( get_option( 'woocommerce_weight_unit' ) ); ?></dd><?php endif; ?>
+						<?php if ( ! empty( $item['sku'] ) ) : ?>
+							<dt class="sku"><?php _e( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt>
+							<dd class="sku"><?php echo esc_attr( $item['sku'] ); ?></dd>
+						<?php endif; ?>
+						<?php if ( ! empty( $item['weight'] ) ) : ?>
+							<dt class="weight"><?php _e( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' ); ?></dt>
+							<dd class="weight"><?php echo esc_attr( $item['weight'] ); ?><?php echo esc_attr( get_option( 'woocommerce_weight_unit' ) ); ?></dd>
+						<?php endif; ?>
 					</dl>
 					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order ); ?>
 				</td>
