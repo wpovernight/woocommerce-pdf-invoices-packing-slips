@@ -77,6 +77,11 @@ th, td {
 	text-align: left;
 }
 
+td > span {
+	display: block;
+	clear: both;
+}
+
 table.container {
 	width:100%;
 	border: 0;
@@ -115,11 +120,6 @@ td.shop-info {
 	width: 40%;
 }
 
-td.shop-info span {
-	display: block;
-	clear: both;
-}
-
 .document-type-label {
 	text-transform: uppercase;
 }
@@ -133,11 +133,6 @@ table.order-data-addresses {
 table.order-data-addresses td.address,
 table.order-data-addresses td.order-data {
 	overflow-wrap: anywhere;
-}
-
-table.order-data-addresses td.address span {
-	display: block;
-	clear: both;
 }
 
 td.order-data {
