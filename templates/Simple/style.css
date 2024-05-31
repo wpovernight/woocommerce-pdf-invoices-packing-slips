@@ -6,6 +6,7 @@
 	margin-right: 2cm;
 	footer: docFooter;
 }
+
 body {
 	background: #fff;
 	color: #000;
@@ -96,6 +97,10 @@ div.bottom-spacer {
 	height: 8mm;
 }
 
+span.label {
+	font-weight: bold;
+}
+
 /* Header */
 table.head {
 	margin-bottom: 12mm;
@@ -105,6 +110,11 @@ td.header img {
 	max-height: 3cm; /* may be overridden by the settings */
 	width: auto;
 }
+
+/* .mpdf td.header img { */
+	/* img width & heights can only be set with inline styles (mpdf 8.0) https://github.com/mpdf/mpdf/issues/366 */
+	/* using wpo_wcpdf_header_logo_img_element filter instead in wcpdf-mpdf.php */
+/* } */
 
 td.header {
 	font-size: 16pt;
@@ -153,7 +163,8 @@ td.order-data table th {
 }
 
 /* Order details */
-table.order-details {
+table.order-details,
+table.notes-totals {
 	width:100%;
 	margin-bottom: 8mm;
 	page-break-before: avoid;
@@ -164,19 +175,23 @@ table.order-details {
 	width: 20%;
 }
 
-.order-details tr {
+.order-details tr,
+.notes-totals tr {
 	page-break-inside: always;
 	page-break-after: auto;
 }
 
 .order-details td,
-.order-details th {
+.order-details th,
+.notes-totals td,
+.notes-totals th {
 	border-bottom: 1px #ccc solid;
 	border-top: 1px #ccc solid;
 	padding: 0.375em;
 }
 
-.order-details th {
+.order-details th,
+.notes-totals th {
 	font-weight: bold;
 	text-align: left;
 }
@@ -201,36 +216,20 @@ table.order-details {
 	display: none;
 }
 
-/* item meta formatting for WC2.6 and older */
-dl {
-	margin: 4px 0;
-}
-
-dt, dd, dd p {
-	display: inline;
-	font-size: 7pt;
-	line-height: 7pt;
-}
-
-dd {
-	margin-left: 5px;
-}
-
-dd:after {
-	content: "\A";
-	white-space: pre;
-}
-/* item-meta formatting for WC3.0+ */
-.wc-item-meta {
+/* item meta formatting */
+.wc-item-meta,
+ul.meta {
 	margin: 4px 0;
 	font-size: 7pt;
 	line-height: 7pt;
 	overflow-wrap: anywhere;
 }
-.wc-item-meta p {
+.wc-item-meta p,
+ul.meta p {
 	display: inline;
 }
-.wc-item-meta li {
+.wc-item-meta li,
+ul.meta li {
 	margin: 0;
 	margin-left: 5px;
 }
@@ -272,6 +271,7 @@ table.totals tr.payment_method {
 }
 
 /* Footer Imprint */
+/* mPDF footer styles are hooked via wpo_wcpdf_mpdf_premium_style_overrides() */
 #footer {
 	position: absolute;
 	bottom: -2cm;
