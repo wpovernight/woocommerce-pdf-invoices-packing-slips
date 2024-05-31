@@ -534,8 +534,7 @@ class Admin {
 						<?php
 						foreach ( $mails as $mail ) {
 							if ( in_array( $mail->id, $available_emails ) && 'no' !== $mail->enabled ) {
-								$title = ( 'customer_invoice' === $mail->id ) ? __( 'Customer Invoice', 'woocommerce-pdf-invoices-packing-slips' ) : $mail->title; // `customer_invoice` default title is "Order details"
-								echo '<option value="send_email_' . esc_attr( $mail->id ) . '">' . esc_html( $title ) . '</option>';
+								echo '<option value="send_email_' . esc_attr( $mail->id ) . '">' . esc_html( $mail->title ) . '</option>';
 							}
 						} ?>
 						<?php
