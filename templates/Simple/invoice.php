@@ -128,10 +128,10 @@
 	</tbody>
 </table>
 
-<table class="notes-totals" style="width:100%">
+<table class="notes-totals">
 	<tbody>
 		<tr class="no-borders">
-			<td class="no-borders" style="width:60%">
+			<td class="no-borders notes-cell">
 				<?php do_action( 'wpo_wcpdf_before_document_notes', $this->get_type(), $this->order ); ?>
 				<?php if ( $this->get_document_notes() ) : ?>
 					<div class="document-notes">
@@ -149,7 +149,7 @@
 				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_customer_notes', $this->get_type(), $this->order ); ?>
 			</td>
-			<td class="no-borders totals-cell" style="width:40%">
+			<td class="no-borders totals-cell">
 				<table class="totals">
 					<tfoot>
 						<?php foreach ( $this->get_woocommerce_totals() as $key => $total ) : ?>

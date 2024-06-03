@@ -92,6 +92,14 @@ td.no-borders {
 	width: auto;
 }
 
+td.notes-cell{
+	width: 60%;
+}
+
+td.totals-cell {
+	width: 40%;
+}
+
 div.bottom-spacer {
 	clear: both;
 	height: 8mm;
