@@ -159,6 +159,8 @@ if ( ! $server_configs['PHP version']['result'] ) {
 	</tbody>
 </table>
 
+<?php do_action( 'wpo_wcpdf_after_system_status_table' ); ?>
+
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
 	<thead>
 		<tr>
