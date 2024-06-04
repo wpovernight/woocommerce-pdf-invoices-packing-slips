@@ -583,11 +583,22 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	}
 
 	libxml_use_internal_errors( true ); // suppress malformed HTML errors
-	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	@$dom->loadHTML( '<div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 	libxml_clear_errors();
 
-	if ( empty( $dom ) ) {
-		return '';
+	$extra_wrapper = $dom->getElementsByTagName( 'div' )->item( 0 );
+	$content       = ! empty( $extra_wrapper ) ? $extra_wrapper->parentNode->removeChild( $extra_wrapper ) : null;
+
+	if ( ! empty( $content ) ) {
+		// Clear DOM by removing all nodes from it.
+		while ( $dom->firstChild ) {
+			$dom->removeChild( $dom->firstChild );
+		}
+
+		// Append the content to the DOM to remove the extra DIV wrapper.
+		while ( $content->firstChild ) {
+			$dom->appendChild( $content->firstChild );
+		}
 	}
 
 	$xpath = new \DOMXPath( $dom );
@@ -626,7 +637,7 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		return '';
 	}
 
-	return $html;
+	return trim( $html );
 }
 
 /**
