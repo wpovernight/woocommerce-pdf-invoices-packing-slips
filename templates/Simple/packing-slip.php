@@ -39,7 +39,7 @@
 		<td class="address shipping-address">
 			<!-- <h3><?php _e( 'Shipping Address:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3> -->
 			<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->get_type(), $this->order ); ?>
-			<?php $this->shipping_address(); ?>
+			<p><?php $this->shipping_address(); ?></p>
 			<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->get_type(), $this->order ); ?>
 			<?php if ( isset( $this->settings['display_email'] ) ) : ?>
 				<div class="billing-email"><?php $this->billing_email(); ?></div>
@@ -52,7 +52,7 @@
 			<?php if ( $this->show_billing_address() ) : ?>
 				<h3><?php _e( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
 				<?php do_action( 'wpo_wcpdf_before_billing_address', $this->get_type(), $this->order ); ?>
-				<?php $this->billing_address(); ?>
+				<p><?php $this->billing_address(); ?></p>
 				<?php do_action( 'wpo_wcpdf_after_billing_address', $this->get_type(), $this->order ); ?>
 				<?php if ( isset( $this->settings['display_phone'] ) && ! empty( $this->get_billing_phone() ) ) : ?>
 					<div class="billing-phone"><?php $this->billing_phone(); ?></div>
