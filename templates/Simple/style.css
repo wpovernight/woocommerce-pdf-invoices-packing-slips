@@ -231,22 +231,29 @@ table.notes-totals {
 	overflow-wrap: anywhere;
 }
 
-.wc-item-meta {
-	margin: 4px 0 0 0;
+/* 'ul' applies to Dompdf only */
+ul.wc-item-meta {
+	margin: 0;
 }
 
-.wc-item-meta li {
+ul.wc-item-meta li {
 	margin-top: 4px;
 	margin-left: 0;
 }
 
+ul.wc-item-meta li p {
+	display: inline;
+}
+
+/* with mPDF extension '.wc-item-meta' is not 'ul' but a 'div', see 'wpo_wcpdf_mpdf_modify_html()' */
+div.wc-item-meta {
+	margin: 0;
+}
+
+/* this applies to both Dompdf and mPDF */
 .wc-item-meta p,
 .item-meta p {
 	margin-top: 4px;
-}
-
-.wc-item-meta p {
-	display: inline;
 }
 
 /* Notes & Totals */
