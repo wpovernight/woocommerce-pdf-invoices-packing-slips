@@ -130,6 +130,7 @@ td.header {
 td.shop-info {
 	width: 40%;
 }
+
 .document-type-label {
 	text-transform: uppercase;
 }
@@ -230,9 +231,14 @@ table.notes-totals {
 	line-height: 7pt;
 	overflow-wrap: anywhere;
 }
+
 .wc-item-meta li {
 	margin: 0;
 	margin-left: 5px;
+}
+
+.wc-item-meta p {
+	display: inline;
 }
 
 /* Notes & Totals */
