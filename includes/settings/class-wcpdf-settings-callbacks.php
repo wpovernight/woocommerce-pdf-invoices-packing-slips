@@ -609,67 +609,70 @@ class Settings_Callbacks {
 		return $languages;
 	}
 
-	public function normalize_settings_args ( $args ) {
-		$args['value'] = isset( $args['value'] ) ? $args['value'] : 1;
-
-		$args['placeholder'] = isset( $args['placeholder'] ) ? $args['placeholder'] : '';
+	public function normalize_settings_args( $args ) {
+		$args['value']           = isset( $args['value'] ) ? $args['value'] : 1;
+		$args['placeholder']     = isset( $args['placeholder'] ) ? $args['placeholder'] : '';
 		$args['store_unchecked'] = isset( $args['store_unchecked'] ) && $args['store_unchecked'] ? true : false;
 
-		// get main settings array
+		// Get main settings array
 		$option = get_option( $args['option_name'] );
 
-		if ( empty ( $args['setting_name'] ) ) {
+		if ( empty( $args['setting_name'] ) ) {
 			$args['setting_name'] = "{$args['option_name']}[{$args['id']}]";
 		}
 
-		if ( !isset($args['lang']) && !empty($args['translatable']) ) {
+		if ( ! isset( $args['lang'] ) && ! empty( $args['translatable'] ) ) {
 			$args['lang'] = 'default';
 		}
 
 		if ( ! array_key_exists( 'current', $args ) ) {
-			if (isset($args['lang'])) {
+			if ( isset( $args['lang'] ) ) {
 				// i18n settings name
 				$args['setting_name'] = "{$args['setting_name']}[{$args['lang']}]";
-				// copy current option value if set
+				// Copy current option value if set
 
-				if ( $args['lang'] == 'default' && !empty($option[$args['id']]) && !isset( $option[$args['id']]['default'] ) ) {
-					// we're switching back from WPML to normal
-					// try english first
-					if ( isset( $option[$args['id']]['en'] ) ) {
-						$args['current'] = $option[$args['id']]['en'];
-					} elseif ( is_array( $option[$args['id']] ) ) {
-						// fallback to the first language if english not found
-						$first = array_shift($option[$args['id']]);
-						if (!empty($first)) {
+				if ( 'default' === $args['lang'] && ! empty( $option[ $args['id'] ] ) && ! isset( $option[ $args['id'] ]['default'] ) ) {
+					// We're switching back from WPML to normal
+					// Try English first
+					if ( isset( $option[ $args['id'] ]['en'] ) ) {
+						$args['current'] = $option[ $args['id'] ]['en'];
+					} elseif ( is_array( $option[ $args['id'] ] ) ) {
+						// Fallback to the first language if English not found
+						$first = array_shift( $option[ $args['id'] ] );
+						if ( ! empty( $first ) ) {
 							$args['current'] = $first;
 						}
-					} elseif ( is_string( $option[$args['id']] ) ) {
-						$args['current'] = $option[$args['id']];
+					} elseif ( is_string( $option[ $args['id'] ] ) ) {
+						$args['current'] = $option[ $args['id'] ];
 					} else {
-						// nothing, really?
+						// Nothing, really?
 						$args['current'] = '';
 					}
 				} else {
-					if ( isset( $option[$args['id']][$args['lang']] ) ) {
-						$args['current'] = $option[$args['id']][$args['lang']];
-					} elseif (isset( $option[$args['id']]['default'] )) {
-						$args['current'] = $option[$args['id']]['default'];
-					} elseif ( isset( $option[$args['id']] ) ) {
-						$args['current'] = $option[$args['id']];
+					if ( isset( $option[ $args['id'] ][ $args['lang'] ] ) ) {
+						$args['current'] = $option[ $args['id'] ][ $args['lang'] ];
+					} elseif ( isset( $option[ $args['id'] ]['default'] ) ) {
+						$args['current'] = $option[ $args['id'] ]['default'];
+					} elseif ( isset( $option[ $args['id'] ] ) ) {
+						$args['current'] = $option[ $args['id'] ];
 					}
 				}
 			} else {
-				// copy current option value if set
-				if ( isset( $option[$args['id']] ) ) {
-					$args['current'] = $option[$args['id']];
+				// Copy current option value if set
+				if ( isset( $option[ $args['id'] ] ) ) {
+					$args['current'] = $option[ $args['id'] ];
 				}
 			}
 		}
 
-		// falback to default or empty if no value in option
-		if ( !isset($args['current']) ) {
+		// Fallback to default or empty if no value in option
+		if ( ! isset( $args['current'] ) ) {
 			$args['current'] = isset( $args['default'] ) ? $args['default'] : '';
-		} elseif ( empty($args['current']) && isset($args['default_if_empty']) && $args['default_if_empty'] == true ) { // force fallback if empty 'current' and 'default_if_empty' equals to true
+		} elseif ( is_array( $args['current'] ) ) {
+			// Ensure 'current' is not an array
+			$args['current'] = isset( $args['default'] ) ? $args['default'] : '';
+		} elseif ( empty( $args['current'] ) && isset( $args['default_if_empty'] ) && true === $args['default_if_empty'] ) {
+			// Force fallback if empty 'current' and 'default_if_empty' equals to true
 			$args['current'] = isset( $args['default'] ) ? $args['default'] : '';
 		}
 
