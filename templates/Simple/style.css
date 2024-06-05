@@ -224,17 +224,25 @@ table.notes-totals {
 }
 
 /* item meta formatting */
-.wc-item-meta,
-.meta {
-	margin: 4px 0;
+.item-meta {
+	margin: 8px 0 0 0;
 	font-size: 7pt;
 	line-height: 7pt;
 	overflow-wrap: anywhere;
 }
 
+.wc-item-meta {
+	margin: 4px 0 0 0;
+}
+
 .wc-item-meta li {
-	margin: 0;
-	margin-left: 5px;
+	margin-top: 4px;
+	margin-left: 0;
+}
+
+.wc-item-meta p,
+.item-meta p {
+	margin-top: 4px;
 }
 
 .wc-item-meta p {

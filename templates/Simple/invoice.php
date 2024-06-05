@@ -110,14 +110,18 @@
 					<?php $description_label = __( 'Description', 'woocommerce-pdf-invoices-packing-slips' ); // registering alternate label translation ?>
 					<p class="item-name"><?php echo $item['name']; ?></p>
 					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order ); ?>
-					<p class="item-meta"><?php echo $item['meta']; ?></p>
-					<div class="meta">
+					<div class="item-meta">
 						<?php if ( ! empty( $item['sku'] ) ) : ?>
 							<p class="sku"><span class="label"><?php _e( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' ); ?></span> <?php echo esc_attr( $item['sku'] ); ?></p>
 						<?php endif; ?>
 						<?php if ( ! empty( $item['weight'] ) ) : ?>
 							<p class="weight"><span class="label"><?php _e( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' ); ?></span> <?php echo esc_attr( $item['weight'] ); ?><?php echo esc_attr( get_option( 'woocommerce_weight_unit' ) ); ?></p>
 						<?php endif; ?>
+						<!-- ul.wc-item-meta -->
+						<?php if ( ! empty( $item['meta'] ) ) : ?>
+							<?php echo $item['meta']; ?>
+						<?php endif; ?>
+						<!-- / ul.wc-item-meta -->
 					</div>
 					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order ); ?>
 				</td>
