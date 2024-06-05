@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.5
 Requires PHP: 7.2
-Stable tag: 3.8.2
+Stable tag: 3.8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,22 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.8.3 (2024-06-05) =
+* New: adds language attribute to PDF HTML
+* New: Dompdf `v3.0.0` upgrade
+* New: filter hook `wpo_wcpdf_after_system_status_table`
+* New: filter for server configs `wpo_wcpdf_advanced_status_server_configs`
+* New: PDFJS `v3.11.174` upgrade
+* Tweak: adds `p` as allowed tag of the `wpo_wcpdf_sanitize_html_content()` function
+* Fix: number formatting `[order_number]` placeholder not using parent order number on Credit Notes
+* Fix: remove unwanted tags from `wpo_wcpdf_sanitize_html_content()`
+* Fix: removes unused "Log invoice number generation" setting
+* Fix: reverts the `customer_invoice` email title to the original Woo title
+* Fix: the function `get_extensions_license_data()` returning empty if no cached data found
+* Fix: bug created by the output of the function `wpo_wcpdf_sanitize_html_content()` being `null`
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 9.0
 
 = 3.8.2 (2024-04-29) =
 * Fix: "Customer Invoice" email title under "Send order email" metabox
