@@ -510,7 +510,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
  */
 function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
 	if ( empty( $html ) ) {
-		return '';
+		return $html;
 	}
 
 	// default allowed tags
