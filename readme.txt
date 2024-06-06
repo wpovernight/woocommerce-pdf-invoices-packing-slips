@@ -102,7 +102,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 3.8.3 (2024-06-05) =
+= 3.8.3 (2024-06-06) =
 * New: adds language attribute to PDF HTML
 * New: Dompdf `v3.0.0` upgrade
 * New: filter hook `wpo_wcpdf_after_system_status_table`
