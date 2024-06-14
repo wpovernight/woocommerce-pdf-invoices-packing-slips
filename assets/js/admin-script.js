@@ -491,9 +491,6 @@ jQuery( function( $ ) {
 		// (See also https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding.)
 		pdfData = window.atob( pdfData );
 
-		// Loaded via <script> tag, create shortcut to access PDF.js exports.
-		let pdfjsLib = window['pdfjs-dist/build/pdf'];
-
 		// The workerSrc property shall be specified.
 		pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
