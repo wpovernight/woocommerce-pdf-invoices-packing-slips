@@ -530,13 +530,17 @@ class Settings_Callbacks {
 
 	/**
 	 * Wrapper function to create tabs for settings in different languages
-	 * @param  array $args
+	 *
+	 * @param array $args
+	 *
 	 * @return void
 	 */
-	public function i18n_wrap ( $args ) {
+	public function i18n_wrap( array $args ): void {
 		extract( $this->normalize_settings_args( $args ) );
 
-		if ( $languages = $this->get_languages() ) {
+		$languages = wpo_wcpdf_get_multilingual_languages();
+
+		if ( ! empty( $languages ) ) {
 			printf( '<div id="%s-%s-translations" class="translations">', esc_attr( $option_name ), esc_attr( $id ) );
 			?>
 				<ul>
@@ -586,27 +590,6 @@ class Settings_Callbacks {
 				call_user_func( array( $this, $callback ), $args );
 			}
 		}
-	}
-
-	public function get_languages () {
-		$multilingual = function_exists( 'icl_get_languages' );
-		// $multilingual = true; // for development
-
-		if ( $multilingual ) {
-			// use this instead of function call for development outside of WPML
-			// $icl_get_languages = 'a:3:{s:2:"en";a:8:{s:2:"id";s:1:"1";s:6:"active";s:1:"1";s:11:"native_name";s:7:"English";s:7:"missing";s:1:"0";s:15:"translated_name";s:7:"English";s:13:"language_code";s:2:"en";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/en.png";s:3:"url";s:23:"http://yourdomain/about";}s:2:"fr";a:8:{s:2:"id";s:1:"4";s:6:"active";s:1:"0";s:11:"native_name";s:9:"Français";s:7:"missing";s:1:"0";s:15:"translated_name";s:6:"French";s:13:"language_code";s:2:"fr";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/fr.png";s:3:"url";s:29:"http://yourdomain/fr/a-propos";}s:2:"it";a:8:{s:2:"id";s:2:"27";s:6:"active";s:1:"0";s:11:"native_name";s:8:"Italiano";s:7:"missing";s:1:"0";s:15:"translated_name";s:7:"Italian";s:13:"language_code";s:2:"it";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/it.png";s:3:"url";s:26:"http://yourdomain/it/circa";}}';
-			// $icl_get_languages = unserialize($icl_get_languages);
-
-			$icl_get_languages = icl_get_languages( 'skip_missing=0' );
-			$languages = array();
-			foreach ($icl_get_languages as $lang => $data) {
-				$languages[$data['language_code']] = $data['native_name'];
-			}
-		} else {
-			return false;
-		}
-
-		return $languages;
 	}
 
 	public function normalize_settings_args ( $args ) {
