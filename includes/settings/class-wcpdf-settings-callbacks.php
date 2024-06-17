@@ -597,10 +597,10 @@ class Settings_Callbacks {
 	 * @return array
 	 */
 	public function get_languages(): array {
-		$is_multilingual = apply_filters( 'wpo_wcpdf_is_multilingual', function_exists( 'icl_get_languages' ) ); // defaults to WPML or Polylang only
-		$languages       = array();
+		$languages = array();
 
-		if ( $is_multilingual ) {
+		// refers to WPML or Polylang only
+		if ( function_exists( 'icl_get_languages' ) ) {
 			// use this instead of function call for development outside of WPML
 			// $icl_get_languages = 'a:3:{s:2:"en";a:8:{s:2:"id";s:1:"1";s:6:"active";s:1:"1";s:11:"native_name";s:7:"English";s:7:"missing";s:1:"0";s:15:"translated_name";s:7:"English";s:13:"language_code";s:2:"en";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/en.png";s:3:"url";s:23:"http://yourdomain/about";}s:2:"fr";a:8:{s:2:"id";s:1:"4";s:6:"active";s:1:"0";s:11:"native_name";s:9:"Français";s:7:"missing";s:1:"0";s:15:"translated_name";s:6:"French";s:13:"language_code";s:2:"fr";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/fr.png";s:3:"url";s:29:"http://yourdomain/fr/a-propos";}s:2:"it";a:8:{s:2:"id";s:2:"27";s:6:"active";s:1:"0";s:11:"native_name";s:8:"Italiano";s:7:"missing";s:1:"0";s:15:"translated_name";s:7:"Italian";s:13:"language_code";s:2:"it";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/it.png";s:3:"url";s:26:"http://yourdomain/it/circa";}}';
 			// $icl_get_languages = unserialize($icl_get_languages);
