@@ -530,6 +530,7 @@ class Settings_Callbacks {
 
 	/**
 	 * Wrapper function to create tabs for settings in different languages
+	 *
 	 * @param array $args
 	 *
 	 * @return void
