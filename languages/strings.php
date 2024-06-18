@@ -10,7 +10,7 @@ __( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Description', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'SKU', 'woocommerce-pdf-invoices-packing-slips' );
 
-// document strings
+// Simple template strings
 __( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Shipping Address:', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' );
