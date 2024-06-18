@@ -12,10 +12,12 @@ __( 'SKU', 'woocommerce-pdf-invoices-packing-slips' );
 
 // document strings
 __( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' );
+__( 'Shipping Address:', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Order Number:', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' );
+__( 'Shipping Method:', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Product', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Quantity', 'woocommerce-pdf-invoices-packing-slips' );
 __( 'Price', 'woocommerce-pdf-invoices-packing-slips' );
