@@ -558,12 +558,14 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Return the order items
+	 *
+	 * @return array $data_list
 	 */
-	public function get_order_items() {
-		$items = $this->order->get_items();
+	public function get_order_items(): array {
+		$items     = $this->order->get_items();
 		$data_list = array();
 
-		if( sizeof( $items ) > 0 ) {
+		if ( sizeof( $items ) > 0 ) {
 			foreach ( $items as $item_id => $item ) {
 				// Array with data for the pdf template
 				$data = array();
@@ -572,12 +574,12 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['item_id'] = $item_id;
 
 				// Set the id
-				$data['product_id'] = $item['product_id'];
+				$data['product_id']   = $item['product_id'];
 				$data['variation_id'] = $item['variation_id'];
 
 				// Compatibility: WooCommerce Composite Products uses a workaround for
 				// setting the order before the item name filter, so we run this first
-				if ( class_exists('WC_Composite_Products') ) {
+				if ( class_exists( 'WC_Composite_Products' ) ) {
 					$order_item_class = apply_filters( 'woocommerce_order_item_class', '', $item, $this->order );
 				}
 
@@ -588,25 +590,25 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['quantity'] = $item['qty'];
 
 				// Set the line total (=after discount)
-				$data['line_total'] = $this->format_price( $item['line_total'] );
-				$data['single_line_total'] = $this->format_price( $item['line_total'] / max( 1, abs( $item['qty'] ) ) );
-				$data['line_tax'] = $this->format_price( $item['line_tax'] );
-				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
+				$data['line_total']           = $this->format_price( $item['line_total'] );
+				$data['single_line_total']    = $this->format_price( $item['line_total'] / max( 1, abs( $item['qty'] ) ) );
+				$data['line_tax']             = $this->format_price( $item['line_tax'] );
+				$data['single_line_tax']      = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
 
-				$data['tax_rates'] = $this->get_tax_rate( $item, $this->order, false );
+				$data['tax_rates']            = $this->get_tax_rate( $item, $this->order, false );
 				$data['calculated_tax_rates'] = $this->get_tax_rate( $item, $this->order, true );
 
 				// Set the line subtotal (=before discount)
-				$data['line_subtotal'] = $this->format_price( $item['line_subtotal'] );
+				$data['line_subtotal']     = $this->format_price( $item['line_subtotal'] );
 				$data['line_subtotal_tax'] = $this->format_price( $item['line_subtotal_tax'] );
-				$data['ex_price'] = $this->get_formatted_item_price( $item, 'total', 'excl' );
-				$data['price'] = $this->get_formatted_item_price( $item, 'total' );
-				$data['order_price'] = $this->order->get_formatted_line_subtotal( $item ); // formatted according to WC settings
+				$data['ex_price']          = $this->get_formatted_item_price( $item, 'total', 'excl' );
+				$data['price']             = $this->get_formatted_item_price( $item, 'total' );
+				$data['order_price']       = $this->order->get_formatted_line_subtotal( $item ); // formatted according to WC settings
 
 				// Calculate the single price with the same rules as the formatted line subtotal (!)
 				// = before discount
 				$data['ex_single_price'] = $this->get_formatted_item_price( $item, 'single', 'excl' );
-				$data['single_price'] = $this->get_formatted_item_price( $item, 'single' );
+				$data['single_price']    = $this->get_formatted_item_price( $item, 'single' );
 
 				// Pass complete item array
 				$data['item'] = $item;
@@ -621,7 +623,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				}
 
 				// Checking for existence, thanks to MDesigner0
-				if( !empty( $product ) ) {
+				if ( ! empty( $product ) ) {
 					// Thumbnail (full img tag)
 					$data['thumbnail'] = $this->get_thumbnail( $product );
 
@@ -648,7 +650,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				// Set item meta
 				$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
 
-				$data_list[$item_id] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
+				$data_list[ $item_id ] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
 			}
 		}
 
