@@ -392,10 +392,15 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
-	 * Return/Show order notes
+	 * Get order notes
 	 * could use $order->get_customer_order_notes(), but that filters out private notes already
+	 *
+	 * @param string $filter 'customer' or 'private'
+	 * @param bool $include_system_notes include system notes
+	 *
+	 * @return array $notes
 	 */
-	public function get_order_notes( $filter = 'customer', $include_system_notes = true ) {
+	public function get_order_notes( string $filter = 'customer', bool $include_system_notes = true ): array {
 		if ( $this->is_refund( $this->order ) ) {
 			$order_id = $this->get_refund_parent_id( $this->order );
 		} else {
@@ -403,10 +408,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		if ( empty( $order_id ) ) {
-			return; // prevent order notes from all orders showing when document is not loaded properly
+			return array(); // prevent order notes from all orders showing when document is not loaded properly
 		}
 
-		$type = ( $filter == 'private' ) ? 'internal' : $filter;
+		$type  = ( 'private' === $filter ) ? 'internal' : $filter;
 		$notes = wc_get_order_notes( array(
 			'order_id' => $order_id,
 			'type'     => $type, // use 'internal' for admin and system notes, empty for all
@@ -423,15 +428,26 @@ abstract class Order_Document_Methods extends Order_Document {
 		return $notes;
 
 	}
-	public function order_notes( $filter = 'customer', $include_system_notes = true ) {
+
+	/**
+	 * Show order notes
+	 *
+	 * @param string $filter 'customer' or 'private'
+	 * @param bool $include_system_notes include system notes
+	 *
+	 * @return void
+	 */
+	public function order_notes( string $filter = 'customer', bool $include_system_notes = true ): void {
 		$notes = $this->get_order_notes( $filter, $include_system_notes );
-		if ( $notes ) {
+
+		if ( ! empty( $notes ) ) {
 			foreach( $notes as $note ) {
 				$css_class   = array( 'note', 'note_content' );
 				$css_class[] = $note->customer_note ? 'customer-note' : '';
 				$css_class[] = 'system' === $note->added_by ? 'system-note' : '';
 				$css_class   = apply_filters( 'woocommerce_order_note_class', array_filter( $css_class ), $note );
-				$content = isset($note->content) ? $note->content : $note->comment_content;
+				$content     = isset( $note->content ) ? $note->content : $note->comment_content;
+				$content     = apply_filters( 'wpo_wcpdf_order_note', $content, $note );
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
 					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); ?>
@@ -872,7 +888,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$thumbnail = $thumbnail_img_tag_url;
 		}
 
-		/*
+		/**
 		 * PHP GD library can be installed but 'webp' support could be disabled,
 		 * which turns the function 'imagecreatefromwebp()' inexistent,
 		 * leading to display an error in DOMPDF.
@@ -1097,9 +1113,11 @@ abstract class Order_Document_Methods extends Order_Document {
 
 
 	/**
-	 * Return/Show shipping notes
+	 * Get shipping notes
+	 *
+	 * @return string
 	 */
-	public function get_shipping_notes() {
+	public function get_shipping_notes(): string {
 		if ( $this->is_refund( $this->order ) ) {
 			$shipping_notes = $this->order->get_reason();
 		} else {
@@ -1115,12 +1133,20 @@ abstract class Order_Document_Methods extends Order_Document {
 			$shipping_notes = wp_strip_all_tags( $shipping_notes );
 		}
 
-		$shipping_notes = ! empty( $shipping_notes ) ? __( $shipping_notes, 'woocommerce-pdf-invoices-packing-slips' ) : false;
-
-		return apply_filters( 'wpo_wcpdf_shipping_notes', wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' ), $this );
+		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this );
 	}
-	public function shipping_notes() {
-		echo $this->get_shipping_notes();
+
+	/**
+	 * Display shipping notes
+	 *
+	 * @return void
+	 */
+	public function shipping_notes(): void {
+		$shipping_notes = $this->get_shipping_notes();
+
+		if ( ! empty( $shipping_notes ) ) {
+			echo wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' );
+		}
 	}
 
 	/**
@@ -1214,17 +1240,30 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 	}
 
-	public function get_document_notes() {
-		if ( $document_notes = $this->get_notes( $this->get_type() ) ) {
-			return $document_notes;
-		} else {
-			return '';
-		}
+	/**
+	 * Get document notes
+	 *
+	 * @return string
+	 */
+	public function get_document_notes(): string {
+		$document_notes = $this->get_notes( $this->get_type() );
+
+		return apply_filters( 'wpo_wcpdf_document_notes', $document_notes ?? '', $this );
 	}
 
-	public function document_notes() {
+	/**
+	 * Display document notes
+	 *
+	 * @return void
+	 */
+	public function document_notes(): void {
 		$document_notes = $this->get_document_notes();
-		if( $document_notes == strip_tags( $document_notes ) ) {
+
+		if ( empty( $document_notes ) ) {
+			return;
+		}
+
+		if ( $document_notes === strip_tags( $document_notes ) ) {
 			echo nl2br( $document_notes );
 		} else {
 			echo $document_notes;
