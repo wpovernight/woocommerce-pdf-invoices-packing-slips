@@ -441,7 +441,7 @@ abstract class Order_Document_Methods extends Order_Document {
 		$notes = $this->get_order_notes( $filter, $include_system_notes );
 
 		if ( ! empty( $notes ) ) {
-			foreach( $notes as $note ) {
+			foreach ( $notes as $note ) {
 				$css_class   = array( 'note', 'note_content' );
 				$css_class[] = $note->customer_note ? 'customer-note' : '';
 				$css_class[] = 'system' === $note->added_by ? 'system-note' : '';
