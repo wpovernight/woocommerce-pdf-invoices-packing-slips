@@ -5,6 +5,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $memory_limit   = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 $php_mem_limit  = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
+$gmagick        = extension_loaded( 'gmagick' );
+$imagick        = extension_loaded( 'imagick' );
 
 $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	'PHP version' => array(
@@ -56,13 +58,13 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	'GMagick or IMagick' => array(
 		'required' => __( 'Better with transparent PNG images', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => null,
-		'result'   => extension_loaded( 'gmagick' ) || extension_loaded( 'imagick' ),
+		'result'   => $gmagick || $imagick,
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'ImageMagick' => array(
 		'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => ( extension_loaded( 'imagick' ) && class_exists( '\\Imagick' ) ) ? esc_attr( \Imagick::getVersion()['versionString'] ) : null,
-		'result'   => extension_loaded( 'imagick' ),
+		'value'    => ( $imagick && class_exists( '\\Imagick' ) ) ? esc_attr( \Imagick::getVersion()['versionString'] ) : null,
+		'result'   => $imagick,
 		'fallback' => __( 'ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'glob()' => array(
@@ -102,8 +104,8 @@ if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' 
 	);
 }
 
-if ( extension_loaded( 'gmagick' ) || ( $im = extension_loaded( 'imagick' ) ) ) {
-	$server_configs['GMagick or IMagick']['value'] = ( $im ? 'IMagick ' . phpversion( 'imagick' ) : 'GMagick ' . phpversion( 'gmagick' ) );
+if ( $gmagick || $imagick ) {
+	$server_configs['GMagick or IMagick']['value'] = $imagick ? 'IMagick ' . phpversion( 'imagick' ) : 'GMagick ' . phpversion( 'gmagick' );
 }
 
 if ( ! $server_configs['PHP version']['result'] ) {
