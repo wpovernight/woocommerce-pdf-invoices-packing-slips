@@ -57,7 +57,7 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	),
 	'GMagick or IMagick' => array(
 		'required' => __( 'Better with transparent PNG images', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => null,
+		'value'    => $imagick ? 'IMagick ' . phpversion( 'imagick' ) : ( $gmagick ? 'GMagick ' . phpversion( 'gmagick' ) : '' ),
 		'result'   => $gmagick || $imagick,
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
@@ -102,10 +102,6 @@ if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' 
 			)
 		)
 	);
-}
-
-if ( $gmagick || $imagick ) {
-	$server_configs['GMagick or IMagick']['value'] = $imagick ? 'IMagick ' . phpversion( 'imagick' ) : 'GMagick ' . phpversion( 'gmagick' );
 }
 
 if ( ! $server_configs['PHP version']['result'] ) {
