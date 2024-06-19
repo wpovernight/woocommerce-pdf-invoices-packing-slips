@@ -636,7 +636,7 @@ class Settings_Callbacks {
 						$args['current'] = $option[ $args['id'] ][ $args['lang'] ];
 					} elseif ( isset( $option[ $args['id'] ]['default'] ) ) {
 						$args['current'] = $option[ $args['id'] ]['default'];
-					} elseif ( isset( $option[ $args['id'] ] ) ) {
+					} elseif ( isset( $option[ $args['id'] ] ) && ! is_array( $option[ $args['id'] ] ) ) {
 						$args['current'] = $option[ $args['id'] ];
 					}
 				}
@@ -650,9 +650,6 @@ class Settings_Callbacks {
 
 		// Fallback to default or empty if no value in option
 		if ( ! isset( $args['current'] ) ) {
-			$args['current'] = isset( $args['default'] ) ? $args['default'] : '';
-		} elseif ( is_array( $args['current'] ) ) {
-			// Ensure 'current' is not an array
 			$args['current'] = isset( $args['default'] ) ? $args['default'] : '';
 		} elseif ( empty( $args['current'] ) && isset( $args['default_if_empty'] ) && true === $args['default_if_empty'] ) {
 			// Force fallback if empty 'current' and 'default_if_empty' equals to true
