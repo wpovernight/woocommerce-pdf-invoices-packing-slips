@@ -53,17 +53,11 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'result'   => false,
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
-	'GMagick' => array(
-		'required' => __( 'Better with transparent PNG images (alternative to IMagick)', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => phpversion( 'gmagick' ),
-		'result'   => extension_loaded( 'gmagick' ),
-		'fallback' => ( ! extension_loaded( 'gmagick' ) && extension_loaded( 'imagick' ) ) ? __( 'You are already using IMagick!', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
-	),
-	'IMagick' => array(
-		'required' => __( 'Better with transparent PNG images (alternative to GMagick)', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => phpversion( 'imagick' ),
-		'result'   => extension_loaded( 'imagick' ),
-		'fallback' => ( ! extension_loaded( 'imagick' ) && extension_loaded( 'gmagick' ) ) ? __( 'You are already using GMagick!', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
+	'GMagick or IMagick' => array(
+		'required' => __( 'Better with transparent PNG images', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'    => null,
+		'result'   => extension_loaded( 'gmagick' ) || extension_loaded( 'imagick' ),
+		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'ImageMagick' => array(
 		'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -106,6 +100,10 @@ if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' 
 			)
 		)
 	);
+}
+
+if ( extension_loaded( 'gmagick' ) || ( $im = extension_loaded( 'imagick' ) ) ) {
+	$server_configs['GMagick or IMagick']['value'] = ( $im ? 'IMagick '.phpversion( 'imagick' ) : 'GMagick '.phpversion( 'gmagick' ) );
 }
 
 if ( ! $server_configs['PHP version']['result'] ) {
