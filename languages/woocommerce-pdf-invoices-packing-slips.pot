@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.8.3-beta-2\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.8.4-beta-1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-04T12:24:08+02:00\n"
+"POT-Creation-Date: 2024-06-19T15:05:03+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -97,7 +97,7 @@ msgstr ""
 
 #: includes/class-wcpdf-admin.php:323
 #: includes/class-wcpdf-main.php:1275
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1255
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1296
 #: includes/documents/class-wcpdf-invoice.php:280
 #: includes/views/setup-wizard/display-options.php:60
 msgid "Invoice Date"
@@ -484,7 +484,7 @@ msgid "Date"
 msgstr ""
 
 #: includes/class-wcpdf-settings.php:444
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1083
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1101
 #: ubl/Settings/TaxesSettings.php:170
 msgid "Total"
 msgstr ""
@@ -569,23 +569,23 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:957
+#: includes/documents/abstract-wcpdf-order-document-methods.php:975
 msgid "Subtotal"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:982
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1000
 msgid "Shipping"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1013
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1031
 msgid "Discount"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1080
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1098
 msgid "Total ex. VAT"
 msgstr ""
 
-#: includes/documents/abstract-wcpdf-order-document-methods.php:1256
+#: includes/documents/abstract-wcpdf-order-document-methods.php:1297
 #: includes/documents/class-wcpdf-invoice.php:281
 #: includes/views/setup-wizard/display-options.php:61
 msgid "Order Date"
@@ -2291,78 +2291,90 @@ msgstr ""
 msgid "Send email"
 msgstr ""
 
+#: languages/strings.php:10
+msgid "Description"
+msgstr ""
+
+#: languages/strings.php:11
+msgid "SKU"
+msgstr ""
+
+#: languages/strings.php:14
 #: templates/Simple/invoice.php:40
 #: templates/Simple/packing-slip.php:53
 msgid "Billing Address:"
 msgstr ""
 
+#: languages/strings.php:15
+#: templates/Simple/packing-slip.php:40
+msgid "Shipping Address:"
+msgstr ""
+
+#: languages/strings.php:16
 #: templates/Simple/invoice.php:53
 msgid "Ship To:"
 msgstr ""
 
+#: languages/strings.php:17
 #: templates/Simple/invoice.php:78
 #: templates/Simple/packing-slip.php:66
 msgid "Order Number:"
 msgstr ""
 
+#: languages/strings.php:18
 #: templates/Simple/invoice.php:82
 #: templates/Simple/packing-slip.php:70
 msgid "Order Date:"
 msgstr ""
 
+#: languages/strings.php:19
 #: templates/Simple/invoice.php:87
 msgid "Payment Method:"
 msgstr ""
 
+#: languages/strings.php:20
+#: templates/Simple/packing-slip.php:75
+msgid "Shipping Method:"
+msgstr ""
+
+#: languages/strings.php:21
 #: templates/Simple/invoice.php:102
 #: templates/Simple/packing-slip.php:90
 msgid "Product"
 msgstr ""
 
+#: languages/strings.php:22
 #: templates/Simple/invoice.php:103
 #: templates/Simple/packing-slip.php:91
 msgid "Quantity"
 msgstr ""
 
+#: languages/strings.php:23
 #: templates/Simple/invoice.php:104
 msgid "Price"
 msgstr ""
 
-#: templates/Simple/invoice.php:111
-#: templates/Simple/packing-slip.php:98
-msgid "Description"
-msgstr ""
-
-#: templates/Simple/invoice.php:116
-#: templates/Simple/packing-slip.php:103
-msgid "SKU"
-msgstr ""
-
-#: templates/Simple/invoice.php:117
-#: templates/Simple/packing-slip.php:104
+#: languages/strings.php:24
+#: templates/Simple/invoice.php:115
+#: templates/Simple/packing-slip.php:102
 msgid "SKU:"
 msgstr ""
 
-#: templates/Simple/invoice.php:118
-#: templates/Simple/packing-slip.php:105
+#: languages/strings.php:25
+#: templates/Simple/invoice.php:116
+#: templates/Simple/packing-slip.php:103
 msgid "Weight:"
 msgstr ""
 
-#: templates/Simple/invoice.php:133
+#: languages/strings.php:26
+#: templates/Simple/invoice.php:131
 msgid "Notes"
 msgstr ""
 
-#: templates/Simple/invoice.php:141
-#: templates/Simple/packing-slip.php:122
+#: languages/strings.php:27
+#: templates/Simple/invoice.php:139
+#: templates/Simple/packing-slip.php:120
 msgid "Customer Notes"
-msgstr ""
-
-#: templates/Simple/packing-slip.php:40
-msgid "Shipping Address:"
-msgstr ""
-
-#: templates/Simple/packing-slip.php:75
-msgid "Shipping Method:"
 msgstr ""
 
 #: ubl/Settings/TaxesSettings.php:54
