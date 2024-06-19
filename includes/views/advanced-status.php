@@ -53,11 +53,23 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'result'   => false,
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
-	'GMagick or IMagick' => array(
-		'required' => __( 'Better with transparent PNG images', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => null,
-		'result'   => extension_loaded( 'gmagick' ) || extension_loaded( 'imagick' ),
-		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
+	'GMagick' => array(
+		'required' => __( 'Better with transparent PNG images (alternative to IMagick)', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'    => phpversion( 'gmagick' ),
+		'result'   => extension_loaded( 'gmagick' ),
+		'fallback' => ( ! extension_loaded( 'gmagick' ) && extension_loaded( 'imagick' ) ) ? __( 'You are already using IMagick!', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
+	),
+	'IMagick' => array(
+		'required' => __( 'Better with transparent PNG images (alternative to GMagick)', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'    => phpversion( 'imagick' ),
+		'result'   => extension_loaded( 'imagick' ),
+		'fallback' => ( ! extension_loaded( 'imagick' ) && extension_loaded( 'gmagick' ) ) ? __( 'You are already using GMagick!', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
+	),
+	'ImageMagick' => array(
+		'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'    => class_exists( 'Imagick' ) ? Imagick::getVersion()['versionString'] : null,
+		'result'   => extension_loaded( 'imagick' ),
+		'fallback' => __( 'ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'glob()' => array(
 		'required' => __( 'Required to detect custom templates and to clear the temp folder periodically', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -95,15 +107,11 @@ if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' 
 		)
 	);
 }
-if ( ( $gm = extension_loaded( 'gmagick' ) ) || ( $im = extension_loaded( 'imagick' ) ) ) {
-	$server_configs['GMagick or IMagick']['value'] = ( $im ? 'IMagick '.phpversion( 'imagick' ) : 'GMagick '.phpversion( 'gmagick' ) );
-}
 
 if ( ! $server_configs['PHP version']['result'] ) {
 	/* translators: <a> tags */
 	$server_configs['PHP version']['required'] .= '<br/>' . sprintf( __( 'Download %1$sthis addon%2$s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
 }
-
 ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
