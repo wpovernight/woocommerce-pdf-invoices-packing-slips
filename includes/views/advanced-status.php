@@ -67,7 +67,7 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	),
 	'ImageMagick' => array(
 		'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => class_exists( 'Imagick' ) ? Imagick::getVersion()['versionString'] : null,
+		'value'    => class_exists( '\\Imagick' ) ? \Imagick::getVersion()['versionString'] : null,
 		'result'   => extension_loaded( 'imagick' ),
 		'fallback' => __( 'ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
