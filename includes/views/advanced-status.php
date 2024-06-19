@@ -103,7 +103,7 @@ if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' 
 }
 
 if ( extension_loaded( 'gmagick' ) || ( $im = extension_loaded( 'imagick' ) ) ) {
-	$server_configs['GMagick or IMagick']['value'] = ( $im ? 'IMagick '.phpversion( 'imagick' ) : 'GMagick '.phpversion( 'gmagick' ) );
+	$server_configs['GMagick or IMagick']['value'] = ( $im ? 'IMagick ' . phpversion( 'imagick' ) : 'GMagick ' . phpversion( 'gmagick' ) );
 }
 
 if ( ! $server_configs['PHP version']['result'] ) {
