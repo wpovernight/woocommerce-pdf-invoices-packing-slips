@@ -863,7 +863,11 @@ abstract class Order_Document {
 			$attachment_src = $attachment[0];
 
 			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
-				$src = $attachment_path;
+				$src = realpath( $attachment_path );
+				if ( ! $src ) {
+					wcpdf_log_error( 'Failed to normalize logo file path: ' . $attachment_path, 'critical' );
+					return;
+				}
 			} else {
 				$head = wp_remote_head( $attachment_src, array( 'sslverify' => false ) );
 				
@@ -892,6 +896,11 @@ abstract class Order_Document {
 					wcpdf_log_error( 'Header logo file not found in: ' . $src, 'critical' );
 					return;
 				}
+			}
+			
+			if ( ! is_readable( $src ) ) {
+				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
+				return;
 			}
 
 			$image_base64 = $this->base64_encode_image( $src );
