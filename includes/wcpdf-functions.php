@@ -723,14 +723,31 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 
 /**
  * Base64 encode image from URL or local path
- * 
+ *
  * @param string $src
- * 
+ *
  * @return string|bool
  */
 function wpo_wcpdf_base64_encode_image( string $src ) {
 	$image_data = @file_get_contents( $src );
 	return base64_encode( $image_data ) ?? false;
+}
+
+/**
+ * Check if a file is readable using fopen
+ *
+ * @param string $src
+ * @return bool
+ */
+function wpo_wcpdf_is_file_readable( string $src ): bool {
+	$handle = @fopen( $src, 'r' );
+
+	if ( $handle ) {
+		fclose( $handle );
+		return true;
+	}
+
+	return false;
 }
 
 /**

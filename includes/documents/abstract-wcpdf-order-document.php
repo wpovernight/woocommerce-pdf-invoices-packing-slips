@@ -885,14 +885,14 @@ abstract class Order_Document {
 				}
 			}
 
-			if ( ! is_readable( $src ) ) {
+			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
 				// last try, convert path to URL
 				if ( apply_filters( 'wpo_wcpdf_use_path', true ) ) {
 					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
 				}
 
 				// last check
-				if ( ! is_readable( $src ) ) {
+				if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
 					// convert to path again if necessary
 					if ( false !== strpos( $src, WP_CONTENT_URL ) ) {
 						$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
@@ -904,10 +904,11 @@ abstract class Order_Document {
 				}
 			}
 
-			$image_info = getimagesize( $src );
-			$mime_type  = $image_info['mime'];
+			$image_info       = getimagesize( $src );
+			$mime_type        = $image_info['mime'];
+			$image_mime_types = apply_filters( 'wpo_wcpdf_image_mime_types', array( 'image/png', 'image/jpeg', 'image/svg+xml' ), $this );
 
-			if ( ! in_array( $mime_type, array( 'image/png', 'image/jpeg', 'image/svg+xml' ), true ) ) {
+			if ( ! in_array( $mime_type, $allowed_mime_types, true ) ) {
 				wcpdf_log_error( 'Unsupported header logo mime type: ' . $mime_type, 'critical' );
 				return;
 			}
