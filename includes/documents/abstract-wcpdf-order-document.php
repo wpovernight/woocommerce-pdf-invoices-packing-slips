@@ -882,8 +882,16 @@ abstract class Order_Document {
 			}
 
 			if ( ! file_exists( $src ) ) {
-				wcpdf_log_error( 'Header logo file not found in: ' . $src, 'critical' );
-				return;
+				// last try, convert path to URL
+				if ( apply_filters( 'wpo_wcpdf_use_path', true ) ) {
+					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
+				}
+				
+				// last check
+				if ( ! file_exists( $src ) ) {
+					wcpdf_log_error( 'Header logo file not found in: ' . $src, 'critical' );
+					return;
+				}
 			}
 
 			$image_base64 = $this->base64_encode_image( $src );
