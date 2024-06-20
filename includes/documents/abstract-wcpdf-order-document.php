@@ -865,7 +865,7 @@ abstract class Order_Document {
 			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 				$src = realpath( $attachment_path );
 				if ( ! $src ) {
-					wcpdf_log_error( 'Failed to normalize logo file path: ' . $attachment_path, 'critical' );
+					wcpdf_log_error( 'Failed to normalize header logo file path: ' . $attachment_path, 'critical' );
 					return;
 				}
 			} else {
@@ -885,24 +885,19 @@ abstract class Order_Document {
 				}
 			}
 
-			if ( ! file_exists( $src ) ) {
+			if ( ! is_readable( $src ) ) {
 				// last try, convert path to URL
 				if ( apply_filters( 'wpo_wcpdf_use_path', true ) ) {
 					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
 				}
 				
 				// last check
-				if ( ! file_exists( $src ) ) {
-					wcpdf_log_error( 'Header logo file not found in: ' . $src, 'critical' );
+				if ( ! is_readable( $src ) ) {
+					wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
 					return;
 				}
 			}
 			
-			if ( ! is_readable( $src ) ) {
-				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
-				return;
-			}
-
 			$image_base64 = $this->base64_encode_image( $src );
 			
 			if ( ! $image_base64 ) {
