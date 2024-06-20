@@ -893,12 +893,6 @@ abstract class Order_Document {
 				
 				// last check
 				if ( ! is_readable( $src ) ) {
-					// check if the file at least exists
-					if ( ! file_exists( $src ) ) {
-						wcpdf_log_error( 'Header logo file not found: ' . $src, 'critical' );
-						return;
-					}
-					
 					// convert to path again if necessary
 					if ( false !== strpos( $src, WP_CONTENT_URL ) ) {
 						$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
