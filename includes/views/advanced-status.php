@@ -151,9 +151,10 @@ if ( ! $server_configs['PHP version']['result'] ) {
 						if ( ! $server_config['result'] ) {
 							if ( isset( $server_config['fallback'] ) ) {
 								printf( '<div>%s. %s</div>', esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ), esc_html( $server_config['fallback'] ) );
-							}
-							if ( isset( $server_config['failure'] ) ) {
+							} elseif ( isset( $server_config['failure'] ) ) {
 								printf( '<div>%s</div>', wp_kses_post( $server_config['failure'] ) );
+							} else {
+								printf( '<div>%s</div>', esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) );
 							}
 						}
 						?>
