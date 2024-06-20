@@ -912,7 +912,7 @@ abstract class Order_Document {
 			}
 
 			$image_src   = 'data:image/png;base64,' . $image_base64;
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $image_src ), esc_attr( $company ) );
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
 
 			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 		}
