@@ -844,8 +844,10 @@ abstract class Order_Document {
 
 	/**
 	 * Show logo HTML
+	 * 
+	 * @return void
 	 */
-	public function header_logo() {
+	public function header_logo(): void {
 		$attachment_id = $this->get_header_logo_id();
 
 		if ( $attachment_id ) {
