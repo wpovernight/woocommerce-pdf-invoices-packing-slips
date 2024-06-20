@@ -78,10 +78,16 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'fallback' => __( 'allow_url_fopen disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'base64_decode'	=> array (
-		'required' => __( 'To compress and decompress font data', 'woocommerce-pdf-invoices-packing-slips' ),
+		'required' => __( 'To compress and decompress font and image data', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'	   => null,
 		'result'   => function_exists( 'base64_decode' ),
 		'fallback' => __( 'base64_decode disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+	),
+	'POSIX'	=> array (
+		'required' => __( 'To get file or directory owner and group names', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'	   => null,
+		'result'   => extension_loaded( 'posix' ),
+		'fallback' => __( 'posix disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 ) );
 

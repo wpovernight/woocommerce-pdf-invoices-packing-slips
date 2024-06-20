@@ -893,12 +893,24 @@ abstract class Order_Document {
 				
 				// last check
 				if ( ! is_readable( $src ) ) {
-					wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
+					// check if the file at least exists
+					if ( ! file_exists( $src ) ) {
+						wcpdf_log_error( 'Header logo file not found: ' . $src, 'critical' );
+						return;
+					}
+					
+					// convert to path again if necessary
+					if ( false !== strpos( $src, WP_CONTENT_URL ) ) {
+						$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
+					}
+					
+					$permissions_info = wpo_wcpdf_get_file_permissions_info( $src );
+					wcpdf_log_error( 'Header logo file not readable: ' . $src . "\n" . $permissions_info, 'critical' );
 					return;
 				}
 			}
 			
-			$image_base64 = $this->base64_encode_image( $src );
+			$image_base64 = wpo_wcpdf_base64_encode_image( $src );
 			
 			if ( ! $image_base64 ) {
 				wcpdf_log_error( 'Unable to encode header logo to base64.', 'critical' );
@@ -910,18 +922,6 @@ abstract class Order_Document {
 
 			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 		}
-	}
-
-	/**
-	 * Base64 encode image from URL or local path
-	 * 
-	 * @param string $src
-	 * 
-	 * @return string|bool
-	 */
-	public function base64_encode_image( string $src ) {
-		$image_data = @file_get_contents( $src );
-		return base64_encode( $image_data ) ?? false;
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {

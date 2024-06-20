@@ -721,3 +721,41 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 	return apply_filters( 'wpo_wcpdf_multilingual_languages', $languages );
 }
 
+/**
+ * Base64 encode image from URL or local path
+ * 
+ * @param string $src
+ * 
+ * @return string|bool
+ */
+function wpo_wcpdf_base64_encode_image( string $src ) {
+	$image_data = @file_get_contents( $src );
+	return base64_encode( $image_data ) ?? false;
+}
+
+/**
+ * Get path permissions and ownership information
+ * Requires PHP POSIX extension to be enabled on the server to get owner and group names
+ *
+ * @param string $path
+ * @return string
+ */
+function wpo_wcpdf_get_path_permissions_info( string $path ): string {
+	if ( ! file_exists( $path ) ) {
+		return 'Path does not exist.';
+	}
+
+	$permissions = substr( sprintf( '%o', fileperms( $path ) ), -4 );
+	$owner_id    = fileowner( $path );
+	$group_id    = filegroup( $path );
+	$owner_info  = function_exists( 'posix_getpwuid' ) ? posix_getpwuid( $owner_id ) : null;
+	$group_info  = function_exists( 'posix_getgrgid' ) ? posix_getgrgid( $group_id ) : null;
+	$owner_name  = $owner_info ? $owner_info['name'] : $owner_id;
+	$group_name  = $group_info ? $group_info['name'] : $group_id;
+
+	$info  = "Permissions: $permissions\n";
+	$info .= "Owner: $owner_name\n";
+	$info .= "Group: $group_name\n";
+
+	return $info;
+}
