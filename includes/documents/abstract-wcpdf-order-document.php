@@ -811,7 +811,7 @@ abstract class Order_Document {
 	}
 
 	public function has_header_logo() {
-		return !empty( $this->settings['header_logo'] );
+		return ! empty( $this->settings['header_logo'] );
 	}
 
 	/**
@@ -878,10 +878,34 @@ abstract class Order_Document {
 				}
 			}
 
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
+			if ( ! file_exists( $src ) ) {
+				// let's try again but with URL this time
+				$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
+
+				if ( ! file_exists( $src ) ) {
+					wcpdf_log_error( 'Header logo file not found in: ' . $src, 'critical' );
+					return;
+				}
+			}
+
+			$image_base64 = $this->base64_encode_image( $src );
+			$image_src    = 'data:image/png;base64,' . $image_base64;
+			$img_element  = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $image_src ), esc_attr( $company ) );
 
 			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 		}
+	}
+
+	/**
+	 * Return base64 encoded image
+	 *
+	 * @param string $image_src
+	 *
+	 * @return string
+	 */
+	public function base64_encode_image( string $image_src ): string {
+		$image = file_get_contents( $image_src );
+		return base64_encode( $image );
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
