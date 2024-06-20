@@ -905,7 +905,7 @@ abstract class Order_Document {
 	 */
 	public function base64_encode_image( string $src ) {
 		$image_data = @file_get_contents( $src );
-		return $image_data ? base64_encode( $image_data ) : false;
+		return base64_encode( $image_data ) ?? false;
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
