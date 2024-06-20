@@ -864,6 +864,7 @@ abstract class Order_Document {
 				$src = $attachment_path;
 			} else {
 				$head = wp_remote_head( $attachment_src, array( 'sslverify' => false ) );
+				
 				if ( is_wp_error( $head ) ) {
 					$errors = $head->get_error_messages();
 					foreach ( $errors as $error ) {
@@ -873,6 +874,7 @@ abstract class Order_Document {
 				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
 					$src = $attachment_src;
 				} else {
+					wcpdf_log_error( 'Header logo file not found in: ' . $attachment_src, 'critical' );
 					return;
 				}
 			}
