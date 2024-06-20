@@ -843,7 +843,7 @@ abstract class Order_Document {
 	}
 
 	/**
-	 * Show logo html
+	 * Show logo HTML
 	 */
 	public function header_logo() {
 		$attachment_id = $this->get_header_logo_id();
@@ -854,17 +854,16 @@ abstract class Order_Document {
 			$attachment_path = get_attached_file( $attachment_id );
 
 			if ( empty( $attachment ) || empty( $attachment_path ) ) {
+				wcpdf_log_error( 'Header logo attachment not found.', 'critical' );
 				return;
 			}
 
-			$attachment_src    = $attachment[0];
-			$attachment_width  = $attachment[1];
-			$attachment_height = $attachment[2];
+			$attachment_src = $attachment[0];
 
 			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
 				$src = $attachment_path;
 			} else {
-				$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
+				$head = wp_remote_head( $attachment_src, array( 'sslverify' => false ) );
 				if ( is_wp_error( $head ) ) {
 					$errors = $head->get_error_messages();
 					foreach ( $errors as $error ) {
@@ -879,33 +878,34 @@ abstract class Order_Document {
 			}
 
 			if ( ! file_exists( $src ) ) {
-				// let's try again but with URL this time
-				$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
-
-				if ( ! file_exists( $src ) ) {
-					wcpdf_log_error( 'Header logo file not found in: ' . $src, 'critical' );
-					return;
-				}
+				wcpdf_log_error( 'Header logo file not found in: ' . $src, 'critical' );
+				return;
 			}
 
 			$image_base64 = $this->base64_encode_image( $src );
-			$image_src    = 'data:image/png;base64,' . $image_base64;
-			$img_element  = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $image_src ), esc_attr( $company ) );
+			
+			if ( ! $image_base64 ) {
+				wcpdf_log_error( 'Unable to encode header logo to base64.', 'critical' );
+				return;
+			}
+
+			$image_src   = 'data:image/png;base64,' . $image_base64;
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $image_src ), esc_attr( $company ) );
 
 			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 		}
 	}
 
 	/**
-	 * Return base64 encoded image
-	 *
-	 * @param string $image_src
-	 *
-	 * @return string
+	 * Base64 encode image from URL or local path
+	 * 
+	 * @param string $src
+	 * 
+	 * @return string|bool
 	 */
-	public function base64_encode_image( string $image_src ): string {
-		$image = file_get_contents( $image_src );
-		return base64_encode( $image );
+	public function base64_encode_image( string $src ) {
+		$image_data = @file_get_contents( $src );
+		return $image_data ? base64_encode( $image_data ) : false;
 	}
 
 	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
