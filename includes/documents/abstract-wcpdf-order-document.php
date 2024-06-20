@@ -904,7 +904,7 @@ abstract class Order_Document {
 						$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
 					}
 					
-					$permissions_info = wpo_wcpdf_get_file_permissions_info( $src );
+					$permissions_info = wpo_wcpdf_get_path_permissions_info( $src );
 					wcpdf_log_error( 'Header logo file not readable: ' . $src . "\n" . $permissions_info, 'critical' );
 					return;
 				}
