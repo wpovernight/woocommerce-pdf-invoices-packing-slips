@@ -875,7 +875,7 @@ abstract class Order_Document {
 				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
 					$src = $attachment_src;
 				} elseif ( file_exists( $attachment_path ) ) {
-					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
+					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $attachment_path );
 				} else {
 					wcpdf_log_error( 'Header logo file not found in: ' . $attachment_src, 'critical' );
 					return;
