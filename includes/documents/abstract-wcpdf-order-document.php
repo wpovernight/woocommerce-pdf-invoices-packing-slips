@@ -885,7 +885,7 @@ abstract class Order_Document {
 
 			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
 				// convert path to URL
-				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, WP_CONTENT_URL ) ) {
+				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
 					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
 				}
 
