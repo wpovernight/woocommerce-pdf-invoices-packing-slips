@@ -908,7 +908,7 @@ abstract class Order_Document {
 			$mime_type        = $image_info['mime'];
 			$image_mime_types = apply_filters( 'wpo_wcpdf_image_mime_types', array( 'image/png', 'image/jpeg', 'image/svg+xml' ), $this );
 
-			if ( ! in_array( $mime_type, $allowed_mime_types, true ) ) {
+			if ( ! in_array( $mime_type, $image_mime_types, true ) ) {
 				wcpdf_log_error( 'Unsupported header logo mime type: ' . $mime_type, 'critical' );
 				return;
 			}
