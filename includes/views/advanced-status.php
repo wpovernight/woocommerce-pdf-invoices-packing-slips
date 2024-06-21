@@ -77,6 +77,12 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'result'   => ini_get( 'allow_url_fopen' ),
 		'fallback' => __( 'allow_url_fopen disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
+	'fileinfo' => array (
+		'required' => __( 'Necessary to verify the MIME type of local images.', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'	   => null,
+		'result'   => extension_loaded( 'fileinfo' ),
+		'fallback' => __( 'fileinfo disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+	),
 	'base64_decode'	=> array (
 		'required' => __( 'To compress and decompress font and image data', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'	   => null,

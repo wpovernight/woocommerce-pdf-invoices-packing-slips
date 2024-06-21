@@ -722,6 +722,47 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 }
 
 /**
+ * Get image mime type
+ *
+ * @param string $src
+ * @return string
+ */
+function wpo_wcpdf_get_image_mime_type( string $src ): string {
+	$mime_type = '';
+
+	// Check if 'getimagesize' function exists and try to get mime type for local files
+	if ( function_exists( 'getimagesize' ) && file_exists( $src ) ) {
+		$image_info = @getimagesize( $src );
+		$mime_type  = $image_info['mime'] ?? '';
+	}
+
+	// Fallback to 'finfo_file' if mime type is empty for local files
+	if ( empty( $mime_type ) && function_exists( 'finfo_open' ) && file_exists( $src ) ) {
+		$finfo = finfo_open( FILEINFO_MIME_TYPE );
+		if ( $finfo ) {
+			$mime_type = finfo_file( $finfo, $src );
+			finfo_close( $finfo );
+		} else {
+			wcpdf_log_error( 'Fileinfo failed to open.' );
+		}
+	}
+
+	// Handle remote files
+	if ( empty( $mime_type ) && filter_var( $src, FILTER_VALIDATE_URL ) ) {
+		$headers = get_headers( $src, 1 );
+		if ( $headers && isset( $headers['Content-Type'] ) ) {
+			$mime_type = is_array( $headers['Content-Type'] ) ? $headers['Content-Type'][0] : $headers['Content-Type'];
+		}
+	}
+
+	if ( empty( $mime_type ) ) {
+		wcpdf_log_error( 'Unable to determine MIME type for file: ' . $src );
+	}
+
+	return $mime_type ?? '';
+}
+
+/**
  * Base64 encode image from URL or local path
  *
  * @param string $src

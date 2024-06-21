@@ -901,8 +901,7 @@ abstract class Order_Document {
 				}
 			}
 
-			$image_info       = getimagesize( $src );
-			$mime_type        = $image_info['mime'] ?? '';
+			$mime_type        = wpo_wcpdf_get_image_mime_type( $src );
 			$image_mime_types = apply_filters( 'wpo_wcpdf_image_mime_types', array( 'image/png', 'image/jpeg', 'image/svg+xml' ), $this );
 
 			if ( ! in_array( $mime_type, $image_mime_types, true ) ) {
