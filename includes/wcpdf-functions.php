@@ -745,6 +745,9 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 	if ( $handle ) {
 		fclose( $handle );
 		return true;
+	} else {
+		// Ensure that 'allow_url_fopen' is enabled in 'php.ini'
+		wcpdf_log_error( 'Failed to open file: ' . $path, 'critical' );
 	}
 
 	return false;
