@@ -853,7 +853,7 @@ abstract class Order_Document {
 		if ( $attachment_id ) {
 			$company         = $this->get_shop_name();
 			$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
-			$attachment_path = get_attached_file( $attachment_id );
+			$attachment_path = realpath( get_attached_file( $attachment_id ) );
 
 			if ( empty( $attachment ) || empty( $attachment_path ) ) {
 				wcpdf_log_error( 'Header logo attachment not found.', 'critical' );
@@ -863,11 +863,7 @@ abstract class Order_Document {
 			$attachment_src = $attachment[0];
 
 			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
-				$src = realpath( $attachment_path );
-				if ( ! $src ) {
-					wcpdf_log_error( 'Failed to normalize header logo file path: ' . $attachment_path, 'critical' );
-					return;
-				}
+				$src = $attachment_path;
 			} else {
 				$head = wp_remote_head( $attachment_src, array( 'sslverify' => false ) );
 
@@ -879,6 +875,8 @@ abstract class Order_Document {
 					return;
 				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
 					$src = $attachment_src;
+				} elseif ( file_exists( $attachment_path ) ) {
+					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
 				} else {
 					wcpdf_log_error( 'Header logo file not found in: ' . $attachment_src, 'critical' );
 					return;
@@ -887,7 +885,7 @@ abstract class Order_Document {
 
 			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
 				// last try, convert path to URL
-				if ( apply_filters( 'wpo_wcpdf_use_path', true ) ) {
+				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, WP_CONTENT_URL ) ) {
 					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
 				}
 
