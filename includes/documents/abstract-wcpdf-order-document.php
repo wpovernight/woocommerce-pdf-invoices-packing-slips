@@ -872,7 +872,7 @@ abstract class Order_Document {
 						wcpdf_log_error( $error, 'critical' );
 					}
 					return;
-				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
+				} elseif ( ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) || file_exists( $attachment_src ) ) {
 					$src = $attachment_src;
 				} elseif ( file_exists( $attachment_path ) ) {
 					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $attachment_path );
