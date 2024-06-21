@@ -392,10 +392,15 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 
 	/**
-	 * Return/Show order notes
+	 * Get order notes
 	 * could use $order->get_customer_order_notes(), but that filters out private notes already
+	 *
+	 * @param string $filter 'customer' or 'private'
+	 * @param bool $include_system_notes include system notes
+	 *
+	 * @return array $notes
 	 */
-	public function get_order_notes( $filter = 'customer', $include_system_notes = true ) {
+	public function get_order_notes( string $filter = 'customer', bool $include_system_notes = true ): array {
 		if ( $this->is_refund( $this->order ) ) {
 			$order_id = $this->get_refund_parent_id( $this->order );
 		} else {
@@ -403,10 +408,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 
 		if ( empty( $order_id ) ) {
-			return; // prevent order notes from all orders showing when document is not loaded properly
+			return array(); // prevent order notes from all orders showing when document is not loaded properly
 		}
 
-		$type = ( $filter == 'private' ) ? 'internal' : $filter;
+		$type  = ( 'private' === $filter ) ? 'internal' : $filter;
 		$notes = wc_get_order_notes( array(
 			'order_id' => $order_id,
 			'type'     => $type, // use 'internal' for admin and system notes, empty for all
@@ -423,15 +428,26 @@ abstract class Order_Document_Methods extends Order_Document {
 		return $notes;
 
 	}
-	public function order_notes( $filter = 'customer', $include_system_notes = true ) {
+
+	/**
+	 * Show order notes
+	 *
+	 * @param string $filter 'customer' or 'private'
+	 * @param bool $include_system_notes include system notes
+	 *
+	 * @return void
+	 */
+	public function order_notes( string $filter = 'customer', bool $include_system_notes = true ): void {
 		$notes = $this->get_order_notes( $filter, $include_system_notes );
-		if ( $notes ) {
-			foreach( $notes as $note ) {
+
+		if ( ! empty( $notes ) ) {
+			foreach ( $notes as $note ) {
 				$css_class   = array( 'note', 'note_content' );
 				$css_class[] = $note->customer_note ? 'customer-note' : '';
 				$css_class[] = 'system' === $note->added_by ? 'system-note' : '';
 				$css_class   = apply_filters( 'woocommerce_order_note_class', array_filter( $css_class ), $note );
-				$content = isset($note->content) ? $note->content : $note->comment_content;
+				$content     = isset( $note->content ) ? $note->content : $note->comment_content;
+				$content     = apply_filters( 'wpo_wcpdf_order_note', $content, $note );
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
 					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); ?>
@@ -542,12 +558,14 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	/**
 	 * Return the order items
+	 *
+	 * @return array $data_list
 	 */
-	public function get_order_items() {
-		$items = $this->order->get_items();
+	public function get_order_items(): array {
+		$items     = $this->order->get_items();
 		$data_list = array();
 
-		if( sizeof( $items ) > 0 ) {
+		if ( sizeof( $items ) > 0 ) {
 			foreach ( $items as $item_id => $item ) {
 				// Array with data for the pdf template
 				$data = array();
@@ -556,12 +574,12 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['item_id'] = $item_id;
 
 				// Set the id
-				$data['product_id'] = $item['product_id'];
+				$data['product_id']   = $item['product_id'];
 				$data['variation_id'] = $item['variation_id'];
 
 				// Compatibility: WooCommerce Composite Products uses a workaround for
 				// setting the order before the item name filter, so we run this first
-				if ( class_exists('WC_Composite_Products') ) {
+				if ( class_exists( 'WC_Composite_Products' ) ) {
 					$order_item_class = apply_filters( 'woocommerce_order_item_class', '', $item, $this->order );
 				}
 
@@ -572,25 +590,25 @@ abstract class Order_Document_Methods extends Order_Document {
 				$data['quantity'] = $item['qty'];
 
 				// Set the line total (=after discount)
-				$data['line_total'] = $this->format_price( $item['line_total'] );
-				$data['single_line_total'] = $this->format_price( $item['line_total'] / max( 1, abs( $item['qty'] ) ) );
-				$data['line_tax'] = $this->format_price( $item['line_tax'] );
-				$data['single_line_tax'] = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
+				$data['line_total']           = $this->format_price( $item['line_total'] );
+				$data['single_line_total']    = $this->format_price( $item['line_total'] / max( 1, abs( $item['qty'] ) ) );
+				$data['line_tax']             = $this->format_price( $item['line_tax'] );
+				$data['single_line_tax']      = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
 
-				$data['tax_rates'] = $this->get_tax_rate( $item, $this->order, false );
+				$data['tax_rates']            = $this->get_tax_rate( $item, $this->order, false );
 				$data['calculated_tax_rates'] = $this->get_tax_rate( $item, $this->order, true );
 
 				// Set the line subtotal (=before discount)
-				$data['line_subtotal'] = $this->format_price( $item['line_subtotal'] );
+				$data['line_subtotal']     = $this->format_price( $item['line_subtotal'] );
 				$data['line_subtotal_tax'] = $this->format_price( $item['line_subtotal_tax'] );
-				$data['ex_price'] = $this->get_formatted_item_price( $item, 'total', 'excl' );
-				$data['price'] = $this->get_formatted_item_price( $item, 'total' );
-				$data['order_price'] = $this->order->get_formatted_line_subtotal( $item ); // formatted according to WC settings
+				$data['ex_price']          = $this->get_formatted_item_price( $item, 'total', 'excl' );
+				$data['price']             = $this->get_formatted_item_price( $item, 'total' );
+				$data['order_price']       = $this->order->get_formatted_line_subtotal( $item ); // formatted according to WC settings
 
 				// Calculate the single price with the same rules as the formatted line subtotal (!)
 				// = before discount
 				$data['ex_single_price'] = $this->get_formatted_item_price( $item, 'single', 'excl' );
-				$data['single_price'] = $this->get_formatted_item_price( $item, 'single' );
+				$data['single_price']    = $this->get_formatted_item_price( $item, 'single' );
 
 				// Pass complete item array
 				$data['item'] = $item;
@@ -605,7 +623,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				}
 
 				// Checking for existence, thanks to MDesigner0
-				if( !empty( $product ) ) {
+				if ( ! empty( $product ) ) {
 					// Thumbnail (full img tag)
 					$data['thumbnail'] = $this->get_thumbnail( $product );
 
@@ -632,7 +650,7 @@ abstract class Order_Document_Methods extends Order_Document {
 				// Set item meta
 				$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
 
-				$data_list[$item_id] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
+				$data_list[ $item_id ] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
 			}
 		}
 
@@ -872,7 +890,7 @@ abstract class Order_Document_Methods extends Order_Document {
 			$thumbnail = $thumbnail_img_tag_url;
 		}
 
-		/*
+		/**
 		 * PHP GD library can be installed but 'webp' support could be disabled,
 		 * which turns the function 'imagecreatefromwebp()' inexistent,
 		 * leading to display an error in DOMPDF.
@@ -1097,9 +1115,11 @@ abstract class Order_Document_Methods extends Order_Document {
 
 
 	/**
-	 * Return/Show shipping notes
+	 * Get shipping notes
+	 *
+	 * @return string
 	 */
-	public function get_shipping_notes() {
+	public function get_shipping_notes(): string {
 		if ( $this->is_refund( $this->order ) ) {
 			$shipping_notes = $this->order->get_reason();
 		} else {
@@ -1115,12 +1135,20 @@ abstract class Order_Document_Methods extends Order_Document {
 			$shipping_notes = wp_strip_all_tags( $shipping_notes );
 		}
 
-		$shipping_notes = ! empty( $shipping_notes ) ? __( $shipping_notes, 'woocommerce-pdf-invoices-packing-slips' ) : false;
-
-		return apply_filters( 'wpo_wcpdf_shipping_notes', wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' ), $this );
+		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this );
 	}
-	public function shipping_notes() {
-		echo $this->get_shipping_notes();
+
+	/**
+	 * Display shipping notes
+	 *
+	 * @return void
+	 */
+	public function shipping_notes(): void {
+		$shipping_notes = $this->get_shipping_notes();
+
+		if ( ! empty( $shipping_notes ) ) {
+			echo wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' );
+		}
 	}
 
 	/**
@@ -1214,17 +1242,30 @@ abstract class Order_Document_Methods extends Order_Document {
 		}
 	}
 
-	public function get_document_notes() {
-		if ( $document_notes = $this->get_notes( $this->get_type() ) ) {
-			return $document_notes;
-		} else {
-			return '';
-		}
+	/**
+	 * Get document notes
+	 *
+	 * @return string
+	 */
+	public function get_document_notes(): string {
+		$document_notes = $this->get_notes( $this->get_type() );
+
+		return apply_filters( 'wpo_wcpdf_document_notes', $document_notes ?? '', $this );
 	}
 
-	public function document_notes() {
+	/**
+	 * Display document notes
+	 *
+	 * @return void
+	 */
+	public function document_notes(): void {
 		$document_notes = $this->get_document_notes();
-		if( $document_notes == strip_tags( $document_notes ) ) {
+
+		if ( empty( $document_notes ) ) {
+			return;
+		}
+
+		if ( $document_notes === strip_tags( $document_notes ) ) {
 			echo nl2br( $document_notes );
 		} else {
 			echo $document_notes;

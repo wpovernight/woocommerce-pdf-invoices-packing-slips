@@ -830,7 +830,7 @@ abstract class Order_Document {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
+		return apply_filters( 'wpo_wcpdf_header_logo_id', absint( $header_logo_id ), $this );
 	}
 
 	/**
