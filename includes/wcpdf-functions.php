@@ -730,7 +730,7 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 function wpo_wcpdf_get_image_mime_type( string $src ): string {
 	$mime_type = '';
 
-	if ( empty( $src ) || ! file_exists( $src ) ) {
+	if ( empty( $src ) ) {
 		return $mime_type;
 	}
 
@@ -785,7 +785,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 		}
 	}
 
-	// Fallback to determining MIME type from file extension
+	// Determine using WP functions
 	if ( empty( $mime_type ) ) {
 		$path      = wp_parse_url( $src, PHP_URL_PATH );
 		$file_info = wp_check_filetype( $path );
@@ -793,6 +793,37 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 		if ( 'application/octet-stream' === $mime_type ) {
 			wcpdf_log_error( 'Unknown file extension for file: ' . $src );
+		}
+	}
+
+	// Last chance, determine from file extension
+	if ( empty( $mime_type ) ) {
+		$path      = parse_url( $src, PHP_URL_PATH );
+		$extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+
+		switch ( $extension ) {
+			case 'jpg':
+			case 'jpeg':
+				$mime_type = 'image/jpeg';
+				break;
+			case 'png':
+				$mime_type = 'image/png';
+				break;
+			case 'gif':
+				$mime_type = 'image/gif';
+				break;
+			case 'bmp':
+				$mime_type = 'image/bmp';
+				break;
+			case 'webp':
+				$mime_type = 'image/webp';
+				break;
+			case 'svg':
+				$mime_type = 'image/svg+xml';
+				break;
+			default:
+				$mime_type = 'application/octet-stream';
+				wcpdf_log_error( 'Unknown file extension: ' . $extension . ' for file: ' . $src );
 		}
 	}
 
