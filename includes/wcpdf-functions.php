@@ -733,33 +733,66 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 	// Check if 'getimagesize' function exists and try to get mime type for local files
 	if ( function_exists( 'getimagesize' ) && file_exists( $src ) ) {
 		$image_info = @getimagesize( $src );
-		$mime_type  = $image_info['mime'] ?? '';
+
+		if ( $image_info && isset( $image_info['mime'] ) ) {
+			$mime_type = $image_info['mime'];
+		} else {
+			wcpdf_log_error( 'getimagesize failed for file: ' . $src );
+		}
 	}
 
 	// Fallback to 'finfo_file' if mime type is empty for local files
 	if ( empty( $mime_type ) && function_exists( 'finfo_open' ) && file_exists( $src ) ) {
 		$finfo = finfo_open( FILEINFO_MIME_TYPE );
+
 		if ( $finfo ) {
 			$mime_type = finfo_file( $finfo, $src );
 			finfo_close( $finfo );
 		} else {
-			wcpdf_log_error( 'Fileinfo failed to open.' );
+			wcpdf_log_error( 'Fileinfo failed to open for file: ' . $src );
 		}
 	}
 
 	// Handle remote files
 	if ( empty( $mime_type ) && filter_var( $src, FILTER_VALIDATE_URL ) ) {
-		$headers = get_headers( $src, 1 );
-		if ( $headers && isset( $headers['Content-Type'] ) ) {
-			$mime_type = is_array( $headers['Content-Type'] ) ? $headers['Content-Type'][0] : $headers['Content-Type'];
+		$context = stream_context_create( array(
+			'http' => array(
+				'method'        => 'HEAD',
+				'ignore_errors' => true,
+			),
+			'https' => array(
+				'method'           => 'HEAD',
+				'ignore_errors'    => true,
+				'verify_peer'      => false,
+				'verify_peer_name' => false,
+			),
+		) );
+
+		$headers = @get_headers( $src, 1, $context );
+
+		if ( $headers ) {
+			if ( isset( $headers['Content-Type'] ) ) {
+				$mime_type = is_array( $headers['Content-Type'] ) ? $headers['Content-Type'][0] : $headers['Content-Type'];
+			} else {
+				wcpdf_log_error( 'Content-Type header not found for URL: ' . $src );
+			}
+		} else {
+			wcpdf_log_error( 'Failed to get headers for URL: ' . $src );
 		}
 	}
 
+	// Fallback to determining MIME type from file extension
 	if ( empty( $mime_type ) ) {
-		wcpdf_log_error( 'Unable to determine MIME type for file: ' . $src );
+		$path      = wp_parse_url( $src, PHP_URL_PATH );
+		$file_info = wp_check_filetype( $path );
+		$mime_type = $file_info['type'] ?? 'application/octet-stream';
+
+		if ( 'application/octet-stream' === $mime_type ) {
+			wcpdf_log_error( 'Unknown file extension for file: ' . $src );
+		}
 	}
 
-	return $mime_type ?? '';
+	return $mime_type;
 }
 
 /**
