@@ -730,8 +730,12 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 function wpo_wcpdf_get_image_mime_type( string $src ): string {
 	$mime_type = '';
 
+	if ( empty( $src ) || ! file_exists( $src ) ) {
+		return $mime_type;
+	}
+
 	// Check if 'getimagesize' function exists and try to get mime type for local files
-	if ( function_exists( 'getimagesize' ) && file_exists( $src ) ) {
+	if ( function_exists( 'getimagesize' ) ) {
 		$image_info = @getimagesize( $src );
 
 		if ( $image_info && isset( $image_info['mime'] ) ) {
@@ -742,7 +746,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 	}
 
 	// Fallback to 'finfo_file' if mime type is empty for local files
-	if ( empty( $mime_type ) && function_exists( 'finfo_open' ) && file_exists( $src ) ) {
+	if ( empty( $mime_type ) && function_exists( 'finfo_open' ) ) {
 		$finfo = finfo_open( FILEINFO_MIME_TYPE );
 
 		if ( $finfo ) {
