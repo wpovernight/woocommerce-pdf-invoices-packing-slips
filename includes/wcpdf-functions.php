@@ -745,8 +745,8 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 		}
 	}
 
-	// Fallback to 'finfo_file' if mime type is empty for local files
-	if ( empty( $mime_type ) && function_exists( 'finfo_open' ) ) {
+	// Fallback to 'finfo_file' if mime type is empty for local files only (no remote files allowed)
+	if ( empty( $mime_type ) && function_exists( 'finfo_open' ) && ! filter_var( $src, FILTER_VALIDATE_URL ) ) {
 		$finfo = finfo_open( FILEINFO_MIME_TYPE );
 
 		if ( $finfo ) {
