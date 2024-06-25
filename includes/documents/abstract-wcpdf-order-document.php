@@ -856,28 +856,15 @@ abstract class Order_Document {
 			$attachment_src  = $attachment[0] ?? '';
 			$attachment_path = realpath( get_attached_file( $attachment_id ) );
 
-			if ( empty( $attachment_src ) || empty( $attachment_path ) ) {
-				wcpdf_log_error( 'Header logo attachment not found.', 'critical' );
-				return;
-			}
-
-			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
+			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! empty( $attachment_path ) ) {
 				$src = $attachment_path;
 			} else {
-				$head = wp_remote_head( $attachment_src, array( 'sslverify' => false ) );
-
-				if ( is_wp_error( $head ) ) {
-					$errors = $head->get_error_messages();
-					foreach ( $errors as $error ) {
-						wcpdf_log_error( $error, 'critical' );
-					}
-					return;
-				} elseif ( ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) || file_exists( $attachment_src ) ) {
+				if ( ! empty( $attachment_src ) ) {
 					$src = $attachment_src;
-				} elseif ( file_exists( $attachment_path ) ) {
+				} elseif ( ! empty( $attachment_path ) ) {
 					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $attachment_path );
 				} else {
-					wcpdf_log_error( 'Header logo file not found in: ' . $attachment_src, 'critical' );
+					wcpdf_log_error( 'Header logo file not found.', 'critical' );
 					return;
 				}
 			}
