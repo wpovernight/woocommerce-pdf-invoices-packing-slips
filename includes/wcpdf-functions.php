@@ -843,20 +843,36 @@ function wpo_wcpdf_base64_encode_image( string $src ) {
 }
 
 /**
- * Check if a file is readable using fopen
+ * Check if a file is readable
  *
  * @param string $path
  * @return bool
  */
 function wpo_wcpdf_is_file_readable( string $path ): bool {
-	$handle = @fopen( $path, 'r' );
+	// Check if the path is a URL
+	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
+		$response = wp_safe_remote_head( $path );
 
+		if ( ! is_wp_error( $response ) ) {
+			$status_code = wp_remote_retrieve_response_code( $response );
+
+			if ( $status_code === 200 ) {
+				return true;
+			}
+		}
+
+		wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . ( is_wp_error( $response ) ? $response->get_error_message() : 'HTTP status code: ' . $status_code ), 'critical' );
+	} else {
+		if ( is_readable( $path ) ) {
+			return true;
+		}
+	}
+
+	// Fallback to fopen if initial methods fail
+	$handle = @fopen( $path, 'r' );
 	if ( $handle ) {
 		fclose( $handle );
 		return true;
-	} else {
-		// Ensure that 'allow_url_fopen' is enabled in Advanced Status tab
-		wcpdf_log_error( 'Failed to open file: ' . $path, 'critical' );
 	}
 
 	return false;
