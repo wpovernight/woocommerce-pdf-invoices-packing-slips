@@ -853,54 +853,30 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
 		$response = wp_safe_remote_head( $path );
 
-		if ( ! is_wp_error( $response ) ) {
-			$status_code = wp_remote_retrieve_response_code( $response );
-
-			if ( $status_code === 200 ) {
-				return true;
-			}
+		if ( is_wp_error( $response ) ) {
+			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
+			return false;
 		}
 
-		wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . ( is_wp_error( $response ) ? $response->get_error_message() : 'HTTP status code: ' . $status_code ), 'critical' );
+		$status_code = wp_remote_retrieve_response_code( $response );
+		return ( $status_code === 200 );
+
+	// Local path file check
 	} else {
 		if ( is_readable( $path ) ) {
 			return true;
+		} else {
+			// Fallback to fopen if first check fails
+			$handle = @fopen( $path, 'r' );
+
+			if ( $handle ) {
+				fclose( $handle );
+				return true;
+			} else {
+				wcpdf_log_error( 'Failed to open local file with both methods: ' . $path, 'critical' );
+				return false;
+			}
 		}
 	}
-
-	// Fallback to fopen if initial methods fail
-	$handle = @fopen( $path, 'r' );
-	if ( $handle ) {
-		fclose( $handle );
-		return true;
-	}
-
-	return false;
 }
 
-/**
- * Get path permissions and ownership information
- * Requires PHP POSIX extension to be enabled on the server to get owner and group names
- *
- * @param string $path
- * @return string
- */
-function wpo_wcpdf_get_path_permissions_info( string $path ): string {
-	if ( ! file_exists( $path ) ) {
-		return 'Path does not exist.';
-	}
-
-	$permissions = substr( sprintf( '%o', fileperms( $path ) ), -4 );
-	$owner_id    = fileowner( $path );
-	$group_id    = filegroup( $path );
-	$owner_info  = function_exists( 'posix_getpwuid' ) ? posix_getpwuid( $owner_id ) : null;
-	$group_info  = function_exists( 'posix_getgrgid' ) ? posix_getgrgid( $group_id ) : null;
-	$owner_name  = $owner_info ? $owner_info['name'] : $owner_id;
-	$group_name  = $group_info ? $group_info['name'] : $group_id;
-
-	$info  = "Permissions: $permissions\n";
-	$info .= "Owner: $owner_name\n";
-	$info .= "Group: $group_name\n";
-
-	return $info;
-}

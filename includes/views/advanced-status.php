@@ -89,12 +89,6 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'result'   => function_exists( 'base64_decode' ),
 		'fallback' => __( 'base64_decode disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
-	'POSIX'	=> array (
-		'required' => __( 'To get file or directory owner and group names', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'	   => null,
-		'result'   => extension_loaded( 'posix' ),
-		'fallback' => __( 'posix disabled', 'woocommerce-pdf-invoices-packing-slips' ),
-	),
 ) );
 
 if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' ) ) || ( $zop = extension_loaded( 'Zend OPcache' ) ) || ( $op = extension_loaded( 'opcache' ) ) ) {

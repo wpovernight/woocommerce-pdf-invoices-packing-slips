@@ -856,34 +856,26 @@ abstract class Order_Document {
 			$attachment_src  = $attachment[0] ?? '';
 			$attachment_path = realpath( get_attached_file( $attachment_id ) );
 
-			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! empty( $attachment_path ) ) {
-				$src = $attachment_path;
-			} else {
-				if ( ! empty( $attachment_src ) ) {
-					$src = $attachment_src;
-				} elseif ( ! empty( $attachment_path ) ) {
-					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $attachment_path );
-				} else {
-					wcpdf_log_error( 'Header logo file not found.', 'critical' );
-					return;
-				}
+			if ( empty( $attachment_src ) || empty( $attachment_path ) ) {
+				wcpdf_log_error( 'Header logo file not found.', 'critical' );
+				return;
 			}
+
+			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
 
 			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
 				// convert path to URL
 				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
 					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
+
+				// convert url to path
+				} elseif ( false !== strpos( $src, WP_CONTENT_URL ) ) {
+					$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
 				}
 
 				// last check
 				if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
-					// convert to path again if necessary
-					if ( false !== strpos( $src, WP_CONTENT_URL ) ) {
-						$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
-					}
-
-					$permissions_info = wpo_wcpdf_get_path_permissions_info( $src );
-					wcpdf_log_error( 'Header logo file not readable: ' . $src . "\n" . $permissions_info, 'critical' );
+					wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
 					return;
 				}
 			}
