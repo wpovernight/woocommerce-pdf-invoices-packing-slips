@@ -868,7 +868,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 		}
 	}
 
-	// Fallback to fopen if initial method fails
+	// Fallback to fopen if initial methods fail
 	$handle = @fopen( $path, 'r' );
 	if ( $handle ) {
 		fclose( $handle );
