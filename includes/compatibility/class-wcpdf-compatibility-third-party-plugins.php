@@ -41,6 +41,9 @@ class Third_Party_Plugins {
 		// WPC Bundles compatibility (add row classes)
 		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_wpc_product_bundles_classes' ), 10, 4 );
 
+		// YITH WooCommerce Product Bundles compatibility (add row classes)
+		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_yith_product_bundles_classes' ), 10, 4 );
+
 		// WooCommerce Chained Products compatibility (add row classes)
 		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 4 );
 
@@ -187,6 +190,45 @@ class Third_Party_Plugins {
 			$classes = $classes . ' bundled-item';
 		} elseif ( $bundled_items = wc_get_order_item_meta( $class_item_id, '_woosb_ids', true ) ) {
 			$classes = $classes . ' product-bundle';
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * YITH WooCommerce Product Bundles compatibility
+	 *
+	 * @param string $classes CSS classes for item row (tr)
+	 * @param string $document_type PDF Document type
+	 * @param object $order WC_Order order
+	 * @param int $item_id WooCommerce Item ID
+	 */
+	public function add_yith_product_bundles_classes( string $classes, string $document_type, object $order, int $item_id = 0 ): string {
+		if ( ! class_exists( 'YITH_WCPB' ) ) {
+			return $classes;
+		}
+
+		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
+
+		if ( empty( $item_id ) ) {
+			return $classes;
+		}
+
+		$product_id = (int) wc_get_order_item_meta( $item_id, '_product_id', true );
+		$product    = wc_get_product( $product_id );
+
+		if ( empty( $product ) ) {
+			return $classes;
+		}
+
+		$product_type      = $product->get_type();
+		$is_bundle_product = ( 'yith_bundle' === $product_type );
+		$is_bundle_item    = wc_get_order_item_meta( $item_id, '_bundled_by', true );
+
+		if ( $is_bundle_product ) {
+			return $classes . ' product-bundle';
+		} elseif ( $is_bundle_item ) {
+			return $classes . ' bundled-item';
 		}
 
 		return $classes;
