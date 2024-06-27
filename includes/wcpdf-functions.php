@@ -831,15 +831,15 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 }
 
 /**
- * Base64 encode image from URL or local path
+ * Base64 encode file from URL or local path
  *
  * @param string $src
  *
  * @return string|bool
  */
-function wpo_wcpdf_base64_encode_image( string $src ) {
-	$image_data = @file_get_contents( $src );
-	return base64_encode( $image_data ) ?? false;
+function wpo_wcpdf_base64_encode_file( string $src ) {
+	$file_data = @file_get_contents( $src );
+	return base64_encode( $file_data ) ?? false;
 }
 
 /**
@@ -899,7 +899,7 @@ function wpo_wcpdf_get_image_src_in_base64( string $src ): string {
 		return $src;
 	}
 
-	$image_base64 = wpo_wcpdf_base64_encode_image( $src );
+	$image_base64 = wpo_wcpdf_base64_encode_file( $src );
 
 	if ( ! $image_base64 ) {
 		wcpdf_log_error( 'Unable to encode header logo to base64.', 'critical' );
