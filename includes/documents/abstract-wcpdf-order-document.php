@@ -864,38 +864,11 @@ abstract class Order_Document {
 			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
 
 			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
-				// convert path to URL
-				if ( apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
-					$src = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $src );
-
-				// convert url to path
-				} elseif ( false !== strpos( $src, WP_CONTENT_URL ) ) {
-					$src = str_replace( trailingslashit( WP_CONTENT_URL ), trailingslashit( WP_CONTENT_DIR ), $src );
-				}
-
-				// last check
-				if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
-					wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
-					return;
-				}
-			}
-
-			$mime_type        = wpo_wcpdf_get_image_mime_type( $src );
-			$image_mime_types = apply_filters( 'wpo_wcpdf_header_logo_image_mime_types', array( 'image/png', 'image/jpeg', 'image/svg+xml', 'image/webp' ), $this );
-
-			if ( ! in_array( $mime_type, $image_mime_types, true ) ) {
-				wcpdf_log_error( 'Unsupported header logo mime type: ' . $mime_type, 'critical' );
+				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
 				return;
 			}
 
-			$image_base64 = wpo_wcpdf_base64_encode_image( $src );
-
-			if ( ! $image_base64 ) {
-				wcpdf_log_error( 'Unable to encode header logo to base64.', 'critical' );
-				return;
-			}
-
-			$image_src   = 'data:' . $mime_type . ';base64,' . $image_base64;
+			$image_src   = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
 			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
 
 			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );

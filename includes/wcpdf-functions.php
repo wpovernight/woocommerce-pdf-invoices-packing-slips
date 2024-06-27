@@ -880,3 +880,31 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 	}
 }
 
+/**
+ * Get image source in base64 format
+ *
+ * @param string $src
+ *
+ * @return string
+ */
+function wpo_wcpdf_get_image_src_in_base64( string $src ): string {
+	if ( empty( $src ) ) {
+		return $src;
+	}
+
+	$mime_type = wpo_wcpdf_get_image_mime_type( $src );
+
+	if ( empty( $mime_type ) ) {
+		wcpdf_log_error( 'Unable to determine image mime type for file: ' . $src, 'critical' );
+		return $src;
+	}
+
+	$image_base64 = wpo_wcpdf_base64_encode_image( $src );
+
+	if ( ! $image_base64 ) {
+		wcpdf_log_error( 'Unable to encode header logo to base64.', 'critical' );
+		return $src;
+	}
+
+	return 'data:' . $mime_type . ';base64,' . $image_base64;
+}
