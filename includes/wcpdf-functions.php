@@ -863,7 +863,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 
 	// Local path file check
 	} else {
-		if ( is_readable( $path ) ) {
+		if ( @is_readable( $path ) ) {
 			return true;
 		} else {
 			// Fallback to fopen if first check fails

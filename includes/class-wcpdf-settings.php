@@ -362,6 +362,8 @@ class Settings {
 			}
 
 		} catch ( \Throwable $th ) {
+			wcpdf_log_error( 'Error trying to generate document: ' . $th->getTraceAsString(), 'critical' );
+
 			wp_send_json_error(
 				array(
 					'error' => sprintf(
