@@ -870,8 +870,6 @@ abstract class Order_Document {
 
 			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
 
-		} else {
-			wcpdf_log_error( 'Header logo not set.', 'critical' );
 		}
 	}
 
