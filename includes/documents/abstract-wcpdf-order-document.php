@@ -823,7 +823,8 @@ abstract class Order_Document {
 		$header_logo_id = 0;
 
 		if ( ! empty( $this->settings['header_logo'] ) ) {
-			$header_logo_id = absint( $this->get_settings_text( 'header_logo', $header_logo_id, false ) );
+			$attachment_id  = $this->get_settings_text( 'header_logo', $header_logo_id, false );
+			$header_logo_id = is_numeric( $attachment_id ) ? absint( $attachment_id ) : 0;
 		}
 
 		return apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
