@@ -855,7 +855,15 @@ function wpo_wcpdf_base64_encode_file( string $src ) {
 function wpo_wcpdf_is_file_readable( string $path ): bool {
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
-		$response = wp_safe_remote_head( $path );
+		// Check if the URL is localhost
+		$parsed_url = parse_url( $path );
+		$args	    = array();
+		
+		if ( 'localhost' === $parsed_url['host'] || '127.0.0.1' === $parsed_url['host'] ) {
+			$args = array( 'sslverify' => false );
+		}
+		
+		$response = wp_safe_remote_head( $path, $args );
 
 		if ( is_wp_error( $response ) ) {
 			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
