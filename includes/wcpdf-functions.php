@@ -735,7 +735,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 	}
 
 	// Check if 'getimagesize' function exists and try to get mime type for local files
-	if ( function_exists( 'getimagesize' ) ) {
+	if ( function_exists( 'getimagesize' ) && ! filter_var( $src, FILTER_VALIDATE_URL ) ) {
 		$image_info = @getimagesize( $src );
 
 		if ( $image_info && isset( $image_info['mime'] ) ) {
