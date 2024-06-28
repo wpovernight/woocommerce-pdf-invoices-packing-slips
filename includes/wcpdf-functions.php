@@ -838,6 +838,10 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
  * @return string|bool
  */
 function wpo_wcpdf_base64_encode_file( string $src ) {
+	if ( empty( $string ) ) {
+		return false;
+	}
+	
 	$file_data = @file_get_contents( $src );
 	return base64_encode( $file_data ) ?? false;
 }
