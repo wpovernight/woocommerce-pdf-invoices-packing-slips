@@ -830,7 +830,7 @@ class Settings_Debug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'embed_images',
-					'description' => __( 'Embed images, especially if PNG files are having issues loading in your PDF. Please note that this option may significantly increase the file size.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Embed images only if you are experiencing issues with them loading in your PDF. Please note that this option can significantly increase the file size.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
