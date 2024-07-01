@@ -292,6 +292,11 @@ table.totals tr.payment_method {
 	display: none;
 }
 
+/* mPDF */
+.rtl {
+	direction: rtl;
+}
+
 /* Footer Imprint */
 /* mPDF footer styles are hooked via wpo_wcpdf_mpdf_premium_style_overrides() */
 #footer {
