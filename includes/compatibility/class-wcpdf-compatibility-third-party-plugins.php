@@ -200,7 +200,7 @@ class Third_Party_Plugins {
 	 *
 	 * @param string $classes CSS classes for item row (tr)
 	 * @param string $document_type PDF Document type
-	 * @param object $order WC_Order order
+	 * @param object $order \WC_Order order
 	 * @param int $item_id WooCommerce Item ID
 	 */
 	public function add_yith_product_bundles_classes( string $classes, string $document_type, object $order, int $item_id = 0 ): string {
@@ -226,13 +226,9 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
-		$product_type      = $product->get_type();
-		$is_bundle_product = ( 'yith_bundle' === $product_type );
-		$is_bundle_item    = wc_get_order_item_meta( $item_id, '_bundled_by', true );
-
-		if ( $is_bundle_product ) {
+		if ( 'yith_bundle' === $product->get_type() ) {
 			return $classes . ' product-bundle';
-		} elseif ( $is_bundle_item ) {
+		} elseif ( $item->get_meta( '_bundled_by', true ) ) {
 			return $classes . ' bundled-item';
 		}
 
