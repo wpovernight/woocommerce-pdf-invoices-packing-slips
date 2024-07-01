@@ -785,6 +785,26 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 		}
 	}
 
+	// Fetch the actual image data if MIME type is still unknown (remote files)
+	if ( empty( $mime_type ) && filter_var( $src, FILTER_VALIDATE_URL ) ) {
+		$image_data = @file_get_contents( $src );
+
+		if ( $image_data ) {
+			if ( function_exists( 'finfo_open' ) ) {
+				$finfo = finfo_open( FILEINFO_MIME_TYPE );
+
+				if ( $finfo ) {
+					$mime_type = finfo_buffer( $finfo, $image_data );
+					finfo_close( $finfo );
+				} else {
+					wcpdf_log_error( 'Fileinfo failed to open for buffer.' );
+				}
+			}
+		} else {
+			wcpdf_log_error( 'Failed to fetch image data for URL: ' . $src );
+		}
+	}
+
 	// Determine using WP functions
 	if ( empty( $mime_type ) ) {
 		$path      = wp_parse_url( $src, PHP_URL_PATH );
