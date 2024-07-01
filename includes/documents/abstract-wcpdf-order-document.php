@@ -859,9 +859,9 @@ abstract class Order_Document {
 			}
 
 			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
-			$src = preg_replace( '/^[A-Z]:/i', '', $src ); // removes Windows drive letter
 			
-			if ( ! apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) { // fix URL using path
+			// fix URLs using path
+			if ( ! apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
 				$path = preg_replace( '/^https?:\/\//', '', $src ); // removes http(s)://
 				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
 			}
