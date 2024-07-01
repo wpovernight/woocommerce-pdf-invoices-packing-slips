@@ -849,8 +849,7 @@ abstract class Order_Document {
 
 		if ( $attachment_id > 0 ) {
 			$company         = $this->get_shop_name();
-			$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
-			$attachment_src  = $attachment[0] ?? '';
+			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 
 			if ( empty( $attachment_src ) || empty( $attachment_path ) ) {
