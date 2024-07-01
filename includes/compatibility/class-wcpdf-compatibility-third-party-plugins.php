@@ -228,7 +228,7 @@ class Third_Party_Plugins {
 
 		if ( 'yith_bundle' === $product->get_type() ) {
 			return $classes . ' product-bundle';
-		} elseif ( $item->get_meta( '_bundled_by', true ) ) {
+		} elseif ( ! empty( $item->get_meta( '_bundled_by', true ) ) ) {
 			return $classes . ' bundled-item';
 		}
 
