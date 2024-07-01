@@ -214,8 +214,13 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
-		$product_id = (int) wc_get_order_item_meta( $item_id, '_product_id', true );
-		$product    = wc_get_product( $product_id );
+		$item = new \WC_Order_Item_Product( $item_id );
+
+		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
+			return $classes;
+		}
+
+		$product = $item->get_product();
 
 		if ( empty( $product ) ) {
 			return $classes;
