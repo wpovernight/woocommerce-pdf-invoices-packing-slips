@@ -329,10 +329,11 @@ class Third_Party_Plugins {
 	 * @return array
 	 */
 	function hpos_admin_search_filters( array $options ): array {
+		$all = $options['all'];
 		unset( $options['all'] );
 		$options['invoice_number'] = __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' );
-		$options['all']            = __( 'All', 'woocommerce-pdf-invoices-packing-slips' );
-		
+		$options['all'] = $all;
+
 		return $options;
 	}
 	
