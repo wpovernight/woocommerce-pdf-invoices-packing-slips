@@ -510,7 +510,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
  */
 function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
 	if ( empty( $html ) ) {
-		return '';
+		return $html;
 	}
 
 	// default allowed tags
@@ -583,11 +583,22 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	}
 
 	libxml_use_internal_errors( true ); // suppress malformed HTML errors
-	@$dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	@$dom->loadHTML( '<div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 	libxml_clear_errors();
 
-	if ( empty( $dom ) ) {
-		return '';
+	$extra_wrapper = $dom->getElementsByTagName( 'div' )->item( 0 );
+	$content       = ! empty( $extra_wrapper ) ? $extra_wrapper->parentNode->removeChild( $extra_wrapper ) : null;
+
+	if ( ! empty( $content ) ) {
+		// Clear DOM by removing all nodes from it.
+		while ( $dom->firstChild ) {
+			$dom->removeChild( $dom->firstChild );
+		}
+
+		// Append the content to the DOM to remove the extra DIV wrapper.
+		while ( $content->firstChild ) {
+			$dom->appendChild( $content->firstChild );
+		}
 	}
 
 	$xpath = new \DOMXPath( $dom );
@@ -626,7 +637,7 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		return '';
 	}
 
-	return $html;
+	return trim( $html );
 }
 
 /**
@@ -684,5 +695,29 @@ function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, array
 	}
 
 	return $wp_query_args;
+}
+
+/**
+ * Get multilingual languages.
+ *
+ * @return array
+ */
+function wpo_wcpdf_get_multilingual_languages(): array {
+	$languages = array();
+
+	// refers to WPML or Polylang only
+	if ( function_exists( 'icl_get_languages' ) ) {
+		// use this instead of function call for development outside of WPML
+		// $icl_get_languages = 'a:3:{s:2:"en";a:8:{s:2:"id";s:1:"1";s:6:"active";s:1:"1";s:11:"native_name";s:7:"English";s:7:"missing";s:1:"0";s:15:"translated_name";s:7:"English";s:13:"language_code";s:2:"en";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/en.png";s:3:"url";s:23:"http://yourdomain/about";}s:2:"fr";a:8:{s:2:"id";s:1:"4";s:6:"active";s:1:"0";s:11:"native_name";s:9:"Français";s:7:"missing";s:1:"0";s:15:"translated_name";s:6:"French";s:13:"language_code";s:2:"fr";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/fr.png";s:3:"url";s:29:"http://yourdomain/fr/a-propos";}s:2:"it";a:8:{s:2:"id";s:2:"27";s:6:"active";s:1:"0";s:11:"native_name";s:8:"Italiano";s:7:"missing";s:1:"0";s:15:"translated_name";s:7:"Italian";s:13:"language_code";s:2:"it";s:16:"country_flag_url";s:43:"http://yourdomain/wpmlpath/res/flags/it.png";s:3:"url";s:26:"http://yourdomain/it/circa";}}';
+		// $icl_get_languages = unserialize($icl_get_languages);
+
+		$icl_get_languages = icl_get_languages( 'skip_missing=0' );
+
+		foreach ( $icl_get_languages as $lang => $data ) {
+			$languages[ $data['language_code'] ] = $data['native_name'];
+		}
+	}
+
+	return apply_filters( 'wpo_wcpdf_multilingual_languages', $languages );
 }
 
