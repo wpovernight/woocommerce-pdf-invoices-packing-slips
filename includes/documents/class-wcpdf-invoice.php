@@ -387,22 +387,6 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
-				'id'			=> 'log_number_generation',
-				'title'			=> __( 'Log invoice number generation', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> $this->type,
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'log_number_generation',
-					'description'	=> sprintf(
-						/* translators: here link */
-						__( 'Enables the invoice number generation logs %s. Helpful for debugging numbering issues.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="'.esc_url( admin_url( 'admin.php?page=wc-status&tab=logs' ) ).'">'.__( 'here', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
-					),
-				)
-			),
-			array(
-				'type'			=> 'setting',
 				'id'			=> 'my_account_buttons',
 				'title'			=> __( 'Allow My Account invoice download', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
