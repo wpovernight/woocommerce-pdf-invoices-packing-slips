@@ -740,8 +740,6 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 		if ( $image_info && isset( $image_info['mime'] ) ) {
 			$mime_type = $image_info['mime'];
-		} else {
-			wcpdf_log_error( 'getimagesize failed for file: ' . $src );
 		}
 	}
 
@@ -752,8 +750,6 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 		if ( $finfo ) {
 			$mime_type = finfo_file( $finfo, $src );
 			finfo_close( $finfo );
-		} else {
-			wcpdf_log_error( 'Fileinfo failed to open for file: ' . $src );
 		}
 	}
 
@@ -777,11 +773,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 		if ( $headers ) {
 			if ( isset( $headers['Content-Type'] ) ) {
 				$mime_type = is_array( $headers['Content-Type'] ) ? $headers['Content-Type'][0] : $headers['Content-Type'];
-			} else {
-				wcpdf_log_error( 'Content-Type header not found for URL: ' . $src );
 			}
-		} else {
-			wcpdf_log_error( 'Failed to get headers for URL: ' . $src );
 		}
 	}
 
@@ -796,12 +788,8 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 				if ( $finfo ) {
 					$mime_type = finfo_buffer( $finfo, $image_data );
 					finfo_close( $finfo );
-				} else {
-					wcpdf_log_error( 'Fileinfo failed to open for buffer.' );
 				}
 			}
-		} else {
-			wcpdf_log_error( 'Failed to fetch image data for URL: ' . $src );
 		}
 	}
 
@@ -809,11 +797,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 	if ( empty( $mime_type ) ) {
 		$path      = wp_parse_url( $src, PHP_URL_PATH );
 		$file_info = wp_check_filetype( $path );
-		$mime_type = $file_info['type'] ?? 'application/octet-stream';
-
-		if ( 'application/octet-stream' === $mime_type ) {
-			wcpdf_log_error( 'Unknown file extension for file: ' . $src );
-		}
+		$mime_type = $file_info['type'] ?? '';
 	}
 
 	// Last chance, determine from file extension
@@ -841,9 +825,6 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 			case 'svg':
 				$mime_type = 'image/svg+xml';
 				break;
-			default:
-				$mime_type = 'application/octet-stream';
-				wcpdf_log_error( 'Unknown file extension: ' . $extension . ' for file: ' . $src );
 		}
 	}
 
