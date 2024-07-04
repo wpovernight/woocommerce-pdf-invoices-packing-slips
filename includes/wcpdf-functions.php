@@ -875,21 +875,32 @@ function wpo_wcpdf_base64_encode_file( string $src ) {
 function wpo_wcpdf_is_file_readable( string $path ): bool {
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
-		// Check if the URL is localhost
 		$parsed_url = parse_url( $path );
 		$args	    = array();
 		
-		if ( 'localhost' === $parsed_url['host'] || '127.0.0.1' === $parsed_url['host'] ) {
-			$args = array( 'sslverify' => false );
+		// Check if the URL is localhost
+		if (
+			'localhost' === $parsed_url['host']                                             ||
+			'127.0.0.1' === $parsed_url['host']                                             ||
+			false !== strpos( $parsed_url['host'], '192.168.' )                             ||
+			false !== strpos( $parsed_url['host'], '10.' )                                  ||
+			( preg_match( '/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $parsed_url['host'] ) === 1 ) ||
+			false !== strpos( $parsed_url['host'], '.dev' )                                 ||
+			false !== strpos( $parsed_url['host'], '.test' )                                ||
+			false !== strpos( $parsed_url['host'], '.local' )                               ||
+			getenv( 'DISABLE_SSL_VERIFY' ) === 'true'
+		) {
+			$args['sslverify'] = false;
 		}
 		
+		$args     = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
 		$response = wp_safe_remote_head( $path, $args );
-
+		
 		if ( is_wp_error( $response ) ) {
 			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
 			return false;
 		}
-
+		
 		$status_code = wp_remote_retrieve_response_code( $response );
 		return ( $status_code === 200 );
 
