@@ -854,6 +854,10 @@ function wpo_wcpdf_base64_encode_file( string $src ) {
  * @return bool
  */
 function wpo_wcpdf_is_file_readable( string $path ): bool {
+	if ( empty( $path ) ) {
+		return false;
+	}
+	
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
 		$parsed_url = parse_url( $path );
