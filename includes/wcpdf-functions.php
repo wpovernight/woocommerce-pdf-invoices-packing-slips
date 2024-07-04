@@ -882,12 +882,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 		if (
 			'localhost' === $parsed_url['host']                                             ||
 			'127.0.0.1' === $parsed_url['host']                                             ||
-			false !== strpos( $parsed_url['host'], '192.168.' )                             ||
-			false !== strpos( $parsed_url['host'], '10.' )                                  ||
 			( preg_match( '/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $parsed_url['host'] ) === 1 ) ||
-			false !== strpos( $parsed_url['host'], '.dev' )                                 ||
-			false !== strpos( $parsed_url['host'], '.test' )                                ||
-			false !== strpos( $parsed_url['host'], '.local' )                               ||
 			getenv( 'DISABLE_SSL_VERIFY' ) === 'true'
 		) {
 			$args['sslverify'] = false;
