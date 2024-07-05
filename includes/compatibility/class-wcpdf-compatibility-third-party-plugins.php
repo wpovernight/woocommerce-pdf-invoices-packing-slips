@@ -368,7 +368,7 @@ class Third_Party_Plugins {
 	 * @return array
 	 */
 	function hpos_admin_search_filters( array $options ): array {
-		if ( isset( get_option( 'wpo_wcpdf_documents_settings_invoice', array() )['invoice_number_search'] ) ) {
+		if ( WPO_WCPDF()->admin->invoice_number_search_enabled() ) {
 			$all = $options['all'];
 			unset( $options['all'] );
 			$options['invoice_number'] = __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' );
