@@ -916,10 +916,10 @@ abstract class Order_Document_Methods extends Order_Document {
 		foreach ( $totals as $key => $total ) {
 			$label = $total['label'];
 			$colon = strrpos( $label, ':' );
-			if( $colon !== false ) {
+			if ( $colon !== false ) {
 				$label = substr_replace( $label, '', $colon, 1 );
 			}
-			$totals[$key]['label'] = $label;
+			$totals[ $key ]['label'] = __( $label, 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
 		// Fix order_total for refunded orders
