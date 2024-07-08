@@ -120,6 +120,7 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		</tr>
 
 		<?php
+			$server_configs = apply_filters( 'wpo_wcpdf_advanced_status_server_configs', $server_configs );
 			foreach ( $server_configs as $label => $server_config ) :
 				if ( $server_config['result'] ) {
 					$background = '#68de7c'; // green
@@ -157,6 +158,8 @@ if ( ! $server_configs['PHP version']['result'] ) {
 		<?php endforeach; ?>
 	</tbody>
 </table>
+
+<?php do_action( 'wpo_wcpdf_after_system_status_table' ); ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
 	<thead>

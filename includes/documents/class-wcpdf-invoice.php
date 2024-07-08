@@ -387,22 +387,6 @@ class Invoice extends Order_Document_Methods {
 			),
 			array(
 				'type'			=> 'setting',
-				'id'			=> 'log_number_generation',
-				'title'			=> __( 'Log invoice number generation', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> $this->type,
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'log_number_generation',
-					'description'	=> sprintf(
-						/* translators: here link */
-						__( 'Enables the invoice number generation logs %s. Helpful for debugging numbering issues.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="'.esc_url( admin_url( 'admin.php?page=wc-status&tab=logs' ) ).'">'.__( 'here', 'woocommerce-pdf-invoices-packing-slips' ).'</a>'
-					),
-				)
-			),
-			array(
-				'type'			=> 'setting',
 				'id'			=> 'my_account_buttons',
 				'title'			=> __( 'Allow My Account invoice download', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
@@ -457,7 +441,7 @@ class Invoice extends Order_Document_Methods {
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'invoice_number_search',
-					'description'   => __( 'Can potentially slow down the search process.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'   => __( 'The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href="https://woocommerce.com/document/high-performance-order-storage/" target="_blank">HPOS</a> feature, allowing you to search orders by invoice numbers using the search type selector.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
