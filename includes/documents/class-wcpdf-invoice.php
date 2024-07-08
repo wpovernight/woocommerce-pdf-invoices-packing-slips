@@ -441,7 +441,7 @@ class Invoice extends Order_Document_Methods {
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'invoice_number_search',
-					'description'   => __( 'Can potentially slow down the search process.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'   => __( 'The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href="https://woocommerce.com/document/high-performance-order-storage/" target="_blank">HPOS</a> feature, allowing you to search orders by invoice numbers using the search type selector.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
