@@ -8,7 +8,7 @@ $php_mem_limit  = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limi
 $gmagick        = extension_loaded( 'gmagick' );
 $imagick        = extension_loaded( 'imagick' );
 
-$server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
+$server_configs = array(
 	'PHP version' => array(
 		'required' => __( '7.2+ (7.4 or higher recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => PHP_VERSION,
@@ -57,7 +57,7 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	),
 	'GMagick or IMagick' => array(
 		'required' => __( 'Better with transparent PNG images', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => $imagick ? 'IMagick ' . phpversion( 'imagick' ) : ( $gmagick ? 'GMagick ' . phpversion( 'gmagick' ) : '' ),
+		'value'    => $imagick ? 'IMagick ' . phpversion( 'imagick' ) : ( $gmagick ? 'GMagick ' . phpversion( 'gmagick' ) : null ),
 		'result'   => $gmagick || $imagick,
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
@@ -91,7 +91,23 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'result'   => function_exists( 'base64_decode' ),
 		'fallback' => __( 'base64_decode disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
-) );
+);
+
+if ( $imagick ) {
+	$gmagick_imagick_position = array_search( 'GMagick or IMagick', array_keys( $server_configs ) ) + 1;
+	$image_magick_config      = array(
+		'ImageMagick' => array(
+			'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => ( $imagick && class_exists( '\\Imagick' ) ) ? esc_attr( \Imagick::getVersion()['versionString'] ) : null,
+			'result'   => $imagick,
+			'fallback' => __( 'ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+	);
+
+	$server_configs = array_slice( $server_configs, 0, $gmagick_imagick_position, true ) + $image_magick_config + array_slice( $server_configs, $gmagick_imagick_position, null, true );
+}
+
+$server_configs = apply_filters( 'wpo_wcpdf_server_configs', $server_configs );
 
 if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' ) ) || ( $zop = extension_loaded( 'Zend OPcache' ) ) || ( $op = extension_loaded( 'opcache' ) ) ) {
 	$server_configs['opcache']['result'] = true;
