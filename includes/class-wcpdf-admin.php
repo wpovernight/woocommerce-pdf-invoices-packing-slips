@@ -797,6 +797,7 @@ class Admin {
 			}
 		}
 
+		// Independent documents can exist on their own without requiring another document type to be created first.
 		$independent_documents = apply_filters( 'wpo_wcpdf_document_data_meta_box_independent_documents', array( 'invoice', 'packing-slip' ) );
 		$data                  = apply_filters( 'wpo_wcpdf_document_data_meta_box_document_data_fields', $data, $document );
 		$data                  = $this->get_current_values_for_document( $document, $data );
