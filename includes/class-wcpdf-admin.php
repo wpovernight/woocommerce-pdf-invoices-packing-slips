@@ -784,8 +784,16 @@ class Admin {
 			$document_title = $document->get_title();
 
 			$data = array(
-				'number' => array( 'label' => $document_title . ' ' . __( 'Number', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
-				'date'   => array( 'label' => $document_title . ' ' . __( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+				'number' => array( 'label' => sprintf(
+					/* translators: %s: Document type */
+					__( '%s Number', 'woocommerce-pdf-invoices-packing-slips' ),
+					$document_title
+				) . ':' ),
+				'date'   => array( 'label' => sprintf(
+					/* translators: %s: Document type */
+					__( '%s Date', 'woocommerce-pdf-invoices-packing-slips' ),
+					$document_title
+				) . ':' ),
 			);
 
 			if ( 'invoice' === $document->get_type() ) {
