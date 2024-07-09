@@ -916,10 +916,20 @@ abstract class Order_Document_Methods extends Order_Document {
 		foreach ( $totals as $key => $total ) {
 			$label = $total['label'];
 			$colon = strrpos( $label, ':' );
-			if( $colon !== false ) {
+
+			if ( false !== $colon ) {
 				$label = substr_replace( $label, '', $colon, 1 );
 			}
-			$totals[$key]['label'] = $label;
+
+			$textdomain = 'woocommerce-pdf-invoices-packing-slips';
+
+			if ( ! empty( $label ) ) {
+				if ( function_exists( 'WPO_WCPDF_Pro' ) && isset( \WPO_WCPDF_Pro()->multilingual_full ) && is_callable( array( \WPO_WCPDF_Pro()->multilingual_full, 'maybe_get_string_translation' ) ) ) {
+					$totals[ $key ]['label'] = \WPO_WCPDF_Pro()->multilingual_full->maybe_get_string_translation( $label, $textdomain );
+				} else {
+					$totals[ $key ]['label'] = __( $label, $textdomain );
+				}
+			}
 		}
 
 		// Fix order_total for refunded orders
