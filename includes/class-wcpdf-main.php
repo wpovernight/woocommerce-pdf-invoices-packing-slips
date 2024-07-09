@@ -124,6 +124,8 @@ class Main {
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
 
 		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date' ), 10, 2 );
+
+		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 	}
 
 	/**
@@ -1310,6 +1312,22 @@ class Main {
 			/* translators: 1. document title, 2. creation trigger */
 			$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $triggers[$trigger] );
+			$this->log_to_order_notes( $note, $document );
+		}
+	}
+
+	/**
+	 * Log document deletion to order notes.
+	 *
+	 * @param object $document
+	 *
+	 * @return void
+	 */
+	public function log_document_deletion_to_order_notes( object $document ): void {
+		if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+			/* translators: document title */
+			$message = __( 'PDF %s deleted.', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title() );
 			$this->log_to_order_notes( $note, $document );
 		}
 	}
