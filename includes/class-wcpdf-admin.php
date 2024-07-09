@@ -575,12 +575,12 @@ class Admin {
 			$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 			$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 			$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
-			$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
-			$document_settings     = get_option( 'wpo_wcpdf_documents_settings_'.$document->get_type() ); // $document-settings might be not updated with the last settings
+			$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : array();
+			$document_settings     = get_option( 'wpo_wcpdf_documents_settings_' . $document->get_type() ); // $document-settings might be not updated with the last settings
 			$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
 			$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
 			$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
-			$class                 = [ $document->get_type() ];
+			$class                 = array( $document->get_type() );
 
 			if ( $document_exists ) {
 				$class[] = 'exists';
@@ -614,10 +614,10 @@ class Admin {
 				$alt                   = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
 				$title                 = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
 				$exists                = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
-				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="'.$data['mark_printed_url'].'">'.__( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ).'</a></p>' : '';
+				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="' . $data['mark_printed_url'] . '">' . __( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>' : '';
 				$printed               = isset( $data['printed'] ) && $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
-				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="'.$data['unmark_printed_url'].'">'.__( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
-				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unmark_printed.'</p>' : '';
+				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="' . $data['unmark_printed_url'] . '">' . __( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>' : '';
+				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ) . '' . $unmark_printed . '</p>' : '';
 
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',
