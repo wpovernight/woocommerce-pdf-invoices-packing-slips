@@ -798,9 +798,21 @@ class Admin {
 
 			if ( 'invoice' === $document->get_type() ) {
 				$data = array_merge( $data, array(
-					'display_date'     => array( 'label' => $document_title . ' ' . __( 'Display date', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
-					'creation_trigger' => array( 'label' => $document_title . ' ' . __( 'Created via', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
-					'notes'            => array( 'label' => $document_title . ' ' . __( 'Notes (printed in the invoice)', 'woocommerce-pdf-invoices-packing-slips' ) . ':' ),
+					'display_date'     => array( 'label' => sprintf(
+						/* translators: %s: Document type */
+						__( '%s Display date', 'woocommerce-pdf-invoices-packing-slips' ),
+						$document_title
+					) . ':' ),
+					'creation_trigger' => array( 'label' => sprintf(
+						/* translators: %s: Document type */
+						__( '%s Created via', 'woocommerce-pdf-invoices-packing-slips' ),
+						$document_title
+					) . ':' ),
+					'notes'            => array( 'label' => sprintf(
+						/* translators: %s: Document type */
+						__( '%s Notes (printed in the invoice)', 'woocommerce-pdf-invoices-packing-slips' ),
+						$document_title
+					) . ':' ),
 				) );
 			}
 		}
