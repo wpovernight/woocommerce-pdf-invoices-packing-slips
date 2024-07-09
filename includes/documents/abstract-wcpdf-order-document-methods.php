@@ -916,7 +916,8 @@ abstract class Order_Document_Methods extends Order_Document {
 		foreach ( $totals as $key => $total ) {
 			$label = $total['label'];
 			$colon = strrpos( $label, ':' );
-			if ( $colon !== false ) {
+
+			if ( false !== $colon ) {
 				$label = substr_replace( $label, '', $colon, 1 );
 			}
 
