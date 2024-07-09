@@ -1304,7 +1304,6 @@ class Admin {
 		$document_types = array_map( 'sanitize_text_field', $_REQUEST['document_types'] );
 		$documents_data = array();
 
-		ob_start();
 		foreach ( $document_types as $document_type ) {
 			if ( ! wpo_wcpdf_is_document_type_valid( $document_type ) ) {
 				continue;
@@ -1312,12 +1311,11 @@ class Admin {
 
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 			if ( $document && $document->exists() ) {
+				ob_start();
 				$this->output_number_date_edit_fields( $document );
-				$documents_data[ $document_type ] = ob_get_contents();
-				ob_clean();
+				$documents_data[ $document_type ] = ob_get_clean();
 			}
 		}
-		ob_end_clean();
 
 		if ( ! empty( $documents_data ) ) {
 			wp_send_json_success( $documents_data );
