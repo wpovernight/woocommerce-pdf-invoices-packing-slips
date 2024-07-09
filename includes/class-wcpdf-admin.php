@@ -757,17 +757,17 @@ class Admin {
 		}
 
 		if ( ! empty( $data['creation_trigger'] ) ) {
-			$document_triggers = WPO_WCPDF()->main->get_document_triggers();
-			$creation_trigger  = $document->get_creation_trigger();
+			$document_triggers           = WPO_WCPDF()->main->get_document_triggers();
+			$creation_trigger            = $document->get_creation_trigger();
 			$current['creation_trigger'] = array(
-				'value' => isset( $document_triggers[$creation_trigger] ) ? $document_triggers[$creation_trigger] : '',
+				'value' => isset( $document_triggers[ $creation_trigger ] ) ? $document_triggers[ $creation_trigger ] : '',
 				'name'  => "_wcpdf_{$document->slug}_creation_trigger",
 			);
 		}
 
 		foreach ( $data as $key => $value ) {
 			if ( isset( $current[$key] ) ) {
-				$data[$key] = array_merge( $current[$key], $value );
+				$data[ $key ] = array_merge( $current[ $key ], $value );
 			}
 		}
 
