@@ -75,6 +75,8 @@ class Admin {
 		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
 		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
 		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
+
+		add_action( 'wp_ajax_wpo_fetch_document_data', array( $this, 'ajax_fetch_pdf_document_data' ) );
 	}
 
 	// display review admin notice after 100 pdf downloads
@@ -562,41 +564,43 @@ class Admin {
 		$documents        = WPO_WCPDF()->documents->get_documents();
 
 		foreach ( $documents as $document ) {
-			$document_title = $document->get_title();
-			$document       = wcpdf_get_document( $document->get_type(), $order );
+			$document = wcpdf_get_document( $document->get_type(), $order );
 
-			if ( $document ) {
-				$document_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
-				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-				$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
-				$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
-				$document_settings     = get_option( 'wpo_wcpdf_documents_settings_'.$document->get_type() ); // $document-settings might be not updated with the last settings
-				$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
-				$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
-				$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
-				$class                 = [ $document->get_type() ];
-
-				if ( $document_exists ) {
-					$class[] = 'exists';
-				}
-				if ( $document_printed ) {
-					$class[] = 'printed';
-				}
-
-				$meta_box_actions[$document->get_type()] = array(
-					'url'                   => esc_url( $document_url ),
-					'alt'                   => "PDF " . $document_title,
-					'title'                 => "PDF " . $document_title,
-					'exists'                => $document_exists,
-					'printed'               => $document_printed,
-					'printed_data'          => $document_printed_data,
-					'unmark_printed_url'    => $unmark_printed_url,
-					'manually_mark_printed' => $manually_mark_printed,
-					'mark_printed_url'      => $mark_printed_url,
-					'class'                 => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
-				);
+			if ( ! $document ) {
+				continue;
 			}
+
+			$document_title        = $document->get_title();
+			$document_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+			$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+			$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+			$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+			$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : array();
+			$document_settings     = get_option( 'wpo_wcpdf_documents_settings_' . $document->get_type() ); // $document-settings might be not updated with the last settings
+			$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
+			$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
+			$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
+			$class                 = array( $document->get_type() );
+
+			if ( $document_exists ) {
+				$class[] = 'exists';
+			}
+			if ( $document_printed ) {
+				$class[] = 'printed';
+			}
+
+			$meta_box_actions[ $document->get_type() ] = array(
+				'url'                   => esc_url( $document_url ),
+				'alt'                   => 'PDF ' . $document_title,
+				'title'                 => 'PDF ' . $document_title,
+				'exists'                => $document_exists,
+				'printed'               => $document_printed,
+				'printed_data'          => $document_printed_data,
+				'unmark_printed_url'    => $unmark_printed_url,
+				'manually_mark_printed' => $manually_mark_printed,
+				'mark_printed_url'      => $mark_printed_url,
+				'class'                 => apply_filters( 'wpo_wcpdf_action_button_class', implode( ' ', $class ), $document ),
+			);
 		}
 
 		$meta_box_actions = apply_filters( 'wpo_wcpdf_meta_box_actions', $meta_box_actions, $order->get_id() );
@@ -610,10 +614,10 @@ class Admin {
 				$alt                   = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
 				$title                 = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
 				$exists                = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
-				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="'.$data['mark_printed_url'].'">'.__( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ).'</a></p>' : '';
+				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="' . $data['mark_printed_url'] . '">' . __( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>' : '';
 				$printed               = isset( $data['printed'] ) && $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
-				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="'.$data['unmark_printed_url'].'">'.__( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
-				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unmark_printed.'</p>' : '';
+				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="' . $data['unmark_printed_url'] . '">' . __( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>' : '';
+				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ) . '' . $unmark_printed . '</p>' : '';
 
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',
@@ -716,28 +720,7 @@ class Admin {
 		do_action( 'wpo_wcpdf_meta_box_start', $order, $this );
 
 		if ( $invoice ) {
-			// data
-			$data = array(
-				'number' => array(
-					'label' => __( 'Invoice number:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'date' => array(
-					'label' => __( 'Invoice date:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'display_date' =>  array(
-					'label' => __( 'Invoice display date:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'creation_trigger' =>  array(
-					'label' => __( 'Invoice created via:', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-				'notes' => array(
-					'label' => __( 'Notes (printed in the invoice):', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-
-			);
-			// output
-			$this->output_number_date_edit_fields( $invoice, $data );
-
+			$this->output_number_date_edit_fields( $invoice );
 		}
 
 		do_action( 'wpo_wcpdf_meta_box_end', $order, $this );
@@ -774,167 +757,87 @@ class Admin {
 		}
 
 		if ( ! empty( $data['creation_trigger'] ) ) {
-			$document_triggers = WPO_WCPDF()->main->get_document_triggers();
-			$creation_trigger  = $document->get_creation_trigger();
+			$document_triggers           = WPO_WCPDF()->main->get_document_triggers();
+			$creation_trigger            = $document->get_creation_trigger();
 			$current['creation_trigger'] = array(
-				'value' => isset( $document_triggers[$creation_trigger] ) ? $document_triggers[$creation_trigger] : '',
+				'value' => isset( $document_triggers[ $creation_trigger ] ) ? $document_triggers[ $creation_trigger ] : '',
 				'name'  => "_wcpdf_{$document->slug}_creation_trigger",
 			);
 		}
 
 		foreach ( $data as $key => $value ) {
 			if ( isset( $current[$key] ) ) {
-				$data[$key] = array_merge( $current[$key], $value );
+				$data[ $key ] = array_merge( $current[ $key ], $value );
 			}
 		}
 
 		return apply_filters( 'wpo_wcpdf_current_values_for_document', $data, $document );
 	}
 
-	public function output_number_date_edit_fields( $document, $data ) {
-		if ( empty( $document ) || empty( $data ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
+	public function output_number_date_edit_fields( object $document, array $data = array() ): void {
+		if ( empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
 			return;
 		}
-		$data = $this->get_current_values_for_document( $document, $data );
-		?>
-		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
-			<section class="wcpdf-data-fields-section number-date">
-				<!-- Title -->
-				<h4>
-					<?php echo wp_kses_post( $document->get_title() ); ?>
-					<?php if ( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) && $this->user_can_manage_document( $document->get_type() ) ) : ?>
-						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
-						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
-						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
-					<?php endif; ?>
-				</h4>
 
-				<!-- Read only -->
-				<div class="read-only">
-					<?php if ( $document->exists() ) : ?>
-						<?php if ( isset( $data['number'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
-							<p class="form-field <?= esc_attr( $data['number']['name'] ); ?>_field">
-								<p>
-									<span><strong><?= wp_kses_post( $data['number']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['number']['formatted'] ); ?></span>
-								</p>
-							</p>
-						</div>
-						<?php endif; ?>
-						<?php if( isset( $data['date'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-date">
-							<p class="form-field form-field-wide">
-								<p>
-									<span><strong><?= wp_kses_post( $data['date']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['date']['formatted'] ); ?></span>
-								</p>
-							</p>
-						</div>
-						<?php endif; ?>
-						<div class="pdf-more-details" style="display:none;">
-							<?php if ( isset( $data['display_date'] ) ) : ?>
-							<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
-								<p class="form-field form-field-wide">
-									<p>
-										<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
-										<span><?= esc_attr( $data['display_date']['value'] ); ?></span>
-									</p>
-								</p>
-							</div>
-							<?php endif; ?>
-							<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
-							<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
-								<p class="form-field form-field-wide">
-									<p>
-										<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
-										<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
-									</p>
-								</p>
-							</div>
-							<?php endif; ?>
-						</div>
-						<?php if ( isset( $data['display_date'] ) || isset( $data['creation_trigger'] ) ) : ?>
-							<div>
-								<a href="#" class="view-more"><?php _e( 'View more details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-								<a href="#" class="hide-details" style="display:none;"><?php _e( 'Hide details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-							</div>
-						<?php endif; ?>
-						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
-					<?php else : ?>
-						<?php /* translators: document title */ ?>
-						<?php
-						if ( $this->user_can_manage_document( $document->get_type() ) ) {
-							printf(
-								'<span class="wpo-wcpdf-set-date-number button">%s</span>',
-								sprintf(
-									/* translators: document title */
-									esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
-									wp_kses_post( $document->get_title() )
-								)
-							);
-						} else {
-							printf( '<p>%s</p>', esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ) );
-						}
-						?>
+		// Go for default data.
+		if ( empty( $data ) ) {
+			$document_title = $document->get_title();
 
-					<?php endif; ?>
-				</div>
+			$data = array(
+				'number' => array( 'label' => sprintf(
+					/* translators: %s: Document title */
+					__( '%s Number', 'woocommerce-pdf-invoices-packing-slips' ),
+					$document_title
+				) . ':' ),
+				'date'   => array( 'label' => sprintf(
+					/* translators: %s: Document title */
+					__( '%s Date', 'woocommerce-pdf-invoices-packing-slips' ),
+					$document_title
+				) . ':' ),
+			);
 
-				<!-- Editable -->
-				<div class="editable">
-					<?php if( isset( $data['number'] ) ) : ?>
-					<p class="form-field <?= esc_attr( $data['number']['name'] ); ?>_field">
-						<label for="<?= esc_attr( $data['number']['name'] ); ?>"><?= wp_kses_post( $data['number']['label'] ); ?></label>
-						<input type="text" class="short" style="" name="<?= esc_attr( $data['number']['name'] ); ?>" id="<?= esc_attr( $data['number']['name'] ); ?>" value="<?= esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?= esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
-					</p>
-					<?php endif; ?>
-					<?php if( isset( $data['date'] ) ) : ?>
-					<p class="form-field form-field-wide">
-						<label for="<?= esc_attr( $data['date']['name'] ); ?>[date]"><?= wp_kses_post( $data['date']['label'] ); ?></label>
-						<input type="text" class="date-picker-field" name="<?= esc_attr( $data['date']['name'] ); ?>[date]" id="<?= esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?= esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce' ); ?>" name="<?= esc_attr( $data['date']['name'] ); ?>[hour]" id="<?= esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?= esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce' ); ?>" name="<?= esc_attr( $data['date']['name'] ); ?>[minute]" id="<?= esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?= esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
-					</p>
-					<?php endif; ?>
-				</div>
+			if ( 'invoice' === $document->get_type() ) {
+				$data = array_merge( $data, array(
+					'display_date'     => array( 'label' => sprintf(
+						/* translators: %s: Document title */
+						__( '%s Display date', 'woocommerce-pdf-invoices-packing-slips' ),
+						$document_title
+					) . ':' ),
+					'creation_trigger' => array( 'label' => sprintf(
+						/* translators: %s: Document title */
+						__( '%s Created via', 'woocommerce-pdf-invoices-packing-slips' ),
+						$document_title
+					) . ':' ),
+					'notes'            => array( 'label' => sprintf(
+						/* translators: %s: Document title */
+						__( '%s Notes (printed in the document)', 'woocommerce-pdf-invoices-packing-slips' ),
+						$document_title
+					) . ':' ),
+				) );
+			}
+		}
 
-				<!-- Document Notes -->
-				<?php if( array_key_exists( 'notes', $data ) ) : ?>
+		// Independent documents can exist on their own without requiring another document type to be created first.
+		$independent_documents = apply_filters( 'wpo_wcpdf_document_data_meta_box_independent_documents', array( 'invoice', 'packing-slip' ) );
+		$data                  = apply_filters( 'wpo_wcpdf_document_data_meta_box_document_data_fields', $data, $document );
+		$data                  = $this->get_current_values_for_document( $document, $data );
+		$in_process            = as_next_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
+			'document_type' => $document->get_type(),
+			'order_id'      => $document->order->get_id()
+		) );
 
-				<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
+		// Prevent displaying setup for documents that are not independent, and don't exist, or are not in process,
+		// like documents that require an invoice first and don't exist already or are not in process.
+		if ( ! $in_process && ! $document->exists() && ! in_array( $document->get_type(), $independent_documents, true ) ) {
+			return;
+		}
 
-				<!-- Read only -->
-				<div class="read-only">
-					<span><strong><?= wp_kses_post( $data['notes']['label'] ); ?></strong></span>
-					<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
-						<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
-					<?php endif; ?>
-					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
-				</div>
-				<!-- Editable -->
-				<div class="editable-notes">
-					<p class="form-field form-field-wide">
-						<label for="<?= esc_attr( $data['notes']['name'] ); ?>"><?= wp_kses_post( $data['notes']['label'] ); ?></label>
-						<p><textarea name="<?= esc_attr( $data['notes']['name'] ); ?>" class="<?= esc_attr( $data['notes']['name'] ); ?>" cols="60" rows="5" disabled="disabled"><?= wp_kses_post( $data['notes']['value'] ); ?></textarea></p>
-					</p>
-				</div>
+		// Allow preventing document output.
+		if ( apply_filters( 'wpo_wcpdf_document_data_meta_box_prevent_document_output', false, $data, $in_process, $document ) ) {
+			return;
+		}
 
-				<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
-
-				<?php endif; ?>
-				<!-- / Document Notes -->
-
-			</section>
-
-			<!-- Save/Cancel buttons -->
-			<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
-				<div>
-					<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>" data-action="save"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-					<a class="button wpo-wcpdf-cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-				</div>
-			</section>
-			<!-- / Save/Cancel buttons -->
-		</div>
-		<?php
+		include WPO_WCPDF()->plugin_path() . '/includes/views/document-data-metabox.php';
 	}
 
 	public function add_regenerate_document_button( $document ) {
@@ -1392,12 +1295,56 @@ class Admin {
 	 *
 	 * @return bool
 	 */
-	private function is_invoice_number_numeric() {
+	private function is_invoice_number_numeric(): bool {
 		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
 							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
 		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
+	}
+
+	/**
+	 * Updates documents data in the "PDF document data" meta box if the generation in the background is finished.
+	 *
+	 * @return void
+	 */
+	public function ajax_fetch_pdf_document_data(): void {
+		if ( ! isset( $_REQUEST['security'] ) || ! wp_verify_nonce( $_REQUEST['security'], 'generate_wpo_wcpdf' ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Invalid or expired nonce!', 'woocommerce-pdf-invoices-packing-slips' ),
+			) );
+		}
+
+		if ( empty( $_REQUEST['document_types'] ) || empty( $_REQUEST['order_id'] ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Incomplete or incorrect request!', 'woocommerce-pdf-invoices-packing-slips' ),
+			) );
+		}
+
+		$order_id       = (int) $_REQUEST['order_id'];
+		$document_types = array_map( 'sanitize_text_field', $_REQUEST['document_types'] );
+		$documents_data = array();
+
+		foreach ( $document_types as $document_type ) {
+			if ( ! wpo_wcpdf_is_document_type_valid( $document_type ) ) {
+				continue;
+			}
+
+			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
+			if ( $document && $document->exists() ) {
+				ob_start();
+				$this->output_number_date_edit_fields( $document );
+				$documents_data[ $document_type ] = ob_get_clean();
+			}
+		}
+
+		if ( ! empty( $documents_data ) ) {
+			wp_send_json_success( $documents_data );
+		}
+
+		wp_send_json_error( array(
+			'message' => esc_html__( 'Documents data is empty!', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
 	}
 
 }
