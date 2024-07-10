@@ -61,12 +61,6 @@ $server_configs = array(
 		'result'   => $gmagick || $imagick,
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
-	'ImageMagick' => array(
-		'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => ( $imagick && class_exists( '\\Imagick' ) ) ? esc_attr( \Imagick::getVersion()['versionString'] ) : null,
-		'result'   => $imagick,
-		'fallback' => __( 'ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities', 'woocommerce-pdf-invoices-packing-slips' ),
-	),
 	'glob()' => array(
 		'required' => __( 'Required to detect custom templates and to clear the temp folder periodically', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => null,
