@@ -785,12 +785,12 @@ class Admin {
 
 			$data = array(
 				'number' => array( 'label' => sprintf(
-					/* translators: %s: Document type */
+					/* translators: %s: Document title */
 					__( '%s Number', 'woocommerce-pdf-invoices-packing-slips' ),
 					$document_title
 				) . ':' ),
 				'date'   => array( 'label' => sprintf(
-					/* translators: %s: Document type */
+					/* translators: %s: Document title */
 					__( '%s Date', 'woocommerce-pdf-invoices-packing-slips' ),
 					$document_title
 				) . ':' ),
@@ -799,18 +799,18 @@ class Admin {
 			if ( 'invoice' === $document->get_type() ) {
 				$data = array_merge( $data, array(
 					'display_date'     => array( 'label' => sprintf(
-						/* translators: %s: Document type */
+						/* translators: %s: Document title */
 						__( '%s Display date', 'woocommerce-pdf-invoices-packing-slips' ),
 						$document_title
 					) . ':' ),
 					'creation_trigger' => array( 'label' => sprintf(
-						/* translators: %s: Document type */
+						/* translators: %s: Document title */
 						__( '%s Created via', 'woocommerce-pdf-invoices-packing-slips' ),
 						$document_title
 					) . ':' ),
 					'notes'            => array( 'label' => sprintf(
-						/* translators: %s: Document type */
-						__( '%s Notes (printed in the invoice)', 'woocommerce-pdf-invoices-packing-slips' ),
+						/* translators: %s: Document title */
+						__( '%s Notes (printed in the document)', 'woocommerce-pdf-invoices-packing-slips' ),
 						$document_title
 					) . ':' ),
 				) );
