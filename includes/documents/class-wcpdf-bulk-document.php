@@ -135,16 +135,9 @@ class Bulk_Document {
 				continue;
 			}
 
-			// temporarily apply filters that need to be removed again after the html is generated
-			$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $document );
-			$this->add_filters( $html_filters );
-
 			do_action( 'wpo_wcpdf_before_html', $document->get_type(), $document );
 
 			$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );
-
-			// remove temporary filters
-			$this->remove_filters( $html_filters );
 
 			do_action( 'wpo_wcpdf_after_html', $document->get_type(), $document );
 		}
