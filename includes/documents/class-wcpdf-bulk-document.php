@@ -117,7 +117,7 @@ class Bulk_Document {
 	}
 
 	public function get_html() {
-		do_action( 'wpo_wcpdf_before_bulk_html', $this );
+		do_action( 'wpo_wcpdf_before_bulk_document_html', $this );
 
 		$html_content = array();
 		foreach ( $this->order_ids as $key => $order_id ) {
@@ -142,7 +142,7 @@ class Bulk_Document {
 		$this->wrapper_document = wcpdf_get_document( $this->get_type(), null );
 		$html                   = $this->wrapper_document->wrap_html_content( $this->merge_documents( $html_content ) );
 
-		do_action( 'wpo_wcpdf_after_bulk_html', $this );
+		do_action( 'wpo_wcpdf_after_bulk_document_html', $this );
 
 		return $html;
 	}
