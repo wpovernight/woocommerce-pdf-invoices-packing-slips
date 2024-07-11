@@ -134,12 +134,8 @@ class Bulk_Document {
 			if ( ! $document ) {
 				continue;
 			}
-
-			do_action( 'wpo_wcpdf_before_html', $document->get_type(), $document );
-
+			
 			$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );
-
-			do_action( 'wpo_wcpdf_after_html', $document->get_type(), $document );
 		}
 
 		// get wrapper document & insert body content
