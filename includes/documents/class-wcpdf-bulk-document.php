@@ -123,7 +123,12 @@ class Bulk_Document {
 		foreach ( $this->order_ids as $key => $order_id ) {
 			do_action( 'wpo_wcpdf_process_template_order', $this->get_type(), $order_id );
 
-			$order    = wc_get_order( $order_id );
+			$order = wc_get_order( $order_id );
+			
+			if ( ! $order ) {
+				continue;
+			}
+			
 			$document = wcpdf_get_document( $this->get_type(), $order, true );
 
 			if ( ! $document ) {
