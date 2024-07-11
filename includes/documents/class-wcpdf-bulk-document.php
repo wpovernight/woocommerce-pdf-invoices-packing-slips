@@ -117,31 +117,36 @@ class Bulk_Document {
 	}
 
 	public function get_html() {
-		// temporarily apply filters that need to be removed again after the html is generated
-		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
-		$this->add_filters( $html_filters );
-
-		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
+		do_action( 'wpo_wcpdf_before_bulk_html', $this );
 
 		$html_content = array();
 		foreach ( $this->order_ids as $key => $order_id ) {
 			do_action( 'wpo_wcpdf_process_template_order', $this->get_type(), $order_id );
 
-			$order = wc_get_order( $order_id );
+			$order    = wc_get_order( $order_id );
+			$document = wcpdf_get_document( $this->get_type(), $order, true );
 
-			if ( $document = wcpdf_get_document( $this->get_type(), $order, true ) ) {
+			// temporarily apply filters that need to be removed again after the html is generated
+			$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $document );
+			$this->add_filters( $html_filters );
+
+			do_action( 'wpo_wcpdf_before_html', $document->get_type(), $document );
+
+			if ( $document ) {
 				$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );
 			}
+
+			// remove temporary filters
+			$this->remove_filters( $html_filters );
+
+			do_action( 'wpo_wcpdf_after_html', $document->get_type(), $document );
 		}
 
 		// get wrapper document & insert body content
 		$this->wrapper_document = wcpdf_get_document( $this->get_type(), null );
-		$html = $this->wrapper_document->wrap_html_content( $this->merge_documents( $html_content ) );
+		$html                   = $this->wrapper_document->wrap_html_content( $this->merge_documents( $html_content ) );
 
-		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
-
-		// remove temporary filters
-		$this->remove_filters( $html_filters );
+		do_action( 'wpo_wcpdf_after_bulk_html', $this );
 
 		return $html;
 	}
