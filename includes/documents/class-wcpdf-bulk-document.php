@@ -63,7 +63,7 @@ class Bulk_Document {
 		$this->order_ids = $order_ids;
 		$this->is_bulk   = true;
 
-		// output formats (placed after parent construct to override the abstract default)
+		// output formats
 		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf' ), $this );
 	}
 
@@ -99,14 +99,14 @@ class Bulk_Document {
 		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array(), $this );
 		$this->add_filters( $pdf_filters );
 
-		$html = $this->get_html();
+		$html         = $this->get_html();
 		$pdf_settings = array(
 			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->wrapper_document->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
 			'font_subsetting'	=> $this->wrapper_document->get_setting( 'font_subsetting', false ),
 		);
-		$pdf_maker = wcpdf_get_pdf_maker( $html, $pdf_settings, $this );
-		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );
+		$pdf_maker    = wcpdf_get_pdf_maker( $html, $pdf_settings, $this );
+		$pdf          = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );
 
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
 
@@ -150,7 +150,8 @@ class Bulk_Document {
 	public function merge_documents( $html_content ) {
 		// insert page breaks merge
 		$page_break = "\n<div style=\"page-break-before: always;\"></div>\n";
-		$html = implode( $page_break, $html_content );
+		$html       = implode( $page_break, $html_content );
+		
 		return apply_filters( 'wpo_wcpdf_merged_bulk_document_content', $html, $html_content, $this );
 	}
 
@@ -170,11 +171,14 @@ class Bulk_Document {
 		if ( empty( $this->wrapper_document ) ) {
 			$this->wrapper_document = wcpdf_get_document( $this->get_type(), null );
 		}
+		
 		$default_args = array(
 			'order_ids' => $this->order_ids,
 		);
-		$args = $args + $default_args;
+		
+		$args     = $args + $default_args;
 		$filename = $this->wrapper_document->get_filename( $context, $args );
+		
 		return $filename;
 	}
 
@@ -193,11 +197,12 @@ class Bulk_Document {
 	}
 
 	protected function normalize_filter_args( $filter ) {
-		$filter = array_values( $filter );
-		$hook_name = $filter[0];
-		$callback = $filter[1];
-		$priority = isset( $filter[2] ) ? $filter[2] : 10;
+		$filter        = array_values( $filter );
+		$hook_name     = $filter[0];
+		$callback      = $filter[1];
+		$priority      = isset( $filter[2] ) ? $filter[2] : 10;
 		$accepted_args = isset( $filter[3] ) ? $filter[3] : 1;
+		
 		return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
 	}
 
