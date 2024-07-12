@@ -262,6 +262,16 @@ abstract class Order_Document {
 		}
 	}
 
+	public function initiate_date(): void {
+		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] === 'order_date' && ! empty( $this->order ) ) {
+			$this->set_date( $this->order->get_date_created() );
+			$this->set_display_date( 'order_date' );
+		} elseif ( empty( $this->get_date() ) ) {
+			$this->set_date( current_time( 'timestamp', true ) );
+			$this->set_display_date( 'document_date' );
+		}
+	}
+
 	public function initiate_number( $force_new_number = false ) {
 		$lock            = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
