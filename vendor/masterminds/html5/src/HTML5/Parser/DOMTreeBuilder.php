@@ -1,14 +1,9 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
-namespace WPO\IPS\Vendor\Masterminds\HTML5\Parser;
+namespace Masterminds\HTML5\Parser;
 
-use WPO\IPS\Vendor\Masterminds\HTML5\Elements;
-use WPO\IPS\Vendor\Masterminds\HTML5\InstructionProcessor;
+use Masterminds\HTML5\Elements;
+use Masterminds\HTML5\InstructionProcessor;
 
 /**
  * Create an HTML5 DOM tree from events.

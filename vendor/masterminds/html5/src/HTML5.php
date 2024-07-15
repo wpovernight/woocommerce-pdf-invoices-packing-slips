@@ -1,17 +1,12 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
-namespace WPO\IPS\Vendor\Masterminds;
+namespace Masterminds;
 
-use WPO\IPS\Vendor\Masterminds\HTML5\Parser\DOMTreeBuilder;
-use WPO\IPS\Vendor\Masterminds\HTML5\Parser\Scanner;
-use WPO\IPS\Vendor\Masterminds\HTML5\Parser\Tokenizer;
-use WPO\IPS\Vendor\Masterminds\HTML5\Serializer\OutputRules;
-use WPO\IPS\Vendor\Masterminds\HTML5\Serializer\Traverser;
+use Masterminds\HTML5\Parser\DOMTreeBuilder;
+use Masterminds\HTML5\Parser\Scanner;
+use Masterminds\HTML5\Parser\Tokenizer;
+use Masterminds\HTML5\Serializer\OutputRules;
+use Masterminds\HTML5\Serializer\Traverser;
 
 /**
  * This class offers convenience methods for parsing and serializing HTML5.

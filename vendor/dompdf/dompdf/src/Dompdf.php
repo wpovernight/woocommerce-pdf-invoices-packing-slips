@@ -17,7 +17,7 @@ use WPO\IPS\Vendor\Dompdf\Frame\FrameTree;
 use WPO\IPS\Vendor\Dompdf\Image\Cache;
 use WPO\IPS\Vendor\Dompdf\Css\Stylesheet;
 use WPO\IPS\Vendor\Dompdf\Helpers;
-use WPO\IPS\Vendor\Masterminds\HTML5;
+use Masterminds\HTML5;
 
 /**
  * Dompdf - PHP5 HTML to PDF renderer
