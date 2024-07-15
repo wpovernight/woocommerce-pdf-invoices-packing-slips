@@ -103,6 +103,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 == Changelog ==
 
 = 3.8.5 (2024-07-15) =
+* New: PDFJS v4.3.136 upgrade
 * New: advanced embed images setting
 * New: includes ImageMagick library in the Advanced Status
 * New: adds Invoice number to search type selector in HPOS setups
