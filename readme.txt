@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.6
 Requires PHP: 7.2
-Stable tag: 3.8.4
+Stable tag: 3.8.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,18 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.8.5 (2024-07-15) =
+* New: advanced embed images setting
+* New: includes ImageMagick library in the Advanced Status
+* New: adds Invoice number to search type selector in HPOS setups
+* New: adds row classes for "YITH WooCommerce Product Bundles"
+* New: register a log for document deletion in the Order Notes
+* Tweak: improves header logo loading
+* Fix: make Simple template total labels translatable
+* Fix: wraps document addresses around `<p>` tags
+* Translations: Updated translation template (POT)
+* Tested up to WooCommerce 9.1 & WordPress 6.6
 
 = 3.8.4 (2024-06-19) =
 * New: filter hook `wpo_wcpdf_multilingual_languages`
