@@ -582,15 +582,3 @@ function WPO_WCPDF() {
 }
 
 WPO_WCPDF(); // load plugin
-
-// legacy class for plugin detecting
-if ( ! class_exists( 'WooCommerce_PDF_Invoices' ) ) {
-	class WooCommerce_PDF_Invoices{
-		public static $version;
-
-		public function __construct() {
-			self::$version = WPO_WCPDF()->version;
-		}
-	}
-	new WooCommerce_PDF_Invoices();
-}
