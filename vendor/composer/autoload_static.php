@@ -17,6 +17,7 @@ class ComposerStaticInit76ee76e4d000c4c6a2005913129fc5bd
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
+            'WPO\\WC\\PDF_Invoices\\Documents\\' => 30,
             'WPO\\IPS\\UBL\\' => 12,
             'WPO\\IPS\\' => 8,
         ),
@@ -44,6 +45,10 @@ class ComposerStaticInit76ee76e4d000c4c6a2005913129fc5bd
     );
 
     public static $prefixDirsPsr4 = array (
+        'WPO\\WC\\PDF_Invoices\\Documents\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/legacy',
+        ),
         'WPO\\IPS\\UBL\\' => 
         array (
             0 => __DIR__ . '/../..' . '/ubl',
@@ -322,6 +327,7 @@ class ComposerStaticInit76ee76e4d000c4c6a2005913129fc5bd
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Symbol' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Symbol.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Text' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Text.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\UseTag' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/UseTag.php',
+        'WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods' => __DIR__ . '/../..' . '/legacy/legacy-order-document-methods.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

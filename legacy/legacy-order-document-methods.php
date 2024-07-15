@@ -1,6 +1,8 @@
 <?php
 namespace WPO\WC\PDF_Invoices\Documents;
 
+use WPO\IPS\Documents\OrderDocument;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -14,7 +16,7 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods
  * Created as abstract rather than traits to support PHP versions older than 5.4
  */
 
-abstract class Order_Document_Methods extends Order_Document {
+abstract class Order_Document_Methods extends OrderDocument {
 
 	public function is_refund( $order ) {
 		return 'shop_order_refund' === $order->get_type();
