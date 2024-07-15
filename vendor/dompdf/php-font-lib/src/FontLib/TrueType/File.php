@@ -3,18 +3,20 @@
  * @package php-font-lib
  * @link    https://github.com/dompdf/php-font-lib
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace FontLib\TrueType;
+namespace WPO\IPS\Vendor\FontLib\TrueType;
 
-use FontLib\AdobeFontMetrics;
-use FontLib\Font;
-use FontLib\BinaryStream;
-use FontLib\Table\Table;
-use FontLib\Table\DirectoryEntry;
-use FontLib\Table\Type\glyf;
-use FontLib\Table\Type\name;
-use FontLib\Table\Type\nameRecord;
+use WPO\IPS\Vendor\FontLib\AdobeFontMetrics;
+use WPO\IPS\Vendor\FontLib\Font;
+use WPO\IPS\Vendor\FontLib\BinaryStream;
+use WPO\IPS\Vendor\FontLib\Table\Table;
+use WPO\IPS\Vendor\FontLib\Table\DirectoryEntry;
+use WPO\IPS\Vendor\FontLib\Table\Type\glyf;
+use WPO\IPS\Vendor\FontLib\Table\Type\name;
+use WPO\IPS\Vendor\FontLib\Table\Type\nameRecord;
 
 /**
  * TrueType font file.
@@ -419,14 +421,14 @@ class File extends BinaryStream {
     if (!self::$raw) {
       $name_canon = preg_replace("/[^a-z0-9]/", "", strtolower($tag));
 
-      $class = "FontLib\\Table\\Type\\$name_canon";
+      $class = "WPO\\IPS\\Vendor\\FontLib\\Table\\Type\\$name_canon";
 
       if (!isset($this->directory[$tag]) || !@class_exists($class)) {
         return;
       }
     }
     else {
-      $class = "FontLib\\Table\\Table";
+      $class = "WPO\\IPS\\Vendor\\FontLib\\Table\\Table";
     }
 
     /** @var Table $table */

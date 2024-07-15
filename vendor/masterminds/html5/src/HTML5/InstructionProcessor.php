@@ -1,9 +1,12 @@
 <?php
 /**
  * A handler for processor instructions.
+ *
+ * @license MIT
+ * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Masterminds\HTML5;
+namespace WPO\IPS\Vendor\Masterminds\HTML5;
 
 /**
  * Provide an processor to handle embedded instructions.

@@ -1,6 +1,11 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Parsing;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Parsing;
 
 class SourceException extends \Exception
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace WPO\WC\UBL\Handlers\Ubl;
+namespace WPO\IPS\UBL\Handlers\Ubl;
 
-use WPO\WC\UBL\Handlers\UblHandler;
-use WPO\WC\UBL\Models\Order;
+use WPO\IPS\UBL\Handlers\UblHandler;
+use WPO\IPS\UBL\Models\Order;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

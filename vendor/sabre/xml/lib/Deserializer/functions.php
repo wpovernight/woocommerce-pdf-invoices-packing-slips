@@ -1,10 +1,15 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Deserializer;
+namespace WPO\IPS\Vendor\Sabre\Xml\Deserializer;
 
-use Sabre\Xml\Reader;
+use WPO\IPS\Vendor\Sabre\Xml\Reader;
 
 /**
  * This class provides a number of 'deserializer' helper functions.

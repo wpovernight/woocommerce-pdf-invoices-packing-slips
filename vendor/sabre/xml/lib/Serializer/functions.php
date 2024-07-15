@@ -1,12 +1,17 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Serializer;
+namespace WPO\IPS\Vendor\Sabre\Xml\Serializer;
 
 use InvalidArgumentException;
-use Sabre\Xml\Writer;
-use Sabre\Xml\XmlSerializable;
+use WPO\IPS\Vendor\Sabre\Xml\Writer;
+use WPO\IPS\Vendor\Sabre\Xml\XmlSerializable;
 
 /**
  * This file provides a number of 'serializer' helper functions.

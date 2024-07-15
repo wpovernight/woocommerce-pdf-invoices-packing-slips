@@ -1,8 +1,13 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml;
+namespace WPO\IPS\Vendor\Sabre\Xml;
 
 /**
  * XML parsing and writing service.
@@ -245,10 +250,10 @@ class Service
         list($namespace) = self::parseClarkNotation($elementName);
 
         $this->elementMap[$elementName] = function (Reader $reader) use ($className, $namespace) {
-            return \Sabre\Xml\Deserializer\valueObject($reader, $className, $namespace);
+            return \WPO\IPS\Vendor\Sabre\Xml\Deserializer\valueObject($reader, $className, $namespace);
         };
         $this->classMap[$className] = function (Writer $writer, $valueObject) use ($namespace) {
-            return \Sabre\Xml\Serializer\valueObject($writer, $valueObject, $namespace);
+            return \WPO\IPS\Vendor\Sabre\Xml\Serializer\valueObject($writer, $valueObject, $namespace);
         };
         $this->valueObjectMap[$className] = $elementName;
     }

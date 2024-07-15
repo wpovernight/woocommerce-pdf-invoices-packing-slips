@@ -1,10 +1,15 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Element;
+namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
-use Sabre\Xml;
+use WPO\IPS\Vendor\Sabre\Xml;
 
 /**
  * Uri element.
@@ -60,7 +65,7 @@ class Uri implements Xml\Element
     public function xmlSerialize(Xml\Writer $writer)
     {
         $writer->text(
-            \Sabre\Uri\resolve(
+            \WPO\IPS\Vendor\Sabre\Uri\resolve(
                 $writer->contextUri,
                 $this->value
             )
@@ -90,7 +95,7 @@ class Uri implements Xml\Element
     public static function xmlDeserialize(Xml\Reader $reader)
     {
         return new self(
-            \Sabre\Uri\resolve(
+            \WPO\IPS\Vendor\Sabre\Uri\resolve(
                 (string) $reader->contextUri,
                 $reader->readText()
             )
