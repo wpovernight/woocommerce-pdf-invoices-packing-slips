@@ -817,17 +817,19 @@ abstract class Order_Document {
 	/**
 	 * Return logo id
 	 *
-	 * @return ?int
+	 * @return int
 	 */
-	public function get_header_logo_id(): ?int {
+	public function get_header_logo_id(): int {
 		$header_logo_id = 0;
 
 		if ( ! empty( $this->settings['header_logo'] ) ) {
 			$attachment_id  = $this->get_settings_text( 'header_logo', $header_logo_id, false );
 			$header_logo_id = is_numeric( $attachment_id ) ? absint( $attachment_id ) : 0;
 		}
+		
+		$header_logo_id = apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 
-		return apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
+		return $header_logo_id ?? 0;
 	}
 
 	/**
@@ -847,7 +849,7 @@ abstract class Order_Document {
 	public function header_logo(): void {
 		$attachment_id = $this->get_header_logo_id();
 
-		if ( ! is_null( $attachment_id ) && $attachment_id > 0 ) {
+		if ( $attachment_id > 0 ) {
 			$company         = $this->get_shop_name();
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
