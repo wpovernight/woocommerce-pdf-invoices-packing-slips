@@ -817,9 +817,9 @@ abstract class Order_Document {
 	/**
 	 * Return logo id
 	 *
-	 * @return int
+	 * @return ?int
 	 */
-	public function get_header_logo_id(): int {
+	public function get_header_logo_id(): ?int {
 		$header_logo_id = 0;
 
 		if ( ! empty( $this->settings['header_logo'] ) ) {
