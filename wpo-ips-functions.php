@@ -668,10 +668,6 @@ function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
 	}
 }
 
-function WPO_WCPDF_Legacy() {
-	return \WPO\WC\PDF_Invoices\Legacy\WPO_WCPDF_Legacy::instance();
-}
-
 /**
  * Parse document date for WP_Query.
  *
