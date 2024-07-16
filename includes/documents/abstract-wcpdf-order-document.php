@@ -847,7 +847,7 @@ abstract class Order_Document {
 	public function header_logo(): void {
 		$attachment_id = $this->get_header_logo_id();
 
-		if ( $attachment_id > 0 ) {
+		if ( ! is_null( $attachment_id ) && $attachment_id > 0 ) {
 			$company         = $this->get_shop_name();
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
