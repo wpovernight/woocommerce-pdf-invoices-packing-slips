@@ -829,7 +829,7 @@ abstract class Order_Document {
 		
 		$header_logo_id = apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 
-		return $header_logo_id ?? 0;
+		return $header_logo_id && is_numeric( $header_logo_id ) ? absint( $header_logo_id ) : 0;
 	}
 
 	/**
