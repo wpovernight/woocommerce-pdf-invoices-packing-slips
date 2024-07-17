@@ -218,11 +218,7 @@ class Third_Party_Plugins {
 		} else {
 			return $classes;
 		}
-
-		if ( empty( $order ) ) {
-			return $classes;
-		}
-
+		
 		$product    = null;
 		$bundled_by = null;
 
