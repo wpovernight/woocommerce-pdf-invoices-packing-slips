@@ -219,6 +219,10 @@ class Third_Party_Plugins {
 			return $classes;
 		}
 
+		if ( empty( $order ) ) {
+			return $classes;
+		}
+
 		$product    = null;
 		$bundled_by = null;
 
@@ -235,9 +239,9 @@ class Third_Party_Plugins {
 		}
 
 		if ( 'yith_bundle' === $product->get_type() ) {
-			return $classes . ' product-bundle';
+			$classes .= ' product-bundle';
 		} elseif ( ! empty( $bundled_by ) ) {
-			return $classes . ' bundled-item';
+			$classes .= ' bundled-item';
 		}
 
 		return $classes;
