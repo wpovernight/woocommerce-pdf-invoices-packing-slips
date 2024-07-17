@@ -102,6 +102,9 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 3.8.6 (2024-07-17) =
+* Fix: `get_header_logo_id()` return type fatal error
+
 = 3.8.5 (2024-07-16) =
 * New: PDFJS v4.3.136 upgrade
 * New: advanced embed images setting
