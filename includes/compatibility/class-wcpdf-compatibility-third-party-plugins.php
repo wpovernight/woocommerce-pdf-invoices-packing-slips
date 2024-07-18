@@ -202,33 +202,46 @@ class Third_Party_Plugins {
 	 * YITH WooCommerce Product Bundles compatibility
 	 *
 	 * @param string $classes CSS classes for item row (tr)
-	 * @param string $document_type PDF Document type
-	 * @param \WC_Abstract_Order $order order
-	 * @param int $item_id WooCommerce Item ID
+	 * @param ?string $document_type PDF Document type
+	 * @param object $order order
+	 * @param int|string $item_id WooCommerce Item ID
+	 *
+	 * @return string
 	 */
-	public function add_yith_product_bundles_classes( string $classes, string $document_type, \WC_Abstract_Order $order, int $item_id = 0 ): string {
-		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
-
-		if ( empty( $item_id ) ) {
-			return $classes;
+	public function add_yith_product_bundles_classes( string $classes, ?string $document_type, object $order, $item_id = 0 ): string {
+		if ( empty( $item_id ) && ! empty( $classes ) ) {
+			$item_id = $this->get_item_id_from_classes( $classes );
 		}
 
-		$item = new \WC_Order_Item_Product( $item_id );
-
-		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
+		if ( ! empty( $item_id ) && is_numeric( $item_id ) ) {
+			$item_id = absint( $item_id );
+		} else {
 			return $classes;
 		}
+		
+		if ( ! $order instanceof \WC_Abstract_Order ) {
+			return $classes;
+		}
+		
+		$product    = null;
+		$bundled_by = null;
 
-		$product = $item->get_product();
+		foreach ( $order->get_items() as $order_item_id => $order_item ) {
+			if ( absint( $order_item_id ) === $item_id ) {
+				$product    = $order_item->get_product();
+				$bundled_by = $order_item->get_meta( '_bundled_by', true );
+				break;
+			}
+		}
 
-		if ( empty( $product ) ) {
+		if ( empty( $product ) || ! is_a( $product, 'WC_Product' ) ) {
 			return $classes;
 		}
 
 		if ( 'yith_bundle' === $product->get_type() ) {
-			return $classes . ' product-bundle';
-		} elseif ( ! empty( $item->get_meta( '_bundled_by', true ) ) ) {
-			return $classes . ' bundled-item';
+			$classes .= ' product-bundle';
+		} elseif ( ! empty( $bundled_by ) ) {
+			$classes .= ' bundled-item';
 		}
 
 		return $classes;
@@ -362,9 +375,9 @@ class Third_Party_Plugins {
 
 	/**
 	 * Adds invoice number filter to the search filters available in the admin order search.
-	 * 
+	 *
 	 * @param array $options List of available filters.
-	 * 
+	 *
 	 * @return array
 	 */
 	function hpos_admin_search_filters( array $options ): array {
@@ -377,12 +390,12 @@ class Third_Party_Plugins {
 
 		return $options;
 	}
-	
+
 	/**
 	 * Modifies the arguments passed to `wc_get_orders()` to support 'invoice_number' order search filter.
-	 * 
+	 *
 	 * @param array $order_query_args Arguments to be passed to `wc_get_orders()`.
-	 * 
+	 *
 	 * @return array
 	 */
 	function invoice_number_query_args( array $order_query_args ): array {
@@ -392,7 +405,7 @@ class Third_Party_Plugins {
 			$order_query_args['search_filter'] = 'all';
 			unset( $order_query_args['s'] );
 		}
-	
+
 		return $order_query_args;
 	}
 }
