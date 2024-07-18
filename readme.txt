@@ -102,7 +102,8 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 3.8.6 (2024-07-17) =
+= 3.8.6 (2024-07-18) =
+* Fix: function `add_yith_product_bundles_classes()` errors
 * Fix: `get_header_logo_id()` return type fatal error
 
 = 3.8.5 (2024-07-16) =
