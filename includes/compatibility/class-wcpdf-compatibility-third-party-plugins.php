@@ -209,6 +209,10 @@ class Third_Party_Plugins {
 	 * @return string
 	 */
 	public function add_yith_product_bundles_classes( string $classes, ?string $document_type, object $order, $item_id = 0 ): string {
+		if ( ! $order instanceof \WC_Abstract_Order ) {
+			return $classes;
+		}
+		
 		if ( empty( $item_id ) && ! empty( $classes ) ) {
 			$item_id = $this->get_item_id_from_classes( $classes );
 		}
@@ -216,10 +220,6 @@ class Third_Party_Plugins {
 		if ( ! empty( $item_id ) && is_numeric( $item_id ) ) {
 			$item_id = absint( $item_id );
 		} else {
-			return $classes;
-		}
-		
-		if ( ! $order instanceof \WC_Abstract_Order ) {
 			return $classes;
 		}
 		
