@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.6
 Requires PHP: 7.2
-Stable tag: 3.8.5
+Stable tag: 3.8.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,7 +102,8 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 3.8.6 (2024-07-17) =
+= 3.8.6 (2024-07-18) =
+* Fix: function `add_yith_product_bundles_classes()` errors
 * Fix: `get_header_logo_id()` return type fatal error
 
 = 3.8.5 (2024-07-16) =
