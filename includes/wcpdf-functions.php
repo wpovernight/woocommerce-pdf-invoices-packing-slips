@@ -321,10 +321,16 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 /**
  * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
  */
-function wcpdf_log_error( $message, $level = 'error', $e = null ) {
+function wcpdf_log_error( $message, $level = 'error', $e = null, $document = null ) {
 	if ( function_exists( 'wc_get_logger' ) ) {
 		$logger  = wc_get_logger();
-		$context = array( 'source' => 'wpo-wcpdf' );
+		$source = 'wpo-wcpdf';
+
+		if($document) {
+			$source.= '-' . $document->get_type() . '-' . $document->get_number()->get_formatted();
+		}
+
+		$context = array( 'source' => $source );
 
 		if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ) {
 			$message = sprintf( '%s (%s:%d)', $message, $e->getFile(), $e->getLine() );
