@@ -849,7 +849,7 @@ abstract class Order_Document {
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 
 			if ( empty( $attachment_src ) || empty( $attachment_path ) ) {
-				wcpdf_log_error( 'Header logo file not found.', 'error', null, $this );
+				wcpdf_log_error( 'Header logo file not found.', 'critical', null, $this );
 				return;
 			}
 
