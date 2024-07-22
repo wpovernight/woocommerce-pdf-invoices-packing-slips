@@ -320,8 +320,15 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 
 /**
  * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
+ * 
+ * @param string         $message
+ * @param string         $level
+ * @param \Exception     $e
+ * @param Order_Document $document
+ * 
+ * @return void
  */
-function wcpdf_log_error( $message, $level = 'error', $e = null, $document = null ) {
+function wcpdf_log_error( string $message, string $level = 'error', \Exception $e = null, WPO\WC\PDF_Invoices\Documents\Order_Document $document = null ): void {
 	if ( function_exists( 'wc_get_logger' ) ) {
 		$logger  = wc_get_logger();
 		$source = 'wpo-wcpdf';
