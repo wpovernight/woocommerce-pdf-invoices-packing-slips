@@ -323,18 +323,18 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
  * 
  * @param string         $message
  * @param string         $level
- * @param \Exception     $e
+ * @param object         $e
  * @param Order_Document $document
  * 
  * @return void
  */
-function wcpdf_log_error( string $message, string $level = 'error', \Exception $e = null, WPO\WC\PDF_Invoices\Documents\Order_Document $document = null ): void {
+function wcpdf_log_error( string $message, string $level = 'error', object $e = null, WPO\WC\PDF_Invoices\Documents\Order_Document $document = null ): void {
 	if ( function_exists( 'wc_get_logger' ) ) {
 		$logger  = wc_get_logger();
-		$source = 'wpo-wcpdf';
+		$source  = 'wpo-wcpdf';
 
-		if($document) {
-			$source.= '-' . $document->get_type() . '-' . $document->get_number()->get_formatted();
+		if( $document ) {
+			$source .= '-' . $document->get_type();
 		}
 
 		$context = array( 'source' => $source );
