@@ -203,12 +203,16 @@ class Third_Party_Plugins {
 	 *
 	 * @param string $classes CSS classes for item row (tr)
 	 * @param ?string $document_type PDF Document type
-	 * @param object $order order
+	 * @param ?object $order order
 	 * @param int|string $item_id WooCommerce Item ID
 	 *
 	 * @return string
 	 */
-	public function add_yith_product_bundles_classes( string $classes, ?string $document_type, object $order, $item_id = 0 ): string {
+	public function add_yith_product_bundles_classes( string $classes, ?string $document_type, ?object $order, $item_id = 0 ): string {
+		if ( empty( $order ) ) {
+			return $classes;
+		}
+		
 		if ( ! $order instanceof \WC_Abstract_Order ) {
 			return $classes;
 		}
