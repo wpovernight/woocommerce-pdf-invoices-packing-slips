@@ -50,6 +50,9 @@ $wcpdf_legacy_class_alias_mapping = array(
 	'\\WPO\\WC\\PDF_Invoices\\Settings'                           => '\\WPO\\IPS\\Settings',
 	'\\WPO\\WC\\PDF_Invoices\\Setup_Wizard'                       => '\\WPO\\IPS\\SetupWizard',
 	'\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0'              => '\\WPO\\IPS\\Semaphore',
+	
+	// ubl
+	'\\WPO\\WC\\UBL\\Handlers\\UblHandler'                        => '\\WPO\\IPS\\UBL\\Handlers\\UblHandler', // used by `woocommerce-pdf-ips-ubl-extender`
 );
 
 foreach ( $wcpdf_legacy_class_alias_mapping as $old_class => $new_class ) {
