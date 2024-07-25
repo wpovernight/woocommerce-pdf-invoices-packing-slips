@@ -29,6 +29,14 @@ jobs:
           path: ${{ env.plugin_slug }}
           submodules: true
 
+      - name: Check stable version in readme.txt
+        run: |
+          STABLE_TAG=$(grep -oP '(?<=Stable tag: ).*' ${{ env.plugin_slug }}/readme.txt | tr -d '[:space:]')
+          if [ "$STABLE_TAG" != "${{ env.version }}" ]; then
+            echo "Stable tag ($STABLE_TAG) does not match release version (${{ env.version }}). Halting execution."
+            exit 1
+          fi
+
       - name: Create ZIP
         run: |
           # reformat .distignore: remove all empty lines, leading slashes and prefix with the folder
@@ -37,7 +45,7 @@ jobs:
           # create zip file
           zip -rq ${{ env.zip_file_name }} ${{ env.plugin_slug }} -x@.zipignore
 
-      - name: Add ZIP to release asseets
+      - name: Add ZIP to release assets
         uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
