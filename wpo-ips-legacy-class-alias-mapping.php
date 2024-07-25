@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-$wcpdf_legacy_class_alias_mapping = array(
+$wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias_mapping', array(
 	// includes/Compatibility
 	'\\WPO\\WC\\PDF_Invoices\\Compatibility\\Third_Party_Plugins' => '\\WPO\\IPS\\Compatibility\\ThirdPartyPlugins',
 	'\\WPO\\WC\\PDF_Invoices\\Compatibility\\Order_Util'          => '\\WPO\\IPS\\Compatibility\\OrderUtil',
@@ -53,7 +53,7 @@ $wcpdf_legacy_class_alias_mapping = array(
 	
 	// ubl
 	'\\WPO\\WC\\UBL\\Handlers\\UblHandler'                        => '\\WPO\\IPS\\UBL\\Handlers\\UblHandler', // used by `woocommerce-pdf-ips-ubl-extender`
-);
+) );
 
 foreach ( $wcpdf_legacy_class_alias_mapping as $old_class => $new_class ) {
 	if ( ! class_exists( $old_class ) && class_exists( $new_class ) ) {
