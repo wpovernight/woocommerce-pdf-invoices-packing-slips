@@ -321,10 +321,10 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 /**
  * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
  * 
- * @param string         $message
- * @param string         $level
- * @param object         $e
- * @param Order_Document $document
+ * @param string $message
+ * @param string $level
+ * @param object $e
+ * @param WPO\WC\PDF_Invoices\Documents\Order_Document $document
  * 
  * @return void
  */
@@ -333,14 +333,14 @@ function wcpdf_log_error( string $message, string $level = 'error', object $e = 
 		$logger  = wc_get_logger();
 		$source  = 'wpo-wcpdf';
 
-		if( $document ) {
+		if ( $document ) {
 			$source .= '-' . $document->get_type();
 		}
 
 		$context = array( 'source' => $source );
 
 		if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ) {
-			$message = sprintf( '%s (%s:%d)', $message, $e->getFile(), $e->getLine() );
+			$message .= sprintf( ' (%s:%d)', $e->getFile(), $e->getLine() );
 		}
 
 		if ( apply_filters( 'wcpdf_log_stacktrace', false ) && is_callable( array( $e, 'getTraceAsString' ) ) ) {
