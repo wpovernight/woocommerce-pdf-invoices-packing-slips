@@ -4,12 +4,10 @@
 		"autoload": {
 			"psr-4": {
 				"WPO\\IPS\\": "includes/",
-				"WPO\\IPS\\UBL\\": "ubl/",
-				"WPO\\WC\\PDF_Invoices\\Documents\\": "legacy/"
+				"WPO\\IPS\\UBL\\": "ubl/"
 			},
 			"classmap": [
-				"vendor/",
-				"legacy/"
+				"vendor/"
 			]
 	},
 	"require": {

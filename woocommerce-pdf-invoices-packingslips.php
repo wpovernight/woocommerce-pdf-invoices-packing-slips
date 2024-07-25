@@ -59,7 +59,7 @@ class WPO_WCPDF {
 	 */
 	public function __construct() {
 		require $this->plugin_path() . '/vendor/autoload.php';
-		
+
 		$this->plugin_basename = plugin_basename(__FILE__);
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
 			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
@@ -138,8 +138,11 @@ class WPO_WCPDF {
 	 * Load the main plugin classes and functions
 	 */
 	public function includes() {
+		// plugin legacy class mapping
+		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
+		
 		// plugin functions
-		include_once( $this->plugin_path() . '/wpo-ips-functions.php' );
+		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 
 		// Third party compatibility
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();

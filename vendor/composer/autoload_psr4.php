@@ -6,7 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WPO\\WC\\PDF_Invoices\\Documents\\' => array($baseDir . '/legacy'),
     'WPO\\IPS\\UBL\\' => array($baseDir . '/ubl'),
     'WPO\\IPS\\' => array($baseDir . '/includes'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
