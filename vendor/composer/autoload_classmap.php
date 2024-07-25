@@ -237,5 +237,6 @@ return array(
     'WPO\\IPS\\Vendor\\Svg\\Tag\\Symbol' => $vendorDir . '/dompdf/php-svg-lib/src/Svg/Tag/Symbol.php',
     'WPO\\IPS\\Vendor\\Svg\\Tag\\Text' => $vendorDir . '/dompdf/php-svg-lib/src/Svg/Tag/Text.php',
     'WPO\\IPS\\Vendor\\Svg\\Tag\\UseTag' => $vendorDir . '/dompdf/php-svg-lib/src/Svg/Tag/UseTag.php',
+    'WPO\\WC\\PDF_Invoices\\Documents\\Order_Document' => $baseDir . '/legacy/legacy-abstract-order-document.php',
     'WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods' => $baseDir . '/legacy/legacy-abstract-order-document-methods.php',
 );

@@ -327,6 +327,7 @@ class ComposerStaticInit1162ee2ebe23625d660e1450eec5007b
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Symbol' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Symbol.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Text' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Text.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\UseTag' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/UseTag.php',
+        'WPO\\WC\\PDF_Invoices\\Documents\\Order_Document' => __DIR__ . '/../..' . '/legacy/legacy-abstract-order-document.php',
         'WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods' => __DIR__ . '/../..' . '/legacy/legacy-abstract-order-document-methods.php',
     );
 
