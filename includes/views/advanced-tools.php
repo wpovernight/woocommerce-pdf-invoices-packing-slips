@@ -57,6 +57,33 @@
 			</form>
 		</div>
 		<!-- /clear_tmp -->
+		<!-- clear_semaphore_expired_locks -->
+		<div class="tool">
+			<h4><?php _e( 'Remove Semaphore expired locks', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+			<p><?php _e( 'Clean up the expired locks from the database.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+			<form method="post" id="clear_semaphore_expired_locks">
+				<input type="hidden" name="debug_tool" value="clear_semaphore_expired_locks">
+				<input type="submit" class="button button-secondary submit" value="<?php _e( 'Remove expired locks', 'woocommerce-pdf-invoices-packing-slips' ); ?>">
+				<fieldset>
+					<div class="notice inline" style="display:none;"><p></p></div>
+				</fieldset>
+			</form>
+			<?php $semaphore_expired_locks = \WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0::count_expired_locks(); ?>
+			<?php if ( $semaphore_expired_locks > 0 ) : ?>
+				<div class="notice notice-warning inline">
+					<p>
+						<?php
+							printf(
+								/* translators: %s: number of expired locks */
+								__( 'There are %s expired locks in the database.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<strong>' . $semaphore_expired_locks . '</strong>'
+							);
+						?>
+					</p>
+				</div>
+			<?php endif; ?>
+		</div>
+		<!-- /clear_semaphore_expired_locks -->
 		<!-- run_wizard -->
 		<div class="tool">
 			<h4><?php _e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
