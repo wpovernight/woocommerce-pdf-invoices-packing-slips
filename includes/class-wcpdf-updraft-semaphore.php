@@ -57,9 +57,10 @@ class Updraft_Semaphore_3_0 {
 	 * @param String  $name		  - a unique (across the WP site) name for the lock. Should be no more than 51 characters in length (because of the use of the WP options table, with some further characters used internally)
 	 * @param Integer $locked_for - time (in seconds) after which the lock will expire if not released. This needs to be positive if you don't want bad things to happen.
 	 * @param Array	  $loggers	  - an array of loggers
+	 * @param Array	  $context	  - Optional. Additional information for log handlers.
 	 */
 	public function __construct( $name, $locked_for = 300, $loggers = array(), $context = array() ) {
-		$this->option_name = 'updraft_lock_'.$name;
+		$this->option_name = 'wpo_wcpdf_lock/' . $name;
 		$this->locked_for  = $locked_for;
 		$this->loggers     = $loggers;
 		$this->context     = $context;

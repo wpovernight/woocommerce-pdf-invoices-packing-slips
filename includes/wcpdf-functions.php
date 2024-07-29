@@ -1,4 +1,7 @@
 <?php
+
+use WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0 as Semaphore;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -61,9 +64,14 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 				}
 
 				if ( $init && ! $document->exists() ) {
-					$document->init();
-					$document->save();
+					try {
+						wcpdf_init_document( $document_type, absint( $order->get_id() ) );
+					} catch ( \Exception $e ) {
+						wcpdf_log_error( $e->getMessage(), 'critical' );
+						return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+					}
 				}
+
 				return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 			} else {
 				// order ids array changed, continue processing that array.
@@ -94,9 +102,14 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 			}
 
 			if ( $init && ! $document->exists() ) {
-				$document->init();
-				$document->save();
+				try {
+					wcpdf_init_document( $document_type, absint( $order_id ) );
+				} catch ( \Exception $e ) {
+					wcpdf_log_error( $e->getMessage(), 'critical' );
+					return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+				}
 			}
+
 		// otherwise we use bulk class to wrap multiple documents in one.
 		} else {
 			$document = wcpdf_get_bulk_document( $document_type, $order_ids );
@@ -108,6 +121,178 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 
 	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 }
+
+/**
+ * Initiate a document for an order
+ *
+ * @param string $document_type
+ * @param int $order_id
+ * 
+ * @throws \Exception
+ * @throws \Dompdf\Exception
+ * @throws \Error
+ * 
+ * @return void
+ */
+function wcpdf_init_document( string $document_type, int $order_id ): void {
+	if ( empty( $document_type ) || empty( $order_id ) ) {
+		return;
+	}
+	
+	$current_action               = current_action();
+	$request_id                   = '[' . mt_rand( 10000000, 99999999 ) . '] ';
+	
+	// lock
+	$lock_time                    = apply_filters( 'wpo_wcpdf_init_document_lock_time', WPO_WCPDF()->lock_time, $current_action );
+	$lock_release_time            = apply_filters( 'wpo_wcpdf_init_document_lock_release_time', $lock_time + 5, $current_action );
+	$look_release_hook            = 'wpo_wcpdf_init_document_release_lock';
+	$lock_name                    = sprintf( 'wcpdf_init_document/%1$s_with_order_%2$s', $document_type, $order_id );
+	$lock                         = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+	$lock_release_hook_args       = array( $lock_name, $request_id, $document_type, absint( $order_id ) );
+	
+	// race condition
+	$race_condition_delay         = apply_filters( 'wpo_wcpdf_init_document_race_condition_delay', mt_rand( 1500000, 3500000 ) ); // delay between 1.5 to 3.5 seconds
+	$race_condition_actions       = apply_filters( 'wpo_wcpdf_init_document_race_condition_actions', array( 'woocommerce_order_status_changed', 'wpo_wcpdf_generate_document_on_order_status' ) );
+	$race_condition_invalid_types = apply_filters( 'wpo_wcpdf_init_document_race_condition_invalid_types', array( 'credit-note', 'bulk', 'summary' ) );
+	$is_race_condition            = in_array( $current_action, $race_condition_actions ) && ! in_array( $document_type, $race_condition_invalid_types );
+	
+	// Random delay to reduce race conditions
+	if ( $is_race_condition ) {
+		usleep( $race_condition_delay );
+	}
+	
+	// Unschedule the release lock action if it was scheduled before for the same order and document type
+	wcpdf_unschedule_as_actions( $look_release_hook, array( 'order_id' => $order_id, 'document_type' => $document_type ) );	
+	
+	// Fetch the order object to get the latest data
+	$order = wc_get_order( $order_id );
+	
+	if ( ! $order ) {
+		$lock->log( $request_id . sprintf( 'Pre-lock check: Order ID# %1$s not found.', $order_id ), 'info' );
+		return;
+	}
+
+	// Re-fetch the document to ensure it is up-to-date
+	$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+
+	if ( ! $document || ! $document->is_allowed() ) {
+		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s with order ID# %2$s is not allowed.', $document_type, $order_id ), 'info' );
+		return;
+	}
+
+	// Check if the document was created by another process before proceeding
+	if ( $document->exists() || ! empty( $document->get_number_from_order_meta( $order ) ) ) {
+		$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s was created by another process. No need to generate again.', $document_type, $order_id ), 'info' );
+		return;
+	}
+	
+	// // Last chance, check directly in the database.
+	// // This will not have any effect if the numbers are reset using the Danger Tools feature, but it will prevent concurrent requests for the same document.
+	// if ( $is_race_condition ) {
+	// 	$number_store = $document->get_sequential_number_store();
+	// 	if ( ! empty( $number_store ) ) {
+	// 		global $wpdb;
+	// 		$column_name = 'order_id';
+	// 		$query       = $wpdb->prepare( "SELECT COUNT(*) FROM {$number_store->table_name} WHERE {$column_name} = %d", $order_id );
+	// 		$exists      = $wpdb->get_var( $query );
+
+	// 		if ( $exists ) {
+	// 			$lock->log( $request_id . sprintf( 'Pre-lock check: Document %1$s for order ID# %2$s already exists in the database.', $document_type, $order_id ), 'info' );
+	// 			return;
+	// 		}
+	// 	}
+	// }
+
+	if ( $lock->lock( WPO_WCPDF()->lock_retries ) ) {
+		$lock->log( $request_id . sprintf( 'Lock acquired to init document %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+
+		try {
+			// Schedule action for releasing the lock.
+			// This is to ensure the lock is released even if the process is killed.
+			as_schedule_single_action( time() + $lock_release_time, $look_release_hook, $lock_release_hook_args );
+			
+			$document->init();
+			$lock->log( $request_id . sprintf( 'Document init completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+
+			$document->save();
+			$lock->log( $request_id . sprintf( 'Document save completed for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+			
+		} catch ( \Exception $e ) {
+			$lock->log( $request_id . $e->getMessage(), 'critical' );
+			throw $e;
+		} catch ( \Dompdf\Exception $e ) {
+			$lock->log( $request_id . $e->getMessage(), 'critical' );
+			throw $e;
+		} catch ( \Error $e ) {
+			$lock->log( $request_id . $e->getMessage(), 'critical' );
+			throw $e;
+		} finally {
+			$lock->log( $request_id . 'Waiting lock to be released...', 'info' );
+			
+			// Release the lock if not race condition.
+			// This prevents the lock getting acquiring by concurrent requests during the race condition.
+			if ( ! $is_race_condition ) {
+				$lock->release();
+			}
+		}
+	} else {
+		$lock->log( $request_id . sprintf( 'Couldn\'t get the lock while initiating the document %1$s with order ID# %2$s.', $document_type, $order_id ), 'critical' );
+	}
+}
+
+/**
+ * Unschedule actions for a specific hook with partial search arguments
+ *
+ * @param string $hook
+ * @param array  $partial_search_args
+ * 
+ * @return void
+ */
+function wcpdf_unschedule_as_actions( string $hook, array $partial_search_args = array() ): void {
+	$args = apply_filters( 'wcpdf_unschedule_as_actions_args', array(
+		'per_page'	=> -1,
+		'hook'		=> $hook,
+		'status'	=> ActionScheduler_Store::STATUS_PENDING,
+	), $hook, $partial_search_args );
+	
+	// AS >= 3.5.3
+	if ( class_exists( 'ActionScheduler_Versions' ) && ! empty( $partial_search_args ) ) {
+		$as_version = ActionScheduler_Versions::instance()->latest_version();
+		if ( version_compare( $as_version, '3.5.3', '>=' ) ) {
+			$args['args']                  = $partial_search_args;
+			$args['partial_args_matching'] = 'json';
+		}
+	}
+
+	// AS < 3.5.3
+	if ( ! isset( $args['partial_args_matching'] ) && ! empty( $partial_search_args ) ) {
+		$args['search'] = trim( json_encode( $partial_search_args ), '{}' );
+	}
+
+	$actions = as_get_scheduled_actions( $args );
+	
+	if ( count( $actions ) > 0 ) {
+		foreach ( $actions as $action ) {
+			as_unschedule_action( $hook, $action->get_args(), $action->get_group() );
+		}
+	}
+}
+
+/**
+ * Release the lock after the document is initiated
+ *
+ * @param string $lock_name
+ * @param string $request_id
+ * @param string $document_type
+ * @param int $order_id
+ * 
+ * @return void
+ */
+add_action( 'wpo_wcpdf_init_document_release_lock', function( string $lock_name, string $request_id, string $document_type, int $order_id ): void {
+	$lock = new Semaphore( $lock_name, WPO_WCPDF()->lock_time, WPO_WCPDF()->lock_loggers, WPO_WCPDF()->lock_context );
+	$lock->log( $request_id . sprintf( 'Lock released for %1$s with order ID# %2$s.', $document_type, $order_id ), 'info' );
+	$lock->release();
+}, 10, 4 );
 
 function wcpdf_get_bulk_document( $document_type, $order_ids ) {
 	return new \WPO\WC\PDF_Invoices\Documents\Bulk_Document( $document_type, $order_ids );
