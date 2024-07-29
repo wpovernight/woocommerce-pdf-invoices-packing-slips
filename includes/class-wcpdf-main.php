@@ -139,7 +139,7 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
-		$lock                     = new Semaphore( "_order_{$order_id}_email_{$email_id}" );
+		$lock                     = new Semaphore( "attach_doc_to_email_{$email_id}_from_order_{$order_id}" );
 
 		if ( $lock->lock( apply_filters( 'wpo_wcpdf_lock_retries', 0, $this ) ) ) {
 
