@@ -148,13 +148,13 @@ function wcpdf_get_bulk_actions() {
  * @param string       $html
  * @param array        $settings
  * @param null|object  $document
- * @return WPO\IPS\Makers\PdfMaker
+ * @return WPO\IPS\Makers\PDFMaker
  */
 function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
-	$class = '\\WPO\\IPS\\Makers\\PdfMaker';
+	$class = '\\WPO\\IPS\\Makers\\PDFMaker';
 
 	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/PdfMaker.php' );
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/PDFMaker.php' );
 	}
 
 	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
@@ -166,13 +166,13 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
  * Get UBL Maker
  * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
  *
- * @return WPO\IPS\Makers\UblMaker
+ * @return WPO\IPS\Makers\UBLMaker
  */
 function wcpdf_get_ubl_maker() {
-	$class = '\\WPO\\IPS\\Makers\\UblMaker';
+	$class = '\\WPO\\IPS\\Makers\\UBLMaker';
 	
 	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/UblMaker.php' );
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/UBLMaker.php' );
 	}
 
 	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
@@ -186,7 +186,7 @@ function wcpdf_get_ubl_maker() {
  * @return bool whether the PDF maker is the default or not
  */
 function wcpdf_pdf_maker_is_default() {
-	$default_pdf_maker = '\\WPO\\IPS\\Makers\\PdfMaker';
+	$default_pdf_maker = '\\WPO\\IPS\\Makers\\PDFMaker';
 	
 	return $default_pdf_maker == apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker );
 }

@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\IPS\\Makers\\PdfMaker' ) ) :
+if ( ! class_exists( '\\WPO\\IPS\\Makers\\PDFMaker' ) ) :
 
-class PdfMaker {
+class PDFMaker {
 
 	public $html;
 	public $settings;

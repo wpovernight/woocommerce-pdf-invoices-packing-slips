@@ -25,8 +25,8 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 	'\\WPO\\WC\\PDF_Invoices\\Documents\\Sequential_Number_Store' => '\\WPO\\IPS\\Documents\\SequentialNumberStore',
 	
 	// includes/Makers
-	'\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker'                  => '\\WPO\\IPS\\Makers\\PdfMaker',
-	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\UblMaker',
+	'\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker'                  => '\\WPO\\IPS\\Makers\\PDFMaker',
+	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\UBLMaker',
 	
 	// includes/Settings
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks'       => '\\WPO\\IPS\\Settings\\SettingsCallbacks',

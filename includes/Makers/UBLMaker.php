@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\IPS\\Makers\\UblMaker' ) ) :
+if ( ! class_exists( '\\WPO\\IPS\\Makers\\UBLMaker' ) ) :
 
-class UblMaker {
+class UBLMaker {
 
 	protected $tmp_base;
 
