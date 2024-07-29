@@ -3,7 +3,6 @@
 namespace WPO\IPS\UBL\Transformers;
 
 use WPO\IPS\UBL\Models\Order;
-use WPO\IPS\UBL\Transformers\AddressTransformer;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

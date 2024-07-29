@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\UBL\Handlers\Ubl;
+namespace WPO\IPS\UBL\Handlers\Invoice;
 
 use WPO\IPS\UBL\Handlers\UblHandler;
 

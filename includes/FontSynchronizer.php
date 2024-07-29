@@ -2,7 +2,6 @@
 namespace WPO\IPS;
 
 use WPO\IPS\Vendor\Dompdf\Dompdf;
-use WPO\IPS\Vendor\Dompdf\Options;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

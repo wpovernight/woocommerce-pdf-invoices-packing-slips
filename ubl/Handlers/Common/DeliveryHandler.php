@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\UBL\Handlers\Ubl;
+namespace WPO\IPS\UBL\Handlers\DocumentHandlers;
 
 use WPO\IPS\UBL\Handlers\UblHandler;
 
