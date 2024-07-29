@@ -2,6 +2,12 @@
 namespace WPO\IPS;
 
 use WPO\IPS\Documents\SequentialNumberStore;
+use WPO\IPS\Settings\SettingsCallbacks;
+use WPO\IPS\Settings\SettingsGeneral;
+use WPO\IPS\Settings\SettingsDocuments;
+use WPO\IPS\Settings\SettingsDebug;
+use WPO\IPS\Settings\SettingsUbl;
+use WPO\IPS\Settings\SettingsUpgrade;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -41,12 +47,12 @@ class Settings {
 	}
 
 	public function __construct() {
-		$this->callbacks        = \WPO\IPS\Settings\SettingsCallbacks::instance();
-		$this->general          = \WPO\IPS\Settings\SettingsGeneral::instance();
-		$this->documents        = \WPO\IPS\Settings\SettingsDocuments::instance();
-		$this->debug            = \WPO\IPS\Settings\SettingsDebug::instance();
-		$this->ubl              = \WPO\IPS\Settings\SettingsUbl::instance();
-		$this->upgrade          = \WPO\IPS\Settings\SettingsUpgrade::instance();
+		$this->callbacks        = SettingsCallbacks::instance();
+		$this->general          = SettingsGeneral::instance();
+		$this->documents        = SettingsDocuments::instance();
+		$this->debug            = SettingsDebug::instance();
+		$this->ubl              = SettingsUbl::instance();
+		$this->upgrade          = SettingsUpgrade::instance();
 
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
 		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
