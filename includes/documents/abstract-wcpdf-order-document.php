@@ -231,7 +231,7 @@ abstract class Order_Document {
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 
-		if ( $lock->lock( apply_filters( 'wpo_wcpdf_lock_retries', 0, $this ) ) && empty( $document_number ) ) {
+		if ( $lock->lock() && empty( $document_number ) ) {
 			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 
 			try {

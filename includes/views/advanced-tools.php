@@ -81,6 +81,10 @@
 						?>
 					</p>
 				</div>
+			<?php else : ?>
+				<div class="notice notice-success inline">
+					<p><?php _e( 'There are no expired locks in the database.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				</div>
 			<?php endif; ?>
 		</div>
 		<!-- /clear_semaphore_expired_locks -->

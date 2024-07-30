@@ -810,7 +810,7 @@ class Settings {
 		// if no concurrent actions sets the action
 		if ( $scheduled_actions < 1 ) {
 
-			if ( $lock->lock( apply_filters( 'wpo_wcpdf_lock_retries', 0, $this ) ) ) {
+			if ( $lock->lock() ) {
 
 				$lock->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
 
@@ -859,7 +859,7 @@ class Settings {
 	public function yearly_reset_numbers() {
 		$lock = new Semaphore( 'yearly_reset_numbers' );
 
-		if ( $lock->lock( apply_filters( 'wpo_wcpdf_lock_retries', 0, $this ) ) ) {
+		if ( $lock->lock() ) {
 
 			$lock->log( 'Lock acquired for yearly reset numbers.', 'info' );
 

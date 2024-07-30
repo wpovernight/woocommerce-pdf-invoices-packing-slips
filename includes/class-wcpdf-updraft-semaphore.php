@@ -23,6 +23,13 @@ class Updraft_Semaphore_3_0 {
 	 * @var int
 	 */
 	protected $locked_for;
+	
+	/**
+	 * Number of retries to acquire the lock
+	 * 
+	 * @var int
+	 */
+	protected $retries;
 
 	/**
 	 * An array of loggers
@@ -50,14 +57,16 @@ class Updraft_Semaphore_3_0 {
 	 *
 	 * @param string $name        - a unique (across the WP site) name for the lock. Should be no more than 51 characters in length (because of the use of the WP options table, with some further characters used internally)
 	 * @param int    $locked_for  - time (in seconds) after which the lock will expire if not released. This needs to be positive if you don't want bad things to happen.
+	 * @param int    $retries     - how many times to retry (after a 1 second sleep each time)
 	 * @param array  $loggers     - an array of loggers
 	 * @param array  $context     - an array of context for the loggers
 	 */
-	public function __construct( string $name, int $locked_for = 300, array $loggers = array(), array $context = array() ) {
+	public function __construct( string $name, int $locked_for = 300, int $retries = 0, array $loggers = array(), array $context = array() ) {
 		$this->option_name = 'wpo_ips_semaphore_lock_' . $name;
-		$this->locked_for  = apply_filters( 'wpo_ips_semaphore_lock_time', $locked_for > 0 ? $locked_for : 300 );
-		$this->loggers     = apply_filters( 'wpo_ips_semaphore_lock_loggers', empty( $loggers ) ? array( wc_get_logger() ) : $loggers );
-		$this->context     = apply_filters( 'wpo_ips_semaphore_lock_context', empty( $context ) ? array( 'source' => 'wpo-ips-semaphore' ) : $context );
+		$this->locked_for  = apply_filters( 'wpo_ips_semaphore_lock_time', $locked_for > 0 ? $locked_for : 300, $this->option_name );
+		$this->retries     = apply_filters( 'wpo_ips_semaphore_lock_retries', $retries > 0 ? $retries : 0, $this->option_name );
+		$this->loggers     = apply_filters( 'wpo_ips_semaphore_lock_loggers', empty( $loggers ) ? array( wc_get_logger() ) : $loggers, $this->option_name );
+		$this->context     = apply_filters( 'wpo_ips_semaphore_lock_context', empty( $context ) ? array( 'source' => 'wpo-ips-semaphore' ) : $context, $this->option_name );
 	}
 
 	/**
@@ -102,7 +111,8 @@ class Updraft_Semaphore_3_0 {
 
 		global $wpdb;
 
-		$time_now = time();
+		$time_now      = time();
+		$retries       = $retries > 0 ? $retries : $this->retries;
 		$acquire_until = $time_now + $this->locked_for;
 
 		$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d", $acquire_until, $this->option_name, $time_now );
@@ -244,13 +254,11 @@ class Updraft_Semaphore_3_0 {
 	public static function cleanup_expired_locks(): void {
 		global $wpdb;
 		
-		$time_now = time();
-		
 		// Cleanup legacy expired locks
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%' AND option_value < %d", $time_now ) );
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%'" );
 		
 		// Cleanup expired locks
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%' AND option_value < %d", $time_now ) );
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%'" );
 	}
 	
 	/**
@@ -261,23 +269,16 @@ class Updraft_Semaphore_3_0 {
 	public static function count_expired_locks(): int {
 		global $wpdb;
 
-		$time_now = time();
-		$count    = 0;
+		$count = 0;
 
 		// Count legacy expired locks
 		$count += (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%' AND option_value < %d",
-				$time_now
-			)
+			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%'"
 		);
 
 		// Count expired locks
 		$count += (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%' AND option_value < %d",
-				$time_now
-			)
+			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%'"
 		);
 
 		return $count;
