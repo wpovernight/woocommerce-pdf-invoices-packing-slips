@@ -7,7 +7,7 @@
  * @license http://creativecommons.org/licenses/publicdomain/ Public Domain
  * @package Cpdf
  *
- * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf;
 

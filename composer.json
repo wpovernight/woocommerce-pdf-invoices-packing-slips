@@ -1,14 +1,14 @@
 {
 	"name": "wpovernight/woocommerce-pdf-invoices-packing-slips",
-		"description": "PDF Invoices & Packing Slips for WooCommerce",
-		"autoload": {
-			"psr-4": {
-				"WPO\\IPS\\": "includes/",
-				"WPO\\IPS\\UBL\\": "ubl/"
-			},
-			"classmap": [
-				"vendor/"
-			]
+	"description": "PDF Invoices & Packing Slips for WooCommerce",
+	"autoload": {
+		"psr-4": {
+			"WPO\\IPS\\": "includes/",
+			"WPO\\IPS\\UBL\\": "ubl/"
+		},
+		"classmap": [
+			"vendor/"
+		]
 	},
 	"require": {
 		"dompdf/dompdf": "^3.0",
@@ -22,18 +22,13 @@
 			"namespace_prefix": "WPO\\IPS\\Vendor\\",
 			"classmap_prefix": "WPO_IPS_Vendor_",
 			"constant_prefix": "WPO_IPS_VENDOR_",
-			"packages": [
-			],
+			"packages": [],
 			"update_call_sites": false,
-			"override_autoload": {
-			},
+			"override_autoload": {},
 			"exclude_from_copy": {
-				"packages": [
-				],
-				"namespaces": [
-				],
-				"file_patterns": [
-				]
+				"packages": [],
+				"namespaces": [],
+				"file_patterns": []
 			},
 			"exclude_from_prefix": {
 				"packages": [
@@ -41,13 +36,10 @@
 					"symfony/polyfill-iconv",
 					"masterminds/html5"
 				],
-				"namespaces": [
-				],
-				"file_patterns": [
-				]
+				"namespaces": [],
+				"file_patterns": []
 			},
-			"namespace_replacement_patterns" : {
-			},
+			"namespace_replacement_patterns": {},
 			"delete_vendor_packages": false,
 			"delete_vendor_files": false
 		}

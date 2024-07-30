@@ -2,7 +2,7 @@
 /**
  * @license BSD-3-Clause
  *
- * Modified by wpovernight on 15-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 declare(strict_types=1);
@@ -38,7 +38,7 @@ class LibXMLException extends ParseException
      * @param LibXMLError[] $errors
      * @param Throwable     $previousException
      */
-    public function __construct(array $errors, int $code = 0, Throwable $previousException = null)
+    public function __construct(array $errors, int $code = 0, ?Throwable $previousException = null)
     {
         $this->errors = $errors;
         parent::__construct($errors[0]->message.' on line '.$errors[0]->line.', column '.$errors[0]->column, $code, $previousException);
