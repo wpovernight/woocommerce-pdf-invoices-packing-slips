@@ -3,7 +3,6 @@
 namespace WPO\IPS\UBL\Handlers\Common;
 
 use WPO\IPS\UBL\Handlers\UblHandler;
-use WPO\IPS\UBL\Models\Order;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
