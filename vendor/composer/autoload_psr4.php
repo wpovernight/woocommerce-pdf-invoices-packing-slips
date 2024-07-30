@@ -14,7 +14,7 @@ return array(
     'WPO\\IPS\\Vendor\\Sabre\\Xml\\' => array($vendorDir . '/sabre/xml/lib'),
     'WPO\\IPS\\Vendor\\Sabre\\Uri\\' => array($vendorDir . '/sabre/uri/lib'),
     'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\' => array($vendorDir . '/sabberworm/php-css-parser/src'),
-    'Masterminds\\' => array($vendorDir . '/masterminds/html5/src'),
+    'WPO\\IPS\\Vendor\\Masterminds\\' => array($vendorDir . '/masterminds/html5/src'),
     'WPO\\IPS\\Vendor\\FontLib\\' => array($vendorDir . '/dompdf/php-font-lib/src/FontLib'),
     'WPO\\IPS\\Vendor\\Dompdf\\' => array($vendorDir . '/dompdf/dompdf/src'),
 );

@@ -35,8 +35,7 @@
 			"exclude_from_prefix": {
 				"packages": [
 					"symfony/polyfill-mbstring",
-					"symfony/polyfill-iconv",
-					"masterminds/html5"
+					"symfony/polyfill-iconv"
 				],
 				"namespaces": [],
 				"file_patterns": []
