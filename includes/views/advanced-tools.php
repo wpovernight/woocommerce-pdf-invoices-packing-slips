@@ -74,8 +74,13 @@
 					<p>
 						<?php
 							printf(
-								/* translators: %s: number of expired locks */
-								__( 'There are %s expired locks in the database.', 'woocommerce-pdf-invoices-packing-slips' ),
+								/* translators: 1: number of expired locks */
+								_n(
+									'There is %s expired lock in the database.', 
+									'There are %s expired locks in the database.', 
+									$semaphore_expired_locks, 
+									'woocommerce-pdf-invoices-packing-slips'
+								),
 								'<strong>' . $semaphore_expired_locks . '</strong>'
 							);
 						?>
