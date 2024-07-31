@@ -796,7 +796,7 @@ class Admin {
 			return;
 		}
 
-		$data = apply_filters( 'wpo_wcpdf_metabox_data_fields', $data, $document );
+		$data = apply_filters( 'wpo_wcpdf_document_data_meta_box_fields', $data, $document );
 
 		if ( empty( $data ) ) {
 			return;
