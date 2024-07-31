@@ -791,11 +791,19 @@ class Admin {
 		return apply_filters( 'wpo_wcpdf_current_values_for_document', $data, $document );
 	}
 
-	public function output_number_date_edit_fields( $document, $data ) {
-		if ( empty( $document ) || empty( $data ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
+	public function output_number_date_edit_fields( $document, $data ): void {
+		if ( empty( $document ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
 			return;
 		}
+
+		$data = apply_filters( 'wpo_wcpdf_metabox_data_fields', $data, $document );
+
+		if ( empty( $data ) ) {
+			return;
+		}
+
 		$data = $this->get_current_values_for_document( $document, $data );
+
 		?>
 		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
