@@ -1,12 +1,17 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Element;
+namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
-use Sabre\Xml\Element;
-use Sabre\Xml\Reader;
-use Sabre\Xml\Writer;
+use WPO\IPS\Vendor\Sabre\Xml\Element;
+use WPO\IPS\Vendor\Sabre\Xml\Reader;
+use WPO\IPS\Vendor\Sabre\Xml\Writer;
 
 /**
  * The XmlFragment element allows you to extract a portion of your xml tree,

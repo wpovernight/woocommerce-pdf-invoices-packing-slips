@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\WC\UBL\Repositories\Contracts;
+namespace WPO\IPS\UBL\Repositories\Contracts;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

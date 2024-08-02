@@ -5,11 +5,14 @@
  *
  * These output rules are likely to generate output similar to the document that
  * was parsed. It is not intended to output exactly the document that was parsed.
+ *
+ * @license MIT
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Masterminds\HTML5\Serializer;
+namespace WPO\IPS\Vendor\Masterminds\HTML5\Serializer;
 
-use Masterminds\HTML5\Elements;
+use WPO\IPS\Vendor\Masterminds\HTML5\Elements;
 
 /**
  * Generate the output html5 based on element rules.

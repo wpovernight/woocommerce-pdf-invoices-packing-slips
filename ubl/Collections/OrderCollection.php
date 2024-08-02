@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\WC\UBL\Collections;
+namespace WPO\IPS\UBL\Collections;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

@@ -1,8 +1,8 @@
 <?php
 
-namespace WPO\WC\UBL\Transformers;
+namespace WPO\IPS\UBL\Transformers;
 
-use WPO\WC\UBL\Models\DateTime;
+use WPO\IPS\UBL\Models\DateTime;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

@@ -1,8 +1,13 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml;
+namespace WPO\IPS\Vendor\Sabre\Xml;
 
 /**
  * XML parsing and writing service.
@@ -109,7 +114,7 @@ class Service
      *
      * @return array|object|string
      */
-    public function parse($input, string $contextUri = null, string &$rootElementName = null)
+    public function parse($input, ?string $contextUri = null, ?string &$rootElementName = null)
     {
         if (is_resource($input)) {
             // Unfortunately the XMLReader doesn't support streams. When it
@@ -153,7 +158,7 @@ class Service
      *
      * @return array|object|string
      */
-    public function expect($rootElementName, $input, string $contextUri = null)
+    public function expect($rootElementName, $input, ?string $contextUri = null)
     {
         if (is_resource($input)) {
             // Unfortunately the XMLReader doesn't support streams. When it
@@ -204,7 +209,7 @@ class Service
      *
      * @return string
      */
-    public function write(string $rootElementName, $value, string $contextUri = null)
+    public function write(string $rootElementName, $value, ?string $contextUri = null)
     {
         $w = $this->getWriter();
         $w->openMemory();
@@ -245,10 +250,10 @@ class Service
         list($namespace) = self::parseClarkNotation($elementName);
 
         $this->elementMap[$elementName] = function (Reader $reader) use ($className, $namespace) {
-            return \Sabre\Xml\Deserializer\valueObject($reader, $className, $namespace);
+            return \WPO\IPS\Vendor\Sabre\Xml\Deserializer\valueObject($reader, $className, $namespace);
         };
         $this->classMap[$className] = function (Writer $writer, $valueObject) use ($namespace) {
-            return \Sabre\Xml\Serializer\valueObject($writer, $valueObject, $namespace);
+            return \WPO\IPS\Vendor\Sabre\Xml\Serializer\valueObject($writer, $valueObject, $namespace);
         };
         $this->valueObjectMap[$className] = $elementName;
     }
@@ -266,7 +271,7 @@ class Service
      *
      * @throws \InvalidArgumentException
      */
-    public function writeValueObject($object, string $contextUri = null)
+    public function writeValueObject($object, ?string $contextUri = null)
     {
         if (!isset($this->valueObjectMap[get_class($object)])) {
             throw new \InvalidArgumentException('"'.get_class($object).'" is not a registered value object class. Register your class with mapValueObject.');

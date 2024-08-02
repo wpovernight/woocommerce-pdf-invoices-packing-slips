@@ -1,8 +1,8 @@
 <?php
 
-namespace WPO\WC\UBL\Documents;
+namespace WPO\IPS\UBL\Documents;
 
-use WPO\WC\PDF_Invoices\Documents\Order_Document;
+use WPO\IPS\Documents\OrderDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -19,7 +19,7 @@ abstract class Document {
 	/** @var string */
 	public $output;
 
-	/** @var Order_Document */
+	/** @var OrderDocument */
 	public $order_document;
 
 	public function set_order( \WC_Abstract_Order $order ) {
@@ -27,7 +27,7 @@ abstract class Document {
 		$this->order_tax_data = $this->get_tax_rates();
 	}
 
-	public function set_order_document( Order_Document $order_document ) {
+	public function set_order_document( OrderDocument $order_document ) {
 		$this->order_document = $order_document;
 	}
 

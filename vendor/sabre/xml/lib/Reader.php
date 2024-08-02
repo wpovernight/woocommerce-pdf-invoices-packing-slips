@@ -1,8 +1,13 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml;
+namespace WPO\IPS\Vendor\Sabre\Xml;
 
 use XMLReader;
 
@@ -103,7 +108,7 @@ class Reader extends XMLReader
      * If the $elementMap argument is specified, the existing elementMap will
      * be overridden while parsing the tree, and restored after this process.
      */
-    public function parseGetElements(array $elementMap = null): array
+    public function parseGetElements(?array $elementMap = null): array
     {
         $result = $this->parseInnerTree($elementMap);
         if (!is_array($result)) {
@@ -126,7 +131,7 @@ class Reader extends XMLReader
      *
      * @return array|string|null
      */
-    public function parseInnerTree(array $elementMap = null)
+    public function parseInnerTree(?array $elementMap = null)
     {
         $text = null;
         $elements = [];
@@ -283,12 +288,12 @@ class Reader extends XMLReader
             if ('{}' == substr($name, 0, 2) && array_key_exists(substr($name, 2), $this->elementMap)) {
                 $name = substr($name, 2);
             } else {
-                return ['Sabre\\Xml\\Element\\Base', 'xmlDeserialize'];
+                return ['WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Base', 'xmlDeserialize'];
             }
         }
 
         $deserializer = $this->elementMap[$name];
-        if (is_subclass_of($deserializer, 'Sabre\\Xml\\XmlDeserializable')) {
+        if (is_subclass_of($deserializer, 'WPO\\IPS\\Vendor\\Sabre\\Xml\\XmlDeserializable')) {
             return [$deserializer, 'xmlDeserialize'];
         }
 

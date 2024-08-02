@@ -2,9 +2,12 @@
 /**
  * @file
  * The interface definition for Rules to generate output.
+ *
+ * @license MIT
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Masterminds\HTML5\Serializer;
+namespace WPO\IPS\Vendor\Masterminds\HTML5\Serializer;
 
 /**
  * To create a new rule set for writing output the RulesInterface needs to be implemented.
