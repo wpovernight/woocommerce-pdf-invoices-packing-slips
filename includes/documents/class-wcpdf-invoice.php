@@ -59,15 +59,7 @@ class Invoice extends Order_Document_Methods {
 	public function init() {
 		// save settings
 		$this->save_settings();
-
-		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
-			$this->set_date( $this->order->get_date_created() );
-			$this->set_display_date( 'order_date' );
-		} elseif( empty( $this->get_date() ) ) {
-			$this->set_date( current_time( 'timestamp', true ) );
-			$this->set_display_date( 'invoice_date' );
-		}
-
+		$this->initiate_date();
 		$this->initiate_number();
 
 		do_action( 'wpo_wcpdf_init_document', $this );
