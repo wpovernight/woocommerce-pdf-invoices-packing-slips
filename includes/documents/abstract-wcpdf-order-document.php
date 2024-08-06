@@ -845,26 +845,19 @@ abstract class Order_Document {
 	}
 
 	public function has_header_logo() {
-		return !empty( $this->settings['header_logo'] );
+		return ! empty( $this->settings['header_logo'] );
 	}
 
 	/**
 	 * Return logo id
 	 *
-	 * @return int|bool
+	 * @return int
 	 */
-	public function get_header_logo_id() {
-		$header_logo_id = false;
+	public function get_header_logo_id(): int {
+		$header_logo_id = ! empty( $this->settings['header_logo'] ) ? $this->get_settings_text( 'header_logo', 0, false ) : 0;		
+		$header_logo_id = apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 
-		if ( ! empty( $this->settings['header_logo'] ) ) {
-			$header_logo_id = absint( $this->get_settings_text( 'header_logo', '', false ) );
-
-			if ( 0 === $header_logo_id ) {
-				$header_logo_id = false;
-			}
-		}
-
-		return apply_filters( 'wpo_wcpdf_header_logo_id', absint( $header_logo_id ), $this );
+		return $header_logo_id && is_numeric( $header_logo_id ) ? absint( $header_logo_id ) : 0;
 	}
 
 	/**
@@ -877,44 +870,41 @@ abstract class Order_Document {
 	}
 
 	/**
-	 * Show logo html
+	 * Show logo HTML
+	 *
+	 * @return void
 	 */
-	public function header_logo() {
+	public function header_logo(): void {
 		$attachment_id = $this->get_header_logo_id();
 
-		if ( $attachment_id ) {
+		if ( $attachment_id > 0 ) {
 			$company         = $this->get_shop_name();
-			$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
-			$attachment_path = get_attached_file( $attachment_id );
+			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
+			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 
-			if ( empty( $attachment ) || empty( $attachment_path ) ) {
+			if ( empty( $attachment_src ) || empty( $attachment_path ) ) {
+				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
 			}
 
-			$attachment_src    = $attachment[0];
-			$attachment_width  = $attachment[1];
-			$attachment_height = $attachment[2];
-
-			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
-				$src = $attachment_path;
-			} else {
-				$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
-				if ( is_wp_error( $head ) ) {
-					$errors = $head->get_error_messages();
-					foreach ( $errors as $error ) {
-						wcpdf_log_error( $error, 'critical' );
-					}
-					return;
-				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
-					$src = $attachment_src;
-				} else {
-					return;
-				}
+			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
+			
+			// fix URLs using path
+			if ( ! apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
+				$path = preg_replace( '/^https?:\/\//', '', $src ); // removes http(s)://
+				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
 			}
 
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
+			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
+				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
+				return;
+			}
 
-			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
+			$image_src   = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
+
+			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
+
 		}
 	}
 

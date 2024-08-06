@@ -42,6 +42,7 @@ class PDF_Maker {
 			'logOutputFile'           => WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) . "/log.htm",
 			'defaultFont'             => 'dejavu sans',
 			'isRemoteEnabled'         => true,
+			'isHtml5ParserEnabled'    => true,
 			'isFontSubsettingEnabled' => $this->settings['font_subsetting'],
 		) ) );
 
