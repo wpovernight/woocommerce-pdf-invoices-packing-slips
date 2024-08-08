@@ -383,8 +383,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding-bottom: 0.6em;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr:not(:last-child) > td,
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr:not(:last-child) > td {
 	padding-bottom: 2.4em;
 }
 
@@ -453,6 +453,58 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th {
 	width: 300px !important;
 }
+
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings_category {
+	margin-bottom: 1em;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 {
+	border: 1px solid #ddd;
+	font-weight: normal;
+	color: #222;
+	font-family: serif;
+	font-size: 18px;
+	cursor: pointer;
+	background-color: #fafafa;
+	padding: 0.75em;
+	margin: 0;
+	border-radius: 3px;
+	position: relative;
+	transition: transform 0.3s;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings_category h2.active {
+	border-radius: 3px 3px 0 0;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings_category h2:hover {
+	background-color: #f3f3f3;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 ~ .form-table {
+	padding: 1em !important;
+	border: 1px solid #dcdcdc;
+	margin-top: -2px;
+	border-radius: 0 0 3px 3px;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings_category h2::after {
+	content: '\f347';
+	font-family: 'dashicons';
+	font-size: 19px;
+	color: #82878c;
+	position: absolute;
+	right: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	transition: transform 0.3s;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings_category h2.active::after {
+	transform: translateY(-50%) rotate(180deg);
+}
+
 
 /* WPML */
 
