@@ -49,10 +49,10 @@ jQuery( function( $ ) {
 	$( "[name='wpo_wcpdf_documents_settings_invoice[display_number]']" ).on( 'change', function( event ) {
 		if ( $( this ).val() == 'order_number' ) {
 			$( this ).closest( 'td' ).find( '.description' ).slideDown();
-			$( this ).closest( 'tr' ).next( 'tr' ).hide();
+			$( this ).closest( 'tr' ).nextAll('tr').has('input#next_invoice_number').first().hide();
 		} else {
 			$( this ).closest( 'td' ).find( '.description' ).hide();
-			$( this ).closest( 'tr' ).next( 'tr' ).show();
+			$( this ).closest( 'tr' ).nextAll('tr').has('input#next_invoice_number').first().show();
 		}
 	} ).trigger( 'change' );
 
@@ -584,5 +584,35 @@ jQuery( function( $ ) {
 	}
 
 	//----------> /Preview <----------//
+
+	function settingsAccordion() {
+		// Hide all the content initially except the "init"
+		$( '.settings_category' ).not( '#init' ).find( '.form-table' ).hide();
+
+		let state_exists = false;
+		// Retrieve the state from localStorage
+		$( '.settings_category h2' ).each( function( index ) {
+			const state = localStorage.getItem( 'wcpdf_accordion_state' + index );
+			if ( 'true' === state ) {
+				state_exists = true;
+				$( this ).addClass( 'active' ).next( '.form-table' ).show();
+			}
+		} );
+
+		// Show the first accordion by default if there's no state saved
+		if ( ! state_exists ) {
+			$( '.settings_category h2:first' ).addClass( 'active' ).next( '.form-table' ).show();
+		}
+
+		$('.settings_category h2' ).click( function() {
+			const index = $( '.settings_category h2' ).index( $( this ) );
+
+			$( this ).toggleClass( 'active' ).next( '.form-table' ).slideToggle( 'fast', function() {
+				localStorage.setItem( 'wcpdf_accordion_state' + index, $( this ).is( ':visible' ) );
+			} );
+		} );
+	}
+
+	settingsAccordion();
 
 } );
