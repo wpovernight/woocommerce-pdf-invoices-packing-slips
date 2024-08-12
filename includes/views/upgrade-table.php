@@ -21,7 +21,6 @@ $all_plugins = get_plugins();
 	<tr>
 		<th class="first" align="left">&nbsp;</th>
 		<th align="left"><?php esc_html_e( 'Professional', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-		<th align="left"><?php esc_html_e( 'Premium Templates', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left"><?php esc_html_e( 'Bundle', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left" class="last">&nbsp;</td>
 	</tr>
@@ -30,7 +29,7 @@ $all_plugins = get_plugins();
 	foreach ( $features as $feature ) {
 		echo '<tr><td class="first feature-label">' . $feature['label'];
 		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . $feature['description'] . '</span></td>' : '</td>';
-		foreach ( ['pro', 'templates', 'bundle'] as $extension ) {
+		foreach ( ['pro', 'bundle'] as $extension ) {
 			echo in_array( $extension, $feature['extensions'] ) ? '<td><span class="feature-available"></span></td>' : '<td>-</td>';
 		}
 		echo '<td align="left" class="last">&nbsp;</td></tr>';

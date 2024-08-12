@@ -20,7 +20,7 @@ class Settings_Upgrade {
 	}
 
 	public function __construct() {
-		$this->extensions = array( 'pro', 'templates' );
+		$this->extensions = array( 'pro' );
 
 		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
@@ -100,7 +100,7 @@ class Settings_Upgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-the-customizer/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add custom data to your documents', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -110,17 +110,17 @@ class Settings_Upgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-custom-blocks/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Additional PDF templates', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Make use of our Business or Modern template designs.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add styling', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Easily change the look and feel of your documents by adding some custom CSS.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 			);
 
