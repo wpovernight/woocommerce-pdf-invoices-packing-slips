@@ -1291,6 +1291,11 @@ abstract class Order_Document_Methods extends Order_Document {
 			$document_display_date = $document_settings['display_date'] ?? 'document_date';
 		}
 
+		// Convert the old `invoice_date` slug to the new `document_date` slug.
+		if ( 'invoice_date' === $document_display_date ) {
+			$document_display_date = 'document_date';
+		}
+
 		return $this->get_display_date_label( $document_display_date );
 	}
 
