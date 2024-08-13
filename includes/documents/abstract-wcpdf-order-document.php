@@ -253,7 +253,7 @@ abstract class Order_Document {
 					if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
 						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
 					} else {
-						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'invoice_date' );
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'document_date' );
 					}
 				}
 

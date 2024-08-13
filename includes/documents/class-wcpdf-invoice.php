@@ -269,7 +269,7 @@ class Invoice extends Order_Document_Methods {
 					'id'			=> 'display_date',
 					'options' 		=> array(
 						''				=> __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'invoice_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'document_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'order_date'	=> __( 'Order Date' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 				)
