@@ -1296,7 +1296,11 @@ abstract class Order_Document_Methods extends Order_Document {
 
 	public function get_display_date_label( string $date_string ): string {
 		$date_labels = array(
-			'document_date' => __( 'Document Date', 'woocommerce-pdf-invoices-packing-slips' ),
+			'document_date' => sprintf(
+				/* translators: Document title */
+				__( '%s Date', 'woocommerce-pdf-invoices-packing-slips' ),
+				$this->title
+			),
 			'order_date'    => __( 'Order Date', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 
