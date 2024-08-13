@@ -262,8 +262,13 @@ abstract class Order_Document {
 		}
 	}
 
+	/**
+	 * Initiate and set document date and display_date.
+	 *
+	 * @return void
+	 */
 	public function initiate_date(): void {
-		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] === 'order_date' && ! empty( $this->order ) ) {
+		if ( isset( $this->settings['display_date'] ) && 'order_date' === $this->settings['display_date'] && ! empty( $this->order ) ) {
 			$this->set_date( $this->order->get_date_created() );
 			$this->set_display_date( 'order_date' );
 		} elseif ( empty( $this->get_date() ) ) {
@@ -311,11 +316,11 @@ abstract class Order_Document {
 	/**
 	 * Generate the document number.
 	 *
-	 * @param bool $increment_document_number
+	 * @param bool $increment
 	 *
 	 * @return mixed
 	 */
-	public function generate_document_number( bool $increment_document_number = false ) {
+	public function generate_document_number( bool $increment = false ) {
 		$document_number = null;
 
 		// If a third-party plugin claims to generate document numbers, trigger this instead
@@ -338,7 +343,7 @@ abstract class Order_Document {
 		} else {
 			$number_store = $this->get_sequential_number_store();
 
-			if ( $increment_document_number ) {
+			if ( $increment ) {
 				$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 			} else {
 				$document_number = $number_store->get_next();
@@ -854,7 +859,7 @@ abstract class Order_Document {
 	 * @return int
 	 */
 	public function get_header_logo_id(): int {
-		$header_logo_id = ! empty( $this->settings['header_logo'] ) ? $this->get_settings_text( 'header_logo', 0, false ) : 0;		
+		$header_logo_id = ! empty( $this->settings['header_logo'] ) ? $this->get_settings_text( 'header_logo', 0, false ) : 0;
 		$header_logo_id = apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 
 		return $header_logo_id && is_numeric( $header_logo_id ) ? absint( $header_logo_id ) : 0;
@@ -888,7 +893,7 @@ abstract class Order_Document {
 			}
 
 			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
-			
+
 			// fix URLs using path
 			if ( ! apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
 				$path = preg_replace( '/^https?:\/\//', '', $src ); // removes http(s)://
