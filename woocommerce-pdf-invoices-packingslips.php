@@ -11,7 +11,7 @@
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 3.3
- * WC tested up to:      9.1
+ * WC tested up to:      9.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -140,7 +140,7 @@ class WPO_WCPDF {
 	public function includes() {
 		// plugin legacy class mapping
 		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
-		
+
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 
