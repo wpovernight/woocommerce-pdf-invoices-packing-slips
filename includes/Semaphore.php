@@ -8,70 +8,73 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 
-/**
- * Class Semaphore
- *
- * This class is much simpler to use than the the previous series, as it has dropped support for complicated cases that were not being used. It also now only uses a single row in the options database, and takes care of creating it itself internally.
- *
- * Logging, though, may be noisier, unless your loggers are taking note of the log level and only registering what is required.
- *
- * Example of use (a lock that will expire if not released within 300 seconds)
- *
- * See test.php for a longer example (including logging).
- *
- * $my_lock = new Semaphore('my_lock_name', 300);
- * // If getting the lock does not succeed first time, try again up to twice
- * if ($my_lock->lock(2)) {
- *   try {
- *     // do stuff ...
- *   } catch (Exception $e) {
- *     // We are making sure we release the lock in case of an error
- *   } catch (Error $e) {
- *     // We are making sure we release the lock in case of an error
- *   }
- *   $my_lock->release();
- * } else {
- *   error_log("Sorry, could not get the lock");
- * }
- */
 class Semaphore {
 
-	// Time after which the lock will expire (in seconds)
-	protected $locked_for;
-
-	// Name for the lock in the WP options table
+	/**
+	 * Name for the lock in the WP options table
+	 *
+	 * @var string
+	 */
 	protected $option_name;
 
-	// Lock status - a boolean
-	protected $acquired = false;
+	/**
+	 * Time after which the lock will expire (in seconds)
+	 *
+	 * @var int
+	 */
+	protected $locked_for;
 
-	// An array of loggers
+	/**
+	 * Number of retries to acquire the lock
+	 *
+	 * @var int
+	 */
+	protected $retries;
+
+	/**
+	 * An array of loggers
+	 *
+	 * @var array
+	 */
 	protected $loggers = array();
 
-	// Context for loggers
+	/**
+	 * Context for loggers
+	 *
+	 * @var array
+	 */
 	protected $context = array();
+
+	/**
+	 * Lock status - a boolean
+	 *
+	 * @var boolean
+	 */
+	protected $acquired = false;
 
 	/**
 	 * Constructor. Instantiating does not lock anything, but sets up the details for future operations.
 	 *
-	 * @param String  $name		  - a unique (across the WP site) name for the lock. Should be no more than 51 characters in length (because of the use of the WP options table, with some further characters used internally)
-	 * @param Integer $locked_for - time (in seconds) after which the lock will expire if not released. This needs to be positive if you don't want bad things to happen.
-	 * @param Array	  $loggers	  - an array of loggers
+	 * @param string $name        - a unique (across the WP site) name for the lock. Should be no more than 51 characters in length (because of the use of the WP options table, with some further characters used internally)
+	 * @param int    $locked_for  - time (in seconds) after which the lock will expire if not released. This needs to be positive if you don't want bad things to happen.
+	 * @param int    $retries     - how many times to retry (after a 1 second sleep each time)
+	 * @param array  $loggers     - an array of loggers
+	 * @param array  $context     - an array of context for the loggers
 	 */
-	public function __construct( $name, $locked_for = 300, $loggers = array(), $context = array() ) {
-		$this->option_name = 'updraft_lock_'.$name;
-		$this->locked_for  = $locked_for;
-		$this->loggers     = $loggers;
-		$this->context     = $context;
+	public function __construct( string $name, int $locked_for = 300, int $retries = 0, array $loggers = array(), array $context = array() ) {
+		$this->option_name = 'wpo_ips_semaphore_lock_' . $name;
+		$this->locked_for  = apply_filters( 'wpo_ips_semaphore_lock_time', $locked_for > 0 ? $locked_for : 300, $this->option_name );
+		$this->retries     = apply_filters( 'wpo_ips_semaphore_lock_retries', $retries > 0 ? $retries : 0, $this->option_name );
+		$this->loggers     = apply_filters( 'wpo_ips_semaphore_lock_loggers', empty( $loggers ) ? array( wc_get_logger() ) : $loggers, $this->option_name );
+		$this->context     = apply_filters( 'wpo_ips_semaphore_lock_context', empty( $context ) ? array( 'source' => 'wpo-ips-semaphore' ) : $context, $this->option_name );
 	}
 
 	/**
 	 * Internal function to make sure that the lock is set up in the database
 	 *
-	 * @return Integer - 0 means 'failed' (which could include that someone else concurrently created it); 1 means 'already existed'; 2 means 'exists, because we created it). The intention is that non-zero results mean that the lock exists.
+	 * @return int - 0 means 'failed' (which could include that someone else concurrently created it); 1 means 'already existed'; 2 means 'exists, because we created it). The intention is that non-zero results mean that the lock exists.
 	 */
-	private function ensure_database_initialised() {
-
+	private function ensure_database_initialised(): int {
 		global $wpdb;
 
 		$sql = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", $this->option_name );
@@ -86,9 +89,9 @@ class Semaphore {
 		$rows_affected = $wpdb->query( $sql );
 
 		if ( $rows_affected > 0 ) {
-			$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') was created in the database', 'debug' );
+			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') was created in the database', 'debug' );
 		} else {
-			$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') failed to be created in the database (could already exist)', 'notice' );
+			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') failed to be created in the database (could already exist)', 'notice' );
 		}
 
 		return ( $rows_affected > 0 ) ? 2 : 0;
@@ -97,25 +100,25 @@ class Semaphore {
 	/**
 	 * Attempt to acquire the lock. If it was already acquired, then nothing extra will be done (the method will be a no-op).
 	 *
-	 * @param Integer $retries - how many times to retry (after a 1 second sleep each time)
+	 * @param int $retries - how many times to retry (after a 1 second sleep each time)
 	 *
-	 * @return Boolean - whether the lock was successfully acquired or not
+	 * @return bool - whether the lock was successfully acquired or not
 	 */
-	public function lock($retries = 0) {
-
+	public function lock( int $retries = 0 ): bool {
 		if ( $this->acquired ) {
 			return true;
 		}
 
 		global $wpdb;
 
-		$time_now = time();
+		$time_now      = time();
+		$retries       = $retries > 0 ? $retries : $this->retries;
 		$acquire_until = $time_now + $this->locked_for;
 
 		$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d", $acquire_until, $this->option_name, $time_now );
 
 		if ( 1 === $wpdb->query( $sql ) ) {
-			$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') acquired', 'info' );
+			$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') acquired', 'info' );
 			$this->acquired = true;
 			return true;
 		}
@@ -128,13 +131,13 @@ class Semaphore {
 		do {
 			// Now that the row has been created, try again
 			if ( 1 === $wpdb->query( $sql ) ) {
-				$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') acquired after initialising the database', 'info' );
+				$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') acquired after initialising the database', 'info' );
 				$this->acquired = true;
 				return true;
 			}
 			$retries--;
-			if ( $retries >=0 ) {
-				$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') not yet acquired; sleeping', 'debug' );
+			if ( $retries >= 0 ) {
+				$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') not yet acquired; sleeping', 'debug' );
 				sleep( 1 );
 				// As a second has passed, update the time we are aiming for
 				$time_now = time();
@@ -143,7 +146,7 @@ class Semaphore {
 			}
 		} while ( $retries >= 0 );
 
-		$this->log( 'Lock ('.$this->option_name.', '.$wpdb->options.') could not be acquired (it is locked)', 'info' );
+		$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') could not be acquired (it is locked)', 'info' );
 
 		return false;
 	}
@@ -153,9 +156,9 @@ class Semaphore {
 	 *
 	 * N.B. We don't attempt to unlock it unless we locked it. i.e. Lost locks are left to expire rather than being forced. (If we want to force them, we'll need to introduce a new parameter).
 	 *
-	 * @return Boolean - if it returns false, then the lock was apparently not locked by us (and the caller will most likely therefore ignore the result, whatever it is).
+	 * @return bool - if it returns false, then the lock was apparently not locked by us (and the caller will most likely therefore ignore the result, whatever it is).
 	 */
-	public function release() {
+	public function release(): bool {
 		if ( ! $this->acquired ) {
 			return false;
 		}
@@ -163,9 +166,9 @@ class Semaphore {
 		global $wpdb;
 		$sql = $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = '0' WHERE option_name = %s", $this->option_name );
 
-		$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') released', 'info' );
+		$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') released', 'info' );
 
-		$result = (int) $wpdb->query($sql) === 1;
+		$result = (int) $wpdb->query( $sql ) === 1;
 
 		$this->acquired = false;
 
@@ -173,28 +176,34 @@ class Semaphore {
 	}
 
 	/**
-	 * Cleans up the DB of any residual data. This should not be used as part of ordinary unlocking; only as part of deinstalling, or if you otherwise know that the lock will not be used again. If calling this, it's redundant to first unlock (and a no-op to attempt to do so afterwards).
+	 * Cleans up the DB of any residual data. This should not be used as part of ordinary unlocking; only as part of deinstalling, or if you otherwise know that the lock will not be used again.
+	 * If calling this, it's redundant to first unlock (and a no-op to attempt to do so afterwards).
+	 *
+	 * @return void
 	 */
-	public function delete() {
+	public function delete(): void {
 		$this->acquired = false;
 
 		global $wpdb;
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s", $this->option_name ) );
 
-		$this->log( 'Lock option ('.$this->option_name.', '.$wpdb->options.') was deleted from the database' );
+		$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') was deleted from the database' );
 	}
 
 	/**
 	 * Captures and logs any given messages
 	 *
-	 * @param String $message - the error message
-	 * @param String $level	  - the message level (debug, notice, info, warning, error)
-	 * @param Array  $context - Optional. Additional information for log handlers.
+	 * @param string $message - the error message
+	 * @param string $level   - the message level (debug, notice, info, warning, error)
+	 * @param array  $context - Optional. Additional information for log handlers.
+	 *
+	 * @return void
 	 */
-	public function log( $message, $level = 'info', $context = array() ) {
-		$context = ! empty( $context ) ? $context : $this->context;
+	public function log( string $message, string $level = 'info', array $context = array() ): void {
+		$context      = ! empty( $context ) ? $context : $this->context;
+		$logs_enabled = isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] );
 
-		if ( ! empty( $this->loggers ) ) {
+		if ( ! empty( $this->loggers ) && $logs_enabled ) {
 			foreach ( $this->loggers as $logger ) {
 				if ( ! empty( $context ) ) {
 					$logger->log( $level, $message, $context );
@@ -208,9 +217,11 @@ class Semaphore {
 	/**
 	 * Sets the list of loggers for this instance (removing any others).
 	 *
-	 * @param Array $loggers - the loggers for this task
+	 * @param array $loggers - the loggers for this task
+	 *
+	 * @return void
 	 */
-	public function set_loggers( $loggers ) {
+	public function set_loggers( array $loggers = array() ): void {
 		$this->loggers = array();
 		foreach ( $loggers as $logger ) {
 			$this->add_logger( $logger );
@@ -220,19 +231,57 @@ class Semaphore {
 	/**
 	 * Add a logger to loggers list
 	 *
-	 * @param Callable $logger - a logger (a method with a callable function 'log', taking string parameters $level $message)
+	 * @param object $logger - a logger (a method with a callable function 'log', taking string parameters $level $message)
 	 */
-	public function add_logger( $logger ) {
+	public function add_logger( object $logger ) {
 		$this->loggers[] = $logger;
 	}
 
 	/**
 	 * Return the current list of loggers
 	 *
-	 * @return Array
+	 * @return array - the list of loggers
 	 */
-	public function get_loggers() {
+	public function get_loggers(): array {
 		return $this->loggers;
+	}
+
+	/**
+	 * Cleanup expired locks from the database
+	 *
+	 * @return void
+	 */
+	public static function cleanup_expired_locks(): void {
+		global $wpdb;
+
+		// Cleanup legacy expired locks
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%'" );
+
+		// Cleanup expired locks
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%'" );
+	}
+
+	/**
+	 * Count the number of expired locks in the database
+	 *
+	 * @return int - the number of expired locks
+	 */
+	public static function count_expired_locks(): int {
+		global $wpdb;
+
+		$count = 0;
+
+		// Count legacy expired locks
+		$count += (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%'"
+		);
+
+		// Count expired locks
+		$count += (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%'"
+		);
+
+		return $count;
 	}
 
 }

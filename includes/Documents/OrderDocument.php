@@ -87,36 +87,6 @@ abstract class OrderDocument {
 	public $output_formats = array();
 
 	/**
-	 * Semaphore lock name.
-	 * @var string
-	 */
-	private $lock_name;
-
-	/**
-	 * Semaphore lock context.
-	 * @var array
-	 */
-	private $lock_context = array( 'source' => 'wpo-wcpdf-document-semaphore' );
-
-	/**
-	 * Semaphore lock time.
-	 * @var int
-	 */
-	private $lock_time;
-
-	/**
-	 * Semaphore lock retries.
-	 * @var int
-	 */
-	private $lock_retries;
-
-	/**
-	 * Semaphore lock loggers.
-	 * @var array
-	 */
-	private $lock_loggers;
-
-	/**
 	 * Linked documents, used for data retrieval
 	 * @var array
 	 */
@@ -152,12 +122,6 @@ abstract class OrderDocument {
 		if ( $this->order ) {
 			$this->read_data( $this->order );
 		}
-
-		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_time", 60 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_retries", 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_document_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		// load settings
 		$this->init_settings_data();
@@ -263,11 +227,11 @@ abstract class OrderDocument {
 	}
 
 	public function initiate_number( $force_new_number = false ) {
-		$lock            = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
+		$lock            = new Semaphore( "initiate_{$this->slug}_number" );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 
-		if ( $lock->lock( $this->lock_retries ) && empty( $document_number ) ) {
+		if ( $lock->lock() && empty( $document_number ) ) {
 			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 
 			try {
