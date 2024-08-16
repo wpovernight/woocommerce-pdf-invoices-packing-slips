@@ -69,6 +69,16 @@ class Settings_Documents {
 				}
 				?>
 			</ul>
+			<p><i>
+				<?php
+					printf(
+						/* translators: 1. open anchor tag, 2. close anchor tag */
+						__( 'Need more document? Please visit %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://docs.wpovernight.com/">', // ToDo: Update URL
+						'</a>'
+					);
+				?>
+			</i></p>
 		</div>
 		<div class="wcpdf_document_settings_document_output_formats">
 			<?php
