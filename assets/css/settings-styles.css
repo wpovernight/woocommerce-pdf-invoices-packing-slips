@@ -1152,6 +1152,81 @@ div.upgrade-table-description a,
 	color: #fcfbf7;
 }
 
+.card-container {
+    border-radius: 5px;
+    width: calc(100% - 30px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 15px;
+    background-color: #f0f0f0;
+	justify-content: center;
+	padding-bottom: 50px;
+}
+
+.card {
+	border-radius: 5px;
+	margin-top: 0;
+	width: 25%;
+	height: fit-content;
+	background-color: #ffffff;
+	border: 1px solid #ccc;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	padding: 15px;
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.card.installed .card-content {
+	opacity: 0.5;
+}
+
+.card.installed p:before {
+	display: none; /* Needed to override common.css */
+}
+
+.card img {
+	width: 100%;
+}
+
+.card h5 {
+	text-align: left;
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+.card p {
+	text-align: left;
+}
+
+.card .button {
+	padding: 3%;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #6e1edc;
+    color: #6e1edc;
+    cursor: pointer;
+	float: left;
+	font-weight: bold;
+    font-size: 1.2em;
+}
+
+.card.installed .button {
+	display: none;
+}
+
+.card.last-item {
+	order: 999;
+}
+
+.card span.installed {
+    position: relative;
+    top: 50px;
+	font-size: 1.1em;
+    font-weight: bold;
+	font-style: italic;
+}
+
 @media screen and (max-width: 1100px) {
 	#upgrade-table {
 		font-size: 1em;
