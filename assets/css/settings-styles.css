@@ -1239,8 +1239,6 @@ div.upgrade-table-description a,
 }
 
 #plugin-recommendations .card span.installed {
-    position: relative;
-    top: 50px;
 	font-size: 1.1em;
     font-weight: bold;
 	font-style: italic;

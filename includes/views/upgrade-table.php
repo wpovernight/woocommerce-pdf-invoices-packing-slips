@@ -108,8 +108,8 @@ $all_plugins = get_plugins();
 						<h5>%3$s</h5>
 						<p>%4$s</p>
 						<a class="button" target="_blank" href="%5$s">Buy now</a>
+						%6$s
 					</div>	
-					%6$s
 				</div>
 			',
 			isset( $all_plugins[ $plugin['plugin_path'] ] ) ? 'installed last-item' : '',

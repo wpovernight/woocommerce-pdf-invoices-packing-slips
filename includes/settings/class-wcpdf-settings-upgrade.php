@@ -132,21 +132,21 @@ class Settings_Upgrade {
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/Smart-Reminder-Emails-Logo-400x400.png',
 					'label'       => __( 'WooCommerce Smart Reminder Emails', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Automatically schedule and send Reminder Emails for WooCommerce orders.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders/'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=reminder-emails-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-address-labels/woocommerce-address-labels.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/Print-Address-Labels-Logo-400x400.png',
 					'label'       => __( 'WooCommerce Print Address Labels', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Print out address labels for selected orders straight from WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-address-labels/'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-address-labels?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=address-labels-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-printnode/print-orders.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/WC-printnode-logo-400x400.png',
 					'label'       => __( 'WooCommerce Automatic Printing - PrintNode', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'A plugin to automatically print completed orders via PrintNode.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode/'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=order-printing-cross'
 				),
 			);
 
