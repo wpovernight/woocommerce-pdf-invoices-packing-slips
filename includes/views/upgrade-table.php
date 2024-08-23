@@ -96,38 +96,29 @@ $all_plugins = get_plugins();
 	</tr>
 </table>
 
-<div class="upgrade-table-description">
+<div id="plugin-recommendations" class="upgrade-table-description">
 	<h1><?php esc_html_e( 'You might also like...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
-</div>
-
-<div class="card-container">
-	<div class="card <?php echo isset( $all_plugins['wc-reminder-emails/wc-reminder-emails.php'] ) ? 'installed last-item' : ''; ?>">
-		<div class="card-content">
-			<img src="<?php echo WPO_WCPDF()->plugin_url().'/assets/images/Smart-Reminder-Emails-Logo-400x400.png'; ?>" alt="WooCommerce Smart Reminder Emails Logo">
-			<h5><?php esc_html_e( 'WooCommerce Smart Reminder Emails', 'woocommerce-pdf-invoices-packing-slips' ); ?></h5>
-			<p><?php esc_html_e( 'Automatically schedule and send Reminder Emails for WooCommerce orders.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-			<a class="button" target="_blank" href="https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders/">Buy now</a>
-		</div>
-		<?php echo isset( $all_plugins['wc-reminder-emails/wc-reminder-emails.php'] ) ? '<span class="installed">' . __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>' : ''; ?>
-	</div>
-
-	<div class="card <?php echo isset( $all_plugins['woocommerce-address-labels/woocommerce-address-labels.php'] ) ? 'installed last-item' : ''; ?>">
-		<div class="card-content">
-			<img src="<?php echo WPO_WCPDF()->plugin_url().'/assets/images/Print-Address-Labels-Logo-400x400.png'; ?>" alt="WooCommerce Smart Reminder Emails Logo">
-			<h5><?php esc_html_e( 'WooCommerce Print Address Labels', 'woocommerce-pdf-invoices-packing-slips' ); ?></h5>
-			<p><?php esc_html_e( 'Print out address labels for selected orders straight from WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-			<a class="button" target="_blank" href="https://wpovernight.com/downloads/woocommerce-print-address-labels/">Buy now</a>
-		</div>	
-		<?php echo isset( $all_plugins['woocommerce-address-labels/woocommerce-address-labels.php'] ) ? '<span class="installed">' . __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>' : ''; ?>
-	</div>
-
-	<div class="card <?php echo isset( $all_plugins['woocommerce-printnode/print-orders.php'] ) ? 'installed last-item' : ''; ?>">
-		<div class="card-content">
-			<img src="<?php echo WPO_WCPDF()->plugin_url().'/assets/images/WC-printnode-logo-400x400.png'; ?>" alt="WooCommerce Smart Reminder Emails Logo">
-			<h5><?php esc_html_e( 'WooCommerce Automatic Printing - PrintNode', 'woocommerce-pdf-invoices-packing-slips' ); ?></h5>
-			<p><?php esc_html_e( 'A plugin to automatically print completed orders via PrintNode.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-			<a class="button" target="_blank" href="https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/">Buy now</a>
-		</div>	
-		<?php echo isset( $all_plugins['woocommerce-printnode/print-orders.php'] ) ? '<span class="installed">' . __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>' : ''; ?>
+	<div class="card-container">
+	<?php
+		foreach ( $plugin_recommendations_data as $plugin ) {
+			echo sprintf('
+				<div class="card %1$s">
+					<div class="card-content">
+						<img src="%2$s" alt="%3$s">
+						<h5>%3$s</h5>
+						<p>%4$s</p>
+						<a class="button" target="_blank" href="%5$s">Buy now</a>
+					</div>	
+					%6$s
+				</div>
+			',
+			isset( $all_plugins[ $plugin['plugin_path'] ] ) ? 'installed last-item' : '',
+			$plugin['thumbnail'],
+			$plugin['label'],
+			$plugin['description'],
+			$plugin['url'],
+			isset( $all_plugins[ $plugin['plugin_path'] ] ) ? '<span class="installed">' . __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>' : '');
+		}
+	?>
 	</div>
 </div>

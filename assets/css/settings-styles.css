@@ -1152,24 +1152,23 @@ div.upgrade-table-description a,
 	color: #fcfbf7;
 }
 
-.card-container {
-    border-radius: 5px;
+#plugin-recommendations {
+	border-radius: 5px;
+    background-color: #f1e9fc;
+}
+
+#plugin-recommendations .card-container {
     width: calc(100% - 30px);
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
     padding: 15px;
-    background-color: #f0f0f0;
-	justify-content: center;
 	padding-bottom: 50px;
 }
 
-.card {
-	border-radius: 5px;
+#plugin-recommendations .card {
 	margin-top: 0;
-	width: 25%;
-	height: fit-content;
-	background-color: #ffffff;
+	width: min-content;
 	border: 1px solid #ccc;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	padding: 15px;
@@ -1177,49 +1176,69 @@ div.upgrade-table-description a,
 	text-align: center;
 }
 
-.card.installed .card-content {
+#plugin-recommendations .card.installed .card-content {
 	opacity: 0.5;
 }
 
-.card.installed p:before {
+#plugin-recommendations .card.installed p:before {
 	display: none; /* Needed to override common.css */
 }
 
-.card img {
+#plugin-recommendations .card img {
 	width: 100%;
 }
 
-.card h5 {
+#plugin-recommendations .card h5 {
 	text-align: left;
     font-size: 1.4em;
     font-weight: bold;
 }
 
-.card p {
+#plugin-recommendations .card p {
 	text-align: left;
 }
 
-.card .button {
-	padding: 3%;
-    background: white;
-    border-radius: 5px;
-    border: 1px solid #6e1edc;
-    color: #6e1edc;
-    cursor: pointer;
-	float: left;
-	font-weight: bold;
-    font-size: 1.2em;
+#plugin-recommendations .card .button {
+	display: inline-block;
+	background: white;
+	padding: 1em 3em 1em 2em;
+	border-radius: 12px;
+	border: 1px solid #6e1edc;
+	text-decoration: none;
+	margin: 2em 0;
+	position: relative;
 }
 
-.card.installed .button {
+#plugin-recommendations .card .button:after {
+	content: ' \2192'; /* ASCII code for right arrow */
+	display: block;
+	position: absolute;
+	right: 1.8em;
+	top: 1.1em;
+	transition: 0.5s;
+}
+
+#plugin-recommendations .card .button:hover:after {
+	right: 1.1em;
+	font-weight: bold;
+}
+
+
+#plugin-recommendations .card .button:focus,
+#plugin-recommendations .card .button:hover {
+	background: #6e1edc;
+	color: #fcfbf7;
+}
+
+#plugin-recommendations .card.installed .button {
 	display: none;
 }
 
-.card.last-item {
+#plugin-recommendations .card.last-item {
 	order: 999;
 }
 
-.card span.installed {
+#plugin-recommendations .card span.installed {
     position: relative;
     top: 50px;
 	font-size: 1.1em;
@@ -1297,5 +1316,9 @@ div.upgrade-table-description a,
 
 	#upgrade-table .upgrade-links a:after {
 		display: none;
+	}
+
+	#plugin-recommendations .card-container {
+		justify-content: center;
 	}
 }
