@@ -124,7 +124,7 @@ class Settings_Upgrade {
 				),
 			);
 
-			$extension_license_infos = $this->get_extension_license_infos( true );
+			$extension_license_infos = $this->get_extension_license_infos();
 
 			$plugin_recommendations_data = array(
 				array(
@@ -325,6 +325,10 @@ class Settings_Upgrade {
 			}
 		}
 
+		if ( isset( $data['templates'] ) ) {
+			unset( $data['templates'] );
+		}
+
 		return $data;
 	}
 
@@ -344,32 +348,6 @@ class Settings_Upgrade {
 		}
 
 		return $installed;
-	}
-
-	/**
-	 * Check if bundle (Pro + Templates) is active
-	 *
-	 * @return bool
-	 */
-	public function bundle_is_active() {
-		$extension_license_infos = $this->get_extension_license_infos();
-		$bundle                  = false;
-
-		if ( ! empty( $extension_license_infos ) ) {
-			$bundle = true;
-
-			foreach ( $this->extensions as $extension ) {
-				if (
-					( isset( $extension_license_infos[ $extension ]['status'] ) && 'valid' !== $extension_license_infos[ $extension ]['status'] ) ||
-					! isset( $extension_license_infos[ $extension ]['status'] )
-				) {
-					$bundle = false;
-					break;
-				}
-			}
-		}
-
-		return $bundle;
 	}
 
 }
