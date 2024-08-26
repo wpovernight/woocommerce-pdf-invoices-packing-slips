@@ -272,13 +272,10 @@ class Settings_Upgrade {
 			} else {
 				switch ( $extension ) {
 					case 'pro':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/';
-						break;
-					case 'templates':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/';
+						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-pro-upgrade';
 						break;
 					case 'bundle':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/';
+						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-bundle-upgrade';
 						break;
 				}
 			}
