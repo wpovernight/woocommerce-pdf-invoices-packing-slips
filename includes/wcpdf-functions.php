@@ -927,7 +927,7 @@ function wpo_wcpdf_get_image_src_in_base64( string $src ): string {
 	$image_base64 = wpo_wcpdf_base64_encode_file( $src );
 
 	if ( ! $image_base64 ) {
-		wcpdf_log_error( 'Unable to encode image source to base64.', 'critical' );
+		wcpdf_log_error( 'Unable to encode image source to base64:' . $src, 'critical' );
 		return $src;
 	}
 
