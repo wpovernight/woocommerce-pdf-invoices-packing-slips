@@ -101,23 +101,20 @@ $all_plugins = get_plugins();
 	<div class="card-container">
 	<?php
 		foreach ( $plugin_recommendations_data as $plugin ) {
-			echo sprintf('
-				<div class="card %1$s">
-					<div class="card-content">
-						<img src="%2$s" alt="%3$s">
-						<h5>%3$s</h5>
-						<p>%4$s</p>
-						<a class="button" target="_blank" href="%5$s">Buy now</a>
-						%6$s
-					</div>	
-				</div>
-			',
-			isset( $all_plugins[ $plugin['plugin_path'] ] ) ? 'installed last-item' : '',
-			$plugin['thumbnail'],
-			$plugin['label'],
-			$plugin['description'],
-			$plugin['url'],
-			isset( $all_plugins[ $plugin['plugin_path'] ] ) ? '<span class="installed">' . __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>' : '');
+			$plugin_isset = isset( $all_plugins[ $plugin['plugin_path'] ] );
+			?>
+			<div class="card <?php echo $plugin_isset ? 'installed last-item' : ''; ?>">
+				<div class="card-content">
+					<img src="<?php echo $plugin['thumbnail']; ?>" alt="<?php echo $plugin['label']; ?>">
+					<h5><?php echo $plugin['label']; ?></h5>
+					<p><?php echo $plugin['description']; ?></p>
+					<?php if ( ! $plugin_isset ) { ?> 
+					<a class="upgrade_button" target="_blank" href="<?php echo $plugin['url']; ?>">Buy now</a>
+					<?php } ?>
+					<?php echo $plugin_isset ? '<span class="installed">' . __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>' : ''; ?>
+				</div>	
+			</div>
+			<?php
 		}
 	?>
 	</div>
