@@ -243,6 +243,14 @@ class Settings_Debug {
 				exit;
 		}
 	}
+	
+	private function clear_semaphore_expired_locks( $data ) {
+		\WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0::cleanup_expired_locks();
+
+		$message = esc_html__( 'Semaphore expired locks cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
+	}
 
 	private function clear_extensions_license_cache( $data ) {
 		WPO_WCPDF()->settings->upgrade->clear_extensions_license_cache();
@@ -819,6 +827,18 @@ class Settings_Debug {
 					'id'          => 'html_output',
 					'description' => __( 'Send the template output as HTML to the browser instead of creating a PDF.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
 									 __( 'You can also add <code>&output=html</code> to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'embed_images',
+				'title'    => __( 'Embed Images', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'embed_images',
+					'description' => __( 'Embed images only if you are experiencing issues with them loading in your PDF. Please note that this option can significantly increase the file size.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(

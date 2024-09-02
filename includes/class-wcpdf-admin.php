@@ -779,6 +779,8 @@ class Admin {
 			return;
 		}
 
+		$data = apply_filters( 'wpo_wcpdf_document_data_meta_box_fields', $data, $document );
+
 		// Go for default data.
 		if ( empty( $data ) ) {
 			$document_title = $document->get_title();

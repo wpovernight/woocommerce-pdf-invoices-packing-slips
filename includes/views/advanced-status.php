@@ -5,8 +5,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $memory_limit   = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 $php_mem_limit  = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
+$gmagick        = extension_loaded( 'gmagick' );
+$imagick        = extension_loaded( 'imagick' );
 
-$server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
+$server_configs = array(
 	'PHP version' => array(
 		'required' => __( '7.2+ (7.4 or higher recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => PHP_VERSION,
@@ -55,8 +57,8 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 	),
 	'GMagick or IMagick' => array(
 		'required' => __( 'Better with transparent PNG images', 'woocommerce-pdf-invoices-packing-slips' ),
-		'value'    => null,
-		'result'   => extension_loaded( 'gmagick' ) || extension_loaded( 'imagick' ),
+		'value'    => $imagick ? 'IMagick ' . phpversion( 'imagick' ) : ( $gmagick ? 'GMagick ' . phpversion( 'gmagick' ) : null ),
+		'result'   => $gmagick || $imagick,
 		'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'glob()' => array(
@@ -77,13 +79,35 @@ $server_configs = apply_filters( 'wpo_wcpdf_server_configs' , array(
 		'result'   => ini_get( 'allow_url_fopen' ),
 		'fallback' => __( 'allow_url_fopen disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
+	'fileinfo' => array (
+		'required' => __( 'Necessary to verify the MIME type of local images.', 'woocommerce-pdf-invoices-packing-slips' ),
+		'value'	   => null,
+		'result'   => extension_loaded( 'fileinfo' ),
+		'fallback' => __( 'fileinfo disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+	),
 	'base64_decode'	=> array (
-		'required' => __( 'To compress and decompress font data', 'woocommerce-pdf-invoices-packing-slips' ),
+		'required' => __( 'To compress and decompress font and image data', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'	   => null,
 		'result'   => function_exists( 'base64_decode' ),
 		'fallback' => __( 'base64_decode disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
-) );
+);
+
+if ( $imagick ) {
+	$gmagick_imagick_position = array_search( 'GMagick or IMagick', array_keys( $server_configs ) ) + 1;
+	$image_magick_config      = array(
+		'ImageMagick' => array(
+			'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => ( $imagick && class_exists( '\\Imagick' ) ) ? esc_attr( \Imagick::getVersion()['versionString'] ) : null,
+			'result'   => $imagick,
+			'fallback' => __( 'ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+	);
+
+	$server_configs = array_slice( $server_configs, 0, $gmagick_imagick_position, true ) + $image_magick_config + array_slice( $server_configs, $gmagick_imagick_position, null, true );
+}
+
+$server_configs = apply_filters( 'wpo_wcpdf_server_configs', $server_configs );
 
 if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' ) ) || ( $zop = extension_loaded( 'Zend OPcache' ) ) || ( $op = extension_loaded( 'opcache' ) ) ) {
 	$server_configs['opcache']['result'] = true;
@@ -95,15 +119,11 @@ if ( ( $xc = extension_loaded( 'xcache' ) ) || ( $apc = extension_loaded( 'apc' 
 		)
 	);
 }
-if ( ( $gm = extension_loaded( 'gmagick' ) ) || ( $im = extension_loaded( 'imagick' ) ) ) {
-	$server_configs['GMagick or IMagick']['value'] = ( $im ? 'IMagick '.phpversion( 'imagick' ) : 'GMagick '.phpversion( 'gmagick' ) );
-}
 
 if ( ! $server_configs['PHP version']['result'] ) {
 	/* translators: <a> tags */
 	$server_configs['PHP version']['required'] .= '<br/>' . sprintf( __( 'Download %1$sthis addon%2$s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
 }
-
 ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
@@ -147,9 +167,10 @@ if ( ! $server_configs['PHP version']['result'] ) {
 						if ( ! $server_config['result'] ) {
 							if ( isset( $server_config['fallback'] ) ) {
 								printf( '<div>%s. %s</div>', esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ), esc_html( $server_config['fallback'] ) );
-							}
-							if ( isset( $server_config['failure'] ) ) {
+							} elseif ( isset( $server_config['failure'] ) ) {
 								printf( '<div>%s</div>', wp_kses_post( $server_config['failure'] ) );
+							} else {
+								printf( '<div>%s</div>', esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) );
 							}
 						}
 						?>

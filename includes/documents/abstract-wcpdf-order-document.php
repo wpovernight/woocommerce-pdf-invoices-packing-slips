@@ -87,36 +87,6 @@ abstract class Order_Document {
 	public $output_formats = array();
 
 	/**
-	 * Semaphore lock name.
-	 * @var string
-	 */
-	private $lock_name;
-
-	/**
-	 * Semaphore lock context.
-	 * @var array
-	 */
-	private $lock_context = array( 'source' => 'wpo-wcpdf-document-semaphore' );
-
-	/**
-	 * Semaphore lock time.
-	 * @var int
-	 */
-	private $lock_time;
-
-	/**
-	 * Semaphore lock retries.
-	 * @var int
-	 */
-	private $lock_retries;
-
-	/**
-	 * Semaphore lock loggers.
-	 * @var array
-	 */
-	private $lock_loggers;
-
-	/**
 	 * Linked documents, used for data retrieval
 	 * @var array
 	 */
@@ -152,12 +122,6 @@ abstract class Order_Document {
 		if ( $this->order ) {
 			$this->read_data( $this->order );
 		}
-
-		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_time", 60 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_retries", 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_document_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		// load settings
 		$this->init_settings_data();
@@ -263,11 +227,11 @@ abstract class Order_Document {
 	}
 
 	public function initiate_number( $force_new_number = false ) {
-		$lock            = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
+		$lock            = new Semaphore( "initiate_{$this->slug}_number" );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 
-		if ( $lock->lock( $this->lock_retries ) && empty( $document_number ) ) {
+		if ( $lock->lock() && empty( $document_number ) ) {
 			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 
 			try {
@@ -811,26 +775,19 @@ abstract class Order_Document {
 	}
 
 	public function has_header_logo() {
-		return !empty( $this->settings['header_logo'] );
+		return ! empty( $this->settings['header_logo'] );
 	}
 
 	/**
 	 * Return logo id
 	 *
-	 * @return int|bool
+	 * @return int
 	 */
-	public function get_header_logo_id() {
-		$header_logo_id = false;
+	public function get_header_logo_id(): int {
+		$header_logo_id = ! empty( $this->settings['header_logo'] ) ? $this->get_settings_text( 'header_logo', 0, false ) : 0;
+		$header_logo_id = apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 
-		if ( ! empty( $this->settings['header_logo'] ) ) {
-			$header_logo_id = absint( $this->get_settings_text( 'header_logo', '', false ) );
-
-			if ( 0 === $header_logo_id ) {
-				$header_logo_id = false;
-			}
-		}
-
-		return apply_filters( 'wpo_wcpdf_header_logo_id', absint( $header_logo_id ), $this );
+		return $header_logo_id && is_numeric( $header_logo_id ) ? absint( $header_logo_id ) : 0;
 	}
 
 	/**
@@ -843,44 +800,41 @@ abstract class Order_Document {
 	}
 
 	/**
-	 * Show logo html
+	 * Show logo HTML
+	 *
+	 * @return void
 	 */
-	public function header_logo() {
+	public function header_logo(): void {
 		$attachment_id = $this->get_header_logo_id();
 
-		if ( $attachment_id ) {
+		if ( $attachment_id > 0 ) {
 			$company         = $this->get_shop_name();
-			$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
-			$attachment_path = get_attached_file( $attachment_id );
+			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
+			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 
-			if ( empty( $attachment ) || empty( $attachment_path ) ) {
+			if ( empty( $attachment_src ) || empty( $attachment_path ) ) {
+				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
 			}
 
-			$attachment_src    = $attachment[0];
-			$attachment_width  = $attachment[1];
-			$attachment_height = $attachment[2];
+			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
 
-			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
-				$src = $attachment_path;
-			} else {
-				$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
-				if ( is_wp_error( $head ) ) {
-					$errors = $head->get_error_messages();
-					foreach ( $errors as $error ) {
-						wcpdf_log_error( $error, 'critical' );
-					}
-					return;
-				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
-					$src = $attachment_src;
-				} else {
-					return;
-				}
+			// fix URLs using path
+			if ( ! apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
+				$path = preg_replace( '/^https?:\/\//', '', $src ); // removes http(s)://
+				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
 			}
 
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
+			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
+				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
+				return;
+			}
 
-			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
+			$image_src   = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
+
+			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
+
 		}
 	}
 
