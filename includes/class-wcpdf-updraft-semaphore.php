@@ -346,7 +346,7 @@ class Updraft_Semaphore_3_0 {
 	 */
 	public static function schedule_semaphore_cleanup(): void {
 		if ( ! self::is_cleanup_scheduled() ) {
-			$interval = apply_filters( self::get_hook_name() . '_interval', 30 * DAY_IN_SECONDS );
+			$interval = apply_filters( self::get_hook_name() . '_interval', 30 * DAY_IN_SECONDS ); // default: every 30 days
 			as_schedule_recurring_action( time(), $interval, self::get_hook_name() );
 		}
 	}
