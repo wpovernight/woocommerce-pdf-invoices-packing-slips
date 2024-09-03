@@ -244,10 +244,10 @@ class Settings_Debug {
 		}
 	}
 
-	private function clear_unlocked_semaphore_locks( $data ) {
-		\WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0::cleanup_unlocked_locks();
+	private function clear_released_semaphore_locks( $data ) {
+		\WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0::cleanup_released_locks();
 
-		$message = esc_html__( 'Unlocked semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
+		$message = esc_html__( 'Released semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
 		wcpdf_log_error( $message, 'info' );
 		wp_send_json_success( compact( 'message' ) );
 	}

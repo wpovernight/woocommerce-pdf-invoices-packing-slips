@@ -9,16 +9,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0' ) ) :
 
 class Updraft_Semaphore_3_0 {
-	
+
 	/**
 	 * Prefix for the lock in the WP options table
 	 *
 	 * @var string
 	 */
 	protected static $option_prefix = 'wpo_ips_semaphore_lock_';
-	
+
 	/**
-	 * Hook name suffix for the cleanup of unlocked locks
+	 * Hook name suffix for the cleanup of released locks
 	 *
 	 * @var string
 	 */
@@ -261,13 +261,13 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
-	 * Cleanup unlocked locks from the database
+	 * Cleanup released locks from the database
 	 *
 	 * @return void
 	 */
-	public static function cleanup_unlocked_locks(): void {
+	public static function cleanup_released_locks(): void {
 		global $wpdb;
-		
+
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
@@ -277,13 +277,13 @@ class Updraft_Semaphore_3_0 {
 	}
 
 	/**
-	 * Count the number of unlocked locks in the database
+	 * Count the number of released locks in the database
 	 *
-	 * @return int - the number of unlocked locks
+	 * @return int - the number of released locks
 	 */
-	public static function count_unlocked_locks(): int {
+	public static function count_released_locks(): int {
 		global $wpdb;
-		
+
 		$count = (int) $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
@@ -293,75 +293,75 @@ class Updraft_Semaphore_3_0 {
 
 		return $count;
 	}
-	
+
 	/**
-	 * Get the hook name for the cleanup of unlocked locks
+	 * Get the hook name for the cleanup of released locks
 	 *
 	 * @return string - the hook name
 	 */
-	private static function get_hook_name(): string {
+	private static function get_cleanup_hook_name(): string {
 		return self::$option_prefix . self::$hook_name_suffix;
 	}
-	
+
 	/**
-	 * Check if the cleanup of unlocked locks is scheduled
+	 * Check if the cleanup of released locks is scheduled
 	 *
 	 * @return bool - whether the cleanup is scheduled
 	 */
 	public static function is_cleanup_scheduled(): bool {
-		return function_exists( 'as_next_scheduled_action' ) && as_next_scheduled_action( self::get_hook_name() );
+		return function_exists( 'as_next_scheduled_action' ) && as_next_scheduled_action( self::get_cleanup_hook_name() );
 	}
-	
+
 	/**
-	 * Get the next scheduled cleanup of unlocked locks
+	 * Get the next scheduled cleanup of released locks
 	 *
 	 * @return object|null - the next scheduled cleanup action or null
 	 */
-	public static function get_cleanup_action() {
+	public static function get_cleanup_action(): ?object {
 		$action = null;
-		
+
 		if ( self::is_cleanup_scheduled() ) {
 			$args = array(
-				'hook'    => self::get_hook_name(),
+				'hook'    => self::get_cleanup_hook_name(),
 				'status'  => \ActionScheduler_Store::STATUS_PENDING,
 				'orderby' => 'timestamp',
 				'order'   => 'ASC',
 				'limit'   => 1,
 			);
-			
+
 			$actions = as_get_scheduled_actions( $args );
-			
+
 			if ( ! empty( $actions ) && 1 === count( $actions ) ) {
 				$action = reset( $actions );
 			}
 		}
-		
+
 		return $action;
 	}
-	
+
 	/**
-	 * Schedule the cleanup of unlocked locks
+	 * Schedule the cleanup of released locks
 	 *
 	 * @return void
 	 */
 	public static function schedule_semaphore_cleanup(): void {
 		if ( ! self::is_cleanup_scheduled() ) {
-			$interval = apply_filters( self::get_hook_name() . '_interval', 30 * DAY_IN_SECONDS ); // default: every 30 days
-			as_schedule_recurring_action( time(), $interval, self::get_hook_name() );
+			$interval = apply_filters( self::get_cleanup_hook_name() . '_interval', 30 * DAY_IN_SECONDS ); // default: every 30 days
+			as_schedule_recurring_action( time(), $interval, self::get_cleanup_hook_name() );
 		}
 	}
-	
+
 	/**
-	 * Initialize the cleanup of unlocked locks
+	 * Initialize the cleanup of released locks
 	 *
 	 * @return void
 	 */
-	public static function init_cleanup(): void {		
-		// Schedule cleanup of unlocked locks
+	public static function init_cleanup(): void {
+		// Schedule cleanup of released locks
 		self::schedule_semaphore_cleanup();
-		
-		// Cleanup unlocked locks
-		add_action( self::get_hook_name(), array( __CLASS__, 'cleanup_unlocked_locks' ) );
+
+		// Cleanup released locks
+		add_action( self::get_cleanup_hook_name(), array( __CLASS__, 'cleanup_released_locks' ) );
 	}
 
 }
