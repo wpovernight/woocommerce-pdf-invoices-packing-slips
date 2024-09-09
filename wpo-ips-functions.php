@@ -170,7 +170,7 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
  */
 function wcpdf_get_ubl_maker() {
 	$class = '\\WPO\\IPS\\Makers\\UBLMaker';
-	
+
 	if ( ! class_exists( $class ) ) {
 		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/UBLMaker.php' );
 	}
@@ -187,7 +187,7 @@ function wcpdf_get_ubl_maker() {
  */
 function wcpdf_pdf_maker_is_default() {
 	$default_pdf_maker = '\\WPO\\IPS\\Makers\\PDFMaker';
-	
+
 	return $default_pdf_maker == apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker );
 }
 
@@ -839,7 +839,7 @@ function wpo_wcpdf_base64_encode_file( string $src ) {
 	if ( empty( $src ) ) {
 		return false;
 	}
-	
+
 	$file_data = @file_get_contents( $src );
 	return base64_encode( $file_data ) ?? false;
 }
@@ -854,12 +854,12 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 	if ( empty( $path ) ) {
 		return false;
 	}
-	
+
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
 		$parsed_url = parse_url( $path );
 		$args	    = array();
-		
+
 		// Check if the URL is localhost
 		if (
 			'localhost' === $parsed_url['host']                                             ||
@@ -871,15 +871,15 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 		) {
 			$args['sslverify'] = false;
 		}
-		
+
 		$args     = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
 		$response = wp_safe_remote_head( $path, $args );
-		
+
 		if ( is_wp_error( $response ) ) {
 			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
 			return false;
 		}
-		
+
 		$status_code = wp_remote_retrieve_response_code( $response );
 		return ( $status_code === 200 );
 
@@ -924,7 +924,7 @@ function wpo_wcpdf_get_image_src_in_base64( string $src ): string {
 	$image_base64 = wpo_wcpdf_base64_encode_file( $src );
 
 	if ( ! $image_base64 ) {
-		wcpdf_log_error( 'Unable to encode image source to base64.', 'critical' );
+		wcpdf_log_error( 'Unable to encode image source to base64:' . $src, 'critical' );
 		return $src;
 	}
 
