@@ -11,6 +11,20 @@ if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 class Semaphore {
 
 	/**
+	 * Prefix for the lock in the WP options table
+	 *
+	 * @var string
+	 */
+	protected static $option_prefix = 'wpo_ips_semaphore_lock_';
+
+	/**
+	 * Hook name suffix for the cleanup of released locks
+	 *
+	 * @var string
+	 */
+	protected static $hook_name_suffix = 'cleanup';
+
+	/**
 	 * Name for the lock in the WP options table
 	 *
 	 * @var string
@@ -62,11 +76,11 @@ class Semaphore {
 	 * @param array  $context     - an array of context for the loggers
 	 */
 	public function __construct( string $name, int $locked_for = 300, int $retries = 0, array $loggers = array(), array $context = array() ) {
-		$this->option_name = 'wpo_ips_semaphore_lock_' . $name;
-		$this->locked_for  = apply_filters( 'wpo_ips_semaphore_lock_time', $locked_for > 0 ? $locked_for : 300, $this->option_name );
-		$this->retries     = apply_filters( 'wpo_ips_semaphore_lock_retries', $retries > 0 ? $retries : 0, $this->option_name );
-		$this->loggers     = apply_filters( 'wpo_ips_semaphore_lock_loggers', empty( $loggers ) ? array( wc_get_logger() ) : $loggers, $this->option_name );
-		$this->context     = apply_filters( 'wpo_ips_semaphore_lock_context', empty( $context ) ? array( 'source' => 'wpo-ips-semaphore' ) : $context, $this->option_name );
+		$this->option_name = self::$option_prefix . $name;
+		$this->locked_for  = apply_filters( self::$option_prefix . 'time', $locked_for > 0 ? $locked_for : 300, $this->option_name );
+		$this->retries     = apply_filters( self::$option_prefix . 'retries', $retries > 0 ? $retries : 0, $this->option_name );
+		$this->loggers     = apply_filters( self::$option_prefix . 'loggers', empty( $loggers ) ? array( wc_get_logger() ) : $loggers, $this->option_name );
+		$this->context     = apply_filters( self::$option_prefix . 'context', empty( $context ) ? array( 'source' => 'wpo-ips-semaphore' ) : $context, $this->option_name );
 	}
 
 	/**
@@ -247,41 +261,107 @@ class Semaphore {
 	}
 
 	/**
-	 * Cleanup expired locks from the database
+	 * Cleanup released locks from the database
 	 *
 	 * @return void
 	 */
-	public static function cleanup_expired_locks(): void {
+	public static function cleanup_released_locks(): void {
 		global $wpdb;
 
-		// Cleanup legacy expired locks
-		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%'" );
-
-		// Cleanup expired locks
-		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%'" );
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
+				$wpdb->esc_like( self::$option_prefix ) . '%'
+			)
+		);
 	}
 
 	/**
-	 * Count the number of expired locks in the database
+	 * Count the number of released locks in the database
 	 *
-	 * @return int - the number of expired locks
+	 * @return int - the number of released locks
 	 */
-	public static function count_expired_locks(): int {
+	public static function count_released_locks(): int {
 		global $wpdb;
 
-		$count = 0;
-
-		// Count legacy expired locks
-		$count += (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%'"
-		);
-
-		// Count expired locks
-		$count += (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%'"
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
+				$wpdb->esc_like( self::$option_prefix ) . '%'
+			)
 		);
 
 		return $count;
+	}
+
+	/**
+	 * Get the hook name for the cleanup of released locks
+	 *
+	 * @return string - the hook name
+	 */
+	private static function get_cleanup_hook_name(): string {
+		return self::$option_prefix . self::$hook_name_suffix;
+	}
+
+	/**
+	 * Check if the cleanup of released locks is scheduled
+	 *
+	 * @return bool - whether the cleanup is scheduled
+	 */
+	public static function is_cleanup_scheduled(): bool {
+		return function_exists( 'as_next_scheduled_action' ) && as_next_scheduled_action( self::get_cleanup_hook_name() );
+	}
+
+	/**
+	 * Get the next scheduled cleanup of released locks
+	 *
+	 * @return object|null - the next scheduled cleanup action or null
+	 */
+	public static function get_cleanup_action(): ?object {
+		$action = null;
+
+		if ( self::is_cleanup_scheduled() ) {
+			$args = array(
+				'hook'    => self::get_cleanup_hook_name(),
+				'status'  => \ActionScheduler_Store::STATUS_PENDING,
+				'orderby' => 'timestamp',
+				'order'   => 'ASC',
+				'limit'   => 1,
+			);
+
+			$actions = as_get_scheduled_actions( $args );
+
+			if ( ! empty( $actions ) && 1 === count( $actions ) ) {
+				$action = reset( $actions );
+			}
+		}
+
+		return $action;
+	}
+
+	/**
+	 * Schedule the cleanup of released locks
+	 *
+	 * @return void
+	 */
+	public static function schedule_semaphore_cleanup(): void {
+		if ( ! self::is_cleanup_scheduled() ) {
+			$interval = apply_filters( self::get_cleanup_hook_name() . '_interval', 30 * DAY_IN_SECONDS ); // default: every 30 days
+			as_schedule_recurring_action( time(), $interval, self::get_cleanup_hook_name() );
+		}
+	}
+
+	/**
+	 * Initialize the cleanup of released locks
+	 *
+	 * @return void
+	 */
+	public static function init_cleanup(): void {
+		// Schedule cleanup of released locks
+		self::schedule_semaphore_cleanup();
+
+		// Cleanup released locks
+		add_action( self::get_cleanup_hook_name(), array( __CLASS__, 'cleanup_released_locks' ) );
 	}
 
 }
