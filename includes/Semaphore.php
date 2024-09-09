@@ -11,6 +11,20 @@ if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 class Semaphore {
 
 	/**
+	 * Prefix for the lock in the WP options table
+	 *
+	 * @var string
+	 */
+	protected static $option_prefix = 'wpo_ips_semaphore_lock_';
+
+	/**
+	 * Hook name suffix for the cleanup of released locks
+	 *
+	 * @var string
+	 */
+	protected static $hook_name_suffix = 'cleanup';
+
+	/**
 	 * Name for the lock in the WP options table
 	 *
 	 * @var string
@@ -62,11 +76,11 @@ class Semaphore {
 	 * @param array  $context     - an array of context for the loggers
 	 */
 	public function __construct( string $name, int $locked_for = 300, int $retries = 0, array $loggers = array(), array $context = array() ) {
-		$this->option_name = 'wpo_ips_semaphore_lock_' . $name;
-		$this->locked_for  = apply_filters( 'wpo_ips_semaphore_lock_time', $locked_for > 0 ? $locked_for : 300, $this->option_name );
-		$this->retries     = apply_filters( 'wpo_ips_semaphore_lock_retries', $retries > 0 ? $retries : 0, $this->option_name );
-		$this->loggers     = apply_filters( 'wpo_ips_semaphore_lock_loggers', empty( $loggers ) ? array( wc_get_logger() ) : $loggers, $this->option_name );
-		$this->context     = apply_filters( 'wpo_ips_semaphore_lock_context', empty( $context ) ? array( 'source' => 'wpo-ips-semaphore' ) : $context, $this->option_name );
+		$this->option_name = self::$option_prefix . $name;
+		$this->locked_for  = apply_filters( self::$option_prefix . 'time', $locked_for > 0 ? $locked_for : 300, $this->option_name );
+		$this->retries     = apply_filters( self::$option_prefix . 'retries', $retries > 0 ? $retries : 0, $this->option_name );
+		$this->loggers     = apply_filters( self::$option_prefix . 'loggers', empty( $loggers ) ? array( wc_get_logger() ) : $loggers, $this->option_name );
+		$this->context     = apply_filters( self::$option_prefix . 'context', empty( $context ) ? array( 'source' => 'wpo-ips-semaphore' ) : $context, $this->option_name );
 	}
 
 	/**
@@ -251,7 +265,7 @@ class Semaphore {
 	 *
 	 * @return void
 	 */
-	public static function cleanup_expired_locks(): void {
+	public static function cleanup_released_locks(): void {
 		global $wpdb;
 
 		// Cleanup legacy expired locks
@@ -262,23 +276,18 @@ class Semaphore {
 	}
 
 	/**
-	 * Count the number of expired locks in the database
+	 * Count the number of released locks in the database
 	 *
-	 * @return int - the number of expired locks
+	 * @return int - the number of released locks
 	 */
-	public static function count_expired_locks(): int {
+	public static function count_released_locks(): int {
 		global $wpdb;
 
-		$count = 0;
-
-		// Count legacy expired locks
-		$count += (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'updraft_lock_%'"
-		);
-
-		// Count expired locks
-		$count += (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE 'wpo_ips_semaphore_lock_%'"
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
+				$wpdb->esc_like( self::$option_prefix ) . '%'
+			)
 		);
 
 		return $count;
