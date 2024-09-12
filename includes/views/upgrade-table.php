@@ -102,17 +102,21 @@ $all_plugins = get_plugins();
 	<?php
 		foreach ( $plugin_recommendations_data as $plugin ) {
 			$plugin_isset = isset( $all_plugins[ $plugin['plugin_path'] ] );
+			$card_class = $plugin_isset ? 'recommendation-card currently-installed' : 'recommendation-card';
 			?>
-			<div class="card <?php echo $plugin_isset ? 'installed last-item' : ''; ?>">
+			<div class="<?php echo $card_class; ?>">
+				<img src="<?php echo $plugin['thumbnail']; ?>" alt="<?php echo $plugin['label']; ?>">
 				<div class="card-content">
-					<img src="<?php echo $plugin['thumbnail']; ?>" alt="<?php echo $plugin['label']; ?>">
 					<h5><?php echo $plugin['label']; ?></h5>
 					<p><?php echo $plugin['description']; ?></p>
-					<?php if ( ! $plugin_isset ) { ?> 
-					<a class="upgrade_button" target="_blank" href="<?php echo $plugin['url']; ?>">Buy now</a>
-					<?php } ?>
-					<?php echo $plugin_isset ? '<span class="installed">' . __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>' : ''; ?>
-				</div>	
+					<?php 
+					if ( ! $plugin_isset ) {
+						printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', $plugin['url'], __( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' ) );
+					} else {
+						printf( '<span class="currently-installed">%s</span>', __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) );
+					}
+					?>
+				</div>
 			</div>
 			<?php
 		}
