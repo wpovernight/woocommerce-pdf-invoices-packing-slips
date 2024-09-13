@@ -18,6 +18,13 @@ class Semaphore {
 	protected static $option_prefix = 'wpo_ips_semaphore_lock_';
 
 	/**
+	 * Legacy option prefix for the lock in the WP options table
+	 *
+	 * @var string
+	 */
+	protected static $legacy_option_prefix = 'updraft_lock_wpo_wcpdf_';
+
+	/**
 	 * Hook name suffix for the cleanup of released locks
 	 *
 	 * @var string
@@ -263,15 +270,19 @@ class Semaphore {
 	/**
 	 * Cleanup released locks from the database
 	 *
+	 * @param bool $legacy - whether to cleanup legacy locks
+	 *
 	 * @return void
 	 */
-	public static function cleanup_released_locks(): void {
+	public static function cleanup_released_locks( bool $legacy = false ): void {
 		global $wpdb;
+
+		$option_prefix = $legacy ? self::$legacy_option_prefix : self::$option_prefix;
 
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
-				$wpdb->esc_like( self::$option_prefix ) . '%'
+				$wpdb->esc_like( $option_prefix ) . '%'
 			)
 		);
 	}
@@ -279,15 +290,19 @@ class Semaphore {
 	/**
 	 * Count the number of released locks in the database
 	 *
+	 * @param bool $legacy - whether to count legacy locks
+	 *
 	 * @return int - the number of released locks
 	 */
-	public static function count_released_locks(): int {
+	public static function count_released_locks( bool $legacy = false ): int {
 		global $wpdb;
+
+		$option_prefix = $legacy ? self::$legacy_option_prefix : self::$option_prefix;
 
 		$count = (int) $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
-				$wpdb->esc_like( self::$option_prefix ) . '%'
+				$wpdb->esc_like( $option_prefix ) . '%'
 			)
 		);
 
