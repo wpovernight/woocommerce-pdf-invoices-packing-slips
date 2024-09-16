@@ -621,6 +621,16 @@ abstract class Order_Document {
 		echo $this->get_due_date_title();
 	}
 
+	/**
+	 * Prints the due date.
+	 *
+	 * @return void
+	 */
+	public function due_date(): void {
+		$due_date_timestamp = $this->get_due_date();
+		echo apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Data setters

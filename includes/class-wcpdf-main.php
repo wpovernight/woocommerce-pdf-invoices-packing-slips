@@ -81,7 +81,14 @@ class Main {
 		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
 
-		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date' ), 10, 2 );
+		// Add due date to documents for templates in the Premium Templates for old versions.
+		if ( function_exists( 'WPO_WCPDF_Templates' ) && version_compare( WPO_WCPDF_Templates()->version, '2.21.9', '<=' ) ) {
+			$template = explode( '/', WPO_WCPDF()->settings->get_template_path() );
+
+			if ( 'Simple' !== end( $template ) ) {
+				add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date' ), 10, 2 );
+			}
+		}
 
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 	}
