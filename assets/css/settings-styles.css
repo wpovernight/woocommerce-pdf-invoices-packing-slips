@@ -941,6 +941,15 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-bottom: 4em;
 }
 
+#wpo-wcpdf-preview-wrapper input#due_date_days {
+	text-align: right;
+}
+
+#wpo-wcpdf-preview-wrapper input#due_date_days:disabled {
+	background-color: #eaeaea;
+	color: #999;
+}
+
 sup.wcpdf_beta {
 	background-color: #51266b;
 	color: white;

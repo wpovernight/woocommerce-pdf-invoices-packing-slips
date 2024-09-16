@@ -293,10 +293,9 @@ class Invoice extends Order_Document_Methods {
 					'id'                 => 'due_date',
 					/* translators: number of days */
 					'text_input_wrap'    => __( '%s days', 'woocommerce-pdf-invoices-packing-slips' ),
-					'text_input_size'    => 1,
+					'text_input_size'    => 3,
 					'text_input_id'      => 'due_date_days',
 					'text_input_default' => 30,
-					'description'        => __( 'Displays a due date below the order data.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
