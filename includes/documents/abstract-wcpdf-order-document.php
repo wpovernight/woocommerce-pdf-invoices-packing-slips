@@ -1476,9 +1476,10 @@ abstract class Order_Document {
 			return 0;
 		}
 
-		$base_date         = apply_filters( 'wpo_wcpdf_due_date_base_date', $this->order->get_date_created(), $this->type, $this );
-		$due_date_datetime = clone $base_date;
-		$due_date_datetime = $due_date_datetime->modify( "+$due_date_days days" );
+		$document_creation_date = $this->get_date( $this->type, $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$base_date              = apply_filters( 'wpo_wcpdf_due_date_base_date', $document_creation_date, $this->type, $this );
+		$due_date_datetime      = clone $base_date;
+		$due_date_datetime      = $due_date_datetime->modify( "+$due_date_days days" );
 
 		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->type, $this );
 	}
