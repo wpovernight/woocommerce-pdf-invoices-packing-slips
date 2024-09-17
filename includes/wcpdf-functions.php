@@ -941,10 +941,14 @@ function wpo_wcpdf_get_image_src_in_base64( string $src ): string {
  */
 function wpo_wcpdf_checkout_is_block(): bool {
 	$checkout_page_id = wc_get_page_id( 'checkout' );
-	$is_block         = $checkout_page_id && function_exists( 'has_block' ) && has_block( 'woocommerce/checkout', $checkout_page_id );
+
+	$is_block = $checkout_page_id
+		&& function_exists( 'has_block' )
+		&& has_block( 'woocommerce/checkout', $checkout_page_id );
 
 	if ( ! $is_block ) {
-		$is_block = class_exists( '\\WC_Blocks_Utils' ) && count( \WC_Blocks_Utils::get_blocks_from_page( 'woocommerce/checkout', 'checkout' ) ) > 0;
+		$is_block = class_exists( '\\WC_Blocks_Utils' )
+			&& count( \WC_Blocks_Utils::get_blocks_from_page( 'woocommerce/checkout', 'checkout' ) ) > 0;
 	}
 
 	if ( ! $is_block ) {
