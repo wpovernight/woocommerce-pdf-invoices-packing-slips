@@ -97,7 +97,7 @@ $all_plugins = get_plugins();
 </table>
 
 <div id="plugin-recommendations" class="upgrade-table-description">
-	<h1><?php esc_html_e( 'You might also like...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
+	<h1><?php esc_html_e( 'You might also like these plugins...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
 	<div class="card-container">
 	<?php
 		foreach ( $plugin_recommendations_data as $plugin ) {
