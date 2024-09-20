@@ -11,7 +11,7 @@
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 3.3
- * WC tested up to:      9.1
+ * WC tested up to:      9.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -78,6 +78,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
+		add_action( 'init', array( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0', 'init_cleanup' ), 999 ); // wait AS to initialize
 
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
