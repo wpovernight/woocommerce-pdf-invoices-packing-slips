@@ -2,8 +2,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-
-$all_plugins = get_plugins();
 ?>
 <style>
 	#wpo-wcpdf-settings { display: none; }
@@ -98,22 +96,26 @@ $all_plugins = get_plugins();
 
 <div id="plugin-recommendations" class="upgrade-table-description">
 	<h1><?php esc_html_e( 'You might also like these plugins...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
+	<?php
+	if ( count( array_column( $sorted_plugin_recommendations, 'installed' ) ) == count( $sorted_plugin_recommendations ) ) {
+		printf( '<p>%s</p>', __( 'Wow! It looks like you own all of our recommendations. Check out our shop for even more plugins.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', 'https://wpovernight.com/shop/', __( 'Visit shop', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+	?>
 	<div class="card-container">
 	<?php
-		foreach ( $plugin_recommendations_data as $plugin ) {
-			$plugin_isset = isset( $all_plugins[ $plugin['plugin_path'] ] );
-			$card_class = $plugin_isset ? 'recommendation-card currently-installed' : 'recommendation-card';
+		foreach ( $sorted_plugin_recommendations as $plugin ) {
 			?>
-			<div class="<?php echo $card_class; ?>">
-				<img src="<?php echo $plugin['thumbnail']; ?>" alt="<?php echo $plugin['label']; ?>">
+			<div class="<?php echo isset( $plugin['installed'] ) ? 'recommendation-card currently-installed' : 'recommendation-card'; ?>">
+				<img src="<?php echo $plugin['thumbnail']; ?>" alt="<?php echo $plugin['title']; ?>">
 				<div class="card-content">
-					<h5><?php echo $plugin['label']; ?></h5>
+					<h5><?php echo $plugin['title']; ?></h5>
 					<p><?php echo $plugin['description']; ?></p>
 					<?php 
-					if ( ! $plugin_isset ) {
-						printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', $plugin['url'], __( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' ) );
-					} else {
+					if ( isset( $plugin['installed'] ) ) {
 						printf( '<span class="currently-installed">%s</span>', __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) );
+					} else {
+						printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', $plugin['url'], __( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' ) );
 					}
 					?>
 				</div>

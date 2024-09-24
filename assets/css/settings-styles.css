@@ -1121,7 +1121,7 @@ div.upgrade-table-description a,
 }
 
 #upgrade-table .upgrade-links a.upgrade_button,
-#plugin-recommendations .recommendation-card a.upgrade_button {
+#plugin-recommendations a.upgrade_button {
 	display: inline-block;
 	background: white;
 	padding: 1em 3em 1em 2em;
@@ -1133,7 +1133,7 @@ div.upgrade-table-description a,
 }
 
 #upgrade-table .upgrade-links a.upgrade_button:after,
-#plugin-recommendations .recommendation-card a.upgrade_button:after {
+#plugin-recommendations a.upgrade_button:after {
 	content: ' \2192'; /* ASCII code for right arrow */
 	display: block;
 	position: absolute;
@@ -1143,15 +1143,15 @@ div.upgrade-table-description a,
 }
 
 #upgrade-table .upgrade-links a.upgrade_button:hover:after,
-#plugin-recommendations .recommendation-card a.upgrade_button:hover:after {
+#plugin-recommendations a.upgrade_button:hover:after {
 	right: 1.1em;
 	font-weight: bold;
 }
 
 #upgrade-table .upgrade-links a.upgrade_button:focus,
 #upgrade-table .upgrade-links a.upgrade_button:hover,
-#plugin-recommendations .recommendation-card a.upgrade_button:focus,
-#plugin-recommendations .recommendation-card a.upgrade_button:hover {
+#plugin-recommendations a.upgrade_button:focus,
+#plugin-recommendations a.upgrade_button:hover {
 	background: #6e1edc;
 	color: #fcfbf7;
 }
@@ -1181,17 +1181,20 @@ div.upgrade-table-description a,
 	transition: 0.2s;
 }
 
+#plugin-recommendations .recommendation-card:nth-child(n+4) {
+	display: none;
+}
+
 #plugin-recommendations .recommendation-card:hover {
 	scale: 1.02;
 }
 
 #plugin-recommendations .recommendation-card.currently-installed {
 	opacity: 0.5;
-	order: 999;
 }
 
 #plugin-recommendations .recommendation-card .card-content{
-	padding: 0 2em 3em;
+	padding: 0 4em 3em 2em;
 }
 
 #plugin-recommendations .recommendation-card img {
