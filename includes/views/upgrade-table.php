@@ -97,7 +97,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="plugin-recommendations" class="upgrade-table-description">
 	<h1><?php esc_html_e( 'You might also like these plugins...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
 	<?php
-	if ( count( array_column( $sorted_plugin_recommendations, 'installed' ) ) == count( $sorted_plugin_recommendations ) ) {
+	if ( count( array_column( $sorted_plugin_recommendations, 'installed' ) ) === count( $sorted_plugin_recommendations ) ) {
 		printf( '<p>%s</p>', __( 'Wow! It looks like you own all of our recommendations. Check out our shop for even more plugins.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', 'https://wpovernight.com/shop/', __( 'Visit shop', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
