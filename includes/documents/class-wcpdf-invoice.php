@@ -51,17 +51,32 @@ class Invoice extends Order_Document_Methods {
 		return apply_filters( 'wpo_wcpdf_document_store_settings', true, $this );
 	}
 
-	public function get_title() {
+	/**
+	 * Get the document title
+	 *
+	 * @return string
+	 */
+	public function get_title(): string {
 		// override/not using $this->title to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_title', __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 	
-	public function get_number_title() {
+	/**
+	 * Get the document number title
+	 *
+	 * @return string
+	 */
+	public function get_number_title():string {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_number_title', __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 	
-	public function get_date_title() {
+	/**
+	 * Get the document date title
+	 *
+	 * @return string
+	 */
+	public function get_date_title(): string {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_date_title', __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}

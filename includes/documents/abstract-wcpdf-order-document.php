@@ -585,111 +585,255 @@ abstract class Order_Document {
 		return $this->get_data( 'creation_trigger', $document_type, $order, $context );
 	}
 
-	public function get_title() {
+	/**
+	 * Get the document title
+	 *
+	 * @return string
+	 */
+	public function get_title(): string {
 		return $this->get_title_for( 'document' );
 	}
 
-	public function title() {
+	/**
+	 * Print the document number title
+	 *
+	 * @return void
+	 */
+	public function title(): void {
 		echo $this->get_title();
 	}
 
-	public function get_number_title() {
+	/**
+	 * Get the document number title
+	 *
+	 * @return string
+	 */
+	public function get_number_title(): string {
 		return $this->get_title_for( 'document_number' );
 	}
 
-	public function number_title() {
+	/**
+	 * Print the document number title
+	 *
+	 * @return void
+	 */
+	public function number_title(): void {
 		echo $this->get_number_title();
 	}
 
-	public function get_date_title() {
+	/**
+	 * Get the document date title
+	 *
+	 * @return string
+	 */
+	public function get_date_title(): string {
 		return $this->get_title_for( 'document_date' );
 	}
 
-	public function date_title() {
+	/**
+	 * Print the document date title
+	 *
+	 * @return void
+	 */
+	public function date_title(): void {
 		echo $this->get_date_title();
 	}
 
-	public function get_due_date_title() {
+	/**
+	 * Get the document due date title
+	 *
+	 * @return string
+	 */
+	public function get_due_date_title(): string {
 		return $this->get_title_for( 'document_due_date' );
 	}
 
-	public function due_date_title() {
+	/**
+	 * Print the document due date title
+	 *
+	 * @return void
+	 */
+	public function due_date_title(): void {
 		echo $this->get_due_date_title();
 	}
 	
-	public function get_billing_address_title() {
+	/**
+	 * Get the billing address title
+	 *
+	 * @return string
+	 */
+	public function get_billing_address_title(): string {
 		return $this->get_title_for( 'billing_address' );
 	}
 	
-	public function billing_address_title() {
+	/**
+	 * Print the billing address title
+	 *
+	 * @return void
+	 */
+	public function billing_address_title(): void {
 		echo $this->get_billing_address_title();
 	}
 	
-	public function get_shipping_address_title() {
+	/**
+	 * Get the shipping address title
+	 *
+	 * @return string
+	 */
+	public function get_shipping_address_title(): string {
 		return $this->get_title_for( 'shipping_address' );
 	}
 	
-	public function shipping_address_title() {
+	/**
+	 * Print the shipping address title
+	 *
+	 * @return void
+	 */
+	public function shipping_address_title(): void {
 		echo $this->get_shipping_address_title();
 	}
 	
-	public function get_order_number_title() {
+	/**
+	 * Get the order number title
+	 *
+	 * @return string
+	 */
+	public function get_order_number_title(): string {
 		return $this->get_title_for( 'order_number' );
 	}
 	
-	public function order_number_title() {
+	/**
+	 * Print the order number title
+	 *
+	 * @return void
+	 */
+	public function order_number_title(): void {
 		echo $this->get_order_number_title();
 	}
 	
-	public function order_date_title() {
-		echo $this->get_title_for( 'order_date' );
+	/**
+	 * Get the order date title
+	 *
+	 * @return string
+	 */
+	public function get_order_date_title(): string {
+		return $this->get_title_for( 'order_date' );
 	}
 	
-	public function get_payment_method_title() {
+	/**
+	 * Print the order date title
+	 *
+	 * @return void
+	 */
+	public function order_date_title(): void {
+		echo $this->get_order_date_title();
+	}
+	
+	/**
+	 * Get the payment method title
+	 *
+	 * @return string
+	 */
+	public function get_payment_method_title(): string {
 		return $this->get_title_for( 'payment_method' );
 	}
 	
-	public function payment_method_title() {
+	/**
+	 * Print the payment method title
+	 *
+	 * @return void
+	 */
+	public function payment_method_title(): void {
 		echo $this->get_payment_method_title();
 	}
 	
-	public function get_shipping_method_title() {
+	/**
+	 * Get the shipping method title
+	 *
+	 * @return string
+	 */
+	public function get_shipping_method_title(): string {
 		return $this->get_title_for( 'shipping_method' );
 	}
 	
-	public function shipping_method_title() {
+	/**
+	 * Print the shipping method title
+	 *
+	 * @return void
+	 */
+	public function shipping_method_title(): void {
 		echo $this->get_shipping_method_title();
 	}
 	
-	public function get_sku_title() {
+	/**
+	 * Get the SKU title
+	 *
+	 * @return string
+	 */
+	public function get_sku_title(): string {
 		return $this->get_title_for( 'sku' );
 	}
 	
-	public function sku_title() {
+	/**
+	 * Print the SKU title
+	 *
+	 * @return void
+	 */
+	public function sku_title(): void {
 		echo $this->get_sku_title();
 	}
 	
-	public function get_weight_title() {
+	/**
+	 * Get the weight title
+	 *
+	 * @return string
+	 */
+	public function get_weight_title(): string {
 		return $this->get_title_for( 'weight' );
 	}
 	
-	public function weight_title() {
+	/**
+	 * Print the weight title
+	 *
+	 * @return void
+	 */
+	public function weight_title(): void {
 		echo $this->get_weight_title();
 	}
 	
-	public function get_notes_title() {
+	/**
+	 * Get the notes title
+	 *
+	 * @return string
+	 */
+	public function get_notes_title(): string {
 		return $this->get_title_for( 'notes' );
 	}
 	
-	public function notes_title() {
+	/**
+	 * Print the notes title
+	 *
+	 * @return void
+	 */
+	public function notes_title(): void {
 		echo $this->get_notes_title();
 	}
 	
-	public function get_customer_notes_title() {
+	/**
+	 * Get the customer notes title
+	 *
+	 * @return string
+	 */
+	public function get_customer_notes_title(): string {
 		return $this->get_title_for( 'customer_notes' );
 	}
 	
-	public function customer_notes_title() {
+	/**
+	 * Print the customer notes title
+	 *
+	 * @return void
+	 */
+	public function customer_notes_title(): void {
 		echo $this->get_customer_notes_title();
 	}
 	

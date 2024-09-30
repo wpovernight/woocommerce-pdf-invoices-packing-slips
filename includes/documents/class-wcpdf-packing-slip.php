@@ -36,17 +36,32 @@ class Packing_Slip extends Order_Document_Methods {
 		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
 	}
 
-	public function get_title() {
+	/**
+	 * Get the document title
+	 *
+	 * @return string
+	 */
+	public function get_title(): string {
 		// override/not using $this->title to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_title', __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 	
-	public function get_number_title() {
+	/**
+	 * Get the document number title
+	 *
+	 * @return string
+	 */
+	public function get_number_title(): string {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_number_title', __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 	
-	public function get_date_title() {
+	/**
+	 * Get the document date title
+	 *
+	 * @return string
+	 */
+	public function get_date_title(): string {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_date_title', __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
