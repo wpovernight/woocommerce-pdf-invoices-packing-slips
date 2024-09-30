@@ -33,12 +33,12 @@ class Packing_Slip extends Order_Document_Methods {
 		parent::__construct( $order );
 
 		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf' ), $this );
+		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
 	}
 
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
-		return apply_filters( "wpo_wcpdf_document_title", __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+		return apply_filters( 'wpo_wcpdf_document_title', __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 	
 	public function get_number_title() {
