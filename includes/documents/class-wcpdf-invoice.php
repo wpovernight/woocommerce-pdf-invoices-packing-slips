@@ -16,6 +16,7 @@ class Invoice extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
+	public $titles;
 	public $output_formats;
 
 	/**
@@ -25,9 +26,14 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type  = 'invoice';
-		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->type   = 'invoice';
+		$this->title  = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon   = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->titles = apply_filters( "wpo_wcpdf_{$this->slug}_titles", array(
+			'document_number'  => __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ),
+			'document_date'    => __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+			'shipping_address' => __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ),
+		), $this );
 
 		// call parent constructor
 		parent::__construct( $order );
@@ -583,22 +589,6 @@ class Invoice extends Order_Document_Methods {
 		);
 
 		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );
-	}
-
-	/**
-	 * Document number title
-	 */
-	public function get_number_title() {
-		$number_title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
-	}
-
-	/**
-	 * Document date title
-	 */
-	public function get_date_title() {
-		$date_title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
 }

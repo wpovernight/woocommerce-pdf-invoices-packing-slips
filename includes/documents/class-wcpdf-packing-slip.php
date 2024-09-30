@@ -12,6 +12,12 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Packing_Slip' ) ) :
  */
 
 class Packing_Slip extends Order_Document_Methods {
+	
+	public $type;
+	public $title;
+	public $icon;
+	public $titles;
+	public $output_formats;
 
 	/**
 	 * Init/load the order object.
@@ -20,9 +26,13 @@ class Packing_Slip extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type  = 'packing-slip';
-		$this->title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
+		$this->type   = 'packing-slip';
+		$this->title  = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon   = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
+		$this->titles = apply_filters( "wpo_wcpdf_{$this->slug}_titles", array(
+			'document_number' => __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' ),
+			'document_date'   => __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+		), $this );
 
 		// call parent constructor
 		parent::__construct( $order );
@@ -175,22 +185,6 @@ class Packing_Slip extends Order_Document_Methods {
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
 
-	}
-
-	/**
-	 * Document number title
-	 */
-	public function get_number_title() {
-		$number_title = __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
-	}
-
-	/**
-	 * Document date title
-	 */
-	public function get_date_title() {
-		$date_title = __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
 }

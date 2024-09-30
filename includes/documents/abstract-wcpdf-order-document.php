@@ -585,7 +585,7 @@ abstract class Order_Document {
 	}
 
 	public function get_title() {
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
+		return $this->get_title_for( 'document' );
 	}
 
 	public function title() {
@@ -593,9 +593,7 @@ abstract class Order_Document {
 	}
 
 	public function get_number_title() {
-		/* translators: %s: document name */
-		$number_title = sprintf( __( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
+		return $this->get_title_for( 'document_number' );
 	}
 
 	public function number_title() {
@@ -603,9 +601,7 @@ abstract class Order_Document {
 	}
 
 	public function get_date_title() {
-		/* translators: %s: document name */
-		$date_title = sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
+		return $this->get_title_for( 'document_date' );
 	}
 
 	public function date_title() {
@@ -613,12 +609,125 @@ abstract class Order_Document {
 	}
 
 	public function get_due_date_title() {
-		$due_date_title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date_title", $due_date_title, $this );
+		return $this->get_title_for( 'document_due_date' );
 	}
 
 	public function due_date_title() {
 		echo $this->get_due_date_title();
+	}
+	
+	public function billing_address_title() {
+		echo $this->get_title_for( 'billing_address' );
+	}
+	
+	public function shipping_address_title() {
+		echo $this->get_title_for( 'shipping_address' );
+	}
+	
+	public function order_number_title() {
+		echo $this->get_title_for( 'order_number' );
+	}
+	
+	public function order_date_title() {
+		echo $this->get_title_for( 'order_date' );
+	}
+	
+	public function payment_method_title() {
+		echo $this->get_title_for( 'payment_method' );
+	}
+	
+	public function shipping_method_title() {
+		echo $this->get_title_for( 'shipping_method' );
+	}
+	
+	public function sku_title() {
+		echo $this->get_title_for( 'sku' );
+	}
+	
+	public function weight_title() {
+		echo $this->get_title_for( 'weight' );
+	}
+	
+	public function notes_title() {
+		echo $this->get_title_for( 'notes' );
+	}
+	
+	public function customer_notes_title() {
+		echo $this->get_title_for( 'customer_notes' );
+	}
+	
+	/**
+	 * Get the title for a specific slug
+	 *
+	 * @param string $slug
+	 * @return string
+	 */
+	public function get_title_for( string $slug ): string {
+		switch ( $slug ) {
+			case 'document':
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.9.0', 'wpo_wcpdf_document_title' );
+				break;
+			case 'document_number':
+				$title = sprintf(
+					/* translators: %s: document name */
+					__( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ),
+					$this->title
+				);
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.9.0', 'wpo_wcpdf_document_number_title' );
+				break;
+			case 'document_date':
+				$title = sprintf(
+					/* translators: %s: document name */
+					__( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+					$this->title
+				);
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.9.0', 'wpo_wcpdf_document_date_title' );
+				break;
+			case 'document_due_date':
+				$title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_due_date_title", array( $title, $this ), '3.9.0', 'wpo_wcpdf_document_due_date_title' );
+				break;
+			case 'billing_address':
+				$title = __( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'shipping_address':
+				$title = __( 'Shipping Address:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'order_number':
+				$title = __( 'Order Number:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'order_date':
+				$title = __( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'payment_method':
+				$title = __( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'shipping_method':
+				$title = __( 'Shipping Method:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'sku':
+				$title = __( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'weight':
+				$title = __( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'notes':
+				$title = __( 'Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'customer_notes':
+				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			default:
+				$title = '';
+				break;
+		}
+		
+		// Allow for custom/specific titles overriding the default ones
+		if ( ! empty( $this->titles ) && is_array( $this->titles ) && isset( $this->titles[ $slug ] ) ) {
+			$title = $this->titles[ $slug ];
+		}
+		
+		return apply_filters( "wpo_wcpdf_{$slug}_title", $title, $this );
 	}
 
 	/*
