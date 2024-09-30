@@ -16,7 +16,7 @@ class Packing_Slip extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
-	public $titles;
+	public $custom_titles;
 	public $output_formats;
 
 	/**
@@ -26,10 +26,10 @@ class Packing_Slip extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type   = 'packing-slip';
-		$this->title  = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon   = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
-		$this->titles = apply_filters( "wpo_wcpdf_{$this->slug}_titles", array(
+		$this->type          = 'packing-slip';
+		$this->title         = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon          = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
+		$this->custom_titles = apply_filters( "wpo_wcpdf_{$this->slug}_custom_titles", array(
 			'document_number' => __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' ),
 			'document_date'   => __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' ),
 		), $this );

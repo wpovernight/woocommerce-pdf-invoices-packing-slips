@@ -16,7 +16,7 @@ class Invoice extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
-	public $titles;
+	public $custom_titles;
 	public $output_formats;
 
 	/**
@@ -26,10 +26,10 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type   = 'invoice';
-		$this->title  = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon   = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-		$this->titles = apply_filters( "wpo_wcpdf_{$this->slug}_titles", array(
+		$this->type          = 'invoice';
+		$this->title         = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon          = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->custom_titles = apply_filters( "wpo_wcpdf_{$this->slug}_custom_titles", array(
 			'document_number'  => __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ),
 			'document_date'    => __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ),
 			'shipping_address' => __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ),

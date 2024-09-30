@@ -723,8 +723,8 @@ abstract class Order_Document {
 		}
 		
 		// Allow for custom/specific titles overriding the default ones
-		if ( ! empty( $this->titles ) && is_array( $this->titles ) && isset( $this->titles[ $slug ] ) ) {
-			$title = $this->titles[ $slug ];
+		if ( ! empty( $this->custom_titles ) && is_array( $this->custom_titles ) && isset( $this->custom_titles[ $slug ] ) ) {
+			$title = $this->custom_titles[ $slug ];
 		}
 		
 		return apply_filters( "wpo_wcpdf_{$slug}_title", $title, $this );
