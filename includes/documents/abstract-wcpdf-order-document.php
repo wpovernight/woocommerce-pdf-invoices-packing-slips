@@ -616,44 +616,80 @@ abstract class Order_Document {
 		echo $this->get_due_date_title();
 	}
 	
+	public function get_billing_address_title() {
+		return $this->get_title_for( 'billing_address' );
+	}
+	
 	public function billing_address_title() {
-		echo $this->get_title_for( 'billing_address' );
+		echo $this->get_billing_address_title();
+	}
+	
+	public function get_shipping_address_title() {
+		return $this->get_title_for( 'shipping_address' );
 	}
 	
 	public function shipping_address_title() {
-		echo $this->get_title_for( 'shipping_address' );
+		echo $this->get_shipping_address_title();
+	}
+	
+	public function get_order_number_title() {
+		return $this->get_title_for( 'order_number' );
 	}
 	
 	public function order_number_title() {
-		echo $this->get_title_for( 'order_number' );
+		echo $this->get_order_number_title();
 	}
 	
 	public function order_date_title() {
 		echo $this->get_title_for( 'order_date' );
 	}
 	
+	public function get_payment_method_title() {
+		return $this->get_title_for( 'payment_method' );
+	}
+	
 	public function payment_method_title() {
-		echo $this->get_title_for( 'payment_method' );
+		echo $this->get_payment_method_title();
+	}
+	
+	public function get_shipping_method_title() {
+		return $this->get_title_for( 'shipping_method' );
 	}
 	
 	public function shipping_method_title() {
-		echo $this->get_title_for( 'shipping_method' );
+		echo $this->get_shipping_method_title();
+	}
+	
+	public function get_sku_title() {
+		return $this->get_title_for( 'sku' );
 	}
 	
 	public function sku_title() {
-		echo $this->get_title_for( 'sku' );
+		echo $this->get_sku_title();
+	}
+	
+	public function get_weight_title() {
+		return $this->get_title_for( 'weight' );
 	}
 	
 	public function weight_title() {
-		echo $this->get_title_for( 'weight' );
+		echo $this->get_weight_title();
+	}
+	
+	public function get_notes_title() {
+		return $this->get_title_for( 'notes' );
 	}
 	
 	public function notes_title() {
-		echo $this->get_title_for( 'notes' );
+		echo $this->get_notes_title();
+	}
+	
+	public function get_customer_notes_title() {
+		return $this->get_title_for( 'customer_notes' );
 	}
 	
 	public function customer_notes_title() {
-		echo $this->get_title_for( 'customer_notes' );
+		echo $this->get_customer_notes_title();
 	}
 	
 	/**
@@ -720,11 +756,6 @@ abstract class Order_Document {
 			default:
 				$title = '';
 				break;
-		}
-		
-		// Allow for custom/specific titles overriding the default ones
-		if ( ! empty( $this->custom_titles ) && is_array( $this->custom_titles ) && isset( $this->custom_titles[ $slug ] ) ) {
-			$title = $this->custom_titles[ $slug ];
 		}
 		
 		return apply_filters( "wpo_wcpdf_{$slug}_title", $title, $this );

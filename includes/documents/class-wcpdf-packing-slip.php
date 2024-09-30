@@ -16,7 +16,6 @@ class Packing_Slip extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
-	public $custom_titles;
 	public $output_formats;
 
 	/**
@@ -26,13 +25,9 @@ class Packing_Slip extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type          = 'packing-slip';
-		$this->title         = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon          = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
-		$this->custom_titles = apply_filters( "wpo_wcpdf_{$this->slug}_custom_titles", array(
-			'document_number' => __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' ),
-			'document_date'   => __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' ),
-		), $this );
+		$this->type  = 'packing-slip';
+		$this->title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
 
 		// call parent constructor
 		parent::__construct( $order );
@@ -43,7 +38,17 @@ class Packing_Slip extends Order_Document_Methods {
 
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+		return apply_filters( "wpo_wcpdf_document_title", __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	public function get_number_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_number_title', __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	public function get_date_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_date_title', __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {

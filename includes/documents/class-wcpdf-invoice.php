@@ -16,7 +16,6 @@ class Invoice extends Order_Document_Methods {
 	public $type;
 	public $title;
 	public $icon;
-	public $custom_titles;
 	public $output_formats;
 
 	/**
@@ -26,14 +25,9 @@ class Invoice extends Order_Document_Methods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type          = 'invoice';
-		$this->title         = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon          = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-		$this->custom_titles = apply_filters( "wpo_wcpdf_{$this->slug}_custom_titles", array(
-			'document_number'  => __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ),
-			'document_date'    => __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ),
-			'shipping_address' => __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ),
-		), $this );
+		$this->type  = 'invoice';
+		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
 
 		// call parent constructor
 		parent::__construct( $order );
@@ -59,7 +53,22 @@ class Invoice extends Order_Document_Methods {
 
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+		return apply_filters( "wpo_wcpdf_document_title", __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	public function get_number_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_number_title', __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	public function get_date_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_date_title', __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	public function get_shipping_address_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_shipping_address_title', __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
 	public function init() {
