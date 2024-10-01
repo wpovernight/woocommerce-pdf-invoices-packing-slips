@@ -2,7 +2,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-
 ?>
 <style>
 	#wpo-wcpdf-settings { display: none; }
@@ -20,7 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tr>
 		<th class="first" align="left">&nbsp;</th>
 		<th align="left"><?php esc_html_e( 'Professional', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-		<th align="left"><?php esc_html_e( 'Premium Templates', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left"><?php esc_html_e( 'Bundle', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left" class="last">&nbsp;</td>
 	</tr>
@@ -29,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	foreach ( $features as $feature ) {
 		echo '<tr><td class="first feature-label">' . $feature['label'];
 		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . $feature['description'] . '</span></td>' : '</td>';
-		foreach ( ['pro', 'templates', 'bundle'] as $extension ) {
+		foreach ( ['pro', 'bundle'] as $extension ) {
 			echo in_array( $extension, $feature['extensions'] ) ? '<td><span class="feature-available"></span></td>' : '<td>-</td>';
 		}
 		echo '<td align="left" class="last">&nbsp;</td></tr>';
@@ -95,3 +93,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<td align="left" class="last">&nbsp;</td>
 	</tr>
 </table>
+
+<div id="plugin-recommendations" class="upgrade-table-description">
+	<h1><?php esc_html_e( 'You might also like these plugins...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
+	<?php
+	if ( count( array_column( $sorted_plugin_recommendations, 'installed' ) ) === count( $sorted_plugin_recommendations ) ) {
+		printf( '<p>%s</p>', __( 'Wow! It looks like you own all of our recommendations. Check out our shop for even more plugins.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', 'https://wpovernight.com/shop/', __( 'Visit shop', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+	?>
+	<div class="card-container">
+	<?php
+		foreach ( $sorted_plugin_recommendations as $plugin ) {
+			?>
+			<div class="<?php echo isset( $plugin['installed'] ) ? 'recommendation-card currently-installed' : 'recommendation-card'; ?>">
+				<img src="<?php echo $plugin['thumbnail']; ?>" alt="<?php echo $plugin['title']; ?>">
+				<div class="card-content">
+					<h5><?php echo $plugin['title']; ?></h5>
+					<p><?php echo $plugin['description']; ?></p>
+					<?php 
+					if ( isset( $plugin['installed'] ) ) {
+						printf( '<span class="currently-installed">%s</span>', __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) );
+					} else {
+						printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', $plugin['url'], __( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' ) );
+					}
+					?>
+				</div>
+			</div>
+			<?php
+		}
+	?>
+	</div>
+</div>
