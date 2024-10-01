@@ -604,13 +604,8 @@ class Invoice extends Order_Document_Methods {
 					'display_shipping_address',
 					'display_date',
 					'display_number',
-					'next_invoice_number' // this should follow 'display_number'
-				)
-			),
-			'due_date'         => array(
-				'title'   => __( 'Due date', 'woocommerce-pdf-invoices-packing-slips' ),
-				'members' => array(
-					'due_date',
+					'next_invoice_number', // this should follow 'display_number'
+					'due_date'
 				)
 			),
 			'admin_display'    => array(
