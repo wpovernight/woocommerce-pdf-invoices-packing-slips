@@ -74,7 +74,7 @@
 						<td><?php $this->date( $this->get_type() ); ?></td>
 					</tr>
 				<?php endif; ?>
-				<?php if ( $this->get_due_date() > 0 ) : ?>
+				<?php if ( $this->has_due_date() ) : ?>
 					<tr class="due-date">
 						<th><?php $this->due_date_title(); ?></th>
 						<td><?php $this->due_date(); ?></td>

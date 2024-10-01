@@ -1480,18 +1480,27 @@ abstract class Order_Document {
 			return 0;
 		}
 
-		$due_date_days = apply_filters( 'wpo_wcpdf_due_date_days', $due_date_days, $this->type, $this );
+		$due_date_days = apply_filters( 'wpo_wcpdf_due_date_days', $due_date_days, $this );
 
 		if ( 0 >= intval( $due_date_days ) ) {
 			return 0;
 		}
 
-		$document_creation_date = $this->get_date( $this->type, $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
-		$base_date              = apply_filters( 'wpo_wcpdf_due_date_base_date', $document_creation_date, $this->type, $this );
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$base_date              = apply_filters( 'wpo_wcpdf_due_date_base_date', $document_creation_date, $this->get_type(), $this );
 		$due_date_datetime      = clone $base_date;
 		$due_date_datetime      = $due_date_datetime->modify( "+$due_date_days days" );
 
-		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->type, $this );
+		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->get_type(), $this );
+	}
+
+	/**
+	 * Check if the document has a due date.
+	 *
+	 * @return bool
+	 */
+	public function has_due_date(): bool {
+		return $this->get_due_date() > 0;
 	}
 
 	protected function add_filters( $filters ) {

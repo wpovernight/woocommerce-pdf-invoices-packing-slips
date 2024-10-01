@@ -1607,7 +1607,7 @@ class Main {
 	 *
 	 * @return void
 	 */
-	public function display_due_date_table_row( string $document_type = null, \WC_Abstract_Order $order = null ): void {
+	public function display_due_date_table_row( ?string $document_type = null, ?\WC_Abstract_Order $order = null ): void {
 		if ( empty( $order ) || empty( $document_type ) ) {
 			return;
 		}
