@@ -1093,13 +1093,13 @@ class Settings {
 		// Check for any unprocessed settings fields.
 		$unprocessed_settings_fields = array_diff_key( $settings_fields, array_flip( $processed_keys ) );
 
-		// Create a "More" section for uncategorized settings fields.
+		// Create an "Additional settings" section for uncategorized settings fields.
 		if ( ! empty( $unprocessed_settings_fields ) ) {
-			$category_name              = 'more';
+			$category_name              = 'additional';
 			$modified_settings_fields[] = array(
 				'type'     => 'section',
 				'id'       => $category_name,
-				'title'    => __( 'More', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => __( 'Additional settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'section',
 				'args'     => array(
 					'before_section' => '<div class="settings_category" id="' . $category_name . '">',
