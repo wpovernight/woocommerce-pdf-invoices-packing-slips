@@ -190,7 +190,7 @@ class Packing_Slip extends Order_Document_Methods {
 				),
 			),
 			'document_display' => array(
-				'title'   => __( 'Document display options', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'display_billing_address',
 					'display_email',
