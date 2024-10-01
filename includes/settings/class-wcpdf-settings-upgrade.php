@@ -20,7 +20,7 @@ class Settings_Upgrade {
 	}
 
 	public function __construct() {
-		$this->extensions = array( 'pro', 'templates' );
+		$this->extensions = array( 'pro' );
 
 		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
@@ -100,7 +100,7 @@ class Settings_Upgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-the-customizer/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add custom data to your documents', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -110,21 +110,79 @@ class Settings_Upgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-custom-blocks/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Additional PDF templates', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Make use of our Business or Modern template designs.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add styling', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Easily change the look and feel of your documents by adding some custom CSS.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'templates', 'bundle' ),
+					'extensions'  => array( 'bundle' ),
 				),
 			);
 
 			$extension_license_infos = $this->get_extension_license_infos();
+
+			$plugin_recommendations = array(
+				array(
+					'plugin_path' => 'wc-reminder-emails/wc-reminder-emails.php',
+					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/wc-reminder-emails-thumbnail-400x400.jpg',
+					'title'       => __( 'WooCommerce Smart Reminder Emails', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Automatically schedule and send Reminder Emails for WooCommerce orders.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=reminder-emails-cross'
+				),
+				array(
+					'plugin_path' => 'woocommerce-address-labels/woocommerce-address-labels.php',
+					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-address-labels-thumbnail-400x400.jpg',
+					'title'       => __( 'WooCommerce Print Address Labels', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Print out address labels for selected orders straight from WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-address-labels?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=address-labels-cross'
+				),
+				array(
+					'plugin_path' => 'woocommerce-printnode/print-orders.php',
+					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-printnode-thumbnail-400x400.jpg',
+					'title'       => __( 'WooCommerce Automatic Printing - PrintNode', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'A plugin to automatically print completed orders via PrintNode.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=order-printing-cross'
+				),
+				array(
+					'plugin_path' => 'woocommerce-ultimate-barcodes/woocommerce-ultimate-barcodes.php',
+					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-ultimate-barcodes-thumbnail-400x400.jpg',
+					'title'       => __( 'WooCommerce Ultimate Barcodes', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Generate barcodes (ZATCA, QR-codes, C128, EAN-13 and more) for your orders, products and even invoices & packing slips.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-ultimate-barcodes?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ultimate-barcodes-cross'
+				),
+				array(
+					'plugin_path' => 'woocommerce-order-list/woocommerce-order-list.php',
+					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-order-list-thumbnail-400x400.jpg',
+					'title'       => __( 'WooCommerce Print Order List', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'This plugin lets you quickly print a list of your WooCommerce orders. Great for order picking.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-order-list?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=order-list-cross'
+				),
+				array(
+					'plugin_path' => 'wp-menu-cart-pro/wp-menu-cart-pro.php',
+					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/wp-menu-cart-pro-thumbnail-400x400.jpg',
+					'title'       => __( 'Menu Cart Pro', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Integrates seamlessly with WooCommerce to add a shopping cart to your menu.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'url'         => 'https://wpovernight.com/downloads/menu-cart-pro?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=menu-cart-pro-cross'
+				),
+			);
+
+			// Sort recommendations based on if the plugin is installed
+			$installed_plugins = get_plugins();
+			$sorted_plugin_recommendations = array();
+
+			foreach ( array_reverse( $plugin_recommendations ) as $plugin ) {
+				if ( isset( $installed_plugins[ $plugin['plugin_path'] ] ) ) {
+					$plugin['installed'] = true;
+					$sorted_plugin_recommendations[] = $plugin;
+				} else {
+					array_unshift( $sorted_plugin_recommendations, $plugin );
+				}
+			}
 
 			include( WPO_WCPDF()->plugin_path() . '/includes/views/upgrade-table.php' );
 		}
@@ -248,13 +306,10 @@ class Settings_Upgrade {
 			} else {
 				switch ( $extension ) {
 					case 'pro':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/';
-						break;
-					case 'templates':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-premium-templates/';
+						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-pro-upgrade';
 						break;
 					case 'bundle':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/';
+						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-bundle-upgrade';
 						break;
 				}
 			}
@@ -301,6 +356,10 @@ class Settings_Upgrade {
 			}
 		}
 
+		if ( isset( $data['templates'] ) ) {
+			unset( $data['templates'] );
+		}
+
 		return $data;
 	}
 
@@ -320,32 +379,6 @@ class Settings_Upgrade {
 		}
 
 		return $installed;
-	}
-
-	/**
-	 * Check if bundle (Pro + Templates) is active
-	 *
-	 * @return bool
-	 */
-	public function bundle_is_active() {
-		$extension_license_infos = $this->get_extension_license_infos();
-		$bundle                  = false;
-
-		if ( ! empty( $extension_license_infos ) ) {
-			$bundle = true;
-
-			foreach ( $this->extensions as $extension ) {
-				if (
-					( isset( $extension_license_infos[ $extension ]['status'] ) && 'valid' !== $extension_license_infos[ $extension ]['status'] ) ||
-					! isset( $extension_license_infos[ $extension ]['status'] )
-				) {
-					$bundle = false;
-					break;
-				}
-			}
-		}
-
-		return $bundle;
 	}
 
 }

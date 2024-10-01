@@ -25,13 +25,13 @@ class Admin {
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
 		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed
-			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 ); // WC 7.1+
+			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 200 ); // WC 7.1+ (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
 			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
 			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
 			add_filter( 'woocommerce_shop_order_list_table_sortable_columns', array( $this, 'add_invoice_column_to_sortable_columns' ) );
 			add_filter( 'woocommerce_order_list_table_prepare_items_query_args', array( $this, 'adjust_order_list_query_args' ) );
 
-			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
+			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 200 ); // (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
 			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
 			add_action( 'pre_get_posts', array( $this, 'sort_orders_by_numeric_invoice_number' ) );

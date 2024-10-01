@@ -321,18 +321,16 @@ class Invoice extends Order_Document_Methods {
 				'type'			=> 'setting',
 				'id'			=> 'due_date',
 				'title'			=> __( 'Display due date', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'select',
+				'callback'		=> 'checkbox_text_input',
 				'section'		=> $this->type,
 				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'due_date',
-					'options'       => apply_filters( 'wpo_wcpdf_due_date_options', array(
-						''   => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ),
-						'1'  => __( '1 day', 'woocommerce-pdf-invoices-packing-slips' ),
-						'7'  => __( '7 days', 'woocommerce-pdf-invoices-packing-slips' ),
-						'30' => __( '30 days', 'woocommerce-pdf-invoices-packing-slips' ),
-					), $this->type ),
-					'description'	=> __( 'Displays a due date below the order data.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'        => $option_name,
+					'id'                 => 'due_date',
+					/* translators: number of days */
+					'text_input_wrap'    => __( '%s days', 'woocommerce-pdf-invoices-packing-slips' ),
+					'text_input_size'    => 3,
+					'text_input_id'      => 'due_date_days',
+					'text_input_default' => 30,
 				)
 			),
 			array(
