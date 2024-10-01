@@ -903,7 +903,7 @@ abstract class Order_Document {
 				break;
 		}
 		
-		$title = apply_filters( "wpo_wcpdf_title_for", $title, $slug, $this ); // used by Pro to translate strings (TranslatePress)
+		$title = apply_filters( 'wpo_wcpdf_title_for', $title, $slug, $this ); // used by Pro to translate strings
 		
 		return apply_filters( "wpo_wcpdf_{$slug}_title", $title, $this );
 	}
