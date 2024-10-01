@@ -179,13 +179,10 @@ class Packing_Slip extends Order_Document_Methods {
 
 	public function get_settings_categories(): array {
 		$settings_categories = array(
-			'init'             => array(
-				'title'   => '',
-				'members' => array( 'enabled' ),
-			),
 			'general'          => array(
 				'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
+					'enabled',
 					'attach_to_email_ids',
 				),
 			),
