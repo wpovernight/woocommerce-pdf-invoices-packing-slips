@@ -748,6 +748,24 @@ abstract class Order_Document {
 	}
 	
 	/**
+	 * Get the payment date title
+	 *
+	 * @return string
+	 */
+	public function get_payment_date_title() {
+		return $this->get_title_for( 'payment_date' );
+	}
+	
+	/**
+	 * Print the payment date title
+	 *
+	 * @return void
+	 */
+	public function payment_date_title() {
+		echo $this->get_payment_date_title();
+	}
+	
+	/**
 	 * Get the shipping method title
 	 *
 	 * @return string
@@ -882,6 +900,9 @@ abstract class Order_Document {
 				break;
 			case 'payment_method':
 				$title = __( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'payment_date':
+				$title = __( 'Payment Date:', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
 			case 'shipping_method':
 				$title = __( 'Shipping Method:', 'woocommerce-pdf-invoices-packing-slips' );
