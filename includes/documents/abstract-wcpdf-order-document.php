@@ -1491,7 +1491,7 @@ abstract class Order_Document {
 		$due_date_datetime      = clone $base_date;
 		$due_date_datetime      = $due_date_datetime->modify( "+$due_date_days days" );
 
-		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->get_type(), $this );
+		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this );
 	}
 
 	/**
