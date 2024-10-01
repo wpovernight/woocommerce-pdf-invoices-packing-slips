@@ -56,7 +56,7 @@ class Invoice extends Order_Document_Methods {
 	 *
 	 * @return string
 	 */
-	public function get_title(): string {
+	public function get_title() {
 		// override/not using $this->title to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_title', __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
@@ -66,7 +66,7 @@ class Invoice extends Order_Document_Methods {
 	 *
 	 * @return string
 	 */
-	public function get_number_title():string {
+	public function get_number_title() {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_number_title', __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
@@ -76,11 +76,16 @@ class Invoice extends Order_Document_Methods {
 	 *
 	 * @return string
 	 */
-	public function get_date_title(): string {
+	public function get_date_title() {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_date_title', __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 	
+	/**
+	 * Get the shipping address title
+	 *
+	 * @return string
+	 */
 	public function get_shipping_address_title() {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_shipping_address_title', __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ), $this );

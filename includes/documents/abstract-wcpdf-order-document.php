@@ -590,7 +590,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_title(): string {
+	public function get_title() {
 		return $this->get_title_for( 'document' );
 	}
 
@@ -599,7 +599,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function title(): void {
+	public function title() {
 		echo $this->get_title();
 	}
 
@@ -608,7 +608,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_number_title(): string {
+	public function get_number_title() {
 		return $this->get_title_for( 'document_number' );
 	}
 
@@ -617,7 +617,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function number_title(): void {
+	public function number_title() {
 		echo $this->get_number_title();
 	}
 
@@ -626,7 +626,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_date_title(): string {
+	public function get_date_title() {
 		return $this->get_title_for( 'document_date' );
 	}
 
@@ -635,7 +635,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function date_title(): void {
+	public function date_title() {
 		echo $this->get_date_title();
 	}
 
@@ -644,7 +644,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_due_date_title(): string {
+	public function get_due_date_title() {
 		return $this->get_title_for( 'document_due_date' );
 	}
 
@@ -653,7 +653,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function due_date_title(): void {
+	public function due_date_title() {
 		echo $this->get_due_date_title();
 	}
 	
@@ -662,7 +662,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_billing_address_title(): string {
+	public function get_billing_address_title() {
 		return $this->get_title_for( 'billing_address' );
 	}
 	
@@ -671,7 +671,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function billing_address_title(): void {
+	public function billing_address_title() {
 		echo $this->get_billing_address_title();
 	}
 	
@@ -680,7 +680,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_shipping_address_title(): string {
+	public function get_shipping_address_title() {
 		return $this->get_title_for( 'shipping_address' );
 	}
 	
@@ -689,7 +689,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function shipping_address_title(): void {
+	public function shipping_address_title() {
 		echo $this->get_shipping_address_title();
 	}
 	
@@ -698,7 +698,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_order_number_title(): string {
+	public function get_order_number_title() {
 		return $this->get_title_for( 'order_number' );
 	}
 	
@@ -707,7 +707,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function order_number_title(): void {
+	public function order_number_title() {
 		echo $this->get_order_number_title();
 	}
 	
@@ -716,7 +716,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_order_date_title(): string {
+	public function get_order_date_title() {
 		return $this->get_title_for( 'order_date' );
 	}
 	
@@ -725,7 +725,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function order_date_title(): void {
+	public function order_date_title() {
 		echo $this->get_order_date_title();
 	}
 	
@@ -734,7 +734,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_payment_method_title(): string {
+	public function get_payment_method_title() {
 		return $this->get_title_for( 'payment_method' );
 	}
 	
@@ -743,7 +743,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function payment_method_title(): void {
+	public function payment_method_title() {
 		echo $this->get_payment_method_title();
 	}
 	
@@ -752,7 +752,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_shipping_method_title(): string {
+	public function get_shipping_method_title() {
 		return $this->get_title_for( 'shipping_method' );
 	}
 	
@@ -761,7 +761,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function shipping_method_title(): void {
+	public function shipping_method_title() {
 		echo $this->get_shipping_method_title();
 	}
 	
@@ -770,7 +770,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_sku_title(): string {
+	public function get_sku_title() {
 		return $this->get_title_for( 'sku' );
 	}
 	
@@ -779,7 +779,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function sku_title(): void {
+	public function sku_title() {
 		echo $this->get_sku_title();
 	}
 	
@@ -788,7 +788,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_weight_title(): string {
+	public function get_weight_title() {
 		return $this->get_title_for( 'weight' );
 	}
 	
@@ -797,7 +797,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function weight_title(): void {
+	public function weight_title() {
 		echo $this->get_weight_title();
 	}
 	
@@ -806,7 +806,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_notes_title(): string {
+	public function get_notes_title() {
 		return $this->get_title_for( 'notes' );
 	}
 	
@@ -815,7 +815,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function notes_title(): void {
+	public function notes_title() {
 		echo $this->get_notes_title();
 	}
 	
@@ -824,7 +824,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_customer_notes_title(): string {
+	public function get_customer_notes_title() {
 		return $this->get_title_for( 'customer_notes' );
 	}
 	
@@ -833,7 +833,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function customer_notes_title(): void {
+	public function customer_notes_title() {
 		echo $this->get_customer_notes_title();
 	}
 	
