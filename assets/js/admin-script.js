@@ -599,6 +599,7 @@ jQuery( function( $ ) {
 	function settingsAccordion() {
 		// Hide all the content initially except the "init"
 		$( '.settings_category' ).not( '#general' ).find( '.form-table' ).hide();
+		$( '#general > h2' ).addClass( 'active' );
 
 		let state_exists = false;
 		// Retrieve the state from localStorage
@@ -609,9 +610,6 @@ jQuery( function( $ ) {
 				$( this ).addClass( 'active' ).next( '.form-table' ).show();
 			}
 		} );
-
-		// Show the first accordion always.
-		$( '.settings_category h2:first' ).addClass( 'active' ).next( '.form-table' ).show();
 
 		$('.settings_category h2' ).click( function() {
 			const index = $( '.settings_category h2' ).index( $( this ) );

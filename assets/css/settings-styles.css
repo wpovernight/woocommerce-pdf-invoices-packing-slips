@@ -1071,8 +1071,17 @@ sup.wcpdf_beta {
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr,
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th,
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td {
-		display: block!important;
+		display: block;
 		/*width: 100%!important;*/
+	}
+
+	#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
+	#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > td,
+	#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
+	#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td,
+	#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
+	#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
+		display: block;
 	}
 
 	.preview-document .preview-data-wrapper {
