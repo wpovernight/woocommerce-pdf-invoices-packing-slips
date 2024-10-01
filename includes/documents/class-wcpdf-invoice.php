@@ -617,7 +617,7 @@ class Invoice extends Order_Document_Methods {
 				)
 			),
 			'admin_display'    => array(
-				'title'   => __( 'Admin display options', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Admin', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'invoice_number_column',
 					'invoice_date_column',
