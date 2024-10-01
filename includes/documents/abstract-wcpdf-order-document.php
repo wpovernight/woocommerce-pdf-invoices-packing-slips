@@ -1495,11 +1495,11 @@ abstract class Order_Document {
 	}
 
 	/**
-	 * Check if the document has a due date.
+	 * Check if due date should be shown
 	 *
 	 * @return bool
 	 */
-	public function has_due_date(): bool {
+	public function show_due_date(): bool {
 		return $this->get_due_date() > 0;
 	}
 
