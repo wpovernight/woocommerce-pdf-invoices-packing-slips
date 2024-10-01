@@ -449,8 +449,26 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
 	display: table-cell;
-	padding: 15px 10px 15px 0px;
+	padding: 15px 2em 15px 2em;
 	width: auto;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:first-child > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:first-child > td,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > td,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > td {
+	padding-top: 2em;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:last-child > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:last-child > td,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > td,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > th,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > td {
+	padding-bottom: 2em;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
@@ -1325,12 +1343,12 @@ div.upgrade-table-description a,
 	#upgrade-table td.feature-label span.description {
 		display: none;
 	}
-	
+
 	#upgrade-table th:not(.last),
 	#upgrade-table td:not(.last) {
 		width: 20%;
 	}
-	
+
 	#upgrade-table td.first {
 		width: 40%;
 	}
