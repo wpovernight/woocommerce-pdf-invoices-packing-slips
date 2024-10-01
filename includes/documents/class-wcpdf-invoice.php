@@ -596,7 +596,7 @@ class Invoice extends Order_Document_Methods {
 				),
 			),
 			'document_display' => array(
-				'title'   => __( 'Document display options', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'display_email',
 					'display_phone',
