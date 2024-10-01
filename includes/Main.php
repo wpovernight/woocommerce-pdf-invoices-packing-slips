@@ -82,7 +82,8 @@ class Main {
 		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
 
-		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date' ), 10, 2 );
+		// Add due date via action hook for legacy templates
+		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 2 );
 
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 	}
@@ -1601,13 +1602,33 @@ class Main {
 	}
 
 	/**
+	 * Display due date table row in the order data section for legacy templates.
+	 *
 	 * @param null|string $document_type
-	 * @param null|\WC_Order|\WC_Order_Refund $order
+	 * @param null|\WC_Abstract_Order $order
 	 *
 	 * @return void
 	 */
-	public function display_due_date( string $document_type = null, $order = null ): void {
+	public function display_due_date_table_row( ?string $document_type = null, ?\WC_Abstract_Order $order = null ): void {
 		if ( empty( $order ) || empty( $document_type ) ) {
+			return;
+		}
+
+		$current_template_path = explode( '/', WPO_WCPDF()->settings->get_template_path() );
+		$current_template      = end( $current_template_path );
+		$premium_templates     = array( 'Simple Premium', 'Modern', 'Business' );
+
+		// Return if the Simple template is selected. Due date is displayed through template.
+		if ( 'Simple' === $current_template ) {
+			return;
+		}
+
+		// Return if the Updated Premium Template is selected. Due date is displayed through template.
+		if (
+			function_exists( 'WPO_WCPDF_Templates' ) &&
+			version_compare( WPO_WCPDF_Templates()->version, '2.21.9', '>' ) &&
+			in_array( $current_template, $premium_templates, true )
+		) {
 			return;
 		}
 

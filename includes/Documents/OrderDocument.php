@@ -621,6 +621,16 @@ abstract class OrderDocument {
 		echo $this->get_due_date_title();
 	}
 
+	/**
+	 * Prints the due date.
+	 *
+	 * @return void
+	 */
+	public function due_date(): void {
+		$due_date_timestamp = $this->get_due_date();
+		echo apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Data setters
@@ -1463,23 +1473,34 @@ abstract class OrderDocument {
 	 * @return int
 	 */
 	public function get_due_date(): int {
-		$due_date = $this->get_setting( 'due_date' );
+		$due_date      = $this->get_setting( 'due_date' );
+		$due_date_days = $this->get_setting( 'due_date_days' );
 
-		if ( empty( $this->order ) || empty( $due_date ) ) {
+		if ( empty( $this->order ) || empty( $due_date ) || empty( $due_date_days ) ) {
 			return 0;
 		}
 
-		$due_date_days = apply_filters( 'wpo_wcpdf_due_date_days', $due_date, $this->type, $this );
+		$due_date_days = apply_filters( 'wpo_wcpdf_due_date_days', $due_date_days, $this );
 
 		if ( 0 >= intval( $due_date_days ) ) {
 			return 0;
 		}
 
-		$base_date         = apply_filters( 'wpo_wcpdf_due_date_base_date', $this->order->get_date_created(), $this->type, $this );
-		$due_date_datetime = clone $base_date;
-		$due_date_datetime = $due_date_datetime->modify( "+$due_date_days days" );
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$base_date              = apply_filters( 'wpo_wcpdf_due_date_base_date', $document_creation_date, $this->get_type(), $this );
+		$due_date_datetime      = clone $base_date;
+		$due_date_datetime      = $due_date_datetime->modify( "+$due_date_days days" );
 
-		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->type, $this );
+		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this );
+	}
+
+	/**
+	 * Check if the document has a due date.
+	 *
+	 * @return bool
+	 */
+	public function has_due_date(): bool {
+		return $this->get_due_date() > 0;
 	}
 
 	protected function add_filters( $filters ) {
