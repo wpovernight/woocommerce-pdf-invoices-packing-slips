@@ -107,7 +107,7 @@
 		<tr>
 			<?php 
 				foreach ( $headers as $column_class => $column_title ) {
-					printf( '<th class="%s"><span>%s</span></th>', $column_class, $column_title );
+					printf( '<th class="%s">%s</th>', $column_class, $column_title );
 				}
 			?>
 		</tr>
