@@ -117,7 +117,7 @@ abstract class Order_Document {
 
 		// output formats
 		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
-		$this->output_formats = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_output_formats", array( $this->output_formats, $this ), '3.8.8', 'wpo_wcpdf_document_output_formats' );
+		$this->output_formats = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_output_formats", array( $this->output_formats, $this ), '3.8.7', 'wpo_wcpdf_document_output_formats' );
 
 		// load data
 		if ( $this->order ) {
@@ -864,7 +864,7 @@ abstract class Order_Document {
 	public function get_title_for( string $slug ): string {
 		switch ( $slug ) {
 			case 'document':
-				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.8.8', 'wpo_wcpdf_document_title' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
 				break;
 			case 'document_number':
 				$title = sprintf(
@@ -872,7 +872,7 @@ abstract class Order_Document {
 					__( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ),
 					$this->title
 				);
-				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.8', 'wpo_wcpdf_document_number_title' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
 				break;
 			case 'document_date':
 				$title = sprintf(
@@ -880,11 +880,11 @@ abstract class Order_Document {
 					__( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ),
 					$this->title
 				);
-				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.8', 'wpo_wcpdf_document_date_title' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' );
 				break;
 			case 'document_due_date':
 				$title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
-				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_due_date_title", array( $title, $this ), '3.8.8', 'wpo_wcpdf_document_due_date_title' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_due_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_due_date_title' );
 				break;
 			case 'billing_address':
 				$title = __( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' );
