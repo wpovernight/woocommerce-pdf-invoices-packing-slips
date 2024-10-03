@@ -1480,18 +1480,37 @@ abstract class Order_Document {
 			return 0;
 		}
 
-		$due_date_days = apply_filters( 'wpo_wcpdf_due_date_days', $due_date_days, $this );
+		$due_date_days = apply_filters_deprecated(
+			'wpo_wcpdf_due_date_days',
+			array( $due_date_days, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date_days'
+		);
+		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
 
 		if ( 0 >= intval( $due_date_days ) ) {
 			return 0;
 		}
 
 		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
-		$base_date              = apply_filters( 'wpo_wcpdf_due_date_base_date', $document_creation_date, $this->get_type(), $this );
+		$base_date              = apply_filters_deprecated(
+			'wpo_wcpdf_due_date_base_date',
+			array( $document_creation_date, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date_base_date'
+		);
+		$base_date              = apply_filters( 'wpo_wcpdf_document_due_date_base_date', $base_date, $this );
 		$due_date_datetime      = clone $base_date;
 		$due_date_datetime      = $due_date_datetime->modify( "+$due_date_days days" );
 
-		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this );
+		$due_date = apply_filters_deprecated(
+			'wpo_wcpdf_due_date',
+			array( $due_date_datetime->getTimestamp() ?? 0, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date'
+		);
+
+		return apply_filters( 'wpo_wcpdf_document_due_date', $due_date ?? 0, $this );
 	}
 
 	/**
