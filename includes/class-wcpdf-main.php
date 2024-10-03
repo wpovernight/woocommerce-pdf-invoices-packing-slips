@@ -1564,9 +1564,7 @@ class Main {
 	 * Enable PHP error output for administrators.
 	 */
 	public function enable_debug() {
-		$user = wp_get_current_user();
-
-		if ( $user && in_array( 'administrator', $user->roles, true ) ) {
+		if ( \WPO_WCPDF()->settings->user_can_manage_settings() ) {
 			error_reporting( E_ALL );
 			ini_set( 'display_errors', 1 );
 		}
