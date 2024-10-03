@@ -13,11 +13,6 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Invoice' ) ) :
 
 class Invoice extends Order_Document_Methods {
 
-	public $type;
-	public $title;
-	public $icon;
-	public $output_formats;
-
 	/**
 	 * Init/load the order object.
 	 *

@@ -12,11 +12,6 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Packing_Slip' ) ) :
  */
 
 class Packing_Slip extends Order_Document_Methods {
-	
-	public $type;
-	public $title;
-	public $icon;
-	public $output_formats;
 
 	/**
 	 * Init/load the order object.
