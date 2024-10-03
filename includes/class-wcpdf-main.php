@@ -1561,11 +1561,15 @@ class Main {
 	}
 
 	/**
-	 * Enable PHP error output
+	 * Enable PHP error output for administrators.
 	 */
-	public function enable_debug () {
-		error_reporting( E_ALL );
-		ini_set( 'display_errors', 1 );
+	public function enable_debug() {
+		$user = wp_get_current_user();
+
+		if ( $user && in_array( 'administrator', $user->roles, true ) ) {
+			error_reporting( E_ALL );
+			ini_set( 'display_errors', 1 );
+		}
 	}
 
 	public function wc_webhook_topic_hooks( $topic_hooks, $wc_webhook ) {
