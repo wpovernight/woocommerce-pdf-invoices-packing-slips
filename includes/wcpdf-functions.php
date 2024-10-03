@@ -959,3 +959,23 @@ function wpo_wcpdf_checkout_is_block(): bool {
 
 	return $is_block;
 }
+
+/**
+ * Get the default table headers for the Simple template.
+ *
+ * @param object $document
+ * @return array
+ */
+function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array {
+	$headers = array(
+		'product'  => __( 'Product', 'woocommerce-pdf-invoices-packing-slips' ),
+		'quantity' => __( 'Quantity', 'woocommerce-pdf-invoices-packing-slips' ),
+		'price'    => __( 'Price', 'woocommerce-pdf-invoices-packing-slips' ),
+	);
+	
+	if ( 'packing-slip' === $document->get_type() ) {
+		unset( $headers['price'] );
+	}
+	
+	return apply_filters( 'wpo_wcpdf_simple_template_default_table_headers', $headers, $document );
+}
