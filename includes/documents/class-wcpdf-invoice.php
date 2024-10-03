@@ -86,7 +86,7 @@ class Invoice extends Order_Document_Methods {
 	 *
 	 * @return string
 	 */
-	public function get_shipping_address_title() {
+	public function get_shipping_address_title(): string {
 		// override to allow for language switching!
 		return apply_filters( 'wpo_wcpdf_document_shipping_address_title', __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}

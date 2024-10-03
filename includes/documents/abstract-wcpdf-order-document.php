@@ -662,7 +662,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_billing_address_title() {
+	public function get_billing_address_title(): string {
 		return $this->get_title_for( 'billing_address' );
 	}
 	
@@ -671,7 +671,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function billing_address_title() {
+	public function billing_address_title(): void {
 		echo $this->get_billing_address_title();
 	}
 	
@@ -680,7 +680,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_shipping_address_title() {
+	public function get_shipping_address_title(): string {
 		return $this->get_title_for( 'shipping_address' );
 	}
 	
@@ -689,7 +689,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function shipping_address_title() {
+	public function shipping_address_title(): void {
 		echo $this->get_shipping_address_title();
 	}
 	
@@ -698,7 +698,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_order_number_title() {
+	public function get_order_number_title(): string {
 		return $this->get_title_for( 'order_number' );
 	}
 	
@@ -707,7 +707,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function order_number_title() {
+	public function order_number_title(): void {
 		echo $this->get_order_number_title();
 	}
 	
@@ -716,7 +716,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_order_date_title() {
+	public function get_order_date_title(): string {
 		return $this->get_title_for( 'order_date' );
 	}
 	
@@ -725,7 +725,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function order_date_title() {
+	public function order_date_title(): void {
 		echo $this->get_order_date_title();
 	}
 	
@@ -734,7 +734,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_payment_method_title() {
+	public function get_payment_method_title(): string {
 		return $this->get_title_for( 'payment_method' );
 	}
 	
@@ -743,7 +743,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function payment_method_title() {
+	public function payment_method_title(): void {
 		echo $this->get_payment_method_title();
 	}
 	
@@ -752,7 +752,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_payment_date_title() {
+	public function get_payment_date_title(): string {
 		return $this->get_title_for( 'payment_date' );
 	}
 	
@@ -761,7 +761,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function payment_date_title() {
+	public function payment_date_title(): void {
 		echo $this->get_payment_date_title();
 	}
 	
@@ -770,7 +770,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_shipping_method_title() {
+	public function get_shipping_method_title(): string {
 		return $this->get_title_for( 'shipping_method' );
 	}
 	
@@ -779,7 +779,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function shipping_method_title() {
+	public function shipping_method_title(): void {
 		echo $this->get_shipping_method_title();
 	}
 	
@@ -788,7 +788,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_sku_title() {
+	public function get_sku_title(): string {
 		return $this->get_title_for( 'sku' );
 	}
 	
@@ -797,7 +797,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function sku_title() {
+	public function sku_title(): void {
 		echo $this->get_sku_title();
 	}
 	
@@ -806,7 +806,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_weight_title() {
+	public function get_weight_title(): string {
 		return $this->get_title_for( 'weight' );
 	}
 	
@@ -815,7 +815,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function weight_title() {
+	public function weight_title(): void {
 		echo $this->get_weight_title();
 	}
 	
@@ -824,7 +824,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_notes_title() {
+	public function get_notes_title(): string {
 		return $this->get_title_for( 'notes' );
 	}
 	
@@ -833,7 +833,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function notes_title() {
+	public function notes_title(): void {
 		echo $this->get_notes_title();
 	}
 	
@@ -842,7 +842,7 @@ abstract class Order_Document {
 	 *
 	 * @return string
 	 */
-	public function get_customer_notes_title() {
+	public function get_customer_notes_title(): string {
 		return $this->get_title_for( 'customer_notes' );
 	}
 	
@@ -851,7 +851,7 @@ abstract class Order_Document {
 	 *
 	 * @return void
 	 */
-	public function customer_notes_title() {
+	public function customer_notes_title(): void {
 		echo $this->get_customer_notes_title();
 	}
 	
