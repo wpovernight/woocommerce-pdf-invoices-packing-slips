@@ -1483,7 +1483,7 @@ abstract class Order_Document {
 		$due_date_days = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_days',
 			array( $due_date_days, $this->get_type(), $this ),
-			'3.8.7-beta-2',
+			'3.8.7',
 			'wpo_wcpdf_document_due_date_days'
 		);
 		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
@@ -1496,7 +1496,7 @@ abstract class Order_Document {
 		$base_date              = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_base_date',
 			array( $document_creation_date, $this->get_type(), $this ),
-			'3.8.7-beta-2',
+			'3.8.7',
 			'wpo_wcpdf_document_due_date_base_date'
 		);
 		$base_date              = apply_filters( 'wpo_wcpdf_document_due_date_base_date', $base_date, $this );
@@ -1506,7 +1506,7 @@ abstract class Order_Document {
 		$due_date = apply_filters_deprecated(
 			'wpo_wcpdf_due_date',
 			array( $due_date_datetime->getTimestamp() ?? 0, $this->get_type(), $this ),
-			'3.8.7-beta-2',
+			'3.8.7',
 			'wpo_wcpdf_document_due_date'
 		);
 
