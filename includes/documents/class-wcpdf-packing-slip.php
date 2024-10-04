@@ -28,12 +28,37 @@ class Packing_Slip extends Order_Document_Methods {
 		parent::__construct( $order );
 
 		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf' ), $this );
+		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
 	}
 
+	/**
+	 * Get the document title
+	 *
+	 * @return string
+	 */
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+		return apply_filters( 'wpo_wcpdf_document_title', __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	/**
+	 * Get the document number title
+	 *
+	 * @return string
+	 */
+	public function get_number_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_number_title', __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	/**
+	 * Get the document date title
+	 *
+	 * @return string
+	 */
+	public function get_date_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_date_title', __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
 	public function get_filename( $context = 'download', $args = array() ) {
@@ -175,22 +200,6 @@ class Packing_Slip extends Order_Document_Methods {
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		return;
 
-	}
-
-	/**
-	 * Document number title
-	 */
-	public function get_number_title() {
-		$number_title = __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
-	}
-
-	/**
-	 * Document date title
-	 */
-	public function get_date_title() {
-		$date_title = __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
 }
