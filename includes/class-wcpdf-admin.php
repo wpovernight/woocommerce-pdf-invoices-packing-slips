@@ -218,7 +218,7 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			$document_type  = $document->get_type();
-			$icon           = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
+			$icon           = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
 
 			if ( $document = wcpdf_get_document( $document_type, $order ) ) {
 				foreach ( $document->output_formats as $output_format ) {
