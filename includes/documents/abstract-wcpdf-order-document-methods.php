@@ -1338,7 +1338,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	
 	/**
-	 * Get the title for the refund reason
+	 * Get the title for the refund reason,
+	 * used by the Credit Note document.
+	 * Later we can move this to the Pro extension.
 	 *
 	 * @return string
 	 */
@@ -1347,7 +1349,9 @@ abstract class Order_Document_Methods extends Order_Document {
 	}
 	
 	/**
-	 * Display the title for the refund reason
+	 * Display the title for the refund reason,
+	 * used by the Credit Note document.
+	 * Later we can move this to the Pro extension.
 	 * 
 	 * @return void
 	 */
