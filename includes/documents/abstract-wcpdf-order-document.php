@@ -620,6 +620,28 @@ abstract class Order_Document {
 	public function number_title() {
 		echo $this->get_number_title();
 	}
+	
+	/**
+	 * Get the invoice number title,
+	 * this allows other documents to use
+	 * the invoice number title. Example: Proforma Invoice
+	 *
+	 * @return string
+	 */
+	public function get_invoice_number_title() {
+		return $this->get_title_for( 'invoice_number' );
+	}
+
+	/**
+	 * Print the invoice number title,
+	 * this allows other documents to use
+	 * the invoice number title. Example: Proforma Invoice
+	 *
+	 * @return void
+	 */
+	public function invoice_number_title() {
+		echo $this->get_invoice_number_title();
+	}
 
 	/**
 	 * Get the document date title
@@ -891,6 +913,10 @@ abstract class Order_Document {
 					$this->title
 				);
 				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
+				break;
+			case 'invoice_number':
+				$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_invoice_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
 				break;
 			case 'document_date':
 				$title = sprintf(
