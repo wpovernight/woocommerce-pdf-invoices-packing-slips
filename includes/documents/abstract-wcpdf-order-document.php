@@ -620,28 +620,6 @@ abstract class Order_Document {
 	public function number_title() {
 		echo $this->get_number_title();
 	}
-	
-	/**
-	 * Get the invoice number title,
-	 * this allows other documents to use
-	 * the invoice number title. Example: Proforma Invoice
-	 *
-	 * @return string
-	 */
-	public function get_invoice_number_title() {
-		return $this->get_title_for( 'invoice_number' );
-	}
-
-	/**
-	 * Print the invoice number title,
-	 * this allows other documents to use
-	 * the invoice number title. Example: Proforma Invoice
-	 *
-	 * @return void
-	 */
-	public function invoice_number_title() {
-		echo $this->get_invoice_number_title();
-	}
 
 	/**
 	 * Get the document date title
@@ -878,24 +856,6 @@ abstract class Order_Document {
 	}
 	
 	/**
-	 * Get the title for the refund reason
-	 *
-	 * @return string
-	 */
-	public function get_refund_reason_title(): string {
-		return $this->get_title_for( 'refund_reason' );
-	}
-	
-	/**
-	 * Display the title for the refund reason
-	 * 
-	 * @return void
-	 */
-	public function refund_reason_title(): void {
-		echo $this->get_refund_reason_title();
-	}
-	
-	/**
 	 * Get the title for a specific slug
 	 *
 	 * @param string $slug
@@ -913,10 +873,6 @@ abstract class Order_Document {
 					$this->title
 				);
 				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
-				break;
-			case 'invoice_number':
-				$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
-				$title = apply_filters_deprecated( "wpo_wcpdf_invoice_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
 				break;
 			case 'document_date':
 				$title = sprintf(
@@ -962,9 +918,6 @@ abstract class Order_Document {
 				break;
 			case 'customer_notes':
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
-				break;
-			case 'refund_reason':
-				$title = __( 'Reason for refund:', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
 			default:
 				$title = '';
