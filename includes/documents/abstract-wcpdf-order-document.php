@@ -856,6 +856,24 @@ abstract class Order_Document {
 	}
 	
 	/**
+	 * Get the title for the refund reason
+	 *
+	 * @return string
+	 */
+	public function get_refund_reason_title(): string {
+		return $this->get_title_for( 'refund_reason' );
+	}
+	
+	/**
+	 * Display the title for the refund reason
+	 * 
+	 * @return void
+	 */
+	public function refund_reason_title(): void {
+		echo $this->get_refund_reason_title();
+	}
+	
+	/**
 	 * Get the title for a specific slug
 	 *
 	 * @param string $slug
@@ -918,6 +936,9 @@ abstract class Order_Document {
 				break;
 			case 'customer_notes':
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'refund_reason':
+				$title = __( 'Reason for refund:', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
 			default:
 				$title = '';
