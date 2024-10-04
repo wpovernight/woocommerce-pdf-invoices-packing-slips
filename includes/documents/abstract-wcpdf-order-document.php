@@ -113,8 +113,7 @@ abstract class Order_Document {
 		}
 
 		// set properties
-		$this->slug = ! empty( $this->type ) ? str_replace( '-', '_', $this->type ) : '';
-		$this->icon = WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
+		$this->slug = ! empty( $this->type ) ? str_replace(  '-', '_', $this->type ) : '';
 
 		// output formats
 		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
