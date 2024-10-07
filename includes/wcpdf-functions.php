@@ -721,3 +721,261 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 	return apply_filters( 'wpo_wcpdf_multilingual_languages', $languages );
 }
 
+/**
+ * Get image mime type
+ *
+ * @param string $src
+ * @return string
+ */
+function wpo_wcpdf_get_image_mime_type( string $src ): string {
+	$mime_type = '';
+
+	if ( empty( $src ) ) {
+		return $mime_type;
+	}
+
+	// Check if 'getimagesize' function exists and try to get mime type for local files
+	if ( function_exists( 'getimagesize' ) && ! filter_var( $src, FILTER_VALIDATE_URL ) ) {
+		$image_info = @getimagesize( $src );
+
+		if ( $image_info && isset( $image_info['mime'] ) ) {
+			$mime_type = $image_info['mime'];
+		}
+	}
+
+	// Fallback to 'finfo_file' if mime type is empty for local files only (no remote files allowed)
+	if ( empty( $mime_type ) && function_exists( 'finfo_open' ) && ! filter_var( $src, FILTER_VALIDATE_URL ) ) {
+		$finfo = finfo_open( FILEINFO_MIME_TYPE );
+
+		if ( $finfo ) {
+			$mime_type = finfo_file( $finfo, $src );
+			finfo_close( $finfo );
+		}
+	}
+
+	// Handle remote files
+	if ( empty( $mime_type ) && filter_var( $src, FILTER_VALIDATE_URL ) ) {
+		$context = stream_context_create( array(
+			'http' => array(
+				'method'        => 'HEAD',
+				'ignore_errors' => true,
+			),
+			'https' => array(
+				'method'           => 'HEAD',
+				'ignore_errors'    => true,
+				'verify_peer'      => false,
+				'verify_peer_name' => false,
+			),
+		) );
+
+		$headers = @get_headers( $src, 1, $context );
+
+		if ( $headers ) {
+			if ( isset( $headers['Content-Type'] ) ) {
+				$mime_type = is_array( $headers['Content-Type'] ) ? $headers['Content-Type'][0] : $headers['Content-Type'];
+			}
+		}
+	}
+
+	// Fetch the actual image data if MIME type is still unknown (remote files)
+	if ( empty( $mime_type ) && filter_var( $src, FILTER_VALIDATE_URL ) ) {
+		$image_data = @file_get_contents( $src );
+
+		if ( $image_data ) {
+			if ( function_exists( 'finfo_open' ) ) {
+				$finfo = finfo_open( FILEINFO_MIME_TYPE );
+
+				if ( $finfo ) {
+					$mime_type = finfo_buffer( $finfo, $image_data );
+					finfo_close( $finfo );
+				}
+			}
+		}
+	}
+
+	// Determine using WP functions
+	if ( empty( $mime_type ) ) {
+		$path      = wp_parse_url( $src, PHP_URL_PATH );
+		$file_info = wp_check_filetype( $path );
+		$mime_type = $file_info['type'] ?? '';
+	}
+
+	// Last chance, determine from file extension
+	if ( empty( $mime_type ) ) {
+		$path      = parse_url( $src, PHP_URL_PATH );
+		$extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+
+		switch ( $extension ) {
+			case 'jpg':
+			case 'jpeg':
+				$mime_type = 'image/jpeg';
+				break;
+			case 'png':
+				$mime_type = 'image/png';
+				break;
+			case 'gif':
+				$mime_type = 'image/gif';
+				break;
+			case 'bmp':
+				$mime_type = 'image/bmp';
+				break;
+			case 'webp':
+				$mime_type = 'image/webp';
+				break;
+			case 'svg':
+				$mime_type = 'image/svg+xml';
+				break;
+		}
+	}
+
+	return $mime_type;
+}
+
+/**
+ * Base64 encode file from URL or local path
+ *
+ * @param string $src
+ *
+ * @return string|bool
+ */
+function wpo_wcpdf_base64_encode_file( string $src ) {
+	if ( empty( $src ) ) {
+		return false;
+	}
+
+	$file_data = @file_get_contents( $src );
+	return base64_encode( $file_data ) ?? false;
+}
+
+/**
+ * Check if a file is readable
+ *
+ * @param string $path
+ * @return bool
+ */
+function wpo_wcpdf_is_file_readable( string $path ): bool {
+	if ( empty( $path ) ) {
+		return false;
+	}
+
+	// Check if the path is a URL
+	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
+		$parsed_url = parse_url( $path );
+		$args	    = array();
+
+		// Check if the URL is localhost
+		if (
+			'localhost' === $parsed_url['host']                                             ||
+			'127.0.0.1' === $parsed_url['host']                                             ||
+			( preg_match( '/^192\.168\./', $parsed_url['host'] ) === 1 )                    || // 192.168.*
+			( preg_match( '/^10\./', $parsed_url['host'] ) === 1 )                          || // 10.*
+			( preg_match( '/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $parsed_url['host'] ) === 1 ) || // 172.16.* to 172.31.*
+			getenv( 'DISABLE_SSL_VERIFY' ) === 'true'
+		) {
+			$args['sslverify'] = false;
+		}
+
+		$args     = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
+		$response = wp_safe_remote_head( $path, $args );
+
+		if ( is_wp_error( $response ) ) {
+			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
+			return false;
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		return ( $status_code === 200 );
+
+	// Local path file check
+	} else {
+		if ( @is_readable( $path ) ) {
+			return true;
+		} else {
+			// Fallback to fopen if first check fails
+			$handle = @fopen( $path, 'r' );
+
+			if ( $handle ) {
+				fclose( $handle );
+				return true;
+			} else {
+				wcpdf_log_error( 'Failed to open local file with both methods: ' . $path, 'critical' );
+				return false;
+			}
+		}
+	}
+}
+
+/**
+ * Get image source in base64 format
+ *
+ * @param string $src
+ *
+ * @return string
+ */
+function wpo_wcpdf_get_image_src_in_base64( string $src ): string {
+	if ( empty( $src ) ) {
+		return $src;
+	}
+
+	$mime_type = wpo_wcpdf_get_image_mime_type( $src );
+
+	if ( empty( $mime_type ) ) {
+		wcpdf_log_error( 'Unable to determine image mime type for file: ' . $src, 'critical' );
+		return $src;
+	}
+
+	$image_base64 = wpo_wcpdf_base64_encode_file( $src );
+
+	if ( ! $image_base64 ) {
+		wcpdf_log_error( 'Unable to encode image source to base64:' . $src, 'critical' );
+		return $src;
+	}
+
+	return 'data:' . $mime_type . ';base64,' . $image_base64;
+}
+
+/**
+ * Determine if the checkout is a block.
+ *
+ * @return bool
+ */
+function wpo_wcpdf_checkout_is_block(): bool {
+	$checkout_page_id = wc_get_page_id( 'checkout' );
+
+	$is_block = $checkout_page_id &&
+		function_exists( 'has_block' ) &&
+		has_block( 'woocommerce/checkout', $checkout_page_id );
+
+	if ( ! $is_block ) {
+		$is_block = class_exists( '\\WC_Blocks_Utils' ) &&
+			count( \WC_Blocks_Utils::get_blocks_from_page( 'woocommerce/checkout', 'checkout' ) ) > 0;
+	}
+
+	if ( ! $is_block ) {
+		$is_block = class_exists( '\\Automattic\\WooCommerce\\Blocks\\Utils\\CartCheckoutUtils' ) &&
+			is_callable( array( '\\Automattic\\WooCommerce\\Blocks\\Utils\\CartCheckoutUtils', 'is_checkout_block_default' ) ) &&
+			\Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::is_checkout_block_default();
+	}
+
+	return $is_block;
+}
+
+/**
+ * Get the default table headers for the Simple template.
+ *
+ * @param object $document
+ * @return array
+ */
+function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array {
+	$headers = array(
+		'product'  => __( 'Product', 'woocommerce-pdf-invoices-packing-slips' ),
+		'quantity' => __( 'Quantity', 'woocommerce-pdf-invoices-packing-slips' ),
+		'price'    => __( 'Price', 'woocommerce-pdf-invoices-packing-slips' ),
+	);
+	
+	if ( 'packing-slip' === $document->get_type() ) {
+		unset( $headers['price'] );
+	}
+	
+	return apply_filters( 'wpo_wcpdf_simple_template_default_table_headers', $headers, $document );
+}

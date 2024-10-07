@@ -105,6 +105,17 @@ jQuery( function( $ ) {
 		'delay':     200
 	} );
 
+	$( '#wpo-wcpdf-preview-wrapper #due_date' ).on( 'change', function() {
+		const $due_date_checkbox   = $( '#wpo-wcpdf-preview-wrapper #due_date' );
+		const $due_date_days_input = $( '#wpo-wcpdf-preview-wrapper #due_date_days' );
+
+		if ( $due_date_checkbox.is( ':checked' ) ) {
+			$due_date_days_input.prop( 'disabled', false );
+		} else {
+			$due_date_days_input.prop( 'disabled', true );
+		}
+	} ).trigger( 'change' );
+
 	//----------> Preview <----------//
 	// objects
 	let $previewWrapper           = $( '#wpo-wcpdf-preview-wrapper' );
@@ -490,9 +501,6 @@ jQuery( function( $ ) {
 		// atob() is used to convert base64 encoded PDF to binary-like data.
 		// (See also https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding.)
 		pdfData = window.atob( pdfData );
-
-		// Loaded via <script> tag, create shortcut to access PDF.js exports.
-		let pdfjsLib = window['pdfjs-dist/build/pdf'];
 
 		// The workerSrc property shall be specified.
 		pdfjsLib.GlobalWorkerOptions.workerSrc = worker;

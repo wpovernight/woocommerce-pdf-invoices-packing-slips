@@ -87,36 +87,6 @@ abstract class Order_Document {
 	public $output_formats = array();
 
 	/**
-	 * Semaphore lock name.
-	 * @var string
-	 */
-	private $lock_name;
-
-	/**
-	 * Semaphore lock context.
-	 * @var array
-	 */
-	private $lock_context = array( 'source' => 'wpo-wcpdf-document-semaphore' );
-
-	/**
-	 * Semaphore lock time.
-	 * @var int
-	 */
-	private $lock_time;
-
-	/**
-	 * Semaphore lock retries.
-	 * @var int
-	 */
-	private $lock_retries;
-
-	/**
-	 * Semaphore lock loggers.
-	 * @var array
-	 */
-	private $lock_loggers;
-
-	/**
 	 * Linked documents, used for data retrieval
 	 * @var array
 	 */
@@ -146,18 +116,13 @@ abstract class Order_Document {
 		$this->slug = ! empty( $this->type ) ? str_replace(  '-', '_', $this->type ) : '';
 
 		// output formats
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf' ), $this  );
+		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
+		$this->output_formats = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_output_formats", array( $this->output_formats, $this ), '3.8.7', 'wpo_wcpdf_document_output_formats' );
 
 		// load data
 		if ( $this->order ) {
 			$this->read_data( $this->order );
 		}
-
-		// semaphore
-		$this->lock_name    = "wpo_wcpdf_{$this->slug}_semaphore_lock";
-		$this->lock_time    = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_time", 60 );
-		$this->lock_retries = apply_filters( "wpo_wcpdf_{$this->slug}_semaphore_lock_retries", 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_document_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
 
 		// load settings
 		$this->init_settings_data();
@@ -263,11 +228,11 @@ abstract class Order_Document {
 	}
 
 	public function initiate_number( $force_new_number = false ) {
-		$lock            = new Semaphore( $this->lock_name, $this->lock_time, $this->lock_loggers, $this->lock_context );
+		$lock            = new Semaphore( "initiate_{$this->slug}_number" );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 
-		if ( $lock->lock( $this->lock_retries ) && empty( $document_number ) ) {
+		if ( $lock->lock() && empty( $document_number ) ) {
 			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 
 			try {
@@ -620,41 +585,358 @@ abstract class Order_Document {
 		return $this->get_data( 'creation_trigger', $document_type, $order, $context );
 	}
 
+	/**
+	 * Get the document title
+	 *
+	 * @return string
+	 */
 	public function get_title() {
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", $this->title, $this );
+		return $this->get_title_for( 'document' );
 	}
 
+	/**
+	 * Print the document number title
+	 *
+	 * @return void
+	 */
 	public function title() {
 		echo $this->get_title();
 	}
 
+	/**
+	 * Get the document number title
+	 *
+	 * @return string
+	 */
 	public function get_number_title() {
-		/* translators: %s: document name */
-		$number_title = sprintf( __( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
+		return $this->get_title_for( 'document_number' );
 	}
 
+	/**
+	 * Print the document number title
+	 *
+	 * @return void
+	 */
 	public function number_title() {
 		echo $this->get_number_title();
 	}
 
+	/**
+	 * Get the document date title
+	 *
+	 * @return string
+	 */
 	public function get_date_title() {
-		/* translators: %s: document name */
-		$date_title = sprintf( __( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this->title );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
+		return $this->get_title_for( 'document_date' );
 	}
 
+	/**
+	 * Print the document date title
+	 *
+	 * @return void
+	 */
 	public function date_title() {
 		echo $this->get_date_title();
 	}
 
+	/**
+	 * Get the document due date title
+	 *
+	 * @return string
+	 */
 	public function get_due_date_title() {
-		$due_date_title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_due_date_title", $due_date_title, $this );
+		return $this->get_title_for( 'document_due_date' );
 	}
 
+	/**
+	 * Print the document due date title
+	 *
+	 * @return void
+	 */
 	public function due_date_title() {
 		echo $this->get_due_date_title();
+	}
+	
+	/**
+	 * Get the billing address title
+	 *
+	 * @return string
+	 */
+	public function get_billing_address_title(): string {
+		return $this->get_title_for( 'billing_address' );
+	}
+	
+	/**
+	 * Print the billing address title
+	 *
+	 * @return void
+	 */
+	public function billing_address_title(): void {
+		echo $this->get_billing_address_title();
+	}
+	
+	/**
+	 * Get the shipping address title
+	 *
+	 * @return string
+	 */
+	public function get_shipping_address_title(): string {
+		return $this->get_title_for( 'shipping_address' );
+	}
+	
+	/**
+	 * Print the shipping address title
+	 *
+	 * @return void
+	 */
+	public function shipping_address_title(): void {
+		echo $this->get_shipping_address_title();
+	}
+	
+	/**
+	 * Get the order number title
+	 *
+	 * @return string
+	 */
+	public function get_order_number_title(): string {
+		return $this->get_title_for( 'order_number' );
+	}
+	
+	/**
+	 * Print the order number title
+	 *
+	 * @return void
+	 */
+	public function order_number_title(): void {
+		echo $this->get_order_number_title();
+	}
+	
+	/**
+	 * Get the order date title
+	 *
+	 * @return string
+	 */
+	public function get_order_date_title(): string {
+		return $this->get_title_for( 'order_date' );
+	}
+	
+	/**
+	 * Print the order date title
+	 *
+	 * @return void
+	 */
+	public function order_date_title(): void {
+		echo $this->get_order_date_title();
+	}
+	
+	/**
+	 * Get the payment method title
+	 *
+	 * @return string
+	 */
+	public function get_payment_method_title(): string {
+		return $this->get_title_for( 'payment_method' );
+	}
+	
+	/**
+	 * Print the payment method title
+	 *
+	 * @return void
+	 */
+	public function payment_method_title(): void {
+		echo $this->get_payment_method_title();
+	}
+	
+	/**
+	 * Get the payment date title
+	 *
+	 * @return string
+	 */
+	public function get_payment_date_title(): string {
+		return $this->get_title_for( 'payment_date' );
+	}
+	
+	/**
+	 * Print the payment date title
+	 *
+	 * @return void
+	 */
+	public function payment_date_title(): void {
+		echo $this->get_payment_date_title();
+	}
+	
+	/**
+	 * Get the shipping method title
+	 *
+	 * @return string
+	 */
+	public function get_shipping_method_title(): string {
+		return $this->get_title_for( 'shipping_method' );
+	}
+	
+	/**
+	 * Print the shipping method title
+	 *
+	 * @return void
+	 */
+	public function shipping_method_title(): void {
+		echo $this->get_shipping_method_title();
+	}
+	
+	/**
+	 * Get the SKU title
+	 *
+	 * @return string
+	 */
+	public function get_sku_title(): string {
+		return $this->get_title_for( 'sku' );
+	}
+	
+	/**
+	 * Print the SKU title
+	 *
+	 * @return void
+	 */
+	public function sku_title(): void {
+		echo $this->get_sku_title();
+	}
+	
+	/**
+	 * Get the weight title
+	 *
+	 * @return string
+	 */
+	public function get_weight_title(): string {
+		return $this->get_title_for( 'weight' );
+	}
+	
+	/**
+	 * Print the weight title
+	 *
+	 * @return void
+	 */
+	public function weight_title(): void {
+		echo $this->get_weight_title();
+	}
+	
+	/**
+	 * Get the notes title
+	 *
+	 * @return string
+	 */
+	public function get_notes_title(): string {
+		return $this->get_title_for( 'notes' );
+	}
+	
+	/**
+	 * Print the notes title
+	 *
+	 * @return void
+	 */
+	public function notes_title(): void {
+		echo $this->get_notes_title();
+	}
+	
+	/**
+	 * Get the customer notes title
+	 *
+	 * @return string
+	 */
+	public function get_customer_notes_title(): string {
+		return $this->get_title_for( 'customer_notes' );
+	}
+	
+	/**
+	 * Print the customer notes title
+	 *
+	 * @return void
+	 */
+	public function customer_notes_title(): void {
+		echo $this->get_customer_notes_title();
+	}
+	
+	/**
+	 * Get the title for a specific slug
+	 *
+	 * @param string $slug
+	 * @return string
+	 */
+	public function get_title_for( string $slug ): string {
+		switch ( $slug ) {
+			case 'document':
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
+				break;
+			case 'document_number':
+				$title = sprintf(
+					/* translators: %s: document name */
+					__( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ),
+					$this->title
+				);
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
+				break;
+			case 'document_date':
+				$title = sprintf(
+					/* translators: %s: document name */
+					__( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+					$this->title
+				);
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' );
+				break;
+			case 'document_due_date':
+				$title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_due_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_due_date_title' );
+				break;
+			case 'billing_address':
+				$title = __( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'shipping_address':
+				$title = __( 'Shipping Address:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'order_number':
+				$title = __( 'Order Number:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'order_date':
+				$title = __( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'payment_method':
+				$title = __( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'payment_date':
+				$title = __( 'Payment Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'shipping_method':
+				$title = __( 'Shipping Method:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'sku':
+				$title = __( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'weight':
+				$title = __( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'notes':
+				$title = __( 'Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'customer_notes':
+				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			default:
+				$title = '';
+				break;
+		}
+		
+		$title = apply_filters( 'wpo_wcpdf_title_for', $title, $slug, $this ); // used by Pro to translate strings
+		
+		return apply_filters( "wpo_wcpdf_{$slug}_title", $title, $this );
+	}
+
+	/**
+	 * Prints the due date.
+	 *
+	 * @return void
+	 */
+	public function due_date(): void {
+		$due_date_timestamp = $this->get_due_date();
+		echo apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
 	}
 
 	/*
@@ -811,26 +1093,19 @@ abstract class Order_Document {
 	}
 
 	public function has_header_logo() {
-		return !empty( $this->settings['header_logo'] );
+		return ! empty( $this->settings['header_logo'] );
 	}
 
 	/**
 	 * Return logo id
 	 *
-	 * @return int|bool
+	 * @return int
 	 */
-	public function get_header_logo_id() {
-		$header_logo_id = false;
+	public function get_header_logo_id(): int {
+		$header_logo_id = ! empty( $this->settings['header_logo'] ) ? $this->get_settings_text( 'header_logo', 0, false ) : 0;
+		$header_logo_id = apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
 
-		if ( ! empty( $this->settings['header_logo'] ) ) {
-			$header_logo_id = absint( $this->get_settings_text( 'header_logo', '', false ) );
-
-			if ( 0 === $header_logo_id ) {
-				$header_logo_id = false;
-			}
-		}
-
-		return apply_filters( 'wpo_wcpdf_header_logo_id', absint( $header_logo_id ), $this );
+		return $header_logo_id && is_numeric( $header_logo_id ) ? absint( $header_logo_id ) : 0;
 	}
 
 	/**
@@ -843,44 +1118,41 @@ abstract class Order_Document {
 	}
 
 	/**
-	 * Show logo html
+	 * Show logo HTML
+	 *
+	 * @return void
 	 */
-	public function header_logo() {
+	public function header_logo(): void {
 		$attachment_id = $this->get_header_logo_id();
 
-		if ( $attachment_id ) {
+		if ( $attachment_id > 0 ) {
 			$company         = $this->get_shop_name();
-			$attachment      = wp_get_attachment_image_src( $attachment_id, 'full', false );
-			$attachment_path = get_attached_file( $attachment_id );
+			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
+			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 
-			if ( empty( $attachment ) || empty( $attachment_path ) ) {
+			if ( empty( $attachment_src ) || empty( $attachment_path ) ) {
+				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
 			}
 
-			$attachment_src    = $attachment[0];
-			$attachment_width  = $attachment[1];
-			$attachment_height = $attachment[2];
+			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
 
-			if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $attachment_path ) ) {
-				$src = $attachment_path;
-			} else {
-				$head = wp_remote_head( $attachment_src, [ 'sslverify' => false ] );
-				if ( is_wp_error( $head ) ) {
-					$errors = $head->get_error_messages();
-					foreach ( $errors as $error ) {
-						wcpdf_log_error( $error, 'critical' );
-					}
-					return;
-				} elseif ( isset( $head['response']['code'] ) && $head['response']['code'] === 200 ) {
-					$src = $attachment_src;
-				} else {
-					return;
-				}
+			// fix URLs using path
+			if ( ! apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
+				$path = preg_replace( '/^https?:\/\//', '', $src ); // removes http(s)://
+				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
 			}
 
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s" />', esc_attr( $src ), esc_attr( $company ) );
+			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
+				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
+				return;
+			}
 
-			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment, $this );
+			$image_src   = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
+
+			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
+
 		}
 	}
 
@@ -1509,23 +1781,53 @@ abstract class Order_Document {
 	 * @return int
 	 */
 	public function get_due_date(): int {
-		$due_date = $this->get_setting( 'due_date' );
+		$due_date      = $this->get_setting( 'due_date' );
+		$due_date_days = $this->get_setting( 'due_date_days' );
 
-		if ( empty( $this->order ) || empty( $due_date ) ) {
+		if ( empty( $this->order ) || empty( $due_date ) || empty( $due_date_days ) ) {
 			return 0;
 		}
 
-		$due_date_days = apply_filters( 'wpo_wcpdf_due_date_days', $due_date, $this->type, $this );
+		$due_date_days = apply_filters_deprecated(
+			'wpo_wcpdf_due_date_days',
+			array( $due_date_days, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date_days'
+		);
+		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
 
 		if ( 0 >= intval( $due_date_days ) ) {
 			return 0;
 		}
 
-		$base_date         = apply_filters( 'wpo_wcpdf_due_date_base_date', $this->order->get_date_created(), $this->type, $this );
-		$due_date_datetime = clone $base_date;
-		$due_date_datetime = $due_date_datetime->modify( "+$due_date_days days" );
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$base_date              = apply_filters_deprecated(
+			'wpo_wcpdf_due_date_base_date',
+			array( $document_creation_date, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date_base_date'
+		);
+		$base_date              = apply_filters( 'wpo_wcpdf_document_due_date_base_date', $base_date, $this );
+		$due_date_datetime      = clone $base_date;
+		$due_date_datetime      = $due_date_datetime->modify( "+$due_date_days days" );
 
-		return apply_filters( 'wpo_wcpdf_due_date', $due_date_datetime->getTimestamp() ?? 0, $this->type, $this );
+		$due_date = apply_filters_deprecated(
+			'wpo_wcpdf_due_date',
+			array( $due_date_datetime->getTimestamp() ?? 0, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date'
+		);
+
+		return apply_filters( 'wpo_wcpdf_document_due_date', $due_date ?? 0, $this );
+	}
+
+	/**
+	 * Check if due date should be shown
+	 *
+	 * @return bool
+	 */
+	public function show_due_date(): bool {
+		return $this->get_due_date() > 0;
 	}
 
 	protected function add_filters( $filters ) {

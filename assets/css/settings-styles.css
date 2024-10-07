@@ -941,6 +941,15 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-bottom: 4em;
 }
 
+#wpo-wcpdf-preview-wrapper input#due_date_days {
+	text-align: right;
+}
+
+#wpo-wcpdf-preview-wrapper input#due_date_days:disabled {
+	background-color: #eaeaea;
+	color: #999;
+}
+
 sup.wcpdf_beta {
 	background-color: #51266b;
 	color: white;
@@ -1120,7 +1129,8 @@ div.upgrade-table-description a,
 	font-size: 0.8em;
 }
 
-#upgrade-table .upgrade-links a.upgrade_button {
+#upgrade-table .upgrade-links a.upgrade_button,
+#plugin-recommendations a.upgrade_button {
 	display: inline-block;
 	background: white;
 	padding: 1em 3em 1em 2em;
@@ -1131,7 +1141,8 @@ div.upgrade-table-description a,
 	position: relative;
 }
 
-#upgrade-table .upgrade-links a.upgrade_button:after {
+#upgrade-table .upgrade-links a.upgrade_button:after,
+#plugin-recommendations a.upgrade_button:after {
 	content: ' \2192'; /* ASCII code for right arrow */
 	display: block;
 	position: absolute;
@@ -1140,16 +1151,90 @@ div.upgrade-table-description a,
 	transition: 0.5s;
 }
 
-#upgrade-table .upgrade-links a.upgrade_button:hover:after {
+#upgrade-table .upgrade-links a.upgrade_button:hover:after,
+#plugin-recommendations a.upgrade_button:hover:after {
 	right: 1.1em;
 	font-weight: bold;
 }
 
-
 #upgrade-table .upgrade-links a.upgrade_button:focus,
-#upgrade-table .upgrade-links a.upgrade_button:hover {
+#upgrade-table .upgrade-links a.upgrade_button:hover,
+#plugin-recommendations a.upgrade_button:focus,
+#plugin-recommendations a.upgrade_button:hover {
 	background: #6e1edc;
 	color: #fcfbf7;
+}
+
+#plugin-recommendations {
+	border-radius: 8px;
+    background-color: #f1e9fc;
+	padding: 4em 3em;
+}
+
+#plugin-recommendations .card-container {
+	max-width: 1100px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 3em;
+    padding: 2em 0;
+}
+
+#plugin-recommendations .recommendation-card {
+	margin-top: 0;
+	border-radius: 6px;
+	background-color: white;
+	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
+	box-sizing: border-box;
+	font-size: 15px;
+	overflow: hidden;
+	transition: 0.2s;
+}
+
+#plugin-recommendations .recommendation-card:nth-child(n+4) {
+	display: none;
+}
+
+#plugin-recommendations .recommendation-card:hover {
+	scale: 1.02;
+}
+
+#plugin-recommendations .recommendation-card.currently-installed {
+	opacity: 0.5;
+}
+
+#plugin-recommendations .recommendation-card .card-content{
+	padding: 0 4em 3em 2em;
+}
+
+#plugin-recommendations .recommendation-card img {
+	width: 100%;
+}
+
+#plugin-recommendations .recommendation-card h5 {
+	text-align: left;
+    font-size: 1.4em;
+	line-height: 1.3em;
+    font-weight: bold;
+	margin: 1em 0;
+}
+
+#plugin-recommendations .recommendation-card p {
+	text-align: left;
+	padding-bottom: 10px;
+}
+
+#plugin-recommendations .recommendation-card a.upgrade_button {
+	margin: 0;
+}
+
+#plugin-recommendations .recommendation-card span.currently-installed {
+	font-size: 0.7em;
+	color: white;
+	background-color: #6e1edc;
+	padding: 1em 2em;
+	border-radius: 12px;
+	margin: 0;
+	display: inline-block;
 }
 
 @media screen and (max-width: 1100px) {
@@ -1173,20 +1258,35 @@ div.upgrade-table-description a,
 	#upgrade-table td.feature-label span.description {
 		padding-top: 6px;
 	}
+
+	#plugin-recommendations .card-container {
+		grid-gap: 2em;
+	}
+}
+
+@media screen and (max-width: 968px) {
+	#plugin-recommendations .card-container {
+		grid-template-columns: repeat(1, 1fr);
+		padding-right: 40%;
+	}
 }
 
 @media screen and (max-width: 767px) {
 	#upgrade-table td.feature-label span.description {
 		display: none;
 	}
-
+	
 	#upgrade-table th:not(.last),
 	#upgrade-table td:not(.last) {
 		width: 20%;
 	}
-
+	
 	#upgrade-table td.first {
 		width: 40%;
+	}
+
+	#plugin-recommendations .card-container {
+		padding-right: 0;
 	}
 }
 
@@ -1222,5 +1322,9 @@ div.upgrade-table-description a,
 
 	#upgrade-table .upgrade-links a:after {
 		display: none;
+	}
+
+	#plugin-recommendations .card-container {
+		justify-content: center;
 	}
 }

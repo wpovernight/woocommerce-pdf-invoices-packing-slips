@@ -13,11 +13,6 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Documents\\Invoice' ) ) :
 
 class Invoice extends Order_Document_Methods {
 
-	public $type;
-	public $title;
-	public $icon;
-	public $output_formats;
-
 	/**
 	 * Init/load the order object.
 	 *
@@ -33,7 +28,7 @@ class Invoice extends Order_Document_Methods {
 		parent::__construct( $order );
 
 		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( "wpo_wcpdf_{$this->slug}_output_formats", array( 'pdf', 'ubl' ), $this );
+		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf', 'ubl' ), $this );
 	}
 
 	public function use_historical_settings() {
@@ -51,9 +46,44 @@ class Invoice extends Order_Document_Methods {
 		return apply_filters( 'wpo_wcpdf_document_store_settings', true, $this );
 	}
 
+	/**
+	 * Get the document title
+	 *
+	 * @return string
+	 */
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
-		return apply_filters( "wpo_wcpdf_{$this->slug}_title", __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+		return apply_filters( 'wpo_wcpdf_document_title', __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	/**
+	 * Get the document number title
+	 *
+	 * @return string
+	 */
+	public function get_number_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_number_title', __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	/**
+	 * Get the document date title
+	 *
+	 * @return string
+	 */
+	public function get_date_title() {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_date_title', __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	/**
+	 * Get the shipping address title
+	 *
+	 * @return string
+	 */
+	public function get_shipping_address_title(): string {
+		// override to allow for language switching!
+		return apply_filters( 'wpo_wcpdf_document_shipping_address_title', __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
 	public function init() {
@@ -286,18 +316,16 @@ class Invoice extends Order_Document_Methods {
 				'type'			=> 'setting',
 				'id'			=> 'due_date',
 				'title'			=> __( 'Display due date', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'select',
+				'callback'		=> 'checkbox_text_input',
 				'section'		=> $this->type,
 				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'due_date',
-					'options'       => apply_filters( 'wpo_wcpdf_due_date_options', array(
-						''   => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ),
-						'1'  => __( '1 day', 'woocommerce-pdf-invoices-packing-slips' ),
-						'7'  => __( '7 days', 'woocommerce-pdf-invoices-packing-slips' ),
-						'30' => __( '30 days', 'woocommerce-pdf-invoices-packing-slips' ),
-					), $this->type ),
-					'description'	=> __( 'Displays a due date below the order data.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'        => $option_name,
+					'id'                 => 'due_date',
+					/* translators: number of days */
+					'text_input_wrap'    => __( '%s days', 'woocommerce-pdf-invoices-packing-slips' ),
+					'text_input_size'    => 3,
+					'text_input_id'      => 'due_date_days',
+					'text_input_default' => 30,
 				)
 			),
 			array(
@@ -583,22 +611,6 @@ class Invoice extends Order_Document_Methods {
 		);
 
 		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );
-	}
-
-	/**
-	 * Document number title
-	 */
-	public function get_number_title() {
-		$number_title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_title", $number_title, $this );
-	}
-
-	/**
-	 * Document date title
-	 */
-	public function get_date_title() {
-		$date_title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters( "wpo_wcpdf_{$this->slug}_date_title", $date_title, $this );
 	}
 
 }

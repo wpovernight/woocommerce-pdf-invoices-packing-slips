@@ -34,14 +34,14 @@ jQuery( function( $ ) {
 				contentType: false,
 				success ( response ) {
 					process_form_response( tool, response, $form );
+					$form.closest( '.tool' ).unblock();
 				},
 				error ( xhr, error, status ) {
 					//console.log( error, status );
+					$form.closest( '.tool' ).unblock();
 				}
 			} );
 		}
-
-		$form.closest( '.tool' ).unblock();
 	} );
 
 	function process_form_response( tool, response, $form ) {
@@ -69,6 +69,7 @@ jQuery( function( $ ) {
 			default:
 				if ( response.success && response.data.message ) {
 					$notice.addClass( 'notice-success' );
+					$form.find( '> .notice-warning' ).remove();
 				} else if ( ! response.success && response.data.message ) {
 					$notice.addClass( 'notice-error' );
 				}

@@ -916,10 +916,20 @@ abstract class Order_Document_Methods extends Order_Document {
 		foreach ( $totals as $key => $total ) {
 			$label = $total['label'];
 			$colon = strrpos( $label, ':' );
-			if( $colon !== false ) {
+
+			if ( false !== $colon ) {
 				$label = substr_replace( $label, '', $colon, 1 );
 			}
-			$totals[$key]['label'] = $label;
+
+			$textdomain = 'woocommerce-pdf-invoices-packing-slips';
+
+			if ( ! empty( $label ) ) {
+				if ( function_exists( 'WPO_WCPDF_Pro' ) && isset( \WPO_WCPDF_Pro()->multilingual_full ) && is_callable( array( \WPO_WCPDF_Pro()->multilingual_full, 'maybe_get_string_translation' ) ) ) {
+					$totals[ $key ]['label'] = \WPO_WCPDF_Pro()->multilingual_full->maybe_get_string_translation( $label, $textdomain );
+				} else {
+					$totals[ $key ]['label'] = __( $label, $textdomain );
+				}
+			}
 		}
 
 		// Fix order_total for refunded orders
@@ -1302,6 +1312,51 @@ abstract class Order_Document_Methods extends Order_Document {
 			return '';
 		}
 
+	}
+	
+	/**
+	 * Get the invoice number title,
+	 * this allows other documents to use
+	 * the invoice number title. Example: Receipt document
+	 *
+	 * @return string
+	 */
+	public function get_invoice_number_title() {
+		$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
+		return apply_filters_deprecated( "wpo_wcpdf_invoice_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
+	}
+
+	/**
+	 * Print the invoice number title,
+	 * this allows other documents to use
+	 * the invoice number title. Example: Receipt document
+	 *
+	 * @return void
+	 */
+	public function invoice_number_title() {
+		echo $this->get_invoice_number_title();
+	}
+	
+	/**
+	 * Get the title for the refund reason,
+	 * used by the Credit Note document.
+	 * (Later we can move this to the Pro extension.)
+	 *
+	 * @return string
+	 */
+	public function get_refund_reason_title(): string {
+		return apply_filters( 'wpo_wcpdf_refund_reason_title', __( 'Reason for refund:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+	}
+	
+	/**
+	 * Display the title for the refund reason,
+	 * used by the Credit Note document.
+	 * (Later we can move this to the Pro extension.)
+	 * 
+	 * @return void
+	 */
+	public function refund_reason_title(): void {
+		echo $this->get_refund_reason_title();
 	}
 
 }

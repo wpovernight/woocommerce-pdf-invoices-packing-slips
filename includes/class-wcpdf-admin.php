@@ -25,13 +25,13 @@ class Admin {
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
 		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed
-			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 999 ); // WC 7.1+
+			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 200 ); // WC 7.1+ (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
 			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
 			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
 			add_filter( 'woocommerce_shop_order_list_table_sortable_columns', array( $this, 'add_invoice_column_to_sortable_columns' ) );
 			add_filter( 'woocommerce_order_list_table_prepare_items_query_args', array( $this, 'adjust_order_list_query_args' ) );
 
-			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 999 );
+			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 200 ); // (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
 			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
 			add_action( 'pre_get_posts', array( $this, 'sort_orders_by_numeric_invoice_number' ) );
@@ -218,7 +218,7 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			$document_type  = $document->get_type();
-			$icon           = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . "/assets/images/generic_document.png";
+			$icon           = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
 
 			if ( $document = wcpdf_get_document( $document_type, $order ) ) {
 				foreach ( $document->output_formats as $output_format ) {
@@ -791,11 +791,19 @@ class Admin {
 		return apply_filters( 'wpo_wcpdf_current_values_for_document', $data, $document );
 	}
 
-	public function output_number_date_edit_fields( $document, $data ) {
-		if ( empty( $document ) || empty( $data ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
+	public function output_number_date_edit_fields( $document, $data ): void {
+		if ( empty( $document ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
 			return;
 		}
+
+		$data = apply_filters( 'wpo_wcpdf_document_data_meta_box_fields', $data, $document );
+
+		if ( empty( $data ) ) {
+			return;
+		}
+
 		$data = $this->get_current_values_for_document( $document, $data );
+
 		?>
 		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">

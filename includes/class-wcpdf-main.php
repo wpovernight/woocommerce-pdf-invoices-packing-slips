@@ -14,41 +14,6 @@ if ( ! class_exists( '\\WPO\\WC\\PDF_Invoices\\Main' ) ) :
 class Main {
 
 	/**
-	 * Lock name
-	 *
-	 * @var string
-	 */
-	public $lock_name;
-
-	/**
-	 * Lock context
-	 *
-	 * @var array
-	 */
-	public $lock_context;
-
-	/**
-	 * Lock time limit if the release doesn't happen before
-	 *
-	 * @var int
-	 */
-	public $lock_time;
-
-	/**
-	 * Lock retries
-	 *
-	 * @var int
-	 */
-	public $lock_retries;
-
-	/**
-	 * Lock loggers
-	 *
-	 * @var int
-	 */
-	public $lock_loggers;
-
-	/**
 	 * Temp subfolders
 	 *
 	 * @var array
@@ -65,13 +30,6 @@ class Main {
 	}
 
 	public function __construct() {
-		// semaphore
-		$this->lock_name    = 'wpo_wcpdf_main_semaphore_lock';
-		$this->lock_context = array( 'source' => 'wpo-wcpdf-semaphore' );
-		$this->lock_time    = apply_filters( 'wpo_wcpdf_main_semaphore_lock_time', 60 );
-		$this->lock_retries = apply_filters( 'wpo_wcpdf_main_semaphore_lock_retries', 0 );
-		$this->lock_loggers = apply_filters( 'wpo_wcpdf_main_semaphore_lock_loggers', isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] ) ? array( wc_get_logger() ) : array() );
-
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 
@@ -123,7 +81,8 @@ class Main {
 		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
 
-		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date' ), 10, 2 );
+		// Add due date via action hook for legacy templates
+		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 2 );
 
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 	}
@@ -181,9 +140,9 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
-		$lock                     = new Semaphore( $this->lock_name . "_order_{$order_id}_email_{$email_id}", $this->lock_time, $this->lock_loggers, $this->lock_context );
+		$lock                     = new Semaphore( "attach_doc_to_email_{$email_id}_from_order_{$order_id}" );
 
-		if ( $lock->lock( $this->lock_retries ) ) {
+		if ( $lock->lock() ) {
 
 			$lock->log( sprintf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
 
@@ -1602,11 +1561,13 @@ class Main {
 	}
 
 	/**
-	 * Enable PHP error output
+	 * Enable PHP error output for administrators.
 	 */
-	public function enable_debug () {
-		error_reporting( E_ALL );
-		ini_set( 'display_errors', 1 );
+	public function enable_debug() {
+		if ( \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			error_reporting( E_ALL );
+			ini_set( 'display_errors', 1 );
+		}
 	}
 
 	public function wc_webhook_topic_hooks( $topic_hooks, $wc_webhook ) {
@@ -1641,13 +1602,33 @@ class Main {
 	}
 
 	/**
+	 * Display due date table row in the order data section for legacy templates.
+	 *
 	 * @param null|string $document_type
-	 * @param null|\WC_Order|\WC_Order_Refund $order
+	 * @param null|\WC_Abstract_Order $order
 	 *
 	 * @return void
 	 */
-	public function display_due_date( string $document_type = null, $order = null ): void {
+	public function display_due_date_table_row( ?string $document_type = null, ?\WC_Abstract_Order $order = null ): void {
 		if ( empty( $order ) || empty( $document_type ) ) {
+			return;
+		}
+
+		$current_template_path = explode( '/', WPO_WCPDF()->settings->get_template_path() );
+		$current_template      = end( $current_template_path );
+		$premium_templates     = array( 'Simple Premium', 'Modern', 'Business' );
+
+		// Return if the Simple template is selected. Due date is displayed through template.
+		if ( 'Simple' === $current_template ) {
+			return;
+		}
+
+		// Return if the Updated Premium Template is selected. Due date is displayed through template.
+		if (
+			function_exists( 'WPO_WCPDF_Templates' ) &&
+			version_compare( WPO_WCPDF_Templates()->version, '2.21.9', '>' ) &&
+			in_array( $current_template, $premium_templates, true )
+		) {
 			return;
 		}
 
