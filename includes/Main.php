@@ -1563,11 +1563,13 @@ class Main {
 	}
 
 	/**
-	 * Enable PHP error output
+	 * Enable PHP error output for administrators.
 	 */
-	public function enable_debug () {
-		error_reporting( E_ALL );
-		ini_set( 'display_errors', 1 );
+	public function enable_debug() {
+		if ( \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			error_reporting( E_ALL );
+			ini_set( 'display_errors', 1 );
+		}
 	}
 
 	public function wc_webhook_topic_hooks( $topic_hooks, $wc_webhook ) {
