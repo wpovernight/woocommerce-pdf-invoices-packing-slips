@@ -54,7 +54,8 @@ class Invoice extends Order_Document_Methods {
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
 		$title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
+		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' ); // deprecated
+		return apply_filters( 'wpo_wcpdf_document_title', $title, $this );
 	}
 
 	/**
@@ -65,7 +66,8 @@ class Invoice extends Order_Document_Methods {
 	public function get_number_title() {
 		// override to allow for language switching!
 		$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
+		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' ); // deprecated
+		return apply_filters( 'wpo_wcpdf_document_number_title', $title, $this );
 	}
 
 	/**
@@ -76,7 +78,8 @@ class Invoice extends Order_Document_Methods {
 	public function get_date_title() {
 		// override to allow for language switching!
 		$title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' );
+		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' ); // deprecated
+		return apply_filters( 'wpo_wcpdf_document_date_title', $title, $this );
 	}
 
 	/**
