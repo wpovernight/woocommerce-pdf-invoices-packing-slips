@@ -63,7 +63,7 @@ class Packing_Slip extends Order_Document_Methods {
 	public function get_date_title() {
 		// override to allow for language switching!
 		$title = __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' );
-		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' );
+		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' ); // deprecated
 		return apply_filters( 'wpo_wcpdf_document_date_title', $title, $this );
 	}
 
