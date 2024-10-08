@@ -54,7 +54,7 @@ class Invoice extends Order_Document_Methods {
 	public function get_title() {
 		// override/not using $this->title to allow for language switching!
 		$title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		return apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
+		return apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
 	}
 
 	/**
