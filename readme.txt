@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.6
 Requires PHP: 7.2
-Stable tag: 3.8.7
+Stable tag: 3.8.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,9 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.8.8 (2024-10-08) =
+* Fix: adds missing deprecated filters to document title methods
 
 = 3.8.7 (2024-10-07) =
 * New: Add full compatibility with mPDF to the Simple Template.
