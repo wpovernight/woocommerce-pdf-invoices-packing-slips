@@ -656,7 +656,7 @@ abstract class Order_Document {
 	public function due_date_title() {
 		echo $this->get_due_date_title();
 	}
-	
+
 	/**
 	 * Get the billing address title
 	 *
@@ -665,7 +665,7 @@ abstract class Order_Document {
 	public function get_billing_address_title(): string {
 		return $this->get_title_for( 'billing_address' );
 	}
-	
+
 	/**
 	 * Print the billing address title
 	 *
@@ -674,7 +674,7 @@ abstract class Order_Document {
 	public function billing_address_title(): void {
 		echo $this->get_billing_address_title();
 	}
-	
+
 	/**
 	 * Get the shipping address title
 	 *
@@ -683,7 +683,7 @@ abstract class Order_Document {
 	public function get_shipping_address_title(): string {
 		return $this->get_title_for( 'shipping_address' );
 	}
-	
+
 	/**
 	 * Print the shipping address title
 	 *
@@ -692,7 +692,7 @@ abstract class Order_Document {
 	public function shipping_address_title(): void {
 		echo $this->get_shipping_address_title();
 	}
-	
+
 	/**
 	 * Get the order number title
 	 *
@@ -701,7 +701,7 @@ abstract class Order_Document {
 	public function get_order_number_title(): string {
 		return $this->get_title_for( 'order_number' );
 	}
-	
+
 	/**
 	 * Print the order number title
 	 *
@@ -710,7 +710,7 @@ abstract class Order_Document {
 	public function order_number_title(): void {
 		echo $this->get_order_number_title();
 	}
-	
+
 	/**
 	 * Get the order date title
 	 *
@@ -719,7 +719,7 @@ abstract class Order_Document {
 	public function get_order_date_title(): string {
 		return $this->get_title_for( 'order_date' );
 	}
-	
+
 	/**
 	 * Print the order date title
 	 *
@@ -728,7 +728,7 @@ abstract class Order_Document {
 	public function order_date_title(): void {
 		echo $this->get_order_date_title();
 	}
-	
+
 	/**
 	 * Get the payment method title
 	 *
@@ -737,7 +737,7 @@ abstract class Order_Document {
 	public function get_payment_method_title(): string {
 		return $this->get_title_for( 'payment_method' );
 	}
-	
+
 	/**
 	 * Print the payment method title
 	 *
@@ -746,7 +746,7 @@ abstract class Order_Document {
 	public function payment_method_title(): void {
 		echo $this->get_payment_method_title();
 	}
-	
+
 	/**
 	 * Get the payment date title
 	 *
@@ -755,7 +755,7 @@ abstract class Order_Document {
 	public function get_payment_date_title(): string {
 		return $this->get_title_for( 'payment_date' );
 	}
-	
+
 	/**
 	 * Print the payment date title
 	 *
@@ -764,7 +764,7 @@ abstract class Order_Document {
 	public function payment_date_title(): void {
 		echo $this->get_payment_date_title();
 	}
-	
+
 	/**
 	 * Get the shipping method title
 	 *
@@ -773,7 +773,7 @@ abstract class Order_Document {
 	public function get_shipping_method_title(): string {
 		return $this->get_title_for( 'shipping_method' );
 	}
-	
+
 	/**
 	 * Print the shipping method title
 	 *
@@ -782,7 +782,7 @@ abstract class Order_Document {
 	public function shipping_method_title(): void {
 		echo $this->get_shipping_method_title();
 	}
-	
+
 	/**
 	 * Get the SKU title
 	 *
@@ -791,7 +791,7 @@ abstract class Order_Document {
 	public function get_sku_title(): string {
 		return $this->get_title_for( 'sku' );
 	}
-	
+
 	/**
 	 * Print the SKU title
 	 *
@@ -800,7 +800,7 @@ abstract class Order_Document {
 	public function sku_title(): void {
 		echo $this->get_sku_title();
 	}
-	
+
 	/**
 	 * Get the weight title
 	 *
@@ -809,7 +809,7 @@ abstract class Order_Document {
 	public function get_weight_title(): string {
 		return $this->get_title_for( 'weight' );
 	}
-	
+
 	/**
 	 * Print the weight title
 	 *
@@ -818,7 +818,7 @@ abstract class Order_Document {
 	public function weight_title(): void {
 		echo $this->get_weight_title();
 	}
-	
+
 	/**
 	 * Get the notes title
 	 *
@@ -827,7 +827,7 @@ abstract class Order_Document {
 	public function get_notes_title(): string {
 		return $this->get_title_for( 'notes' );
 	}
-	
+
 	/**
 	 * Print the notes title
 	 *
@@ -836,7 +836,7 @@ abstract class Order_Document {
 	public function notes_title(): void {
 		echo $this->get_notes_title();
 	}
-	
+
 	/**
 	 * Get the customer notes title
 	 *
@@ -845,7 +845,7 @@ abstract class Order_Document {
 	public function get_customer_notes_title(): string {
 		return $this->get_title_for( 'customer_notes' );
 	}
-	
+
 	/**
 	 * Print the customer notes title
 	 *
@@ -854,7 +854,7 @@ abstract class Order_Document {
 	public function customer_notes_title(): void {
 		echo $this->get_customer_notes_title();
 	}
-	
+
 	/**
 	 * Get the title for a specific slug
 	 *
@@ -923,9 +923,9 @@ abstract class Order_Document {
 				$title = '';
 				break;
 		}
-		
+
 		$title = apply_filters( 'wpo_wcpdf_title_for', $title, $slug, $this ); // used by Pro to translate strings
-		
+
 		return apply_filters( "wpo_wcpdf_{$slug}_title", $title, $this );
 	}
 
