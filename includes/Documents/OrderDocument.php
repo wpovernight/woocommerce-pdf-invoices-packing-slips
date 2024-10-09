@@ -135,17 +135,17 @@ abstract class OrderDocument {
 		return;
 	}
 
-	public function init_settings_data() {
-		// don't override/save settings on Preview requests
-		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
-			return;
-		}
-
+	public function init_settings_data(): void {
 		// order
 		$this->order_settings  = $this->get_order_settings();
 		// pdf
 		$this->settings        = $this->get_settings();
 		$this->latest_settings = $this->get_settings( true );
+
+		// don't override/save settings on Preview requests
+		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
+			return;
+		}
 
 		// save settings
 		$this->save_settings( $this->maybe_use_latest_settings() );
@@ -218,7 +218,7 @@ abstract class OrderDocument {
 					if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
 						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
 					} else {
-						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'invoice_date' );
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'document_date' );
 					}
 				}
 
@@ -227,7 +227,29 @@ abstract class OrderDocument {
 		}
 	}
 
-	public function initiate_number( $force_new_number = false ) {
+	/**
+	 * Initiate and set document date and display_date.
+	 *
+	 * @return void
+	 */
+	public function initiate_date(): void {
+		if ( isset( $this->settings['display_date'] ) && 'order_date' === $this->settings['display_date'] && ! empty( $this->order ) ) {
+			$this->set_date( $this->order->get_date_created() );
+			$this->set_display_date( 'order_date' );
+		} elseif ( empty( $this->get_date() ) ) {
+			$this->set_date( current_time( 'timestamp', true ) );
+			$this->set_display_date( 'document_date' );
+		}
+	}
+
+	/**
+	 * Initiate and set document number.
+	 *
+	 * @param bool $force_new_number
+	 *
+	 * @return mixed
+	 */
+	public function initiate_number( bool $force_new_number = false ) {
 		$lock            = new Semaphore( "initiate_{$this->slug}_number" );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
@@ -236,35 +258,12 @@ abstract class OrderDocument {
 			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 
 			try {
-				// If a third-party plugin claims to generate document numbers, trigger this instead
-				if ( apply_filters( "woocommerce_{$this->slug}_number_by_plugin", false ) || apply_filters( "wpo_wcpdf_external_{$this->slug}_number_enabled", false, $this ) ) {
-					$document_number = apply_filters( "woocommerce_generate_{$this->slug}_number", $document_number, $this->order );  // legacy (backwards compatibility)
-					$document_number = apply_filters( "woocommerce_{$this->slug}_number", $document_number, $this->order->get_id() ); // legacy (backwards compatibility)
-					$document_number = apply_filters( "wpo_wcpdf_external_{$this->slug}_number", $document_number, $this );
-				} elseif ( isset( $this->settings['display_number'] ) && 'order_number' === $this->settings['display_number'] && ! empty( $this->order ) ) {
-					$document_number = $this->order->get_order_number();
-				}
-
-				if ( ! empty( $document_number ) ) { // overridden by plugin or set to order number
-					if ( ! is_numeric( $document_number ) && ! ( $document_number instanceof DocumentNumber ) ) {
-						// document number is not numeric, treat as formatted
-						// try to extract meaningful number data
-						$formatted_number = $document_number;
-						$number           = (int) preg_replace( '/\D/', '', $document_number );
-						$document_number  = compact( 'number', 'formatted_number' );
-					}
-				} else {
-					$number_store    = $this->get_sequential_number_store();
-					$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
-				}
+				$document_number = $this->generate_document_number( true );
 
 				if ( ! is_null( $document_number ) ) {
 					$this->set_number( $document_number );
 				}
-
-			} catch ( \Exception $e ) {
-				$lock->log( $e, 'critical' );
-			} catch ( \Error $e ) {
+			} catch ( \Exception|\Error $e ) {
 				$lock->log( $e, 'critical' );
 			}
 
@@ -274,6 +273,46 @@ abstract class OrderDocument {
 
 		} else {
 			$lock->log( "Couldn't get the lock for the {$this->slug} number init.", 'critical' );
+		}
+
+		return $document_number;
+	}
+
+	/**
+	 * Generate the document number.
+	 *
+	 * @param bool $increment
+	 *
+	 * @return mixed
+	 */
+	public function generate_document_number( bool $increment = false ) {
+		$document_number = null;
+
+		// If a third-party plugin claims to generate document numbers, trigger this instead
+		if ( apply_filters( "woocommerce_{$this->slug}_number_by_plugin", false ) || apply_filters( "wpo_wcpdf_external_{$this->slug}_number_enabled", false, $this ) ) {
+			$document_number = apply_filters( "woocommerce_generate_{$this->slug}_number", $document_number, $this->order );  // legacy (backwards compatibility)
+			$document_number = apply_filters( "woocommerce_{$this->slug}_number", $document_number, $this->order->get_id() ); // legacy (backwards compatibility)
+			$document_number = apply_filters( "wpo_wcpdf_external_{$this->slug}_number", $document_number, $this );
+		} elseif ( isset( $this->settings['display_number'] ) && 'order_number' === $this->settings['display_number'] && ! empty( $this->order ) ) {
+			$document_number = $this->order->get_order_number();
+		}
+
+		if ( ! empty( $document_number ) ) { // overridden by plugin or set to order number
+			if ( ! is_numeric( $document_number ) && ! ( $document_number instanceof DocumentNumber ) ) {
+				// document number is not numeric, treat as formatted
+				// try to extract meaningful number data
+				$formatted_number = $document_number;
+				$number           = (int) preg_replace( '/\D/', '', $document_number );
+				$document_number  = compact( 'number', 'formatted_number' );
+			}
+		} else {
+			$number_store = $this->get_sequential_number_store();
+
+			if ( $increment ) {
+				$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
+			} else {
+				$document_number = $number_store->get_next();
+			}
 		}
 
 		return $document_number;
