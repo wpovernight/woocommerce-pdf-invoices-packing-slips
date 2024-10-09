@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\WC\UBL\Collections;
+namespace WPO\IPS\UBL\Collections;
 
 use Iterator;
 

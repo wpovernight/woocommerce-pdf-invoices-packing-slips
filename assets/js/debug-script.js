@@ -69,6 +69,7 @@ jQuery( function( $ ) {
 			default:
 				if ( response.success && response.data.message ) {
 					$notice.addClass( 'notice-success' );
+					$form.find( '> .notice-warning' ).remove();
 				} else if ( ! response.success && response.data.message ) {
 					$notice.addClass( 'notice-error' );
 				}
