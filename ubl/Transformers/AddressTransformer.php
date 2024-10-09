@@ -1,8 +1,8 @@
 <?php
 
-namespace WPO\WC\UBL\Transformers;
+namespace WPO\IPS\UBL\Transformers;
 
-use WPO\WC\UBL\Models\Address;
+use WPO\IPS\UBL\Models\Address;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

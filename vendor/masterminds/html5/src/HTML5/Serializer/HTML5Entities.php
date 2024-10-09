@@ -7,9 +7,12 @@
  * that list was generated from the w3c. It contains some entities that are
  * not entirely proper such as &am; which maps to &. This list is meant to be
  * a fallback for PHP versions prior to PHP 5.4 when dealing with encoding.
+ *
+ * @license MIT
+ * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Masterminds\HTML5\Serializer;
+namespace WPO\IPS\Vendor\Masterminds\HTML5\Serializer;
 
 /**
  * A mapping of entities to their html5 representation.

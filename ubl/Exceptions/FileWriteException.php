@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\WC\UBL\Exceptions;
+namespace WPO\IPS\UBL\Exceptions;
 
 use Exception;
 
