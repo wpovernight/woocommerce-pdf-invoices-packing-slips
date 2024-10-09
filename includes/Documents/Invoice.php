@@ -619,6 +619,60 @@ class Invoice extends OrderDocumentMethods {
 		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );
 	}
 
+	/**
+	 * Get the settings categories.
+	 *
+	 * @return array
+	 */
+	public function get_settings_categories(): array {
+		$settings_categories = array(
+			'general'          => array(
+				'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'enabled',
+					'attach_to_email_ids',
+					'disable_for_statuses',
+					'number_format',
+					'my_account_buttons',
+				),
+			),
+			'document_display' => array(
+				'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'display_email',
+					'display_phone',
+					'display_customer_notes',
+					'display_shipping_address',
+					'display_date',
+					'display_number',
+					'next_invoice_number', // this should follow 'display_number'
+					'due_date'
+				)
+			),
+			'admin_display'    => array(
+				'title'   => __( 'Admin', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'invoice_number_column',
+					'invoice_date_column',
+					'invoice_number_search',
+				),
+			),
+			'advanced'         => array(
+				'title'   => __( 'Advanced', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'next_invoice_number',
+					'reset_number_yearly',
+					'mark_printed',
+					'unmark_printed',
+					'disable_free',
+					'use_latest_settings',
+				)
+			)
+		);
+
+		return apply_filters( "wpo_wcpdf_{$this->type}_settings_categories", $settings_categories, $this );
+	}
+
 }
 
 endif; // class_exists
