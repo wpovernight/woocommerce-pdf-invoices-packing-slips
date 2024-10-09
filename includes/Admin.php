@@ -839,7 +839,7 @@ class Admin {
 			return;
 		}
 
-		include WPO_WCPDF()->plugin_path() . '/includes/views/document-data-metabox.php';
+		include WPO_WCPDF()->plugin_path() . '/views/document-data-metabox.php';
 	}
 
 	public function add_regenerate_document_button( $document ) {
