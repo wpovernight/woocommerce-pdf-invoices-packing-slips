@@ -102,6 +102,9 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 3.8.8 (2024-10-08) =
+* Fix: adds missing deprecated filters to document title methods
+
 = 3.8.7 (2024-10-07) =
 * New: Add full compatibility with mPDF to the Simple Template.
 * New: Add refund reason and invoice number titles to the document methods abstract class.
