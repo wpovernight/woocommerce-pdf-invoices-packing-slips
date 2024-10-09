@@ -105,6 +105,17 @@ jQuery( function( $ ) {
 		'delay':     200
 	} );
 
+	$( '#wpo-wcpdf-preview-wrapper #due_date' ).on( 'change', function() {
+		const $due_date_checkbox   = $( '#wpo-wcpdf-preview-wrapper #due_date' );
+		const $due_date_days_input = $( '#wpo-wcpdf-preview-wrapper #due_date_days' );
+
+		if ( $due_date_checkbox.is( ':checked' ) ) {
+			$due_date_days_input.prop( 'disabled', false );
+		} else {
+			$due_date_days_input.prop( 'disabled', true );
+		}
+	} ).trigger( 'change' );
+
 	//----------> Preview <----------//
 	// objects
 	let $previewWrapper           = $( '#wpo-wcpdf-preview-wrapper' );
