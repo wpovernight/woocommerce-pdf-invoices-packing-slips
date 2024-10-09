@@ -1,9 +1,9 @@
 <?php
 
-namespace WPO\WC\UBL\Models;
+namespace WPO\IPS\UBL\Models;
 
-use WPO\WC\UBL\Models\Address;
-use WPO\WC\UBL\Models\DateTime;
+use WPO\IPS\UBL\Models\Address;
+use WPO\IPS\UBL\Models\DateTime;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

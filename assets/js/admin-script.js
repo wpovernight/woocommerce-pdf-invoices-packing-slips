@@ -105,7 +105,7 @@ jQuery( function( $ ) {
 		'delay':     200
 	} );
 
-	$( '#wpo-wcpdf-preview-wrapper #due_date' ).change( function() {
+	$( '#wpo-wcpdf-preview-wrapper #due_date' ).on( 'change', function() {
 		const $due_date_checkbox   = $( '#wpo-wcpdf-preview-wrapper #due_date' );
 		const $due_date_days_input = $( '#wpo-wcpdf-preview-wrapper #due_date_days' );
 

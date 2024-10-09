@@ -1,9 +1,9 @@
 <?php
 
-namespace WPO\WC\UBL\Repositories;
+namespace WPO\IPS\UBL\Repositories;
 
-use WPO\WC\UBL\Transformers\OrderTransformer;
-use WPO\WC\UBL\Repositories\Contracts\OrderRepository as OrderRepositoryContract;
+use WPO\IPS\UBL\Transformers\OrderTransformer;
+use WPO\IPS\UBL\Repositories\Contracts\OrderRepository as OrderRepositoryContract;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
