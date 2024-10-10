@@ -181,7 +181,7 @@ class AddressHandler extends UblHandler {
 		if ( ! empty( $billing_company ) ) {
 			// $customerPartyName = "{$billing_company} ({$customerPartyName})";
 			// we register customer name separately as Contact too,
-			// so we use the comapny name as the primary name
+			// so we use the company name as the primary name
 			$customerPartyName = $billing_company;
 		}
 

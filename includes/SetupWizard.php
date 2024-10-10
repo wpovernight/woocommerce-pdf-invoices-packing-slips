@@ -9,7 +9,7 @@ if ( ! class_exists( '\\WPO\\IPS\\SetupWizard' ) ) :
 
 class SetupWizard {
 
-	/** @var string Currenct Step */
+	/** @var string Current Step */
 	private $step   = '';
 
 	/** @var array Steps for the setup wizard */
