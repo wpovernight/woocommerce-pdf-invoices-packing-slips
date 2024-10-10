@@ -1654,7 +1654,7 @@ class Main {
 				$document_type,
 				$document
 			),
-			'3.8.7',
+			'3.9.0',
 			'wpo_wcpdf_document_due_date'
 		);
 		$due_date_title = is_callable( array( $document, 'get_due_date_title' ) ) ?
