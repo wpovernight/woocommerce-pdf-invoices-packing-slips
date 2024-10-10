@@ -4654,7 +4654,7 @@ EOT;
     function newPage($insert = 0, $id = 0, $pos = 'after')
     {
         // if there is a state saved, then go up the stack closing them
-        // then on the new page, re-open them with the right settings
+        // then on the new page, re-open them with the right setings
 
         if ($this->nStateStack) {
             for ($i = $this->nStateStack; $i >= 1; $i--) {
