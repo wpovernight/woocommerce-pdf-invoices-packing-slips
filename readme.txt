@@ -181,7 +181,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 * Fix: replaces deprecated jQuery functions
 * Fix: bug with type hint in `wpo_wcpdf_parse_document_date_for_wp_query()` function
 * Fix: bug calling `is_allowed()` on `bool` under `wcpdf_get_document()` function
-* Fix: not removing documents meta on Woo subcription renewal
+* Fix: not removing documents meta on Woo subscription renewal
 * Fix: XSS vulnerability on Woo Checkout user input address data
 * Fix: Semaphore attachments issue on concurrent refunds
 * Translations: Updated translation template (POT)

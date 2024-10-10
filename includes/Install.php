@@ -521,9 +521,9 @@ class Install {
 
 
 			// legacy ubl tax settings
-			$legacy_ubl_tax_setings = get_option( 'ubl_wc_taxes', [] );
-			if ( ! empty( $legacy_ubl_tax_setings ) ) {
-				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_setings );
+			$legacy_ubl_tax_settings = get_option( 'ubl_wc_taxes', [] );
+			if ( ! empty( $legacy_ubl_tax_settings ) ) {
+				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_settings );
 			}
 
 			// set transient to flush rewrite rules if pretty links are enabled
