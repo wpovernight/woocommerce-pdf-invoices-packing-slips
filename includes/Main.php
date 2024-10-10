@@ -86,6 +86,11 @@ class Main {
 		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 2 );
 
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
+
+		// Fix line item data of product bundle parents from WPC Product Bundle.
+		add_action( 'wpo_wcpdf_before_html', function () {
+			add_filter( 'woocommerce_order_get_items', array( $this, 'modify_product_bundle_item' ) );
+		} );
 	}
 
 	/**
@@ -952,7 +957,7 @@ class Main {
 	public function copy_fonts( $path = '', $merge_with_local = true ) {
 		// only copy fonts if the bundled dompdf library is used!
 		$default_pdf_maker = '\\WPO\\IPS\\Makers\\PDFMaker';
-		
+
 		if ( $default_pdf_maker !== apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker ) ) {
 			return;
 		}
@@ -1656,6 +1661,47 @@ class Main {
 			</tr>';
 		}
 	}
+
+	/**
+	 * Modify the product bundle item in the order items from WPC Product Bundle plugin.
+	 *
+	 * @param array $order_items
+	 *
+	 * @return
+	 */
+	public function modify_product_bundle_item( array $order_items ): array {
+		foreach ( $order_items as $item ) {
+			$product = wc_get_product( $item['product_id'] );
+
+			// Ensure the product exists and is of type 'woosb'
+			if ( ! $product || ! $product->is_type( 'woosb' ) ) {
+				continue;
+			}
+
+			$bundle_parent_product_id = intval( $item['product_id'] );
+
+			$line_subtotal = $line_subtotal_tax = $line_total = $line_tax = 0.0;
+
+			foreach ( $order_items as $order_item ) {
+				$item_parent_product_id = intval( $order_item->get_meta( '_woosb_parent_id' ) );
+
+				if ( $bundle_parent_product_id && $bundle_parent_product_id === $item_parent_product_id ) {
+					$line_subtotal     += (float) $order_item['line_subtotal'];
+					$line_subtotal_tax += (float) $order_item['line_subtotal_tax'];
+					$line_total        += (float) $order_item['line_total'];
+					$line_tax          += (float) $order_item['line_tax'];
+				}
+			}
+
+			$item['line_subtotal']     = $line_subtotal;
+			$item['line_subtotal_tax'] = $line_subtotal_tax;
+			$item['line_total']        = $line_total;
+			$item['line_tax']          = $line_tax;
+		}
+
+		return $order_items;
+	}
+
 }
 
 endif; // class_exists
