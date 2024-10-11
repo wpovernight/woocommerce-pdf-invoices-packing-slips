@@ -1129,8 +1129,8 @@ abstract class OrderDocument {
 			$company         = $this->get_shop_name();
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
-
-			$src = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
+			$src             = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
+			
 			if ( empty( $src ) ) {
 				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
