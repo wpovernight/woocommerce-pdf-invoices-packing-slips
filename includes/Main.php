@@ -1667,7 +1667,7 @@ class Main {
 	 *
 	 * @param array $order_items
 	 *
-	 * @return
+	 * @return array
 	 */
 	public function modify_product_bundle_item( array $order_items ): array {
 		foreach ( $order_items as $item ) {
@@ -1693,12 +1693,11 @@ class Main {
 				}
 			}
 
-			$item['line_subtotal']     = $line_subtotal;
-			$item['line_subtotal_tax'] = $line_subtotal_tax;
-			$item['line_total']        = $line_total;
-			$item['line_tax']          = $line_tax;
+			$item->set_subtotal( $line_subtotal );
+			$item->set_subtotal_tax( $line_subtotal_tax );
+			$item->set_total( $line_total );
+			$item->set_total_tax( $line_tax );
 		}
-
 		return $order_items;
 	}
 
