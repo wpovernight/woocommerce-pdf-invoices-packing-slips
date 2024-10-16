@@ -213,8 +213,10 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 }
 
 function wcpdf_ubl_headers( $filename, $size ) {
+	$charset = apply_filters( 'wcpdf_ubl_headers_charset', 'UTF-8' );
+	
 	header( 'Content-Description: File Transfer' );
-	header( 'Content-Type: text/xml' );
+	header( 'Content-Type: text/xml; charset=' . $charset );
 	header( 'Content-Disposition: attachment; filename=' . $filename );
 	header( 'Content-Transfer-Encoding: binary' );
 	header( 'Connection: Keep-Alive' );
@@ -222,6 +224,7 @@ function wcpdf_ubl_headers( $filename, $size ) {
 	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 	header( 'Pragma: public' );
 	header( 'Content-Length: ' . $size );
+	
 	do_action( 'wpo_after_ubl_headers', $filename, $size );
 }
 
