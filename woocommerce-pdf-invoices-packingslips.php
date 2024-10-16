@@ -464,7 +464,7 @@ class WPO_WCPDF {
 			return;
 		}
 
-		if ( version_compare( PHP_VERSION, '7.4', '<=' ) && ! get_option( 'wpo_wcpdf_hide_php_below_7_4_drop_notice' ) ) {
+		if ( version_compare( PHP_VERSION, '7.4', '<' ) && ! get_option( 'wpo_wcpdf_hide_php_below_7_4_drop_notice' ) ) {
 			ob_start();
 			?>
 			<div class="notice notice-warning">
