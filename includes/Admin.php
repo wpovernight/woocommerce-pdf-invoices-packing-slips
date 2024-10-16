@@ -251,7 +251,7 @@ class Admin {
 							}
 							break;
 						case 'ubl':
-							if ( $document->is_enabled( $output_format ) ) {
+							if ( $document->is_enabled( $output_format ) && wcpdf_is_ubl_available() ) {
 								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
@@ -669,7 +669,7 @@ class Admin {
 		}
 
 		$meta_box_actions = apply_filters( 'wpo_wcpdf_ubl_meta_box_actions', $meta_box_actions, $order->get_id() );
-		if ( empty( $meta_box_actions ) ) {
+		if ( empty( $meta_box_actions ) || ! wcpdf_is_ubl_available() ) {
 			return;
 		}
 		?>

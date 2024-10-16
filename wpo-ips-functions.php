@@ -181,6 +181,16 @@ function wcpdf_get_ubl_maker() {
 }
 
 /**
+ * Check if UBL is available
+ *
+ * @return bool
+ */
+function wcpdf_is_ubl_available(): bool {
+	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
+	return apply_filters( 'wpo_wcpdf_ubl_available', version_compare( PHP_VERSION, '7.4', '>=' ) );
+}
+
+/**
  * Check if the default PDF maker is used for creating PDF
  *
  * @return bool whether the PDF maker is the default or not
