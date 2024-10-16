@@ -76,6 +76,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
+		add_action( 'admin_notices', array( $this, 'php_below_7_4_drop' ) );
 		add_action( 'admin_notices', array( $this, 'ubl_php_version_required' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		add_action( 'init', array( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0', 'init_cleanup' ), 999 ); // wait AS to initialize
@@ -451,6 +452,49 @@ class WPO_WCPDF {
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
 			}
+		}
+	}
+	
+	/**
+	 * PHP below 7.4 notice
+	 *
+	 * @return void
+	 */
+	public function php_below_7_4_drop(): void {
+		if ( ! is_super_admin() ) {
+			return;
+		}
+
+		if ( version_compare( PHP_VERSION, '7.4', '<' ) && ! get_option( 'wpo_wcpdf_hide_php_below_7_4_drop_notice' ) ) {
+			ob_start();
+			?>
+			<div class="notice notice-warning">
+				<p>
+					<?php
+						printf(
+							/* translators: plugin name */
+							__( 'Soon, our %s plugin and its extensions will no longer support PHP versions below 7.4. To ensure uninterrupted use and continued access to updates, please update your PHP version to 7.4 or higher as soon as possible. If you need assistance, please contact your hosting provider for support with the update.', 'woocommerce-pdf-invoices-packing-slips' ),
+							'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>'
+						);
+					?>
+				</p>
+				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_php_below_7_4_drop_notice', 'true' ), 'hide_php_below_7_4_drop_notice_nonce' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo wp_kses_post( ob_get_clean() );
+		}
+
+		// save option to hide notice
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_php_below_7_4_drop_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_php_below_7_4_drop_notice_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_php_below_7_4_drop_notice' );
+			} else {
+				update_option( 'wpo_wcpdf_hide_php_below_7_4_drop_notice', true );
+			}
+			
+			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+			exit;
 		}
 	}
 	
