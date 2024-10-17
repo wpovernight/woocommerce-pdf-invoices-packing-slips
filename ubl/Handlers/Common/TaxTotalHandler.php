@@ -17,14 +17,14 @@ class TaxTotalHandler extends UblHandler {
 				'value' => array(
 					array(
 						'name'       => 'cbc:TaxableAmount',
-						'value'      => round( $item['total_ex'], 2 ),
+						'value'      => wc_round_tax_total( $item['total_ex'] ),
 						'attributes' => array(
 							'currencyID' => $this->document->order->get_currency(),
 						),
 					),
 					array(
 						'name'       => 'cbc:TaxAmount',
-						'value'      => round( $item['total_tax'], 2 ),
+						'value'      => wc_round_tax_total( $item['total_tax'] ),
 						'attributes' => array(
 							'currencyID' => $this->document->order->get_currency(),
 						),

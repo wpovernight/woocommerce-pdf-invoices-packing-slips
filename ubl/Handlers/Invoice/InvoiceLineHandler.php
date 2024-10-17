@@ -33,14 +33,14 @@ class InvoiceLineHandler extends UblHandler {
 					'value' => array(
 						array(
 							'name'       => 'cbc:TaxableAmount',
-							'value'      => round( $item[ $lineTotalKey ], 2 ),
+							'value'      => wc_round_tax_total( $item[ $lineTotalKey ] ),
 							'attributes' => array(
 								'currencyID' => $this->document->order->get_currency(),
 							),
 						),
 						array(
 							'name'       => 'cbc:TaxAmount',
-							'value'      => round( $tax, 2 ),
+							'value'      => wc_round_tax_total( $tax ),
 							'attributes' => array(
 								'currencyID' => $this->document->order->get_currency(),
 							),
