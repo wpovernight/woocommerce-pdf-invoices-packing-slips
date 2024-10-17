@@ -2,7 +2,7 @@
 /**
  * @license BSD-3-Clause
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 16-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 declare(strict_types=1);
@@ -214,6 +214,19 @@ function parse(string $uri): array
     $result = parse_url($uri);
     if (false === $result) {
         $result = _parse_fallback($uri);
+    } else {
+        // Add empty host and leading slash to Windows file paths
+        // file:///C:/path or file:///C:\path
+        // Note: the regex fragment [a-zA-Z]:[\/\\\\].* end up being
+        // [a-zA-Z]:[\/\\].*
+        // The 4 backslash in a row are the way to get 2 backslash into the actual string
+        // that is used as the regex. The 2 backslash are then the way to get 1 backslash
+        // character into the character set "a forward slash or a backslash"
+        if (isset($result['scheme']) && 'file' === $result['scheme'] && isset($result['path'])
+            && 1 === preg_match('/^(?<windows_path> [a-zA-Z]:([\/\\\\].*)?)$/x', $result['path'])) {
+            $result['path'] = '/'.$result['path'];
+            $result['host'] = '';
+        }
     }
 
     /*
@@ -228,14 +241,14 @@ function parse(string $uri): array
      */
     return
          $result + [
-            'scheme' => null,
-            'host' => null,
-            'path' => null,
-            'port' => null,
-            'user' => null,
-            'query' => null,
-            'fragment' => null,
-        ];
+             'scheme' => null,
+             'host' => null,
+             'path' => null,
+             'port' => null,
+             'user' => null,
+             'query' => null,
+             'fragment' => null,
+         ];
 }
 
 /**
@@ -296,7 +309,7 @@ function build(array $parts): string
  * If there is no dirname, it will return an empty string. Any / appearing at
  * the end of the string is stripped off.
  *
- * @return array<int, mixed>
+ * @return list<mixed>
  */
 function split(string $path): array
 {
