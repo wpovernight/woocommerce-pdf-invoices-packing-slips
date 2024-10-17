@@ -117,17 +117,7 @@ class AddressHandler extends UblHandler {
 				),
 			);
 		}
-
-		$supplierPartyDetails[] = array(
-			'name'  => 'cac:Contact',
-			'value' => array(
-				array(
-					'name'  => 'cbc:ElectronicMail',
-					'value' => get_option( 'woocommerce_email_from_address' ),
-				),
-			),
-		);
-
+		
 		if ( ! empty( $company ) && ! empty( $coc_number ) ) {
 			$supplierPartyDetails[] = array(
 				'name'  => 'cac:PartyLegalEntity',
@@ -146,6 +136,17 @@ class AddressHandler extends UblHandler {
 				),
 			);
 		}
+
+		$supplierPartyDetails[] = array(
+			'name'  => 'cac:Contact',
+			'value' => array(
+				array(
+					'name'  => 'cbc:ElectronicMail',
+					'value' => get_option( 'woocommerce_email_from_address' ),
+				),
+			),
+		);
+		
 		return $supplierPartyDetails;
 	}
 
