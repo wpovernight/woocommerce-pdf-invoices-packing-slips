@@ -1282,6 +1282,12 @@ div.upgrade-table-description a,
 	}
 }
 
+@media screen and (max-width: 782px) {
+	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td:has( input[type="checkbox"] + input[type="text"] ) > input {
+		display: inline-block;
+	}
+}
+
 @media screen and (max-width: 767px) {
 	#upgrade-table td.feature-label span.description {
 		display: none;
