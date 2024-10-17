@@ -597,25 +597,25 @@ jQuery( function( $ ) {
 	//----------> /Preview <----------//
 
 	function settingsAccordion() {
-		// Hide all the content initially except the "init"
+		// Default to expanded for '#general', collapsed for others.
 		$( '.settings_category' ).not( '#general' ).find( '.form-table' ).hide();
 		$( '#general > h2' ).addClass( 'active' );
 
-		let state_exists = false;
 		// Retrieve the state from localStorage
 		$( '.settings_category h2' ).each( function( index ) {
-			const state = localStorage.getItem( 'wcpdf_accordion_state' + index );
+			const state = localStorage.getItem( 'wcpdf_accordion_state_' + index );
 			if ( 'true' === state ) {
-				state_exists = true;
 				$( this ).addClass( 'active' ).next( '.form-table' ).show();
 			}
 		} );
 
 		$('.settings_category h2' ).click( function() {
-			const index = $( '.settings_category h2' ).index( $( this ) );
+			const index = $( '.settings_category h2' ).index( this );
 
 			$( this ).toggleClass( 'active' ).next( '.form-table' ).slideToggle( 'fast', function() {
-				localStorage.setItem( 'wcpdf_accordion_state' + index, $( this ).is( ':visible' ) );
+				// Save the state in localStorage
+				const isVisible = $( this ).is( ':visible' );
+				localStorage.setItem( 'wcpdf_accordion_state_' + index, isVisible );
 			} );
 		} );
 	}

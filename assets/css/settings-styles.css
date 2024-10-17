@@ -371,9 +371,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > th,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th,
@@ -383,29 +380,22 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding: 0;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > th,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th {
 	padding-bottom: 0.6em;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr:not(:last-child) > td,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr:not(:last-child) > td {
 	padding-bottom: 2.4em;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > p.description,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description {
 	font-size: 0.85em;
 	padding-top: 0.7em;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > input[type="text"],
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input[type="text"],
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > input[type="url"],
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input[type="url"],
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > select,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > select,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td > textarea,
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > textarea {
 	max-width: none;
 	width: 100%;
@@ -421,60 +411,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: auto !important;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table {
-	display: table;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tbody,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table tbody,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tbody {
-	display: table-row-group;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tr,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table tr,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tr,
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table tbody tr,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table tbody tr,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table tbody tr {
-	display: table-row;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > td,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > td {
-	display: table-cell;
-	padding: 15px 2em 15px 2em;
-	width: auto;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:first-child > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:first-child > td,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > td,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:first-child > td {
-	padding-top: 2em;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:last-child > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr:last-child > td,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > td,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr:last-child > td {
-	padding-bottom: 2em;
-}
-
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th,
-#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr > th {
-	width: 300px !important;
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr,
+#wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar .form-table > tbody > tr,
+#wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-preview-state="closed"] .sidebar .form-table > tbody > tr {
+	display: grid;
+	grid-template-columns: 300px 1fr;
+	gap: 4em;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 {
@@ -1064,9 +1006,6 @@ sup.wcpdf_beta {
 	}
 
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table,
-	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr,
-	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > th,
-	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tr > td,
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody,
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr,
 	#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th,
