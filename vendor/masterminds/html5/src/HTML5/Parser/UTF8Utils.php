@@ -1,11 +1,6 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
-namespace WPO\IPS\Vendor\Masterminds\HTML5\Parser;
+namespace Masterminds\HTML5\Parser;
 
 /*
 Portions based on code from html5lib files with the following copyright:
@@ -32,7 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-use WPO\IPS\Vendor\Masterminds\HTML5\Exception;
+use Masterminds\HTML5\Exception;
 
 class UTF8Utils
 {

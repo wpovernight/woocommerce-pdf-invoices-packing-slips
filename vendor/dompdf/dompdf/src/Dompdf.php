@@ -4,7 +4,7 @@
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf;
 
@@ -17,7 +17,7 @@ use WPO\IPS\Vendor\Dompdf\Frame\FrameTree;
 use WPO\IPS\Vendor\Dompdf\Image\Cache;
 use WPO\IPS\Vendor\Dompdf\Css\Stylesheet;
 use WPO\IPS\Vendor\Dompdf\Helpers;
-use WPO\IPS\Vendor\Masterminds\HTML5;
+use Masterminds\HTML5;
 
 /**
  * Dompdf - PHP5 HTML to PDF renderer

@@ -5,7 +5,7 @@
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  * @version $Id: Font_Table_glyf.php 46 2012-04-02 20:22:38Z fabien.menager $
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 namespace WPO\IPS\Vendor\FontLib\Glyph;

@@ -1,11 +1,6 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
-namespace WPO\IPS\Vendor\Masterminds\HTML5\Parser;
+namespace Masterminds\HTML5\Parser;
 
 /**
  * Handles special-case rules for the DOM tree builder.
