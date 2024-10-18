@@ -2,14 +2,12 @@
 /**
  * @license BSD-3-Clause
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 16-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 declare(strict_types=1);
 
 namespace WPO\IPS\Vendor\Sabre\Xml;
-
-use Exception;
 
 /**
  * This is a base exception for any exception related to parsing xml files.
@@ -18,6 +16,6 @@ use Exception;
  * @author Evert Pot (http://evertpot.com/)
  * @license http://sabre.io/license/ Modified BSD License
  */
-class ParseException extends Exception
+class ParseException extends \Exception
 {
 }
