@@ -3,7 +3,7 @@
         'name' => 'wpovernight/woocommerce-pdf-invoices-packing-slips',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '2bfdfbf5261118e7da3e5fa1833f792b561aaa16',
+        'reference' => '1363b1af65d3bffce322459f30b0ff30cc50a4a0',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -94,7 +94,7 @@
         'wpovernight/woocommerce-pdf-invoices-packing-slips' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '2bfdfbf5261118e7da3e5fa1833f792b561aaa16',
+            'reference' => '1363b1af65d3bffce322459f30b0ff30cc50a4a0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

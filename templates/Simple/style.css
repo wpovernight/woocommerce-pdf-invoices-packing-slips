@@ -231,29 +231,26 @@ table.notes-totals {
 	overflow-wrap: anywhere;
 }
 
-/* 'ul' applies to Dompdf only */
-ul.wc-item-meta {
+/* In Dompdf, '.wc-item-meta' is applied to a 'ul' element, whereas with the mPDF extension, it's a 'div' instead. For more details, refer to 'wpo_wcpdf_mpdf_modify_html()'. */
+.wc-item-meta {
 	margin: 0;
 }
 
-ul.wc-item-meta li {
+.wc-item-meta li {
 	margin-top: 4px;
 	margin-left: 0;
 }
 
-ul.wc-item-meta li p {
+.wc-item-meta li p,
+.wc-item-meta li dd {
 	display: inline;
 }
 
-/* with mPDF extension '.wc-item-meta' is not 'ul' but a 'div', see 'wpo_wcpdf_mpdf_modify_html()' */
-div.wc-item-meta {
-	margin: 0;
-}
-
-/* this applies to both Dompdf and mPDF */
 .wc-item-meta p,
+.wc-item-meta dd,
 .item-meta p {
 	margin-top: 4px;
+	margin-left: 0;
 }
 
 /* Notes & Totals */
