@@ -208,6 +208,34 @@ class PackingSlip extends OrderDocumentMethods {
 
 	}
 
+	/**
+	 * Get the settings categories.
+	 *
+	 * @return array
+	 */
+	public function get_settings_categories(): array {
+		$settings_categories = array(
+			'general'          => array(
+				'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'enabled',
+					'attach_to_email_ids',
+				),
+			),
+			'document_display' => array(
+				'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'display_billing_address',
+					'display_email',
+					'display_phone',
+					'display_customer_notes',
+				)
+			),
+		);
+
+		return apply_filters( "wpo_wcpdf_{$this->type}_settings_categories", $settings_categories, $this );
+	}
+
 }
 
 endif; // class_exists
