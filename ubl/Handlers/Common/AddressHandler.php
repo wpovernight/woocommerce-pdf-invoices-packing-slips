@@ -117,17 +117,7 @@ class AddressHandler extends UblHandler {
 				),
 			);
 		}
-
-		$supplierPartyDetails[] = array(
-			'name'  => 'cac:Contact',
-			'value' => array(
-				array(
-					'name'  => 'cbc:ElectronicMail',
-					'value' => get_option( 'woocommerce_email_from_address' ),
-				),
-			),
-		);
-
+		
 		if ( ! empty( $company ) && ! empty( $coc_number ) ) {
 			$supplierPartyDetails[] = array(
 				'name'  => 'cac:PartyLegalEntity',
@@ -146,6 +136,17 @@ class AddressHandler extends UblHandler {
 				),
 			);
 		}
+
+		$supplierPartyDetails[] = array(
+			'name'  => 'cac:Contact',
+			'value' => array(
+				array(
+					'name'  => 'cbc:ElectronicMail',
+					'value' => get_option( 'woocommerce_email_from_address' ),
+				),
+			),
+		);
+		
 		return $supplierPartyDetails;
 	}
 
@@ -167,7 +168,7 @@ class AddressHandler extends UblHandler {
 			);
 
 			foreach ( $vat_meta_keys as $meta_key ) {
-				$vat_number = wpo_wcpdf_sanitize_html_content( $this->document->order->get_meta( $meta_key ), 'vat_number' );
+				$vat_number = $this->document->order->get_meta( $meta_key );
 
 				if ( $vat_number ) {
 					break;
@@ -175,13 +176,13 @@ class AddressHandler extends UblHandler {
 			}
 		}
 
-		$customerPartyName = $customerPartyContactName = wpo_wcpdf_sanitize_html_content( $this->document->order->get_formatted_billing_full_name(), 'full_name' );
-		$billing_company   = wpo_wcpdf_sanitize_html_content( $this->document->order->get_billing_company(), 'company' );
+		$customerPartyName = $customerPartyContactName = $this->document->order->get_formatted_billing_full_name();
+		$billing_company   = $this->document->order->get_billing_company();
 
 		if ( ! empty( $billing_company ) ) {
 			// $customerPartyName = "{$billing_company} ({$customerPartyName})";
 			// we register customer name separately as Contact too,
-			// so we use the comapny name as the primary name
+			// so we use the company name as the primary name
 			$customerPartyName = $billing_company;
 		}
 
@@ -207,11 +208,11 @@ class AddressHandler extends UblHandler {
 							'value' => array(
 								array(
 									'name'  => 'cbc:StreetName',
-									'value' => wpo_wcpdf_sanitize_html_content( $this->document->order->get_billing_address_1(), 'address_1' ),
+									'value' => $this->document->order->get_billing_address_1(),
 								),
 								array(
 									'name'  => 'cbc:CityName',
-									'value' => wpo_wcpdf_sanitize_html_content( $this->document->order->get_billing_city(), 'city' ),
+									'value' => $this->document->order->get_billing_city(),
 								),
 								array(
 									'name'  => 'cbc:PostalZone',
@@ -221,7 +222,7 @@ class AddressHandler extends UblHandler {
 									'name'  => 'cac:AddressLine',
 									'value' => array(
 										'name'  => 'cbc:Line',
-										'value' => wpo_wcpdf_sanitize_html_content( $this->document->order->get_billing_address_1(), 'address_1' ) . '<br/>' . wpo_wcpdf_sanitize_html_content( $this->document->order->get_billing_address_2(), 'address_2' ),
+										'value' => $this->document->order->get_billing_address_1() . '<br/>' . $this->document->order->get_billing_address_2(),
 									),
 								),
 								array(

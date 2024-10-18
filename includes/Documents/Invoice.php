@@ -116,7 +116,7 @@ class Invoice extends OrderDocumentMethods {
 	/**
 	 * Legacy function < v3.8.0
 	 *
-	 * Still being used by thrid party plugins.
+	 * Still being used by third party plugins.
 	 *
 	 * @return mixed
 	 */
