@@ -1123,22 +1123,49 @@ class Settings {
 	}
 
 	/**
-	 * Helper method to add a setting field to a category.
+	 * Helper method to add a single setting field to a category.
 	 *
 	 * @param array           $settings_categories
-	 * @param string|array    $new_setting_id
+	 * @param string          $new_setting_id
 	 * @param string          $category_name
 	 * @param string|int|null $position
 	 *
 	 * @return array
 	 */
-	public function add_setting_field_to_category( array $settings_categories, $new_setting_id, string $category_name, $position = null ): array {
+	public function add_single_setting_field_to_category( array $settings_categories, string $new_setting_id, string $category_name, $position = null ): array {
+		return $this->add_setting_field_to_category_impl( $settings_categories, [ $new_setting_id ], $category_name, $position );
+	}
+
+	/**
+	 * Helper method to add multiple setting fields to a category.
+	 *
+	 * @param array           $settings_categories
+	 * @param array           $new_setting_ids
+	 * @param string          $category_name
+	 * @param string|int|null $position
+	 *
+	 * @return array
+	 */
+	public function add_multiple_setting_fields_to_category( array $settings_categories, array $new_setting_ids, string $category_name, $position = null ): array {
+		return $this->add_setting_field_to_category_impl( $settings_categories, $new_setting_ids, $category_name, $position );
+	}
+
+	/**
+	 * Internal method to handle adding setting fields to a category.
+	 *
+	 * @param array           $settings_categories
+	 * @param array           $new_setting_ids
+	 * @param string          $category_name
+	 * @param string|int|null $position
+	 *
+	 * @return array
+	 */
+	private function add_setting_field_to_category_impl( array $settings_categories, array $new_setting_ids, string $category_name, $position = null ): array {
 		if ( ! isset( $settings_categories[ $category_name ] ) ) {
 			return $settings_categories;
 		}
 
-		$new_setting_ids = (array) $new_setting_id;
-		$members         = &$settings_categories[ $category_name ]['members'];
+		$members = &$settings_categories[ $category_name ]['members'];
 
 		if ( is_null( $position ) ) {
 			$members = array_merge( $members, $new_setting_ids );
@@ -1148,13 +1175,13 @@ class Settings {
 				$key = array_search( $position, $members, true );
 
 				if ( false !== $key ) {
-					array_splice( $members, $key + 1, 0, $new_setting_id );
+					array_splice( $members, $key + 1, 0, $new_setting_ids );
 				} else {
 					$members = array_merge( $members, $new_setting_ids );
 				}
 			} elseif ( is_int( $position ) ) {
 				// If it's a member index
-				array_splice( $members, $position, 0, $new_setting_id );
+				array_splice( $members, $position, 0, $new_setting_ids );
 			}
 		}
 
