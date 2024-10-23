@@ -1190,12 +1190,6 @@ class Admin {
 				} elseif( $action_type == 'save' ) {
 					$is_new = false === $document->exists();
 					$document->set_data( $document_data, $order );
-
-					// check if we have number, and if not generate one
-					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
-						$document->initiate_number();
-					}
-
 					$document->save();
 
 					if ( $is_new ) {
@@ -1203,7 +1197,7 @@ class Admin {
 						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data' );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
-					$response      = array(
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
