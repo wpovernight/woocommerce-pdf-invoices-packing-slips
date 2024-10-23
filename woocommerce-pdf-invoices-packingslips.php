@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              3.9.0-beta-3
+ * Version:              3.9.0
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '3.9.0-beta-3';
+	public $version              = '3.9.0';
 	public $version_php          = '7.2';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -77,6 +77,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'php_below_7_4_drop' ) );
+		add_action( 'admin_notices', array( $this, 'ubl_php_version_required' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		add_action( 'init', array( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0', 'init_cleanup' ), 999 ); // wait AS to initialize
 
@@ -439,7 +440,7 @@ class WPO_WCPDF {
 			echo wp_kses_post( ob_get_clean() );
 		}
 
-		// save option to hide mailpoet notice
+		// save option to hide notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_rtl_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
 			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_rtl_notice_nonce' ) ) {
@@ -453,7 +454,7 @@ class WPO_WCPDF {
 			}
 		}
 	}
-	
+
 	/**
 	 * PHP below 7.4 notice
 	 *
@@ -491,7 +492,38 @@ class WPO_WCPDF {
 			} else {
 				update_option( 'wpo_wcpdf_hide_php_below_7_4_drop_notice', true );
 			}
-			
+
+			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+			exit;
+		}
+	}
+
+	/**
+	 * UBL requires PHP 7.4
+	 *
+	 * @return void
+	 */
+	public function ubl_php_version_required(): void {
+		if ( ! wcpdf_is_ubl_available() && ! get_option( 'wpo_wcpdf_hide_ubl_php_notice' ) ) {
+			ob_start();
+			?>
+			<div class="notice notice-warning">
+				<p><?php _e( 'PDF Invoices & Packing Slips for WooCommerce has detected that your PHP version is below 7.4. As a result, UBL features are disabled. To enable these features, please consider upgrading your PHP version.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_ubl_php_notice', 'true' ), 'hide_ubl_php_notice_nonce' ) ); ?>"><?php _e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo wp_kses_post( ob_get_clean() );
+		}
+
+		// save option to hide notice
+		if ( isset( $_REQUEST['wpo_wcpdf_hide_ubl_php_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			// validate nonce
+			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_ubl_php_notice_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_ubl_php_notice' );
+			} else {
+				update_option( 'wpo_wcpdf_hide_ubl_php_notice', true );
+			}
+
 			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 			exit;
 		}

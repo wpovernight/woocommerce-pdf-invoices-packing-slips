@@ -14,7 +14,7 @@
 		"dompdf/dompdf": "^3.0",
 		"symfony/polyfill-mbstring": "^1.27",
 		"symfony/polyfill-iconv": "^1.27",
-		"sabre/xml": "^2.2.5"
+		"sabre/xml": "^4.0"
 	},
 	"extra": {
 		"strauss": {
@@ -35,7 +35,8 @@
 			"exclude_from_prefix": {
 				"packages": [
 					"symfony/polyfill-mbstring",
-					"symfony/polyfill-iconv"
+					"symfony/polyfill-iconv",
+					"masterminds/html5"
 				],
 				"namespaces": [],
 				"file_patterns": []
