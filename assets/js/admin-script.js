@@ -609,7 +609,7 @@ jQuery( function( $ ) {
 			}
 		} );
 
-		$('.settings_category h2' ).click( function() {
+		$('.settings_category h2' ).on( 'click', function() {
 			const index = $( '.settings_category h2' ).index( this );
 
 			$( this ).toggleClass( 'active' ).next( '.form-table' ).slideToggle( 'fast', function() {
