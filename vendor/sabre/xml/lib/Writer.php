@@ -2,7 +2,7 @@
 /**
  * @license BSD-3-Clause
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 declare(strict_types=1);
@@ -35,7 +35,7 @@ use XMLWriter;
  * @author Evert Pot (http://evertpot.com/)
  * @license http://sabre.io/license/ Modified BSD License
  */
-class Writer extends XMLWriter
+class Writer extends \XMLWriter
 {
     use ContextStackTrait;
 
@@ -46,19 +46,17 @@ class Writer extends XMLWriter
      * time* they are used, but this array allows the writer to make sure that
      * the prefixes are consistent anyway.
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected $adhocNamespaces = [];
+    protected array $adhocNamespaces = [];
 
     /**
      * When the first element is written, this flag is set to true.
      *
      * This ensures that the namespaces in the namespaces map are only written
      * once.
-     *
-     * @var bool
      */
-    protected $namespacesWritten = false;
+    protected bool $namespacesWritten = false;
 
     /**
      * Writes a value to the output stream.
@@ -99,9 +97,9 @@ class Writer extends XMLWriter
      *    ]
      * ]
      *
-     * @param mixed $value
+     * @param mixed $value PHP value to be written
      */
-    public function write($value)
+    public function write($value): void
     {
         Serializer\standardSerializer($this, $value);
     }
@@ -109,7 +107,7 @@ class Writer extends XMLWriter
     /**
      * Opens a new element.
      *
-     * You can either just use a local elementname, or you can use clark-
+     * You can either just use a local element name, or you can use clark-
      * notation to start a new element.
      *
      * Example:
@@ -122,6 +120,7 @@ class Writer extends XMLWriter
      *
      * Note: this function doesn't have the string typehint, because PHP's
      * XMLWriter::startElement doesn't either.
+     * From PHP 8.0 the typehint exists, so it can be added here after PHP 7.4 is dropped.
      *
      * @param string $name
      */
@@ -140,7 +139,7 @@ class Writer extends XMLWriter
             } else {
                 // An empty namespace means it's the global namespace. This is
                 // allowed, but it mustn't get a prefix.
-                if ('' === $namespace || null === $namespace) {
+                if ('' === $namespace) {
                     $result = $this->startElement($localName);
                     $this->writeAttribute('xmlns', '');
                 } else {
@@ -156,7 +155,7 @@ class Writer extends XMLWriter
 
         if (!$this->namespacesWritten) {
             foreach ($this->namespaceMap as $namespace => $prefix) {
-                $this->writeAttribute(($prefix ? 'xmlns:'.$prefix : 'xmlns'), $namespace);
+                $this->writeAttribute($prefix ? 'xmlns:'.$prefix : 'xmlns', $namespace);
             }
             $this->namespacesWritten = true;
         }
@@ -185,8 +184,10 @@ class Writer extends XMLWriter
      *
      * Note: this function doesn't have the string typehint, because PHP's
      * XMLWriter::startElement doesn't either.
+     * From PHP 8.0 the typehint exists, so it can be added here after PHP 7.4 is dropped.
      *
-     * @param array|string|object|null $content
+     * @param string                                      $name
+     * @param array<int|string, mixed>|string|object|null $content
      */
     public function writeElement($name, $content = null): bool
     {
@@ -207,8 +208,10 @@ class Writer extends XMLWriter
      * The key is an attribute name. If the key is a 'localName', the current
      * xml namespace is assumed. If it's a 'clark notation key', this namespace
      * will be used instead.
+     *
+     * @param array<string, string> $attributes
      */
-    public function writeAttributes(array $attributes)
+    public function writeAttributes(array $attributes): void
     {
         foreach ($attributes as $name => $value) {
             $this->writeAttribute($name, $value);
@@ -224,6 +227,7 @@ class Writer extends XMLWriter
      *
      * Note: this function doesn't have typehints, because for some reason
      * PHP's XMLWriter::writeAttribute doesn't either.
+     * From PHP 8.0 the typehint exists, so it can be added here after PHP 7.4 is dropped.
      *
      * @param string $name
      * @param string $value
@@ -236,7 +240,7 @@ class Writer extends XMLWriter
 
         list(
             $namespace,
-            $localName
+            $localName,
         ) = Service::parseClarkNotation($name);
 
         if (array_key_exists($namespace, $this->namespaceMap)) {
