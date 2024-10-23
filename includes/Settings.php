@@ -88,7 +88,7 @@ class Settings {
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
 
 		// Apply settings sections.
-		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings' ), 999 );
+		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_sections' ), 999 );
 	}
 
 	public function menu() {
@@ -1009,12 +1009,18 @@ class Settings {
 		return $new_settings;
 	}
 
-	public function update_documents_settings(): void {
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+	/**
+	 * Applies categories to document settings.
+	 *
+	 * @return void
+	 */
+	public function update_documents_settings_sections(): void {
+		$documents = WPO_WCPDF()->documents->documents;
 
 		foreach ( $documents as $document ) {
-			$document = str_replace( '-', '_', $document->get_type() );
-			add_filter( 'wpo_wcpdf_settings_fields_documents_' . $document, array( $this, 'apply_settings_categories' ), 999, 4 );
+			foreach ( $document->output_formats as $output_format ) {
+				add_filter( "wpo_wcpdf_settings_fields_documents_{$document->slug}_{$output_format}", array( $this, 'apply_settings_categories' ), 999 );
+			}
 		}
 	}
 
