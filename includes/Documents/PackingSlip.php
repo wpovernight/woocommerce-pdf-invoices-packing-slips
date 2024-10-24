@@ -201,11 +201,14 @@ class PackingSlip extends OrderDocumentMethods {
 			$settings_fields = WPO_WCPDF()->settings->move_setting_after_id( $settings_fields, $pro_notice, 'enabled' );
 		}
 
-		// allow plugins to alter settings fields
+		// Legacy filter to allow plugins to alter settings fields.
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_documents_packing_slip', $settings_fields, $page, $option_group, $option_name );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-		return;
 
+		// Allow plugins to alter settings fields.
+		if ( ! empty( $settings_fields ) ) {
+			$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_pdf", $settings_fields, $page, $option_group, $option_name, $this );
+			WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+		}
 	}
 
 	/**

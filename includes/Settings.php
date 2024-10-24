@@ -182,7 +182,7 @@ class Settings {
 				'preview_states' => 3,
 			),
 		) );
-		
+
 		if ( wcpdf_is_ubl_available() ) {
 			$settings_tabs['ubl'] = array(
 				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1022,7 +1022,7 @@ class Settings {
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {
-				add_filter( "wpo_wcpdf_settings_fields_documents_{$document->slug}_{$output_format}", array( $this, 'apply_settings_categories' ), 999 );
+				add_filter( "wpo_wcpdf_settings_fields_documents_{$document->type}_{$output_format}", array( $this, 'apply_settings_categories' ), 999 );
 			}
 		}
 	}
@@ -1031,22 +1031,20 @@ class Settings {
 	 * Apply settings categories to the settings fields.
 	 *
 	 * @param array  $settings_fields
-	 * @param string $page
-	 * @param string $option_group
-	 * @param string $option_name
 	 *
 	 * @return array
 	 */
-	public function apply_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name ): array {
-		$document_type = explode( '_', $option_group );
-		$document_type = end( $document_type );
-		$document      = wcpdf_get_document( $document_type, null );
+	public function apply_settings_categories( array $settings_fields ): array {
+		$current_filter = explode( '_', current_filter() );
+		$output_format  = end( $current_filter );
+		$document_type  = prev( $current_filter );
+		$document       = wcpdf_get_document( $document_type, null );
 
 		if ( ! $document ) {
 			return $settings_fields;
 		}
 
-		$settings_categories = is_callable( array( $document, 'get_settings_categories' ) ) ? $document->get_settings_categories() : array();
+		$settings_categories = is_callable( array( $document, 'get_settings_categories' ) ) ? $document->get_settings_categories( $output_format ) : array();
 
 		// Return if no category found!
 		if ( empty( $settings_categories ) ) {
