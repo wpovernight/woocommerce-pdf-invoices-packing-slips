@@ -639,20 +639,20 @@ class Invoice extends OrderDocumentMethods {
 						'enabled',
 						'attach_to_email_ids',
 						'disable_for_statuses',
-						'number_format',
 						'my_account_buttons',
 					),
 				),
-				'document_display' => array(
+				'document_details' => array(
 					'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
 					'members' => array(
 						'display_email',
 						'display_phone',
 						'display_customer_notes',
 						'display_shipping_address',
-						'display_date',
 						'display_number',
 						'next_invoice_number', // this should follow 'display_number'
+						'number_format',
+						'display_date',
 						'due_date'
 					)
 				),

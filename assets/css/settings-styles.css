@@ -463,6 +463,10 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	transform: translateY(-50%) rotate(180deg);
 }
 
+#wpo-wcpdf-preview-wrapper .my_account_buttons_custom {
+	margin-top: 1em;
+}
+
 
 /* WPML */
 
@@ -1343,5 +1347,12 @@ div.upgrade-table-description a,
 
 	#plugin-recommendations .card-container {
 		justify-content: center;
+	}
+}
+
+/* Override WordPress default form style */
+@media screen and (max-width: 782px) {
+	input[type="radio"], input[type="checkbox"] {
+		margin-bottom: 0.5em;
 	}
 }

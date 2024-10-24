@@ -232,13 +232,13 @@ class PackingSlip extends OrderDocumentMethods {
 						'attach_to_email_ids',
 					),
 				),
-				'document_display' => array(
+				'document_details' => array(
 					'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
 					'members' => array(
-						'display_billing_address',
 						'display_email',
 						'display_phone',
 						'display_customer_notes',
+						'display_billing_address',
 					),
 				),
 			),
