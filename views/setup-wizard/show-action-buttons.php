@@ -15,5 +15,7 @@
 	if ( in_array( 'wc_actions', $hidden ) )
 		$actions = false
 	?>
-	<input id="show-action-buttons" type="checkbox" <?php echo $actions !== false ? 'checked' : ''; ?> name="wc_show_action_buttons" value="1"><label for="show-action-buttons" class="checkbox"><?php esc_html_e( 'Show action buttons', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+	<input id="show-action-buttons" type="checkbox" <?php echo $actions !== false ? 'checked' : ''; ?> name="wc_show_action_buttons" value="1">
+	<label for="show-action-buttons" class="slider"></label>
+	<label for="show-action-buttons" class="checkbox"><?php esc_html_e( 'Show action buttons', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 </div>

@@ -91,6 +91,12 @@ class SetupWizard {
 			array( 'dashicons', 'install' ),
 			WPO_WCPDF_VERSION
 		);
+		wp_enqueue_style(
+			'wpo-wcpdf-toggle-switch',
+			WPO_WCPDF()->plugin_url() . '/assets/css/toggle-switch'.$suffix.'.css',
+			array( 'dashicons', 'install' ),
+			WPO_WCPDF_VERSION
+		);
 		wp_register_script(
 			'wpo-wcpdf-media-upload',
 			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
@@ -214,7 +220,7 @@ class SetupWizard {
 	public function get_step_link( $step ) {
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step && empty( $step ) ) {
-			return admin_url('admin.php?page=wpo_wcpdf_options_page');
+			return admin_url('admin.php?page=wpo_wcpdf_options_page&tab=upgrade');
 		}
 		return esc_url_raw( add_query_arg( 'step', $step ) );
 	}

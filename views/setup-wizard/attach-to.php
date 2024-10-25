@@ -21,6 +21,7 @@
 				<th>
 					<input type="hidden" value="" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][attach_to_email_ids][%1$s]">
 					<input id="%1$s" type="checkbox" %3$s name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][attach_to_email_ids][%1$s]" value="1">
+					<label for="%1$s" class="slider"></label>
 				</th>
 				<td>
 					<label for="%1$s" class="checkbox">%2$s</label>
