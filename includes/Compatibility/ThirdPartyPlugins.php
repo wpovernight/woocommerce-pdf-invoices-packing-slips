@@ -558,7 +558,7 @@ class ThirdPartyPlugins {
 	 * @return mixed
 	 */
 	function add_invoice_creation_trigger( $after_status_options ) {
-		$after_status_options['wc-invoice-creation'] = __( 'Invoice Creation', 'woocommerce-pdf-invoices-packing-slips' );
+		$after_status_options['wc-invoice-creation'] = __( 'Invoice creation', 'woocommerce-pdf-invoices-packing-slips' );
 
 		return $after_status_options;
 	}
