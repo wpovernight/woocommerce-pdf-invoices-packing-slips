@@ -69,6 +69,14 @@ class ThirdPartyPlugins {
 
 		add_filter( 'woocommerce_hpos_admin_search_filters', array( $this, 'hpos_admin_search_filters' ) );
 		add_filter( 'woocommerce_shop_order_list_table_prepare_items_query_args', array( $this, 'invoice_number_query_args' ) );
+
+		// Register and create payment reminder email for Smart Reminder Email plugin.
+		add_action( 'init', array( $this, 'handle_payment_reminder_emails' ) );
+
+		// Handle invoice creation trigger.
+		add_filter( 'wpo_wcsre_after_status_options', array( $this, 'add_invoice_creation_trigger' ) );
+		add_action( 'wpo_wcpdf_save_document', array( $this, 'schedule_payment_reminder_email_on_invoice_creation' ), 10, 2 );
+		add_filter( 'wpo_wcsre_order_status_trigger_condition', array( $this, 'modify_status_trigger_condition' ), 10, 6 );
 	}
 
 	/**
@@ -212,11 +220,11 @@ class ThirdPartyPlugins {
 		if ( empty( $order ) ) {
 			return $classes;
 		}
-		
+
 		if ( ! $order instanceof \WC_Abstract_Order ) {
 			return $classes;
 		}
-		
+
 		if ( empty( $item_id ) && ! empty( $classes ) ) {
 			$item_id = $this->get_item_id_from_classes( $classes );
 		}
@@ -226,7 +234,7 @@ class ThirdPartyPlugins {
 		} else {
 			return $classes;
 		}
-		
+
 		$product    = null;
 		$bundled_by = null;
 
@@ -348,30 +356,31 @@ class ThirdPartyPlugins {
 	 * Aelia Currency Switcher compatibility
 	 * Applies decimal & Thousand separator settings
 	 */
-	function aelia_currency_formatting( $document_type, $document ) {
+	public function aelia_currency_formatting( $document_type, $document ) {
 		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
 	}
 
-	function aelia_currency_price_args( $args ) {
-		if ( !empty( $args['currency'] ) && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) {
-			$cs_settings = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
-			$args['decimal_separator'] = $cs_settings->get_currency_decimal_separator( $args['currency'] );
+	public function aelia_currency_price_args( $args ) {
+		if ( ! empty( $args['currency'] ) && class_exists( "\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher" ) ) {
+			$cs_settings                = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
+			$args['decimal_separator']  = $cs_settings->get_currency_decimal_separator( $args['currency'] );
 			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
 		}
+
 		return $args;
 	}
 
 	/**
 	 * Avoid double images from German Market: remove filter
 	 */
-	function remove_wgm_thumbnails( $document_type, $document ) {
+	public function remove_wgm_thumbnails( $document_type, $document ) {
 		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 	}
 
 	/**
 	 * Restore above
 	 */
-	function restore_wgm_thumbnails( $document_type, $document ) {
+	public function restore_wgm_thumbnails( $document_type, $document ) {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
@@ -384,12 +393,12 @@ class ThirdPartyPlugins {
 	 *
 	 * @return array
 	 */
-	function hpos_admin_search_filters( array $options ): array {
+	public function hpos_admin_search_filters( array $options ): array {
 		if ( WPO_WCPDF()->admin->invoice_number_search_enabled() ) {
 			$all = $options['all'];
 			unset( $options['all'] );
 			$options['invoice_number'] = __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' );
-			$options['all'] = $all;
+			$options['all']            = $all;
 		}
 
 		return $options;
@@ -402,7 +411,7 @@ class ThirdPartyPlugins {
 	 *
 	 * @return array
 	 */
-	function invoice_number_query_args( array $order_query_args ): array {
+	public function invoice_number_query_args( array $order_query_args ): array {
 		if ( isset( $order_query_args['search_filter'] ) && 'invoice_number' === $order_query_args['search_filter'] && isset( $order_query_args['s'] ) ) {
 			$order_query_args['meta_key']      = '_wcpdf_invoice_number';
 			$order_query_args['meta_value']    = $order_query_args['s'];
@@ -412,6 +421,192 @@ class ThirdPartyPlugins {
 
 		return $order_query_args;
 	}
+
+	/**
+	 * Register payment reminder email templates and create them for the Smart Reminder Email plugin for the first time.z
+	 *
+	 * @return void
+	 */
+	public function handle_payment_reminder_emails(): void {
+		if ( $this->is_smart_reminder_email_supported() ) {
+			$this->register_payment_reminder_email_templates();
+			$this->create_payment_reminder_emails();
+		}
+	}
+
+	/**
+	 * Check if Smart Reminder Email plugin is supported.
+	 *
+	 * @return bool
+	 */
+	private function is_smart_reminder_email_supported(): bool {
+		return function_exists( 'WPO_WCSRE' ) && version_compare( WPO_WCSRE()->version, '2.8.1-beta-1', '>=' );
+	}
+
+	/**
+	 * Register payment reminder email templates for Smart Reminder Email plugin.
+	 *
+	 * @return void
+	 */
+	private function register_payment_reminder_email_templates(): void {
+		// Register payment reminder email for admin.
+		$admin_content      = sprintf(
+			/* translators: Order number */
+			__( 'This is to inform you that the payment for Order #%s is still pending beyond the due date.' ), '{order_number}'
+		);
+		$admin_content      = apply_filters( 'wpo_wcpdf_payment_reminder_admin_email_content', $admin_content );
+		$admin_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_admin_email_trigger_days', array( 90 ) );
+		$this->register_payment_reminder_email_template( $admin_content, true, $admin_trigger_days );
+
+		// Register payment reminder email for customer.
+		$customer_content      = sprintf(
+			/* translators: 1: First name, 2: Last name, 3: Order number, 4, 5: HTML anchor tag */
+			__( 'Dear %1$s %2$s,<br><br>This is a gentle reminder that payment for your order #%3$s is still pending.<br><br>To complete the payment, please use the following link: %4$sPay the order%5$s. We kindly ask that you process the payment at your earliest convenience.<br><br>Best regards' ),
+			'{billing_first_name}',
+			'{billing_last_name}',
+			'{order_number}',
+			'<a href="{payment_url}">',
+			'</a>'
+		);
+		$customer_content      = apply_filters( 'wpo_wcpdf_payment_reminder_customer_email_content', $customer_content );
+		$customer_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_customer_email_trigger_days', array( 30, 60 ) );
+		$this->register_payment_reminder_email_template( $customer_content, false, $customer_trigger_days );
+	}
+
+	/**
+	 * Create payment reminder emails automatically for the first time.
+	 *
+	 * @return void
+	 */
+	private function create_payment_reminder_emails(): void {
+		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
+
+		// Only proceed if the due date is defined and valid.
+		if ( empty( $invoice_settings['due_date'] ) || empty( $invoice_settings['due_date_days'] ) || $invoice_settings['due_date'] < 1 ) {
+			return;
+		}
+
+		// Create emails only if they haven't been generated before.
+		if ( ! get_option( 'wpo_wcpdf_payment_reminder_emails_generated', false ) ) {
+			WPO_WCSRE()->email_templates->create_email( 'admin_payment_reminder' );
+			WPO_WCSRE()->email_templates->create_email( 'customer_payment_reminder' );
+			update_option( 'wpo_wcpdf_payment_reminder_emails_generated', true );
+		}
+	}
+
+	/**
+	 * Register payment reminder email template for Smart Reminder Email plugin.
+	 *
+	 * @param string $content
+	 * @param bool $to_admin
+	 * @param array $trigger_days
+	 *
+	 * @return void
+	 */
+	private function register_payment_reminder_email_template( string $content, bool $to_admin, array $trigger_days ): void {
+		if ( empty( $content ) ) {
+			return;
+		}
+
+		$trigger_days = array_map( 'absint', $trigger_days );
+
+		if ( empty( $trigger_days ) ) {
+			return;
+		}
+
+		// Prepare post data.
+		$post_title = $to_admin ? __( 'Admin Payment Reminder', 'wpo_wcsre' ) : __( 'Customer Payment Reminder', 'wpo_wcsre' );
+		$post_data  = array(
+			'post_title'   => $post_title,
+			'post_content' => $content,
+			'post_status'  => 'draft',
+		);
+
+		// Prepare meta data.
+		$meta_data = array(
+			'_subject' => 'Payment Reminder',
+			'_heading' => 'Payment Reminder',
+			'_to' => $to_admin ? 'admin' : 'customer',
+		);
+
+		// Prepare triggers.
+		$triggers = array_map( function ( $days ) {
+			$days = intval( $days );
+
+			return array(
+				'id'           => \WPO_WCSRE()->functions->get_new_trigger_id(),
+				'send'         => array(
+					'title'                  => sprintf( __( '%d Days Reminder', '' ), $days ),
+					'after_status_count'     => (string) $days,
+					'after_status_time_unit' => 'days',
+					'after_status'           => 'wc-invoice-creation'
+				),
+				'restrictions' => array(
+					'status' => array( 'wc-on-hold' ),
+				)
+			);
+		}, $trigger_days );
+
+		WPO_WCSRE()->email_templates->register_template( $post_data, $meta_data, $triggers );
+	}
+
+	/**
+	 * Add invoice creation trigger to Smart Reminder Email plugin.
+	 *
+	 * @param $after_status_options
+	 *
+	 * @return mixed
+	 */
+	function add_invoice_creation_trigger( $after_status_options ) {
+		$after_status_options['wc-invoice-creation'] = __( 'Invoice Creation', 'woocommerce-pdf-invoices-packing-slips' );
+
+		return $after_status_options;
+	}
+
+	/**
+	 * Schedule payment reminder email on invoice creation.
+	 *
+	 * @param object $document
+	 * @param \WC_Abstract_Order $order
+	 *
+	 * @return void
+	 */
+	function schedule_payment_reminder_email_on_invoice_creation( object $document, \WC_Abstract_Order $order ) {
+		if ( $this->is_smart_reminder_email_supported() ) {
+			WPO_WCSRE()->functions->check_email_schedule( $order, $order->get_status(), 'wc-invoice-creation' );
+		}
+
+	}
+
+	/**
+	 * Modify the status trigger condition to use the order status
+	 * instead of the 'wc-invoice-creation' custom status sent to the function.
+	 *
+	 * @param bool $order_status_condition
+	 * @param \WPO_WCSRE_Email $email
+	 * @param \WC_Abstract_Order $order
+	 * @param string $old_status
+	 * @param string $new_status
+	 * @param array $trigger
+	 *
+	 * @return bool
+	 */
+	public function modify_status_trigger_condition( bool $order_status_condition, \WPO_WCSRE_Email $email, \WC_Abstract_Order $order, string $old_status, string $new_status, array $trigger ): bool {
+		if ( 'wc-invoice-creation' !== $new_status ) {
+			return $order_status_condition;
+		}
+
+		$trigger_order_statuses = isset( $trigger['restrictions']['status'] ) ? (array) $trigger['restrictions']['status'] : array();
+		$order_status           = $order->get_status();
+		$order_status           = 'wc-' === substr( $order_status, 0, 3 ) ? $order_status : 'wc-' . $order_status;
+
+		if ( in_array( $order_status, $trigger_order_statuses, true ) ) {
+			return true;
+		}
+
+		return $order_status_condition;
+	}
+
 }
 
 

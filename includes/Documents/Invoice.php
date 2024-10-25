@@ -332,6 +332,31 @@ class Invoice extends OrderDocumentMethods {
 					'text_input_size'    => 3,
 					'text_input_id'      => 'due_date_days',
 					'text_input_default' => 30,
+					'description'        =>
+						(
+							class_exists( 'WPO_WC_Smart_Reminder_Emails' ) ?
+								sprintf(
+									'<a class="button button-secondary submit wpo-button" href="%s">%s</a> %s',
+									esc_url( add_query_arg( array( 'post_type' => 'wc_reminder_email', 'generate_template' => array( 'admin-payment-reminder','customer-payment-reminder' ) ), admin_url( 'edit.php' ) ) ),
+									__( 'Create payment reminders' ),
+									sprintf(
+										/* translators: %s: Plugin name */
+										__( 'with one click using %s!', 'woocommerce-pdf-invoices-packing-slips' ),
+										'Smart Reminder Email'
+									)
+								) :
+								sprintf(
+									'<span class="wpo-info">%s</span>',
+									sprintf(
+										/* translators: %s: Plugin name hyperlink */
+										__( 'Create payment reminders with one click using %s!', 'woocommerce-pdf-invoices-packing-slips' ),
+										'<a href="https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders/">Smart Reminder Email</a>'
+									)
+								)
+						) .
+						'<br>' .
+						/* translators: 1, 2: HTML opening and closing anchor tags */
+						sprintf( __( 'Need more information? Read a %1$sstep-by-step guide.%2$s' ), '<a href="#">', '</a>' ), // ToDo: Replace # with the article link.
 				)
 			),
 			array(
