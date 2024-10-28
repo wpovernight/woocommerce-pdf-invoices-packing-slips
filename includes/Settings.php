@@ -106,7 +106,7 @@ class Settings {
 	 */
 	public function add_settings_link( $links ) {
 		$action_links = array(
-			'settings' => '<a href="admin.php?page=wpo_wcpdf_options_page">'. esc_html__( 'Settings', 'woocommerce' ) . '</a>',
+			'settings' => '<a href="admin.php?page=wpo_wcpdf_options_page">'. esc_html__( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
 		);
 
 		return array_merge( $action_links, $links );
@@ -160,7 +160,7 @@ class Settings {
 		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			/* translators: database row value */
 			$error = wp_kses_post( sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %d, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Advanced tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), intval( $row->Value ) ) );
-			printf( '<div class="error"><p>%s</p></div>', $error );
+			printf( '<div class="error"><p>%s</p></div>', wp_kses_post( $error ) );
 		}
 	}
 
@@ -179,7 +179,7 @@ class Settings {
 				'preview_states' => 3,
 			),
 		) );
-		
+
 		if ( wcpdf_is_ubl_available() ) {
 			$settings_tabs['ubl'] = array(
 				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),

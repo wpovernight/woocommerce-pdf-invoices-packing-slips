@@ -21,7 +21,7 @@ class Admin {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
 		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed
@@ -88,7 +88,7 @@ class Admin {
 		} else {
 			if ( isset( $_REQUEST['wpo_wcpdf_dismiss_review'] ) && isset( $_REQUEST['_wpdismissnonce'] ) ) {
 				// validate nonce
-				if ( ! wp_verify_nonce( $_REQUEST['_wpdismissnonce'], 'dismiss_review_nonce' ) ) {
+				if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpdismissnonce'] ) ), 'dismiss_review_nonce' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_dismiss_review' );
 					return;
 				} else {
@@ -102,7 +102,7 @@ class Admin {
 			if ( $invoice_count > 100 ) {
 				// keep track of how many days this notice is show so we can remove it after 7 days
 				$notice_shown_on = get_option( 'wpo_wcpdf_review_notice_shown', array() );
-				$today           = date('Y-m-d');
+				$today           = gmdate( 'Y-m-d' );
 				if ( ! in_array( $today, $notice_shown_on ) ) {
 					$notice_shown_on[] = $today;
 					update_option( 'wpo_wcpdf_review_notice_shown', $notice_shown_on );
@@ -116,8 +116,15 @@ class Admin {
 				$rounded_count = (int) substr( (string) $invoice_count, 0, 1 ) * pow( 10, strlen( (string) $invoice_count ) - 1);
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
-					<?php /* translators: rounded count */ ?>
-					<h3><?php printf( esc_html__( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
+					<h3>
+						<?php
+							printf(
+								/* translators: rounded count */
+								esc_html__( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ),
+								esc_html( $rounded_count )
+							);
+						?>
+					</h3>
 					<p><?php esc_html_e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
 						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post" class="button"><?php esc_html_e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></a></li>
@@ -151,7 +158,7 @@ class Admin {
 		} else {
 			if ( isset( $_REQUEST['wpo_wcpdf_dismiss_install'] ) && isset( $_REQUEST['_wpdismissnonce'] ) ) {
 				// validate nonce
-				if ( ! wp_verify_nonce( $_REQUEST['_wpdismissnonce'], 'dismiss_install_nonce' ) ) {
+				if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpdismissnonce'] ) ), 'dismiss_install_nonce' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_dismiss_install' );
 					return;
 				} else {
@@ -164,7 +171,7 @@ class Admin {
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-install-notice">
 					<p><strong><?php esc_html_e( 'New to PDF Invoices & Packing Slips for WooCommerce?', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong> &#8211; <?php esc_html_e( 'Jumpstart the plugin by following our wizard!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-					<p class="submit"><a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button-primary"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_dismiss_install', true ), 'dismiss_install_nonce', '_wpdismissnonce' ) ); ?>" class="wpo-wcpdf-dismiss-wizard"><?php esc_html_e( 'I am the wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+					<p class="submit"><a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ), 'wpo_wcpdf_setup' ) ); ?>" class="button-primary"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a> <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_dismiss_install', true ), 'dismiss_install_nonce', '_wpdismissnonce' ) ); ?>" class="wpo-wcpdf-dismiss-wizard"><?php esc_html_e( 'I am the wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 				</div>
 				<script type="text/javascript">
 				jQuery( function( $ ) {
@@ -182,7 +189,7 @@ class Admin {
 
 	public function setup_wizard() {
 		// Setup/welcome
-		if ( ! empty( $_GET['page'] ) && $_GET['page'] == 'wpo-wcpdf-setup' ) {
+		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] && wp_verify_nonce( $_GET['_wpnonce'], 'wpo_wcpdf_setup' ) ) {
 			delete_transient( 'wpo_wcpdf_new_install' );
 			SetupWizard::instance();
 		}
@@ -240,7 +247,7 @@ class Admin {
 								}
 
 								$listing_actions[$document->get_type()] = array(
-									'url'           => esc_url( $document_url ),
+									'url'           => $document_url,
 									'img'           => $icon,
 									'alt'           => "PDF " . $document_title,
 									'exists'        => $document_exists,
@@ -262,7 +269,7 @@ class Admin {
 								}
 
 								$listing_actions[ $document->get_type()."_{$output_format}" ] = array(
-									'url'           => esc_url( $document_url ),
+									'url'           => $document_url,
 									'img'           => $icon,
 									'alt'           => "UBL " . $document_title,
 									'exists'        => $document_exists,
@@ -292,15 +299,28 @@ class Admin {
 			// ubl replaces exists
 			$exists  = isset( $data['output_format'] ) && 'ubl' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
 
+			$allowed_svg_tags = array(
+				'svg' => array(
+					'class'   => true,
+					'xmlns'   => true,
+					'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+				),
+				'path' => array(
+					'fill-rule' => true,
+					'clip-rule' => true,
+					'd'         => true,
+				),
+			);
+				
 			if ( isset( $data['output_format'] ) && ( 'ubl' !== $data['output_format'] || $data['exists'] ) ) {
 				printf(
 					'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
-					esc_attr( $data['url'] ),
+					esc_url( $data['url'] ),
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
 					esc_attr( $data['img'] ),
-					$exists,
-					$printed
+					str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_svg_tags ) ),
+					str_replace( 'viewbox=', 'viewBox=', wp_kses( $printed, $allowed_svg_tags ) )
 				);
 			}
 		}
@@ -362,12 +382,12 @@ class Admin {
 		switch ( $column ) {
 			case 'invoice_number_column':
 				$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? $invoice->get_number() : '';
-				echo $invoice_number;
+				echo esc_html( $invoice_number );
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
 				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) : '';
-				echo $invoice_date;
+				echo esc_html( $invoice_date );
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
 			default:
@@ -605,10 +625,10 @@ class Admin {
 		<ul class="wpo_wcpdf-actions">
 			<?php
 			foreach ( $meta_box_actions as $document_type => $data ) {
-				$url                   = isset( $data['url'] ) ? esc_attr( $data['url'] ) : '';
-				$class                 = isset( $data['class'] ) ? esc_attr( $data['class'] ) : '';
-				$alt                   = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
-				$title                 = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
+				$url                   = isset( $data['url'] ) ? $data['url'] : '';
+				$class                 = isset( $data['class'] ) ? $data['class'] : '';
+				$alt                   = isset( $data['alt'] ) ? $data['alt'] : '';
+				$title                 = isset( $data['title'] ) ? $data['title'] : '';
 				$exists                = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="'.$data['mark_printed_url'].'">'.__( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ).'</a></p>' : '';
 				$printed               = isset( $data['printed'] ) && $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
@@ -617,13 +637,13 @@ class Admin {
 
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',
-					$url,
-					$class,
-					$alt,
-					$title,
-					$exists,
-					$manually_mark_printed,
-					$printed_data
+					esc_url( $url ),
+					esc_attr( $class ),
+					esc_attr( $alt ),
+					esc_html( $title ),
+					esc_html( $exists ),
+					esc_html( $manually_mark_printed ),
+					esc_html( $printed_data )
 				);
 			}
 			?>
@@ -678,20 +698,20 @@ class Admin {
 				$ubl_documents = 0;
 
 				foreach ( $meta_box_actions as $document_type => $data ) {
-					$url    = isset( $data['url'] ) ? esc_attr( $data['url'] ) : '';
-					$class  = isset( $data['class'] ) ? esc_attr( $data['class'] ) : '';
-					$alt    = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
-					$title  = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
+					$url    = isset( $data['url'] ) ? $data['url'] : '';
+					$class  = isset( $data['class'] ) ? $data['class'] : '';
+					$alt    = isset( $data['alt'] ) ? $data['alt'] : '';
+					$title  = isset( $data['title'] ) ? $data['title'] : '';
 					$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 
 					if ( ! empty( $exists ) ) {
 						printf(
 							'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
-							$url,
-							$class,
-							$alt,
-							$title,
-							$exists
+							esc_url( $url ),
+							esc_attr( $class ),
+							esc_attr( $alt ),
+							esc_html( $title ),
+							esc_html( $exists )
 						);
 
 						$ubl_documents++;
@@ -699,7 +719,7 @@ class Admin {
 				}
 
 				if ( 0 === $ubl_documents ) {
-					_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
+					esc_html_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 			?>
 		</ul>
@@ -805,14 +825,14 @@ class Admin {
 		$data = $this->get_current_values_for_document( $document, $data );
 
 		?>
-		<div class="wcpdf-data-fields" data-document="<?= esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
+		<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
 				<!-- Title -->
 				<h4>
 					<?php echo wp_kses_post( $document->get_title() ); ?>
 					<?php if ( $document->exists() && ( isset( $data['number'] ) || isset( $data['date'] ) ) && $this->user_can_manage_document( $document->get_type() ) ) : ?>
 						<span class="wpo-wcpdf-edit-date-number dashicons dashicons-edit"></span>
-						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_delete_document" ); ?>"></span>
+						<span class="wpo-wcpdf-delete-document dashicons dashicons-trash" data-action="delete" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wpo_wcpdf_delete_document' ) ); ?>"></span>
 						<?php do_action( 'wpo_wcpdf_document_actions', $document ); ?>
 					<?php endif; ?>
 				</h4>
@@ -821,42 +841,42 @@ class Admin {
 				<div class="read-only">
 					<?php if ( $document->exists() ) : ?>
 						<?php if ( isset( $data['number'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-number">
-							<p class="form-field <?= esc_attr( $data['number']['name'] ); ?>_field">
+						<div class="<?php echo esc_attr( $document->get_type() ); ?>-number">
+							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
 								<p>
-									<span><strong><?= wp_kses_post( $data['number']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['number']['formatted'] ); ?></span>
+									<span><strong><?php echo wp_kses_post( $data['number']['label'] ); ?></strong></span>
+									<span><?php echo esc_attr( $data['number']['formatted'] ); ?></span>
 								</p>
 							</p>
 						</div>
 						<?php endif; ?>
 						<?php if( isset( $data['date'] ) ) : ?>
-						<div class="<?= esc_attr( $document->get_type() ); ?>-date">
+						<div class="<?php echo esc_attr( $document->get_type() ); ?>-date">
 							<p class="form-field form-field-wide">
 								<p>
-									<span><strong><?= wp_kses_post( $data['date']['label'] ); ?></strong></span>
-									<span><?= esc_attr( $data['date']['formatted'] ); ?></span>
+									<span><strong><?php echo wp_kses_post( $data['date']['label'] ); ?></strong></span>
+									<span><?php echo esc_attr( $data['date']['formatted'] ); ?></span>
 								</p>
 							</p>
 						</div>
 						<?php endif; ?>
 						<div class="pdf-more-details" style="display:none;">
 							<?php if ( isset( $data['display_date'] ) ) : ?>
-							<div class="<?= esc_attr( $document->get_type() ); ?>-display-date">
+							<div class="<?php echo esc_attr( $document->get_type() ); ?>-display-date">
 								<p class="form-field form-field-wide">
 									<p>
-										<span><strong><?= wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
-										<span><?= esc_attr( $data['display_date']['value'] ); ?></span>
+										<span><strong><?php echo wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
+										<span><?php echo esc_attr( $data['display_date']['value'] ); ?></span>
 									</p>
 								</p>
 							</div>
 							<?php endif; ?>
 							<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
-							<div class="<?= esc_attr( $document->get_type() ); ?>-creation-status">
+							<div class="<?php echo esc_attr( $document->get_type() ); ?>-creation-status">
 								<p class="form-field form-field-wide">
 									<p>
-										<span><strong><?= wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
-										<span><?= esc_attr( $data['creation_trigger']['value'] ); ?></span>
+										<span><strong><?php echo wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
+										<span><?php echo esc_attr( $data['creation_trigger']['value'] ); ?></span>
 									</p>
 								</p>
 							</div>
@@ -864,8 +884,8 @@ class Admin {
 						</div>
 						<?php if ( isset( $data['display_date'] ) || isset( $data['creation_trigger'] ) ) : ?>
 							<div>
-								<a href="#" class="view-more"><?php _e( 'View more details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-								<a href="#" class="hide-details" style="display:none;"><?php _e( 'Hide details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="#" class="view-more"><?php esc_html_e( 'View more details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="#" class="hide-details" style="display:none;"><?php esc_html_e( 'Hide details', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							</div>
 						<?php endif; ?>
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
@@ -892,15 +912,15 @@ class Admin {
 				<!-- Editable -->
 				<div class="editable">
 					<?php if( isset( $data['number'] ) ) : ?>
-					<p class="form-field <?= esc_attr( $data['number']['name'] ); ?>_field">
-						<label for="<?= esc_attr( $data['number']['name'] ); ?>"><?= wp_kses_post( $data['number']['label'] ); ?></label>
-						<input type="text" class="short" style="" name="<?= esc_attr( $data['number']['name'] ); ?>" id="<?= esc_attr( $data['number']['name'] ); ?>" value="<?= esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?= esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+					<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
+						<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php echo wp_kses_post( $data['number']['label'] ); ?></label>
+						<input type="text" class="short" style="" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 					</p>
 					<?php endif; ?>
 					<?php if( isset( $data['date'] ) ) : ?>
 					<p class="form-field form-field-wide">
-						<label for="<?= esc_attr( $data['date']['name'] ); ?>[date]"><?= wp_kses_post( $data['date']['label'] ); ?></label>
-						<input type="text" class="date-picker-field" name="<?= esc_attr( $data['date']['name'] ); ?>[date]" id="<?= esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?= esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce' ); ?>" name="<?= esc_attr( $data['date']['name'] ); ?>[hour]" id="<?= esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?= esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce' ); ?>" name="<?= esc_attr( $data['date']['name'] ); ?>[minute]" id="<?= esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?= esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
+						<label for="<?php echo esc_attr( $data['date']['name'] ); ?>[date]"><?php echo wp_kses_post( $data['date']['label'] ); ?></label>
+						<input type="text" class="date-picker-field" name="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?php echo esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?php echo esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?php echo esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 					</p>
 					<?php endif; ?>
 				</div>
@@ -912,17 +932,17 @@ class Admin {
 
 				<!-- Read only -->
 				<div class="read-only">
-					<span><strong><?= wp_kses_post( $data['notes']['label'] ); ?></strong></span>
+					<span><strong><?php echo wp_kses_post( $data['notes']['label'] ); ?></strong></span>
 					<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
 						<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
 					<?php endif; ?>
-					<p><?= ( $data['notes']['value'] == strip_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
+					<p><?php echo ( $data['notes']['value'] == wp_strip_all_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
 				</div>
 				<!-- Editable -->
 				<div class="editable-notes">
 					<p class="form-field form-field-wide">
-						<label for="<?= esc_attr( $data['notes']['name'] ); ?>"><?= wp_kses_post( $data['notes']['label'] ); ?></label>
-						<p><textarea name="<?= esc_attr( $data['notes']['name'] ); ?>" class="<?= esc_attr( $data['notes']['name'] ); ?>" cols="60" rows="5" disabled="disabled"><?= wp_kses_post( $data['notes']['value'] ); ?></textarea></p>
+						<label for="<?php echo esc_attr( $data['notes']['name'] ); ?>"><?php echo wp_kses_post( $data['notes']['label'] ); ?></label>
+						<p><textarea name="<?php echo esc_attr( $data['notes']['name'] ); ?>" class="<?php echo esc_attr( $data['notes']['name'] ); ?>" cols="60" rows="5" disabled="disabled"><?php echo wp_kses_post( $data['notes']['value'] ); ?></textarea></p>
 					</p>
 				</div>
 
@@ -936,7 +956,7 @@ class Admin {
 			<!-- Save/Cancel buttons -->
 			<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
 				<div>
-					<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo wp_create_nonce( "wpo_wcpdf_save_document" ); ?>" data-action="save"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					<a class="button button-primary wpo-wcpdf-save-document" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wpo_wcpdf_save_document' ) ); ?>" data-action="save"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 					<a class="button wpo-wcpdf-cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 				</div>
 			</section>
@@ -948,7 +968,7 @@ class Admin {
 	public function add_regenerate_document_button( $document ) {
 		$document_settings = $document->get_settings( true );
 		if ( $document->use_historical_settings() == true || isset( $document_settings['archive_pdf'] ) ) {
-			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s" data-action="regenerate"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
+			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s" data-action="regenerate"></span>', esc_attr( wp_create_nonce( 'wpo_wcpdf_regenerate_document' ) ) );
 		}
 	}
 
@@ -1283,7 +1303,7 @@ class Admin {
 			$minute       = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
 
 			// clean & sanitize input
-			$date         = date( 'Y-m-d', strtotime( $date ) );
+			$date         = gmdate( 'Y-m-d', strtotime( $date ) );
 			$hour         = sprintf('%02d', intval( $hour ));
 			$minute       = sprintf('%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";

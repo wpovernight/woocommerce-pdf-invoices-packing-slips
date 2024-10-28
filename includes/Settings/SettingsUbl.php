@@ -46,12 +46,12 @@ class SettingsUbl {
 				<?php
 					foreach ( $this->sections as $section => $title ) {
 						$active = ( $section == $active_section ) ? 'nav-tab-active' : '';
-						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), $active, esc_html( $title ) );
+						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
 					}
 				?>
 			</h2>
 			<?php else : ?>
-			<h3><?php echo $this->sections[ $active_section ]; ?></h3>
+			<h3><?php echo esc_html( $this->sections[ $active_section ] ); ?></h3>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -154,7 +154,7 @@ class SettingsUbl {
 				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '">' . __( 'UBL settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 			);
 
-			echo '<div class="notice notice-warning"><p>' . $message . '</p></div>';
+			echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
 		}
 	}
 

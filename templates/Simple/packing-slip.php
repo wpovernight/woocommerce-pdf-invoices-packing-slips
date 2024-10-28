@@ -89,16 +89,16 @@
 		<tr>
 			<?php
 				foreach ( $headers as $column_class => $column_title ) {
-					printf( '<th class="%s"><span>%s</span></th>', $column_class, $column_title );
+					printf( '<th class="%s">%s</th>', esc_attr( $column_class ), esc_html( $column_title ) );
 				}
 			?>
 		</tr>
 	</thead>
 	<tbody>
 		<?php foreach ( $this->get_order_items() as $item_id => $item ) : ?>
-			<tr class="<?php echo apply_filters( 'wpo_wcpdf_item_row_class', 'item-' . $item_id, esc_attr( $this->get_type() ), $this->order, $item_id ); ?>">
+			<tr class="<?php echo esc_html( $item['row_class'] ); ?>">
 				<td class="product">
-					<p class="item-name"><?php echo $item['name']; ?></p>
+					<p class="item-name"><?php echo esc_html( $item['name'] ); ?></p>
 					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order ); ?>
 					<div class="item-meta">
 						<?php if ( ! empty( $item['sku'] ) ) : ?>
@@ -109,13 +109,13 @@
 						<?php endif; ?>
 						<!-- ul.wc-item-meta -->
 						<?php if ( ! empty( $item['meta'] ) ) : ?>
-							<?php echo $item['meta']; ?>
+							<?php echo wp_kses_post( $item['meta'] ); ?>
 						<?php endif; ?>
 						<!-- / ul.wc-item-meta -->
 					</div>
 					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order ); ?>
 				</td>
-				<td class="quantity"><?php echo $item['quantity']; ?></td>
+				<td class="quantity"><?php echo esc_html( $item['quantity'] ); ?></td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>

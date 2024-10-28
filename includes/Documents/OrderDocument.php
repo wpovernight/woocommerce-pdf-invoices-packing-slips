@@ -85,6 +85,18 @@ abstract class OrderDocument {
 	 * @var array
 	 */
 	public $output_formats = array();
+	
+	/**
+	 * Language attributes.
+	 * @var string
+	 */
+	public $language_attributes;
+	
+	/**
+	 * Body class.
+	 * @var string
+	 */
+	public $body_class;
 
 	/**
 	 * Linked documents, used for data retrieval
@@ -118,6 +130,12 @@ abstract class OrderDocument {
 		// output formats
 		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
 		$this->output_formats = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_output_formats", array( $this->output_formats, $this ), '3.8.7', 'wpo_wcpdf_document_output_formats' );
+		
+		// language attributes
+		$this->language_attributes = apply_filters( 'wpo_wcpdf_html_language_attributes', get_language_attributes(), $this->get_type(), $this );
+		
+		// body class
+		$this->body_class = apply_filters( 'wpo_wcpdf_body_class', $this->get_type(), $this );
 
 		// load data
 		if ( $this->order ) {
@@ -137,7 +155,7 @@ abstract class OrderDocument {
 
 	public function init_settings_data() {
 		// don't override/save settings on Preview requests
-		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
+		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] && wp_verify_nonce( $_REQUEST['security'], 'wpo_wcpdf_preview' ) ) {
 			return;
 		}
 
@@ -467,8 +485,17 @@ abstract class OrderDocument {
 		if ( $this->get_type() == 'credit-note' ) {
 			$refund_id = $order->get_id();
 			$parent_order = wc_get_order( $order->get_parent_id() );
-		} /*translators: 1. credit note title, 2. refund id */
-		$note = $refund_id ? sprintf( __( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ) );
+		}
+		$note = $refund_id ? sprintf(
+			/* translators: 1. credit note title, 2. refund id */
+			esc_html__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() ),
+			$refund_id
+		) : sprintf(
+			/* translators: document title */
+			esc_html__( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() )
+		);
 		$note = wp_kses( $note, 'strip' );
 		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
 
@@ -556,7 +583,7 @@ abstract class OrderDocument {
 	}
 
 	public function number( $document_type ) {
-		echo $this->get_number( $document_type, null, 'view', true );
+		echo esc_html( $this->get_number( $document_type, null, 'view', true ) );
 	}
 
 	public function get_date( $document_type = '', $order = null, $context = 'view', $formatted = false ) {
@@ -570,7 +597,7 @@ abstract class OrderDocument {
 	}
 
 	public function date( $document_type ) {
-		echo $this->get_date( $document_type, null, 'view', true );
+		echo esc_html( $this->get_date( $document_type, null, 'view', true ) );
 	}
 
 	public function get_notes( $document_type = '', $order = null, $context = 'view'  ) {
@@ -600,7 +627,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function title() {
-		echo $this->get_title();
+		echo esc_html( $this->get_title() );
 	}
 
 	/**
@@ -618,7 +645,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function number_title() {
-		echo $this->get_number_title();
+		echo esc_html( $this->get_number_title() );
 	}
 
 	/**
@@ -636,7 +663,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function date_title() {
-		echo $this->get_date_title();
+		echo esc_html( $this->get_date_title() );
 	}
 
 	/**
@@ -654,7 +681,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function due_date_title() {
-		echo $this->get_due_date_title();
+		echo esc_html( $this->get_due_date_title() );
 	}
 
 	/**
@@ -672,7 +699,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function billing_address_title(): void {
-		echo $this->get_billing_address_title();
+		echo esc_html( $this->get_billing_address_title() );
 	}
 
 	/**
@@ -690,7 +717,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shipping_address_title(): void {
-		echo $this->get_shipping_address_title();
+		echo esc_html( $this->get_shipping_address_title() );
 	}
 
 	/**
@@ -708,7 +735,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function order_number_title(): void {
-		echo $this->get_order_number_title();
+		echo esc_html( $this->get_order_number_title() );
 	}
 
 	/**
@@ -726,7 +753,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function order_date_title(): void {
-		echo $this->get_order_date_title();
+		echo esc_html( $this->get_order_date_title() );
 	}
 
 	/**
@@ -744,7 +771,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function payment_method_title(): void {
-		echo $this->get_payment_method_title();
+		echo esc_html( $this->get_payment_method_title() );
 	}
 
 	/**
@@ -762,7 +789,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function payment_date_title(): void {
-		echo $this->get_payment_date_title();
+		echo esc_html( $this->get_payment_date_title() );
 	}
 
 	/**
@@ -780,7 +807,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shipping_method_title(): void {
-		echo $this->get_shipping_method_title();
+		echo esc_html( $this->get_shipping_method_title() );
 	}
 
 	/**
@@ -798,7 +825,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function sku_title(): void {
-		echo $this->get_sku_title();
+		echo esc_html( $this->get_sku_title() );
 	}
 
 	/**
@@ -816,7 +843,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function weight_title(): void {
-		echo $this->get_weight_title();
+		echo esc_html( $this->get_weight_title() );
 	}
 
 	/**
@@ -834,7 +861,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function notes_title(): void {
-		echo $this->get_notes_title();
+		echo esc_html( $this->get_notes_title() );
 	}
 
 	/**
@@ -852,7 +879,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function customer_notes_title(): void {
-		echo $this->get_customer_notes_title();
+		echo esc_html( $this->get_customer_notes_title() );
 	}
 
 	/**
@@ -936,7 +963,8 @@ abstract class OrderDocument {
 	 */
 	public function due_date(): void {
 		$due_date_timestamp = $this->get_due_date();
-		echo apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
+		$due_date           = apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
+		echo esc_html( $due_date );
 	}
 
 	/*
@@ -1089,7 +1117,7 @@ abstract class OrderDocument {
 		$css = ob_get_clean();
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
 
-		echo $css;
+		echo esc_html( $css );
 	}
 
 	public function has_header_logo() {
@@ -1130,7 +1158,7 @@ abstract class OrderDocument {
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 			$src             = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
-			
+
 			if ( empty( $src ) ) {
 				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
@@ -1149,9 +1177,9 @@ abstract class OrderDocument {
 
 			$image_src   = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
 			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
-
-			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
-
+			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
+			
+			echo wp_kses_post( $img_element );
 		}
 	}
 
@@ -1196,7 +1224,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_name', $default, false );
 	}
 	public function shop_name() {
-		echo $this->get_shop_name();
+		echo esc_html( $this->get_shop_name() );
 	}
 
 	/**
@@ -1206,7 +1234,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'vat_number', '', false );
 	}
 	public function shop_vat_number() {
-		echo $this->get_shop_vat_number();
+		echo esc_html( $this->get_shop_vat_number() );
 	}
 
 	/**
@@ -1216,7 +1244,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'coc_number', '', false );
 	}
 	public function shop_coc_number() {
-		echo $this->get_shop_coc_number();
+		echo esc_html( $this->get_shop_coc_number() );
 	}
 
 	/**
@@ -1226,7 +1254,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_address' );
 	}
 	public function shop_address() {
-		echo $this->get_shop_address();
+		echo esc_html( $this->get_shop_address() );
 	}
 
 	/**
@@ -1240,7 +1268,7 @@ abstract class OrderDocument {
 		return ob_get_clean();
 	}
 	public function footer() {
-		echo $this->get_footer();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_footer() );
 	}
 
 	/**
@@ -1251,7 +1279,7 @@ abstract class OrderDocument {
 
 	}
 	public function extra_1() {
-		echo $this->get_extra_1();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_1() );
 	}
 
 	/**
@@ -1261,7 +1289,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_2' );
 	}
 	public function extra_2() {
-		echo $this->get_extra_2();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_2() );
 	}
 
 	/**
@@ -1271,7 +1299,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_3' );
 	}
 	public function extra_3() {
-		echo $this->get_extra_3();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_3() );
 	}
 
 	/*
@@ -1285,9 +1313,12 @@ abstract class OrderDocument {
 		WPO_WCPDF()->main->maybe_reinstall_fonts();
 
 		$pdf = null;
+		
 		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
-			$pdf = file_get_contents( $pdf_file );
+			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+			$pdf = $wp_filesystem->get_contents( $pdf_file );
 		}
+		
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
 		if ( !empty( $pdf ) ) {
 			return $pdf;
@@ -1417,10 +1448,16 @@ abstract class OrderDocument {
 
 		wcpdf_ubl_headers( $quoted, $size );
 
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+
 		ob_clean();
 		flush();
-		@readfile( $full_filename );
-		@unlink( $full_filename );
+		
+		if ( $wp_filesystem->exists( $full_filename ) ) {
+			echo esc_xml( $wp_filesystem->get_contents( $full_filename ) );
+		}
+		
+		wp_delete_file( $full_filename );
 
 		exit();
 	}
@@ -1447,7 +1484,7 @@ abstract class OrderDocument {
 		if ( $order_count == 1 ) {
 			$suffix = $number;
 		} else {
-			$suffix = date('Y-m-d'); // 2020-11-11
+			$suffix = gmdate('Y-m-d'); // 2020-11-11
 		}
 
 		// get filename

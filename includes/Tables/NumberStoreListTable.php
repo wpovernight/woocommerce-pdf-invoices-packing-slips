@@ -218,12 +218,10 @@ class NumberStoreListTable extends \WP_List_Table {
 
 		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order}", $search, $search );
+				$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order}", $search, $search ) );
 			} else {
-				$query = "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order}";
+				$results = $wpdb->get_results( "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order}" );
 			}
-
-			$results = $wpdb->get_results( $query );
 		}
 
 		// add document title or 'Deleted'

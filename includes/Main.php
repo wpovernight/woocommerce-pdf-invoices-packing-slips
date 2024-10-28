@@ -212,16 +212,18 @@ class Main {
 	}
 
 	public function get_document_pdf_attachment( $document, $tmp_path ) {
-		$filename  = $document->get_filename();
-		$pdf_path  = $tmp_path . $filename;
-		$lock_file = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
-
-		// if this file already exists in the temp path, we'll reuse it if it's not older than 60 seconds
-		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
-		if ( file_exists( $pdf_path ) && $max_reuse_age > 0 ) {
-			// get last modification date
-			if ( $filemtime = filemtime( $pdf_path ) ) {
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+		$filename      = $document->get_filename();
+		$pdf_path      = $tmp_path . $filename;
+		$lock_file     = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
+		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 ); // if this file already exists in the temp path, we'll reuse it if it's not older than 60 seconds
+		
+		if ( $wp_filesystem->exists( $pdf_path ) && $max_reuse_age > 0 ) {
+			$filemtime = filemtime( $pdf_path ); // get last modification date
+			
+			if ( $filemtime ) {
 				$time_difference = time() - $filemtime;
+				
 				if ( $time_difference < $max_reuse_age ) {
 					// check if file is still being written to
 					if ( $lock_file && $this->wait_for_file_lock( $pdf_path ) === false ) {
@@ -238,9 +240,9 @@ class Main {
 		$pdf_data = $document->get_pdf();
 
 		if ( $lock_file ) {
-			file_put_contents ( $pdf_path, $pdf_data, LOCK_EX );
+			$wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE | LOCK_EX );
 		} else {
-			file_put_contents ( $pdf_path, $pdf_data );
+			$wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
 		}
 
 		// wait for file lock
@@ -267,33 +269,37 @@ class Main {
 		return $full_filename;
 	}
 
-	public function file_is_locked( $fp ) {
-		if (!flock($fp, LOCK_EX|LOCK_NB, $wouldblock)) {
-			if ($wouldblock) {
-				return true; // file is locked
-			} else {
-				return true; // can't lock for whatever reason (could be locked in Windows + PHP5.3)
-			}
-		} else {
-			flock($fp,LOCK_UN); // release lock
-			return false; // not locked
+	public function file_is_locked( $path ) {
+		// Attempt to write a temporary lock file
+		$lock_test_path = $path . '.lock_test';
+		$is_locked      = false;
+		$wp_filesystem  = wpo_wcpdf_get_wp_filesystem();
+	
+		if ( ! $wp_filesystem->put_contents( $lock_test_path, 'test', FS_CHMOD_FILE | LOCK_EX ) ) {
+			$is_locked = true; // Could not write lock file, likely locked
 		}
+	
+		// Clean up the temporary lock file, regardless of lock status
+		$wp_filesystem->delete( $lock_test_path );
+	
+		return $is_locked;
 	}
-
+	
 	public function wait_for_file_lock( $path ) {
-		$fp = fopen($path, 'r+');
-		if ( $locked = $this->file_is_locked( $fp ) ) {
-			// optional delay (ms) to double check if the write process is finished
+		$locked = $this->file_is_locked( $path );
+	
+		if ( $locked ) {
+			// Optional delay (ms) to double-check if the write process is finished
 			$delay = intval( apply_filters( 'wpo_wcpdf_attachment_locked_file_delay', 250 ) );
+			
 			if ( $delay > 0 ) {
 				usleep( $delay * 1000 );
-				$locked = $this->file_is_locked( $fp );
+				$locked = $this->file_is_locked( $path );
 			}
 		}
-		fclose($fp);
-
+	
 		return $locked;
-	}
+	}		
 
 	public function get_documents_for_email( $email_id, $order ) {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
@@ -349,12 +355,14 @@ class Main {
 		if ( empty( $_REQUEST['access_key'] ) ) {
 			foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
 				if ( ! empty( $_REQUEST[ $legacy_key ] ) ) {
-					$_REQUEST['access_key'] = sanitize_text_field( $_REQUEST[ $legacy_key ] );
+					$_REQUEST['access_key'] = sanitize_text_field( wp_unslash( $_REQUEST[ $legacy_key ] ) );
 				}
 			}
 		}
 
-		$valid_nonce = ! empty( $_REQUEST['access_key'] ) && ! empty( $_REQUEST['action'] ) && wp_verify_nonce( $_REQUEST['access_key'], $_REQUEST['action'] );
+		$access_key  = isset( $_REQUEST['access_key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['access_key'] ) ) : '';
+		$action      = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+		$valid_nonce = ! empty( $access_key ) && ! empty( $action ) && wp_verify_nonce( $access_key, $action );
 
 		// check if we have the access key set
 		if ( empty( $_REQUEST['access_key'] ) ) {
@@ -376,7 +384,7 @@ class Main {
 
 		// Check if all parameters are set
 		if ( empty( $_REQUEST['document_type'] ) && ! empty( $_REQUEST['template_type'] ) ) {
-			$_REQUEST['document_type'] = $_REQUEST['template_type'];
+			$_REQUEST['document_type'] = sanitize_text_field( wp_unslash( $_REQUEST['template_type'] ) );
 		}
 
 		if ( empty( $_REQUEST['order_ids'] ) ) {
@@ -394,8 +402,8 @@ class Main {
 			$this->enable_debug();
 		}
 
-		$document_type = sanitize_text_field( $_REQUEST['document_type'] );
-		$order_ids     = (array) array_map( 'absint', explode( 'x', $_REQUEST['order_ids'] ) );
+		$document_type = sanitize_text_field( wp_unslash( $_REQUEST['document_type'] ) );
+		$order_ids     = isset( $_REQUEST['order_ids'] ) ? array_map( 'absint', explode( 'x', sanitize_text_field( wp_unslash( $_REQUEST['order_ids'] ) ) ) ) : array();
 		$order         = false;
 
 		// single order
@@ -466,7 +474,7 @@ class Main {
 				break;
 			case 'full':
 				// check if we have a valid access key only when it's not from bulk actions
-				if ( ! isset( $_REQUEST['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
+				if ( ! isset( $_REQUEST['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), wp_unslash( $_REQUEST['access_key'] ) ) ) {
 					$allowed = false;
 					break;
 				}
@@ -572,7 +580,7 @@ class Main {
 	/**
 	 * Return tmp path for different plugin processes
 	 */
-	public function get_tmp_path ( $type = '' ) {
+	public function get_tmp_path( $type = '' ) {
 		$tmp_base = $this->get_tmp_base();
 
 		// don't continue if we don't have an upload dir
@@ -607,10 +615,12 @@ class Main {
 				$tmp_path = $tmp_base . $type;
 				break;
 		}
-
+		
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+		
 		// double check for existence, in case tmp_base was installed, but subfolder not created
-		if ( ! is_dir( $tmp_path ) ) {
-			$dir = mkdir( $tmp_path );
+		if ( ! $wp_filesystem->is_dir( $tmp_path ) ) {
+			$dir = $wp_filesystem->mkdir( $tmp_path );
 
 			if ( ! $dir ) {
 				update_option( 'wpo_wcpdf_no_dir_error', $tmp_path );
@@ -739,7 +749,7 @@ class Main {
 				$exclude_files = array( 'index.php', '.htaccess' );
 				foreach ( $files as $file ) {
 					if ( is_file( $file ) && ! in_array( basename( $file ), $exclude_files ) ) {
-						unlink( $file );
+						wp_delete_file( $file );
 					}
 				}
 			} else {
@@ -761,7 +771,7 @@ class Main {
 		if ( function_exists( 'random_bytes' ) ) { // PHP7+
 			$code = bin2hex(random_bytes(16));
 		} else {
-			$code = md5(uniqid(rand(), true));
+			$code = md5(uniqid(wp_rand(), true));
 		}
 		// create option
 		update_option( 'wpo_wcpdf_random_string', $code );
@@ -782,18 +792,18 @@ class Main {
 	/**
 	 * Install/create plugin tmp folders
 	 */
-	public function init_tmp () {
+	public function init_tmp() {
 		// generate random string if don't exist
 		if( ! $this->get_random_string() ) {
 			$this->generate_random_string();
 		}
-
-		// get tmp base
-		$tmp_base = $this->get_tmp_base();
+		
+		$tmp_base      = $this->get_tmp_base(); // get tmp base
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
 
 		// create plugin base temp folder
-		if ( ! is_dir( $tmp_base ) ) {
-			$dir = mkdir( $tmp_base );
+		if ( ! $wp_filesystem->is_dir( $tmp_base ) ) {
+			$dir = $wp_filesystem->mkdir( $tmp_base );
 
 			// don't continue if we don't have an upload dir
 			if ( ! $dir ) {
@@ -810,8 +820,8 @@ class Main {
 		// create subfolders & protect
 		foreach ( $this->subfolders as $subfolder ) {
 			$path = $tmp_base . $subfolder . '/';
-			if ( ! is_dir( $path ) ) {
-				$dir = mkdir( $path );
+			if ( ! $wp_filesystem->is_dir( $path ) ) {
+				$dir = $wp_filesystem->mkdir( $path );
 
 				// check if we have dir
 				if ( ! $dir ) {
@@ -831,8 +841,8 @@ class Main {
 			}
 
 			// create .htaccess file and empty index.php to protect in case an open webfolder is used!
-			file_put_contents( $path . '.htaccess', 'deny from all' );
-			touch( $path . 'index.php' );
+			$wp_filesystem->put_contents( $path . '.htaccess', 'deny from all', FS_CHMOD_FILE );
+			$wp_filesystem->put_contents( $path . 'index.php', '', FS_CHMOD_FILE );
 		}
 	}
 
@@ -847,8 +857,16 @@ class Main {
 					ob_start();
 					?>
 					<div class="error">
-					<?php /* translators: 1. plugin name, 2. directory path */ ?>
-						<p><?php printf( esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>PDF Invoices & Packing Slips for WooCommerce</strong>' ,'<code>' . $path . '</code>' ); ?></p>
+						<p>
+							<?php
+								printf(
+									/* translators: 1. plugin name, 2. directory path */
+									esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ),
+									'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+									'<code>' . esc_url_raw( $path ) . '</code>'
+								);
+							?>
+						</p>
 						<p><?php esc_html_e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 						<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ), 'hide_no_dir_notice_nonce' ) ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 					</div>
@@ -858,7 +876,7 @@ class Main {
 					// save option to hide notice
 					if ( isset( $_REQUEST['wpo_wcpdf_hide_no_dir_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 						// validate nonce
-						if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_no_dir_notice_nonce' ) ) {
+						if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_no_dir_notice_nonce' ) ) {
 							wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_no_dir_notice' );
 							wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 							exit;
@@ -885,8 +903,10 @@ class Main {
 			return;
 		}
 
-		if ( ! is_dir( $new_path ) ) {
-			$dir = mkdir( $new_path );
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+
+		if ( ! $wp_filesystem->is_dir( $new_path ) ) {
+			$dir = $wp_filesystem->mkdir( $new_path );
 
 			// check if we have dir
 			if ( ! $dir ) {
@@ -898,17 +918,6 @@ class Main {
 			update_option( 'wpo_wcpdf_no_dir_error', $new_path );
 			wcpdf_log_error( "Temp folder {$new_path} not writable", 'critical' );
 			return false;
-		}
-
-		global $wp_filesystem;
-
-		if ( ! function_exists( 'WP_Filesystem' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		}
-
-		if ( ! WP_Filesystem() ) {
-			wcpdf_log_error( "WP_Filesystem couldn't be initiated! Unable to copy directory contents.", 'critical' );
-			return;
 		}
 
 		// we have the directories, let's try to copy
@@ -1176,7 +1185,7 @@ class Main {
 
 					// delete file
 					if ( $file_timestamp < $delete_before ) {
-						if ( unlink( $file ) ) {
+						if ( wp_delete_file( $file ) ) {
 							$success++;
 						} else {
 							$error++;
@@ -1224,7 +1233,7 @@ class Main {
 		foreach ( $number_stores as $store_name ) {
 			$order_id = $order->get_id();
 			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
-			$wpdb->query( $wpdb->prepare( "UPDATE $table_name SET order_id = 0 WHERE order_id = %s", $order_id ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE " . esc_sql( $table_name ) . " SET order_id = 0 WHERE order_id = %s", $order_id ) );
 		}
 	}
 
@@ -1350,11 +1359,11 @@ class Main {
 				continue;
 			}
 			if ( is_callable( array( $order, 'add_order_note' ) ) ) { // order
-				$order->add_order_note( strip_tags( $note ) );
+				$order->add_order_note( wp_strip_all_tags( $note ) );
 			} elseif ( $document->is_refund( $order ) ) {            // refund order
 				$parent_order = $document->get_refund_parent( $order );
 				if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'add_order_note' ) ) ) {
-					$parent_order->add_order_note( strip_tags( $note ) );
+					$parent_order->add_order_note( wp_strip_all_tags( $note ) );
 				}
 			}
 		}
@@ -1371,12 +1380,10 @@ class Main {
 	public function log_document_creation_trigger_to_order_meta( $document, $trigger, $force = false ) {
 		if ( $trigger == 'bulk' && property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
 			$order_ids = $document->order_ids;
-		} elseif ( ! is_null( $document->order ) && is_callable( [ $document->order, 'get_id' ] ) ) {
-			$order_ids = [ $document->order->get_id() ];
-		} elseif ( isset( $_REQUEST['order_id'] ) ) {
-			$order_ids = [ absint( $_REQUEST['order_id'] ) ];
+		} elseif ( ! is_null( $document->order ) && is_callable( array( $document->order, 'get_id' ) ) ) {
+			$order_ids = array( $document->order->get_id() );
 		} else {
-			$order_ids = [];
+			$order_ids = array();
 		}
 
 		if ( ! empty( $order_ids ) ) {
@@ -1496,8 +1503,14 @@ class Main {
 		}
 
 		if ( $error > 0 ) {
-			/* translators: 1. document type, 2. mark/unmark */
-			wp_die( sprintf( esc_html__( 'Document of type %1$s for the selected order could not be %2$s as printed.', 'woocommerce-pdf-invoices-packing-slips' ), esc_attr( $data['document_type'] ), $event_type ) );
+			wp_die(
+				sprintf(
+					/* translators: 1. document type, 2. mark/unmark */
+					esc_html__( 'Document of type %1$s for the selected order could not be %2$s as printed.', 'woocommerce-pdf-invoices-packing-slips' ),
+					esc_attr( $data['document_type'] ),
+					esc_html( $event_type )
+				)
+			);
 		}
 	}
 
@@ -1563,12 +1576,28 @@ class Main {
 	}
 
 	/**
-	 * Enable PHP error output for administrators.
+	 * Enable error logging for administrators.
 	 */
 	public function enable_debug() {
 		if ( \WPO_WCPDF()->settings->user_can_manage_settings() ) {
-			error_reporting( E_ALL );
-			ini_set( 'display_errors', 1 );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// Log errors to debug.log file
+				if ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+					// Errors are already being logged; no action needed
+				} else {
+					// Enable logging to wp-content/debug.log
+					define( 'WP_DEBUG_LOG', true );
+				}
+			} else {
+				// Enable WP_DEBUG and WP_DEBUG_LOG
+				define( 'WP_DEBUG', true );
+				define( 'WP_DEBUG_LOG', true );
+			}
+
+			// Ensure errors are not displayed on the screen
+			if ( ! defined( 'WP_DEBUG_DISPLAY' ) ) {
+				define( 'WP_DEBUG_DISPLAY', false );
+			}
 		}
 	}
 
@@ -1662,10 +1691,10 @@ class Main {
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">
-				<th>', $due_date_title, '</th>
-				<td>', $due_date, '</td>
+				<th>', esc_html( $due_date_title ), '</th>
+				<td>', esc_html( $due_date ), '</td>
 			</tr>';
-		}
+		}			
 	}
 }
 

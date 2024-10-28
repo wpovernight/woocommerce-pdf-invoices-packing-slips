@@ -59,7 +59,7 @@ class SettingsDocuments {
 				<?php
 				foreach ( $documents as $document ) {
 					if( $document->get_type() != $section ) {
-						$title = strip_tags( $document->get_title() );
+						$title = wp_strip_all_tags( $document->get_title() );
 						if ( empty( trim( $title ) ) ) {
 							$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
 						}
@@ -86,7 +86,7 @@ class SettingsDocuments {
 								if ( 'ubl' === $document_output_format ) {
 									$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
 								}
-								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), $active, $tab_title );
+								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), esc_attr( $active ), wp_kses_post( $tab_title ) );
 							}
 						?>
 					</h2>

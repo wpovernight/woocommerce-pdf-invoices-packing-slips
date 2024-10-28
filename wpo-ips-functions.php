@@ -325,10 +325,9 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 		do_action( 'deprecated_function_run', $function, $replacement, $version );
 		$log_string  = "The {$function} function is deprecated since version {$version}.";
 		$log_string .= $replacement ? " Replace with {$replacement}." : '';
-		error_log( $log_string );
 		wcpdf_log_error( $log_string, 'warning' );
 	} else {
-		_deprecated_function( $function, $version, $replacement );
+		_deprecated_function( esc_html( $function ), esc_html( $version ), esc_html( $replacement ) );
 	}
 }
 
@@ -358,7 +357,7 @@ function wcpdf_log_error( $message, $level = 'error', $e = null ) {
 		// emergency - 'System is unusable'.
 		$logger->log( $level, $message, $context );
 	} else {
-		error_log( "WCPDF error ({$level}): {$message}" );
+		wcpdf_log_error( "WCPDF error ({$level}): {$message}", 'warning' );
 	}
 }
 
@@ -397,7 +396,7 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
 
 	switch ( $handling_type ) {
 		case 'exception':
-			throw new \Exception( $message );
+			throw new \Exception( esc_html( $message ) );
 			break;
 		case 'output':
 			wcpdf_output_error( $message, $log_level );
@@ -677,7 +676,7 @@ function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
 		wp_safe_redirect( $url );
 		exit;
 	} else {
-		wp_die( $message );
+		wp_die( esc_html( $message ) );
 	}
 }
 
@@ -789,10 +788,12 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 	// Fetch the actual image data if MIME type is still unknown (remote files)
 	if ( empty( $mime_type ) && filter_var( $src, FILTER_VALIDATE_URL ) ) {
-		$image_data = @file_get_contents( $src );
+		$response = wp_remote_get( $src );
 
-		if ( $image_data ) {
-			if ( function_exists( 'finfo_open' ) ) {
+		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+			$image_data = wp_remote_retrieve_body( $response );
+
+			if ( $image_data && function_exists( 'finfo_open' ) ) {
 				$finfo = finfo_open( FILEINFO_MIME_TYPE );
 
 				if ( $finfo ) {
@@ -853,8 +854,14 @@ function wpo_wcpdf_base64_encode_file( string $src ) {
 		return false;
 	}
 
-	$file_data = @file_get_contents( $src );
-	return base64_encode( $file_data ) ?? false;
+	$file_data = false;
+	$response  = wp_remote_get( $src );
+
+	if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+		$file_data = wp_remote_retrieve_body( $response );
+	}
+
+	return $file_data ? base64_encode( $file_data ) : false;
 }
 
 /**
@@ -870,7 +877,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
-		$parsed_url = parse_url( $path );
+		$parsed_url = wp_parse_url( $path );
 		$args	    = array();
 
 		// Check if the URL is localhost
@@ -898,17 +905,18 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 
 	// Local path file check
 	} else {
-		if ( @is_readable( $path ) ) {
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+
+		if ( $wp_filesystem->is_readable( $path ) ) {
 			return true;
 		} else {
-			// Fallback to fopen if first check fails
-			$handle = @fopen( $path, 'r' );
-
-			if ( $handle ) {
-				fclose( $handle );
+			// Fallback to checking file readability by attempting to open it
+			$file_contents = $wp_filesystem->get_contents( $path );
+	
+			if ( $file_contents ) {
 				return true;
 			} else {
-				wcpdf_log_error( 'Failed to open local file with both methods: ' . $path, 'critical' );
+				wcpdf_log_error( 'Failed to open local file with WP_Filesystem methods: ' . $path, 'critical' );
 				return false;
 			}
 		}
@@ -988,4 +996,20 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
 	}
 	
 	return apply_filters( 'wpo_wcpdf_simple_template_default_table_headers', $headers, $document );
+}
+
+/**
+ * Get the WP_Filesystem instance
+ *
+ * @return WP_Filesystem
+ */
+function wpo_wcpdf_get_wp_filesystem() {
+	global $wp_filesystem;
+
+	if ( empty( $wp_filesystem ) ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		WP_Filesystem();
+	}
+
+	return $wp_filesystem;
 }

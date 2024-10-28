@@ -39,7 +39,7 @@ class SettingsDebug {
 				<?php
 					foreach ( $sections as $section => $title ) {
 						$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
-						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), $active, esc_html( $title ) );
+						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
 					}
 				?>
 			</h2>
@@ -103,6 +103,10 @@ class SettingsDebug {
 
 		$list_table = new NumberStoreListTable();
 		$list_table->prepare_items();
+		
+		$list_table_name = $_GET['table_name'];
+		$search_value    = isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : '';
+		$disable_reset   = empty( $search_value ) ? 'disabled' : '';
 
 		include( WPO_WCPDF()->plugin_path() . '/views/advanced-numbers.php' );
 	}
@@ -334,7 +338,7 @@ class SettingsDebug {
 			}
 		}
 
-		$filename = apply_filters( 'wpo_wcpdf_export_settings_filename', sprintf( "{$type}-settings-export_%s.json", date( 'Y-m-d_H-i-s' ) ), $type );
+		$filename = apply_filters( 'wpo_wcpdf_export_settings_filename', sprintf( "{$type}-settings-export_%s.json", gmdate( 'Y-m-d_H-i-s' ) ), $type );
 
 		wp_send_json_success( compact( 'filename', 'settings' ) );
 	}
@@ -345,8 +349,10 @@ class SettingsDebug {
 		$file_data = [];
 
 		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
-			$json_data = file_get_contents( $_FILES['file']['tmp_name'], $_FILES['file']['name'] );
-			if ( false === $json_data ) {
+			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+			$json_data     = $wp_filesystem->get_contents( $_FILES['file']['tmp_name'] );
+			
+			if ( ! $json_data ) {
 				$message = __( 'Failed to get contents from JSON file!', 'woocommerce-pdf-invoices-packing-slips' );
 				wcpdf_log_error( $message );
 				wp_send_json_error( compact( 'message' ) );
@@ -909,16 +915,16 @@ class SettingsDebug {
 		?>
 		<table id="document-link-access-type">
 			<tr>
-				<td class="option"><strong><?php _e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php _e( "Document can be accessed by logged in users only.", 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td class="option"><strong><?php esc_html_e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php esc_html_e( "Document can be accessed by logged in users only.", 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
-				<td class="option"><strong><?php _e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php _e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td class="option"><strong><?php esc_html_e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php esc_html_e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
-				<td class="option"><strong><?php _e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php _e( 'Document can be accessed by everyone with the link.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td class="option"><strong><?php esc_html_e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php esc_html_e( 'Document can be accessed by everyone with the link.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 		</table>
 		<?php
