@@ -76,7 +76,6 @@ class ThirdPartyPlugins {
 		// Handle invoice creation trigger.
 		add_filter( 'wpo_wcsre_after_status_options', array( $this, 'add_invoice_creation_trigger' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'schedule_payment_reminder_email_on_invoice_creation' ), 10, 2 );
-		add_filter( 'wpo_wcsre_order_status_trigger_condition', array( $this, 'modify_status_trigger_condition' ), 10, 6 );
 	}
 
 	/**
@@ -449,13 +448,16 @@ class ThirdPartyPlugins {
 	 * @return void
 	 */
 	private function register_payment_reminder_email_templates(): void {
+		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
+		$due_date_days    = $invoice_settings['due_date_days'] ?? 14; // Default to two weeks.
+
 		// Register payment reminder email for admin.
 		$admin_content      = sprintf(
 			/* translators: Order number */
 			__( 'This is to inform you that the payment for Order #%s is still pending beyond the due date.' ), '{order_number}'
 		);
 		$admin_content      = apply_filters( 'wpo_wcpdf_payment_reminder_admin_email_content', $admin_content );
-		$admin_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_admin_email_trigger_days', array( 90 ) );
+		$admin_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_admin_email_trigger_days', array( $due_date_days + 7 ) ); // Default to one week after the due date.
 		$this->register_payment_reminder_email_template( $admin_content, true, $admin_trigger_days );
 
 		// Register payment reminder email for customer.
@@ -469,7 +471,7 @@ class ThirdPartyPlugins {
 			'</a>'
 		);
 		$customer_content      = apply_filters( 'wpo_wcpdf_payment_reminder_customer_email_content', $customer_content );
-		$customer_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_customer_email_trigger_days', array( 30, 60 ) );
+		$customer_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_customer_email_trigger_days', array( $due_date_days - 2, $due_date_days + 7 ) ); // Default to two days before and seven days after the due date.
 		$this->register_payment_reminder_email_template( $customer_content, false, $customer_trigger_days );
 	}
 
@@ -539,7 +541,7 @@ class ThirdPartyPlugins {
 					'title'                  => sprintf( __( '%d Days Reminder', '' ), $days ),
 					'after_status_count'     => (string) $days,
 					'after_status_time_unit' => 'days',
-					'after_status'           => 'wc-invoice-creation'
+					'after_status'           => 'invoice-creation'
 				),
 				'restrictions' => array(
 					'status' => array( 'wc-on-hold' ),
@@ -558,7 +560,7 @@ class ThirdPartyPlugins {
 	 * @return mixed
 	 */
 	function add_invoice_creation_trigger( $after_status_options ) {
-		$after_status_options['wc-invoice-creation'] = __( 'Invoice creation', 'woocommerce-pdf-invoices-packing-slips' );
+		$after_status_options['invoice-creation'] = __( 'Invoice creation', 'woocommerce-pdf-invoices-packing-slips' );
 
 		return $after_status_options;
 	}
@@ -573,38 +575,9 @@ class ThirdPartyPlugins {
 	 */
 	function schedule_payment_reminder_email_on_invoice_creation( object $document, \WC_Abstract_Order $order ) {
 		if ( $this->is_smart_reminder_email_supported() ) {
-			WPO_WCSRE()->functions->check_email_schedule( $order, $order->get_status(), 'wc-invoice-creation' );
+			$order_status = $order->get_status();
+			WPO_WCSRE()->functions->check_email_schedule( $order, $order_status, $order_status, 'invoice-creation' );
 		}
-
-	}
-
-	/**
-	 * Modify the status trigger condition to use the order status
-	 * instead of the 'wc-invoice-creation' custom status sent to the function.
-	 *
-	 * @param bool $order_status_condition
-	 * @param \WPO_WCSRE_Email $email
-	 * @param \WC_Abstract_Order $order
-	 * @param string $old_status
-	 * @param string $new_status
-	 * @param array $trigger
-	 *
-	 * @return bool
-	 */
-	public function modify_status_trigger_condition( bool $order_status_condition, \WPO_WCSRE_Email $email, \WC_Abstract_Order $order, string $old_status, string $new_status, array $trigger ): bool {
-		if ( 'wc-invoice-creation' !== $new_status ) {
-			return $order_status_condition;
-		}
-
-		$trigger_order_statuses = isset( $trigger['restrictions']['status'] ) ? (array) $trigger['restrictions']['status'] : array();
-		$order_status           = $order->get_status();
-		$order_status           = 'wc-' === substr( $order_status, 0, 3 ) ? $order_status : 'wc-' . $order_status;
-
-		if ( in_array( $order_status, $trigger_order_statuses, true ) ) {
-			return true;
-		}
-
-		return $order_status_condition;
 	}
 
 }
