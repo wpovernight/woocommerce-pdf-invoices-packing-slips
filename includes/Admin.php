@@ -319,8 +319,8 @@ class Admin {
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
 					esc_attr( $data['img'] ),
-					str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_svg_tags ) ),
-					str_replace( 'viewbox=', 'viewBox=', wp_kses( $printed, $allowed_svg_tags ) )
+					! empty( $exists ) ? str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_svg_tags ) ) : '',
+					! empty( $printed ) ? str_replace( 'viewbox=', 'viewBox=', wp_kses( $printed, $allowed_svg_tags ) ) : ''
 				);
 			}
 		}
@@ -663,9 +663,9 @@ class Admin {
 					esc_attr( $class ),
 					esc_attr( $alt ),
 					esc_html( $title ),
-					str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_tags ) ),
+					! empty( $exists ) ? str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_tags ) ) : '',
 					wp_kses( $manually_mark_printed, $allowed_tags ),
-					str_replace( 'viewbox=', 'viewBox=', wp_kses( $printed_data, $allowed_tags ) )
+					! empty( $printed_data ) ? str_replace( 'viewbox=', 'viewBox=', wp_kses( $printed_data, $allowed_tags ) ) : ''
 				);
 			}
 			?>
@@ -746,7 +746,7 @@ class Admin {
 							esc_attr( $class ),
 							esc_attr( $alt ),
 							esc_html( $title ),
-							str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_svg_tags ) )
+							! empty( $exists ) ? str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_svg_tags ) ) : ''
 						);
 
 						$ubl_documents++;

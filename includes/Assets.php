@@ -87,7 +87,7 @@ class Assets {
 
 		// only load on our own settings page
 		// maybe find a way to refer directly to WPO\IPS\Settings::$options_page_hook ?
-		if ( false !== strpos( $hook, 'wpo_wcpdf_options_page' ) ) {
+		if ( ! empty( $hook ) && false !== strpos( $hook, 'wpo_wcpdf_options_page' ) ) {
 			$tab = filter_input( INPUT_GET, 'tab', FILTER_DEFAULT );
 			$tab = sanitize_text_field( $tab );
 			
