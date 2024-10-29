@@ -136,7 +136,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$billing_email = $parent_order->get_billing_email();
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_email', $billing_email, $this );
+		return apply_filters( 'wpo_wcpdf_billing_email', sanitize_email( $billing_email ), $this );
 	}
 	public function billing_email() {
 		echo esc_html( $this->get_billing_email() );
