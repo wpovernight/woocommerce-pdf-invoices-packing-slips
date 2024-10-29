@@ -1456,7 +1456,7 @@ abstract class OrderDocument {
 		flush();
 		
 		if ( $wp_filesystem->exists( $full_filename ) ) {
-			echo esc_xml( $wp_filesystem->get_contents( $full_filename ) );
+			echo $wp_filesystem->get_contents( $full_filename );
 		}
 		
 		wp_delete_file( $full_filename );
