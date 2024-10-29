@@ -158,8 +158,15 @@ class Settings {
 		global $wpdb;
 		$row = $wpdb->get_row( "SHOW VARIABLES LIKE 'auto_increment_increment'" );
 		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
-			/* translators: database row value */
-			$error = wp_kses_post( sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %d, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Advanced tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), intval( $row->Value ) ) );
+			$error = wp_kses_post(
+				sprintf(
+					/* translators: 1: Warning!, 2: AUTO_INCREMENT, 3. step size value */
+					__( '%1$s Your database has an %2$s step size of %2$d, your invoice numbers may not be sequential. Enable the "Calculate document numbers (slow)" setting in the Advanced tab to use an alternate method.' , 'woocommerce-pdf-invoices-packing-slips' ),
+					'<strong>' . __( 'Warning!', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>',
+					'<code>AUTO_INCREMENT</code>',
+					intval( $row->Value )
+				)
+			);
 			printf( '<div class="error"><p>%s</p></div>', wp_kses_post( $error ) );
 		}
 	}
