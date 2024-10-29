@@ -28,7 +28,7 @@ class SettingsGeneral {
 
 	public function output( $section, $nonce ) {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
-			wp_die( 'Security check' );
+			return;
 		}
 		
 		settings_fields( $this->option_name );

@@ -31,7 +31,7 @@ class SettingsDebug {
 
 	public function output( $active_section, $nonce ) {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
-			wp_die( 'Security check' );
+			return;
 		}
 		
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
@@ -88,7 +88,7 @@ class SettingsDebug {
 
 	public function display_numbers( $nonce ) {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
-			wp_die( 'Security check' );
+			return;
 		}
 		
 		global $wpdb;

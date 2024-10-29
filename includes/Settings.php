@@ -728,7 +728,7 @@ class Settings {
 
 	public function maybe_migrate_template_paths( $settings_section = null, $nonce = null ) {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
-			wp_die( 'Security check' );
+			return;
 		}
 		
 		// bail if no template is selected yet (fresh install)
