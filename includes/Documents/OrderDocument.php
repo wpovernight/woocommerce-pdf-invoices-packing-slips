@@ -132,10 +132,12 @@ abstract class OrderDocument {
 		$this->output_formats = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_output_formats", array( $this->output_formats, $this ), '3.8.7', 'wpo_wcpdf_document_output_formats' );
 		
 		// language attributes
-		$this->language_attributes = apply_filters( 'wpo_wcpdf_html_language_attributes', get_language_attributes(), $this->get_type(), $this );
+		$this->language_attributes = apply_filters( 'wpo_wcpdf_document_language_attributes', get_language_attributes(), $this );
+		$this->language_attributes = apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $this->language_attributes, $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
 		
 		// body class
-		$this->body_class = apply_filters( 'wpo_wcpdf_body_class', $this->get_type(), $this );
+		$this->body_class = apply_filters( 'wpo_wcpdf_document_body_class', $this->get_type(), $this );
+		$this->body_class = apply_filters_deprecated( 'wpo_wcpdf_body_class', array( $this->body_class, $this ), '3.9.1', 'wpo_wcpdf_document_body_class' );
 
 		// load data
 		if ( $this->order ) {

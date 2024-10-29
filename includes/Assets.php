@@ -19,21 +19,13 @@ class Assets {
 	}
 
 	public function __construct()	{
-		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_scripts_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
 	}
 
 	/**
 	 * Load styles & scripts
 	 */
-	public function frontend_scripts_styles ( $hook ) {
-		# none yet
-	}
-
-	/**
-	 * Load styles & scripts
-	 */
-	public function backend_scripts_styles ( $hook ) {
+	public function backend_scripts_styles( $hook ) {
 		$suffix        = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$pdfjs_version = '4.3.136';
 
