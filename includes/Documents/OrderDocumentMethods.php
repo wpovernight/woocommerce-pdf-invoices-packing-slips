@@ -286,7 +286,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			if ( is_array( $custom_field ) ) {
 				echo wp_kses( $field_label . implode( '<br>', $custom_field ), $allow_tags );
 			} else {
-				$custom_field = wp_kses( $custom_field, 'custom_field', $allow_tags );
+				$custom_field = wpo_wcpdf_sanitize_html_content( $custom_field, 'custom_field', $allow_tags );
 				echo wp_kses( $field_label . nl2br( $custom_field ), $allow_tags );
 			}
 		}
