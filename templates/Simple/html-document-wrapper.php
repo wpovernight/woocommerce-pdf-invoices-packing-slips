@@ -8,6 +8,6 @@
 	<style type="text/css"><?php $this->template_custom_styles(); ?></style>
 </head>
 <body class="<?php $this->body_class(); ?>">
-<?php echo $content; ?>
+<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </body>
 </html>

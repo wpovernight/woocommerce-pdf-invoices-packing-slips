@@ -450,7 +450,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 				$content     = apply_filters( 'wpo_wcpdf_order_note', $content, $note );
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
-					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); ?>
+					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</div>
 				<?php
 			}
@@ -1159,7 +1159,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$shipping_notes = $this->get_shipping_notes();
 
 		if ( ! empty( $shipping_notes ) ) {
-			echo wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' );
+			echo wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 
@@ -1274,7 +1274,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$document_notes = $this->get_document_notes();
 
 		if ( ! empty( $document_notes ) ) {
-			echo wpo_wcpdf_sanitize_html_content( $document_notes, 'notes' );
+			echo wpo_wcpdf_sanitize_html_content( $document_notes, 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 

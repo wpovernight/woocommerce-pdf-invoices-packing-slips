@@ -1299,12 +1299,12 @@ abstract class OrderDocument {
 	public function get_footer() {
 		ob_start();
 		do_action( 'wpo_wcpdf_before_footer', $this->get_type(), $this->order );
-		echo $this->get_settings_text( 'footer' );
+		echo $this->get_settings_text( 'footer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
 		return ob_get_clean();
 	}
 	public function footer() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_footer() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_footer() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1315,7 +1315,7 @@ abstract class OrderDocument {
 
 	}
 	public function extra_1() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_1() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_1() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1325,7 +1325,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_2' );
 	}
 	public function extra_2() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_2() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_2() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1335,7 +1335,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_3' );
 	}
 	public function extra_3() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_3() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_3() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/*
@@ -1440,12 +1440,12 @@ abstract class OrderDocument {
 	public function output_pdf( $output_mode = 'download' ) {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
-		echo $pdf;
+		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit();
 	}
 
 	public function output_html() {
-		echo $this->get_html();
+		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public function preview_ubl() {
@@ -1490,7 +1490,7 @@ abstract class OrderDocument {
 		flush();
 		
 		if ( $wp_filesystem->exists( $full_filename ) ) {
-			echo $wp_filesystem->get_contents( $full_filename );
+			echo $wp_filesystem->get_contents( $full_filename ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		
 		wp_delete_file( $full_filename );
