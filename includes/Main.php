@@ -1697,7 +1697,7 @@ class Main {
 				<th>', esc_html( $due_date_title ), '</th>
 				<td>', esc_html( $due_date ), '</td>
 			</tr>';
-		}			
+		}
 	}
 }
 

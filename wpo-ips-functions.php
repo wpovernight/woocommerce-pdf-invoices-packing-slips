@@ -916,7 +916,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 			if ( $file_contents ) {
 				return true;
 			} else {
-				wcpdf_log_error( 'Failed to open local file with WP_Filesystem methods: ' . $path, 'critical' );
+				wcpdf_log_error( 'Failed to open local file: ' . $path, 'critical' );
 				return false;
 			}
 		}
