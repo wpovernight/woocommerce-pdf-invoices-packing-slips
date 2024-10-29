@@ -244,7 +244,7 @@ class PackingSlip extends OrderDocumentMethods {
 			),
 		);
 
-		return apply_filters( "wpo_wcpdf_document_settings_categories", $settings_categories[ $output_format ], $output_format, $this );
+		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ], $output_format, $this );
 	}
 
 }

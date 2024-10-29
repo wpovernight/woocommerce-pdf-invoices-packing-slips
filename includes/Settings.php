@@ -1022,7 +1022,7 @@ class Settings {
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {
-				add_filter( "wpo_wcpdf_settings_fields_documents_{$document->type}_{$output_format}", array( $this, 'apply_settings_categories' ), 999 );
+				add_filter( "wpo_wcpdf_settings_fields_documents_{$document->get_type()}_{$output_format}", array( $this, 'apply_settings_categories' ), 999 );
 			}
 		}
 	}
@@ -1132,67 +1132,74 @@ class Settings {
 	/**
 	 * Helper method to add a single setting field to a category.
 	 *
-	 * @param array           $settings_categories
-	 * @param string          $new_setting_id
-	 * @param string          $category_name
-	 * @param string|int|null $position
+	 * @param array    $settings_categories Array of existing settings categories, with category names as keys.
+	 * @param string   $new_setting_id      The new setting ID to add to the specified category.
+	 * @param string   $category_name       Name of the category to which the settings will be added.
+	 * @param int|null $position            Optional. The position at which to insert the new settings (starts from 1). Defaults to appending at the end.
 	 *
 	 * @return array
 	 */
-	public function add_single_setting_field_to_category( array $settings_categories, string $new_setting_id, string $category_name, $position = null ): array {
-		return $this->add_setting_field_to_category_impl( $settings_categories, [ $new_setting_id ], $category_name, $position );
+	public function add_single_setting_field_to_category( array $settings_categories, string $new_setting_id, string $category_name, ?int $position = null ): array {
+		return $this->add_setting_field_to_category( $settings_categories, array( $new_setting_id ), $category_name, $position );
 	}
 
 	/**
 	 * Helper method to add multiple setting fields to a category.
 	 *
-	 * @param array           $settings_categories
-	 * @param array           $new_setting_ids
-	 * @param string          $category_name
-	 * @param string|int|null $position
+	 * @param array    $settings_categories Array of existing settings categories, with category names as keys.
+	 * @param array    $new_setting_ids     Array of new setting IDs to add to the specified category.
+	 * @param string   $category_name       Name of the category to which the settings will be added.
+	 * @param int|null $position            Optional. The position at which to insert the new settings (starts from 1). Defaults to appending at the end.
 	 *
 	 * @return array
 	 */
-	public function add_multiple_setting_fields_to_category( array $settings_categories, array $new_setting_ids, string $category_name, $position = null ): array {
-		return $this->add_setting_field_to_category_impl( $settings_categories, $new_setting_ids, $category_name, $position );
+	public function add_multiple_setting_fields_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
+		return $this->add_setting_field_to_category( $settings_categories, $new_setting_ids, $category_name, $position );
 	}
 
 	/**
 	 * Internal method to handle adding setting fields to a category.
 	 *
-	 * @param array           $settings_categories
-	 * @param array           $new_setting_ids
-	 * @param string          $category_name
-	 * @param string|int|null $position
+	 * @param array    $settings_categories Array of existing settings categories, with category names as keys.
+	 * @param array    $new_setting_ids     Array of new setting IDs to add to the specified category.
+	 * @param string   $category_name       Name of the category to which the settings will be added.
+	 * @param int|null $position            Optional. The position at which to insert the new settings (1-based index). Defaults to appending at the end.
 	 *
 	 * @return array
 	 */
-	private function add_setting_field_to_category_impl( array $settings_categories, array $new_setting_ids, string $category_name, $position = null ): array {
+	private function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
 		if ( ! isset( $settings_categories[ $category_name ] ) ) {
 			return $settings_categories;
 		}
 
 		$members = &$settings_categories[ $category_name ]['members'];
 
-		if ( is_null( $position ) ) {
+		if ( is_null( $position ) || 0 === $position ) {
 			$members = array_merge( $members, $new_setting_ids );
 		} else {
-			// If it's a member name
-			if ( is_string( $position ) ) {
-				$key = array_search( $position, $members, true );
-
-				if ( false !== $key ) {
-					array_splice( $members, $key + 1, 0, $new_setting_ids );
-				} else {
-					$members = array_merge( $members, $new_setting_ids );
-				}
-			} elseif ( is_int( $position ) ) {
-				// If it's a member index
-				array_splice( $members, $position, 0, $new_setting_ids );
-			}
+			array_splice( $members, $position - 1, 0, $new_setting_ids );
 		}
 
 		return $settings_categories;
+	}
+
+	/**
+	 * Get the position of a specific setting in the settings array.
+	 *
+	 * @param array  $settings_categories Array of settings categories where the setting name is searched.
+	 * @param string $category            Name of the category to search in.
+	 * @param string $setting_name        Name of the setting to find in the settings array.
+	 *
+	 * @return int Position of the setting (1-based index) if found; otherwise, returns 0.
+	 */
+	public function get_setting_position( array $settings_categories, string $category, string $setting_name ): int {
+		if ( empty( $settings_categories[ $category ]['members'] ) ) {
+			return 0;
+		}
+
+		$key = array_search( $setting_name, $settings_categories[ $category ]['members'], true );
+
+		return $key !== false ? absint( $key ) + 1: 0;
 	}
 
 	/**
