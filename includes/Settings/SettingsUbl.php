@@ -28,7 +28,7 @@ class SettingsUbl {
 		];
 
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
-		add_action( 'wpo_wcpdf_settings_output_ubl', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_settings_output_ubl', array( $this, 'output' ), 10, 2 );
 
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
@@ -37,7 +37,11 @@ class SettingsUbl {
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
 	}
 
-	public function output( $active_section ) {
+	public function output( $active_section, $nonce ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			wp_die( 'Security check' );
+		}
+		
 		$active_section = ! empty( $active_section ) ? $active_section : 'taxes';
 		?>
 		<div class="wcpdf_ubl_settings_sections">

@@ -77,7 +77,7 @@ class Settings {
 		add_action( "update_option_wpo_wcpdf_settings_debug", array( $this, 'debug_settings_updated' ), 10, 3 );
 		add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
 		// migrate old template paths to template IDs before loading settings page
-		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 1 );
+		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 2 );
 
 		// AJAX preview
 		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
@@ -164,7 +164,6 @@ class Settings {
 		}
 	}
 
-
 	public function settings_page() {
 		// feedback on settings save
 		settings_errors();
@@ -199,12 +198,11 @@ class Settings {
 			'preview_states' => 1,
 		);
 
-		$settings_tabs  = $this->maybe_disable_preview_on_settings_tabs( $settings_tabs ); // disable preview on debug setting
-		$default_tab    = apply_filters( 'wpo_wcpdf_settings_tabs_default', ! empty( $settings_tabs['general'] ) ? 'general' : key( $settings_tabs ) );
-		$active_tab     = isset( $_GET[ 'tab' ] ) ? sanitize_text_field( $_GET[ 'tab' ] ) : $default_tab;
-		$active_section = isset( $_GET[ 'section' ] ) ? sanitize_text_field( $_GET[ 'section' ] ) : '';
+		$settings_tabs = $this->maybe_disable_preview_on_settings_tabs( $settings_tabs ); // disable preview on debug setting
+		$default_tab   = apply_filters( 'wpo_wcpdf_settings_tabs_default', ! empty( $settings_tabs['general'] ) ? 'general' : key( $settings_tabs ) );
+		$nonce         = wp_create_nonce( 'wp_wcpdf_settings_page_nonce' );
 
-		include( WPO_WCPDF()->plugin_path() . '/views/settings-page.php' );
+		include WPO_WCPDF()->plugin_path() . '/views/settings-page.php';
 	}
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
@@ -233,14 +231,14 @@ class Settings {
 
 			// get document type
 			if ( ! empty( $_POST['document_type'] ) ) {
-				$document_type = sanitize_text_field( $_POST['document_type'] );
+				$document_type = sanitize_text_field( wp_unslash( $_POST['document_type'] ) );
 			} else {
 				$document_type = 'invoice';
 			}
 
 			// get order ID
 			if ( ! empty( $_POST['order_id'] ) ) {
-				$order_id = sanitize_text_field( $_POST['order_id'] );
+				$order_id = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
 
 				if ( $document_type == 'credit-note' ) {
 					// get last refund ID of the order if available
@@ -277,7 +275,8 @@ class Settings {
 				// process settings data
 				if ( ! empty( $_POST['data'] ) ) {
 					// parse form data
-					parse_str( $_POST['data'], $form_data );
+					$posted_data = sanitize_text_field( wp_unslash( $_POST['data'] ) );
+					parse_str( $posted_data, $form_data );
 					$form_data = stripslashes_deep( $form_data );
 
 					foreach ( $form_data as $option_key => $form_settings ) {
@@ -323,7 +322,7 @@ class Settings {
 					}
 
 					// preview
-					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats ) ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
+					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) ) : 'pdf';
 					switch ( $output_format ) {
 						default:
 						case 'pdf':
@@ -380,8 +379,8 @@ class Settings {
 			}
 
 			if ( ! empty( $_POST['search'] ) && ! empty( $_POST['document_type'] ) ) {
-				$search        = sanitize_text_field( $_POST['search'] );
-				$document_type = sanitize_text_field( $_POST['document_type'] );
+				$search        = sanitize_text_field( wp_unslash( $_POST['search'] ) );
+				$document_type = sanitize_text_field( wp_unslash( $_POST['document_type'] ) );
 				$results       = array();
 
 				// we have an order ID
@@ -529,15 +528,15 @@ class Settings {
 		}
 	}
 
-	public function get_output_format( $document = null ) {
+	public function get_output_format( $document = null, $request = null ) {
 		$output_format = 'pdf'; // default
 
-		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $_REQUEST['output'] ) && 'html' === $_REQUEST['output'] ) ) {
+		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
 			$output_format = 'html';
-		} elseif ( isset( $_REQUEST['output'] ) && ! empty( $_REQUEST['output'] ) && ! empty( $document ) && in_array( $_REQUEST['output'], $document->output_formats ) ) {
-			$document_settings = $this->get_document_settings( $document->get_type(), esc_attr( $_REQUEST['output'] ) );
+		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats ) ) {
+			$document_settings = $this->get_document_settings( $document->get_type(), esc_attr( $request['output'] ) );
 			if ( isset( $document_settings['enabled'] ) ) {
-				$output_format = esc_attr( $_REQUEST['output'] );
+				$output_format = esc_attr( $request['output'] );
 			}
 		}
 
@@ -720,7 +719,11 @@ class Settings {
 		return str_replace( $base_path, '', wp_normalize_path( $absolute_path ) );
 	}
 
-	public function maybe_migrate_template_paths( $settings_section = null ) {
+	public function maybe_migrate_template_paths( $settings_section = null, $nonce = null ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			wp_die( 'Security check' );
+		}
+		
 		// bail if no template is selected yet (fresh install)
 		if ( empty( $this->general_settings['template_path'] ) ) {
 			return;
@@ -760,7 +763,10 @@ class Settings {
 	}
 
 	public function set_number_store() {
-		check_ajax_referer( "wpo_wcpdf_next_{$_POST['store']}", 'security' );
+		$store = ! empty( $_POST['store'] ) ? sanitize_text_field( wp_unslash( $_POST['store'] ) ) : '';
+		
+		check_ajax_referer( "wpo_wcpdf_next_{$store}", 'security' );
+		
 		// check permissions
 		if ( ! $this->user_can_manage_settings() ) {
 			die();
@@ -769,9 +775,9 @@ class Settings {
 		$number = ! empty( $_POST['number'] ) ? (int) $_POST['number'] : 0;
 		if ( $number > 0 ) {
 			$number_store_method = $this->get_sequential_number_store_method();
-			$number_store = new SequentialNumberStore( $_POST['store'], $number_store_method );
+			$number_store = new SequentialNumberStore( $store, $number_store_method );
 			$number_store->set_next( $number );
-			echo wp_kses_post( "next number ({$_POST['store']}) set to {$number}" );
+			echo wp_kses_post( "next number ({$store}) set to {$number}" );
 		}
 		die();
 	}
@@ -954,14 +960,15 @@ class Settings {
 
 	public function get_media_upload_setting_html() {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
+		
 		// check permissions
 		if ( ! $this->user_can_manage_settings() ) {
 			wp_send_json_error();
 		}
 
 		// get previous (default) args and preset current
-		$args = $_POST['args'];
-		$args['current'] = absint( $_POST['attachment_id'] );
+		$args            = isset( $_POST['args'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['args'] ) ) : array();
+		$args['current'] = isset( $_POST['attachment_id'] ) ? absint( sanitize_text_field( wp_unslash( $_POST['attachment_id'] ) ) ) : 0;
 
 		if ( isset( $args['translatable'] ) ) {
 			$args['translatable'] = wc_string_to_bool( $args['translatable'] );

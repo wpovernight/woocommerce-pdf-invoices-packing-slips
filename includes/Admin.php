@@ -189,7 +189,7 @@ class Admin {
 
 	public function setup_wizard() {
 		// Setup/welcome
-		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] && wp_verify_nonce( $_GET['_wpnonce'], 'wpo_wcpdf_setup' ) ) {
+		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpo_wcpdf_setup' ) ) {
 			delete_transient( 'wpo_wcpdf_new_install' );
 			SetupWizard::instance();
 		}
@@ -331,7 +331,9 @@ class Admin {
 	 * @param array $columns shop order columns
 	 */
 	public function add_invoice_columns( $columns ) {
-		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() && isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wc-orders' && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'edit' ) {
+		$current_screen = get_current_screen();
+		
+		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() && 'woocommerce_page_wc-orders' !== $current_screen->id ) {
 			return $columns;
 		}
 
@@ -635,15 +637,35 @@ class Admin {
 				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="'.$data['unmark_printed_url'].'">'.__( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
 				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; '.$printed.''.date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ).''.$unmark_printed.'</p>' : '';
 
+				$allowed_tags = array(
+					'svg' => array(
+						'class'   => true,
+						'xmlns'   => true,
+						'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+					),
+					'path' => array(
+						'fill-rule' => true,
+						'clip-rule' => true,
+						'd'         => true,
+					),
+					'p' => array(
+						'class' => true,
+					),
+					'a' => array(
+						'href' => true,
+						'class' => true,
+					),
+				);
+				
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',
 					esc_url( $url ),
 					esc_attr( $class ),
 					esc_attr( $alt ),
 					esc_html( $title ),
-					esc_html( $exists ),
-					esc_html( $manually_mark_printed ),
-					esc_html( $printed_data )
+					str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_tags ) ),
+					wp_kses( $manually_mark_printed, $allowed_tags ),
+					str_replace( 'viewbox=', 'viewBox=', wp_kses( $printed_data, $allowed_tags ) )
 				);
 			}
 			?>
@@ -994,9 +1016,9 @@ class Admin {
 
 		$order_type = $order->get_type();
 
-		if ( $order_type == 'shop_order' ) {
-			// bail if this is not an actual 'Save order' action
-			if ( ! isset( $_POST['action'] ) || $_POST['action'] != 'editpost' ) {
+		if ( 'shop_order' === $order_type ) {
+			// Check the nonce.
+			if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				return;
 			}
 
@@ -1058,9 +1080,14 @@ class Admin {
 	 */
 	public function send_emails( $post_or_order_object_id, $post_or_order_object ) {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		
+		// Check the nonce.
+		if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			return;
+		}
 
 		if ( ! empty( $_POST['wpo_wcpdf_send_emails'] ) ) {
-			$action = wc_clean( $_POST['wpo_wcpdf_send_emails'] );
+			$action = sanitize_text_field( wp_unslash( $_POST['wpo_wcpdf_send_emails'] ) );
 			if ( ! empty( $action ) && strstr( $action, 'send_email_' ) ) {
 				$email_to_send = str_replace( 'send_email_', '', $action );
 				// Switch back to the site locale.
@@ -1143,7 +1170,7 @@ class Admin {
 			) );
 		}
 
-		if ( ! $this->user_can_manage_document( sanitize_text_field( $_POST['document_type'] ) ) ) {
+		if ( ! $this->user_can_manage_document( sanitize_text_field( wp_unslash( $_POST['document_type'] ) ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
@@ -1151,12 +1178,14 @@ class Admin {
 
 		$order_id        = absint( $_POST['order_id'] );
 		$order           = wc_get_order( $order_id );
-		$document_type   = sanitize_text_field( $_POST['document_type'] );
-		$action_type     = sanitize_text_field( $_POST['action_type'] );
-		$notice          = sanitize_text_field( $_POST['wpcdf_document_data_notice'] );
+		$document_type   = sanitize_text_field( wp_unslash( $_POST['document_type'] ) );
+		$action_type     = sanitize_text_field( wp_unslash( $_POST['action_type'] ) );
+		$notice          = isset( $_POST['wpcdf_document_data_notice'] ) ? sanitize_text_field( wp_unslash( $_POST['wpcdf_document_data_notice'] ) ) : 'saved';
+		$request_data    = isset( $_POST['form_data'] ) ? sanitize_text_field( wp_unslash( $_POST['form_data'] ) ) : '';
 
 		// parse form data
-		parse_str( $_POST['form_data'], $form_data );
+		parse_str( $request_data, $form_data );
+		
 		if ( is_array( $form_data ) ) {
 			foreach ( $form_data as $key => &$value ) {
 				if ( is_array( $value ) && !empty( $value[$order_id] ) ) {
@@ -1164,6 +1193,7 @@ class Admin {
 				}
 			}
 		}
+		
 		$form_data = stripslashes_deep( $form_data );
 
 		// notice messages
@@ -1291,6 +1321,16 @@ class Admin {
 	public function process_order_document_form_data( $form_data, $document_slug )
 	{
 		$data = array();
+		
+		if (
+			check_ajax_referer( 'wpo_wcpdf_regenerate_document', 'security', false ) === false &&
+			check_ajax_referer( 'wpo_wcpdf_save_document', 'security', false ) === false &&
+			check_ajax_referer( 'wpo_wcpdf_delete_document', 'security', false ) === false &&
+			( empty( $_POST['woocommerce_meta_nonce'] ) || 
+			  ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		) {
+			return $data;
+		}
 
 		if( isset( $form_data['_wcpdf_'.$document_slug.'_number'] ) ) {
 			$data['number'] = sanitize_text_field( $form_data['_wcpdf_'.$document_slug.'_number'] );

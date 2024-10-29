@@ -347,7 +347,7 @@ class WPO_WCPDF {
 		// protect PDF directory
 		if ( isset( $_REQUEST['wpo_wcpdf_protect_pdf_directory'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
-			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'protect_pdf_directory_nonce' ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'protect_pdf_directory_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_protect_pdf_directory' );
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
@@ -366,7 +366,7 @@ class WPO_WCPDF {
 		// save option to hide nginx notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_nginx_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
-			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_nginx_notice_nonce' ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_nginx_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_nginx_notice' );
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
@@ -406,7 +406,7 @@ class WPO_WCPDF {
 		// save option to hide mailpoet notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_mailpoet_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
-			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_mailpoet_notice_nonce' ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_mailpoet_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_mailpoet_notice' );
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
@@ -443,7 +443,7 @@ class WPO_WCPDF {
 		// save option to hide notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_rtl_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
-			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_rtl_notice_nonce' ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_rtl_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_rtl_notice' );
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
@@ -487,7 +487,7 @@ class WPO_WCPDF {
 		// save option to hide notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_php_below_7_4_drop_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
-			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_php_below_7_4_drop_notice_nonce' ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_php_below_7_4_drop_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_php_below_7_4_drop_notice' );
 			} else {
 				update_option( 'wpo_wcpdf_hide_php_below_7_4_drop_notice', true );
@@ -518,7 +518,7 @@ class WPO_WCPDF {
 		// save option to hide notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_ubl_php_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
-			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_ubl_php_notice_nonce' ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_ubl_php_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_ubl_php_notice' );
 			} else {
 				update_option( 'wpo_wcpdf_hide_ubl_php_notice', true );
@@ -606,7 +606,7 @@ class WPO_WCPDF {
 
 			// save option to hide legacy addon notice
 			if ( isset( $_REQUEST[ $query_arg ] ) && isset( $_REQUEST['_wpnonce'] ) ) {
-				if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'wcpdf_legacy_addon_notice' ) ) {
+				if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'wcpdf_legacy_addon_notice' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: ' . $query_arg );
 				} else {
 					delete_transient( $transient_name );

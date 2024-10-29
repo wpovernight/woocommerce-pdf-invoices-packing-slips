@@ -20,7 +20,7 @@ class SettingsDocuments {
 
 	public function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
-		add_action( 'wpo_wcpdf_settings_output_documents', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_settings_output_documents', array( $this, 'output' ), 10, 2 );
 	}
 
 	public function init_settings() {
@@ -32,7 +32,11 @@ class SettingsDocuments {
 		}
 	}
 
-	public function output( $section ) {
+	public function output( $section, $nonce ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			wp_die( 'Security check' );
+		}
+		
 		$section          = ! empty( $section ) ? $section : 'invoice';
 		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
 		$output_format    = 'pdf';

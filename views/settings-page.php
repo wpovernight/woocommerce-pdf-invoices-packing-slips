@@ -1,12 +1,19 @@
 <?php defined( 'ABSPATH' ) or exit; ?>
 <?php
-$review_url = 'https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/#new-post';
-$review_link = sprintf( '<a href="%s">★★★★★</a>', $review_url );
+
+if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+	wp_die( __( 'Action failed. Please refresh the page and retry.', 'woocommerce-pdf-invoices-packing-slips' ) );
+}
+
+$review_url        = 'https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/#new-post';
+$review_link       = sprintf( '<a href="%s">★★★★★</a>', $review_url );
 $review_invitation = sprintf(
 	/* translators: ★★★★★ (5-star) */
 	__( 'If you like <strong>PDF Invoices & Packing Slips for WooCommerce</strong> please leave us a %s rating. A huge thank you in advance!', 'woocommerce-pdf-invoices-packing-slips' ),
 	$review_link
 );
+$active_tab        = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : $default_tab;
+$active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '';
 ?>
 <script type="text/javascript">
 	jQuery( function( $ ) {
@@ -74,7 +81,7 @@ $review_invitation = sprintf(
 				<?php
 					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
 					if ( has_action( "wpo_wcpdf_settings_output_{$active_tab}" ) ) {
-						do_action( "wpo_wcpdf_settings_output_{$active_tab}", $active_section );
+						do_action( "wpo_wcpdf_settings_output_{$active_tab}", $active_section, $nonce );
 					} else {
 						// legacy settings
 						settings_fields( "wpo_wcpdf_{$active_tab}_settings" );

@@ -23,13 +23,17 @@ class SettingsDebug {
 
 	public function __construct()	{
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
-		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 	}
 
-	public function output( $active_section ) {
+	public function output( $active_section, $nonce ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			wp_die( 'Security check' );
+		}
+		
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
 		$sections       = $this->get_settings_sections();
 
@@ -57,7 +61,7 @@ class SettingsDebug {
 				$this->display_tools();
 				break;
 			case 'numbers':
-				$this->display_numbers();
+				$this->display_numbers( $nonce );
 				break;
 			default:
 				do_action( 'wpo_wcpdf_settings_debug_section_output', $active_section );
@@ -82,15 +86,20 @@ class SettingsDebug {
 		include( WPO_WCPDF()->plugin_path() . '/views/advanced-tools.php' );
 	}
 
-	public function display_numbers() {
+	public function display_numbers( $nonce ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			wp_die( 'Security check' );
+		}
+		
 		global $wpdb;
-
+		
+		$_GET['_wpnonce']               = $nonce;
 		$number_store_tables            = $this->get_number_store_tables();
 		$invoice_number_store_doc_types = $this->get_additional_invoice_number_store_document_types();
 		$store_name                     = 'invoice_number';
 
 		if ( isset( $_GET['table_name'] ) ) {
-			$selected_table_name = esc_attr( $_GET['table_name'] );
+			$selected_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
 		} else {
 			$_GET['table_name'] = $selected_table_name = apply_filters( 'wpo_wcpdf_number_store_table_name', "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
 		}
@@ -99,16 +108,16 @@ class SettingsDebug {
 			$_GET['table_name'] = $selected_table_name = null;
 		}
 
-		$document_type = $this->get_document_type_from_store_table_name( esc_attr( $_GET['table_name'] ) );
+		$document_type = $this->get_document_type_from_store_table_name( sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) );
 
 		$list_table = new NumberStoreListTable();
 		$list_table->prepare_items();
 		
-		$list_table_name = $_GET['table_name'];
-		$search_value    = isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : '';
+		$list_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
+		$search_value    = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
 		$disable_reset   = empty( $search_value ) ? 'disabled' : '';
 
-		include( WPO_WCPDF()->plugin_path() . '/views/advanced-numbers.php' );
+		include WPO_WCPDF()->plugin_path() . '/views/advanced-numbers.php';
 	}
 
 	public function get_number_store_tables() {
@@ -344,13 +353,15 @@ class SettingsDebug {
 	}
 
 	private function import_settings( $data ) {
+		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+		
 		extract( $data );
 
 		$file_data = [];
 
 		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
 			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-			$json_data     = $wp_filesystem->get_contents( $_FILES['file']['tmp_name'] );
+			$json_data     = $wp_filesystem->get_contents( sanitize_text_field( wp_unslash( $_FILES['file']['tmp_name'] ) ) );
 			
 			if ( ! $json_data ) {
 				$message = __( 'Failed to get contents from JSON file!', 'woocommerce-pdf-invoices-packing-slips' );

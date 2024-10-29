@@ -149,7 +149,7 @@
 		<div class="tool">
 			<h4><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 			<p><?php esc_html_e( 'Set up your basic invoice workflow via our Wizard.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ), 'wpo_wcpdf_setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 		</div>
 		<!-- /run_wizard -->
 		<!-- export_settings -->
@@ -248,7 +248,7 @@
 		<div id="danger_zone" class="wrapper">
 			<div class="tool">
 				<div class="notice notice-warning inline">
-					<p><?php esc_html_e( '<strong>DANGER ZONE:</strong> Create a backup before using these tools, the actions they perform are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+					<p><?php echo wp_kses_post( '<strong>DANGER ZONE:</strong> Create a backup before using these tools, the actions they perform are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				</div>
 			</div>
 			<!-- renumber_documents -->
@@ -259,7 +259,7 @@
 					<?php
 						printf(
 							/* translators: step-by-step instructions */
-							esc_html__( 'Set the <strong>next document number</strong> setting %s to the number you want to use for the first document. ', 'woocommerce-pdf-invoices-packing-slips' ),
+							wp_kses_post( 'Set the <strong>next document number</strong> setting %s to the number you want to use for the first document. ', 'woocommerce-pdf-invoices-packing-slips' ),
 							'<code>WooCommerce > PDF Invoices > Documents > Select document</code>'
 						);
 					?>

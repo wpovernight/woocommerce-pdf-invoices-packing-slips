@@ -29,7 +29,6 @@ class SetupWizard {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );
 		}
-
 	}
 
 	/**
@@ -45,7 +44,7 @@ class SetupWizard {
 	public function setup_wizard() {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] ) {
+		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] || empty( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpo_wcpdf_setup' ) ) {
 			return;
 		}
 
@@ -83,7 +82,7 @@ class SetupWizard {
 				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
 			),
 		);
-		$this->step = isset( $_GET['step'] ) ? sanitize_key( $_GET['step'] ) : current( array_keys( $this->steps ) );
+		$this->step = isset( $_GET['step'] ) ? sanitize_text_field( wp_unslash( $_GET['step'] ) ) : current( array_keys( $this->steps ) );
 
 		wp_enqueue_style(
 			'wpo-wcpdf-setup',
@@ -241,7 +240,9 @@ class SetupWizard {
 			$hidden = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
 			if ( ! empty( $_POST['wcpdf_settings'] ) && is_array( $_POST['wcpdf_settings'] ) ) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
-				foreach ( $_POST['wcpdf_settings'] as $option => $settings ) {
+				$request_settings = isset( $_POST['wcpdf_settings'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['wcpdf_settings'] ) ) : array();
+				
+				foreach ( $request_settings as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
 						if ( $key == 'shop_address' && function_exists( 'sanitize_textarea_field' ) ) {
@@ -262,7 +263,7 @@ class SetupWizard {
 					$new_settings = $settings + $current_settings;
 					update_option( $option, $new_settings );
 				}
-			} elseif ( $_POST['wpo_wcpdf_step'] == 'show-action-buttons' ) {
+			} elseif ( ! empty( $_POST['wpo_wcpdf_step'] ) && 'show-action-buttons' === $_POST['wpo_wcpdf_step'] ) {
 				if ( ! empty( $_POST['wc_show_action_buttons'] ) ) {
 					$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
 					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );

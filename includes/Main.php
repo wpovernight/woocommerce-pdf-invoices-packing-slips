@@ -350,28 +350,29 @@ class Main {
 	public function generate_document_ajax() {
 		$access_type  = WPO_WCPDF()->endpoint->get_document_link_access_type();
 		$redirect_url = WPO_WCPDF()->endpoint->get_document_denied_frontend_redirect_url();
+		$request      = stripslashes_deep( $_REQUEST );
 
 		// handle bulk actions access key (_wpnonce) and legacy access key (order_key)
-		if ( empty( $_REQUEST['access_key'] ) ) {
+		if ( empty( $request['access_key'] ) ) {
 			foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
-				if ( ! empty( $_REQUEST[ $legacy_key ] ) ) {
-					$_REQUEST['access_key'] = sanitize_text_field( wp_unslash( $_REQUEST[ $legacy_key ] ) );
+				if ( ! empty( $request[ $legacy_key ] ) ) {
+					$request['access_key'] = sanitize_text_field( wp_unslash( $request[ $legacy_key ] ) );
 				}
 			}
 		}
 
-		$access_key  = isset( $_REQUEST['access_key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['access_key'] ) ) : '';
-		$action      = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+		$access_key  = isset( $request['access_key'] ) ? sanitize_text_field( wp_unslash( $request['access_key'] ) ) : '';
+		$action      = isset( $request['action'] ) ? sanitize_text_field( wp_unslash( $request['action'] ) ) : '';
 		$valid_nonce = ! empty( $access_key ) && ! empty( $action ) && wp_verify_nonce( $access_key, $action );
 
 		// check if we have the access key set
-		if ( empty( $_REQUEST['access_key'] ) ) {
+		if ( empty( $request['access_key'] ) ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty access key', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
 		// check if we have the action
-		if ( empty( $_REQUEST['action'] ) ) {
+		if ( empty( $request['action'] ) ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty action', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
@@ -383,27 +384,27 @@ class Main {
 		}
 
 		// Check if all parameters are set
-		if ( empty( $_REQUEST['document_type'] ) && ! empty( $_REQUEST['template_type'] ) ) {
-			$_REQUEST['document_type'] = sanitize_text_field( wp_unslash( $_REQUEST['template_type'] ) );
+		if ( empty( $request['document_type'] ) && ! empty( $request['template_type'] ) ) {
+			$request['document_type'] = sanitize_text_field( wp_unslash( $request['template_type'] ) );
 		}
 
-		if ( empty( $_REQUEST['order_ids'] ) ) {
+		if ( empty( $request['order_ids'] ) ) {
 			$message = esc_attr__( "You haven't selected any orders", 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( null, $message );
 		}
 
-		if ( empty( $_REQUEST['document_type'] ) ) {
+		if ( empty( $request['document_type'] ) ) {
 			$message = esc_attr__( 'Some of the export parameters are missing.', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( null, $message );
 		}
 
 		// debug enabled by URL
-		if ( isset( $_REQUEST['debug'] ) && ! ( is_user_logged_in() || isset( $_REQUEST['my-account'] ) ) ) {
+		if ( isset( $request['debug'] ) && ! ( is_user_logged_in() || isset( $request['my-account'] ) ) ) {
 			$this->enable_debug();
 		}
 
-		$document_type = sanitize_text_field( wp_unslash( $_REQUEST['document_type'] ) );
-		$order_ids     = isset( $_REQUEST['order_ids'] ) ? array_map( 'absint', explode( 'x', sanitize_text_field( wp_unslash( $_REQUEST['order_ids'] ) ) ) ) : array();
+		$document_type = sanitize_text_field( wp_unslash( $request['document_type'] ) );
+		$order_ids     = isset( $request['order_ids'] ) ? array_map( 'absint', explode( 'x', sanitize_text_field( wp_unslash( $request['order_ids'] ) ) ) ) : array();
 		$order         = false;
 
 		// single order
@@ -460,7 +461,7 @@ class Main {
 				}
 
 				if ( ! $full_permission ) {
-					if ( ! isset( $_REQUEST['my-account'] ) && ! isset( $_REQUEST['shortcode'] ) ) {
+					if ( ! isset( $request['my-account'] ) && ! isset( $request['shortcode'] ) ) {
 						$allowed = false;
 						break;
 					}
@@ -474,7 +475,7 @@ class Main {
 				break;
 			case 'full':
 				// check if we have a valid access key only when it's not from bulk actions
-				if ( ! isset( $_REQUEST['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), wp_unslash( $_REQUEST['access_key'] ) ) ) {
+				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), wp_unslash( $request['access_key'] ) ) ) {
 					$allowed = false;
 					break;
 				}
@@ -491,13 +492,13 @@ class Main {
 		// if we got here, we're safe to go!
 		try {
 			// log document creation to order notes
-			if ( count( $order_ids ) > 1 && isset( $_REQUEST['bulk'] ) ) {
+			if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'bulk' );
 					$this->log_document_creation_trigger_to_order_meta( $document, 'bulk' );
 					$this->mark_document_printed( $document, 'bulk' );
 				} );
-			} elseif ( isset( $_REQUEST['my-account'] ) ) {
+			} elseif ( isset( $request['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'my_account' );
 					$this->log_document_creation_trigger_to_order_meta( $document, 'my_account' );
@@ -517,7 +518,7 @@ class Main {
 			if ( $document ) {
 				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself with $document->order_ids)
 
-				$output_format = WPO_WCPDF()->settings->get_output_format( $document );
+				$output_format = WPO_WCPDF()->settings->get_output_format( $document, $request );
 
 				switch ( $output_format ) {
 					case 'ubl':

@@ -155,7 +155,7 @@ abstract class OrderDocument {
 
 	public function init_settings_data() {
 		// don't override/save settings on Preview requests
-		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] && wp_verify_nonce( $_REQUEST['security'], 'wpo_wcpdf_preview' ) ) {
+		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] && isset( $_REQUEST['security'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ), 'wpo_wcpdf_preview' ) ) {
 			return;
 		}
 
@@ -1547,7 +1547,12 @@ abstract class OrderDocument {
 	public function get_wc_emails() {
 		// only run this in the context of the settings page or setup wizard
 		// prevents WPML language mixups
-		if ( empty( $_GET['page'] ) || !in_array( $_GET['page'], array('wpo-wcpdf-setup','wpo_wcpdf_options_page') ) ) {
+		
+		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] && ( isset( $_GET['_wpnonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpo_wcpdf_setup' ) ) ) {
+			return array();
+		}
+
+		if ( ! in_array( $_GET['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ) ) ) {
 			return array();
 		}
 
@@ -1728,9 +1733,9 @@ abstract class OrderDocument {
 		$current_year_table_name = "{$default_table_name}_{$current_year}";
 
 		// first, remove last year if it already exists
-		$retired_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$retired_table_name}'" ) == $retired_table_name;
-		if( $retired_exists ) {
-			$table_removed = $wpdb->query( "DROP TABLE IF EXISTS {$retired_table_name}" );
+		$retired_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $retired_table_name ) . "'" ) == $retired_table_name;
+		if ( $retired_exists ) {
+			$table_removed = $wpdb->query( "DROP TABLE IF EXISTS `" . esc_sql( $retired_table_name ) . "`" );
 
 			if( ! $table_removed ) {
 				wcpdf_log_error( sprintf( 'An error occurred while trying to remove the duplicate number store %s: %s', $retired_table_name, $wpdb->last_error ) );
@@ -1739,9 +1744,9 @@ abstract class OrderDocument {
 		}
 
 		// rename current to last year
-		$default_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'" ) == $default_table_name;
-		if( $default_exists ) {
-			$table_renamed = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$retired_table_name}" );
+		$default_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $default_table_name ) . "'" ) == $default_table_name;
+		if ( $default_exists ) {
+			$table_renamed = $wpdb->query( "ALTER TABLE `" . esc_sql( $default_table_name ) . "` RENAME `" . esc_sql( $retired_table_name ) . "`" );
 
 			if( ! $table_renamed ) {
 				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $default_table_name, $retired_table_name, $wpdb->last_error ) );
@@ -1750,9 +1755,9 @@ abstract class OrderDocument {
 		}
 
 		// if the current year table name already exists (created earlier as a 'future' year), rename that to default
-		$current_year_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$current_year_table_name}'" ) == $current_year_table_name;
-		if( $current_year_exists ) {
-			$table_renamed = $wpdb->query( "ALTER TABLE {$current_year_table_name} RENAME {$default_table_name}" );
+		$current_year_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $current_year_table_name ) . "'" ) == $current_year_table_name;
+		if ( $current_year_exists ) {
+			$table_renamed = $wpdb->query( "ALTER TABLE `" . esc_sql( $current_year_table_name ) . "` RENAME `" . esc_sql( $default_table_name ) . "`" );
 
 			if( ! $table_renamed ) {
 				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $current_year_table_name, $default_table_name, $wpdb->last_error ) );
@@ -1760,7 +1765,7 @@ abstract class OrderDocument {
 			}
 		}
 
-		if( $was_showing_errors ) {
+		if ( $was_showing_errors ) {
 			$wpdb->show_errors();
 		}
 
@@ -1786,17 +1791,17 @@ abstract class OrderDocument {
 			$current_year = intval( $next_year->date_i18n( 'Y' ) );
 		}
 
-		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'") == $table_name;
-		if( $table_exists ) {
+		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $table_name ) . "'" ) == $table_name;
+		if ( $table_exists ) {
 			// get year for the last row
-			$year = $wpdb->get_var( "SELECT YEAR(date) FROM {$table_name} ORDER BY id DESC LIMIT 1" );
+			$year = $wpdb->get_var( "SELECT YEAR(date) FROM `" . esc_sql( $table_name ) . "` ORDER BY id DESC LIMIT 1" );
 			// default to current year if no results
-			if( ! $year ) {
+			if ( ! $year ) {
 				$year = $current_year;
 				// if we don't get a result, this could either mean there's an error,
 				// OR that the first number simply has not been created yet (=no rows)
 				// we only log when there's an actual error
-				if( ! empty( $wpdb->last_error ) ) {
+				if ( ! empty( $wpdb->last_error ) ) {
 					wcpdf_log_error( sprintf( 'An error occurred while trying to get the current year from the %s table: %s', $table_name, $wpdb->last_error ) );
 				}
 			}
@@ -1804,7 +1809,7 @@ abstract class OrderDocument {
 			$year = $current_year;
 		}
 
-		if( $was_showing_errors ) {
+		if ( $was_showing_errors ) {
 			$wpdb->show_errors();
 		}
 

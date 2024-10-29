@@ -26,7 +26,7 @@
 			<?php
 				printf(
 					/* translators: chose table title */
-					esc_html__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
+					wp_kses_post( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
 					esc_html( $choose_table_title )
 				);
 			?>

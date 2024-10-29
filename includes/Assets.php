@@ -213,7 +213,8 @@ class Assets {
 			if ( 'debug' === $tab ) {
 				wp_enqueue_style(
 					'wpo-wcpdf-jquery-ui-styles',
-					'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css'
+					WPO_WCPDF()->plugin_url() . '/assets/css/jquery-ui' . $suffix . '.css',
+					'1.14.0'
 				);
 
 				wp_enqueue_script( 'jquery-ui-datepicker' );
