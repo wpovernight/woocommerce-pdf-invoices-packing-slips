@@ -700,7 +700,7 @@ class Admin {
 					}
 
 					$meta_box_actions[ $document->get_type() ] = array(
-						'url'    => esc_url( $document_url ),
+						'url'    => $document_url,
 						'alt'    => "UBL " . $document_title,
 						'title'  => "UBL " . $document_title,
 						'exists' => $document_exists,
@@ -726,6 +726,19 @@ class Admin {
 					$title  = isset( $data['title'] ) ? $data['title'] : '';
 					$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 
+					$allowed_svg_tags = array(
+						'svg' => array(
+							'class'   => true,
+							'xmlns'   => true,
+							'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+						),
+						'path' => array(
+							'fill-rule' => true,
+							'clip-rule' => true,
+							'd'         => true,
+						),
+					);
+					
 					if ( ! empty( $exists ) ) {
 						printf(
 							'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
@@ -733,7 +746,7 @@ class Admin {
 							esc_attr( $class ),
 							esc_attr( $alt ),
 							esc_html( $title ),
-							esc_html( $exists )
+							str_replace( 'viewbox=', 'viewBox=', wp_kses( $exists, $allowed_svg_tags ) )
 						);
 
 						$ubl_documents++;
