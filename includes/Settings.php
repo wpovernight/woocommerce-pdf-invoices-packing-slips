@@ -718,11 +718,16 @@ class Settings {
 	}
 
 	public function get_relative_template_path( $absolute_path ) {
+		if ( empty( $absolute_path ) ) {
+			return '';
+		}
+		
 		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
 			$base_path = wp_normalize_path( ABSPATH );
 		} else {
 			$base_path = wp_normalize_path( WP_CONTENT_DIR );
 		}
+		
 		return str_replace( $base_path, '', wp_normalize_path( $absolute_path ) );
 	}
 

@@ -246,7 +246,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 
 		// WC3.0 fallback to properties
-		$property = str_replace( '-', '_', sanitize_title( ltrim( $field_name, '_' ) ) );
+		$property = ! empty( $field_name ) ? str_replace( '-', '_', sanitize_title( ltrim( $field_name, '_' ) ) ) : '';
 		if ( empty( $custom_field ) && is_callable( array( $this->order, "get_{$property}" ) ) ) {
 			$custom_field = $this->order->{"get_{$property}"}( 'view' );
 		}
@@ -863,7 +863,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 
 		$contextless_site_url  = ! empty( $site_url ) ? str_replace( array( 'http://', 'https://' ), '', $site_url ) : $site_url;
-		$thumbnail_path        = ! empty( $contextless_site_url ) ? str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url ) : $contextless_site_url;
+		$thumbnail_path        = ! empty( $contextless_thumbnail_url ) ? str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url ) : $contextless_site_url;
 
 		// fallback if thumbnail file doesn't exist
 		if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
@@ -917,7 +917,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$label = $total['label'];
 			$colon = strrpos( $label, ':' );
 
-			if ( false !== $colon ) {
+			if ( ! empty( $colon ) ) {
 				$label = substr_replace( $label, '', $colon, 1 );
 			}
 

@@ -564,7 +564,7 @@ class SettingsDebug {
 		if ( in_array( $date_type, $wc_date_types ) ) {
 			$date_arg      = $date_type;
 		} elseif ( 'document_date' === $date_type ) {
-			$document_slug = str_replace( '-', '_', $document_type );
+			$document_slug = ! empty( $document_type ) ? str_replace( '-', '_', $document_type ) : '';
 			$date_arg      = "wcpdf_{$document_slug}_date";
 		} else {
 			$date_arg      = '';

@@ -564,7 +564,7 @@ class WPO_WCPDF {
 		$active_plugin  = '';
 
 		foreach ( $active_plugins as $plugin ) {
-			if ( false !== strpos( $plugin, $filename ) ) {
+			if ( ! empty( $plugin ) && false !== strpos( $plugin, $filename ) ) {
 				$active_plugin = $plugin;
 				break;
 			}
