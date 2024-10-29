@@ -1170,39 +1170,41 @@ class Admin {
 				'message' => esc_html__( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
+		
+		$request = stripslashes_deep( $_POST );
 
-		if ( ! isset($_POST['action']) ||  ! in_array( $_POST['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
+		if ( ! isset( $request['action'] ) ||  ! in_array( $request['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Bad action!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		if( empty($_POST['order_id']) || empty($_POST['document_type']) || empty($_POST['action_type']) ) {
+		if ( empty( $request['order_id'] ) || empty( $request['document_type'] ) || empty( $request['action_type'] ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		if ( ! $this->user_can_manage_document( sanitize_text_field( wp_unslash( $_POST['document_type'] ) ) ) ) {
+		if ( ! $this->user_can_manage_document( sanitize_text_field( wp_unslash( $request['document_type'] ) ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		$order_id        = absint( $_POST['order_id'] );
+		$order_id        = absint( $request['order_id'] );
 		$order           = wc_get_order( $order_id );
-		$document_type   = sanitize_text_field( wp_unslash( $_POST['document_type'] ) );
-		$action_type     = sanitize_text_field( wp_unslash( $_POST['action_type'] ) );
-		$notice          = isset( $_POST['wpcdf_document_data_notice'] ) ? sanitize_text_field( wp_unslash( $_POST['wpcdf_document_data_notice'] ) ) : 'saved';
-		$request_data    = isset( $_POST['form_data'] ) ? sanitize_text_field( wp_unslash( $_POST['form_data'] ) ) : '';
+		$document_type   = sanitize_text_field( wp_unslash( $request['document_type'] ) );
+		$action_type     = sanitize_text_field( wp_unslash( $request['action_type'] ) );
+		$notice          = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( wp_unslash( $request['wpcdf_document_data_notice'] ) ) : 'saved';
+		$request_data    = isset( $request['form_data'] ) ? sanitize_text_field( wp_unslash( $request['form_data'] ) ) : '';
 
 		// parse form data
 		parse_str( $request_data, $form_data );
 		
 		if ( is_array( $form_data ) ) {
 			foreach ( $form_data as $key => &$value ) {
-				if ( is_array( $value ) && !empty( $value[$order_id] ) ) {
-					$value = $value[$order_id];
+				if ( is_array( $value ) && ! empty( $value[ $order_id ] ) ) {
+					$value = $value[ $order_id ];
 				}
 			}
 		}
@@ -1231,7 +1233,7 @@ class Admin {
 			if( ! empty( $document ) ) {
 
 				// perform legacy date fields replacements check
-				if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
+				if ( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
 					$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
 				}
 
@@ -1239,15 +1241,15 @@ class Admin {
 				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
 
 				// on regenerate
-				if( $action_type == 'regenerate' && $document->exists() ) {
+				if ( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
-					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true );
+					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
 				// on delete
-				} elseif( $action_type == 'delete' && $document->exists() ) {
+				} elseif ( $action_type == 'delete' && $document->exists() ) {
 					$document->delete();
 
 					$response = array(
@@ -1255,7 +1257,7 @@ class Admin {
 					);
 
 				// on save
-				} elseif( $action_type == 'save' ) {
+				} elseif ( $action_type == 'save' ) {
 					$is_new = false === $document->exists();
 					$document->set_data( $document_data, $order );
 
@@ -1268,7 +1270,7 @@ class Admin {
 
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
-						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data' );
+						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
 					$response      = array(

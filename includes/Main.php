@@ -299,7 +299,7 @@ class Main {
 		}
 	
 		return $locked;
-	}		
+	}
 
 	public function get_documents_for_email( $email_id, $order ) {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
@@ -495,19 +495,19 @@ class Main {
 			if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'bulk' );
-					$this->log_document_creation_trigger_to_order_meta( $document, 'bulk' );
+					$this->log_document_creation_trigger_to_order_meta( $document, 'bulk', false, $request );
 					$this->mark_document_printed( $document, 'bulk' );
 				} );
 			} elseif ( isset( $request['my-account'] ) ) {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'my_account' );
-					$this->log_document_creation_trigger_to_order_meta( $document, 'my_account' );
+					$this->log_document_creation_trigger_to_order_meta( $document, 'my_account', false, $request );
 					$this->mark_document_printed( $document, 'my_account' );
 				} );
 			} else {
 				add_action( 'wpo_wcpdf_init_document', function( $document ) {
 					$this->log_document_creation_to_order_notes( $document, 'single' );
-					$this->log_document_creation_trigger_to_order_meta( $document, 'single' );
+					$this->log_document_creation_trigger_to_order_meta( $document, 'single', false, $request );
 					$this->mark_document_printed( $document, 'single' );
 				} );
 			}
@@ -768,11 +768,11 @@ class Main {
 	/**
 	 * Generate random string
 	 */
-	public function generate_random_string () {
-		if ( function_exists( 'random_bytes' ) ) { // PHP7+
-			$code = bin2hex(random_bytes(16));
+	public function generate_random_string() {
+		if ( function_exists( 'random_bytes' ) ) {
+			$code = bin2hex( random_bytes( 16 ) );
 		} else {
-			$code = md5(uniqid(wp_rand(), true));
+			$code = md5( uniqid( wp_rand(), true ) );
 		}
 		// create option
 		update_option( 'wpo_wcpdf_random_string', $code );
@@ -862,7 +862,7 @@ class Main {
 							<?php
 								printf(
 									/* translators: 1. plugin name, 2. directory path */
-									esc_html__( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ),
+									wp_kses_post( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ),
 									'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
 									'<code>' . esc_url_raw( $path ) . '</code>'
 								);
@@ -1373,16 +1373,19 @@ class Main {
 	/**
 	 * Logs to the order meta
 	 *
-	 * @param object  $document
-	 * @param string  $trigger
-	 * @param boolean $force
+	 * @param object     $document
+	 * @param string     $trigger
+	 * @param boolean    $force
+	 * @param array|null $request
 	 * @return void
 	 */
-	public function log_document_creation_trigger_to_order_meta( $document, $trigger, $force = false ) {
+	public function log_document_creation_trigger_to_order_meta( $document, $trigger, $force = false, $request = null ) {
 		if ( $trigger == 'bulk' && property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
 			$order_ids = $document->order_ids;
 		} elseif ( ! is_null( $document->order ) && is_callable( array( $document->order, 'get_id' ) ) ) {
 			$order_ids = array( $document->order->get_id() );
+		} elseif ( isset( $request['order_id'] ) ) {
+			$order_ids = array( absint( $request['order_id'] ) );
 		} else {
 			$order_ids = array();
 		}
