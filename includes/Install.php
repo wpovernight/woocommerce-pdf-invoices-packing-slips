@@ -390,14 +390,12 @@ class Install {
 			global $wpdb;
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
-				$store_name      = "{$document->slug}_number";
-				$method          = WPO_WCPDF()->settings->get_sequential_number_store_method();
-				$table_name      = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method );
-				$table_name_safe = sanitize_key( $table_name );
-				$prepared_query  = $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name_safe );
+				$store_name        = "{$document->slug}_number";
+				$method            = WPO_WCPDF()->settings->get_sequential_number_store_method();
+				$table_name        = apply_filters( 'wpo_wcpdf_number_store_table_name', sanitize_key( "{$wpdb->prefix}wcpdf_{$store_name}" ), $store_name, $method );
+				$table_name_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", esc_sql( $table_name ) ) ) === $table_name;
 
-				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-				if ( $wpdb->get_var( $prepared_query ) !== $table_name_safe ) {
+				if ( ! $table_name_exists ) {
 					continue;
 				}
 
@@ -407,14 +405,8 @@ class Install {
 					if ( ! empty( $number_store ) ) {
 						$column_name      = 'date';
 						$table_name_safe  = sanitize_key( $number_store->table_name );
-						$column_name_safe = sanitize_key( $column_name );
-						$alter_query = $wpdb->prepare(
-							"ALTER TABLE `" . esc_sql( $table_name_safe ) . "` ALTER `" . esc_sql( $column_name_safe ) . "` SET DEFAULT %s",
-							'1000-01-01 00:00:00'
-						);						
-
-						// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-						$query_result = $wpdb->query( $alter_query );
+						$column_name_safe = sanitize_key( $column_name );					
+						$query_result     = $wpdb->query( $wpdb->prepare( "ALTER TABLE `" . esc_sql( $table_name_safe ) . "` ALTER `" . esc_sql( $column_name_safe ) . "` SET DEFAULT %s", '1000-01-01 00:00:00' ) );
 
 						if ( $query_result ) {
 							wcpdf_log_error(
