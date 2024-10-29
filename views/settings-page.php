@@ -2,7 +2,7 @@
 <?php
 
 if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
-	wp_die( __( 'Action failed. Please refresh the page and retry.', 'woocommerce-pdf-invoices-packing-slips' ) );
+	wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'woocommerce-pdf-invoices-packing-slips' ) );
 }
 
 $review_url        = 'https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/#new-post';
@@ -156,7 +156,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 				<?php endif; ?>
 			</div>
 			<input type="hidden" name="document_type" data-default="<?php echo esc_attr( $document_type ); ?>" value="<?php echo esc_attr( $document_type ); ?>">
-			<input type="hidden" name="output_format" value="<?php echo ( isset( $_REQUEST['output_format'] ) && ! empty( $_REQUEST['output_format'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) ) : 'pdf'; ?>">
+			<input type="hidden" name="output_format" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( ( isset( $_REQUEST['output_format'] ) && ! empty( $_REQUEST['output_format'] ) ) ? $_REQUEST['output_format'] : 'pdf' ) ) ); ?>">
 			<input type="hidden" name="order_id" value="">
 			<input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'wpo_wcpdf_preview' ) ); ?>">
 			<div class="preview"></div>
