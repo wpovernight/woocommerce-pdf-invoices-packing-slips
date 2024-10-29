@@ -85,18 +85,6 @@ abstract class OrderDocument {
 	 * @var array
 	 */
 	public $output_formats = array();
-	
-	/**
-	 * Language attributes.
-	 * @var string
-	 */
-	public $language_attributes;
-	
-	/**
-	 * Body class.
-	 * @var string
-	 */
-	public $body_class;
 
 	/**
 	 * Linked documents, used for data retrieval
@@ -130,14 +118,6 @@ abstract class OrderDocument {
 		// output formats
 		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
 		$this->output_formats = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_output_formats", array( $this->output_formats, $this ), '3.8.7', 'wpo_wcpdf_document_output_formats' );
-		
-		// language attributes
-		$this->language_attributes = apply_filters( 'wpo_wcpdf_document_language_attributes', get_language_attributes(), $this );
-		$this->language_attributes = apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $this->language_attributes, $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
-		
-		// body class
-		$this->body_class = apply_filters( 'wpo_wcpdf_document_body_class', $this->get_type(), $this );
-		$this->body_class = apply_filters_deprecated( 'wpo_wcpdf_body_class', array( $this->body_class, $this ), '3.9.1', 'wpo_wcpdf_document_body_class' );
 
 		// load data
 		if ( $this->order ) {
@@ -968,6 +948,44 @@ abstract class OrderDocument {
 		$due_date           = apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
 		echo esc_html( $due_date );
 	}
+	
+	/**
+	 * Get the language attributes for the document.
+	 *
+	 * @return string
+	 */
+	public function get_language_attributes(): string {
+		$language_attributes = apply_filters( 'wpo_wcpdf_document_language_attributes', get_language_attributes(), $this );
+		return apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $language_attributes, $this->get_type(), $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
+	}
+	
+	/**
+	 * Print the language attributes for the document.
+	 *
+	 * @return void
+	 */
+	public function language_attributes(): void {
+		echo esc_html( $this->get_language_attributes() );
+	}
+	
+	/**
+	 * Get the body class for the document.
+	 *
+	 * @return string
+	 */
+	public function get_body_class(): string {
+		$body_class = apply_filters( 'wpo_wcpdf_document_body_class', $this->get_type(), $this );
+		return apply_filters_deprecated( 'wpo_wcpdf_body_class', array( $body_class, $this ), '3.9.1', 'wpo_wcpdf_document_body_class' );
+	}
+	
+	/**
+	 * Print the body class for the document.
+	 *
+	 * @return void
+	 */
+	public function body_class(): void {
+		echo esc_html( $this->get_body_class() );
+	}
 
 	/*
 	|--------------------------------------------------------------------------
@@ -1110,14 +1128,30 @@ abstract class OrderDocument {
 	 * Output template styles
 	 */
 	public function template_styles() {
-		$css = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( "style.css" ) );
-
-		ob_start();
-		if (file_exists($css)) {
-			include($css);
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+		$css_file_path = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( 'style.css' ) );
+		$css           = '';
+		
+		if ( $wp_filesystem->exists( $css_file_path ) ) {
+			$css = $wp_filesystem->get_contents( $css_file_path );
 		}
-		$css = ob_get_clean();
+	
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
+	
+		echo esc_html( $css );
+	}
+	
+	/**
+	 * Output custom template styles
+	 * 
+	 * @return void
+	 */
+	public function template_custom_styles(): void {
+		ob_start();
+
+		do_action( 'wpo_wcpdf_custom_styles', $this->get_type(), $this );
+
+		$css = apply_filters( 'wpo_wcpdf_template_custom_styles', ob_get_clean(), $this );
 
 		echo esc_html( $css );
 	}

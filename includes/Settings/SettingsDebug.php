@@ -927,7 +927,7 @@ class SettingsDebug {
 		<table id="document-link-access-type">
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php esc_html_e( "Document can be accessed by logged in users only.", 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td><?php esc_html_e( 'Document can be accessed by logged in users only.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
