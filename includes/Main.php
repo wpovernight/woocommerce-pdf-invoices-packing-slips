@@ -76,6 +76,9 @@ class Main {
 		// show notice of missing required directories
 		add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
 
+		// Show a notice if the plugin requirements are not met.
+		add_action( 'admin_notices', array( $this, 'requirement_missing_notice' ) );
+
 		// add custom webhook topics for documents
 		add_filter( 'woocommerce_webhook_topic_hooks', array( $this, 'wc_webhook_topic_hooks' ), 10, 2 );
 		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
@@ -871,6 +874,15 @@ class Main {
 				}
 			}
 		}
+	}
+
+	public function requirement_missing_notice(): void {
+		$notice = sprintf(
+		/* translators: 1. open anchor tag, 2. close anchor tag */
+			__( 'Your server does not meet the minimum requirements for WooCommerce PDF Invoices & Packing Slips. Please check the %1$sSystem Status%2$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="' . esc_url( admin_url( 'admin.php?page=wc-status&tab=tools' ) ) . '">',
+			'</a>'
+		);
 	}
 
 	/**

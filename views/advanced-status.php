@@ -124,6 +124,23 @@ if ( ! $server_configs['PHP version']['result'] ) {
 	/* translators: <a> tags */
 	$server_configs['PHP version']['required'] .= '<br/>' . sprintf( __( 'Download %1$sthis addon%2$s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">', '</a>' );
 }
+
+
+$does_requirements_meet = true;
+
+foreach ( $server_configs as $config_name => $server_config ) {
+	// This is always false!
+	if ( 'opcache' === $config_name ) {
+		continue;
+	}
+
+	if ( ! $server_config['result'] ) {
+		$does_requirements_meet = false;
+	}
+}
+
+update_option( 'wpo_wcpdf_show_requirement_notice', $does_requirements_meet );
+
 ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
