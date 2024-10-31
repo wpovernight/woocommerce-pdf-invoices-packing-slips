@@ -224,8 +224,9 @@ table.notes-totals {
 }
 
 /* item meta formatting */
-.item-meta {
-	margin: 8px 0 0 0;
+.item-meta,
+.meta {
+	margin: 4px 0 0 0;
 	font-size: 7pt;
 	line-height: 7pt;
 	overflow-wrap: anywhere;
@@ -248,9 +249,9 @@ table.notes-totals {
 
 .wc-item-meta p,
 .wc-item-meta dd,
-.item-meta p {
-	margin-top: 4px;
-	margin-left: 0;
+.item-meta p,
+.meta p {
+	margin: 0;
 }
 
 /* Notes & Totals */
