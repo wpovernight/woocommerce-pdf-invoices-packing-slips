@@ -97,23 +97,25 @@ class Semaphore {
 	 */
 	private function ensure_database_initialised(): int {
 		global $wpdb;
-
-		$results = (int) $wpdb->get_results( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", $this->option_name ) );
-
-		if ( 1 === $results ) {
+	
+		// Check if the lock option already exists
+		$existing_option = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", $this->option_name ) );
+	
+		if ( 1 === (int) $existing_option ) {
 			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') already existed in the database', 'debug' );
 			return 1;
 		}
-
-		$rows_affected = $wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES(%s, '0', 'no');", $this->option_name ) );
-
+	
+		// Insert the lock option with a default value of 0
+		$rows_affected = $wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, '0', 'no')", $this->option_name ) );
+	
 		if ( $rows_affected > 0 ) {
 			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') was created in the database', 'debug' );
+			return 2;
 		} else {
-			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') failed to be created in the database (could already exist)', 'notice' );
+			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') failed to be created in the database', 'notice' );
+			return 0;
 		}
-
-		return ( $rows_affected > 0 ) ? 2 : 0;
 	}
 
 	/**

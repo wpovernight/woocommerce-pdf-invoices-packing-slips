@@ -215,41 +215,56 @@ class Main {
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
 		$filename      = $document->get_filename();
 		$pdf_path      = $tmp_path . $filename;
+		$document_type = $document->get_type();
+		$order_id      = $document->order->get_id();
 		$lock_file     = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
-		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 ); // if this file already exists in the temp path, we'll reuse it if it's not older than 60 seconds
-
-		if ( $wp_filesystem->exists( $pdf_path ) && $max_reuse_age > 0 ) {
-			$filemtime = filemtime( $pdf_path ); // get last modification date
-
-			if ( $filemtime ) {
-				$time_difference = time() - $filemtime;
-
-				if ( $time_difference < $max_reuse_age ) {
-					// check if file is still being written to
-					if ( $lock_file && $this->wait_for_file_lock( $pdf_path ) === false ) {
-						return $pdf_path;
-					} else {
-						// make sure this gets logged, but don't abort process
-						wcpdf_log_error( "Attachment file locked (reusing: {$pdf_path})", 'critical' );
-					}
+		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
+	
+		try {
+			// Check if the file can be reused
+			if ( $wp_filesystem->exists( $pdf_path ) && $max_reuse_age > 0 ) {
+				$filemtime = filemtime( $pdf_path );
+				if ( $filemtime && ( time() - $filemtime < $max_reuse_age ) ) {
+					return $pdf_path;
 				}
 			}
+	
+			// Get PDF data and set up the Semaphore
+			$pdf_data  = $document->get_pdf();
+			$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
+	
+			// Attempt to acquire the lock if needed
+			$lock_acquired = false;
+			if ( $lock_file ) {
+				$lock_acquired = $semaphore->lock();
+			}
+	
+			// Write the file
+			$file_written = $wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
+	
+			// Log if the lock was not acquired
+			if ( $lock_file && ! $lock_acquired ) {
+				$semaphore->log( "Couldn't get the lock for the PDF attachment", 'critical' );
+			}
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( "Exception occurred: " . $e->getMessage(), 'critical' );
+			return false;
+		} finally {
+			// Release the lock if it was acquired
+			if ( $lock_acquired ) {
+				$semaphore->release();
+				$semaphore->log( 'Lock released for the PDF attachment.', 'info' );
+			}
 		}
-
-		// get pdf data & store
-		$pdf_data = $document->get_pdf();
-
-		if ( $lock_file ) {
-			$wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE | LOCK_EX );
-		} else {
-			$wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
+	
+		// Check if the file was written successfully
+		if ( ! $file_written ) {
+			$message = "Couldn't write the PDF attachment to {$pdf_path}";
+			$semaphore->log( $message, 'critical' );
+			wcpdf_log_error( $message, 'critical' );
+			return false;
 		}
-
-		// wait for file lock
-		if ( $lock_file && $this->wait_for_file_lock( $pdf_path ) === true ) {
-			wcpdf_log_error( "Attachment file locked ({$pdf_path})", 'critical' );
-		}
-
+	
 		return $pdf_path;
 	}
 
@@ -267,38 +282,6 @@ class Main {
 		$full_filename = $ubl_maker->write( $filename, $contents );
 
 		return $full_filename;
-	}
-
-	public function file_is_locked( $path ) {
-		// Attempt to write a temporary lock file
-		$lock_test_path = $path . '.lock_test';
-		$is_locked      = false;
-		$wp_filesystem  = wpo_wcpdf_get_wp_filesystem();
-
-		if ( ! $wp_filesystem->put_contents( $lock_test_path, 'test', FS_CHMOD_FILE | LOCK_EX ) ) {
-			$is_locked = true; // Could not write lock file, likely locked
-		}
-
-		// Clean up the temporary lock file, regardless of lock status
-		$wp_filesystem->delete( $lock_test_path );
-
-		return $is_locked;
-	}
-
-	public function wait_for_file_lock( $path ) {
-		$locked = $this->file_is_locked( $path );
-
-		if ( $locked ) {
-			// Optional delay (ms) to double-check if the write process is finished
-			$delay = intval( apply_filters( 'wpo_wcpdf_attachment_locked_file_delay', 250 ) );
-
-			if ( $delay > 0 ) {
-				usleep( $delay * 1000 );
-				$locked = $this->file_is_locked( $path );
-			}
-		}
-
-		return $locked;
 	}
 
 	public function get_documents_for_email( $email_id, $order ) {

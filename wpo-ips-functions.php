@@ -270,7 +270,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$function = "get_document_{$output_format}_attachment";
+	$function = "get_document_{$output_format}_attachment"; // 'get_document_pdf_attachment' or 'get_document_ubl_attachment'
 
 	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
 		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
