@@ -948,7 +948,7 @@ abstract class OrderDocument {
 		$due_date           = apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
 		echo esc_html( $due_date );
 	}
-	
+
 	/**
 	 * Get the language attributes for the document.
 	 *
@@ -958,7 +958,7 @@ abstract class OrderDocument {
 		$language_attributes = apply_filters( 'wpo_wcpdf_document_language_attributes', get_language_attributes(), $this );
 		return apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $language_attributes, $this->get_type(), $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
 	}
-	
+
 	/**
 	 * Print the language attributes for the document.
 	 *
@@ -967,7 +967,7 @@ abstract class OrderDocument {
 	public function language_attributes(): void {
 		echo esc_html( $this->get_language_attributes() );
 	}
-	
+
 	/**
 	 * Get the body class for the document.
 	 *
@@ -977,7 +977,7 @@ abstract class OrderDocument {
 		$body_class = apply_filters( 'wpo_wcpdf_document_body_class', $this->get_type(), $this );
 		return apply_filters_deprecated( 'wpo_wcpdf_body_class', array( $body_class, $this ), '3.9.1', 'wpo_wcpdf_document_body_class' );
 	}
-	
+
 	/**
 	 * Print the body class for the document.
 	 *
@@ -1131,19 +1131,19 @@ abstract class OrderDocument {
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
 		$css_file_path = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( 'style.css' ) );
 		$css           = '';
-		
+
 		if ( $wp_filesystem->exists( $css_file_path ) ) {
 			$css = $wp_filesystem->get_contents( $css_file_path );
 		}
-	
+
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
-	
+
 		echo esc_html( $css );
 	}
-	
+
 	/**
 	 * Output custom template styles
-	 * 
+	 *
 	 * @return void
 	 */
 	public function template_custom_styles(): void {
@@ -1214,7 +1214,7 @@ abstract class OrderDocument {
 			$image_src   = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
 			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
 			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
-			
+
 			echo wp_kses_post( $img_element );
 		}
 	}
@@ -1349,12 +1349,12 @@ abstract class OrderDocument {
 		WPO_WCPDF()->main->maybe_reinstall_fonts();
 
 		$pdf = null;
-		
+
 		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
 			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
 			$pdf = $wp_filesystem->get_contents( $pdf_file );
 		}
-		
+
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
 		if ( !empty( $pdf ) ) {
 			return $pdf;
@@ -1488,12 +1488,11 @@ abstract class OrderDocument {
 
 		ob_clean();
 		flush();
-		
+
 		if ( $wp_filesystem->exists( $full_filename ) ) {
 			echo $wp_filesystem->get_contents( $full_filename ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			wp_delete_file( $full_filename );
 		}
-		
-		wp_delete_file( $full_filename );
 
 		exit();
 	}
@@ -1583,12 +1582,13 @@ abstract class OrderDocument {
 	public function get_wc_emails() {
 		// only run this in the context of the settings page or setup wizard
 		// prevents WPML language mixups
-		
-		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] && ( isset( $_GET['_wpnonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpo_wcpdf_setup' ) ) ) {
+		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( ! empty( $request['page'] ) && 'wpo-wcpdf-setup' === $request['page'] ) {
 			return array();
 		}
 
-		if ( ! in_array( $_GET['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ) ) ) {
+		if ( ! in_array( $request['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ) ) ) {
 			return array();
 		}
 

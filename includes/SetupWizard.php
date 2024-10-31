@@ -42,9 +42,10 @@ class SetupWizard {
 	 * Show the setup wizard.
 	 */
 	public function setup_wizard() {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix  = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$request = stripslashes_deep( $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] || empty( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpo_wcpdf_setup' ) ) {
+		if ( empty( $request['page'] ) || 'wpo-wcpdf-setup' !== $request['page'] ) {
 			return;
 		}
 
@@ -82,7 +83,7 @@ class SetupWizard {
 				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
 			),
 		);
-		$this->step = isset( $_GET['step'] ) ? sanitize_text_field( wp_unslash( $_GET['step'] ) ) : current( array_keys( $this->steps ) );
+		$this->step = isset( $request['step'] ) ? sanitize_text_field( wp_unslash( $request['step'] ) ) : current( array_keys( $this->steps ) );
 
 		wp_enqueue_style(
 			'wpo-wcpdf-setup',
@@ -114,7 +115,7 @@ class SetupWizard {
 			);
 		}
 
-		if ( ! empty( $_POST['save_step'] ) ) {
+		if ( ! empty( $request['save_step'] ) ) {
 			$this->save_step();
 		}
 
@@ -241,7 +242,7 @@ class SetupWizard {
 			if ( ! empty( $_POST['wcpdf_settings'] ) && is_array( $_POST['wcpdf_settings'] ) ) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
 				$request_settings = isset( $_POST['wcpdf_settings'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['wcpdf_settings'] ) ) : array();
-				
+
 				foreach ( $request_settings as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {

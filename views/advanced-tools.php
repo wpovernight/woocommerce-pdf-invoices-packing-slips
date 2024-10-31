@@ -149,7 +149,7 @@
 		<div class="tool">
 			<h4><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 			<p><?php esc_html_e( 'Set up your basic invoice workflow via our Wizard.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ), 'wpo_wcpdf_setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo-wcpdf-setup' ) ); ?>" class="button"><?php esc_html_e( 'Run the Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 		</div>
 		<!-- /run_wizard -->
 		<!-- export_settings -->

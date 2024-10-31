@@ -217,13 +217,13 @@ class Main {
 		$pdf_path      = $tmp_path . $filename;
 		$lock_file     = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
 		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 ); // if this file already exists in the temp path, we'll reuse it if it's not older than 60 seconds
-		
+
 		if ( $wp_filesystem->exists( $pdf_path ) && $max_reuse_age > 0 ) {
 			$filemtime = filemtime( $pdf_path ); // get last modification date
-			
+
 			if ( $filemtime ) {
 				$time_difference = time() - $filemtime;
-				
+
 				if ( $time_difference < $max_reuse_age ) {
 					// check if file is still being written to
 					if ( $lock_file && $this->wait_for_file_lock( $pdf_path ) === false ) {
@@ -274,30 +274,30 @@ class Main {
 		$lock_test_path = $path . '.lock_test';
 		$is_locked      = false;
 		$wp_filesystem  = wpo_wcpdf_get_wp_filesystem();
-	
+
 		if ( ! $wp_filesystem->put_contents( $lock_test_path, 'test', FS_CHMOD_FILE | LOCK_EX ) ) {
 			$is_locked = true; // Could not write lock file, likely locked
 		}
-	
+
 		// Clean up the temporary lock file, regardless of lock status
 		$wp_filesystem->delete( $lock_test_path );
-	
+
 		return $is_locked;
 	}
-	
+
 	public function wait_for_file_lock( $path ) {
 		$locked = $this->file_is_locked( $path );
-	
+
 		if ( $locked ) {
 			// Optional delay (ms) to double-check if the write process is finished
 			$delay = intval( apply_filters( 'wpo_wcpdf_attachment_locked_file_delay', 250 ) );
-			
+
 			if ( $delay > 0 ) {
 				usleep( $delay * 1000 );
 				$locked = $this->file_is_locked( $path );
 			}
 		}
-	
+
 		return $locked;
 	}
 
@@ -493,19 +493,19 @@ class Main {
 		try {
 			// log document creation to order notes
 			if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) ) {
-				add_action( 'wpo_wcpdf_init_document', function( $document ) {
+				add_action( 'wpo_wcpdf_init_document', function( $document ) use ( $request ) {
 					$this->log_document_creation_to_order_notes( $document, 'bulk' );
 					$this->log_document_creation_trigger_to_order_meta( $document, 'bulk', false, $request );
 					$this->mark_document_printed( $document, 'bulk' );
 				} );
 			} elseif ( isset( $request['my-account'] ) ) {
-				add_action( 'wpo_wcpdf_init_document', function( $document ) {
+				add_action( 'wpo_wcpdf_init_document', function( $document ) use ( $request ) {
 					$this->log_document_creation_to_order_notes( $document, 'my_account' );
 					$this->log_document_creation_trigger_to_order_meta( $document, 'my_account', false, $request );
 					$this->mark_document_printed( $document, 'my_account' );
 				} );
 			} else {
-				add_action( 'wpo_wcpdf_init_document', function( $document ) {
+				add_action( 'wpo_wcpdf_init_document', function( $document ) use ( $request ) {
 					$this->log_document_creation_to_order_notes( $document, 'single' );
 					$this->log_document_creation_trigger_to_order_meta( $document, 'single', false, $request );
 					$this->mark_document_printed( $document, 'single' );
@@ -616,9 +616,9 @@ class Main {
 				$tmp_path = $tmp_base . $type;
 				break;
 		}
-		
+
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-		
+
 		// double check for existence, in case tmp_base was installed, but subfolder not created
 		if ( ! $wp_filesystem->is_dir( $tmp_path ) ) {
 			$dir = $wp_filesystem->mkdir( $tmp_path );
@@ -798,7 +798,7 @@ class Main {
 		if( ! $this->get_random_string() ) {
 			$this->generate_random_string();
 		}
-		
+
 		$tmp_base      = $this->get_tmp_base(); // get tmp base
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
 
