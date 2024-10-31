@@ -258,7 +258,7 @@ class SettingsDebug {
 	}
 
 	private function clear_released_semaphore_locks( $data ) {
-		\WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0::cleanup_released_locks();
+		\WPO\IPS\Semaphore::cleanup_released_locks();
 
 		$message = esc_html__( 'Released semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
 		wcpdf_log_error( $message, 'info' );
@@ -266,7 +266,7 @@ class SettingsDebug {
 	}
 
 	private function clear_released_legacy_semaphore_locks( $data ) {
-		\WPO\WC\PDF_Invoices\Updraft_Semaphore_3_0::cleanup_released_locks( true );
+		\WPO\IPS\Semaphore::cleanup_released_locks( true );
 
 		$message = esc_html__( 'Released legacy semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
 		wcpdf_log_error( $message, 'info' );
