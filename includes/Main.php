@@ -219,6 +219,7 @@ class Main {
 		$order_id      = $document->order->get_id();
 		$lock_file     = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
 		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
+		$lock_acquired = false;
 	
 		try {
 			// Check if the file can be reused
@@ -234,7 +235,6 @@ class Main {
 			$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
 	
 			// Attempt to acquire the lock if needed
-			$lock_acquired = false;
 			if ( $lock_file ) {
 				$lock_acquired = $semaphore->lock();
 			}
