@@ -126,20 +126,21 @@ if ( ! $server_configs['PHP version']['result'] ) {
 }
 
 
-$does_requirements_meet = true;
+$show_requirement_notice = false;
 
-foreach ( $server_configs as $config_name => $server_config ) {
+foreach ( $server_configs as $config_name => $config ) {
 	// This is always false!
 	if ( 'opcache' === $config_name ) {
 		continue;
 	}
 
-	if ( ! $server_config['result'] ) {
-		$does_requirements_meet = false;
+	if ( ! $config['result'] ) {
+		$show_requirement_notice = true;
+		break;
 	}
 }
 
-update_option( 'wpo_wcpdf_show_requirement_notice', $does_requirements_meet );
+update_option( 'wpo_wcpdf_show_requirement_notice', $show_requirement_notice );
 
 ?>
 

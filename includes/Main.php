@@ -877,12 +877,43 @@ class Main {
 	}
 
 	public function requirement_missing_notice(): void {
-		$notice = sprintf(
-		/* translators: 1. open anchor tag, 2. close anchor tag */
-			__( 'Your server does not meet the minimum requirements for WooCommerce PDF Invoices & Packing Slips. Please check the %1$sSystem Status%2$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<a href="' . esc_url( admin_url( 'admin.php?page=wc-status&tab=tools' ) ) . '">',
+		$should_show_notice  = get_option( 'wpo_wcpdf_show_requirement_notice', true );
+		$is_notice_dismissed = get_option( 'wpo_wcpdf_dismiss_requirements_notice', false );
+
+		if ( ! $should_show_notice || $is_notice_dismissed ) {
+			return;
+		}
+
+		// Handle dismissal action
+		if ( isset( $_GET['wpo_dismiss_requirements_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'dismiss_requirements_notice' ) ) {
+				update_option( 'wpo_wcpdf_dismiss_requirements_notice', true );
+				wp_redirect( remove_query_arg( array( 'wpo_dismiss_requirements_notice', '_wpnonce' ) ) );
+				exit;
+			} else {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
+				return;
+			}
+		}
+
+		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
+		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
+		$notice_message  = sprintf(
+			/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
+			__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<strong>WooCommerce PDF Invoices & Packing Slips</strong>',
+			'<a href="' . esc_url( $status_page_url ) . '">',
 			'</a>'
 		);
+
+		?>
+
+		<div class="notice notice-warning">
+			<p><?php echo wp_kses_post( $notice_message ); ?></p>
+			<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+		</div>
+
+		<?php
 	}
 
 	/**
