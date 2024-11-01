@@ -238,9 +238,13 @@ class Main {
 			if ( $lock_file ) {
 				$lock_acquired = $semaphore->lock();
 			}
-	
+			
+			$write_file = ( $lock_file && $lock_acquired ) || ! $lock_file;
+			
 			// Write the file
-			$file_written = $wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
+			if ( $write_file ) {
+				$file_written = $wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
+			}
 	
 			// Log if the lock was not acquired
 			if ( $lock_file && ! $lock_acquired ) {
