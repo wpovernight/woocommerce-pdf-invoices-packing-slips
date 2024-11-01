@@ -11,4 +11,3 @@ esc_html__( 'Shipping method', 'woocommerce-pdf-invoices-packing-slips' );
 esc_html__( 'Send email', 'woocommerce-pdf-invoices-packing-slips' );
 esc_html__( 'Description', 'woocommerce-pdf-invoices-packing-slips' );
 esc_html__( 'SKU', 'woocommerce-pdf-invoices-packing-slips' );
-

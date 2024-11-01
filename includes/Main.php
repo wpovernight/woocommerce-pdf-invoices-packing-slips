@@ -1570,23 +1570,18 @@ class Main {
 	 */
 	public function enable_debug() {
 		if ( \WPO_WCPDF()->settings->user_can_manage_settings() ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				// Log errors to debug.log file
-				if ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-					// Errors are already being logged; no action needed
-				} else {
-					// Enable logging to wp-content/debug.log
-					define( 'WP_DEBUG_LOG', true );
-				}
-			} else {
-				// Enable WP_DEBUG and WP_DEBUG_LOG
-				define( 'WP_DEBUG', true );
-				define( 'WP_DEBUG_LOG', true );
-			}
-
 			// Ensure errors are not displayed on the screen
 			if ( ! defined( 'WP_DEBUG_DISPLAY' ) ) {
 				define( 'WP_DEBUG_DISPLAY', false );
+			}
+	
+			// Enable WP_DEBUG and WP_DEBUG_LOG if not already defined
+			if ( ! defined( 'WP_DEBUG' ) ) {
+				define( 'WP_DEBUG', true );
+			}
+	
+			if ( ! defined( 'WP_DEBUG_LOG' ) ) {
+				define( 'WP_DEBUG_LOG', true );
 			}
 		}
 	}
