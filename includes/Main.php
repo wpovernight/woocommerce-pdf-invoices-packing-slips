@@ -1573,19 +1573,8 @@ class Main {
 	 */
 	public function enable_debug() {
 		if ( \WPO_WCPDF()->settings->user_can_manage_settings() ) {
-			// Ensure errors are not displayed on the screen
-			if ( ! defined( 'WP_DEBUG_DISPLAY' ) ) {
-				define( 'WP_DEBUG_DISPLAY', false );
-			}
-	
-			// Enable WP_DEBUG and WP_DEBUG_LOG if not already defined
-			if ( ! defined( 'WP_DEBUG' ) ) {
-				define( 'WP_DEBUG', true );
-			}
-	
-			if ( ! defined( 'WP_DEBUG_LOG' ) ) {
-				define( 'WP_DEBUG_LOG', true );
-			}
+			error_reporting( E_ALL );       // phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting
+			ini_set( 'display_errors', 1 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 		}
 	}
 
