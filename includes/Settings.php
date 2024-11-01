@@ -1098,8 +1098,10 @@ class Settings {
 
 		// Create an "Additional settings" section for uncategorized settings fields.
 		if ( ! empty( $unprocessed_settings_fields ) ) {
+			$category_name = 'additional';
+
 			$modified_settings_fields[] = $this->create_section(
-				'additional',
+				$category_name,
 				__( 'Additional settings', 'woocommerce-pdf-invoices-packing-slips' )
 			);
 
@@ -1116,8 +1118,8 @@ class Settings {
 	/**
 	 * Creates a section array for settings fields.
 	 *
-	 * @param string $category_name
-	 * @param string $category_title
+	 * @param string $category_name The ID of the category.
+	 * @param string $category_title The title of the section.
 	 *
 	 * @return array The section configuration array.
 	 */
