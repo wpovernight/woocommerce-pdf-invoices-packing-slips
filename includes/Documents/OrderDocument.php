@@ -1584,11 +1584,7 @@ abstract class OrderDocument {
 		// prevents WPML language mixups
 		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if ( ! empty( $request['page'] ) && 'wpo-wcpdf-setup' === $request['page'] ) {
-			return array();
-		}
-
-		if ( ! in_array( $request['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ) ) ) {
+		if ( empty( $request['page'] ) || ! in_array( $request['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ) ) ) {
 			return array();
 		}
 

@@ -232,18 +232,20 @@ class SetupWizard {
 	}
 
 	public function save_step() {
+		$request = stripslashes_deep( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
 			check_admin_referer( 'wpo-wcpdf-setup' );
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
 			$user_id = get_current_user_id();
-			$hidden = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
-			if ( ! empty( $_POST['wcpdf_settings'] ) && is_array( $_POST['wcpdf_settings'] ) ) {
+			$hidden  = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
+			
+			if ( ! empty( $_request['wcpdf_settings'] ) && is_array( $_request['wcpdf_settings'] ) ) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
-				$request_settings = isset( $_POST['wcpdf_settings'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['wcpdf_settings'] ) ) : array();
-
-				foreach ( $request_settings as $option => $settings ) {
+				
+				foreach ( $_request['wcpdf_settings'] as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
 						if ( $key == 'shop_address' && function_exists( 'sanitize_textarea_field' ) ) {
@@ -264,8 +266,8 @@ class SetupWizard {
 					$new_settings = $settings + $current_settings;
 					update_option( $option, $new_settings );
 				}
-			} elseif ( ! empty( $_POST['wpo_wcpdf_step'] ) && 'show-action-buttons' === $_POST['wpo_wcpdf_step'] ) {
-				if ( ! empty( $_POST['wc_show_action_buttons'] ) ) {
+			} elseif ( ! empty( $_request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $_request['wpo_wcpdf_step'] ) {
+				if ( ! empty( $_request['wc_show_action_buttons'] ) ) {
 					$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
 					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
 				} else {
