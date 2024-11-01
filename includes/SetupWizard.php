@@ -83,7 +83,7 @@ class SetupWizard {
 				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
 			),
 		);
-		$this->step = isset( $request['step'] ) ? sanitize_text_field( wp_unslash( $request['step'] ) ) : current( array_keys( $this->steps ) );
+		$this->step = isset( $request['step'] ) ? sanitize_text_field( $request['step'] ) : current( array_keys( $this->steps ) );
 
 		wp_enqueue_style(
 			'wpo-wcpdf-setup',

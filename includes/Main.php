@@ -339,23 +339,23 @@ class Main {
 		if ( empty( $request['access_key'] ) ) {
 			foreach ( array( '_wpnonce', 'order_key' ) as $legacy_key ) {
 				if ( ! empty( $request[ $legacy_key ] ) ) {
-					$request['access_key'] = sanitize_text_field( wp_unslash( $request[ $legacy_key ] ) );
+					$request['access_key'] = sanitize_text_field( $request[ $legacy_key ] );
 				}
 			}
 		}
 
-		$access_key  = isset( $request['access_key'] ) ? sanitize_text_field( wp_unslash( $request['access_key'] ) ) : '';
-		$action      = isset( $request['action'] ) ? sanitize_text_field( wp_unslash( $request['action'] ) ) : '';
+		$access_key  = isset( $request['access_key'] ) ? sanitize_text_field( $request['access_key'] ) : '';
+		$action      = isset( $request['action'] ) ? sanitize_text_field( $request['action'] ) : '';
 		$valid_nonce = ! empty( $access_key ) && ! empty( $action ) && wp_verify_nonce( $access_key, $action );
 
 		// check if we have the access key set
-		if ( empty( $request['access_key'] ) ) {
+		if ( empty( $access_key ) ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty access key', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
 		// check if we have the action
-		if ( empty( $request['action'] ) ) {
+		if ( empty( $action) ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: empty action', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
@@ -368,7 +368,7 @@ class Main {
 
 		// Check if all parameters are set
 		if ( empty( $request['document_type'] ) && ! empty( $request['template_type'] ) ) {
-			$request['document_type'] = sanitize_text_field( wp_unslash( $request['template_type'] ) );
+			$request['document_type'] = sanitize_text_field( $request['template_type'] );
 		}
 
 		if ( empty( $request['order_ids'] ) ) {
@@ -386,8 +386,8 @@ class Main {
 			$this->enable_debug();
 		}
 
-		$document_type = sanitize_text_field( wp_unslash( $request['document_type'] ) );
-		$order_ids     = isset( $request['order_ids'] ) ? array_map( 'absint', explode( 'x', sanitize_text_field( wp_unslash( $request['order_ids'] ) ) ) ) : array();
+		$document_type = sanitize_text_field( $request['document_type'] );
+		$order_ids     = isset( $request['order_ids'] ) ? array_map( 'absint', explode( 'x', sanitize_text_field( $request['order_ids'] ) ) ) : array();
 		$order         = false;
 
 		// single order
@@ -458,7 +458,7 @@ class Main {
 				break;
 			case 'full':
 				// check if we have a valid access key only when it's not from bulk actions
-				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), wp_unslash( $request['access_key'] ) ) ) {
+				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), $access_key ) ) {
 					$allowed = false;
 					break;
 				}

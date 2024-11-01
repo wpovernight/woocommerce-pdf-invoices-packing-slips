@@ -1030,7 +1030,6 @@ class Admin {
 		$order_type = $order->get_type();
 
 		if ( 'shop_order' === $order_type ) {
-			// Check the nonce.
 			if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				return;
 			}
@@ -1185,7 +1184,7 @@ class Admin {
 			) );
 		}
 
-		if ( ! $this->user_can_manage_document( sanitize_text_field( wp_unslash( $request['document_type'] ) ) ) ) {
+		if ( ! $this->user_can_manage_document( $request['document_type'] ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
@@ -1193,10 +1192,10 @@ class Admin {
 
 		$order_id        = absint( $request['order_id'] );
 		$order           = wc_get_order( $order_id );
-		$document_type   = sanitize_text_field( wp_unslash( $request['document_type'] ) );
-		$action_type     = sanitize_text_field( wp_unslash( $request['action_type'] ) );
-		$notice          = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( wp_unslash( $request['wpcdf_document_data_notice'] ) ) : 'saved';
-		$request_data    = isset( $request['form_data'] ) ? sanitize_text_field( wp_unslash( $request['form_data'] ) ) : '';
+		$document_type   = sanitize_text_field( $request['document_type'] );
+		$action_type     = sanitize_text_field( $request['action_type'] );
+		$notice          = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( $request['wpcdf_document_data_notice'] ) : 'saved';
+		$request_data    = isset( $request['form_data'] ) ? sanitize_text_field( $request['form_data'] ) : '';
 
 		// parse form data
 		parse_str( $request_data, $form_data );
