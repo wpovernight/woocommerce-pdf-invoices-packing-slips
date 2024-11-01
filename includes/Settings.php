@@ -1018,7 +1018,7 @@ class Settings {
 	 * @return void
 	 */
 	public function update_documents_settings_sections(): void {
-		$documents = WPO_WCPDF()->documents->documents;
+		$documents = WPO_WCPDF()->documents->get_documents();
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {
@@ -1073,16 +1073,7 @@ class Settings {
 		// Update settings fields.
 		foreach ( $settings_categories as $category_name => $category_details ) {
 			// Add section for each category.
-			$modified_settings_fields[] = array(
-				'type'     => 'section',
-				'id'       => $category_name,
-				'title'    => $category_details['title'],
-				'callback' => 'section',
-				'args'     => array(
-					'before_section' => '<div class="settings_category" id="' . $category_name . '">',
-					'after_section'  => '</div>',
-				),
-			);
+			$modified_settings_fields[] = $this->create_section( $category_name, $category_details['title'] );
 
 			// Add settings fields based on the order in the members array.
 			foreach ( $category_details['members'] as $member ) {
@@ -1107,16 +1098,9 @@ class Settings {
 
 		// Create an "Additional settings" section for uncategorized settings fields.
 		if ( ! empty( $unprocessed_settings_fields ) ) {
-			$category_name              = 'additional';
-			$modified_settings_fields[] = array(
-				'type'     => 'section',
-				'id'       => $category_name,
-				'title'    => __( 'Additional settings', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'section',
-				'args'     => array(
-					'before_section' => '<div class="settings_category" id="' . $category_name . '">',
-					'after_section'  => '</div>',
-				),
+			$modified_settings_fields[] = $this->create_section(
+				'additional',
+				__( 'Additional settings', 'woocommerce-pdf-invoices-packing-slips' )
 			);
 
 			// Add rest of settings to the $modified_settings_fields array under "More" category
@@ -1127,6 +1111,27 @@ class Settings {
 		}
 
 		return $modified_settings_fields;
+	}
+
+	/**
+	 * Creates a section array for settings fields.
+	 *
+	 * @param string $category_name
+	 * @param string $category_title
+	 *
+	 * @return array The section configuration array.
+	 */
+	private function create_section( string $category_name, string $category_title ): array {
+		return array(
+			'type'     => 'section',
+			'id'       => $category_name,
+			'title'    => $category_title,
+			'callback' => 'section',
+			'args'     => array(
+				'before_section' => '<div class="settings_category" id="' . esc_attr( $category_name ) . '">',
+				'after_section'  => '</div>',
+			),
+		);
 	}
 
 	/**
