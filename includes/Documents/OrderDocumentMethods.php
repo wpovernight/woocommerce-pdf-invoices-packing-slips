@@ -276,11 +276,31 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 		if ( ! empty( $custom_field ) || $display_empty ) {
 			$allow_tags = array(
-				'p'    => array(),
-				'span' => array(),
-				'ul'   => array(),
-				'ol'   => array(),
-				'li'   => array(),
+				'p'    => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'span' => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'ul'   => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'ol'   => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'li'   => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
 			);
 
 			if ( is_array( $custom_field ) ) {
