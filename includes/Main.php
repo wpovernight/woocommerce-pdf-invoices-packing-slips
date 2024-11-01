@@ -141,11 +141,11 @@ class Main {
 		}
 
 		$attach_to_document_types = $this->get_documents_for_email( $email_id, $order );
-		$lock                     = new Semaphore( "attach_doc_to_email_{$email_id}_from_order_{$order_id}" );
+		$semaphore                = new Semaphore( "attach_doc_to_email_{$email_id}_from_order_{$order_id}" );
 
-		if ( $lock->lock() ) {
+		if ( $semaphore->lock() ) {
 
-			$lock->log( sprintf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
+			$semaphore->log( sprintf( 'Lock acquired for attach document to email for order ID# %s.', $order_id ), 'info' );
 
 			foreach ( $attach_to_document_types as $output_format => $document_types ) {
 				foreach ( $document_types as $document_type ) {
@@ -198,12 +198,12 @@ class Main {
 				}
 			}
 
-			if ( $lock->release() ) {
-				$lock->log( sprintf( 'Lock released for attach document to email for order ID# %s.', $order_id ), 'info' );
+			if ( $semaphore->release() ) {
+				$semaphore->log( sprintf( 'Lock released for attach document to email for order ID# %s.', $order_id ), 'info' );
 			}
 
 		} else {
-			$lock->log( sprintf( 'Couldn\'t get the lock for attach document to email for order ID# %s.', $order_id ), 'critical' );
+			$semaphore->log( sprintf( 'Couldn\'t get the lock for attach document to email for order ID# %s.', $order_id ), 'critical' );
 		}
 
 		remove_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );

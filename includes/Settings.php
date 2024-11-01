@@ -819,7 +819,7 @@ class Settings {
 
 		$next_year = strval( intval( current_time( 'Y' ) ) + 1 );
 		$datetime  = new \WC_DateTime( "{$next_year}-01-01 00:00:01", new \DateTimeZone( wc_timezone_string() ) );
-		$lock      = new Semaphore( 'schedule_yearly_reset_numbers' );
+		$semaphore = new Semaphore( 'schedule_yearly_reset_numbers' );
 		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
 
 		// checks if there are pending actions
@@ -831,9 +831,9 @@ class Settings {
 		// if no concurrent actions sets the action
 		if ( $scheduled_actions < 1 ) {
 
-			if ( $lock->lock() ) {
+			if ( $semaphore->lock() ) {
 
-				$lock->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
+				$semaphore->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
 
 				try {
 					$action_id = as_schedule_single_action( $datetime->getTimestamp(), $hook );
@@ -849,17 +849,17 @@ class Settings {
 						);
 					}
 				} catch ( \Exception $e ) {
-					$lock->log( $e, 'critical' );
+					$semaphore->log( $e, 'critical' );
 				} catch ( \Error $e ) {
-					$lock->log( $e, 'critical' );
+					$semaphore->log( $e, 'critical' );
 				}
 
-				if ( $lock->release() ) {
-					$lock->log( 'Lock released for yearly reset numbers schedule.', 'info' );
+				if ( $semaphore->release() ) {
+					$semaphore->log( 'Lock released for yearly reset numbers schedule.', 'info' );
 				}
 
 			} else {
-				$lock->log( 'Couldn\'t get the lock for yearly reset numbers schedule.', 'critical' );
+				$semaphore->log( 'Couldn\'t get the lock for yearly reset numbers schedule.', 'critical' );
 			}
 
 		} else {
@@ -878,11 +878,11 @@ class Settings {
 	}
 
 	public function yearly_reset_numbers() {
-		$lock = new Semaphore( 'yearly_reset_numbers' );
+		$semaphore = new Semaphore( 'yearly_reset_numbers' );
 
-		if ( $lock->lock() ) {
+		if ( $semaphore->lock() ) {
 
-			$lock->log( 'Lock acquired for yearly reset numbers.', 'info' );
+			$semaphore->log( 'Lock acquired for yearly reset numbers.', 'info' );
 
 			try {
 				// reset numbers
@@ -911,17 +911,17 @@ class Settings {
 					}
 				}
 			} catch ( \Exception $e ) {
-				$lock->log( $e, 'critical' );
+				$semaphore->log( $e, 'critical' );
 			} catch ( \Error $e ) {
-				$lock->log( $e, 'critical' );
+				$semaphore->log( $e, 'critical' );
 			}
 
-			if ( $lock->release() ) {
-				$lock->log( 'Lock release for yearly reset numbers.', 'info' );
+			if ( $semaphore->release() ) {
+				$semaphore->log( 'Lock release for yearly reset numbers.', 'info' );
 			}
 
 		} else {
-			$lock->log( 'Couldn\'t get the lock for yearly reset numbers.', 'critical' );
+			$semaphore->log( 'Couldn\'t get the lock for yearly reset numbers.', 'critical' );
 		}
 
 		// reschedule the action for the next year

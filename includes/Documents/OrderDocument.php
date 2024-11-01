@@ -228,12 +228,12 @@ abstract class OrderDocument {
 	}
 
 	public function initiate_number( $force_new_number = false ) {
-		$lock            = new Semaphore( "initiate_{$this->slug}_number" );
+		$semaphore       = new Semaphore( "initiate_{$this->slug}_number" );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 
-		if ( $lock->lock() && empty( $document_number ) ) {
-			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
+		if ( $semaphore->lock() && empty( $document_number ) ) {
+			$semaphore->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 
 			try {
 				// If a third-party plugin claims to generate document numbers, trigger this instead
@@ -263,17 +263,17 @@ abstract class OrderDocument {
 				}
 
 			} catch ( \Exception $e ) {
-				$lock->log( $e, 'critical' );
+				$semaphore->log( $e, 'critical' );
 			} catch ( \Error $e ) {
-				$lock->log( $e, 'critical' );
+				$semaphore->log( $e, 'critical' );
 			}
 
-			if ( $lock->release() ) {
-				$lock->log( "Lock released for the {$this->slug} number init.", 'info' );
+			if ( $semaphore->release() ) {
+				$semaphore->log( "Lock released for the {$this->slug} number init.", 'info' );
 			}
 
 		} else {
-			$lock->log( "Couldn't get the lock for the {$this->slug} number init.", 'critical' );
+			$semaphore->log( "Couldn't get the lock for the {$this->slug} number init.", 'critical' );
 		}
 
 		return $document_number;
