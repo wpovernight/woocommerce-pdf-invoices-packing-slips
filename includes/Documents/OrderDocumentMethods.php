@@ -943,7 +943,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 			if ( ! empty( $label ) ) {
 				if ( function_exists( 'WPO_WCPDF_Pro' ) && isset( \WPO_WCPDF_Pro()->multilingual_full ) && is_callable( array( \WPO_WCPDF_Pro()->multilingual_full, 'maybe_get_string_translation' ) ) ) {
-					$totals[ $key ]['label'] = \WPO_WCPDF_Pro()->multilingual_full->maybe_get_string_translation( $label, 'woocommerce-pdf-invoices-packing-slips' );
+					$totals[ $key ]['label'] = \WPO_WCPDF_Pro()->multilingual_full->maybe_get_string_translation( $label, 'woocommerce' );
 				} else {
 					$totals[ $key ]['label'] = $label;
 				}

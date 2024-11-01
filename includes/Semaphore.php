@@ -157,7 +157,9 @@ class Semaphore {
 				$this->acquired = true;
 				return true;
 			}
+			
 			$retries--;
+			
 			if ( $retries >= 0 ) {
 				$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') not yet acquired; sleeping', 'debug' );
 				sleep( 1 );
@@ -189,7 +191,7 @@ class Semaphore {
 		
 		$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') released', 'info' );
 
-		$result = (int) $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = '0' WHERE option_name = %s", $this->option_name ) ) === 1;
+		$result = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = '0' WHERE option_name = %s", $this->option_name ) ) === 1;
 
 		$this->acquired = false;
 
