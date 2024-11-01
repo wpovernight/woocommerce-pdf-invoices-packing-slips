@@ -1190,15 +1190,14 @@ class Admin {
 			) );
 		}
 
-		$order_id        = absint( $request['order_id'] );
-		$order           = wc_get_order( $order_id );
-		$document_type   = sanitize_text_field( $request['document_type'] );
-		$action_type     = sanitize_text_field( $request['action_type'] );
-		$notice          = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( $request['wpcdf_document_data_notice'] ) : 'saved';
-		$request_data    = isset( $request['form_data'] ) ? sanitize_text_field( $request['form_data'] ) : '';
+		$order_id      = absint( $request['order_id'] );
+		$order         = wc_get_order( $order_id );
+		$document_type = sanitize_text_field( $request['document_type'] );
+		$action_type   = sanitize_text_field( $request['action_type'] );
+		$notice        = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( $request['wpcdf_document_data_notice'] ) : 'saved';
 
 		// parse form data
-		parse_str( $request_data, $form_data );
+		parse_str( $request['form_data'], $form_data );
 
 		if ( is_array( $form_data ) ) {
 			foreach ( $form_data as $key => &$value ) {
