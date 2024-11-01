@@ -282,8 +282,7 @@ class Settings {
 				// process settings data
 				if ( ! empty( $_POST['data'] ) ) {
 					// parse form data
-					$posted_data = sanitize_text_field( wp_unslash( $_POST['data'] ) );
-					parse_str( $posted_data, $form_data );
+					parse_str( $_POST['data'], $form_data );
 					$form_data = stripslashes_deep( $form_data );
 
 					foreach ( $form_data as $option_key => $form_settings ) {
