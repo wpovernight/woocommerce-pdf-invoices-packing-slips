@@ -244,6 +244,9 @@ class Main {
 			// Write the file
 			if ( $write_file ) {
 				$file_written = $wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
+				$semaphore->log( "PDF attachment written to {$pdf_path}", 'info' );
+			} else {
+				$semaphore->log( "PDF attachment not written to {$pdf_path} because the lock was not acquired", 'info' );
 			}
 	
 			// Log if the lock was not acquired
