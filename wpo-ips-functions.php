@@ -854,12 +854,8 @@ function wpo_wcpdf_base64_encode_file( string $src ) {
 		return false;
 	}
 
-	$file_data = false;
-	$response  = wp_remote_get( $src );
-
-	if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-		$file_data = wp_remote_retrieve_body( $response );
-	}
+	$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+	$file_data     = $wp_filesystem->get_contents( $src );
 
 	return $file_data ? base64_encode( $file_data ) : false;
 }
