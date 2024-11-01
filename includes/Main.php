@@ -216,7 +216,7 @@ class Main {
 		$filename      = $document->get_filename();
 		$pdf_path      = $tmp_path . $filename;
 		$document_type = $document->get_type();
-		$order_id      = $document->order->get_id();
+		$order_id      = isset( $document->order ) ? $document->order->get_id() : 0;
 		$lock_file     = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
 		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
 		$lock_acquired = false;
