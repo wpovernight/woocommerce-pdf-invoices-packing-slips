@@ -372,8 +372,8 @@ class SettingsGeneral {
 					continue;
 				}
 				// we're stripping abspath to make the plugin settings more portable
-				$forwardslash_dir = str_replace( '\\', '/', $dir );
-				$relative_path    = ! empty( $forwardslash_dir ) ? str_replace( $forwardslash_basepath, '', $forwardslash_dir ) : '';
+				$forwardslash_dir                      = str_replace( '\\', '/', $dir );
+				$relative_path                         = ! empty( $forwardslash_dir ) ? str_replace( $forwardslash_basepath, '', $forwardslash_dir ) : '';
 				$installed_templates[ $relative_path ] = basename( $dir );
 			}
 		}

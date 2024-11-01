@@ -282,7 +282,7 @@ class Settings {
 				// process settings data
 				if ( ! empty( $_POST['data'] ) ) {
 					// parse form data
-					parse_str( $_POST['data'], $form_data );
+					parse_str( $_POST['data'], $form_data ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					$form_data = stripslashes_deep( $form_data );
 
 					foreach ( $form_data as $option_key => $form_settings ) {
@@ -972,14 +972,16 @@ class Settings {
 	public function get_media_upload_setting_html() {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
 		
+		$request = stripslashes_deep( $_POST );
+		
 		// check permissions
 		if ( ! $this->user_can_manage_settings() ) {
 			wp_send_json_error();
 		}
 
 		// get previous (default) args and preset current
-		$args            = isset( $_POST['args'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['args'] ) ) : array();
-		$args['current'] = isset( $_POST['attachment_id'] ) ? absint( sanitize_text_field( wp_unslash( $_POST['attachment_id'] ) ) ) : 0;
+		$args            = isset( $request['args'] ) ? $request['args'] : array();
+		$args['current'] = isset( $request['attachment_id'] ) ? absint( $request['attachment_id'] ) : 0;
 
 		if ( isset( $args['translatable'] ) ) {
 			$args['translatable'] = wc_string_to_bool( $args['translatable'] );

@@ -242,10 +242,10 @@ class SetupWizard {
 			$user_id = get_current_user_id();
 			$hidden  = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
 			
-			if ( ! empty( $_request['wcpdf_settings'] ) && is_array( $_request['wcpdf_settings'] ) ) {
+			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
 				
-				foreach ( $_request['wcpdf_settings'] as $option => $settings ) {
+				foreach ( $request['wcpdf_settings'] as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
 						if ( $key == 'shop_address' && function_exists( 'sanitize_textarea_field' ) ) {
@@ -266,8 +266,8 @@ class SetupWizard {
 					$new_settings = $settings + $current_settings;
 					update_option( $option, $new_settings );
 				}
-			} elseif ( ! empty( $_request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $_request['wpo_wcpdf_step'] ) {
-				if ( ! empty( $_request['wc_show_action_buttons'] ) ) {
+			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
+				if ( ! empty( $request['wc_show_action_buttons'] ) ) {
 					$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
 					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
 				} else {
