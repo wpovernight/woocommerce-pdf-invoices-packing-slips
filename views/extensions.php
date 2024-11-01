@@ -111,7 +111,7 @@
 							printf(
 								/* translators: Premium Templates link */
 								esc_html__( 'Check out the Premium PDF Invoice & Packing Slips templates at %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-								esc_url_raw( $template_link )
+								esc_url( $template_link )
 							);
 						?>
 					</li>
@@ -120,7 +120,7 @@
 							printf(
 								/* translators: email link */
 								esc_html__( 'For custom templates, contact us at %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-								esc_url_raw( $email_link )
+								esc_url( $email_link )
 							);
 						?>
 					</li>

@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php
 	foreach ( $features as $feature ) {
 		echo '<tr><td class="first feature-label">' . esc_html( $feature['label'] );
-		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . esc_html( $feature['description'] ) . '</span></td>' : '</td>';
+		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . wp_kses_post( $feature['description'] ) . '</span></td>' : '</td>';
 		foreach ( ['pro', 'bundle'] as $extension ) {
 			echo in_array( $extension, $feature['extensions'] ) ? '<td><span class="feature-available"></span></td>' : '<td>-</td>';
 		}
@@ -36,9 +36,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tr class="upgrade-links">
 		<td class="first" align="left">&nbsp;</td>
 		<?php
-			$extensions_disabled = [];
-			$extensions_enabled  = [];
-			$extension_columns   = [];
+			$extensions_disabled = array();
+			$extensions_enabled  = array();
+			$extension_columns   = array();
 
 			// pro, templates & bundle columns
 			foreach ( $extension_license_infos as $extension => $info ) {
@@ -47,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$extensions_enabled[] = $extension;
 
 					$title = __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' );
-					if ( empty( $info['status'] ) || $info['status'] != 'valid' ) {
+					if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {
 						$subtitle = sprintf(
 							/* translators: learn more link */
 							__( 'License not yet activated: %s', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -57,7 +57,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$subtitle = '';
 					}
 
-					$extension_columns[$extension] = sprintf(
+					$extension_columns[ $extension ] = sprintf(
 						'<td align="left"><h4>%s</h4><p>%s</p></td>',
 						$title,
 						$subtitle
@@ -67,11 +67,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 				} else {
 					$extensions_disabled[] = $extension;
 					if ( $info['url'] == 'is_bundled' ) { // extension license is bundled, no need to buy
-						$extension_columns[$extension] = '<td align="left">&nbsp;</td>';
+						$extension_columns[ $extension ] = '<td align="left">&nbsp;</td>';
 					} else {
-						$extension_columns[$extension] = sprintf(
+						$extension_columns[ $extension ] = sprintf(
 							'<td align="left"><a class="upgrade_button" href="%s" target="_blank">%s</a></td>',
-							esc_url_raw( $info['url'] ),
+							esc_url( $info['url'] ),
 							__( 'Upgrade now', 'woocommerce-pdf-invoices-packing-slips' )
 						);
 					}
@@ -80,8 +80,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			// maybe disable 1 extension or bundle column
 			foreach ( $extensions_disabled as $extension_disabled ) {
-				if ( ( count( $extensions_disabled ) < 3 && $extension_disabled != 'bundle' ) || ( count( $extensions_disabled ) == 1 && $extension_disabled == 'bundle' ) ) {
-					$extension_columns[$extension_disabled] = '<td align="left">&nbsp;</td>';
+				if ( ( count( $extensions_disabled ) < 3 && 'bundle' !== $extension_disabled ) || ( count( $extensions_disabled ) == 1 && 'bundle' === $extension_disabled ) ) {
+					$extension_columns[ $extension_disabled ] = '<td align="left">&nbsp;</td>';
 				}
 			}
 

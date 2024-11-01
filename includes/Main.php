@@ -847,7 +847,7 @@ class Main {
 									/* translators: 1. plugin name, 2. directory path */
 									wp_kses_post( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ),
 									'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-									'<code>' . esc_url_raw( $path ) . '</code>'
+									'<code>' . esc_url( $path ) . '</code>'
 								);
 							?>
 						</p>
