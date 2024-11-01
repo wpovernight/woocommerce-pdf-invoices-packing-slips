@@ -36,7 +36,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 			'<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>',
 			esc_url( $tab_link ),
 			esc_attr( $tab_slug ),
-			( ( $active_tab == $tab_slug ) ? 'nav-tab-active' : '' ),
+			( ( $active_tab === $tab_slug ) ? 'nav-tab-active' : '' ),
 			wp_kses_post( $tab_title )
 		);
 	}
@@ -44,7 +44,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 	</h2>
 
 	<?php
-	do_action( 'wpo_wcpdf_before_settings_page', $active_tab, $active_section );
+	do_action( 'wpo_wcpdf_before_settings_page', $active_tab, $active_section, $nonce );
 
 	// save or check option to hide extensions ad
 	if ( isset( $_REQUEST['wpo_wcpdf_hide_extensions_ad'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
@@ -79,7 +79,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 			<?php endif; ?>
 				<?php
-					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section );
+					do_action( 'wpo_wcpdf_before_settings', $active_tab, $active_section, $nonce );
 					if ( has_action( "wpo_wcpdf_settings_output_{$active_tab}" ) ) {
 						do_action( "wpo_wcpdf_settings_output_{$active_tab}", $active_section, $nonce );
 					} else {
@@ -89,12 +89,12 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 
 						submit_button();
 					}
-					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section );
+					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section, $nonce );
 				?>
 			<?php if ( ! in_array( $active_section, $excluded_sections ) ) : ?>
 				</form>
 			<?php endif; ?>
-			<?php do_action( 'wpo_wcpdf_after_settings_form', $active_tab, $active_section ); ?>
+			<?php do_action( 'wpo_wcpdf_after_settings_form', $active_tab, $active_section, $nonce ); ?>
 		</div>
 
 		<div class="gutter">
@@ -164,6 +164,6 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 
 	</div>
 
-	<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section ); ?>
+	<?php do_action( 'wpo_wcpdf_after_settings_page', $active_tab, $active_section, $nonce ); ?>
 
 </div>

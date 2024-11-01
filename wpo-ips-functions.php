@@ -843,19 +843,19 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 }
 
 /**
- * Base64 encode file from URL or local path
+ * Base64 encode file from local path
  *
- * @param string $src
+ * @param string $local_path
  *
  * @return string|bool
  */
-function wpo_wcpdf_base64_encode_file( string $src ) {
-	if ( empty( $src ) ) {
+function wpo_wcpdf_base64_encode_file( string $local_path ) {
+	if ( empty( $local_path ) ) {
 		return false;
 	}
 
 	$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-	$file_data     = $wp_filesystem->get_contents( $src );
+	$file_data     = $wp_filesystem->get_contents( $local_path );
 
 	return $file_data ? base64_encode( $file_data ) : false;
 }
