@@ -173,7 +173,7 @@ td.order-data table th {
 table.order-details,
 table.notes-totals {
 	width: 100%;
-	margin-bottom: 8mm;
+	margin-bottom: 0;
 	page-break-before: avoid;
 }
 
@@ -258,7 +258,7 @@ table.notes-totals {
 
 table.totals {
 	width: 100%;
-	margin-top: 5mm;
+	margin-top: 0;
 	table-layout: fixed;
 }
 
@@ -267,6 +267,12 @@ table.totals td {
 	border: 0;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
+}
+
+table.totals tr:nth-child(1) th,
+table.totals tr:nth-child(1) td {
+	border-top: 0;
+	border-bottom: 0;
 }
 
 table.totals th.description,
