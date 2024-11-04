@@ -118,18 +118,18 @@
 				<td class="product">
 					<p class="item-name"><?php echo $item['name']; ?></p>
 					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order ); ?>
-					<div class="item-meta">
+					<div class="item-meta meta">
 						<?php if ( ! empty( $item['sku'] ) ) : ?>
 							<p class="sku"><span class="label"><?php $this->sku_title(); ?></span> <?php echo esc_attr( $item['sku'] ); ?></p>
 						<?php endif; ?>
 						<?php if ( ! empty( $item['weight'] ) ) : ?>
 							<p class="weight"><span class="label"><?php $this->weight_title(); ?></span> <?php echo esc_attr( $item['weight'] ); ?><?php echo esc_attr( get_option( 'woocommerce_weight_unit' ) ); ?></p>
 						<?php endif; ?>
-						<!-- ul.wc-item-meta -->
+						<!-- .wc-item-meta -->
 						<?php if ( ! empty( $item['meta'] ) ) : ?>
 							<?php echo $item['meta']; ?>
 						<?php endif; ?>
-						<!-- / ul.wc-item-meta -->
+						<!-- / .wc-item-meta -->
 					</div>
 					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order ); ?>
 				</td>
