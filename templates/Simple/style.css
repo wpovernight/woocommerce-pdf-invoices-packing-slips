@@ -45,7 +45,7 @@ ul {
 }
 
 li {
-	margin-bottom: 0.75em;
+	margin: 0;
 }
 
 p {
@@ -235,11 +235,6 @@ table.notes-totals {
 /* In Dompdf, '.wc-item-meta' is applied to a 'ul' element, whereas with the mPDF extension, it's a 'div' instead. For more details, refer to 'wpo_wcpdf_mpdf_modify_html()'. */
 .wc-item-meta {
 	margin: 0;
-}
-
-.wc-item-meta li {
-	margin-top: 4px;
-	margin-left: 0;
 }
 
 .wc-item-meta li p,
