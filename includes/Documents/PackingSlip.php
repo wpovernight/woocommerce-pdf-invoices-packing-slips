@@ -201,11 +201,50 @@ class PackingSlip extends OrderDocumentMethods {
 			$settings_fields = WPO_WCPDF()->settings->move_setting_after_id( $settings_fields, $pro_notice, 'enabled' );
 		}
 
-		// allow plugins to alter settings fields
+		// Legacy filter to allow plugins to alter settings fields.
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_documents_packing_slip', $settings_fields, $page, $option_group, $option_name );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-		return;
 
+		// Allow plugins to alter settings fields.
+		if ( ! empty( $settings_fields ) ) {
+			$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_pdf", $settings_fields, $page, $option_group, $option_name, $this );
+			WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+		}
+	}
+
+	/**
+	 * Get the settings categories.
+	 *
+	 * @param string $output_format
+	 *
+	 * @return array
+	 */
+	public function get_settings_categories( string $output_format ): array {
+		if ( ! in_array( $output_format, $this->output_formats, true ) ) {
+			return array();
+		}
+
+		$settings_categories = array(
+			'pdf' => array(
+				'general'          => array(
+					'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+					'members' => array(
+						'enabled',
+						'attach_to_email_ids',
+					),
+				),
+				'document_details' => array(
+					'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
+					'members' => array(
+						'display_email',
+						'display_phone',
+						'display_customer_notes',
+						'display_billing_address',
+					),
+				),
+			),
+		);
+
+		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ], $output_format, $this );
 	}
 
 }
