@@ -33,7 +33,7 @@ class SettingsDebug {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
 		$sections       = $this->get_settings_sections();
 
@@ -90,9 +90,9 @@ class SettingsDebug {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		global $wpdb;
-		
+
 		$_GET['_wpnonce']               = $nonce;
 		$number_store_tables            = $this->get_number_store_tables();
 		$invoice_number_store_doc_types = $this->get_additional_invoice_number_store_document_types();
@@ -112,7 +112,7 @@ class SettingsDebug {
 
 		$list_table = new NumberStoreListTable();
 		$list_table->prepare_items();
-		
+
 		$list_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
 		$search_value    = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
 		$disable_reset   = empty( $search_value ) ? 'disabled' : '';
@@ -354,15 +354,15 @@ class SettingsDebug {
 
 	private function import_settings( $data ) {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
-		
+
 		extract( $data );
 
 		$file_data = [];
 
 		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
 			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-			$json_data     = $wp_filesystem->get_contents( sanitize_text_field( wp_unslash( $_FILES['file']['tmp_name'] ) ) );
-			
+			$json_data     = $wp_filesystem->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
 			if ( ! $json_data ) {
 				$message = __( 'Failed to get contents from JSON file!', 'woocommerce-pdf-invoices-packing-slips' );
 				wcpdf_log_error( $message );
