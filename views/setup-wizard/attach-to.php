@@ -17,7 +17,7 @@
 		'options'         => $wc_emails,
 		'multiple'        => true,
 		'enhanced_select' => true,
-		'default'         => isset( $current_settings['attach_to_email_ids'] ) ? array_keys( array_filter( $current_settings['attach_to_email_ids'], function( $value ) { return $value == 1; } ) ) : array(),
+		'default'         => isset( $current_settings['attach_to_email_ids'] ) ? array_keys( array_filter( $current_settings['attach_to_email_ids'], function( $value ) { return $value === '1'; } ) ) : array(),
 	);
 
 	WPO_WCPDF()->settings->callbacks->select( $attach_to_setting );
