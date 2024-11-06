@@ -1,5 +1,7 @@
 jQuery( function( $ ) {
 
+	$( '.wc-enhanced-select' ).select2();
+	
 	$( '.tab' ).on( 'click', function() {
 		$( this ).closest('.extra-field').find('.tab').removeClass( 'active' );
 		$( this ).addClass( 'active' );

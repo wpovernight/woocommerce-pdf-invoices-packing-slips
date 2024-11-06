@@ -151,6 +151,8 @@ class SetupWizard {
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
+			<link rel="stylesheet" href="<?php echo WC()->plugin_url() . '/assets/css/admin.css'; ?>">
+			<script src="<?php echo WC()->plugin_url() . '/assets/js/select2/select2.full.min.js'; ?>"></script>
 		</head>
 		<body class="wpo-wcpdf-setup wp-core-ui">
 			<?php if( $this->step == 'good-to-go' ) { echo "<div id='confetti'></div>"; } ?>
@@ -250,6 +252,10 @@ class SetupWizard {
 				foreach ( $_POST['wcpdf_settings'] as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
+						if ( 'attach_to_email_ids' === $key ) {
+							$value = array_fill_keys( $value, '1' );
+						}
+
 						if ( $key == 'shop_address' && function_exists( 'sanitize_textarea_field' ) ) {
 							$sanitize_function = 'sanitize_textarea_field';
 						} else {

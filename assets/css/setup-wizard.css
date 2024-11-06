@@ -37,6 +37,11 @@ body.wpo-wcpdf-setup select:focus {
 	color: black!important;
 }
 
+body.wpo-wcpdf-setup .select2-search__field:focus {
+	border-color: none!important;
+	box-shadow: none!important;
+}
+
 body.wpo-wcpdf-setup select:hover {
 	color: #666!important;
 }
