@@ -1022,11 +1022,8 @@ function wpo_wcpdf_escape_image_file( string $url_or_path ): string {
 	if ( 0 === strpos( $url_or_path, 'http' ) ) {
 		// It's a URL, escape as a URL
 		return esc_url( $url_or_path );
-	} elseif ( 0 === strpos( $url_or_path, 'data:image/' ) ) {
-		// It's a data URI, escape as an attribute
-		return esc_attr( $url_or_path );
 	} else {
-		// Assume it's a filesystem path, escape as an attribute
+		// It's a data URI or a filesystem path, escape as an attribute
 		return esc_attr( $url_or_path );
 	}
 }
