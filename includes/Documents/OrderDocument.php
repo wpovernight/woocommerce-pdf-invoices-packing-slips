@@ -1211,14 +1211,9 @@ abstract class OrderDocument {
 				return;
 			}
 
-			$img_src              = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
-			$img_src_standardized = str_replace( '\\', '/', $img_src );
-			$img_element          = sprintf(
-				'<img src="%1$s" alt="%2$s"/>',
-				( 0 === strpos( $img_src_standardized, 'data:image/' ) ? esc_attr( $img_src_standardized ) : esc_url( $img_src_standardized ) ),
-				esc_attr( $company )
-			);
-			$img_element          = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
+			$img_src     = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', ( 0 === strpos( $img_src, 'data:image/' ) ? esc_attr( $img_src ) : esc_url( $img_src ) ), esc_attr( $company ) );
+			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
 			
 			echo $img_element; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
