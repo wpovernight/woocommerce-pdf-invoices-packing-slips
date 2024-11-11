@@ -1135,46 +1135,6 @@ class Main {
 		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
 		$this->temporary_files_cleanup( $delete_timestamp );
 	}
-	
-	/**
-	 * Recursive function to list files up to a certain folder depth
-	 *
-	 * @param string $path
-	 * @param int    $depth
-	 * @param int    $max_depth
-	 * @param array  $excluded_files
-	 *
-	 * @return array
-	 */
-	private function list_files_with_depth( string $path, int $depth, int $max_depth, array $excluded_files = array() ): array {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-		$files         = array();
-
-		if ( $depth > $max_depth || ! $wp_filesystem->is_dir( $path ) ) {
-			return $files;
-		}
-
-		$listed_items = $wp_filesystem->dirlist( $path );
-
-		foreach ( $listed_items as $fileinfo ) {
-			$file_path = trailingslashit( $path ) . $fileinfo['name'];
-			$basename  = wp_basename( $file_path );
-
-			// Skip excluded files
-			if ( in_array( $basename, $excluded_files ) ) {
-				continue;
-			}
-
-			if ( 'f' === $fileinfo['type'] ) {
-				$files[] = $file_path;
-			} elseif ( 'd' === $fileinfo['type'] ) {
-				// Recurse into subdirectories
-				$files = array_merge( $files, $this->list_files_with_depth( $file_path, $depth + 1, $max_depth, $excluded_files ) );
-			}
-		}
-
-		return $files;
-	}
 
 	/**
 	 * Temporary files cleanup from paths
@@ -1194,22 +1154,35 @@ class Main {
 			'.htaccess',
 			'log.htm',
 		) );
-		$folders_level    = apply_filters( 'wpo_wcpdf_cleanup_folders_level', 3 );
+		$folders_level    = apply_filters_deprecated( 'wpo_wcpdf_cleanup_folders_level', array( 3 ), '3.9.1', '', 'This filter is no longer necessary.' );
+		$files            = array();
 		$success          = 0;
 		$error            = 0;
 		$output           = array();
-		$files            = array();
-
-		// Collect files from paths up to the specified folder level
+		
 		foreach ( $paths_to_cleanup as $path ) {
-			$files = array_merge( $files, $this->list_files_with_depth( $path, 0, $folders_level, $excluded_files ) );
+			if ( $wp_filesystem->is_dir( $path ) ) {
+				$listed_files = $wp_filesystem->dirlist( $path, true, true );
+				
+				if ( $listed_files ) {
+					foreach ( $listed_files as $fileinfo ) {
+						$files[] = trailingslashit( $path ) . $fileinfo['name'];
+					}
+				}
+			}
 		}
-
-		// Process and delete files
+		
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $file ) {
+				$basename = wp_basename( $file );
+				
+				// Exclude specific files before processing
+				if ( in_array( $basename, $excluded_files ) || ! $wp_filesystem->exists( $file ) || $wp_filesystem->is_dir( $file ) ) {
+					continue;
+				}
+				
 				$file_timestamp = $wp_filesystem->mtime( $file );
-
+				
 				// Delete file if it's older than the specified timestamp
 				if ( $file_timestamp < $delete_before ) {
 					if ( $wp_filesystem->delete( $file ) ) {

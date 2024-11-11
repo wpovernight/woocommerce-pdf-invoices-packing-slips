@@ -350,8 +350,8 @@ if ( ! $server_configs['PHP version']['result'] ) {
 					printf(
 						/* translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts */
 						esc_html__( 'The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>' . esc_url( WPO_WCPDF()->main->get_tmp_path() ) . '</code>',
-						'<code>' . esc_url( $upload_base ) . '</code>',
+						'<code>' . esc_html( str_replace('\\', '/', WPO_WCPDF()->main->get_tmp_path() ) ) . '</code>',
+						'<code>' . esc_html( str_replace('\\', '/', $upload_base ) ) . '</code>',
 						'<code>UPLOADS</code>',
 						'<code>wpo_wcpdf_tmp_path</code>',
 						'<code>attachments</code>',
@@ -367,7 +367,7 @@ if ( ! $server_configs['PHP version']['result'] ) {
 					printf(
 						/* translators: directory path */
 						esc_html__( 'If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>' . esc_url( WPO_WCPDF()->plugin_path() . '/vendor/dompdf/dompdf/lib/fonts/' ) . '</code>'
+						'<code>' . esc_html( str_replace('\\', '/', WPO_WCPDF()->plugin_path() . '/vendor/dompdf/dompdf/lib/fonts/' ) ) . '</code>'
 					);
 				?>
 			</td>
