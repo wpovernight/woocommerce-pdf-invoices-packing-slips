@@ -1011,12 +1011,12 @@ function wpo_wcpdf_get_wp_filesystem() {
 }
 
 /**
- * Escapes a URL, data URI, or filesystem path for safe output in HTML.
+ * Escapes a URL or filesystem path for safe output in HTML.
  *
  * @param string $url_or_path
  * @return string
  */
-function wpo_wcpdf_escape_image_file( string $url_or_path ): string {
+function wpo_wcpdf_esc_url_or_path( string $url_or_path ): string {
 	$url_or_path = wp_normalize_path( $url_or_path );
 
 	if ( 0 === strpos( $url_or_path, 'http' ) ) {
