@@ -1212,7 +1212,7 @@ abstract class OrderDocument {
 			}
 
 			$img_src     = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', ( 0 === strpos( $img_src, 'data:image/' ) ? esc_attr( $img_src ) : esc_url( $img_src ) ), esc_attr( $company ) );
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', wpo_wcpdf_escape_image_file( $img_src ), esc_attr( $company ) );
 			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
 			
 			echo $img_element; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
