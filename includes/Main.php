@@ -1142,7 +1142,7 @@ class Main {
 	 *
 	 * @return array  Output message
 	 */
-	public function temporary_files_cleanup( $delete_timestamp = 0 ) {
+	public function temporary_files_cleanup( int $delete_timestamp = 0 ): array {
 		$wp_filesystem    = wpo_wcpdf_get_wp_filesystem();
 		$delete_before    = ! empty( $delete_timestamp ) ? intval( $delete_timestamp ) : time();
 		$paths_to_cleanup = apply_filters( 'wpo_wcpdf_cleanup_tmp_paths', array(
@@ -1160,50 +1160,70 @@ class Main {
 		$error            = 0;
 		$output           = array();
 		
+		// Gather all files from the paths
 		foreach ( $paths_to_cleanup as $path ) {
 			if ( $wp_filesystem->is_dir( $path ) ) {
 				$listed_files = $wp_filesystem->dirlist( $path, true, true );
 				
 				if ( $listed_files ) {
 					foreach ( $listed_files as $fileinfo ) {
-						$files[] = trailingslashit( $path ) . $fileinfo['name'];
+						$file_path = trailingslashit( $path ) . $fileinfo['name'];
+						$basename  = wp_basename( $file_path );
+
+						// Exclude specific files before adding to list
+						if ( ! in_array( $basename, $excluded_files ) && $wp_filesystem->exists( $file_path ) && ! $wp_filesystem->is_dir( $file_path ) ) {
+							$files[] = $file_path;
+						}
 					}
 				}
 			}
 		}
 		
-		if ( ! empty( $files ) ) {
-			foreach ( $files as $file ) {
-				$basename = wp_basename( $file );
-				
-				// Exclude specific files before processing
-				if ( in_array( $basename, $excluded_files ) || ! $wp_filesystem->exists( $file ) || $wp_filesystem->is_dir( $file ) ) {
-					continue;
-				}
-				
-				$file_timestamp = $wp_filesystem->mtime( $file );
-				
-				// Delete file if it's older than the specified timestamp
-				if ( $file_timestamp < $delete_before ) {
-					if ( $wp_filesystem->delete( $file ) ) {
-						$success++;
-					} else {
-						$error++;
-					}
-				}
-			}
-
-			if ( $error > 0 ) {
-				/* translators: 1,2. file count  */
-				$message           = sprintf( esc_html__( 'Unable to delete %1$d files! (deleted %2$d)', 'woocommerce-pdf-invoices-packing-slips' ), $error, $success );
-				$output['error']   = $message;
-			} else {
-				/* translators: file count */
-				$message           = sprintf( esc_html__( 'Successfully deleted %d files!', 'woocommerce-pdf-invoices-packing-slips' ), $success );
-				$output['success'] = $message;
-			}
-		} else {
+		// No files to delete
+		if ( empty( $files ) ) {
 			$output['success'] = esc_html__( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' );
+			return $output;
+		}
+		
+		// Process and delete files
+		foreach ( $files as $file ) {
+			$file_timestamp = $wp_filesystem->mtime( $file );
+
+			// Delete file if it's older than the specified timestamp
+			if ( $file_timestamp < $delete_before ) {
+				if ( $wp_filesystem->delete( $file ) ) {
+					$success++;
+				} else {
+					$error++;
+				}
+			}
+		}
+
+		if ( $error > 0 ) {
+			$message_error = sprintf(
+				/* translators: %1$d is the number of files that couldn't be deleted, %2$d is the number of successfully deleted files */
+				_n(
+					'Unable to delete %1$d file! (deleted %2$d)',
+					'Unable to delete %1$d files! (deleted %2$d)',
+					$error,
+					'woocommerce-pdf-invoices-packing-slips'
+				),
+				$error,
+				$success
+			);
+			$output['error'] = $message_error;
+		} else {
+			$message_success = sprintf(
+				/* translators: %d is the number of files successfully deleted */
+				_n(
+					'Successfully deleted %d file!',
+					'Successfully deleted %d files!',
+					$success,
+					'woocommerce-pdf-invoices-packing-slips'
+				),
+				$success
+			);
+			$output['success'] = $message_success;
 		}
 
 		return $output;
