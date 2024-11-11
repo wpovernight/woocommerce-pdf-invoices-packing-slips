@@ -1154,7 +1154,7 @@ class Main {
 			'.htaccess',
 			'log.htm',
 		) );
-		$folders_level    = apply_filters_deprecated( 'wpo_wcpdf_cleanup_folders_level', array( 3 ), '3.9.1', '', 'This filter is no longer necessary.' );
+		apply_filters_deprecated( 'wpo_wcpdf_cleanup_folders_level', array( 3 ), '3.9.1', '', 'This filter is no longer necessary.' );
 		$files            = array();
 		$success          = 0;
 		$error            = 0;
