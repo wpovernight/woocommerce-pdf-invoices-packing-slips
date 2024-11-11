@@ -212,18 +212,19 @@ class Main {
 	}
 
 	public function get_document_pdf_attachment( $document, $tmp_path ) {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-		$filename      = $document->get_filename();
-		$pdf_path      = $tmp_path . $filename;
-		$document_type = $document->get_type();
-		$order_id      = isset( $document->order ) ? $document->order->get_id() : 0;
-		$lock_file     = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
-		$max_reuse_age = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
-		$lock_acquired = false;
+		$wp_filesystem    = wpo_wcpdf_get_wp_filesystem();
+		$filename         = $document->get_filename();
+		$pdf_path         = $tmp_path . $filename;
+		$document_type    = $document->get_type();
+		$order_id         = isset( $document->order ) ? $document->order->get_id() : 0;
+		$lock_file        = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
+		$reuse_attachment = apply_filters( 'wpo_wcpdf_reuse_attachment', true );
+		$max_reuse_age    = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
+		$lock_acquired    = false;
 	
 		try {
 			// Check if the file can be reused
-			if ( $wp_filesystem->exists( $pdf_path ) && $max_reuse_age > 0 ) {
+			if ( $wp_filesystem->exists( $pdf_path ) && $reuse_attachment && $max_reuse_age > 0 ) {
 				$filemtime = filemtime( $pdf_path );
 				if ( $filemtime && ( time() - $filemtime < $max_reuse_age ) ) {
 					return $pdf_path;
