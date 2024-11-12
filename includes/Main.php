@@ -218,7 +218,7 @@ class Main {
 		$document_type    = $document->get_type();
 		$order_id         = isset( $document->order ) ? $document->order->get_id() : 0;
 		$lock_file        = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
-		$reuse_attachment = apply_filters( 'wpo_wcpdf_reuse_attachment', true );
+		$reuse_attachment = apply_filters( 'wpo_wcpdf_reuse_attachment', true, $document );
 		$max_reuse_age    = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
 		$lock_acquired    = false;
 	
