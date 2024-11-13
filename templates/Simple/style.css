@@ -45,7 +45,7 @@ ul {
 }
 
 li {
-	margin-bottom: 0.75em;
+	margin: 0;
 }
 
 p {
@@ -173,7 +173,7 @@ td.order-data table th {
 table.order-details,
 table.notes-totals {
 	width: 100%;
-	margin-bottom: 8mm;
+	margin-bottom: 0;
 	page-break-before: avoid;
 }
 
@@ -224,8 +224,9 @@ table.notes-totals {
 }
 
 /* item meta formatting */
-.item-meta {
-	margin: 8px 0 0 0;
+.item-meta,
+.meta {
+	margin: 4px 0 0 0;
 	font-size: 7pt;
 	line-height: 7pt;
 	overflow-wrap: anywhere;
@@ -236,11 +237,6 @@ table.notes-totals {
 	margin: 0;
 }
 
-.wc-item-meta li {
-	margin-top: 4px;
-	margin-left: 0;
-}
-
 .wc-item-meta li p,
 .wc-item-meta li dd {
 	display: inline;
@@ -248,9 +244,9 @@ table.notes-totals {
 
 .wc-item-meta p,
 .wc-item-meta dd,
-.item-meta p {
-	margin-top: 4px;
-	margin-left: 0;
+.item-meta p,
+.meta p {
+	margin: 0;
 }
 
 /* Notes & Totals */
@@ -262,7 +258,7 @@ table.notes-totals {
 
 table.totals {
 	width: 100%;
-	margin-top: 5mm;
+	margin-top: 0;
 	table-layout: fixed;
 }
 
@@ -271,6 +267,12 @@ table.totals td {
 	border: 0;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
+}
+
+table.totals tr:nth-child(1) th,
+table.totals tr:nth-child(1) td {
+	border-top: 0;
+	border-bottom: 0;
 }
 
 table.totals th.description,
