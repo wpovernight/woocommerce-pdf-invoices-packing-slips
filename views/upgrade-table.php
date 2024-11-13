@@ -82,11 +82,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			$styles = '';
 
-			if ( isset( $extension_license_infos['pro']['status'] ) && 'valid' === $extension_license_infos['pro']['status'] ) {
+			if ( isset( $extension_license_infos['pro']['status'] ) ) {
 				$styles .= '#upgrade-table .templates { display: none; }';
 			}
 
-			if ( isset( $extension_license_infos['templates']['status'] ) && 'valid' === $extension_license_infos['templates']['status'] ) {
+			if ( isset( $extension_license_infos['templates']['status'] ) ) {
 				$styles .= '#upgrade-table .pro { display: none; }';
 			}
 
