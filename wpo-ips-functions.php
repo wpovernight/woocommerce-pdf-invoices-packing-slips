@@ -181,6 +181,16 @@ function wcpdf_get_ubl_maker() {
 }
 
 /**
+ * Check if UBL is available
+ *
+ * @return bool
+ */
+function wcpdf_is_ubl_available(): bool {
+	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
+	return apply_filters( 'wpo_wcpdf_ubl_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) );
+}
+
+/**
  * Check if the default PDF maker is used for creating PDF
  *
  * @return bool whether the PDF maker is the default or not
@@ -213,8 +223,10 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 }
 
 function wcpdf_ubl_headers( $filename, $size ) {
+	$charset = apply_filters( 'wcpdf_ubl_headers_charset', 'UTF-8' );
+	
 	header( 'Content-Description: File Transfer' );
-	header( 'Content-Type: text/xml' );
+	header( 'Content-Type: text/xml; charset=' . $charset );
 	header( 'Content-Disposition: attachment; filename=' . $filename );
 	header( 'Content-Transfer-Encoding: binary' );
 	header( 'Connection: Keep-Alive' );
@@ -222,6 +234,7 @@ function wcpdf_ubl_headers( $filename, $size ) {
 	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 	header( 'Pragma: public' );
 	header( 'Content-Length: ' . $size );
+	
 	do_action( 'wpo_after_ubl_headers', $filename, $size );
 }
 

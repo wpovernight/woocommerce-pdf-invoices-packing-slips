@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              3.9.0-beta-3
+ * Version:              3.9.1-beta-1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,8 +22,8 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '3.9.0-beta-3';
-	public $version_php          = '7.2';
+	public $version              = '3.9.1-beta-1';
+	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
 	public $plugin_basename;
@@ -77,7 +77,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
-		add_action( 'init', array( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0', 'init_cleanup' ), 999 ); // wait AS to initialize
+		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
@@ -438,7 +438,7 @@ class WPO_WCPDF {
 			echo wp_kses_post( ob_get_clean() );
 		}
 
-		// save option to hide mailpoet notice
+		// save option to hide notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_rtl_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
 			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_rtl_notice_nonce' ) ) {

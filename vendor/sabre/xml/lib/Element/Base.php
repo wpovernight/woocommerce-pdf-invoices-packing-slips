@@ -2,7 +2,7 @@
 /**
  * @license BSD-3-Clause
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 declare(strict_types=1);
@@ -25,14 +25,14 @@ use WPO\IPS\Vendor\Sabre\Xml;
 class Base implements Xml\Element
 {
     /**
-     * PHP value to serialize.
-     *
-     * @var mixed
+     * @var mixed PHP value to serialize
      */
     protected $value;
 
     /**
      * Constructor.
+     *
+     * @param mixed $value PHP value to serialize
      */
     public function __construct($value = null)
     {
@@ -55,7 +55,7 @@ class Base implements Xml\Element
      *
      * If you are opening new elements, you must also close them again.
      */
-    public function xmlSerialize(Xml\Writer $writer)
+    public function xmlSerialize(Xml\Writer $writer): void
     {
         $writer->write($this->value);
     }
@@ -78,7 +78,7 @@ class Base implements Xml\Element
      * $reader->parseInnerTree() will parse the entire sub-tree, and advance to
      * the next element.
      *
-     * @return mixed
+     * @return array<int,array<string, mixed>>|string|null
      */
     public static function xmlDeserialize(Xml\Reader $reader)
     {

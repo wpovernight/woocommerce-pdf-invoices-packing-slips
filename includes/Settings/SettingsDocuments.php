@@ -87,6 +87,10 @@ class SettingsDocuments {
 					<h2 class="nav-tab-wrapper">
 						<?php
 							foreach ( $section_document->output_formats as $document_output_format ) {
+								if ( ! wcpdf_is_ubl_available() && 'ubl' === $document_output_format ) {
+									continue;
+								}
+								
 								$active    = ( $output_format == $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
 								$tab_title = strtoupper( esc_html( $document_output_format ) );
 								if ( 'ubl' === $document_output_format ) {

@@ -82,7 +82,7 @@ class Install {
 	 */
 	protected function install() {
 		// only install when php version or higher
-		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
 		}
 
@@ -212,7 +212,7 @@ class Install {
 	 */
 	protected function upgrade( $installed_version ) {
 		// only upgrade when php version or higher
-		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
 		}
 
@@ -521,9 +521,9 @@ class Install {
 
 
 			// legacy ubl tax settings
-			$legacy_ubl_tax_setings = get_option( 'ubl_wc_taxes', [] );
-			if ( ! empty( $legacy_ubl_tax_setings ) ) {
-				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_setings );
+			$legacy_ubl_tax_settings = get_option( 'ubl_wc_taxes', [] );
+			if ( ! empty( $legacy_ubl_tax_settings ) ) {
+				update_option( 'wpo_wcpdf_settings_ubl_taxes', $legacy_ubl_tax_settings );
 			}
 
 			// set transient to flush rewrite rules if pretty links are enabled
