@@ -1,11 +1,16 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Value;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
-use Sabberworm\CSS\OutputFormat;
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\UnexpectedEOFException;
-use Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
 
 /**
  * `Color's can be input in the form #rrggbb, #rgb or schema(val1, val2, …) but are always stored as an array of
@@ -56,12 +61,19 @@ class Color extends CSSFunction
                         $oParserState->currentLine()
                     ),
                 ];
-            } else {
+            } elseif ($oParserState->strlen($sValue) === 6) {
                 $aColor = [
                     'r' => new Size(intval($sValue[0] . $sValue[1], 16), null, true, $oParserState->currentLine()),
                     'g' => new Size(intval($sValue[2] . $sValue[3], 16), null, true, $oParserState->currentLine()),
                     'b' => new Size(intval($sValue[4] . $sValue[5], 16), null, true, $oParserState->currentLine()),
                 ];
+            } else {
+                throw new UnexpectedTokenException(
+                    'Invalid hex color value',
+                    $sValue,
+                    'custom',
+                    $oParserState->currentLine()
+                );
             }
         } else {
             $sColorMode = $oParserState->parseIdentifier(true);

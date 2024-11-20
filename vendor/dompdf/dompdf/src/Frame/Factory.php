@@ -3,16 +3,18 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Frame;
+namespace WPO\IPS\Vendor\Dompdf\Frame;
 
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Page as PageFrameDecorator;
-use Dompdf\FrameReflower\Page as PageFrameReflower;
-use Dompdf\Positioner\AbstractPositioner;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\AbstractFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Page as PageFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameReflower\Page as PageFrameReflower;
+use WPO\IPS\Vendor\Dompdf\Positioner\AbstractPositioner;
 use DOMXPath;
 
 /**
@@ -191,8 +193,8 @@ class Factory
             $reflower = "Image";
         }
 
-        $decorator  = "Dompdf\\FrameDecorator\\$decorator";
-        $reflower   = "Dompdf\\FrameReflower\\$reflower";
+        $decorator  = "WPO\\IPS\\Vendor\\Dompdf\\FrameDecorator\\$decorator";
+        $reflower   = "WPO\\IPS\\Vendor\\Dompdf\\FrameReflower\\$reflower";
 
         /** @var AbstractFrameDecorator $deco */
         $deco = new $decorator($frame, $dompdf);
@@ -254,7 +256,7 @@ class Factory
     protected static function getPositionerInstance(string $type): AbstractPositioner
     {
         if (!isset(self::$_positioners[$type])) {
-            $class = '\\Dompdf\\Positioner\\'.$type;
+            $class = '\\WPO\\IPS\\Vendor\\Dompdf\\Positioner\\'.$type;
             self::$_positioners[$type] = new $class();
         }
         return self::$_positioners[$type];

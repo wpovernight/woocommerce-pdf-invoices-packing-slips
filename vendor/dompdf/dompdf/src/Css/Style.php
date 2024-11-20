@@ -3,24 +3,26 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Css;
+namespace WPO\IPS\Vendor\Dompdf\Css;
 
-use Dompdf\Adapter\CPDF;
-use Dompdf\Css\Content\Attr;
-use Dompdf\Css\Content\CloseQuote;
-use Dompdf\Css\Content\ContentPart;
-use Dompdf\Css\Content\Counter;
-use Dompdf\Css\Content\Counters;
-use Dompdf\Css\Content\NoCloseQuote;
-use Dompdf\Css\Content\NoOpenQuote;
-use Dompdf\Css\Content\OpenQuote;
-use Dompdf\Css\Content\StringPart;
-use Dompdf\Css\Content\Url;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Frame;
-use Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Adapter\CPDF;
+use WPO\IPS\Vendor\Dompdf\Css\Content\Attr;
+use WPO\IPS\Vendor\Dompdf\Css\Content\CloseQuote;
+use WPO\IPS\Vendor\Dompdf\Css\Content\ContentPart;
+use WPO\IPS\Vendor\Dompdf\Css\Content\Counter;
+use WPO\IPS\Vendor\Dompdf\Css\Content\Counters;
+use WPO\IPS\Vendor\Dompdf\Css\Content\NoCloseQuote;
+use WPO\IPS\Vendor\Dompdf\Css\Content\NoOpenQuote;
+use WPO\IPS\Vendor\Dompdf\Css\Content\OpenQuote;
+use WPO\IPS\Vendor\Dompdf\Css\Content\StringPart;
+use WPO\IPS\Vendor\Dompdf\Css\Content\Url;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FontMetrics;
+use WPO\IPS\Vendor\Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Helpers;
 
 /**
  * Represents CSS properties.

@@ -1,14 +1,19 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\CSSList;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\CSSList;
 
-use Sabberworm\CSS\OutputFormat;
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\SourceException;
-use Sabberworm\CSS\Property\Selector;
-use Sabberworm\CSS\RuleSet\DeclarationBlock;
-use Sabberworm\CSS\RuleSet\RuleSet;
-use Sabberworm\CSS\Value\Value;
+use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\Selector;
+use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\DeclarationBlock;
+use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\RuleSet;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
 
 /**
  * This class represents the root of a parsed CSS file. It contains all top-level CSS contents: mostly declaration

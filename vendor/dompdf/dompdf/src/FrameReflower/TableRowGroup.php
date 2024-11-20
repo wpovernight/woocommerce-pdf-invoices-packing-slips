@@ -3,13 +3,15 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\FrameReflower;
+namespace WPO\IPS\Vendor\Dompdf\FrameReflower;
 
-use Dompdf\Exception;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableRowGroup as TableRowGroupFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Block as BlockFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Table as TableFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\TableRowGroup as TableRowGroupFrameDecorator;
 
 /**
  * Reflows table row groups (e.g. tbody tags)

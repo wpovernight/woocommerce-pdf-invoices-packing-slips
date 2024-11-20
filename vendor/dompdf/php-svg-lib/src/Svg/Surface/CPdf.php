@@ -6,9 +6,11 @@
  * @author  Wayne Munro
  * @license Public Domain http://creativecommons.org/licenses/publicdomain/
  * @package Cpdf
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Svg\Surface;
+namespace WPO\IPS\Vendor\Svg\Surface;
 
 class CPdf
 {

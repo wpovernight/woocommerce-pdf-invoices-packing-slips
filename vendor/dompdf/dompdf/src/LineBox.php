@@ -3,15 +3,17 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Block;
-use Dompdf\FrameDecorator\ListBullet;
-use Dompdf\FrameDecorator\Page;
-use Dompdf\FrameReflower\Text as TextFrameReflower;
-use Dompdf\Positioner\Inline as InlinePositioner;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\AbstractFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Block;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\ListBullet;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Page;
+use WPO\IPS\Vendor\Dompdf\FrameReflower\Text as TextFrameReflower;
+use WPO\IPS\Vendor\Dompdf\Positioner\Inline as InlinePositioner;
 use Iterator;
 
 /**

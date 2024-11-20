@@ -3,18 +3,20 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
 use DOMDocument;
 use DOMNode;
-use Dompdf\Adapter\CPDF;
+use WPO\IPS\Vendor\Dompdf\Adapter\CPDF;
 use DOMXPath;
-use Dompdf\Frame\Factory;
-use Dompdf\Frame\FrameTree;
-use Dompdf\Image\Cache;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Frame\Factory;
+use WPO\IPS\Vendor\Dompdf\Frame\FrameTree;
+use WPO\IPS\Vendor\Dompdf\Image\Cache;
+use WPO\IPS\Vendor\Dompdf\Css\Stylesheet;
+use WPO\IPS\Vendor\Dompdf\Helpers;
 use Masterminds\HTML5;
 
 /**
@@ -1293,7 +1295,7 @@ class Dompdf
     }
 
     /**
-     * Return the underlying Canvas instance (e.g. Dompdf\Adapter\CPDF, Dompdf\Adapter\GD)
+     * Return the underlying Canvas instance (e.g. WPO\IPS\Vendor\Dompdf\Adapter\CPDF, WPO\IPS\Vendor\Dompdf\Adapter\GD)
      *
      * @return Canvas
      */

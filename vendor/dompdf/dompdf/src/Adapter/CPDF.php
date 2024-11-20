@@ -3,18 +3,20 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 // FIXME: Need to sanity check inputs to this class
-namespace Dompdf\Adapter;
+namespace WPO\IPS\Vendor\Dompdf\Adapter;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
-use FontLib\Exception\FontNotFoundException;
+use WPO\IPS\Vendor\Dompdf\Canvas;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FontMetrics;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Image\Cache;
+use WPO\IPS\Vendor\FontLib\Exception\FontNotFoundException;
 
 /**
  * PDF rendering interface
@@ -109,7 +111,7 @@ class CPDF implements Canvas
     /**
      * Instance of Cpdf class
      *
-     * @var \Dompdf\Cpdf
+     * @var \WPO\IPS\Vendor\Dompdf\Cpdf
      */
     protected $_pdf;
 
@@ -174,7 +176,7 @@ class CPDF implements Canvas
             $this->_dompdf = $dompdf;
         }
 
-        $this->_pdf = new \Dompdf\Cpdf(
+        $this->_pdf = new \WPO\IPS\Vendor\Dompdf\Cpdf(
             $size,
             true,
             $this->_dompdf->getOptions()->getFontCache(),
@@ -202,7 +204,7 @@ class CPDF implements Canvas
     /**
      * Returns the Cpdf instance
      *
-     * @return \Dompdf\Cpdf
+     * @return \WPO\IPS\Vendor\Dompdf\Cpdf
      */
     public function get_cpdf()
     {
@@ -689,8 +691,8 @@ class CPDF implements Canvas
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_CHOICE;
-        $ff = \Dompdf\Cpdf::ACROFORM_FIELD_CHOICE_COMBO;
+        $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_CHOICE;
+        $ff = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_CHOICE_COMBO;
 
         $id = $pdf->addFormField($ft, rand(), $x, $this->y($y) - $h, $x + $w, $this->y($y), $ff, $size, $color);
         $pdf->setFormFieldOpt($id, $opts);
@@ -706,8 +708,8 @@ class CPDF implements Canvas
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
-        $ff = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT_MULTILINE;
+        $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+        $ff = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT_MULTILINE;
 
         $pdf->addFormField($ft, rand(), $x, $this->y($y) - $h, $x + $w, $this->y($y), $ff, $size, $color);
     }
@@ -722,19 +724,19 @@ class CPDF implements Canvas
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+        $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
         $ff = 0;
 
         switch ($type) {
             case 'text':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+                $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
                 break;
             case 'password':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
-                $ff = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT_PASSWORD;
+                $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+                $ff = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_TEXT_PASSWORD;
                 break;
             case 'submit':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_BUTTON;
+                $ft = \WPO\IPS\Vendor\Dompdf\Cpdf::ACROFORM_FIELD_BUTTON;
                 break;
         }
 

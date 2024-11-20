@@ -3,18 +3,20 @@
  * @package php-svg-lib
  * @link    http://github.com/dompdf/php-svg-lib
  * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Svg\Surface;
+namespace WPO\IPS\Vendor\Svg\Surface;
 
-use Svg\Document;
-use Svg\Style;
+use WPO\IPS\Vendor\Svg\Document;
+use WPO\IPS\Vendor\Svg\Style;
 
 class SurfaceCpdf implements SurfaceInterface
 {
     const DEBUG = false;
 
-    /** @var \Svg\Surface\CPdf */
+    /** @var \WPO\IPS\Vendor\Svg\Surface\CPdf */
     private $canvas;
 
     private $width;
@@ -32,7 +34,7 @@ class SurfaceCpdf implements SurfaceInterface
         $h = $dimensions["height"];
 
         if (!$canvas) {
-            $canvas = new \Svg\Surface\CPdf(array(0, 0, $w, $h));
+            $canvas = new \WPO\IPS\Vendor\Svg\Surface\CPdf(array(0, 0, $w, $h));
             $refl = new \ReflectionClass($canvas);
             $canvas->fontcache = realpath(dirname($refl->getFileName()) . "/../../fonts/")."/";
         }

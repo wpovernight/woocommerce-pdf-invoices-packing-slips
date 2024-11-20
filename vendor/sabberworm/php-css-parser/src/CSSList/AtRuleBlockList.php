@@ -1,9 +1,14 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\CSSList;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\CSSList;
 
-use Sabberworm\CSS\OutputFormat;
-use Sabberworm\CSS\Property\AtRule;
+use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\AtRule;
 
 /**
  * A `BlockList` constructed by an unknown at-rule. `@media` rules are rendered into `AtRuleBlockList` objects.

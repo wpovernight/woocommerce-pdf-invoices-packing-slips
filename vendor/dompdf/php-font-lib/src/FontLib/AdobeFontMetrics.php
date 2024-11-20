@@ -3,12 +3,14 @@
  * @package php-font-lib
  * @link    https://github.com/dompdf/php-font-lib
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace FontLib;
+namespace WPO\IPS\Vendor\FontLib;
 
-use FontLib\Table\Type\name;
-use FontLib\TrueType\File;
+use WPO\IPS\Vendor\FontLib\Table\Type\name;
+use WPO\IPS\Vendor\FontLib\TrueType\File;
 
 /**
  * Adobe Font Metrics file creation utility class.

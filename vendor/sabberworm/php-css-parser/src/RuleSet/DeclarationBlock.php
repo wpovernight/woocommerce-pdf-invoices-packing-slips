@@ -1,22 +1,27 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\RuleSet;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\RuleSet;
 
-use Sabberworm\CSS\CSSList\CSSList;
-use Sabberworm\CSS\CSSList\KeyFrame;
-use Sabberworm\CSS\OutputFormat;
-use Sabberworm\CSS\Parsing\OutputException;
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\UnexpectedEOFException;
-use Sabberworm\CSS\Parsing\UnexpectedTokenException;
-use Sabberworm\CSS\Property\KeyframeSelector;
-use Sabberworm\CSS\Property\Selector;
-use Sabberworm\CSS\Rule\Rule;
-use Sabberworm\CSS\Value\Color;
-use Sabberworm\CSS\Value\RuleValueList;
-use Sabberworm\CSS\Value\Size;
-use Sabberworm\CSS\Value\URL;
-use Sabberworm\CSS\Value\Value;
+use WPO\IPS\Vendor\Sabberworm\CSS\CSSList\CSSList;
+use WPO\IPS\Vendor\Sabberworm\CSS\CSSList\KeyFrame;
+use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\OutputException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\KeyframeSelector;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\Selector;
+use WPO\IPS\Vendor\Sabberworm\CSS\Rule\Rule;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\Color;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\RuleValueList;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\Size;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\URL;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
 
 /**
  * This class represents a `RuleSet` constrained by a `Selector`.

@@ -1,10 +1,15 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS;
+namespace WPO\IPS\Vendor\Sabberworm\CSS;
 
-use Sabberworm\CSS\CSSList\Document;
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\SourceException;
+use WPO\IPS\Vendor\Sabberworm\CSS\CSSList\Document;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
 
 /**
  * This class parses CSS from text into a data structure.

@@ -3,17 +3,19 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Css;
+namespace WPO\IPS\Vendor\Dompdf\Css;
 
 use DOMElement;
 use DOMXPath;
-use Dompdf\Css\Content\Url;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Frame\FrameTree;
-use Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Css\Content\Url;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FontMetrics;
+use WPO\IPS\Vendor\Dompdf\Frame\FrameTree;
+use WPO\IPS\Vendor\Dompdf\Helpers;
 
 /**
  * The master stylesheet class

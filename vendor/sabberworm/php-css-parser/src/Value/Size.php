@@ -1,11 +1,16 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Value;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
-use Sabberworm\CSS\OutputFormat;
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\UnexpectedEOFException;
-use Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
 
 /**
  * A `Size` consists of a numeric `size` value and a unit.
@@ -16,16 +21,27 @@ class Size extends PrimitiveValue
      * vh/vw/vm(ax)/vmin/rem are absolute insofar as they don’t scale to the immediate parent (only the viewport)
      *
      * @var array<int, string>
+     *
+     * @internal
      */
-    const ABSOLUTE_SIZE_UNITS = ['px', 'cm', 'mm', 'mozmm', 'in', 'pt', 'pc', 'vh', 'vw', 'vmin', 'vmax', 'rem'];
+    const ABSOLUTE_SIZE_UNITS = [
+        'px', 'pt', 'pc',
+        'cm', 'mm', 'mozmm', 'in',
+        'vh', 'dvh', 'svh', 'lvh',
+        'vw', 'vmin', 'vmax', 'rem',
+    ];
 
     /**
      * @var array<int, string>
+     *
+     * @internal
      */
     const RELATIVE_SIZE_UNITS = ['%', 'em', 'ex', 'ch', 'fr'];
 
     /**
      * @var array<int, string>
+     *
+     * @internal
      */
     const NON_SIZE_UNITS = ['deg', 'grad', 'rad', 's', 'ms', 'turn', 'Hz', 'kHz'];
 

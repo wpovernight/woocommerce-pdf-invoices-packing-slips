@@ -3,12 +3,14 @@
  * @package php-font-lib
  * @link    https://github.com/dompdf/php-font-lib
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace FontLib\EOT;
+namespace WPO\IPS\Vendor\FontLib\EOT;
 
 use Exception;
-use FontLib\Font;
+use WPO\IPS\Vendor\FontLib\Font;
 
 /**
  * TrueType font file header.
@@ -17,7 +19,7 @@ use FontLib\Font;
  *
  * @property File $font
  */
-class Header extends \FontLib\Header {
+class Header extends \WPO\IPS\Vendor\FontLib\Header {
   protected $def = array(
     "format"        => self::uint32,
     "numTables"     => self::uint16,

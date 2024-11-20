@@ -1,12 +1,17 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Value;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\SourceException;
-use Sabberworm\CSS\Parsing\UnexpectedEOFException;
-use Sabberworm\CSS\Parsing\UnexpectedTokenException;
-use Sabberworm\CSS\Renderable;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Renderable;
 
 /**
  * Abstract base class for specific classes of CSS values: `Size`, `Color`, `CSSString` and `URL`, and another
@@ -67,23 +72,30 @@ abstract class Value implements Renderable
         }
         // Convert the list to list objects
         foreach ($aListDelimiters as $sDelimiter) {
-            if (count($aStack) === 1) {
+            $iStackLength = count($aStack);
+            if ($iStackLength === 1) {
                 return $aStack[0];
             }
-            $iStartPosition = null;
-            while (($iStartPosition = array_search($sDelimiter, $aStack, true)) !== false) {
+            $aNewStack = [];
+            for ($iStartPosition = 0; $iStartPosition < $iStackLength; ++$iStartPosition) {
+                if ($iStartPosition === ($iStackLength - 1) || $sDelimiter !== $aStack[$iStartPosition + 1]) {
+                    $aNewStack[] = $aStack[$iStartPosition];
+                    continue;
+                }
                 $iLength = 2; //Number of elements to be joined
-                for ($i = $iStartPosition + 2; $i < count($aStack); $i += 2, ++$iLength) {
+                for ($i = $iStartPosition + 3; $i < $iStackLength; $i += 2, ++$iLength) {
                     if ($sDelimiter !== $aStack[$i]) {
                         break;
                     }
                 }
                 $oList = new RuleValueList($sDelimiter, $oParserState->currentLine());
-                for ($i = $iStartPosition - 1; $i - $iStartPosition + 1 < $iLength * 2; $i += 2) {
+                for ($i = $iStartPosition; $i - $iStartPosition < $iLength * 2; $i += 2) {
                     $oList->addListComponent($aStack[$i]);
                 }
-                array_splice($aStack, $iStartPosition - 1, $iLength * 2 - 1, [$oList]);
+                $aNewStack[] = $oList;
+                $iStartPosition += $iLength * 2 - 2;
             }
+            $aStack = $aNewStack;
         }
         if (!isset($aStack[0])) {
             throw new UnexpectedTokenException(
@@ -156,7 +168,16 @@ abstract class Value implements Renderable
         } elseif ($oParserState->comes("U+")) {
             $oValue = self::parseUnicodeRangeValue($oParserState);
         } else {
-            $oValue = self::parseIdentifierOrFunction($oParserState);
+            $sNextChar = $oParserState->peek(1);
+            try {
+                $oValue = self::parseIdentifierOrFunction($oParserState);
+            } catch (UnexpectedTokenException $e) {
+                if (\in_array($sNextChar, ['+', '-', '*', '/'], true)) {
+                    $oValue = $oParserState->consume(1);
+                } else {
+                    throw $e;
+                }
+            }
         }
         $oParserState->consumeWhiteSpace();
         return $oValue;

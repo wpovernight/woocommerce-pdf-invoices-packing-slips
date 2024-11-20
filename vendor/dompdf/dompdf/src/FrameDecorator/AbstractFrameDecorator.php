@@ -3,21 +3,23 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\FrameDecorator;
+namespace WPO\IPS\Vendor\Dompdf\FrameDecorator;
 
 use DOMElement;
 use DOMNode;
-use Dompdf\Helpers;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\Frame;
-use Dompdf\Frame\Factory;
-use Dompdf\Frame\FrameListIterator;
-use Dompdf\Frame\FrameTreeIterator;
-use Dompdf\FrameReflower\AbstractFrameReflower;
-use Dompdf\Css\Style;
-use Dompdf\Positioner\AbstractPositioner;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Frame\Factory;
+use WPO\IPS\Vendor\Dompdf\Frame\FrameListIterator;
+use WPO\IPS\Vendor\Dompdf\Frame\FrameTreeIterator;
+use WPO\IPS\Vendor\Dompdf\FrameReflower\AbstractFrameReflower;
+use WPO\IPS\Vendor\Dompdf\Css\Style;
+use WPO\IPS\Vendor\Dompdf\Positioner\AbstractPositioner;
 
 /**
  * Base AbstractFrameDecorator class

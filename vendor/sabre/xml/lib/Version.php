@@ -1,8 +1,13 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml;
+namespace WPO\IPS\Vendor\Sabre\Xml;
 
 /**
  * This class contains the version number for this package.
@@ -16,5 +21,5 @@ class Version
     /**
      * Full version number.
      */
-    const VERSION = '2.2.7';
+    public const VERSION = '4.0.6';
 }

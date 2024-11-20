@@ -3,9 +3,9 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, moham
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.2
-Stable tag: 3.8.7-beta-2
+Stable tag: 3.9.1-beta-1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,38 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 3.9.0 (2024-10-21) =
+* New: Updated `sabre/xml` library to version 4.
+* New: Added notice about dropping support for PHP versions below 7.4.
+* New: Implemented PSR-4 Autoloading Standard for improved code structure and maintainability.
+* New: Deprecated `wpo_wcpdf_due_date_display` hook.
+* Fix: WC item meta style issue when using `dd`.
+* Fix: Relocated `wpo_wcpdf_use_path` hook before `$src` empty check.
+* Translations: Updated translation template (POT).
+
+= 3.8.8 (2024-10-08) =
+* Fix: adds missing deprecated filters to document title methods
+
+= 3.8.7 (2024-10-07) =
+* New: Add full compatibility with mPDF to the Simple Template.
+* New: Add refund reason and invoice number titles to the document methods abstract class.
+* New: Improve template titles registration.
+* New: Improve invoice due date setting.
+* New: Add "You might also like these plugins" section to the Upgrade tab.
+* New: Function to determine if checkout is using block: `wpo_wcpdf_checkout_is_block()`.
+* New: Clean legacy Semaphore locks tool.
+* New: Automatic cleanup of unlocked Semaphore locks and other improvements.
+* New: Tool to remove expired Semaphore locks.
+* New: Filter to modify PDF document data fields: `wpo_wcpdf_document_data_meta_box_fields`.
+* Tweak: Lower hook priority (200) for invoice columns in WooCommerce orders list.
+* Fix: Replace deprecated jQuery `change()` function usage.
+* Fix: Correct path to generic document icon.
+* Fix: Check user capabilities in the `enable_debug()` function.
+* Fix: Load plugin translations later on the `init` hook.
+* Fix: Unblock UI when a tool button is clicked.
+* Translations: Update translation template (POT).
+* Tested up to WooCommerce 9.4.
+
 = 3.8.6 (2024-07-18) =
 * Fix: function `add_yith_product_bundles_classes()` errors
 * Fix: `get_header_logo_id()` return type fatal error
@@ -158,7 +190,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 * Fix: replaces deprecated jQuery functions
 * Fix: bug with type hint in `wpo_wcpdf_parse_document_date_for_wp_query()` function
 * Fix: bug calling `is_allowed()` on `bool` under `wcpdf_get_document()` function
-* Fix: not removing documents meta on Woo subcription renewal
+* Fix: not removing documents meta on Woo subscription renewal
 * Fix: XSS vulnerability on Woo Checkout user input address data
 * Fix: Semaphore attachments issue on concurrent refunds
 * Translations: Updated translation template (POT)

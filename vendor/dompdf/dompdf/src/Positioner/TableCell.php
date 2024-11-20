@@ -3,12 +3,14 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Positioner;
+namespace WPO\IPS\Vendor\Dompdf\Positioner;
 
-use Dompdf\Exception;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Table;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\AbstractFrameDecorator;
+use WPO\IPS\Vendor\Dompdf\FrameDecorator\Table;
 
 /**
  * Positions table cells

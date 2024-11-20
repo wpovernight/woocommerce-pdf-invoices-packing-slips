@@ -4,14 +4,14 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              3.8.7-beta-3
+ * Version:              3.9.1-beta-2
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 3.3
- * WC tested up to:      9.3
+ * WC tested up to:      9.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,8 +22,8 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '3.8.7-beta-3';
-	public $version_php          = '7.2';
+	public $version              = '3.9.1-beta-2';
+	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
 	public $plugin_basename;
@@ -50,7 +50,6 @@ class WPO_WCPDF {
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
-			self::$_instance->autoloaders();
 		}
 		return self::$_instance;
 	}
@@ -59,6 +58,8 @@ class WPO_WCPDF {
 	 * Constructor
 	 */
 	public function __construct() {
+		require $this->plugin_path() . '/vendor/autoload.php';
+
 		$this->plugin_basename = plugin_basename(__FILE__);
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
 			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
@@ -66,8 +67,6 @@ class WPO_WCPDF {
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
-
-		require $this->plugin_path() . '/vendor/autoload.php';
 
 		// load the localisation & classes
 		add_action( 'init', array( $this, 'translations' ), 8 );
@@ -78,7 +77,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
-		add_action( 'init', array( '\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0', 'init_cleanup' ), 999 ); // wait AS to initialize
+		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
@@ -96,11 +95,6 @@ class WPO_WCPDF {
 		}
 
 		return false;
-	}
-
-	private function autoloaders() {
-		// main plugin autoloader
-		require plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 	}
 
 	/**
@@ -145,23 +139,26 @@ class WPO_WCPDF {
 	 * Load the main plugin classes and functions
 	 */
 	public function includes() {
+		// plugin legacy class mapping
+		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
+
 		// plugin functions
-		include_once( $this->plugin_path() . '/includes/wcpdf-functions.php' );
+		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 
 		// Third party compatibility
-		$this->third_party_plugins = \WPO\WC\PDF_Invoices\Compatibility\Third_Party_Plugins::instance();
+		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		// WC OrderUtil compatibility
-		$this->order_util          = \WPO\WC\PDF_Invoices\Compatibility\Order_Util::instance();
+		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		// Plugin classes
-		$this->settings            = \WPO\WC\PDF_Invoices\Settings::instance();
-		$this->documents           = \WPO\WC\PDF_Invoices\Documents::instance();
-		$this->main                = \WPO\WC\PDF_Invoices\Main::instance();
-		$this->endpoint            = \WPO\WC\PDF_Invoices\Endpoint::instance();
-		$this->assets              = \WPO\WC\PDF_Invoices\Assets::instance();
-		$this->admin               = \WPO\WC\PDF_Invoices\Admin::instance();
-		$this->frontend            = \WPO\WC\PDF_Invoices\Frontend::instance();
-		$this->install             = \WPO\WC\PDF_Invoices\Install::instance();
-		$this->font_synchronizer   = \WPO\WC\PDF_Invoices\Font_Synchronizer::instance();
+		$this->settings            = \WPO\IPS\Settings::instance();
+		$this->documents           = \WPO\IPS\Documents::instance();
+		$this->main                = \WPO\IPS\Main::instance();
+		$this->endpoint            = \WPO\IPS\Endpoint::instance();
+		$this->assets              = \WPO\IPS\Assets::instance();
+		$this->admin               = \WPO\IPS\Admin::instance();
+		$this->frontend            = \WPO\IPS\Frontend::instance();
+		$this->install             = \WPO\IPS\Install::instance();
+		$this->font_synchronizer   = \WPO\IPS\FontSynchronizer::instance();
 	}
 
 	/**
@@ -441,7 +438,7 @@ class WPO_WCPDF {
 			echo wp_kses_post( ob_get_clean() );
 		}
 
-		// save option to hide mailpoet notice
+		// save option to hide notice
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_rtl_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
 			if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_rtl_notice_nonce' ) ) {
@@ -589,15 +586,3 @@ function WPO_WCPDF() {
 }
 
 WPO_WCPDF(); // load plugin
-
-// legacy class for plugin detecting
-if ( ! class_exists( 'WooCommerce_PDF_Invoices' ) ) {
-	class WooCommerce_PDF_Invoices{
-		public static $version;
-
-		public function __construct() {
-			self::$version = WPO_WCPDF()->version;
-		}
-	}
-	new WooCommerce_PDF_Invoices();
-}

@@ -1,11 +1,15 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml;
+namespace WPO\IPS\Vendor\Sabre\Xml;
 
 use LibXMLError;
-use Throwable;
 
 /**
  * This exception is thrown when the Reader runs into a parsing error.
@@ -23,17 +27,16 @@ class LibXMLException extends ParseException
      *
      * @var \LibXMLError[]
      */
-    protected $errors;
+    protected array $errors;
 
     /**
      * Creates the exception.
      *
      * You should pass a list of LibXMLError objects in its constructor.
      *
-     * @param LibXMLError[] $errors
-     * @param Throwable     $previousException
+     * @param \LibXMLError[] $errors
      */
-    public function __construct(array $errors, int $code = 0, Throwable $previousException = null)
+    public function __construct(array $errors, int $code = 0, ?\Throwable $previousException = null)
     {
         $this->errors = $errors;
         parent::__construct($errors[0]->message.' on line '.$errors[0]->line.', column '.$errors[0]->column, $code, $previousException);
@@ -41,6 +44,8 @@ class LibXMLException extends ParseException
 
     /**
      * Returns the LibXML errors.
+     *
+     * @return \LibXMLError[]
      */
     public function getErrors(): array
     {

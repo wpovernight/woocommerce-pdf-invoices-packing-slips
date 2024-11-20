@@ -6,12 +6,14 @@
  * @author  Wayne Munro
  * @license http://creativecommons.org/licenses/publicdomain/ Public Domain
  * @package Cpdf
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
-use FontLib\Exception\FontNotFoundException;
-use FontLib\Font;
-use FontLib\BinaryStream;
+use WPO\IPS\Vendor\FontLib\Exception\FontNotFoundException;
+use WPO\IPS\Vendor\FontLib\Font;
+use WPO\IPS\Vendor\FontLib\BinaryStream;
 
 class Cpdf
 {
@@ -5919,7 +5921,7 @@ EOT;
      */
     function addSvgFromFile($file, $x, $y, $w = 0, $h = 0)
     {
-        $doc = new \Svg\Document();
+        $doc = new \WPO\IPS\Vendor\Svg\Document();
         $doc->loadFile($file);
         $dimensions = $doc->getDimensions();
 
@@ -5927,7 +5929,7 @@ EOT;
 
         $this->transform([$w / $dimensions["width"], 0, 0, $h / $dimensions["height"], $x, $y]);
 
-        $surface = new \Svg\Surface\SurfaceCpdf($doc, $this);
+        $surface = new \WPO\IPS\Vendor\Svg\Surface\SurfaceCpdf($doc, $this);
         $doc->render($surface);
 
         $this->restore();

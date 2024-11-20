@@ -3,14 +3,16 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\FrameDecorator;
+namespace WPO\IPS\Vendor\Dompdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\Helpers;
-use Dompdf\Frame;
-use Dompdf\Renderer;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Renderer;
 
 /**
  * Decorates frames for page layout

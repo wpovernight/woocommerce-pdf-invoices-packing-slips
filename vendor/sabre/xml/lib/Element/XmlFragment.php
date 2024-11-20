@@ -1,12 +1,17 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Element;
+namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
-use Sabre\Xml\Element;
-use Sabre\Xml\Reader;
-use Sabre\Xml\Writer;
+use WPO\IPS\Vendor\Sabre\Xml\Element;
+use WPO\IPS\Vendor\Sabre\Xml\Reader;
+use WPO\IPS\Vendor\Sabre\Xml\Writer;
 
 /**
  * The XmlFragment element allows you to extract a portion of your xml tree,
@@ -26,10 +31,8 @@ class XmlFragment implements Element
 {
     /**
      * The inner XML value.
-     *
-     * @var string
      */
-    protected $xml;
+    protected string $xml;
 
     /**
      * Constructor.
@@ -63,7 +66,7 @@ class XmlFragment implements Element
      *
      * If you are opening new elements, you must also close them again.
      */
-    public function xmlSerialize(Writer $writer)
+    public function xmlSerialize(Writer $writer): void
     {
         $reader = new Reader();
 
@@ -135,8 +138,6 @@ XML;
      *
      * $reader->parseInnerTree() will parse the entire sub-tree, and advance to
      * the next element.
-     *
-     * @return mixed
      */
     public static function xmlDeserialize(Reader $reader)
     {

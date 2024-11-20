@@ -1,9 +1,14 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS;
+namespace WPO\IPS\Vendor\Sabberworm\CSS;
 
-use Sabberworm\CSS\Comment\Commentable;
-use Sabberworm\CSS\Parsing\OutputException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Commentable;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\OutputException;
 
 class OutputFormatter
 {

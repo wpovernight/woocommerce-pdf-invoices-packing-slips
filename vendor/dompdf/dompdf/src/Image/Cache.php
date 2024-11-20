@@ -3,12 +3,14 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Image;
+namespace WPO\IPS\Vendor\Dompdf\Image;
 
-use Dompdf\Options;
-use Dompdf\Helpers;
-use Dompdf\Exception\ImageException;
+use WPO\IPS\Vendor\Dompdf\Options;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Exception\ImageException;
 
 /**
  * Static class that resolves image urls and downloads and caches

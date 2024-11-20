@@ -3,11 +3,13 @@
  * @package php-svg-lib
  * @link    http://github.com/dompdf/php-svg-lib
  * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Svg;
+namespace WPO\IPS\Vendor\Svg;
 
-use Svg\Tag\AbstractTag;
+use WPO\IPS\Vendor\Svg\Tag\AbstractTag;
 
 class Style
 {
@@ -114,10 +116,10 @@ class Style
 
         foreach ($stylesheets as $_sc) {
 
-            /** @var \Sabberworm\CSS\RuleSet\DeclarationBlock $_decl */
+            /** @var \WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\DeclarationBlock $_decl */
             foreach ($_sc->getAllDeclarationBlocks() as $_decl) {
 
-                /** @var \Sabberworm\CSS\Property\Selector $_selector */
+                /** @var \WPO\IPS\Vendor\Sabberworm\CSS\Property\Selector $_selector */
                 foreach ($_decl->getSelectors() as $_selector) {
                     $_selector = $_selector->getSelector();
 
@@ -125,7 +127,7 @@ class Style
                     if ($class !== null) {
                         foreach ($class as $_class) {
                             if ($_selector === ".$_class") {
-                                /** @var \Sabberworm\CSS\Rule\Rule $_rule */
+                                /** @var \WPO\IPS\Vendor\Sabberworm\CSS\Rule\Rule $_rule */
                                 foreach ($_decl->getRules() as $_rule) {
                                     $styles[$_rule->getRule()] = $_rule->getValue() . "";
                                 }
@@ -137,7 +139,7 @@ class Style
 
                     // Match tag name
                     if ($_selector === $tag->tagName) {
-                        /** @var \Sabberworm\CSS\Rule\Rule $_rule */
+                        /** @var \WPO\IPS\Vendor\Sabberworm\CSS\Rule\Rule $_rule */
                         foreach ($_decl->getRules() as $_rule) {
                             $styles[$_rule->getRule()] = $_rule->getValue() . "";
                         }

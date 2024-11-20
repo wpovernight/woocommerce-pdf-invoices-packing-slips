@@ -6,14 +6,15 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WPO\\WC\\UBL\\' => array($baseDir . '/ubl'),
+    'WPO\\IPS\\UBL\\' => array($baseDir . '/ubl'),
+    'WPO\\IPS\\' => array($baseDir . '/includes'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Iconv\\' => array($vendorDir . '/symfony/polyfill-iconv'),
-    'Svg\\' => array($vendorDir . '/dompdf/php-svg-lib/src/Svg'),
-    'Sabre\\Xml\\' => array($vendorDir . '/sabre/xml/lib'),
-    'Sabre\\Uri\\' => array($vendorDir . '/sabre/uri/lib'),
-    'Sabberworm\\CSS\\' => array($vendorDir . '/sabberworm/php-css-parser/src'),
+    'WPO\\IPS\\Vendor\\Svg\\' => array($vendorDir . '/dompdf/php-svg-lib/src/Svg'),
+    'WPO\\IPS\\Vendor\\Sabre\\Xml\\' => array($vendorDir . '/sabre/xml/lib'),
+    'WPO\\IPS\\Vendor\\Sabre\\Uri\\' => array($vendorDir . '/sabre/uri/lib'),
+    'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\' => array($vendorDir . '/sabberworm/php-css-parser/src'),
     'Masterminds\\' => array($vendorDir . '/masterminds/html5/src'),
-    'FontLib\\' => array($vendorDir . '/dompdf/php-font-lib/src/FontLib'),
-    'Dompdf\\' => array($vendorDir . '/dompdf/dompdf/src'),
+    'WPO\\IPS\\Vendor\\FontLib\\' => array($vendorDir . '/dompdf/php-font-lib/src/FontLib'),
+    'WPO\\IPS\\Vendor\\Dompdf\\' => array($vendorDir . '/dompdf/dompdf/src'),
 );

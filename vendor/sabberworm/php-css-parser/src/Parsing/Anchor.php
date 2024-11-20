@@ -1,6 +1,11 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Parsing;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Parsing;
 
 class Anchor
 {
@@ -10,13 +15,13 @@ class Anchor
     private $iPosition;
 
     /**
-     * @var \Sabberworm\CSS\Parsing\ParserState
+     * @var \WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState
      */
     private $oParserState;
 
     /**
      * @param int $iPosition
-     * @param \Sabberworm\CSS\Parsing\ParserState $oParserState
+     * @param \WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState $oParserState
      */
     public function __construct($iPosition, ParserState $oParserState)
     {

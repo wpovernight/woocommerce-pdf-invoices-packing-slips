@@ -4,12 +4,14 @@
  * @link    https://github.com/dompdf/php-font-lib
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  * @version $Id: Font_Table_glyf.php 46 2012-04-02 20:22:38Z fabien.menager $
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace FontLib\Glyph;
+namespace WPO\IPS\Vendor\FontLib\Glyph;
 
-use FontLib\Table\Type\glyf;
-use FontLib\TrueType\File;
-use FontLib\BinaryStream;
+use WPO\IPS\Vendor\FontLib\Table\Type\glyf;
+use WPO\IPS\Vendor\FontLib\TrueType\File;
+use WPO\IPS\Vendor\FontLib\BinaryStream;
 
 /**
  * `glyf` font table.
@@ -18,7 +20,7 @@ use FontLib\BinaryStream;
  */
 class Outline extends BinaryStream {
   /**
-   * @var \FontLib\Table\Type\glyf
+   * @var \WPO\IPS\Vendor\FontLib\Table\Type\glyf
    */
   protected $table;
 

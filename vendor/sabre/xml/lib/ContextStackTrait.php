@@ -1,8 +1,13 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml;
+namespace WPO\IPS\Vendor\Sabre\Xml;
 
 /**
  * Context Stack.
@@ -32,9 +37,9 @@ trait ContextStackTrait
      * Values may also be a callable. In that case the function will be called
      * directly.
      *
-     * @var array
+     * @phpstan-var array<string, class-string|callable|object>
      */
-    public $elementMap = [];
+    public array $elementMap = [];
 
     /**
      * A contextUri pointing to the document being parsed / written.
@@ -44,10 +49,8 @@ trait ContextStackTrait
      * The reader and writer don't use this property, but as it's an extremely
      * common use-case for parsing XML documents, it's added here as a
      * convenience.
-     *
-     * @var string|null
      */
-    public $contextUri;
+    public ?string $contextUri = null;
 
     /**
      * This is a list of namespaces that you want to give default prefixes.
@@ -55,9 +58,9 @@ trait ContextStackTrait
      * You must make sure you create this entire list before starting to write.
      * They should be registered on the root element.
      *
-     * @var array
+     * @phpstan-var array<string, class-string|string|null>
      */
-    public $namespaceMap = [];
+    public array $namespaceMap = [];
 
     /**
      * This is a list of custom serializers for specific classes.
@@ -65,7 +68,7 @@ trait ContextStackTrait
      * The writer may use this if you attempt to serialize an object with a
      * class that does not implement XmlSerializable.
      *
-     * Instead it will look at this classmap to see if there is a custom
+     * Instead, it will look at this classmap to see if there is a custom
      * serializer here. This is useful if you don't want your value objects
      * to be responsible for serializing themselves.
      *
@@ -75,16 +78,16 @@ trait ContextStackTrait
      *
      * function (Writer $writer, object $value)
      *
-     * @var array
+     * @phpstan-var array<class-string, callable(Writer, object):mixed>
      */
-    public $classMap = [];
+    public array $classMap = [];
 
     /**
      * Backups of previous contexts.
      *
-     * @var array
+     * @var list<mixed>
      */
-    protected $contextStack = [];
+    protected array $contextStack = [];
 
     /**
      * Create a new "context".
@@ -93,7 +96,7 @@ trait ContextStackTrait
      * namespaceMap. After you're done, you can restore the old data again
      * with popContext.
      */
-    public function pushContext()
+    public function pushContext(): void
     {
         $this->contextStack[] = [
             $this->elementMap,
@@ -106,13 +109,13 @@ trait ContextStackTrait
     /**
      * Restore the previous "context".
      */
-    public function popContext()
+    public function popContext(): void
     {
         list(
             $this->elementMap,
             $this->contextUri,
             $this->namespaceMap,
-            $this->classMap
+            $this->classMap,
         ) = array_pop($this->contextStack);
     }
 }

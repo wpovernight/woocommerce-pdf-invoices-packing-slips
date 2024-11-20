@@ -3,11 +3,13 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
-use Dompdf\Css\Style;
-use Dompdf\Frame\FrameListIterator;
+use WPO\IPS\Vendor\Dompdf\Css\Style;
+use WPO\IPS\Vendor\Dompdf\Frame\FrameListIterator;
 
 /**
  * The main Frame class

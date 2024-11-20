@@ -3,18 +3,20 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
-use Dompdf\Renderer\AbstractRenderer;
-use Dompdf\Renderer\Block;
-use Dompdf\Renderer\Image;
-use Dompdf\Renderer\Inline;
-use Dompdf\Renderer\ListBullet;
-use Dompdf\Renderer\TableCell;
-use Dompdf\Renderer\TableRow;
-use Dompdf\Renderer\TableRowGroup;
-use Dompdf\Renderer\Text;
+use WPO\IPS\Vendor\Dompdf\Renderer\AbstractRenderer;
+use WPO\IPS\Vendor\Dompdf\Renderer\Block;
+use WPO\IPS\Vendor\Dompdf\Renderer\Image;
+use WPO\IPS\Vendor\Dompdf\Renderer\Inline;
+use WPO\IPS\Vendor\Dompdf\Renderer\ListBullet;
+use WPO\IPS\Vendor\Dompdf\Renderer\TableCell;
+use WPO\IPS\Vendor\Dompdf\Renderer\TableRow;
+use WPO\IPS\Vendor\Dompdf\Renderer\TableRowGroup;
+use WPO\IPS\Vendor\Dompdf\Renderer\Text;
 
 /**
  * Concrete renderer

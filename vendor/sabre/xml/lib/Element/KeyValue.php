@@ -1,11 +1,16 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Element;
+namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
-use Sabre\Xml;
-use Sabre\Xml\Deserializer;
+use WPO\IPS\Vendor\Sabre\Xml;
+use WPO\IPS\Vendor\Sabre\Xml\Deserializer;
 
 /**
  * 'KeyValue' parses out all child elements from a single node, and outputs a
@@ -40,12 +45,14 @@ class KeyValue implements Xml\Element
     /**
      * Value to serialize.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $value;
+    protected array $value;
 
     /**
      * Constructor.
+     *
+     * @param array<string, mixed> $value
      */
     public function __construct(array $value = [])
     {
@@ -68,7 +75,7 @@ class KeyValue implements Xml\Element
      *
      * If you are opening new elements, you must also close them again.
      */
-    public function xmlSerialize(Xml\Writer $writer)
+    public function xmlSerialize(Xml\Writer $writer): void
     {
         $writer->write($this->value);
     }
@@ -91,7 +98,7 @@ class KeyValue implements Xml\Element
      * $reader->parseInnerTree() will parse the entire sub-tree, and advance to
      * the next element.
      *
-     * @return mixed
+     * @return array<string, mixed>
      */
     public static function xmlDeserialize(Xml\Reader $reader)
     {

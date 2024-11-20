@@ -3,16 +3,18 @@
  * @package php-font-lib
  * @link    https://github.com/dompdf/php-font-lib
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace FontLib\WOFF;
+namespace WPO\IPS\Vendor\FontLib\WOFF;
 
 /**
  * WOFF font file header.
  *
  * @package php-font-lib
  */
-class Header extends \FontLib\TrueType\Header {
+class Header extends \WPO\IPS\Vendor\FontLib\TrueType\Header {
   protected $def = array(
     "format"         => self::uint32,
     "flavor"         => self::uint32,

@@ -1,10 +1,17 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Xml\Element;
+namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
-use Sabre\Xml;
+use WPO\IPS\Vendor\Sabre\Xml;
+
+use function WPO\IPS\Vendor\Sabre\Uri\resolve;
 
 /**
  * Uri element.
@@ -26,17 +33,13 @@ class Uri implements Xml\Element
 {
     /**
      * Uri element value.
-     *
-     * @var string
      */
-    protected $value;
+    protected string $value;
 
     /**
      * Constructor.
-     *
-     * @param string $value
      */
-    public function __construct($value)
+    public function __construct(string $value)
     {
         $this->value = $value;
     }
@@ -57,11 +60,11 @@ class Uri implements Xml\Element
      *
      * If you are opening new elements, you must also close them again.
      */
-    public function xmlSerialize(Xml\Writer $writer)
+    public function xmlSerialize(Xml\Writer $writer): void
     {
         $writer->text(
-            \Sabre\Uri\resolve(
-                $writer->contextUri,
+            resolve(
+                $writer->contextUri ?? '',
                 $this->value
             )
         );
@@ -84,13 +87,11 @@ class Uri implements Xml\Element
      *
      * $reader->parseSubTree() will parse the entire sub-tree, and advance to
      * the next element.
-     *
-     * @return mixed
      */
     public static function xmlDeserialize(Xml\Reader $reader)
     {
         return new self(
-            \Sabre\Uri\resolve(
+            resolve(
                 (string) $reader->contextUri,
                 $reader->readText()
             )

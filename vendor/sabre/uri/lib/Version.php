@@ -1,8 +1,13 @@
 <?php
+/**
+ * @license BSD-3-Clause
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
 declare(strict_types=1);
 
-namespace Sabre\Uri;
+namespace WPO\IPS\Vendor\Sabre\Uri;
 
 /**
  * This class contains the version number for this package.
@@ -16,5 +21,5 @@ class Version
     /**
      * Full version number.
      */
-    public const VERSION = '2.3.3';
+    public const VERSION = '3.0.2';
 }

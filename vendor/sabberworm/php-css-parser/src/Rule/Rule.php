@@ -1,16 +1,21 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Rule;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Rule;
 
-use Sabberworm\CSS\Comment\Comment;
-use Sabberworm\CSS\Comment\Commentable;
-use Sabberworm\CSS\OutputFormat;
-use Sabberworm\CSS\Parsing\ParserState;
-use Sabberworm\CSS\Parsing\UnexpectedEOFException;
-use Sabberworm\CSS\Parsing\UnexpectedTokenException;
-use Sabberworm\CSS\Renderable;
-use Sabberworm\CSS\Value\RuleValueList;
-use Sabberworm\CSS\Value\Value;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Commentable;
+use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Renderable;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\RuleValueList;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
 
 /**
  * `Rule`s just have a string key (the rule) and a 'Value'.

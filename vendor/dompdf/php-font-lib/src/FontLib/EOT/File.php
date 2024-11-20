@@ -3,16 +3,18 @@
  * @package php-font-lib
  * @link    https://github.com/dompdf/php-font-lib
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace FontLib\EOT;
+namespace WPO\IPS\Vendor\FontLib\EOT;
 
 /**
  * EOT font file.
  *
  * @package php-font-lib
  */
-class File extends \FontLib\TrueType\File {
+class File extends \WPO\IPS\Vendor\FontLib\TrueType\File {
   const TTEMBED_SUBSET                   = 0x00000001;
   const TTEMBED_TTCOMPRESSED             = 0x00000004;
   const TTEMBED_FAILIFVARIATIONSIMULATED = 0x00000010;

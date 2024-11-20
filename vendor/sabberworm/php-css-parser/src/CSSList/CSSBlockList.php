@@ -1,14 +1,19 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\CSSList;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\CSSList;
 
-use Sabberworm\CSS\Property\Selector;
-use Sabberworm\CSS\Rule\Rule;
-use Sabberworm\CSS\RuleSet\DeclarationBlock;
-use Sabberworm\CSS\RuleSet\RuleSet;
-use Sabberworm\CSS\Value\CSSFunction;
-use Sabberworm\CSS\Value\Value;
-use Sabberworm\CSS\Value\ValueList;
+use WPO\IPS\Vendor\Sabberworm\CSS\Property\Selector;
+use WPO\IPS\Vendor\Sabberworm\CSS\Rule\Rule;
+use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\DeclarationBlock;
+use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\RuleSet;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\CSSFunction;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
+use WPO\IPS\Vendor\Sabberworm\CSS\Value\ValueList;
 
 /**
  * A `CSSBlockList` is a `CSSList` whose `DeclarationBlock`s are guaranteed to contain valid declaration blocks or

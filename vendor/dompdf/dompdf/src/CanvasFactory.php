@@ -3,8 +3,10 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
 /**
  * Create canvas instances
@@ -41,14 +43,14 @@ class CanvasFactory
             if (($backend === "auto" || $backend === "pdflib") &&
                 class_exists("PDFLib", false)
             ) {
-                $class = "Dompdf\\Adapter\\PDFLib";
+                $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\PDFLib";
             }
 
             else {
                 if ($backend === "gd" && extension_loaded('gd')) {
-                    $class = "Dompdf\\Adapter\\GD";
+                    $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\GD";
                 } else {
-                    $class = "Dompdf\\Adapter\\CPDF";
+                    $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\CPDF";
                 }
             }
         }

@@ -3,8 +3,10 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf;
+namespace WPO\IPS\Vendor\Dompdf;
 
 class Helpers
 {
@@ -785,7 +787,7 @@ class Helpers
                     $height = (int) $meta["height"];
                     $type = "bmp";
                 } elseif (strpos($data, "<svg") !== false) {
-                    $doc = new \Svg\Document();
+                    $doc = new \WPO\IPS\Vendor\Svg\Document();
                     $doc->loadFile($filename);
 
                     [$width, $height] = $doc->getDimensions();

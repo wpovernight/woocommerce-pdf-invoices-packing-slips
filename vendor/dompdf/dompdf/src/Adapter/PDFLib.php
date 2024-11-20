@@ -3,15 +3,17 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Adapter;
+namespace WPO\IPS\Vendor\Dompdf\Adapter;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
+use WPO\IPS\Vendor\Dompdf\Canvas;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
+use WPO\IPS\Vendor\Dompdf\Exception;
+use WPO\IPS\Vendor\Dompdf\FontMetrics;
+use WPO\IPS\Vendor\Dompdf\Helpers;
+use WPO\IPS\Vendor\Dompdf\Image\Cache;
 
 /**
  * PDF rendering interface
@@ -78,7 +80,7 @@ class PDFLib implements Canvas
     ];
 
     /**
-     * @var \Dompdf\Dompdf
+     * @var \WPO\IPS\Vendor\Dompdf\Dompdf
      */
     protected $_dompdf;
 

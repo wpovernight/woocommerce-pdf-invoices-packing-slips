@@ -1,6 +1,11 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ */
 
-namespace Sabberworm\CSS\Property;
+namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
 class KeyframeSelector extends Selector
 {
@@ -8,6 +13,8 @@ class KeyframeSelector extends Selector
      * regexp for specificity calculations
      *
      * @var string
+     *
+     * @internal
      */
     const SELECTOR_VALIDATION_RX = '/
     ^(

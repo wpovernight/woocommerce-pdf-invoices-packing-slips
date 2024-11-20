@@ -3,29 +3,31 @@
  * @package php-svg-lib
  * @link    http://github.com/dompdf/php-svg-lib
  * @license GNU LGPLv3+ http://www.gnu.org/copyleft/lesser.html
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
-namespace Svg;
+namespace WPO\IPS\Vendor\Svg;
 
-use Svg\Surface\SurfaceInterface;
-use Svg\Tag\AbstractTag;
-use Svg\Tag\Anchor;
-use Svg\Tag\Circle;
-use Svg\Tag\Ellipse;
-use Svg\Tag\Group;
-use Svg\Tag\ClipPath;
-use Svg\Tag\Image;
-use Svg\Tag\Line;
-use Svg\Tag\LinearGradient;
-use Svg\Tag\Path;
-use Svg\Tag\Polygon;
-use Svg\Tag\Polyline;
-use Svg\Tag\Rect;
-use Svg\Tag\Stop;
-use Svg\Tag\Symbol;
-use Svg\Tag\Text;
-use Svg\Tag\StyleTag;
-use Svg\Tag\UseTag;
+use WPO\IPS\Vendor\Svg\Surface\SurfaceInterface;
+use WPO\IPS\Vendor\Svg\Tag\AbstractTag;
+use WPO\IPS\Vendor\Svg\Tag\Anchor;
+use WPO\IPS\Vendor\Svg\Tag\Circle;
+use WPO\IPS\Vendor\Svg\Tag\Ellipse;
+use WPO\IPS\Vendor\Svg\Tag\Group;
+use WPO\IPS\Vendor\Svg\Tag\ClipPath;
+use WPO\IPS\Vendor\Svg\Tag\Image;
+use WPO\IPS\Vendor\Svg\Tag\Line;
+use WPO\IPS\Vendor\Svg\Tag\LinearGradient;
+use WPO\IPS\Vendor\Svg\Tag\Path;
+use WPO\IPS\Vendor\Svg\Tag\Polygon;
+use WPO\IPS\Vendor\Svg\Tag\Polyline;
+use WPO\IPS\Vendor\Svg\Tag\Rect;
+use WPO\IPS\Vendor\Svg\Tag\Stop;
+use WPO\IPS\Vendor\Svg\Tag\Symbol;
+use WPO\IPS\Vendor\Svg\Tag\Text;
+use WPO\IPS\Vendor\Svg\Tag\StyleTag;
+use WPO\IPS\Vendor\Svg\Tag\UseTag;
 
 class Document extends AbstractTag
 {
@@ -51,7 +53,7 @@ class Document extends AbstractTag
     /** @var AbstractTag[] */
     protected $defs = array();
 
-    /** @var \Sabberworm\CSS\CSSList\Document[] */
+    /** @var \WPO\IPS\Vendor\Sabberworm\CSS\CSSList\Document[] */
     protected $styleSheets = array();
 
     public $allowExternalReferences = true;
@@ -210,7 +212,7 @@ class Document extends AbstractTag
     /**
      * Append a style sheet
      *
-     * @param \Sabberworm\CSS\CSSList\Document $stylesheet
+     * @param \WPO\IPS\Vendor\Sabberworm\CSS\CSSList\Document $stylesheet
      */
     public function appendStyleSheet($stylesheet) {
         $this->styleSheets[] = $stylesheet;
@@ -219,7 +221,7 @@ class Document extends AbstractTag
     /**
      * Get the document style sheets
      *
-     * @return \Sabberworm\CSS\CSSList\Document[]
+     * @return \WPO\IPS\Vendor\Sabberworm\CSS\CSSList\Document[]
      */
     public function getStyleSheets() {
         return $this->styleSheets;

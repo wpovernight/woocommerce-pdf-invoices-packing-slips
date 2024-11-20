@@ -3,11 +3,13 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ *
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
-namespace Dompdf\Renderer;
+namespace WPO\IPS\Vendor\Dompdf\Renderer;
 
-use Dompdf\Adapter\CPDF;
-use Dompdf\Frame;
+use WPO\IPS\Vendor\Dompdf\Adapter\CPDF;
+use WPO\IPS\Vendor\Dompdf\Frame;
 
 /**
  * Renders text frames
@@ -38,7 +40,7 @@ class Text extends AbstractRenderer
     const DECO_EXTENSION = 0.0;
 
     /**
-     * @param \Dompdf\FrameDecorator\Text $frame
+     * @param \WPO\IPS\Vendor\Dompdf\FrameDecorator\Text $frame
      */
     function render(Frame $frame)
     {
