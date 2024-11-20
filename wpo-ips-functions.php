@@ -187,7 +187,7 @@ function wcpdf_get_ubl_maker() {
  */
 function wcpdf_is_ubl_available(): bool {
 	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
-	return apply_filters( 'wpo_wcpdf_ubl_available', version_compare( PHP_VERSION, '7.4', '>=' ) );
+	return apply_filters( 'wpo_wcpdf_ubl_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) );
 }
 
 /**
