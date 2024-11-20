@@ -82,7 +82,7 @@ class Install {
 	 */
 	protected function install() {
 		// only install when php version or higher
-		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
 		}
 
@@ -212,7 +212,7 @@ class Install {
 	 */
 	protected function upgrade( $installed_version ) {
 		// only upgrade when php version or higher
-		if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
+		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
 		}
 
