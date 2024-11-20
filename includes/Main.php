@@ -1290,7 +1290,7 @@ class Main {
 	 * Fixed in WP5.5 due to upgrade to newer PHPMailer
 	 */
 	public function set_phpmailer_validator( $mailArray ) {
-		if ( version_compare( PHP_VERSION, '7.3', '>=' ) && version_compare( get_bloginfo( 'version' ), '5.5-dev', '<' ) ) {
+		if ( version_compare( get_bloginfo( 'version' ), '5.5-dev', '<' ) ) {
 			global $phpmailer;
 			if ( ! ( $phpmailer instanceof \PHPMailer ) ) {
 				require_once ABSPATH . WPINC . '/class-phpmailer.php';
