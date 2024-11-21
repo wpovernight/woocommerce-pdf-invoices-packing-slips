@@ -877,7 +877,7 @@ class Main {
 	}
 
 	public function requirement_missing_notice(): void {
-		$should_show_notice  = get_option( 'wpo_wcpdf_show_requirement_notice', true );
+		$should_show_notice  = get_option( 'wpo_wcpdf_show_requirement_notice', false );
 		$is_notice_dismissed = get_option( 'wpo_wcpdf_dismiss_requirements_notice', false );
 
 		if ( ! $should_show_notice || $is_notice_dismissed ) {
