@@ -21,7 +21,7 @@ class SettingsDebug {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
 		// Show a notice if the plugin requirements are not met.
 		add_action( 'admin_init', array( $this, 'display_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
