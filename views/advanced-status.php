@@ -129,8 +129,7 @@ if ( ! $server_configs['PHP version']['result'] ) {
 $show_requirement_notice = false;
 
 foreach ( $server_configs as $config_name => $config ) {
-	// This is always false!
-	if ( 'opcache' === $config_name ) {
+	if ( in_array( $config_name, array( 'opcache', 'GMagick or IMagick' ), true ) ) {
 		continue;
 	}
 

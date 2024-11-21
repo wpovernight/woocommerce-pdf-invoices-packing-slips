@@ -901,7 +901,7 @@ class Main {
 		$notice_message  = sprintf(
 			/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
 			__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<strong>WooCommerce PDF Invoices & Packing Slips</strong>',
+			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
 			'<a href="' . esc_url( $status_page_url ) . '">',
 			'</a>'
 		);
