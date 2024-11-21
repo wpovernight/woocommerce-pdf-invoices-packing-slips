@@ -326,6 +326,9 @@ class SettingsGeneral {
 				case 'premium_plugin':
 					// no suffix
 					break;
+				case 'extension':
+					$template_name = sprintf( '%s (%s)', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ) );
+					break;
 				case 'theme':
 				default:
 					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
