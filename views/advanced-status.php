@@ -76,7 +76,7 @@ $server_configs = array(
 	'allow_url_fopen' => array (
 		'required' => __( 'Allow remote stylesheets and images', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'	   => null,
-		'result'   => ini_get( 'allow_url_fopen' ),
+		'result'   => (bool) ini_get( 'allow_url_fopen' ),
 		'fallback' => __( 'allow_url_fopen disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 	),
 	'fileinfo' => array (
