@@ -2,7 +2,7 @@
 /**
  * @license BSD-3-Clause
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 declare(strict_types=1);
@@ -21,5 +21,5 @@ class Version
     /**
      * Full version number.
      */
-    const VERSION = '2.2.9';
+    public const VERSION = '4.0.6';
 }

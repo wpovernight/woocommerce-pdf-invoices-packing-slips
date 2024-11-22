@@ -2,7 +2,7 @@
 /**
  * @license BSD-3-Clause
  *
- * Modified by wpovernight on 30-July-2024 using {@see https://github.com/BrianHenryIE/strauss}.
+ * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 declare(strict_types=1);
@@ -28,10 +28,8 @@ class Cdata implements Xml\XmlSerializable
 {
     /**
      * CDATA element value.
-     *
-     * @var string
      */
-    protected $value;
+    protected string $value;
 
     /**
      * Constructor.
@@ -57,7 +55,7 @@ class Cdata implements Xml\XmlSerializable
      *
      * If you are opening new elements, you must also close them again.
      */
-    public function xmlSerialize(Xml\Writer $writer)
+    public function xmlSerialize(Xml\Writer $writer): void
     {
         $writer->writeCData($this->value);
     }

@@ -108,7 +108,7 @@ class Invoice extends OrderDocumentMethods {
 	/**
 	 * Legacy function < v3.8.0
 	 *
-	 * Still being used by thrid party plugins.
+	 * Still being used by third party plugins.
 	 *
 	 * @return mixed
 	 */
@@ -609,6 +609,78 @@ class Invoice extends OrderDocumentMethods {
 		);
 
 		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );
+	}
+
+	/**
+	 * Get the settings categories.
+	 *
+	 * @param string $output_format
+	 *
+	 * @return array
+	 */
+	public function get_settings_categories( string $output_format ): array {
+		if ( ! in_array( $output_format, $this->output_formats, true ) ) {
+			return array();
+		}
+
+		$settings_categories = array(
+			'pdf' => array(
+				'general'          => array(
+					'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+					'members' => array(
+						'enabled',
+						'attach_to_email_ids',
+						'disable_for_statuses',
+						'my_account_buttons',
+					),
+				),
+				'document_details' => array(
+					'title'   => __( 'Document details', 'woocommerce-pdf-invoices-packing-slips' ),
+					'members' => array(
+						'display_email',
+						'display_phone',
+						'display_customer_notes',
+						'display_shipping_address',
+						'display_number',
+						'next_invoice_number', // this should follow 'display_number'
+						'number_format',
+						'display_date',
+						'due_date'
+					)
+				),
+				'admin_display'    => array(
+					'title'   => __( 'Admin', 'woocommerce-pdf-invoices-packing-slips' ),
+					'members' => array(
+						'invoice_number_column',
+						'invoice_date_column',
+						'invoice_number_search',
+					),
+				),
+				'advanced'         => array(
+					'title'   => __( 'Advanced', 'woocommerce-pdf-invoices-packing-slips' ),
+					'members' => array(
+						'next_invoice_number',
+						'reset_number_yearly',
+						'mark_printed',
+						'unmark_printed',
+						'disable_free',
+						'use_latest_settings',
+					)
+				),
+			),
+			'ubl' => array(
+				'general' => array(
+					'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+					'members' => array(
+						'enabled',
+						'attach_to_email_ids',
+						'include_encrypted_pdf',
+					),
+				),
+			)
+		);
+
+		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ], $output_format, $this );
 	}
 
 }
