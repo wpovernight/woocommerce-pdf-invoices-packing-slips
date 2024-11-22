@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitda89efa14b410f6884f98183affb035a
+class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
 {
     public static $files = array (
         '383eaff206634a77a1be54e64e6459c7' => __DIR__ . '/..' . '/sabre/uri/lib/functions.php',
@@ -24,10 +24,10 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
-            'Svg\\' => 4,
+            'WPO\\IPS\\Vendor\\Svg\\' => 4,
             'WPO\\IPS\\Vendor\\Sabre\\Xml\\' => 10,
             'WPO\\IPS\\Vendor\\Sabre\\Uri\\' => 10,
-            'Sabberworm\\CSS\\' => 15,
+            'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\' => 15,
         ),
         'M' => 
         array (
@@ -35,11 +35,11 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         ),
         'F' => 
         array (
-            'FontLib\\' => 8,
+            'WPO\\IPS\\Vendor\\FontLib\\' => 8,
         ),
         'D' => 
         array (
-            'Dompdf\\' => 7,
+            'WPO\\IPS\\Vendor\\Dompdf\\' => 7,
         ),
     );
 
@@ -60,7 +60,7 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
-        'Svg\\' => 
+        'WPO\\IPS\\Vendor\\Svg\\' => 
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
@@ -72,7 +72,7 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         array (
             0 => __DIR__ . '/..' . '/sabre/uri/lib',
         ),
-        'Sabberworm\\CSS\\' => 
+        'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
         ),
@@ -80,41 +80,18 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'FontLib\\' => 
+        'WPO\\IPS\\Vendor\\FontLib\\' => 
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
         ),
-        'Dompdf\\' => 
+        'WPO\\IPS\\Vendor\\Dompdf\\' => 
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
     );
 
     public static $classMap = array (
-        'ComposerAutoloaderInitda89efa14b410f6884f98183affb035a' => __DIR__ . '/..' . '/composer/autoload_real.php',
-        'Composer\\Autoload\\ClassLoader' => __DIR__ . '/..' . '/composer/ClassLoader.php',
-        'Composer\\Autoload\\ComposerStaticInitda89efa14b410f6884f98183affb035a' => __DIR__ . '/..' . '/composer/autoload_static.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Uri\\InvalidUriException' => __DIR__ . '/..' . '/sabre/uri/lib/InvalidUriException.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Uri\\Version' => __DIR__ . '/..' . '/sabre/uri/lib/Version.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\ContextStackTrait' => __DIR__ . '/..' . '/sabre/xml/lib/ContextStackTrait.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element' => __DIR__ . '/..' . '/sabre/xml/lib/Element.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Base' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Base.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Cdata' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Cdata.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Elements' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Elements.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\KeyValue' => __DIR__ . '/..' . '/sabre/xml/lib/Element/KeyValue.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Uri' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Uri.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\XmlFragment' => __DIR__ . '/..' . '/sabre/xml/lib/Element/XmlFragment.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\LibXMLException' => __DIR__ . '/..' . '/sabre/xml/lib/LibXMLException.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\ParseException' => __DIR__ . '/..' . '/sabre/xml/lib/ParseException.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Reader' => __DIR__ . '/..' . '/sabre/xml/lib/Reader.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Service' => __DIR__ . '/..' . '/sabre/xml/lib/Service.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Version' => __DIR__ . '/..' . '/sabre/xml/lib/Version.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Writer' => __DIR__ . '/..' . '/sabre/xml/lib/Writer.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\XmlDeserializable' => __DIR__ . '/..' . '/sabre/xml/lib/XmlDeserializable.php',
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\XmlSerializable' => __DIR__ . '/..' . '/sabre/xml/lib/XmlSerializable.php',
-        'Symfony\\Polyfill\\Iconv\\Iconv' => __DIR__ . '/..' . '/symfony/polyfill-iconv/Iconv.php',
-        'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'WPO\\IPS\\Vendor\\Dompdf\\Adapter\\CPDF' => __DIR__ . '/..' . '/dompdf/dompdf/src/Adapter/CPDF.php',
         'WPO\\IPS\\Vendor\\Dompdf\\Adapter\\GD' => __DIR__ . '/..' . '/dompdf/dompdf/src/Adapter/GD.php',
         'WPO\\IPS\\Vendor\\Dompdf\\Adapter\\PDFLib' => __DIR__ . '/..' . '/dompdf/dompdf/src/Adapter/PDFLib.php',
@@ -233,26 +210,26 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         'WPO\\IPS\\Vendor\\FontLib\\WOFF\\File' => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib/WOFF/File.php',
         'WPO\\IPS\\Vendor\\FontLib\\WOFF\\Header' => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib/WOFF/Header.php',
         'WPO\\IPS\\Vendor\\FontLib\\WOFF\\TableDirectoryEntry' => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib/WOFF/TableDirectoryEntry.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Elements' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Elements.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Entities' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Entities.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Exception' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Exception.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\InstructionProcessor' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/InstructionProcessor.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\CharacterReference' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/CharacterReference.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\DOMTreeBuilder' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/DOMTreeBuilder.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\EventHandler' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/EventHandler.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\FileInputStream' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/FileInputStream.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\InputStream' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/InputStream.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\ParseError' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/ParseError.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\Scanner' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/Scanner.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\StringInputStream' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/StringInputStream.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\Tokenizer' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/Tokenizer.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\TreeBuildingRules' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/TreeBuildingRules.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Parser\\UTF8Utils' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/UTF8Utils.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Serializer\\HTML5Entities' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/HTML5Entities.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Serializer\\OutputRules' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/OutputRules.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Serializer\\RulesInterface' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/RulesInterface.php',
-        'WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Serializer\\Traverser' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/Traverser.php',
+        'Masterminds\\HTML5' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5.php',
+        'Masterminds\\HTML5\\Elements' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Elements.php',
+        'Masterminds\\HTML5\\Entities' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Entities.php',
+        'Masterminds\\HTML5\\Exception' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Exception.php',
+        'Masterminds\\HTML5\\InstructionProcessor' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/InstructionProcessor.php',
+        'Masterminds\\HTML5\\Parser\\CharacterReference' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/CharacterReference.php',
+        'Masterminds\\HTML5\\Parser\\DOMTreeBuilder' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/DOMTreeBuilder.php',
+        'Masterminds\\HTML5\\Parser\\EventHandler' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/EventHandler.php',
+        'Masterminds\\HTML5\\Parser\\FileInputStream' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/FileInputStream.php',
+        'Masterminds\\HTML5\\Parser\\InputStream' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/InputStream.php',
+        'Masterminds\\HTML5\\Parser\\ParseError' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/ParseError.php',
+        'Masterminds\\HTML5\\Parser\\Scanner' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/Scanner.php',
+        'Masterminds\\HTML5\\Parser\\StringInputStream' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/StringInputStream.php',
+        'Masterminds\\HTML5\\Parser\\Tokenizer' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/Tokenizer.php',
+        'Masterminds\\HTML5\\Parser\\TreeBuildingRules' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/TreeBuildingRules.php',
+        'Masterminds\\HTML5\\Parser\\UTF8Utils' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/UTF8Utils.php',
+        'Masterminds\\HTML5\\Serializer\\HTML5Entities' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/HTML5Entities.php',
+        'Masterminds\\HTML5\\Serializer\\OutputRules' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/OutputRules.php',
+        'Masterminds\\HTML5\\Serializer\\RulesInterface' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/RulesInterface.php',
+        'Masterminds\\HTML5\\Serializer\\Traverser' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/Traverser.php',
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\CSSList\\AtRuleBlockList' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/CSSList/AtRuleBlockList.php',
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\CSSList\\CSSBlockList' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/CSSList/CSSBlockList.php',
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\CSSList\\CSSList' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/CSSList/CSSList.php',
@@ -293,6 +270,24 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\URL' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/URL.php',
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\Value' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/Value.php',
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\ValueList' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/ValueList.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Uri\\InvalidUriException' => __DIR__ . '/..' . '/sabre/uri/lib/InvalidUriException.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Uri\\Version' => __DIR__ . '/..' . '/sabre/uri/lib/Version.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\ContextStackTrait' => __DIR__ . '/..' . '/sabre/xml/lib/ContextStackTrait.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element' => __DIR__ . '/..' . '/sabre/xml/lib/Element.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Base' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Base.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Cdata' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Cdata.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Elements' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Elements.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\KeyValue' => __DIR__ . '/..' . '/sabre/xml/lib/Element/KeyValue.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Uri' => __DIR__ . '/..' . '/sabre/xml/lib/Element/Uri.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\XmlFragment' => __DIR__ . '/..' . '/sabre/xml/lib/Element/XmlFragment.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\LibXMLException' => __DIR__ . '/..' . '/sabre/xml/lib/LibXMLException.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\ParseException' => __DIR__ . '/..' . '/sabre/xml/lib/ParseException.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Reader' => __DIR__ . '/..' . '/sabre/xml/lib/Reader.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Service' => __DIR__ . '/..' . '/sabre/xml/lib/Service.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Version' => __DIR__ . '/..' . '/sabre/xml/lib/Version.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\Writer' => __DIR__ . '/..' . '/sabre/xml/lib/Writer.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\XmlDeserializable' => __DIR__ . '/..' . '/sabre/xml/lib/XmlDeserializable.php',
+        'WPO\\IPS\\Vendor\\Sabre\\Xml\\XmlSerializable' => __DIR__ . '/..' . '/sabre/xml/lib/XmlSerializable.php',
         'WPO\\IPS\\Vendor\\Svg\\CssLength' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/CssLength.php',
         'WPO\\IPS\\Vendor\\Svg\\DefaultStyle' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/DefaultStyle.php',
         'WPO\\IPS\\Vendor\\Svg\\Document' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Document.php',
@@ -322,14 +317,16 @@ class ComposerStaticInitda89efa14b410f6884f98183affb035a
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Symbol' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Symbol.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Text' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Text.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\UseTag' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/UseTag.php',
+        'Symfony\\Polyfill\\Iconv\\Iconv' => __DIR__ . '/..' . '/symfony/polyfill-iconv/Iconv.php',
+        'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitda89efa14b410f6884f98183affb035a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitda89efa14b410f6884f98183affb035a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitda89efa14b410f6884f98183affb035a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8da09a8f6b5e759115e893ca39030504::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8da09a8f6b5e759115e893ca39030504::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit8da09a8f6b5e759115e893ca39030504::$classMap;
 
         }, null, ClassLoader::class);
     }

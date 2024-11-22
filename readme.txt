@@ -3,9 +3,9 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, moham
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.2
-Stable tag: 3.9.0-beta-3
+Stable tag: 3.9.1-beta-2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,15 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.9.0 (2024-10-21) =
+* New: Updated `sabre/xml` library to version 4.
+* New: Added notice about dropping support for PHP versions below 7.4.
+* New: Implemented PSR-4 Autoloading Standard for improved code structure and maintainability.
+* New: Deprecated `wpo_wcpdf_due_date_display` hook.
+* Fix: WC item meta style issue when using `dd`.
+* Fix: Relocated `wpo_wcpdf_use_path` hook before `$src` empty check.
+* Translations: Updated translation template (POT).
 
 = 3.8.8 (2024-10-08) =
 * Fix: adds missing deprecated filters to document title methods
