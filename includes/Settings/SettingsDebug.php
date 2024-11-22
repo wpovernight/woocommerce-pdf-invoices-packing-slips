@@ -981,12 +981,6 @@ class SettingsDebug {
 				'result'   => function_exists( 'imagecreatefromwebp' ),
 				'fallback' => __( 'Required if you have .webp images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
-			// "PCRE" => array(
-			// 	"required" => true,
-			// 	"value"    => phpversion("pcre"),
-			// 	"result"   => function_exists("preg_match") && @preg_match("/./u", "a"),
-			// 	"failure"  => "PCRE is required with Unicode support (the \"u\" modifier)",
-			// ),
 			'Zlib' => array(
 				'required' => __( 'To compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'    => phpversion( 'zlib' ),
