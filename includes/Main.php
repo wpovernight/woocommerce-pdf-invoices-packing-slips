@@ -952,7 +952,7 @@ class Main {
 	public function copy_fonts( $path = '', $merge_with_local = true ) {
 		// only copy fonts if the bundled dompdf library is used!
 		$default_pdf_maker = '\\WPO\\IPS\\Makers\\PDFMaker';
-		
+
 		if ( $default_pdf_maker !== apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker ) ) {
 			return;
 		}
@@ -1247,7 +1247,7 @@ class Main {
 	 * Fixed in WP5.5 due to upgrade to newer PHPMailer
 	 */
 	public function set_phpmailer_validator( $mailArray ) {
-		if ( version_compare( PHP_VERSION, '7.3', '>=' ) && version_compare( get_bloginfo( 'version' ), '5.5-dev', '<' ) ) {
+		if ( version_compare( get_bloginfo( 'version' ), '5.5-dev', '<' ) ) {
 			global $phpmailer;
 			if ( ! ( $phpmailer instanceof \PHPMailer ) ) {
 				require_once ABSPATH . WPINC . '/class-phpmailer.php';
@@ -1646,8 +1646,19 @@ class Main {
 			return;
 		}
 
-		$due_date       = apply_filters( 'wpo_wcpdf_due_date_display', date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $document_type, $document );
-		$due_date_title = is_callable( array( $document, 'get_due_date_title' ) ) ? $document->get_due_date_title() : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+		$due_date = apply_filters_deprecated(
+			'wpo_wcpdf_due_date_display',
+			array(
+				date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ),
+				$due_date_timestamp,
+				$document_type,
+				$document
+			),
+			'3.9.0',
+			'wpo_wcpdf_document_due_date'
+		);
+		$due_date_title = is_callable( array( $document, 'get_due_date_title' ) ) ?
+			$document->get_due_date_title() : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">

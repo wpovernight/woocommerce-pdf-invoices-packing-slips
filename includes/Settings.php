@@ -86,6 +86,9 @@ class Settings {
 
 		// schedule yearly reset numbers
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
+
+		// Apply settings sections.
+		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_sections' ), 999 );
 	}
 
 	public function menu() {
@@ -178,12 +181,15 @@ class Settings {
 				'title'          => __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
-			'ubl' => array(
+		) );
+
+		if ( wcpdf_is_ubl_available() ) {
+			$settings_tabs['ubl'] = array(
 				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 1,
 				'beta'           => true,
-			),
-		) );
+			);
+		}
 
 		// add status and upgrade tabs last in row
 		$settings_tabs['debug'] = array(
@@ -476,7 +482,8 @@ class Settings {
 					$settings_field['id'],
 					$settings_field['title'],
 					$callback,
-					$page
+					$page,
+					$settings_field['args'] ?? array()
 				);
 			} else {
 				add_settings_field(
@@ -1003,6 +1010,227 @@ class Settings {
 		$new_settings = array_merge( array_slice( $settings, 0, $pos, true ), $insert_settings, array_slice( $settings, $pos, NULL, true ) );
 
 		return $new_settings;
+	}
+
+	/**
+	 * Applies categories to document settings.
+	 *
+	 * @return void
+	 */
+	public function update_documents_settings_sections(): void {
+		$documents = WPO_WCPDF()->documents->get_documents();
+
+		foreach ( $documents as $document ) {
+			foreach ( $document->output_formats as $output_format ) {
+				add_filter( "wpo_wcpdf_settings_fields_documents_{$document->get_type()}_{$output_format}", array( $this, 'apply_settings_categories' ), 999 );
+			}
+		}
+	}
+
+	/**
+	 * Apply settings categories to the settings fields.
+	 *
+	 * @param array  $settings_fields
+	 *
+	 * @return array
+	 */
+	public function apply_settings_categories( array $settings_fields ): array {
+		$current_filter = explode( '_', current_filter() );
+		$output_format  = end( $current_filter );
+		$document_type  = prev( $current_filter );
+		$document       = wcpdf_get_document( $document_type, null );
+
+		if ( ! $document ) {
+			return $settings_fields;
+		}
+
+		$settings_categories = is_callable( array( $document, 'get_settings_categories' ) ) ? $document->get_settings_categories( $output_format ) : array();
+
+		// Return if no category found!
+		if ( empty( $settings_categories ) ) {
+			return $settings_fields;
+		}
+
+		// Remove all sections first.
+		foreach ( $settings_fields as $key => $field ) {
+			if ( 'section' === $field['type'] ) {
+				unset( $settings_fields[ $key ] );
+			}
+		}
+
+		$modified_settings_fields = array();
+		$settings_lookup          = array();
+		$processed_keys           = array();
+
+		// Create a lookup array for settings fields by id.
+		// This allows for quick access to settings fields by their id, reducing the time complexity
+		// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
+		// and m is the number of settings fields.
+		foreach ( $settings_fields as $key => $settings_field ) {
+			$settings_lookup[ $settings_field['id'] ] = $key;
+		}
+
+		// Update settings fields.
+		foreach ( $settings_categories as $category_name => $category_details ) {
+			// Add section for each category.
+			$modified_settings_fields[] = $this->create_section( $category_name, $category_details['title'] );
+
+			// Add settings fields based on the order in the members array.
+			foreach ( $category_details['members'] as $member ) {
+				if ( isset( $settings_lookup[ $member ] ) ) {
+					$key = $settings_lookup[ $member ];
+
+					// Skip if the key has already been processed.
+					if ( in_array( $key, $processed_keys, true ) ) {
+						continue;
+					}
+
+					$settings_field             = $settings_fields[ $key ];
+					$settings_field['section']  = $category_name;
+					$modified_settings_fields[] = $settings_field;
+					$processed_keys[]           = $key;
+				}
+			}
+		}
+
+		// Check for any unprocessed settings fields.
+		$unprocessed_settings_fields = array_diff_key( $settings_fields, array_flip( $processed_keys ) );
+
+		// Create an "Additional settings" section for uncategorized settings fields.
+		if ( ! empty( $unprocessed_settings_fields ) ) {
+			$category_name = 'additional';
+
+			$modified_settings_fields[] = $this->create_section(
+				$category_name,
+				__( 'Additional settings', 'woocommerce-pdf-invoices-packing-slips' )
+			);
+
+			// Add rest of settings to the $modified_settings_fields array under "More" category
+			foreach ( $unprocessed_settings_fields as $settings_field ) {
+				$settings_field['section']  = $category_name;
+				$modified_settings_fields[] = $settings_field;
+			}
+		}
+
+		return $modified_settings_fields;
+	}
+
+	/**
+	 * Creates a section array for settings fields.
+	 *
+	 * @param string $category_name The ID of the category.
+	 * @param string $category_title The title of the section.
+	 *
+	 * @return array The section configuration array.
+	 */
+	private function create_section( string $category_name, string $category_title ): array {
+		return array(
+			'type'     => 'section',
+			'id'       => $category_name,
+			'title'    => $category_title,
+			'callback' => 'section',
+			'args'     => array(
+				'before_section' => '<div class="settings_category" id="' . esc_attr( $category_name ) . '">',
+				'after_section'  => '</div>',
+			),
+		);
+	}
+
+	/**
+	 * Helper method to add a single setting field to a category.
+	 *
+	 * @param array    $settings_categories Array of existing settings categories, with category names as keys.
+	 * @param string   $new_setting_id      The new setting ID to add to the specified category.
+	 * @param string   $category_name       Name of the category to which the settings will be added.
+	 * @param int|null $position            Optional. The position at which to insert the new settings (starts from 1). Defaults to appending at the end.
+	 *
+	 * @return array
+	 */
+	public function add_single_setting_field_to_category( array $settings_categories, string $new_setting_id, string $category_name, ?int $position = null ): array {
+		return $this->add_setting_field_to_category( $settings_categories, array( $new_setting_id ), $category_name, $position );
+	}
+
+	/**
+	 * Helper method to add multiple setting fields to a category.
+	 *
+	 * @param array    $settings_categories Array of existing settings categories, with category names as keys.
+	 * @param array    $new_setting_ids     Array of new setting IDs to add to the specified category.
+	 * @param string   $category_name       Name of the category to which the settings will be added.
+	 * @param int|null $position            Optional. The position at which to insert the new settings (starts from 1). Defaults to appending at the end.
+	 *
+	 * @return array
+	 */
+	public function add_multiple_setting_fields_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
+		return $this->add_setting_field_to_category( $settings_categories, $new_setting_ids, $category_name, $position );
+	}
+
+	/**
+	 * Internal method to handle adding setting fields to a category.
+	 *
+	 * @param array    $settings_categories Array of existing settings categories, with category names as keys.
+	 * @param array    $new_setting_ids     Array of new setting IDs to add to the specified category.
+	 * @param string   $category_name       Name of the category to which the settings will be added.
+	 * @param int|null $position            Optional. The position at which to insert the new settings (1-based index). Defaults to appending at the end.
+	 *
+	 * @return array
+	 */
+	private function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
+		if ( ! isset( $settings_categories[ $category_name ] ) ) {
+			return $settings_categories;
+		}
+
+		$members = &$settings_categories[ $category_name ]['members'];
+
+		if ( is_null( $position ) || 0 === $position ) {
+			$members = array_merge( $members, $new_setting_ids );
+		} else {
+			array_splice( $members, $position - 1, 0, $new_setting_ids );
+		}
+
+		return $settings_categories;
+	}
+
+	/**
+	 * Get the position of a specific setting in the settings array.
+	 *
+	 * @param array  $settings_categories Array of settings categories where the setting name is searched.
+	 * @param string $category            Name of the category to search in.
+	 * @param string $setting_name        Name of the setting to find in the settings array.
+	 *
+	 * @return int Position of the setting (1-based index) if found; otherwise, returns 0.
+	 */
+	public function get_setting_position( array $settings_categories, string $category, string $setting_name ): int {
+		if ( empty( $settings_categories[ $category ]['members'] ) ) {
+			return 0;
+		}
+
+		$key = array_search( $setting_name, $settings_categories[ $category ]['members'], true );
+
+		return $key !== false ? absint( $key ) + 1: 0;
+	}
+
+	/**
+	 * Helper method to add a setting category.
+	 *
+	 * @param array  $settings_categories
+	 * @param string $category_name
+	 * @param string $title
+	 * @param array  $members
+	 *
+	 * @return array
+	 */
+	public function add_settings_category( array $settings_categories, string $category_name, string $title, array $members ): array {
+		// Do not override if the category already exist.
+		if ( isset( $settings_categories[ $category_name ] ) ) {
+			return $settings_categories;
+		}
+
+		$settings_categories[ $category_name ] = array(
+			'title'   => $title,
+			'members' => $members,
+		);
+
+		return $settings_categories;
 	}
 
 }
