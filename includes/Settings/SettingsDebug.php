@@ -76,12 +76,23 @@ class SettingsDebug {
 		submit_button();
 	}
 
-	public function display_status() {
-		include( WPO_WCPDF()->plugin_path() . '/views/advanced-status.php' );
+	/**
+	 * Display the server requirement page.
+	 *
+	 * @return void
+	 */
+	public function display_status(): void {
+		$server_configs = $this->get_server_config();
+		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}
 
-	public function display_tools() {
-		include( WPO_WCPDF()->plugin_path() . '/views/advanced-tools.php' );
+	/**
+	 * Display the advanced tools page.
+	 *
+	 * @return void
+	 */
+	public function display_tools(): void {
+		include WPO_WCPDF()->plugin_path() . '/views/advanced-tools.php';
 	}
 
 	public function display_numbers() {
@@ -1051,15 +1062,6 @@ class SettingsDebug {
 			} else {
 				$server_configs['opcache']['value'] = 'PHP OPCache ' . phpversion( 'opcache' );
 			}
-		}
-
-		if ( ! $server_configs['PHP version']['result'] ) {
-			$server_configs['PHP version']['required'] .= '<br/>' . sprintf(
-					/* translators: <a> tags */
-					__( 'Download %1$sthis addon%2$s to enable backwards compatibility.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/backwards-compatibility-with-php-5-6/" target="_blank">',
-					'</a>'
-				);
 		}
 
 		return apply_filters( 'wpo_wcpdf_server_configs', $server_configs );
