@@ -10,9 +10,9 @@ $imagick        = extension_loaded( 'imagick' );
 
 $server_configs = array(
 	'PHP version' => array(
-		'required' => __( '7.2+ (7.4 or higher recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
+		'required' => __( '7.4 or superior', 'woocommerce-pdf-invoices-packing-slips' ),
 		'value'    => PHP_VERSION,
-		'result'   => version_compare( PHP_VERSION, '7.2', '>' ),
+		'result'   => WPO_WCPDF()->is_dependency_version_supported( 'php' ),
 	),
 	'DOMDocument extension' => array(
 		'required' => true,

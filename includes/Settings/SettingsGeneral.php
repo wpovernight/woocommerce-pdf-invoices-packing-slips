@@ -320,18 +320,28 @@ class SettingsGeneral {
 		$template_list = array();
 		foreach ( $installed_templates as $path => $template_id ) {
 			$template_name = basename( $template_id );
-			$group = dirname( $template_id );
+			$group         = dirname( $template_id );
+
+			// check if this is an extension template
+			if ( false !== strpos( $group, 'extension::' ) ) {
+				$extension = explode( '::', $group );
+				$group     = 'extension';
+			}
+
 			switch ( $group ) {
 				case 'default':
 				case 'premium_plugin':
 					// no suffix
+					break;
+				case 'extension':
+					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
 					break;
 				case 'theme':
 				default:
 					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
 					break;
 			}
-			$template_list[$template_id] = $template_name;
+			$template_list[ $template_id ] = $template_name;
 		}
 		return $template_list;
 	}
