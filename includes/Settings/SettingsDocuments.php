@@ -38,11 +38,9 @@ class SettingsDocuments {
 		$output_format    = 'pdf';
 		$section_document = null;
 
-		if ( isset( $_REQUEST['output_format'] ) && 'ubl' === $_REQUEST['output_format'] ) {
-			$output_format = 'ubl';
+		if ( ! empty( $_REQUEST['output_format'] ) ) {
+			$output_format = esc_attr( $_REQUEST['output_format'] );
 		}
-
-		$output_format = apply_filters( 'wpo_wcpdf_settings_documents_output_format', $output_format, $section );
 
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() == $section ) {
