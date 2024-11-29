@@ -42,6 +42,8 @@ class SettingsDocuments {
 			$output_format = 'ubl';
 		}
 
+		$output_format = apply_filters( 'wpo_wcpdf_settings_documents_output_format', $output_format, $section );
+
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() == $section ) {
 				$section_document = $document;
@@ -80,7 +82,7 @@ class SettingsDocuments {
 								if ( ! wcpdf_is_ubl_available() && 'ubl' === $document_output_format ) {
 									continue;
 								}
-								
+
 								$active    = ( $output_format == $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
 								$tab_title = strtoupper( esc_html( $document_output_format ) );
 								if ( 'ubl' === $document_output_format ) {
