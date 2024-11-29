@@ -72,11 +72,12 @@ body.wpo-wcpdf-setup form {
 
 .wpo-plugin-title {
 	width: 100%;
-	padding: 40px 0 30px 0;
+	padding: 50px 0 30px 0;
 	margin: 0;
 	text-align: center;
 	display: block;
 	font-weight: 200;
+	font-size: 1.5em;
 }
 
 .wpo-progress-bar {
@@ -138,6 +139,7 @@ body.wpo-wcpdf-setup form {
 
 .wpo-progress-bar {
 	counter-reset: section;
+	padding-bottom: 25px;
 }
 
 .wpo-progress-marker::before {
@@ -175,10 +177,23 @@ li.completed .wpo-progress-marker::before {
 }
 
 .wpo-step-description {
-	width: 50%;
+	width: 40%;
 	float: left;
-	padding: 50px;
+	padding: 30px 40px 30px 50px;
 	box-sizing: border-box;
+}
+
+.wpo-step-description h2 {
+	color: #444;
+	font-family: serif;
+    letter-spacing: -0.25px;
+    font-size: 2.4em;
+    font-style: italic;
+	line-height: 0.9;
+}
+
+.wpo-step-description p {
+	font-size: 16px;
 }
 
 .wpo-step-description ul {
@@ -186,11 +201,12 @@ li.completed .wpo-progress-marker::before {
 }
 
 .wpo-setup-input {
-	width: 50%;
+	width: 60%;
 	float: left;
-	padding: 50px 50px 50px 0;
+	padding: 30px 50px;
 	box-sizing: border-box;
 	position: relative;
+	border-left: 1px solid #eaeaea;
 }
 
 .wpo-setup-input select {
@@ -358,9 +374,9 @@ li.completed .wpo-progress-marker::before {
 	color: #666;
 }
 
-.wpo-setup-input table th,
-.wpo-setup-input table td {
-	padding-bottom: 5px;
+.wpo-setup-input table th {
+	width: 40%;
+	padding-bottom: 20px;
 }
 
 .wpo-setup-input input[type=checkbox] {
@@ -380,12 +396,28 @@ li.completed .wpo-progress-marker::before {
 .wpo-final {
 	text-align: center;
 	width: 100%;
-	padding: 50px;
+	padding: 25px 50px 30px;
 }
 
 .wpo-final h1 {
-	font-size: 3em;
+	font-size: 6em;
 	line-height: 1em;
+	font-family: serif;
+    letter-spacing: -4px;
+    font-style: italic;
+}
+
+.wpo-final h2 {
+	letter-spacing: -1px;
+	font-size: 2em;
+	font-weight: lighter;
+	padding-top: 0.8em;
+	font-family: sans-serif;
+	font-style: normal;
+}
+
+.wpo-final p {
+	font-size: 1.3em;
 }
 
 .wpo-final a:hover {
