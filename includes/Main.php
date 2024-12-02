@@ -1270,9 +1270,10 @@ class Main {
 	public function log_document_creation_to_order_notes( $document, $trigger ) {
 		$triggers = $this->get_document_triggers();
 		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
+			$user    = wp_get_current_user();
 			/* translators: 1. document title, 2. creation trigger */
-			$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
-			$note    = sprintf( $message, $document->get_title(), $triggers[$trigger] );
+			$message = __( 'PDF %1$s created via %2$s by %3$s(#%4$s).', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title(), $triggers[ $trigger ], $user->display_name, $user->ID );
 			$this->log_to_order_notes( $note, $document );
 		}
 	}
