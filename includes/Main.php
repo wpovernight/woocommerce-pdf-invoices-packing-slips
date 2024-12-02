@@ -1289,7 +1289,7 @@ class Main {
 		if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
 			$user    = wp_get_current_user();
 			/* translators: 1. document title 2. user display name, 3. user ID */
-			$message = __( 'PDF %s deleted by %3$s(#%4$s).', 'woocommerce-pdf-invoices-packing-slips' );
+			$message = __( 'PDF %1$s deleted by %2$s(#%3$s).', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $user->display_name, $user->ID );
 			$this->log_to_order_notes( $note, $document );
 		}
