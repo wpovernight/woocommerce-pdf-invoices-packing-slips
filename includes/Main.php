@@ -1271,7 +1271,7 @@ class Main {
 		$triggers = $this->get_document_triggers();
 		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
 			$user    = wp_get_current_user();
-			/* translators: 1. document title, 2. creation trigger */
+			/* translators: 1. document title, 2. creation trigger, 3. user display name, 4. user ID */
 			$message = __( 'PDF %1$s created via %2$s by %3$s(#%4$s).', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $triggers[ $trigger ], $user->display_name, $user->ID );
 			$this->log_to_order_notes( $note, $document );
@@ -1287,9 +1287,10 @@ class Main {
 	 */
 	public function log_document_deletion_to_order_notes( object $document ): void {
 		if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			/* translators: document title */
-			$message = __( 'PDF %s deleted.', 'woocommerce-pdf-invoices-packing-slips' );
-			$note    = sprintf( $message, $document->get_title() );
+			$user    = wp_get_current_user();
+			/* translators: 1. document title 2. user display name, 3. user ID */
+			$message = __( 'PDF %s deleted by %3$s(#%4$s).', 'woocommerce-pdf-invoices-packing-slips' );
+			$note    = sprintf( $message, $document->get_title(), $user->display_name, $user->ID );
 			$this->log_to_order_notes( $note, $document );
 		}
 	}
