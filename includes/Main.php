@@ -1265,25 +1265,41 @@ class Main {
 	 *
 	 * @param object $document
 	 * @param string $trigger
+	 *
 	 * @return void
 	 */
-	public function log_document_creation_to_order_notes( $document, $trigger ) {
+	public function log_document_creation_to_order_notes( object $document, string $trigger ) {
+		if ( empty( $document ) || empty( $trigger ) || ! isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+			return;
+		}
+
 		$triggers = $this->get_document_triggers();
-		if ( ! empty( $document ) && isset( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
+
+		if ( ! array_key_exists( $trigger, $triggers ) ) {
+			return;
+		}
+
+		$user_note_message = '';
+		$manual_triggers   = $this->get_document_triggers( true );
+
+		// Add user information if the trigger is manual.
+		if ( array_key_exists( $trigger, $manual_triggers ) ) {
 			$user = wp_get_current_user();
 
-			if ( empty( $user ) ) {
-				$user = (object) array(
-					'display_name' => 'System',
-					'ID'           => 0,
+			if ( ! empty( $user->display_name ) && ! empty( $user->ID )   ) {
+				$user_note_message = sprintf(
+					/* translators: 1. user display name, 2. user ID */
+					__( ' by %1$s(#%2$s)', 'woocommerce-pdf-invoices-packing-slips' ),
+					$user->display_name,
+					$user->ID
 				);
 			}
-
-			/* translators: 1. document title, 2. creation trigger, 3. user display name, 4. user ID */
-			$message = __( 'PDF %1$s created via %2$s by %3$s(#%4$s).', 'woocommerce-pdf-invoices-packing-slips' );
-			$note    = sprintf( $message, $document->get_title(), $triggers[ $trigger ], $user->display_name, $user->ID );
-			$this->log_to_order_notes( $note, $document );
 		}
+
+		/* translators: 1. document title, 2. creation trigger, 3. user info */
+		$message = __( 'PDF %1$s created via %2$s%3$s.', 'woocommerce-pdf-invoices-packing-slips' );
+		$note    = sprintf( $message, $document->get_title(), $triggers[ $trigger ], $user_note_message );
+		$this->log_to_order_notes( $note, $document );
 	}
 
 	/**
@@ -1296,14 +1312,6 @@ class Main {
 	public function log_document_deletion_to_order_notes( object $document ): void {
 		if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
 			$user = wp_get_current_user();
-
-			if ( empty( $user ) ) {
-				$user = (object) array(
-					'display_name' => 'System',
-					'ID'           => 0,
-				);
-			}
-
 			/* translators: 1. document title 2. user display name, 3. user ID */
 			$message = __( 'PDF %1$s deleted by %2$s(#%3$s).', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $user->display_name, $user->ID );
@@ -1423,16 +1431,25 @@ class Main {
 	/**
 	 * Get the document triggers
 	 *
+	 * @param bool $only_manual_triggers
+	 *
 	 * @return array
 	 */
-	public function get_document_triggers() {
-		return apply_filters( 'wpo_wcpdf_document_triggers', [
+	public function get_document_triggers( bool $only_manual_triggers = false ): array {
+		$triggers = array(
 			'single'           => __( 'single order action', 'woocommerce-pdf-invoices-packing-slips' ),
 			'bulk'             => __( 'bulk order action', 'woocommerce-pdf-invoices-packing-slips' ),
 			'my_account'       => __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ),
 			'email_attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
 			'document_data'    => __( 'order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
-		] );
+		);
+
+		if ( $only_manual_triggers ) {
+			$user_triggers = array( 'single', 'bulk', 'my_account', 'document_data' );
+			$triggers      = array_intersect_key( $triggers, array_flip( $user_triggers ) );
+		}
+
+		return apply_filters( 'wpo_wcpdf_document_triggers', $triggers, $only_manual_triggers );
 	}
 
 	/**
