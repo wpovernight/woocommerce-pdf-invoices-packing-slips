@@ -1286,20 +1286,19 @@ class Main {
 		if ( array_key_exists( $trigger, $manual_triggers ) ) {
 			$user = wp_get_current_user();
 
-			if ( ! empty( $user->display_name ) && ! empty( $user->ID )   ) {
+			if ( ! empty( $user->user_login ) ) {
 				$user_note_message = sprintf(
-					/* translators: 1. user display name, 2. user ID */
-					__( ' by %1$s(#%2$s)', 'woocommerce-pdf-invoices-packing-slips' ),
-					$user->display_name,
-					$user->ID
+					/* translators: user login name */
+					__( ' (User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
+					esc_html( $user->user_login )
 				);
 			}
 		}
 
-		/* translators: 1. document title, 2. creation trigger, 3. user info */
-		$message = __( 'PDF %1$s created via %2$s%3$s.', 'woocommerce-pdf-invoices-packing-slips' );
-		$note    = sprintf( $message, $document->get_title(), $triggers[ $trigger ], $user_note_message );
-		$this->log_to_order_notes( $note, $document );
+		/* translators: 1. document title, 2. creation trigger */
+		$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
+		$note    = sprintf( $message, $document->get_title(), $triggers[ $trigger ] );
+		$this->log_to_order_notes( $note . $user_note_message, $document );
 	}
 
 	/**
