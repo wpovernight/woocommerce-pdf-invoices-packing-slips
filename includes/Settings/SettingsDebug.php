@@ -1120,8 +1120,7 @@ class SettingsDebug {
 
 			<div class="notice notice-warning">
 				<p><?php echo wp_kses_post( $notice_message ); ?></p>
-				<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-				</p>
+				<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
 			</div>
 
 			<?php
