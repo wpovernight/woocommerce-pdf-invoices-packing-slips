@@ -175,10 +175,10 @@ class Invoice extends OrderDocumentMethods {
 		do_action( "wpo_wcpdf_before_{$this->type}_init_settings", $this );
 
 		foreach ( $this->output_formats as $output_format ) {
+			$page = $option_group = $option_name = '';
 			$settings_fields = array();
 
 			switch ( $output_format ) {
-				default:
 				case 'pdf':
 					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
 					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
@@ -189,9 +189,15 @@ class Invoice extends OrderDocumentMethods {
 					break;
 			}
 
+			// custom output format
+			if ( empty( $page ) ) {
+				$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output_format}";
+			}
+
+			// allow plugins to alter settings fields
+			$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_{$output_format}", $settings_fields, $page, $option_group, $option_name, $this );
+
 			if ( ! empty( $settings_fields ) ) {
-				// allow plugins to alter settings fields
-				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_{$output_format}", $settings_fields, $page, $option_group, $option_name, $this );
 				WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 			}
 		}
@@ -692,7 +698,7 @@ class Invoice extends OrderDocumentMethods {
 			)
 		);
 
-		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ], $output_format, $this );
+		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ] ?? array(), $output_format, $this );
 	}
 
 }
