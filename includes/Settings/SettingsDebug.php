@@ -1105,24 +1105,27 @@ class SettingsDebug {
 		}
 
 		// Display the notice.
-		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
-		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
-		$notice_message  = sprintf(
-			/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
-			__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-			'<a href="' . esc_url( $status_page_url ) . '">',
-			'</a>'
-		);
+		add_action( 'admin_notices', function () {
+			$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
+			$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
+			$notice_message  = sprintf(
+				/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
+				__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+				'<a href="' . esc_url( $status_page_url ) . '">',
+				'</a>'
+			);
 
-		?>
+			?>
 
-		<div class="notice notice-warning">
-			<p><?php echo wp_kses_post( $notice_message ); ?></p>
-			<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-		</div>
+			<div class="notice notice-warning">
+				<p><?php echo wp_kses_post( $notice_message ); ?></p>
+				<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				</p>
+			</div>
 
-		<?php
+			<?php
+		} );
 	}
 
 	private function get_settings_sections(): array {
