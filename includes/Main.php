@@ -1310,11 +1310,21 @@ class Main {
 	 */
 	public function log_document_deletion_to_order_notes( object $document ): void {
 		if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			$user = wp_get_current_user();
+			$user_note_message = '';
+			$user              = wp_get_current_user();
+
+			if ( ! empty( $user->user_login ) ) {
+				$user_note_message = sprintf(
+					/* translators: user login name */
+					__( ' (User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
+					esc_html( $user->user_login )
+				);
+			}
+
 			/* translators: 1. document title 2. user display name, 3. user ID */
-			$message = __( 'PDF %1$s deleted by %2$s(#%3$s).', 'woocommerce-pdf-invoices-packing-slips' );
+			$message = __( 'PDF %1$s deleted.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $user->display_name, $user->ID );
-			$this->log_to_order_notes( $note, $document );
+			$this->log_to_order_notes( $note . $user_note_message, $document );
 		}
 	}
 
