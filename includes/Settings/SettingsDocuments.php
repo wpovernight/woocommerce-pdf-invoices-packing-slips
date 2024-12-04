@@ -38,8 +38,8 @@ class SettingsDocuments {
 		$output_format    = 'pdf';
 		$section_document = null;
 
-		if ( isset( $_REQUEST['output_format'] ) && 'ubl' === $_REQUEST['output_format'] ) {
-			$output_format = 'ubl';
+		if ( ! empty( $_REQUEST['output_format'] ) ) {
+			$output_format = esc_attr( $_REQUEST['output_format'] );
 		}
 
 		foreach ( $documents as $document ) {
@@ -80,7 +80,7 @@ class SettingsDocuments {
 								if ( ! wcpdf_is_ubl_available() && 'ubl' === $document_output_format ) {
 									continue;
 								}
-								
+
 								$active    = ( $output_format == $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
 								$tab_title = strtoupper( esc_html( $document_output_format ) );
 								if ( 'ubl' === $document_output_format ) {

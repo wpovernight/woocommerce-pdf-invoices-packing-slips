@@ -21,7 +21,9 @@ class SettingsDebug {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
+		// Show a notice if the plugin requirements are not met.
+		add_action( 'admin_init', array( $this, 'display_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 
@@ -74,12 +76,23 @@ class SettingsDebug {
 		submit_button();
 	}
 
-	public function display_status() {
-		include( WPO_WCPDF()->plugin_path() . '/views/advanced-status.php' );
+	/**
+	 * Display the server requirement page.
+	 *
+	 * @return void
+	 */
+	public function display_status(): void {
+		$server_configs = $this->get_server_config();
+		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}
 
-	public function display_tools() {
-		include( WPO_WCPDF()->plugin_path() . '/views/advanced-tools.php' );
+	/**
+	 * Display the advanced tools page.
+	 *
+	 * @return void
+	 */
+	public function display_tools(): void {
+		include WPO_WCPDF()->plugin_path() . '/views/advanced-tools.php';
 	}
 
 	public function display_numbers() {
@@ -921,6 +934,194 @@ class SettingsDebug {
 				<td><?php _e( 'Document can be accessed by everyone with the link.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 		</table>
+		<?php
+	}
+
+	/**
+	 * Get the server configuration.
+	 *
+	 * @return array
+	 */
+	public function get_server_config(): array {
+		$memory_limit  = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
+		$php_mem_limit = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
+		$gmagick       = extension_loaded( 'gmagick' );
+		$imagick       = extension_loaded( 'imagick' );
+		$xc            = extension_loaded( 'xcache' );
+		$apc           = extension_loaded( 'apc' );
+		$zop           = extension_loaded( 'Zend OPcache' );
+		$op            = extension_loaded( 'opcache' );
+
+		$server_configs = array(
+			'PHP version' => array(
+				'required' => __( '7.4 or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => PHP_VERSION,
+				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'php' ),
+			),
+			'DOMDocument extension' => array(
+				'required' => true,
+				'value'    => phpversion( 'DOM' ),
+				'result'   => class_exists( 'DOMDocument' ),
+			),
+			'MBString extension' => array(
+				'required' => true,
+				'value'    => phpversion( 'mbstring' ),
+				'result'   => function_exists( 'mb_send_mail' ),
+				'fallback' => __( 'Recommended, will use fallback functions', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'GD' => array(
+				'required' => true,
+				'value'    => phpversion( 'gd' ),
+				'result'   => function_exists( 'imagecreate' ),
+				'fallback' => __( 'Required if you have images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'WebP Support' => array(
+				'required' => __( 'Required when using .webp images', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => null,
+				'result'   => function_exists( 'imagecreatefromwebp' ),
+				'fallback' => __( 'Required if you have .webp images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'Zlib' => array(
+				'required' => __( 'To compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => phpversion( 'zlib' ),
+				'result'   => function_exists( 'gzcompress' ),
+				'fallback' => __( 'Recommended to compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'opcache' => array(
+				'required' => __( 'For better performances', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => null,
+				'result'   => false,
+				'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'GMagick or IMagick' => array(
+				'required' => __( 'Better with transparent PNG images', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => $imagick ? 'IMagick ' . phpversion( 'imagick' ) : ( $gmagick ? 'GMagick ' . phpversion( 'gmagick' ) : null ),
+				'result'   => $gmagick || $imagick,
+				'fallback' => __( 'Recommended for better performances', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'glob()' => array(
+				'required' => __( 'Required to detect custom templates and to clear the temp folder periodically', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => null,
+				'result'   => function_exists( 'glob' ),
+				'fallback' => __( 'Check PHP disable_functions', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'WP Memory Limit' => array(
+				/* translators: <a> tags */
+				'required' => sprintf( __( 'Recommended: 128MB (more for plugin-heavy setups<br/>See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
+				'value'    => sprintf( 'WordPress: %s, PHP: %s', WP_MEMORY_LIMIT, $php_mem_limit ),
+				'result'   => $memory_limit > 67108864,
+			),
+			'allow_url_fopen' => array (
+				'required' => __( 'Allow remote stylesheets and images', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'	   => null,
+				'result'   => (bool) ini_get( 'allow_url_fopen' ),
+				'fallback' => __( 'allow_url_fopen disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'fileinfo' => array (
+				'required' => __( 'Necessary to verify the MIME type of local images.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'	   => null,
+				'result'   => extension_loaded( 'fileinfo' ),
+				'fallback' => __( 'fileinfo disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'base64_decode'	=> array (
+				'required' => __( 'To compress and decompress font and image data', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'	   => null,
+				'result'   => function_exists( 'base64_decode' ),
+				'fallback' => __( 'base64_decode disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+		);
+
+		if ( $imagick ) {
+			$gmagick_imagick_position = array_search( 'GMagick or IMagick', array_keys( $server_configs ) ) + 1;
+			$image_magick_config      = array(
+				'ImageMagick' => array(
+					'required' => __( 'Required for IMagick', 'woocommerce-pdf-invoices-packing-slips' ),
+					'value'    => ( $imagick && class_exists( '\\Imagick' ) ) ? esc_attr( \Imagick::getVersion()['versionString'] ) : null,
+					'result'   => $imagick,
+					'fallback' => __( 'ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			);
+
+			$server_configs = array_slice( $server_configs, 0, $gmagick_imagick_position, true ) + $image_magick_config + array_slice( $server_configs, $gmagick_imagick_position, null, true );
+		}
+
+		if ( $xc || $apc || $zop || $op ) {
+			$server_configs['opcache']['result'] = true;
+			if ( $xc ) {
+				$server_configs['opcache']['value'] = 'XCache ' . phpversion( 'xcache' );
+			} elseif ( $apc ) {
+				$server_configs['opcache']['value'] = 'APC ' . phpversion( 'apc' );
+			} elseif ( $zop ) {
+				$server_configs['opcache']['value'] = 'Zend OPCache ' . phpversion( 'Zend OPcache' );
+			} else {
+				$server_configs['opcache']['value'] = 'PHP OPCache ' . phpversion( 'opcache' );
+			}
+		}
+
+		return apply_filters( 'wpo_wcpdf_server_configs', $server_configs );
+	}
+
+	/**
+	 * Set a notice to be displayed if the server requirements are not met.
+	 *
+	 * @return void
+	 */
+	public function display_server_requirement_notice(): void {
+		// Return if the notice has been dismissed.
+		if ( get_option( 'wpo_wcpdf_dismiss_requirements_notice', false ) ) {
+			return;
+		}
+
+		// Handle dismissal action.
+		if ( isset( $_GET['wpo_dismiss_requirements_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_requirements_notice' ) ) {
+				update_option( 'wpo_wcpdf_dismiss_requirements_notice', true );
+				wp_redirect( remove_query_arg( array( 'wpo_dismiss_requirements_notice', '_wpnonce' ) ) );
+				exit;
+			} else {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
+				return;
+			}
+		}
+
+		// Check if the server requirements are met.
+		$show_requirement_notice = false;
+		$server_configs          = $this->get_server_config();
+
+		foreach ( $server_configs as $config_name => $config ) {
+			if ( in_array( $config_name, array( 'opcache', 'GMagick or IMagick' ), true ) ) {
+				continue;
+			}
+
+			if ( ! $config['result'] ) {
+				$show_requirement_notice = true;
+				break;
+			}
+		}
+
+		// Return if the server requirements are met.
+		if ( ! $show_requirement_notice ) {
+			return;
+		}
+
+		// Display the notice.
+		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
+		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
+		$notice_message  = sprintf(
+			/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
+			__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+			'<a href="' . esc_url( $status_page_url ) . '">',
+			'</a>'
+		);
+
+		?>
+
+		<div class="notice notice-warning">
+			<p><?php echo wp_kses_post( $notice_message ); ?></p>
+			<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+		</div>
+
 		<?php
 	}
 
