@@ -20,7 +20,7 @@ class SettingsUpgrade {
 	}
 
 	public function __construct() {
-		$this->extensions = array( 'pro' );
+		$this->extensions = array( 'pro', 'templates' );
 
 		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
@@ -100,7 +100,7 @@ class SettingsUpgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-the-customizer/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add custom data to your documents', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -110,17 +110,17 @@ class SettingsUpgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-custom-blocks/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Additional PDF templates', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Make use of our Business or Modern template designs.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add styling', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Easily change the look and feel of your documents by adding some custom CSS.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 			);
 
@@ -257,6 +257,7 @@ class SettingsUpgrade {
 				if ( ! empty( $license_key ) ) {
 					$args['edd_action']  = 'check_license';
 					$args['license_key'] = trim( $license_key );
+					$license_info[$extension]['license_key'] = $license_key;
 
 					// legacy
 					if ( $sidekick ) {
@@ -304,12 +305,16 @@ class SettingsUpgrade {
 			if ( ! empty( $bundle_upgrade_link ) && $license_status == 'valid' ) {
 				$license_info[$extension]['url'] = $bundle_upgrade_link;
 			} else {
+				$license = ! empty( $license_info[$extension]['license_key'] ) ? $license_info[$extension]['license_key'] : ( ! empty( $license_info['pro']['license_key'] ) ? $license_info['pro']['license_key'] : $license_info['templates']['license_key'] );
 				switch ( $extension ) {
 					case 'pro':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-pro-upgrade';
+						$license_info[$extension]['url'] = "https://wpovernight.com/checkout/?edd_license_key={$license}";
+						break;
+					case 'templates':
+						$license_info[$extension]['url'] = "https://wpovernight.com/checkout/?edd_license_key={$license}";
 						break;
 					case 'bundle':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-bundle-upgrade';
+						$license_info[$extension]['url'] = "https://wpovernight.com/checkout/?edd_license_key={$license}";
 						break;
 				}
 			}
@@ -354,10 +359,6 @@ class SettingsUpgrade {
 			if ( 'cached' === $type ) {
 				update_option( $option_key, $data );
 			}
-		}
-
-		if ( isset( $data['templates'] ) ) {
-			unset( $data['templates'] );
 		}
 
 		return $data;
