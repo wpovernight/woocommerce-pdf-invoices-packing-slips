@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// pro, templates & bundle columns
 			foreach ( $extension_license_infos as $extension => $info ) {
 				// enabled
-				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) ) {
+				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) || ( $extension == 'bundle' && [] === array_diff( array( 'pro', 'templates' ), $extensions_enabled ) ) ) {
 					$extensions_enabled[] = $extension;
 
 					$title = __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' );
@@ -82,18 +82,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			$styles = '';
 
-			if ( isset( $extension_license_infos['pro']['status'] ) ) {
-				$styles .= '#upgrade-table .templates { display: none; }';
+			switch ( implode( ',', $extensions_enabled ) . '-' . implode( ',', $extensions_disabled ) ) {
+				case 'pro-templates,bundle':
+					$styles .= '#upgrade-table .templates { display: none; }';
+					break;
+				case 'templates-pro,bundle':
+					$styles .= '#upgrade-table .pro { display: none; }';
+					break;
+				case 'pro,templates-':
+					$styles .= '#upgrade-table .templates { display: none; }';
+					break;
+				case 'pro,templates-bundle':
+					$styles .= '#upgrade-table .templates { display: none; }';
+					break;
+				case 'pro,templates,bundle-':
+					$styles .= '#upgrade-table .templates { display: none; }';
+					break;
+				case '-pro,templates,bundle':
+					$styles .= '#upgrade-table .templates { display: none; }';
+					break;
 			}
-
-			if ( isset( $extension_license_infos['templates']['status'] ) ) {
-				$styles .= '#upgrade-table .pro { display: none; }';
-			}
-
-			if ( ! isset( $extension_license_infos['templates']['status'] ) && ! isset( $extension_license_infos['pro']['status'] ) ) {
-				$styles .= '#upgrade-table .templates { display: none; }';
-			}
-
 
 			echo '<style>' . $styles . '</style>';
 
