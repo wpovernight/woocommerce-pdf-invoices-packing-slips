@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// pro, templates & bundle columns
 			foreach ( $extension_license_infos as $extension => $info ) {
 				// enabled
-				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) || ( 'bundle' === $extension && [] === array_diff( array( 'pro', 'templates' ), $extensions_enabled ) ) ) {
+				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) || ( 'bundle' === $extension && array() === array_diff( array( 'pro', 'templates' ), $extensions_enabled ) ) ) {
 					$extensions_enabled[] = $extension;
 
 					$title = __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' );
