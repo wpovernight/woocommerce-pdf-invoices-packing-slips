@@ -23,7 +23,13 @@ class InvoiceLineHandler extends UblHandler {
 			$line_tax_data    = $item[ $taxDataContainer ];
 
 			foreach ( $line_tax_data[ $taxDataKey ] as $tax_id => $tax ) {
-				$tax = absint( $tax );
+				if ( empty( $tax ) ) {
+					$tax = 0;
+				}
+
+				if ( ! is_numeric( $tax ) ) {
+					continue;
+				}
 
 				$taxOrderData  = $this->document->order_tax_data[ $tax_id ];
 
