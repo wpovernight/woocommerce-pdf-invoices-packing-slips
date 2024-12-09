@@ -1452,16 +1452,16 @@ class Main {
 	 * @return array
 	 */
 	public function get_document_triggers( string $trigger_type = 'all' ): array {
-		$manual_triggers = array(
+		$manual_triggers = apply_filters( 'wpo_wcpdf_manual_document_triggers', array(
 			'single'        => __( 'single order action', 'woocommerce-pdf-invoices-packing-slips' ),
 			'bulk'          => __( 'bulk order action', 'woocommerce-pdf-invoices-packing-slips' ),
 			'my_account'    => __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ),
 			'document_data' => __( 'order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
+		) );
 
-		$automatic_triggers = array(
+		$automatic_triggers = apply_filters( 'wpo_wcpdf_automatic_document_triggers', array(
 			'email_attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
+		) );
 
 		switch ( $trigger_type ) {
 			case 'manual':
