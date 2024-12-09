@@ -23,7 +23,7 @@ class SettingsDebug {
 
 	public function __construct() {
 		// Show a notice if the plugin requirements are not met.
-		add_action( 'admin_init', array( $this, 'display_server_requirement_notice' ) );
+		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 
@@ -1066,7 +1066,7 @@ class SettingsDebug {
 	 *
 	 * @return void
 	 */
-	public function display_server_requirement_notice(): void {
+	public function handle_server_requirement_notice(): void {
 		// Return if the notice has been dismissed.
 		if ( get_option( 'wpo_wcpdf_dismiss_requirements_notice', false ) ) {
 			return;
@@ -1105,26 +1105,33 @@ class SettingsDebug {
 		}
 
 		// Display the notice.
-		add_action( 'admin_notices', function () {
-			$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
-			$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
-			$notice_message  = sprintf(
-				/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
-				__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-				'<a href="' . esc_url( $status_page_url ) . '">',
-				'</a>'
-			);
+		add_action( 'admin_notices', array( $this, 'display_server_requirement_notice' ) );
+	}
 
-			?>
+	/**
+	 * Display a notice informing the user that the server requirements are not met.
+	 *
+	 * @return void
+	 */
+	public function display_server_requirement_notice() {
+		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
+		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
+		$notice_message  = sprintf(
+			/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
+			__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+			'<a href="' . esc_url( $status_page_url ) . '">',
+			'</a>'
+		);
 
-			<div class="notice notice-warning">
-				<p><?php echo wp_kses_post( $notice_message ); ?></p>
-				<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-			</div>
+		?>
 
-			<?php
-		} );
+		<div class="notice notice-warning">
+			<p><?php echo wp_kses_post( $notice_message ); ?></p>
+			<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+		</div>
+
+		<?php
 	}
 
 	private function get_settings_sections(): array {
