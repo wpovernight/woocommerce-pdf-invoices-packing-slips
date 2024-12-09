@@ -1279,26 +1279,30 @@ class Main {
 			return;
 		}
 
-		$user_note_message = '';
-		$manual_triggers   = $this->get_document_triggers( true );
+		$user_note       = '';
+		$manual_triggers = $this->get_document_triggers( true );
 
 		// Add user information if the trigger is manual.
 		if ( array_key_exists( $trigger, $manual_triggers ) ) {
 			$user = wp_get_current_user();
 
 			if ( ! empty( $user->user_login ) ) {
-				$user_note_message = sprintf(
+				$user_note = sprintf(
 					/* translators: user login name */
-					__( ' (User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( '(User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
 					esc_html( $user->user_login )
 				);
 			}
 		}
 
-		/* translators: 1. document title, 2. creation trigger */
-		$message = __( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
-		$note    = sprintf( $message, $document->get_title(), $triggers[ $trigger ] );
-		$this->log_to_order_notes( $note . $user_note_message, $document );
+		$note = sprintf(
+			/* translators: 1. document title, 2. creation trigger */
+			__( 'PDF %1$s created via %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+			$document->get_title(),
+			$triggers[ $trigger ]
+		);
+
+		$this->log_to_order_notes( $note . ' ' . $user_note, $document );
 	}
 
 	/**
@@ -1310,21 +1314,24 @@ class Main {
 	 */
 	public function log_document_deletion_to_order_notes( object $document ): void {
 		if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			$user_note_message = '';
-			$user              = wp_get_current_user();
+			$user_note = '';
+			$user      = wp_get_current_user();
 
 			if ( ! empty( $user->user_login ) ) {
-				$user_note_message = sprintf(
+				$user_note = sprintf(
 					/* translators: user login name */
-					__( ' (User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( '(User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
 					esc_html( $user->user_login )
 				);
 			}
 
-			/* translators: 1. document title 2. user display name, 3. user ID */
-			$message = __( 'PDF %1$s deleted.', 'woocommerce-pdf-invoices-packing-slips' );
-			$note    = sprintf( $message, $document->get_title(), $user->display_name, $user->ID );
-			$this->log_to_order_notes( $note . $user_note_message, $document );
+			$note = sprintf(
+				/* translators: document title  */
+				__( 'PDF %s deleted.', 'woocommerce-pdf-invoices-packing-slips' ),
+				$document->get_title()
+			);
+
+			$this->log_to_order_notes( $note . ' ' . $user_note, $document );
 		}
 	}
 
