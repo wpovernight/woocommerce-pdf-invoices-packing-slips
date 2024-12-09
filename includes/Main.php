@@ -1447,7 +1447,7 @@ class Main {
 	/**
 	 * Get the document triggers
 	 *
-	 * @param string $trigger_type
+	 * @param string $trigger_type The trigger type: 'manual', 'automatic', or 'all'. Defaults to 'all'.
 	 *
 	 * @return array
 	 */
