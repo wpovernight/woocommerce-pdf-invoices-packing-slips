@@ -1280,7 +1280,7 @@ class Main {
 		}
 
 		$user_note       = '';
-		$manual_triggers = $this->get_document_triggers( true );
+		$manual_triggers = $this->get_document_triggers( 'manual' );
 
 		// Add user information if the trigger is manual.
 		if ( array_key_exists( $trigger, $manual_triggers ) ) {
@@ -1447,25 +1447,36 @@ class Main {
 	/**
 	 * Get the document triggers
 	 *
-	 * @param bool $only_manual_triggers
+	 * @param string $trigger_type
 	 *
 	 * @return array
 	 */
-	public function get_document_triggers( bool $only_manual_triggers = false ): array {
-		$triggers = array(
-			'single'           => __( 'single order action', 'woocommerce-pdf-invoices-packing-slips' ),
-			'bulk'             => __( 'bulk order action', 'woocommerce-pdf-invoices-packing-slips' ),
-			'my_account'       => __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ),
-			'email_attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
-			'document_data'    => __( 'order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
+	public function get_document_triggers( string $trigger_type = 'all' ): array {
+		$manual_triggers = array(
+			'single'        => __( 'single order action', 'woocommerce-pdf-invoices-packing-slips' ),
+			'bulk'          => __( 'bulk order action', 'woocommerce-pdf-invoices-packing-slips' ),
+			'my_account'    => __( 'my account', 'woocommerce-pdf-invoices-packing-slips' ),
+			'document_data' => __( 'order document data (number and/or date set manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 
-		if ( $only_manual_triggers ) {
-			$user_triggers = array( 'single', 'bulk', 'my_account', 'document_data' );
-			$triggers      = array_intersect_key( $triggers, array_flip( $user_triggers ) );
+		$automatic_triggers = array(
+			'email_attachment' => __( 'email attachment', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+
+		switch ( $trigger_type ) {
+			case 'manual':
+				$triggers = $manual_triggers;
+				break;
+			case 'automatic':
+				$triggers = $automatic_triggers;
+				break;
+			case 'all':
+			default:
+				$triggers = array_merge( $manual_triggers, $automatic_triggers );
+				break;
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_triggers', $triggers, $only_manual_triggers );
+		return apply_filters( 'wpo_wcpdf_document_triggers', $triggers, $trigger_type );
 	}
 
 	/**
