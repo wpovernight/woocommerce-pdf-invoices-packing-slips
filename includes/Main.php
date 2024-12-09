@@ -1287,7 +1287,7 @@ class Main {
 			$user = wp_get_current_user();
 
 			if ( ! empty( $user->user_login ) ) {
-				$user_note = sprintf(
+				$user_note = ' ' . sprintf(
 					/* translators: user login name */
 					__( '(User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
 					esc_html( $user->user_login )
@@ -1302,7 +1302,7 @@ class Main {
 			$triggers[ $trigger ]
 		);
 
-		$this->log_to_order_notes( $note . ' ' . $user_note, $document );
+		$this->log_to_order_notes( $note . $user_note, $document );
 	}
 
 	/**
@@ -1318,7 +1318,7 @@ class Main {
 			$user      = wp_get_current_user();
 
 			if ( ! empty( $user->user_login ) ) {
-				$user_note = sprintf(
+				$user_note = ' ' . sprintf(
 					/* translators: user login name */
 					__( '(User: %s)', 'woocommerce-pdf-invoices-packing-slips' ),
 					esc_html( $user->user_login )
@@ -1331,7 +1331,7 @@ class Main {
 				$document->get_title()
 			);
 
-			$this->log_to_order_notes( $note . ' ' . $user_note, $document );
+			$this->log_to_order_notes( $note . $user_note, $document );
 		}
 	}
 
