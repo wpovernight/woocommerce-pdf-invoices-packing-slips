@@ -55,6 +55,7 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 
 	// ubl
 	'\\WPO\\WC\\UBL\\Handlers\\UblHandler'                        => '\\WPO\\IPS\\UBL\\Handlers\\UblHandler', // used by `woocommerce-pdf-ips-ubl-extender`
+	'\\WPO\\WC\\UBL\\Documents\\Document'                         => '\\WPO\\IPS\\Documents\\XMLDocument',
 
 ) );
 

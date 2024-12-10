@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\UBL\Documents;
+namespace WPO\IPS\Documents;
 
 use WPO\IPS\Documents\OrderDocument;
 
@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-abstract class Document {
+abstract class XMLDocument {
 
 	/** @var \WC_Abstract_Order */
 	public $order;

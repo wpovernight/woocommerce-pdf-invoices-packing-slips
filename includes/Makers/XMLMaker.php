@@ -3,7 +3,7 @@
 namespace WPO\IPS\Makers;
 
 use WPO\IPS\Vendor\Sabre\Xml\Service;
-use WPO\IPS\UBL\Documents\Document;
+use WPO\IPS\Documents\XMLDocument;
 use WPO\IPS\UBL\Exceptions\FileWriteException;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -58,11 +58,11 @@ class XMLMaker {
 	/**
 	 * Build XML
 	 *
-	 * @param Document $xml_document
+	 * @param XMLDocument $xml_document
 	 *
 	 * @return mixed
 	 */
-	public function build( Document $xml_document ) {
+	public function build( XMLDocument $xml_document ) {
 		// Sabre wants namespaces in value/key format, so we need to flip it
 		$namespaces                  = array_flip( $xml_document->get_namespaces() );
 		$this->service->namespaceMap = $namespaces;
