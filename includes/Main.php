@@ -511,7 +511,8 @@ class Main {
 
 				switch ( $output_format ) {
 					case 'ubl':
-						$document->output_ubl();
+						$ubl_document = new UblDocument();
+						$document->output_xml( false, $ubl_document );
 						break;
 					case 'html':
 						add_filter( 'wpo_wcpdf_use_path', '__return_false' );

@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS\Documents;
 
-use WPO\IPS\UBL\Documents\UblDocument;
+use WPO\IPS\Documents\XMLDocument;
 use WPO\IPS\Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1380,29 +1380,42 @@ abstract class OrderDocument {
 		echo $this->get_html();
 	}
 
-	public function preview_ubl() {
+	/**
+	 * Preview XML
+	 *
+	 * @param string $output_format
+	 * @param XMLDocument $xml_document
+	 * @return void
+	 */
+	public function preview_xml( string $output_format, XMLDocument $xml_document ) {
 		// get last settings
-		$this->settings = $this->get_settings( true, 'ubl' );
+		$this->settings = $this->get_settings( true, $output_format );
 
-		return $this->output_ubl( true );
+		return $this->output_xml( true, $xml_document );
 	}
 
-	public function output_ubl( $contents_only = false ) {
-		$xml_maker    = wcpdf_get_xml_maker();
-		$ubl_document = new UblDocument();
+	/**
+	 * Output XML
+	 *
+	 * @param boolean $contents_only
+	 * @param XMLDocument $xml_document
+	 * @return void
+	 */
+	public function output_xml( $contents_only = false, XMLDocument $xml_document ) {
+		$xml_maker = wcpdf_get_xml_maker();
 
-		$ubl_document->set_order( $this->order );
+		$xml_document->set_order( $this->order );
 
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
 		if ( $document ) {
-			$ubl_document->set_order_document( $document );
+			$xml_document->set_order_document( $document );
 		} else {
 			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
 			exit();
 		}
 
-		$contents = $xml_maker->build( $ubl_document );
+		$contents = $xml_maker->build( $xml_document );
 
 		if ( $contents_only ) {
 			return $contents;
