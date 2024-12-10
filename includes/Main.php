@@ -19,7 +19,7 @@ class Main {
 	 *
 	 * @var array
 	 */
-	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
+	private $subfolders = array( 'attachments', 'fonts', 'dompdf', 'xml' );
 
 	protected static $_instance = null;
 
@@ -252,8 +252,8 @@ class Main {
 	}
 
 	public function get_document_ubl_attachment( $document, $tmp_path ) {
-		$ubl_maker = wcpdf_get_ubl_maker();
-		$ubl_maker->set_file_path( $tmp_path );
+		$xml_maker = wcpdf_get_xml_maker();
+		$xml_maker->set_file_path( $tmp_path );
 
 		$ubl_document = new UblDocument();
 		$ubl_document->set_order( $document->order );
@@ -262,7 +262,7 @@ class Main {
 		$builder       = new SabreBuilder();
 		$contents      = $builder->build( $ubl_document );
 		$filename      = $document->get_filename( 'download', [ 'output' => 'ubl' ] );
-		$full_filename = $ubl_maker->write( $filename, $contents );
+		$full_filename = $xml_maker->write( $filename, $contents );
 
 		return $full_filename;
 	}
@@ -593,8 +593,9 @@ class Main {
 			case 'dompdf':
 				$tmp_path = $tmp_base . 'dompdf';
 				break;
+			case 'xml':
 			case 'ubl':
-				$tmp_path = $tmp_base . 'ubl';
+				$tmp_path = $tmp_base . 'xml';
 				break;
 			case 'font_cache':
 			case 'fonts':

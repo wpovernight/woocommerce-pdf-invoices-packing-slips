@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\IPS\\Makers\\UBLMaker' ) ) :
+if ( ! class_exists( '\\WPO\\IPS\\Makers\\XMLMaker' ) ) :
 
-class UBLMaker {
+class XMLMaker {
 
 	protected $tmp_base;
 
@@ -19,7 +19,7 @@ class UBLMaker {
 		$status         = file_put_contents( $full_file_name, $contents );
 
 		if ( false === $status ) {
-			throw new FileWriteException( 'Error writing UBL file' );
+			throw new FileWriteException( 'Error writing XML file' );
 		}
 
 		return $full_file_name;
@@ -34,7 +34,7 @@ class UBLMaker {
 			return $this->tmp_base;
 		}
 
-		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'ubl' ) );
+		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'xml' ) );
 		return $this->tmp_base;
 	}
 }

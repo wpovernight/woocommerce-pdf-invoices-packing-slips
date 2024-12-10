@@ -163,19 +163,20 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
 }
 
 /**
- * Get UBL Maker
- * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
+ * Get XML Maker
+ * Use wpo_wcpdf_xml_maker filter to change the XML class (which can wrap another XML library).
  *
- * @return WPO\IPS\Makers\UBLMaker
+ * @return WPO\IPS\Makers\XMLMaker
  */
-function wcpdf_get_ubl_maker() {
-	$class = '\\WPO\\IPS\\Makers\\UBLMaker';
+function wcpdf_get_xml_maker() {
+	$class = '\\WPO\\IPS\\Makers\\XMLMaker';
 
 	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/UBLMaker.php' );
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/XMLMaker.php' );
 	}
 
-	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
+	$class = apply_filters_deprecated( 'wpo_wcpdf_ubl_maker', array( $class ), '3.9.2', 'wpo_wcpdf_xml_maker' );
+	$class = apply_filters( 'wpo_wcpdf_xml_maker', $class );
 
 	return new $class();
 }

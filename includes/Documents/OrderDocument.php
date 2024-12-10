@@ -1389,7 +1389,7 @@ abstract class OrderDocument {
 	}
 
 	public function output_ubl( $contents_only = false ) {
-		$ubl_maker    = wcpdf_get_ubl_maker();
+		$xml_maker    = wcpdf_get_xml_maker();
 		$ubl_document = new UblDocument();
 
 		$ubl_document->set_order( $this->order );
@@ -1411,7 +1411,7 @@ abstract class OrderDocument {
 		}
 
 		$filename      = $document->get_filename( 'download', array( 'output' => 'ubl' ) );
-		$full_filename = $ubl_maker->write( $filename, $contents );
+		$full_filename = $xml_maker->write( $filename, $contents );
 		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
 		$size          = filesize( $full_filename );
 
