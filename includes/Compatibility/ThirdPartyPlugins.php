@@ -212,11 +212,11 @@ class ThirdPartyPlugins {
 		if ( empty( $order ) ) {
 			return $classes;
 		}
-		
+
 		if ( ! $order instanceof \WC_Abstract_Order ) {
 			return $classes;
 		}
-		
+
 		if ( empty( $item_id ) && ! empty( $classes ) ) {
 			$item_id = $this->get_item_id_from_classes( $classes );
 		}
@@ -226,7 +226,7 @@ class ThirdPartyPlugins {
 		} else {
 			return $classes;
 		}
-		
+
 		$product    = null;
 		$bundled_by = null;
 
@@ -378,7 +378,7 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * Adds invoice number filter to the search filters available in the admin order search.
+	 * Adds "Invoice numbers" filter to the search filters available in the admin order search.
 	 *
 	 * @param array $options List of available filters.
 	 *
@@ -388,7 +388,7 @@ class ThirdPartyPlugins {
 		if ( WPO_WCPDF()->admin->invoice_number_search_enabled() ) {
 			$all = $options['all'];
 			unset( $options['all'] );
-			$options['invoice_number'] = __( 'Invoice number', 'woocommerce-pdf-invoices-packing-slips' );
+			$options['invoice_numbers'] = __( 'Invoice numbers', 'woocommerce-pdf-invoices-packing-slips' );
 			$options['all'] = $all;
 		}
 
@@ -396,16 +396,25 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * Modifies the arguments passed to `wc_get_orders()` to support 'invoice_number' order search filter.
+	 * Modifies the arguments passed to `wc_get_orders()` to support 'invoice_numbers' order search filter.
 	 *
 	 * @param array $order_query_args Arguments to be passed to `wc_get_orders()`.
 	 *
 	 * @return array
 	 */
 	function invoice_number_query_args( array $order_query_args ): array {
-		if ( isset( $order_query_args['search_filter'] ) && 'invoice_number' === $order_query_args['search_filter'] && isset( $order_query_args['s'] ) ) {
-			$order_query_args['meta_key']      = '_wcpdf_invoice_number';
-			$order_query_args['meta_value']    = $order_query_args['s'];
+		if ( isset( $order_query_args['search_filter'] ) && 'invoice_numbers' === $order_query_args['search_filter'] && ! empty( $order_query_args['s'] ) ) {
+			$invoice_numbers = explode( ',', $order_query_args['s'] );
+			$invoice_numbers = array_map( function ( $number ) {
+				return sanitize_text_field( trim( $number ) );
+			}, $invoice_numbers );
+
+			$order_query_args['meta_query']    = $order_query_args['meta_query'] ?? array();
+			$order_query_args['meta_query'][]  = [
+				'key'     => '_wcpdf_invoice_number',
+				'value'   => $invoice_numbers,
+				'compare' => 'IN',
+			];
 			$order_query_args['search_filter'] = 'all';
 			unset( $order_query_args['s'] );
 		}
