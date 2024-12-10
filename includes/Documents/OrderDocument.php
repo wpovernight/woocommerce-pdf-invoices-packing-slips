@@ -1,7 +1,6 @@
 <?php
 namespace WPO\IPS\Documents;
 
-use WPO\IPS\UBL\Builders\SabreBuilder;
 use WPO\IPS\UBL\Documents\UblDocument;
 use WPO\IPS\Semaphore;
 
@@ -1403,8 +1402,7 @@ abstract class OrderDocument {
 			exit();
 		}
 
-		$builder  = new SabreBuilder();
-		$contents = $builder->build( $ubl_document );
+		$contents = $xml_maker->build( $ubl_document );
 
 		if ( $contents_only ) {
 			return $contents;

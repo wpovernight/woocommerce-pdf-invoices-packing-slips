@@ -1,7 +1,6 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Builders\SabreBuilder;
 use WPO\IPS\UBL\Documents\UblDocument;
 use WPO\IPS\UBL\Exceptions\FileWriteException;
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
@@ -259,8 +258,7 @@ class Main {
 		$ubl_document->set_order( $document->order );
 		$ubl_document->set_order_document( $document );
 
-		$builder       = new SabreBuilder();
-		$contents      = $builder->build( $ubl_document );
+		$contents      = $xml_maker->build( $ubl_document );
 		$filename      = $document->get_filename( 'download', [ 'output' => 'ubl' ] );
 		$full_filename = $xml_maker->write( $filename, $contents );
 
