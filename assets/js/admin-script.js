@@ -476,9 +476,10 @@ jQuery( function( $ ) {
 							renderPdf( worker, canvasId, response.data.preview_data );
 							break;
 						case 'ubl':
+						case 'xrechnung': // extension
 							let xml         = response.data.preview_data;
 							let xml_escaped = xml.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
-							$preview.html( '<div id="preview-ubl">'+xml_escaped+'</div>' );
+							$preview.html( '<div id="preview-xml" class="preview-'+response.data.output_format+'">'+xml_escaped+'</div>' );
 							break;
 					}
 				}

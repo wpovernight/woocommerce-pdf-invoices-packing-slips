@@ -41,11 +41,11 @@ abstract class XMLDocument {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$taxDataContainer = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-			$taxDataKey       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
-			$lineTotalKey     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
-
-			$line_tax_data = $item[ $taxDataContainer ];
+			$taxDataContainer = ( 'line_item' === $item['type'] ) ? 'line_tax_data' : 'taxes';
+			$taxDataKey       = ( 'line_item' === $item['type'] ) ? 'subtotal'      : 'total';
+			$lineTotalKey     = ( 'line_item' === $item['type'] ) ? 'line_total'    : 'total';
+			$line_tax_data    = $item[ $taxDataContainer ];
+			
 			foreach ( $line_tax_data[ $taxDataKey ] as $tax_id => $tax ) {
 				if ( is_numeric( $tax ) ) {
 					if ( empty( $order_tax_data[ $tax_id ] ) ) {
