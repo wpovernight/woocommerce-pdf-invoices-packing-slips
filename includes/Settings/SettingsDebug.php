@@ -1113,7 +1113,7 @@ class SettingsDebug {
 	 *
 	 * @return void
 	 */
-	public function display_server_requirement_notice() {
+	public function display_server_requirement_notice(): void {
 		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
 		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
 		$notice_message  = sprintf(
