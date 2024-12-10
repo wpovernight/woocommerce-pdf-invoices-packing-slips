@@ -198,6 +198,19 @@ class SettingsGeneral {
 				)
 			),
 			array(
+				'type'     => 'setting',
+				'id'       => 'shop_phone_number',
+				'title'    => __( 'Shop Phone Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_phone_number',
+					'translatable' => true,
+					'description'  => __( 'Required for e-Invoice.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro        ,
+				)
+			),
+			array(
 				'type'		=> 'setting',
 				'id'		=> 'shop_address',
 				'title'		=> __( 'Shop Address', 'woocommerce-pdf-invoices-packing-slips' ),
