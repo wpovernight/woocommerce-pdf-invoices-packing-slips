@@ -67,7 +67,7 @@ class XMLMaker {
 		$namespaces                  = array_flip( $xml_document->get_namespaces() );
 		$this->service->namespaceMap = $namespaces;
 
-		return $this->service->write( 'Invoice', $xml_document->get_data() );
+		return $this->service->write( $xml_document->root_element, $xml_document->get_data() );
 	}
 
 	/**
