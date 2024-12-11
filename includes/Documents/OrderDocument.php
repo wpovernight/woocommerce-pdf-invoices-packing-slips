@@ -1391,17 +1391,17 @@ abstract class OrderDocument {
 		// get last settings
 		$this->settings = $this->get_settings( true, $output_format );
 
-		return $this->output_xml( true, $xml_document );
+		return $this->output_xml( $xml_document, true );
 	}
 
 	/**
 	 * Output XML
 	 *
-	 * @param boolean $contents_only
 	 * @param XMLDocument $xml_document
+	 * @param boolean $contents_only
 	 * @return void
 	 */
-	public function output_xml( $contents_only = false, XMLDocument $xml_document ) {
+	public function output_xml( XMLDocument $xml_document, $contents_only = false ) {
 		$xml_maker = wcpdf_get_xml_maker();
 
 		$xml_document->set_order( $this->order );

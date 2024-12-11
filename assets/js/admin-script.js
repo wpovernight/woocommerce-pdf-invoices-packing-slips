@@ -470,13 +470,12 @@ jQuery( function( $ ) {
 					$( '#'+canvasId ).remove();
 
 					switch ( response.data.output_format ) {
-						default:
 						case 'pdf':
 							$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );
 							renderPdf( worker, canvasId, response.data.preview_data );
 							break;
 						case 'ubl':
-						case 'xrechnung': // extension
+						default: // for other XML extensions
 							let xml         = response.data.preview_data;
 							let xml_escaped = xml.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
 							$preview.html( '<div id="preview-xml" class="preview-'+response.data.output_format+'">'+xml_escaped+'</div>' );
