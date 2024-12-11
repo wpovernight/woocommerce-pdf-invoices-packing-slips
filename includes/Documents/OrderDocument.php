@@ -1133,12 +1133,14 @@ abstract class OrderDocument {
 		$css           = '';
 
 		if ( $wp_filesystem->exists( $css_file_path ) ) {
-			$css = $wp_filesystem->get_contents( $css_file_path );
+			ob_start();
+			include $css_file_path;
+			$css = ob_get_clean();
 		}
 
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
 
-		echo esc_html( $css );
+		echo esc_textarea( $css );
 	}
 
 	/**
