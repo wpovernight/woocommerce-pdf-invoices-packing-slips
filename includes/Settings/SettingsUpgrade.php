@@ -35,7 +35,7 @@ class SettingsUpgrade {
 				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=tools' ) ) . '">',
 				'</a>'
 			);
-			printf( '<div class="notice inline notice-warning"><p>%s</p></div>', $message );
+			printf( '<div class="notice inline notice-warning"><p>%s</p></div>', wp_kses_post( $message ) );
 		}
 	}
 
