@@ -1015,17 +1015,22 @@ function wpo_wcpdf_get_wp_filesystem() {
 }
 
 /**
- * Escapes a URL or filesystem path for safe output in HTML.
+ * Escapes a URL, filesystem path, or base64 string for safe output in HTML.
  *
- * @param string $url_or_path
+ * @param string $url_path_or_base64
  * @return string
  */
-function wpo_wcpdf_esc_url_or_path( string $url_or_path ): string {
-	if ( 0 === strpos( $url_or_path, 'http' ) ) {
-		// It's a URL, escape as a URL
-		return esc_url( $url_or_path );
-	} else {
-		// It's a data URI or a filesystem path, escape as an attribute
-		return esc_attr( wp_normalize_path( $url_or_path ) );
+function wpo_wcpdf_escape_url_path_or_base64( string $url_path_or_base64 ): string {
+	// Check if it's a URL
+	if ( 0 === strpos( $url_path_or_base64, 'http' ) ) {
+		return esc_url( $url_path_or_base64 );
 	}
+	
+	// Check if it's a base64 string
+	if ( preg_match( '/^data:[a-zA-Z0-9\/\-\.\+]+;base64,/', $url_path_or_base64 ) ) {
+		return esc_attr( $url_path_or_base64 );
+	}
+
+	// Otherwise, assume it's a filesystem path
+	return esc_attr( wp_normalize_path( $url_path_or_base64 ) );
 }
