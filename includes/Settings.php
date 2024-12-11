@@ -513,19 +513,19 @@ class Settings {
 	 */
 	public function get_common_document_settings(): array {
 		return array(
-			'paper_size'         => isset( $this->general_settings['paper_size'] ) ? $this->general_settings['paper_size'] : '',
-			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ) ? true : false,
-			'header_logo'        => isset( $this->general_settings['header_logo'] ) ? $this->general_settings['header_logo'] : '',
-			'header_logo_height' => isset( $this->general_settings['header_logo_height'] ) ? $this->general_settings['header_logo_height'] : '',
-			'vat_number'         => isset( $this->general_settings['vat_number'] ) ? $this->general_settings['vat_number'] : '',
-			'coc_number'         => isset( $this->general_settings['coc_number'] ) ? $this->general_settings['coc_number'] : '',
-			'shop_name'          => isset( $this->general_settings['shop_name'] ) ? $this->general_settings['shop_name'] : '',
-			'shop_phone_number'  => isset( $this->general_settings['shop_phone_number'] ) ? $this->general_settings['shop_phone_number'] : '',
-			'shop_address'       => isset( $this->general_settings['shop_address'] ) ? $this->general_settings['shop_address'] : '',
-			'footer'             => isset( $this->general_settings['footer'] ) ? $this->general_settings['footer'] : '',
-			'extra_1'            => isset( $this->general_settings['extra_1'] ) ? $this->general_settings['extra_1'] : '',
-			'extra_2'            => isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
-			'extra_3'            => isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
+			'paper_size'         => $this->general_settings['paper_size'] ?? '',
+			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
+			'header_logo'        => $this->general_settings['header_logo'] ?? '',
+			'header_logo_height' => $this->general_settings['header_logo_height'] ?? '',
+			'vat_number'         => $this->general_settings['vat_number'] ?? '',
+			'coc_number'         => $this->general_settings['coc_number'] ?? '',
+			'shop_name'          => $this->general_settings['shop_name'] ?? '',
+			'shop_phone_number'  => $this->general_settings['shop_phone_number'] ?? '',
+			'shop_address'       => $this->general_settings['shop_address'] ?? '',
+			'footer'             => $this->general_settings['footer'] ?? '',
+			'extra_1'            => $this->general_settings['extra_1'] ?? '',
+			'extra_2'            => $this->general_settings['extra_2'] ?? '',
+			'extra_3'            => $this->general_settings['extra_3'] ?? '',
 		);
 	}
 
