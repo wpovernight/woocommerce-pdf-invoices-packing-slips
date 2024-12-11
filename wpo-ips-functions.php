@@ -997,7 +997,8 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
 /**
  * Get the WP_Filesystem instance
  *
- * @return WP_Filesystem
+ * @return WP_Filesystem|false
+ * @throws RuntimeException
  */
 function wpo_wcpdf_get_wp_filesystem() {
 	global $wp_filesystem;
@@ -1008,7 +1009,9 @@ function wpo_wcpdf_get_wp_filesystem() {
 	}
 	
 	if ( ! $wp_filesystem ) {
-		wcpdf_log_error( 'Failed to initialize WP_Filesystem.', 'critical' );
+		$error = 'Failed to initialize WP_Filesystem.';
+		wcpdf_log_error( $error, 'critical' );
+		throw new \RuntimeException( $error );
 	}
 
 	return $wp_filesystem;
