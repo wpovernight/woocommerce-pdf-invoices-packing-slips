@@ -1021,13 +1021,11 @@ function wpo_wcpdf_get_wp_filesystem() {
  * @return string
  */
 function wpo_wcpdf_esc_url_or_path( string $url_or_path ): string {
-	$url_or_path = wp_normalize_path( $url_or_path );
-
 	if ( 0 === strpos( $url_or_path, 'http' ) ) {
 		// It's a URL, escape as a URL
 		return esc_url( $url_or_path );
 	} else {
 		// It's a data URI or a filesystem path, escape as an attribute
-		return esc_attr( $url_or_path );
+		return esc_attr( wp_normalize_path( $url_or_path ) );
 	}
 }
