@@ -1006,6 +1006,10 @@ function wpo_wcpdf_get_wp_filesystem() {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		WP_Filesystem();
 	}
+	
+	if ( ! $wp_filesystem ) {
+		wcpdf_log_error( 'Failed to initialize WP_Filesystem.', 'critical' );
+	}
 
 	return $wp_filesystem;
 }
