@@ -1233,7 +1233,7 @@ abstract class OrderDocument {
 	 * Return/Show shop/company phone number if provided.
 	 */
 	public function get_shop_phone_number() {
-		return $this->get_settings_text( 'shop_phone_number' );
+		return $this->get_settings_text( 'shop_phone_number', '', false );
 	}
 	public function shop_phone_number() {
 		echo $this->get_shop_phone_number();
