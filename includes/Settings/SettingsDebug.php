@@ -23,7 +23,7 @@ class SettingsDebug {
 
 	public function __construct() {
 		// Show a notice if the plugin requirements are not met.
-		add_action( 'admin_init', array( $this, 'display_server_requirement_notice' ) );
+		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 
@@ -1083,7 +1083,7 @@ class SettingsDebug {
 	 *
 	 * @return void
 	 */
-	public function display_server_requirement_notice(): void {
+	public function handle_server_requirement_notice(): void {
 		// Return if the notice has been dismissed.
 		if ( get_option( 'wpo_wcpdf_dismiss_requirements_notice', false ) ) {
 			return;
@@ -1122,6 +1122,15 @@ class SettingsDebug {
 		}
 
 		// Display the notice.
+		add_action( 'admin_notices', array( $this, 'display_server_requirement_notice' ) );
+	}
+
+	/**
+	 * Display a notice informing the user that the server requirements are not met.
+	 *
+	 * @return void
+	 */
+	public function display_server_requirement_notice(): void {
 		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
 		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
 		$notice_message  = sprintf(
