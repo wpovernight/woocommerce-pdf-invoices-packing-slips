@@ -223,7 +223,6 @@ class Admin {
 			if ( $document = wcpdf_get_document( $document_type, $order ) ) {
 				foreach ( $document->output_formats as $output_format ) {
 					switch ( $output_format ) {
-						default:
 						case 'pdf':
 							if ( $document->is_enabled( $output_format ) ) {
 								$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
@@ -280,6 +279,7 @@ class Admin {
 		}
 
 		$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );
+		$xml_formats     = apply_filters( 'wpo_wcpdf_xml_formats', array( 'ubl' ) );
 
 		foreach ( $listing_actions as $action => $data ) {
 			if ( ! isset( $data['class'] ) ) {
@@ -290,9 +290,9 @@ class Admin {
 			$printed = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 
 			// ubl replaces exists
-			$exists  = isset( $data['output_format'] ) && 'ubl' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
+			$exists  = isset( $data['output_format'] ) && in_array( $data['output_format'], $xml_formats ) ? '<svg class="icon-xml" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
 
-			if ( isset( $data['output_format'] ) && ( 'ubl' !== $data['output_format'] || $data['exists'] ) ) {
+			if ( isset( $data['output_format'] ) && ( ! in_array( $data['output_format'], $xml_formats ) || $data['exists'] ) ) {
 				printf(
 					'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
 					esc_attr( $data['url'] ),
