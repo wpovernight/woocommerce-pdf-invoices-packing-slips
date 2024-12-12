@@ -15,6 +15,11 @@ jQuery( function( $ ) {
 				let parts    = action.split( '_' );
 				documentType = parts[0];
 				outputFormat = parts[1];
+				
+				// Check if outputFormat is in wpo_wcpdf_ajax.xml_formats
+				if ( ! wpo_wcpdf_ajax.xml_formats.includes( outputFormat ) ) {
+					outputFormat = 'pdf';
+				}
 			}
 			
 			$( 'tbody th.check-column input[type="checkbox"]:checked' ).each(
