@@ -26,8 +26,8 @@
 	fill: #2aad2a;
 }
 
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf.ubl > svg.icon-ubl,
-.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.ubl > svg.icon-ubl {
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf > svg.icon-ubl,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf > svg.icon-ubl {
 	left: auto;
 	right: 2px;
 	fill: black;
