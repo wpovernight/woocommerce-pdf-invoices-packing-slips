@@ -209,6 +209,22 @@ class Main {
 
 		return $attachments;
 	}
+	
+	public function get_document_attachment( $document, $tmp_path, $output_format ) {
+		switch ( $output_format ) {
+			case 'pdf':
+				$attachment = $this->get_document_pdf_attachment( $document, $tmp_path );
+				break;
+			case 'ubl':
+				$attachment = $this->get_document_ubl_attachment( $document, $tmp_path );
+				break;
+			default:
+				$attachment = apply_filters( 'wpo_wcpdf_get_custom_attachment', false, $document, $tmp_path, $output_format );
+				break;
+		}
+		
+		return $attachment;
+	}
 
 	public function get_document_pdf_attachment( $document, $tmp_path ) {
 		$filename  = $document->get_filename();

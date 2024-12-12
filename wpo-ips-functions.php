@@ -282,14 +282,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$function = "get_document_{$output_format}_attachment";
-
-	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
-		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
-		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
-	}
-
-	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
+	$file_path = WPO_WCPDF()->main->get_document_attachment( $document, $tmp_path, $output_format );
 
 	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
 }
@@ -301,10 +294,10 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
  * @return string
  */
 function wcpdf_get_document_output_format_extension( string $output_format ): string {
-	$output_formats = array(
+	$output_formats = apply_filters( 'wpo_wcpdf_document_output_format_extensions', array(
 		'pdf' => '.pdf',
 		'ubl' => '.xml',
-	);
+	) );
 
 	return isset( $output_formats[ $output_format ] ) ? $output_formats[ $output_format ] : $output_formats['pdf'];
 }
