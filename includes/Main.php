@@ -542,7 +542,7 @@ class Main {
 						$document->output_pdf( $output_mode );
 						break;
 					default: // custom output
-						do_action( 'wpo_wcpdf_document_output', $document, $output_format );
+						do_action( 'wpo_wcpdf_document_custom_output', $document, $output_format );
 						break;
 				}
 			} else {

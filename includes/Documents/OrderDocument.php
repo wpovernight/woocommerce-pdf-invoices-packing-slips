@@ -1395,7 +1395,7 @@ abstract class OrderDocument {
 	 *
 	 * @param string $output_format
 	 * @param XMLDocument $xml_document
-	 * @return void
+	 * @return mixed
 	 */
 	public function preview_xml( string $output_format, XMLDocument $xml_document ) {
 		// get last settings
@@ -1409,9 +1409,9 @@ abstract class OrderDocument {
 	 *
 	 * @param XMLDocument $xml_document
 	 * @param boolean $contents_only
-	 * @return void
+	 * @return mixed
 	 */
-	public function output_xml( XMLDocument $xml_document, $contents_only = false ) {
+	public function output_xml( XMLDocument $xml_document, bool $contents_only = false ) {
 		$xml_maker = wcpdf_get_xml_maker();
 
 		$xml_document->set_order( $this->order );
