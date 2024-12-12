@@ -486,19 +486,15 @@ class Admin {
 			'default'
 		);
 
-
-		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
-		if ( count( $ubl_documents ) > 0 ) {
-			// create UBL buttons
-			add_meta_box(
-				'wpo_wcpdf-ubl-box',
-				__( 'Create UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-				array( $this, 'ubl_actions_meta_box' ),
-				$screen_id,
-				'side',
-				'default'
-			);
-		}
+		// create XML buttons
+		add_meta_box(
+			'wpo_wcpdf-xml-box',
+			__( 'Create XML', 'woocommerce-pdf-invoices-packing-slips' ),
+			array( $this, 'xml_actions_meta_box' ),
+			$screen_id,
+			'side',
+			'default'
+		);
 
 		// Invoice number & date
 		add_meta_box(
@@ -632,9 +628,9 @@ class Admin {
 	}
 
 	/**
-	 * Create the UBL meta box content on the single order page
+	 * Create the XML meta box content on the single order page
 	 */
-	public function ubl_actions_meta_box( $post_or_order_object ) {
+	public function xml_actions_meta_box( $post_or_order_object ) {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
@@ -668,7 +664,8 @@ class Admin {
 			}
 		}
 
-		$meta_box_actions = apply_filters( 'wpo_wcpdf_ubl_meta_box_actions', $meta_box_actions, $order->get_id() );
+		$meta_box_actions = apply_filters_deprecated( 'wpo_wcpdf_ubl_meta_box_actions', array( $meta_box_actions, $order->get_id() ), '3.9.1', 'wpo_wcpdf_xml_meta_box_actions' );
+		$meta_box_actions = apply_filters( 'wpo_wcpdf_xml_meta_box_actions', $meta_box_actions, $order );
 		if ( empty( $meta_box_actions ) || ! wcpdf_is_ubl_available() ) {
 			return;
 		}
@@ -699,7 +696,7 @@ class Admin {
 				}
 
 				if ( 0 === $ubl_documents ) {
-					_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
+					_e( 'XML documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 			?>
 		</ul>
