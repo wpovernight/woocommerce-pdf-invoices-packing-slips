@@ -525,8 +525,7 @@ class Main {
 						$output_mode = WPO_WCPDF()->settings->get_output_mode( $document_type );
 						$document->output_pdf( $output_mode );
 						break;
-					default:
-						// custom output
+					default: // custom output
 						do_action( 'wpo_wcpdf_document_output', $document, $output_format );
 						break;
 				}
