@@ -1,55 +1,53 @@
 jQuery( function( $ ) {
 
 	$( '#doaction, #doaction2' ).on( 'click', function( e ) {
-		let actionselected = $( this ).attr( "id" ).substr( 2 );
-		let action         = $( 'select[name="' + actionselected + '"]' ).val();
-
+		let actionSelected = $( this ).attr( "id" ).substr( 2 );
+		let action         = $( 'select[name="' + actionSelected + '"]' ).val();
+		
 		if ( $.inArray( action, wpo_wcpdf_ajax.bulk_actions ) !== -1 ) {
 			e.preventDefault();
-			let template   = action;
-			let checked    = [];
-			let ubl_output = false;
-
-			// is UBL action
-			if ( action.indexOf( 'ubl' ) != -1 ) {
-				template   = template.replace( '_ubl', '' );
-				ubl_output = true;
+			let documentType = action;
+			let outputFormat = 'pdf'; // default format
+			let checked      = [];
+			
+			// Determine the format dynamically if appended with an underscore
+			if ( action.indexOf( '_' ) !== -1 ) {
+				let parts    = action.split( '_' );
+				documentType = parts[0];
+				outputFormat = parts[1];
+				
+				// Check if outputFormat is in wpo_wcpdf_ajax.xml_formats
+				if ( ! wpo_wcpdf_ajax.xml_formats.includes( outputFormat ) ) {
+					outputFormat = 'pdf';
+				}
 			}
-
+			
 			$( 'tbody th.check-column input[type="checkbox"]:checked' ).each(
 				function() {
 					checked.push( $( this ).val() );
 				}
 			);
-
+			
 			if ( ! checked.length ) {
 				alert( wpo_wcpdf_ajax.select_orders );
 				return;
 			}
-
-			let partial_url = '';
-			let full_url    = '';
-
-			if ( wpo_wcpdf_ajax.ajaxurl.indexOf ("?" ) != -1 ) {
-				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
-			} else {
-				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
-			}
-
-			// ubl
-			if ( ubl_output ) {
-				$.each( checked, function( i, order_id ) {
-					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
-					window.open( full_url, '_blank' );
+			
+			let baseUrl    = wpo_wcpdf_ajax.ajaxurl;
+			let separator  = baseUrl.includes( '?' ) ? '&' : '?';
+			let partialUrl = baseUrl + separator + 'action=generate_wpo_wcpdf&document_type=' + documentType + '&bulk&_wpnonce=' + wpo_wcpdf_ajax.nonce;
+			
+			// Generate URLs based on format
+			if ( outputFormat !== 'pdf' ) {
+				$.each( checked, function( i, orderId ) {
+					fullUrl = partialUrl + '&order_ids=' + orderId + '&output=' + outputFormat;
+					window.open( fullUrl, '_blank' );
 				} );
-
-			// pdf
 			} else {
-				let order_ids = checked.join( 'x' );
-				full_url      = partial_url + '&order_ids='+order_ids;
-				window.open( full_url, '_blank' );
+				let orderIds = checked.join( 'x' );
+				fullUrl      = partialUrl + '&order_ids=' + orderIds;
+				window.open( fullUrl, '_blank' );
 			}
-
 		}
 	} );
 

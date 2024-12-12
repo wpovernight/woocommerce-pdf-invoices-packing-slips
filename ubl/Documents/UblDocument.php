@@ -2,13 +2,21 @@
 
 namespace WPO\IPS\UBL\Documents;
 
+use WPO\IPS\Documents\XMLDocument;
 use WPO\IPS\UBL\Models\Order;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class UblDocument extends Document {
+class UblDocument extends XMLDocument {
+	
+	/**
+	 * Root element
+	 *
+	 * @var string
+	 */
+	public $root_element = 'Invoice';
 
 	public function get_format() {
 		$format = apply_filters( 'wpo_wc_ubl_document_format' , array(

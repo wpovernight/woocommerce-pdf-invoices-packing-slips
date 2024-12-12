@@ -163,21 +163,33 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
 }
 
 /**
- * Get UBL Maker
- * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
+ * Get XML Maker
+ * Use wpo_wcpdf_xml_maker filter to change the XML class (which can wrap another XML library).
  *
- * @return WPO\IPS\Makers\UBLMaker
+ * @return WPO\IPS\Makers\XMLMaker
  */
-function wcpdf_get_ubl_maker() {
-	$class = '\\WPO\\IPS\\Makers\\UBLMaker';
+function wcpdf_get_xml_maker() {
+	$class = '\\WPO\\IPS\\Makers\\XMLMaker';
 
 	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/UBLMaker.php' );
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/XMLMaker.php' );
 	}
 
-	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
+	$class = apply_filters_deprecated( 'wpo_wcpdf_ubl_maker', array( $class ), '3.9.2', 'wpo_wcpdf_xml_maker' );
+	$class = apply_filters( 'wpo_wcpdf_xml_maker', $class );
 
 	return new $class();
+}
+
+/**
+ * Get UBL Maker
+ * Legacy function < v3.9.2
+ *
+ * @return WPO\IPS\Makers\XMLMaker
+ */
+function wcpdf_get_ubl_maker() {
+	wcpdf_deprecated_function( 'wcpdf_get_ubl_maker', '3.9.2', 'wcpdf_get_xml_maker' );
+	return wcpdf_get_xml_maker();
 }
 
 /**
@@ -270,14 +282,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$function = "get_document_{$output_format}_attachment";
-
-	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
-		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
-		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
-	}
-
-	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
+	$file_path = WPO_WCPDF()->main->get_document_attachment( $document, $tmp_path, $output_format );
 
 	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
 }
@@ -289,10 +294,10 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
  * @return string
  */
 function wcpdf_get_document_output_format_extension( string $output_format ): string {
-	$output_formats = array(
+	$output_formats = apply_filters( 'wpo_wcpdf_document_output_format_extensions', array(
 		'pdf' => '.pdf',
 		'ubl' => '.xml',
-	);
+	) );
 
 	return isset( $output_formats[ $output_format ] ) ? $output_formats[ $output_format ] : $output_formats['pdf'];
 }

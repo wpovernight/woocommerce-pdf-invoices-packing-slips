@@ -157,6 +157,7 @@ class Invoice extends OrderDocumentMethods {
 
 		// get filename
 		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
+		$suffix        = 'pdf' !== $output_format ? "{$suffix}-{$output_format}" : $suffix;
 		$filename      = $name . '-' . $suffix . wcpdf_get_document_output_format_extension( $output_format );
 
 		// Filter filename

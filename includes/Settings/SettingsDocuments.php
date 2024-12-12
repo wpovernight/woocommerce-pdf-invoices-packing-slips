@@ -83,7 +83,9 @@ class SettingsDocuments {
 
 								$active    = ( $output_format == $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
 								$tab_title = strtoupper( esc_html( $document_output_format ) );
-								if ( 'ubl' === $document_output_format ) {
+								$beta_tabs = apply_filters( 'wpo_wcpdf_beta_tabs', array( 'ubl' ) );
+								
+								if ( in_array( $document_output_format , $beta_tabs ) ) {
 									$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
 								}
 								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), $active, $tab_title );

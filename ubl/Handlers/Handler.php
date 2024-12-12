@@ -2,7 +2,7 @@
 
 namespace WPO\IPS\UBL\Handlers;
 
-use WPO\IPS\UBL\Documents\Document;
+use WPO\IPS\Documents\XMLDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -10,10 +10,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class Handler {
 
-	/** @var Document */
+	/**
+	 * XMLDocument
+	 *
+	 * @var XMLDocument
+	 */
 	public $document;
 
-	public function __construct( Document $document ) {
+	public function __construct( XMLDocument $document ) {
 		$this->document = $document;
 	}
 

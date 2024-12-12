@@ -26,7 +26,8 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 
 	// includes/Makers
 	'\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker'                  => '\\WPO\\IPS\\Makers\\PDFMaker',
-	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\UBLMaker',
+	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\XMLMaker',
+	'\\WPO\\IPS\\Makers\\UBLMaker'                                => '\\WPO\\IPS\\Makers\\XMLMaker',
 
 	// includes/Settings
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks'       => '\\WPO\\IPS\\Settings\\SettingsCallbacks',
@@ -54,6 +55,7 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 
 	// ubl
 	'\\WPO\\WC\\UBL\\Handlers\\UblHandler'                        => '\\WPO\\IPS\\UBL\\Handlers\\UblHandler', // used by `woocommerce-pdf-ips-ubl-extender`
+	'\\WPO\\WC\\UBL\\Documents\\Document'                         => '\\WPO\\IPS\\Documents\\XMLDocument',
 
 ) );
 

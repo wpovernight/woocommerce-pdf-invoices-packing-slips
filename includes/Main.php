@@ -1,7 +1,6 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Builders\SabreBuilder;
 use WPO\IPS\UBL\Documents\UblDocument;
 use WPO\IPS\UBL\Exceptions\FileWriteException;
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
@@ -19,7 +18,7 @@ class Main {
 	 *
 	 * @var array
 	 */
-	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
+	private $subfolders = array( 'attachments', 'fonts', 'dompdf', 'xml' );
 
 	protected static $_instance = null;
 
@@ -210,6 +209,22 @@ class Main {
 
 		return $attachments;
 	}
+	
+	public function get_document_attachment( $document, $tmp_path, $output_format ) {
+		switch ( $output_format ) {
+			case 'pdf':
+				$attachment = $this->get_document_pdf_attachment( $document, $tmp_path );
+				break;
+			case 'ubl':
+				$attachment = $this->get_document_ubl_attachment( $document, $tmp_path );
+				break;
+			default:
+				$attachment = apply_filters( 'wpo_wcpdf_get_custom_attachment', false, $document, $tmp_path, $output_format );
+				break;
+		}
+		
+		return $attachment;
+	}
 
 	public function get_document_pdf_attachment( $document, $tmp_path ) {
 		$filename  = $document->get_filename();
@@ -252,17 +267,16 @@ class Main {
 	}
 
 	public function get_document_ubl_attachment( $document, $tmp_path ) {
-		$ubl_maker = wcpdf_get_ubl_maker();
-		$ubl_maker->set_file_path( $tmp_path );
+		$xml_maker = wcpdf_get_xml_maker();
+		$xml_maker->set_file_path( $tmp_path );
 
 		$ubl_document = new UblDocument();
 		$ubl_document->set_order( $document->order );
 		$ubl_document->set_order_document( $document );
 
-		$builder       = new SabreBuilder();
-		$contents      = $builder->build( $ubl_document );
+		$contents      = $xml_maker->build( $ubl_document );
 		$filename      = $document->get_filename( 'download', [ 'output' => 'ubl' ] );
-		$full_filename = $ubl_maker->write( $filename, $contents );
+		$full_filename = $xml_maker->write( $filename, $contents );
 
 		return $full_filename;
 	}
@@ -513,19 +527,22 @@ class Main {
 
 				switch ( $output_format ) {
 					case 'ubl':
-						$document->output_ubl();
+						$ubl_document = new UblDocument();
+						$document->output_xml( $ubl_document );
 						break;
 					case 'html':
 						add_filter( 'wpo_wcpdf_use_path', '__return_false' );
 						$document->output_html();
 						break;
 					case 'pdf':
-					default:
 						if ( has_action( 'wpo_wcpdf_created_manually' ) ) {
 							do_action( 'wpo_wcpdf_created_manually', $document->get_pdf(), $document->get_filename() );
 						}
 						$output_mode = WPO_WCPDF()->settings->get_output_mode( $document_type );
 						$document->output_pdf( $output_mode );
+						break;
+					default: // custom output
+						do_action( 'wpo_wcpdf_document_output', $document, $output_format );
 						break;
 				}
 			} else {
@@ -593,8 +610,9 @@ class Main {
 			case 'dompdf':
 				$tmp_path = $tmp_base . 'dompdf';
 				break;
+			case 'xml':
 			case 'ubl':
-				$tmp_path = $tmp_base . 'ubl';
+				$tmp_path = $tmp_base . 'xml';
 				break;
 			case 'font_cache':
 			case 'fonts':

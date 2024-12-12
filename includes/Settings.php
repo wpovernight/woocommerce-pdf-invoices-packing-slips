@@ -8,6 +8,7 @@ use WPO\IPS\Settings\SettingsDocuments;
 use WPO\IPS\Settings\SettingsDebug;
 use WPO\IPS\Settings\SettingsUbl;
 use WPO\IPS\Settings\SettingsUpgrade;
+use WPO\IPS\UBL\Documents\UblDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -327,15 +328,19 @@ class Settings {
 
 					// preview
 					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats ) ) ? esc_attr( $_REQUEST['output_format'] ) : 'pdf';
+					$preview_data  = '';
+					
 					switch ( $output_format ) {
-						default:
 						case 'pdf':
 							$preview_data = base64_encode( $document->preview_pdf() );
 							break;
 						case 'ubl':
-							$preview_data = $document->preview_ubl();
+							$ubl_document = new UblDocument();
+							$preview_data = $document->preview_xml( 'ubl', $ubl_document );
 							break;
 					}
+					
+					$preview_data = apply_filters( 'wpo_wcpdf_preview_data', $preview_data, $document, $order, $output_format );
 
 					wp_send_json_success( array(
 						'preview_data'  => $preview_data,
