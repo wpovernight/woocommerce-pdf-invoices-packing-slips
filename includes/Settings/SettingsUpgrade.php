@@ -325,7 +325,7 @@ class SettingsUpgrade {
 				continue;
 			}
 			
-			$bundle_upgrade_url = "https://wpovernight.com/checkout/?edd_action=sl_license_upgrade&license_id={$license_id}8&upgrade_id={$upgrade_id}";
+			$bundle_upgrade_url = "https://wpovernight.com/checkout/?edd_action=sl_license_upgrade&license_id={$license_id}&upgrade_id={$upgrade_id}";
 		}
 		
 		// set bundle upgrade URL
