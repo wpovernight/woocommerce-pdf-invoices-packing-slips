@@ -261,7 +261,7 @@ class SettingsUpgrade {
 					}
 					
 					$license_info[ $extension ]['status']         = isset( $request->license )        ? $request->license              : 'inactive';
-					$license_info[ $extension ]['site_count']     = isset( $request->site_count )     ? $request->site_count           : 1;
+					$license_info[ $extension ]['license_limit']  = isset( $request->license_limit )  ? $request->license_limit        : 1;
 					$license_info[ $extension ]['license_id']     = isset( $request->license_id )     ? absint( $request->license_id ) : null;
 					$license_info[ $extension ]['bundle_license'] = isset( $request->bundle_license ) ? $request->bundle_license       : false;
 				}
@@ -271,7 +271,7 @@ class SettingsUpgrade {
 		$extensions[]       = 'bundle';
 		$bundle_upgrade_url = '';
 		$upgrade_tiers      = array(
-			// site count => upgrade ID
+			// license limit => upgrade ID
 			'pro' => array(
 				1  => 3,
 				3  => 4,
@@ -317,9 +317,9 @@ class SettingsUpgrade {
 			}
 			
 			// create upgrade URL
-			$license_id         = $license_info[ $extension ]['license_id'];
-			$site_count		    = $license_info[ $extension ]['site_count'];
-			$upgrade_id         = isset( $upgrade_tiers[ $extension ][ $site_count ] ) ? $upgrade_tiers[ $extension ][ $site_count ] : 0;
+			$license_id    = $license_info[ $extension ]['license_id'];
+			$license_limit = $license_info[ $extension ]['license_limit'];
+			$upgrade_id    = isset( $upgrade_tiers[ $extension ][ $license_limit ] ) ? $upgrade_tiers[ $extension ][ $license_limit ] : 0;
 			
 			if ( 0 === $upgrade_id ) {
 				continue;
