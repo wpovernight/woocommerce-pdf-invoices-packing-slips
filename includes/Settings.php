@@ -62,9 +62,6 @@ class Settings {
 		// settings capabilities
 		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
 
-		// admin notice for auto_increment_increment
-		// add_action( 'admin_notices', array( $this, 'check_auto_increment_increment') );
-
 		// AJAX set number store
 		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
 
@@ -156,17 +153,6 @@ class Settings {
 	public function user_can_manage_settings() {
 		return current_user_can( $this->user_settings_capability() );
 	}
-
-	function check_auto_increment_increment() {
-		global $wpdb;
-		$row = $wpdb->get_row( "SHOW VARIABLES LIKE 'auto_increment_increment'" );
-		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
-			/* translators: database row value */
-			$error = wp_kses_post( sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %d, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Advanced tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), intval( $row->Value ) ) );
-			printf( '<div class="error"><p>%s</p></div>', $error );
-		}
-	}
-
 
 	public function settings_page() {
 		// feedback on settings save
