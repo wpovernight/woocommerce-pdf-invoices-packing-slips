@@ -60,7 +60,7 @@
 		<!-- clear_released_semaphore_locks -->
 		<div class="tool">
 			<h4><?php esc_html_e( 'Remove released semaphore locks', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
-			<p><?php esc_html_e( 'Clean up the released semaphore locks from the database.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+			<p><?php esc_html_e( 'Clean up the released semaphore locks from the database. These locks prevent simultaneous document generation requests, ensuring correct document numbering. Once released, they are safe to remove.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 			<form method="post" id="clear_released_semaphore_locks">
 				<input type="hidden" name="debug_tool" value="clear_released_semaphore_locks">
 				<input type="submit" class="button button-secondary submit" value="<?php esc_html_e( 'Remove released locks', 'woocommerce-pdf-invoices-packing-slips' ); ?>">

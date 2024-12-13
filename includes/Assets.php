@@ -30,7 +30,7 @@ class Assets {
 		$pdfjs_version = '4.3.136';
 
 		global $wp_version;
-		
+
 		if ( WPO_WCPDF()->admin->is_order_page() ) {
 
 			// STYLES
@@ -90,7 +90,7 @@ class Assets {
 		if ( ! empty( $hook ) && false !== strpos( $hook, 'wpo_wcpdf_options_page' ) ) {
 			$tab = filter_input( INPUT_GET, 'tab', FILTER_DEFAULT );
 			$tab = sanitize_text_field( $tab );
-			
+
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
@@ -127,9 +127,13 @@ class Assets {
 				wp_enqueue_style( 'wp-pointer' );
 			}
 
+			if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
+				wp_enqueue_script( 'jquery-tiptip' );
+			}
+
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
-				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
 				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' ),
 				WPO_WCPDF_VERSION
 			);
