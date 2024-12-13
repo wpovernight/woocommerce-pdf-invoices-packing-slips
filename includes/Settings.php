@@ -186,7 +186,7 @@ class Settings {
 
 		if ( wcpdf_is_ubl_available() ) {
 			$settings_tabs['ubl'] = array(
-				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'          => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 1,
 				'beta'           => true,
 			);

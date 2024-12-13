@@ -210,7 +210,15 @@ class Main {
 		return $attachments;
 	}
 	
-	public function get_document_attachment( $document, $tmp_path, $output_format ) {
+	/**
+	 * Get document attachment
+	 *
+	 * @param \WPO\IPS\Documents\OrderDocument $document
+	 * @param string $tmp_path
+	 * @param string $output_format
+	 * @return string
+	 */
+	public function get_document_attachment( \WPO\IPS\Documents\OrderDocument $document, string $tmp_path, string $output_format ): string {
 		switch ( $output_format ) {
 			case 'pdf':
 				$attachment = $this->get_document_pdf_attachment( $document, $tmp_path );

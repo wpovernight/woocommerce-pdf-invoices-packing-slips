@@ -24,7 +24,7 @@ class SettingsUbl {
 
 	function __construct()	{
 		$this->sections = [
-			'taxes' => __( 'Taxes classification', 'woocommerce-pdf-invoices-packing-slips' ),
+			'taxes' => __( 'Classification of E-Invoicing Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
