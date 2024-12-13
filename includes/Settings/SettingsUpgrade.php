@@ -289,6 +289,11 @@ class SettingsUpgrade {
 					break;
 			}
 			
+			// if bundle, no upgrade needed
+			if ( $license_info[ $extension ]['bundle_license'] ) {
+				continue;
+			}
+			
 			// there's no license ID, can't be upgraded
 			if ( empty( $license_info[ $extension ]['license_id'] ) ) {
 				continue;
@@ -296,11 +301,6 @@ class SettingsUpgrade {
 			
 			// check if the license is activated and valid
 			if ( empty( $license_info[ $extension ]['status'] ) || 'valid' !== $license_info[ $extension ]['status'] ) {
-				continue;
-			}
-			
-			// if bundle, no upgrade needed
-			if ( $license_info[ $extension ]['bundle_license'] ) {
 				continue;
 			}
 			
