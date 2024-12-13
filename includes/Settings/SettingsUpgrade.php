@@ -124,7 +124,7 @@ class SettingsUpgrade {
 				),
 			);
 
-			$extension_license_infos = $this->get_extension_license_infos();
+			$extension_license_infos = $this->get_extension_license_infos( true );
 
 			$plugin_recommendations = array(
 				array(
@@ -269,6 +269,7 @@ class SettingsUpgrade {
 		}
 		
 		$extensions[]       = 'bundle';
+		$utm_tags           = 'utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-bundle-upgrade';
 		$bundle_upgrade_url = '';
 		$upgrade_tiers      = array(
 			// license limit => upgrade ID
@@ -292,7 +293,7 @@ class SettingsUpgrade {
 					break;
 				case 'templates':
 				case 'bundle':
-					$license_info[ $extension ]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/';
+					$license_info[ $extension ]['url'] = "https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/?{$utm_tags}";
 					break;
 			}
 			
@@ -325,7 +326,7 @@ class SettingsUpgrade {
 				continue;
 			}
 			
-			$bundle_upgrade_url = "https://wpovernight.com/checkout/?edd_action=sl_license_upgrade&license_id={$license_id}&upgrade_id={$upgrade_id}";
+			$bundle_upgrade_url = "https://wpovernight.com/checkout/?edd_action=sl_license_upgrade&license_id={$license_id}&upgrade_id={$upgrade_id}&{$utm_tags}";
 		}
 		
 		// set bundle upgrade URL
