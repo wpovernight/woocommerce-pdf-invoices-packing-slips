@@ -297,7 +297,7 @@ class SettingsUpgrade {
 			}
 			
 			// if bundle, no upgrade needed
-			if ( $license_info[ $extension ]['bundle_license'] ) {
+			if ( isset( $license_info[ $extension ]['bundle_license'] ) && $license_info[ $extension ]['bundle_license'] ) {
 				continue;
 			}
 			
