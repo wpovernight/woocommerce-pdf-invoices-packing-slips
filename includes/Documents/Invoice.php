@@ -603,9 +603,9 @@ class Invoice extends OrderDocumentMethods {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'ubl_format',
-					'options'     => apply_filters( 'wpo_wcpdf_ubl_formats', array(
+					'options'     => apply_filters( 'wpo_wcpdf_document_ubl_formats', array(
 						'ubl_2_1' => __( 'UBL 2.1' , 'woocommerce-pdf-invoices-packing-slips' ),
-					) ),
+					), $this ),
 				)
 			),
 			array(
