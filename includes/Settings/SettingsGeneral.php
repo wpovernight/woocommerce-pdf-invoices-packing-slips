@@ -207,7 +207,7 @@ class SettingsGeneral {
 					'option_name'  => $option_name,
 					'id'           => 'shop_phone_number',
 					'translatable' => true,
-//					'description'  => __( 'Required for e-Invoice.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => __( 'Mandatory for certain UBL formats.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
