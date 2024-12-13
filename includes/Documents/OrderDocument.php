@@ -343,6 +343,11 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
 	
+	/**
+	 * Get the UBL format
+	 *
+	 * @return string|false
+	 */
 	public function get_ubl_format() {
 		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
 		

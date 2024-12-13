@@ -631,7 +631,7 @@ class Invoice extends OrderDocumentMethods {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'include_encrypted_pdf',
-					'description' => __( 'Include the PDF Invoice file encrypted in the UBL file.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Embed the encrypted PDF invoice file within the UBL document. Note that this option may not be supported by all UBL formats.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);
