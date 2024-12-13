@@ -226,7 +226,6 @@ class SettingsUpgrade {
 			$args                       = array();
 			$request                    = null;
 			$license_key                = '';
-			$sidekick                   = false;
 			$updater                    = null;
 
 			if ( $this->extension_is_enabled( $extension ) ) {
