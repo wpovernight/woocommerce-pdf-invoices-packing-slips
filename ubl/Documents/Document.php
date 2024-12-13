@@ -31,6 +31,7 @@ abstract class Document {
 		$this->order_document = $order_document;
 	}
 
+	abstract public function get_root_element();
 	abstract public function get_format();
 	abstract public function get_namespaces();
 	abstract public function get_data();
