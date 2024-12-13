@@ -342,6 +342,12 @@ abstract class OrderDocument {
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
+	
+	public function get_ubl_format() {
+		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
+		
+		return apply_filters( 'wpo_wcpdf_document_ubl_format', $ubl_format, $this );
+	}
 
 	public function get_hook_prefix() {
 		return 'wpo_wcpdf_' . $this->slug . '_get_';

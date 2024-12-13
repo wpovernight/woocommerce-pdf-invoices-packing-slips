@@ -55,6 +55,17 @@ jQuery( function( $ ) {
 			$( this ).closest( 'tr' ).nextAll( 'tr' ).has( 'input#next_invoice_number' ).first().show();
 		}
 	} ).trigger( 'change' );
+	
+	// disable encrypted pdf option for non UBL 2.1 formats
+	$( "[name='wpo_wcpdf_documents_settings_invoice_ubl[ubl_format]']" ).on( 'change', function( event ) {
+		let $encryptedPdfCheckbox = $( this ).closest( 'form' ).find( "[name='wpo_wcpdf_documents_settings_invoice_ubl[include_encrypted_pdf]']" );
+		
+		if ( $( this ).val() !== 'ubl_2_1' ) {
+			$encryptedPdfCheckbox.prop( 'checked', false ).prop( 'disabled', true );
+		} else {
+			$encryptedPdfCheckbox.prop( 'disabled', false );
+		}
+	} ).trigger( 'change' );
 
 	// enable settings document switch
 	$( '.wcpdf_document_settings_sections > h2' ).on( 'click', function() {
