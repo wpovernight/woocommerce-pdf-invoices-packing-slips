@@ -579,7 +579,7 @@ class Invoice extends OrderDocumentMethods {
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
-				'id'       => $this->type.'_ubl',
+				'id'       => $this->type . '_ubl',
 				'title'    => '',
 				'callback' => 'section',
 			),
@@ -588,7 +588,7 @@ class Invoice extends OrderDocumentMethods {
 				'id'       => 'enabled',
 				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
-				'section'  => $this->type.'_ubl',
+				'section'  => $this->type . '_ubl',
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'enabled',
@@ -596,10 +596,24 @@ class Invoice extends OrderDocumentMethods {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'ubl_format',
+				'title'    => __( 'Format', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $this->type . '_ubl',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'format',
+					'options'     => apply_filters( 'wpo_wcpdf_ubl_formats', array(
+						'ubl_2_1' => __( 'UBL 2.1' , 'woocommerce-pdf-invoices-packing-slips' ),
+					) ),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'attach_to_email_ids',
 				'title'    => __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'multiple_checkboxes',
-				'section'  => $this->type.'_ubl',
+				'section'  => $this->type . '_ubl',
 				'args'     => array(
 					'option_name'     => $option_name,
 					'id'              => 'attach_to_email_ids',
@@ -613,7 +627,7 @@ class Invoice extends OrderDocumentMethods {
 				'id'       => 'include_encrypted_pdf',
 				'title'    => __( 'Include encrypted PDF:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
-				'section'  => $this->type.'_ubl',
+				'section'  => $this->type . '_ubl',
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'include_encrypted_pdf',
@@ -687,6 +701,7 @@ class Invoice extends OrderDocumentMethods {
 					'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 					'members' => array(
 						'enabled',
+						'ubl_format',
 						'attach_to_email_ids',
 						'include_encrypted_pdf',
 					),
