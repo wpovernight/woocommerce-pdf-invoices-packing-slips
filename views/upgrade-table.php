@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<th class="first" align="left">&nbsp;</th>
 		<th align="left" class="pro"><?php esc_html_e( 'Professional', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left" class="templates"><?php esc_html_e( 'Premium Templates', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-		<th align="left" class="bundle"><?php esc_html_e( 'Bundle', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		<th align="left" class="bundle"><?php esc_html_e( 'Plus Bundle', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		<th align="left" class="last">&nbsp;</td>
 	</tr>
 
@@ -37,17 +37,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tr class="upgrade-links">
 		<td class="first" align="left">&nbsp;</td>
 		<?php
-			$extensions_disabled = [];
-			$extensions_enabled  = [];
-			$extension_columns   = [];
+			$default_extensions  = array( 'pro', 'templates' );
+			$extensions_enabled  = array();
+			$extensions_disabled = array();
+			$extension_columns   = array();
+			
+			// check if pro and templates are enabled
+			foreach ( $default_extensions as $extension ) {
+				$extension_is_enabled = WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension );
+				
+				if ( $extension_is_enabled ) {
+					$extensions_enabled[]  = $extension;
+				} else {
+					$extensions_disabled[] = $extension;
+				}
+			}
 
 			// pro, templates & bundle columns
 			foreach ( $extension_license_infos as $extension => $info ) {
+				$extension_is_enabled = in_array( $extension, $extensions_enabled );
+				$bundle_is_enabled    = array() === array_diff( array( 'pro', 'templates' ), $extensions_enabled );
+				
 				// enabled
-				if ( WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension ) || ( 'bundle' === $extension && array() === array_diff( array( 'pro', 'templates' ), $extensions_enabled ) ) ) {
-					$extensions_enabled[] = $extension;
-
+				if ( $extension_is_enabled || $bundle_is_enabled ) {
 					$title = __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' );
+
+					// if the bundle is enabled, display only "Bundle" as installed
+					if ( $bundle_is_enabled && 'bundle' !== $extension ) {
+						$title = '';
+					}
+					
 					if ( ( empty( $info['status'] ) || 'valid' !== $info['status'] ) && 'bundle' !== $extension ) {
 						$subtitle = sprintf(
 							/* translators: learn more link */
@@ -65,9 +84,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$subtitle
 					);
 
-				// disabled (includes bundle)
+				// disabled
 				} else {
-					$extensions_disabled[]           = $extension;
+					// add bundle to disabled extensions
+					if ( 'bundle' === $extension && ! in_array( $extension, $extensions_disabled ) ) {
+						$extensions_disabled[] = $extension;
+					}
+					
 					$extension_columns[ $extension ] = sprintf(
 						'<td class="' . $extension . '" align="left"><a class="upgrade_button" href="%s" target="_blank">%s</a></td>',
 						esc_url_raw( $info['url'] ),
