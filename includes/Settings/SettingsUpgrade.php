@@ -272,9 +272,16 @@ class SettingsUpgrade {
 		$bundle_upgrade_url = '';
 		$upgrade_tiers      = array(
 			// site count => upgrade ID
-			1  => 3,
-			3  => 4,
-			25 => 5,
+			'pro' => array(
+				1  => 3,
+				3  => 4,
+				25 => 5,
+			),
+			'templates' => array(
+				1  => 4,
+				3  => 5,
+				25 => 6,
+			),
 		);
 		
 		foreach ( $extensions as $extension ) {
@@ -304,9 +311,20 @@ class SettingsUpgrade {
 				continue;
 			}
 			
+			// if bundle upgrade URL is already set, skip
+			if ( ! empty( $bundle_upgrade_url ) ) {
+				continue;
+			}
+			
 			// create upgrade URL
 			$license_id         = $license_info[ $extension ]['license_id'];
-			$upgrade_id         = $upgrade_tiers[ $license_info[ $extension ]['site_count'] ] ?? 3;
+			$site_count		    = $license_info[ $extension ]['site_count'];
+			$upgrade_id         = isset( $upgrade_tiers[ $extension ][ $site_count ] ) ? $upgrade_tiers[ $extension ][ $site_count ] : 0;
+			
+			if ( 0 === $upgrade_id ) {
+				continue;
+			}
+			
 			$bundle_upgrade_url = "https://wpovernight.com/checkout/?edd_action=sl_license_upgrade&license_id={$license_id}8&upgrade_id={$upgrade_id}";
 		}
 		
