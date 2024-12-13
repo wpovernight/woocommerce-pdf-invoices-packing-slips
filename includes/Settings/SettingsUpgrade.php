@@ -299,6 +299,11 @@ class SettingsUpgrade {
 				continue;
 			}
 			
+			// if bundle, no upgrade needed
+			if ( $license_info[ $extension ]['bundle_license'] ) {
+				continue;
+			}
+			
 			// create upgrade URL
 			$license_id         = $license_info[ $extension ]['license_id'];
 			$upgrade_id         = $upgrade_tiers[ $license_info[ $extension ]['site_count'] ] ?? 3;
