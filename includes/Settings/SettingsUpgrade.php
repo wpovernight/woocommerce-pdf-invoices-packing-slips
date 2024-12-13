@@ -269,15 +269,14 @@ class SettingsUpgrade {
 			}
 		}
 		
-		$upgrade_tiers = array(
+		$extensions[]       = 'bundle';
+		$bundle_upgrade_url = '';
+		$upgrade_tiers      = array(
 			// site count => upgrade ID
 			1  => 3,
 			3  => 4,
 			25 => 5,
 		);
-
-		$extensions[]       = 'bundle';
-		$bundle_upgrade_url = '';
 		
 		foreach ( $extensions as $extension ) {
 			// set default URL
