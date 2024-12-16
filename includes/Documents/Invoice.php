@@ -609,7 +609,7 @@ class Invoice extends OrderDocumentMethods {
 					'description' => __( 'Formats available through extensions:', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . '<a href="https://github.com/wpovernight/wpo-ips-xrechnung/releases/latest/" target="_blank">EN16931 XRechnung</a>' . '<br>' .
 						sprintf(
 							/* translators: %1$s: opening link tag, %2$s: closing link tag */
-							__( 'If the format you need isn\'t listed, please don\'t hesitate to %1$scontact us!%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+							__( 'If the format you need isn\'t listed, please don\'t hesitate to %1$scontact us%2$s!', 'woocommerce-pdf-invoices-packing-slips' ),
 							'<a href="https://wpovernight.com/contact/" target="_blank">',
 							'</a>'
 						),
