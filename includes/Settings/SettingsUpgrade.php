@@ -20,7 +20,7 @@ class SettingsUpgrade {
 	}
 
 	public function __construct() {
-		$this->extensions = array( 'pro' );
+		$this->extensions = array( 'pro', 'templates' );
 
 		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
@@ -100,7 +100,7 @@ class SettingsUpgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-the-customizer/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add custom data to your documents', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -110,21 +110,21 @@ class SettingsUpgrade {
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/using-custom-blocks/',
 						__( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Additional PDF templates', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Make use of our Business or Modern template designs.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 				array(
 					'label'       => __( 'Add styling', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Easily change the look and feel of your documents by adding some custom CSS.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'extensions'  => array( 'bundle' ),
+					'extensions'  => array( 'templates', 'bundle' ),
 				),
 			);
 
-			$extension_license_infos = $this->get_extension_license_infos();
+			$extension_license_infos = $this->get_extension_license_infos( true );
 
 			$plugin_recommendations = array(
 				array(
@@ -214,10 +214,8 @@ class SettingsUpgrade {
 	 * @return array
 	 */
 	public function get_extension_license_infos( $ignore_cache = false ) {
-		$extensions          = $this->extensions;
-		$license_info        = ! $ignore_cache ? $this->get_extensions_license_data( 'cached' ) : array();
-		$bundle_upgrade_link = '';
-		$license_status      = 'inactive';
+		$extensions   = $this->extensions;
+		$license_info = ! $ignore_cache ? $this->get_extensions_license_data( 'cached' ) : array();
 
 		if ( ! empty( $license_info ) ) {
 			return $license_info;
@@ -228,14 +226,13 @@ class SettingsUpgrade {
 			$args                       = array();
 			$request                    = null;
 			$license_key                = '';
-			$sidekick                   = false;
 			$updater                    = null;
 
 			if ( $this->extension_is_enabled( $extension ) ) {
-				$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
+				$extension_main_function = "WPO_WCPDF_" . ucfirst( $extension );
 				$updater                 = $extension_main_function()->updater;
 
-				if ( $extension == 'templates' && version_compare( $extension_main_function()->version, '2.20.0', '<=' ) ) { // 'updater' property had 'private' visibility
+				if ( 'templates' === $extension && version_compare( $extension_main_function()->version, '2.20.0', '<=' ) ) { // 'updater' property had 'private' visibility
 					continue;
 				}
 
@@ -244,43 +241,13 @@ class SettingsUpgrade {
 				}
 
 				// built-in updater
-				if ( is_callable( [ $updater, 'get_license_key' ] ) ) {
+				if ( is_callable( array( $updater, 'get_license_key' ) ) ) {
 					$license_key = $updater->get_license_key();
-				// sidekick (legacy)
-				} elseif ( property_exists( $updater, 'license_key' ) ) {
-					$license_slug     = "wpo_wcpdf_{$extension}_license";
-					$wpo_license_keys = get_option( 'wpocore_settings', array() );
-					$license_key      = isset( $wpo_license_keys[$license_slug] ) ? $wpo_license_keys[$license_slug] : $license_key;
-					$sidekick         = true;
 				}
 
 				if ( ! empty( $license_key ) ) {
 					$args['edd_action']  = 'check_license';
-					$args['license_key'] = trim( $license_key );
-
-					// legacy
-					if ( $sidekick ) {
-						if ( ! class_exists( 'WPO_Update_Helper' ) ) {
-							include_once( $extension_main_function()->plugin_path() . '/updater/update-helper.php' );
-						}
-
-						$item_name = 'PDF Invoices & Packing Slips for WooCommerce - ';
-						$file      = $extension_main_function()->plugin_path();
-						$version   = $extension_main_function()->version;
-						$author    = 'WP Overnight';
-
-						switch ( $extension ) {
-							case 'pro':
-								$item_name = "{$item_name}Professional";
-								break;
-							case 'templates':
-								$item_name = "{$item_name}Premium Templates";
-								break;
-						}
-
-						$updater = new \WPO_Update_Helper( $item_name, $file, $license_slug, $version, $author );
-					}
-
+					$args['license_key'] = $license_info[ $extension ]['license_key'] = trim( $license_key );
 				} else {
 					continue;
 				}
@@ -288,31 +255,86 @@ class SettingsUpgrade {
 				if ( $updater && is_callable( array( $updater, 'remote_license_actions' ) ) && ! empty( $args ) ) {
 					$request = $updater->remote_license_actions( $args );
 
-					if ( is_object( $request ) && isset( $request->license ) ) {
-						$license_info[$extension]['status'] = $license_status = $request->license;
-
-						if ( empty( $bundle_upgrade_link ) && ! empty( $request->bundle_upgrade ) && is_string( $request->bundle_upgrade ) ) {
-							$bundle_upgrade_link = $request->bundle_upgrade; // https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/503#issue-1678203436
-						}
+					if ( is_wp_error( $request ) ) {
+						wcpdf_log_error( 'Unable to retrieve license data from the remote server for the extension ' . $extension . '. Error: ' . $response->get_error_message() );
+						continue;
 					}
+					
+					$license_info[ $extension ]['status']         = isset( $request->license )        ? $request->license              : 'inactive';
+					$license_info[ $extension ]['license_limit']  = isset( $request->license_limit )  ? $request->license_limit        : 1;
+					$license_info[ $extension ]['license_id']     = isset( $request->license_id )     ? absint( $request->license_id ) : null;
+					$license_info[ $extension ]['bundle_license'] = isset( $request->bundle_license ) ? $request->bundle_license       : false;
 				}
 			}
 		}
-
-		$extensions[] = 'bundle';
+		
+		$extensions[]       = 'bundle';
+		$default_utm_tags   = 'utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab';
+		$bundle_upgrade_url = '';
+		$upgrade_tiers      = array(
+			// license limit => upgrade ID
+			'pro' => array(
+				1  => 3,
+				3  => 4,
+				25 => 5,
+			),
+			'templates' => array(
+				1  => 4,
+				3  => 5,
+				25 => 6,
+			),
+		);
+		
 		foreach ( $extensions as $extension ) {
-			if ( ! empty( $bundle_upgrade_link ) && $license_status == 'valid' ) {
-				$license_info[$extension]['url'] = $bundle_upgrade_link;
-			} else {
-				switch ( $extension ) {
-					case 'pro':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-pro-upgrade';
-						break;
-					case 'bundle':
-						$license_info[$extension]['url'] = 'https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ips-bundle-upgrade';
-						break;
-				}
+			// set default URL
+			switch ( $extension ) {
+				case 'pro':
+					$pro_utm_tags                      = $default_utm_tags . '&utm_content=ips-pro-upgrade';
+					$license_info[ $extension ]['url'] = "https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/?{$pro_utm_tags}";
+					break;
+				case 'templates':
+				case 'bundle':
+					$bundle_utm_tags                   = $default_utm_tags . '&utm_content=ips-plus-bundle-upgrade';
+					$license_info[ $extension ]['url'] = "https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/?{$bundle_utm_tags}";
+					break;
 			}
+			
+			// if bundle, no upgrade needed
+			if ( isset( $license_info[ $extension ]['bundle_license'] ) && $license_info[ $extension ]['bundle_license'] ) {
+				continue;
+			}
+			
+			// there's no license ID, can't be upgraded
+			if ( empty( $license_info[ $extension ]['license_id'] ) ) {
+				continue;
+			}
+			
+			// check if the license is activated and valid
+			if ( empty( $license_info[ $extension ]['status'] ) || 'valid' !== $license_info[ $extension ]['status'] ) {
+				continue;
+			}
+			
+			// if bundle upgrade URL is already set, skip
+			if ( ! empty( $bundle_upgrade_url ) ) {
+				continue;
+			}
+			
+			// create upgrade URL
+			$license_id    = $license_info[ $extension ]['license_id'];
+			$license_limit = $license_info[ $extension ]['license_limit'];
+			$upgrade_id    = isset( $upgrade_tiers[ $extension ][ $license_limit ] ) ? $upgrade_tiers[ $extension ][ $license_limit ] : 0;
+			
+			if ( 0 === $upgrade_id ) {
+				continue;
+			}
+			
+			$upgrade_utm_tags   = $default_utm_tags . '&utm_content=ips-plus-bundle-upgrade+upgrade-from-' . $extension;
+			$bundle_upgrade_url = "https://wpovernight.com/checkout/?edd_action=sl_license_upgrade&license_id={$license_id}&upgrade_id={$upgrade_id}&{$upgrade_utm_tags}";
+		}
+		
+		// set bundle upgrade URL
+		if ( ! empty( $bundle_upgrade_url ) ) {
+			$license_info['bundle']['url'] = $bundle_upgrade_url;
 		}
 
 		update_option( 'wpo_wcpdf_extensions_license_cache', $license_info );
@@ -354,10 +376,6 @@ class SettingsUpgrade {
 			if ( 'cached' === $type ) {
 				update_option( $option_key, $data );
 			}
-		}
-
-		if ( isset( $data['templates'] ) ) {
-			unset( $data['templates'] );
 		}
 
 		return $data;
