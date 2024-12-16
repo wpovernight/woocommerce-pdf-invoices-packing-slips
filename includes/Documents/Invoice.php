@@ -587,7 +587,7 @@ class Invoice extends OrderDocumentMethods {
 		}
 		
 		if ( ! empty( $extensions_available ) ) {
-			$ubl_format_description = __( 'Formats available through extensions:', 'woocommerce-pdf-invoices-packing-slips' ) . ':';
+			$ubl_format_description = __( 'Formats available through extensions', 'woocommerce-pdf-invoices-packing-slips' ) . ':';
 			
 			foreach ( $extensions_available as $extension ) {
 				$ubl_format_description .= ' <a href="' . esc_url( $extension['url'] ) . '" target="_blank">' . esc_html( $extension['title'] ) . '</a>';
