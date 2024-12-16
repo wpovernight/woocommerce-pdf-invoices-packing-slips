@@ -714,7 +714,7 @@ class Invoice extends OrderDocumentMethods {
 	}
 	
 	/**
-	 * Get UBL Format setting derscription
+	 * Get UBL Format setting description
 	 * 
 	 * @return string
 	 */
