@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-16T08:12:43+00:00\n"
+"POT-Creation-Date: 2024-12-17T09:06:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -55,7 +55,7 @@ msgstr ""
 
 #: includes/Admin.php:124
 #: includes/Main.php:853
-#: includes/Settings/SettingsDebug.php:1131
+#: includes/Settings/SettingsDebug.php:1141
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:121
 #: views/promo.php:34
@@ -268,7 +268,7 @@ msgid "Preview"
 msgstr ""
 
 #: includes/Assets.php:121
-#: includes/Settings/SettingsDebug.php:1139
+#: includes/Settings/SettingsDebug.php:1149
 msgid "Settings"
 msgstr ""
 
@@ -343,14 +343,14 @@ msgid "Enable"
 msgstr ""
 
 #: includes/Documents/Invoice.php:233
-#: includes/Documents/Invoice.php:614
+#: includes/Documents/Invoice.php:615
 #: includes/Documents/PackingSlip.php:191
 msgid "Attach to:"
 msgstr ""
 
 #. translators: directory path
 #: includes/Documents/Invoice.php:241
-#: includes/Documents/Invoice.php:622
+#: includes/Documents/Invoice.php:623
 msgid "It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices."
 msgstr ""
 
@@ -624,34 +624,47 @@ msgstr ""
 msgid "UBL 2.1"
 msgstr ""
 
-#: includes/Documents/Invoice.php:628
+#: includes/Documents/Invoice.php:629
 msgid "Include encrypted PDF:"
 msgstr ""
 
-#: includes/Documents/Invoice.php:634
+#: includes/Documents/Invoice.php:635
 msgid "Embed the encrypted PDF invoice file within the UBL document. Note that this option may not be supported by all UBL formats."
 msgstr ""
 
-#: includes/Documents/Invoice.php:657
-#: includes/Documents/Invoice.php:701
+#: includes/Documents/Invoice.php:658
+#: includes/Documents/Invoice.php:702
 #: includes/Documents/PackingSlip.php:229
 #: includes/Settings.php:163
 #: includes/Settings/SettingsDebug.php:682
 msgid "General"
 msgstr ""
 
-#: includes/Documents/Invoice.php:666
+#: includes/Documents/Invoice.php:667
 #: includes/Documents/PackingSlip.php:236
 msgid "Document details"
 msgstr ""
 
-#: includes/Documents/Invoice.php:680
+#: includes/Documents/Invoice.php:681
 msgid "Admin"
 msgstr ""
 
-#: includes/Documents/Invoice.php:688
+#: includes/Documents/Invoice.php:689
 #: includes/Settings.php:182
 msgid "Advanced"
+msgstr ""
+
+#: includes/Documents/Invoice.php:727
+msgid "EN16931 XRechnung"
+msgstr ""
+
+#: includes/Documents/Invoice.php:733
+msgid "Formats available through extensions"
+msgstr ""
+
+#. translators: %1$s: opening link tag, %2$s: closing link tag
+#: includes/Documents/Invoice.php:748
+msgid "If the format you need isn't listed, please don't hesitate to %1$scontact us%2$s!"
 msgstr ""
 
 #. translators: 1. credit note title, 2. refund id
@@ -1290,107 +1303,112 @@ msgstr ""
 msgid "Document can be accessed by everyone with the link."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:957
+#: includes/Settings/SettingsDebug.php:962
 msgid "7.4 or superior"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:970
+#: includes/Settings/SettingsDebug.php:975
 msgid "Recommended, will use fallback functions"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:976
+#: includes/Settings/SettingsDebug.php:981
 msgid "Required if you have images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:979
+#: includes/Settings/SettingsDebug.php:984
 msgid "Required when using .webp images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:982
+#: includes/Settings/SettingsDebug.php:987
 msgid "Required if you have .webp images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:985
+#: includes/Settings/SettingsDebug.php:990
 msgid "To compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:988
+#: includes/Settings/SettingsDebug.php:993
 msgid "Recommended to compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:991
+#: includes/Settings/SettingsDebug.php:996
 msgid "For better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:994
-#: includes/Settings/SettingsDebug.php:1000
+#: includes/Settings/SettingsDebug.php:999
+#: includes/Settings/SettingsDebug.php:1005
 msgid "Recommended for better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:997
+#: includes/Settings/SettingsDebug.php:1002
 msgid "Better with transparent PNG images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1003
+#: includes/Settings/SettingsDebug.php:1008
 msgid "Required to detect custom templates and to clear the temp folder periodically"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1006
+#: includes/Settings/SettingsDebug.php:1011
 msgid "Check PHP disable_functions"
 msgstr ""
 
 #. translators: <a> tags
-#: includes/Settings/SettingsDebug.php:1010
-msgid "Recommended: 128MB (more for plugin-heavy setups<br/>See: %1$sIncreasing the WordPress Memory Limit%2$s"
+#: includes/Settings/SettingsDebug.php:1015
+msgid "Recommended: 128MB (especially for plugin-heavy setups)"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1015
+#. translators: 1: opening anchor tag, 2: closing anchor tag
+#: includes/Settings/SettingsDebug.php:1017
+msgid "See: %1$sIncreasing the WordPress Memory Limit%2$s"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1025
 msgid "Allow remote stylesheets and images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1018
+#: includes/Settings/SettingsDebug.php:1028
 msgid "allow_url_fopen disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1021
+#: includes/Settings/SettingsDebug.php:1031
 msgid "Necessary to verify the MIME type of local images."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1024
+#: includes/Settings/SettingsDebug.php:1034
 msgid "fileinfo disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1027
+#: includes/Settings/SettingsDebug.php:1037
 msgid "To compress and decompress font and image data"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1030
+#: includes/Settings/SettingsDebug.php:1040
 msgid "base64_decode disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1038
+#: includes/Settings/SettingsDebug.php:1048
 msgid "Required for IMagick"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1041
+#: includes/Settings/SettingsDebug.php:1051
 msgid "ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
-#: includes/Settings/SettingsDebug.php:1121
+#: includes/Settings/SettingsDebug.php:1131
 msgid "Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1140
+#: includes/Settings/SettingsDebug.php:1150
 #: views/advanced-status.php:203
 msgid "Status"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1141
+#: includes/Settings/SettingsDebug.php:1151
 msgid "Tools"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1142
+#: includes/Settings/SettingsDebug.php:1152
 msgid "Numbers"
 msgstr ""
 
