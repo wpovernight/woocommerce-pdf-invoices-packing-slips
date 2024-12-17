@@ -1012,7 +1012,7 @@ class SettingsDebug {
 			),
 			'WP Memory Limit' => array(
 				/* translators: <a> tags */
-				'required' => sprintf( __( 'Recommended: 128MB (more for plugins with heavy setups) See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
+				'required' => sprintf( __( 'Recommended: 128MB (more for plugins with heavy setups)<br/>See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
 				'value'    => sprintf( 'WordPress: %s, PHP: %s', WP_MEMORY_LIMIT, $php_mem_limit ),
 				'result'   => $memory_limit > 67108864,
 			),
