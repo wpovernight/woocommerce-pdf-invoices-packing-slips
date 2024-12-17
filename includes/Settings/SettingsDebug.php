@@ -961,18 +961,18 @@ class SettingsDebug {
 			'DOMDocument extension' => array(
 				'required' => true,
 				'value'    => phpversion( 'DOM' ),
-				'result'   => class_exists( 'DOMDocument' ),
+				'result'   => extension_loaded( 'DOM' ),
 			),
 			'MBString extension' => array(
 				'required' => true,
 				'value'    => phpversion( 'mbstring' ),
-				'result'   => function_exists( 'mb_send_mail' ),
+				'result'   => extension_loaded( 'mbstring' ),
 				'fallback' => __( 'Recommended, will use fallback functions', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'GD' => array(
 				'required' => true,
 				'value'    => phpversion( 'gd' ),
-				'result'   => function_exists( 'imagecreate' ),
+				'result'   => extension_loaded( 'gd' ),
 				'fallback' => __( 'Required if you have images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'WebP Support' => array(
@@ -984,7 +984,7 @@ class SettingsDebug {
 			'Zlib' => array(
 				'required' => __( 'To compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'    => phpversion( 'zlib' ),
-				'result'   => function_exists( 'gzcompress' ),
+				'result'   => extension_loaded( 'zlib' ),
 				'fallback' => __( 'Recommended to compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'opcache' => array(
@@ -1007,7 +1007,7 @@ class SettingsDebug {
 			),
 			'WP Memory Limit' => array(
 				/* translators: <a> tags */
-				'required' => sprintf( __( 'Recommended: 128MB (more for plugin-heavy setups<br/>See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
+				'required' => sprintf( __( 'Recommended: 128MB (more for plugins with heavy setups)<br/>See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
 				'value'    => sprintf( 'WordPress: %s, PHP: %s', WP_MEMORY_LIMIT, $php_mem_limit ),
 				'result'   => $memory_limit > 67108864,
 			),
