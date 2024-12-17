@@ -951,6 +951,11 @@ class SettingsDebug {
 		$apc           = extension_loaded( 'apc' );
 		$zop           = extension_loaded( 'Zend OPcache' );
 		$op            = extension_loaded( 'opcache' );
+		$dom           = extension_loaded( 'DOM' );
+		$mbstring      = extension_loaded( 'mbstring' );
+		$gd            = extension_loaded( 'gd' );
+		$zlib          = extension_loaded( 'zlib' );
+		$fileinfo      = extension_loaded( 'fileinfo' );
 
 		$server_configs = array(
 			'PHP version' => array(
@@ -961,18 +966,18 @@ class SettingsDebug {
 			'DOMDocument extension' => array(
 				'required' => true,
 				'value'    => phpversion( 'DOM' ),
-				'result'   => extension_loaded( 'DOM' ),
+				'result'   => $dom,
 			),
 			'MBString extension' => array(
 				'required' => true,
 				'value'    => phpversion( 'mbstring' ),
-				'result'   => extension_loaded( 'mbstring' ),
+				'result'   => $mbstring,
 				'fallback' => __( 'Recommended, will use fallback functions', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'GD' => array(
 				'required' => true,
 				'value'    => phpversion( 'gd' ),
-				'result'   => extension_loaded( 'gd' ),
+				'result'   => $gd,
 				'fallback' => __( 'Required if you have images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'WebP Support' => array(
@@ -984,7 +989,7 @@ class SettingsDebug {
 			'Zlib' => array(
 				'required' => __( 'To compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'    => phpversion( 'zlib' ),
-				'result'   => extension_loaded( 'zlib' ),
+				'result'   => $zlib,
 				'fallback' => __( 'Recommended to compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'opcache' => array(
@@ -1020,7 +1025,7 @@ class SettingsDebug {
 			'fileinfo' => array (
 				'required' => __( 'Necessary to verify the MIME type of local images.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'	   => null,
-				'result'   => extension_loaded( 'fileinfo' ),
+				'result'   => $fileinfo,
 				'fallback' => __( 'fileinfo disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'base64_decode'	=> array (
