@@ -1094,7 +1094,7 @@ class SettingsDebug {
 		$server_configs          = $this->get_server_config();
 
 		foreach ( $server_configs as $config_name => $config ) {
-			if ( in_array( $config_name, array( 'opcache', 'GMagick or IMagick' ), true ) ) {
+			if ( in_array( $config_name, array( 'opcache', 'GMagick or IMagick', 'WP Memory Limit' ), true ) ) {
 				continue;
 			}
 
