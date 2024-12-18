@@ -52,7 +52,7 @@ abstract class OrderDocument {
 
 	/**
 	 * WC Order ID
-	 * @var object
+	 * @var int
 	 */
 	public $order_id;
 
@@ -105,7 +105,7 @@ abstract class OrderDocument {
 	 */
 	public function __construct( $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
-			$this->order_id = $order;
+			$this->order_id = absint( $order );
 			$this->order    = wc_get_order( $this->order_id );
 		} elseif ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) {
 			$this->order_id = $order->get_id();
