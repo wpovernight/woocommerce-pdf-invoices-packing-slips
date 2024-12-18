@@ -342,7 +342,7 @@ abstract class OrderDocument {
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
-	
+
 	/**
 	 * Get the UBL format
 	 *
@@ -350,7 +350,7 @@ abstract class OrderDocument {
 	 */
 	public function get_ubl_format() {
 		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
-		
+
 		return apply_filters( 'wpo_wcpdf_document_ubl_format', $ubl_format, $this );
 	}
 
@@ -1808,6 +1808,17 @@ abstract class OrderDocument {
 			return 0;
 		}
 
+		return $this->calculate_due_date( $due_date_days );
+	}
+
+	/**
+	 * Calculate the due date.
+	 *
+	 * @param int $due_date_days
+	 *
+	 * @return int Due date timestamp.
+	 */
+	public function calculate_due_date( int $due_date_days ): int {
 		$due_date_days = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_days',
 			array( $due_date_days, $this->get_type(), $this ),
@@ -1816,11 +1827,11 @@ abstract class OrderDocument {
 		);
 		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
 
-		if ( 0 >= intval( $due_date_days ) ) {
+		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) <= 0 ) {
 			return 0;
 		}
 
-		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( wc_timezone_string() ) );
 		$base_date              = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_base_date',
 			array( $document_creation_date, $this->get_type(), $this ),
