@@ -342,6 +342,17 @@ abstract class OrderDocument {
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
+	
+	/**
+	 * Get the UBL format
+	 *
+	 * @return string|false
+	 */
+	public function get_ubl_format() {
+		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
+		
+		return apply_filters( 'wpo_wcpdf_document_ubl_format', $ubl_format, $this );
+	}
 
 	public function get_hook_prefix() {
 		return 'wpo_wcpdf_' . $this->slug . '_get_';
@@ -1130,7 +1141,7 @@ abstract class OrderDocument {
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 			$src             = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
-			
+
 			if ( empty( $src ) ) {
 				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
@@ -1227,6 +1238,16 @@ abstract class OrderDocument {
 	}
 	public function shop_address() {
 		echo $this->get_shop_address();
+	}
+
+	/**
+	 * Return/Show shop/company phone number if provided.
+	 */
+	public function get_shop_phone_number() {
+		return $this->get_settings_text( 'shop_phone_number', '', false );
+	}
+	public function shop_phone_number() {
+		echo $this->get_shop_phone_number();
 	}
 
 	/**

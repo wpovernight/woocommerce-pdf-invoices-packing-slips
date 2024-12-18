@@ -20,7 +20,7 @@ class Assets {
 
 	public function __construct()	{
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_scripts_styles' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ), 11 ); // after WC
 	}
 
 	/**
@@ -134,9 +134,13 @@ class Assets {
 				wp_enqueue_style( 'wp-pointer' );
 			}
 
+			if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
+				wp_enqueue_script( 'jquery-tiptip' );
+			}
+
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
-				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script'.$suffix.'.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
 				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' ),
 				WPO_WCPDF_VERSION
 			);
