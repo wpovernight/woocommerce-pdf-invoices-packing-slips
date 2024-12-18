@@ -1808,18 +1808,17 @@ abstract class OrderDocument {
 			return 0;
 		}
 
-		return $this->calculate_due_date( $due_date_days, $this->order );
+		return $this->calculate_due_date( $due_date_days );
 	}
 
 	/**
 	 * Calculate the due date.
 	 *
 	 * @param int $due_date_days
-	 * @param \WC_Abstract_Order $order
 	 *
 	 * @return int Due date timestamp.
 	 */
-	public function calculate_due_date( int $due_date_days, \WC_Abstract_Order $order ): int {
+	public function calculate_due_date( int $due_date_days ): int {
 		$due_date_days = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_days',
 			array( $due_date_days, $this->get_type(), $this ),
@@ -1832,7 +1831,7 @@ abstract class OrderDocument {
 			return 0;
 		}
 
-		$document_creation_date = $this->get_date( $this->get_type(), $order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( wc_timezone_string() ) );
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( wc_timezone_string() ) );
 		$base_date              = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_base_date',
 			array( $document_creation_date, $this->get_type(), $this ),
