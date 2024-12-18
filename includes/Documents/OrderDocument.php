@@ -342,7 +342,7 @@ abstract class OrderDocument {
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
-	
+
 	/**
 	 * Get the UBL format
 	 *
@@ -350,7 +350,7 @@ abstract class OrderDocument {
 	 */
 	public function get_ubl_format() {
 		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
-		
+
 		return apply_filters( 'wpo_wcpdf_document_ubl_format', $ubl_format, $this );
 	}
 
@@ -1832,7 +1832,7 @@ abstract class OrderDocument {
 			return 0;
 		}
 
-		$document_creation_date = $this->get_date( $this->get_type(), $order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$document_creation_date = $this->get_date( $this->get_type(), $order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( wc_timezone_string() ) );
 		$base_date              = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_base_date',
 			array( $document_creation_date, $this->get_type(), $this ),
