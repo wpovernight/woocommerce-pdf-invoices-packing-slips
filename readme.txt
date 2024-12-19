@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 3.9.2
+Stable tag: 3.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,13 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.9.3 (2024-12-19) =
+* New: enable searching for multiple invoice numbers in the Orders list for HPOS setups
+* New: `calculate_due_date()` document function
+* Fix: correct the type of the abstract document `order_id` property
+* Fix: UBL shop country code
+* Translations: update translation template (POT)
 
 = 3.9.2 (2024-12-17) =
 - New: adds description to UBL format selector

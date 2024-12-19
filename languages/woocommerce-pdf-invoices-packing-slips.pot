@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.2\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-17T09:06:58+00:00\n"
+"POT-Creation-Date: 2024-12-19T16:44:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -302,8 +302,7 @@ msgid "<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools."
 msgstr ""
 
 #: includes/Compatibility/ThirdPartyPlugins.php:391
-#: views/setup-wizard/display-options.php:73
-msgid "Invoice number"
+msgid "Invoice numbers"
 msgstr ""
 
 #: includes/Documents/Invoice.php:24
@@ -543,7 +542,7 @@ msgid "Enable invoice number search in the orders list"
 msgstr ""
 
 #: includes/Documents/Invoice.php:484
-msgid "The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href=\"https://woocommerce.com/document/high-performance-order-storage/\" target=\"_blank\">HPOS</a> feature, allowing you to search orders by invoice numbers using the search type selector."
+msgid "The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href=\"https://woocommerce.com/document/high-performance-order-storage/\" target=\"_blank\">HPOS</a> feature to search for orders by invoice numbers using the search type selector. Additionally, it allows you to search for multiple orders using a comma-separated list of invoice numbers."
 msgstr ""
 
 #: includes/Documents/Invoice.php:490
@@ -2718,6 +2717,10 @@ msgstr ""
 
 #: views/setup-wizard/display-options.php:52
 msgid "Invoice date"
+msgstr ""
+
+#: views/setup-wizard/display-options.php:73
+msgid "Invoice number"
 msgstr ""
 
 #: views/setup-wizard/good-to-go.php:3
