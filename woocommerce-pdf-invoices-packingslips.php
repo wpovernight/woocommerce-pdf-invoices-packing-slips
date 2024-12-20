@@ -460,7 +460,7 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function yearly_reset_action_missing_notice(): void {
-		if ( ! WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) {
+		if ( ! $this->settings->maybe_schedule_yearly_reset_numbers() ) {
 			return;
 		}
 		
@@ -469,7 +469,7 @@ class WPO_WCPDF {
 		}
 		
 		$current_date   = new \DateTime();
-		$end_of_year    = new \DateTime('last day of December');
+		$end_of_year    = new \DateTime( 'last day of December' );
 		$days_remaining = $current_date->diff( $end_of_year )->days;
 
 		// Check if the current date is within the last 30 days of the year
