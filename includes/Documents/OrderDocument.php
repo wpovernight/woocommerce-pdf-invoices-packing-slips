@@ -1802,9 +1802,9 @@ abstract class OrderDocument {
 	 */
 	public function get_due_date(): int {
 		$due_date      = $this->get_setting( 'due_date' );
-		$due_date_days = $this->get_setting( 'due_date_days' );
+		$due_date_days = absint( $this->get_setting( 'due_date_days' ) );
 
-		if ( empty( $this->order ) || empty( $due_date ) || empty( $due_date_days ) ) {
+		if ( empty( $this->order ) || empty( $due_date ) || $due_date_days < 0 ) {
 			return 0;
 		}
 
@@ -1827,7 +1827,7 @@ abstract class OrderDocument {
 		);
 		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
 
-		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) <= 0 ) {
+		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) < 0 ) {
 			return 0;
 		}
 
