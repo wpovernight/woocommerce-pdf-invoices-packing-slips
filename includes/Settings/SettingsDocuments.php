@@ -69,16 +69,18 @@ class SettingsDocuments {
 				}
 				?>
 			</ul>
+			<?php if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) : ?>
 			<p><i>
 				<?php
 					printf(
 						/* translators: 1. open anchor tag, 2. close anchor tag */
-						__( 'Need more document? Please visit %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Looking for more documents? Learn more %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="https://docs.wpovernight.com/">', // ToDo: Update URL
 						'</a>'
 					);
 				?>
 			</i></p>
+			<?php endif; ?>
 		</div>
 		<div class="wcpdf_document_settings_document_output_formats">
 			<?php
