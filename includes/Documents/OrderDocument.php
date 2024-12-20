@@ -52,7 +52,7 @@ abstract class OrderDocument {
 
 	/**
 	 * WC Order ID
-	 * @var object
+	 * @var int
 	 */
 	public $order_id;
 
@@ -105,7 +105,7 @@ abstract class OrderDocument {
 	 */
 	public function __construct( $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
-			$this->order_id = $order;
+			$this->order_id = absint( $order );
 			$this->order    = wc_get_order( $this->order_id );
 		} elseif ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) {
 			$this->order_id = $order->get_id();
@@ -341,6 +341,17 @@ abstract class OrderDocument {
 		$is_enabled = $this->get_setting( 'enabled', false, $output_format );
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
+	}
+
+	/**
+	 * Get the UBL format
+	 *
+	 * @return string|false
+	 */
+	public function get_ubl_format() {
+		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
+
+		return apply_filters( 'wpo_wcpdf_document_ubl_format', $ubl_format, $this );
 	}
 
 	public function get_hook_prefix() {
@@ -1130,7 +1141,7 @@ abstract class OrderDocument {
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 			$src             = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
-			
+
 			if ( empty( $src ) ) {
 				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
@@ -1227,6 +1238,16 @@ abstract class OrderDocument {
 	}
 	public function shop_address() {
 		echo $this->get_shop_address();
+	}
+
+	/**
+	 * Return/Show shop/company phone number if provided.
+	 */
+	public function get_shop_phone_number() {
+		return $this->get_settings_text( 'shop_phone_number', '', false );
+	}
+	public function shop_phone_number() {
+		echo $this->get_shop_phone_number();
 	}
 
 	/**
@@ -1787,6 +1808,17 @@ abstract class OrderDocument {
 			return 0;
 		}
 
+		return $this->calculate_due_date( $due_date_days );
+	}
+
+	/**
+	 * Calculate the due date.
+	 *
+	 * @param int $due_date_days
+	 *
+	 * @return int Due date timestamp.
+	 */
+	public function calculate_due_date( int $due_date_days ): int {
 		$due_date_days = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_days',
 			array( $due_date_days, $this->get_type(), $this ),
@@ -1795,11 +1827,11 @@ abstract class OrderDocument {
 		);
 		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
 
-		if ( 0 >= intval( $due_date_days ) ) {
+		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) <= 0 ) {
 			return 0;
 		}
 
-		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( wc_timezone_string() ) );
 		$base_date              = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_base_date',
 			array( $document_creation_date, $this->get_type(), $this ),

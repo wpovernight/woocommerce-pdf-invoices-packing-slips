@@ -23,7 +23,7 @@ class SabreBuilder extends Builder {
 		$namespaces                  = array_flip( $document->get_namespaces() );
 		$this->service->namespaceMap = $namespaces;
 
-		return $this->service->write( 'Invoice', $document->get_data() );
+		return $this->service->write( $document->get_root_element(), $document->get_data() );
 	}
 
 }

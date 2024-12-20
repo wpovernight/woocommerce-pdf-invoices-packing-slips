@@ -82,7 +82,7 @@ class AddressHandler extends UblHandler {
 						'name'  => 'cac:Country',
 						'value' => array(
 							'name'       => 'cbc:IdentificationCode',
-							'value'      => get_option( 'woocommerce_default_country' ),
+							'value'      => wc_format_country_state_string( get_option( 'woocommerce_default_country', '' ) )['country'],
 							'attributes' => array(
 								'listID'       => 'ISO3166-1:Alpha2',
 								'listAgencyID' => '6',
