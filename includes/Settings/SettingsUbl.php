@@ -59,6 +59,7 @@ class SettingsUbl {
 		switch ( $active_section ) {
 			default:
 			case 'taxes':
+				echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 				$setting = new UblTaxSettings();
 				$setting->output();
 				break;
