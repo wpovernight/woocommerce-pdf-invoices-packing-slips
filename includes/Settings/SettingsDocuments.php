@@ -75,7 +75,7 @@ class SettingsDocuments {
 					printf(
 						/* translators: 1. open anchor tag, 2. close anchor tag */
 						__( 'Looking for more documents? Learn more %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/more-document-types/">', // ToDo: Update URL
+						'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/more-document-types/">',
 						'</a>'
 					);
 				?>
