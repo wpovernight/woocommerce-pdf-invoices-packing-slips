@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 3.9.3
+Stable tag: 3.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,7 +102,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 3.9.3 (2024-12-19) =
+= 3.9.4 (2024-12-23) =
+* New: add a note to inform users about the availability of additional documents
+* New: display a notice when the yearly reset action is not scheduled
+* Tweak: transition UBL support out of beta
+* Translations: update translation template (POT)
+
 * New: enable searching for multiple invoice numbers in the Orders list for HPOS setups
 * New: `calculate_due_date()` document function
 * Fix: correct the type of the abstract document `order_id` property
