@@ -490,8 +490,7 @@ class WPO_WCPDF {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_schedule_yearly_reset_action' );
 			} else {
 				$this->settings->schedule_yearly_reset_numbers();
-				$message = esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' );
-				wcpdf_log_error( $message, 'info' );
+				wcpdf_log_error( 'Yearly reset numbering system rescheduled!', 'info' );
 			}
 			
 			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
