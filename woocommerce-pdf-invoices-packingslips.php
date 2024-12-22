@@ -76,6 +76,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
+		add_action( 'admin_notices', array( $this, 'yearly_reset_action_missing_notice' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
@@ -450,6 +451,50 @@ class WPO_WCPDF {
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
 			}
+		}
+	}
+	
+	/**
+	 * Yearly reset action missing notice
+	 * 
+	 * @return void
+	 */
+	public function yearly_reset_action_missing_notice(): void {
+		if ( ! $this->settings->maybe_schedule_yearly_reset_numbers() ) {
+			return;
+		}
+		
+		if ( ! function_exists( 'as_get_scheduled_actions' ) ) {
+			return;
+		}
+		
+		$current_date   = new \DateTime();
+		$end_of_year    = new \DateTime( 'last day of December' );
+		$days_remaining = $current_date->diff( $end_of_year )->days;
+
+		// Check if the current date is within the last 30 days of the year
+		if ( $days_remaining <= 30 && ! $this->settings->yearly_reset_action_is_scheduled() ) {
+			ob_start();
+			?>
+			<div class="notice notice-error">
+				<p><?php esc_html_e( "The year-end is approaching, and we noticed that your PDF Invoices & Packing Slips for WooCommerce plugin doesn't have the scheduled action to reset invoice numbers annually, even though you've explicitly enabled this setting in the document options. Click the button below to schedule the action before the year ends.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><a class="button" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_schedule_yearly_reset_action', 'true' ), 'schedule_yearly_reset_action_nonce' ) ); ?>"><?php esc_html_e( 'Schedule the action now', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+			</div>
+			<?php
+			echo wp_kses_post( ob_get_clean() );
+		}
+		
+		// Schedule yearly reset action
+		if ( isset( $_REQUEST['wpo_wcpdf_schedule_yearly_reset_action'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'schedule_yearly_reset_action_nonce' ) ) {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_schedule_yearly_reset_action' );
+			} else {
+				$this->settings->schedule_yearly_reset_numbers();
+				wcpdf_log_error( 'Yearly reset numbering system rescheduled!', 'info' );
+			}
+			
+			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
+			exit;
 		}
 	}
 
