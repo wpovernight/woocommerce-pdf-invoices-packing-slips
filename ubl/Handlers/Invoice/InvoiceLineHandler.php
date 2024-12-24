@@ -3,7 +3,6 @@
 namespace WPO\IPS\UBL\Handlers\Invoice;
 
 use WPO\IPS\UBL\Handlers\UblHandler;
-use Automattic\WooCommerce\Utilities\NumberUtil;
 use WPO\IPS\UBL\Settings\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,7 +32,7 @@ class InvoiceLineHandler extends UblHandler {
 					continue;
 				}
 
-				$taxOrderData  = $this->document->order_tax_data[ $tax_id ];
+				$taxOrderData = $this->document->order_tax_data[ $tax_id ];
 
 				// Build the TaxCategory array
 				$taxCategory = array(
@@ -114,7 +113,7 @@ class InvoiceLineHandler extends UblHandler {
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => NumberUtil::round( $item->get_total(), wc_get_price_decimals() ),
+						'value'      => round( $item->get_total(), 2 ),
 						'attributes' => array(
 							'currencyID' => $this->document->order->get_currency(),
 						),
