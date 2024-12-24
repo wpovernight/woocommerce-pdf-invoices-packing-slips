@@ -166,6 +166,10 @@ abstract class Document {
 	 */
 	public function get_tax_data_from_fallback( string $key, int $rate_id ): string {
 		$result = '';
+		
+		if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ) ) ) {
+			return $result;
+		}
 	
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
