@@ -295,6 +295,7 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
 			'attach_to_email_ids',
+			'ubl_format',
 			'disable_for_statuses',
 			'number_format', // this is stored in the number data already!
 			'my_account_buttons',
