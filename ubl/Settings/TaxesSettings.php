@@ -112,7 +112,7 @@ class TaxesSettings {
 		<?php
 	}
 
-	public function get_scheme_select( $type, $id, $selected ) {
+	public function get_scheme_select( $type, $id, $selected ): string {
 		$select = '<select name="wpo_wcpdf_settings_ubl_taxes['.$type.']['.$id.'][scheme]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
 		foreach ( $this->get_available_schemes() as $key => $value ) {
 			$select .= '<option '.selected( $key, $selected, false ).' value="'.$key.'">'.$value.'</option>';
@@ -121,7 +121,7 @@ class TaxesSettings {
 		return $select;
 	}
 
-	public function get_available_schemes() {
+	public function get_available_schemes(): array {
 		return array(
 			'vat' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'gst' => __( 'Goods and services tax (GST)', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -179,7 +179,7 @@ class TaxesSettings {
 		);
 	}
 
-	public function get_category_select( $type, $id, $selected ) {
+	public function get_category_select( $type, $id, $selected ): string {
 		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][category]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
 		foreach ( $this->get_available_categories() as $key => $value ) {
 			$select .= '<option '.selected( $key, $selected, false ).' value="' . $key . '">' . $value . '</option>';
@@ -188,7 +188,7 @@ class TaxesSettings {
 		return $select;
 	}
 	
-	public function get_available_categories() {
+	public function get_available_categories(): array {
 		return array(
 			's'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
 			'aa' => __( 'Lower rate', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -206,7 +206,7 @@ class TaxesSettings {
 		);
 	}
 	
-	public function get_reason_select( $type, $id, $selected ) {
+	public function get_reason_select( $type, $id, $selected ): string {
 		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][reason]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
 		foreach ( self::get_available_reasons() as $key => $value ) {
 			$select .= '<option '.selected( $key, $selected, false ).' value="' . $key . '">' . $value . '</option>';
@@ -215,7 +215,7 @@ class TaxesSettings {
 		return $select;
 	}
 	
-	public static function get_available_reasons() {
+	public static function get_available_reasons(): array {
 		return array(
 			'VATEX-EU-79-C'      => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-132'       => __( 'Exempt based on article 132 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
