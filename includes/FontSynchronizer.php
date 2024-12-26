@@ -48,10 +48,11 @@ class FontSynchronizer {
 	 * @return void
 	 */
 	public function sync( $destination, $merge_with_local = true ) {
-		$destination = trailingslashit( wp_normalize_path( $destination ) );
-
-		$plugin_fonts = $this->get_plugin_fonts();
-		$dompdf_fonts = $this->get_dompdf_fonts();
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+		$destination   = trailingslashit( wp_normalize_path( $destination ) );
+		$plugin_fonts  = $this->get_plugin_fonts();
+		$dompdf_fonts  = $this->get_dompdf_fonts();
+		
 		if ( $merge_with_local ) {
 			$local_fonts = $this->get_local_fonts( $destination );
 		} else {
@@ -78,9 +79,9 @@ class FontSynchronizer {
 		// normalize one last time
 		$local_fonts = $this->normalize_font_paths( $local_fonts );
 		// rebuild font cache file
-		$cacheData   = json_encode( $local_fonts, JSON_PRETTY_PRINT );
+		$cacheData   = wp_json_encode( $local_fonts, JSON_PRETTY_PRINT );
 		// write file with merged cache data
-		file_put_contents( $destination . $this->font_cache_filename, $cacheData );
+		$wp_filesystem->put_contents( $destination . $this->font_cache_filename, $cacheData, FS_CHMOD_FILE );
 	}
 
 	/**
@@ -100,7 +101,7 @@ class FontSynchronizer {
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
 				if ( file_exists( $file ) ) {
-					@unlink( $file );
+					wp_delete_file( $file );
 				}
 			}
 		}
@@ -142,13 +143,14 @@ class FontSynchronizer {
 		$rootDir           = $this->dompdf->getOptions()->getRootDir();
 		$cache_file        = trailingslashit( $path ) . $this->font_cache_filename;
 		$legacy_cache_file = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
+		$wp_filesystem     = wpo_wcpdf_get_wp_filesystem();
 
-		if ( is_readable( $cache_file ) ) {
-			$json_data = file_get_contents( $cache_file );
+		if ( $wp_filesystem->is_readable( $cache_file ) ) {
+			$json_data = $wp_filesystem->get_contents( $cache_file );
 			$font_data = json_decode( $json_data, true );
-		} elseif ( is_readable( $legacy_cache_file ) ) {
+		} elseif ( $wp_filesystem->is_readable( $legacy_cache_file ) ) {
 			$font_data = include $legacy_cache_file;
-			@unlink( $legacy_cache_file );
+			wp_delete_file( $legacy_cache_file );
 		} else {
 			$font_data = array();
 		}

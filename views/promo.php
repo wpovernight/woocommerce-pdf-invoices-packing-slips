@@ -10,7 +10,7 @@
 
 	if ( isset( $_REQUEST['wpo_wcpdf_hide_promo_ad'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 		// validate nonce
-		if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'hide_promo_ad_nonce' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_promo_ad_nonce' ) ) {
 			wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_promo_ad' );
 		} else {
 			update_option( 'wpo_wcpdf_hide_promo_ad', true );
