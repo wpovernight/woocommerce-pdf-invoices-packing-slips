@@ -137,7 +137,7 @@ class TaxesSettings {
 				$options = array();
 		}
 
-		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][reason]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
+		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
 		foreach ( $options as $key => $value ) {
 			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
 		}
