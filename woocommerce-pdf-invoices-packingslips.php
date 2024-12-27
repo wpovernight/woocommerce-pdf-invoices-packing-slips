@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              3.9.4
+ * Version:              3.9.5-beta-1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '3.9.4';
+	public $version              = '3.9.5-beta-1';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -453,21 +453,21 @@ class WPO_WCPDF {
 			}
 		}
 	}
-	
+
 	/**
 	 * Yearly reset action missing notice
-	 * 
+	 *
 	 * @return void
 	 */
 	public function yearly_reset_action_missing_notice(): void {
 		if ( ! $this->settings->maybe_schedule_yearly_reset_numbers() ) {
 			return;
 		}
-		
+
 		if ( ! function_exists( 'as_get_scheduled_actions' ) ) {
 			return;
 		}
-		
+
 		$current_date   = new \DateTime();
 		$end_of_year    = new \DateTime( 'last day of December' );
 		$days_remaining = $current_date->diff( $end_of_year )->days;
@@ -483,7 +483,7 @@ class WPO_WCPDF {
 			<?php
 			echo wp_kses_post( ob_get_clean() );
 		}
-		
+
 		// Schedule yearly reset action
 		if ( isset( $_REQUEST['wpo_wcpdf_schedule_yearly_reset_action'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'schedule_yearly_reset_action_nonce' ) ) {
@@ -492,7 +492,7 @@ class WPO_WCPDF {
 				$this->settings->schedule_yearly_reset_numbers();
 				wcpdf_log_error( 'Yearly reset numbering system rescheduled!', 'info' );
 			}
-			
+
 			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
 			exit;
 		}
