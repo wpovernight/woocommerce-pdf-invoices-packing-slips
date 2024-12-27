@@ -85,9 +85,9 @@ class TaxesSettings {
 							echo '<td>' . $postcode . '</td>';
 							echo '<td>' . $city . '</td>';
 							echo '<td>' . $result->tax_rate . '</td>';
-							echo '<td>' . $this->get_scheme_select( 'rate', $result->tax_rate_id, $scheme ) . '</td>';
-							echo '<td>' . $this->get_category_select( 'rate', $result->tax_rate_id, $category ) . '</td>';
-							echo '<td>' . $this->get_reason_select( 'rate', $result->tax_rate_id, $reason ) . '</td>';
+							echo '<td>' . $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme ) . '</td>';
+							echo '<td>' . $this->get_select_for( 'category', 'rate', $result->tax_rate_id, $category ) . '</td>';
+							echo '<td>' . $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason ) . '</td>';
 							echo '</tr>';
 						}
 					} else {
@@ -103,19 +103,43 @@ class TaxesSettings {
 						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : '';
 						$reason   = isset( $this->settings['class'][ $slug ]['reason'] )   ? $this->settings['class'][ $slug ]['reason']   : '';
 					?>
-					<th><?php echo $this->get_scheme_select( 'class', $slug, $scheme ); ?></th>
-					<th><?php echo $this->get_category_select( 'class', $slug, $category ); ?></th>
-					<th><?php echo $this->get_reason_select( 'class', $slug, $reason  ); ?></th>
+					<th><?php echo $this->get_select_for( 'scheme', 'class', $slug, $scheme ); ?></th>
+					<th><?php echo $this->get_select_for( 'category', 'class', $slug, $category ); ?></th>
+					<th><?php echo $this->get_select_for( 'reason', 'class', $slug, $reason ); ?></th>
 				</tr>
 			</tfoot>
 		</table>
 		<?php
 	}
 
-	public function get_scheme_select( $type, $id, $selected ): string {
-		$select = '<select name="wpo_wcpdf_settings_ubl_taxes['.$type.']['.$id.'][scheme]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
-		foreach ( $this->get_available_schemes() as $key => $value ) {
-			$select .= '<option '.selected( $key, $selected, false ).' value="'.$key.'">'.$value.'</option>';
+	/**
+	 * Get select field for tax rate
+	 *
+	 * @param string $for
+	 * @param string $type
+	 * @param string $id
+	 * @param string $selected
+	 *
+	 * @return string
+	 */
+	public function get_select_for( string $for, string $type, string $id, string $selected ): string {
+		switch ( $for ) {
+			case 'scheme':
+				$options = $this->get_available_schemes();
+				break;
+			case 'category':
+				$options = $this->get_available_categories();
+				break;
+			case 'reason':
+				$options = self::get_available_reasons();
+				break;
+			default:
+				$options = array();
+		}
+
+		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][reason]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
+		foreach ( $options as $key => $value ) {
+			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
 		}
 		$select .= '</select>';
 		return $select;
@@ -179,15 +203,6 @@ class TaxesSettings {
 		);
 	}
 
-	public function get_category_select( $type, $id, $selected ): string {
-		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][category]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
-		foreach ( $this->get_available_categories() as $key => $value ) {
-			$select .= '<option '.selected( $key, $selected, false ).' value="' . $key . '">' . $value . '</option>';
-		}
-		$select .= '</select>';
-		return $select;
-	}
-	
 	public function get_available_categories(): array {
 		return array(
 			'AE' => __( 'VAT Reverse Charge', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -200,18 +215,9 @@ class TaxesSettings {
 			'L'  => __( 'Canary Islands general indirect tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'M'  => __( 'Tax for production, services and importation in Ceuta and Melilla', 'woocommerce-pdf-invoices-packing-slips' ),
 			'B'  => __( 'Transferred (VAT), In Italy', 'woocommerce-pdf-invoices-packing-slips' ),
-		);		
+		);
 	}
-	
-	public function get_reason_select( $type, $id, $selected ): string {
-		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][reason]"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
-		foreach ( self::get_available_reasons() as $key => $value ) {
-			$select .= '<option '.selected( $key, $selected, false ).' value="' . $key . '">' . $value . '</option>';
-		}
-		$select .= '</select>';
-		return $select;
-	}
-	
+
 	public static function get_available_reasons(): array {
 		return array(
 			'VATEX-EU-79-C'      => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -257,4 +263,5 @@ class TaxesSettings {
 			'VATEX-FR-CNWVAT'    => __( 'France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 	}
+
 }
