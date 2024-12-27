@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WPO\IPS\Vendor\Sabre\Xml;
 
 use XMLWriter;
+use WPO\IPS\Vendor\Sabre\Xml\Serializer;
 
 /**
  * The XML Writer class.
@@ -101,7 +102,7 @@ class Writer extends \XMLWriter
      */
     public function write($value): void
     {
-    	\WPO\IPS\Vendor\Sabre\Xml\Serializer\standardSerializer($this, $value);
+    	Serializer\standardSerializer($this, $value);
     }
 
     /**
