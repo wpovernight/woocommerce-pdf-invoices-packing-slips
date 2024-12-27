@@ -52,8 +52,8 @@ class InvoiceLineHandler extends UblHandler {
 
 				// Add TaxExemptionReason only if it's not empty
 				if ( ! empty( $taxOrderData['reason'] ) ) {
-					$reasonKey      = $taxOrderData['reason'];
-					$reason         = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
+					$reasonKey     = $taxOrderData['reason'];
+					$reason        = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
 					$taxCategory[] = array(
 						'name'  => 'cbc:TaxExemptionReasonCode',
 						'value' => $reasonKey,
@@ -63,7 +63,7 @@ class InvoiceLineHandler extends UblHandler {
 						'value' => $reason,
 					);
 				}
-				
+
 				// Place the TaxScheme after the TaxExemptionReason
 				$taxCategory[] = array(
 					'name'  => 'cac:TaxScheme',
