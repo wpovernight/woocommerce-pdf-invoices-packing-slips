@@ -81,6 +81,7 @@ abstract class Document {
 				// takes into account possible line item rounding settings as well
 				// we still apply rounding on the total (for non-checkout orders)
 				$order_tax_data[ $tax_data_key ]['total_tax'] = wc_round_tax_total( $tax_item['tax_amount'] ) + wc_round_tax_total( $tax_item['shipping_tax_amount'] );
+				$rate_id = absint( $tax_item['rate_id'] );
 
 				if ( is_callable( array( $tax_item, 'get_rate_percent' ) ) && version_compare( '3.7.0', $this->order->get_version(), '>=' ) ) {
 					$percentage = $tax_item->get_rate_percent();
@@ -89,35 +90,50 @@ abstract class Document {
 				}
 
 				if ( ! is_numeric( $percentage ) ) {
-					$percentage = $this->get_percentage_from_fallback( $tax_data, $tax_item['rate_id'] );
+					$percentage = $this->get_percentage_from_fallback( $tax_data, $rate_id );
 					wc_update_order_item_meta( $tax_item_key, '_wcpdf_rate_percentage', $percentage );
 				}
 
 				$category = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_category', true );
 
 				if ( empty( $category ) ) {
-					$category = $this->get_category_from_fallback( $tax_data, $tax_item['rate_id'] );
+					$category = $this->get_tax_data_from_fallback( 'category', $rate_id );
 					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_category', $category );
 				}
 
 				$scheme = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_scheme', true );
 
 				if ( empty( $scheme ) ) {
-					$scheme = $this->get_scheme_from_fallback( $tax_data, $tax_item['rate_id'] );
+					$scheme = $this->get_tax_data_from_fallback( 'scheme', $rate_id );
 					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_scheme', $scheme );
+				}
+				
+				$reason = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_reason', true );
+
+				if ( empty( $reason ) ) {
+					$reason = $this->get_tax_data_from_fallback( 'reason', $rate_id );
+					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_reason', $reason );
 				}
 			}
 
 			$order_tax_data[ $tax_data_key ]['percentage'] = $percentage;
 			$order_tax_data[ $tax_data_key ]['category']   = $category;
 			$order_tax_data[ $tax_data_key ]['scheme']     = $scheme;
+			$order_tax_data[ $tax_data_key ]['reason']     = $reason;
 			$order_tax_data[ $tax_data_key ]['name']       = ! empty( $tax_item['label'] ) ? $tax_item['label'] : $tax_item['name'];
 		}
 
 		return $order_tax_data;
 	}
 
-	public function get_percentage_from_fallback( $tax_data, $rate_id ) {
+	/**
+	 * Get percentage from fallback
+	 *
+	 * @param array $tax_data
+	 * @param int   $rate_id
+	 * @return float|int
+	 */
+	public function get_percentage_from_fallback( array $tax_data, int $rate_id ) {
 		$percentage = ( 0 != $tax_data['total_ex'] ) ? ( $tax_data['total_tax'] / $tax_data['total_ex'] ) * 100 : 0;
 
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
@@ -140,53 +156,40 @@ abstract class Document {
 
 		return $percentage;
 	}
-
-	public function get_category_from_fallback( $tax_data, $rate_id ) {
-		$category = '';
-
+	
+	/**
+	 * Get tax data from fallback
+	 *
+	 * @param string $key      Can be category, scheme, or reason
+	 * @param int    $rate_id  The tax rate ID
+	 * @return string
+	 */
+	public function get_tax_data_from_fallback( string $key, int $rate_id ): string {
+		$result = '';
+		
+		if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ) ) ) {
+			return $result;
+		}
+	
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
-
+	
 			if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
 				$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
-				$category         = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['category'] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['category'] : '';
+				$result           = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] : '';
 				$tax_rate_class   = $tax_rate->tax_rate_class;
-
+	
 				if ( empty( $tax_rate_class ) ) {
 					$tax_rate_class = 'standard';
 				}
-
-				if ( empty( $category ) ) {
-					$category = isset( $ubl_tax_settings['class'][ $tax_rate_class ]['category'] ) ? $ubl_tax_settings['class'][ $tax_rate_class ]['category'] : '';
+	
+				if ( empty( $result ) ) {
+					$result = isset( $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] ) ? $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] : '';
 				}
 			}
 		}
-
-		return $category;
-	}
-
-	public function get_scheme_from_fallback( $tax_data, $rate_id ) {
-		$scheme = '';
-
-		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
-			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
-
-			if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-				$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
-				$scheme           = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['scheme'] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['scheme'] : '';
-				$tax_rate_class   = $tax_rate->tax_rate_class;
-
-				if ( empty( $tax_rate_class ) ) {
-					$tax_rate_class = 'standard';
-				}
-
-				if ( empty( $scheme ) ) {
-					$scheme = isset( $ubl_tax_settings['class'][ $tax_rate_class ]['scheme'] ) ? $ubl_tax_settings['class'][ $tax_rate_class ]['scheme'] : '';
-				}
-			}
-		}
-
-		return $scheme;
-	}
+	
+		return $result;
+	}	
 
 }
