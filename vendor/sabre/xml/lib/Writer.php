@@ -101,7 +101,7 @@ class Writer extends \XMLWriter
      */
     public function write($value): void
     {
-        Serializer\standardSerializer($this, $value);
+    	\WPO\IPS\Vendor\Sabre\Xml\Serializer\standardSerializer($this, $value);
     }
 
     /**
