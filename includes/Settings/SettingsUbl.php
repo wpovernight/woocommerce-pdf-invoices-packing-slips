@@ -109,7 +109,7 @@ class SettingsUbl {
 				// read tax rate data from db
 				if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 					$tax_rate = \WC_Tax::_get_tax_rate( $tax_rate_id, OBJECT );
-					
+
 					if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
 						// store percentage in tax item meta
 						wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
@@ -133,6 +133,10 @@ class SettingsUbl {
 							$scheme = isset( $ubl_tax_settings['class'][ $tax_rate_class ]['scheme'] ) ? $ubl_tax_settings['class'][ $tax_rate_class ]['scheme'] : '';
 						}
 
+						if ( empty( $reason ) ) {
+							$reason = isset( $ubl_tax_settings['class'][ $tax_rate_class ]['reason'] ) ? $ubl_tax_settings['class'][ $tax_rate_class ]['reason'] : '';
+						}
+
 						if ( ! empty( $category ) ) {
 							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_category', $category );
 						}
@@ -140,7 +144,7 @@ class SettingsUbl {
 						if ( ! empty( $scheme ) ) {
 							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_scheme', $scheme );
 						}
-						
+
 						if ( ! empty( $reason ) ) {
 							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_reason', $reason );
 						}
