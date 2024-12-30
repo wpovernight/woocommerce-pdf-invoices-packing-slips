@@ -23,7 +23,7 @@ class SettingsDebug {
 
 	public function __construct() {
 		// Show a notice if the plugin requirements are not met.
-		add_action( 'admin_init', array( $this, 'display_server_requirement_notice' ) );
+		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
@@ -955,6 +955,11 @@ class SettingsDebug {
 		$apc           = extension_loaded( 'apc' );
 		$zop           = extension_loaded( 'Zend OPcache' );
 		$op            = extension_loaded( 'opcache' );
+		$dom           = extension_loaded( 'DOM' );
+		$mbstring      = extension_loaded( 'mbstring' );
+		$gd            = extension_loaded( 'gd' );
+		$zlib          = extension_loaded( 'zlib' );
+		$fileinfo      = extension_loaded( 'fileinfo' );
 
 		$server_configs = array(
 			'PHP version' => array(
@@ -965,18 +970,18 @@ class SettingsDebug {
 			'DOMDocument extension' => array(
 				'required' => true,
 				'value'    => phpversion( 'DOM' ),
-				'result'   => class_exists( 'DOMDocument' ),
+				'result'   => $dom,
 			),
 			'MBString extension' => array(
 				'required' => true,
 				'value'    => phpversion( 'mbstring' ),
-				'result'   => function_exists( 'mb_send_mail' ),
+				'result'   => $mbstring,
 				'fallback' => __( 'Recommended, will use fallback functions', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'GD' => array(
 				'required' => true,
 				'value'    => phpversion( 'gd' ),
-				'result'   => function_exists( 'imagecreate' ),
+				'result'   => $gd,
 				'fallback' => __( 'Required if you have images in your documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'WebP Support' => array(
@@ -988,7 +993,7 @@ class SettingsDebug {
 			'Zlib' => array(
 				'required' => __( 'To compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'    => phpversion( 'zlib' ),
-				'result'   => function_exists( 'gzcompress' ),
+				'result'   => $zlib,
 				'fallback' => __( 'Recommended to compress PDF documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'opcache' => array(
@@ -1011,7 +1016,12 @@ class SettingsDebug {
 			),
 			'WP Memory Limit' => array(
 				/* translators: <a> tags */
-				'required' => sprintf( __( 'Recommended: 128MB (more for plugin-heavy setups<br/>See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">', '</a>' ),
+				'required' => __( 'Recommended: 128MB (especially for plugin-heavy setups)', 'woocommerce-pdf-invoices-packing-slips' ) . '<br/>' . sprintf(
+						/* translators: 1: opening anchor tag, 2: closing anchor tag */
+						__( 'See: %1$sIncreasing the WordPress Memory Limit%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://docs.woocommerce.com/document/increasing-the-wordpress-memory-limit/" target="_blank">',
+						'</a>'
+					),
 				'value'    => sprintf( 'WordPress: %s, PHP: %s', WP_MEMORY_LIMIT, $php_mem_limit ),
 				'result'   => $memory_limit > 67108864,
 			),
@@ -1024,7 +1034,7 @@ class SettingsDebug {
 			'fileinfo' => array (
 				'required' => __( 'Necessary to verify the MIME type of local images.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'	   => null,
-				'result'   => extension_loaded( 'fileinfo' ),
+				'result'   => $fileinfo,
 				'fallback' => __( 'fileinfo disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'base64_decode'	=> array (
@@ -1070,7 +1080,7 @@ class SettingsDebug {
 	 *
 	 * @return void
 	 */
-	public function display_server_requirement_notice(): void {
+	public function handle_server_requirement_notice(): void {
 		// Return if the notice has been dismissed.
 		if ( get_option( 'wpo_wcpdf_dismiss_requirements_notice', false ) ) {
 			return;
@@ -1093,7 +1103,7 @@ class SettingsDebug {
 		$server_configs          = $this->get_server_config();
 
 		foreach ( $server_configs as $config_name => $config ) {
-			if ( in_array( $config_name, array( 'opcache', 'GMagick or IMagick' ), true ) ) {
+			if ( in_array( $config_name, array( 'opcache', 'GMagick or IMagick', 'WP Memory Limit' ), true ) ) {
 				continue;
 			}
 
@@ -1109,6 +1119,15 @@ class SettingsDebug {
 		}
 
 		// Display the notice.
+		add_action( 'admin_notices', array( $this, 'display_server_requirement_notice' ) );
+	}
+
+	/**
+	 * Display a notice informing the user that the server requirements are not met.
+	 *
+	 * @return void
+	 */
+	public function display_server_requirement_notice(): void {
 		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
 		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
 		$notice_message  = sprintf(

@@ -3,7 +3,7 @@
 namespace WPO\IPS\UBL\Handlers\Invoice;
 
 use WPO\IPS\UBL\Handlers\UblHandler;
-use Automattic\WooCommerce\Utilities\NumberUtil;
+use WPO\IPS\UBL\Settings\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class InvoiceLineHandler extends UblHandler {
 
 	public function handle( $data, $options = array() ) {
-		$items = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+		$items      = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+		$taxReasons = TaxesSettings::get_available_reasons();
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
@@ -23,11 +24,56 @@ class InvoiceLineHandler extends UblHandler {
 			$line_tax_data    = $item[ $taxDataContainer ];
 
 			foreach ( $line_tax_data[ $taxDataKey ] as $tax_id => $tax ) {
+				if ( empty( $tax ) ) {
+					$tax = 0;
+				}
+
 				if ( ! is_numeric( $tax ) ) {
 					continue;
 				}
 
-				$taxOrderData  = $this->document->order_tax_data[ $tax_id ];
+				$taxOrderData = $this->document->order_tax_data[ $tax_id ];
+
+				// Build the TaxCategory array
+				$taxCategory = array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => strtoupper( $taxOrderData['category'] ),
+					),
+					array(
+						'name'  => 'cbc:Name',
+						'value' => $taxOrderData['name'],
+					),
+					array(
+						'name'  => 'cbc:Percent',
+						'value' => round( $taxOrderData['percentage'], 2 ),
+					),
+				);
+
+				// Add TaxExemptionReason only if it's not empty
+				if ( ! empty( $taxOrderData['reason'] ) ) {
+					$reasonKey     = $taxOrderData['reason'];
+					$reason        = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
+					$taxCategory[] = array(
+						'name'  => 'cbc:TaxExemptionReasonCode',
+						'value' => $reasonKey,
+					);
+					$taxCategory[] = array(
+						'name'  => 'cbc:TaxExemptionReason',
+						'value' => $reason,
+					);
+				}
+
+				// Place the TaxScheme after the TaxExemptionReason
+				$taxCategory[] = array(
+					'name'  => 'cac:TaxScheme',
+					'value' => array(
+						array(
+							'name'  => 'cbc:ID',
+							'value' => strtoupper( $taxOrderData['scheme'] ),
+						),
+					),
+				);
 
 				$taxSubtotal[] = array(
 					'name'  => 'cac:TaxSubtotal',
@@ -48,29 +94,7 @@ class InvoiceLineHandler extends UblHandler {
 						),
 						array(
 							'name'  => 'cac:TaxCategory',
-							'value' => array(
-								array(
-									'name'  => 'cbc:ID',
-									'value' => strtoupper( $taxOrderData['category'] ),
-								),
-								array(
-									'name'  => 'cbc:Name',
-									'value' => $taxOrderData['name'],
-								),
-								array(
-									'name'  => 'cbc:Percent',
-									'value' => round( $taxOrderData['percentage'], 2 ),
-								),
-								array(
-									'name'  => 'cac:TaxScheme',
-									'value' => array(
-										array(
-											'name'  => 'cbc:ID',
-											'value' => strtoupper( $taxOrderData['scheme'] ),
-										),
-									),
-								),
-							),
+							'value' => $taxCategory,
 						),
 					),
 				);
@@ -89,7 +113,7 @@ class InvoiceLineHandler extends UblHandler {
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => NumberUtil::round( $item->get_total(), wc_get_price_decimals() ),
+						'value'      => round( $item->get_total(), 2 ),
 						'attributes' => array(
 							'currencyID' => $this->document->order->get_currency(),
 						),
@@ -118,7 +142,6 @@ class InvoiceLineHandler extends UblHandler {
 					),
 				),
 			);
-
 
 			$data[] = apply_filters( 'wpo_wc_ubl_handle_InvoiceLine', $invoiceLine, $data, $options, $item, $this );
 
