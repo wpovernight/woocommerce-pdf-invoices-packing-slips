@@ -36,6 +36,7 @@
 			<td>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_email]" value="">
 				<input id="display-email" type="checkbox" <?php echo ! empty( $current_settings['display_email'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_email]" value="1">
+				<label for="display-email" class="slider"></label>
 			</td>
 		</tr>
 		<tr>
@@ -45,6 +46,7 @@
 			<td>
 				<input type="hidden" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_phone]" value="">
 				<input id="display-phone" type="checkbox" <?php echo ! empty( $current_settings['display_phone'] ) ? 'checked' : ''; ?> name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_phone]" value="1">
+				<label for="display-phone" class="slider"></label>
 			</td>
 		</tr>
 		<tr>
