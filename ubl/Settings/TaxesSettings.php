@@ -146,7 +146,7 @@ class TaxesSettings {
 	}
 
 	public function get_available_schemes(): array {
-		return array(
+		return apply_filters( 'wpo_wcpdf_ubl_tax_schemes', array(
 			'vat' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'gst' => __( 'Goods and services tax (GST)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'aaa' => __( 'Petroleum tax', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -200,11 +200,11 @@ class TaxesSettings {
 			'tox' => __( 'Turnover tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'tta' => __( 'Tonnage taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 			'vad' => __( 'Valuation deposit', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
+		), $this );
 	}
 
 	public function get_available_categories(): array {
-		return array(
+		return apply_filters( 'wpo_wcpdf_ubl_tax_categories', array(
 			'AE' => __( 'VAT Reverse Charge', 'woocommerce-pdf-invoices-packing-slips' ),
 			'E'  => __( 'Exempt from Tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'S'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -215,11 +215,11 @@ class TaxesSettings {
 			'L'  => __( 'Canary Islands general indirect tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'M'  => __( 'Tax for production, services and importation in Ceuta and Melilla', 'woocommerce-pdf-invoices-packing-slips' ),
 			'B'  => __( 'Transferred (VAT), In Italy', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
+		), $this );
 	}
 
 	public static function get_available_reasons(): array {
-		return array(
+		return apply_filters( 'wpo_wcpdf_ubl_tax_reasons', array(
 			'VATEX-EU-79-C'      => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-132'       => __( 'Exempt based on article 132 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-132-1A'    => __( 'Exempt based on article 132, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -261,7 +261,7 @@ class TaxesSettings {
 			'VATEX-EU-I'         => __( 'Intra-Community acquisition of works of art', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-FR-FRANCHISE' => __( 'France domestic VAT franchise in base', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-FR-CNWVAT'    => __( 'France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
+		), $this );
 	}
 
 }
