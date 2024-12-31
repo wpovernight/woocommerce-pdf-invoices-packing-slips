@@ -52,7 +52,7 @@ class TaxesSettings {
 					<th><?php _e( 'City', 'woocommerce' ); ?></th>
 					<th width="8%"><?php _e( 'Rate&nbsp;%', 'woocommerce' ); ?></th>
 					<th width="20%"><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th width="20%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL5305/" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th width="20%"><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
 					<th width="20%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php _e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
 				</tr>
 			</thead>
@@ -205,16 +205,27 @@ class TaxesSettings {
 
 	public function get_available_categories(): array {
 		return apply_filters( 'wpo_wcpdf_ubl_tax_categories', array(
+			'A'  => __( 'Mixed tax rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'AA' => __( 'Lower rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'AB' => __( 'Exempt for resale', 'woocommerce-pdf-invoices-packing-slips' ),
+			'AC' => __( 'Value Added Tax (VAT) not now due for payment', 'woocommerce-pdf-invoices-packing-slips' ),
+			'AD' => __( 'Value Added Tax (VAT) due from a previous invoice', 'woocommerce-pdf-invoices-packing-slips' ),
 			'AE' => __( 'VAT Reverse Charge', 'woocommerce-pdf-invoices-packing-slips' ),
-			'E'  => __( 'Exempt from Tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'S'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
-			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
-			'G'  => __( 'Free export item, VAT not charged', 'woocommerce-pdf-invoices-packing-slips' ),
-			'O'  => __( 'Services outside scope of tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'B'  => __( 'Transferred (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'C'  => __( 'Duty paid by supplier', 'woocommerce-pdf-invoices-packing-slips' ),
+			'D'  => __( 'Value Added Tax (VAT) margin scheme - travel agents', 'woocommerce-pdf-invoices-packing-slips' ),
+			'E'  => __( 'Exempt from tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'F'  => __( 'Value Added Tax (VAT) margin scheme - second-hand goods', 'woocommerce-pdf-invoices-packing-slips' ),
+			'G'  => __( 'Free export item, tax not charged', 'woocommerce-pdf-invoices-packing-slips' ),
+			'H'  => __( 'Higher rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'I'  => __( 'Value Added Tax (VAT) margin scheme - works of art', 'woocommerce-pdf-invoices-packing-slips' ),
+			'J'  => __( 'Value Added Tax (VAT) margin scheme - collector’s items and antiques', 'woocommerce-pdf-invoices-packing-slips' ),
 			'K'  => __( 'VAT exempt for EEA intra-community supply of goods and services', 'woocommerce-pdf-invoices-packing-slips' ),
 			'L'  => __( 'Canary Islands general indirect tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'M'  => __( 'Tax for production, services and importation in Ceuta and Melilla', 'woocommerce-pdf-invoices-packing-slips' ),
-			'B'  => __( 'Transferred (VAT), In Italy', 'woocommerce-pdf-invoices-packing-slips' ),
+			'O'  => __( 'Services outside scope of tax', 'woocommerce-pdf-invoices-packing-slips' ),
+			'S'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
+			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
 	}
 
