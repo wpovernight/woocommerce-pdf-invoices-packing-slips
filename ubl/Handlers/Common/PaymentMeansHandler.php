@@ -21,21 +21,21 @@ class PaymentMeansHandler extends UblHandler {
 		return $data;
 	}
 
-	private function get_payment_means_code( $payment_method ) {
+	private function get_payment_means_code( string $payment_method ): string {
 		// Map WooCommerce payment methods to Payment Means Code
 		// All available codes: https://docs.peppol.eu/poacc/billing/3.0/2024-Q2/codelist/UNCL4461/
-		$mapping = array(
+		$mapping = apply_filters( 'wpo_wc_ubl_payment_means_code_mapping', array(
 			'cod'    => '10',
-			'bacs'   => '31',
+			'bacs'   => '30',
 			'cheque' => '20',
 			'paypal' => 'ZZZ',
 			'stripe' => 'ZZZ',
-		);
+		), $this );
 
 		return isset( $mapping[ $payment_method ] ) ? $mapping[ $payment_method ] : '97'; // Default to 'Other'
 	}
 
-	public function get_payment_means() {
+	public function get_payment_means(): array {
 		$payment_method    = $this->document->order->get_payment_method();
 		$payment_type_code = $this->get_payment_means_code( $payment_method );
 
@@ -62,7 +62,7 @@ class PaymentMeansHandler extends UblHandler {
 							),
 							array(
 								'name'  => 'cbc:Name',
-								'value' => $default_account['account_name'] ?? get_bloginfo( 'name' ),
+								'value' => $default_account['account_name'] ?? $this->document->order_document->get_shop_name(),
 							),
 						),
 					);
