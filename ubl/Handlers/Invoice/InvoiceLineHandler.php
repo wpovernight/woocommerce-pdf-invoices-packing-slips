@@ -140,6 +140,18 @@ class InvoiceLineHandler extends UblHandler {
 							),
 						),
 					),
+					array(
+						'name'  => 'cac:Price',
+						'value' => array(
+							array(
+								'name'       => 'cbc:PriceAmount',
+								'value'      => round( $this->get_item_unit_price( $item ), 2 ),
+								'attributes' => array(
+									'currencyID' => $this->document->order->get_currency(),
+								),
+							),
+						),
+					),
 				),
 			);
 
@@ -150,6 +162,22 @@ class InvoiceLineHandler extends UblHandler {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Get the unit price of an item
+	 *
+	 * @param WC_Order_Item $item
+	 * @return int|float
+	 */
+	private function get_item_unit_price( $item ) {
+		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+			return $item->get_subtotal() / $item->get_quantity();
+		} elseif ( is_a( $item, 'WC_Order_Item_Shipping' ) || is_a( $item, 'WC_Order_Item_Fee' ) ) {
+			return $item->get_total();
+		} else {
+			return 0;
+		}
 	}
 
 }
