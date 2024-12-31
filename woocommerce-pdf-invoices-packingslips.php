@@ -145,6 +145,7 @@ class WPO_WCPDF {
 
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
+		include_once $this->plugin_path() . '/wpo-ips-ubl-functions.php';
 
 		// Third party compatibility
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
