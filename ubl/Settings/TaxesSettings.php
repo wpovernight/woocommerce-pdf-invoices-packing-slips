@@ -200,7 +200,7 @@ class TaxesSettings {
 			'tox' => __( 'Turnover tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'tta' => __( 'Tonnage taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 			'vad' => __( 'Valuation deposit', 'woocommerce-pdf-invoices-packing-slips' ),
-		), $this );
+		) );
 	}
 
 	public function get_available_categories(): array {
@@ -215,7 +215,7 @@ class TaxesSettings {
 			'L'  => __( 'Canary Islands general indirect tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'M'  => __( 'Tax for production, services and importation in Ceuta and Melilla', 'woocommerce-pdf-invoices-packing-slips' ),
 			'B'  => __( 'Transferred (VAT), In Italy', 'woocommerce-pdf-invoices-packing-slips' ),
-		), $this );
+		) );
 	}
 
 	public static function get_available_reasons(): array {
@@ -261,7 +261,7 @@ class TaxesSettings {
 			'VATEX-EU-I'         => __( 'Intra-Community acquisition of works of art', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-FR-FRANCHISE' => __( 'France domestic VAT franchise in base', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-FR-CNWVAT'    => __( 'France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount', 'woocommerce-pdf-invoices-packing-slips' ),
-		), $this );
+		) );
 	}
 
 }
