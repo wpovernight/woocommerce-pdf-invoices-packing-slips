@@ -219,7 +219,7 @@ class TaxesSettings {
 			'G'  => __( 'Free export item, tax not charged', 'woocommerce-pdf-invoices-packing-slips' ),
 			'H'  => __( 'Higher rate', 'woocommerce-pdf-invoices-packing-slips' ),
 			'I'  => __( 'Value Added Tax (VAT) margin scheme - works of art', 'woocommerce-pdf-invoices-packing-slips' ),
-			'J'  => __( 'Value Added Tax (VAT) margin scheme - collector’s items and antiques', 'woocommerce-pdf-invoices-packing-slips' ),
+			'J'  => __( 'Value Added Tax (VAT) margin scheme - collector\'s items and antiques', 'woocommerce-pdf-invoices-packing-slips' ),
 			'K'  => __( 'VAT exempt for EEA intra-community supply of goods and services', 'woocommerce-pdf-invoices-packing-slips' ),
 			'L'  => __( 'Canary Islands general indirect tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'M'  => __( 'Tax for production, services and importation in Ceuta and Melilla', 'woocommerce-pdf-invoices-packing-slips' ),
