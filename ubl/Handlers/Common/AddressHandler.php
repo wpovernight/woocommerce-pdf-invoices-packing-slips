@@ -43,10 +43,10 @@ class AddressHandler extends UblHandler {
 	}
 
 	public function return_supplier_party_details() {
-		$company    = ! empty( $this->document->order_document ) ? wcpdf_ubl_get_shop_name( $this->document->order_document ): '';
-		$address    = ! empty( $this->document->order_document ) ? wcpdf_ubl_get_shop_address( $this->document->order_document ) : get_option( 'woocommerce_store_address' );
-		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
-		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_coc_number() : '';
+		$company    = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_name() ): '';
+		$address    = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_address() ) : get_option( 'woocommerce_store_address' );
+		$vat_number = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_vat_number() ) : '';
+		$coc_number = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_coc_number() ) : '';
 
 		$supplierPartyDetails = array(
 			array(

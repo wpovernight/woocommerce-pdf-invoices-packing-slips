@@ -17,11 +17,11 @@ class AdditionalDocumentReferenceHandler extends UblHandler {
 				'value' => array(
 					array(
 						'name'  => 'cbc:ID',
-						'value' => ! empty( $this->document->order_document->get_number() ) ? $this->document->order_document->get_number()->get_formatted() : '',
+						'value' => ! empty( $this->document->order_document->get_number() ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_number()->get_formatted() ) : '',
 					),
 					array(
 						'name'  => 'cbc:DocumentType',
-						'value' => ! empty( $this->document->order_document->get_title() ) ? 'PDF '.$this->document->order_document->get_title() : '',
+						'value' => ! empty( $this->document->order_document->get_title() ) ? wpo_ips_ubl_sanitize_string( 'PDF ' . $this->document->order_document->get_title() ) : '',
 					),
 					array(
 						'name'  => 'cac:Attachment',
@@ -30,7 +30,7 @@ class AdditionalDocumentReferenceHandler extends UblHandler {
 							'value'      => ! empty( $this->document->order_document->get_pdf() ) ? base64_encode( $this->document->order_document->get_pdf() ) : '',
 							'attributes' => array(
 								'mimeCode' => 'application/pdf',
-								'filename' => ! empty( $this->document->order_document->get_filename() ) ? $this->document->order_document->get_filename() : '',
+								'filename' => ! empty( $this->document->order_document->get_filename() ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_filename() ) : '',
 							),
 						),
 					),
