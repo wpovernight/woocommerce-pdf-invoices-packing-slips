@@ -63,7 +63,7 @@ class UblDocument extends Document {
 				'handler' => \WPO\IPS\UBL\Handlers\Common\DeliveryHandler::class,
 			),
 			'paymentmeans' => array(
-				'enabled' => false,
+				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Common\PaymentMeansHandler::class,
 			),
 			'paymentterms' => array(
