@@ -13,7 +13,7 @@ class IdHandler extends UblHandler {
 	public function handle( $data, $options = array() ) {
 		$ID = array(
 			'name'  => 'cbc:ID',
-			'value' => wpo_ips_ubl_sanitize_string( $this->document->order_document->get_number()->get_formatted() ),
+			'value' => $this->document->order_document->get_number()->get_formatted(),
 		);
 
 		$data[] = apply_filters( 'wpo_wc_ubl_handle_ID', $ID, $data, $options, $this );

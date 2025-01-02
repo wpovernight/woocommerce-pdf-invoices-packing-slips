@@ -45,8 +45,8 @@ class AddressHandler extends UblHandler {
 	public function return_supplier_party_details() {
 		$company    = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_name() ): '';
 		$address    = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_address() ) : get_option( 'woocommerce_store_address' );
-		$vat_number = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_vat_number() ) : '';
-		$coc_number = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_coc_number() ) : '';
+		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
+		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_coc_number() : '';
 
 		$supplierPartyDetails = array(
 			array(
@@ -208,11 +208,11 @@ class AddressHandler extends UblHandler {
 							'value' => array(
 								array(
 									'name'  => 'cbc:StreetName',
-									'value' => $this->document->order->get_billing_address_1(),
+									'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() ),
 								),
 								array(
 									'name'  => 'cbc:CityName',
-									'value' => $this->document->order->get_billing_city(),
+									'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_city() ),
 								),
 								array(
 									'name'  => 'cbc:PostalZone',
@@ -222,7 +222,7 @@ class AddressHandler extends UblHandler {
 									'name'  => 'cac:AddressLine',
 									'value' => array(
 										'name'  => 'cbc:Line',
-										'value' => $this->document->order->get_billing_address_1() . '<br/>' . $this->document->order->get_billing_address_2(),
+										'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() . ' ' . $this->document->order->get_billing_address_2() ),
 									),
 								),
 								array(
