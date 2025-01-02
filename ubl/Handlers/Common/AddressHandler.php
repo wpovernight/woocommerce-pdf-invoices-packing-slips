@@ -43,8 +43,8 @@ class AddressHandler extends UblHandler {
 	}
 
 	public function return_supplier_party_details() {
-		$company    = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_name() ): '';
-		$address    = ! empty( $this->document->order_document ) ? wpo_ips_ubl_sanitize_string( $this->document->order_document->get_shop_address() ) : get_option( 'woocommerce_store_address' );
+		$company    = wpo_ips_ubl_sanitize_string( ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_name() : '' );
+		$address    = wpo_ips_ubl_sanitize_string( ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_address() : get_option( 'woocommerce_store_address' ) );
 		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
 		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_coc_number() : '';
 
@@ -61,7 +61,7 @@ class AddressHandler extends UblHandler {
 				'value' => array(
 					array(
 						'name'  => 'cbc:StreetName',
-						'value' => get_option( 'woocommerce_store_address' ),
+						'value' => wpo_ips_ubl_sanitize_string( get_option( 'woocommerce_store_address' ) ),
 					),
 					array(
 						'name'  => 'cbc:CityName',
@@ -200,7 +200,7 @@ class AddressHandler extends UblHandler {
 							'name'  => 'cac:PartyName',
 							'value' => array(
 								'name'  => 'cbc:Name',
-								'value' => $customerPartyName,
+								'value' => wpo_ips_ubl_sanitize_string( $customerPartyName ),
 							),
 						),
 						array(
@@ -265,7 +265,7 @@ class AddressHandler extends UblHandler {
 							'value' => array(
 								array(
 									'name'  => 'cbc:Name',
-									'value' => $customerPartyContactName,
+									'value' => wpo_ips_ubl_sanitize_string( $customerPartyContactName ),
 								),
 								array(
 									'name'  => 'cbc:ElectronicMail',
