@@ -43,8 +43,8 @@ class AddressHandler extends UblHandler {
 	}
 
 	public function return_supplier_party_details() {
-		$company    = wpo_ips_ubl_sanitize_string( ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_name() : '' );
-		$address    = wpo_ips_ubl_sanitize_string( ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_address() : get_option( 'woocommerce_store_address' ) );
+		$company    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_name()       : '';
+		$address    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_address()    : get_option( 'woocommerce_store_address' );
 		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
 		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_coc_number() : '';
 
@@ -53,7 +53,7 @@ class AddressHandler extends UblHandler {
 				'name'  => 'cac:PartyName',
 				'value' => array(
 					'name'  => 'cbc:Name',
-					'value' => $company,
+					'value' => wpo_ips_ubl_sanitize_string( $company ),
 				),
 			),
 			array(
@@ -65,7 +65,7 @@ class AddressHandler extends UblHandler {
 					),
 					array(
 						'name'  => 'cbc:CityName',
-						'value' => get_option( 'woocommerce_store_city' ),
+						'value' => wpo_ips_ubl_sanitize_string( get_option( 'woocommerce_store_city' ) ),
 					),
 					array(
 						'name'  => 'cbc:PostalZone',
@@ -75,7 +75,7 @@ class AddressHandler extends UblHandler {
 						'name'  => 'cac:AddressLine',
 						'value' => array(
 							'name'  => 'cbc:Line',
-							'value' => $address,
+							'value' => wpo_ips_ubl_sanitize_string( $address ),
 						),
 					),
 					array(
@@ -124,7 +124,7 @@ class AddressHandler extends UblHandler {
 				'value' => array(
 					array(
 						'name'  => 'cbc:RegistrationName',
-						'value' => $company,
+						'value' => wpo_ips_ubl_sanitize_string( $company ),
 					),
 					array(
 						'name'       => 'cbc:CompanyID',
