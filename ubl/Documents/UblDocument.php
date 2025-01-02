@@ -36,10 +36,6 @@ class UblDocument extends Document {
 				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Common\DocumentCurrencyCodeHandler::class,
 			),
-			'buyerreference' => array(
-				'enabled' => false,
-				'handler' => \WPO\IPS\UBL\Handlers\Common\BuyerReferenceHandler::class,
-			),
 			'orderreference' => array(
 				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Common\OrderReferenceHandler::class,
