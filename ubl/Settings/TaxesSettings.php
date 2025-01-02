@@ -79,6 +79,8 @@ class TaxesSettings {
 								}
 							}
 							
+							$country  = empty( $result->tax_rate_country ) ? '*' : $result->tax_rate_country;
+							$state    = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
 							$postcode = empty( $postcode ) ? '*' : implode( '; ', $postcode );
 							$city     = empty( $city ) ? '*' : implode( '; ', $city );
 							$scheme   = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : '';
@@ -86,8 +88,8 @@ class TaxesSettings {
 							$reason   = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : '';
 
 							echo '<tr>';
-							echo '<td>' . $result->tax_rate_country . '</td>';
-							echo '<td>' . $result->tax_rate_state . '</td>';
+							echo '<td>' . $country . '</td>';
+							echo '<td>' . $state . '</td>';
 							echo '<td>' . $postcode . '</td>';
 							echo '<td>' . $city . '</td>';
 							echo '<td>' . $result->tax_rate . '</td>';
