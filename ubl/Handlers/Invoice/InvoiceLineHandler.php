@@ -136,7 +136,7 @@ class InvoiceLineHandler extends UblHandler {
 						'value' => array(
 							array(
 								'name'  => 'cbc:Name',
-								'value' => $item->get_name(),
+								'value' => wpo_ips_ubl_sanitize_string( $item->get_name() ),
 							),
 						),
 					),
