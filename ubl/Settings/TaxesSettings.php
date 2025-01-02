@@ -61,27 +61,35 @@ class TaxesSettings {
 					if ( ! empty( $results ) ) {
 						foreach ( $results as $result ) {
 							$locationResults = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;", $result->tax_rate_id ) );
-							$postcode = $city = '';
-
+							$postcode        = array();
+							$city            = array();
+							
 							foreach ( $locationResults as $locationResult ) {
-								if ( 'postcode' === $locationResult->location_type ) {
-									$postcode = $locationResult->location_code;
+								if ( ! isset( $locationResult->location_type ) ) {
 									continue;
 								}
-
-								if ( 'city' === $locationResult->location_type ) {
-									$city = $locationResult->location_code;
-									continue;
+								
+								switch ( $locationResult->location_type ) {
+									case 'postcode':
+										$postcode[] = $locationResult->location_code;
+										break;
+									case 'city':
+										$city[] = $locationResult->location_code;
+										break;
 								}
 							}
-
+							
+							$country  = empty( $result->tax_rate_country ) ? '*' : $result->tax_rate_country;
+							$state    = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
+							$postcode = empty( $postcode ) ? '*' : implode( '; ', $postcode );
+							$city     = empty( $city ) ? '*' : implode( '; ', $city );
 							$scheme   = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : '';
 							$category = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : '';
 							$reason   = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : '';
 
 							echo '<tr>';
-							echo '<td>' . $result->tax_rate_country . '</td>';
-							echo '<td>' . $result->tax_rate_state . '</td>';
+							echo '<td>' . $country . '</td>';
+							echo '<td>' . $state . '</td>';
 							echo '<td>' . $postcode . '</td>';
 							echo '<td>' . $city . '</td>';
 							echo '<td>' . $result->tax_rate . '</td>';
