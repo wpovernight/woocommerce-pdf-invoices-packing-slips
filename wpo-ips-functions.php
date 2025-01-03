@@ -1004,23 +1004,26 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	
 	$translation        = '';
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
-
+	
 	// Check for multilingual support class
 	if ( class_exists( $multilingual_class ) && method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 	
+	// If the translate() function doesn't exist, return whatever we have
 	if ( ! function_exists( 'translate' ) ) {
-		return $string;
+		return $translation ?: $string;
 	}
-
-	// Fallback to translate()
-	$translation = ( $translation !== $string ) ? translate( $string, $textdomain ) : $string;
-
-	// Log missing translations for debugging
+	
+	// If multilingual didn't change the string, fall back to native translate()
+	if ( $translation === $string ) {
+		$translation = translate( $string, $textdomain );
+	}
+	
+	// Log missing translations for debugging if it's still untranslated
 	if ( $translation === $string && isset( WPO_WCPDF()->settings->debug_settings['translation_logs'] ) ) {
 		wcpdf_log_error( "Missing translation for: {$string} in textdomain: {$textdomain}", 'warning' );
 	}
 	
-	return $translation;
+	return $translation ?: $string;
 }
