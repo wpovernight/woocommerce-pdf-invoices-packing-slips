@@ -998,31 +998,28 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
  * @return string
  */
 function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
+	$log_message        = "Missing translation for: {$string} in textdomain: {$textdomain}";
+	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
+	$translation        = '';
+	
 	if ( empty( $string ) ) {
+		wcpdf_log_error( $log_message, 'warning' );
 		return $string;
 	}
-	
-	$translation        = '';
-	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	
 	// Check for multilingual support class
 	if ( class_exists( $multilingual_class ) && method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 	
-	// If the translate() function doesn't exist, return whatever we have
-	if ( ! function_exists( 'translate' ) ) {
-		return $translation ?: $string;
-	}
-	
 	// If multilingual didn't change the string, fall back to native translate()
-	if ( $translation === $string ) {
+	if ( $translation === $string && function_exists( 'translate' ) ) {
 		$translation = translate( $string, $textdomain );
 	}
 	
 	// Log missing translations for debugging if it's still untranslated
 	if ( $translation === $string && isset( WPO_WCPDF()->settings->debug_settings['translation_logs'] ) ) {
-		wcpdf_log_error( "Missing translation for: {$string} in textdomain: {$textdomain}", 'warning' );
+		wcpdf_log_error( $log_message, 'warning' );
 	}
 	
 	return $translation ?: $string;
