@@ -998,7 +998,7 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
  * @return string
  */
 function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
-	$log_enabled		= isset( WPO_WCPDF()->settings->debug_settings['translation_logs'] );
+	$log_enabled		= isset( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
 	$log_message        = "Missing translation for: {$string} in textdomain: {$textdomain}";
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = '';

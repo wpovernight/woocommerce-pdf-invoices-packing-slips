@@ -876,6 +876,18 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'log_missing_translations',
+				'title'    => __( 'Log missing translations', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'log_missing_translations',
+					'description' => __( 'Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),			
+			array(
+				'type'     => 'setting',
 				'id'       => 'disable_preview',
 				'title'    => __( 'Disable document preview', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
@@ -896,18 +908,6 @@ class SettingsDebug {
 					'option_name' => $option_name,
 					'id'          => 'semaphore_logs',
 					'description' => __( 'Our plugin uses a semaphore class that prevents race conditions in multiple places in the code. Enable this setting only if you are having issues with document numbers, yearly reset or documents being assigned to the wrong order.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'translation_logs',
-				'title'    => __( 'Enable translation logs', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'translation_logs',
-					'description' => __( 'Our plugin attempts to translate dynamic strings automatically. If a translation cannot be found, it logs the unregistered string for your reference.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
