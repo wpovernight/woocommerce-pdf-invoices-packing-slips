@@ -114,6 +114,8 @@ abstract class Document {
 					if ( $use_historical_settings ) {
 						wc_update_order_item_meta( $tax_item_key, $meta_key, $value );
 					}
+					
+					${$key} = $value;
 				}
 			}
 
