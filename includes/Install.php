@@ -532,13 +532,13 @@ class Install {
 			}
 		}
 		
-		// 3.9.5-beta-4: migrate UBL tax schemes
+		// 3.9.5-beta-4: migrate UBL tax schemes/categories
 		if ( version_compare( $installed_version, '3.9.5-beta-4', '<' ) ) {
 			$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 
 			if ( ! empty( $ubl_tax_settings ) ) {
 				array_walk_recursive( $ubl_tax_settings, function ( &$value, $key ) {
-					if ( 'scheme' === $key && ! empty( $value ) ) {
+					if ( in_array( $key, array( 'scheme', 'category' ) ) && ! empty( $value ) ) {
 						$value = strtoupper( $value );
 					}
 				} );
