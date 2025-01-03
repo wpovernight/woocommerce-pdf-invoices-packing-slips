@@ -29,6 +29,7 @@ abstract class Document {
 
 	public function set_order_document( OrderDocument $order_document ) {
 		$this->order_document = $order_document;
+		$this->set_order( $order_document->order );
 	}
 
 	abstract public function get_root_element();
@@ -69,6 +70,8 @@ abstract class Document {
 		if ( empty( $tax_items ) ) {
 			return $order_tax_data;
 		}
+		
+		$use_historical_settings = $this->order_document->use_historical_settings();
 
 		// Loop through all the tax items...
 		foreach ( $order_tax_data as $tax_data_key => $tax_data ) {
@@ -81,38 +84,36 @@ abstract class Document {
 				// takes into account possible line item rounding settings as well
 				// we still apply rounding on the total (for non-checkout orders)
 				$order_tax_data[ $tax_data_key ]['total_tax'] = wc_round_tax_total( $tax_item['tax_amount'] ) + wc_round_tax_total( $tax_item['shipping_tax_amount'] );
-				$rate_id = absint( $tax_item['rate_id'] );
 
 				if ( is_callable( array( $tax_item, 'get_rate_percent' ) ) && version_compare( '3.7.0', $this->order->get_version(), '>=' ) ) {
 					$percentage = $tax_item->get_rate_percent();
 				} else {
 					$percentage = wc_get_order_item_meta( $tax_item_key, '_wcpdf_rate_percentage', true );
 				}
+				
+				$rate_id = absint( $tax_item['rate_id'] );
 
 				if ( ! is_numeric( $percentage ) ) {
 					$percentage = $this->get_percentage_from_fallback( $tax_data, $rate_id );
 					wc_update_order_item_meta( $tax_item_key, '_wcpdf_rate_percentage', $percentage );
 				}
 
-				$category = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_category', true );
-
-				if ( empty( $category ) ) {
-					$category = $this->get_tax_data_from_fallback( 'category', $rate_id );
-					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_category', $category );
-				}
-
-				$scheme = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_scheme', true );
-
-				if ( empty( $scheme ) ) {
-					$scheme = $this->get_tax_data_from_fallback( 'scheme', $rate_id );
-					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_scheme', $scheme );
-				}
+				$fields = array(
+					'category' => '_wcpdf_ubl_tax_category',
+					'scheme'   => '_wcpdf_ubl_tax_scheme',
+					'reason'   => '_wcpdf_ubl_tax_reason',
+				);
 				
-				$reason = wc_get_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_reason', true );
-
-				if ( empty( $reason ) ) {
-					$reason = $this->get_tax_data_from_fallback( 'reason', $rate_id );
-					wc_update_order_item_meta( $tax_item_key, '_wcpdf_ubl_tax_reason', $reason );
+				foreach ( $fields as $key => $meta_key ) {
+					$value = wc_get_order_item_meta( $tax_item_key, $meta_key, true );
+					
+					if ( empty( $value ) || ! $use_historical_settings ) {
+						$value = $this->get_tax_data_from_fallback( $key, $rate_id );
+					}
+					
+					if ( $use_historical_settings ) {
+						wc_update_order_item_meta( $tax_item_key, $meta_key, $value );
+					}
 				}
 			}
 

@@ -1414,8 +1414,6 @@ abstract class OrderDocument {
 		$ubl_maker    = wcpdf_get_ubl_maker();
 		$ubl_document = new UblDocument();
 
-		$ubl_document->set_order( $this->order );
-
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
 		if ( $document ) {
