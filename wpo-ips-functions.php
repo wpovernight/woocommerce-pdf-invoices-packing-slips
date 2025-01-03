@@ -998,23 +998,29 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
  * @return string
  */
 function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
-	if ( ! function_exists( 'translate' ) ) {
-		return esc_html( $string );
+	if ( empty( $string ) ) {
+		return $string;
 	}
+	
+	$translation        = '';
+	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 
 	// Check for multilingual support class
-	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	if ( class_exists( $multilingual_class ) && method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
+	
+	if ( ! function_exists( 'translate' ) ) {
+		return $string;
+	}
 
 	// Fallback to translate()
-	$translation = $translation ?? translate( $string, $textdomain );
+	$translation = ( $translation !== $string ) ? translate( $string, $textdomain ) : $string;
 
 	// Log missing translations for debugging
 	if ( $translation === $string && isset( WPO_WCPDF()->settings->debug_settings['translation_logs'] ) ) {
-		error_log( "Missing translation for: {$string} in textdomain: {$textdomain}" );
+		wcpdf_log_error( "Missing translation for: {$string} in textdomain: {$textdomain}", 'warning' );
 	}
 	
-	return esc_html( $translation );
+	return $translation;
 }
