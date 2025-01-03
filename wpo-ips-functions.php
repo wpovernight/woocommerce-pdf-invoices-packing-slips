@@ -1003,12 +1003,9 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	}
 
 	// Check for multilingual support class
-	if ( class_exists( '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full' ) ) {
-		$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
-
-		if ( method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
-			$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
-		}
+	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
+	if ( class_exists( $multilingual_class ) && method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
+		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 
 	// Fallback to translate()
