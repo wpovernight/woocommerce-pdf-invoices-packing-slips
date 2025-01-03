@@ -989,3 +989,20 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
 	
 	return apply_filters( 'wpo_wcpdf_simple_template_default_table_headers', $headers, $document );
 }
+
+/**
+ * Dynamic string translation
+ *
+ * @param string $string
+ * @param string $textdomain
+ * @return string
+ */
+function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
+	if ( ! function_exists( 'translate' ) ) {
+		return $string;
+	}
+	
+    $translation = translate( $string, $textdomain );
+	
+    return $translation !== $string ? $translation : $string; // Fallback to original if not translated
+}
