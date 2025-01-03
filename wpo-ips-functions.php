@@ -1016,7 +1016,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	}
 	
 	// If multilingual didn't change the string, fall back to native translate()
-	if ( $translation === $string && function_exists( 'translate' ) ) {
+	if ( ( empty( $translation ) || $translation === $string ) && function_exists( 'translate' ) ) {
 		$translation = translate( $string, $textdomain );
 	}
 	
