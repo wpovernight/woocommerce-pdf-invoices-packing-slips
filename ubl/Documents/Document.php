@@ -75,6 +75,11 @@ abstract class Document {
 
 		// Loop through all the tax items...
 		foreach ( $order_tax_data as $tax_data_key => $tax_data ) {
+			$percentage = 0;
+			$category   = '';
+			$scheme     = '';
+			$reason     = '';
+			
 			foreach ( $tax_items as $tax_item_key => $tax_item ) {
 				if ( $tax_item['rate_id'] !== $tax_data_key ) {
 					continue;
