@@ -531,6 +531,19 @@ class Install {
 				set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
 			}
 		}
+		
+		// 3.9.5-beta-4: migrate UBL tax schemes
+		if ( version_compare( $installed_version, '3.9.5-beta-4', '<' ) ) {
+			$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+	
+			foreach ( $ubl_tax_settings as $key => $value ) {
+				if ( is_array( $value ) && ! empty( $value['scheme'] ) ) {
+					$ubl_tax_settings[ $key ]['scheme'] = strtoupper( $value['scheme'] );
+				}
+			}
+			
+			update_option( 'wpo_wcpdf_settings_ubl_taxes', $ubl_tax_settings );
+		}
 
 	}
 
