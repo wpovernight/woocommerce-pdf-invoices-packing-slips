@@ -900,6 +900,18 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'translation_logs',
+				'title'    => __( 'Enable translation logs', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'translation_logs',
+					'description' => __( 'Our plugin attempts to translate dynamic strings automatically. If a translation cannot be found, it logs the unregistered string for your reference.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'enable_danger_zone_tools',
 				'title'    => __( 'Enable danger zone tools', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
