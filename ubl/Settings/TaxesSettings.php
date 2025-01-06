@@ -109,11 +109,10 @@ class TaxesSettings {
 					<?php
 						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] )   ? $this->settings['class'][ $slug ]['scheme']   : '';
 						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : '';
-						$reason   = isset( $this->settings['class'][ $slug ]['reason'] )   ? $this->settings['class'][ $slug ]['reason']   : '';
 					?>
 					<th><?php echo $this->get_select_for( 'scheme', 'class', $slug, $scheme ); ?></th>
 					<th><?php echo $this->get_select_for( 'category', 'class', $slug, $category ); ?></th>
-					<th><?php echo $this->get_select_for( 'reason', 'class', $slug, $reason ); ?></th>
+					<th></th>
 				</tr>
 			</tfoot>
 		</table>
@@ -131,6 +130,8 @@ class TaxesSettings {
 	 * @return string
 	 */
 	public function get_select_for( string $for, string $type, string $id, string $selected ): string {
+		$default_name = ( 'reason' !== $for ) ? __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'None', 'woocommerce-pdf-invoices-packing-slips' );
+		
 		switch ( $for ) {
 			case 'scheme':
 				$options = $this->get_available_schemes();
@@ -145,11 +146,12 @@ class TaxesSettings {
 				$options = array();
 		}
 
-		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']"><option value="">' . __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) . '</option>';
+		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']"><option value="">' . $default_name . '</option>';
 		foreach ( $options as $key => $value ) {
 			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
 		}
 		$select .= '</select>';
+		
 		return $select;
 	}
 
