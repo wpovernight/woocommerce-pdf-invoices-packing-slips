@@ -150,6 +150,13 @@ class InvoiceLineHandler extends UblHandler {
 									'currencyID' => $this->document->order->get_currency(),
 								),
 							),
+							array(
+								'name'       => 'cbc:BaseQuantity',
+								'value'      => 1, // value should be 1, as we're using the unit price
+								'attributes' => array(
+									'unitCode' => 'EA', // EA = Each (https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/)
+								),
+							),
 						),
 					),
 				),
