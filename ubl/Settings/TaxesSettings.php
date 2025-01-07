@@ -117,23 +117,11 @@ class TaxesSettings {
 							echo '</td>';
 							echo '<td>';
 							
-							foreach ( $this->get_available_remarks() as $field => $remarks ) {								
-								switch ( $field ) {
-									case 'reasons':
-										if ( isset( $remarks[ $reason ] ) ) {
-											echo '<p><code>' . $reason . '</code> ' . $remarks[ $reason ] . '</p>';
-										}
-										break;
-									case 'schemes':
-										if ( isset( $remarks[ $scheme ] ) ) {
-											echo '<p><code>' . $scheme . '</code> ' . $remarks[ $scheme ] . '</p>';
-										}
-										break;
-									case 'categories':
-										if ( isset( $remarks[ $category ] ) ) {
-											echo '<p><code>' . $category . '</code> ' . $remarks[ $category ] . '</p>';
-										}
-										break;
+							foreach ( $this->get_available_remarks() as $field => $remarks ) {
+								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
+									if ( isset( $remarks[ ${$f} ] ) ) {
+										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
+									}
 								}
 							}
 							
@@ -174,22 +162,10 @@ class TaxesSettings {
 					<th>
 						<?php
 							foreach ( $this->get_available_remarks() as $field => $remarks ) {
-								switch ( $field ) {
-									case 'reasons':
-										if ( isset( $remarks[ $reason ] ) ) {
-											echo '<p><code>' . $reason . '</code> ' . $remarks[ $reason ] . '</p>';
-										}
-										break;
-									case 'schemes':
-										if ( isset( $remarks[ $scheme ] ) ) {
-											echo '<p><code>' . $scheme . '</code> ' . $remarks[ $scheme ] . '</p>';
-										}
-										break;
-									case 'categories':
-										if ( isset( $remarks[ $category ] ) ) {
-											echo '<p><code>' . $category . '</code> ' . $remarks[ $category ] . '</p>';
-										}
-										break;
+								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
+									if ( isset( $remarks[ ${$f} ] ) ) {
+										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
+									}
 								}
 							}
 						?>
@@ -401,17 +377,22 @@ class TaxesSettings {
 	 *
 	 * @return array
 	 */
-	public function get_available_remarks() {
+	public function get_available_remarks(): array {
+		/* translators: %s: tax category code */
+		$reason_common_remark = __( 'Only use with tax category code %s', 'woocommerce-pdf-invoices-packing-slips' );
+
 		return apply_filters( 'wpo_wcpdf_ubl_tax_remarks', array(
-			'reasons' => array(
-				'VATEX-EU-AE' => __( 'Only use with tax category code AE', 'woocommerce-pdf-invoices-packing-slips' ),
-				'VATEX-EU-D'  => __( 'Only use with tax category code E', 'woocommerce-pdf-invoices-packing-slips' ),
-				'VATEX-EU-F'  => __( 'Only use with tax category code E', 'woocommerce-pdf-invoices-packing-slips' ),
-				'VATEX-EU-G'  => __( 'Only use with tax category code G', 'woocommerce-pdf-invoices-packing-slips' ),
-				'VATEX-EU-I'  => __( 'Only use with tax category code E', 'woocommerce-pdf-invoices-packing-slips' ),
-				'VATEX-EU-IC' => __( 'Only use with tax category code K', 'woocommerce-pdf-invoices-packing-slips' ),
-				'VATEX-EU-J'  => __( 'Only use with tax category code E', 'woocommerce-pdf-invoices-packing-slips' ),
-				'VATEX-EU-O'  => __( 'Only use with tax category code O', 'woocommerce-pdf-invoices-packing-slips' ),
+			'scheme'   => array(),
+			'category' => array(),
+			'reason'   => array(
+				'VATEX-EU-AE' => sprintf( $reason_common_remark, '<code>AE</code>' ),
+				'VATEX-EU-D'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-F'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-G'  => sprintf( $reason_common_remark, '<code>G</code>' ),
+				'VATEX-EU-I'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-IC' => sprintf( $reason_common_remark, '<code>K</code>' ),
+				'VATEX-EU-J'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-O'  => sprintf( $reason_common_remark, '<code>O</code>' ),
 			),
 		) );
 	}
