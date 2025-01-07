@@ -459,7 +459,8 @@ abstract class OrderDocument {
 	}
 
 	public function regenerate( $order = null, $data = null ) {
-		$order = empty( $order ) ? $this->order : $order;
+		$order     = empty( $order ) ? $this->order : $order;
+		$refund_id = false;
 		
 		if ( empty( $order ) ) {
 			return;
@@ -473,16 +474,15 @@ abstract class OrderDocument {
 
 		// save settings
 		$this->save_settings( true );
-
-		$parent_order = $refund_id = false;
 		
-		// If credit note
+		// if credit note
 		if ( 'credit-note' === $this->get_type() ) {
-			$refund_id    = $order->get_id();
-			$parent_order = wc_get_order( $order->get_parent_id() );
+			$refund_id = $order->get_id();
+			$order     = wc_get_order( $order->get_parent_id() );
+		}
 		
-		// UBL
-		} else {
+		// ubl
+		if ( $document->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
 			wpo_ips_ubl_save_order_taxes( $order );
 		}
 		
@@ -497,7 +497,9 @@ abstract class OrderDocument {
 		);
 		
 		$note = wp_kses( $note, 'strip' );
-		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
+		
+		// add note to order
+		$order->add_order_note( $note );
 
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
 	}
