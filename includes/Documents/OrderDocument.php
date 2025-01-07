@@ -488,7 +488,8 @@ abstract class OrderDocument {
 		
 		$note = $refund_id ? sprintf(
 			/* translators: 1. credit note title, 2. refund id */
-			__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ),
+			__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() ),
 			$refund_id
 		) : sprintf(
 			/* translators: 1. document title */

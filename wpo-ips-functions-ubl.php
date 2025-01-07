@@ -64,10 +64,6 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, int $rate_id ): st
  * @return void
  */
 function wpo_ips_ubl_save_order_taxes( \WC_Abstract_Order $order ): void {
-	if ( empty( $order ) ) {
-		return;
-	}
-	
 	foreach ( $order->get_taxes() as $item_id => $tax_item ) {
 		if ( is_a( $tax_item, '\WC_Order_Item_Tax' ) && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
 			// get tax rate id from item
