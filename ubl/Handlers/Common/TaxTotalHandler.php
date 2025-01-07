@@ -31,7 +31,7 @@ class TaxTotalHandler extends UblHandler {
 			);
 
 			// Add TaxExemptionReason only if it's not empty
-			if ( ! empty( $item['reason'] ) ) {
+			if ( ! empty( $item['reason'] ) && 'none' !== $item['reason'] ) {
 				$reasonKey     = $item['reason'];
 				$reason        = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
 				$taxCategory[] = array(

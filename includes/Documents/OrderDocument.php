@@ -460,12 +460,13 @@ abstract class OrderDocument {
 
 	public function regenerate( $order = null, $data = null ) {
 		$order = empty( $order ) ? $this->order : $order;
+		
 		if ( empty( $order ) ) {
-			return; //Nothing to update
+			return;
 		}
 
 		// pass data to setter functions
-		if( ! empty( $data ) ) {
+		if ( ! empty( $data ) ) {
 			$this->set_data( $data, $order );
 			$this->save();
 		}
@@ -473,14 +474,28 @@ abstract class OrderDocument {
 		// save settings
 		$this->save_settings( true );
 
-		//Add order note
 		$parent_order = $refund_id = false;
+		
 		// If credit note
-		if ( $this->get_type() == 'credit-note' ) {
-			$refund_id = $order->get_id();
+		if ( 'credit-note' === $this->get_type() ) {
+			$refund_id    = $order->get_id();
 			$parent_order = wc_get_order( $order->get_parent_id() );
-		} /*translators: 1. credit note title, 2. refund id */
-		$note = $refund_id ? sprintf( __( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ) );
+		
+		// UBL
+		} else {
+			wpo_ips_ubl_save_order_taxes( $order );
+		}
+		
+		$note = $refund_id ? sprintf(
+			/* translators: 1. credit note title, 2. refund id */
+			__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ),
+			$refund_id
+		) : sprintf(
+			/* translators: 1. document title */
+			__( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() )
+		);
+		
 		$note = wp_kses( $note, 'strip' );
 		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
 
