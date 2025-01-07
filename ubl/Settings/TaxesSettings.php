@@ -43,7 +43,7 @@ class TaxesSettings {
 		?>
 
 		<h4><?php echo $name; ?></h4>
-		<table class="widefat striped" style="width: 100%; max-width: 100%;">
+		<table class="widefat striped">
 			<thead>
 				<tr>
 					<th><?php _e( 'Country&nbsp;code', 'woocommerce' ); ?></th>
