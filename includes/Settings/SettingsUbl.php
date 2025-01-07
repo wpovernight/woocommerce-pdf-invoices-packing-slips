@@ -86,7 +86,7 @@ class SettingsUbl {
 		// it seems $and taxes is mostly false, meaning taxes are calculated separately,
 		// but we still update just in case anything changed
 		if ( ! empty( $order ) ) {
-			$this->save_order_taxes( $order );
+			wpo_ips_ubl_save_order_taxes( $order );
 		}
 	}
 
@@ -96,61 +96,7 @@ class SettingsUbl {
 		}
 
 		if ( $order ) {
-			$this->save_order_taxes( $order );
-		}
-	}
-
-	public function save_order_taxes( $order ) {
-		foreach ( $order->get_taxes() as $item_id => $tax_item ) {
-			if ( is_a( $tax_item, '\WC_Order_Item_Tax' ) && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
-				// get tax rate id from item
-				$tax_rate_id = $tax_item->get_rate_id();
-
-				// read tax rate data from db
-				if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
-					$tax_rate = \WC_Tax::_get_tax_rate( $tax_rate_id, OBJECT );
-
-					if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-						// store percentage in tax item meta
-						wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
-
-						$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
-
-						$category       = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['category'] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['category'] : '';
-						$scheme         = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['scheme'] )   ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['scheme']   : '';
-						$reason         = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['reason'] )   ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ]['reason']   : '';
-						$tax_rate_class = $tax_rate->tax_rate_class;
-
-						if ( empty( $tax_rate_class ) ) {
-							$tax_rate_class = 'standard';
-						}
-
-						if ( empty( $category ) ) {
-							$category = isset( $ubl_tax_settings['class'][ $tax_rate_class ]['category'] ) ? $ubl_tax_settings['class'][ $tax_rate_class ]['category'] : '';
-						}
-
-						if ( empty( $scheme ) ) {
-							$scheme = isset( $ubl_tax_settings['class'][ $tax_rate_class ]['scheme'] ) ? $ubl_tax_settings['class'][ $tax_rate_class ]['scheme'] : '';
-						}
-
-						if ( empty( $reason ) ) {
-							$reason = isset( $ubl_tax_settings['class'][ $tax_rate_class ]['reason'] ) ? $ubl_tax_settings['class'][ $tax_rate_class ]['reason'] : '';
-						}
-
-						if ( ! empty( $category ) ) {
-							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_category', $category );
-						}
-
-						if ( ! empty( $scheme ) ) {
-							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_scheme', $scheme );
-						}
-
-						if ( ! empty( $reason ) ) {
-							wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_reason', $reason );
-						}
-					}
-				}
-			}
+			wpo_ips_ubl_save_order_taxes( $order );
 		}
 	}
 

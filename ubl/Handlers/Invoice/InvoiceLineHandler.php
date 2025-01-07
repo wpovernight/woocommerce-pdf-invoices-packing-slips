@@ -51,7 +51,7 @@ class InvoiceLineHandler extends UblHandler {
 				);
 
 				// Add TaxExemptionReason only if it's not empty
-				if ( ! empty( $taxOrderData['reason'] ) ) {
+				if ( ! empty( $taxOrderData['reason'] ) && 'none' !== $taxOrderData['reason'] ) {
 					$reasonKey     = $taxOrderData['reason'];
 					$reason        = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
 					$taxCategory[] = array(

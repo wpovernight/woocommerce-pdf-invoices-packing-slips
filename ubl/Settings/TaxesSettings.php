@@ -83,9 +83,9 @@ class TaxesSettings {
 							$state    = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
 							$postcode = empty( $postcode ) ? '*' : implode( '; ', $postcode );
 							$city     = empty( $city ) ? '*' : implode( '; ', $city );
-							$scheme   = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : '';
-							$category = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : '';
-							$reason   = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : '';
+							$scheme   = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
+							$category = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
+							$reason   = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
 
 							echo '<tr>';
 							echo '<td>' . $country . '</td>';
@@ -107,12 +107,13 @@ class TaxesSettings {
 				<tr>
 					<th colspan="5" style="text-align: right;"><?php _e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
 					<?php
-						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] )   ? $this->settings['class'][ $slug ]['scheme']   : '';
-						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : '';
+						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] )   ? $this->settings['class'][ $slug ]['scheme']   : 'default';
+						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
+						$reason   = isset( $this->settings['class'][ $slug ]['reason'] )   ? $this->settings['class'][ $slug ]['reason']   : 'default';
 					?>
 					<th><?php echo $this->get_select_for( 'scheme', 'class', $slug, $scheme ); ?></th>
 					<th><?php echo $this->get_select_for( 'category', 'class', $slug, $category ); ?></th>
-					<th></th>
+					<th><?php echo $this->get_select_for( 'reason', 'class', $slug, $reason ); ?></th>
 				</tr>
 			</tfoot>
 		</table>
@@ -130,7 +131,9 @@ class TaxesSettings {
 	 * @return string
 	 */
 	public function get_select_for( string $for, string $type, string $id, string $selected ): string {
-		$default_name = ( 'reason' !== $for ) ? __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'None', 'woocommerce-pdf-invoices-packing-slips' );
+		$defaults = array(
+			'default' => __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
 		
 		switch ( $for ) {
 			case 'scheme':
@@ -140,16 +143,27 @@ class TaxesSettings {
 				$options = $this->get_available_categories();
 				break;
 			case 'reason':
-				$options = self::get_available_reasons();
+				$defaults['none'] = __( 'None', 'woocommerce-pdf-invoices-packing-slips' );
+				$options          = self::get_available_reasons();
 				break;
 			default:
 				$options = array();
 		}
 
-		$select = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']"><option value="">' . $default_name . '</option>';
+		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']">';
+		
+		foreach ( $defaults as $key => $value ) {
+			if ( 'class' === $type && 'default' === $key ) {
+				continue;
+			}
+			
+			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
+		}
+		
 		foreach ( $options as $key => $value ) {
 			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
 		}
+		
 		$select .= '</select>';
 		
 		return $select;
