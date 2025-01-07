@@ -105,15 +105,15 @@ class TaxesSettings {
 							echo '<td>' . $result->tax_rate . '</td>';
 							echo '<td>';
 							echo $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
-							echo '<div style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme_code . '</code></div>';
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme_code . '</code></div>';
 							echo '</td>';
 							echo '<td>';
 							echo $this->get_select_for( 'category', 'rate', $result->tax_rate_id, $category );
-							echo '<div style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category_code . '</code></div>';
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category_code . '</code></div>';
 							echo '</td>';
 							echo '<td>';
 							echo $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
-							echo '<div style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason_code . '</code></div>';
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason_code . '</code></div>';
 							echo '</td>';
 							echo '<td>';
 							
@@ -144,19 +144,19 @@ class TaxesSettings {
 					<th>
 						<?php
 							echo $this->get_select_for( 'scheme', 'class', $slug, $scheme );
-							echo '<div style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme . '</code></div>';
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme . '</code></div>';
 						?>
 					</th>
 					<th>
 						<?php
 							echo $this->get_select_for( 'category', 'class', $slug, $category );
-							echo '<div style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category . '</code></div>';
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category . '</code></div>';
 						?>
 					</th>
 					<th>
 						<?php
 							echo $this->get_select_for( 'reason', 'class', $slug, $reason );
-							echo '<div style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason . '</code></div>';
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason . '</code></div>';
 						?>
 					</th>
 					<th>
@@ -206,7 +206,7 @@ class TaxesSettings {
 				$options = array();
 		}
 
-		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']">';
+		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '">';
 		
 		foreach ( $defaults as $key => $value ) {
 			if ( 'class' === $type && 'default' === $key ) {
