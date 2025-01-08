@@ -43,17 +43,18 @@ class TaxesSettings {
 		?>
 
 		<h4><?php echo $name; ?></h4>
-		<table class="widefat">
+		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th width="8%"><?php _e( 'Country&nbsp;code', 'woocommerce' ); ?></th>
-					<th width="8%"><?php _e( 'State code', 'woocommerce' ); ?></th>
+					<th><?php _e( 'Country code', 'woocommerce' ); ?></th>
+					<th><?php _e( 'State code', 'woocommerce' ); ?></th>
 					<th><?php _e( 'Postcode / ZIP', 'woocommerce' ); ?></th>
 					<th><?php _e( 'City', 'woocommerce' ); ?></th>
-					<th width="8%"><?php _e( 'Rate&nbsp;%', 'woocommerce' ); ?></th>
-					<th width="20%"><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th width="20%"><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th width="20%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php _e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th><?php _e( 'Rate', 'woocommerce' ); ?></th>
+					<th><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th width="10%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php _e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th width="15%"><?php _e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 				</tr>
 			</thead>
 			<tbody id="rates">
@@ -79,27 +80,56 @@ class TaxesSettings {
 								}
 							}
 							
-							$country  = empty( $result->tax_rate_country ) ? '*' : $result->tax_rate_country;
-							$state    = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
-							$postcode = empty( $postcode ) ? '*' : implode( '; ', $postcode );
-							$city     = empty( $city ) ? '*' : implode( '; ', $city );
-							$scheme   = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
-							$category = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
-							$reason   = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
+							$country          = empty( $result->tax_rate_country ) ? '*' : $result->tax_rate_country;
+							$state            = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
+							$postcode         = empty( $postcode ) ? '*' : implode( '; ', $postcode );
+							$city             = empty( $city ) ? '*' : implode( '; ', $city );
+							
+							$scheme           = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
+							$scheme_default   = isset( $this->settings['class'][ $slug ]['scheme'] ) ? $this->settings['class'][ $slug ]['scheme'] : 'default';
+							$scheme_code      = ( 'default' === $scheme ) ? $scheme_default : $scheme;
 
+							$category         = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
+							$category_default = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
+							$category_code    = ( 'default' === $category ) ? $category_default : $category;
+							
+							$reason           = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
+							$reason_default   = isset( $this->settings['class'][ $slug ]['reason'] ) ? $this->settings['class'][ $slug ]['reason'] : 'default';
+							$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
+							
 							echo '<tr>';
 							echo '<td>' . $country . '</td>';
 							echo '<td>' . $state . '</td>';
 							echo '<td>' . $postcode . '</td>';
 							echo '<td>' . $city . '</td>';
-							echo '<td>' . $result->tax_rate . '</td>';
-							echo '<td>' . $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme ) . '</td>';
-							echo '<td>' . $this->get_select_for( 'category', 'rate', $result->tax_rate_id, $category ) . '</td>';
-							echo '<td>' . $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason ) . '</td>';
+							echo '<td>' . wc_round_tax_total( $result->tax_rate ) . '%</td>';
+							echo '<td>';
+							echo $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme_code . '</code></div>';
+							echo '</td>';
+							echo '<td>';
+							echo $this->get_select_for( 'category', 'rate', $result->tax_rate_id, $category );
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category_code . '</code></div>';
+							echo '</td>';
+							echo '<td>';
+							echo $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason_code . '</code></div>';
+							echo '</td>';
+							echo '<td>';
+							
+							foreach ( $this->get_available_remarks() as $field => $remarks ) {
+								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
+									if ( isset( $remarks[ ${$f} ] ) ) {
+										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
+									}
+								}
+							}
+							
+							echo '</td>';
 							echo '</tr>';
 						}
 					} else {
-						echo '<tr><td colspan="7">' . __( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
+						echo '<tr><td colspan="9">' . __( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
 					}
 				?>
 			</tbody>
@@ -111,9 +141,35 @@ class TaxesSettings {
 						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
 						$reason   = isset( $this->settings['class'][ $slug ]['reason'] )   ? $this->settings['class'][ $slug ]['reason']   : 'default';
 					?>
-					<th><?php echo $this->get_select_for( 'scheme', 'class', $slug, $scheme ); ?></th>
-					<th><?php echo $this->get_select_for( 'category', 'class', $slug, $category ); ?></th>
-					<th><?php echo $this->get_select_for( 'reason', 'class', $slug, $reason ); ?></th>
+					<th>
+						<?php
+							echo $this->get_select_for( 'scheme', 'class', $slug, $scheme );
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme . '</code></div>';
+						?>
+					</th>
+					<th>
+						<?php
+							echo $this->get_select_for( 'category', 'class', $slug, $category );
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category . '</code></div>';
+						?>
+					</th>
+					<th>
+						<?php
+							echo $this->get_select_for( 'reason', 'class', $slug, $reason );
+							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason . '</code></div>';
+						?>
+					</th>
+					<th>
+						<?php
+							foreach ( $this->get_available_remarks() as $field => $remarks ) {
+								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
+									if ( isset( $remarks[ ${$f} ] ) ) {
+										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
+									}
+								}
+							}
+						?>
+					</th>
 				</tr>
 			</tfoot>
 		</table>
@@ -150,7 +206,7 @@ class TaxesSettings {
 				$options = array();
 		}
 
-		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']">';
+		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '" style="width:100%; box-sizing:border-box;">';
 		
 		foreach ( $defaults as $key => $value ) {
 			if ( 'class' === $type && 'default' === $key ) {
@@ -288,14 +344,56 @@ class TaxesSettings {
 			'VATEX-EU-143-1J'    => __( 'Exempt based on article 143, section 1 (j) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-143-1K'    => __( 'Exempt based on article 143, section 1 (k) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-143-1L'    => __( 'Exempt based on article 143, section 1 (l) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-151'       => __( 'Exempt based on article 151 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148'       => __( 'Exempt based on article 148 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148-A'     => __( 'Exempt based on article 148, section (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148-B'     => __( 'Exempt based on article 148, section (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148-C'     => __( 'Exempt based on article 148, section (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148-D'     => __( 'Exempt based on article 148, section (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148-E'     => __( 'Exempt based on article 148, section (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148-F'     => __( 'Exempt based on article 148, section (f) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-148-G'     => __( 'Exempt based on article 148, section (g) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-151-1A'    => __( 'Exempt based on article 151, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-151-1AA'   => __( 'Exempt based on article 151, section 1 (aa) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-151-1B'    => __( 'Exempt based on article 151, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-151-1C'    => __( 'Exempt based on article 151, section 1 (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-151-1D'    => __( 'Exempt based on article 151, section 1 (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-151-1E'    => __( 'Exempt based on article 151, section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-309'       => __( 'Exempt based on article 309 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-AE'        => __( 'Reverse charge', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-D'         => __( 'Intra-Community acquisition from second hand means of transport', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-F'         => __( 'Intra-Community acquisition of second hand goods', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-D'         => __( 'Travel agents VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-F'         => __( 'Second hand goods VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-G'         => __( 'Export outside the EU', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-I'         => __( 'Intra-Community acquisition of works of art', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-I'         => __( 'Works of art VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-IC'        => __( 'Intra-community supply', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-J'         => __( 'Collectors items and antiques VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-O'         => __( 'Not subject to VAT', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-FR-FRANCHISE' => __( 'France domestic VAT franchise in base', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-FR-CNWVAT'    => __( 'France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
+	}
+	
+	/**
+	 * Get available remarks
+	 *
+	 * @return array
+	 */
+	public function get_available_remarks(): array {
+		/* translators: %s: tax category code */
+		$reason_common_remark = __( 'Only use with tax category code %s', 'woocommerce-pdf-invoices-packing-slips' );
+
+		return apply_filters( 'wpo_wcpdf_ubl_tax_remarks', array(
+			'scheme'   => array(),
+			'category' => array(),
+			'reason'   => array(
+				'VATEX-EU-AE' => sprintf( $reason_common_remark, '<code>AE</code>' ),
+				'VATEX-EU-D'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-F'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-G'  => sprintf( $reason_common_remark, '<code>G</code>' ),
+				'VATEX-EU-I'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-IC' => sprintf( $reason_common_remark, '<code>K</code>' ),
+				'VATEX-EU-J'  => sprintf( $reason_common_remark, '<code>E</code>' ),
+				'VATEX-EU-O'  => sprintf( $reason_common_remark, '<code>O</code>' ),
+			),
 		) );
 	}
 
