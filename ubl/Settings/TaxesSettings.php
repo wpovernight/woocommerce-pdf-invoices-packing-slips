@@ -115,9 +115,9 @@ class TaxesSettings {
 							echo $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
 							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason_code . '</code></div>';
 							echo '</td>';
-							echo '<td>';
+							echo '<td class="remark">';
 							
-							foreach ( $this->get_available_remarks() as $field => $remarks ) {
+							foreach ( self::get_available_remarks() as $field => $remarks ) {
 								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
 									if ( isset( $remarks[ ${$f} ] ) ) {
 										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
@@ -159,9 +159,9 @@ class TaxesSettings {
 							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason . '</code></div>';
 						?>
 					</th>
-					<th>
+					<th class="remark">
 						<?php
-							foreach ( $this->get_available_remarks() as $field => $remarks ) {
+							foreach ( self::get_available_remarks() as $field => $remarks ) {
 								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
 									if ( isset( $remarks[ ${$f} ] ) ) {
 										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
@@ -377,7 +377,7 @@ class TaxesSettings {
 	 *
 	 * @return array
 	 */
-	public function get_available_remarks(): array {
+	public static function get_available_remarks(): array {
 		/* translators: %s: tax category code */
 		$reason_common_remark = __( 'Only use with tax category code %s', 'woocommerce-pdf-invoices-packing-slips' );
 

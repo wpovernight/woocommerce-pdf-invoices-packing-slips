@@ -16,6 +16,17 @@ jQuery( function ( $ ) {
 		} else {
 			$current.html( oldHtml );
 		}
+		
+		// Display the remark if available
+		if ( $( this ).attr( 'name' ).endsWith( '[reason]' ) ) {
+			let remark = wpo_wcpdf_ubl.remarks[ 'reason' ][ newValue ];
+			
+			if ( remark ) {
+				$( this ).closest( 'tr' ).find( '.remark' ).html( remark );
+			} else {
+				$( this ).closest( 'tr' ).find( '.remark' ).html( '' );
+			}
+		}
 	} );
 	
 } );

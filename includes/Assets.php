@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS;
 
+use WPO\IPS\UBL\Settings\TaxesSettings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -297,6 +299,7 @@ class Assets {
 					'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 					'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 					'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
+					'remarks' => TaxesSettings::get_available_remarks(),
 				)
 			);
 		}
