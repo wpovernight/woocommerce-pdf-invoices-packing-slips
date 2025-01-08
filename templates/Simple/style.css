@@ -114,8 +114,8 @@ table.head {
 
 td.header img {
 	max-height: 3cm; /* may be overridden by the settings */
-	width: auto;
 	max-width: 100%;
+	width: auto;
 }
 
 /* .mpdf td.header img { */
