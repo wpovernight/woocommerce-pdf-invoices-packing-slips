@@ -46,11 +46,11 @@ class TaxesSettings {
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php _e( 'Country&nbsp;code', 'woocommerce' ); ?></th>
+					<th><?php _e( 'Country code', 'woocommerce' ); ?></th>
 					<th><?php _e( 'State code', 'woocommerce' ); ?></th>
 					<th><?php _e( 'Postcode / ZIP', 'woocommerce' ); ?></th>
 					<th><?php _e( 'City', 'woocommerce' ); ?></th>
-					<th><?php _e( 'Rate&nbsp;%', 'woocommerce' ); ?></th>
+					<th><?php _e( 'Rate', 'woocommerce' ); ?></th>
 					<th><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
 					<th><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
 					<th width="10%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php _e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
@@ -102,7 +102,7 @@ class TaxesSettings {
 							echo '<td>' . $state . '</td>';
 							echo '<td>' . $postcode . '</td>';
 							echo '<td>' . $city . '</td>';
-							echo '<td>' . $result->tax_rate . '</td>';
+							echo '<td>' . wc_round_tax_total( $result->tax_rate ) . '%</td>';
 							echo '<td>';
 							echo $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
 							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme_code . '</code></div>';
