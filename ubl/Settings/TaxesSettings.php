@@ -206,7 +206,7 @@ class TaxesSettings {
 				$options = array();
 		}
 
-		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '">';
+		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '" style="width:100%; box-sizing:border-box;">';
 		
 		foreach ( $defaults as $key => $value ) {
 			if ( 'class' === $type && 'default' === $key ) {
