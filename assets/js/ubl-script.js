@@ -8,10 +8,13 @@ jQuery( function ( $ ) {
 		let newValue     = $( this ).find( 'option:selected' ).val();
 		let $current     = $( this ).closest( 'td, th' ).find( '.current' );
 		let newHtml      = `${wpo_wcpdf_ubl.new}: <code>${newValue}</code> <strong>(${wpo_wcpdf_ubl.unsaved})</strong>`;
+		let oldHtml      = `${wpo_wcpdf_ubl.code}: <code>${currentValue}</code>`;
 
 		// Only update the '.current' element if the value has changed
 		if ( newValue !== currentValue ) {
 			$current.html( newHtml );
+		} else {
+			$current.html( oldHtml );
 		}
 	} );
 	

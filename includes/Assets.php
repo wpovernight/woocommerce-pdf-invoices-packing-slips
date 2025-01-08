@@ -294,6 +294,7 @@ class Assets {
 				'wpo-wcpdf-ubl',
 				'wpo_wcpdf_ubl',
 				array(
+					'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 					'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 					'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
