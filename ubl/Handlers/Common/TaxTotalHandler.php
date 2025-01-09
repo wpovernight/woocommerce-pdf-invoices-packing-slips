@@ -3,6 +3,7 @@
 namespace WPO\IPS\UBL\Handlers\Common;
 
 use WPO\IPS\UBL\Handlers\UblHandler;
+use WPO\IPS\UBL\Settings\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -11,7 +12,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 class TaxTotalHandler extends UblHandler {
 
 	public function handle( $data, $options = array() ) {
-		$formatted_tax_array = array_map( function( $item ) {
+		$taxReasons = TaxesSettings::get_available_reasons();
+		
+		$formatted_tax_array = array_map( function( $item ) use ( $taxReasons ) {
+			$taxCategory = array(
+				array(
+					'name'  => 'cbc:ID',
+					'value' => strtoupper( $item['category'] ),
+				),
+				array(
+					'name'  => 'cbc:Name',
+					'value' => $item['name'],
+				),
+				array(
+					'name'  => 'cbc:Percent',
+					'value' => round( $item['percentage'], 1 ),
+				),
+			);
+
+			// Add TaxExemptionReason only if it's not empty
+			if ( ! empty( $item['reason'] ) && 'none' !== $item['reason'] ) {
+				$reasonKey     = $item['reason'];
+				$reason        = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
+				$taxCategory[] = array(
+					'name'  => 'cbc:TaxExemptionReasonCode',
+					'value' => $reasonKey,
+				);
+				$taxCategory[] = array(
+					'name'  => 'cbc:TaxExemptionReason',
+					'value' => $reason,
+				);
+			}
+			
+			// Place the TaxScheme after the TaxExemptionReason
+			$taxCategory[] = array(
+				'name'  => 'cac:TaxScheme',
+				'value' => array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => strtoupper( $item['scheme'] ),
+					),
+				),
+			);
+
 			return array(
 				'name'  => 'cac:TaxSubtotal',
 				'value' => array(
@@ -31,29 +74,7 @@ class TaxTotalHandler extends UblHandler {
 					),
 					array(
 						'name'  => 'cac:TaxCategory',
-						'value' => array(
-							array(
-								'name'  => 'cbc:ID',
-								'value' => strtoupper( $item['category'] ),
-							),
-							array(
-								'name'  => 'cbc:Name',
-								'value' => $item['name'],
-							),
-							array(
-								'name'  => 'cbc:Percent',
-								'value' => round( $item['percentage'], 1 ),
-							),
-							array(
-								'name'  => 'cac:TaxScheme',
-								'value' => array(
-									array(
-										'name'  => 'cbc:ID',
-										'value' => strtoupper( $item['scheme'] ),
-									),
-								),
-							),
-						),
+						'value' => $taxCategory,
 					),
 				),
 			);

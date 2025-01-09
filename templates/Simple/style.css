@@ -114,6 +114,7 @@ table.head {
 
 td.header img {
 	max-height: 3cm; /* may be overridden by the settings */
+	max-width: 100%;
 	width: auto;
 }
 
