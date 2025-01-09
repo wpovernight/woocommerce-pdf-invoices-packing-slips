@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS;
 
+use WPO\IPS\UBL\Settings\TaxesSettings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -236,7 +238,7 @@ class Assets {
 		}
 
 		// status/debug page scripts
-		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'debug' ) {
+		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && 'debug' === $_REQUEST['tab'] ) {
 			wp_enqueue_style(
 				'wpo-wcpdf-jquery-ui-styles',
 				'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css'
@@ -278,6 +280,28 @@ class Assets {
 				)
 			);
 
+		}
+		
+		// ubl taxes
+		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && 'ubl' === $_REQUEST['tab'] ) {
+			wp_enqueue_script(
+				'wpo-wcpdf-ubl',
+				WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
+				array( 'jquery' ),
+				WPO_WCPDF_VERSION,
+				true
+			);
+			
+			wp_localize_script(
+				'wpo-wcpdf-ubl',
+				'wpo_wcpdf_ubl',
+				array(
+					'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
+					'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
+					'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
+					'remarks' => TaxesSettings::get_available_remarks(),
+				)
+			);
 		}
 	}
 

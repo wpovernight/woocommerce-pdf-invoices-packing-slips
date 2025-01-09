@@ -1007,7 +1007,7 @@ class Settings {
 	 * @return void
 	 */
 	public function update_documents_settings_sections(): void {
-		$documents = WPO_WCPDF()->documents->get_documents();
+		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {

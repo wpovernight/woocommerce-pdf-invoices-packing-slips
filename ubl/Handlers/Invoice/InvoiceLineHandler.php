@@ -51,7 +51,7 @@ class InvoiceLineHandler extends UblHandler {
 				);
 
 				// Add TaxExemptionReason only if it's not empty
-				if ( ! empty( $taxOrderData['reason'] ) ) {
+				if ( ! empty( $taxOrderData['reason'] ) && 'none' !== $taxOrderData['reason'] ) {
 					$reasonKey     = $taxOrderData['reason'];
 					$reason        = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
 					$taxCategory[] = array(
@@ -136,7 +136,26 @@ class InvoiceLineHandler extends UblHandler {
 						'value' => array(
 							array(
 								'name'  => 'cbc:Name',
-								'value' => $item->get_name(),
+								'value' => wpo_ips_ubl_sanitize_string( $item->get_name() ),
+							),
+						),
+					),
+					array(
+						'name'  => 'cac:Price',
+						'value' => array(
+							array(
+								'name'       => 'cbc:PriceAmount',
+								'value'      => round( $this->get_item_unit_price( $item ), 2 ),
+								'attributes' => array(
+									'currencyID' => $this->document->order->get_currency(),
+								),
+							),
+							array(
+								'name'       => 'cbc:BaseQuantity',
+								'value'      => 1, // value should be 1, as we're using the unit price
+								'attributes' => array(
+									'unitCode' => 'EA', // EA = Each (https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/)
+								),
 							),
 						),
 					),
@@ -150,6 +169,22 @@ class InvoiceLineHandler extends UblHandler {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Get the unit price of an item
+	 *
+	 * @param WC_Order_Item $item
+	 * @return int|float
+	 */
+	private function get_item_unit_price( $item ) {
+		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+			return $item->get_subtotal() / $item->get_quantity();
+		} elseif ( is_a( $item, 'WC_Order_Item_Shipping' ) || is_a( $item, 'WC_Order_Item_Fee' ) ) {
+			return $item->get_total();
+		} else {
+			return 0;
+		}
 	}
 
 }
