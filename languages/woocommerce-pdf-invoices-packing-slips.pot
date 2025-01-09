@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.3\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-19T16:44:34+00:00\n"
+"POT-Creation-Date: 2024-12-22T19:57:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -59,10 +59,10 @@ msgstr ""
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:121
 #: views/promo.php:34
-#: woocommerce-pdf-invoices-packingslips.php:338
-#: woocommerce-pdf-invoices-packingslips.php:397
-#: woocommerce-pdf-invoices-packingslips.php:435
-#: woocommerce-pdf-invoices-packingslips.php:525
+#: woocommerce-pdf-invoices-packingslips.php:339
+#: woocommerce-pdf-invoices-packingslips.php:398
+#: woocommerce-pdf-invoices-packingslips.php:436
+#: woocommerce-pdf-invoices-packingslips.php:570
 msgid "Hide this message"
 msgstr ""
 
@@ -649,7 +649,7 @@ msgid "Admin"
 msgstr ""
 
 #: includes/Documents/Invoice.php:689
-#: includes/Settings.php:182
+#: includes/Settings.php:180
 msgid "Advanced"
 msgstr ""
 
@@ -766,7 +766,7 @@ msgid "Total ex. VAT"
 msgstr ""
 
 #: includes/Documents/OrderDocumentMethods.php:1111
-#: includes/Settings.php:427
+#: includes/Settings.php:425
 #: ubl/Settings/TaxesSettings.php:170
 msgid "Total"
 msgstr ""
@@ -841,8 +841,8 @@ msgid "Could not find the order #%s."
 msgstr ""
 
 #: includes/Main.php:479
-#: includes/Settings.php:220
-#: includes/Settings.php:368
+#: includes/Settings.php:218
+#: includes/Settings.php:366
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -950,60 +950,60 @@ msgstr ""
 msgid "Documents"
 msgstr ""
 
-#: includes/Settings.php:174
-msgid "UBL"
+#: includes/Settings.php:173
+msgid "Taxes"
 msgstr ""
 
-#: includes/Settings.php:187
+#: includes/Settings.php:185
 msgid "Upgrade"
 msgstr ""
 
-#: includes/Settings.php:260
+#: includes/Settings.php:258
 msgid "Order not found!"
 msgstr ""
 
-#: includes/Settings.php:263
+#: includes/Settings.php:261
 msgid "Object found is not an order!"
 msgstr ""
 
 #. translators: order ID
-#: includes/Settings.php:335
+#: includes/Settings.php:333
 msgid "Document not available for order #%s, try selecting a different order."
 msgstr ""
 
-#: includes/Settings.php:342
+#: includes/Settings.php:340
 msgid "No WooCommerce orders found! Please consider adding your first order to see this preview."
 msgstr ""
 
 #. translators: error message
-#: includes/Settings.php:352
+#: includes/Settings.php:350
 msgid "Error trying to generate document: %s"
 msgstr ""
 
-#: includes/Settings.php:426
+#: includes/Settings.php:424
 #: includes/Tables/NumberStoreListTable.php:122
 msgid "Date"
 msgstr ""
 
-#: includes/Settings.php:434
+#: includes/Settings.php:432
 msgid "No order(s) found!"
 msgstr ""
 
-#: includes/Settings.php:437
+#: includes/Settings.php:435
 msgid "An error occurred when trying to process your request!"
 msgstr ""
 
 #. translators: error message
-#: includes/Settings.php:444
+#: includes/Settings.php:442
 msgid "Error trying to get orders: %s"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/Settings.php:940
+#: includes/Settings.php:938
 msgid "Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found"
 msgstr ""
 
-#: includes/Settings.php:1096
+#: includes/Settings.php:1094
 msgid "Additional settings"
 msgstr ""
 
@@ -1417,12 +1417,17 @@ msgid "untitled"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag
+#: includes/Settings/SettingsDocuments.php:78
+msgid "Looking for more documents? Learn more %1$shere%2$s."
+msgstr ""
+
+#. translators: 1. open anchor tag, 2. close anchor tag
 #: includes/Settings/SettingsGeneral.php:44
 msgid "Requires the %1$sProfessional extension%2$s."
 msgstr ""
 
 #: includes/Settings/SettingsGeneral.php:50
-#: includes/Settings/SettingsUbl.php:153
+#: includes/Settings/SettingsUbl.php:154
 msgid "General settings"
 msgstr ""
 
@@ -1590,12 +1595,16 @@ msgstr ""
 msgid "Taxes classification"
 msgstr ""
 
+#: includes/Settings/SettingsUbl.php:62
+msgid "To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices."
+msgstr ""
+
 #. translators: 1. General Settings, 2. UBL Settings
-#: includes/Settings/SettingsUbl.php:152
+#: includes/Settings/SettingsUbl.php:153
 msgid "You've enabled UBL output for a document, but some essential details are missing. Please ensure you've added your VAT and CoC numbers in the %1$s. Also, specify your tax rates in the %2$s."
 msgstr ""
 
-#: includes/Settings/SettingsUbl.php:154
+#: includes/Settings/SettingsUbl.php:155
 msgid "UBL settings"
 msgstr ""
 
@@ -2830,55 +2839,63 @@ msgid "Buy now"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version
-#: woocommerce-pdf-invoices-packingslips.php:192
+#: woocommerce-pdf-invoices-packingslips.php:193
 msgid "PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version %3$s or higher to be installed & activated!"
 msgstr ""
 
 #. translators: PHP version
-#: woocommerce-pdf-invoices-packingslips.php:237
+#: woocommerce-pdf-invoices-packingslips.php:238
 msgid "PDF Invoices & Packing Slips for WooCommerce requires PHP %s or higher."
 msgstr ""
 
 #. translators: <a> tags
-#: woocommerce-pdf-invoices-packingslips.php:243
+#: woocommerce-pdf-invoices-packingslips.php:244
 msgid "We strongly recommend to %1$supdate your PHP version%2$s."
 msgstr ""
 
 #. translators: directory path
-#: woocommerce-pdf-invoices-packingslips.php:335
+#: woocommerce-pdf-invoices-packingslips.php:336
 msgid "The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:336
+#: woocommerce-pdf-invoices-packingslips.php:337
 msgid "To protect them, you must click the button below."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:337
+#: woocommerce-pdf-invoices-packingslips.php:338
 msgid "Generate random temporary folder name"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:394
+#: woocommerce-pdf-invoices-packingslips.php:395
 msgid "When sending emails with MailPoet 3 and the active sending method is <strong>MailPoet Sending Service</strong> or <strong>Your web host / web server</strong>, MailPoet does not include the <strong>PDF Invoices & Packing Slips for WooCommerce</strong> attachments in the emails."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:395
+#: woocommerce-pdf-invoices-packingslips.php:396
 msgid "To fix this you should select <strong>The default WordPress sending method (default)</strong> on the <strong>Advanced tab</strong>."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:396
+#: woocommerce-pdf-invoices-packingslips.php:397
 msgid "Change MailPoet sending method to WordPress (default)"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:433
+#: woocommerce-pdf-invoices-packingslips.php:434
 msgid "PDF Invoices & Packing Slips for WooCommerce detected that your current site locale is right-to-left (RTL) which the current PDF engine does not support it. Please consider installing our mPDF extension that is compatible."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:434
+#: woocommerce-pdf-invoices-packingslips.php:435
 msgid "Download mPDF extension"
 msgstr ""
 
+#: woocommerce-pdf-invoices-packingslips.php:480
+msgid "The year-end is approaching, and we noticed that your PDF Invoices & Packing Slips for WooCommerce plugin doesn't have the scheduled action to reset invoice numbers annually, even though you've explicitly enabled this setting in the document options. Click the button below to schedule the action before the year ends."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:481
+msgid "Schedule the action now"
+msgstr ""
+
 #. translators: legacy addon name
-#: woocommerce-pdf-invoices-packingslips.php:520
+#: woocommerce-pdf-invoices-packingslips.php:565
 msgid "While updating the PDF Invoices & Packing Slips for WooCommerce plugin we've noticed our legacy %s add-on was active on your site. This functionality is now incorporated into the core plugin. We've deactivated the add-on for you, and you are free to uninstall it."
 msgstr ""
 

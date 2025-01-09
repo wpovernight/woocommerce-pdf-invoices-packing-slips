@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS;
 
+use WPO\IPS\UBL\Settings\TaxesSettings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -200,11 +202,11 @@ class Assets {
 			wp_enqueue_media();
 			wp_enqueue_script(
 				'wpo-wcpdf-media-upload',
-				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
-
+			
 			// status/debug page scripts
 			if ( 'debug' === $tab ) {
 				wp_enqueue_style(
@@ -217,13 +219,13 @@ class Assets {
 
 				wp_enqueue_style(
 					'wpo-wcpdf-debug-tools-styles',
-					WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools'.$suffix.'.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools' . $suffix . '.css',
 					WPO_WCPDF_VERSION
 				);
 
 				wp_enqueue_script(
 					'wpo-wcpdf-debug',
-					WPO_WCPDF()->plugin_url() . '/assets/js/debug-script'.$suffix.'.js',
+					WPO_WCPDF()->plugin_url() . '/assets/js/debug-script' . $suffix . '.js',
 					array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
 					WPO_WCPDF_VERSION
 				);
@@ -248,7 +250,31 @@ class Assets {
 						),
 					)
 				);
+
 			}
+			
+			// ubl taxes
+			if ( 'ubl' === $tab ) {
+				wp_enqueue_script(
+					'wpo-wcpdf-ubl',
+					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
+					array( 'jquery' ),
+					WPO_WCPDF_VERSION,
+					true
+				);
+				
+				wp_localize_script(
+					'wpo-wcpdf-ubl',
+					'wpo_wcpdf_ubl',
+					array(
+						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
+						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
+						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
+						'remarks' => TaxesSettings::get_available_remarks(),
+					)
+				);
+			}
+
 		}
 
 		if (
@@ -271,6 +297,7 @@ class Assets {
 				)
 			);
 		}
+
 	}
 
 }

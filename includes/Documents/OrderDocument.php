@@ -295,6 +295,7 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
 			'attach_to_email_ids',
+			'ubl_format',
 			'disable_for_statuses',
 			'number_format', // this is stored in the number data already!
 			'my_account_buttons',
@@ -458,39 +459,48 @@ abstract class OrderDocument {
 	}
 
 	public function regenerate( $order = null, $data = null ) {
-		$order = empty( $order ) ? $this->order : $order;
+		$order     = empty( $order ) ? $this->order : $order;
+		$refund_id = false;
+		
 		if ( empty( $order ) ) {
-			return; //Nothing to update
+			return;
 		}
 
 		// pass data to setter functions
-		if( ! empty( $data ) ) {
+		if ( ! empty( $data ) ) {
 			$this->set_data( $data, $order );
 			$this->save();
 		}
 
 		// save settings
 		$this->save_settings( true );
-
-		//Add order note
-		$parent_order = $refund_id = false;
-		// If credit note
-		if ( $this->get_type() == 'credit-note' ) {
+		
+		// if credit note
+		if ( 'credit-note' === $this->get_type() ) {
 			$refund_id = $order->get_id();
-			$parent_order = wc_get_order( $order->get_parent_id() );
+			$order     = wc_get_order( $order->get_parent_id() );
 		}
+		
+		// ubl
+		if ( $document->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
+			wpo_ips_ubl_save_order_taxes( $order );
+		}
+		
 		$note = $refund_id ? sprintf(
 			/* translators: 1. credit note title, 2. refund id */
 			esc_html__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ),
 			ucfirst( $this->get_title() ),
 			$refund_id
 		) : sprintf(
-			/* translators: document title */
+			/* translators: 1. document title */
 			esc_html__( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
 			ucfirst( $this->get_title() )
 		);
+		
 		$note = wp_kses( $note, 'strip' );
-		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
+		
+		// add note to order
+		$order->add_order_note( $note );
 
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
 	}
@@ -1482,8 +1492,6 @@ abstract class OrderDocument {
 		$ubl_maker    = wcpdf_get_ubl_maker();
 		$ubl_document = new UblDocument();
 
-		$ubl_document->set_order( $this->order );
-
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
 		if ( $document ) {
@@ -1878,9 +1886,9 @@ abstract class OrderDocument {
 	 */
 	public function get_due_date(): int {
 		$due_date      = $this->get_setting( 'due_date' );
-		$due_date_days = $this->get_setting( 'due_date_days' );
+		$due_date_days = absint( $this->get_setting( 'due_date_days' ) );
 
-		if ( empty( $this->order ) || empty( $due_date ) || empty( $due_date_days ) ) {
+		if ( empty( $this->order ) || empty( $due_date ) || $due_date_days < 0 ) {
 			return 0;
 		}
 
@@ -1903,7 +1911,7 @@ abstract class OrderDocument {
 		);
 		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
 
-		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) <= 0 ) {
+		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) < 0 ) {
 			return 0;
 		}
 

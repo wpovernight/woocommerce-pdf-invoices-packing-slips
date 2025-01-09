@@ -492,11 +492,13 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function get_payment_method() {
 		if ( $this->is_refund( $this->order ) ) {
-			$parent_order   = $this->get_refund_parent( $this->order );
-			$payment_method = $parent_order->get_payment_method_title();
+			$parent_order         = $this->get_refund_parent( $this->order );
+			$payment_method_title = $parent_order->get_payment_method_title();
 		} else {
-			$payment_method = $this->order->get_payment_method_title();
+			$payment_method_title = $this->order->get_payment_method_title();
 		}
+
+		$payment_method = wpo_wcpdf_dynamic_translate( $payment_method_title, 'woocommerce' );
 
 		return apply_filters( 'wpo_wcpdf_payment_method', $payment_method, $this );
 	}
@@ -527,7 +529,8 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * Return/Show shipping method
 	 */
 	public function get_shipping_method() {
-		return apply_filters( 'wpo_wcpdf_shipping_method', $this->order->get_shipping_method(), $this );
+		$shipping_method = wpo_wcpdf_dynamic_translate( $this->order->get_shipping_method(), 'woocommerce' );
+		return apply_filters( 'wpo_wcpdf_shipping_method', $shipping_method, $this );
 	}
 	public function shipping_method() {
 		echo esc_html( $this->get_shipping_method() );
@@ -942,11 +945,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 
 			if ( ! empty( $label ) ) {
-				if ( function_exists( 'WPO_WCPDF_Pro' ) && isset( \WPO_WCPDF_Pro()->multilingual_full ) && is_callable( array( \WPO_WCPDF_Pro()->multilingual_full, 'maybe_get_string_translation' ) ) ) {
-					$totals[ $key ]['label'] = \WPO_WCPDF_Pro()->multilingual_full->maybe_get_string_translation( $label, 'woocommerce' );
-				} else {
-					$totals[ $key ]['label'] = $label;
-				}
+				$totals[ $key ]['label'] = wpo_wcpdf_dynamic_translate( $label, 'woocommerce-pdf-invoices-packing-slips' );
 			}
 		}
 
