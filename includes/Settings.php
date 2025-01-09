@@ -62,9 +62,6 @@ class Settings {
 		// settings capabilities
 		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
 
-		// admin notice for auto_increment_increment
-		// add_action( 'admin_notices', array( $this, 'check_auto_increment_increment') );
-
 		// AJAX set number store
 		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
 
@@ -157,17 +154,6 @@ class Settings {
 		return current_user_can( $this->user_settings_capability() );
 	}
 
-	function check_auto_increment_increment() {
-		global $wpdb;
-		$row = $wpdb->get_row( "SHOW VARIABLES LIKE 'auto_increment_increment'" );
-		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
-			/* translators: database row value */
-			$error = wp_kses_post( sprintf( __( "<strong>Warning!</strong> Your database has an AUTO_INCREMENT step size of %d, your invoice numbers may not be sequential. Enable the 'Calculate document numbers (slow)' setting in the Advanced tab to use an alternate method." , 'woocommerce-pdf-invoices-packing-slips' ), intval( $row->Value ) ) );
-			printf( '<div class="error"><p>%s</p></div>', $error );
-		}
-	}
-
-
 	public function settings_page() {
 		// feedback on settings save
 		settings_errors();
@@ -183,13 +169,11 @@ class Settings {
 			),
 		) );
 
-		if ( wcpdf_is_ubl_available() ) {
-			$settings_tabs['ubl'] = array(
-				'title'          => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-				'preview_states' => 1,
-				'beta'           => true,
-			);
-		}
+		$settings_tabs['ubl'] = array(
+			'title'          => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+			'preview_states' => 1,
+			//'beta'           => true,
+		);
 
 		// add status and upgrade tabs last in row
 		$settings_tabs['debug'] = array(
@@ -518,22 +502,27 @@ class Settings {
 
 	}
 
-	public function get_common_document_settings() {
-		$common_settings = array(
-			'paper_size'         => isset( $this->general_settings['paper_size'] ) ? $this->general_settings['paper_size'] : '',
-			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined("DOMPDF_ENABLE_FONTSUBSETTING") && DOMPDF_ENABLE_FONTSUBSETTING === true ) ? true : false,
-			'header_logo'        => isset( $this->general_settings['header_logo'] ) ? $this->general_settings['header_logo'] : '',
-			'header_logo_height' => isset( $this->general_settings['header_logo_height'] ) ? $this->general_settings['header_logo_height'] : '',
-			'vat_number'         => isset( $this->general_settings['vat_number'] ) ? $this->general_settings['vat_number'] : '',
-			'coc_number'         => isset( $this->general_settings['coc_number'] ) ? $this->general_settings['coc_number'] : '',
-			'shop_name'          => isset( $this->general_settings['shop_name'] ) ? $this->general_settings['shop_name'] : '',
-			'shop_address'       => isset( $this->general_settings['shop_address'] ) ? $this->general_settings['shop_address'] : '',
-			'footer'             => isset( $this->general_settings['footer'] ) ? $this->general_settings['footer'] : '',
-			'extra_1'            => isset( $this->general_settings['extra_1'] ) ? $this->general_settings['extra_1'] : '',
-			'extra_2'            => isset( $this->general_settings['extra_2'] ) ? $this->general_settings['extra_2'] : '',
-			'extra_3'            => isset( $this->general_settings['extra_3'] ) ? $this->general_settings['extra_3'] : '',
+	/**
+	 * Get document general settings.
+	 *
+	 * @return array
+	 */
+	public function get_common_document_settings(): array {
+		return array(
+			'paper_size'         => $this->general_settings['paper_size'] ?? '',
+			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
+			'header_logo'        => $this->general_settings['header_logo'] ?? '',
+			'header_logo_height' => $this->general_settings['header_logo_height'] ?? '',
+			'vat_number'         => $this->general_settings['vat_number'] ?? '',
+			'coc_number'         => $this->general_settings['coc_number'] ?? '',
+			'shop_name'          => $this->general_settings['shop_name'] ?? '',
+			'shop_phone_number'  => $this->general_settings['shop_phone_number'] ?? '',
+			'shop_address'       => $this->general_settings['shop_address'] ?? '',
+			'footer'             => $this->general_settings['footer'] ?? '',
+			'extra_1'            => $this->general_settings['extra_1'] ?? '',
+			'extra_2'            => $this->general_settings['extra_2'] ?? '',
+			'extra_3'            => $this->general_settings['extra_3'] ?? '',
 		);
-		return $common_settings;
 	}
 
 	public function get_document_settings( $document_type, $output_format = 'pdf' ) {
@@ -1030,7 +1019,7 @@ class Settings {
 	 * @return void
 	 */
 	public function update_documents_settings_sections(): void {
-		$documents = WPO_WCPDF()->documents->get_documents();
+		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {
