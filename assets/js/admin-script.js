@@ -56,6 +56,17 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 
+	// disable encrypted pdf option for non UBL 2.1 formats
+	$( "[name='wpo_wcpdf_documents_settings_invoice_ubl[ubl_format]']" ).on( 'change', function( event ) {
+		let $encryptedPdfCheckbox = $( this ).closest( 'form' ).find( "[name='wpo_wcpdf_documents_settings_invoice_ubl[include_encrypted_pdf]']" );
+
+		if ( $( this ).val() !== 'ubl_2_1' ) {
+			$encryptedPdfCheckbox.prop( 'checked', false ).prop( 'disabled', true );
+		} else {
+			$encryptedPdfCheckbox.prop( 'disabled', false );
+		}
+	} ).trigger( 'change' );
+
 	// enable settings document switch
 	$( '.wcpdf_document_settings_sections > h2' ).on( 'click', function() {
 		$( this ).parent().find( 'ul' ).toggleClass( 'active' );
@@ -373,7 +384,14 @@ jQuery( function( $ ) {
 	} );
 
 	// Trigger the Preview
-	function triggerPreview( timeoutDuration ) {
+	function triggerPreview( timeoutDuration = 0 ) {
+		$previewStates = $( '#wpo-wcpdf-preview-wrapper' ).data( 'preview-states' );
+		
+		// Check if preview is disabled and return
+		if ( 'undefined' === $previewStates || 1 === $previewStates ) {
+			return;
+		}
+		
 		timeoutDuration = typeof timeoutDuration == 'number' ? timeoutDuration : 0;
 
 		loadPreviewData();
@@ -430,6 +448,7 @@ jQuery( function( $ ) {
 
 	// Load the Preview with AJAX
 	function ajaxLoadPreview() {
+		console.log( 'Loading preview...' );
 		let worker   = wpo_wcpdf_admin.pdfjs_worker;
 		let canvasId = 'preview-canvas';
 		let data     = {

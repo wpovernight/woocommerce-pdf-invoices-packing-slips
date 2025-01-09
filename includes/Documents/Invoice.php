@@ -481,7 +481,7 @@ class Invoice extends OrderDocumentMethods {
 				'args'			=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'invoice_number_search',
-					'description'   => __( 'The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href="https://woocommerce.com/document/high-performance-order-storage/" target="_blank">HPOS</a> feature, allowing you to search orders by invoice numbers using the search type selector.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'   => __( 'The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href="https://woocommerce.com/document/high-performance-order-storage/" target="_blank">HPOS</a> feature to search for orders by invoice numbers using the search type selector. Additionally, it allows you to search for multiple orders using a comma-separated list of invoice numbers.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -579,7 +579,7 @@ class Invoice extends OrderDocumentMethods {
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
-				'id'       => $this->type.'_ubl',
+				'id'       => $this->type . '_ubl',
 				'title'    => '',
 				'callback' => 'section',
 			),
@@ -588,7 +588,7 @@ class Invoice extends OrderDocumentMethods {
 				'id'       => 'enabled',
 				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
-				'section'  => $this->type.'_ubl',
+				'section'  => $this->type . '_ubl',
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'enabled',
@@ -596,10 +596,25 @@ class Invoice extends OrderDocumentMethods {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'ubl_format',
+				'title'    => __( 'Format', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $this->type . '_ubl',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'ubl_format',
+					'options'     => apply_filters( 'wpo_wcpdf_document_ubl_settings_formats', array(
+						'ubl_2_1' => __( 'UBL 2.1' , 'woocommerce-pdf-invoices-packing-slips' ),
+					), $this ),
+					'description' => $this->get_ubl_format_description(),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'attach_to_email_ids',
 				'title'    => __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'multiple_checkboxes',
-				'section'  => $this->type.'_ubl',
+				'section'  => $this->type . '_ubl',
 				'args'     => array(
 					'option_name'     => $option_name,
 					'id'              => 'attach_to_email_ids',
@@ -613,11 +628,11 @@ class Invoice extends OrderDocumentMethods {
 				'id'       => 'include_encrypted_pdf',
 				'title'    => __( 'Include encrypted PDF:', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
-				'section'  => $this->type.'_ubl',
+				'section'  => $this->type . '_ubl',
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'include_encrypted_pdf',
-					'description' => __( 'Include the PDF Invoice file encrypted in the UBL file.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Embed the encrypted PDF invoice file within the UBL document. Note that this option may not be supported by all UBL formats.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 		);
@@ -687,6 +702,7 @@ class Invoice extends OrderDocumentMethods {
 					'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 					'members' => array(
 						'enabled',
+						'ubl_format',
 						'attach_to_email_ids',
 						'include_encrypted_pdf',
 					),
@@ -695,6 +711,46 @@ class Invoice extends OrderDocumentMethods {
 		);
 
 		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ] ?? array(), $output_format, $this );
+	}
+
+	/**
+	 * Get UBL Format setting description
+	 *
+	 * @return string
+	 */
+	private function get_ubl_format_description(): string {
+		$extensions_available   = array();
+		$ubl_format_description = '';
+
+		if ( ! class_exists( 'WPO_IPS_XRechnung' ) ) {
+			$extensions_available['xrechnung'] = array(
+				'title' => __( 'EN16931 XRechnung', 'woocommerce-pdf-invoices-packing-slips' ),
+				'url'   => 'https://github.com/wpovernight/wpo-ips-xrechnung/releases/latest/',
+			);
+		}
+
+		if ( ! empty( $extensions_available ) ) {
+			$ubl_format_description = __( 'Formats available through extensions', 'woocommerce-pdf-invoices-packing-slips' ) . ':';
+
+			foreach ( $extensions_available as $extension ) {
+				$ubl_format_description .= ' <a href="' . esc_url( $extension['url'] ) . '" target="_blank">' . esc_html( $extension['title'] ) . '</a>';
+
+				if ( next( $extensions_available ) ) {
+					$ubl_format_description .= ',';
+				} else {
+					$ubl_format_description .= '<br>';
+				}
+			}
+		}
+
+		$ubl_format_description .= sprintf(
+			/* translators: %1$s: opening link tag, %2$s: closing link tag */
+			__( 'If the format you need isn\'t listed, please don\'t hesitate to %1$scontact us%2$s!', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="https://wpovernight.com/contact/" target="_blank">',
+			'</a>'
+		);
+
+		return $ubl_format_description;
 	}
 
 }

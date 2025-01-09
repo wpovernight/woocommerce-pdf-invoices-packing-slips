@@ -21,7 +21,7 @@ class AdditionalDocumentReferenceHandler extends UblHandler {
 					),
 					array(
 						'name'  => 'cbc:DocumentType',
-						'value' => ! empty( $this->document->order_document->get_title() ) ? 'PDF '.$this->document->order_document->get_title() : '',
+						'value' => ! empty( $this->document->order_document->get_title() ) ? wpo_ips_ubl_sanitize_string( 'PDF ' . $this->document->order_document->get_title() ) : '',
 					),
 					array(
 						'name'  => 'cac:Attachment',

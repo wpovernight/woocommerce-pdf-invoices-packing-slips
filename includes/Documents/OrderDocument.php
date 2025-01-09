@@ -52,7 +52,7 @@ abstract class OrderDocument {
 
 	/**
 	 * WC Order ID
-	 * @var object
+	 * @var int
 	 */
 	public $order_id;
 
@@ -105,7 +105,7 @@ abstract class OrderDocument {
 	 */
 	public function __construct( $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
-			$this->order_id = $order;
+			$this->order_id = absint( $order );
 			$this->order    = wc_get_order( $this->order_id );
 		} elseif ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) {
 			$this->order_id = $order->get_id();
@@ -295,6 +295,7 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
 			'attach_to_email_ids',
+			'ubl_format',
 			'disable_for_statuses',
 			'number_format', // this is stored in the number data already!
 			'my_account_buttons',
@@ -341,6 +342,17 @@ abstract class OrderDocument {
 		$is_enabled = $this->get_setting( 'enabled', false, $output_format );
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
+	}
+
+	/**
+	 * Get the UBL format
+	 *
+	 * @return string|false
+	 */
+	public function get_ubl_format() {
+		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
+
+		return apply_filters( 'wpo_wcpdf_document_ubl_format', $ubl_format, $this );
 	}
 
 	public function get_hook_prefix() {
@@ -447,30 +459,48 @@ abstract class OrderDocument {
 	}
 
 	public function regenerate( $order = null, $data = null ) {
-		$order = empty( $order ) ? $this->order : $order;
+		$order     = empty( $order ) ? $this->order : $order;
+		$refund_id = false;
+		
 		if ( empty( $order ) ) {
-			return; //Nothing to update
+			return;
 		}
 
 		// pass data to setter functions
-		if( ! empty( $data ) ) {
+		if ( ! empty( $data ) ) {
 			$this->set_data( $data, $order );
 			$this->save();
 		}
 
 		// save settings
 		$this->save_settings( true );
-
-		//Add order note
-		$parent_order = $refund_id = false;
-		// If credit note
-		if ( $this->get_type() == 'credit-note' ) {
+		
+		// if credit note
+		if ( 'credit-note' === $this->get_type() ) {
 			$refund_id = $order->get_id();
-			$parent_order = wc_get_order( $order->get_parent_id() );
-		} /*translators: 1. credit note title, 2. refund id */
-		$note = $refund_id ? sprintf( __( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ), $refund_id ) : sprintf( __( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ), ucfirst( $this->get_title() ) );
+			$order     = wc_get_order( $order->get_parent_id() );
+		}
+		
+		// ubl
+		if ( $document->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
+			wpo_ips_ubl_save_order_taxes( $order );
+		}
+		
+		$note = $refund_id ? sprintf(
+			/* translators: 1. credit note title, 2. refund id */
+			__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() ),
+			$refund_id
+		) : sprintf(
+			/* translators: 1. document title */
+			__( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() )
+		);
+		
 		$note = wp_kses( $note, 'strip' );
-		$parent_order ? $parent_order->add_order_note( $note ) : $order->add_order_note( $note );
+		
+		// add note to order
+		$order->add_order_note( $note );
 
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
 	}
@@ -1130,7 +1160,7 @@ abstract class OrderDocument {
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
 			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
 			$src             = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
-			
+
 			if ( empty( $src ) ) {
 				wcpdf_log_error( 'Header logo file not found.', 'critical' );
 				return;
@@ -1227,6 +1257,16 @@ abstract class OrderDocument {
 	}
 	public function shop_address() {
 		echo $this->get_shop_address();
+	}
+
+	/**
+	 * Return/Show shop/company phone number if provided.
+	 */
+	public function get_shop_phone_number() {
+		return $this->get_settings_text( 'shop_phone_number', '', false );
+	}
+	public function shop_phone_number() {
+		echo $this->get_shop_phone_number();
 	}
 
 	/**
@@ -1391,8 +1431,6 @@ abstract class OrderDocument {
 	public function output_ubl( $contents_only = false ) {
 		$ubl_maker    = wcpdf_get_ubl_maker();
 		$ubl_document = new UblDocument();
-
-		$ubl_document->set_order( $this->order );
 
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
@@ -1781,12 +1819,23 @@ abstract class OrderDocument {
 	 */
 	public function get_due_date(): int {
 		$due_date      = $this->get_setting( 'due_date' );
-		$due_date_days = $this->get_setting( 'due_date_days' );
+		$due_date_days = absint( $this->get_setting( 'due_date_days' ) );
 
-		if ( empty( $this->order ) || empty( $due_date ) || empty( $due_date_days ) ) {
+		if ( empty( $this->order ) || empty( $due_date ) || $due_date_days < 0 ) {
 			return 0;
 		}
 
+		return $this->calculate_due_date( $due_date_days );
+	}
+
+	/**
+	 * Calculate the due date.
+	 *
+	 * @param int $due_date_days
+	 *
+	 * @return int Due date timestamp.
+	 */
+	public function calculate_due_date( int $due_date_days ): int {
 		$due_date_days = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_days',
 			array( $due_date_days, $this->get_type(), $this ),
@@ -1795,11 +1844,11 @@ abstract class OrderDocument {
 		);
 		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
 
-		if ( 0 >= intval( $due_date_days ) ) {
+		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) < 0 ) {
 			return 0;
 		}
 
-		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( wc_timezone_string() ) );
 		$base_date              = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_base_date',
 			array( $document_creation_date, $this->get_type(), $this ),
