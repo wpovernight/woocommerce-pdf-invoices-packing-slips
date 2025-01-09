@@ -9,6 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class UblDocument extends Document {
+	
+	public function get_root_element() {
+		return apply_filters( 'wpo_wc_ubl_document_root_element', 'Invoice', $this );
+	}
 
 	public function get_format() {
 		$format = apply_filters( 'wpo_wc_ubl_document_format' , array(
@@ -31,6 +35,10 @@ class UblDocument extends Document {
 			'documentcurrencycode' => array(
 				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Common\DocumentCurrencyCodeHandler::class,
+			),
+			'buyerreference' => array(
+				'enabled' => false,
+				'handler' => \WPO\IPS\UBL\Handlers\Common\BuyerReferenceHandler::class,
 			),
 			'orderreference' => array(
 				'enabled' => true,
@@ -59,7 +67,7 @@ class UblDocument extends Document {
 				'handler' => \WPO\IPS\UBL\Handlers\Common\DeliveryHandler::class,
 			),
 			'paymentmeans' => array(
-				'enabled' => false,
+				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Common\PaymentMeansHandler::class,
 			),
 			'paymentterms' => array(
@@ -82,7 +90,7 @@ class UblDocument extends Document {
 				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Invoice\InvoiceLineHandler::class,
 			),
-		) );
+		), $this );
 
 		foreach ( $format as $key => $element ) {
 			if ( false === $element['enabled'] ) {
@@ -98,7 +106,7 @@ class UblDocument extends Document {
 			'cac' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
 			'cbc' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
 			''    => 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2',
-		) );
+		), $this );
 	}
 
 	public function get_data() {
