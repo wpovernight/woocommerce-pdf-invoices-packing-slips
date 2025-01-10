@@ -39,7 +39,7 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id ): s
 	$tax_rate_class   = '';
 	$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 	
-	if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
+	if ( ! is_null( $rate_id ) && class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
 		if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
