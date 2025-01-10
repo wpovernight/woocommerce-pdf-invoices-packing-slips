@@ -89,7 +89,7 @@ class TaxTotalHandler extends UblHandler {
 					),
 				),
 			);
-		}, apply_filters( 'wpo_wc_ubl_orderTaxData' ), $orderTaxData, $data, $options, $this );
+		}, apply_filters( 'wpo_wc_ubl_orderTaxData', $orderTaxData, $data, $options, $this ) );
 
 		$array = array(
 			'name'  => 'cac:TaxTotal',
