@@ -25,35 +25,37 @@ function wpo_ips_ubl_sanitize_string( string $string ): string {
 /**
  * Get UBL tax data from fallback
  *
- * @param string $key      Can be category, scheme, or reason
- * @param int    $rate_id  The tax rate ID
+ * @param string   $key      Can be category, scheme, or reason
+ * @param int|null $rate_id  The tax rate ID
  * @return string
  */
-function wpo_ips_ubl_get_tax_data_from_fallback( string $key, int $rate_id ): string {
+function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id ): string {
 	$result = '';
 	
 	if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ) ) ) {
 		return $result;
 	}
-
+	
+	$tax_rate_class   = '';
+	$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+	
 	if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
 		if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-			$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
-			$result           = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] : '';
-			$tax_rate_class   = $tax_rate->tax_rate_class;
-
-			if ( empty( $tax_rate_class ) ) {
-				$tax_rate_class = 'standard';
-			}
-
-			if ( empty( $result ) || 'default' === $result ) {
-				$result = isset( $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] ) ? $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] : '';
-			}
+			$result         = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] : '';
+			$tax_rate_class = $tax_rate->tax_rate_class;
 		}
 	}
-
+	
+	if ( empty( $tax_rate_class ) ) {
+		$tax_rate_class = 'standard';
+	}
+	
+	if ( empty( $result ) || 'default' === $result ) {
+		$result = isset( $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] ) ? $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] : '';
+	}
+	
 	return $result;
 }
 
