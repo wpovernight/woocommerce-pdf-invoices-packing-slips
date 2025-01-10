@@ -47,21 +47,25 @@ class TaxTotalHandler extends UblHandler {
 					'name'  => 'cbc:Percent',
 					'value' => round( $itemTaxPercentage, 1 ),
 				),
-				array(
+			);
+			
+			if ( 'none' !== $itemTaxReasonKey ) {
+				$taxCategory[] = array(
 					'name'  => 'cbc:TaxExemptionReasonCode',
 					'value' => $itemTaxReasonKey,
-				),
-				array(
+				);
+				$taxCategory[] = array(
 					'name'  => 'cbc:TaxExemptionReason',
 					'value' => $itemTaxReason,
-				),
-				array(
-					'name'  => 'cac:TaxScheme',
-					'value' => array(
-						array(
-							'name'  => 'cbc:ID',
-							'value' => strtoupper( $itemTaxScheme ),
-						),
+				);
+			}
+			
+			$taxCategory[] = array(
+				'name'  => 'cac:TaxScheme',
+				'value' => array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => strtoupper( $itemTaxScheme ),
 					),
 				),
 			);
