@@ -67,7 +67,7 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 				$result = 'AE';
 				break;
 			case 'reason':
-				$result = __( 'Reverse charge', 'woocommerce-pdf-invoices-packing-slips' );
+				$result = 'VATEX-EU-AE';
 				break;
 		}
 		
