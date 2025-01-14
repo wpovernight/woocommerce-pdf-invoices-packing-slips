@@ -1086,18 +1086,21 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_dic',           // EU/UK VAT Manager for WooCommerce
 	), $order );
 
+	$vat_number = null;
+
 	foreach ( $vat_meta_keys as $meta_key ) {
-		$vat_number = $order->get_meta( $meta_key );
+		$meta_value = $order->get_meta( $meta_key );
 
 		// Handle multidimensional VAT data (e.g., Aelia EU VAT Assistant)
-		if ( '_eu_vat_evidence' === $meta_key && is_array( $vat_number ) ) {
-			$vat_number = $vat_number['exemption']['vat_number'] ?? '';
+		if ( '_eu_vat_evidence' === $meta_key && is_array( $meta_value ) ) {
+			$meta_value = $meta_value['exemption']['vat_number'] ?? '';
 		}
 
-		if ( $vat_number ) {
-			return $vat_number;
+		if ( $meta_value ) {
+			$vat_number = $meta_value;
+			break;
 		}
 	}
 
-	return null;
+	return apply_filters( 'wpo_wcpdf_order_customer_vat_number', $vat_number, $order, $meta_key ?? null );
 }
