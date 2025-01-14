@@ -110,7 +110,7 @@ abstract class Document {
 					$value    = wc_get_order_item_meta( $tax_item_key, $meta_key, true );
 					
 					if ( empty( $value ) || 'default' === $value || ! $use_historical_settings ) {
-						$value = wpo_ips_ubl_get_tax_data_from_fallback( $field, $tax_rate_id );
+						$value = wpo_ips_ubl_get_tax_data_from_fallback( $field, $tax_rate_id, $this->order );
 					}
 					
 					if ( $use_historical_settings ) {
