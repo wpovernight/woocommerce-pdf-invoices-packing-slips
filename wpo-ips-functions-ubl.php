@@ -69,14 +69,14 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 	
 	if ( $is_vat_exempt ) {
 		switch ( $key ) {
-			case 'category':
-				$result = 'E';
-				break;
 			case 'scheme':
 				$result = 'VAT';
 				break;
+			case 'category':
+				$result = 'AE';
+				break;
 			case 'reason':
-				$result = __( 'VAT exemption', 'woocommerce-pdf-invoices-packing-slips' );
+				$result = __( 'Reverse charge', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
 		}
 		
