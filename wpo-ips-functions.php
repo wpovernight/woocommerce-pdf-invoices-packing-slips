@@ -1042,18 +1042,19 @@ function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
 	// Fallback to customer VAT exemption if order is not exempt
 	if ( ! $is_vat_exempt && apply_filters( 'wpo_wcpdf_order_vat_exempt_fallback_to_customer', true, $order ) ) {
 		$customer_id = $order->get_customer_id();
+		
 		if ( $customer_id ) {
-			$customer = new \WC_Customer( $customer_id );
+			$customer      = new \WC_Customer( $customer_id );
 			$is_vat_exempt = $customer->is_vat_exempt();
 		}
 	}
 
 	// Check VAT exemption for EU orders based on VAT number and tax details
 	if ( ! $is_vat_exempt && apply_filters( 'wpo_wcpdf_order_vat_exempt_fallback_to_customer_vat_number', true, $order ) ) {
-		$is_eu_order = in_array( 
-			$order->get_billing_country(), 
-			WC()->countries->get_european_union_countries( 'eu_vat' ), 
-			true 
+		$is_eu_order = in_array(
+			$order->get_billing_country(),
+			WC()->countries->get_european_union_countries( 'eu_vat' ),
+			true
 		);
 
 		if ( $is_eu_order && $order->get_total() > 0 && $order->get_total_tax() == 0 ) {
