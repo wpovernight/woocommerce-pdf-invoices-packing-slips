@@ -58,16 +58,7 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 	}
 	
 	// check if order is tax exempt
-	$vat_exempt_meta_key = apply_filters( 'wpo_ips_ubl_vat_exempt_meta_key', 'is_vat_exempt', $order );
-	$is_vat_exempt       = apply_filters( 'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( $vat_exempt_meta_key ), $order );
-		
-	if ( ! $is_vat_exempt && apply_filters( 'wpo_ips_ubl_vat_exempt_fallback_to_customer', true, $order ) ) {
-		// fallback to customer
-		$customer      = new \WC_Customer( $order->get_customer_id() );
-		$is_vat_exempt = $customer ? $customer->is_vat_exempt() : false;
-	}
-	
-	if ( $is_vat_exempt ) {
+	if ( wpo_wcpdf_order_is_vat_exempt( $order ) ) {
 		switch ( $key ) {
 			case 'scheme':
 				$result = 'VAT';
