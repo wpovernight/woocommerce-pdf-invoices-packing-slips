@@ -13,6 +13,10 @@ class UblDocument extends Document {
 	public function get_root_element() {
 		return apply_filters( 'wpo_wc_ubl_document_root_element', 'Invoice', $this );
 	}
+	
+	public function get_additional_root_elements() {
+		return apply_filters( 'wpo_wc_ubl_document_additional_root_elements', array(), $this );
+	}
 
 	public function get_format() {
 		$format = apply_filters( 'wpo_wc_ubl_document_format' , array(

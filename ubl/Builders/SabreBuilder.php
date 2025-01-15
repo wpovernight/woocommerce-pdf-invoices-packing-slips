@@ -3,6 +3,7 @@
 namespace WPO\IPS\UBL\Builders;
 
 use WPO\IPS\Vendor\Sabre\Xml\Service;
+use WPO\IPS\Vendor\Sabre\Xml\Writer;
 use WPO\IPS\UBL\Documents\Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -11,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SabreBuilder extends Builder {
 
-	/** Service */
+	/** @var Service */
 	private $service;
 
 	public function __construct() {
@@ -19,11 +20,28 @@ class SabreBuilder extends Builder {
 	}
 
 	public function build( Document $document ) {
-		// Sabre wants namespaces in value/key format, so we need to flip it
-		$namespaces                  = array_flip( $document->get_namespaces() );
-		$this->service->namespaceMap = $namespaces;
+		// Flip namespaces so Sabre sees prefix => URI
+		$this->service->namespaceMap = array_flip( $document->get_namespaces() );
+		
+		$rootElement        = $document->get_root_element();
+		$additionalElements = $document->get_additional_root_elements();
+		
+		// If there are no elements
+		if ( empty( $additionalElements ) ) {
+			return $this->service->write( $rootElement, $document->get_data() );
 
-		return $this->service->write( $document->get_root_element(), $document->get_data() );
+		// If there are elements
+		} else {
+			// We map that root element to our custom class so Sabre knows how to serialize it
+			$this->service->elementMap = array(
+				$rootElement => SabreSerializer::class,
+			);
+
+			return $this->service->write(
+				$rootElement,
+				new SabreSerializer( $document )
+			);
+		}
 	}
-
+	
 }
