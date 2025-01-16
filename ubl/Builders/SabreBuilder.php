@@ -19,7 +19,7 @@ class SabreBuilder extends Builder {
 	}
 
 	public function build( Document $document ) {
-		// Flip namespaces so Sabre sees prefix => URI
+		// Sabre wants namespaces in value => key format, so we need to flip it
 		$this->service->namespaceMap = array_flip( $document->get_namespaces() );
 
 		$rootElement        = $document->get_root_element();
