@@ -3,7 +3,6 @@
 namespace WPO\IPS\UBL\Builders;
 
 use WPO\IPS\Vendor\Sabre\Xml\Service;
-use WPO\IPS\Vendor\Sabre\Xml\Writer;
 use WPO\IPS\UBL\Documents\Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,10 +21,10 @@ class SabreBuilder extends Builder {
 	public function build( Document $document ) {
 		// Flip namespaces so Sabre sees prefix => URI
 		$this->service->namespaceMap = array_flip( $document->get_namespaces() );
-		
+
 		$rootElement        = $document->get_root_element();
 		$additionalElements = $document->get_additional_root_elements();
-		
+
 		// If there are no elements
 		if ( empty( $additionalElements ) ) {
 			return $this->service->write( $rootElement, $document->get_data() );
@@ -43,5 +42,5 @@ class SabreBuilder extends Builder {
 			);
 		}
 	}
-	
+
 }
