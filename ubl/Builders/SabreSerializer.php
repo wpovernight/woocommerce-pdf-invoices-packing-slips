@@ -17,11 +17,11 @@ class SabreSerializer implements XmlSerializable {
 
 	public function xmlSerialize( Writer $writer ): void {
 		$additionalElements = $this->document->get_additional_root_elements();
-		
+
 		if ( ! empty( $additionalElements ) && is_array( $additionalElements ) ) {
 			$writer->writeAttributes( $additionalElements );
 		}
-		
+
 		$writer->write( $this->document->get_data() );
 	}
 }

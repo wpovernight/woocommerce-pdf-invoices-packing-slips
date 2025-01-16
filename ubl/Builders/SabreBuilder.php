@@ -22,25 +22,10 @@ class SabreBuilder extends Builder {
 		// Sabre wants namespaces in value => key format, so we need to flip it
 		$this->service->namespaceMap = array_flip( $document->get_namespaces() );
 
-		$rootElement        = $document->get_root_element();
-		$additionalElements = $document->get_additional_root_elements();
-
-		// If there are no elements
-		if ( empty( $additionalElements ) ) {
-			return $this->service->write( $rootElement, $document->get_data() );
-
-		// If there are elements
-		} else {
-			// We map that root element to our custom class so Sabre knows how to serialize it
-			$this->service->elementMap = array(
-				$rootElement => SabreSerializer::class,
-			);
-
-			return $this->service->write(
-				$rootElement,
-				new SabreSerializer( $document )
-			);
-		}
+		return $this->service->write(
+			$document->get_root_element(),
+			empty( $document->get_additional_root_elements() ) ? $document->get_data() : new SabreSerializer( $document )
+		);
 	}
 
 }
