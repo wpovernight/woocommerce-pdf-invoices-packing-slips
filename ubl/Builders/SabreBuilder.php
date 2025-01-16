@@ -12,14 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SabreBuilder extends Builder {
 
-	private $service;
-	private $document;
+	private Service $service;
+	private Document $document;
 
 	public function __construct() {
 		$this->service = new Service();
 	}
 
-	public function build( Document $document ) {
+	public function build( Document $document ): string {
 		$this->document = $document;
 
 		// Map namespaces (Sabre requires URI => prefix)
