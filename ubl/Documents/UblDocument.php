@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class UblDocument extends Document {
-	
+
 	public function get_root_element() {
 		return apply_filters( 'wpo_wc_ubl_document_root_element', 'Invoice', $this );
 	}
@@ -117,11 +117,34 @@ class UblDocument extends Document {
 		$data = array();
 
 		foreach ( $this->get_format() as $key => $value ) {
-			$handler = new $value['handler']($this);
-			$options = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
-			$data    = $handler->handle( $data, $options );
+			$options  = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
+			$handlers = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
+
+			// Get the root from options if defined
+			$root_name = isset( $options['root'] ) ? $options['root'] : null;
+			$root_data = array();
+
+			foreach ( $handlers as $handler_class ) {
+				if (  ! class_exists( $handler_class ) ) {
+					continue;
+				}
+
+				$handler   = new $handler_class( $this );
+				$root_data = $handler->handle( $root_data, $options );
+			}
+
+			// Add to $data under the root name if specified, otherwise merge directly
+			if ( $root_name ) {
+				$data[] = array(
+					'name'  => $root_name,
+					'value' => $root_data,
+				);
+			} else {
+				$data = array_merge( $data, $root_data );
+			}
 		}
 
 		return apply_filters( 'wpo_wc_ubl_document_data', $data, $this );
 	}
+
 }
