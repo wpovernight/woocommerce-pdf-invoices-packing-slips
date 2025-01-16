@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SabreBuilder extends Builder {
 
-	/** @var Service */
 	private $service;
 
 	public function __construct() {

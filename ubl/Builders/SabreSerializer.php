@@ -8,7 +8,6 @@ use WPO\IPS\Vendor\Sabre\Xml\Writer;
 
 class SabreSerializer implements XmlSerializable {
 
-	/** @var Document */
 	private $document;
 
 	public function __construct( Document $document ) {
