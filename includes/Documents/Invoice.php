@@ -606,7 +606,7 @@ class Invoice extends OrderDocumentMethods {
 					'options'     => apply_filters( 'wpo_wcpdf_document_ubl_settings_formats', array(
 						'ubl_2_1' => __( 'UBL 2.1' , 'woocommerce-pdf-invoices-packing-slips' ),
 					), $this ),
-					'description' => wpo_ips_ubl_is_country_format_extension_active() ? sprintf(
+					'description' => ! wpo_ips_ubl_is_country_format_extension_active() ? sprintf(
 						/* translators: %1$s: opening link tag, %2$s: closing link tag */
 						__( 'Install extensions to support country-specific e-invoicing formats. See the latest %1$ssupported formats%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="https://github.com/wpovernight/wpo-ips-einvoicing" target="_blank">',
