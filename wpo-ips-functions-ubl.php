@@ -32,14 +32,14 @@ function wpo_ips_ubl_sanitize_string( string $string ): string {
  */
 function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\WC_Abstract_Order $order ): string {
 	$result = '';
-	
+
 	if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ) ) ) {
 		return $result;
 	}
-	
+
 	$tax_rate_class   = '';
 	$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
-	
+
 	if ( ! is_null( $rate_id ) && class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
@@ -48,15 +48,15 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 			$tax_rate_class = $tax_rate->tax_rate_class;
 		}
 	}
-	
+
 	if ( empty( $tax_rate_class ) ) {
 		$tax_rate_class = 'standard';
 	}
-	
+
 	if ( empty( $result ) || 'default' === $result ) {
 		$result = isset( $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] ) ? $ubl_tax_settings['class'][ $tax_rate_class ][ $key ] : '';
 	}
-	
+
 	// check if order is tax exempt
 	if ( wpo_wcpdf_order_is_vat_exempt( $order ) ) {
 		switch ( $key ) {
@@ -70,10 +70,10 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 				$result = 'VATEX-EU-AE';
 				break;
 		}
-		
+
 		$result = apply_filters( 'wpo_ips_ubl_get_tax_data_from_fallback_vat_exempt', $result, $key, $rate_id, $order );
 	}
-	
+
 	return $result;
 }
 
@@ -99,18 +99,27 @@ function wpo_ips_ubl_save_order_taxes( \WC_Abstract_Order $order ): void {
 
 					$ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 					$tax_fields       = array( 'category', 'scheme', 'reason' );
-					
+
 					foreach ( $tax_fields as $field ) {
 						$value = isset( $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $field ] ) ? $ubl_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $field ] : '';
-						
+
 						if ( empty( $value ) || 'default' === $value ) {
 							$value = wpo_ips_ubl_get_tax_data_from_fallback( $field, $tax_rate_id, $order );
 						}
-						
+
 						wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_' . $field, $value );
 					}
 				}
 			}
 		}
 	}
+}
+
+/**
+ * Check if the country format extension is active
+ *
+ * @return bool
+ */
+function wpo_ips_ubl_is_country_format_extension_active(): bool {
+	return apply_filters( 'wpo_ips_ubl_is_country_format_extension_active', false );
 }
