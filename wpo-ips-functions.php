@@ -262,6 +262,11 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		$error_message = "Invalid output format: {$output_format}. Expected one of: " . implode( ', ', $document->output_formats );
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
+	
+	if ( ! $document->is_enabled( $output_format ) ) {
+		$error_message = "The {$output_format} output format is not enabled for this document: {$document->get_title()}.";
+		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
+	}
 
 	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
 
@@ -1035,6 +1040,14 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
  * @return bool
  */
 function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
+	if ( 'shop_order_refund' === $order->get_type() ) {
+		$order = wc_get_order( $order->get_parent_id() );
+		
+		if ( ! $order ) {
+			return false;
+		}
+	}
+	
 	// Check if order is VAT exempt based on order meta
 	$vat_exempt_meta_key = apply_filters( 'wpo_wcpdf_order_vat_exempt_meta_key', 'is_vat_exempt', $order );
 	$is_vat_exempt       = apply_filters(  'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( $vat_exempt_meta_key ), $order );
