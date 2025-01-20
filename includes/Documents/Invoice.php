@@ -606,7 +606,12 @@ class Invoice extends OrderDocumentMethods {
 					'options'     => apply_filters( 'wpo_wcpdf_document_ubl_settings_formats', array(
 						'ubl_2_1' => __( 'UBL 2.1' , 'woocommerce-pdf-invoices-packing-slips' ),
 					), $this ),
-					'description' => $this->get_ubl_format_description(),
+					'description' => ! wpo_ips_ubl_is_country_format_extension_active() ? sprintf(
+						/* translators: %1$s: opening link tag, %2$s: closing link tag */
+						__( 'Install extensions to support country-specific e-invoicing formats. See the latest %1$ssupported formats%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://github.com/wpovernight/wpo-ips-einvoicing" target="_blank">',
+						'</a>'
+					) : '',
 				)
 			),
 			array(
@@ -711,46 +716,6 @@ class Invoice extends OrderDocumentMethods {
 		);
 
 		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ] ?? array(), $output_format, $this );
-	}
-
-	/**
-	 * Get UBL Format setting description
-	 *
-	 * @return string
-	 */
-	private function get_ubl_format_description(): string {
-		$extensions_available   = array();
-		$ubl_format_description = '';
-
-		if ( ! class_exists( 'WPO_IPS_XRechnung' ) ) {
-			$extensions_available['xrechnung'] = array(
-				'title' => __( 'EN16931 XRechnung', 'woocommerce-pdf-invoices-packing-slips' ),
-				'url'   => 'https://github.com/wpovernight/wpo-ips-xrechnung/releases/latest/',
-			);
-		}
-
-		if ( ! empty( $extensions_available ) ) {
-			$ubl_format_description = __( 'Formats available through extensions', 'woocommerce-pdf-invoices-packing-slips' ) . ':';
-
-			foreach ( $extensions_available as $extension ) {
-				$ubl_format_description .= ' <a href="' . esc_url( $extension['url'] ) . '" target="_blank">' . esc_html( $extension['title'] ) . '</a>';
-
-				if ( next( $extensions_available ) ) {
-					$ubl_format_description .= ',';
-				} else {
-					$ubl_format_description .= '<br>';
-				}
-			}
-		}
-
-		$ubl_format_description .= sprintf(
-			/* translators: %1$s: opening link tag, %2$s: closing link tag */
-			__( 'If the format you need isn\'t listed, please don\'t hesitate to %1$scontact us%2$s!', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<a href="https://wpovernight.com/contact/" target="_blank">',
-			'</a>'
-		);
-
-		return $ubl_format_description;
 	}
 
 }
