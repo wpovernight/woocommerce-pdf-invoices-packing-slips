@@ -151,31 +151,7 @@ class AddressHandler extends UblHandler {
 	}
 
 	public function return_customer_party( $data, $options = array() ) {
-		$vat_number = apply_filters( 'wpo_wc_ubl_vat_number', '', $this->document->order );
-
-		if ( empty( $vat_number ) ) {
-			// Try fetching VAT Number from meta
-			$vat_meta_keys = array(
-				'_vat_number',              // WooCommerce EU VAT Number
-				'VAT Number',               // WooCommerce EU VAT Compliance
-				'vat_number',               // Aelia EU VAT Assistant
-				'_billing_vat_number',      // WooCommerce EU VAT Number 2.3.21+
-				'_billing_eu_vat_number',   // EU VAT Number for WooCommerce (WP Whale/former Algoritmika)
-				'yweu_billing_vat',         // YITH WooCommerce EU VAT
-				'billing_vat',              // German Market
-				'_billing_vat_id',          // Germanized Pro
-				'_shipping_vat_id'          // Germanized Pro (alternative)
-			);
-
-			foreach ( $vat_meta_keys as $meta_key ) {
-				$vat_number = $this->document->order->get_meta( $meta_key );
-
-				if ( $vat_number ) {
-					break;
-				}
-			}
-		}
-
+		$vat_number        = apply_filters( 'wpo_wc_ubl_vat_number', wpo_wcpdf_get_order_customer_vat_number( $this->document->order ), $this->document->order );
 		$customerPartyName = $customerPartyContactName = $this->document->order->get_formatted_billing_full_name();
 		$billing_company   = $this->document->order->get_billing_company();
 
