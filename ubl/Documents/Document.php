@@ -33,6 +33,7 @@ abstract class Document {
 	}
 
 	abstract public function get_root_element();
+	abstract public function get_additional_root_elements();
 	abstract public function get_format();
 	abstract public function get_namespaces();
 	abstract public function get_data();
@@ -70,7 +71,7 @@ abstract class Document {
 		if ( empty( $tax_items ) ) {
 			return $order_tax_data;
 		}
-		
+
 		$use_historical_settings = $this->order_document->use_historical_settings();
 
 		// Loop through all the tax items...
@@ -79,7 +80,7 @@ abstract class Document {
 			$category   = '';
 			$scheme     = '';
 			$reason     = '';
-			
+
 			foreach ( $tax_items as $tax_item_key => $tax_item ) {
 				if ( $tax_item['rate_id'] !== $tax_data_key ) {
 					continue;
@@ -95,7 +96,7 @@ abstract class Document {
 				} else {
 					$percentage = wc_get_order_item_meta( $tax_item_key, '_wcpdf_rate_percentage', true );
 				}
-				
+
 				$tax_rate_id = absint( $tax_item['rate_id'] );
 
 				if ( ! is_numeric( $percentage ) ) {
@@ -104,19 +105,19 @@ abstract class Document {
 				}
 
 				$fields = array( 'category', 'scheme', 'reason' );
-				
+
 				foreach ( $fields as $field ) {
 					$meta_key = '_wcpdf_ubl_tax_' . $field;
 					$value    = wc_get_order_item_meta( $tax_item_key, $meta_key, true );
-					
+
 					if ( empty( $value ) || 'default' === $value || ! $use_historical_settings ) {
-						$value = wpo_ips_ubl_get_tax_data_from_fallback( $field, $tax_rate_id );
+						$value = wpo_ips_ubl_get_tax_data_from_fallback( $field, $tax_rate_id, $this->order );
 					}
-					
+
 					if ( $use_historical_settings ) {
 						wc_update_order_item_meta( $tax_item_key, $meta_key, $value );
 					}
-					
+
 					${$field} = $value;
 				}
 			}
@@ -160,6 +161,6 @@ abstract class Document {
 		}
 
 		return $percentage;
-	}	
+	}
 
 }
