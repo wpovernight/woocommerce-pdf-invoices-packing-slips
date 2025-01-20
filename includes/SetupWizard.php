@@ -91,6 +91,12 @@ class SetupWizard {
 			array( 'dashicons', 'install' ),
 			WPO_WCPDF_VERSION
 		);
+		wp_enqueue_style(
+			'wpo-wcpdf-toggle-switch',
+			WPO_WCPDF()->plugin_url() . '/assets/css/toggle-switch'.$suffix.'.css',
+			array( 'dashicons', 'install' ),
+			WPO_WCPDF_VERSION
+		);
 		wp_register_script(
 			'wpo-wcpdf-media-upload',
 			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
@@ -145,6 +151,8 @@ class SetupWizard {
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
+			<link rel="stylesheet" href="<?php echo WC()->plugin_url() . '/assets/css/admin.css'; ?>">
+			<script src="<?php echo WC()->plugin_url() . '/assets/js/select2/select2.full.min.js'; ?>"></script>
 		</head>
 		<body class="wpo-wcpdf-setup wp-core-ui">
 			<?php if( $this->step == 'good-to-go' ) { echo "<div id='confetti'></div>"; } ?>
@@ -214,7 +222,7 @@ class SetupWizard {
 	public function get_step_link( $step ) {
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step && empty( $step ) ) {
-			return admin_url('admin.php?page=wpo_wcpdf_options_page');
+			return admin_url('admin.php?page=wpo_wcpdf_options_page&tab=upgrade');
 		}
 		return esc_url_raw( add_query_arg( 'step', $step ) );
 	}
@@ -244,6 +252,10 @@ class SetupWizard {
 				foreach ( $_POST['wcpdf_settings'] as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
+						if ( 'attach_to_email_ids' === $key ) {
+							$value = array_fill_keys( $value, '1' );
+						}
+
 						if ( $key == 'shop_address' && function_exists( 'sanitize_textarea_field' ) ) {
 							$sanitize_function = 'sanitize_textarea_field';
 						} else {
