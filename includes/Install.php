@@ -381,8 +381,8 @@ class Install {
 
 		// 2.11.2: remove the obsolete .dist font cache file and mustRead.html from local fonts folder
 		if ( version_compare( $installed_version, '2.11.2', '<' ) ) {
-			@unlink( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
-			@unlink( trailingslashit( $font_path ) . 'mustRead.html' );
+			wp_delete_file( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
+			wp_delete_file( trailingslashit( $font_path ) . 'mustRead.html' );
 		}
 
 		// 2.12.2-dev-1: change 'date' database table default value to '1000-01-01 00:00:00'
@@ -390,25 +390,32 @@ class Install {
 			global $wpdb;
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
-				$store_name = "{$document->slug}_number";
-				$method     = WPO_WCPDF()->settings->get_sequential_number_store_method();
-				$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, $method );
-				if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
+				$store_name        = "{$document->slug}_number";
+				$method            = WPO_WCPDF()->settings->get_sequential_number_store_method();
+				$table_name        = apply_filters( 'wpo_wcpdf_number_store_table_name', sanitize_key( "{$wpdb->prefix}wcpdf_{$store_name}" ), $store_name, $method );
+				$table_name_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", esc_sql( $table_name ) ) ) === $table_name;
+
+				if ( ! $table_name_exists ) {
 					continue;
 				}
+
 				if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
 					$number_store = $document->get_sequential_number_store();
+
 					if ( ! empty( $number_store ) ) {
-						$column_name = 'date';
-						$query       = $wpdb->query( "ALTER TABLE {$number_store->table_name} ALTER {$column_name} SET DEFAULT '1000-01-01 00:00:00'" );
-						if ( $query ) {
+						$column_name      = 'date';
+						$table_name_safe  = sanitize_key( $number_store->table_name );
+						$column_name_safe = sanitize_key( $column_name );					
+						$query_result     = $wpdb->query( $wpdb->prepare( "ALTER TABLE `" . esc_sql( $table_name_safe ) . "` ALTER `" . esc_sql( $column_name_safe ) . "` SET DEFAULT %s", '1000-01-01 00:00:00' ) );
+
+						if ( $query_result ) {
 							wcpdf_log_error(
-								"Default value changed for 'date' column to '1000-01-01 00:00:00' on database table: {$number_store->table_name}",
+								"Default value changed for 'date' column to '1000-01-01 00:00:00' on database table: {$table_name_safe}",
 								'info'
 							);
 						} else {
 							wcpdf_log_error(
-								"An error occurred! The default value for 'date' column couldn't be changed to '1000-01-01 00:00:00' on database table: {$number_store->table_name}",
+								"An error occurred! The default value for 'date' column couldn't be changed to '1000-01-01 00:00:00' on database table: {$table_name_safe}",
 								'critical'
 							);
 						}

@@ -509,7 +509,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	font-size: 12px;
 }
 
-#wpo-wcpdf-settings .system-status-table {
+#wpo-wcpdf-settings .system-status-table,
+#wpo-wcpdf-settings .form-table {
 	margin-top: 2em;
 }
 

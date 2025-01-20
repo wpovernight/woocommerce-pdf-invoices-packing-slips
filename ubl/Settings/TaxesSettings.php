@@ -21,7 +21,7 @@ class TaxesSettings {
 
 		$rates                       = \WC_Tax::get_tax_rate_classes();
 		$formatted_rates             = array();
-		$formatted_rates['standard'] = __( 'Standard', 'woocommerce' );
+		$formatted_rates['standard'] = __( 'Standard', 'woocommerce-pdf-invoices-packing-slips' );
 
 		foreach ( $rates as $rate ) {
 			if ( empty( $rate->slug ) ) {
@@ -39,22 +39,35 @@ class TaxesSettings {
 
 	public function output_table_for_tax_class( $slug, $name ) {
 		global $wpdb;
-		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
+		$results      = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
+		$allowed_html = array(
+			'select' => array(
+				'name'         => true,
+				'id'           => true,
+				'class'        => true,
+				'style'        => true,
+				'data-current' => true
+			),
+			'option' => array(
+				'value'        => true,
+				'selected'     => true,
+			)
+		);
 		?>
 
 		<h4><?php echo $name; ?></h4>
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php _e( 'Country code', 'woocommerce' ); ?></th>
-					<th><?php _e( 'State code', 'woocommerce' ); ?></th>
-					<th><?php _e( 'Postcode / ZIP', 'woocommerce' ); ?></th>
-					<th><?php _e( 'City', 'woocommerce' ); ?></th>
-					<th><?php _e( 'Rate', 'woocommerce' ); ?></th>
-					<th><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php _e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php _e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th width="10%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php _e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th width="15%"><?php _e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php esc_html_e( 'Country code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php esc_html_e( 'State code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php esc_html_e( 'Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php esc_html_e( 'City', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php esc_html_e( 'Rate', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th width="10%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th width="15%"><?php esc_html_e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 				</tr>
 			</thead>
 			<tbody id="rates">
@@ -98,29 +111,32 @@ class TaxesSettings {
 							$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
 							
 							echo '<tr>';
-							echo '<td>' . $country . '</td>';
-							echo '<td>' . $state . '</td>';
-							echo '<td>' . $postcode . '</td>';
-							echo '<td>' . $city . '</td>';
-							echo '<td>' . wc_round_tax_total( $result->tax_rate ) . '%</td>';
+							echo '<td>' . esc_html( $country ) . '</td>';
+							echo '<td>' . esc_html( $state ) . '</td>';
+							echo '<td>' . esc_html( $postcode ) . '</td>';
+							echo '<td>' . esc_html( $city ) . '</td>';
+							echo '<td>' . esc_html( wc_round_tax_total( $result->tax_rate ) ) . '%</td>';
 							echo '<td>';
-							echo $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
-							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme_code . '</code></div>';
+							$select_for_scheme = $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
+							echo wp_kses( $select_for_scheme, $allowed_html );
+							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
 							echo '</td>';
 							echo '<td>';
-							echo $this->get_select_for( 'category', 'rate', $result->tax_rate_id, $category );
-							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category_code . '</code></div>';
+							$select_for_category = $this->get_select_for( 'category', 'rate', $result->tax_rate_id, $category );
+							echo wp_kses( $select_for_category, $allowed_html );
+							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
 							echo '</td>';
 							echo '<td>';
-							echo $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
-							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason_code . '</code></div>';
+							$select_for_reason = $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
+							echo wp_kses( $select_for_reason, $allowed_html );
+							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
 							echo '</td>';
 							echo '<td class="remark">';
 							
 							foreach ( self::get_available_remarks() as $field => $remarks ) {
 								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
 									if ( isset( $remarks[ ${$f} ] ) ) {
-										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
+										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
 									}
 								}
 							}
@@ -129,13 +145,13 @@ class TaxesSettings {
 							echo '</tr>';
 						}
 					} else {
-						echo '<tr><td colspan="9">' . __( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
+						echo '<tr><td colspan="9">' . esc_html__( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
 					}
 				?>
 			</tbody>
 			<tfoot>
 				<tr>
-					<th colspan="5" style="text-align: right;"><?php _e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
+					<th colspan="5" style="text-align: right;"><?php esc_html_e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
 					<?php
 						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] )   ? $this->settings['class'][ $slug ]['scheme']   : 'default';
 						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
@@ -143,20 +159,23 @@ class TaxesSettings {
 					?>
 					<th>
 						<?php
-							echo $this->get_select_for( 'scheme', 'class', $slug, $scheme );
-							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $scheme . '</code></div>';
+							$select_for_scheme = $this->get_select_for( 'scheme', 'class', $slug, $scheme );
+							echo wp_kses( $select_for_scheme, $allowed_html );
+							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme ) . '</code></div>';
 						?>
 					</th>
 					<th>
 						<?php
-							echo $this->get_select_for( 'category', 'class', $slug, $category );
-							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $category . '</code></div>';
+							$select_for_category = $this->get_select_for( 'category', 'class', $slug, $category );
+							echo wp_kses( $select_for_category, $allowed_html );
+							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category ) . '</code></div>';
 						?>
 					</th>
 					<th>
 						<?php
-							echo $this->get_select_for( 'reason', 'class', $slug, $reason );
-							echo '<div class="current" style="margin-top:6px;">' . __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . $reason . '</code></div>';
+							$select_for_reason = $this->get_select_for( 'reason', 'class', $slug, $reason );
+							echo wp_kses( $select_for_reason, $allowed_html );
+							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason ) . '</code></div>';
 						?>
 					</th>
 					<th class="remark">
@@ -164,7 +183,7 @@ class TaxesSettings {
 							foreach ( self::get_available_remarks() as $field => $remarks ) {
 								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
 									if ( isset( $remarks[ ${$f} ] ) ) {
-										echo '<p><code>' . ${$f} . '</code>: ' . $remarks[ ${$f} ] . '</p>';
+										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
 									}
 								}
 							}
