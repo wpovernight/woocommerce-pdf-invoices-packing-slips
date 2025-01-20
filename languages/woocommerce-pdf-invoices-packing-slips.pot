@@ -1,15 +1,15 @@
-# Copyright (C) 2024 WP Overnight
+# Copyright (C) 2025 WP Overnight
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.4\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-22T19:57:06+00:00\n"
+"POT-Creation-Date: 2025-01-20T10:39:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -54,15 +54,15 @@ msgid "Yes you deserve it!"
 msgstr ""
 
 #: includes/Admin.php:124
-#: includes/Main.php:853
-#: includes/Settings/SettingsDebug.php:1141
+#: includes/Main.php:852
+#: includes/Settings/SettingsDebug.php:1153
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:121
 #: views/promo.php:34
-#: woocommerce-pdf-invoices-packingslips.php:339
-#: woocommerce-pdf-invoices-packingslips.php:398
-#: woocommerce-pdf-invoices-packingslips.php:436
-#: woocommerce-pdf-invoices-packingslips.php:570
+#: woocommerce-pdf-invoices-packingslips.php:340
+#: woocommerce-pdf-invoices-packingslips.php:399
+#: woocommerce-pdf-invoices-packingslips.php:437
+#: woocommerce-pdf-invoices-packingslips.php:571
 msgid "Hide this message"
 msgstr ""
 
@@ -94,17 +94,17 @@ msgstr ""
 
 #: includes/Admin.php:322
 #: includes/Admin.php:1342
-#: includes/Assets.php:233
+#: includes/Assets.php:235
 #: includes/Documents/Invoice.php:354
-#: includes/Main.php:1237
+#: includes/Main.php:1236
 #: views/setup-wizard/display-options.php:81
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:323
 #: includes/Documents/Invoice.php:322
-#: includes/Documents/OrderDocumentMethods.php:1306
-#: includes/Main.php:1238
+#: includes/Documents/OrderDocumentMethods.php:1300
+#: includes/Main.php:1237
 #: views/setup-wizard/display-options.php:60
 msgid "Invoice Date"
 msgstr ""
@@ -251,54 +251,72 @@ msgstr ""
 msgid "DEBUG output enabled"
 msgstr ""
 
-#: includes/Assets.php:87
+#: includes/Assets.php:89
 msgid "You have to select order(s) first!"
 msgstr ""
 
-#: includes/Assets.php:88
+#: includes/Assets.php:90
 msgid "Are you sure you want to delete this document? This cannot be undone."
 msgstr ""
 
-#: includes/Assets.php:89
+#: includes/Assets.php:91
 msgid "Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings."
 msgstr ""
 
-#: includes/Assets.php:118
+#: includes/Assets.php:120
 msgid "Preview"
 msgstr ""
 
-#: includes/Assets.php:121
-#: includes/Settings/SettingsDebug.php:1149
+#: includes/Assets.php:123
+#: includes/Settings/SettingsDebug.php:1161
 msgid "Settings"
 msgstr ""
 
-#: includes/Assets.php:180
+#: includes/Assets.php:182
 msgid "Document settings"
 msgstr ""
 
-#: includes/Assets.php:181
+#: includes/Assets.php:183
 msgid "Select a document in the dropdown menu above to edit its settings."
 msgstr ""
 
-#: includes/Assets.php:192
+#: includes/Assets.php:194
 msgid "The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding."
 msgstr ""
 
-#: includes/Assets.php:266
+#: includes/Assets.php:268
 msgid "Download"
 msgstr ""
 
-#: includes/Assets.php:267
+#: includes/Assets.php:269
 msgid "Are you sure you want to reset this settings? This cannot be undone."
 msgstr ""
 
-#: includes/Assets.php:268
+#: includes/Assets.php:270
 msgid "Please select a document type"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag
-#: includes/Assets.php:273
+#: includes/Assets.php:275
 msgid "<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools."
+msgstr ""
+
+#: includes/Assets.php:299
+#: ubl/Settings/TaxesSettings.php:108
+#: ubl/Settings/TaxesSettings.php:112
+#: ubl/Settings/TaxesSettings.php:116
+#: ubl/Settings/TaxesSettings.php:147
+#: ubl/Settings/TaxesSettings.php:153
+#: ubl/Settings/TaxesSettings.php:159
+msgid "Code"
+msgstr ""
+
+#: includes/Assets.php:300
+msgid "New"
+msgstr ""
+
+#: includes/Assets.php:301
+msgid "unsaved"
 msgstr ""
 
 #: includes/Compatibility/ThirdPartyPlugins.php:391
@@ -312,7 +330,7 @@ msgid "Invoice"
 msgstr ""
 
 #: includes/Documents/Invoice.php:68
-#: includes/Documents/OrderDocumentMethods.php:1325
+#: includes/Documents/OrderDocumentMethods.php:1319
 msgid "Invoice Number:"
 msgstr ""
 
@@ -342,14 +360,14 @@ msgid "Enable"
 msgstr ""
 
 #: includes/Documents/Invoice.php:233
-#: includes/Documents/Invoice.php:615
+#: includes/Documents/Invoice.php:620
 #: includes/Documents/PackingSlip.php:191
 msgid "Attach to:"
 msgstr ""
 
 #. translators: directory path
 #: includes/Documents/Invoice.php:241
-#: includes/Documents/Invoice.php:623
+#: includes/Documents/Invoice.php:628
 msgid "It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices."
 msgstr ""
 
@@ -411,7 +429,7 @@ msgid "Display invoice date"
 msgstr ""
 
 #: includes/Documents/Invoice.php:323
-#: includes/Documents/OrderDocumentMethods.php:1307
+#: includes/Documents/OrderDocumentMethods.php:1301
 #: views/setup-wizard/display-options.php:61
 msgid "Order Date"
 msgstr ""
@@ -623,124 +641,116 @@ msgstr ""
 msgid "UBL 2.1"
 msgstr ""
 
-#: includes/Documents/Invoice.php:629
+#. translators: %1$s: opening link tag, %2$s: closing link tag
+#: includes/Documents/Invoice.php:611
+msgid "Install extensions to support country-specific e-invoicing formats. See the latest %1$ssupported formats%2$s."
+msgstr ""
+
+#: includes/Documents/Invoice.php:634
 msgid "Include encrypted PDF:"
 msgstr ""
 
-#: includes/Documents/Invoice.php:635
+#: includes/Documents/Invoice.php:640
 msgid "Embed the encrypted PDF invoice file within the UBL document. Note that this option may not be supported by all UBL formats."
 msgstr ""
 
-#: includes/Documents/Invoice.php:658
-#: includes/Documents/Invoice.php:702
-#: includes/Documents/PackingSlip.php:229
+#: includes/Documents/Invoice.php:663
+#: includes/Documents/Invoice.php:707
+#: includes/Documents/PackingSlip.php:230
 #: includes/Settings.php:163
 #: includes/Settings/SettingsDebug.php:682
 msgid "General"
 msgstr ""
 
-#: includes/Documents/Invoice.php:667
-#: includes/Documents/PackingSlip.php:236
+#: includes/Documents/Invoice.php:672
+#: includes/Documents/PackingSlip.php:237
 msgid "Document details"
 msgstr ""
 
-#: includes/Documents/Invoice.php:681
+#: includes/Documents/Invoice.php:686
 msgid "Admin"
 msgstr ""
 
-#: includes/Documents/Invoice.php:689
+#: includes/Documents/Invoice.php:694
 #: includes/Settings.php:180
 msgid "Advanced"
 msgstr ""
 
-#: includes/Documents/Invoice.php:727
-msgid "EN16931 XRechnung"
-msgstr ""
-
-#: includes/Documents/Invoice.php:733
-msgid "Formats available through extensions"
-msgstr ""
-
-#. translators: %1$s: opening link tag, %2$s: closing link tag
-#: includes/Documents/Invoice.php:748
-msgid "If the format you need isn't listed, please don't hesitate to %1$scontact us%2$s!"
-msgstr ""
-
 #. translators: 1. credit note title, 2. refund id
-#: includes/Documents/OrderDocument.php:482
+#: includes/Documents/OrderDocument.php:491
 msgid "%1$s (refund #%2$s) was regenerated."
 msgstr ""
 
-#. translators: 1. credit note title, 2. refund id
-#: includes/Documents/OrderDocument.php:482
+#. translators: 1. document title
+#: includes/Documents/OrderDocument.php:496
 msgid "%s was regenerated"
 msgstr ""
 
 #. translators: %s: document name
-#: includes/Documents/OrderDocument.php:883
+#: includes/Documents/OrderDocument.php:902
 msgid "%s Number:"
 msgstr ""
 
 #. translators: %s: document name
-#: includes/Documents/OrderDocument.php:891
+#: includes/Documents/OrderDocument.php:910
 msgid "%s Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:897
-#: includes/Main.php:1723
+#: includes/Documents/OrderDocument.php:916
+#: includes/Main.php:1722
 msgid "Due Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:901
+#: includes/Documents/OrderDocument.php:920
 msgid "Billing Address:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:904
+#: includes/Documents/OrderDocument.php:923
 msgid "Shipping Address:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:907
+#: includes/Documents/OrderDocument.php:926
 msgid "Order Number:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:910
+#: includes/Documents/OrderDocument.php:929
 msgid "Order Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:913
+#: includes/Documents/OrderDocument.php:932
 msgid "Payment Method:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:916
+#: includes/Documents/OrderDocument.php:935
 #: languages/strings.php:6
 msgid "Payment Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:919
+#: includes/Documents/OrderDocument.php:938
 msgid "Shipping Method:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:922
+#: includes/Documents/OrderDocument.php:941
 msgid "SKU:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:925
+#: includes/Documents/OrderDocument.php:944
 msgid "Weight:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:928
+#: includes/Documents/OrderDocument.php:947
 msgid "Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:931
+#: includes/Documents/OrderDocument.php:950
 msgid "Customer Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1565
+#: includes/Documents/OrderDocument.php:1582
 msgid "Admin email"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1568
+#: includes/Documents/OrderDocument.php:1585
 msgid "Manual email"
 msgstr ""
 
@@ -749,29 +759,29 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:985
+#: includes/Documents/OrderDocumentMethods.php:979
 msgid "Subtotal"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1010
+#: includes/Documents/OrderDocumentMethods.php:1004
 msgid "Shipping"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1041
+#: includes/Documents/OrderDocumentMethods.php:1035
 msgid "Discount"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1108
+#: includes/Documents/OrderDocumentMethods.php:1102
 msgid "Total ex. VAT"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1111
+#: includes/Documents/OrderDocumentMethods.php:1105
 #: includes/Settings.php:425
-#: ubl/Settings/TaxesSettings.php:170
+#: ubl/Settings/TaxesSettings.php:279
 msgid "Total"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1348
+#: includes/Documents/OrderDocumentMethods.php:1342
 msgid "Reason for refund:"
 msgstr ""
 
@@ -811,125 +821,125 @@ msgstr ""
 msgid "Download %s (PDF)"
 msgstr ""
 
-#: includes/Main.php:361
+#: includes/Main.php:360
 msgid "You do not have sufficient permissions to access this page. Reason: empty access key"
 msgstr ""
 
-#: includes/Main.php:367
+#: includes/Main.php:366
 msgid "You do not have sufficient permissions to access this page. Reason: empty action"
 msgstr ""
 
-#: includes/Main.php:373
+#: includes/Main.php:372
 msgid "You do not have sufficient permissions to access this page. Reason: invalid nonce"
 msgstr ""
 
-#: includes/Main.php:383
+#: includes/Main.php:382
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/Main.php:388
+#: includes/Main.php:387
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/Main.php:407
+#: includes/Main.php:406
 msgid "You have to save the order before generating a PDF document for it."
 msgstr ""
 
 #. translators: %s: Order ID
-#: includes/Main.php:412
+#: includes/Main.php:411
 msgid "Could not find the order #%s."
 msgstr ""
 
-#: includes/Main.php:479
+#: includes/Main.php:478
 #: includes/Settings.php:218
 #: includes/Settings.php:366
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: document type
-#: includes/Main.php:534
+#: includes/Main.php:533
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
 #. translators: 1. plugin name, 2. directory path
-#: includes/Main.php:851
+#: includes/Main.php:850
 msgid "The %1$s directory %2$s couldn't be created or is not writable!"
 msgstr ""
 
-#: includes/Main.php:852
+#: includes/Main.php:851
 msgid "Please check your directories write permissions or contact your hosting service provider."
 msgstr ""
 
 #. translators: 1,2. file count
-#: includes/Main.php:1190
+#: includes/Main.php:1189
 msgid "Unable to delete %1$d files! (deleted %2$d)"
 msgstr ""
 
 #. translators: file count
-#: includes/Main.php:1194
+#: includes/Main.php:1193
 msgid "Successfully deleted %d files!"
 msgstr ""
 
-#: includes/Main.php:1198
+#: includes/Main.php:1197
 msgid "Nothing to delete!"
 msgstr ""
 
-#: includes/Main.php:1292
-#: includes/Main.php:1323
+#: includes/Main.php:1291
+#: includes/Main.php:1322
 msgid "User"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1300
+#: includes/Main.php:1299
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1330
+#: includes/Main.php:1329
 msgid "PDF %s deleted."
 msgstr ""
 
-#: includes/Main.php:1347
+#: includes/Main.php:1346
 msgid "manually"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1353
+#: includes/Main.php:1352
 msgid "%1$s document marked as printed via %2$s."
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1369
+#: includes/Main.php:1368
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/Main.php:1456
+#: includes/Main.php:1455
 msgid "single order action"
 msgstr ""
 
-#: includes/Main.php:1457
+#: includes/Main.php:1456
 msgid "bulk order action"
 msgstr ""
 
-#: includes/Main.php:1458
+#: includes/Main.php:1457
 msgid "my account"
 msgstr ""
 
-#: includes/Main.php:1459
+#: includes/Main.php:1458
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Main.php:1463
+#: includes/Main.php:1462
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/Main.php:1562
+#: includes/Main.php:1561
 msgid "Document of type %1$s for the selected order could not be %2$s as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1659
+#: includes/Main.php:1658
 msgid "Order %s Saved"
 msgstr ""
 
@@ -1015,15 +1025,15 @@ msgstr ""
 msgid "These are used for the (optional) footer columns in the <em>Modern (Premium)</em> template, but can also be used for other elements in your custom template"
 msgstr ""
 
-#: includes/Settings/SettingsCallbacks.php:467
+#: includes/Settings/SettingsCallbacks.php:496
 msgid "Image resolution"
 msgstr ""
 
-#: includes/Settings/SettingsCallbacks.php:475
+#: includes/Settings/SettingsCallbacks.php:504
 msgid "The image resolution exceeds the recommended maximum of 600dpi. This will unnecessarily increase the size of your PDF files and could negatively affect performance."
 msgstr ""
 
-#: includes/Settings/SettingsCallbacks.php:523
+#: includes/Settings/SettingsCallbacks.php:552
 msgid "Save"
 msgstr ""
 
@@ -1150,12 +1160,12 @@ msgid "Logged in (recommended)"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:729
-#: includes/Settings/SettingsDebug.php:929
+#: includes/Settings/SettingsDebug.php:941
 msgid "Guest"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:730
-#: includes/Settings/SettingsDebug.php:933
+#: includes/Settings/SettingsDebug.php:945
 msgid "Full"
 msgstr ""
 
@@ -1263,151 +1273,159 @@ msgid "Log PDF document creation, deletion, and mark/unmark as printed to order 
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:880
-msgid "Disable document preview"
+msgid "Log missing translations"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:886
-msgid "Disables the document preview on the plugin settings pages."
+msgid "Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation."
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:892
-msgid "Enable semaphore logs"
+msgid "Disable document preview"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:898
-msgid "Our plugin uses a semaphore class that prevents race conditions in multiple places in the code. Enable this setting only if you are having issues with document numbers, yearly reset or documents being assigned to the wrong order."
+msgid "Disables the document preview on the plugin settings pages."
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:904
-msgid "Enable danger zone tools"
+msgid "Enable semaphore logs"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:910
+msgid "Our plugin uses a semaphore class that prevents race conditions in multiple places in the code. Enable this setting only if you are having issues with document numbers, yearly reset or documents being assigned to the wrong order."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:916
+msgid "Enable danger zone tools"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:922
 msgid "Enables the danger zone tools. The actions performed by these tools are irreversible!"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:925
+#: includes/Settings/SettingsDebug.php:937
 msgid "Logged in"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:926
+#: includes/Settings/SettingsDebug.php:938
 msgid "Document can be accessed by logged in users only."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:930
+#: includes/Settings/SettingsDebug.php:942
 msgid "Document can be accessed by logged in and guest users."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:934
+#: includes/Settings/SettingsDebug.php:946
 msgid "Document can be accessed by everyone with the link."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:962
+#: includes/Settings/SettingsDebug.php:974
 msgid "7.4 or superior"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:975
+#: includes/Settings/SettingsDebug.php:987
 msgid "Recommended, will use fallback functions"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:981
+#: includes/Settings/SettingsDebug.php:993
 msgid "Required if you have images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:984
+#: includes/Settings/SettingsDebug.php:996
 msgid "Required when using .webp images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:987
+#: includes/Settings/SettingsDebug.php:999
 msgid "Required if you have .webp images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:990
+#: includes/Settings/SettingsDebug.php:1002
 msgid "To compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:993
+#: includes/Settings/SettingsDebug.php:1005
 msgid "Recommended to compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:996
+#: includes/Settings/SettingsDebug.php:1008
 msgid "For better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:999
-#: includes/Settings/SettingsDebug.php:1005
+#: includes/Settings/SettingsDebug.php:1011
+#: includes/Settings/SettingsDebug.php:1017
 msgid "Recommended for better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1002
+#: includes/Settings/SettingsDebug.php:1014
 msgid "Better with transparent PNG images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1008
+#: includes/Settings/SettingsDebug.php:1020
 msgid "Required to detect custom templates and to clear the temp folder periodically"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1011
+#: includes/Settings/SettingsDebug.php:1023
 msgid "Check PHP disable_functions"
 msgstr ""
 
 #. translators: <a> tags
-#: includes/Settings/SettingsDebug.php:1015
+#: includes/Settings/SettingsDebug.php:1027
 msgid "Recommended: 128MB (especially for plugin-heavy setups)"
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: includes/Settings/SettingsDebug.php:1017
+#: includes/Settings/SettingsDebug.php:1029
 msgid "See: %1$sIncreasing the WordPress Memory Limit%2$s"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1025
+#: includes/Settings/SettingsDebug.php:1037
 msgid "Allow remote stylesheets and images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1028
+#: includes/Settings/SettingsDebug.php:1040
 msgid "allow_url_fopen disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1031
+#: includes/Settings/SettingsDebug.php:1043
 msgid "Necessary to verify the MIME type of local images."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1034
+#: includes/Settings/SettingsDebug.php:1046
 msgid "fileinfo disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1037
+#: includes/Settings/SettingsDebug.php:1049
 msgid "To compress and decompress font and image data"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1040
+#: includes/Settings/SettingsDebug.php:1052
 msgid "base64_decode disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1048
+#: includes/Settings/SettingsDebug.php:1060
 msgid "Required for IMagick"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1051
+#: includes/Settings/SettingsDebug.php:1063
 msgid "ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
-#: includes/Settings/SettingsDebug.php:1131
+#: includes/Settings/SettingsDebug.php:1143
 msgid "Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1150
+#: includes/Settings/SettingsDebug.php:1162
 #: views/advanced-status.php:203
 msgid "Status"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1151
+#: includes/Settings/SettingsDebug.php:1163
 msgid "Tools"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1152
+#: includes/Settings/SettingsDebug.php:1164
 msgid "Numbers"
 msgstr ""
 
@@ -1427,7 +1445,7 @@ msgid "Requires the %1$sProfessional extension%2$s."
 msgstr ""
 
 #: includes/Settings/SettingsGeneral.php:50
-#: includes/Settings/SettingsUbl.php:154
+#: includes/Settings/SettingsUbl.php:111
 msgid "General settings"
 msgstr ""
 
@@ -1599,12 +1617,20 @@ msgstr ""
 msgid "To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices."
 msgstr ""
 
+#: includes/Settings/SettingsUbl.php:63
+msgid "Note"
+msgstr ""
+
+#: includes/Settings/SettingsUbl.php:63
+msgid "Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to \"Default,\" they will automatically inherit the settings selected in the \"Tax class default\" dropdowns at the bottom of the table."
+msgstr ""
+
 #. translators: 1. General Settings, 2. UBL Settings
-#: includes/Settings/SettingsUbl.php:153
+#: includes/Settings/SettingsUbl.php:110
 msgid "You've enabled UBL output for a document, but some essential details are missing. Please ensure you've added your VAT and CoC numbers in the %1$s. Also, specify your tax rates in the %2$s."
 msgstr ""
 
-#: includes/Settings/SettingsUbl.php:155
+#: includes/Settings/SettingsUbl.php:112
 msgid "UBL settings"
 msgstr ""
 
@@ -1892,277 +1918,557 @@ msgstr ""
 msgid "Tax Category"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:91
-msgid "No taxes found for this class."
+#: ubl/Settings/TaxesSettings.php:56
+msgid "Reason"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:97
-msgid "Tax class default"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:111
-#: ubl/Settings/TaxesSettings.php:178
-msgid "Default"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:121
-msgid "Value added tax (VAT)"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:122
-msgid "Goods and services tax (GST)"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:123
-msgid "Petroleum tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:124
-msgid "Provisional countervailing duty cash"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:125
-msgid "Provisional countervailing duty bond"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:126
-msgid "Tobacco tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:127
-msgid "Energy fee"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:128
-msgid "Coffee tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:129
-msgid "Harmonised sales tax, Canadian"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:130
-msgid "Quebec sales tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:131
-msgid "Canadian provincial sales tax"
+#: ubl/Settings/TaxesSettings.php:57
+msgid "Remarks"
 msgstr ""
 
 #: ubl/Settings/TaxesSettings.php:132
-msgid "Tax on replacement part"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:133
-msgid "Mineral oil tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:134
-msgid "Special tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:135
-msgid "Anti-dumping duty"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:136
-msgid "Stamp duty (Imposta di Bollo)"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:137
-msgid "Agricultural levy"
+msgid "No taxes found for this class."
 msgstr ""
 
 #: ubl/Settings/TaxesSettings.php:138
-msgid "Car tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:139
-msgid "Paper consortium tax (Italy)"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:140
-msgid "Commodity specific tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:141
-msgid "Customs duty"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:142
-msgid "Countervailing duty"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:143
-msgid "Environmental tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:144
-msgid "Excise duty"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:145
-msgid "Agricultural export rebate"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:146
-msgid "Federal excise tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:147
-msgid "Free"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:148
-msgid "General construction tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:149
-msgid "Illuminants tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:150
-msgid "Import tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:151
-msgid "Individual tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:152
-msgid "Business license fee"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:153
-msgid "Local construction tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:154
-msgid "Light dues payable"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:155
-msgid "Local sales tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:156
-msgid "Lust tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:157
-msgid "Monetary compensatory amount"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:158
-msgid "Miscellaneous cash deposit"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:159
-msgid "Other taxes"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:160
-msgid "Provisional duty bond"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:161
-msgid "Provisional duty cash"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:162
-msgid "Preference duty"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:163
-msgid "Special construction tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:164
-msgid "Shifted social securities"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:165
-msgid "State/provincial sales tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:166
-msgid "Suspended duty"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:167
-msgid "Surtax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:168
-msgid "Shifted wage tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:169
-msgid "Alcohol mark tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:171
-msgid "Turnover tax"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:172
-msgid "Tonnage taxes"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:173
-msgid "Valuation deposit"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:188
-msgid "Standard rate"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:189
-msgid "Lower rate"
-msgstr ""
-
-#: ubl/Settings/TaxesSettings.php:190
-msgid "Zero rated goods"
+msgid "Tax class default"
 msgstr ""
 
 #: ubl/Settings/TaxesSettings.php:191
+msgid "Default"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:202
+msgid "None"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:230
+msgid "Value added tax (VAT)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:231
+msgid "Goods and services tax (GST)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:232
+msgid "Petroleum tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:233
+msgid "Provisional countervailing duty cash"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:234
+msgid "Provisional countervailing duty bond"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:235
+msgid "Tobacco tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:236
+msgid "Energy fee"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:237
+msgid "Coffee tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:238
+msgid "Harmonised sales tax, Canadian"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:239
+msgid "Quebec sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:240
+msgid "Canadian provincial sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:241
+msgid "Tax on replacement part"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:242
+msgid "Mineral oil tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:243
+msgid "Special tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:244
+msgid "Anti-dumping duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:245
+msgid "Stamp duty (Imposta di Bollo)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:246
+msgid "Agricultural levy"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:247
+msgid "Car tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:248
+msgid "Paper consortium tax (Italy)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:249
+msgid "Commodity specific tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:250
+msgid "Customs duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:251
+msgid "Countervailing duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:252
+msgid "Environmental tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:253
+msgid "Excise duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:254
+msgid "Agricultural export rebate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:255
+msgid "Federal excise tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:256
+msgid "Free"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:257
+msgid "General construction tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:258
+msgid "Illuminants tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:259
+msgid "Import tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:260
+msgid "Individual tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:261
+msgid "Business license fee"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:262
+msgid "Local construction tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:263
+msgid "Light dues payable"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:264
+msgid "Local sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:265
+msgid "Lust tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:266
+msgid "Monetary compensatory amount"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:267
+msgid "Miscellaneous cash deposit"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:268
+msgid "Other taxes"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:269
+msgid "Provisional duty bond"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:270
+msgid "Provisional duty cash"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:271
+msgid "Preference duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:272
+msgid "Special construction tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:273
+msgid "Shifted social securities"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:274
+msgid "State/provincial sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:275
+msgid "Suspended duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:276
+msgid "Surtax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:277
+msgid "Shifted wage tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:278
+msgid "Alcohol mark tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:280
+msgid "Turnover tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:281
+msgid "Tonnage taxes"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:282
+msgid "Valuation deposit"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:288
 msgid "Mixed tax rate"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:192
+#: ubl/Settings/TaxesSettings.php:289
+msgid "Lower rate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:290
 msgid "Exempt for resale"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:193
+#: ubl/Settings/TaxesSettings.php:291
 msgid "Value Added Tax (VAT) not now due for payment"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:194
+#: ubl/Settings/TaxesSettings.php:292
 msgid "Value Added Tax (VAT) due from a previous invoice"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:195
+#: ubl/Settings/TaxesSettings.php:293
+msgid "VAT Reverse Charge"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:294
 msgid "Transferred (VAT)"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:196
+#: ubl/Settings/TaxesSettings.php:295
 msgid "Duty paid by supplier"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:197
+#: ubl/Settings/TaxesSettings.php:296
+msgid "Value Added Tax (VAT) margin scheme - travel agents"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:297
 msgid "Exempt from tax"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:198
+#: ubl/Settings/TaxesSettings.php:298
+msgid "Value Added Tax (VAT) margin scheme - second-hand goods"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:299
 msgid "Free export item, tax not charged"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:199
+#: ubl/Settings/TaxesSettings.php:300
 msgid "Higher rate"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:200
+#: ubl/Settings/TaxesSettings.php:301
+msgid "Value Added Tax (VAT) margin scheme - works of art"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:302
+msgid "Value Added Tax (VAT) margin scheme - collector's items and antiques"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:303
+msgid "VAT exempt for EEA intra-community supply of goods and services"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:304
+msgid "Canary Islands general indirect tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:305
+msgid "Tax for production, services and importation in Ceuta and Melilla"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:306
 msgid "Services outside scope of tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:307
+msgid "Standard rate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:308
+msgid "Zero rated goods"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:314
+msgid "Exempt based on article 79, point c of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:315
+msgid "Exempt based on article 132 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:316
+msgid "Exempt based on article 132, section 1 (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:317
+msgid "Exempt based on article 132, section 1 (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:318
+msgid "Exempt based on article 132, section 1 (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:319
+msgid "Exempt based on article 132, section 1 (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:320
+msgid "Exempt based on article 132, section 1 (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:321
+msgid "Exempt based on article 132, section 1 (f) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:322
+msgid "Exempt based on article 132, section 1 (g) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:323
+msgid "Exempt based on article 132, section 1 (h) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:324
+msgid "Exempt based on article 132, section 1 (i) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:325
+msgid "Exempt based on article 132, section 1 (j) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:326
+msgid "Exempt based on article 132, section 1 (k) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:327
+msgid "Exempt based on article 132, section 1 (l) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:328
+msgid "Exempt based on article 132, section 1 (m) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:329
+msgid "Exempt based on article 132, section 1 (n) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:330
+msgid "Exempt based on article 132, section 1 (o) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:331
+msgid "Exempt based on article 132, section 1 (p) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:332
+msgid "Exempt based on article 132, section 1 (q) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:333
+msgid "Exempt based on article 143 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:334
+msgid "Exempt based on article 143, section 1 (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:335
+msgid "Exempt based on article 143, section 1 (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:336
+msgid "Exempt based on article 143, section 1 (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:337
+msgid "Exempt based on article 143, section 1 (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:338
+msgid "Exempt based on article 143, section 1 (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:339
+msgid "Exempt based on article 143, section 1 (f) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:340
+msgid "Exempt based on article 143, section 1 (fa) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:341
+msgid "Exempt based on article 143, section 1 (g) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:342
+msgid "Exempt based on article 143, section 1 (h) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:343
+msgid "Exempt based on article 143, section 1 (i) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:344
+msgid "Exempt based on article 143, section 1 (j) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:345
+msgid "Exempt based on article 143, section 1 (k) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:346
+msgid "Exempt based on article 143, section 1 (l) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:347
+msgid "Exempt based on article 148 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:348
+msgid "Exempt based on article 148, section (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:349
+msgid "Exempt based on article 148, section (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:350
+msgid "Exempt based on article 148, section (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:351
+msgid "Exempt based on article 148, section (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:352
+msgid "Exempt based on article 148, section (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:353
+msgid "Exempt based on article 148, section (f) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:354
+msgid "Exempt based on article 148, section (g) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:355
+msgid "Exempt based on article 151, section 1 (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:356
+msgid "Exempt based on article 151, section 1 (aa) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:357
+msgid "Exempt based on article 151, section 1 (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:358
+msgid "Exempt based on article 151, section 1 (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:359
+msgid "Exempt based on article 151, section 1 (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:360
+msgid "Exempt based on article 151, section 1 (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:361
+msgid "Exempt based on article 309 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:362
+msgid "Reverse charge"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:363
+msgid "Travel agents VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:364
+msgid "Second hand goods VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:365
+msgid "Export outside the EU"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:366
+msgid "Works of art VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:367
+msgid "Intra-community supply"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:368
+msgid "Collectors items and antiques VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:369
+msgid "Not subject to VAT"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:370
+msgid "France domestic VAT franchise in base"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:371
+msgid "France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount"
+msgstr ""
+
+#. translators: %s: tax category code
+#: ubl/Settings/TaxesSettings.php:382
+msgid "Only use with tax category code %s"
 msgstr ""
 
 #: views/advanced-numbers.php:5
@@ -2839,63 +3145,63 @@ msgid "Buy now"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version
-#: woocommerce-pdf-invoices-packingslips.php:193
+#: woocommerce-pdf-invoices-packingslips.php:194
 msgid "PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version %3$s or higher to be installed & activated!"
 msgstr ""
 
 #. translators: PHP version
-#: woocommerce-pdf-invoices-packingslips.php:238
+#: woocommerce-pdf-invoices-packingslips.php:239
 msgid "PDF Invoices & Packing Slips for WooCommerce requires PHP %s or higher."
 msgstr ""
 
 #. translators: <a> tags
-#: woocommerce-pdf-invoices-packingslips.php:244
+#: woocommerce-pdf-invoices-packingslips.php:245
 msgid "We strongly recommend to %1$supdate your PHP version%2$s."
 msgstr ""
 
 #. translators: directory path
-#: woocommerce-pdf-invoices-packingslips.php:336
+#: woocommerce-pdf-invoices-packingslips.php:337
 msgid "The PDF files in %s are not currently protected due to your site running on <strong>NGINX</strong>."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:337
+#: woocommerce-pdf-invoices-packingslips.php:338
 msgid "To protect them, you must click the button below."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:338
+#: woocommerce-pdf-invoices-packingslips.php:339
 msgid "Generate random temporary folder name"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:395
+#: woocommerce-pdf-invoices-packingslips.php:396
 msgid "When sending emails with MailPoet 3 and the active sending method is <strong>MailPoet Sending Service</strong> or <strong>Your web host / web server</strong>, MailPoet does not include the <strong>PDF Invoices & Packing Slips for WooCommerce</strong> attachments in the emails."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:396
+#: woocommerce-pdf-invoices-packingslips.php:397
 msgid "To fix this you should select <strong>The default WordPress sending method (default)</strong> on the <strong>Advanced tab</strong>."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:397
+#: woocommerce-pdf-invoices-packingslips.php:398
 msgid "Change MailPoet sending method to WordPress (default)"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:434
+#: woocommerce-pdf-invoices-packingslips.php:435
 msgid "PDF Invoices & Packing Slips for WooCommerce detected that your current site locale is right-to-left (RTL) which the current PDF engine does not support it. Please consider installing our mPDF extension that is compatible."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:435
+#: woocommerce-pdf-invoices-packingslips.php:436
 msgid "Download mPDF extension"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:480
+#: woocommerce-pdf-invoices-packingslips.php:481
 msgid "The year-end is approaching, and we noticed that your PDF Invoices & Packing Slips for WooCommerce plugin doesn't have the scheduled action to reset invoice numbers annually, even though you've explicitly enabled this setting in the document options. Click the button below to schedule the action before the year ends."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:481
+#: woocommerce-pdf-invoices-packingslips.php:482
 msgid "Schedule the action now"
 msgstr ""
 
 #. translators: legacy addon name
-#: woocommerce-pdf-invoices-packingslips.php:565
+#: woocommerce-pdf-invoices-packingslips.php:566
 msgid "While updating the PDF Invoices & Packing Slips for WooCommerce plugin we've noticed our legacy %s add-on was active on your site. This functionality is now incorporated into the core plugin. We've deactivated the add-on for you, and you are free to uninstall it."
 msgstr ""
 
