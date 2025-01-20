@@ -482,7 +482,7 @@ abstract class OrderDocument {
 		}
 		
 		// ubl
-		if ( $document->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
+		if ( $this->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
 			wpo_ips_ubl_save_order_taxes( $order );
 		}
 		

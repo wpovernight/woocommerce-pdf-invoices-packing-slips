@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 3.9.5-beta-7
+Stable tag: 3.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,32 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 3.9.5 (2025-01-20) =
+- New: Email input callback function for settings
+- New: Adds support for additional UBL root elements
+- New: Add support for multiple handlers under a single root in `UblDocument::get_data()`
+- New: Validation for order tax exemption to apply UBL tax reason
+- New: The "Regenerate Invoice" feature now updates UBL Tax item data
+- New: Enhance UBL Taxes default selector, 'None' Option
+- New: Add `cbc:BaseQuantity` support to UBL structure
+- New: UBL Tax settings now align with the latest settings option
+- New: Add utility function for dynamic string translation
+- New: Add `cbc:BuyerReference` element to UBL for buyer reference
+- New: Enable Support for `cac:PaymentMeans` in UBL
+- New: Filter hooks for UBL tax schemes, categories, and reasons
+- New: Add `cac:Price` support to UBL
+- New: Support for UBL Tax Category Reason
+- Tweak: Replace UBL code to get the customer VAT number with new function
+- Tweak: Update UBL format selector description
+- Tweak: Allow `0` days for the due date 
+- Tweak: Apply `wpo_wcpdf_settings_fields_documents_{$this->type}_pdf` before checking the emptiness of the `$settings_fields`
+- Fix: Logo height setting can break document layout on Simple template
+- Fix: Setting categories not applied to disabled documents
+- Fix: Postcode and city defaults in UBL tax output
+- Fix: Incorrect treatment of UBL format setting as historical
+- Translations: Updated translation template (POT).
+- Tested: Tested up to WooCommerce 9.6.
 
 = 3.9.4 (2024-12-23) =
 * New: add a note to inform users about the availability of additional documents

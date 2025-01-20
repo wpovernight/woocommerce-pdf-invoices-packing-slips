@@ -3,6 +3,7 @@
 namespace WPO\IPS\UBL\Builders;
 
 use WPO\IPS\Vendor\Sabre\Xml\Service;
+use WPO\IPS\Vendor\Sabre\Xml\Writer;
 use WPO\IPS\UBL\Documents\Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -11,19 +12,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SabreBuilder extends Builder {
 
-	/** Service */
-	private $service;
+	private Service $service;
+	private Document $document;
 
 	public function __construct() {
 		$this->service = new Service();
 	}
 
-	public function build( Document $document ) {
-		// Sabre wants namespaces in value/key format, so we need to flip it
-		$namespaces                  = array_flip( $document->get_namespaces() );
-		$this->service->namespaceMap = $namespaces;
+	public function build( Document $document ): string {
+		$this->document = $document;
 
-		return $this->service->write( $document->get_root_element(), $document->get_data() );
+		// Map namespaces (Sabre requires URI => prefix)
+		$this->service->namespaceMap = array_flip( $document->get_namespaces() );
+
+		return $this->service->write(
+			$document->get_root_element(),
+			function ( Writer $writer ) {
+				$this->xmlSerialize( $writer );
+			}
+		);
+	}
+
+	public function xmlSerialize( Writer $writer ): void {
+		$additionalElements = $this->document->get_additional_root_elements();
+
+		if ( ! empty( $additionalElements ) && is_array( $additionalElements ) ) {
+			$writer->writeAttributes( $additionalElements );
+		}
+
+		$writer->write( $this->document->get_data() );
 	}
 
 }
