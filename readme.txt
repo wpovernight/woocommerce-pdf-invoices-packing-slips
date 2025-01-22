@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 3.9.6
+Stable tag: 4.0.0-beta-1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,7 +122,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - New: Support for UBL Tax Category Reason
 - Tweak: Replace UBL code to get the customer VAT number with new function
 - Tweak: Update UBL format selector description
-- Tweak: Allow `0` days for the due date 
+- Tweak: Allow `0` days for the due date
 - Tweak: Apply `wpo_wcpdf_settings_fields_documents_{$this->type}_pdf` before checking the emptiness of the `$settings_fields`
 - Fix: Logo height setting can break document layout on Simple template
 - Fix: Setting categories not applied to disabled documents
