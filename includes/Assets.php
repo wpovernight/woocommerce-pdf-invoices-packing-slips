@@ -21,25 +21,18 @@ class Assets {
 	}
 
 	public function __construct()	{
-		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_scripts_styles' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ), 11 ); // after WC
+		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
 	}
 
 	/**
 	 * Load styles & scripts
 	 */
-	public function frontend_scripts_styles ( $hook ) {
-		# none yet
-	}
-
-	/**
-	 * Load styles & scripts
-	 */
-	public function backend_scripts_styles ( $hook ) {
+	public function backend_scripts_styles( $hook ) {
 		$suffix        = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$pdfjs_version = '4.3.136';
 
 		global $wp_version;
+
 		if ( WPO_WCPDF()->admin->is_order_page() ) {
 
 			// STYLES
@@ -96,10 +89,10 @@ class Assets {
 
 		// only load on our own settings page
 		// maybe find a way to refer directly to WPO\IPS\Settings::$options_page_hook ?
-		if (
-			in_array( $hook, array( 'woocommerce_page_wpo_wcpdf_options_page', 'settings_page_wpo_wcpdf_options_page' ) ) ||
-			( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === $_GET['page'] )
-		) {
+		if ( ! empty( $hook ) && false !== strpos( $hook, 'wpo_wcpdf_options_page' ) ) {
+			$tab = filter_input( INPUT_GET, 'tab', FILTER_DEFAULT );
+			$tab = sanitize_text_field( $tab );
+
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
 				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
@@ -209,10 +202,78 @@ class Assets {
 			wp_enqueue_media();
 			wp_enqueue_script(
 				'wpo-wcpdf-media-upload',
-				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
+			
+			// status/debug page scripts
+			if ( 'debug' === $tab ) {
+				wp_enqueue_style(
+					'wpo-wcpdf-jquery-ui-styles',
+					WPO_WCPDF()->plugin_url() . '/assets/css/jquery-ui' . $suffix . '.css',
+					'1.14.0'
+				);
+
+				wp_enqueue_script( 'jquery-ui-datepicker' );
+
+				wp_enqueue_style(
+					'wpo-wcpdf-debug-tools-styles',
+					WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools' . $suffix . '.css',
+					WPO_WCPDF_VERSION
+				);
+
+				wp_enqueue_script(
+					'wpo-wcpdf-debug',
+					WPO_WCPDF()->plugin_url() . '/assets/js/debug-script' . $suffix . '.js',
+					array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
+					WPO_WCPDF_VERSION
+				);
+
+				wp_localize_script(
+					'wpo-wcpdf-debug',
+					'wpo_wcpdf_debug',
+					array(
+						'ajaxurl'              => admin_url( 'admin-ajax.php' ),
+						'nonce'                => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
+						'download_label'       => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
+						'confirm_reset'        => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'select_document_type' => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
+						'danger_zone'          => array(
+							'enabled' => isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ? true : false,
+							'message' => sprintf(
+								/* translators: 1. open anchor tag, 2. close anchor tag */
+								__( '<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '#danger_zone">',
+								'</a>'
+							),
+						),
+					)
+				);
+
+			}
+			
+			// ubl taxes
+			if ( 'ubl' === $tab ) {
+				wp_enqueue_script(
+					'wpo-wcpdf-ubl',
+					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
+					array( 'jquery' ),
+					WPO_WCPDF_VERSION,
+					true
+				);
+				
+				wp_localize_script(
+					'wpo-wcpdf-ubl',
+					'wpo_wcpdf_ubl',
+					array(
+						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
+						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
+						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
+						'remarks' => TaxesSettings::get_available_remarks(),
+					)
+				);
+			}
 
 		}
 
@@ -237,72 +298,6 @@ class Assets {
 			);
 		}
 
-		// status/debug page scripts
-		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && 'debug' === $_REQUEST['tab'] ) {
-			wp_enqueue_style(
-				'wpo-wcpdf-jquery-ui-styles',
-				'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css'
-			);
-
-			wp_enqueue_script( 'jquery-ui-datepicker' );
-
-			wp_enqueue_style(
-				'wpo-wcpdf-debug-tools-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools'.$suffix.'.css',
-				WPO_WCPDF_VERSION
-			);
-
-			wp_enqueue_script(
-				'wpo-wcpdf-debug',
-				WPO_WCPDF()->plugin_url() . '/assets/js/debug-script'.$suffix.'.js',
-				array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
-				WPO_WCPDF_VERSION
-			);
-
-			wp_localize_script(
-				'wpo-wcpdf-debug',
-				'wpo_wcpdf_debug',
-				array(
-					'ajaxurl'              => admin_url( 'admin-ajax.php' ),
-					'nonce'                => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
-					'download_label'       => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
-					'confirm_reset'        => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'select_document_type' => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
-					'danger_zone'          => array(
-						'enabled' => isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ? true : false,
-						'message' => sprintf(
-							/* translators: 1. open anchor tag, 2. close anchor tag */
-							__( '<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '#danger_zone">',
-							'</a>'
-						),
-					),
-				)
-			);
-
-		}
-		
-		// ubl taxes
-		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wpo_wcpdf_options_page' && isset( $_REQUEST['tab'] ) && 'ubl' === $_REQUEST['tab'] ) {
-			wp_enqueue_script(
-				'wpo-wcpdf-ubl',
-				WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
-				array( 'jquery' ),
-				WPO_WCPDF_VERSION,
-				true
-			);
-			
-			wp_localize_script(
-				'wpo-wcpdf-ubl',
-				'wpo_wcpdf_ubl',
-				array(
-					'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
-					'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
-					'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-					'remarks' => TaxesSettings::get_available_remarks(),
-				)
-			);
-		}
 	}
 
 }
