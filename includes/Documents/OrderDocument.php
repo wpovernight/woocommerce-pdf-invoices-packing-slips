@@ -1323,7 +1323,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_phone_number', '', false );
 	}
 	public function shop_phone_number() {
-		echo $this->get_shop_phone_number();
+		echo esc_html( $this->get_shop_phone_number() );
 	}
 
 	/**

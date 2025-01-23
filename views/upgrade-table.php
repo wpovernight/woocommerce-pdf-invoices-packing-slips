@@ -28,8 +28,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	foreach ( $features as $feature ) {
 		echo '<tr><td class="first feature-label">' . esc_html( $feature['label'] );
 		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . wp_kses_post( $feature['description'] ) . '</span></td>' : '</td>';
-		foreach ( ['pro', 'templates', 'bundle'] as $extension ) {
-			echo in_array( $extension, $feature['extensions'] ) ? '<td class="' . $extension . '"><span class="feature-available"></span></td>' : '<td class="' . $extension . '">-</td>';
+		foreach ( array( 'pro', 'templates', 'bundle' ) as $extension ) {
+			echo in_array( $extension, $feature['extensions'] ) ? '<td class="' . esc_attr( $extension ) . '"><span class="feature-available"></span></td>' : '<td class="' . esc_attr( $extension ) . '">-</td>';
 		}
 		echo '<td align="left" class="last">&nbsp;</td></tr>';
 	}
@@ -122,7 +122,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					break;
 			}
 
-			echo '<style>' . $styles . '</style>';
+			if ( ! empty( $styles ) ) {
+				echo '<style>' . esc_html( $styles ) . '</style>';
+			}
 
 			foreach ( $extension_columns as $column ) {
 				echo wp_kses_post( $column );
