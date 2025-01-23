@@ -26,8 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php
 	foreach ( $features as $feature ) {
-		echo '<tr><td class="first feature-label">' . $feature['label'];
-		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . $feature['description'] . '</span></td>' : '</td>';
+		echo '<tr><td class="first feature-label">' . esc_html( $feature['label'] );
+		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . wp_kses_post( $feature['description'] ) . '</span></td>' : '</td>';
 		foreach ( ['pro', 'templates', 'bundle'] as $extension ) {
 			echo in_array( $extension, $feature['extensions'] ) ? '<td class="' . $extension . '"><span class="feature-available"></span></td>' : '<td class="' . $extension . '">-</td>';
 		}
@@ -125,7 +125,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			echo '<style>' . $styles . '</style>';
 
 			foreach ( $extension_columns as $column ) {
-				echo $column;
+				echo wp_kses_post( $column );
 			}
 
 		?>
@@ -137,8 +137,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<h1><?php esc_html_e( 'You might also like these plugins...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
 	<?php
 	if ( count( array_column( $sorted_plugin_recommendations, 'installed' ) ) === count( $sorted_plugin_recommendations ) ) {
-		printf( '<p>%s</p>', __( 'Wow! It looks like you own all of our recommendations. Check out our shop for even more plugins.', 'woocommerce-pdf-invoices-packing-slips' ) );
-		printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', 'https://wpovernight.com/shop/', __( 'Visit shop', 'woocommerce-pdf-invoices-packing-slips' ) );
+		printf( '<p>%s</p>', esc_html__( 'Wow! It looks like you own all of our recommendations. Check out our shop for even more plugins.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', 'https://wpovernight.com/shop/', esc_html__( 'Visit shop', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 	?>
 	<div class="card-container">
@@ -146,15 +146,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		foreach ( $sorted_plugin_recommendations as $plugin ) {
 			?>
 			<div class="<?php echo isset( $plugin['installed'] ) ? 'recommendation-card currently-installed' : 'recommendation-card'; ?>">
-				<img src="<?php echo $plugin['thumbnail']; ?>" alt="<?php echo $plugin['title']; ?>">
+				<img src="<?php echo esc_url( $plugin['thumbnail'] ); ?>" alt="<?php echo esc_html( $plugin['title'] ); ?>">
 				<div class="card-content">
-					<h5><?php echo $plugin['title']; ?></h5>
-					<p><?php echo $plugin['description']; ?></p>
-					<?php 
+					<h5><?php echo esc_html( $plugin['title'] ); ?></h5>
+					<p><?php echo esc_html( $plugin['description'] ); ?></p>
+					<?php
 					if ( isset( $plugin['installed'] ) ) {
-						printf( '<span class="currently-installed">%s</span>', __( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) );
+						printf( '<span class="currently-installed">%s</span>', esc_html__( 'Currently installed', 'woocommerce-pdf-invoices-packing-slips' ) );
 					} else {
-						printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', $plugin['url'], __( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' ) );
+						printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', esc_url( $plugin['url'] ), esc_html__( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' ) );
 					}
 					?>
 				</div>
