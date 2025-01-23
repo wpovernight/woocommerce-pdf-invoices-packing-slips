@@ -21,7 +21,7 @@ class Admin {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 
 		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed
@@ -90,7 +90,7 @@ class Admin {
 		} else {
 			if ( isset( $_REQUEST['wpo_wcpdf_dismiss_review'] ) && isset( $_REQUEST['_wpdismissnonce'] ) ) {
 				// validate nonce
-				if ( ! wp_verify_nonce( $_REQUEST['_wpdismissnonce'], 'dismiss_review_nonce' ) ) {
+				if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpdismissnonce'] ) ), 'dismiss_review_nonce' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_dismiss_review' );
 					return;
 				} else {
@@ -104,7 +104,7 @@ class Admin {
 			if ( $invoice_count > 100 ) {
 				// keep track of how many days this notice is show so we can remove it after 7 days
 				$notice_shown_on = get_option( 'wpo_wcpdf_review_notice_shown', array() );
-				$today           = date('Y-m-d');
+				$today           = gmdate( 'Y-m-d' );
 				if ( ! in_array( $today, $notice_shown_on ) ) {
 					$notice_shown_on[] = $today;
 					update_option( 'wpo_wcpdf_review_notice_shown', $notice_shown_on );
@@ -118,8 +118,15 @@ class Admin {
 				$rounded_count = (int) substr( (string) $invoice_count, 0, 1 ) * pow( 10, strlen( (string) $invoice_count ) - 1);
 				?>
 				<div class="notice notice-info is-dismissible wpo-wcpdf-review-notice">
-					<?php /* translators: rounded count */ ?>
-					<h3><?php printf( esc_html__( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ), $rounded_count ); ?></h3>
+					<h3>
+						<?php
+							printf(
+								/* translators: rounded count */
+								esc_html__( 'Wow, you have created more than %d invoices with our plugin!', 'woocommerce-pdf-invoices-packing-slips' ),
+								esc_html( $rounded_count )
+							);
+						?>
+					</h3>
 					<p><?php esc_html_e( 'It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					<ul>
 						<li><a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips/reviews/?rate=5#new-post" class="button"><?php esc_html_e( 'Yes you deserve it!', 'woocommerce-pdf-invoices-packing-slips' ); ?></span></a></li>
@@ -153,7 +160,7 @@ class Admin {
 		} else {
 			if ( isset( $_REQUEST['wpo_wcpdf_dismiss_install'] ) && isset( $_REQUEST['_wpdismissnonce'] ) ) {
 				// validate nonce
-				if ( ! wp_verify_nonce( $_REQUEST['_wpdismissnonce'], 'dismiss_install_nonce' ) ) {
+				if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpdismissnonce'] ) ), 'dismiss_install_nonce' ) ) {
 					wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_dismiss_install' );
 					return;
 				} else {
@@ -184,7 +191,7 @@ class Admin {
 
 	public function setup_wizard() {
 		// Setup/welcome
-		if ( ! empty( $_GET['page'] ) && $_GET['page'] == 'wpo-wcpdf-setup' ) {
+		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			delete_transient( 'wpo_wcpdf_new_install' );
 			SetupWizard::instance();
 		}
@@ -242,7 +249,7 @@ class Admin {
 								}
 
 								$listing_actions[$document->get_type()] = array(
-									'url'           => esc_url( $document_url ),
+									'url'           => $document_url,
 									'img'           => $icon,
 									'alt'           => "PDF " . $document_title,
 									'exists'        => $document_exists,
@@ -264,7 +271,7 @@ class Admin {
 								}
 
 								$listing_actions[ $document->get_type()."_{$output_format}" ] = array(
-									'url'           => esc_url( $document_url ),
+									'url'           => $document_url,
 									'img'           => $icon,
 									'alt'           => "UBL " . $document_title,
 									'exists'        => $document_exists,
@@ -294,15 +301,28 @@ class Admin {
 			// ubl replaces exists
 			$exists  = isset( $data['output_format'] ) && 'ubl' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
 
+			$allowed_svg_tags = array(
+				'svg' => array(
+					'class'   => true,
+					'xmlns'   => true,
+					'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+				),
+				'path' => array(
+					'fill-rule' => true,
+					'clip-rule' => true,
+					'd'         => true,
+				),
+			);
+
 			if ( isset( $data['output_format'] ) && ( 'ubl' !== $data['output_format'] || $data['exists'] ) ) {
 				printf(
 					'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
-					esc_attr( $data['url'] ),
+					esc_url( $data['url'] ),
 					esc_attr( $data['class'] ),
 					esc_attr( $data['alt'] ),
 					esc_attr( $data['img'] ),
-					$exists,
-					$printed
+					! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : '',
+					! empty( $printed ) ? wp_kses( $printed, $allowed_svg_tags ) : ''
 				);
 			}
 		}
@@ -313,7 +333,9 @@ class Admin {
 	 * @param array $columns shop order columns
 	 */
 	public function add_invoice_columns( $columns ) {
-		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() && isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'wc-orders' && isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'edit' ) {
+		$current_screen = get_current_screen();
+
+		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() && 'woocommerce_page_wc-orders' !== $current_screen->id ) {
 			return $columns;
 		}
 
@@ -364,12 +386,12 @@ class Admin {
 		switch ( $column ) {
 			case 'invoice_number_column':
 				$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? $invoice->get_number() : '';
-				echo $invoice_number;
+				echo esc_html( $invoice_number );
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
 				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) : '';
-				echo $invoice_date;
+				echo esc_html( $invoice_date );
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
 			default:
@@ -609,25 +631,45 @@ class Admin {
 		<ul class="wpo_wcpdf-actions">
 			<?php
 			foreach ( $meta_box_actions as $document_type => $data ) {
-				$url                   = isset( $data['url'] ) ? esc_attr( $data['url'] ) : '';
-				$class                 = isset( $data['class'] ) ? esc_attr( $data['class'] ) : '';
-				$alt                   = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
-				$title                 = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
+				$url                   = isset( $data['url'] ) ? $data['url'] : '';
+				$class                 = isset( $data['class'] ) ? $data['class'] : '';
+				$alt                   = isset( $data['alt'] ) ? $data['alt'] : '';
+				$title                 = isset( $data['title'] ) ? $data['title'] : '';
 				$exists                = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="' . $data['mark_printed_url'] . '">' . __( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>' : '';
 				$printed               = isset( $data['printed'] ) && $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="' . $data['unmark_printed_url'] . '">' . __( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>' : '';
 				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ) . '' . $unmark_printed . '</p>' : '';
 
+				$allowed_tags = array(
+					'svg' => array(
+						'class'   => true,
+						'xmlns'   => true,
+						'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+					),
+					'path' => array(
+						'fill-rule' => true,
+						'clip-rule' => true,
+						'd'         => true,
+					),
+					'p' => array(
+						'class' => true,
+					),
+					'a' => array(
+						'href' => true,
+						'class' => true,
+					),
+				);
+
 				printf(
 					'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a>%6$s%7$s</li>',
-					$url,
-					$class,
-					$alt,
-					$title,
-					$exists,
-					$manually_mark_printed,
-					$printed_data
+					esc_url( $url ),
+					esc_attr( $class ),
+					esc_attr( $alt ),
+					esc_html( $title ),
+					! empty( $exists ) ? wp_kses( $exists, $allowed_tags ) : '',
+					wp_kses( $manually_mark_printed, $allowed_tags ),
+					! empty( $printed_data ) ? wp_kses( $printed_data, $allowed_tags ) : ''
 				);
 			}
 			?>
@@ -662,7 +704,7 @@ class Admin {
 					}
 
 					$meta_box_actions[ $document->get_type() ] = array(
-						'url'    => esc_url( $document_url ),
+						'url'    => $document_url,
 						'alt'    => "UBL " . $document_title,
 						'title'  => "UBL " . $document_title,
 						'exists' => $document_exists,
@@ -682,20 +724,33 @@ class Admin {
 				$ubl_documents = 0;
 
 				foreach ( $meta_box_actions as $document_type => $data ) {
-					$url    = isset( $data['url'] ) ? esc_attr( $data['url'] ) : '';
-					$class  = isset( $data['class'] ) ? esc_attr( $data['class'] ) : '';
-					$alt    = isset( $data['alt'] ) ? esc_attr( $data['alt'] ) : '';
-					$title  = isset( $data['title'] ) ? esc_attr( $data['title'] ) : '';
+					$url    = isset( $data['url'] ) ? $data['url'] : '';
+					$class  = isset( $data['class'] ) ? $data['class'] : '';
+					$alt    = isset( $data['alt'] ) ? $data['alt'] : '';
+					$title  = isset( $data['title'] ) ? $data['title'] : '';
 					$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
+
+					$allowed_svg_tags = array(
+						'svg' => array(
+							'class'   => true,
+							'xmlns'   => true,
+							'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+						),
+						'path' => array(
+							'fill-rule' => true,
+							'clip-rule' => true,
+							'd'         => true,
+						),
+					);
 
 					if ( ! empty( $exists ) ) {
 						printf(
 							'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
-							$url,
-							$class,
-							$alt,
-							$title,
-							$exists
+							esc_url( $url ),
+							esc_attr( $class ),
+							esc_attr( $alt ),
+							esc_html( $title ),
+							! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : ''
 						);
 
 						$ubl_documents++;
@@ -703,7 +758,7 @@ class Admin {
 				}
 
 				if ( 0 === $ubl_documents ) {
-					_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
+					esc_html_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 			?>
 		</ul>
@@ -845,7 +900,7 @@ class Admin {
 	public function add_regenerate_document_button( $document ) {
 		$document_settings = $document->get_settings( true );
 		if ( $document->use_historical_settings() == true || isset( $document_settings['archive_pdf'] ) ) {
-			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s" data-action="regenerate"></span>', wp_create_nonce( "wpo_wcpdf_regenerate_document" ) );
+			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s" data-action="regenerate"></span>', esc_attr( wp_create_nonce( 'wpo_wcpdf_regenerate_document' ) ) );
 		}
 	}
 
@@ -871,9 +926,8 @@ class Admin {
 
 		$order_type = $order->get_type();
 
-		if ( $order_type == 'shop_order' ) {
-			// bail if this is not an actual 'Save order' action
-			if ( ! isset( $_POST['action'] ) || $_POST['action'] != 'editpost' ) {
+		if ( 'shop_order' === $order_type ) {
+			if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				return;
 			}
 
@@ -936,8 +990,13 @@ class Admin {
 	public function send_emails( $post_or_order_object_id, $post_or_order_object ) {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
+		// Check the nonce.
+		if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			return;
+		}
+
 		if ( ! empty( $_POST['wpo_wcpdf_send_emails'] ) ) {
-			$action = wc_clean( $_POST['wpo_wcpdf_send_emails'] );
+			$action = sanitize_text_field( wp_unslash( $_POST['wpo_wcpdf_send_emails'] ) );
 			if ( ! empty( $action ) && strstr( $action, 'send_email_' ) ) {
 				$email_to_send = str_replace( 'send_email_', '', $action );
 				// Switch back to the site locale.
@@ -1008,39 +1067,43 @@ class Admin {
 			) );
 		}
 
-		if ( ! isset($_POST['action']) ||  ! in_array( $_POST['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
+		$request = stripslashes_deep( $_POST );
+
+		if ( ! isset( $request['action'] ) ||  ! in_array( $request['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Bad action!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		if( empty($_POST['order_id']) || empty($_POST['document_type']) || empty($_POST['action_type']) ) {
+		if ( empty( $request['order_id'] ) || empty( $request['document_type'] ) || empty( $request['action_type'] ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Incomplete request!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		if ( ! $this->user_can_manage_document( sanitize_text_field( $_POST['document_type'] ) ) ) {
+		if ( ! $this->user_can_manage_document( $request['document_type'] ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'No permissions!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		$order_id        = absint( $_POST['order_id'] );
-		$order           = wc_get_order( $order_id );
-		$document_type   = sanitize_text_field( $_POST['document_type'] );
-		$action_type     = sanitize_text_field( $_POST['action_type'] );
-		$notice          = sanitize_text_field( $_POST['wpcdf_document_data_notice'] );
+		$order_id      = absint( $request['order_id'] );
+		$order         = wc_get_order( $order_id );
+		$document_type = sanitize_text_field( $request['document_type'] );
+		$action_type   = sanitize_text_field( $request['action_type'] );
+		$notice        = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( $request['wpcdf_document_data_notice'] ) : 'saved';
 
 		// parse form data
-		parse_str( $_POST['form_data'], $form_data );
+		parse_str( $request['form_data'], $form_data );
+
 		if ( is_array( $form_data ) ) {
 			foreach ( $form_data as $key => &$value ) {
-				if ( is_array( $value ) && !empty( $value[$order_id] ) ) {
-					$value = $value[$order_id];
+				if ( is_array( $value ) && ! empty( $value[ $order_id ] ) ) {
+					$value = $value[ $order_id ];
 				}
 			}
 		}
+
 		$form_data = stripslashes_deep( $form_data );
 
 		// notice messages
@@ -1065,7 +1128,7 @@ class Admin {
 			if( ! empty( $document ) ) {
 
 				// perform legacy date fields replacements check
-				if( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
+				if ( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
 					$form_data = $this->legacy_date_fields_replacements( $form_data, $document->slug );
 				}
 
@@ -1073,15 +1136,15 @@ class Admin {
 				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
 
 				// on regenerate
-				if( $action_type == 'regenerate' && $document->exists() ) {
+				if ( $action_type == 'regenerate' && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
-					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true );
+					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
 				// on delete
-				} elseif( $action_type == 'delete' && $document->exists() ) {
+				} elseif ( $action_type == 'delete' && $document->exists() ) {
 					$document->delete();
 
 					$response = array(
@@ -1089,7 +1152,7 @@ class Admin {
 					);
 
 				// on save
-				} elseif( $action_type == 'save' ) {
+				} elseif ( $action_type == 'save' ) {
 					$is_new = false === $document->exists();
 					$document->set_data( $document_data, $order );
 
@@ -1102,7 +1165,7 @@ class Admin {
 
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
-						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data' );
+						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
 					$response      = array(
@@ -1169,6 +1232,16 @@ class Admin {
 	{
 		$data = array();
 
+		if (
+			check_ajax_referer( 'wpo_wcpdf_regenerate_document', 'security', false ) === false &&
+			check_ajax_referer( 'wpo_wcpdf_save_document', 'security', false ) === false &&
+			check_ajax_referer( 'wpo_wcpdf_delete_document', 'security', false ) === false &&
+			( empty( $_POST['woocommerce_meta_nonce'] ) ||
+			  ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		) {
+			return $data;
+		}
+
 		if( isset( $form_data['_wcpdf_'.$document_slug.'_number'] ) ) {
 			$data['number'] = sanitize_text_field( $form_data['_wcpdf_'.$document_slug.'_number'] );
 		}
@@ -1180,7 +1253,7 @@ class Admin {
 			$minute       = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
 
 			// clean & sanitize input
-			$date         = date( 'Y-m-d', strtotime( $date ) );
+			$date         = gmdate( 'Y-m-d', strtotime( $date ) );
 			$hour         = sprintf('%02d', intval( $hour ));
 			$minute       = sprintf('%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";
