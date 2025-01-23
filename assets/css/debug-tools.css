@@ -1,6 +1,6 @@
 .wcpdf_debug_settings_sections,
 #debug-tools {
-	width: calc(100% - 4em);
+	width: 100%;
 	max-width: 50vw;
 }
 

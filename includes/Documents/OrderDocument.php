@@ -143,7 +143,12 @@ abstract class OrderDocument {
 		$this->latest_settings = $this->get_settings( true );
 
 		// don't override/save settings on Preview requests
-		if ( isset( $_REQUEST['action'] ) && 'wpo_wcpdf_preview' === $_REQUEST['action'] ) {
+		if (
+			isset( $_REQUEST['action'] ) &&
+			'wpo_wcpdf_preview' === $_REQUEST['action'] &&
+			isset( $_REQUEST['security'] ) &&
+			wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ), 'wpo_wcpdf_preview' )
+		) {
 			return;
 		}
 
@@ -250,12 +255,12 @@ abstract class OrderDocument {
 	 * @return mixed
 	 */
 	public function initiate_number( bool $force_new_number = false ) {
-		$lock            = new Semaphore( "initiate_{$this->slug}_number" );
+		$semaphore       = new Semaphore( "initiate_{$this->slug}_number" );
 		$document_number = $this->exists() ? $this->get_data( 'number' ) : null;
 		$document_number = ! empty( $document_number ) && $force_new_number ? null : $document_number;
 
-		if ( $lock->lock() && empty( $document_number ) ) {
-			$lock->log( "Lock acquired for the {$this->slug} number init.", 'info' );
+		if ( $semaphore->lock() && empty( $document_number ) ) {
+			$semaphore->log( "Lock acquired for the {$this->slug} number init.", 'info' );
 
 			try {
 				$document_number = $this->generate_document_number( true );
@@ -264,15 +269,15 @@ abstract class OrderDocument {
 					$this->set_number( $document_number );
 				}
 			} catch ( \Exception|\Error $e ) {
-				$lock->log( $e, 'critical' );
+				$semaphore->log( $e, 'critical' );
 			}
 
-			if ( $lock->release() ) {
-				$lock->log( "Lock released for the {$this->slug} number init.", 'info' );
+			if ( $semaphore->release() ) {
+				$semaphore->log( "Lock released for the {$this->slug} number init.", 'info' );
 			}
 
 		} else {
-			$lock->log( "Couldn't get the lock for the {$this->slug} number init.", 'critical' );
+			$semaphore->log( "Couldn't get the lock for the {$this->slug} number init.", 'critical' );
 		}
 
 		return $document_number;
@@ -500,7 +505,7 @@ abstract class OrderDocument {
 	public function regenerate( $order = null, $data = null ) {
 		$order     = empty( $order ) ? $this->order : $order;
 		$refund_id = false;
-		
+
 		if ( empty( $order ) ) {
 			return;
 		}
@@ -513,31 +518,31 @@ abstract class OrderDocument {
 
 		// save settings
 		$this->save_settings( true );
-		
+
 		// if credit note
 		if ( 'credit-note' === $this->get_type() ) {
 			$refund_id = $order->get_id();
 			$order     = wc_get_order( $order->get_parent_id() );
 		}
-		
+
 		// ubl
 		if ( $this->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
 			wpo_ips_ubl_save_order_taxes( $order );
 		}
-		
+
 		$note = $refund_id ? sprintf(
 			/* translators: 1. credit note title, 2. refund id */
-			__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ),
+			esc_html__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ),
 			ucfirst( $this->get_title() ),
 			$refund_id
 		) : sprintf(
 			/* translators: 1. document title */
-			__( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
+			esc_html__( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
 			ucfirst( $this->get_title() )
 		);
-		
+
 		$note = wp_kses( $note, 'strip' );
-		
+
 		// add note to order
 		$order->add_order_note( $note );
 
@@ -625,7 +630,7 @@ abstract class OrderDocument {
 	}
 
 	public function number( $document_type ) {
-		echo $this->get_number( $document_type, null, 'view', true );
+		echo esc_html( $this->get_number( $document_type, null, 'view', true ) );
 	}
 
 	public function get_date( $document_type = '', $order = null, $context = 'view', $formatted = false ) {
@@ -639,7 +644,7 @@ abstract class OrderDocument {
 	}
 
 	public function date( $document_type ) {
-		echo $this->get_date( $document_type, null, 'view', true );
+		echo esc_html( $this->get_date( $document_type, null, 'view', true ) );
 	}
 
 	public function get_notes( $document_type = '', $order = null, $context = 'view'  ) {
@@ -669,7 +674,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function title() {
-		echo $this->get_title();
+		echo esc_html( $this->get_title() );
 	}
 
 	/**
@@ -687,7 +692,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function number_title() {
-		echo $this->get_number_title();
+		echo esc_html( $this->get_number_title() );
 	}
 
 	/**
@@ -705,7 +710,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function date_title() {
-		echo $this->get_date_title();
+		echo esc_html( $this->get_date_title() );
 	}
 
 	/**
@@ -723,7 +728,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function due_date_title() {
-		echo $this->get_due_date_title();
+		echo esc_html( $this->get_due_date_title() );
 	}
 
 	/**
@@ -741,7 +746,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function billing_address_title(): void {
-		echo $this->get_billing_address_title();
+		echo esc_html( $this->get_billing_address_title() );
 	}
 
 	/**
@@ -759,7 +764,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shipping_address_title(): void {
-		echo $this->get_shipping_address_title();
+		echo esc_html( $this->get_shipping_address_title() );
 	}
 
 	/**
@@ -777,7 +782,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function order_number_title(): void {
-		echo $this->get_order_number_title();
+		echo esc_html( $this->get_order_number_title() );
 	}
 
 	/**
@@ -795,7 +800,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function order_date_title(): void {
-		echo $this->get_order_date_title();
+		echo esc_html( $this->get_order_date_title() );
 	}
 
 	/**
@@ -813,7 +818,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function payment_method_title(): void {
-		echo $this->get_payment_method_title();
+		echo esc_html( $this->get_payment_method_title() );
 	}
 
 	/**
@@ -831,7 +836,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function payment_date_title(): void {
-		echo $this->get_payment_date_title();
+		echo esc_html( $this->get_payment_date_title() );
 	}
 
 	/**
@@ -849,7 +854,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shipping_method_title(): void {
-		echo $this->get_shipping_method_title();
+		echo esc_html( $this->get_shipping_method_title() );
 	}
 
 	/**
@@ -867,7 +872,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function sku_title(): void {
-		echo $this->get_sku_title();
+		echo esc_html( $this->get_sku_title() );
 	}
 
 	/**
@@ -885,7 +890,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function weight_title(): void {
-		echo $this->get_weight_title();
+		echo esc_html( $this->get_weight_title() );
 	}
 
 	/**
@@ -903,7 +908,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function notes_title(): void {
-		echo $this->get_notes_title();
+		echo esc_html( $this->get_notes_title() );
 	}
 
 	/**
@@ -921,7 +926,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function customer_notes_title(): void {
-		echo $this->get_customer_notes_title();
+		echo esc_html( $this->get_customer_notes_title() );
 	}
 
 	/**
@@ -1005,7 +1010,46 @@ abstract class OrderDocument {
 	 */
 	public function due_date(): void {
 		$due_date_timestamp = $this->get_due_date();
-		echo apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
+		$due_date           = apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
+		echo esc_html( $due_date );
+	}
+
+	/**
+	 * Get the language attributes for the document.
+	 *
+	 * @return string
+	 */
+	public function get_language_attributes(): string {
+		$language_attributes = apply_filters( 'wpo_wcpdf_document_language_attributes', get_language_attributes(), $this );
+		return apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $language_attributes, $this->get_type(), $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
+	}
+
+	/**
+	 * Print the language attributes for the document.
+	 *
+	 * @return void
+	 */
+	public function language_attributes(): void {
+		echo esc_html( $this->get_language_attributes() );
+	}
+
+	/**
+	 * Get the body class for the document.
+	 *
+	 * @return string
+	 */
+	public function get_body_class(): string {
+		$body_class = apply_filters( 'wpo_wcpdf_document_body_class', $this->get_type(), $this );
+		return apply_filters_deprecated( 'wpo_wcpdf_body_class', array( $body_class, $this ), '3.9.1', 'wpo_wcpdf_document_body_class' );
+	}
+
+	/**
+	 * Print the body class for the document.
+	 *
+	 * @return void
+	 */
+	public function body_class(): void {
+		echo esc_html( $this->get_body_class() );
 	}
 
 	/*
@@ -1149,16 +1193,34 @@ abstract class OrderDocument {
 	 * Output template styles
 	 */
 	public function template_styles() {
-		$css = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( "style.css" ) );
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+		$css_file_path = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( 'style.css' ) );
+		$css           = '';
 
-		ob_start();
-		if (file_exists($css)) {
-			include($css);
+		if ( $wp_filesystem->exists( $css_file_path ) ) {
+			ob_start();
+			include $css_file_path;
+			$css = ob_get_clean();
 		}
-		$css = ob_get_clean();
+
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
 
-		echo $css;
+		echo esc_textarea( $css );
+	}
+
+	/**
+	 * Output custom template styles
+	 *
+	 * @return void
+	 */
+	public function template_custom_styles(): void {
+		ob_start();
+
+		do_action( 'wpo_wcpdf_custom_styles', $this->get_type(), $this );
+
+		$css = apply_filters( 'wpo_wcpdf_template_custom_styles', ob_get_clean(), $this );
+
+		echo esc_html( $css );
 	}
 
 	public function has_header_logo() {
@@ -1216,11 +1278,11 @@ abstract class OrderDocument {
 				return;
 			}
 
-			$image_src   = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', esc_attr( $image_src ), esc_attr( $company ) );
+			$img_src     = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
+			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', wpo_wcpdf_escape_url_path_or_base64( $img_src ), esc_attr( $company ) );
+			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
 
-			echo apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
-
+			echo $img_element; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 
@@ -1265,7 +1327,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_name', $default, false );
 	}
 	public function shop_name() {
-		echo $this->get_shop_name();
+		echo esc_html( $this->get_shop_name() );
 	}
 
 	/**
@@ -1275,7 +1337,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'vat_number', '', false );
 	}
 	public function shop_vat_number() {
-		echo $this->get_shop_vat_number();
+		echo esc_html( $this->get_shop_vat_number() );
 	}
 
 	/**
@@ -1285,7 +1347,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'coc_number', '', false );
 	}
 	public function shop_coc_number() {
-		echo $this->get_shop_coc_number();
+		echo esc_html( $this->get_shop_coc_number() );
 	}
 
 	/**
@@ -1295,7 +1357,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_address' );
 	}
 	public function shop_address() {
-		echo $this->get_shop_address();
+		echo esc_html( $this->get_shop_address() );
 	}
 
 	/**
@@ -1314,12 +1376,12 @@ abstract class OrderDocument {
 	public function get_footer() {
 		ob_start();
 		do_action( 'wpo_wcpdf_before_footer', $this->get_type(), $this->order );
-		echo $this->get_settings_text( 'footer' );
+		echo $this->get_settings_text( 'footer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
 		return ob_get_clean();
 	}
 	public function footer() {
-		echo $this->get_footer();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_footer() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1330,7 +1392,7 @@ abstract class OrderDocument {
 
 	}
 	public function extra_1() {
-		echo $this->get_extra_1();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_1() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1340,7 +1402,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_2' );
 	}
 	public function extra_2() {
-		echo $this->get_extra_2();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_2() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1350,7 +1412,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_3' );
 	}
 	public function extra_3() {
-		echo $this->get_extra_3();
+		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_3() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/*
@@ -1364,9 +1426,12 @@ abstract class OrderDocument {
 		WPO_WCPDF()->main->maybe_reinstall_fonts();
 
 		$pdf = null;
+
 		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
-			$pdf = file_get_contents( $pdf_file );
+			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+			$pdf = $wp_filesystem->get_contents( $pdf_file );
 		}
+
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
 		if ( !empty( $pdf ) ) {
 			return $pdf;
@@ -1452,12 +1517,12 @@ abstract class OrderDocument {
 	public function output_pdf( $output_mode = 'download' ) {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
-		echo $pdf;
+		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit();
 	}
 
 	public function output_html() {
-		echo $this->get_html();
+		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public function preview_ubl() {
@@ -1494,10 +1559,15 @@ abstract class OrderDocument {
 
 		wcpdf_ubl_headers( $quoted, $size );
 
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+
 		ob_clean();
 		flush();
-		@readfile( $full_filename );
-		@unlink( $full_filename );
+
+		if ( $wp_filesystem->exists( $full_filename ) ) {
+			echo $wp_filesystem->get_contents( $full_filename ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			wp_delete_file( $full_filename );
+		}
 
 		exit();
 	}
@@ -1524,7 +1594,7 @@ abstract class OrderDocument {
 		if ( $order_count == 1 ) {
 			$suffix = $number;
 		} else {
-			$suffix = date('Y-m-d'); // 2020-11-11
+			$suffix = gmdate('Y-m-d'); // 2020-11-11
 		}
 
 		// get filename
@@ -1587,7 +1657,9 @@ abstract class OrderDocument {
 	public function get_wc_emails() {
 		// only run this in the context of the settings page or setup wizard
 		// prevents WPML language mixups
-		if ( empty( $_GET['page'] ) || !in_array( $_GET['page'], array('wpo-wcpdf-setup','wpo_wcpdf_options_page') ) ) {
+		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( empty( $request['page'] ) || ! in_array( $request['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ) ) ) {
 			return array();
 		}
 
@@ -1768,9 +1840,9 @@ abstract class OrderDocument {
 		$current_year_table_name = "{$default_table_name}_{$current_year}";
 
 		// first, remove last year if it already exists
-		$retired_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$retired_table_name}'" ) == $retired_table_name;
-		if( $retired_exists ) {
-			$table_removed = $wpdb->query( "DROP TABLE IF EXISTS {$retired_table_name}" );
+		$retired_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $retired_table_name ) . "'" ) == $retired_table_name;
+		if ( $retired_exists ) {
+			$table_removed = $wpdb->query( "DROP TABLE IF EXISTS `" . esc_sql( $retired_table_name ) . "`" );
 
 			if( ! $table_removed ) {
 				wcpdf_log_error( sprintf( 'An error occurred while trying to remove the duplicate number store %s: %s', $retired_table_name, $wpdb->last_error ) );
@@ -1779,9 +1851,9 @@ abstract class OrderDocument {
 		}
 
 		// rename current to last year
-		$default_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$default_table_name}'" ) == $default_table_name;
-		if( $default_exists ) {
-			$table_renamed = $wpdb->query( "ALTER TABLE {$default_table_name} RENAME {$retired_table_name}" );
+		$default_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $default_table_name ) . "'" ) == $default_table_name;
+		if ( $default_exists ) {
+			$table_renamed = $wpdb->query( "ALTER TABLE `" . esc_sql( $default_table_name ) . "` RENAME `" . esc_sql( $retired_table_name ) . "`" );
 
 			if( ! $table_renamed ) {
 				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $default_table_name, $retired_table_name, $wpdb->last_error ) );
@@ -1790,9 +1862,9 @@ abstract class OrderDocument {
 		}
 
 		// if the current year table name already exists (created earlier as a 'future' year), rename that to default
-		$current_year_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$current_year_table_name}'" ) == $current_year_table_name;
-		if( $current_year_exists ) {
-			$table_renamed = $wpdb->query( "ALTER TABLE {$current_year_table_name} RENAME {$default_table_name}" );
+		$current_year_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $current_year_table_name ) . "'" ) == $current_year_table_name;
+		if ( $current_year_exists ) {
+			$table_renamed = $wpdb->query( "ALTER TABLE `" . esc_sql( $current_year_table_name ) . "` RENAME `" . esc_sql( $default_table_name ) . "`" );
 
 			if( ! $table_renamed ) {
 				wcpdf_log_error( sprintf( 'An error occurred while trying to rename the number store from %s to %s: %s', $current_year_table_name, $default_table_name, $wpdb->last_error ) );
@@ -1800,7 +1872,7 @@ abstract class OrderDocument {
 			}
 		}
 
-		if( $was_showing_errors ) {
+		if ( $was_showing_errors ) {
 			$wpdb->show_errors();
 		}
 
@@ -1826,17 +1898,17 @@ abstract class OrderDocument {
 			$current_year = intval( $next_year->date_i18n( 'Y' ) );
 		}
 
-		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'") == $table_name;
-		if( $table_exists ) {
+		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $table_name ) . "'" ) == $table_name;
+		if ( $table_exists ) {
 			// get year for the last row
-			$year = $wpdb->get_var( "SELECT YEAR(date) FROM {$table_name} ORDER BY id DESC LIMIT 1" );
+			$year = $wpdb->get_var( "SELECT YEAR(date) FROM `" . esc_sql( $table_name ) . "` ORDER BY id DESC LIMIT 1" );
 			// default to current year if no results
-			if( ! $year ) {
+			if ( ! $year ) {
 				$year = $current_year;
 				// if we don't get a result, this could either mean there's an error,
 				// OR that the first number simply has not been created yet (=no rows)
 				// we only log when there's an actual error
-				if( ! empty( $wpdb->last_error ) ) {
+				if ( ! empty( $wpdb->last_error ) ) {
 					wcpdf_log_error( sprintf( 'An error occurred while trying to get the current year from the %s table: %s', $table_name, $wpdb->last_error ) );
 				}
 			}
@@ -1844,7 +1916,7 @@ abstract class OrderDocument {
 			$year = $current_year;
 		}
 
-		if( $was_showing_errors ) {
+		if ( $was_showing_errors ) {
 			$wpdb->show_errors();
 		}
 
