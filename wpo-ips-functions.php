@@ -1051,7 +1051,7 @@ function wpo_wcpdf_escape_url_path_or_base64( string $url_path_or_base64 ): stri
  * @return string
  */
 function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
-	$log_enabled		= isset( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
+	$log_enabled        = isset( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
 	$log_message        = "Missing translation for: {$string} in textdomain: {$textdomain}";
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = '';
@@ -1068,9 +1068,10 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 	
-	// If multilingual didn't change the string, fall back to native translate()
-	if ( ( empty( $translation ) || $translation === $string ) && function_exists( 'translate' ) ) {
-		$translation = translate( $string, $textdomain );
+	// If no translation found, apply gettext filters
+	if ( empty( $translation ) || $translation === $string ) {
+		$translation = apply_filters( 'gettext', $string, $string, $textdomain );
+		$translation = apply_filters( "gettext_{$textdomain}", $translation, $string, $textdomain );
 	}
 	
 	// Log missing translations for debugging if it's still untranslated
