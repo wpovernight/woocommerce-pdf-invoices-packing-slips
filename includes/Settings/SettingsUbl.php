@@ -28,7 +28,7 @@ class SettingsUbl {
 		];
 
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
-		add_action( 'wpo_wcpdf_settings_output_ubl', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_settings_output_ubl', array( $this, 'output' ), 10, 2 );
 
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
@@ -37,7 +37,11 @@ class SettingsUbl {
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
 	}
 
-	public function output( $active_section ) {
+	public function output( $active_section, $nonce ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			return;
+		}
+		
 		$active_section = ! empty( $active_section ) ? $active_section : 'taxes';
 		?>
 		<div class="wcpdf_ubl_settings_sections">
@@ -46,12 +50,12 @@ class SettingsUbl {
 				<?php
 					foreach ( $this->sections as $section => $title ) {
 						$active = ( $section == $active_section ) ? 'nav-tab-active' : '';
-						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), $active, esc_html( $title ) );
+						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
 					}
 				?>
 			</h2>
 			<?php else : ?>
-			<h3><?php echo $this->sections[ $active_section ]; ?></h3>
+			<h3><?php echo esc_html( $this->sections[ $active_section ] ); ?></h3>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -112,7 +116,7 @@ class SettingsUbl {
 				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '">' . __( 'UBL settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 			);
 
-			echo '<div class="notice notice-warning"><p>' . $message . '</p></div>';
+			echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
 		}
 	}
 

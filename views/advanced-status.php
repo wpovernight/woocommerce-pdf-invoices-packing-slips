@@ -79,8 +79,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 		<tr>
 			<td class="title"><?php echo esc_html( $document->get_title() ); ?></td>
-			<td style="<?= $is_enabled ? 'background-color:#68de7c; color:black;' : 'background-color:#ffabaf; color:black;' ?>"><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
-			<td style="<?= $is_reset_enabled ? 'background-color:#68de7c; color:black;' : 'background-color:#ffabaf; color:black;' ?>"><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td style="<?php echo $is_enabled ? 'background-color:#68de7c; color:black;' : 'background-color:#ffabaf; color:black;' ?>"><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td style="<?php echo $is_reset_enabled ? 'background-color:#68de7c; color:black;' : 'background-color:#ffabaf; color:black;' ?>"><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
 		</tr>
 	</tbody>
 	<?php endforeach; ?>
@@ -100,12 +100,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 				if ( ! empty( $scheduled_actions ) ) {
 					$total_actions = count( $scheduled_actions );
 					if ( $total_actions === 1 ) {
-						$action      = reset( $scheduled_actions );
-						$action_date = is_callable( array( $action->get_schedule(), 'get_date' ) ) ? $action->get_schedule()->get_date() : $action->get_schedule()->get_next( as_get_datetime_object() );
-						/* translators: action date */
+						$action                 = reset( $scheduled_actions );
+						$action_date            = is_callable( array( $action->get_schedule(), 'get_date' ) ) ? $action->get_schedule()->get_date() : $action->get_schedule()->get_next( as_get_datetime_object() );
 						$yearly_reset['value']  = sprintf(
-							__( 'Scheduled to: %s' ), date( wcpdf_date_format( null, 'yearly_reset_schedule' ),
-							$action_date->getTimeStamp() )
+							/* translators: %s action date */
+							__( 'Scheduled to: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+							gmdate( wcpdf_date_format( null, 'yearly_reset_schedule' ), $action_date->getTimestamp() )
 						);
 						$yearly_reset['result'] = true;
 					} else {
@@ -155,6 +155,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 </table>
 
 <?php
+	$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+
 	$status = array(
 		'ok'     => __( 'Writable', 'woocommerce-pdf-invoices-packing-slips' ),
 		'failed' => __( 'Not writable', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -164,26 +166,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 		'WCPDF_TEMP_DIR' => array (
 			'description'    => __( 'Central temporary plugin folder', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'          => WPO_WCPDF()->main->get_tmp_path(),
-			'status'         => is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',
-			'status_message' => is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? $status['ok'] : $status['failed'],
+			'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',
+			'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? $status['ok'] : $status['failed'],
 		),
 		'WCPDF_ATTACHMENT_DIR' => array (
 			'description'    => __( 'Temporary attachments folder', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ),
-			'status'         => is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',
-			'status_message' => is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
+			'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',
+			'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
 		),
 		'DOMPDF_TEMP_DIR' => array (
 			'description'    => __( 'Temporary DOMPDF folder', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'          => trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )),
-			'status'         => is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? 'ok' : 'failed',
-			'status_message' => is_writable(WPO_WCPDF()->main->get_tmp_path( 'dompdf' )) ? $status['ok'] : $status['failed'],
+			'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ),
+			'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ) ? 'ok' : 'failed',
+			'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ) ? $status['ok'] : $status['failed'],
 		),
 		'DOMPDF_FONT_DIR' => array (
 			'description'    => __( 'DOMPDF fonts folder (needs to be writable for custom/remote fonts)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'          => trailingslashit(WPO_WCPDF()->main->get_tmp_path( 'fonts' )),
-			'status'         => is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? 'ok' : 'failed',
-			'status_message' => is_writable(WPO_WCPDF()->main->get_tmp_path( 'fonts' )) ? $status['ok'] : $status['failed'],
+			'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ),
+			'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ) ? 'ok' : 'failed',
+			'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ) ? $status['ok'] : $status['failed'],
 		),
 	), $status );
 
@@ -214,7 +216,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 		<tr>
 			<td><?php echo wp_kses_post( $permission['description'] ); ?></td>
-			<td><?php echo ! empty( $permission['value'] ) ? str_replace( array('/','\\' ), array('/<wbr>','\\<wbr>' ), wp_kses_post( $permission['value'] ) ) : ''; ?></td>
+			<td><?php echo ! empty( $permission['value'] ) ? wp_kses_post( str_replace( array( '/', '\\' ), array( '/<wbr>', '\\<wbr>' ), $permission['value'] ) ) : ''; ?></td>
 			<td style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>"><?php echo wp_kses_post( $permission['status_message'] ); ?></td>
 		</tr>
 		<?php } ?>
@@ -223,10 +225,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tr>
 			<td colspan="3">
 				<?php
-					/* translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts */
-					printf( esc_attr__( 'The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>'.WPO_WCPDF()->main->get_tmp_path().'</code>',
-						'<code>'.$upload_base.'</code>',
+					printf(
+						/* translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts */
+						esc_html__( 'The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>' . wpo_wcpdf_escape_url_path_or_base64( WPO_WCPDF()->main->get_tmp_path() ) . '</code>', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						'<code>' . wpo_wcpdf_escape_url_path_or_base64( $upload_base ) . '</code>', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						'<code>UPLOADS</code>',
 						'<code>wpo_wcpdf_tmp_path</code>',
 						'<code>attachments</code>',
@@ -239,9 +242,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tr>
 			<td colspan="3">
 				<?php
-					/* translators: directory path */
-					printf( esc_attr__('If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>'.WPO_WCPDF()->plugin_path() . "/vendor/dompdf/dompdf/lib/fonts/".'</code>'
+					printf(
+						/* translators: directory path */
+						esc_html__( 'If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>' . wpo_wcpdf_escape_url_path_or_base64( WPO_WCPDF()->plugin_path() . '/vendor/dompdf/dompdf/lib/fonts/' ) . '</code>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					);
 				?>
 			</td>

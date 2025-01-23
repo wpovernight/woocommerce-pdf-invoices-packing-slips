@@ -59,9 +59,9 @@ class SequentialNumberStore {
 		} else {
 			// check calculated_number column if using 'calculate' method
 			if ( $this->method == 'calculate' ) {
-				$column_exists = $this->wpdb->get_var("SHOW COLUMNS FROM `{$this->table_name}` LIKE 'calculated_number'");
+				$column_exists = $this->wpdb->get_var( "SHOW COLUMNS FROM `" . esc_sql( $this->table_name ) . "` LIKE 'calculated_number'" );
 				if ( empty( $column_exists ) ) {
-					$this->wpdb->query("ALTER TABLE {$this->table_name} ADD calculated_number int (16)");
+					$this->wpdb->query( "ALTER TABLE `" . esc_sql( $this->table_name ) . "` ADD `calculated_number` INT(16)" );
 				}
 			}
 			return; // no further business
@@ -95,7 +95,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 */
 	public function increment( $order_id = 0, $date = null ) {
 		if ( empty( $date ) ) {
-			$date = get_date_from_gmt( date( 'Y-m-d H:i:s' ) );
+			$date = get_date_from_gmt( gmdate( 'Y-m-d H:i:s' ) );
 		}
 
 		do_action( 'wpo_wcpdf_before_sequential_number_increment', $this, $order_id, $date );
@@ -128,10 +128,11 @@ $sql = "CREATE TABLE {$this->table_name} (
 				$this->wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
 			}
 			// get next auto_increment value
-			$table_status = $this->wpdb->get_row("SHOW TABLE STATUS LIKE '{$this->table_name}'");
+			$table_status = $this->wpdb->get_row( "SHOW TABLE STATUS LIKE '" . esc_sql( $this->table_name ) . "'" );
 			$next         = $table_status->Auto_increment;
 		} elseif ( $this->method == 'calculate' ) {
-			$last_row = $this->wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
+			$last_row = $this->wpdb->get_row( "SELECT * FROM `" . esc_sql( $this->table_name ) . "` WHERE id = ( SELECT MAX(id) FROM `" . esc_sql( $this->table_name ) . "` )" );
+
 			if ( empty( $last_row ) ) {
 				$next = 1;
 			} elseif ( ! empty( $last_row->calculated_number ) ) {
@@ -147,18 +148,21 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 * Set the number that will be used on the next increment
 	 */
 	public function set_next( $number = 1 ) {
+		$table_name = $this->table_name;
+		$wpdb       = $this->wpdb;
+		
 		// delete all rows
-		$delete = $this->wpdb->query("TRUNCATE TABLE {$this->table_name}");
+		$delete = $wpdb->query( "TRUNCATE TABLE `" . esc_sql( $table_name ) . "`" );
 
 		// set auto_increment
 		if ( $number > 1 ) {
 			// if AUTO_INCREMENT is not 1, we need to make sure we have a 'highest value' in case of server restarts
 			// https://serverfault.com/questions/228690/mysql-auto-increment-fields-resets-by-itself
 			$highest_number = (int) $number - 1;
-			$this->wpdb->query( $this->wpdb->prepare( "ALTER TABLE {$this->table_name} AUTO_INCREMENT=%d;", $highest_number ) );
+			$wpdb->query( $wpdb->prepare( "ALTER TABLE `" . esc_sql( $table_name ) . "` AUTO_INCREMENT=%d;", $highest_number ) );
 			$data = array(
 				'order_id' => 0,
-				'date'     => get_date_from_gmt( date( 'Y-m-d H:i:s' ) ),
+				'date'     => get_date_from_gmt( gmdate( 'Y-m-d H:i:s' ) ),
 			);
 
 			if ( $this->method == 'calculate' ) {
@@ -166,31 +170,26 @@ $sql = "CREATE TABLE {$this->table_name} (
 			}
 
 			// after this insert, AUTO_INCREMENT will be equal to $number
-			$this->wpdb->insert( $this->table_name, $data );
+			$wpdb->insert( $table_name, $data );
 		} else {
 			// simple scenario, no need to insert any rows
-			$this->wpdb->query( $this->wpdb->prepare( "ALTER TABLE {$this->table_name} AUTO_INCREMENT=%d;", $number ) );
+			$wpdb->query( $wpdb->prepare( "ALTER TABLE `" . esc_sql( $table_name ) . "` AUTO_INCREMENT=%d;", $number ) );
 		}
 	}
 
 	public function get_last_date( $format = 'Y-m-d H:i:s' ) {
-		$row  = $this->wpdb->get_row( "SELECT * FROM {$this->table_name} WHERE id = ( SELECT MAX(id) from {$this->table_name} )" );
+		$row  = $this->wpdb->get_row( "SELECT * FROM `" . esc_sql( $this->table_name ) . "` WHERE id = ( SELECT MAX(id) FROM `" . esc_sql( $this->table_name ) . "` )" );
 		$date = isset( $row->date ) ? $row->date : 'now';
-		$formatted_date = date( $format, strtotime( $date ) );
-
-		return $formatted_date;
+		
+		return gmdate( $format, strtotime( $date ) );
 	}
 
 	/**
+	 * Check if the number store table exists
 	 * @return bool
 	 */
 	public function store_name_exists() {
-		// check if table exists
-		if ( $this->wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") == $this->table_name ) {
-			return true;
-		} else {
-			return false;
-		}
+		return $this->wpdb->get_var( "SHOW TABLES LIKE '" . esc_sql( $this->table_name ) . "'" ) === $this->table_name;
 	}
 
 }

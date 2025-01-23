@@ -25,7 +25,7 @@ class SettingsDebug {
 		// Show a notice if the plugin requirements are not met.
 		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
-		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 1 );
+		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
@@ -33,7 +33,11 @@ class SettingsDebug {
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
 	}
 
-	public function output( $active_section ) {
+	public function output( $active_section, $nonce ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			return;
+		}
+
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
 		$sections       = $this->get_settings_sections();
 
@@ -43,7 +47,7 @@ class SettingsDebug {
 				<?php
 					foreach ( $sections as $section => $title ) {
 						$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
-						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), $active, esc_html( $title ) );
+						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
 					}
 				?>
 			</h2>
@@ -61,7 +65,7 @@ class SettingsDebug {
 				$this->display_tools();
 				break;
 			case 'numbers':
-				$this->display_numbers();
+				$this->display_numbers( $nonce );
 				break;
 			default:
 				do_action( 'wpo_wcpdf_settings_debug_section_output', $active_section );
@@ -97,15 +101,20 @@ class SettingsDebug {
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-tools.php';
 	}
 
-	public function display_numbers() {
+	public function display_numbers( $nonce ) {
+		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+			return;
+		}
+
 		global $wpdb;
 
+		$_GET['_wpnonce']               = $nonce;
 		$number_store_tables            = $this->get_number_store_tables();
 		$invoice_number_store_doc_types = $this->get_additional_invoice_number_store_document_types();
 		$store_name                     = 'invoice_number';
 
 		if ( isset( $_GET['table_name'] ) ) {
-			$selected_table_name = esc_attr( $_GET['table_name'] );
+			$selected_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
 		} else {
 			$_GET['table_name'] = $selected_table_name = apply_filters( 'wpo_wcpdf_number_store_table_name', "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
 		}
@@ -114,14 +123,18 @@ class SettingsDebug {
 			$_GET['table_name'] = $selected_table_name = null;
 		}
 
-		$document_type = $this->get_document_type_from_store_table_name( esc_attr( $_GET['table_name'] ) );
+		$document_type = $this->get_document_type_from_store_table_name( sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) );
 		$list_table    = new Number_Store_List_Table();
 		$as_actions    = as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' );
 		$last_fetch    = get_option( "wpo_wcpdf_number_data::{$selected_table_name}::last_time" );
 
 		$list_table->prepare_items();
 
-		include( WPO_WCPDF()->plugin_path() . '/views/advanced-numbers.php' );
+		$list_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
+		$search_value    = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
+		$disable_reset   = empty( $search_value ) ? 'disabled' : '';
+
+		include WPO_WCPDF()->plugin_path() . '/views/advanced-numbers.php';
 	}
 
 	public function get_number_store_tables() {
@@ -351,19 +364,23 @@ class SettingsDebug {
 			}
 		}
 
-		$filename = apply_filters( 'wpo_wcpdf_export_settings_filename', sprintf( "{$type}-settings-export_%s.json", date( 'Y-m-d_H-i-s' ) ), $type );
+		$filename = apply_filters( 'wpo_wcpdf_export_settings_filename', sprintf( "{$type}-settings-export_%s.json", gmdate( 'Y-m-d_H-i-s' ) ), $type );
 
 		wp_send_json_success( compact( 'filename', 'settings' ) );
 	}
 
 	private function import_settings( $data ) {
+		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+
 		extract( $data );
 
 		$file_data = [];
 
 		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
-			$json_data = file_get_contents( $_FILES['file']['tmp_name'], $_FILES['file']['name'] );
-			if ( false === $json_data ) {
+			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+			$json_data     = $wp_filesystem->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			if ( ! $json_data ) {
 				$message = __( 'Failed to get contents from JSON file!', 'woocommerce-pdf-invoices-packing-slips' );
 				wcpdf_log_error( $message );
 				wp_send_json_error( compact( 'message' ) );
@@ -564,7 +581,7 @@ class SettingsDebug {
 		if ( in_array( $date_type, $wc_date_types ) ) {
 			$date_arg      = $date_type;
 		} elseif ( 'document_date' === $date_type ) {
-			$document_slug = str_replace( '-', '_', $document_type );
+			$document_slug = ! empty( $document_type ) ? str_replace( '-', '_', $document_type ) : '';
 			$date_arg      = "wcpdf_{$document_slug}_date";
 		} else {
 			$date_arg      = '';
@@ -938,16 +955,16 @@ class SettingsDebug {
 		?>
 		<table id="document-link-access-type">
 			<tr>
-				<td class="option"><strong><?php _e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php _e( "Document can be accessed by logged in users only.", 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td class="option"><strong><?php esc_html_e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php esc_html_e( 'Document can be accessed by logged in users only.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
-				<td class="option"><strong><?php _e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php _e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td class="option"><strong><?php esc_html_e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php esc_html_e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
-				<td class="option"><strong><?php _e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php _e( 'Document can be accessed by everyone with the link.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td class="option"><strong><?php esc_html_e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
+				<td><?php esc_html_e( 'Document can be accessed by everyone with the link.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 		</table>
 		<?php

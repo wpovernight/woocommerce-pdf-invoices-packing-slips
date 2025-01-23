@@ -8,7 +8,7 @@
 	<ul>
 		<?php
 			foreach ( $number_store_tables as $table_name => $title ) {
-				if ( isset( $_GET['table_name'] ) && $table_name !== $_GET['table_name'] ) {
+				if ( isset( $list_table_name ) && $table_name !== $list_table_name ) {
 					if ( empty( trim( $title ) ) ) {
 						$title = '[' . __( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ) . ']';
 					}
@@ -19,15 +19,15 @@
 	</ul>
 	<?php if ( ! empty( $document_type ) && 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) : ?>
 		<div class="notice notice-warning inline">
-			<p><?php _e( 'This document is currently using the main invoice number sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+			<p><?php esc_html_e( 'This document is currently using the main invoice number sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		</div>
 	<?php elseif ( ! empty( $selected_table_name ) && ! empty( $number_store_tables[ $selected_table_name ] ) ) : ?>
 		<p>
 			<?php
 				printf(
 					/* translators: chose table title */
-					__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
-					$choose_table_title
+					wp_kses_post( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the <strong>next %s number</strong> value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
+					esc_html( $choose_table_title )
 				);
 			?>
 		</p>
@@ -95,7 +95,7 @@
 		</div>
 	<?php else : ?>
 		<div class="notice notice-info inline">
-			<p><?php _e( 'Please select a number store!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+			<p><?php esc_html_e( 'Please select a number store!', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		</div>
 	<?php endif; ?>
 </div>
