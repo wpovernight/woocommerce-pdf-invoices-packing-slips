@@ -29,7 +29,6 @@ class SetupWizard {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );
 		}
-
 	}
 
 	/**
@@ -43,9 +42,10 @@ class SetupWizard {
 	 * Show the setup wizard.
 	 */
 	public function setup_wizard() {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix  = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$request = stripslashes_deep( $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if ( empty( $_GET['page'] ) || 'wpo-wcpdf-setup' !== $_GET['page'] ) {
+		if ( empty( $request['page'] ) || 'wpo-wcpdf-setup' !== $request['page'] ) {
 			return;
 		}
 
@@ -83,7 +83,7 @@ class SetupWizard {
 				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
 			),
 		);
-		$this->step = isset( $_GET['step'] ) ? sanitize_key( $_GET['step'] ) : current( array_keys( $this->steps ) );
+		$this->step = isset( $request['step'] ) ? sanitize_text_field( $request['step'] ) : current( array_keys( $this->steps ) );
 
 		wp_enqueue_style(
 			'wpo-wcpdf-setup',
@@ -121,7 +121,7 @@ class SetupWizard {
 			);
 		}
 
-		if ( ! empty( $_POST['save_step'] ) ) {
+		if ( ! empty( $request['save_step'] ) ) {
 			$this->save_step();
 		}
 
@@ -240,16 +240,20 @@ class SetupWizard {
 	}
 
 	public function save_step() {
+		$request = stripslashes_deep( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
 			check_admin_referer( 'wpo-wcpdf-setup' );
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
 			$user_id = get_current_user_id();
-			$hidden = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
-			if ( ! empty( $_POST['wcpdf_settings'] ) && is_array( $_POST['wcpdf_settings'] ) ) {
+			$hidden  = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
+			
+			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
-				foreach ( $_POST['wcpdf_settings'] as $option => $settings ) {
+				
+				foreach ( $request['wcpdf_settings'] as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
 						if ( 'attach_to_email_ids' === $key ) {
@@ -274,8 +278,8 @@ class SetupWizard {
 					$new_settings = $settings + $current_settings;
 					update_option( $option, $new_settings );
 				}
-			} elseif ( $_POST['wpo_wcpdf_step'] == 'show-action-buttons' ) {
-				if ( ! empty( $_POST['wc_show_action_buttons'] ) ) {
+			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
+				if ( ! empty( $request['wc_show_action_buttons'] ) ) {
 					$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
 					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
 				} else {

@@ -1,0 +1,14 @@
+name: Depends on check
+
+on:
+  pull_request:
+    types: [opened, edited, closed, reopened, synchronize]
+
+jobs:
+  check_dependencies:
+    runs-on: ubuntu-latest
+    name: Depends on check
+    steps:
+    - uses: gregsdennis/dependencies-action@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
