@@ -31,7 +31,7 @@
 				);
 			?>
 		</p>
-		<p><?php _e( 'Numbers may have been assigned to orders before this.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+		<p><?php esc_html_e( 'Numbers may have been assigned to orders before this.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="number-table-data-info">
 			<?php if ( ! empty( $as_actions ) ) : ?>
 				<div class="notice notice-info inline">
@@ -47,48 +47,48 @@
 					</p>
 				</div>
 			<?php else : ?>
-				<p><?php _e( 'Given the potential impact of querying a large volume of orders on site performance, it\'s essential to fetch data each time you need the most current information. This procedure ensures that the site remains efficient and responsive, even when handling substantial order quantities.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+				<p><?php esc_html_e( 'Given the potential impact of querying a large volume of orders on site performance, it\'s essential to fetch data each time you need the most current information. This procedure ensures that the site remains efficient and responsive, even when handling substantial order quantities.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 				<?php if ( ! empty( $last_fetch ) ) : ?>
-					<p><strong><?php _e( 'Last fetch', 'woocommerce-pdf-invoices-packing-slips' ); ?>: </strong><code><?php echo date_i18n( 'Y-m-d H:i:s', $last_fetch ); ?></code></p>
+					<p><strong><?php esc_html_e( 'Last fetch', 'woocommerce-pdf-invoices-packing-slips' ); ?>: </strong><code><?php echo date_i18n( 'Y-m-d H:i:s', $last_fetch ); ?></code></p>
 					<?php if ( $last_fetch > strtotime( 'today 23:59:59' ) ) : ?>
-						<div class="notice notice-warning inline"><p><?php _e( 'The displayed data may not be current. To ensure you have the most recent information, you might want to fetch updated data.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p></div>
+						<div class="notice notice-warning inline"><p><?php esc_html_e( 'The displayed data may not be current. To ensure you have the most recent information, you might want to fetch updated data.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p></div>
 					<?php endif; ?>
 				<?php endif; ?>
 				<table>
 					<tbody>
 						<tr>
-							<td><?php _e( 'From:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td><?php esc_html_e( 'From:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 							<td>
 								<input type="text" id="fetch-numbers-data-date-from" name="fetch-numbers-data-date-from" value="<?php echo date( 'Y-m-d' ); ?>" size="10">
-								<span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
+								<span class="add-info"><?php esc_html_e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
 							</td>
 						</tr>
 						<tr>
-							<td><?php _e( 'To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td><?php esc_html_e( 'To:', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 							<td>
 								<input type="text" id="fetch-numbers-data-date-to" name="fetch-numbers-data-date-to" value="<?php echo date( 'Y-m-d' ); ?>" size="10">
-								<span class="add-info"><?php _e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
+								<span class="add-info"><?php esc_html_e( '(as: yyyy-mm-dd)', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 				<p>
-					<span><a href="#" id="fetch-numbers-data" class="button button-primary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="fetch"><?php _e( 'Fetch data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
+					<span><a href="#" id="fetch-numbers-data" class="button button-primary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="fetch"><?php esc_html_e( 'Fetch data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
 					<?php if ( $last_fetch ) : ?>
-						<span style="margin-left:6px;"><a href="#" id="delete-numbers-data" class="button button-secondary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="delete"><?php _e( 'Delete cached data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
+						<span style="margin-left:6px;"><a href="#" id="delete-numbers-data" class="button button-secondary" data-table_name="<?php echo $selected_table_name; ?>" data-operation="delete"><?php esc_html_e( 'Delete cached data', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></span>
 					<?php endif; ?>
 				</p>
 				<?php if ( $last_fetch ) : ?>
 					<div class="number-search" style="text-align:right;">
 						<input type="number" id="number_search_input" name="number_search_input" min="1" max="4294967295" value="<?php echo isset( $_REQUEST['s'] ) ? esc_attr( $_REQUEST['s'] ) : ''; ?>">
-						<a href="#" class="button button-primary number-search-button"><?php _e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						<a href="#" class="button button-primary number-search-button"><?php esc_html_e( 'Search number', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						<?php $disabled = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? '' : 'disabled'; ?>
-						<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php _e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						<a href="<?php echo esc_url( remove_query_arg( 's' ) ); ?>" class="button button-secondary" <?php echo $disabled; ?>><?php esc_html_e( 'Reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 					</div>
 				<?php $list_table->prepare_items(); $list_table->display(); ?>
 				<?php else : ?>
 					<div class="notice notice-info inline">
-						<p><?php _e( 'Please fetch data to view it listed here.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+						<p><?php esc_html_e( 'Please fetch data to view it listed here.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 					</div>
 				<?php endif; ?>
 			<?php endif; ?>
