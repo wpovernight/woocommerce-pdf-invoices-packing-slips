@@ -124,8 +124,10 @@ class NumberStoreListTable extends \WP_List_Table {
 			'order_status'      => __( 'Order Status', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 
-		$table_name    = isset( $_GET['table_name'] ) ? sanitize_text_field( $_GET['table_name'] ) : null;
-		$document_type = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
+		if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wp_wcpdf_settings_page_nonce' ) ) {
+			$table_name    = isset( $_GET['table_name'] ) ? sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) : null;
+			$document_type = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
+		}
 
 		if ( empty( $document_type ) || 'invoice' !== $document_type ) {
 			unset( $columns['type'] );
@@ -191,6 +193,10 @@ class NumberStoreListTable extends \WP_List_Table {
 	 */
 	public function get_numbers() {
 		global $wpdb;
+		
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wp_wcpdf_settings_page_nonce' ) ) {
+			return array();
+		}
 
 		$request                        = stripslashes_deep( $_GET );
 		$results                        = array();
@@ -218,12 +224,16 @@ class NumberStoreListTable extends \WP_List_Table {
 
 		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d OR `order_id` = %d ORDER BY {$orderby} {$order}", $search, $search );
+				$results = $wpdb->get_results( 
+					$wpdb->prepare(
+						"SELECT * FROM `" . esc_sql( $table_name ) . "` WHERE `id` = %d OR `order_id` = %d ORDER BY " . esc_sql( $orderby ) . " " . esc_sql( $order ), 
+						$search, 
+						$search 
+					) 
+				);										
 			} else {
-				$query = "SELECT * FROM {$table_name} ORDER BY {$orderby} {$order}";
+				$results = $wpdb->get_results( "SELECT * FROM `" . esc_sql( $table_name ) . "` ORDER BY `" . esc_sql( $orderby ) . "` " . esc_sql( $order ) );
 			}
-
-			$results = $wpdb->get_results( $query );
 		}
 
 		// add document title or 'Deleted'

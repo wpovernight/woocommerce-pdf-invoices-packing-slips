@@ -1,0 +1,3449 @@
+# Copyright (C) 2025 WP Overnight
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 3.9.5\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-"
+"invoices-packing-slips\n"
+"POT-Creation-Date: 2025-01-21 15:52+0100\n"
+"PO-Revision-Date: 2025-01-22 14:12+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: lt_LT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && (n%100<11 || n%100>19) ? 0 : "
+"n%10>=2 && n%10<=9 && (n%100<11 || n%100>19) ? 1 : 2);\n"
+"X-Generator: Poedit 3.5\n"
+"X-Domain: woocommerce-pdf-invoices-packing-slips\n"
+
+#. Plugin Name of the plugin
+#: woocommerce-pdf-invoices-packingslips.php views/settings-page.php:18
+msgid "PDF Invoices & Packing Slips for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: woocommerce-pdf-invoices-packingslips.php
+msgid ""
+"https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-"
+"bundle/"
+msgstr ""
+
+#. Description of the plugin
+#: woocommerce-pdf-invoices-packingslips.php
+msgid ""
+"Create, print & email PDF or UBL Invoices & PDF Packing Slips for "
+"WooCommerce orders."
+msgstr ""
+
+#. Author of the plugin
+#: woocommerce-pdf-invoices-packingslips.php
+msgid "WP Overnight"
+msgstr ""
+
+#. Author URI of the plugin
+#: woocommerce-pdf-invoices-packingslips.php
+msgid "https://www.wpovernight.com"
+msgstr ""
+
+#. translators: rounded count
+#: includes/Admin.php:120
+msgid "Wow, you have created more than %d invoices with our plugin!"
+msgstr ""
+
+#: includes/Admin.php:121
+msgid ""
+"It would mean a lot to us if you would quickly give our plugin a 5-star "
+"rating. Help us spread the word and boost our motivation!"
+msgstr ""
+
+#: includes/Admin.php:123
+msgid "Yes you deserve it!"
+msgstr ""
+
+#: includes/Admin.php:124 includes/Main.php:852
+#: includes/Settings/SettingsDebug.php:1153
+#: views/attachment-settings-hint.php:12 views/extensions.php:121
+#: views/promo.php:34 woocommerce-pdf-invoices-packingslips.php:340
+#: woocommerce-pdf-invoices-packingslips.php:399
+#: woocommerce-pdf-invoices-packingslips.php:437
+#: woocommerce-pdf-invoices-packingslips.php:571
+msgid "Hide this message"
+msgstr ""
+
+#: includes/Admin.php:124
+msgid "Already did!"
+msgstr ""
+
+#: includes/Admin.php:125
+msgid "Actually, I have a complaint..."
+msgstr ""
+
+#: includes/Admin.php:166
+msgid "New to PDF Invoices & Packing Slips for WooCommerce?"
+msgstr ""
+
+#: includes/Admin.php:166
+msgid "Jumpstart the plugin by following our wizard!"
+msgstr ""
+
+#: includes/Admin.php:167 views/advanced-tools.php:150
+#: views/advanced-tools.php:152
+msgid "Run the Setup Wizard"
+msgstr ""
+
+#: includes/Admin.php:167
+msgid "I am the wizard"
+msgstr ""
+
+#: includes/Admin.php:322 includes/Admin.php:1342 includes/Assets.php:235
+#: includes/Documents/Invoice.php:354 includes/Main.php:1236
+#: views/setup-wizard/display-options.php:81
+msgid "Invoice Number"
+msgstr ""
+
+#: includes/Admin.php:323 includes/Documents/Invoice.php:322
+#: includes/Documents/OrderDocumentMethods.php:1300 includes/Main.php:1237
+#: views/setup-wizard/display-options.php:60
+msgid "Invoice Date"
+msgstr ""
+
+#: includes/Admin.php:472
+msgid "Send order email"
+msgstr ""
+
+#: includes/Admin.php:482
+msgid "Create PDF"
+msgstr ""
+
+#: includes/Admin.php:495
+msgid "Create UBL"
+msgstr ""
+
+#: includes/Admin.php:506
+msgid "PDF document data"
+msgstr ""
+
+#: includes/Admin.php:523
+msgid "Choose an email to send&hellip;"
+msgstr ""
+
+#: includes/Admin.php:544
+msgid "Save order & send email"
+msgstr ""
+
+#: includes/Admin.php:613
+msgid "Mark printed"
+msgstr ""
+
+#: includes/Admin.php:615
+msgid "Unmark"
+msgstr ""
+
+#: includes/Admin.php:702
+msgid "UBL documents require the correspondent PDF to be generated first."
+msgstr ""
+
+#: includes/Admin.php:722
+msgid "Invoice number:"
+msgstr ""
+
+#: includes/Admin.php:725
+msgid "Invoice date:"
+msgstr ""
+
+#: includes/Admin.php:728
+msgid "Invoice display date:"
+msgstr ""
+
+#: includes/Admin.php:731
+msgid "Invoice created via:"
+msgstr ""
+
+#: includes/Admin.php:734
+msgid "Notes (printed in the invoice):"
+msgstr ""
+
+#: includes/Admin.php:867
+msgid "View more details"
+msgstr ""
+
+#: includes/Admin.php:868
+msgid "Hide details"
+msgstr ""
+
+#. translators: document title
+#: includes/Admin.php:880
+msgid "Set %s number & date"
+msgstr ""
+
+#: includes/Admin.php:885
+msgid "You do not have sufficient permissions to edit this document."
+msgstr ""
+
+#: includes/Admin.php:897
+msgid "unformatted!"
+msgstr ""
+
+#: includes/Admin.php:939
+msgid "Save changes"
+msgstr ""
+
+#: includes/Admin.php:940
+msgid "Cancel"
+msgstr ""
+
+#. translators: %s: email title
+#: includes/Admin.php:1062
+msgid "%s email notification manually sent."
+msgstr ""
+
+#: includes/Admin.php:1110
+msgid "Nonce expired!"
+msgstr ""
+
+#: includes/Admin.php:1116
+msgid "Bad action!"
+msgstr ""
+
+#: includes/Admin.php:1122
+msgid "Incomplete request!"
+msgstr ""
+
+#: includes/Admin.php:1128
+msgid "No permissions!"
+msgstr ""
+
+#: includes/Admin.php:1152
+msgid "Document data saved!"
+msgstr ""
+
+#: includes/Admin.php:1153
+msgid "An error occurred while saving the document data!"
+msgstr ""
+
+#: includes/Admin.php:1156
+msgid "Document regenerated!"
+msgstr ""
+
+#: includes/Admin.php:1157
+msgid "An error occurred while regenerating the document!"
+msgstr ""
+
+#: includes/Admin.php:1160
+msgid "Document deleted!"
+msgstr ""
+
+#: includes/Admin.php:1161
+msgid "An error occurred while deleting the document!"
+msgstr ""
+
+#: includes/Admin.php:1217
+msgid "Document does not exist."
+msgstr ""
+
+#: includes/Admin.php:1231
+msgid "Document is empty."
+msgstr ""
+
+#: includes/Admin.php:1262
+msgid "DEBUG output enabled"
+msgstr ""
+
+#: includes/Assets.php:89
+msgid "You have to select order(s) first!"
+msgstr ""
+
+#: includes/Assets.php:90
+msgid "Are you sure you want to delete this document? This cannot be undone."
+msgstr ""
+
+#: includes/Assets.php:91
+msgid ""
+"Are you sure you want to regenerate this document? This will make the "
+"document reflect the most current settings (such as footer text, document "
+"name, etc.) rather than using historical settings."
+msgstr ""
+
+#: includes/Assets.php:120
+msgid "Preview"
+msgstr ""
+
+#: includes/Assets.php:123 includes/Settings/SettingsDebug.php:1161
+msgid "Settings"
+msgstr ""
+
+#: includes/Assets.php:182
+msgid "Document settings"
+msgstr ""
+
+#: includes/Assets.php:183
+msgid "Select a document in the dropdown menu above to edit its settings."
+msgstr ""
+
+#: includes/Assets.php:194
+msgid ""
+"The number should be smaller than 2147483647. Please note you should add "
+"your next document number without prefix, suffix or padding."
+msgstr ""
+
+#: includes/Assets.php:268
+msgid "Download"
+msgstr ""
+
+#: includes/Assets.php:269
+msgid "Are you sure you want to reset this settings? This cannot be undone."
+msgstr ""
+
+#: includes/Assets.php:270
+msgid "Please select a document type"
+msgstr ""
+
+#. translators: 1. open anchor tag, 2. close anchor tag
+#: includes/Assets.php:275
+msgid "<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools."
+msgstr ""
+
+#: includes/Assets.php:299 ubl/Settings/TaxesSettings.php:108
+#: ubl/Settings/TaxesSettings.php:112 ubl/Settings/TaxesSettings.php:116
+#: ubl/Settings/TaxesSettings.php:147 ubl/Settings/TaxesSettings.php:153
+#: ubl/Settings/TaxesSettings.php:159
+msgid "Code"
+msgstr ""
+
+#: includes/Assets.php:300
+msgid "New"
+msgstr ""
+
+#: includes/Assets.php:301
+msgid "unsaved"
+msgstr ""
+
+#: includes/Compatibility/ThirdPartyPlugins.php:391
+msgid "Invoice numbers"
+msgstr ""
+
+#: includes/Documents/Invoice.php:24 includes/Documents/Invoice.php:56
+#: views/settings-page.php:127
+msgid "Invoice"
+msgstr "Sąskaita"
+
+#: includes/Documents/Invoice.php:68
+#: includes/Documents/OrderDocumentMethods.php:1319
+msgid "Invoice Number:"
+msgstr "Sąskaita Numeris:"
+
+#: includes/Documents/Invoice.php:80
+msgid "Invoice Date:"
+msgstr "Sąskaita Data:"
+
+#: includes/Documents/Invoice.php:92
+msgid "Ship To:"
+msgstr "Siųsti į:"
+
+#. translators: document type
+#: includes/Documents/Invoice.php:131 includes/Documents/Invoice.php:393
+#: includes/Documents/Invoice.php:402 includes/Documents/Invoice.php:410
+#: includes/Documents/Invoice.php:414
+msgid "invoice"
+msgid_plural "invoices"
+msgstr[0] "saskaita"
+msgstr[1] "saskaitos"
+msgstr[2] "saskaitu"
+
+#: includes/Documents/Invoice.php:222 includes/Documents/Invoice.php:589
+#: includes/Documents/PackingSlip.php:116
+msgid "Enable"
+msgstr ""
+
+#: includes/Documents/Invoice.php:233 includes/Documents/Invoice.php:620
+#: includes/Documents/PackingSlip.php:191
+msgid "Attach to:"
+msgstr ""
+
+#. translators: directory path
+#: includes/Documents/Invoice.php:241 includes/Documents/Invoice.php:628
+msgid ""
+"It looks like the temp folder (<code>%s</code>) is not writable, check the "
+"permissions for this folder! Without having write access to this folder, the "
+"plugin will not be able to email invoices."
+msgstr ""
+
+#: includes/Documents/Invoice.php:247
+msgid "Disable for:"
+msgstr ""
+
+#: includes/Documents/Invoice.php:256
+msgid "Select one or more statuses"
+msgstr ""
+
+#: includes/Documents/Invoice.php:262
+msgid "Display shipping address"
+msgstr ""
+
+#: includes/Documents/Invoice.php:269 includes/Documents/Invoice.php:321
+#: includes/Documents/Invoice.php:353 includes/Documents/PackingSlip.php:134
+#: views/advanced-status.php:47 views/advanced-status.php:51
+#: views/advanced-status.php:82 views/advanced-status.php:83
+#: views/setup-wizard/display-options.php:20
+#: views/setup-wizard/display-options.php:59
+#: views/setup-wizard/display-options.php:80
+msgid "No"
+msgstr ""
+
+#: includes/Documents/Invoice.php:270 views/setup-wizard/display-options.php:21
+msgid "Only when different from billing address"
+msgstr ""
+
+#: includes/Documents/Invoice.php:271 includes/Documents/Invoice.php:440
+#: includes/Documents/PackingSlip.php:136
+#: views/setup-wizard/display-options.php:22
+msgid "Always"
+msgstr ""
+
+#: includes/Documents/Invoice.php:279 includes/Documents/PackingSlip.php:144
+msgid "Display email address"
+msgstr ""
+
+#: includes/Documents/Invoice.php:290 includes/Documents/PackingSlip.php:155
+msgid "Display phone number"
+msgstr ""
+
+#: includes/Documents/Invoice.php:301 includes/Documents/PackingSlip.php:166
+msgid "Display customer notes"
+msgstr ""
+
+#: includes/Documents/Invoice.php:314
+msgid "Display invoice date"
+msgstr ""
+
+#: includes/Documents/Invoice.php:323
+#: includes/Documents/OrderDocumentMethods.php:1301
+#: views/setup-wizard/display-options.php:61
+msgid "Order Date"
+msgstr "Užsakymo data"
+
+#: includes/Documents/Invoice.php:330
+msgid "Display due date"
+msgstr ""
+
+#. translators: number of days
+#: includes/Documents/Invoice.php:337
+msgid "%s days"
+msgstr ""
+
+#: includes/Documents/Invoice.php:346
+msgid "Display invoice number"
+msgstr ""
+
+#: includes/Documents/Invoice.php:355 views/setup-wizard/display-options.php:82
+msgid "Order Number"
+msgstr "Užsakymo numeris"
+
+#: includes/Documents/Invoice.php:359
+msgid "Warning!"
+msgstr ""
+
+#: includes/Documents/Invoice.php:360
+msgid ""
+"Using the Order Number as invoice number is not recommended as this may lead "
+"to gaps in the invoice number sequence (even when order numbers are "
+"sequential)."
+msgstr ""
+
+#: includes/Documents/Invoice.php:361
+msgid "More information"
+msgstr ""
+
+#: includes/Documents/Invoice.php:368
+msgid "Next invoice number (without prefix/suffix etc.)"
+msgstr ""
+
+#: includes/Documents/Invoice.php:374
+msgid ""
+"This is the number that will be used for the next document. By default, "
+"numbering starts from 1 and increases for every new document. Note that if "
+"you override this and set it lower than the current/highest number, this "
+"could create duplicate numbers!"
+msgstr ""
+
+#: includes/Documents/Invoice.php:380
+msgid "Number format"
+msgstr ""
+
+#: includes/Documents/Invoice.php:388
+msgid "Prefix"
+msgstr ""
+
+#: includes/Documents/Invoice.php:390
+msgid "If set, this value will be used as number prefix."
+msgstr ""
+
+#. translators: 1. document type, 2-3 placeholders
+#: includes/Documents/Invoice.php:392 includes/Documents/Invoice.php:401
+msgid ""
+"You can use the %1$s year and/or month with the %2$s or %3$s placeholders "
+"respectively."
+msgstr ""
+
+#: includes/Documents/Invoice.php:394 includes/Documents/Invoice.php:403
+msgid ""
+"Check the Docs article below to see all the available placeholders for "
+"prefix/suffix."
+msgstr ""
+
+#: includes/Documents/Invoice.php:397
+msgid "Suffix"
+msgstr ""
+
+#: includes/Documents/Invoice.php:399
+msgid "If set, this value will be used as number suffix."
+msgstr ""
+
+#: includes/Documents/Invoice.php:406
+msgid "Padding"
+msgstr ""
+
+#. translators: document type
+#: includes/Documents/Invoice.php:410
+msgid ""
+"Enter the number of digits you want to use as padding. For instance, enter "
+"<code>6</code> to display the %s number <code>123</code> as <code>000123</"
+"code>, filling it with zeros until the number set as padding is reached."
+msgstr ""
+
+#. translators: document type
+#: includes/Documents/Invoice.php:414
+msgid ""
+"For more information about setting up the number format and see the "
+"available placeholders for the prefix and suffix, check this article:"
+msgstr ""
+
+#. translators: document type
+#: includes/Documents/Invoice.php:414
+msgid "Number format explained"
+msgstr ""
+
+#. translators: document type
+#: includes/Documents/Invoice.php:414
+msgid ""
+"<strong>Note</strong>: Changes made to the number format will only be "
+"reflected on new orders. Also, if you have already created a custom %s "
+"number format with a filter, the above settings will be ignored."
+msgstr ""
+
+#: includes/Documents/Invoice.php:420
+msgid "Reset invoice number yearly"
+msgstr ""
+
+#: includes/Documents/Invoice.php:431
+msgid "Allow My Account invoice download"
+msgstr ""
+
+#: includes/Documents/Invoice.php:438
+msgid "Only when an invoice is already created/emailed"
+msgstr ""
+
+#: includes/Documents/Invoice.php:439
+msgid "Only for specific order statuses (define below)"
+msgstr ""
+
+#: includes/Documents/Invoice.php:441
+msgid "Never"
+msgstr ""
+
+#: includes/Documents/Invoice.php:456
+msgid "Enable invoice number column in the orders list"
+msgstr ""
+
+#: includes/Documents/Invoice.php:467
+msgid "Enable invoice date column in the orders list"
+msgstr ""
+
+#: includes/Documents/Invoice.php:478
+msgid "Enable invoice number search in the orders list"
+msgstr ""
+
+#: includes/Documents/Invoice.php:484
+msgid ""
+"The search process may be slower on non-HPOS stores. For a more efficient "
+"search, you can utilize the <a href=\"https://woocommerce.com/document/high-"
+"performance-order-storage/\" target=\"_blank\">HPOS</a> feature to search "
+"for orders by invoice numbers using the search type selector. Additionally, "
+"it allows you to search for multiple orders using a comma-separated list of "
+"invoice numbers."
+msgstr ""
+
+#: includes/Documents/Invoice.php:490
+msgid "Disable for free orders"
+msgstr ""
+
+#. translators: zero number
+#: includes/Documents/Invoice.php:497
+msgid "Disable document when the order total is %s"
+msgstr ""
+
+#: includes/Documents/Invoice.php:503
+msgid "Mark as printed"
+msgstr ""
+
+#: includes/Documents/Invoice.php:511
+msgid "Manually"
+msgstr ""
+
+#: includes/Documents/Invoice.php:514
+msgid "On single order action"
+msgstr ""
+
+#: includes/Documents/Invoice.php:515
+msgid "On bulk order action"
+msgstr ""
+
+#: includes/Documents/Invoice.php:516
+msgid "On my account"
+msgstr ""
+
+#: includes/Documents/Invoice.php:517
+msgid "On email attachment"
+msgstr ""
+
+#: includes/Documents/Invoice.php:518
+msgid "On order document data (number and/or date set manually)"
+msgstr ""
+
+#: includes/Documents/Invoice.php:523
+msgid ""
+"Allows you to mark the document as printed, manually (in the order page) or "
+"automatically (based on the document creation context you have selected)."
+msgstr ""
+
+#: includes/Documents/Invoice.php:529
+msgid "Unmark as printed"
+msgstr ""
+
+#: includes/Documents/Invoice.php:535
+msgid "Adds a link in the order page to allow to remove the printed mark."
+msgstr ""
+
+#: includes/Documents/Invoice.php:541
+msgid "Always use most current settings"
+msgstr ""
+
+#: includes/Documents/Invoice.php:547
+msgid ""
+"When enabled, the document will always reflect the most current settings "
+"(such as footer text, document name, etc.) rather than using historical "
+"settings."
+msgstr ""
+
+#: includes/Documents/Invoice.php:549
+msgid ""
+"<strong>Caution:</strong> enabling this will also mean that if you change "
+"your company name or address in the future, previously generated documents "
+"will also be affected."
+msgstr ""
+
+#: includes/Documents/Invoice.php:562
+msgid "Invoice numbers are created by a third-party extension."
+msgstr ""
+
+#. translators: link
+#: includes/Documents/Invoice.php:565
+msgid "Configure it <a href=\"%s\">here</a>."
+msgstr ""
+
+#: includes/Documents/Invoice.php:600
+msgid "Format"
+msgstr ""
+
+#: includes/Documents/Invoice.php:607
+msgid "UBL 2.1"
+msgstr ""
+
+#. translators: %1$s: opening link tag, %2$s: closing link tag
+#: includes/Documents/Invoice.php:611
+msgid ""
+"Install extensions to support country-specific e-invoicing formats. See the "
+"latest %1$ssupported formats%2$s."
+msgstr ""
+
+#: includes/Documents/Invoice.php:634
+msgid "Include encrypted PDF:"
+msgstr ""
+
+#: includes/Documents/Invoice.php:640
+msgid ""
+"Embed the encrypted PDF invoice file within the UBL document. Note that this "
+"option may not be supported by all UBL formats."
+msgstr ""
+
+#: includes/Documents/Invoice.php:663 includes/Documents/Invoice.php:707
+#: includes/Documents/PackingSlip.php:230 includes/Settings.php:163
+#: includes/Settings/SettingsDebug.php:682
+msgid "General"
+msgstr ""
+
+#: includes/Documents/Invoice.php:672 includes/Documents/PackingSlip.php:237
+msgid "Document details"
+msgstr ""
+
+#: includes/Documents/Invoice.php:686
+msgid "Admin"
+msgstr ""
+
+#: includes/Documents/Invoice.php:694 includes/Settings.php:180
+msgid "Advanced"
+msgstr ""
+
+#. translators: 1. credit note title, 2. refund id
+#: includes/Documents/OrderDocument.php:491
+msgid "%1$s (refund #%2$s) was regenerated."
+msgstr ""
+
+#. translators: 1. document title
+#: includes/Documents/OrderDocument.php:496
+msgid "%s was regenerated"
+msgstr ""
+
+#. translators: %s: document name
+#: includes/Documents/OrderDocument.php:902
+msgid "%s Number:"
+msgstr "%s Numeris:"
+
+#. translators: %s: document name
+#: includes/Documents/OrderDocument.php:910
+msgid "%s Date:"
+msgstr "%s Data:"
+
+#: includes/Documents/OrderDocument.php:916 includes/Main.php:1722
+msgid "Due Date:"
+msgstr "Iki:"
+
+#: includes/Documents/OrderDocument.php:920
+msgid "Billing Address:"
+msgstr "Užsakovo informacija:"
+
+#: includes/Documents/OrderDocument.php:923
+msgid "Shipping Address:"
+msgstr "Pristatymo adresas:"
+
+#: includes/Documents/OrderDocument.php:926
+msgid "Order Number:"
+msgstr "Užsakymo numeris:"
+
+#: includes/Documents/OrderDocument.php:929
+msgid "Order Date:"
+msgstr "Užsakymo data:"
+
+#: includes/Documents/OrderDocument.php:932
+msgid "Payment Method:"
+msgstr "Mokėjimo metodas:"
+
+#: includes/Documents/OrderDocument.php:935 languages/strings.php:6
+msgid "Payment Date:"
+msgstr "Mokėjimo data:"
+
+#: includes/Documents/OrderDocument.php:938
+msgid "Shipping Method:"
+msgstr "Pristatymo metodas:"
+
+#: includes/Documents/OrderDocument.php:941
+msgid "SKU:"
+msgstr "Produkto kodas:"
+
+#: includes/Documents/OrderDocument.php:944
+msgid "Weight:"
+msgstr "Svoris:"
+
+#: includes/Documents/OrderDocument.php:947
+msgid "Notes:"
+msgstr "Pastaba:"
+
+#: includes/Documents/OrderDocument.php:950
+msgid "Customer Notes:"
+msgstr "Pirkėjo pastaba:"
+
+#: includes/Documents/OrderDocument.php:1582
+msgid "Admin email"
+msgstr ""
+
+#: includes/Documents/OrderDocument.php:1585
+msgid "Manual email"
+msgstr ""
+
+#: includes/Documents/OrderDocumentMethods.php:96
+#: includes/Documents/OrderDocumentMethods.php:206
+msgid "N/A"
+msgstr ""
+
+#: includes/Documents/OrderDocumentMethods.php:979
+msgid "Subtotal"
+msgstr ""
+
+#: includes/Documents/OrderDocumentMethods.php:1004
+msgid "Shipping"
+msgstr ""
+
+#: includes/Documents/OrderDocumentMethods.php:1035
+msgid "Discount"
+msgstr ""
+
+#: includes/Documents/OrderDocumentMethods.php:1102
+msgid "Total ex. VAT"
+msgstr ""
+
+#: includes/Documents/OrderDocumentMethods.php:1105 includes/Settings.php:425
+#: ubl/Settings/TaxesSettings.php:279
+msgid "Total"
+msgstr ""
+
+#: includes/Documents/OrderDocumentMethods.php:1342
+msgid "Reason for refund:"
+msgstr ""
+
+#: includes/Documents/PackingSlip.php:24 includes/Documents/PackingSlip.php:41
+msgid "Packing Slip"
+msgstr "Pakavimo lapelis"
+
+#: includes/Documents/PackingSlip.php:53
+msgid "Packing Slip Number:"
+msgstr "Pakavimo lapelis numeris:"
+
+#: includes/Documents/PackingSlip.php:65
+msgid "Packing Slip Date:"
+msgstr "Pakavimo lapelio data:"
+
+#: includes/Documents/PackingSlip.php:73
+msgid "packing-slip"
+msgid_plural "packing-slips"
+msgstr[0] "pakavimo-lapelis"
+msgstr[1] "pakavimo-lapeliai"
+msgstr[2] "pakavimo-lapeliai"
+
+#: includes/Documents/PackingSlip.php:127
+msgid "Display billing address"
+msgstr ""
+
+#: includes/Documents/PackingSlip.php:135
+msgid "Only when different from shipping address"
+msgstr ""
+
+#: includes/Documents/PackingSlip.php:182
+msgid ""
+"Upgrade to our Professional extension to attach packing slips to any email!"
+msgstr ""
+
+#. translators: %s: Document type
+#: includes/Frontend.php:140
+msgid "Download %s (PDF)"
+msgstr ""
+
+#: includes/Main.php:360
+msgid ""
+"You do not have sufficient permissions to access this page. Reason: empty "
+"access key"
+msgstr ""
+
+#: includes/Main.php:366
+msgid ""
+"You do not have sufficient permissions to access this page. Reason: empty "
+"action"
+msgstr ""
+
+#: includes/Main.php:372
+msgid ""
+"You do not have sufficient permissions to access this page. Reason: invalid "
+"nonce"
+msgstr ""
+
+#: includes/Main.php:382
+msgid "You haven't selected any orders"
+msgstr ""
+
+#: includes/Main.php:387
+msgid "Some of the export parameters are missing."
+msgstr ""
+
+#: includes/Main.php:406
+msgid "You have to save the order before generating a PDF document for it."
+msgstr ""
+
+#. translators: %s: Order ID
+#: includes/Main.php:411
+msgid "Could not find the order #%s."
+msgstr ""
+
+#: includes/Main.php:478 includes/Settings.php:218 includes/Settings.php:366
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#. translators: document type
+#: includes/Main.php:533
+msgid "Document of type '%s' for the selected order(s) could not be generated"
+msgstr ""
+
+#. translators: 1. plugin name, 2. directory path
+#: includes/Main.php:850
+msgid "The %1$s directory %2$s couldn't be created or is not writable!"
+msgstr ""
+
+#: includes/Main.php:851
+msgid ""
+"Please check your directories write permissions or contact your hosting "
+"service provider."
+msgstr ""
+
+#. translators: 1,2. file count
+#: includes/Main.php:1189
+msgid "Unable to delete %1$d files! (deleted %2$d)"
+msgstr ""
+
+#. translators: file count
+#: includes/Main.php:1193
+msgid "Successfully deleted %d files!"
+msgstr ""
+
+#: includes/Main.php:1197
+msgid "Nothing to delete!"
+msgstr ""
+
+#: includes/Main.php:1291 includes/Main.php:1322
+msgid "User"
+msgstr ""
+
+#. translators: 1. document title, 2. creation trigger
+#: includes/Main.php:1299
+msgid "PDF %1$s created via %2$s."
+msgstr ""
+
+#. translators: document title
+#: includes/Main.php:1329
+msgid "PDF %s deleted."
+msgstr ""
+
+#: includes/Main.php:1346
+msgid "manually"
+msgstr ""
+
+#. translators: 1. document title, 2. creation trigger
+#: includes/Main.php:1352
+msgid "%1$s document marked as printed via %2$s."
+msgstr ""
+
+#. translators: 1. document title, 2. creation trigger
+#: includes/Main.php:1368
+msgid "%1$s document unmark printed."
+msgstr ""
+
+#: includes/Main.php:1455
+msgid "single order action"
+msgstr ""
+
+#: includes/Main.php:1456
+msgid "bulk order action"
+msgstr ""
+
+#: includes/Main.php:1457
+msgid "my account"
+msgstr ""
+
+#: includes/Main.php:1458
+msgid "order document data (number and/or date set manually)"
+msgstr ""
+
+#: includes/Main.php:1462
+msgid "email attachment"
+msgstr ""
+
+#. translators: 1. document type, 2. mark/unmark
+#: includes/Main.php:1561
+msgid ""
+"Document of type %1$s for the selected order could not be %2$s as printed."
+msgstr ""
+
+#. translators: document title
+#: includes/Main.php:1658
+msgid "Order %s Saved"
+msgstr ""
+
+#: includes/Settings.php:96 includes/Settings.php:97
+msgid "PDF Invoices"
+msgstr ""
+
+#: includes/Settings.php:122
+msgid "Documentation"
+msgstr ""
+
+#: includes/Settings.php:123
+msgid "Support Forum"
+msgstr ""
+
+#: includes/Settings.php:167
+msgid "Documents"
+msgstr ""
+
+#: includes/Settings.php:173
+msgid "Taxes"
+msgstr ""
+
+#: includes/Settings.php:185
+msgid "Upgrade"
+msgstr ""
+
+#: includes/Settings.php:258
+msgid "Order not found!"
+msgstr ""
+
+#: includes/Settings.php:261
+msgid "Object found is not an order!"
+msgstr ""
+
+#. translators: order ID
+#: includes/Settings.php:333
+msgid "Document not available for order #%s, try selecting a different order."
+msgstr ""
+
+#: includes/Settings.php:340
+msgid ""
+"No WooCommerce orders found! Please consider adding your first order to see "
+"this preview."
+msgstr ""
+
+#. translators: error message
+#: includes/Settings.php:350
+msgid "Error trying to generate document: %s"
+msgstr ""
+
+#: includes/Settings.php:424 includes/Tables/NumberStoreListTable.php:122
+msgid "Date"
+msgstr ""
+
+#: includes/Settings.php:432
+msgid "No order(s) found!"
+msgstr ""
+
+#: includes/Settings.php:435
+msgid "An error occurred when trying to process your request!"
+msgstr ""
+
+#. translators: error message
+#: includes/Settings.php:442
+msgid "Error trying to get orders: %s"
+msgstr ""
+
+#. translators: total scheduled actions
+#: includes/Settings.php:938
+msgid ""
+"Only 1 scheduled action should exist for the yearly reset of the numbering "
+"system, but %s were found"
+msgstr ""
+
+#: includes/Settings.php:1094
+msgid "Additional settings"
+msgstr ""
+
+#: includes/Settings/SettingsCallbacks.php:37
+msgid ""
+"<b>Warning!</b> The settings below are meant for debugging/development only. "
+"Do not use them on a live website!"
+msgstr ""
+
+#: includes/Settings/SettingsCallbacks.php:46
+msgid ""
+"These are used for the (optional) footer columns in the <em>Modern "
+"(Premium)</em> template, but can also be used for other elements in your "
+"custom template"
+msgstr ""
+
+#: includes/Settings/SettingsCallbacks.php:496
+msgid "Image resolution"
+msgstr ""
+
+#: includes/Settings/SettingsCallbacks.php:504
+msgid ""
+"The image resolution exceeds the recommended maximum of 600dpi. This will "
+"unnecessarily increase the size of your PDF files and could negatively "
+"affect performance."
+msgstr ""
+
+#: includes/Settings/SettingsCallbacks.php:552
+msgid "Save"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:220
+msgid "Temporary folder moved to"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:229
+msgid "Fonts reinstalled!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:237
+msgid "Yearly reset numbering system rescheduled!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:263
+msgid "Released semaphore locks have been cleaned up!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:271
+msgid "Released legacy semaphore locks have been cleaned up!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:279
+msgid "Extensions' license cache cleared successfully!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:307
+msgid "Export settings type is empty!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:344
+msgid "Exported settings data is empty!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:363
+msgid "Failed to get contents from JSON file!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:370
+msgid "JSON file not found!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:376
+msgid "The JSON file data is corrupted!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:387
+msgid "The JSON file settings type is not supported on this store!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:412
+msgid "Couldn't determine the settings option for the import!"
+msgstr ""
+
+#. translators: settings type
+#: includes/Settings/SettingsDebug.php:421
+msgid "%s settings imported successfully!"
+msgstr ""
+
+#. translators: settings type
+#: includes/Settings/SettingsDebug.php:429
+msgid ""
+"The %s settings file you are trying to import is identical to your current "
+"settings, therefore, the settings were not imported."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:441
+msgid "Reset settings type is empty!"
+msgstr ""
+
+#. translators: settings type
+#: includes/Settings/SettingsDebug.php:480
+msgid "%s settings reset not supported!"
+msgstr ""
+
+#. translators: settings type
+#: includes/Settings/SettingsDebug.php:493
+msgid "%s settings are already reset!"
+msgstr ""
+
+#. translators: settings type
+#: includes/Settings/SettingsDebug.php:505
+msgid "%s settings reset successfully!"
+msgstr ""
+
+#. translators: settings type
+#: includes/Settings/SettingsDebug.php:513
+msgid "An error occurred when trying to reset the %s settings."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:527
+msgid "One or more request parameters missing."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:539
+msgid "documents deleted."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:539
+msgid "documents renumbered."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:570
+msgid "Wrong date type selected."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:585
+msgid "Unexpected results from the orders query."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:683
+msgid "Debug"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:684
+msgid "UBL Taxes"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:720
+msgid "Document link access type"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:728
+msgid "Logged in (recommended)"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:729
+#: includes/Settings/SettingsDebug.php:941
+msgid "Guest"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:730
+#: includes/Settings/SettingsDebug.php:945
+msgid "Full"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:747
+msgid "Document access denied redirect page"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:755
+msgid "Blank page with message (default)"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:756
+msgid "Login page"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:757
+msgid "My Account page"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:758
+msgid "Custom page (enter below)"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:760
+msgid ""
+"Select a frontend page to be used to redirect users when the document access "
+"is denied."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:773
+msgid "Custom external URLs not allowed."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:779
+msgid "Pretty document links"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:785
+msgid "Changes the document links to a prettier URL scheme."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:791
+msgid "Calculate document numbers (slow)"
+msgstr ""
+
+#. translators: 1. AUTO_INCREMENT, 2. one
+#: includes/Settings/SettingsDebug.php:799
+msgid ""
+"Document numbers (such as invoice numbers) are generated using %1$s by "
+"default. Use this setting if your database auto increments with more than "
+"%2$s."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:808
+msgid "Enable debug output"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:814
+msgid ""
+"Enable this option to output plugin errors if you're getting a blank page or "
+"other PDF generation issues."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:815
+msgid ""
+"<b>Caution!</b> This setting may reveal errors (from other plugins) in other "
+"places on your site too, therefore this is not recommended to leave it "
+"enabled on live sites."
+msgstr ""
+
+#. translators: &debug=true
+#: includes/Settings/SettingsDebug.php:818
+msgid "You can also add %s to the URL to apply this on a per-order basis."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:826
+msgid "Enable automatic cleanup"
+msgstr ""
+
+#. translators: number of days
+#: includes/Settings/SettingsDebug.php:833
+msgid "every %s days"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:837
+msgid ""
+"Automatically clean up PDF files stored in the temporary folder (used for "
+"email attachments)"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:843
+msgid "Output to HTML"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:849
+msgid ""
+"Send the template output as HTML to the browser instead of creating a PDF."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:850
+msgid ""
+"You can also add <code>&output=html</code> to the URL to apply this on a per-"
+"order basis."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:856
+msgid "Embed Images"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:862
+msgid ""
+"Embed images only if you are experiencing issues with them loading in your "
+"PDF. Please note that this option can significantly increase the file size."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:868
+msgid "Log to order notes"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:874
+msgid ""
+"Log PDF document creation, deletion, and mark/unmark as printed to order "
+"notes."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:880
+msgid "Log missing translations"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:886
+msgid ""
+"Enable this option to log dynamic strings that could not be translated. This "
+"can help you identify which strings need to be registered for translation."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:892
+msgid "Disable document preview"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:898
+msgid "Disables the document preview on the plugin settings pages."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:904
+msgid "Enable semaphore logs"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:910
+msgid ""
+"Our plugin uses a semaphore class that prevents race conditions in multiple "
+"places in the code. Enable this setting only if you are having issues with "
+"document numbers, yearly reset or documents being assigned to the wrong "
+"order."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:916
+msgid "Enable danger zone tools"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:922
+msgid ""
+"Enables the danger zone tools. The actions performed by these tools are "
+"irreversible!"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:937
+msgid "Logged in"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:938
+msgid "Document can be accessed by logged in users only."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:942
+msgid "Document can be accessed by logged in and guest users."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:946
+msgid "Document can be accessed by everyone with the link."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:974
+msgid "7.4 or superior"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:987
+msgid "Recommended, will use fallback functions"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:993
+msgid "Required if you have images in your documents"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:996
+msgid "Required when using .webp images"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:999
+msgid "Required if you have .webp images in your documents"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1002
+msgid "To compress PDF documents"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1005
+msgid "Recommended to compress PDF documents"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1008
+msgid "For better performances"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1011
+#: includes/Settings/SettingsDebug.php:1017
+msgid "Recommended for better performances"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1014
+msgid "Better with transparent PNG images"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1020
+msgid ""
+"Required to detect custom templates and to clear the temp folder periodically"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1023
+msgid "Check PHP disable_functions"
+msgstr ""
+
+#. translators: <a> tags
+#: includes/Settings/SettingsDebug.php:1027
+msgid "Recommended: 128MB (especially for plugin-heavy setups)"
+msgstr ""
+
+#. translators: 1: opening anchor tag, 2: closing anchor tag
+#: includes/Settings/SettingsDebug.php:1029
+msgid "See: %1$sIncreasing the WordPress Memory Limit%2$s"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1037
+msgid "Allow remote stylesheets and images"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1040
+msgid "allow_url_fopen disabled"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1043
+msgid "Necessary to verify the MIME type of local images."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1046
+msgid "fileinfo disabled"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1049
+msgid "To compress and decompress font and image data"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1052
+msgid "base64_decode disabled"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1060
+msgid "Required for IMagick"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1063
+msgid ""
+"ImageMagick library, integrated via the IMagick PHP extension for advanced "
+"image processing capabilities"
+msgstr ""
+
+#. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
+#: includes/Settings/SettingsDebug.php:1143
+msgid ""
+"Your server does not meet the requirements for %1$s. Please check the "
+"%2$sStatus page%3$s for more information."
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1162 views/advanced-status.php:203
+msgid "Status"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1163
+msgid "Tools"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1164
+msgid "Numbers"
+msgstr ""
+
+#: includes/Settings/SettingsDocuments.php:64 views/advanced-numbers.php:13
+msgid "untitled"
+msgstr ""
+
+#. translators: 1. open anchor tag, 2. close anchor tag
+#: includes/Settings/SettingsDocuments.php:78
+msgid "Looking for more documents? Learn more %1$shere%2$s."
+msgstr ""
+
+#. translators: 1. open anchor tag, 2. close anchor tag
+#: includes/Settings/SettingsGeneral.php:44
+msgid "Requires the %1$sProfessional extension%2$s."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:50
+#: includes/Settings/SettingsUbl.php:111
+msgid "General settings"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:56
+msgid "How do you want to view the PDF?"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:63
+msgid "Download the PDF"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:64
+msgid "Open the PDF in a new browser tab/window"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:71
+msgid "Choose a template"
+msgstr ""
+
+#. translators: 1,2. template paths
+#: includes/Settings/SettingsGeneral.php:79
+msgid ""
+"Want to use your own template? Copy all the files from %1$s to your (child) "
+"theme in %2$s to customize them"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:85
+msgid "Paper size"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:92
+#: views/setup-wizard/paper-format.php:13
+msgid "A4"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:93
+#: views/setup-wizard/paper-format.php:14
+msgid "Letter"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:100
+msgid "Test mode"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:106
+msgid ""
+"With test mode enabled, any document generated will always use the latest "
+"settings, rather than using the settings as configured at the time the "
+"document was first created."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:106
+msgid ""
+"<strong>Note:</strong> invoice numbers and dates are not affected by this "
+"setting and will still be generated."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:112
+msgid "Extended currency symbol support"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:118
+msgid "Enable this if your currency symbol is not displaying properly"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:124
+msgid "Enable font subsetting"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:130
+msgid ""
+"Font subsetting can reduce file size by only including the characters that "
+"are used in the PDF, but limits the ability to edit PDF files later. "
+"Recommended if you're using an Asian font."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:136
+msgid "Shop header/logo"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:142 views/setup-wizard/logo.php:13
+msgid "Select or upload your invoice header/logo"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:143 views/setup-wizard/logo.php:14
+msgid "Set image"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:144 views/setup-wizard/logo.php:15
+msgid "Remove image"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:151
+msgid "Logo height"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:159
+msgid ""
+"Enter the total height of the logo in mm, cm or in and use a dot for "
+"decimals.<br/>For example: 1.15in or 40mm"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:165 includes/SetupWizard.php:58
+msgid "Shop Name"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:177
+msgid "Shop VAT Number"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:184
+#: includes/Settings/SettingsGeneral.php:197
+msgid ""
+"Required for UBL output format.<br>You can display this number on the "
+"invoice from the document settings."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:190
+msgid "Shop Chamber of Commerce Number"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:203
+msgid "Shop Phone Number"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:210
+msgid "Mandatory for certain UBL formats."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:216
+msgid "Shop Address"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:231
+msgid "Footer: terms & conditions, policies, etc."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:246
+msgid "Extra template fields"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:252
+msgid "Extra field 1"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:260
+msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:267
+msgid "Extra field 2"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:275
+msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:282
+msgid "Extra field 3"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:290
+msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:350
+msgid "Extension"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:354
+msgid "Custom"
+msgstr ""
+
+#: includes/Settings/SettingsUbl.php:27
+msgid "Taxes classification"
+msgstr ""
+
+#: includes/Settings/SettingsUbl.php:62
+msgid ""
+"To ensure compliance with e-invoicing requirements, please complete the "
+"Taxes Classification. This information is essential for accurately "
+"generating legally compliant invoices."
+msgstr ""
+
+#: includes/Settings/SettingsUbl.php:63
+msgid "Note"
+msgstr ""
+
+#: includes/Settings/SettingsUbl.php:63
+msgid ""
+"Each rate line allows you to configure the tax scheme, category, and reason. "
+"If these values are set to \"Default,\" they will automatically inherit the "
+"settings selected in the \"Tax class default\" dropdowns at the bottom of "
+"the table."
+msgstr ""
+
+#. translators: 1. General Settings, 2. UBL Settings
+#: includes/Settings/SettingsUbl.php:110
+msgid ""
+"You've enabled UBL output for a document, but some essential details are "
+"missing. Please ensure you've added your VAT and CoC numbers in the %1$s. "
+"Also, specify your tax rates in the %2$s."
+msgstr ""
+
+#: includes/Settings/SettingsUbl.php:112
+msgid "UBL settings"
+msgstr ""
+
+#. translators: 1. open anchor tag, 2. close anchor tag
+#: includes/Settings/SettingsUpgrade.php:34
+msgid ""
+"Kindly be aware that the extensions' license data is currently stored in "
+"cache, impeding the instant update of the information displayed below. To "
+"access the latest details, we recommend clearing the cache %1$shere%2$s."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:46
+msgid "Proforma Invoice, Credit Note & Receipt"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:47
+msgid ""
+"Update your workflow and handle refunds. Both Proforma & Credit Note "
+"documents can either follow the main invoice numbering or have their own "
+"separate number sequence."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:51
+msgid "Attach to email"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:52
+msgid ""
+"Also attach the Packing Slip, Proforma Invoice and Credit Note to any of the "
+"outgoing emails."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:56
+msgid "Cloud storage upload"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:57
+msgid "Automatically upload your documents via FTP/SFTP or to Dropbox."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:61
+msgid "Bulk export"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:62
+msgid "Easily export documents for a specific date range."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:66
+msgid "Multilingual support"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:67
+msgid ""
+"Handle document translations with WPML, Polylang, Weglot, TranslatePress or "
+"GTranslate."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:71
+msgid "Attach static files"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:72
+msgid "Add up to three static files to your emails."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:76
+msgid "Custom document titles and filenames"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:77
+msgid "Customize document titles and filenames right in the plugin settings."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:81
+msgid "Custom address format"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:82
+msgid "Customize the address format of the billing and shipping addresses."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:86
+msgid "Order notification email"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:89
+msgid "Send a notification email to user specified addresses."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:91
+#: includes/Settings/SettingsUpgrade.php:101
+#: includes/Settings/SettingsUpgrade.php:111 views/upgrade-table.php:74
+msgid "Learn more"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:96
+msgid "PDF Customizer"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:99
+msgid "Fully customize the product table and totals table on your documents."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:106
+msgid "Add custom data to your documents"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:109
+msgid ""
+"Display all sorts of data and apply conditional logic using Custom Blocks."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:116
+msgid "Additional PDF templates"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:117
+msgid "Make use of our Business or Modern template designs."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:121
+msgid "Add styling"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:122
+msgid ""
+"Easily change the look and feel of your documents by adding some custom CSS."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:133
+msgid "WooCommerce Smart Reminder Emails"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:134
+msgid "Automatically schedule and send Reminder Emails for WooCommerce orders."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:140
+msgid "WooCommerce Print Address Labels"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:141
+msgid "Print out address labels for selected orders straight from WooCommerce."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:147
+msgid "WooCommerce Automatic Printing - PrintNode"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:148
+msgid "A plugin to automatically print completed orders via PrintNode."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:154
+msgid "WooCommerce Ultimate Barcodes"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:155
+msgid ""
+"Generate barcodes (ZATCA, QR-codes, C128, EAN-13 and more) for your orders, "
+"products and even invoices & packing slips."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:161
+msgid "WooCommerce Print Order List"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:162
+msgid ""
+"This plugin lets you quickly print a list of your WooCommerce orders. Great "
+"for order picking."
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:168
+msgid "Menu Cart Pro"
+msgstr ""
+
+#: includes/Settings/SettingsUpgrade.php:169
+msgid ""
+"Integrates seamlessly with WooCommerce to add a shopping cart to your menu."
+msgstr ""
+
+#: includes/SetupWizard.php:62 views/setup-wizard/logo.php:3
+msgid "Your logo"
+msgstr ""
+
+#: includes/SetupWizard.php:66
+msgid "Attachments"
+msgstr ""
+
+#: includes/SetupWizard.php:70 views/setup-wizard/display-options.php:3
+msgid "Display options"
+msgstr ""
+
+#: includes/SetupWizard.php:74 views/setup-wizard/paper-format.php:3
+msgid "Paper format"
+msgstr ""
+
+#: includes/SetupWizard.php:78 views/setup-wizard/show-action-buttons.php:3
+msgid "Action buttons"
+msgstr ""
+
+#: includes/SetupWizard.php:82
+msgid "Ready!"
+msgstr ""
+
+#: includes/SetupWizard.php:143
+msgid "PDF Invoices & Packing Slips for WooCommerce &rsaquo; Setup Wizard"
+msgstr ""
+
+#: includes/SetupWizard.php:163
+msgid "PDF Invoices & Packing Slips"
+msgstr ""
+
+#: includes/SetupWizard.php:195
+msgid "Previous"
+msgstr ""
+
+#: includes/SetupWizard.php:200
+msgid "Next"
+msgstr ""
+
+#: includes/SetupWizard.php:201
+msgid "Skip this step"
+msgstr ""
+
+#: includes/SetupWizard.php:203
+msgid "Finish"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:80
+msgid "Refund:"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:96
+msgid "Unknown"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:119
+msgid "Number"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:120
+msgid "Type"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:121
+msgid "Calculated"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:123
+msgid "Order"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:124
+msgid "Order Status"
+msgstr ""
+
+#: languages/strings.php:3
+msgid "VAT"
+msgstr ""
+
+#: languages/strings.php:4
+msgid "Tax rate"
+msgstr ""
+
+#: languages/strings.php:5
+msgid "Payment date"
+msgstr "Mokėjimo data"
+
+#: languages/strings.php:7
+msgid "Payment method"
+msgstr "Mokėjimo metodas"
+
+#: languages/strings.php:8
+msgid "Shipping method"
+msgstr "Pristatymo metodas"
+
+#: languages/strings.php:9
+msgid "Send email"
+msgstr ""
+
+#: languages/strings.php:10
+msgid "Description"
+msgstr ""
+
+#: languages/strings.php:11
+msgid "SKU"
+msgstr "Produkto kodas"
+
+#: ubl/Settings/TaxesSettings.php:54
+msgid "Tax Scheme"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:55
+msgid "Tax Category"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:56
+msgid "Reason"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:57
+msgid "Remarks"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:132
+msgid "No taxes found for this class."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:138
+msgid "Tax class default"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:191
+msgid "Default"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:202
+msgid "None"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:230
+msgid "Value added tax (VAT)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:231
+msgid "Goods and services tax (GST)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:232
+msgid "Petroleum tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:233
+msgid "Provisional countervailing duty cash"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:234
+msgid "Provisional countervailing duty bond"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:235
+msgid "Tobacco tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:236
+msgid "Energy fee"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:237
+msgid "Coffee tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:238
+msgid "Harmonised sales tax, Canadian"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:239
+msgid "Quebec sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:240
+msgid "Canadian provincial sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:241
+msgid "Tax on replacement part"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:242
+msgid "Mineral oil tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:243
+msgid "Special tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:244
+msgid "Anti-dumping duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:245
+msgid "Stamp duty (Imposta di Bollo)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:246
+msgid "Agricultural levy"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:247
+msgid "Car tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:248
+msgid "Paper consortium tax (Italy)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:249
+msgid "Commodity specific tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:250
+msgid "Customs duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:251
+msgid "Countervailing duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:252
+msgid "Environmental tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:253
+msgid "Excise duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:254
+msgid "Agricultural export rebate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:255
+msgid "Federal excise tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:256
+msgid "Free"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:257
+msgid "General construction tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:258
+msgid "Illuminants tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:259
+msgid "Import tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:260
+msgid "Individual tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:261
+msgid "Business license fee"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:262
+msgid "Local construction tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:263
+msgid "Light dues payable"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:264
+msgid "Local sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:265
+msgid "Lust tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:266
+msgid "Monetary compensatory amount"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:267
+msgid "Miscellaneous cash deposit"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:268
+msgid "Other taxes"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:269
+msgid "Provisional duty bond"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:270
+msgid "Provisional duty cash"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:271
+msgid "Preference duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:272
+msgid "Special construction tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:273
+msgid "Shifted social securities"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:274
+msgid "State/provincial sales tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:275
+msgid "Suspended duty"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:276
+msgid "Surtax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:277
+msgid "Shifted wage tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:278
+msgid "Alcohol mark tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:280
+msgid "Turnover tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:281
+msgid "Tonnage taxes"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:282
+msgid "Valuation deposit"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:288
+msgid "Mixed tax rate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:289
+msgid "Lower rate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:290
+msgid "Exempt for resale"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:291
+msgid "Value Added Tax (VAT) not now due for payment"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:292
+msgid "Value Added Tax (VAT) due from a previous invoice"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:293
+msgid "VAT Reverse Charge"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:294
+msgid "Transferred (VAT)"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:295
+msgid "Duty paid by supplier"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:296
+msgid "Value Added Tax (VAT) margin scheme - travel agents"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:297
+msgid "Exempt from tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:298
+msgid "Value Added Tax (VAT) margin scheme - second-hand goods"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:299
+msgid "Free export item, tax not charged"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:300
+msgid "Higher rate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:301
+msgid "Value Added Tax (VAT) margin scheme - works of art"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:302
+msgid "Value Added Tax (VAT) margin scheme - collector's items and antiques"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:303
+msgid "VAT exempt for EEA intra-community supply of goods and services"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:304
+msgid "Canary Islands general indirect tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:305
+msgid "Tax for production, services and importation in Ceuta and Melilla"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:306
+msgid "Services outside scope of tax"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:307
+msgid "Standard rate"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:308
+msgid "Zero rated goods"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:314
+msgid "Exempt based on article 79, point c of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:315
+msgid "Exempt based on article 132 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:316
+msgid ""
+"Exempt based on article 132, section 1 (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:317
+msgid ""
+"Exempt based on article 132, section 1 (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:318
+msgid ""
+"Exempt based on article 132, section 1 (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:319
+msgid ""
+"Exempt based on article 132, section 1 (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:320
+msgid ""
+"Exempt based on article 132, section 1 (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:321
+msgid ""
+"Exempt based on article 132, section 1 (f) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:322
+msgid ""
+"Exempt based on article 132, section 1 (g) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:323
+msgid ""
+"Exempt based on article 132, section 1 (h) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:324
+msgid ""
+"Exempt based on article 132, section 1 (i) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:325
+msgid ""
+"Exempt based on article 132, section 1 (j) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:326
+msgid ""
+"Exempt based on article 132, section 1 (k) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:327
+msgid ""
+"Exempt based on article 132, section 1 (l) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:328
+msgid ""
+"Exempt based on article 132, section 1 (m) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:329
+msgid ""
+"Exempt based on article 132, section 1 (n) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:330
+msgid ""
+"Exempt based on article 132, section 1 (o) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:331
+msgid ""
+"Exempt based on article 132, section 1 (p) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:332
+msgid ""
+"Exempt based on article 132, section 1 (q) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:333
+msgid "Exempt based on article 143 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:334
+msgid ""
+"Exempt based on article 143, section 1 (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:335
+msgid ""
+"Exempt based on article 143, section 1 (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:336
+msgid ""
+"Exempt based on article 143, section 1 (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:337
+msgid ""
+"Exempt based on article 143, section 1 (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:338
+msgid ""
+"Exempt based on article 143, section 1 (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:339
+msgid ""
+"Exempt based on article 143, section 1 (f) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:340
+msgid ""
+"Exempt based on article 143, section 1 (fa) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:341
+msgid ""
+"Exempt based on article 143, section 1 (g) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:342
+msgid ""
+"Exempt based on article 143, section 1 (h) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:343
+msgid ""
+"Exempt based on article 143, section 1 (i) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:344
+msgid ""
+"Exempt based on article 143, section 1 (j) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:345
+msgid ""
+"Exempt based on article 143, section 1 (k) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:346
+msgid ""
+"Exempt based on article 143, section 1 (l) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:347
+msgid "Exempt based on article 148 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:348
+msgid ""
+"Exempt based on article 148, section (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:349
+msgid ""
+"Exempt based on article 148, section (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:350
+msgid ""
+"Exempt based on article 148, section (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:351
+msgid ""
+"Exempt based on article 148, section (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:352
+msgid ""
+"Exempt based on article 148, section (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:353
+msgid ""
+"Exempt based on article 148, section (f) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:354
+msgid ""
+"Exempt based on article 148, section (g) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:355
+msgid ""
+"Exempt based on article 151, section 1 (a) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:356
+msgid ""
+"Exempt based on article 151, section 1 (aa) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:357
+msgid ""
+"Exempt based on article 151, section 1 (b) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:358
+msgid ""
+"Exempt based on article 151, section 1 (c) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:359
+msgid ""
+"Exempt based on article 151, section 1 (d) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:360
+msgid ""
+"Exempt based on article 151, section 1 (e) of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:361
+msgid "Exempt based on article 309 of Council Directive 2006/112/EC"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:362
+msgid "Reverse charge"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:363
+msgid "Travel agents VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:364
+msgid "Second hand goods VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:365
+msgid "Export outside the EU"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:366
+msgid "Works of art VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:367
+msgid "Intra-community supply"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:368
+msgid "Collectors items and antiques VAT scheme."
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:369
+msgid "Not subject to VAT"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:370
+msgid "France domestic VAT franchise in base"
+msgstr ""
+
+#: ubl/Settings/TaxesSettings.php:371
+msgid ""
+"France domestic Credit Notes without VAT, due to supplier forfeit of VAT for "
+"discount"
+msgstr ""
+
+#. translators: %s: tax category code
+#: ubl/Settings/TaxesSettings.php:382
+msgid "Only use with tax category code %s"
+msgstr ""
+
+#: views/advanced-numbers.php:5
+msgid "Choose a number store"
+msgstr ""
+
+#: views/advanced-numbers.php:22
+msgid "This document is currently using the main invoice number sequence."
+msgstr ""
+
+#. translators: chose table title
+#: views/advanced-numbers.php:29
+msgid ""
+"Below is a list of all the document numbers generated since the last reset "
+"(which happens when you set the <strong>next %s number</strong> value in the "
+"settings)."
+msgstr ""
+
+#: views/advanced-numbers.php:34
+msgid "Numbers may have been assigned to orders before this."
+msgstr ""
+
+#: views/advanced-numbers.php:37
+msgid "Search number"
+msgstr ""
+
+#: views/advanced-numbers.php:39 views/advanced-tools.php:211
+msgid "Reset"
+msgstr ""
+
+#: views/advanced-numbers.php:44
+msgid "Please select a number store!"
+msgstr ""
+
+#: views/advanced-status.php:10
+msgid "System Configuration"
+msgstr ""
+
+#: views/advanced-status.php:16
+msgid "Required"
+msgstr ""
+
+#: views/advanced-status.php:17
+msgid "Present"
+msgstr ""
+
+#: views/advanced-status.php:36 views/advanced-status.php:43
+#: views/advanced-status.php:82 views/advanced-status.php:83
+#: views/advanced-status.php:148
+msgid "Yes"
+msgstr ""
+
+#: views/advanced-status.php:66
+msgid "Documents status"
+msgstr ""
+
+#: views/advanced-status.php:72
+msgid "Enabled"
+msgstr ""
+
+#: views/advanced-status.php:73 views/advanced-status.php:131
+msgid "Yearly reset"
+msgstr ""
+
+#: views/advanced-status.php:96
+msgid "Required to reset documents numeration"
+msgstr ""
+
+#: views/advanced-status.php:97
+msgid "Yearly reset action not found"
+msgstr ""
+
+#. translators: total scheduled actions
+#: views/advanced-status.php:115
+msgid "Only 1 scheduled action should exist, but %s were found"
+msgstr ""
+
+#. translators: 1. open anchor tag, 2. close anchor tag
+#: views/advanced-status.php:123
+msgid "Scheduled action not found. Please reschedule it %1$shere%2$s."
+msgstr ""
+
+#: views/advanced-status.php:159
+msgid "Writable"
+msgstr ""
+
+#: views/advanced-status.php:160
+msgid "Not writable"
+msgstr ""
+
+#: views/advanced-status.php:165
+msgid "Central temporary plugin folder"
+msgstr ""
+
+#: views/advanced-status.php:171
+msgid "Temporary attachments folder"
+msgstr ""
+
+#: views/advanced-status.php:177
+msgid "Temporary DOMPDF folder"
+msgstr ""
+
+#: views/advanced-status.php:183
+msgid "DOMPDF fonts folder (needs to be writable for custom/remote fonts)"
+msgstr ""
+
+#: views/advanced-status.php:196
+msgid "Write Permissions"
+msgstr ""
+
+#: views/advanced-status.php:202
+msgid "Path"
+msgstr ""
+
+#. translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts
+#: views/advanced-status.php:227
+msgid ""
+"The central temp folder is %1$s. By default, this folder is created in the "
+"WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-"
+"config.php. Alternatively, you can control the specific folder for PDF "
+"invoices by using the %4$s filter. Make sure this folder is writable and "
+"that the subfolders %5$s, %6$s and %7$s are present (these will be created "
+"by the plugin if the central temp folder is writable)."
+msgstr ""
+
+#. translators: directory path
+#: views/advanced-status.php:243
+msgid ""
+"If the temporary folders were not automatically created by the plugin, "
+"verify that all the font files (from %s) are copied to the fonts folder. "
+"Normally, this is fully automated, but if your server has strict security "
+"settings, this automated copying may have been prohibited. In that case, you "
+"also need to make sure these folders get synchronized on plugin updates!"
+msgstr ""
+
+#: views/advanced-tools.php:8
+msgid "Generate random temporary directory"
+msgstr ""
+
+#: views/advanced-tools.php:9
+msgid ""
+"For security reasons, it is preferable to use a random name for the "
+"temporary directory."
+msgstr ""
+
+#: views/advanced-tools.php:12
+msgid "Generate temporary directory"
+msgstr ""
+
+#: views/advanced-tools.php:21
+msgid "Reinstall plugin fonts"
+msgstr ""
+
+#: views/advanced-tools.php:22
+msgid ""
+"If you are experiencing issues with rendering fonts there might have been an "
+"issue during installation or upgrade."
+msgstr ""
+
+#: views/advanced-tools.php:25
+msgid "Reinstall fonts"
+msgstr ""
+
+#: views/advanced-tools.php:35
+msgid "Reschedule the yearly reset of the numbering system"
+msgstr ""
+
+#: views/advanced-tools.php:36
+msgid ""
+"You seem to have the yearly reset enabled for one of your documents but the "
+"action that performs this isn't scheduled yet."
+msgstr ""
+
+#: views/advanced-tools.php:39
+msgid "Reschedule yearly reset"
+msgstr ""
+
+#: views/advanced-tools.php:49 views/advanced-tools.php:53
+msgid "Remove temporary files"
+msgstr ""
+
+#: views/advanced-tools.php:50
+msgid ""
+"Clean up the PDF files stored in the temporary folder (used for email "
+"attachments)."
+msgstr ""
+
+#: views/advanced-tools.php:62
+msgid "Remove released semaphore locks"
+msgstr ""
+
+#: views/advanced-tools.php:63
+msgid ""
+"Clean up the released semaphore locks from the database. These locks prevent "
+"simultaneous document generation requests, ensuring correct document "
+"numbering. Once released, they are safe to remove."
+msgstr ""
+
+#: views/advanced-tools.php:66
+msgid "Remove released locks"
+msgstr ""
+
+#. translators: 1: number of released semaphore locks
+#: views/advanced-tools.php:78
+msgid "There is %s released semaphore lock in the database."
+msgid_plural "There are %s released semaphore locks in the database."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: views/advanced-tools.php:91
+msgid "There are no released semaphore locks in the database."
+msgstr ""
+
+#. translators: 1: next run date
+#: views/advanced-tools.php:105
+msgid "The next cleanup action is scheduled to run on %s."
+msgstr ""
+
+#: views/advanced-tools.php:120
+msgid "Remove released legacy semaphore locks"
+msgstr ""
+
+#: views/advanced-tools.php:121
+msgid "Clean up the released legacy semaphore locks from the database."
+msgstr ""
+
+#: views/advanced-tools.php:124
+msgid "Remove released legacy locks"
+msgstr ""
+
+#. translators: 1: number of released legacy semaphore locks
+#: views/advanced-tools.php:134
+msgid "There is %s released legacy semaphore lock in the database."
+msgid_plural "There are %s released legacy semaphore locks in the database."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: views/advanced-tools.php:151
+msgid "Set up your basic invoice workflow via our Wizard."
+msgstr ""
+
+#: views/advanced-tools.php:157
+msgid "Export Settings"
+msgstr ""
+
+#: views/advanced-tools.php:158
+msgid ""
+"Download plugin settings in JSON format to easily export your current setup."
+msgstr ""
+
+#: views/advanced-tools.php:171
+msgid "Export"
+msgstr ""
+
+#: views/advanced-tools.php:181
+msgid "Import Settings"
+msgstr ""
+
+#: views/advanced-tools.php:182
+msgid "Import plugin settings in JSON format."
+msgstr ""
+
+#: views/advanced-tools.php:187
+msgid "Import"
+msgstr ""
+
+#: views/advanced-tools.php:197
+msgid "Reset Settings"
+msgstr ""
+
+#: views/advanced-tools.php:198
+msgid ""
+"This will clear all your selected settings data. Please do a backup first "
+"using the export tool above."
+msgstr ""
+
+#: views/advanced-tools.php:222
+msgid "Clear extensions license caching"
+msgstr ""
+
+#: views/advanced-tools.php:223
+msgid ""
+"This will clear all extensions' license caching. This could be required to "
+"update the license status in the Upgrade tab or for new Cloud Storage "
+"activations (Professional extension)."
+msgstr ""
+
+#: views/advanced-tools.php:226
+msgid "Clear licenses cache"
+msgstr ""
+
+#: views/advanced-tools.php:241
+msgid "Order date created"
+msgstr ""
+
+#: views/advanced-tools.php:242
+msgid "Order date modified"
+msgstr ""
+
+#: views/advanced-tools.php:243
+msgid "Order date completed"
+msgstr ""
+
+#: views/advanced-tools.php:244
+msgid "Order date paid"
+msgstr ""
+
+#: views/advanced-tools.php:245
+msgid "Document date"
+msgstr ""
+
+#: views/advanced-tools.php:251
+msgid ""
+"<strong>DANGER ZONE:</strong> Create a backup before using these tools, the "
+"actions they perform are irreversible!"
+msgstr ""
+
+#: views/advanced-tools.php:256
+msgid "Renumber existing documents"
+msgstr ""
+
+#: views/advanced-tools.php:257
+msgid ""
+"This tool will renumber existing documents within the selected order date "
+"range, while keeping the assigned document date."
+msgstr ""
+
+#. translators: step-by-step instructions
+#: views/advanced-tools.php:262
+msgid ""
+"Set the <strong>next document number</strong> setting %s to the number you "
+"want to use for the first document. "
+msgstr ""
+
+#: views/advanced-tools.php:270 views/advanced-tools.php:318
+msgid "Document type:"
+msgstr ""
+
+#: views/advanced-tools.php:273 views/advanced-tools.php:321
+msgid "Select"
+msgstr ""
+
+#: views/advanced-tools.php:281 views/advanced-tools.php:330
+msgid "Date type:"
+msgstr ""
+
+#: views/advanced-tools.php:293 views/advanced-tools.php:342
+msgid "From:"
+msgstr ""
+
+#: views/advanced-tools.php:294 views/advanced-tools.php:298
+#: views/advanced-tools.php:343 views/advanced-tools.php:347
+msgid "(as: yyyy-mm-dd)"
+msgstr ""
+
+#: views/advanced-tools.php:297 views/advanced-tools.php:346
+msgid "To:"
+msgstr ""
+
+#: views/advanced-tools.php:303
+msgid "Renumber documents"
+msgstr ""
+
+#: views/advanced-tools.php:313
+msgid "Delete existing documents"
+msgstr ""
+
+#: views/advanced-tools.php:314
+msgid ""
+"This tool will delete existing documents within the selected order date "
+"range."
+msgstr ""
+
+#: views/advanced-tools.php:325
+msgid "All"
+msgstr ""
+
+#: views/advanced-tools.php:352
+msgid "Delete documents"
+msgstr ""
+
+#. translators: <a> tags
+#: views/attachment-settings-hint.php:11
+msgid ""
+"It looks like you haven't setup any email attachments yet, check the "
+"settings under <b>%1$sDocuments > Invoice%2$s</b>"
+msgstr ""
+
+#: views/extensions.php:6
+msgid "Check out these premium extensions!"
+msgstr ""
+
+#: views/extensions.php:7
+msgid "click items to read more"
+msgstr ""
+
+#: views/extensions.php:12
+msgid ""
+"Premium PDF Invoice bundle: Everything you need for a perfect invoicing "
+"system"
+msgstr ""
+
+#: views/extensions.php:14
+msgid ""
+"Supercharge PDF Invoices & Packing Slips for WooCommerce with the all our "
+"premium extensions:"
+msgstr ""
+
+#: views/extensions.php:15
+msgid "Professional features:"
+msgstr ""
+
+#: views/extensions.php:17 views/extensions.php:47
+msgid "Email/print/download <b>PDF Credit Notes & Proforma invoices</b>"
+msgstr ""
+
+#: views/extensions.php:18 views/extensions.php:48
+msgid ""
+"Send out a separate <b>notification email</b> with (or without) PDF invoices/"
+"packing slips, for example to a drop-shipper or a supplier."
+msgstr ""
+
+#: views/extensions.php:19 views/extensions.php:49
+msgid ""
+"Attach <b>up to 3 static files</b> (for example a terms & conditions "
+"document) to the WooCommerce emails of your choice."
+msgstr ""
+
+#: views/extensions.php:20 views/extensions.php:50
+msgid ""
+"Use <b>separate numbering systems</b> and/or format for proforma invoices "
+"and credit notes or utilize the main invoice numbering system"
+msgstr ""
+
+#: views/extensions.php:21 views/extensions.php:51
+msgid ""
+"<b>Customize</b> the <b>shipping & billing address</b> format to include "
+"additional custom fields, font sizes etc. without the need to create a "
+"custom template."
+msgstr ""
+
+#: views/extensions.php:22 views/extensions.php:52
+msgid "Use the plugin in multilingual <b>WPML</b> setups"
+msgstr ""
+
+#: views/extensions.php:24 views/extensions.php:104
+msgid "Advanced, customizable templates"
+msgstr ""
+
+#: views/extensions.php:26 views/extensions.php:107
+msgid ""
+"Completely customize the invoice contents (prices, taxes, thumbnails) to "
+"your needs with a drag & drop customizer"
+msgstr ""
+
+#: views/extensions.php:27 views/extensions.php:108
+msgid "Two extra stylish premade templates (Modern & Business)"
+msgstr ""
+
+#: views/extensions.php:29 views/extensions.php:53
+msgid "Upload automatically to dropbox"
+msgstr ""
+
+#: views/extensions.php:31
+msgid ""
+"This extension conveniently uploads all the invoices (and other pdf "
+"documents from the professional extension) that are emailed to your "
+"customers to Dropbox. The best way to keep your invoice administration up to "
+"date!"
+msgstr ""
+
+#: views/extensions.php:34
+msgid "Get PDF Invoices & Packing Slips for WooCommerce Bundle"
+msgstr ""
+
+#: views/extensions.php:43
+msgid "Go Pro: Proforma invoices, credit notes (=refunds) & more!"
+msgstr ""
+
+#: views/extensions.php:45
+msgid ""
+"Supercharge PDF Invoices & Packing Slips for WooCommerce with the following "
+"features:"
+msgstr ""
+
+#: views/extensions.php:55
+msgid "Get PDF Invoices & Packing Slips for WooCommerce Professional!"
+msgstr ""
+
+#: views/extensions.php:63
+msgid "Automatically send payment reminders to your customers"
+msgstr ""
+
+#: views/extensions.php:65
+msgid "WooCommerce Smart Reminder emails"
+msgstr ""
+
+#: views/extensions.php:67
+msgid "<b>Completely automatic</b> scheduled emails"
+msgstr ""
+
+#: views/extensions.php:68
+msgid ""
+"<b>Rich text editor</b> for the email text, including placeholders for data "
+"from the order (name, order total, etc)"
+msgstr ""
+
+#: views/extensions.php:69
+msgid ""
+"Configure the exact requirements for sending an email (time after order, "
+"order status, payment method)"
+msgstr ""
+
+#: views/extensions.php:70
+msgid ""
+"Fully <b>WPML Compatible</b> – emails will be automatically sent in the "
+"order language."
+msgstr ""
+
+#: views/extensions.php:71
+msgid ""
+"<b>Super versatile!</b> Can be used for any kind of reminder email (review "
+"reminders, repeat purchases)"
+msgstr ""
+
+#: views/extensions.php:72
+msgid "Integrates seamlessly with the PDF Invoices & Packing Slips plugin"
+msgstr ""
+
+#: views/extensions.php:74
+msgid "Get WooCommerce Smart Reminder Emails"
+msgstr ""
+
+#: views/extensions.php:83
+msgid ""
+"Automatically send new orders or packing slips to your printer, as soon as "
+"the customer orders!"
+msgstr ""
+
+#: views/extensions.php:89
+msgid ""
+"Check out the WooCommerce Automatic Order Printing extension from our "
+"partners at Simba Hosting"
+msgstr ""
+
+#: views/extensions.php:90
+msgid "WooCommerce Automatic Order Printing"
+msgstr ""
+
+#. translators: Premium Templates link
+#: views/extensions.php:110
+msgid "Check out the Premium PDF Invoice & Packing Slips templates at %s."
+msgstr ""
+
+#. translators: email link
+#: views/extensions.php:112
+msgid "For custom templates, contact us at %s."
+msgstr ""
+
+#: views/promo.php:27
+msgid "Last chance to use your Black Friday discount!"
+msgstr ""
+
+#. translators: ★★★★★ (5-star)
+#: views/settings-page.php:7
+msgid ""
+"If you like <strong>PDF Invoices & Packing Slips for WooCommerce</strong> "
+"please leave us a %s rating. A huge thank you in advance!"
+msgstr ""
+
+#: views/settings-page.php:107
+msgid "ID, email or name"
+msgstr ""
+
+#: views/settings-page.php:108
+msgid "Clear search text"
+msgstr ""
+
+#: views/settings-page.php:110
+msgid "Currently showing last order"
+msgstr ""
+
+#: views/settings-page.php:111 views/settings-page.php:114
+msgid "Search for an order"
+msgstr ""
+
+#: views/settings-page.php:113
+msgid "Show last order"
+msgstr ""
+
+#: views/setup-wizard/attach-to.php:3
+msgid "Attach to..."
+msgstr ""
+
+#: views/setup-wizard/attach-to.php:4
+msgid "Select to which emails you would like to attach your invoice."
+msgstr ""
+
+#: views/setup-wizard/display-options.php:4
+msgid "Select some additional display options for your invoice."
+msgstr ""
+
+#: views/setup-wizard/display-options.php:13
+msgid "Shipping address"
+msgstr "Pristatymo adresas"
+
+#: views/setup-wizard/display-options.php:34
+msgid "Email address"
+msgstr ""
+
+#: views/setup-wizard/display-options.php:43
+msgid "Phone number"
+msgstr ""
+
+#: views/setup-wizard/display-options.php:52
+msgid "Invoice date"
+msgstr ""
+
+#: views/setup-wizard/display-options.php:73
+msgid "Invoice number"
+msgstr ""
+
+#: views/setup-wizard/good-to-go.php:3
+msgid "You are good to go!"
+msgstr ""
+
+#: views/setup-wizard/good-to-go.php:4
+msgid "If you have any questions please have a look at our documentation:"
+msgstr ""
+
+#: views/setup-wizard/good-to-go.php:5
+msgid "Invoices & Packing Slips"
+msgstr ""
+
+#: views/setup-wizard/good-to-go.php:6
+msgid "Happy selling!"
+msgstr ""
+
+#: views/setup-wizard/logo.php:4
+msgid "Set the header image that will display on your invoice."
+msgstr ""
+
+#: views/setup-wizard/paper-format.php:4
+msgid "Select the paper format for your invoice."
+msgstr ""
+
+#: views/setup-wizard/shop-name.php:3
+msgid "Enter your shop name"
+msgstr ""
+
+#: views/setup-wizard/shop-name.php:4
+msgid ""
+"Lets quickly setup your invoice. Please enter the name and address of your "
+"shop in the fields on the right."
+msgstr ""
+
+#: views/setup-wizard/shop-name.php:13
+msgid "Shop name"
+msgstr ""
+
+#: views/setup-wizard/shop-name.php:14
+msgid "Shop address"
+msgstr ""
+
+#: views/setup-wizard/show-action-buttons.php:4
+msgid ""
+"Would you like to display the action buttons in your WooCommerce order list? "
+"The action buttons allow you to manually create a PDF."
+msgstr ""
+
+#: views/setup-wizard/show-action-buttons.php:5
+msgid "(You can always change this setting later via the Screen Options menu)"
+msgstr ""
+
+#: views/setup-wizard/show-action-buttons.php:18
+msgid "Show action buttons"
+msgstr ""
+
+#: views/upgrade-table.php:11
+msgid "Wait, there is more..."
+msgstr ""
+
+#: views/upgrade-table.php:13
+msgid ""
+"A quick overview of the features our PDF Invoices & Packing Slips extensions "
+"have to offer."
+msgstr ""
+
+#: views/upgrade-table.php:14
+msgid "If you have any questions feel free to send us an email at"
+msgstr ""
+
+#: views/upgrade-table.php:21
+msgid "Professional"
+msgstr ""
+
+#: views/upgrade-table.php:22
+msgid "Premium Templates"
+msgstr ""
+
+#: views/upgrade-table.php:23
+msgid "Plus Bundle"
+msgstr ""
+
+#: views/upgrade-table.php:63 views/upgrade-table.php:155
+msgid "Currently installed"
+msgstr ""
+
+#. translators: learn more link
+#: views/upgrade-table.php:73
+msgid "License not yet activated: %s"
+msgstr ""
+
+#: views/upgrade-table.php:97
+msgid "Upgrade now"
+msgstr ""
+
+#: views/upgrade-table.php:137
+msgid "You might also like these plugins..."
+msgstr ""
+
+#: views/upgrade-table.php:140
+msgid ""
+"Wow! It looks like you own all of our recommendations. Check out our shop "
+"for even more plugins."
+msgstr ""
+
+#: views/upgrade-table.php:141
+msgid "Visit shop"
+msgstr ""
+
+#: views/upgrade-table.php:157
+msgid "Buy now"
+msgstr ""
+
+#. translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version
+#: woocommerce-pdf-invoices-packingslips.php:194
+msgid ""
+"PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s "
+"version %3$s or higher to be installed & activated!"
+msgstr ""
+
+#. translators: PHP version
+#: woocommerce-pdf-invoices-packingslips.php:239
+msgid "PDF Invoices & Packing Slips for WooCommerce requires PHP %s or higher."
+msgstr ""
+
+#. translators: <a> tags
+#: woocommerce-pdf-invoices-packingslips.php:245
+msgid "We strongly recommend to %1$supdate your PHP version%2$s."
+msgstr ""
+
+#. translators: directory path
+#: woocommerce-pdf-invoices-packingslips.php:337
+msgid ""
+"The PDF files in %s are not currently protected due to your site running on "
+"<strong>NGINX</strong>."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:338
+msgid "To protect them, you must click the button below."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:339
+msgid "Generate random temporary folder name"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:396
+msgid ""
+"When sending emails with MailPoet 3 and the active sending method is "
+"<strong>MailPoet Sending Service</strong> or <strong>Your web host / web "
+"server</strong>, MailPoet does not include the <strong>PDF Invoices & "
+"Packing Slips for WooCommerce</strong> attachments in the emails."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:397
+msgid ""
+"To fix this you should select <strong>The default WordPress sending method "
+"(default)</strong> on the <strong>Advanced tab</strong>."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:398
+msgid "Change MailPoet sending method to WordPress (default)"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:435
+msgid ""
+"PDF Invoices & Packing Slips for WooCommerce detected that your current site "
+"locale is right-to-left (RTL) which the current PDF engine does not support "
+"it. Please consider installing our mPDF extension that is compatible."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:436
+msgid "Download mPDF extension"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:481
+msgid ""
+"The year-end is approaching, and we noticed that your PDF Invoices & Packing "
+"Slips for WooCommerce plugin doesn't have the scheduled action to reset "
+"invoice numbers annually, even though you've explicitly enabled this setting "
+"in the document options. Click the button below to schedule the action "
+"before the year ends."
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:482
+msgid "Schedule the action now"
+msgstr ""
+
+#. translators: legacy addon name
+#: woocommerce-pdf-invoices-packingslips.php:566
+msgid ""
+"While updating the PDF Invoices & Packing Slips for WooCommerce plugin we've "
+"noticed our legacy %s add-on was active on your site. This functionality is "
+"now incorporated into the core plugin. We've deactivated the add-on for you, "
+"and you are free to uninstall it."
+msgstr ""
+
+#: wpo-ips-functions.php:367
+msgid "Error creating PDF, please contact the site owner."
+msgstr ""
+
+#: wpo-ips-functions.php:981
+msgid "Product"
+msgstr "Produktas"
+
+#: wpo-ips-functions.php:982
+msgid "Quantity"
+msgstr "Kiekis"
+
+#: wpo-ips-functions.php:983
+msgid "Price"
+msgstr "Kaina"
