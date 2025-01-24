@@ -1016,7 +1016,7 @@ function wpo_wcpdf_get_wp_filesystem() {
 	if ( ! $wp_filesystem ) {
 		$error = 'Failed to initialize WP_Filesystem.';
 		wcpdf_log_error( $error, 'critical' );
-		throw new \RuntimeException( $error );
+		throw new \RuntimeException( esc_html( $error ) );
 	}
 
 	return $wp_filesystem;
