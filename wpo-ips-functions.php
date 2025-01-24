@@ -1054,7 +1054,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	static $cache       = array();
 	static $logged      = array();
 	
-	$cache_key          = $textdomain . '::' . $string;
+	$cache_key          = md5( $textdomain . '::' . $string );
 	$log_enabled        = ! empty( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = '';
@@ -1091,7 +1091,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 		}
 	}
 	
-	// If still no translation, optionally log
+	// Log a warning if no translation is found and debug logging is enabled
 	if ( $translation === $string && $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
 		wcpdf_log_error( "Missing translation for: {$string} in textdomain: {$textdomain}", 'warning' );
 		$logged[ $cache_key ] = true;
