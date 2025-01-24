@@ -1016,7 +1016,7 @@ function wpo_wcpdf_get_wp_filesystem() {
 	if ( ! $wp_filesystem ) {
 		$error = 'Failed to initialize WP_Filesystem.';
 		wcpdf_log_error( $error, 'critical' );
-		throw new \RuntimeException( $error );
+		throw new \RuntimeException( esc_html( $error ) );
 	}
 
 	return $wp_filesystem;
@@ -1051,34 +1051,55 @@ function wpo_wcpdf_escape_url_path_or_base64( string $url_path_or_base64 ): stri
  * @return string
  */
 function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
-	$log_enabled		= isset( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
-	$log_message        = "Missing translation for: {$string} in textdomain: {$textdomain}";
+	static $cache       = array();
+	static $logged      = array();
+	
+	$cache_key          = md5( $textdomain . '::' . $string );
+	$log_enabled        = ! empty( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = '';
 	
-	if ( empty( $string ) ) {
-		if ( $log_enabled ) {
-			wcpdf_log_error( $log_message, 'warning' );
+	// Return early if empty string
+	if ( '' === $string ) {
+		if ( $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
+			wcpdf_log_error( "Skipping translation for empty string in textdomain: {$textdomain}", 'warning' );
+			$logged[ $cache_key ] = true;
 		}
 		return $string;
 	}
 	
-	// Check for multilingual support class
+	// Check cache
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+	
+	// Attempt to get a translation from multilingual class
 	if ( class_exists( $multilingual_class ) && method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 	
-	// If multilingual didn't change the string, fall back to native translate()
-	if ( ( empty( $translation ) || $translation === $string ) && function_exists( 'translate' ) ) {
-		$translation = translate( $string, $textdomain );
+	// If not translated yet, allow custom filter & then fallback to WP filters
+	if ( empty( $translation ) || $translation === $string ) {
+		$filtered = apply_filters( 'wpo_wcpdf_gettext', $string, $textdomain );
+		
+		if ( ! empty( $filtered ) && $filtered !== $string ) {
+			$translation = $filtered;
+		} else {
+			// standard WP gettext filters
+			$translation = apply_filters( 'gettext', $string, $string, $textdomain );
+			$translation = apply_filters( "gettext_{$textdomain}", $translation, $string, $textdomain );
+		}
 	}
 	
-	// Log missing translations for debugging if it's still untranslated
-	if ( $translation === $string && $log_enabled ) {
-		wcpdf_log_error( $log_message, 'warning' );
+	// Log a warning if no translation is found and debug logging is enabled
+	if ( $translation === $string && $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
+		wcpdf_log_error( "Missing translation for: {$string} in textdomain: {$textdomain}", 'warning' );
+		$logged[ $cache_key ] = true;
 	}
 	
-	return $translation ?: $string;
+	// Store in cache and return
+	$cache[ $cache_key ] = $translation ?: $string;
+	return $cache[ $cache_key ];
 }
 
 /**

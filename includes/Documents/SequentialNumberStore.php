@@ -159,7 +159,12 @@ $sql = "CREATE TABLE {$this->table_name} (
 			// if AUTO_INCREMENT is not 1, we need to make sure we have a 'highest value' in case of server restarts
 			// https://serverfault.com/questions/228690/mysql-auto-increment-fields-resets-by-itself
 			$highest_number = (int) $number - 1;
-			$wpdb->query( $wpdb->prepare( "ALTER TABLE `" . esc_sql( $table_name ) . "` AUTO_INCREMENT=%d;", $highest_number ) );
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$wpdb->prepare(
+					"ALTER TABLE `" . esc_sql( $table_name ) . "` AUTO_INCREMENT=%d;", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+					$highest_number
+				)
+			);
 			$data = array(
 				'order_id' => 0,
 				'date'     => get_date_from_gmt( gmdate( 'Y-m-d H:i:s' ) ),
@@ -170,10 +175,18 @@ $sql = "CREATE TABLE {$this->table_name} (
 			}
 
 			// after this insert, AUTO_INCREMENT will be equal to $number
-			$wpdb->insert( $table_name, $data );
+			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$table_name,
+				$data
+			);
 		} else {
 			// simple scenario, no need to insert any rows
-			$wpdb->query( $wpdb->prepare( "ALTER TABLE `" . esc_sql( $table_name ) . "` AUTO_INCREMENT=%d;", $number ) );
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$wpdb->prepare(
+					"ALTER TABLE `" . esc_sql( $table_name ) . "` AUTO_INCREMENT=%d;", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+					$number
+				)
+			);
 		}
 	}
 
