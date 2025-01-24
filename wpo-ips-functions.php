@@ -1056,14 +1056,13 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	
 	$cache_key          = $textdomain . '::' . $string;
 	$log_enabled        = ! empty( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
-	$log_message        = "Missing translation for: {$string} in textdomain: {$textdomain}";
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = '';
 	
 	// Return early if empty string
 	if ( '' === $string ) {
 		if ( $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
-			wcpdf_log_error( $log_message, 'warning' );
+			wcpdf_log_error( "Skipping translation for empty string in textdomain: {$textdomain}", 'warning' );
 			$logged[ $cache_key ] = true;
 		}
 		return $string;
@@ -1094,7 +1093,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	
 	// If still no translation, optionally log
 	if ( $translation === $string && $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
-		wcpdf_log_error( $log_message, 'warning' );
+		wcpdf_log_error( "Missing translation for: {$string} in textdomain: {$textdomain}", 'warning' );
 		$logged[ $cache_key ] = true;
 	}
 	
