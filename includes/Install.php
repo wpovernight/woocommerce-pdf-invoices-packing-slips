@@ -393,7 +393,9 @@ class Install {
 				$store_name        = "{$document->slug}_number";
 				$method            = WPO_WCPDF()->settings->get_sequential_number_store_method();
 				$table_name        = apply_filters( 'wpo_wcpdf_number_store_table_name', sanitize_key( "{$wpdb->prefix}wcpdf_{$store_name}" ), $store_name, $method );
-				$table_name_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", esc_sql( $table_name ) ) ) === $table_name;
+				$table_name_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+					$wpdb->prepare( "SHOW TABLES LIKE %s", esc_sql( $table_name ) )
+				) === $table_name;
 
 				if ( ! $table_name_exists ) {
 					continue;
@@ -406,7 +408,12 @@ class Install {
 						$column_name      = 'date';
 						$table_name_safe  = sanitize_key( $number_store->table_name );
 						$column_name_safe = sanitize_key( $column_name );					
-						$query_result     = $wpdb->query( $wpdb->prepare( "ALTER TABLE `" . esc_sql( $table_name_safe ) . "` ALTER `" . esc_sql( $column_name_safe ) . "` SET DEFAULT %s", '1000-01-01 00:00:00' ) );
+						$query_result     = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+							$wpdb->prepare(
+								"ALTER TABLE `" . esc_sql( $table_name_safe ) . "` ALTER `" . esc_sql( $column_name_safe ) . "` SET DEFAULT %s", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+								'1000-01-01 00:00:00'
+							)
+						);
 
 						if ( $query_result ) {
 							wcpdf_log_error(

@@ -785,7 +785,10 @@ class Settings {
 		$method = isset( $this->debug_settings['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
 
 		// safety first - always use calculate when auto_increment_increment is not 1
-		$row = $wpdb->get_row("SHOW VARIABLES LIKE 'auto_increment_increment'");
+		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			"SHOW VARIABLES LIKE 'auto_increment_increment'"
+		);
+		
 		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			$method = 'calculate';
 		}
