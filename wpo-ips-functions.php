@@ -1051,35 +1051,56 @@ function wpo_wcpdf_escape_url_path_or_base64( string $url_path_or_base64 ): stri
  * @return string
  */
 function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
-	$log_enabled        = isset( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
+	static $cache       = array();
+	static $logged      = array();
+	
+	$cache_key          = $textdomain . '::' . $string;
+	$log_enabled        = ! empty( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
 	$log_message        = "Missing translation for: {$string} in textdomain: {$textdomain}";
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = '';
 	
-	if ( empty( $string ) ) {
-		if ( $log_enabled ) {
+	// Return early if empty string
+	if ( '' === $string ) {
+		if ( $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
 			wcpdf_log_error( $log_message, 'warning' );
+			$logged[ $cache_key ] = true;
 		}
 		return $string;
 	}
 	
-	// Check for multilingual support class
+	// Check cache
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+	
+	// Attempt to get a translation from multilingual class
 	if ( class_exists( $multilingual_class ) && method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 	
-	// If no translation found, apply gettext filters
+	// If not translated yet, allow custom filter & then fallback to WP filters
 	if ( empty( $translation ) || $translation === $string ) {
-		$translation = apply_filters( 'gettext', $string, $string, $textdomain );
-		$translation = apply_filters( "gettext_{$textdomain}", $translation, $string, $textdomain );
+		$filtered = apply_filters( 'wpo_wcpdf_gettext', $string, $textdomain );
+		
+		if ( ! empty( $filtered ) && $filtered !== $string ) {
+			$translation = $filtered;
+		} else {
+			// standard WP gettext filters
+			$translation = apply_filters( 'gettext', $string, $string, $textdomain );
+			$translation = apply_filters( "gettext_{$textdomain}", $translation, $string, $textdomain );
+		}
 	}
 	
-	// Log missing translations for debugging if it's still untranslated
-	if ( $translation === $string && $log_enabled ) {
+	// If still no translation, optionally log
+	if ( $translation === $string && $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
 		wcpdf_log_error( $log_message, 'warning' );
+		$logged[ $cache_key ] = true;
 	}
 	
-	return $translation ?: $string;
+	// Store in cache and return
+	$cache[ $cache_key ] = $translation ?: $string;
+	return $cache[ $cache_key ];
 }
 
 /**
