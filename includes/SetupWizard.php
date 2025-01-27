@@ -87,16 +87,18 @@ class SetupWizard {
 
 		wp_enqueue_style(
 			'wpo-wcpdf-setup',
-			WPO_WCPDF()->plugin_url() . '/assets/css/setup-wizard'.$suffix.'.css',
+			WPO_WCPDF()->plugin_url() . '/assets/css/setup-wizard' . $suffix . '.css',
 			array( 'dashicons', 'install' ),
 			WPO_WCPDF_VERSION
 		);
+		
 		wp_enqueue_style(
 			'wpo-wcpdf-toggle-switch',
-			WPO_WCPDF()->plugin_url() . '/assets/css/toggle-switch'.$suffix.'.css',
+			WPO_WCPDF()->plugin_url() . '/assets/css/toggle-switch' . $suffix . '.css',
 			array(),
 			WPO_WCPDF_VERSION
 		);
+		
 		if ( ! wp_style_is( 'woocommerce_admin_styles', 'enqueued' ) ) {
 			wp_enqueue_style(
 				'woocommerce_admin_styles',
@@ -105,33 +107,37 @@ class SetupWizard {
 				WC_VERSION
 			);
 		}
+		
 		wp_register_script(
 			'wpo-wcpdf-media-upload',
-			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
+			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 			array( 'jquery', 'media-editor', 'mce-view' ),
 			WPO_WCPDF_VERSION
 		);
+		
 		wp_register_script(
 			'wpo-wcpdf-setup',
-			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard'.$suffix.'.js',
+			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard' . $suffix . '.js',
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
 			WPO_WCPDF_VERSION
 		);
-		if ( ! wp_script_is( 'wc-enhanced-select', 'enqueued' ) ) {
+		
+		if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
 			wp_register_script(
-				'wc-enhanced-select',
+				'select2',
 				WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
 				array( 'jquery' ),
 				WC_VERSION
 			);
 		}
+		
 		wp_enqueue_media();
 
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step ) {
 			wp_register_script(
 				'wpo-wcpdf-setup-confetti',
-				WPO_WCPDF()->plugin_url() . '/assets/js/confetti'.$suffix.'.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/confetti' . $suffix . '.js',
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
@@ -162,10 +168,10 @@ class SetupWizard {
 		<head>
 			<meta name="viewport" content="width=device-width" />
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<title><?php esc_html_e( 'PDF Invoices & Packing Slips for WooCommerce &rsaquo; Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
+			<title>PDF Invoices & Packing Slips for WooCommerce &rsaquo; <?php esc_html_e( 'Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
-			<?php wp_print_scripts( 'wc-enhanced-select' ); ?>
+			<?php wp_print_scripts( 'select2' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>
@@ -183,7 +189,7 @@ class SetupWizard {
 		// array_shift( $output_steps );
 		?>
 		<div class="wpo-setup-card">
-			<h1 class="wpo-plugin-title"><?php esc_html_e( 'PDF Invoices & Packing Slips', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
+			<h1 class="wpo-plugin-title">PDF Invoices & Packing Slips for WooCommerce</h1>
 			<ol class="wpo-progress-bar">
 				<?php foreach ( $output_steps as $step_key => $step ) : ?>
 					<li class="<?php
