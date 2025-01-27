@@ -94,7 +94,13 @@ class SetupWizard {
 		wp_enqueue_style(
 			'wpo-wcpdf-toggle-switch',
 			WPO_WCPDF()->plugin_url() . '/assets/css/toggle-switch'.$suffix.'.css',
-			array( 'dashicons', 'install' ),
+			array(),
+			WPO_WCPDF_VERSION
+		);
+		wp_enqueue_style(
+			'woocommerce_admin_styles',
+			WC()->plugin_url() . '/assets/css/admin.css',
+			array(),
 			WPO_WCPDF_VERSION
 		);
 		wp_register_script(
@@ -151,7 +157,6 @@ class SetupWizard {
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
-			<link rel="stylesheet" href="<?php echo WC()->plugin_url() . '/assets/css/admin.css'; ?>">
 			<script src="<?php echo WC()->plugin_url() . '/assets/js/select2/select2.full.min.js'; ?>"></script>
 		</head>
 		<body class="wpo-wcpdf-setup wp-core-ui">
