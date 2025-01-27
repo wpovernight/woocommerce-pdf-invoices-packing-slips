@@ -101,7 +101,7 @@ class SetupWizard {
 			'woocommerce_admin_styles',
 			WC()->plugin_url() . '/assets/css/admin.css',
 			array(),
-			WPO_WCPDF_VERSION
+			WC_VERSION
 		);
 		wp_register_script(
 			'wpo-wcpdf-media-upload',
@@ -114,6 +114,12 @@ class SetupWizard {
 			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard'.$suffix.'.js',
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
 			WPO_WCPDF_VERSION
+		);
+		wp_register_script(
+			'select2',
+			WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
+			array( 'jquery' ),
+			WC_VERSION
 		);
 		wp_enqueue_media();
 
@@ -155,9 +161,9 @@ class SetupWizard {
 			<title><?php esc_html_e( 'PDF Invoices & Packing Slips for WooCommerce &rsaquo; Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
+			<?php wp_print_scripts( 'select2' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
-			<script src="<?php echo WC()->plugin_url() . '/assets/js/select2/select2.full.min.js'; ?>"></script>
 		</head>
 		<body class="wpo-wcpdf-setup wp-core-ui">
 			<?php if( $this->step == 'good-to-go' ) { echo "<div id='confetti'></div>"; } ?>
