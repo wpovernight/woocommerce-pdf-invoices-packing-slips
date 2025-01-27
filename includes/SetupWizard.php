@@ -97,12 +97,14 @@ class SetupWizard {
 			array(),
 			WPO_WCPDF_VERSION
 		);
-		wp_enqueue_style(
-			'woocommerce_admin_styles',
-			WC()->plugin_url() . '/assets/css/admin.css',
-			array(),
-			WC_VERSION
-		);
+		if ( ! wp_style_is( 'woocommerce_admin_styles', 'enqueued' ) ) {
+			wp_enqueue_style(
+				'woocommerce_admin_styles',
+				WC()->plugin_url() . '/assets/css/admin.css',
+				array(),
+				WC_VERSION
+			);
+		}
 		wp_register_script(
 			'wpo-wcpdf-media-upload',
 			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload'.$suffix.'.js',
@@ -115,12 +117,14 @@ class SetupWizard {
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
 			WPO_WCPDF_VERSION
 		);
-		wp_register_script(
-			'select2',
-			WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
-			array( 'jquery' ),
-			WC_VERSION
-		);
+		if ( ! wp_script_is( 'wc-enhanced-select', 'enqueued' ) ) {
+			wp_register_script(
+				'wc-enhanced-select',
+				WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
+				array( 'jquery' ),
+				WC_VERSION
+			);
+		}
 		wp_enqueue_media();
 
 		$step_keys = array_keys( $this->steps );
@@ -161,7 +165,7 @@ class SetupWizard {
 			<title><?php esc_html_e( 'PDF Invoices & Packing Slips for WooCommerce &rsaquo; Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
-			<?php wp_print_scripts( 'select2' ); ?>
+			<?php wp_print_scripts( 'wc-enhanced-select' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>
