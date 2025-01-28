@@ -464,6 +464,12 @@ class Main {
 				}
 				break;
 			case 'full':
+				// check if we have a valid access when it's from bulk actions
+				if ( isset( $request['bulk'] ) && ! $valid_nonce ) {
+					$allowed = false;
+					break;
+				}
+				
 				// check if we have a valid access key only when it's not from bulk actions
 				if ( ! isset( $_REQUEST['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), $_REQUEST['access_key'] ) ) {
 					$allowed = false;
