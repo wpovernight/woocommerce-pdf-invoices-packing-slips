@@ -479,12 +479,12 @@ class Settings {
 				);
 				// register option separately for singular options
 				if ( is_string( $settings_field['callback'] ) && $settings_field['callback'] == 'singular_text_element') {
-					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) );
+					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic 
 				}
 			}
 		}
 		// $page, $option_group & $option_name are all the same...
-		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) );
+		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic 
 		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
 	}
