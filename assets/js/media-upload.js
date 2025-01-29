@@ -74,7 +74,7 @@ jQuery(document).ready(function($) {
 
 			xhr = $.ajax({
 				type:    'POST',
-				url:     wpo_wcpdf_media_upload.ajaxurl,
+				url:     wpo_wcpdf_admin.ajaxurl,
 				data:    data,
 				success: function( response ) {
 					if ( response && typeof response.success != 'undefined' && response.success === true ) {

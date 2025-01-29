@@ -118,7 +118,7 @@ class SetupWizard {
 		
 		wp_localize_script(
 			'wpo-wcpdf-media-upload',
-			'wpo_wcpdf_media_upload',
+			'wpo_wcpdf_admin',
 			array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) )
 		);
 		
