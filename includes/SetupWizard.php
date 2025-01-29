@@ -121,12 +121,21 @@ class SetupWizard {
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
 			WPO_WCPDF_VERSION
 		);
+
+		if ( ! wp_script_is( 'jquery-blockui', 'enqueued' ) ) {
+			wp_register_script(
+				'jquery-blockui',
+				WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
+				array( 'jquery' ),
+				WC_VERSION
+			);
+		}
 		
 		if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
 			wp_register_script(
 				'select2',
 				WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
-				array( 'jquery' ),
+				array( 'jquery', 'jquery-blockui' ),
 				WC_VERSION
 			);
 		}
