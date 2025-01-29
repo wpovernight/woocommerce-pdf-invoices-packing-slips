@@ -12,6 +12,7 @@
 			'uploader_title'       => __( 'Select or upload your invoice header/logo', 'woocommerce-pdf-invoices-packing-slips' ),
 			'uploader_button_text' => __( 'Set image', 'woocommerce-pdf-invoices-packing-slips' ),
 			'remove_button_text'   => __( 'Remove image', 'woocommerce-pdf-invoices-packing-slips' ),
+			'translatable'         => true,
 		) );
 	?>
 </div>
