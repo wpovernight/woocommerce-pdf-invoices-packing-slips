@@ -86,6 +86,9 @@ class Main {
 		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 2 );
 
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
+
+		// Add document download link to emails
+		add_action( 'woocommerce_email_order_details', array( $this, 'add_document_download_link_to_email' ), 10, 4 );
 	}
 
 	/**
@@ -221,7 +224,7 @@ class Main {
 		$reuse_attachment = apply_filters( 'wpo_wcpdf_reuse_document_attachment', true, $document );
 		$max_reuse_age    = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
 		$lock_acquired    = false;
-	
+
 		try {
 			// Check if the file can be reused
 			if ( $wp_filesystem->exists( $pdf_path ) && $reuse_attachment && $max_reuse_age > 0 ) {
@@ -230,18 +233,18 @@ class Main {
 					return $pdf_path;
 				}
 			}
-	
+
 			// Get PDF data and set up the Semaphore
 			$pdf_data  = $document->get_pdf();
 			$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
-	
+
 			// Attempt to acquire the lock if needed
 			if ( $lock_file ) {
 				$lock_acquired = $semaphore->lock();
 			}
-			
+
 			$write_file = ( $lock_file && $lock_acquired ) || ! $lock_file;
-			
+
 			// Write the file
 			if ( $write_file ) {
 				$file_written = $wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
@@ -249,7 +252,7 @@ class Main {
 			} else {
 				$semaphore->log( "PDF attachment not written to {$pdf_path} because the lock was not acquired", 'info' );
 			}
-	
+
 			// Log if the lock was not acquired
 			if ( $lock_file && ! $lock_acquired ) {
 				$semaphore->log( "Couldn't get the lock for the PDF attachment", 'critical' );
@@ -264,7 +267,7 @@ class Main {
 				$semaphore->log( 'Lock released for the PDF attachment.', 'info' );
 			}
 		}
-	
+
 		// Check if the file was written successfully
 		if ( ! $file_written ) {
 			$message = "Couldn't write the PDF attachment to {$pdf_path}";
@@ -272,7 +275,7 @@ class Main {
 			wcpdf_log_error( $message, 'critical' );
 			return false;
 		}
-	
+
 		return $pdf_path;
 	}
 
@@ -1159,12 +1162,12 @@ class Main {
 		$success          = 0;
 		$error            = 0;
 		$output           = array();
-		
+
 		// Gather all files from the paths
 		foreach ( $paths_to_cleanup as $path ) {
 			if ( $wp_filesystem->is_dir( $path ) ) {
 				$listed_files = $wp_filesystem->dirlist( $path, true, true );
-				
+
 				if ( $listed_files ) {
 					foreach ( $listed_files as $fileinfo ) {
 						$file_path = trailingslashit( $path ) . $fileinfo['name'];
@@ -1178,13 +1181,13 @@ class Main {
 				}
 			}
 		}
-		
+
 		// No files to delete
 		if ( empty( $files ) ) {
 			$output['success'] = esc_html__( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' );
 			return $output;
 		}
-		
+
 		// Process and delete files
 		foreach ( $files as $file ) {
 			$file_timestamp = $wp_filesystem->mtime( $file );
@@ -1249,11 +1252,11 @@ class Main {
 		global $wpdb;
 		// remove order ID from number stores
 		$number_stores = apply_filters( "wpo_wcpdf_privacy_number_stores", array( 'invoice_number' ) );
-		
+
 		foreach ( $number_stores as $store_name ) {
 			$order_id   = $order->get_id();
 			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
-			
+
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 				$wpdb->prepare(
 					"UPDATE " . esc_sql( $table_name ) . " SET order_id = 0 WHERE order_id = %s",
@@ -1770,6 +1773,80 @@ class Main {
 			</tr>';
 		}
 	}
+
+	/**
+	 * Get WC emails as array of id => title.
+	 *
+	 * @return array
+	 */
+	public function get_wc_emails(): array {
+		$emails    = WC()->mailer()->get_emails();
+		$wc_emails = array();
+
+		foreach ( $emails as $email ) {
+			$wc_emails[ $email->id ] = $email->get_title();
+		}
+
+		return $wc_emails;
+	}
+
+	/**
+	 * Add document download link to the email.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @param bool $sent_to_admin
+	 * @param bool $plain_text
+	 * @param \WC_Email $email
+	 *
+	 * @return void
+	 */
+	public function add_document_download_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, \WC_Email $email ): void {
+		// Check if document access type is 'guest' and customer is a guest.
+		$is_guest_access_type = 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type();
+		$is_customer_guest    = 0 === $order->get_customer_id();
+
+		// Early exit if the requirements are not met
+		if ( ! apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_requirements_met', $is_guest_access_type && $is_customer_guest, $order, $sent_to_admin, $plain_text, $email ) ) {
+			return;
+		}
+
+		$allowed_document_types = apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_allowed_document_types', array( 'invoice' ), $order, $sent_to_admin, $plain_text, $email );
+		$documents              = WPO_WCPDF()->documents->get_documents();
+
+		foreach ( $documents as $document ) {
+			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
+			$selected_emails   = $document_settings['add_download_link_to_emails'] ?? array();
+
+			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email->id, $selected_emails, true );
+
+			if ( ! apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
+				continue;
+			}
+
+			$document = wcpdf_get_document( $document->get_type(), $order );
+
+			if ( ! $document ) {
+				continue;
+			}
+
+			$link_text = sprintf(
+				/* translators: %s: Document type */
+				__( 'Download %s (PDF)', 'woocommerce-pdf-invoices-packing-slips' ),
+				wp_kses_post( $document->get_type() )
+			);
+			$link_url  = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array(), true );
+
+			$document_link = sprintf(
+				'<p><a id="%s" href="%s" target="_blank">%s</a></p>',
+				esc_attr( 'wpo_wcpdf_' . $document->get_type() . '_download_link' ),
+				esc_url( $link_url ),
+				esc_html( $link_text )
+			);
+
+			echo apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_link', $document_link, $document, $order, $sent_to_admin, $plain_text, $email );
+		}
+	}
+
 }
 
 endif; // class_exists

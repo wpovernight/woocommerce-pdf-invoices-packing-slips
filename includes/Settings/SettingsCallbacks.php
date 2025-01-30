@@ -208,7 +208,7 @@ class SettingsCallbacks {
 		ob_start();
 		$this->text_input( $input_args );
 		$text_input = ob_get_clean();
-		
+
 		$allowed_html = array(
 			'input' => array(
 				'type'        => true,
@@ -226,7 +226,7 @@ class SettingsCallbacks {
 		if ( ! empty( $text_input_wrap ) ) {
 			$text_input = sprintf( $text_input_wrap, $text_input );
 		}
-		
+
 		echo wp_kses( "{$checkbox} {$text_input}", $allowed_html );
 
 		// output description.
@@ -306,7 +306,7 @@ class SettingsCallbacks {
 			$title = ! empty( $title ) ? esc_attr( $title ) : '';
 			$class = 'wc-enhanced-select wpo-wcpdf-enhanced-select';
 			$css = 'width:400px';
-			printf( '<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $placeholder ), esc_attr( $title ), esc_attr( $class ), esc_attr( $css ), esc_attr( $multiple ) );
+			printf( '<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s %8$s>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $placeholder ), esc_attr( $title ), esc_attr( $class ), esc_attr( $css ), esc_attr( $multiple ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
 		} else {
 			printf( '<select id="%1$s" name="%2$s">', esc_attr( $id ), esc_attr( $setting_name ) );
 		}
