@@ -210,7 +210,7 @@ class Invoice extends OrderDocumentMethods {
 	 */
 	public function get_pdf_settings_fields( $option_name ) {
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-		
+
 		$settings_fields = array(
 			array(
 				'type'			=> 'section',
@@ -241,6 +241,22 @@ class Invoice extends OrderDocumentMethods {
 					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
 					'description'	  => ! $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'add_download_link_to_emails',
+				'title'    => __( 'Add download link to emails', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name'      => $option_name,
+					'id'               => 'add_download_link_to_emails',
+					'options_callback' => array( WPO_WCPDF()->main, 'get_wc_emails' ),
+					'multiple'         => true,
+					'enhanced_select'  => true,
+					'disabled'         => 'guest' !== WPO_WCPDF()->endpoint->get_document_link_access_type(),
+					'description'      => __( 'Select emails to include the document download link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -579,7 +595,7 @@ class Invoice extends OrderDocumentMethods {
 	 */
 	public function get_ubl_settings_fields( $option_name ) {
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-		
+
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -668,6 +684,7 @@ class Invoice extends OrderDocumentMethods {
 					'members' => array(
 						'enabled',
 						'attach_to_email_ids',
+						'add_download_link_to_emails',
 						'disable_for_statuses',
 						'my_account_buttons',
 					),
