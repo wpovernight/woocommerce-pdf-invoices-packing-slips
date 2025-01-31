@@ -1057,7 +1057,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	$cache_key          = md5( $textdomain . '::' . $string );
 	$log_enabled        = ! empty( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
-	$translation        = '';
+	$translation        = $string;
 	
 	// Return early if empty string
 	if ( '' === $string ) {
@@ -1079,7 +1079,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	}
 	
 	// If not translated yet, allow custom filter & then fallback to WP filters
-	if ( empty( $translation ) || $translation === $string ) {
+	if ( $translation === $string ) {
 		$filtered = apply_filters( 'wpo_wcpdf_gettext', $string, $textdomain );
 		
 		if ( ! empty( $filtered ) && $filtered !== $string ) {
@@ -1098,7 +1098,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	}
 	
 	// Store in cache and return
-	$cache[ $cache_key ] = $translation ?: $string;
+	$cache[ $cache_key ] = $translation;
 	return $cache[ $cache_key ];
 }
 
