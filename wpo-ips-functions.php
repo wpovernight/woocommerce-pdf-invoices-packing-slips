@@ -1078,17 +1078,9 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 	
-	// If not translated yet, allow custom filter & then fallback to WP filters
+	// If not translated yet, allow custom filter & then fallback to standard WP gettext filters
 	if ( $translation === $string ) {
-		$filtered = apply_filters( 'wpo_wcpdf_gettext', $string, $textdomain );
-		
-		if ( ! empty( $filtered ) && $filtered !== $string ) {
-			$translation = $filtered;
-		} else {
-			// standard WP gettext filters
-			$translation = apply_filters( 'gettext', $string, $string, $textdomain );
-			$translation = apply_filters( "gettext_{$textdomain}", $translation, $string, $textdomain );
-		}
+		$translation = wpo_wcpdf_gettext( $string, $textdomain );
 	}
 	
 	// Log a warning if no translation is found and debug logging is enabled
@@ -1100,6 +1092,27 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	// Store in cache and return
 	$cache[ $cache_key ] = $translation;
 	return $cache[ $cache_key ];
+}
+
+/**
+ * Get text translation
+ *
+ * @param string $string
+ * @param string $textdomain
+ * @return string
+ */
+function wpo_wcpdf_gettext( string $string, string $textdomain ): string {
+	$filtered = apply_filters( 'wpo_wcpdf_gettext', $string, $textdomain );
+		
+	if ( ! empty( $filtered ) && $filtered !== $string ) {
+		$translation = $filtered;
+	} else {
+		// standard WP gettext filters
+		$translation = apply_filters( 'gettext', $string, $string, $textdomain );
+		$translation = apply_filters( "gettext_{$textdomain}", $translation, $string, $textdomain );
+	}
+	
+	return $translation;
 }
 
 /**
