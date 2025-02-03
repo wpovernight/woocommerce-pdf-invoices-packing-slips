@@ -116,6 +116,12 @@ class SetupWizard {
 			WPO_WCPDF_VERSION
 		);
 		
+		wp_localize_script(
+			'wpo-wcpdf-media-upload',
+			'wpo_wcpdf_admin',
+			array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) )
+		);
+		
 		wp_register_script(
 			'wpo-wcpdf-setup',
 			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard' . $suffix . '.js',
