@@ -43,7 +43,7 @@ class SettingsDocuments {
 		$section_document = null;
 
 		if ( ! empty( $_REQUEST['output_format'] ) ) {
-			$output_format = esc_attr( $_REQUEST['output_format'] );
+			$output_format = sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) );
 		}
 
 		foreach ( $documents as $document ) {
@@ -79,7 +79,7 @@ class SettingsDocuments {
 					<?php
 						printf(
 							/* translators: 1. open anchor tag, 2. close anchor tag */
-							__( 'Looking for more documents? Learn more %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+							esc_html__( 'Looking for more documents? Learn more %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 							'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/more-document-types/" target="_blank">',
 							'</a>'
 						);

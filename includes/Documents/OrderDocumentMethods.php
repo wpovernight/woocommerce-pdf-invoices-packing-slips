@@ -767,6 +767,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function get_tax_rate_by_id( $rate_id, $order = null ) {
 		global $wpdb;
+		
 		// WC 3.7+ stores rate in tax items!
 		if ( $order_rates = $this->get_tax_rates_from_order( $order ) ) {
 			if ( isset( $order_rates[ $rate_id ] ) ) {
@@ -774,8 +775,14 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 
-		$rate = $wpdb->get_var( $wpdb->prepare( "SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d;", $rate_id ) );
-		if ($rate === NULL) {
+		$rate = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d;",
+				$rate_id
+			)
+		);
+		
+		if ( is_null( $rate ) ) {
 			return false;
 		} else {
 			return (float) $rate;
@@ -819,7 +826,9 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function get_tax_rate_ids() {
 		global $wpdb;
-		$rates = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates" );
+		$rates = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates"
+		);
 
 		$tax_rate_ids = array();
 		foreach ($rates as $rate) {

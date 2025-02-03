@@ -71,7 +71,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 	$preview_states      = isset( $settings_tabs[ $active_tab ]['preview_states'] ) ? $settings_tabs[ $active_tab ]['preview_states'] : 1;
 	$preview_states_lock = $preview_states == 3 ? false : true;
 	?>
-	<div id="wpo-wcpdf-preview-wrapper" class="<?php echo $active_tab; ?>" data-preview-states="<?php echo esc_attr( $preview_states ); ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo esc_attr( $preview_states_lock ); ?>">
+	<div id="wpo-wcpdf-preview-wrapper" class="<?php echo esc_attr( $active_tab ); ?>" data-preview-states="<?php echo esc_attr( $preview_states ); ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo esc_attr( $preview_states_lock ); ?>">
 
 		<div class="sidebar">
 			<?php $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections', array( 'tools' ) ); // tools have their own forms ?>
