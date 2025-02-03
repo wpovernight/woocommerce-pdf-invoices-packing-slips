@@ -24,6 +24,10 @@ class SabreBuilder extends Builder {
 
 		// Map namespaces (Sabre requires URI => prefix)
 		$this->service->namespaceMap = array_flip( $document->get_namespaces() );
+		
+		if ( ! function_exists( 'WPO\\IPS\\Vendor\\Sabre\\Xml\\Serializer\\standardSerializer' ) ) {
+			require_once WPO_WCPDF()->plugin_path() . '/vendor/sabre/xml/lib/Serializer/functions.php';
+		}		
 
 		return $this->service->write(
 			$document->get_root_element(),

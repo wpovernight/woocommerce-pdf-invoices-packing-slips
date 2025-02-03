@@ -1249,10 +1249,17 @@ class Main {
 		global $wpdb;
 		// remove order ID from number stores
 		$number_stores = apply_filters( "wpo_wcpdf_privacy_number_stores", array( 'invoice_number' ) );
+		
 		foreach ( $number_stores as $store_name ) {
-			$order_id = $order->get_id();
+			$order_id   = $order->get_id();
 			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
-			$wpdb->query( $wpdb->prepare( "UPDATE " . esc_sql( $table_name ) . " SET order_id = 0 WHERE order_id = %s", $order_id ) );
+			
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$wpdb->prepare(
+					"UPDATE " . esc_sql( $table_name ) . " SET order_id = 0 WHERE order_id = %s",
+					$order_id
+				)
+			);
 		}
 	}
 
