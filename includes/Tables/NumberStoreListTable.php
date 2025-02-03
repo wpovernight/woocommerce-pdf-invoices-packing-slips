@@ -224,7 +224,7 @@ class NumberStoreListTable extends \WP_List_Table {
 
 		if ( ! empty( $table_name ) ) {
 			if ( $search ) {
-				$results = $wpdb->get_results( 
+				$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 					$wpdb->prepare(
 						"SELECT * FROM `" . esc_sql( $table_name ) . "` WHERE `id` = %d OR `order_id` = %d ORDER BY " . esc_sql( $orderby ) . " " . esc_sql( $order ), 
 						$search, 
@@ -232,7 +232,9 @@ class NumberStoreListTable extends \WP_List_Table {
 					) 
 				);										
 			} else {
-				$results = $wpdb->get_results( "SELECT * FROM `" . esc_sql( $table_name ) . "` ORDER BY `" . esc_sql( $orderby ) . "` " . esc_sql( $order ) );
+				$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+					"SELECT * FROM `" . esc_sql( $table_name ) . "` ORDER BY `" . esc_sql( $orderby ) . "` " . esc_sql( $order )
+				);
 			}
 		}
 

@@ -39,7 +39,14 @@ class TaxesSettings {
 
 	public function output_table_for_tax_class( $slug, $name ) {
 		global $wpdb;
-		$results      = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;", ( $slug == 'standard' ) ? '' : $slug ) );
+		
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;",
+				( $slug == 'standard' ) ? '' : $slug
+			)
+		);
+		
 		$allowed_html = array(
 			'select' => array(
 				'name'         => true,
@@ -55,7 +62,7 @@ class TaxesSettings {
 		);
 		?>
 
-		<h4><?php echo $name; ?></h4>
+		<h4><?php echo esc_html( $name ); ?></h4>
 		<table class="widefat striped">
 			<thead>
 				<tr>
@@ -74,7 +81,12 @@ class TaxesSettings {
 				<?php
 					if ( ! empty( $results ) ) {
 						foreach ( $results as $result ) {
-							$locationResults = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;", $result->tax_rate_id ) );
+							$locationResults = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+								$wpdb->prepare(
+									"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;",
+									$result->tax_rate_id
+								)
+							);
 							$postcode        = array();
 							$city            = array();
 							
