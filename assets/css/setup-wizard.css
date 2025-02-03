@@ -13,17 +13,14 @@ body.wpo-wcpdf-setup {
 	width: 100%;
 	height: 100%;
 	background-repeat: no-repeat;
-	background-attachment: fixed!important;
+	background-attachment: fixed !important;
 	font-size: 14px;
 	line-height: 22px;
-	background: #771787;
-	background: -webkit-linear-gradient(10deg, #3c105d, #771787);
-	background: -o-linear-gradient(10deg, #3c105d, #771787);
-	background: linear-gradient(100deg, #3c105d, #771787);
+	background: #fcfbfe;
 }
 
 body.wpo-wcpdf-setup a:link, body.wpo-wcpdf-setup a:visited {
-	color: #771787;
+	color: #6e1edc;
 	text-decoration: none;
 }
 
@@ -34,14 +31,19 @@ body.wpo-wcpdf-setup a:hover {
 body.wpo-wcpdf-setup input:focus,
 body.wpo-wcpdf-setup textarea:focus,
 body.wpo-wcpdf-setup select:focus {
-	border-color: #239bb9!important;
-	box-shadow: 0 0 0 1px #239bb9!important;
-	outline: 2px solid transparent!important;
-	color: black!important;
+	border-color: #6e1edc !important;
+	box-shadow: 0 0 0 1px #6e1edc !important;
+	outline: 2px solid transparent !important;
+	color: black !important;
+}
+
+body.wpo-wcpdf-setup .select2-search__field:focus {
+	border-color: unset !important;
+	box-shadow: none !important;
 }
 
 body.wpo-wcpdf-setup select:hover {
-	color: #666!important;
+	color: #666 !important;
 }
 
 body.wpo-wcpdf-setup h1, body.wpo-wcpdf-setup h2 {
@@ -64,16 +66,18 @@ body.wpo-wcpdf-setup form {
 	background-color: #fff;
 	padding: 0;
 	overflow: hidden;
-	box-shadow: 0 20px 50px 20px rgba(0,0,0,0.2);
+	border-radius: 20px;
+	box-shadow: 10px 10px 30px rgba(43, 12, 86, 0.1), -10px -10px 30px rgba(43, 12, 86, 0.02);
 }
 
 .wpo-plugin-title {
 	width: 100%;
-	padding: 40px 0 30px 0;
+	padding: 50px 0 30px 0;
 	margin: 0;
 	text-align: center;
 	display: block;
 	font-weight: 200;
+	font-size: 1.5em;
 }
 
 .wpo-progress-bar {
@@ -91,6 +95,10 @@ body.wpo-wcpdf-setup form {
 	position: relative;
 	padding: 0;
 	margin: 0;
+}
+
+.wpo-progress-bar li a {
+	box-shadow: none;
 }
 
 .wpo-progress-bar li:first-child {
@@ -114,7 +122,7 @@ body.wpo-wcpdf-setup form {
 
 .wpo-progress-bar li.active::after,
 .wpo-progress-bar li.completed::after {
-	background-color: #771787;
+	background-color: #6e1edc;
 }
 
 .wpo-progress-marker {
@@ -131,6 +139,7 @@ body.wpo-wcpdf-setup form {
 
 .wpo-progress-bar {
 	counter-reset: section;
+	padding-bottom: 25px;
 }
 
 .wpo-progress-marker::before {
@@ -144,7 +153,7 @@ body.wpo-wcpdf-setup form {
 }
 
 li.active .wpo-progress-marker::before {
-	color: #771787;
+	color: #6e1edc;
 }
 
 li.completed .wpo-progress-marker::before {
@@ -152,12 +161,12 @@ li.completed .wpo-progress-marker::before {
 }
 
 .wpo-progress-bar li.completed .wpo-progress-marker {
-	background-color: #771787;
-	border-color: #771787;
+	background-color: #6e1edc;
+	border-color: #6e1edc;
 }
 
 .wpo-progress-bar li.active .wpo-progress-marker {
-	border-color: #771787;
+	border-color: #6e1edc;
 	background-color: #fff;
 }
 
@@ -168,10 +177,23 @@ li.completed .wpo-progress-marker::before {
 }
 
 .wpo-step-description {
-	width: 50%;
+	width: 40%;
 	float: left;
-	padding: 50px;
+	padding: 30px 40px 30px 50px;
 	box-sizing: border-box;
+}
+
+.wpo-step-description h2 {
+	color: #444;
+	font-family: serif;
+    letter-spacing: -0.25px;
+    font-size: 2.4em;
+    font-style: italic;
+	line-height: 0.9;
+}
+
+.wpo-step-description p {
+	font-size: 16px;
 }
 
 .wpo-step-description ul {
@@ -179,11 +201,12 @@ li.completed .wpo-progress-marker::before {
 }
 
 .wpo-setup-input {
-	width: 50%;
+	width: 60%;
 	float: left;
-	padding: 50px 50px 50px 0;
+	padding: 30px 50px;
 	box-sizing: border-box;
 	position: relative;
+	border-left: 1px solid #eaeaea;
 }
 
 .wpo-setup-input select {
@@ -212,33 +235,40 @@ li.completed .wpo-progress-marker::before {
 }
 
 .wpo-setup-card .wpo-button-next {
-	background-color: #1c6c8b;
-	border: 1px solid #1c6c8b;
-	color: #fff!important;
+	background-color: #6e1edc;
+	border: 1px solid #6e1edc;
+	color: #fff !important;
 }
 
 .wpo-setup-card .wpo-button-previous,
 .wpo-setup-input span.button {
 	background-color: transparent;
-	border: 1px solid #1c6c8b;
-	color: #1c6c8b;
+	border: 1px solid #6e1edc;
+	color: #6e1edc;
 }
 
-.wpo-setup-card .wpo-button-next:hover,
 .wpo-setup-card .wpo-button-previous:hover,
 .wpo-setup-input span.button:hover {
-	background-color: #239bb9;
-	color: #fff!important;
+	background-color: #6e1edc;
+	color: #fff !important;
 	text-decoration: none;
-	border-color: #239bb9;
+	border-color: #6e1edc;
+}
+
+.wpo-setup-card .wpo-button-next:hover {
+	background-color: transparent;
+	color: #6e1edc !important;
+	text-decoration: none;
+	border-color: #6e1edc;
 }
 
 .wpo-setup-card .wpo-button-next:focus,
 .wpo-setup-card .wpo-button-previous:focus,
 .wpo-setup-input span.button:focus {
-	background-color: #239bb9;
-	color: #fff!important;
-	border-color: #239bb9;
+	box-shadow: none;
+	background-color: #6e1edc;
+	color: #fff !important;
+	border-color: #6e1edc;
 }
 
 .wpo-setup-card .wpo-button-next,
@@ -249,19 +279,23 @@ li.completed .wpo-progress-marker::before {
 
 .wpo-setup-card .wpo-button-previous {
 	float: left;
-	color: #1c6c8b!important;
+	color: #6e1edc !important;
 }
 
 .wpo-setup-card .wpo-skip-step {
 	background-color: transparent;
-	color: #666!important;
+	color: #666 !important;
 	font-weight: 200;
 	border: 2px solid transparent;
 }
 
 .wpo-setup-card .wpo-skip-step:hover {
-	color: #000!important;
+	color: #000 !important;
 	text-decoration: none;
+}
+
+.wpo-setup-card .wpo-skip-step:focus {
+	box-shadow: none;
 }
 
 /* Shop address */
@@ -286,7 +320,7 @@ li.completed .wpo-progress-marker::before {
 	resize: none;
 	float: left;
 	margin: 0;
-	text-align: left!important;
+	text-align: left !important;
 }
 
 /* Your logo */
@@ -340,9 +374,9 @@ li.completed .wpo-progress-marker::before {
 	color: #666;
 }
 
-.wpo-setup-input table th,
-.wpo-setup-input table td {
-	padding-bottom: 5px;
+.wpo-setup-input table th {
+	width: 40%;
+	padding-bottom: 20px;
 }
 
 .wpo-setup-input input[type=checkbox] {
@@ -362,12 +396,28 @@ li.completed .wpo-progress-marker::before {
 .wpo-final {
 	text-align: center;
 	width: 100%;
-	padding: 50px;
+	padding: 25px 50px 30px;
 }
 
 .wpo-final h1 {
-	font-size: 3em;
+	font-size: 6em;
 	line-height: 1em;
+	font-family: serif;
+    letter-spacing: -4px;
+    font-style: italic;
+}
+
+.wpo-final h2 {
+	letter-spacing: -1px;
+	font-size: 2em;
+	font-weight: lighter;
+	padding-top: 0.8em;
+	font-family: sans-serif;
+	font-style: normal;
+}
+
+.wpo-final p {
+	font-size: 1.3em;
 }
 
 .wpo-final a:hover {
@@ -383,6 +433,21 @@ li.completed .wpo-progress-marker::before {
 	z-index: -999;
 }
 
+.select2-results__option--highlighted {
+	background-color: #6e1edc !important;
+	color: white !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected="true"] {
+	background-color: #6e1edc !important;
+	color: white !important;
+}
+
+.select2-results__option[aria-selected="true"] {
+	background-color: #f1e9fc !important;
+	color: #000 !important;
+}
+
 /* Portrait tablets and small desktops */
 @media (min-width: 768px) and (max-width: 991px) {
 	body.wpo-wcpdf-setup form {
@@ -393,7 +458,7 @@ li.completed .wpo-progress-marker::before {
 /* Landscape phones and portrait tablets */
 @media (max-width: 767px) {
 	body {
-		background: white!important;
+		background: white !important;
 	}
 
 	body.wpo-wcpdf-setup form {
