@@ -433,6 +433,21 @@ li.completed .wpo-progress-marker::before {
 	z-index: -999;
 }
 
+.select2-results__option--highlighted {
+	background-color: #6e1edc!important;
+	color: white!important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected="true"] {
+	background-color: #6e1edc!important;
+	color: white!important;
+}
+
+.select2-results__option[aria-selected="true"] {
+	background-color: #f1e9fc!important;
+	color: #000!important;
+}
+
 /* Portrait tablets and small desktops */
 @media (min-width: 768px) and (max-width: 991px) {
 	body.wpo-wcpdf-setup form {

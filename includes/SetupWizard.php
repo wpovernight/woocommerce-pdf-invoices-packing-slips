@@ -259,7 +259,7 @@ class SetupWizard {
 	public function get_step_link( $step ) {
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step && empty( $step ) ) {
-			return admin_url('admin.php?page=wpo_wcpdf_options_page&tab=upgrade');
+			return admin_url('admin.php?page=wpo_wcpdf_options_page&tab=general');
 		}
 		return esc_url_raw( add_query_arg( 'step', $step ) );
 	}
