@@ -436,8 +436,8 @@ class Main {
 		// check the user privileges
 		$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
 
-		// multi-order only allowed with permissions
-		if ( ! $full_permission && 1 < count( $order_ids ) ) {
+		// multi-order only allowed with full permissions
+		if ( ! $full_permission && ( count( $order_ids ) > 1 || isset( $request['bulk'] ) ) ) {
 			$allowed = false;
 		}
 
@@ -467,6 +467,12 @@ class Main {
 				}
 				break;
 			case 'full':
+				// check if we have a valid access when it's from bulk actions
+				if ( isset( $request['bulk'] ) && ! $valid_nonce ) {
+					$allowed = false;
+					break;
+				}
+
 				// check if we have a valid access key only when it's not from bulk actions
 				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), $access_key ) ) {
 					$allowed = false;
