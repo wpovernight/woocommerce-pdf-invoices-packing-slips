@@ -224,7 +224,7 @@ function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
 
 function wcpdf_ubl_headers( $filename, $size ) {
 	$charset = apply_filters( 'wcpdf_ubl_headers_charset', 'UTF-8' );
-	
+
 	header( 'Content-Description: File Transfer' );
 	header( 'Content-Type: text/xml; charset=' . $charset );
 	header( 'Content-Disposition: attachment; filename=' . $filename );
@@ -234,7 +234,7 @@ function wcpdf_ubl_headers( $filename, $size ) {
 	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 	header( 'Pragma: public' );
 	header( 'Content-Length: ' . $size );
-	
+
 	do_action( 'wpo_after_ubl_headers', $filename, $size );
 }
 
@@ -262,8 +262,8 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		$error_message = "Invalid output format: {$output_format}. Expected one of: " . implode( ', ', $document->output_formats );
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
-	
-	if ( ! $document->is_enabled( $output_format ) ) {
+
+	if ( is_callable( array( $document, 'is_enabled' ) ) && ! $document->is_enabled( $output_format ) ) {
 		$error_message = "The {$output_format} output format is not enabled for this document: {$document->get_title()}.";
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
@@ -913,7 +913,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 		} else {
 			// Fallback to checking file readability by attempting to open it
 			$file_contents = $wp_filesystem->get_contents( $path );
-	
+
 			if ( $file_contents ) {
 				return true;
 			} else {
@@ -991,11 +991,11 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
 		'quantity' => __( 'Quantity', 'woocommerce-pdf-invoices-packing-slips' ),
 		'price'    => __( 'Price', 'woocommerce-pdf-invoices-packing-slips' ),
 	);
-	
+
 	if ( 'packing-slip' === $document->get_type() ) {
 		unset( $headers['price'] );
 	}
-	
+
 	return apply_filters( 'wpo_wcpdf_simple_template_default_table_headers', $headers, $document );
 }
 
@@ -1012,7 +1012,7 @@ function wpo_wcpdf_get_wp_filesystem() {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		WP_Filesystem();
 	}
-	
+
 	if ( ! $wp_filesystem ) {
 		$error = 'Failed to initialize WP_Filesystem.';
 		wcpdf_log_error( $error, 'critical' );
@@ -1033,7 +1033,7 @@ function wpo_wcpdf_escape_url_path_or_base64( string $url_path_or_base64 ): stri
 	if ( 0 === strpos( $url_path_or_base64, 'http' ) ) {
 		return esc_url( $url_path_or_base64 );
 	}
-	
+
 	// Check if it's a base64 string
 	if ( preg_match( '/^data:[a-zA-Z0-9\/\-\.\+]+;base64,/', $url_path_or_base64 ) ) {
 		return esc_attr( $url_path_or_base64 );
@@ -1053,12 +1053,12 @@ function wpo_wcpdf_escape_url_path_or_base64( string $url_path_or_base64 ): stri
 function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): string {
 	static $cache       = array();
 	static $logged      = array();
-	
+
 	$cache_key          = md5( $textdomain . '::' . $string );
 	$log_enabled        = ! empty( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = $string;
-	
+
 	// Return early if empty string
 	if ( '' === $string ) {
 		if ( $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
@@ -1067,28 +1067,28 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 		}
 		return $string;
 	}
-	
+
 	// Check cache
 	if ( isset( $cache[ $cache_key ] ) ) {
 		return $cache[ $cache_key ];
 	}
-	
+
 	// Attempt to get a translation from multilingual class
 	if ( class_exists( $multilingual_class ) && method_exists( $multilingual_class, 'maybe_get_string_translation' ) ) {
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
-	
+
 	// If not translated yet, allow custom filter & then fallback to standard WP gettext filters
 	if ( $translation === $string ) {
 		$translation = wpo_wcpdf_gettext( $string, $textdomain );
 	}
-	
+
 	// Log a warning if no translation is found and debug logging is enabled
 	if ( $translation === $string && $log_enabled && ! isset( $logged[ $cache_key ] ) ) {
 		wcpdf_log_error( "Missing translation for: {$string} in textdomain: {$textdomain}", 'warning' );
 		$logged[ $cache_key ] = true;
 	}
-	
+
 	// Store in cache and return
 	$cache[ $cache_key ] = $translation;
 	return $cache[ $cache_key ];
@@ -1103,7 +1103,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
  */
 function wpo_wcpdf_gettext( string $string, string $textdomain ): string {
 	$filtered = apply_filters( 'wpo_wcpdf_gettext', $string, $textdomain );
-		
+
 	if ( ! empty( $filtered ) && $filtered !== $string ) {
 		$translation = $filtered;
 	} else {
@@ -1111,7 +1111,7 @@ function wpo_wcpdf_gettext( string $string, string $textdomain ): string {
 		$translation = apply_filters( 'gettext', $string, $string, $textdomain );
 		$translation = apply_filters( "gettext_{$textdomain}", $translation, $string, $textdomain );
 	}
-	
+
 	return $translation;
 }
 
@@ -1124,12 +1124,12 @@ function wpo_wcpdf_gettext( string $string, string $textdomain ): string {
 function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
 	if ( 'shop_order_refund' === $order->get_type() ) {
 		$order = wc_get_order( $order->get_parent_id() );
-		
+
 		if ( ! $order ) {
 			return false;
 		}
 	}
-	
+
 	// Check if order is VAT exempt based on order meta
 	$vat_exempt_meta_key = apply_filters( 'wpo_wcpdf_order_vat_exempt_meta_key', 'is_vat_exempt', $order );
 	$is_vat_exempt       = apply_filters(  'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( $vat_exempt_meta_key ), $order );
@@ -1137,7 +1137,7 @@ function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
 	// Fallback to customer VAT exemption if order is not exempt
 	if ( ! $is_vat_exempt && apply_filters( 'wpo_wcpdf_order_vat_exempt_fallback_to_customer', true, $order ) ) {
 		$customer_id = $order->get_customer_id();
-		
+
 		if ( $customer_id ) {
 			$customer      = new \WC_Customer( $customer_id );
 			$is_vat_exempt = $customer->is_vat_exempt();
