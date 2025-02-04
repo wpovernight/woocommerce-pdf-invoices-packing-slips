@@ -87,13 +87,13 @@ class Endpoint {
 		}
 	}
 
-	public function get_document_link( $order, $document_type, $additional_vars = array(), bool $force_guest_access_key = false ) {
+	public function get_document_link( $order, $document_type, $additional_vars = array(), bool $bypass_login_access = false ) {
 		if ( empty( $order ) || empty( $document_type ) ) {
 			return '';
 		}
 
 		$access_type       = $this->get_document_link_access_type();
-		$is_user_logged_in = is_user_logged_in() && ! $force_guest_access_key;
+		$is_user_logged_in = is_user_logged_in() && ! $bypass_login_access;
 
 		switch ( $access_type ) {
 			case 'logged_in':

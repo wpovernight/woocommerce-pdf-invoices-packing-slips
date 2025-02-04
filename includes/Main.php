@@ -1781,22 +1781,6 @@ class Main {
 	}
 
 	/**
-	 * Get WC emails as array of id => title.
-	 *
-	 * @return array
-	 */
-	public function get_wc_emails(): array {
-		$emails    = WC()->mailer()->get_emails();
-		$wc_emails = array();
-
-		foreach ( $emails as $email ) {
-			$wc_emails[ $email->id ] = $email->get_title();
-		}
-
-		return $wc_emails;
-	}
-
-	/**
 	 * Add document download link to the email.
 	 *
 	 * @param \WC_Abstract_Order $order
@@ -1821,7 +1805,7 @@ class Main {
 
 		foreach ( $documents as $document ) {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
-			$selected_emails   = $document_settings['add_download_link_to_emails'] ?? array();
+			$selected_emails   = $document_settings['include_link_guest_emails'] ?? array();
 
 			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email->id, $selected_emails, true );
 
@@ -1844,12 +1828,12 @@ class Main {
 
 			$document_link = sprintf(
 				'<p><a id="%s" href="%s" target="_blank">%s</a></p>',
-				esc_attr( 'wpo_wcpdf_' . $document->get_type() . '_download_link' ),
+				esc_attr( 'wpo_wcpdf_' . $document->get_type() . '_document_link' ),
 				esc_url( $link_url ),
 				esc_html( $link_text )
 			);
 
-			echo apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_link', $document_link, $document, $order, $sent_to_admin, $plain_text, $email );
+			echo apply_filters( 'wpo_wcpdf_add_document_download_link_to_email', $document_link, $document, $order, $sent_to_admin, $plain_text, $email );
 		}
 	}
 

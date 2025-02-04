@@ -245,18 +245,23 @@ class Invoice extends OrderDocumentMethods {
 			),
 			array(
 				'type'     => 'setting',
-				'id'       => 'add_download_link_to_emails',
-				'title'    => __( 'Add download link to emails', 'woocommerce-pdf-invoices-packing-slips' ),
+				'id'       => 'include_link_guest_emails',
+				'title'    => __( 'Include document link in guest emails', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
 				'section'  => $this->type,
 				'args'     => array(
 					'option_name'      => $option_name,
-					'id'               => 'add_download_link_to_emails',
-					'options_callback' => array( WPO_WCPDF()->main, 'get_wc_emails' ),
+					'id'               => 'include_link_guest_emails',
+					'options_callback' => array( $this, 'get_wc_emails' ),
 					'multiple'         => true,
 					'enhanced_select'  => true,
 					'disabled'         => 'guest' !== WPO_WCPDF()->endpoint->get_document_link_access_type(),
-					'description'      => __( 'Select emails to include the document download link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'      => sprintf(
+						/* translators: 1. opening anchor tag, 2. closing anchor tag */
+						__( 'Select emails to include the document download link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected. %1$sCheck document link access type%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a target="_blank" href="' . admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=settings' ) . '">',
+						'</a>'
+					)
 				)
 			),
 			array(
@@ -684,7 +689,7 @@ class Invoice extends OrderDocumentMethods {
 					'members' => array(
 						'enabled',
 						'attach_to_email_ids',
-						'add_download_link_to_emails',
+						'include_link_guest_emails',
 						'disable_for_statuses',
 						'my_account_buttons',
 					),
