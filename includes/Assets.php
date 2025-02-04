@@ -165,7 +165,8 @@ class Assets {
 						'use_latest_settings',
 						'mark_printed',
 						'unmark_printed',
-						'include_encrypted_pdf'
+						'include_encrypted_pdf',
+						'include_link_guest_emails',
 					) ),
 					'pointers'                  => array(
 						'wcpdf_document_settings_sections' => array(
@@ -206,7 +207,7 @@ class Assets {
 				array( 'jquery' ),
 				WPO_WCPDF_VERSION
 			);
-			
+
 			// status/debug page scripts
 			if ( 'debug' === $tab ) {
 				wp_enqueue_style(
@@ -252,7 +253,7 @@ class Assets {
 				);
 
 			}
-			
+
 			// ubl taxes
 			if ( 'ubl' === $tab ) {
 				wp_enqueue_script(
@@ -262,7 +263,7 @@ class Assets {
 					WPO_WCPDF_VERSION,
 					true
 				);
-				
+
 				wp_localize_script(
 					'wpo-wcpdf-ubl',
 					'wpo_wcpdf_ubl',
