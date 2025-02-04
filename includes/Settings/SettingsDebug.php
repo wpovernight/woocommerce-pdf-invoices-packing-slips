@@ -124,7 +124,7 @@ class SettingsDebug {
 		}
 
 		$document_type = $this->get_document_type_from_store_table_name( sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) );
-		$list_table    = new Number_Store_List_Table();
+		$list_table    = new NumberStoreListTable();
 		$as_actions    = as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' );
 		$last_fetch    = get_option( "wpo_wcpdf_number_data::{$selected_table_name}::last_time" );
 
@@ -143,7 +143,7 @@ class SettingsDebug {
 		$tables = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'"
 		);
-		
+
 		$document_titles = WPO_WCPDF()->documents->get_document_titles();
 		$table_names     = array();
 
@@ -909,7 +909,7 @@ class SettingsDebug {
 					'id'          => 'log_missing_translations',
 					'description' => __( 'Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
-			),			
+			),
 			array(
 				'type'     => 'setting',
 				'id'       => 'disable_preview',
