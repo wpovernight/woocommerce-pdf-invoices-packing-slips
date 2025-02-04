@@ -139,7 +139,7 @@ class SettingsDebug {
 		$tables = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'"
 		);
-		
+
 		$document_titles = WPO_WCPDF()->documents->get_document_titles();
 		$table_names     = array();
 
@@ -905,7 +905,7 @@ class SettingsDebug {
 					'id'          => 'log_missing_translations',
 					'description' => __( 'Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
-			),			
+			),
 			array(
 				'type'     => 'setting',
 				'id'       => 'disable_preview',
@@ -959,7 +959,16 @@ class SettingsDebug {
 			</tr>
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php esc_html_e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+				<td>
+					<?php
+					$desc = sprintf(
+						__( 'Document can be accessed by logged in and guest users. You can choose emails to include document download link from %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a target="_blank" href="' . admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents#general' ) . '">',
+						'</a>'
+					);
+					echo wp_kses_post( $desc );
+					?>
+				</td>
 			</tr>
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>

@@ -244,27 +244,6 @@ class Invoice extends OrderDocumentMethods {
 				)
 			),
 			array(
-				'type'     => 'setting',
-				'id'       => 'include_link_guest_emails',
-				'title'    => __( 'Include document link in guest emails', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'select',
-				'section'  => $this->type,
-				'args'     => array(
-					'option_name'      => $option_name,
-					'id'               => 'include_link_guest_emails',
-					'options_callback' => array( $this, 'get_wc_emails' ),
-					'multiple'         => true,
-					'enhanced_select'  => true,
-					'disabled'         => 'guest' !== WPO_WCPDF()->endpoint->get_document_link_access_type(),
-					'description'      => sprintf(
-						/* translators: 1. opening anchor tag, 2. closing anchor tag */
-						__( 'Select emails to include the document download link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected. %1$sCheck document link access type%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a target="_blank" href="' . admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=settings' ) . '">',
-						'</a>'
-					)
-				)
-			),
-			array(
 				'type'			=> 'setting',
 				'id'			=> 'disable_for_statuses',
 				'title'			=> __( 'Disable for:', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -573,6 +552,30 @@ class Invoice extends OrderDocumentMethods {
 				)
 			),
 		);
+
+		if ( 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type() ) {
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'include_link_guest_emails',
+				'title'    => __( 'Include document link in guest emails', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name'      => $option_name,
+					'id'               => 'include_link_guest_emails',
+					'options_callback' => array( $this, 'get_wc_emails' ),
+					'multiple'         => true,
+					'enhanced_select'  => true,
+					'disabled'         => 'guest' !== WPO_WCPDF()->endpoint->get_document_link_access_type(),
+					'description'      => sprintf(
+					/* translators: 1. opening anchor tag, 2. closing anchor tag */
+						__( 'Select emails to include the document download link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected. %1$sCheck document link access type%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a target="_blank" href="' . admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=settings' ) . '">',
+						'</a>'
+					)
+				)
+			);
+		}
 
 		// remove/rename some fields when invoice number is controlled externally
 		if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) ) {
