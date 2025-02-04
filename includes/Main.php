@@ -221,7 +221,7 @@ class Main {
 		$reuse_attachment = apply_filters( 'wpo_wcpdf_reuse_document_attachment', true, $document );
 		$max_reuse_age    = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
 		$lock_acquired    = false;
-	
+
 		try {
 			// Check if the file can be reused
 			if ( $wp_filesystem->exists( $pdf_path ) && $reuse_attachment && $max_reuse_age > 0 ) {
@@ -230,18 +230,18 @@ class Main {
 					return $pdf_path;
 				}
 			}
-	
+
 			// Get PDF data and set up the Semaphore
 			$pdf_data  = $document->get_pdf();
 			$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
-	
+
 			// Attempt to acquire the lock if needed
 			if ( $lock_file ) {
 				$lock_acquired = $semaphore->lock();
 			}
-			
+
 			$write_file = ( $lock_file && $lock_acquired ) || ! $lock_file;
-			
+
 			// Write the file
 			if ( $write_file ) {
 				$file_written = $wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
@@ -249,7 +249,7 @@ class Main {
 			} else {
 				$semaphore->log( "PDF attachment not written to {$pdf_path} because the lock was not acquired", 'info' );
 			}
-	
+
 			// Log if the lock was not acquired
 			if ( $lock_file && ! $lock_acquired ) {
 				$semaphore->log( "Couldn't get the lock for the PDF attachment", 'critical' );
@@ -264,7 +264,7 @@ class Main {
 				$semaphore->log( 'Lock released for the PDF attachment.', 'info' );
 			}
 		}
-	
+
 		// Check if the file was written successfully
 		if ( ! $file_written ) {
 			$message = "Couldn't write the PDF attachment to {$pdf_path}";
@@ -272,7 +272,7 @@ class Main {
 			wcpdf_log_error( $message, 'critical' );
 			return false;
 		}
-	
+
 		return $pdf_path;
 	}
 
@@ -433,8 +433,8 @@ class Main {
 		// check the user privileges
 		$full_permission = WPO_WCPDF()->admin->user_can_manage_document( $document_type );
 
-		// multi-order only allowed with permissions
-		if ( ! $full_permission && 1 < count( $order_ids ) ) {
+		// multi-order only allowed with full permissions
+		if ( ! $full_permission && ( count( $order_ids ) > 1 || isset( $request['bulk'] ) ) ) {
 			$allowed = false;
 		}
 
@@ -464,6 +464,12 @@ class Main {
 				}
 				break;
 			case 'full':
+				// check if we have a valid access when it's from bulk actions
+				if ( isset( $request['bulk'] ) && ! $valid_nonce ) {
+					$allowed = false;
+					break;
+				}
+
 				// check if we have a valid access key only when it's not from bulk actions
 				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), $access_key ) ) {
 					$allowed = false;
@@ -1159,12 +1165,12 @@ class Main {
 		$success          = 0;
 		$error            = 0;
 		$output           = array();
-		
+
 		// Gather all files from the paths
 		foreach ( $paths_to_cleanup as $path ) {
 			if ( $wp_filesystem->is_dir( $path ) ) {
 				$listed_files = $wp_filesystem->dirlist( $path, true, true );
-				
+
 				if ( $listed_files ) {
 					foreach ( $listed_files as $fileinfo ) {
 						$file_path = trailingslashit( $path ) . $fileinfo['name'];
@@ -1178,13 +1184,13 @@ class Main {
 				}
 			}
 		}
-		
+
 		// No files to delete
 		if ( empty( $files ) ) {
 			$output['success'] = esc_html__( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' );
 			return $output;
 		}
-		
+
 		// Process and delete files
 		foreach ( $files as $file ) {
 			$file_timestamp = $wp_filesystem->mtime( $file );
@@ -1249,11 +1255,11 @@ class Main {
 		global $wpdb;
 		// remove order ID from number stores
 		$number_stores = apply_filters( "wpo_wcpdf_privacy_number_stores", array( 'invoice_number' ) );
-		
+
 		foreach ( $number_stores as $store_name ) {
 			$order_id   = $order->get_id();
 			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
-			
+
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 				$wpdb->prepare(
 					"UPDATE " . esc_sql( $table_name ) . " SET order_id = 0 WHERE order_id = %s",
