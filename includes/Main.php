@@ -88,7 +88,7 @@ class Main {
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 
 		// Add document download link to emails
-		add_action( 'woocommerce_email_order_details', array( $this, 'add_document_link_to_email' ), 10, 4 );
+		add_action( 'init', array( $this, 'handle_document_link_in_guest_email' ) );
 	}
 
 	/**
@@ -1777,6 +1777,26 @@ class Main {
 				<th>', esc_html( $due_date_title ), '</th>
 				<td>', esc_html( $due_date ), '</td>
 			</tr>';
+		}
+	}
+
+	function handle_document_link_in_guest_email( ): void {
+		$email_hooks = array();
+		$documents   = WPO_WCPDF()->documents->get_documents();
+
+		foreach ( $documents as $document ) {
+			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
+			$email_placement   = $document_settings['include_link_guest_emails_placement'] ?? '';
+
+			if ( ! empty( $email_placement ) ) {
+				$email_hooks[] = 'woocommerce_email_' . $email_placement;
+			}
+		}
+
+		$email_hooks = apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks );
+
+		foreach ( $email_hooks as $email_hook ) {
+			add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
 		}
 	}
 
