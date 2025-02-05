@@ -88,7 +88,7 @@ class Main {
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 
 		// Add document download link to emails
-		add_action( 'woocommerce_email_order_details', array( $this, 'add_document_download_link_to_email' ), 10, 4 );
+		add_action( 'woocommerce_email_order_details', array( $this, 'add_document_link_to_email' ), 10, 4 );
 	}
 
 	/**
@@ -1790,17 +1790,17 @@ class Main {
 	 *
 	 * @return void
 	 */
-	public function add_document_download_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, \WC_Email $email ): void {
+	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, \WC_Email $email ): void {
 		// Check if document access type is 'guest' and customer is a guest.
 		$is_guest_access_type = 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type();
 		$is_customer_guest    = 0 === $order->get_customer_id();
 
 		// Early exit if the requirements are not met
-		if ( ! apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_requirements_met', $is_guest_access_type && $is_customer_guest, $order, $sent_to_admin, $plain_text, $email ) ) {
+		if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_requirements_met', $is_guest_access_type && $is_customer_guest, $order, $sent_to_admin, $plain_text, $email ) ) {
 			return;
 		}
 
-		$allowed_document_types = apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_allowed_document_types', array( 'invoice' ), $order, $sent_to_admin, $plain_text, $email );
+		$allowed_document_types = apply_filters( 'wpo_wcpdf_add_document_link_to_email_allowed_document_types', array( 'invoice' ), $order, $sent_to_admin, $plain_text, $email );
 		$documents              = WPO_WCPDF()->documents->get_documents();
 
 		foreach ( $documents as $document ) {
@@ -1809,7 +1809,7 @@ class Main {
 
 			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email->id, $selected_emails, true );
 
-			if ( ! apply_filters( 'wpo_wcpdf_add_document_download_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
+			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
 				continue;
 			}
 
