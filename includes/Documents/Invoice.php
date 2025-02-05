@@ -566,14 +566,29 @@ class Invoice extends OrderDocumentMethods {
 					'options_callback' => array( $this, 'get_wc_emails' ),
 					'multiple'         => true,
 					'enhanced_select'  => true,
-					'disabled'         => 'guest' !== WPO_WCPDF()->endpoint->get_document_link_access_type(),
 					'description'      => sprintf(
-					/* translators: 1. opening anchor tag, 2. closing anchor tag */
-						__( 'Select emails to include the document download link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected. %1$sCheck document link access type%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						/* translators: 1. opening anchor tag, 2. closing anchor tag */
+						__( 'Select emails to include the document link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected. %1$sCheck document link access type%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a target="_blank" href="' . admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=settings' ) . '">',
 						'</a>'
 					)
-				)
+				),
+			);
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'include_link_guest_emails_placement',
+				'title'    => __( 'Placement of document link in guest emails', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'include_link_guest_emails_placement',
+					'options'     => apply_filters( 'wpo_wcpdf_document_link_guest_emails_template_hooks_options', array(
+						'order_details' => 'Order details',
+					), $this ),
+					'description' => __( 'Select the placement of the document link in the guest emails.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
 			);
 		}
 
@@ -693,6 +708,7 @@ class Invoice extends OrderDocumentMethods {
 						'enabled',
 						'attach_to_email_ids',
 						'include_link_guest_emails',
+						'include_link_guest_emails_placement',
 						'disable_for_statuses',
 						'my_account_buttons',
 					),

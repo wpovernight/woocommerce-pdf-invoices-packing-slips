@@ -962,7 +962,8 @@ class SettingsDebug {
 				<td>
 					<?php
 					$desc = sprintf(
-						__( 'Document can be accessed by logged in and guest users. You can choose emails to include document download link from %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						/* translators: 1. Open anchor tag, 2. Close anchor tag */
+						__( 'Document can be accessed by logged in and guest users. You can include document links to emails sent to guest customers from %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a target="_blank" href="' . admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents#general' ) . '">',
 						'</a>'
 					);
