@@ -959,17 +959,7 @@ class SettingsDebug {
 			</tr>
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td>
-					<?php
-					$desc = sprintf(
-						/* translators: 1. Open anchor tag, 2. Close anchor tag */
-						__( 'Document can be accessed by logged in and guest users. You can include document links to emails sent to guest customers from %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a target="_blank" href="' . admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents#general' ) . '">',
-						'</a>'
-					);
-					echo wp_kses_post( $desc );
-					?>
-				</td>
+				<td><?php esc_html_e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
