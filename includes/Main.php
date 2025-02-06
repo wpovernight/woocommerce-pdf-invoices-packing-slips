@@ -87,7 +87,7 @@ class Main {
 
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 
-		// Add document download link to emails
+		// Add document link to emails
 		add_action( 'init', array( $this, 'handle_document_link_in_guest_email' ) );
 	}
 
@@ -1844,7 +1844,7 @@ class Main {
 
 			$link_text = sprintf(
 				/* translators: %s: Document type */
-				__( 'Download %s (PDF)', 'woocommerce-pdf-invoices-packing-slips' ),
+				__( 'View %s (PDF)', 'woocommerce-pdf-invoices-packing-slips' ),
 				wp_kses_post( $document->get_type() )
 			);
 			$link_url  = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array(), true );
