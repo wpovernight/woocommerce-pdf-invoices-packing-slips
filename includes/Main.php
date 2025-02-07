@@ -1786,7 +1786,7 @@ class Main {
 
 		foreach ( $documents as $document ) {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
-			$email_placement   = $document_settings['include_link_emails_placement'] ?? '';
+			$email_placement   = $document_settings['include_email_link_placement'] ?? '';
 
 			if ( ! empty( $email_placement ) ) {
 				$email_hooks[] = 'woocommerce_email_' . $email_placement;
@@ -1825,7 +1825,7 @@ class Main {
 
 		foreach ( $documents as $document ) {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
-			$selected_emails   = $document_settings['include_link_emails'] ?? array();
+			$selected_emails   = $document_settings['include_email_link'] ?? array();
 
 			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email->id, $selected_emails, true );
 

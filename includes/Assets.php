@@ -166,8 +166,8 @@ class Assets {
 						'mark_printed',
 						'unmark_printed',
 						'include_encrypted_pdf',
-						'include_link_emails',
-						'include_link_emails_placement',
+						'include_email_link',
+						'include_email_link_placement',
 					) ),
 					'pointers'                  => array(
 						'wcpdf_document_settings_sections' => array(
