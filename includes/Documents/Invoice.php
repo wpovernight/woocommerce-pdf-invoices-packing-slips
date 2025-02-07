@@ -592,7 +592,7 @@ class Invoice extends OrderDocumentMethods {
 						'customer_address_section' => 'Customer address section',
 						'customer_details'         => 'Customer details',
 					), $this ),
-					'description' => __( 'Select the placement of the document link in the guest emails.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Select the placement of the document link in the guest customer emails.', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 			);
 		}

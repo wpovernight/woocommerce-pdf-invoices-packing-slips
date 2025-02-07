@@ -1780,7 +1780,7 @@ class Main {
 		}
 	}
 
-	function handle_document_link_in_emails( ): void {
+	function handle_document_link_in_emails(): void {
 		$email_hooks = array();
 		$documents   = WPO_WCPDF()->documents->get_documents();
 
@@ -1835,8 +1835,12 @@ class Main {
 
 			$document = wcpdf_get_document( $document->get_type(), $order );
 
+			if ( ! $document ) {
+				continue;
+			}
+
 			if (
-				( ! $document || ! $document->exists() ) &&
+				! $document->exists() &&
 				! apply_filters( 'wpo_wcpdf_add_document_link_to_email_allow_missing_documents', false, $document, $order, $sent_to_admin, $plain_text, $email )
 			) {
 				continue;
