@@ -139,7 +139,7 @@ class SettingsDebug {
 		$tables = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'"
 		);
-		
+
 		$document_titles = WPO_WCPDF()->documents->get_document_titles();
 		$table_names     = array();
 
@@ -905,7 +905,7 @@ class SettingsDebug {
 					'id'          => 'log_missing_translations',
 					'description' => __( 'Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
-			),			
+			),
 			array(
 				'type'     => 'setting',
 				'id'       => 'disable_preview',
