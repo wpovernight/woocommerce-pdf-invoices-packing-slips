@@ -556,13 +556,13 @@ class Invoice extends OrderDocumentMethods {
 		if ( 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type() ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
-				'id'       => 'include_link_guest_emails',
+				'id'       => 'include_link_emails',
 				'title'    => __( 'Include document link in emails', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
 				'section'  => $this->type,
 				'args'     => array(
 					'option_name'      => $option_name,
-					'id'               => 'include_link_guest_emails',
+					'id'               => 'include_link_emails',
 					'options_callback' => array( $this, 'get_wc_emails' ),
 					'multiple'         => true,
 					'enhanced_select'  => true,
@@ -577,13 +577,13 @@ class Invoice extends OrderDocumentMethods {
 
 			$settings_fields[] = array(
 				'type'     => 'setting',
-				'id'       => 'include_link_guest_emails_placement',
+				'id'       => 'include_link_emails_placement',
 				'title'    => __( 'Document link position in emails', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
 				'section'  => $this->type,
 				'args'     => array(
 					'option_name' => $option_name,
-					'id'          => 'include_link_guest_emails_placement',
+					'id'          => 'include_link_emails_placement',
 					'options'     => apply_filters( 'wpo_wcpdf_document_link_guest_emails_template_hooks_options', array(
 						'order_details'            => 'Order details',
 						'order_meta'               => 'Order meta',
@@ -712,8 +712,8 @@ class Invoice extends OrderDocumentMethods {
 					'members' => array(
 						'enabled',
 						'attach_to_email_ids',
-						'include_link_guest_emails',
-						'include_link_guest_emails_placement',
+						'include_link_emails',
+						'include_link_emails_placement',
 						'disable_for_statuses',
 						'my_account_buttons',
 					),

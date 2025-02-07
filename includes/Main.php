@@ -88,7 +88,7 @@ class Main {
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 
 		// Add document link to emails
-		add_action( 'init', array( $this, 'handle_document_link_in_guest_email' ) );
+		add_action( 'init', array( $this, 'handle_document_link_in_emails' ) );
 	}
 
 	/**
@@ -1780,13 +1780,13 @@ class Main {
 		}
 	}
 
-	function handle_document_link_in_guest_email( ): void {
+	function handle_document_link_in_emails( ): void {
 		$email_hooks = array();
 		$documents   = WPO_WCPDF()->documents->get_documents();
 
 		foreach ( $documents as $document ) {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
-			$email_placement   = $document_settings['include_link_guest_emails_placement'] ?? '';
+			$email_placement   = $document_settings['include_link_emails_placement'] ?? '';
 
 			if ( ! empty( $email_placement ) ) {
 				$email_hooks[] = 'woocommerce_email_' . $email_placement;
@@ -1825,7 +1825,7 @@ class Main {
 
 		foreach ( $documents as $document ) {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
-			$selected_emails   = $document_settings['include_link_guest_emails'] ?? array();
+			$selected_emails   = $document_settings['include_link_emails'] ?? array();
 
 			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email->id, $selected_emails, true );
 
