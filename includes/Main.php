@@ -1841,7 +1841,7 @@ class Main {
 
 			if (
 				! $document->exists() &&
-				! apply_filters( 'wpo_wcpdf_add_document_link_to_email_allow_missing_documents', false, $document, $order, $sent_to_admin, $plain_text, $email )
+				apply_filters( 'wpo_wcpdf_add_document_link_to_email_skip_missing_documents', false, $document, $order, $sent_to_admin, $plain_text, $email )
 			) {
 				continue;
 			}
