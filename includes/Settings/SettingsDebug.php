@@ -86,7 +86,9 @@ class SettingsDebug {
 	 * @return void
 	 */
 	public function display_status(): void {
-		$server_configs = $this->get_server_config();
+		$server_configs  = $this->get_server_config();
+		$premium_plugins = $this->get_premium_plugins();
+
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}
 
@@ -1174,6 +1176,41 @@ class SettingsDebug {
 		</div>
 
 		<?php
+	}
+
+	/**
+	 * Get the premium plugins data.
+	 *
+	 * @return array
+	 */
+	public function get_premium_plugins(): array {
+		$premium_plugins = apply_filters( 'wpo_wcpdf_premium_plugins', array(
+			'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php',
+			'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php',
+		) );
+
+		$plugins = array();
+
+		foreach ( $premium_plugins as $premium_plugin ) {
+			$installed_plugins = get_plugins();
+
+			// Check if the plugin is installed.
+			if ( ! isset( $installed_plugins[ $premium_plugin ] ) ) {
+				continue;
+			}
+
+			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $premium_plugin );
+
+			if ( ! empty( $plugin_data ) ) {
+				$plugins[] = array(
+					'name'      => $plugin_data['Name'],
+					'version'   => $plugin_data['Version'],
+					'is_active' => is_plugin_active( $premium_plugin ),
+				);
+			}
+		}
+
+		return apply_filters( 'wpo_wcpdf_premium_plugins_data', $plugins );
 	}
 
 	private function get_settings_sections(): array {

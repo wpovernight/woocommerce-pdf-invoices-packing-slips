@@ -5,6 +5,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
+	<caption><?php esc_html_e( 'Plugins Version', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
+	<thead>
+		<tr>
+			<th align="left"><?php esc_html_e( 'Plugin Name', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<th align="left"><?php esc_html_e( 'Version', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<th align="left"><?php esc_html_e( 'Status', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="title">PDF Invoices & Packing Slips for WooCommerce</td>
+			<td><?php esc_html_e( WPO_WCPDF()->version ); ?></td>
+			<td style="background-color:#68de7c; color:black;" ><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+		</tr>
+		<?php
+		if ( ! empty( $premium_plugins ) ) {
+			foreach ( $premium_plugins as $premium_plugin ) {
+				$style = $premium_plugin['is_active'] ? 'background-color:#68de7c; color:black;' : 'background-color:#ffabaf; color:black;';
+				$status = $premium_plugin['is_active'] ? esc_html__( 'Active', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Inactive', 'woocommerce-pdf-invoices-packing-slips' );
+				?>
+				<tr>
+					<td class="title"><?php echo esc_html( $premium_plugin['name'] ); ?></td>
+					<td><?php echo esc_html( $premium_plugin['version'] ); ?></td>
+					<td style="<?php echo esc_attr( $style ); ?>"><?php echo wp_kses_post( $status ); ?></td>
+				</tr>
+				<?php
+			}
+		}
+		?>
+	</tbody>
+</table>
+
+<table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
 	<thead>
 		<tr>
 			<td colspan="3"><strong><?php esc_html_e( 'System Configuration', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
