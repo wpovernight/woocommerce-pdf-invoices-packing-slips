@@ -1338,7 +1338,7 @@ abstract class OrderDocument {
 		return ob_get_clean();
 	}
 	public function footer() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_footer() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_footer() );
 	}
 
 	/**
@@ -1349,7 +1349,7 @@ abstract class OrderDocument {
 
 	}
 	public function extra_1() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_1() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_extra_1() );
 	}
 
 	/**
@@ -1359,7 +1359,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_2' );
 	}
 	public function extra_2() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_2() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_extra_2() );
 	}
 
 	/**
@@ -1369,7 +1369,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_3' );
 	}
 	public function extra_3() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_3() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_extra_3() );
 	}
 
 	/*
