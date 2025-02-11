@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 4.0.1-beta-1
+Stable tag: 4.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,16 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.0.1 (2025-02-11) =
+- New: Setting to include document link in emails for guest customers
+- Tweak: Enhanced the readme file to list available free extensions
+- Tweak: Use `wp_kses_post` instead of `wpo_wcpdf_sanitize_html_content` for footer and extras fields
+- Fix: Product bundle border bottom in PDF template styles
+- Fix: `OrderDocument::get_language_attributes()` return value must be of type `string`, `null` returned
+- Fix: Regression in PDF totals style
+- Fix: Check if `is_enabled()` is callable for the document in `wcpdf_get_document_file()`
+- Translations: Updated translation template (POT)
 
 = 4.0.0 (2025-02-04) =
 - New: Updated setup Wizard
