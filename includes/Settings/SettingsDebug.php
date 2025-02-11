@@ -1190,10 +1190,9 @@ class SettingsDebug {
 		) );
 
 		$plugins = array();
+		$installed_plugins = get_plugins();
 
 		foreach ( $premium_plugins as $premium_plugin ) {
-			$installed_plugins = get_plugins();
-
 			// Check if the plugin is installed.
 			if ( ! isset( $installed_plugins[ $premium_plugin ] ) ) {
 				continue;
