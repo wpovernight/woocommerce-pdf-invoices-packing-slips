@@ -107,7 +107,8 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 4.0.1 (2025-02-11) =
+= 4.0.1 (2025-02-12) =
+- New: Display Installed Plugin Versions table under Advanced Status
 - New: Setting to include document link in emails for guest customers
 - Tweak: Enhanced the readme file to list available free extensions
 - Tweak: Use `wp_kses_post` instead of `wpo_wcpdf_sanitize_html_content` for footer and extras fields
@@ -116,6 +117,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - Fix: Regression in PDF totals style
 - Fix: Check if `is_enabled()` is callable for the document in `wcpdf_get_document_file()`
 - Translations: Updated translation template (POT)
+- Tested: Tested up to WooCommerce 9.7
 
 = 4.0.0 (2025-02-04) =
 - New: Updated setup Wizard
