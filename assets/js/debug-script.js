@@ -108,7 +108,7 @@ jQuery( function( $ ) {
 	} );
 
 	// datepicker
-	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
+	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to, #fetch-numbers-data-date-from, #fetch-numbers-data-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
 	// danger zone tools
 	$( document.body ).on( 'click', '#debug-tools .number-tools-btn', function( event ) {
@@ -218,5 +218,62 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
-
+	
+	// fetch/delete number table data
+	$( '#wpo-wcpdf-settings' ).on( 'click', '#fetch-numbers-data, #delete-numbers-data', function( e ) {
+		e.preventDefault();
+		
+		let $button    = $( this );
+		let table_name = $button.data( 'table_name' );
+		let operation  = $button.data( 'operation' );
+		let from       = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-from' ).val();
+		let to         = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-to' ).val();
+		let order      = get_number_table_url_query_string( 'order' );
+		let orderby    = get_number_table_url_query_string( 'orderby' );
+		
+		// block ui
+		$button.closest( '.wcpdf_advanced_numbers_choose_table' ).block( {
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6
+			}
+		} );
+		
+		$.ajax( {
+			url: wpo_wcpdf_debug.ajaxurl,
+			data: {
+				action:     'wpo_wcpdf_numbers_data',
+				nonce:      wpo_wcpdf_debug.nonce,
+				table_name: table_name,
+				operation:  operation,
+				order:      order,
+				orderby:    orderby,
+				from:       from,
+				to:         to,
+			},
+			type: 'POST',
+			success: function( response ) {
+				if ( response.success ) {
+					window.location.replace( response.data );
+				} else {
+					location.reload();
+				}
+			},
+			error: function( xhr, ajaxOptions, thrownError ) {
+				alert( xhr.status + ':'+ thrownError );
+				
+				$button.closest( '.wcpdf_advanced_numbers_choose_table' ).unblock();
+			}
+		} );
+		
+	} );
+	
+	function get_number_table_url_query_string( key ) {
+		let url_string = window.location.href;
+		let url        = new URL( url_string );
+		
+		return url.searchParams.get( key );
+	}
+	
 } );
