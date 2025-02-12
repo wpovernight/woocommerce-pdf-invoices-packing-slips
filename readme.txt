@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 4.0.1
+Stable tag: 4.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,7 +107,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 4.0.1 (2025-02-12) =
+= 4.1.0 (2025-02-12) =
 - New: Display Installed Plugin Versions table under Advanced Status
 - New: Setting to include document link in emails for guest customers
 - Tweak: Enhanced the readme file to list available free extensions
