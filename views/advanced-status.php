@@ -2,11 +2,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-
-$green_color_code  = '#68de7c';
-$red_color_code    = '#ffabaf';
-$yellow_color_code = '#f2d675';
-
 ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
@@ -22,18 +17,18 @@ $yellow_color_code = '#f2d675';
 		<tr>
 			<td class="title">PDF Invoices & Packing Slips for WooCommerce</td>
 			<td><?php esc_html_e( WPO_WCPDF()->version ); ?></td>
-			<td style="background-color:<?php echo esc_attr( $green_color_code ); ?>; color:black;" ><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			<td class="valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 		</tr>
 		<?php
 		if ( ! empty( $premium_plugins ) ) {
 			foreach ( $premium_plugins as $premium_plugin ) {
-				$style = $premium_plugin['is_active'] ? "background-color:{$green_color_code}; color:black;" : "background-color:{$red_color_code}; color:black;";
+				$class = $premium_plugin['is_active'] ? 'valid-status' : 'invalid-status';
 				$status = $premium_plugin['is_active'] ? esc_html__( 'Active', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Inactive', 'woocommerce-pdf-invoices-packing-slips' );
 				?>
 				<tr>
 					<td class="title"><?php echo esc_html( $premium_plugin['name'] ); ?></td>
 					<td><?php echo esc_html( $premium_plugin['version'] ); ?></td>
-					<td style="<?php echo esc_attr( $style ); ?>"><?php echo wp_kses_post( $status ); ?></td>
+					<td class="<?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $status ); ?></td>
 				</tr>
 				<?php
 			}
@@ -55,20 +50,18 @@ $yellow_color_code = '#f2d675';
 		<?php
 			$server_configs = apply_filters( 'wpo_wcpdf_advanced_status_server_configs', $server_configs );
 			foreach ( $server_configs as $label => $server_config ) :
-				$color = 'black';
-
 				if ( $server_config['result'] ) {
-					$background = $green_color_code;
+					$class = 'valid-status';
 				} elseif ( isset( $server_config['fallback'] ) ) {
-					$background = $yellow_color_code;
+					$class = 'warning-status';
 				} else {
-					$background = $red_color_code;
+					$class = 'invalid-status';
 				}
 				?>
 				<tr>
 					<td class="title"><?php echo esc_html( $label ); ?></td>
 					<td><?php echo wp_kses_post( $server_config['required'] === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : $server_config['required'] ); ?></td>
-					<td style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
+					<td class="<?php echo esc_attr( $class ); ?>">
 						<?php
 						if ( ! empty( $server_config['value'] ) ) {
 							echo wp_kses_post( $server_config['value'] );
@@ -106,30 +99,29 @@ $yellow_color_code = '#f2d675';
 	<tbody>
 		<?php
 			foreach ( WPO_WCPDF()->documents->get_documents( 'all' ) as $document ) :
-				$is_reset_enabled = isset( $document->settings['reset_number_yearly'] ) ? true : false;
-				$is_enabled       = $document->is_enabled() ? true : false;
-		?>
+				$is_enabled       = (bool) $document->is_enabled();
+				$is_enabled_class = $is_enabled ? 'valid-status' : 'invalid-status';
+				$is_enabled_text  = $is_enabled ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' );
+
+				$is_reset_enabled       = isset( $document->settings['reset_number_yearly'] );
+				$is_reset_enabled_class = $is_reset_enabled ? 'valid-status' : 'invalid-status';
+				$is_reset_enabled_text  = $is_reset_enabled ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' );
+				?>
 		<tr>
 			<td class="title"><?php echo esc_html( $document->get_title() ); ?></td>
-			<td style="<?php echo $is_enabled ? "background-color:{$green_color_code}; color:black;" : "background-color:{$red_color_code}; color:black;" ?>"><?php echo wp_kses_post( $is_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
-			<td style="<?php echo $is_reset_enabled ? "background-color:{$green_color_code}; color:black;" : "background-color:{$red_color_code}; color:black;" ?>"><?php echo wp_kses_post( $is_reset_enabled === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></td>
+			<td class="<?php echo esc_attr( $is_enabled_class ); ?>"><?php echo wp_kses_post( $is_enabled_text ); ?></td>
+			<td class="<?php echo esc_attr( $is_reset_enabled_class ); ?>"><?php echo wp_kses_post( $is_reset_enabled_text ); ?></td>
 		</tr>
 		<?php endforeach; ?>
 	</tbody>
 	<?php
 		if ( ! empty( $yearly_reset_schedule ) ) :
-			$color = 'black';
-
-			if ( $yearly_reset_schedule['result'] ) {
-				$background = $green_color_code;
-			} else {
-				$background = $red_color_code;
-			}
+			$class = $yearly_reset_schedule['result'] ? 'valid-status' : 'invalid-status';
 		?>
 		<tfoot>
 			<tr>
 				<td class="title"><strong><?php echo esc_html( __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></strong></td>
-				<td colspan="2" style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>">
+				<td colspan="2" class="<?php echo esc_attr( $class ); ?>">
 					<?php
 						echo wp_kses_post( $yearly_reset_schedule['value'] );
 						if ( $yearly_reset_schedule['result'] && ! $yearly_reset_schedule['value'] ) {
@@ -153,18 +145,12 @@ $yellow_color_code = '#f2d675';
 	<tbody>
 		<?php
 			foreach ( $write_permissions as $write_permission ) {
-				$color = 'black';
-
-				if ( $write_permission['status'] === 'ok' ) {
-					$background = $green_color_code;
-				} else {
-					$background = $red_color_code;
-				}
+				$class = $write_permission['status'] === 'ok' ? 'valid-status' : 'invalid-status';
 				?>
 		<tr>
 			<td><?php echo wp_kses_post( $write_permission['description'] ); ?></td>
 			<td><?php echo ! empty( $write_permission['value'] ) ? wp_kses_post( str_replace( array( '/', '\\' ), array( '/<wbr>', '\\<wbr>' ), $write_permission['value'] ) ) : ''; ?></td>
-			<td style="background-color:<?php echo esc_attr( $background ); ?>; color:<?php echo esc_attr( $color ); ?>"><?php echo wp_kses_post( $write_permission['status_message'] ); ?></td>
+			<td class="<?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $write_permission['status_message'] ); ?></td>
 		</tr>
 		<?php } ?>
 	</tbody>
