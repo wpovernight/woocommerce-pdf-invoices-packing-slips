@@ -88,7 +88,7 @@ class SettingsDebug {
 	public function display_status(): void {
 		$server_configs        = $this->get_server_config();
 		$premium_plugins       = $this->get_premium_plugins();
-		$write_permissions     = $this->get_write_permissions();
+		$directory_permissions = $this->get_directory_permissions();
 		$yearly_reset_schedule = $this->get_yearly_reset_schedule();
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
@@ -1219,7 +1219,7 @@ class SettingsDebug {
 	 *
 	 * @return array
 	 */
-	public function get_write_permissions(): array {
+	public function get_directory_permissions(): array {
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
 
 		$status = array(

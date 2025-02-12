@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
-	<caption><?php esc_html_e( 'Plugins Version', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
+	<caption><?php esc_html_e( 'Installed Plugin Versions', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
 	<thead>
 		<tr>
 			<th align="left"><?php esc_html_e( 'Plugin Name', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
@@ -88,7 +88,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php do_action( 'wpo_wcpdf_after_system_status_table' ); ?>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
-	<caption><?php esc_html_e( 'Documents Status', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
+	<caption><?php esc_html_e( 'Documents\' Status', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
 	<thead>
 		<tr>
 			<th align="left"><?php esc_html_e( 'Document', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
@@ -120,7 +120,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 		<tfoot>
 			<tr>
-				<td class="title"><strong><?php echo esc_html( __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></strong></td>
+				<td class="title"><strong><?php esc_html_e( __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></strong></td>
 				<td colspan="2" class="<?php echo esc_attr( $class ); ?>">
 					<?php
 						echo wp_kses_post( $yearly_reset_schedule['value'] );
@@ -134,7 +134,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php endif; ?>
 </table>
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
-	<caption><?php esc_html_e( 'Write Permissions', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
+	<caption><?php esc_html_e( 'Directory Permissions', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
 	<thead>
 		<tr>
 			<th align="left"><?php esc_html_e( 'Directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
@@ -144,13 +144,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</thead>
 	<tbody>
 		<?php
-			foreach ( $write_permissions as $write_permission ) {
-				$class = $write_permission['status'] === 'ok' ? 'valid-status' : 'invalid-status';
+			foreach ( $directory_permissions as $directory_permission ) {
+				$class = $directory_permission['status'] === 'ok' ? 'valid-status' : 'invalid-status';
 				?>
 		<tr>
-			<td><?php echo wp_kses_post( $write_permission['description'] ); ?></td>
-			<td><?php echo ! empty( $write_permission['value'] ) ? wp_kses_post( str_replace( array( '/', '\\' ), array( '/<wbr>', '\\<wbr>' ), $write_permission['value'] ) ) : ''; ?></td>
-			<td class="<?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $write_permission['status_message'] ); ?></td>
+			<td><?php echo wp_kses_post( $directory_permission['description'] ); ?></td>
+			<td><?php echo ! empty( $directory_permission['value'] ) ? wp_kses_post( str_replace( array( '/', '\\' ), array( '/<wbr>', '\\<wbr>' ), $directory_permission['value'] ) ) : ''; ?></td>
+			<td class="<?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $directory_permission['status_message'] ); ?></td>
 		</tr>
 		<?php } ?>
 	</tbody>
