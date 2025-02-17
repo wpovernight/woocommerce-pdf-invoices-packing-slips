@@ -38,7 +38,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 </table>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
-	<caption><?php esc_html_e( 'System Configuration', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
+	<caption>
+		<?php esc_html_e( 'System Configuration', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+		<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/server-requirements/" target="_blank" rel="noopener">
+			<span class="dashicons dashicons-external"></span>
+		</a>
+	</caption>
 	<thead>
 		<tr>
 			<th align="left"><?php esc_html_e( 'Configuration', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>

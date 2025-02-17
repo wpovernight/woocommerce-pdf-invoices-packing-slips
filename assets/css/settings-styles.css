@@ -522,6 +522,11 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	text-align: left;
 }
 
+#wpo-wcpdf-settings.status caption > a {
+	margin-left: 6px;
+	text-decoration: none;
+}
+
 #wpo-wcpdf-settings .system-status-table > tbody > tr:nth-of-type(even) {
 	background-color: rgb(245 245 245);
 }
