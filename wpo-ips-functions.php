@@ -1006,14 +1006,21 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
  * @throws RuntimeException
  */
 function wpo_wcpdf_get_wp_filesystem() {
-	global $wp_filesystem;
+	require_once ABSPATH . 'wp-admin/includes/file.php';
 
-	if ( empty( $wp_filesystem ) ) {
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		WP_Filesystem();
+	if ( function_exists( 'get_filesystem_method' ) ) {
+		$filesystem_method = get_filesystem_method();
+
+		if ( 'direct' !== $filesystem_method ) {
+			$error = 'This plugin only supports the direct filesystem method.';
+			wcpdf_log_error( $error, 'critical' );
+			throw new \RuntimeException( esc_html( $error ) );
+		}
 	}
 
-	if ( ! $wp_filesystem ) {
+	global $wp_filesystem;
+
+	if ( ! WP_Filesystem() || ! $wp_filesystem ) {
 		$error = 'Failed to initialize WP_Filesystem.';
 		wcpdf_log_error( $error, 'critical' );
 		throw new \RuntimeException( esc_html( $error ) );
