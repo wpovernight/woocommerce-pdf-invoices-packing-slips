@@ -27,10 +27,10 @@ This WooCommerce extension automatically adds a PDF or UBL invoice to the order 
 = Free extensions =
 The following free extensions are available to add additional features to the plugin:
 
-- **[PDF Invoices & Packing Slips for WooCommerce - mPDF](https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips-mpdf)**: Adds support for RTL layout and Arabic script.
-- **[PDF Invoices & Packing Slips for WooCommerce - mPDF CJK](https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips-mpdf-cjk)**: Provides support for Chinese, Japanese, and Korean (CJK) fonts for the mPDF extension.
-- **[PDF Invoices & Packing Slips for WooCommerce - Unicode Language Pack](https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips-unicode-language-pack)**: Adds support for Chinese, Japanese, and Korean scripts.
-- **[PDF Invoices & Packing Slips for WooCommerce - Taxes Summary](https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips-taxes-summary)**: Adds a taxes summary table after the order details.
+- **[PDF Invoices & Packing Slips for WooCommerce - mPDF](https://github.com/wpovernight/woocommerce-pdf-ips-mpdf)**: Adds support for RTL layout and Arabic script.
+- **[PDF Invoices & Packing Slips for WooCommerce - mPDF CJK](https://github.com/wpovernight/woocommerce-pdf-ips-mpdf-cjk)**: Provides support for Chinese, Japanese, and Korean (CJK) fonts for the mPDF extension.
+- **[PDF Invoices & Packing Slips for WooCommerce - Unicode Language Pack](https://github.com/wpovernight/woocommerce-pdf-ips-unicode)**: Adds support for Chinese, Japanese, and Korean scripts.
+- **[PDF Invoices & Packing Slips for WooCommerce - Taxes Summary](https://github.com/wpovernight/wcpdf-taxes-summary)**: Adds a taxes summary table after the order details.
 
 = Premium extensions =
 In addition to this, we offer several premium extensions:
