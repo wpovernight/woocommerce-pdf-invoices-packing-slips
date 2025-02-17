@@ -979,19 +979,20 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_server_config(): array {
-		$memory_limit  = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
-		$php_mem_limit = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
-		$gmagick       = extension_loaded( 'gmagick' );
-		$imagick       = extension_loaded( 'imagick' );
-		$xc            = extension_loaded( 'xcache' );
-		$apc           = extension_loaded( 'apc' );
-		$zop           = extension_loaded( 'Zend OPcache' );
-		$op            = extension_loaded( 'opcache' );
-		$dom           = extension_loaded( 'DOM' );
-		$mbstring      = extension_loaded( 'mbstring' );
-		$gd            = extension_loaded( 'gd' );
-		$zlib          = extension_loaded( 'zlib' );
-		$fileinfo      = extension_loaded( 'fileinfo' );
+		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
+		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
+		$filesystem_method = function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : 'direct';
+		$gmagick           = extension_loaded( 'gmagick' );
+		$imagick           = extension_loaded( 'imagick' );
+		$xc                = extension_loaded( 'xcache' );
+		$apc               = extension_loaded( 'apc' );
+		$zop               = extension_loaded( 'Zend OPcache' );
+		$op                = extension_loaded( 'opcache' );
+		$dom               = extension_loaded( 'DOM' );
+		$mbstring          = extension_loaded( 'mbstring' );
+		$gd                = extension_loaded( 'gd' );
+		$zlib              = extension_loaded( 'zlib' );
+		$fileinfo          = extension_loaded( 'fileinfo' );
 
 		$server_configs = array(
 			'PHP version' => array(
@@ -1056,6 +1057,12 @@ class SettingsDebug {
 					),
 				'value'    => sprintf( 'WordPress: %s, PHP: %s', WP_MEMORY_LIMIT, $php_mem_limit ),
 				'result'   => $memory_limit > 67108864,
+			),
+			'WP Filesystem Method' => array(
+				'required' => __( 'Required to save documents to the server', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => $filesystem_method,
+				'result'   => 'direct' === $filesystem_method,
+				'fallback' => __( 'Check your server configuration', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'allow_url_fopen' => array (
 				'required' => __( 'Allow remote stylesheets and images', 'woocommerce-pdf-invoices-packing-slips' ),
