@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 4.1.1-rc.1
+Stable tag: 4.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.1.1 (2025-02-17) =
+- Tweak: Added a documentation link to the System Configuration label
+- Tweak: Improved WP Filesystem implementation
+- Fix: Cleans up special characters in `get_html()` for Bulk Document
+- Fix: Fixed line breaks not being respected in Document notes
 
 = 4.1.0 (2025-02-12) =
 - New: Display Installed Plugin Versions table under Advanced Status

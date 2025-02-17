@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.1.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-02-12T11:24:58+00:00\n"
+"POT-Creation-Date: 2025-02-17T11:52:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -55,7 +55,7 @@ msgstr ""
 
 #: includes/Admin.php:131
 #: includes/Main.php:871
-#: includes/Settings/SettingsDebug.php:1177
+#: includes/Settings/SettingsDebug.php:1184
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:135
 #: views/promo.php:34
@@ -277,7 +277,7 @@ msgstr ""
 
 #: includes/Assets.php:116
 #: includes/Settings.php:109
-#: includes/Settings/SettingsDebug.php:1324
+#: includes/Settings/SettingsDebug.php:1331
 msgid "Settings"
 msgstr ""
 
@@ -396,10 +396,10 @@ msgstr ""
 #: includes/Documents/Invoice.php:323
 #: includes/Documents/Invoice.php:355
 #: includes/Documents/PackingSlip.php:134
-#: views/advanced-status.php:74
-#: views/advanced-status.php:78
-#: views/advanced-status.php:104
-#: views/advanced-status.php:108
+#: views/advanced-status.php:79
+#: views/advanced-status.php:83
+#: views/advanced-status.php:109
+#: views/advanced-status.php:113
 #: views/setup-wizard/display-options.php:20
 #: views/setup-wizard/display-options.php:61
 #: views/setup-wizard/display-options.php:82
@@ -1355,152 +1355,160 @@ msgstr ""
 msgid "Document can be accessed by everyone with the link."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:998
+#: includes/Settings/SettingsDebug.php:999
 msgid "7.4 or superior"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1011
+#: includes/Settings/SettingsDebug.php:1012
 msgid "Recommended, will use fallback functions"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1017
+#: includes/Settings/SettingsDebug.php:1018
 msgid "Required if you have images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1020
+#: includes/Settings/SettingsDebug.php:1021
 msgid "Required when using .webp images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1023
+#: includes/Settings/SettingsDebug.php:1024
 msgid "Required if you have .webp images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1026
+#: includes/Settings/SettingsDebug.php:1027
 msgid "To compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1029
+#: includes/Settings/SettingsDebug.php:1030
 msgid "Recommended to compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1032
+#: includes/Settings/SettingsDebug.php:1033
 msgid "For better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1035
-#: includes/Settings/SettingsDebug.php:1041
+#: includes/Settings/SettingsDebug.php:1036
+#: includes/Settings/SettingsDebug.php:1042
 msgid "Recommended for better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1038
+#: includes/Settings/SettingsDebug.php:1039
 msgid "Better with transparent PNG images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1044
+#: includes/Settings/SettingsDebug.php:1045
 msgid "Required to detect custom templates and to clear the temp folder periodically"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1047
+#: includes/Settings/SettingsDebug.php:1048
 msgid "Check PHP disable_functions"
 msgstr ""
 
 #. translators: <a> tags
-#: includes/Settings/SettingsDebug.php:1051
+#: includes/Settings/SettingsDebug.php:1052
 msgid "Recommended: 128MB (especially for plugin-heavy setups)"
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: includes/Settings/SettingsDebug.php:1053
+#: includes/Settings/SettingsDebug.php:1054
 msgid "See: %1$sIncreasing the WordPress Memory Limit%2$s"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1061
+#: includes/Settings/SettingsDebug.php:1062
+msgid "Required to save documents to the server"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1065
+msgid "Check your server configuration"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1068
 msgid "Allow remote stylesheets and images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1064
+#: includes/Settings/SettingsDebug.php:1071
 msgid "allow_url_fopen disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1067
+#: includes/Settings/SettingsDebug.php:1074
 msgid "Necessary to verify the MIME type of local images."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1070
+#: includes/Settings/SettingsDebug.php:1077
 msgid "fileinfo disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1073
+#: includes/Settings/SettingsDebug.php:1080
 msgid "To compress and decompress font and image data"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1076
+#: includes/Settings/SettingsDebug.php:1083
 msgid "base64_decode disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1084
+#: includes/Settings/SettingsDebug.php:1091
 msgid "Required for IMagick"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1087
+#: includes/Settings/SettingsDebug.php:1094
 msgid "ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
-#: includes/Settings/SettingsDebug.php:1167
+#: includes/Settings/SettingsDebug.php:1174
 msgid "Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1226
+#: includes/Settings/SettingsDebug.php:1233
 msgid "Writable"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1227
+#: includes/Settings/SettingsDebug.php:1234
 msgid "Not writable"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1232
+#: includes/Settings/SettingsDebug.php:1239
 msgid "Central temporary plugin folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1238
+#: includes/Settings/SettingsDebug.php:1245
 msgid "Temporary attachments folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1244
+#: includes/Settings/SettingsDebug.php:1251
 msgid "Temporary DOMPDF folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1250
+#: includes/Settings/SettingsDebug.php:1257
 msgid "DOMPDF fonts folder (needs to be writable for custom/remote fonts)"
 msgstr ""
 
 #. translators: %s action date
-#: includes/Settings/SettingsDebug.php:1287
+#: includes/Settings/SettingsDebug.php:1294
 msgid "Scheduled to: %s"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/Settings/SettingsDebug.php:1296
+#: includes/Settings/SettingsDebug.php:1303
 msgid "Only 1 scheduled action should exist, but %s were found"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag
-#: includes/Settings/SettingsDebug.php:1306
+#: includes/Settings/SettingsDebug.php:1313
 msgid "Scheduled action not found. Please reschedule it %1$shere%2$s."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1325
+#: includes/Settings/SettingsDebug.php:1332
 #: views/advanced-status.php:13
-#: views/advanced-status.php:142
+#: views/advanced-status.php:147
 msgid "Status"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1326
+#: includes/Settings/SettingsDebug.php:1333
 msgid "Tools"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1327
+#: includes/Settings/SettingsDebug.php:1334
 msgid "Numbers"
 msgstr ""
 
@@ -2627,66 +2635,66 @@ msgstr ""
 msgid "Inactive"
 msgstr ""
 
-#: views/advanced-status.php:41
+#: views/advanced-status.php:42
 msgid "System Configuration"
 msgstr ""
 
-#: views/advanced-status.php:44
+#: views/advanced-status.php:49
 msgid "Configuration"
 msgstr ""
 
-#: views/advanced-status.php:45
+#: views/advanced-status.php:50
 msgid "Required"
 msgstr ""
 
-#: views/advanced-status.php:46
+#: views/advanced-status.php:51
 msgid "Present"
 msgstr ""
 
-#: views/advanced-status.php:63
-#: views/advanced-status.php:70
-#: views/advanced-status.php:104
-#: views/advanced-status.php:108
-#: views/advanced-status.php:128
+#: views/advanced-status.php:68
+#: views/advanced-status.php:75
+#: views/advanced-status.php:109
+#: views/advanced-status.php:113
+#: views/advanced-status.php:133
 msgid "Yes"
 msgstr ""
 
-#: views/advanced-status.php:91
+#: views/advanced-status.php:96
 msgid "Documents' Status"
 msgstr ""
 
-#: views/advanced-status.php:94
+#: views/advanced-status.php:99
 msgid "Document"
 msgstr ""
 
-#: views/advanced-status.php:95
+#: views/advanced-status.php:100
 msgid "Enabled"
 msgstr ""
 
-#: views/advanced-status.php:96
-#: views/advanced-status.php:123
+#: views/advanced-status.php:101
+#: views/advanced-status.php:128
 msgid "Yearly reset"
 msgstr ""
 
-#: views/advanced-status.php:137
+#: views/advanced-status.php:142
 msgid "Directory Permissions"
 msgstr ""
 
-#: views/advanced-status.php:140
+#: views/advanced-status.php:145
 msgid "Directory"
 msgstr ""
 
-#: views/advanced-status.php:141
+#: views/advanced-status.php:146
 msgid "Path"
 msgstr ""
 
 #. translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts
-#: views/advanced-status.php:163
+#: views/advanced-status.php:168
 msgid "The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable)."
 msgstr ""
 
 #. translators: directory path
-#: views/advanced-status.php:180
+#: views/advanced-status.php:185
 msgid "If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!"
 msgstr ""
 
