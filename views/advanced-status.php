@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tr>
 			<td class="title">PDF Invoices & Packing Slips for WooCommerce</td>
 			<td><?php esc_html_e( WPO_WCPDF()->version ); ?></td>
-			<td class="valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+			<td class="status-cell valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 		</tr>
 		<?php
 		if ( ! empty( $premium_plugins ) ) {
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<tr>
 					<td class="title"><?php echo esc_html( $premium_plugin['name'] ); ?></td>
 					<td><?php echo esc_html( $premium_plugin['version'] ); ?></td>
-					<td class="<?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $status ); ?></td>
+					<td class="status-cell <?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $status ); ?></td>
 				</tr>
 				<?php
 			}
@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<tr>
 					<td class="title"><?php echo esc_html( $label ); ?></td>
 					<td><?php echo wp_kses_post( $server_config['required'] === true ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : $server_config['required'] ); ?></td>
-					<td class="<?php echo esc_attr( $class ); ?>">
+					<td class="status-cell <?php echo esc_attr( $class ); ?>">
 						<?php
 						if ( ! empty( $server_config['value'] ) ) {
 							echo wp_kses_post( $server_config['value'] );
@@ -108,14 +108,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$is_enabled_class = $is_enabled ? 'valid-status' : 'invalid-status';
 				$is_enabled_text  = $is_enabled ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' );
 
-				$is_reset_enabled       = isset( $document->settings['reset_number_yearly'] );
-				$is_reset_enabled_class = $is_reset_enabled ? 'valid-status' : 'invalid-status';
-				$is_reset_enabled_text  = $is_reset_enabled ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' );
+				$is_pro_installed_and_active = false;
+
+				if ( ! empty( $premium_plugins ) ) {
+					foreach ( $premium_plugins as $slug => $premium_plugin ) {
+						if ( 'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php' === $slug && $premium_plugin['is_active'] ) {
+							$is_pro_installed_and_active = true;
+							break;
+						}
+					}
+				}
+
+				// Only invoice has a sequential number on the core plugin.
+				if ( ! $is_pro_installed_and_active && 'packing-slip' === $document->get_type() ) {
+					$is_yearly_reset_enabled_class = 'inactive-status';
+					$is_yearly_reset_enabled_text  = '-';
+				} else {
+					$is_yearly_reset_enabled       = isset( $document->settings['reset_number_yearly'] );
+					$is_yearly_reset_enabled_class = $is_yearly_reset_enabled ? 'valid-status' : 'invalid-status';
+					$is_yearly_reset_enabled_text  = $is_yearly_reset_enabled ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' );
+				}
 				?>
 		<tr>
 			<td class="title"><?php echo esc_html( $document->get_title() ); ?></td>
-			<td class="<?php echo esc_attr( $is_enabled_class ); ?>"><?php echo wp_kses_post( $is_enabled_text ); ?></td>
-			<td class="<?php echo esc_attr( $is_reset_enabled_class ); ?>"><?php echo wp_kses_post( $is_reset_enabled_text ); ?></td>
+			<td class="status-cell <?php echo esc_attr( $is_enabled_class ); ?>"><?php echo wp_kses_post( $is_enabled_text ); ?></td>
+			<td class="status-cell <?php echo esc_attr( $is_yearly_reset_enabled_class ); ?>"><?php echo wp_kses_post( $is_yearly_reset_enabled_text ); ?></td>
 		</tr>
 		<?php endforeach; ?>
 	</tbody>
@@ -126,7 +143,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tfoot>
 			<tr>
 				<td class="title"><strong><?php esc_html_e( __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></strong></td>
-				<td colspan="2" class="<?php echo esc_attr( $class ); ?>">
+				<td colspan="2" class="status-cell <?php echo esc_attr( $class ); ?>">
 					<?php
 						echo wp_kses_post( $yearly_reset_schedule['value'] );
 						if ( $yearly_reset_schedule['result'] && ! $yearly_reset_schedule['value'] ) {
@@ -155,7 +172,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<tr>
 			<td><?php echo wp_kses_post( $directory_permission['description'] ); ?></td>
 			<td><?php echo ! empty( $directory_permission['value'] ) ? wp_kses_post( str_replace( array( '/', '\\' ), array( '/<wbr>', '\\<wbr>' ), $directory_permission['value'] ) ) : ''; ?></td>
-			<td class="<?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $directory_permission['status_message'] ); ?></td>
+			<td class="status-cell <?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $directory_permission['status_message'] ); ?></td>
 		</tr>
 		<?php } ?>
 	</tbody>
