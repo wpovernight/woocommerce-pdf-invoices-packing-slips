@@ -1047,23 +1047,18 @@ class Admin {
 			}
 
 			$form_data = [];
+			$invoice   = wcpdf_get_invoice( $order );
 
-			if ( $invoice = wcpdf_get_invoice( $order ) ) {
+			if ( $invoice ) {
 				$is_new        = false === $invoice->exists();
 				$form_data     = stripslashes_deep( $_POST );
 				$document_data = $this->process_order_document_form_data( $form_data, $invoice->slug );
+
 				if ( empty( $document_data ) ) {
 					return;
 				}
 
-
 				$invoice->set_data( $document_data, $order );
-
-				// check if we have number, and if not generate one
-				if  ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'initiate_number' ) ) ) {
-					$invoice->initiate_number();
-				}
-
 				$invoice->save();
 
 				if ( $is_new ) {
@@ -1265,12 +1260,6 @@ class Admin {
 				} elseif ( $action_type == 'save' ) {
 					$is_new = false === $document->exists();
 					$document->set_data( $document_data, $order );
-
-					// check if we have number, and if not generate one
-					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
-						$document->initiate_number();
-					}
-
 					$document->save();
 
 					if ( $is_new ) {
@@ -1278,7 +1267,7 @@ class Admin {
 						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
 						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
-					$response      = array(
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
