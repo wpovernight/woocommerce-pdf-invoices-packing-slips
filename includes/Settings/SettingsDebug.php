@@ -1369,15 +1369,24 @@ class SettingsDebug {
 			return;
 		}
 
-		$offset        = absint( $offset ?? 0 );
-		$chunk_size    = absint( $chunk_size ?? 100 );
-		$option_name   = "wpo_wcpdf_number_data::{$data['table_name']}";
-		$results       = get_option( $option_name, array() );
-		$hook          = 'wpo_wcpdf_number_table_data_fetch';
+		$offset      = absint( $offset ?? 0 );
+		$chunk_size  = absint( $chunk_size ?? 100 );
+		$option_name = "wpo_wcpdf_number_data::{$data['table_name']}";
+		$results     = get_option( $option_name, array() );
+		$hook        = 'wpo_wcpdf_number_table_data_fetch';
 
 		// query
-		$query         = $wpdb->prepare( "SELECT * FROM {$data['table_name']} WHERE date BETWEEN %s AND %s ORDER BY {$data['orderby']} {$data['order']} LIMIT %d OFFSET %d", $data['from'], $data['to'], $chunk_size, $offset );
-		$chunk_results = $wpdb->get_results( $query );
+		$chunk_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->esc_sql( $data['table_name'] )} WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
+				$data['from'], 
+				$data['to'], 
+				$data['orderby'], 
+				$data['order'], 
+				$chunk_size, 
+				$offset
+			)
+		);		
 
 		if ( empty( $chunk_results ) ) {
 			as_unschedule_all_actions( $hook );
@@ -1514,9 +1523,13 @@ class SettingsDebug {
 
 		$table_name = sanitize_text_field( $table_name );
 		$search     = absint( $search );
-		$query      = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", $search );
-
-		return $wpdb->get_results( $query );
+		
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->esc_sql( $table_name )} WHERE id = %d",
+				$search
+			)
+		);
 	}
 
 	/**
