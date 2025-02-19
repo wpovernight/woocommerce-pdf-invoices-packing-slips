@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tbody>
 		<tr>
 			<td class="title">PDF Invoices & Packing Slips for WooCommerce</td>
-			<td><?php esc_html_e( WPO_WCPDF()->version ); ?></td>
+			<td><?php esc_html( WPO_WCPDF()->version ); ?></td>
 			<td class="valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 		</tr>
 		<?php
@@ -125,7 +125,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 		<tfoot>
 			<tr>
-				<td class="title"><strong><?php esc_html_e( __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></strong></td>
+				<td class="title"><strong><?php esc_html_e( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
 				<td colspan="2" class="<?php echo esc_attr( $class ); ?>">
 					<?php
 						echo wp_kses_post( $yearly_reset_schedule['value'] );

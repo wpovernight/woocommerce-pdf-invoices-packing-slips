@@ -26,9 +26,11 @@ class SettingsDebug {
 		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
+		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
 	}
 
 	public function output( $active_section, $nonce ) {
@@ -126,8 +128,10 @@ class SettingsDebug {
 		}
 
 		$document_type = $this->get_document_type_from_store_table_name( sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) );
+		$list_table    = new NumberStoreListTable();
+		$as_actions    = as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' );
+		$last_fetch    = get_option( "wpo_wcpdf_number_data::{$selected_table_name}::last_time" );
 
-		$list_table = new NumberStoreListTable();
 		$list_table->prepare_items();
 
 		$list_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
@@ -1333,6 +1337,238 @@ class SettingsDebug {
 			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
 			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
+	}
+
+	/**
+	 * Fetch number table data
+	 *
+	 * @param string  $table_name
+	 * @param string  $orderby
+	 * @param string  $order
+	 * @param string  $from
+	 * @param string  $to
+	 * @param integer $chunk_size
+	 * @param integer $offset
+	 *
+	 * @return void
+	 */
+	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', string $from = '', string $to = '', int $chunk_size = 100, int $offset = 0 ): void {
+		global $wpdb;
+
+		$input_data = array(
+			'table_name' => $table_name,
+			'orderby'    => $orderby,
+			'order'      => $order,
+			'from'       => $from,
+			'to'         => $to,
+		);
+
+		$data = $this->filter_fetch_request_data( $input_data );
+
+		if ( empty( $data['table_name'] ) || empty( $data['from'] || empty( $data['to'] ) ) ) {
+			return;
+		}
+
+		$offset      = absint( $offset ?? 0 );
+		$chunk_size  = absint( $chunk_size ?? 100 );
+		$option_name = "wpo_wcpdf_number_data::{$data['table_name']}";
+		$results     = get_option( $option_name, array() );
+		$hook        = 'wpo_wcpdf_number_table_data_fetch';
+
+		// query
+		$chunk_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT * FROM {$data['table_name']} WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
+				$data['from'], 
+				$data['to'], 
+				$data['orderby'], 
+				$data['order'], 
+				$chunk_size, 
+				$offset
+			)
+		);
+
+		if ( empty( $chunk_results ) ) {
+			as_unschedule_all_actions( $hook );
+			update_option( $option_name . '::last_time', time() );
+			return; // exit if no more results
+		}
+
+		$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
+
+		update_option( $option_name, $results );
+
+		$offset += $chunk_size; // increase the offset for the next chunk
+
+		$args = array(
+			'table_name' => $data['table_name'],
+			'orderby'    => $data['orderby'],
+			'order'      => $data['order'],
+			'from'       => $data['from'],
+			'to'         => $data['to'],
+			'chunk_size' => $chunk_size,
+			'offset'     => $offset,
+		);
+
+		as_enqueue_async_action( $hook, $args );
+	}
+
+	/**
+	 * Handle AJAX number table data request
+	 *
+	 * @return void
+	 */
+	public function ajax_numbers_data(): void {
+		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+
+		$request = stripslashes_deep( $_POST );
+
+		if ( isset( $request['action'] ) && 'wpo_wcpdf_numbers_data' === $request['action'] && isset( $request['operation'] ) && isset( $request['table_name'] ) ) {
+			$data = $this->filter_fetch_request_data( $request );
+
+			$this->delete_number_table_data( $data['table_name'] ); // both operations require delete
+
+			if ( 'fetch' === $request['operation'] ) {
+				$this->fetch_number_table_data( $data['table_name'], $data['orderby'], $data['order'], $data['from'], $data['to'] );
+			}
+
+			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=' . $data['orderby'] . '&order=' . $data['order'] . '&table_name=' . $data['table_name'] ) ) ) );
+		} else {
+			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+	}
+
+	/**
+	 * Filter data from number table request
+	 *
+	 * @param array $request_data
+	 *
+	 * @return array
+	 */
+	public function filter_fetch_request_data( array $request_data ): array {
+		return array(
+			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
+			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
+			'orderby'    => isset( $request_data['orderby'] )    && in_array( strtolower( $request_data['orderby'] ), array( 'id' ) )                       ? sanitize_text_field( strtolower( $request_data['orderby'] ) ) : 'id',
+			'from'       => isset( $request_data['from'] )       && ! empty( $request_data['from'] )                                                        ? esc_attr( $request_data['from'] ) . ' 00:00:00'               : null,
+			'to'         => isset( $request_data['to'] )         && ! empty( $request_data['to'] )                                                          ? esc_attr( $request_data['to'] ) . ' 23:59:59'                 : null,
+		);
+	}
+
+	/**
+	 * Delete number table cached data
+	 *
+	 * @param string $table_name
+	 *
+	 * @return void
+	 */
+	public function delete_number_table_data( string $table_name ): void {
+		if ( empty( $table_name ) ) {
+			return;
+		}
+
+		delete_option( "wpo_wcpdf_number_data::{$table_name}" );
+		delete_option( "wpo_wcpdf_number_data::{$table_name}::last_time" );
+	}
+
+	/**
+	 * Search for number in number table data
+	 *
+	 * @param string $table_name
+	 * @param int    $search
+	 *
+	 * @return array
+	 */
+	public function search_number_in_table_data( string $table_name, int $search ): array {
+		if ( empty( $table_name ) ) {
+			return array();
+		}
+
+		$option_name = "wpo_wcpdf_number_data::{$table_name}";
+		$results     = get_option( $option_name, array() );
+		$search      = ! empty( $search ) ? absint( $search ) : false;
+		$found       = array();
+
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $result ) {
+				if ( absint( $result->id ) === $search ) {
+					$found[] = $result;
+					break;
+				}
+			}
+		}
+
+		// number not found in cached data, try directly
+		if ( empty( $found ) ) {
+			$found = $this->search_number_in_database_table( $table_name, $search );
+		}
+
+		return $found;
+	}
+
+	/**
+	 * Search for number in number table database
+	 *
+	 * @param string $table_name
+	 * @param int    $search
+	 *
+	 * @return array|false
+	 */
+	public function search_number_in_database_table( string $table_name, int $search ) {
+		global $wpdb;
+
+		if ( empty( $search ) || empty( $table_name ) || ! in_array( $table_name, array_keys( $this->get_number_store_tables() ) ) ) {
+			return array();
+		}
+
+		$table_name = sanitize_text_field( $table_name );
+		$search     = absint( $search );
+		
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT * FROM {$table_name} WHERE id = %d",
+				$search
+			)
+		);
+	}
+
+	/**
+	 * Sort number table data
+	 *
+	 * @param array  $results
+	 * @param string $order
+	 * @param string $orderby
+	 *
+	 * @return array
+	 */
+	public function sort_number_table_data( array $results, string $order, string $orderby ): array {
+		if ( empty( $results ) ) {
+			return $results;
+		}
+
+		usort( $results, function( $a, $b ) use ( $orderby, $order ) {
+			$orderby = esc_attr( $orderby );
+			$order   = esc_attr( $order );
+
+			switch ( $orderby ) {
+				case 'id':
+					if ( 'desc' === $order ) {
+						return absint( $b->id ) - absint( $a->id );
+					} else {
+						return absint( $a->id ) - absint( $b->id );
+					}
+					break;
+				default:
+					if ( 'desc' === $order ) {
+						return strcmp( $b->$orderby, $a->$orderby );
+					} else {
+						return strcmp( $a->$orderby, $b->$orderby );
+					}
+					break;
+			}
+		} );
+
+		return $results;
 	}
 
 }
