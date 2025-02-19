@@ -1860,7 +1860,7 @@ class Main {
 				esc_html( $link_text )
 			);
 
-			echo apply_filters( 'wpo_wcpdf_add_document_download_link_to_email', $document_link, $document, $order, $sent_to_admin, $plain_text, $email );
+			echo wp_kses_post( apply_filters( 'wpo_wcpdf_add_document_download_link_to_email', $document_link, $document, $order, $sent_to_admin, $plain_text, $email ) );
 		}
 	}
 

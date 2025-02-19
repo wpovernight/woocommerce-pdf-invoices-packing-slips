@@ -183,6 +183,10 @@ table.notes-totals {
 	width: 20%;
 }
 
+.order-details tbody {
+	border-bottom: 1px solid #ccc;
+}
+
 .order-details tr,
 .notes-totals tr {
 	page-break-inside: always;
