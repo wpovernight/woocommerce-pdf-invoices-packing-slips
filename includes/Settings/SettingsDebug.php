@@ -1378,7 +1378,7 @@ class SettingsDebug {
 		// query
 		$chunk_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->esc_sql( $data['table_name'] )} WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
+				"SELECT * FROM {$data['table_name']} WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
 				$data['from'], 
 				$data['to'], 
 				$data['orderby'], 
@@ -1386,7 +1386,7 @@ class SettingsDebug {
 				$chunk_size, 
 				$offset
 			)
-		);		
+		);
 
 		if ( empty( $chunk_results ) ) {
 			as_unschedule_all_actions( $hook );
@@ -1526,7 +1526,7 @@ class SettingsDebug {
 		
 		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->esc_sql( $table_name )} WHERE id = %d",
+				"SELECT * FROM {$table_name} WHERE id = %d",
 				$search
 			)
 		);
