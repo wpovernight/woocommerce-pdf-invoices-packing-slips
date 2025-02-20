@@ -743,6 +743,28 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'file_system_method',
+				'title'    => __( 'File system method', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'file_system_method',
+					'default'     => 'wp_filesystem',
+					'options'     => array(
+						'wp'  => __( 'WP Filesystem API (recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'php' => __( 'PHP filesystem functions', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+					'description' => sprintf(
+						/* translators: 1. WP_Filesystem, 2. direct */
+						__( 'Choose the filesystem method for file operations. By default, our plugin uses %1$s (only supported in %2$s mode). Select PHP file functions if you encounter issues with %1$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>WP Filesystem</code>',
+						'<code>direct</code>'
+					),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'	   => 'document_link_access_type',
 				'title'	   => __( 'Document link access type', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
@@ -935,21 +957,6 @@ class SettingsDebug {
 					'option_name' => $option_name,
 					'id'          => 'semaphore_logs',
 					'description' => __( 'Our plugin uses a semaphore class that prevents race conditions in multiple places in the code. Enable this setting only if you are having issues with document numbers, yearly reset or documents being assigned to the wrong order.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'use_php_filesystem',
-				'title'    => __( 'Disable WordPress filesystem integration', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'use_php_filesystem',
-					'description' => sprintf(
-						__( 'By default, our plugin uses %s for file operations. Enable this setting to bypass it and use standard PHP file functions instead.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>WP_Filesystem</code>'
-					),
 				)
 			),
 			array(
