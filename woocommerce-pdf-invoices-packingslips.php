@@ -30,6 +30,7 @@ class WPO_WCPDF {
 	public $legacy_addons;
 	public $third_party_plugins;
 	public $order_util;
+	public $file_system;
 	public $settings;
 	public $documents;
 	public $main;
@@ -142,15 +143,16 @@ class WPO_WCPDF {
 	public function includes() {
 		// plugin legacy class mapping
 		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
+		
+		// Compatibility classes
+		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
+		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
+		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
 
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
-
-		// Third party compatibility
-		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
-		// WC OrderUtil compatibility
-		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
+		
 		// Plugin classes
 		$this->settings            = \WPO\IPS\Settings::instance();
 		$this->documents           = \WPO\IPS\Documents::instance();

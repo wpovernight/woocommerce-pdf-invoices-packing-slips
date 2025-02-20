@@ -96,7 +96,7 @@ class Install {
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
 		// check if tmp folder exists => if not, initialize
-		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) ) {
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
 			WPO_WCPDF()->main->init_tmp();
 		}
 
@@ -223,7 +223,7 @@ class Install {
 		$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
 
 		// check if tmp folder exists => if not, initialize
-		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) || ! @is_dir( $font_path ) || ! wp_is_writable( $font_path ) ) {
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) || ! WPO_WCPDF()->file_system->is_dir( $font_path ) || ! WPO_WCPDF()->file_system->is_writable( $font_path ) ) {
 			WPO_WCPDF()->main->init_tmp();
 		} else {
 			// don't try merging fonts with local when updating pre 2.0
@@ -596,7 +596,7 @@ class Install {
 		}
 
 		// check if tmp folder exists => if not, initialize
-		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) || ! @is_dir( $font_path ) || ! wp_is_writable( $font_path ) ) {
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) || ! WPO_WCPDF()->file_system->is_dir( $font_path ) || ! WPO_WCPDF()->file_system->is_writable( $font_path ) ) {
 			WPO_WCPDF()->main->init_tmp();
 		} else {
 			WPO_WCPDF()->main->copy_fonts( $font_path );
