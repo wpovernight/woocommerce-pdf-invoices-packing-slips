@@ -142,7 +142,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 		<tfoot>
 			<tr>
-				<td class="title"><strong><?php esc_html_e( __( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ) ); ?></strong></td>
+				<td class="title"><strong><?php esc_html_e( 'Yearly reset', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
 				<td colspan="2" class="status-cell <?php echo esc_attr( $class ); ?>">
 					<?php
 						echo wp_kses_post( $yearly_reset_schedule['value'] );

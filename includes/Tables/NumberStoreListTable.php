@@ -55,54 +55,72 @@ class NumberStoreListTable extends \WP_List_Table {
 	 * @return string Column Name
 	 */
 	public function column_default( $item, $column_name ) {
-		switch ( $column_name ) {
-			case 'number' :
-				$value = $item->id;
-				break;
-			case 'type' :
-				$value = isset( $item->document_title ) ? esc_attr( $item->document_title ) : '-';
-				break;
-			case 'calculated_number' :
-				$value = isset( $item->calculated_number ) ? $item->calculated_number : '-';
-				break;
-			case 'date' :
-				$value = $item->date;
-				break;
-			case 'order' :
-				if ( ! empty( $item->order_id ) ) {
-					$order        = $this->get_base_order( wc_get_order( $item->order_id ) );
+		$order = $this->get_base_order( wc_get_order( $item->order_id ) );
+		$value = '-';
+
+		if ( ! empty( $order ) ) {
+			switch ( $column_name ) {
+				case 'number':
+					$value = $item->id;
+					break;
+				case 'type':
+					$value          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
+					$document_types = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
+
+					// document using invoice number, eg. proforma
+					if ( count( $document_types ) > 1 ) {
+						foreach ( $document_types as $key => $doc_type ) {
+							if ( 'invoice' === $doc_type ) {
+								unset( $document_types[ $key ] );
+							}
+						}
+					}
+
+					$document_type = reset( $document_types );
+
+					if ( ! empty( $document_type ) ) {
+						$document_slug = str_replace( '-', '_', $document_type );
+						$number_data   = $order->get_meta( "_wcpdf_{$document_slug}_number_data", true );
+						$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
+						$order_id      = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
+
+						// all documents using parent order
+						if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item->id ) ) {
+							$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
+						// credit notes may have meta saved in the refund order
+						} elseif ( 'credit-note' === $document_type && absint( $order_id ) !== absint( $item->order_id ) ) {
+							$value = sprintf(
+								'<span class="item-number number-doc-type">%s</span><p style="margin-top:6px;"><span class="item-number number-refund">%s #%s</span></p>',
+								$document_type,
+								__( 'refund:', 'woocommerce-pdf-invoices-packing-slips' ),
+								$item->order_id
+							);
+						}
+					}
+					break;
+				case 'calculated_number':
+					$value = isset( $item->calculated_number ) ? $item->calculated_number : '-';
+					break;
+				case 'date':
+					$value = $item->date;
+					break;
+				case 'order':
 					$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : $item->order_id;
 					$order_id     = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
 					$url          = sprintf( 'post.php?post=%s&action=edit', $order_id );
 					$value        = sprintf( '<a href="%s">#%s</a>', $url, $order_number );
-
-					if ( absint( $order_id ) !== absint( $item->order_id ) ) {
-						$value .= sprintf( ' (%s #%s)', __( 'Refund:', 'woocommerce-pdf-invoices-packing-slips' ), $item->order_id );
-					}
-				} else {
-					$value = '-';
-				}
-				break;
-			case 'order_status' :
-				$order = $this->get_base_order( wc_get_order( $item->order_id ) );
-
-				if ( ! empty( $order ) ) {
+					break;
+				case 'order_status':
 					$value = sprintf(
 						'<mark class="order-status %s"><span>%s</span></mark>',
 						esc_attr( sanitize_html_class( 'status-' . $order->get_status() ) ),
 						esc_html( wc_get_order_status_name( $order->get_status() ) )
 					);
-				} else {
-					$value = '<strong>' . __( 'Unknown', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>';
-				}
-				break;
-			default:
-				$value = isset( $item->$column_name ) ? $item->$column_name : null;
-				break;
-		}
-
-		if ( empty( $value ) ) {
-			$value = '-';
+					break;
+				default:
+					$value = isset( $item->$column_name ) ? $item->$column_name : null;
+					break;
+			}
 		}
 
 		return apply_filters( 'wpo_wcpdf_number_tools_column_content_' . $column_name, $value, $item );
@@ -123,15 +141,6 @@ class NumberStoreListTable extends \WP_List_Table {
 			'order'             => __( 'Order', 'woocommerce-pdf-invoices-packing-slips' ),
 			'order_status'      => __( 'Order Status', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-
-		if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wp_wcpdf_settings_page_nonce' ) ) {
-			$table_name    = isset( $_GET['table_name'] ) ? sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) : null;
-			$document_type = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
-		}
-
-		if ( empty( $document_type ) || 'invoice' !== $document_type ) {
-			unset( $columns['type'] );
-		}
 
 		if ( ! isset( WPO_WCPDF()->settings->debug_settings['calculate_document_numbers'] ) ) {
 			unset( $columns['calculated_number'] );
@@ -174,16 +183,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	}
 
 	/**
-	 * Retrieves the search query string
-	 *
-	 * @since 2.0
-	 * @return mixed string If search is present, false otherwise
-	 */
-	public function get_search( $request ) {
-		return ! empty( $request['s'] ) ? absint( $request['s'] ) : false;
-	}
-
-	/**
 	 * Build all the number data
 	 *
 	 * @since 2.0
@@ -192,54 +191,32 @@ class NumberStoreListTable extends \WP_List_Table {
 	 * @return array $numbers All the data for number list table
 	 */
 	public function get_numbers() {
-		global $wpdb;
-		
-		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wp_wcpdf_settings_page_nonce' ) ) {
-			return array();
-		}
+		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		extract( WPO_WCPDF()->settings->debug->filter_fetch_request_data( $request ) );
 
-		$request                        = stripslashes_deep( $_GET );
-		$results                        = array();
-		$search                         = $this->get_search( $request );
-		$table_name                     = isset( $request['table_name'] ) && in_array( $request['table_name'], array_keys( WPO_WCPDF()->settings->debug->get_number_store_tables() ) ) ? sanitize_text_field( $request['table_name'] ) : null;
-		$order                          = isset( $request['order'] ) && in_array( $request['order'], array( 'DESC', 'ASC' ) ) ? sanitize_text_field( $request['order'] ) : 'DESC';
-		$orderby                        = isset( $request['orderby'] ) && in_array( $request['orderby'], array( 'id' ) ) ? sanitize_text_field( $request['orderby'] ) : 'id';
 		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
 		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
-		$results                        = array();
 
-		if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
-			return $results; // using `invoice_number`
+		if (
+			empty( $document_type ) ||
+			( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) ||
+			empty( $table_name ) ||
+			as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' )
+		) {
+			return array(); // using `invoice_number`
 		}
 
-		// MySQL int range
-		$options = array(
-			'options' => array(
-				'min_range' => 1,
-				'max_range' => 4294967295
-			)
-		);
+		$option_name = "wpo_wcpdf_number_data::{$table_name}";
+		$results     = get_option( $option_name, array() );
 
-		$search = filter_var( $search, FILTER_VALIDATE_INT, $options );
+		if ( ! empty( $results ) ) {
 
-		if ( ! empty( $table_name ) ) {
-			if ( $search ) {
-				$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-					$wpdb->prepare(
-						"SELECT * FROM `" . esc_sql( $table_name ) . "` WHERE `id` = %d OR `order_id` = %d ORDER BY " . esc_sql( $orderby ) . " " . esc_sql( $order ), 
-						$search, 
-						$search 
-					) 
-				);										
-			} else {
-				$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-					"SELECT * FROM `" . esc_sql( $table_name ) . "` ORDER BY `" . esc_sql( $orderby ) . "` " . esc_sql( $order )
-				);
+			// we have a search request, return results by search term
+			if ( isset( $request['s'] ) ) {
+				$results = WPO_WCPDF()->settings->debug->search_number_in_table_data( $table_name, esc_attr( $request['s'] ) );
 			}
-		}
 
-		// add document title or 'Deleted'
-		if ( ! empty( $results ) && ! empty( $document_type ) ) {
+			// include document types
 			foreach ( $results as $key => $result ) {
 				$result         = (array) $result;
 				$document_types = array( $document_type );
@@ -253,20 +230,11 @@ class NumberStoreListTable extends \WP_List_Table {
 					$document_types = array_merge( $document_types, $invoice_number_store_doc_types );
 				}
 
-				foreach ( $document_types as $doc_type ) {
-					$document = wcpdf_get_document( $doc_type, wc_get_order( $order_id ) );
-
-					if ( $document && is_callable( array( $document, 'get_number' ) ) ) {
-						$number_obj = $document->get_number();
-
-						if ( ! empty( $number_obj ) && ! empty( $number_obj->number ) ) {
-							if ( isset( $result['id'] ) && absint( $result['id'] ) === absint( $number_obj->number ) ) {
-								$results[ $key ]->document_title = $document->get_title();
-							}
-						}
-					}
-				}
+				$results[ $key ]->document_types = $document_types;
 			}
+
+			// maybe sort the data
+			$results = WPO_WCPDF()->settings->debug->sort_number_table_data( $results, $order, $orderby );
 		}
 
 		return $results;
