@@ -480,32 +480,37 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 
 	$tool          = apply_filters( 'wpo_wcpdf_convert_encoding_tool', $tool );
 	$from_encoding = apply_filters( 'wpo_wcpdf_convert_from_encoding', 'UTF-8', $tool );
-
-	switch ( $tool ) {
-		case 'mb_convert_encoding':
-			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
-
-			// Use native mb_convert_encoding if mbstring extension is available.
-			if ( function_exists( 'mb_convert_encoding' ) ) {
-				$string = mb_convert_encoding( $string, $to_encoding, $from_encoding );
-			}
-			break;
-		case 'uconverter':
-			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
-
-			// Only for PHP 8.2+.
-			if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
-				$string = UConverter::transcode( $string, $to_encoding, $from_encoding );
-			}
-			break;
-		case 'iconv':
-			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'ISO-8859-1', $tool );
-
-			// Use native iconv if available.
-			if ( function_exists( 'iconv' ) ) {
-				$string = iconv( $from_encoding, $to_encoding, $string );
-			}
-			break;
+	$to_encoding   = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
+	
+	if ( 'HTML-ENTITIES' === $to_encoding ) {
+		$string = htmlentities( $string, ENT_QUOTES | ENT_HTML5, $from_encoding );
+	} else {
+		switch ( $tool ) {
+			case 'mb_convert_encoding':
+				if ( function_exists( 'mb_convert_encoding' ) && extension_loaded( 'mbstring' ) ) {
+					$string = mb_convert_encoding( $string, $to_encoding, $from_encoding );
+				} else {
+					wcpdf_log_error( 'The mbstring extension is not loaded or the mb_convert_encoding function is not available.', 'warning' );
+				}
+				break;
+			case 'uconverter': // Only for PHP 8.2+.
+				if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
+					$string = UConverter::transcode( $string, $to_encoding, $from_encoding );
+				} else {
+					wcpdf_log_error( 'The intl extension is not loaded or the UConverter class is not available.', 'warning' );
+				}
+				break;
+			case 'iconv':
+				if ( function_exists( 'iconv' ) ) {
+					$string = iconv( $from_encoding, $to_encoding, $string );
+				} else {
+					wcpdf_log_error( 'The iconv function is not available.', 'warning' );
+				}
+				break;
+			default:
+				$string = apply_filters( 'wpo_wcpdf_convert_encoding_default', $string, $from_encoding, $to_encoding );
+				break;
+		}
 	}
 
 	return $string;
