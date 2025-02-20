@@ -148,11 +148,11 @@ abstract class Document {
 	
 		foreach ( $applied_coupons as $coupon_code ) {
 			$coupon         = new \WC_Coupon( $coupon_code );
-			$coupons_data[] = [
+			$coupons_data[] = array(
 				'code'   => $coupon->get_code(),
 				'type'   => $coupon->get_discount_type(),
 				'amount' => $coupon->get_amount(),
-			];
+			);
 		}
 	
 		// Get item-level discounts
