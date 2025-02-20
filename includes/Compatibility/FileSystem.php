@@ -21,7 +21,7 @@ class FileSystem {
 	/**
 	 * Singleton instance.
 	 */
-	public static function get_instance() {
+	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -150,6 +150,17 @@ class FileSystem {
 		return $this->is_wp_filesystem() 
 			? $this->wp_filesystem->mkdir( $path ) 
 			: ( $this->suppress_errors ? @mkdir( $path ) : mkdir( $path ) );
+	}
+	
+	/**
+	 * Check if file is writable
+	 * @param string $filename
+	 * @return bool
+	 */
+	public function is_writable( string $filename ): bool {
+		return $this->is_wp_filesystem() 
+			? $this->wp_filesystem->is_writable( $filename ) 
+			: ( $this->suppress_errors ? @is_writable( $filename ) : is_writable( $filename ) );
 	}
 
 	/**
