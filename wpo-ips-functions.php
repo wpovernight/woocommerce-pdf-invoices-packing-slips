@@ -485,16 +485,15 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 		case 'mb_convert_encoding':
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
 
-			// provided by composer 'symfony/polyfill-mbstring' library.
-			// it uses 'iconv()', must have 'libiconv' configured instead of 'glibc' library.
-			if ( class_exists( '\\Symfony\\Polyfill\\Mbstring\\Mbstring' ) ) {
-				$string = \Symfony\Polyfill\Mbstring\Mbstring::mb_convert_encoding( $string, $to_encoding, $from_encoding );
+			// Use native mb_convert_encoding if mbstring extension is available.
+			if ( function_exists( 'mb_convert_encoding' ) ) {
+				$string = mb_convert_encoding( $string, $to_encoding, $from_encoding );
 			}
 			break;
 		case 'uconverter':
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
 
-			// only for PHP 8.2+.
+			// Only for PHP 8.2+.
 			if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
 				$string = UConverter::transcode( $string, $to_encoding, $from_encoding );
 			}
@@ -502,13 +501,8 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 		case 'iconv':
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'ISO-8859-1', $tool );
 
-			// provided by composer 'symfony/polyfill-iconv' library.
-			if ( class_exists( '\\Symfony\\Polyfill\\Iconv\\Iconv' ) ) {
-				$string = \Symfony\Polyfill\Iconv\Iconv::iconv( $from_encoding, $to_encoding, $string );
-
-			// default server library.
-			// must have 'libiconv' configured instead of 'glibc' library.
-			} elseif ( function_exists( 'iconv' ) ) {
+			// Use native iconv if available.
+			if ( function_exists( 'iconv' ) ) {
 				$string = iconv( $from_encoding, $to_encoding, $string );
 			}
 			break;
