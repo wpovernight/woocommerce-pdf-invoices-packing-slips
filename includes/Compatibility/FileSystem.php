@@ -162,7 +162,7 @@ class FileSystem {
 	public function is_writable( string $filename ): bool {
 		return $this->is_wp_filesystem() 
 			? $this->wp_filesystem->is_writable( $filename ) 
-			: ( $this->suppress_errors ? @is_writable( $filename ) : is_writable( $filename ) );
+			: wp_is_writable( $filename );
 	}
 
 	/**
