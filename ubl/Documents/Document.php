@@ -133,7 +133,12 @@ abstract class Document {
 		return $order_tax_data;
 	}
 	
-	public function get_order_coupons_data() {
+	/**
+	 * Get order coupons data
+	 *
+	 * @return array
+	 */
+	public function get_order_coupons_data(): array {
 		$order      = $this->order;
 		$order_data = array();
 	
