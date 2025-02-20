@@ -12,14 +12,34 @@ defined( 'ABSPATH' ) or exit;
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) :
 
 class FileSystem {
-
+	
+	/**
+	 * Filesystem method.
+	 * @var string
+	 */
+	public $system_enabled = 'wp'; // Default to WP Filesystem API
+	
+	/**
+	 * Suppress errors.
+	 * @var bool
+	 */
+	public $suppress_errors = false;
+	
+	/**
+	 * WP_Filesystem instance.
+	 * @var WP_Filesystem_Base|null
+	 */
+	public $wp_filesystem = null;
+	
+	/**
+	 * Singleton instance.
+	 * @var self
+	 */
 	protected static $_instance = null;
-	public $system_enabled      = 'wp'; // Default to WP Filesystem API
-	public $suppress_errors     = false;
-	public $wp_filesystem       = null;
 
 	/**
 	 * Singleton instance.
+	 * @return self
 	 */
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
@@ -35,7 +55,7 @@ class FileSystem {
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		
 		if ( isset( $debug_settings['filesystem'] ) ) {
-			$this->system_enabled = 'php' === $debug_settings['filesystem'] ? 'php' : 'wp';
+			$this->system_enabled = ( 'php' === $debug_settings['filesystem'] ) ? 'php' : 'wp';
 		}
 		
 		if ( 'wp' === $this->system_enabled ) {
