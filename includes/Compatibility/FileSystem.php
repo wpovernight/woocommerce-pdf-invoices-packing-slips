@@ -168,11 +168,12 @@ class FileSystem {
 	/**
 	 * Delete a file
 	 * @param string $filename
+	 * @param bool $recursive
 	 * @return bool
 	 */
-	public function delete( string $filename ): bool {
+	public function delete( string $filename, bool $recursive = false ): bool {
 		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->delete( $filename ) 
+			? $this->wp_filesystem->delete( $filename, $recursive ) 
 			: ( $this->suppress_errors ? @unlink( $filename ) : unlink( $filename ) );
 	}
 

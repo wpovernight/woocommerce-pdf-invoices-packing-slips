@@ -918,7 +918,7 @@ class Main {
 		try {
 			$result = copy_dir( $old_path, $new_path );
 			// delete old directory with contents
-			if( $result ) {
+			if ( $result ) {
 				WPO_WCPDF()->file_system->delete( $old_path, true );
 			}
 		} catch ( \Error $e ) {

@@ -756,7 +756,7 @@ class SettingsDebug {
 						'php' => __( 'PHP filesystem functions', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 					'description' => sprintf(
-						/* translators: 1. WP_Filesystem, 2. direct */
+						/* translators: 1. WP Filesystem, 2. direct */
 						__( 'Choose the filesystem method for file operations. By default, our plugin uses %1$s (only supported in %2$s mode). Select PHP file functions if you encounter issues with %1$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<code>WP Filesystem</code>',
 						'<code>direct</code>'
