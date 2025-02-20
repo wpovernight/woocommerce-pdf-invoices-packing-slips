@@ -24,9 +24,9 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
-            'WPO\\IPS\\Vendor\\Svg\\' => 4,
-            'WPO\\IPS\\Vendor\\Sabre\\Xml\\' => 10,
-            'WPO\\IPS\\Vendor\\Sabre\\Uri\\' => 10,
+            'Svg\\' => 4,
+            'Sabre\\Xml\\' => 10,
+            'Sabre\\Uri\\' => 10,
             'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\' => 15,
         ),
         'M' => 
@@ -60,15 +60,15 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
-        'WPO\\IPS\\Vendor\\Svg\\' => 
+        'Svg\\' => 
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
-        'WPO\\IPS\\Vendor\\Sabre\\Xml\\' => 
+        'Sabre\\Xml\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabre/xml/lib',
         ),
-        'WPO\\IPS\\Vendor\\Sabre\\Uri\\' => 
+        'Sabre\\Uri\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabre/uri/lib',
         ),
@@ -91,6 +91,9 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     );
 
     public static $classMap = array (
+        'ComposerAutoloaderInit8da09a8f6b5e759115e893ca39030504' => __DIR__ . '/..' . '/composer/autoload_real.php',
+        'Composer\\Autoload\\ClassLoader' => __DIR__ . '/..' . '/composer/ClassLoader.php',
+        'Composer\\Autoload\\ComposerStaticInit8da09a8f6b5e759115e893ca39030504' => __DIR__ . '/..' . '/composer/autoload_static.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'WPO\\IPS\\Vendor\\Dompdf\\Adapter\\CPDF' => __DIR__ . '/..' . '/dompdf/dompdf/src/Adapter/CPDF.php',
         'WPO\\IPS\\Vendor\\Dompdf\\Adapter\\GD' => __DIR__ . '/..' . '/dompdf/dompdf/src/Adapter/GD.php',
@@ -270,6 +273,8 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\URL' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/URL.php',
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\Value' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/Value.php',
         'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\ValueList' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Value/ValueList.php',
+        'Symfony\\Polyfill\\Iconv\\Iconv' => __DIR__ . '/..' . '/symfony/polyfill-iconv/Iconv.php',
+        'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'WPO\\IPS\\Vendor\\Sabre\\Uri\\InvalidUriException' => __DIR__ . '/..' . '/sabre/uri/lib/InvalidUriException.php',
         'WPO\\IPS\\Vendor\\Sabre\\Uri\\Version' => __DIR__ . '/..' . '/sabre/uri/lib/Version.php',
         'WPO\\IPS\\Vendor\\Sabre\\Xml\\ContextStackTrait' => __DIR__ . '/..' . '/sabre/xml/lib/ContextStackTrait.php',
@@ -317,8 +322,6 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Symbol' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Symbol.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\Text' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/Text.php',
         'WPO\\IPS\\Vendor\\Svg\\Tag\\UseTag' => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg/Tag/UseTag.php',
-        'Symfony\\Polyfill\\Iconv\\Iconv' => __DIR__ . '/..' . '/symfony/polyfill-iconv/Iconv.php',
-        'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

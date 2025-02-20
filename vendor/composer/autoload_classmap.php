@@ -6,6 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'ComposerAutoloaderInit8da09a8f6b5e759115e893ca39030504' => $vendorDir . '/composer/autoload_real.php',
+    'Composer\\Autoload\\ClassLoader' => $vendorDir . '/composer/ClassLoader.php',
+    'Composer\\Autoload\\ComposerStaticInit8da09a8f6b5e759115e893ca39030504' => $vendorDir . '/composer/autoload_static.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'WPO\\IPS\\Vendor\\Dompdf\\Adapter\\CPDF' => $vendorDir . '/dompdf/dompdf/src/Adapter/CPDF.php',
     'WPO\\IPS\\Vendor\\Dompdf\\Adapter\\GD' => $vendorDir . '/dompdf/dompdf/src/Adapter/GD.php',
@@ -185,6 +188,8 @@ return array(
     'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\URL' => $vendorDir . '/sabberworm/php-css-parser/src/Value/URL.php',
     'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\Value' => $vendorDir . '/sabberworm/php-css-parser/src/Value/Value.php',
     'WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Value\\ValueList' => $vendorDir . '/sabberworm/php-css-parser/src/Value/ValueList.php',
+    'Symfony\\Polyfill\\Iconv\\Iconv' => $vendorDir . '/symfony/polyfill-iconv/Iconv.php',
+    'Symfony\\Polyfill\\Mbstring\\Mbstring' => $vendorDir . '/symfony/polyfill-mbstring/Mbstring.php',
     'WPO\\IPS\\Vendor\\Sabre\\Uri\\InvalidUriException' => $vendorDir . '/sabre/uri/lib/InvalidUriException.php',
     'WPO\\IPS\\Vendor\\Sabre\\Uri\\Version' => $vendorDir . '/sabre/uri/lib/Version.php',
     'WPO\\IPS\\Vendor\\Sabre\\Xml\\ContextStackTrait' => $vendorDir . '/sabre/xml/lib/ContextStackTrait.php',
@@ -232,6 +237,4 @@ return array(
     'WPO\\IPS\\Vendor\\Svg\\Tag\\Symbol' => $vendorDir . '/dompdf/php-svg-lib/src/Svg/Tag/Symbol.php',
     'WPO\\IPS\\Vendor\\Svg\\Tag\\Text' => $vendorDir . '/dompdf/php-svg-lib/src/Svg/Tag/Text.php',
     'WPO\\IPS\\Vendor\\Svg\\Tag\\UseTag' => $vendorDir . '/dompdf/php-svg-lib/src/Svg/Tag/UseTag.php',
-    'Symfony\\Polyfill\\Iconv\\Iconv' => $vendorDir . '/symfony/polyfill-iconv/Iconv.php',
-    'Symfony\\Polyfill\\Mbstring\\Mbstring' => $vendorDir . '/symfony/polyfill-mbstring/Mbstring.php',
 );

@@ -11,7 +11,7 @@
 		]
 	},
 	"require": {
-		"dompdf/dompdf": "^3.0",
+		"dompdf/dompdf": "^3.1",
 		"symfony/polyfill-mbstring": "^1.27",
 		"symfony/polyfill-iconv": "^1.27",
 		"sabre/xml": "^4.0"

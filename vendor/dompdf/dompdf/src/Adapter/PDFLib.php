@@ -3,8 +3,6 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf\Adapter;
 
@@ -244,14 +242,25 @@ class PDFLib implements Canvas
         $this->_pdf->set_info("Date", date("Y-m-d"));
         date_default_timezone_set($tz);
 
+        $doc_options = "";
+
+        if ($options->isPdfAEnabled()) {
+            $doc_options = "pdfa=PDF/A-3b autoxmp";
+        }
+
         if (self::$IN_MEMORY) {
-            $this->_pdf->begin_document("", "");
+            $this->_pdf->begin_document("", $doc_options);
         } else {
             $tmp_dir = $options->getTempDir();
             $tmp_name = @tempnam($tmp_dir, "libdompdf_pdf_");
             @unlink($tmp_name);
             $this->_file = "$tmp_name.pdf";
-            $this->_pdf->begin_document($this->_file, "");
+            $this->_pdf->begin_document($this->_file, $doc_options);
+        }
+
+        if ($options->isPdfAEnabled()) {
+            $iccProfilePath = $options->getRootDir() . '/lib/res/sRGB2014.icc';
+            $this->_pdf->load_iccprofile($iccProfilePath, "usage=outputintent");
         }
 
         $this->_pdf->begin_page_ext($this->_width, $this->_height, "");
