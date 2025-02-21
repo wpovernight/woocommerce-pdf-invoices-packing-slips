@@ -29,13 +29,13 @@ class FileSystem {
 	 * WP_Filesystem instance.
 	 * @var WP_Filesystem_Base|null
 	 */
-	public $wp_filesystem = null;
+	public ?WP_Filesystem_Base $wp_filesystem = null;
 	
 	/**
 	 * Singleton instance.
-	 * @var self
+	 * @var self|null
 	 */
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
 
 	/**
 	 * Singleton instance.
@@ -92,7 +92,7 @@ class FileSystem {
 
 		if ( ! WP_Filesystem() || ! $wp_filesystem ) {
 			wcpdf_log_error( 'WP_Filesystem initialization failed. Falling back to PHP methods.', 'warning' );
-			$this->system_enabled = 'php';
+			$this->system_enabled = $this->change_setting_value( 'php' );
 			return;
 		}
 
@@ -102,8 +102,22 @@ class FileSystem {
 		$filesystem_method = get_filesystem_method();
 		if ( 'direct' !== $filesystem_method ) {
 			wcpdf_log_error( "This plugin only supports the direct filesystem method. Current method: {$filesystem_method}", 'warning' );
-			$this->system_enabled = 'php';
+			$this->system_enabled = $this->change_setting_value( 'php' );
 		}
+	}
+	
+	/**
+	 * Change the filesystem setting value
+	 * @param string $default
+	 * @return string
+	 */
+	protected function change_setting_value( string $default = 'wp' ): string {
+		$debug_settings               = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$debug_settings['filesystem'] = in_array( $default, array( 'wp', 'php' ), true ) ? $default : 'wp';
+		
+		update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+		
+		return $debug_settings['filesystem'];
 	}
 
 	/**
@@ -203,9 +217,9 @@ class FileSystem {
 		}
 		return $this->is_wp_filesystem() ?
 			$this->wp_filesystem->is_writable( $filename ) :
-			( 'Windows' === PHP_OS_FAMILY 
-				? wp_is_writable( $filename ) 
-				: ( $this->suppress_errors ? @is_writable( $filename ) : is_writable( $filename ) ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+			( 'Windows' === PHP_OS_FAMILY ?
+				wp_is_writable( $filename ) :
+				( $this->suppress_errors ? @is_writable( $filename ) : is_writable( $filename ) ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			);
 	}
 
