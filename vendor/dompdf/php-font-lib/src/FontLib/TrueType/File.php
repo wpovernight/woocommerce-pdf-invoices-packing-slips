@@ -382,7 +382,7 @@ class File extends BinaryStream {
 
   function getFontType(){
     $class_parts = explode("\\", get_class($this));
-    return $class_parts[1];
+    return $class_parts[4];
   }
 
   function parseTableEntries() {
@@ -398,7 +398,7 @@ class File extends BinaryStream {
 
 
     $type = $this->getFontType();
-    $class = "FontLib\\$type\\TableDirectoryEntry";
+	$class = "WPO\\IPS\\Vendor\\FontLib\\$type\\TableDirectoryEntry";
 
     for ($i = 0; $i < $this->header->data["numTables"]; $i++) {
       /** @var TableDirectoryEntry $entry */
