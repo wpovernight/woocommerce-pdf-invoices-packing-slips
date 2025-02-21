@@ -124,7 +124,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$is_yearly_reset_enabled_class = 'inactive-status';
 					$is_yearly_reset_enabled_text  = sprintf(
 						/* translators: 1. Opening anchor tag, 2. Closing anchor tag */
-						esc_html__( '%1$sUpgrade to our Professional extension.%1$', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html__( '%1$sUpgrade to our Professional extension.%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a target="_blank" href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">',
 						'</a>'
 					);
