@@ -122,7 +122,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 				// Only invoice has a sequential number on the core plugin.
 				if ( ! $is_pro_installed_and_active && 'packing-slip' === $document->get_type() ) {
 					$is_yearly_reset_enabled_class = 'inactive-status';
-					$is_yearly_reset_enabled_text  = '-';
+					$is_yearly_reset_enabled_text  = sprintf(
+						/* translators: 1. Opening anchor tag, 2. Closing anchor tag */
+						esc_html__( '%1$sUpgrade to our Professional extension.%1$', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a target="_blank" href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">',
+						'</a>'
+					);
 				} else {
 					$is_yearly_reset_enabled       = isset( $document->settings['reset_number_yearly'] );
 					$is_yearly_reset_enabled_class = $is_yearly_reset_enabled ? 'valid-status' : 'invalid-status';
