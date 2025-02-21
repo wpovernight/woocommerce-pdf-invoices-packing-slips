@@ -167,7 +167,7 @@ abstract class Document {
 				'name'     => $item->get_name(),
 				'subtotal' => $subtotal,
 				'total'    => $total,
-				'discount' => $discount,
+				'discount' => (float) $discount,
 			];
 		}
 	
