@@ -17,13 +17,13 @@ class FileSystem {
 	 * Filesystem method.
 	 * @var string
 	 */
-	public $system_enabled = 'wp'; // Default to WP Filesystem API
+	public string $system_enabled = 'wp'; // Default to WP Filesystem API
 	
 	/**
 	 * Suppress errors.
 	 * @var bool
 	 */
-	public $suppress_errors = false;
+	public bool $suppress_errors = false;
 	
 	/**
 	 * WP_Filesystem instance.
@@ -112,9 +112,12 @@ class FileSystem {
 	 * @return string|bool
 	 */
 	public function get_contents( string $filename ) {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->get_contents( $filename ) 
-			: ( $this->suppress_errors ? @file_get_contents( $filename ) : file_get_contents( $filename ) );
+		if ( empty( $filename ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->get_contents( $filename ) :
+			( $this->suppress_errors ? @file_get_contents( $filename ) : file_get_contents( $filename ) );
 	}
 
 	/**
@@ -123,9 +126,12 @@ class FileSystem {
 	 * @return bool
 	 */
 	public function is_readable( string $filename ): bool {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->is_readable( $filename ) 
-			: ( $this->suppress_errors ? @is_readable( $filename ) : is_readable( $filename ) );
+		if ( empty( $filename ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->is_readable( $filename ) :
+			( $this->suppress_errors ? @is_readable( $filename ) : is_readable( $filename ) );
 	}
 
 	/**
@@ -136,9 +142,12 @@ class FileSystem {
 	 * @return int|bool
 	 */
 	public function put_contents( string $filename, string $contents, $mode = false ) {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->put_contents( $filename, $contents, $mode ) 
-			: ( $this->suppress_errors ? @file_put_contents( $filename, $contents ) : file_put_contents( $filename, $contents ) );
+		if ( empty( $filename ) || empty( $contents ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->put_contents( $filename, $contents, $mode ) :
+			( $this->suppress_errors ? @file_put_contents( $filename, $contents ) : file_put_contents( $filename, $contents ) );
 	}
 
 	/**
@@ -147,9 +156,12 @@ class FileSystem {
 	 * @return bool
 	 */
 	public function exists( string $filename ): bool {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->exists( $filename ) 
-			: ( $this->suppress_errors ? @file_exists( $filename ) : file_exists( $filename ) );
+		if ( empty( $filename ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->exists( $filename ) :
+			( $this->suppress_errors ? @file_exists( $filename ) : file_exists( $filename ) );
 	}
 
 	/**
@@ -158,9 +170,12 @@ class FileSystem {
 	 * @return bool
 	 */
 	public function is_dir( string $filename ): bool {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->is_dir( $filename ) 
-			: ( $this->suppress_errors ? @is_dir( $filename ) : is_dir( $filename ) );
+		if ( empty( $filename ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->is_dir( $filename ) :
+			( $this->suppress_errors ? @is_dir( $filename ) : is_dir( $filename ) );
 	}
 
 	/**
@@ -169,9 +184,12 @@ class FileSystem {
 	 * @return bool
 	 */
 	public function mkdir( string $path ): bool {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->mkdir( $path ) 
-			: ( $this->suppress_errors ? @mkdir( $path ) : mkdir( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_mkdir
+		if ( empty( $path ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->mkdir( $path ) :
+			( $this->suppress_errors ? @mkdir( $path ) : mkdir( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_mkdir
 	}
 	
 	/**
@@ -180,9 +198,12 @@ class FileSystem {
 	 * @return bool
 	 */
 	public function is_writable( string $filename ): bool {
-		return $this->is_wp_filesystem()
-			? $this->wp_filesystem->is_writable( $filename )
-			: ( 'Windows' === PHP_OS_FAMILY 
+		if ( empty( $filename ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->is_writable( $filename ) :
+			( 'Windows' === PHP_OS_FAMILY 
 				? wp_is_writable( $filename ) 
 				: ( $this->suppress_errors ? @is_writable( $filename ) : is_writable( $filename ) ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			);
@@ -195,9 +216,12 @@ class FileSystem {
 	 * @return bool
 	 */
 	public function delete( string $filename, bool $recursive = false ): bool {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->delete( $filename, $recursive ) 
-			: ( $this->suppress_errors ? @unlink( $filename ) : unlink( $filename ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+		if ( empty( $filename ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->delete( $filename, $recursive ) :
+			( $this->suppress_errors ? @unlink( $filename ) : unlink( $filename ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 	}
 
 	/**
@@ -206,9 +230,12 @@ class FileSystem {
 	 * @return array|bool
 	 */
 	public function dirlist( string $path ) {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->dirlist( $path ) 
-			: ( $this->suppress_errors ? @scandir( $path ) : scandir( $path ) );
+		if ( empty( $path ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->dirlist( $path ) :
+			( $this->suppress_errors ? @scandir( $path ) : scandir( $path ) );
 	}
 
 	/**
@@ -217,9 +244,12 @@ class FileSystem {
 	 * @return int|bool
 	 */
 	public function mtime( string $filename ) {
-		return $this->is_wp_filesystem() 
-			? $this->wp_filesystem->mtime( $filename ) 
-			: ( $this->suppress_errors ? @filemtime( $filename ) : filemtime( $filename ) );
+		if ( empty( $filename ) ) {
+			return false;
+		}
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->mtime( $filename ) :
+			( $this->suppress_errors ? @filemtime( $filename ) : filemtime( $filename ) );
 	}
 }
 
