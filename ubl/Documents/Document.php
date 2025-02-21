@@ -15,6 +15,9 @@ abstract class Document {
 
 	/** @var array */
 	public $order_tax_data;
+	
+	/** @var array */
+	public $order_coupons_data;
 
 	/** @var string */
 	public $output;
@@ -167,7 +170,7 @@ abstract class Document {
 				'name'     => $item->get_name(),
 				'subtotal' => $subtotal,
 				'total'    => $total,
-				'discount' => $discount,
+				'discount' => (float) $discount,
 			];
 		}
 	
