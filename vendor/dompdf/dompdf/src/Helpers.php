@@ -3,8 +3,6 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf;
 
@@ -45,23 +43,20 @@ class Helpers
     }
 
     /**
-     * builds a full url given a protocol, hostname, base path and url
+     * Builds a full url given a protocol, hostname, base path and URL.
+     *
+     * When the URL provided is a local file reference from the root of the filesystem
+     * (i.e., beginning with a "/") and the file does not resolve to a valid path,
+     * the path is validated against the chroot paths (if provided).
      *
      * @param string $protocol
      * @param string $host
      * @param string $base_path
      * @param string $url
+     * @param array  $chrootDirs array of strings representing the chroot paths
      * @return string
-     *
-     * Initially the trailing slash of $base_path was optional, and conditionally appended.
-     * However on dynamically created sites, where the page is given as url parameter,
-     * the base path might not end with an url.
-     * Therefore do not append a slash, and **require** the $base_url to ending in a slash
-     * when needed.
-     * Vice versa, on using the local file system path of a file, make sure that the slash
-     * is appended (o.k. also for Windows)
      */
-    public static function build_url($protocol, $host, $base_path, $url)
+    public static function build_url($protocol, $host, $base_path, $url, $chrootDirs = [])
     {
         $protocol = mb_strtolower($protocol);
         if (empty($protocol)) {
@@ -115,13 +110,26 @@ class Helpers
             $ret = preg_replace('/\?(.*)$/', "", $ret);
 
             $filepath = realpath($ret);
-            if ($filepath === false) {
-                return null;
+            if ($filepath !== false) {
+                $ret = "$protocol$filepath$res";
+
+                return $ret;
             }
 
-            $ret = "$protocol$filepath$res";
+            if ($url[0] == '/' && !empty($chrootDirs)) {
+                foreach ($chrootDirs as $dir) {
+                    $ret = realpath($dir) . $url;
+                    $ret = preg_replace('/\?(.*)$/', "", $ret);
 
-            return $ret;
+                    if ($filepath = realpath($ret)) {
+                        $ret = "$protocol$filepath$res";
+
+                        return $ret;
+                    }
+                }
+            }
+
+            return null;
         }
 
         $ret = $protocol;
@@ -279,8 +287,13 @@ class Helpers
      */
     public static function parse_data_uri($data_uri)
     {
-        if (!preg_match('/^data:(?P<mime>[a-z0-9\/+-.]+)(;charset=(?P<charset>[a-z0-9-])+)?(?P<base64>;base64)?\,(?P<data>.*)?/is', $data_uri, $match)) {
-            return false;
+        $expression = '/^data:(?P<mime>[a-z0-9\/+-.]+)(;charset=(?P<charset>[a-z0-9-])+)?(?P<base64>;base64)?\,(?P<data>.*)?/is';
+        if (!preg_match($expression, $data_uri, $match)) {
+            $parts = explode(",", $data_uri);
+            $parts[0] = preg_replace('/\\s/', '', $parts[0]);
+            if (preg_match('/\\s/', $data_uri) && !preg_match($expression, implode(",", $parts), $match)) {
+                return false;
+            }
         }
 
         $match['data'] = rawurldecode($match['data']);
@@ -581,7 +594,7 @@ class Helpers
     public static function record_warnings($errno, $errstr, $errfile, $errline)
     {
         // Not a warning or notice
-        if (!($errno & (E_WARNING | E_NOTICE | E_USER_NOTICE | E_USER_WARNING | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED))) {
+        if (!($errno & (E_WARNING | E_NOTICE | E_USER_NOTICE | E_USER_WARNING | E_DEPRECATED | E_USER_DEPRECATED))) {
             throw new Exception($errstr . " $errno");
         }
 
@@ -601,10 +614,10 @@ class Helpers
      * Shim for use on systems running PHP < 7.2
      *
      * @param string $c
-     * @param string $encoding
+     * @param string|null $encoding
      * @return int|false
      */
-    public static function uniord(string $c, string $encoding = null)
+    public static function uniord(string $c, ?string $encoding = null)
     {
         if (function_exists("mb_ord")) {
             if (PHP_VERSION_ID < 80000 && $encoding === null) {
@@ -677,10 +690,10 @@ class Helpers
      * Shim for use on systems running PHP < 7.2
      *
      * @param int    $c
-     * @param string $encoding
+     * @param string|null $encoding
      * @return string|false
      */
-    public static function unichr(int $c, string $encoding = null)
+    public static function unichr(int $c, ?string $encoding = null)
     {
         if (function_exists("mb_chr")) {
             if (PHP_VERSION_ID < 80000 && $encoding === null) {
@@ -787,7 +800,7 @@ class Helpers
                     $height = (int) $meta["height"];
                     $type = "bmp";
                 } elseif (strpos($data, "<svg") !== false) {
-                    $doc = new \WPO\IPS\Vendor\Svg\Document();
+                    $doc = new \Svg\Document();
                     $doc->loadFile($filename);
 
                     [$width, $height] = $doc->getDimensions();

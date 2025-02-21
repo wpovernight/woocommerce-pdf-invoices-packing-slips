@@ -3,8 +3,6 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 // FIXME: Need to sanity check inputs to this class
@@ -187,6 +185,10 @@ class CPDF implements Canvas
         $time = substr_replace(date('YmdHisO'), '\'', -2, 0) . '\'';
         $this->_pdf->addInfo("CreationDate", "D:$time");
         $this->_pdf->addInfo("ModDate", "D:$time");
+
+        if ($this->_dompdf->getOptions()->isPdfAEnabled()) {
+            $this->_pdf->enablePdfACompliance();
+        }
 
         $this->_width = $size[2] - $size[0];
         $this->_height = $size[3] - $size[1];

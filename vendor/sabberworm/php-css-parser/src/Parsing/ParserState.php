@@ -1,21 +1,19 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Parsing;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
 use WPO\IPS\Vendor\Sabberworm\CSS\Settings;
 
+/**
+ * @internal since 8.7.0
+ */
 class ParserState
 {
     /**
      * @var null
      *
-     * @internal
+     * @internal since 8.5.2
      */
     const EOF = null;
 

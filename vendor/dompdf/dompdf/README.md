@@ -2,9 +2,10 @@ Dompdf
 ======
 
 [![Build Status](https://github.com/dompdf/dompdf/actions/workflows/test.yml/badge.svg)](https://github.com/dompdf/dompdf/actions/workflows/test.yml)
-[![Latest Release](https://poser.pugx.org/dompdf/dompdf/v/stable.png)](https://packagist.org/packages/dompdf/dompdf)
-[![Total Downloads](https://poser.pugx.org/dompdf/dompdf/downloads.png)](https://packagist.org/packages/dompdf/dompdf)
-[![License](https://poser.pugx.org/dompdf/dompdf/license.png)](https://packagist.org/packages/dompdf/dompdf)
+[![PHP Versions Supported](https://poser.pugx.org/dompdf/dompdf/require/php)](https://packagist.org/packages/dompdf/dompdf)
+[![Latest Release](https://poser.pugx.org/dompdf/dompdf/v)](https://packagist.org/packages/dompdf/dompdf)
+[![Total Downloads](https://poser.pugx.org/dompdf/dompdf/downloads)](https://packagist.org/packages/dompdf/dompdf)
+[![License](https://poser.pugx.org/dompdf/dompdf/license)](https://packagist.org/packages/dompdf/dompdf)
  
 **Dompdf is an HTML to PDF converter**
 
@@ -98,7 +99,6 @@ Make sure that the autoload file from Composer is loaded.
 // somewhere early in your project's loading, require the Composer autoloader
 // see: http://getcomposer.org/doc/00-intro.md
 require 'vendor/autoload.php';
-
 ```
 
 ### Download and install
@@ -150,6 +150,12 @@ git checkout 8.1.0
 
 Require dompdf and it's dependencies in your PHP.
 For details see the [autoloader in the utils project](https://github.com/dompdf/utils/blob/master/autoload.inc.php).
+
+## Framework Integration
+
+* For Symfony: [nucleos/dompdf-bundle](https://github.com/nucleos/NucleosDompdfBundle)
+* For Laravel: [barryvdh/laravel-dompdf](https://github.com/barryvdh/laravel-dompdf)
+* For Redaxo: [PdfOut](https://github.com/FriendsOfREDAXO/pdfout)
 
 ## Quick Start
 

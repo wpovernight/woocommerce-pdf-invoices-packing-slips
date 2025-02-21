@@ -3,8 +3,6 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf\Image;
 
@@ -70,7 +68,7 @@ class Cache
         $message = null;
         
         try {
-            $full_url = Helpers::build_url($protocol, $host, $base_path, $url);
+            $full_url = Helpers::build_url($protocol, $host, $base_path, $url, $options->getChroot());
 
             if ($full_url === null) {
                 throw new ImageException("Unable to parse image URL $url.", E_WARNING);
@@ -79,17 +77,15 @@ class Cache
             $parsed_url = Helpers::explode_url($full_url);
             $protocol = strtolower($parsed_url["protocol"]);
             $is_data_uri = strpos($protocol, "data:") === 0;
-            
-            if (!$is_data_uri) {
-                $allowed_protocols = $options->getAllowedProtocols();
-                if (!array_key_exists($protocol, $allowed_protocols)) {
-                    throw new ImageException("Permission denied on $url. The communication protocol is not supported.", E_WARNING);
-                }
-                foreach ($allowed_protocols[$protocol]["rules"] as $rule) {
-                    [$result, $message] = $rule($full_url);
-                    if (!$result) {
-                        throw new ImageException("Error loading $url: $message", E_WARNING);
-                    }
+
+            $allowed_protocols = $options->getAllowedProtocols();
+            if (!array_key_exists($protocol, $allowed_protocols)) {
+                throw new ImageException("Permission denied on $url. The communication protocol is not supported.", E_WARNING);
+            }
+            foreach ($allowed_protocols[$protocol]["rules"] as $rule) {
+                [$result, $message] = $rule($full_url);
+                if (!$result) {
+                    throw new ImageException("Error loading $url: $message", E_WARNING);
                 }
             }
 
@@ -156,7 +152,7 @@ class Cache
                                     continue;
                                 }
 
-                                $inner_full_url = Helpers::build_url($parsed_url["protocol"], $parsed_url["host"], $parsed_url["path"], $url);
+                                $inner_full_url = Helpers::build_url($parsed_url["protocol"], $parsed_url["host"], $parsed_url["path"], $url, $options->getChroot());
                                 if (empty($inner_full_url)) {
                                     continue;
                                 }
@@ -170,7 +166,7 @@ class Cache
                             }
                         }
                     },
-                    false
+                    null
                 );
         
                 if (($fp = fopen($resolved_url, "r")) !== false) {
