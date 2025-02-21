@@ -171,7 +171,7 @@ class FileSystem {
 	public function mkdir( string $path ): bool {
 		return $this->is_wp_filesystem() 
 			? $this->wp_filesystem->mkdir( $path ) 
-			: ( $this->suppress_errors ? @mkdir( $path ) : mkdir( $path ) );
+			: ( $this->suppress_errors ? @mkdir( $path ) : mkdir( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_mkdir
 	}
 	
 	/**
@@ -184,7 +184,7 @@ class FileSystem {
 			? $this->wp_filesystem->is_writable( $filename )
 			: ( 'Windows' === PHP_OS_FAMILY 
 				? wp_is_writable( $filename ) 
-				: ( $this->suppress_errors ? @is_writable( $filename ) : is_writable( $filename ) )
+				: ( $this->suppress_errors ? @is_writable( $filename ) : is_writable( $filename ) ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			);
 	}
 
@@ -197,7 +197,7 @@ class FileSystem {
 	public function delete( string $filename, bool $recursive = false ): bool {
 		return $this->is_wp_filesystem() 
 			? $this->wp_filesystem->delete( $filename, $recursive ) 
-			: ( $this->suppress_errors ? @unlink( $filename ) : unlink( $filename ) );
+			: ( $this->suppress_errors ? @unlink( $filename ) : unlink( $filename ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 	}
 
 	/**
