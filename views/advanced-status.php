@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tbody>
 		<tr>
 			<td class="title">PDF Invoices & Packing Slips for WooCommerce</td>
-			<td><?php esc_html_e( WPO_WCPDF()->version ); ?></td>
+			<td><?php echo esc_html( WPO_WCPDF()->version ); ?></td>
 			<td class="status-cell valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 		</tr>
 		<?php
