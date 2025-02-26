@@ -1,9 +1,4 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Comment;
 
@@ -67,9 +62,11 @@ class Comment implements Renderable
     }
 
     /**
+     * @param OutputFormat|null $oOutputFormat
+     *
      * @return string
      */
-    public function render(OutputFormat $oOutputFormat)
+    public function render($oOutputFormat)
     {
         return '/*' . $this->sComment . '*/';
     }

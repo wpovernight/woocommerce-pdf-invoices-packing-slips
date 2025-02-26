@@ -3,8 +3,6 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf\Css;
 
@@ -64,6 +62,13 @@ class Stylesheet
     const PATTERN_CSS_STRING = '(?<CSS_STRING>(?<CSS_STRING_QUOTE>[\'"])(?<CSS_STRING_VALUE>.*?)(?<!\\\\)\g{CSS_STRING_QUOTE})';
 
     /**
+     * RegEx pattern representing the CSS var() function
+     *
+     * @var string
+     */
+    const PATTERN_CSS_VAR_FN = "var\((([^()]|(?R))*)\)";
+
+    /**
      * RegEx pattern representing the CSS url() function
      *
      * @var string
@@ -120,6 +125,13 @@ class Stylesheet
      * @var array<string, Style[]>
      */
     private $_styles;
+
+    /**
+     * Array of embedded files (dataURIs) found in the parsed CSS
+     *
+     * @var array<string>
+     */
+    private $_blobs;
 
     /**
      * Base protocol of the document being parsed
@@ -356,37 +368,34 @@ class Stylesheet
         if (isset($this->_loaded_files[$file])) {
             return;
         }
-
         $this->_loaded_files[$file] = true;
+
+        $parsed_url = Helpers::explode_url($file);
+        $protocol = $parsed_url["protocol"];
+
+        if ($file !== $this->getDefaultStylesheet()) {
+            $options = $this->_dompdf->getOptions();
+            $allowed_protocols = $options->getAllowedProtocols();
+            if (!array_key_exists($protocol, $allowed_protocols)) {
+                Helpers::record_warnings(E_USER_WARNING, "Permission denied on $file. The communication protocol is not supported.", __FILE__, __LINE__);
+                return;
+            }
+            foreach ($allowed_protocols[$protocol]["rules"] as $rule) {
+                [$result, $message] = $rule($file);
+                if (!$result) {
+                    Helpers::record_warnings(E_USER_WARNING, "Error loading $file: $message", __FILE__, __LINE__);
+                    return;
+                }
+            }
+        }
 
         if (strpos($file, "data:") === 0) {
             $parsed = Helpers::parse_data_uri($file);
             $css = $parsed["data"];
         } else {
-            $options = $this->_dompdf->getOptions();
-
-            $parsed_url = Helpers::explode_url($file);
-            $protocol = $parsed_url["protocol"];
-
-            if ($file !== $this->getDefaultStylesheet()) {
-                $allowed_protocols = $options->getAllowedProtocols();
-                if (!array_key_exists($protocol, $allowed_protocols)) {
-                    Helpers::record_warnings(E_USER_WARNING, "Permission denied on $file. The communication protocol is not supported.", __FILE__, __LINE__);
-                    return;
-                }
-                foreach ($allowed_protocols[$protocol]["rules"] as $rule) {
-                    [$result, $message] = $rule($file);
-                    if (!$result) {
-                        Helpers::record_warnings(E_USER_WARNING, "Error loading $file: $message", __FILE__, __LINE__);
-                        return;
-                    }
-                }
-            }
-
             [$css, $http_response_header] = Helpers::getFileContent($file, $this->_dompdf->getHttpContext());
 
             $good_mime_type = true;
-
             if (isset($http_response_header) && !$this->_dompdf->getQuirksmode()) {
                 foreach ($http_response_header as $_header) {
                     if (preg_match("@Content-Type:\s*([\w/]+)@i", $_header, $matches) &&
@@ -501,6 +510,7 @@ class Stylesheet
 
             // Eat characters up to the next delimiter
             $tok = "";
+            $escape = false;
             $in_attr = false;
             $in_func = false;
 
@@ -508,7 +518,13 @@ class Stylesheet
                 $c = $selector[$i];
                 $c_prev = $selector[$i - 1];
 
-                if (!$in_func && !$in_attr && in_array($c, $delimiters, true) && !($c === $c_prev && $c === ":")) {
+                if ($c_prev === "\\" && !$escape) {
+                    $escape = true;
+                } elseif ($escape === true) {
+                    $escape = false;
+                }
+
+                if (!$escape && !$in_func && !$in_attr && in_array($c, $delimiters, true) && !($c === $c_prev && $c === ":")) {
                     break;
                 }
 
@@ -521,15 +537,17 @@ class Stylesheet
 
                 $tok .= $selector[$i++];
 
-                if ($in_attr && $c === "]") {
+                if (!$escape && $in_attr && $c === "]") {
                     $in_attr = false;
                     break;
                 }
-                if ($in_func && $c === ")") {
+                if (!$escape && $in_func && $c === ")") {
                     $in_func = false;
                     break;
                 }
             }
+            $tok = $this->parse_string($tok);
+    
 
             switch ($s) {
 
@@ -990,14 +1008,19 @@ class Stylesheet
                         // https://www.w3.org/TR/CSS21/generate.html#content
                         // https://www.w3.org/TR/CSS21/generate.html#undisplayed-counters
                         if ($content === "normal" || $content === "none") {
-                            continue;
+                            $specified = $style->get_specified("content");
+                            if (!\preg_match("/". self::PATTERN_CSS_VAR_FN . "/", $specified)) {
+                                continue;
+                            } else {
+                                $content = [];
+                            }
                         }
 
                         // https://www.w3.org/TR/css-content-3/#content-property
                         $single = count($content) === 1 ? $content[0] : null;
 
                         if ($single instanceof Url) {
-                            $src = $this->resolve_url("url($single->url)");
+                            $src = $this->resolve_url("url($single->url)", true);
                             $new_node = $node->ownerDocument->createElement("img_generated");
                             $new_node->setAttribute("src", $src);
                         } else {
@@ -1226,8 +1249,6 @@ class Stylesheet
      * Called by {@link Stylesheet::parse_css()}
      *
      * @param string $str
-     *
-     * @throws Exception
      */
     private function _parse_css($str)
     {
@@ -1285,8 +1306,23 @@ class Stylesheet
             /isx
 EOL;
 
-        if (preg_match_all($re, $css, $matches, PREG_SET_ORDER) === false) {
-            throw new Exception("Error parsing css file: preg_match_all() failed.");
+        // replace data URIs with blob URIs
+        while (($start = strpos($css, "data:")) !== false) {
+            $len = null;
+            if (preg_match("/['\"\)]/", $css, $matches, PREG_OFFSET_CAPTURE, $start)) {
+                $len = $matches[0][1] - $start;
+            }
+            $data_uri = substr($css, $start, $len);
+            $data_uri_hash = md5($data_uri);
+            $this->_blobs[$data_uri_hash] = $data_uri;
+            $css = substr($css, 0, $start) . "blob://" . $data_uri_hash . ($len > 0 ? substr($css, $start + $len) : "");
+        }
+
+        $matches = [];
+        if (preg_match_all($re, $css, $matches, PREG_SET_ORDER) === false || count($matches) === 0) {
+            global $_dompdf_warnings;
+            $_dompdf_warnings[] = "Unable to parse CSS that starts with: " . substr($str, 0, 100);
+            return;
         }
 
         $media_query_regex = "/{$pattern_media_query}/isx";
@@ -1408,10 +1444,11 @@ EOL;
      * Resolve the given `url()` declaration to an absolute URL.
      *
      * @param string|null $val The declaration to resolve in the context of the stylesheet.
-     * @return string The resolved URL, or `none`, if the value is `none`,
-     *         invalid, or points to a non-existent local file.
+     * @param bool|null   $resolve_blobs Indicates whether or not to resolve blob URLs to their final value.
+     * @return string     The resolved URL, or `none`, if the value is `none`,
+     *                    invalid, or points to a non-existent local file.
      */
-    public function resolve_url($val): string
+    public function resolve_url($val, $resolve_blobs = false): string
     {
         $DEBUGCSS = $this->_dompdf->getOptions()->getDebugCss();
 
@@ -1432,11 +1469,15 @@ EOL;
                     $url = str_replace(["\\(", "\\)"], ["(", ")"], $url);
                     break;
             }
+            if ($resolve_blobs === true && strpos($url, "blob://") !== false) {
+                $url = $this->_blobs[substr($url, 7)];
+            }
             $path = Helpers::build_url(
                 $this->_protocol,
                 $this->_base_host,
                 $this->_base_path,
-                $url
+                $url,
+                $this->_dompdf->getOptions()->getChroot()
             );
             if ($path === null) {
                 $path = "none";
@@ -1465,7 +1506,7 @@ EOL;
         if (mb_strpos($url, "url(") === false) {
             $url = "url($url)";
         }
-        if (($url = $this->resolve_url($url)) === "none") {
+        if (($url = $this->resolve_url($url, true)) === "none") {
             return;
         }
 
@@ -1579,16 +1620,16 @@ EOL;
 
         $valid_sources = [];
         foreach ($sources as $source) {
-            $url_value = $source["CSS_URL_FN_VALUE"] ?? "";
+            $urlfn = $source["CSS_URL_FN"] ?? "";
             $format = strtolower($source["CSS_STRING_VALUE"] ?? $source["FORMAT_VALUE"] ?? "truetype");
 
-            if ($url_value !== "" && $format === "truetype") {
-                $url = Helpers::build_url($this->_protocol, $this->_base_host, $this->_base_path, $url_value);
-                if ($url === null) {
+            if ($urlfn !== "" && $format === "truetype") {
+                $url = $this->resolve_url($urlfn, true);
+                if ($url === "none") {
                     continue;
                 }
                 $source_info = [
-                    "uri" => $url_value,
+                    "uri" => $urlfn,
                     "format" => $format,
                     "path" => $url,
                 ];
@@ -1630,16 +1671,35 @@ EOL;
             print '[_parse_properties';
         }
 
-        // Split on non-escaped semicolons which are not part of an unquoted
-        // `url()` declaration. Semicolons in strings are not detected here, and
-        // as a consequence, should be escaped if used in a string
-        $urlEnd = "(?> (\\\\[\"'()] | [^\"'()])* ) (?<!\\\\)\)";
-        $properties = preg_split("/(?<!\\\\); (?! $urlEnd )/x", $str);
+        $delims = ['"' => '"', "'" => "'", '(' => ')'];
+        $delim = null;
+        $len = strlen($str);
+        $properties = [];
+        $char = null;
+        $prev = null;
+        for ($pos = 0; $pos < $len; $pos++) {
+            $prev = $char;
+            $char = $str[$pos];
+            if ($delim !== null) {
+                if ($char === $delims[$delim] && $prev !== '\\') {
+                    $delim = null;
+                }
+                continue;
+            }
+            if (isset($delims[$char]) && $prev !== '\\') {
+                $delim = $char;
+                continue;
+            }
+            if ($char === ';' && $prev !== '\\') {
+                $properties[] = substr($str, 0, $pos);
+                $str = substr($str, $pos+1);
+                $pos = 0;
+                $len = strlen($str);
+            }
+        }
+        $properties[] = $str;
         $style = new Style($this, Stylesheet::ORIG_AUTHOR);
-
         foreach ($properties as $prop) {
-            // Instead of short code with `preg_match`, prefer the typical case
-            // with fast code
             $prop = trim($prop);
             if ($prop === "") {
                 continue;
@@ -1740,13 +1800,35 @@ EOL;
     }
 
     /**
+     * Parses a CSS string containing quotes and escaped hex characters.
+     * https://www.w3.org/TR/CSS21/syndata.html#characters
+     *
+     * @param string $string The string to parse.
+     *
+     * @return string
+     */
+    public function parse_string(string $string): string
+    {
+        // Strip string quotes and escapes
+        $string = preg_replace('/^["\']|["\']$/', "", $string);
+        $string = preg_replace("/\\\\([^0-9a-fA-F])/", "\\1", $string);
+
+        // Convert escaped hex characters (e.g. \A => newline)
+        return preg_replace_callback(
+            "/\\\\([0-9a-fA-F]{1,6})\s?/",
+            function ($matches) { return Helpers::unichr(hexdec($matches[1])); },
+            $string
+        ) ?? "";
+    }
+
+    /**
      * @return string
      */
     public function getDefaultStylesheet()
     {
         $options = $this->_dompdf->getOptions();
         $rootDir = realpath($options->getRootDir());
-        return Helpers::build_url("file://", "", $rootDir, $rootDir . self::DEFAULT_STYLESHEET);
+        return Helpers::build_url("file://", "", $rootDir, $rootDir . self::DEFAULT_STYLESHEET, $options->getChroot());
     }
 
     /**

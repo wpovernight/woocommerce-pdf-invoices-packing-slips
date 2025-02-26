@@ -1,9 +1,4 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
@@ -93,9 +88,11 @@ class CSSFunction extends ValueList
     }
 
     /**
+     * @param OutputFormat|null $oOutputFormat
+     *
      * @return string
      */
-    public function render(OutputFormat $oOutputFormat)
+    public function render($oOutputFormat)
     {
         $aArguments = parent::render($oOutputFormat);
         return "{$this->sName}({$aArguments})";
