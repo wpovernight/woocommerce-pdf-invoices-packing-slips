@@ -143,15 +143,15 @@ class WPO_WCPDF {
 	public function includes() {
 		// plugin legacy class mapping
 		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
+
+		// plugin functions
+		include_once $this->plugin_path() . '/wpo-ips-functions.php';
+		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
 		
 		// Compatibility classes
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
-
-		// plugin functions
-		include_once $this->plugin_path() . '/wpo-ips-functions.php';
-		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
 		
 		// Plugin classes
 		$this->settings            = \WPO\IPS\Settings::instance();

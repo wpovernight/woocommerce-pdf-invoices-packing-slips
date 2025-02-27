@@ -1003,8 +1003,14 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
  * @throws RuntimeException
  */
 function wpo_wcpdf_get_wp_filesystem() {
+	
 	wcpdf_deprecated_function( 'wpo_wcpdf_get_wp_filesystem', '4.2.0', 'WPO_WCPDF()->file_system->get_wp_filesystem()' );
-	return WPO_WCPDF()->file_system->wp_filesystem;
+	
+	if ( class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) && method_exists( '\\WPO\\IPS\\Compatibility\\FileSystem', 'instance' ) ) {
+		return \WPO\IPS\Compatibility\FileSystem::instance()->wp_filesystem ?? false;
+	} else {
+		return false;
+	}
 }
 
 /**
