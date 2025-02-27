@@ -1235,7 +1235,7 @@ class SettingsDebug {
 			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $premium_plugin );
 
 			if ( ! empty( $plugin_data ) ) {
-				$plugins[] = array(
+				$plugins[ $premium_plugin ] = array(
 					'name'      => $plugin_data['Name'],
 					'version'   => $plugin_data['Version'],
 					'is_active' => is_plugin_active( $premium_plugin ),
