@@ -102,14 +102,11 @@
 <?php do_action( 'wpo_wcpdf_before_order_details', $this->get_type(), $this->order ); ?>
 
 <table class="order-details">
-	<?php $headers = wpo_wcpdf_get_simple_template_default_table_headers( $this ); ?>
 	<thead>
 		<tr>
-			<?php
-				foreach ( $headers as $column_class => $column_title ) {
-					printf( '<th class="%s">%s</th>', esc_attr( $column_class ), esc_html( $column_title ) );
-				}
-			?>
+			<?php foreach ( wpo_wcpdf_get_simple_template_default_table_headers( $this ) as $column_class => $column_title ) : ?>
+				<th class="<?php echo esc_attr( $column_class ); ?>"><?php echo esc_html( $column_title ); ?></th>
+			<?php endforeach; ?>
 		</tr>
 	</thead>
 	<tbody>
