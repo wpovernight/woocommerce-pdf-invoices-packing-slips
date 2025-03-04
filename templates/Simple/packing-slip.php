@@ -5,15 +5,13 @@
 <table class="head container">
 	<tr>
 		<td class="header">
-		<?php
-			if ( $this->has_header_logo() ) {
-				do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order );
-				$this->header_logo();
-				do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order );
-			} else {
-				$this->title();
-			}
-		?>
+			<?php if ( $this->has_header_logo() ) : ?>
+				<?php do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order ); ?>
+				<?php $this->header_logo(); ?>
+				<?php do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order ); ?>
+			<?php else : ?>
+				<?php $this->title(); ?>
+			<?php endif; ?>
 		</td>
 		<td class="shop-info">
 			<?php do_action( 'wpo_wcpdf_before_shop_name', $this->get_type(), $this->order ); ?>
@@ -29,7 +27,9 @@
 <?php do_action( 'wpo_wcpdf_before_document_label', $this->get_type(), $this->order ); ?>
 
 <?php if ( $this->has_header_logo() ) : ?>
-	<h1 class="document-type-label"><?php $this->title(); ?></h1>
+	<h1 class="document-type-label">
+		<?php $this->title(); ?>
+	</h1>
 <?php endif; ?>
 
 <?php do_action( 'wpo_wcpdf_after_document_label', $this->get_type(), $this->order ); ?>
