@@ -5,15 +5,13 @@
 <table class="head container">
 	<tr>
 		<td class="header">
-		<?php
-			if ( $this->has_header_logo() ) {
-				do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order );
-				$this->header_logo();
-				do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order );
-			} else {
-				$this->title();
-			}
-		?>
+			<?php if ( $this->has_header_logo() ) : ?>
+				<?php do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order ); ?>
+				<?php $this->header_logo(); ?>
+				<?php do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order ); ?>
+			<?php else : ?>
+				<?php $this->title(); ?>
+			<?php endif; ?>
 		</td>
 		<td class="shop-info">
 			<?php do_action( 'wpo_wcpdf_before_shop_name', $this->get_type(), $this->order ); ?>
@@ -102,14 +100,11 @@
 <?php do_action( 'wpo_wcpdf_before_order_details', $this->get_type(), $this->order ); ?>
 
 <table class="order-details">
-	<?php $headers = wpo_wcpdf_get_simple_template_default_table_headers( $this ); ?>
 	<thead>
 		<tr>
-			<?php
-				foreach ( $headers as $column_class => $column_title ) {
-					printf( '<th class="%s">%s</th>', esc_attr( $column_class ), esc_html( $column_title ) );
-				}
-			?>
+			<?php foreach ( wpo_wcpdf_get_simple_template_default_table_headers( $this ) as $column_class => $column_title ) : ?>
+				<th class="<?php echo esc_attr( $column_class ); ?>"><?php echo esc_html( $column_title ); ?></th>
+			<?php endforeach; ?>
 		</tr>
 	</thead>
 	<tbody>
