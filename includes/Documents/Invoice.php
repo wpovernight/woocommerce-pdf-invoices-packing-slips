@@ -553,7 +553,7 @@ class Invoice extends OrderDocumentMethods {
 			),
 		);
 
-		if ( 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type() ) {
+		if ( 'full' === WPO_WCPDF()->endpoint->get_document_link_access_type() ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
 				'id'       => 'include_email_link',
