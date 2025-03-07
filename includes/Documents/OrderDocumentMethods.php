@@ -592,7 +592,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 				// Set the item_id
 				$data['item_id'] = $item_id;
-				
+
 				// Set the item row class
 				$data['row_class'] = apply_filters( 'wpo_wcpdf_item_row_class', 'item-' . $item_id, $this->get_type(), $this->order, $item_id );
 
@@ -767,7 +767,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function get_tax_rate_by_id( $rate_id, $order = null ) {
 		global $wpdb;
-		
+
 		// WC 3.7+ stores rate in tax items!
 		if ( $order_rates = $this->get_tax_rates_from_order( $order ) ) {
 			if ( isset( $order_rates[ $rate_id ] ) ) {
@@ -781,7 +781,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 				$rate_id
 			)
 		);
-		
+
 		if ( is_null( $rate ) ) {
 			return false;
 		} else {
@@ -1302,7 +1302,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$document_notes = $this->get_document_notes();
 
 		if ( ! empty( $document_notes ) ) {
-			echo wpo_wcpdf_sanitize_html_content( $document_notes, 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpo_wcpdf_sanitize_html_content( wpautop( $document_notes ), 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 

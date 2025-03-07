@@ -87,20 +87,21 @@ class Endpoint {
 		}
 	}
 
-	public function get_document_link( $order, $document_type, $additional_vars = array() ) {
+	public function get_document_link( $order, $document_type, $additional_vars = array(), bool $bypass_login_access = false ) {
 		if ( empty( $order ) || empty( $document_type ) ) {
 			return '';
 		}
 
-		$access_type = $this->get_document_link_access_type();
+		$access_type       = $this->get_document_link_access_type();
+		$is_user_logged_in = is_user_logged_in() && ! $bypass_login_access;
 
 		switch ( $access_type ) {
 			case 'logged_in':
 			default:
-				$access_key = is_user_logged_in() ? wp_create_nonce( $this->actions['generate'] ) : '';
+				$access_key = $is_user_logged_in ? wp_create_nonce( $this->actions['generate'] ) : '';
 				break;
 			case 'guest': // 'guest' is hybrid, it can behave as 'logged_in' if the user is logged in, but if not, behaves as 'full'
-				$access_key = ! is_user_logged_in() ? $order->get_order_key() : wp_create_nonce( $this->actions['generate'] );
+				$access_key = ! $is_user_logged_in ? $order->get_order_key() : wp_create_nonce( $this->actions['generate'] );
 				break;
 			case 'full':
 				$access_key = $order->get_order_key();

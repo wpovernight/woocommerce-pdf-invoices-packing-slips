@@ -1025,7 +1025,8 @@ abstract class OrderDocument {
 	 */
 	public function get_language_attributes(): string {
 		$language_attributes = apply_filters( 'wpo_wcpdf_document_language_attributes', get_language_attributes(), $this );
-		return apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $language_attributes, $this->get_type(), $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
+		$language_attributes = apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $language_attributes, $this->get_type(), $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
+		return $language_attributes ?? '';
 	}
 
 	/**
@@ -1385,7 +1386,7 @@ abstract class OrderDocument {
 		return ob_get_clean();
 	}
 	public function footer() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_footer() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_footer() );
 	}
 
 	/**
@@ -1396,7 +1397,7 @@ abstract class OrderDocument {
 
 	}
 	public function extra_1() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_1() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_extra_1() );
 	}
 
 	/**
@@ -1406,7 +1407,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_2' );
 	}
 	public function extra_2() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_2() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_extra_2() );
 	}
 
 	/**
@@ -1416,7 +1417,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'extra_3' );
 	}
 	public function extra_3() {
-		echo wpo_wcpdf_sanitize_html_content( $this->get_extra_3() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_extra_3() );
 	}
 
 	/*
@@ -1847,7 +1848,7 @@ abstract class OrderDocument {
 		$retired_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '" . esc_sql( $retired_table_name ) . "'"
 		) == $retired_table_name;
-		
+
 		if ( $retired_exists ) {
 			$table_removed = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 				"DROP TABLE IF EXISTS `" . esc_sql( $retired_table_name ) . "`" // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
@@ -1863,7 +1864,7 @@ abstract class OrderDocument {
 		$default_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '" . esc_sql( $default_table_name ) . "'"
 		) == $default_table_name;
-		
+
 		if ( $default_exists ) {
 			$table_renamed = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 				"ALTER TABLE `" . esc_sql( $default_table_name ) . "` RENAME `" . esc_sql( $retired_table_name ) . "`" // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
@@ -1879,7 +1880,7 @@ abstract class OrderDocument {
 		$current_year_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '" . esc_sql( $current_year_table_name ) . "'"
 		) == $current_year_table_name;
-		
+
 		if ( $current_year_exists ) {
 			$table_renamed = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 				"ALTER TABLE `" . esc_sql( $current_year_table_name ) . "` RENAME `" . esc_sql( $default_table_name ) . "`" // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
@@ -1920,7 +1921,7 @@ abstract class OrderDocument {
 		$table_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '" . esc_sql( $table_name ) . "'"
 		) == $table_name;
-		
+
 		if ( $table_exists ) {
 			// get year for the last row
 			$year = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery

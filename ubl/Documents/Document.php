@@ -15,6 +15,9 @@ abstract class Document {
 
 	/** @var array */
 	public $order_tax_data;
+	
+	/** @var array */
+	public $order_coupons_data;
 
 	/** @var string */
 	public $output;
@@ -23,8 +26,9 @@ abstract class Document {
 	public $order_document;
 
 	public function set_order( \WC_Abstract_Order $order ) {
-		$this->order          = $order;
-		$this->order_tax_data = $this->get_tax_rates();
+		$this->order              = $order;
+		$this->order_tax_data     = $this->get_tax_rates();
+		$this->order_coupons_data = $this->get_order_coupons_data();
 	}
 
 	public function set_order_document( OrderDocument $order_document ) {
@@ -131,6 +135,50 @@ abstract class Document {
 
 		return $order_tax_data;
 	}
+	
+	/**
+	 * Get order coupons data
+	 *
+	 * @return array
+	 */
+	public function get_order_coupons_data(): array {
+		$order      = $this->order;
+		$order_data = array();
+	
+		// Get applied coupons
+		$applied_coupons = $order->get_coupon_codes();
+		$coupons_data    = array();
+	
+		foreach ( $applied_coupons as $coupon_code ) {
+			$coupon         = new \WC_Coupon( $coupon_code );
+			$coupons_data[] = array(
+				'code'   => $coupon->get_code(),
+				'type'   => $coupon->get_discount_type(),
+				'amount' => $coupon->get_amount(),
+			);
+		}
+	
+		// Get item-level discounts
+		$items_data = array();
+	
+		foreach ( $order->get_items() as $item_id => $item ) {
+			$subtotal = $item->get_subtotal();
+			$total    = $item->get_total();
+			$discount = $subtotal - $total;
+	
+			$items_data[ $item_id ] = [
+				'name'     => $item->get_name(),
+				'subtotal' => $subtotal,
+				'total'    => $total,
+				'discount' => (float) $discount,
+			];
+		}
+	
+		$order_data['coupons'] = $coupons_data;
+		$order_data['items']   = $items_data;
+	
+		return $order_data;
+	}	
 
 	/**
 	 * Get percentage from fallback

@@ -3,8 +3,6 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf\Css;
 
@@ -1349,6 +1347,9 @@ class Style
             } elseif (\in_array($part, $ops, true)) {
                 $rightValue = array_pop($stack);
                 $leftValue = array_pop($stack);
+                if ($rightValue === null || $leftValue === null) {
+                    return null;
+                }
                 switch ($part) {
                     case '*':
                         $stack[] = $leftValue * $rightValue;
@@ -2208,7 +2209,7 @@ class Style
      */
     protected function _get_background_image($computed): string
     {
-        return $this->_stylesheet->resolve_url($computed);
+        return $this->_stylesheet->resolve_url($computed, true);
     }
 
     /**
@@ -2506,7 +2507,7 @@ class Style
      */
     protected function _get_list_style_image($computed): string
     {
-        return $this->_stylesheet->resolve_url($computed);
+        return $this->_stylesheet->resolve_url($computed, true);
     }
 
     /**
@@ -2527,27 +2528,6 @@ class Style
     }
 
     /*==============================*/
-
-    /**
-     * Parses a CSS string containing quotes and escaped hex characters.
-     *
-     * @param string $string The string to parse.
-     *
-     * @return string
-     */
-    protected function parse_string(string $string): string
-    {
-        // Strip string quotes and escapes
-        $string = preg_replace('/^["\']|["\']$/', "", $string);
-        $string = preg_replace("/\\\\([^0-9a-fA-F])/", "\\1", $string);
-
-        // Convert escaped hex characters (e.g. \A => newline)
-        return preg_replace_callback(
-            "/\\\\([0-9a-fA-F]{1,6})/",
-            function ($matches) { return Helpers::unichr(hexdec($matches[1])); },
-            $string
-        ) ?? "";
-    }
 
     /**
      * Parse a property value into its components.
@@ -4118,7 +4098,7 @@ class Style
                 return null;
             }
 
-            $quotes[] = $this->parse_string($value);
+            $quotes[] = $this->_stylesheet->parse_string($value);
         }
 
         if ($quotes === [] || \count($quotes) % 2 !== 0) {
@@ -4150,7 +4130,7 @@ class Style
         foreach ($components as $value) {
             // String
             if (strncmp($value, '"', 1) === 0 || strncmp($value, "'", 1) === 0) {
-                $parts[] = new StringPart($this->parse_string($value));
+                $parts[] = new StringPart($this->_stylesheet->parse_string($value));
                 continue;
             }
 
@@ -4224,7 +4204,7 @@ class Style
                 }
 
                 $name = $matches[1];
-                $string = $this->parse_string($matches[2]);
+                $string = $this->_stylesheet->parse_string($matches[2]);
                 $type = isset($matches[3]) ? strtolower($matches[3]) : "decimal";
 
                 if (!$this->isValidCounterName($name)
@@ -4238,7 +4218,7 @@ class Style
 
             // url()
             elseif ($function === "url") {
-                $url = $this->parse_string($arguments);
+                $url = $this->_stylesheet->parse_string($arguments);
                 $parts[] = new Url($url);
             }
 
