@@ -1,9 +1,4 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
@@ -20,9 +15,11 @@ class CalcRuleValueList extends RuleValueList
     }
 
     /**
+     * @param OutputFormat|null $oOutputFormat
+     *
      * @return string
      */
-    public function render(OutputFormat $oOutputFormat)
+    public function render($oOutputFormat)
     {
         return $oOutputFormat->implode(' ', $this->aComponents);
     }

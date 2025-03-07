@@ -1,9 +1,4 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
@@ -59,7 +54,7 @@ class Selector
      *
      * @var string
      *
-     * @internal
+     * @internal since 8.5.2
      */
     const SELECTOR_VALIDATION_RX = '/
         ^(
