@@ -100,9 +100,6 @@ class Endpoint {
 			default:
 				$access_key = $is_user_logged_in ? wp_create_nonce( $this->actions['generate'] ) : '';
 				break;
-			case 'guest': // 'guest' is hybrid, it can behave as 'logged_in' if the user is logged in, but if not, behaves as 'full'
-				$access_key = ! $is_user_logged_in ? $order->get_order_key() : wp_create_nonce( $this->actions['generate'] );
-				break;
 			case 'full':
 				$access_key = $order->get_order_key();
 				break;

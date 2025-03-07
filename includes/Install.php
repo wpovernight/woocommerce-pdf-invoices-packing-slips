@@ -575,6 +575,16 @@ class Install {
 
 			update_option( 'wpo_wcpdf_settings_general', $general_settings );
 		}
+
+		// 4.2.0-beta.3: migrate 'guest' access type to 'full'
+		if ( version_compare( $installed_version, '4.2.0-beta.3', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+
+			if ( ! empty( $debug_settings['document_link_access_type'] ) && 'guest' === $debug_settings['document_link_access_type'] ) {
+				$debug_settings['document_link_access_type'] = 'full';
+				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+			}
+		}
 	}
 
 	/**
