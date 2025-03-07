@@ -1806,12 +1806,11 @@ class Main {
 	 * @return void
 	 */
 	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, \WC_Email $email ): void {
-		// Check if document access type is 'full' and customer is a guest.
+		// Check if document access type is 'full'.
 		$is_full_access_type = 'full' === WPO_WCPDF()->endpoint->get_document_link_access_type();
-		$is_customer_guest   = 0 === $order->get_customer_id();
 
 		// Early exit if the requirements are not met
-		if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_requirements_met', $is_full_access_type && $is_customer_guest, $order, $sent_to_admin, $plain_text, $email ) ) {
+		if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_requirements_met', $is_full_access_type, $order, $sent_to_admin, $plain_text, $email ) ) {
 			return;
 		}
 
