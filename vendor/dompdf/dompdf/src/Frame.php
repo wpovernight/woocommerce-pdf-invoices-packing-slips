@@ -3,8 +3,6 @@
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 namespace WPO\IPS\Vendor\Dompdf;
 
@@ -52,14 +50,14 @@ class Frame
     /**
      * This frame's calculated style
      *
-     * @var Style
+     * @var Style|null
      */
     protected $_style;
 
     /**
      * This frame's parent in the document tree.
      *
-     * @var Frame
+     * @var Frame|null
      */
     protected $_parent;
 
@@ -67,28 +65,28 @@ class Frame
      * This frame's first child.  All children are handled as a
      * doubly-linked list.
      *
-     * @var Frame
+     * @var Frame|null
      */
     protected $_first_child;
 
     /**
      * This frame's last child.
      *
-     * @var Frame
+     * @var Frame|null
      */
     protected $_last_child;
 
     /**
      * This frame's previous sibling in the document tree.
      *
-     * @var Frame
+     * @var Frame|null
      */
     protected $_prev_sibling;
 
     /**
      * This frame's next sibling in the document tree.
      *
-     * @var Frame
+     * @var Frame|null
      */
     protected $_next_sibling;
 
