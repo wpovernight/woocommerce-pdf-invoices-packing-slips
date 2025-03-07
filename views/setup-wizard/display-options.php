@@ -58,9 +58,9 @@
 				<select id="display-date" name="wcpdf_settings[wpo_wcpdf_documents_settings_invoice][display_date]">
 					<?php
 						$options = array(
-							''             => __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
-							'invoice_date' => __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
-							'order_date'   => __( 'Order Date' , 'woocommerce-pdf-invoices-packing-slips' ),
+							''              => __( 'No', 'woocommerce-pdf-invoices-packing-slips' ),
+							'document_date' => __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
+							'order_date'    => __( 'Order Date', 'woocommerce-pdf-invoices-packing-slips' ),
 						);
 						foreach ( $options as $slug => $name ) {
 							$selected = ( ! empty( $current_settings['display_date'] ) && $current_settings['display_date'] == $slug ) ? 'selected' : '';
