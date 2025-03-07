@@ -370,8 +370,8 @@ class Main {
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
-		// Check the nonce
-		if ( is_user_logged_in() && $access_type === 'logged_in' && ! $valid_nonce ) {
+		// Check the nonce for logged in users
+		if ( is_user_logged_in() && 'logged_in' === $access_type && ! $valid_nonce ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: invalid nonce', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
