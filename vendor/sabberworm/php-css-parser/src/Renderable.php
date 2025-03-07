@@ -1,9 +1,4 @@
 <?php
-/**
- * @license MIT
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
- */
 
 namespace WPO\IPS\Vendor\Sabberworm\CSS;
 
@@ -15,9 +10,11 @@ interface Renderable
     public function __toString();
 
     /**
+     * @param OutputFormat|null $oOutputFormat
+     *
      * @return string
      */
-    public function render(OutputFormat $oOutputFormat);
+    public function render($oOutputFormat);
 
     /**
      * @return int

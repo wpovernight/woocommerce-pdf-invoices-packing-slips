@@ -210,7 +210,7 @@ class Invoice extends OrderDocumentMethods {
 	 */
 	public function get_pdf_settings_fields( $option_name ) {
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-		
+
 		$settings_fields = array(
 			array(
 				'type'			=> 'section',
@@ -553,6 +553,50 @@ class Invoice extends OrderDocumentMethods {
 			),
 		);
 
+		if ( 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type() ) {
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'include_email_link',
+				'title'    => __( 'Include document link in emails', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name'      => $option_name,
+					'id'               => 'include_email_link',
+					'options_callback' => array( $this, 'get_wc_emails' ),
+					'multiple'         => true,
+					'enhanced_select'  => true,
+					'description'      => sprintf(
+						/* translators: 1. opening anchor tag, 2. closing anchor tag */
+						__( 'Select emails to include the document link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected. %1$sCheck document link access type%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a target="_blank" href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=settings' ) ) . '">',
+						'</a>'
+					)
+				),
+			);
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'include_email_link_placement',
+				'title'    => __( 'Document link position in emails', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'include_email_link_placement',
+					'options'     => apply_filters( 'wpo_wcpdf_document_link_guest_emails_template_hooks_options', array(
+						'order_details'            => 'Order details',
+						'order_meta'               => 'Order meta',
+						'before_order_table'       => 'Before order table',
+						'after_order_table'        => 'After order table',
+						'customer_address_section' => 'Customer address section',
+						'customer_details'         => 'Customer details',
+					), $this ),
+					'description' => __( 'Select the placement of the document link in the guest customer emails.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			);
+		}
+
 		// remove/rename some fields when invoice number is controlled externally
 		if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) ) {
 			$remove_settings = array( 'next_invoice_number', 'number_format', 'reset_number_yearly' );
@@ -579,7 +623,7 @@ class Invoice extends OrderDocumentMethods {
 	 */
 	public function get_ubl_settings_fields( $option_name ) {
 		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-		
+
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -668,6 +712,8 @@ class Invoice extends OrderDocumentMethods {
 					'members' => array(
 						'enabled',
 						'attach_to_email_ids',
+						'include_email_link',
+						'include_email_link_placement',
 						'disable_for_statuses',
 						'my_account_buttons',
 					),

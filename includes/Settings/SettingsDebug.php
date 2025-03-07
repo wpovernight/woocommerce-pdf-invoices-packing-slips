@@ -26,9 +26,11 @@ class SettingsDebug {
 		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
+		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
 	}
 
 	public function output( $active_section, $nonce ) {
@@ -86,7 +88,11 @@ class SettingsDebug {
 	 * @return void
 	 */
 	public function display_status(): void {
-		$server_configs = $this->get_server_config();
+		$server_configs        = $this->get_server_config();
+		$premium_plugins       = $this->get_premium_plugins();
+		$directory_permissions = $this->get_directory_permissions();
+		$yearly_reset_schedule = $this->get_yearly_reset_schedule();
+
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}
 
@@ -122,8 +128,10 @@ class SettingsDebug {
 		}
 
 		$document_type = $this->get_document_type_from_store_table_name( sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) );
+		$list_table    = new NumberStoreListTable();
+		$as_actions    = as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' );
+		$last_fetch    = get_option( "wpo_wcpdf_number_data::{$selected_table_name}::last_time" );
 
-		$list_table = new NumberStoreListTable();
 		$list_table->prepare_items();
 
 		$list_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
@@ -139,7 +147,7 @@ class SettingsDebug {
 		$tables = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'"
 		);
-		
+
 		$document_titles = WPO_WCPDF()->documents->get_document_titles();
 		$table_names     = array();
 
@@ -905,7 +913,7 @@ class SettingsDebug {
 					'id'          => 'log_missing_translations',
 					'description' => __( 'Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
-			),			
+			),
 			array(
 				'type'     => 'setting',
 				'id'       => 'disable_preview',
@@ -975,19 +983,20 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_server_config(): array {
-		$memory_limit  = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
-		$php_mem_limit = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
-		$gmagick       = extension_loaded( 'gmagick' );
-		$imagick       = extension_loaded( 'imagick' );
-		$xc            = extension_loaded( 'xcache' );
-		$apc           = extension_loaded( 'apc' );
-		$zop           = extension_loaded( 'Zend OPcache' );
-		$op            = extension_loaded( 'opcache' );
-		$dom           = extension_loaded( 'DOM' );
-		$mbstring      = extension_loaded( 'mbstring' );
-		$gd            = extension_loaded( 'gd' );
-		$zlib          = extension_loaded( 'zlib' );
-		$fileinfo      = extension_loaded( 'fileinfo' );
+		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
+		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
+		$filesystem_method = function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : 'direct';
+		$gmagick           = extension_loaded( 'gmagick' );
+		$imagick           = extension_loaded( 'imagick' );
+		$xc                = extension_loaded( 'xcache' );
+		$apc               = extension_loaded( 'apc' );
+		$zop               = extension_loaded( 'Zend OPcache' );
+		$op                = extension_loaded( 'opcache' );
+		$dom               = extension_loaded( 'DOM' );
+		$mbstring          = extension_loaded( 'mbstring' );
+		$gd                = extension_loaded( 'gd' );
+		$zlib              = extension_loaded( 'zlib' );
+		$fileinfo          = extension_loaded( 'fileinfo' );
 
 		$server_configs = array(
 			'PHP version' => array(
@@ -1052,6 +1061,12 @@ class SettingsDebug {
 					),
 				'value'    => sprintf( 'WordPress: %s, PHP: %s', WP_MEMORY_LIMIT, $php_mem_limit ),
 				'result'   => $memory_limit > 67108864,
+			),
+			'WP Filesystem Method' => array(
+				'required' => __( 'Required to save documents to the server', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => $filesystem_method,
+				'result'   => 'direct' === $filesystem_method,
+				'fallback' => __( 'Check your server configuration', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'allow_url_fopen' => array (
 				'required' => __( 'Allow remote stylesheets and images', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1176,6 +1191,145 @@ class SettingsDebug {
 		<?php
 	}
 
+	/**
+	 * Get the premium plugins data.
+	 *
+	 * @return array
+	 */
+	public function get_premium_plugins(): array {
+		$premium_plugins = apply_filters( 'wpo_wcpdf_premium_plugins', array(
+			'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php',
+			'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php',
+		) );
+
+		$plugins = array();
+		$installed_plugins = get_plugins();
+
+		foreach ( $premium_plugins as $premium_plugin ) {
+			// Check if the plugin is installed.
+			if ( ! isset( $installed_plugins[ $premium_plugin ] ) ) {
+				continue;
+			}
+
+			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $premium_plugin );
+
+			if ( ! empty( $plugin_data ) ) {
+				$plugins[ $premium_plugin ] = array(
+					'name'      => $plugin_data['Name'],
+					'version'   => $plugin_data['Version'],
+					'is_active' => is_plugin_active( $premium_plugin ),
+				);
+			}
+		}
+
+		return apply_filters( 'wpo_wcpdf_premium_plugins_data', $plugins );
+	}
+
+	/**
+	 * Get the write permissions for the plugin directories.
+	 *
+	 * @return array
+	 */
+	public function get_directory_permissions(): array {
+		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+
+		$status = array(
+			'ok'     => __( 'Writable', 'woocommerce-pdf-invoices-packing-slips' ),
+			'failed' => __( 'Not writable', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+
+		$permissions = array(
+			'WCPDF_TEMP_DIR'       => array(
+				'description'    => __( 'Central temporary plugin folder', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'          => WPO_WCPDF()->main->get_tmp_path(),
+				'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',
+				'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? $status['ok'] : $status['failed'],
+			),
+			'WCPDF_ATTACHMENT_DIR' => array(
+				'description'    => __( 'Temporary attachments folder', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ),
+				'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',
+				'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
+			),
+			'DOMPDF_TEMP_DIR'      => array(
+				'description'    => __( 'Temporary DOMPDF folder', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ),
+				'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ) ? 'ok' : 'failed',
+				'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ) ? $status['ok'] : $status['failed'],
+			),
+			'DOMPDF_FONT_DIR'      => array(
+				'description'    => __( 'DOMPDF fonts folder (needs to be writable for custom/remote fonts)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ),
+				'status'         => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ) ? 'ok' : 'failed',
+				'status_message' => $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ) ? $status['ok'] : $status['failed'],
+			),
+		);
+
+		return apply_filters( 'wpo_wcpdf_plugin_directories', $permissions, $status );
+	}
+
+	/**
+	 * Get the yearly reset scheduled action.
+	 *
+	 * @return array|false
+	 */
+	public function get_yearly_reset_schedule() {
+		if ( ! WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() || ! function_exists( 'as_get_scheduled_actions' ) ) {
+			return false;
+		}
+
+		$scheduled_actions = as_get_scheduled_actions( array(
+			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+		) );
+
+		if ( ! empty( $scheduled_actions ) ) {
+			$total_actions = count( $scheduled_actions );
+
+			if ( $total_actions === 1 ) {
+				$action       = reset( $scheduled_actions );
+				$action_date  = is_callable( array( $action->get_schedule(), 'get_date' ) ) ?
+					$action->get_schedule()->get_date() :
+					$action->get_schedule()->get_next( as_get_datetime_object() );
+
+				$yearly_reset = array(
+					'value'  => sprintf(
+						/* translators: %s action date */
+						__( 'Scheduled to: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+						gmdate( wcpdf_date_format( null, 'yearly_reset_schedule' ), $action_date->getTimestamp() )
+					),
+					'result' => true,
+				);
+			} else {
+				$yearly_reset = array(
+					'value'  => sprintf(
+						/* translators: total scheduled actions */
+						__( 'Only 1 scheduled action should exist, but %s were found', 'woocommerce-pdf-invoices-packing-slips' ),
+						$total_actions
+					),
+					'result' => false,
+				);
+			}
+		} else {
+			$yearly_reset = array(
+				'value'  => sprintf(
+					/* translators: 1. open anchor tag, 2. close anchor tag */
+					__( 'Scheduled action not found. Please reschedule it %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '" style="color:black; text-decoration:underline;">',
+					'</a>'
+				),
+				'result' => false,
+			);
+		}
+
+		return $yearly_reset;
+	}
+
+	/**
+	 * Get settings sections.
+	 *
+	 * @return array
+	 */
 	private function get_settings_sections(): array {
 		return apply_filters( 'wpo_wcpdf_settings_debug_sections', array(
 			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1183,6 +1337,238 @@ class SettingsDebug {
 			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
 			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
+	}
+
+	/**
+	 * Fetch number table data
+	 *
+	 * @param string  $table_name
+	 * @param string  $orderby
+	 * @param string  $order
+	 * @param string  $from
+	 * @param string  $to
+	 * @param integer $chunk_size
+	 * @param integer $offset
+	 *
+	 * @return void
+	 */
+	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', string $from = '', string $to = '', int $chunk_size = 100, int $offset = 0 ): void {
+		global $wpdb;
+
+		$input_data = array(
+			'table_name' => $table_name,
+			'orderby'    => $orderby,
+			'order'      => $order,
+			'from'       => $from,
+			'to'         => $to,
+		);
+
+		$data = $this->filter_fetch_request_data( $input_data );
+
+		if ( empty( $data['table_name'] ) || empty( $data['from'] || empty( $data['to'] ) ) ) {
+			return;
+		}
+
+		$offset      = absint( $offset ?? 0 );
+		$chunk_size  = absint( $chunk_size ?? 100 );
+		$option_name = "wpo_wcpdf_number_data::{$data['table_name']}";
+		$results     = get_option( $option_name, array() );
+		$hook        = 'wpo_wcpdf_number_table_data_fetch';
+
+		// query
+		$chunk_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT * FROM {$data['table_name']} WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
+				$data['from'], 
+				$data['to'], 
+				$data['orderby'], 
+				$data['order'], 
+				$chunk_size, 
+				$offset
+			)
+		);
+
+		if ( empty( $chunk_results ) ) {
+			as_unschedule_all_actions( $hook );
+			update_option( $option_name . '::last_time', time() );
+			return; // exit if no more results
+		}
+
+		$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
+
+		update_option( $option_name, $results );
+
+		$offset += $chunk_size; // increase the offset for the next chunk
+
+		$args = array(
+			'table_name' => $data['table_name'],
+			'orderby'    => $data['orderby'],
+			'order'      => $data['order'],
+			'from'       => $data['from'],
+			'to'         => $data['to'],
+			'chunk_size' => $chunk_size,
+			'offset'     => $offset,
+		);
+
+		as_enqueue_async_action( $hook, $args );
+	}
+
+	/**
+	 * Handle AJAX number table data request
+	 *
+	 * @return void
+	 */
+	public function ajax_numbers_data(): void {
+		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+
+		$request = stripslashes_deep( $_POST );
+
+		if ( isset( $request['action'] ) && 'wpo_wcpdf_numbers_data' === $request['action'] && isset( $request['operation'] ) && isset( $request['table_name'] ) ) {
+			$data = $this->filter_fetch_request_data( $request );
+
+			$this->delete_number_table_data( $data['table_name'] ); // both operations require delete
+
+			if ( 'fetch' === $request['operation'] ) {
+				$this->fetch_number_table_data( $data['table_name'], $data['orderby'], $data['order'], $data['from'], $data['to'] );
+			}
+
+			wp_send_json_success( array( esc_url_raw( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=numbers&orderby=' . $data['orderby'] . '&order=' . $data['order'] . '&table_name=' . $data['table_name'] ) ) ) );
+		} else {
+			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+	}
+
+	/**
+	 * Filter data from number table request
+	 *
+	 * @param array $request_data
+	 *
+	 * @return array
+	 */
+	public function filter_fetch_request_data( array $request_data ): array {
+		return array(
+			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
+			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
+			'orderby'    => isset( $request_data['orderby'] )    && in_array( strtolower( $request_data['orderby'] ), array( 'id' ) )                       ? sanitize_text_field( strtolower( $request_data['orderby'] ) ) : 'id',
+			'from'       => isset( $request_data['from'] )       && ! empty( $request_data['from'] )                                                        ? esc_attr( $request_data['from'] ) . ' 00:00:00'               : null,
+			'to'         => isset( $request_data['to'] )         && ! empty( $request_data['to'] )                                                          ? esc_attr( $request_data['to'] ) . ' 23:59:59'                 : null,
+		);
+	}
+
+	/**
+	 * Delete number table cached data
+	 *
+	 * @param string $table_name
+	 *
+	 * @return void
+	 */
+	public function delete_number_table_data( string $table_name ): void {
+		if ( empty( $table_name ) ) {
+			return;
+		}
+
+		delete_option( "wpo_wcpdf_number_data::{$table_name}" );
+		delete_option( "wpo_wcpdf_number_data::{$table_name}::last_time" );
+	}
+
+	/**
+	 * Search for number in number table data
+	 *
+	 * @param string $table_name
+	 * @param int    $search
+	 *
+	 * @return array
+	 */
+	public function search_number_in_table_data( string $table_name, int $search ): array {
+		if ( empty( $table_name ) ) {
+			return array();
+		}
+
+		$option_name = "wpo_wcpdf_number_data::{$table_name}";
+		$results     = get_option( $option_name, array() );
+		$search      = ! empty( $search ) ? absint( $search ) : false;
+		$found       = array();
+
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $result ) {
+				if ( absint( $result->id ) === $search ) {
+					$found[] = $result;
+					break;
+				}
+			}
+		}
+
+		// number not found in cached data, try directly
+		if ( empty( $found ) ) {
+			$found = $this->search_number_in_database_table( $table_name, $search );
+		}
+
+		return $found;
+	}
+
+	/**
+	 * Search for number in number table database
+	 *
+	 * @param string $table_name
+	 * @param int    $search
+	 *
+	 * @return array|false
+	 */
+	public function search_number_in_database_table( string $table_name, int $search ) {
+		global $wpdb;
+
+		if ( empty( $search ) || empty( $table_name ) || ! in_array( $table_name, array_keys( $this->get_number_store_tables() ) ) ) {
+			return array();
+		}
+
+		$table_name = sanitize_text_field( $table_name );
+		$search     = absint( $search );
+		
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT * FROM {$table_name} WHERE id = %d",
+				$search
+			)
+		);
+	}
+
+	/**
+	 * Sort number table data
+	 *
+	 * @param array  $results
+	 * @param string $order
+	 * @param string $orderby
+	 *
+	 * @return array
+	 */
+	public function sort_number_table_data( array $results, string $order, string $orderby ): array {
+		if ( empty( $results ) ) {
+			return $results;
+		}
+
+		usort( $results, function( $a, $b ) use ( $orderby, $order ) {
+			$orderby = esc_attr( $orderby );
+			$order   = esc_attr( $order );
+
+			switch ( $orderby ) {
+				case 'id':
+					if ( 'desc' === $order ) {
+						return absint( $b->id ) - absint( $a->id );
+					} else {
+						return absint( $a->id ) - absint( $b->id );
+					}
+					break;
+				default:
+					if ( 'desc' === $order ) {
+						return strcmp( $b->$orderby, $a->$orderby );
+					} else {
+						return strcmp( $a->$orderby, $b->$orderby );
+					}
+					break;
+			}
+		} );
+
+		return $results;
 	}
 
 }
