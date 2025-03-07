@@ -3,8 +3,6 @@
  * @package php-font-lib
  * @link    https://github.com/dompdf/php-font-lib
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
- *
- * Modified by wpovernight on 18-October-2024 using {@see https://github.com/BrianHenryIE/strauss}.
  */
 
 namespace WPO\IPS\Vendor\FontLib\TrueType;
@@ -102,7 +100,7 @@ class File extends BinaryStream {
     "Ccaron", "ccaron", "dmacron"
   );
 
-  private function uniord (string $c, string $encoding = null) {
+  private function uniord (string $c, ?string $encoding = null) {
     if (function_exists("mb_ord")) {
       if (PHP_VERSION_ID < 80000 && $encoding === null) {
           // in PHP < 8 the encoding argument, if supplied, must be a valid encoding
@@ -400,7 +398,7 @@ class File extends BinaryStream {
 
 
     $type = $this->getFontType();
-    $class = "WPO\\IPS\\Vendor\\FontLib\\$type\\TableDirectoryEntry";
+	$class = "WPO\\IPS\\Vendor\\FontLib\\$type\\TableDirectoryEntry";
 
     for ($i = 0; $i < $this->header->data["numTables"]; $i++) {
       /** @var TableDirectoryEntry $entry */
