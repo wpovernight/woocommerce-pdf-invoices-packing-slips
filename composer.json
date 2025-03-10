@@ -36,7 +36,11 @@
 				"packages": [
 					"symfony/polyfill-mbstring",
 					"symfony/polyfill-iconv",
-					"masterminds/html5"
+					"masterminds/html5",
+					"php-stubs/wordpress-stubs",
+					"phpstan/phpstan",
+					"szepeviktor/phpstan-wordpress",
+					"bin"
 				],
 				"namespaces": [],
 				"file_patterns": []
@@ -47,6 +51,16 @@
 		}
 	},
 	"config": {
-		"platform-check": false
-	}
+		"platform-check": false,
+		"allow-plugins": {
+			"phpstan/extension-installer": true
+		}
+	},
+	"require-dev": {
+		"phpstan/extension-installer": "^1.4",
+		"szepeviktor/phpstan-wordpress": "^2.0"
+	},
+	"scripts": {
+        "analyze": "@php ./vendor/bin/phpstan analyze"
+    }
 }

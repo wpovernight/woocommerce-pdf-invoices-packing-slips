@@ -1,0 +1,15 @@
+parameters:
+  level: 8
+  paths:
+    - woocommerce-pdf-invoices-packingslips.php
+    - wpo-ips-functions-ubl.php
+    - wpo-ips-functions.php
+    - includes
+    - templates
+    - ubl
+    - views
+  treatPhpDocTypesAsCertain: false
+  ignoreErrors:
+    - '#Function wc_.+ not found#'
+    - '#Function WC not found#'
+    - '#Class WC_.+ not found#'
