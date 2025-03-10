@@ -608,6 +608,8 @@ class SettingsDebug {
 		}
 
 		$results = wc_get_orders( $args );
+		
+		remove_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_parse_document_date_for_wp_query', 10, 2 );
 
 		if ( ! is_object( $results ) ) {
 			$message = __( 'Unexpected results from the orders query.', 'woocommerce-pdf-invoices-packing-slips' );
