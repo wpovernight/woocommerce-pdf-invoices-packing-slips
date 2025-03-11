@@ -369,8 +369,8 @@ class Main {
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
-		// Check the nonce - guest access can use nonce if user is logged in
-		if ( is_user_logged_in() && in_array( $access_type, array( 'logged_in', 'guest' ) ) && ! $valid_nonce ) {
+		// Check the nonce for logged in users
+		if ( is_user_logged_in() && 'logged_in' === $access_type && ! $valid_nonce ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page. Reason: invalid nonce', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
@@ -438,11 +438,6 @@ class Main {
 		// multi-order only allowed with full permissions
 		if ( ! $full_permission && ( count( $order_ids ) > 1 || isset( $request['bulk'] ) ) ) {
 			$allowed = false;
-		}
-
-		// 'guest' is hybrid, it can behave as 'logged_in' if the user is logged in, but if not, behaves as 'full'
-		if ( 'guest' === $access_type ) {
-			$access_type = is_user_logged_in() ? 'logged_in' : 'full';
 		}
 
 		switch ( $access_type ) {
@@ -1804,12 +1799,11 @@ class Main {
 	 * @return void
 	 */
 	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, \WC_Email $email ): void {
-		// Check if document access type is 'guest' and customer is a guest.
-		$is_guest_access_type = 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type();
-		$is_customer_guest    = 0 === $order->get_customer_id();
+		// Check if document access type is 'full'.
+		$is_full_access_type = 'full' === WPO_WCPDF()->endpoint->get_document_link_access_type();
 
 		// Early exit if the requirements are not met
-		if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_requirements_met', $is_guest_access_type && $is_customer_guest, $order, $sent_to_admin, $plain_text, $email ) ) {
+		if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_requirements_met', $is_full_access_type, $order, $sent_to_admin, $plain_text, $email ) ) {
 			return;
 		}
 
