@@ -52,18 +52,14 @@ class FileSystem {
 	 * Constructor
 	 */
 	public function __construct() {
-		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-		
-		// Apply a filter to allow overriding the filesystem method via a snippet
-		$debug_settings['filesystem'] = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['filesystem'] ?? 'wp' );
-		
-		$this->system_enabled = ( 'php' === $debug_settings['filesystem'] ) ? 'php' : 'wp';
+		$this->suppress_errors        = apply_filters( 'wpo_wcpdf_file_system_suppress_errors', true );
+		$debug_settings               = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$debug_settings['filesystem'] = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['filesystem'] ?? 'wp' ); // Apply a filter to allow overriding the filesystem method via a snippet
+		$this->system_enabled         = ( 'php' === $debug_settings['filesystem'] ) ? 'php' : 'wp';
 		
 		if ( 'wp' === $this->system_enabled ) {
 			$this->initialize_wp_filesystem();
 		}
-		
-		$this->suppress_errors = apply_filters( 'wpo_wcpdf_file_system_suppress_errors', true );
 	}
 	
 	/**
