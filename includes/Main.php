@@ -1707,7 +1707,46 @@ class Main {
 	}
 
 	public function wc_webhook_trigger( $document, $order ) {
+		$this->reload_wpo_custom_webhooks();
 		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
+	}
+
+	/**
+	 * Reloads WooCommerce PDF Invoices webhooks to ensure custom hooks are processed.
+	 *
+	 * This function introduced to resolve an issue where WooCommerce
+	 * webhooks were not enqueuing our plugin's custom hooks.
+	 * The root cause is that the `wc_webhook_topic_hooks()` function, responsible
+	 * for modifying hooks, is not executed in time. The `add_filter()` call that
+	 * registers `wc_webhook_topic_hooks()` is executed after `apply_filters()`,
+	 * preventing the `wpo_wcpdf_webhook_order_{$document->slug}_saved` action hook
+	 * from being included in the list of webhook topics.
+	 *
+	 * https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/issues/1083
+	 *
+	 * @return void
+	 */
+	private function reload_wpo_custom_webhooks() {
+		if (
+			! apply_filters( 'wpo_wcpdf_reload_wpo_custom_webhooks', true ) ||
+			! class_exists( 'WC_Data_Store' ) ||
+			! class_exists( 'WC_Webhook' )
+		) {
+			return;
+		}
+
+		$wpo_topic_hooks = $this->wc_webhook_topic_events( array() );
+		$data_store      = \WC_Data_Store::load( 'webhook' );
+		$webhooks        = $data_store->get_webhooks_ids( 'active' );
+
+		foreach ( $webhooks as $webhook_id ) {
+			$webhook = new \WC_Webhook( $webhook_id );
+			$topic   = str_replace( 'order.', '', $webhook->get_topic() );
+
+			if ( in_array( $topic, $wpo_topic_hooks, true ) ) {
+				$webhook->enqueue();
+			}
+		}
 	}
 
 	/**
