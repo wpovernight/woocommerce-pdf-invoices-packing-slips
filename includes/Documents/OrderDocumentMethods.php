@@ -608,6 +608,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 				// Set item name
 				$data['name'] = apply_filters( 'woocommerce_order_item_name', $item['name'], $item, false );
+				$data['name'] = apply_filters( 'wpo_wcpdf_order_item_name', $data['name'], $item, $this->order );
 
 				// Set item quantity
 				$data['quantity'] = $item['qty'];
