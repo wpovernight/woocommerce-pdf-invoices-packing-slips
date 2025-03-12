@@ -5,10 +5,7 @@
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
 			"WPO\\IPS\\UBL\\": "ubl/"
-		},
-		"classmap": [
-			"vendor/"
-		]
+		}
 	},
 	"require": {
 		"dompdf/dompdf": "^3.1",
@@ -18,25 +15,50 @@
 	},
 	"extra": {
 		"strauss": {
-			"target_directory": "vendor",
+			"target_directory": "vendor/strauss",
 			"namespace_prefix": "WPO\\IPS\\Vendor\\",
 			"classmap_prefix": "WPO_IPS_Vendor_",
 			"constant_prefix": "WPO_IPS_VENDOR_",
-			"packages": [],
-			"update_call_sites": false,
-			"override_autoload": {},
+			"packages": [
+				"dompdf/dompdf",
+				"sabberworm/php-css-parser",
+				"sabre/xml",
+				"sabre/uri",
+				"masterminds/html5"
+			],
+			"update_call_sites": true,
+			"override_autoload": {
+				"dompdf/dompdf": {
+					"classmap": ["."]
+				},
+				"dompdf/php-font-lib": {
+					"classmap": ["."]
+				},
+				"dompdf/php-svg-lib": {
+					"classmap": ["."]
+				},
+				"masterminds/html5": {
+					"classmap": ["."]
+				},
+				"sabberworm/php-css-parser": {
+					"classmap": ["."]
+				},
+				"sabre/uri": {
+					"classmap": ["."]
+				},
+				"sabre/xml": {
+					"classmap": ["."]
+				}
+			},
 			"exclude_from_copy": {
 				"packages": [],
 				"namespaces": [],
-				"file_patterns": [
-					"/^psr.*$/"
-				]
+				"file_patterns": []
 			},
 			"exclude_from_prefix": {
 				"packages": [
 					"symfony/polyfill-mbstring",
-					"symfony/polyfill-iconv",
-					"masterminds/html5"
+					"symfony/polyfill-iconv"
 				],
 				"namespaces": [],
 				"file_patterns": []
