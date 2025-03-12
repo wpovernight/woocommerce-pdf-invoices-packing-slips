@@ -12,3 +12,4 @@
 *composer.lock
 *strauss.phar
 *strauss.md
+*phpstan.neon
