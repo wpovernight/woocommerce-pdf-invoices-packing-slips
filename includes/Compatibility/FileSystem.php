@@ -54,9 +54,10 @@ class FileSystem {
 	public function __construct() {
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		
-		if ( isset( $debug_settings['filesystem'] ) ) {
-			$this->system_enabled = ( 'php' === $debug_settings['filesystem'] ) ? 'php' : 'wp';
-		}
+		// Apply a filter to allow overriding the filesystem method via a snippet
+		$debug_settings['filesystem'] = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['filesystem'] ?? 'wp' );
+		
+		$this->system_enabled = ( 'php' === $debug_settings['filesystem'] ) ? 'php' : 'wp';
 		
 		if ( 'wp' === $this->system_enabled ) {
 			$this->initialize_wp_filesystem();
