@@ -746,7 +746,7 @@ class SettingsDebug {
 			array(
 				'type'     => 'setting',
 				'id'       => 'file_system_method',
-				'title'    => __( 'File system method', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => __( 'File System Method', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
 				'section'  => 'debug_settings',
 				'args'     => array(
@@ -762,6 +762,9 @@ class SettingsDebug {
 						__( 'Choose the filesystem method for file operations. By default, our plugin uses %1$s (only supported in %2$s mode). Select PHP file functions if you encounter issues with %1$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<code>WP Filesystem</code>',
 						'<code>direct</code>'
+					) . ( has_filter( 'wpo_wcpdf_filesystem_method' ) 
+						? '<div class="notice notice-warning inline"><p><strong>' . __( 'Warning:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> ' . __( 'A code snippet is overriding this setting.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>'
+						: ''
 					),
 				)
 			),
