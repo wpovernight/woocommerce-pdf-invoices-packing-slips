@@ -11,10 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AddressHandler extends UblHandler {
 
 	public function handle( $data, $options = array() ) {
-		$root = isset( $options['root'] ) ? $options['root'] : 'AccountingSupplierParty';
+		$root = isset( $options['root'] ) ? $options['root'] : 'cac:AccountingSupplierParty';
 
-		// AccountingSupplierParty or AccountingCustomerParty
-		if ( 'AccountingSupplierParty' === $root ) {
+		// cac:AccountingSupplierParty or cac:AccountingCustomerParty
+		if ( 'cac:AccountingSupplierParty' === $root ) {
 			return $this->return_supplier_party( $data, $options );
 		}
 
@@ -24,16 +24,13 @@ class AddressHandler extends UblHandler {
 	public function return_supplier_party( $data, $options = array() ) {
 
 		$supplierParty = array(
-			'name'  => 'cac:AccountingSupplierParty',
-			'value' => array(
-				array(
-					'name'  => 'cbc:CustomerAssignedAccountID',
-					'value' => '',
-				),
-				array(
-					'name'  => 'cac:Party',
-					'value' => $this->return_supplier_party_details(),
-				),
+			array(
+				'name'  => 'cbc:CustomerAssignedAccountID',
+				'value' => '',
+			),
+			array(
+				'name'  => 'cac:Party',
+				'value' => $this->return_supplier_party_details(),
 			),
 		);
 
@@ -163,90 +160,87 @@ class AddressHandler extends UblHandler {
 		}
 
 		$customerParty = array(
-			'name'  => 'cac:AccountingCustomerParty',
-			'value' => array(
-				array(
-					'name'  => 'cbc:CustomerAssignedAccountID',
-					'value' => '',
-				),
-				array(
-					'name'  => 'cac:Party',
-					'value' => array(
-						array(
-							'name'  => 'cac:PartyName',
-							'value' => array(
-								'name'  => 'cbc:Name',
-								'value' => wpo_ips_ubl_sanitize_string( $customerPartyName ),
-							),
+			array(
+				'name'  => 'cbc:CustomerAssignedAccountID',
+				'value' => '',
+			),
+			array(
+				'name'  => 'cac:Party',
+				'value' => array(
+					array(
+						'name'  => 'cac:PartyName',
+						'value' => array(
+							'name'  => 'cbc:Name',
+							'value' => wpo_ips_ubl_sanitize_string( $customerPartyName ),
 						),
-						array(
-							'name'  => 'cac:PostalAddress',
-							'value' => array(
-								array(
-									'name'  => 'cbc:StreetName',
-									'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() ),
+					),
+					array(
+						'name'  => 'cac:PostalAddress',
+						'value' => array(
+							array(
+								'name'  => 'cbc:StreetName',
+								'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() ),
+							),
+							array(
+								'name'  => 'cbc:CityName',
+								'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_city() ),
+							),
+							array(
+								'name'  => 'cbc:PostalZone',
+								'value' => $this->document->order->get_billing_postcode(),
+							),
+							array(
+								'name'  => 'cac:AddressLine',
+								'value' => array(
+									'name'  => 'cbc:Line',
+									'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() . ' ' . $this->document->order->get_billing_address_2() ),
 								),
-								array(
-									'name'  => 'cbc:CityName',
-									'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_city() ),
-								),
-								array(
-									'name'  => 'cbc:PostalZone',
-									'value' => $this->document->order->get_billing_postcode(),
-								),
-								array(
-									'name'  => 'cac:AddressLine',
-									'value' => array(
-										'name'  => 'cbc:Line',
-										'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() . ' ' . $this->document->order->get_billing_address_2() ),
+							),
+							array(
+								'name'  => 'cac:Country',
+								'value' => array(
+									'name'       => 'cbc:IdentificationCode',
+									'value'      => $this->document->order->get_billing_country(),
+									'attributes' => array(
+										'listID'       => 'ISO3166-1:Alpha2',
+										'listAgencyID' => '6',
 									),
 								),
-								array(
-									'name'  => 'cac:Country',
-									'value' => array(
-										'name'       => 'cbc:IdentificationCode',
-										'value'      => $this->document->order->get_billing_country(),
+							),
+						),
+					),
+					array(
+						'name'  => 'cac:PartyTaxScheme',
+						'value' => array(
+							array(
+								'name'  => 'cbc:CompanyID',
+								'value' => $vat_number,
+							),
+							array(
+								'name'  => 'cac:TaxScheme',
+								'value' => array(
+									array(
+										'name'       => 'cbc:ID',
+										'value'      => 'VAT',
 										'attributes' => array(
-											'listID'       => 'ISO3166-1:Alpha2',
-											'listAgencyID' => '6',
+											'schemeID'       => 'UN/ECE 5153',
+											'schemeAgencyID' => '6',
 										),
 									),
 								),
 							),
 						),
-						array(
-							'name'  => 'cac:PartyTaxScheme',
-							'value' => array(
-								array(
-									'name'  => 'cbc:CompanyID',
-									'value' => $vat_number,
-								),
-								array(
-									'name'  => 'cac:TaxScheme',
-									'value' => array(
-										array(
-											'name'       => 'cbc:ID',
-											'value'      => 'VAT',
-											'attributes' => array(
-												'schemeID'       => 'UN/ECE 5153',
-												'schemeAgencyID' => '6',
-											),
-										),
-									),
-								),
+					),
+					array(
+						'name'  => 'cac:Contact',
+						'value' => array(
+							array(
+								'name'  => 'cbc:Name',
+								'value' => wpo_ips_ubl_sanitize_string( $customerPartyContactName ),
 							),
-						),
-						array(
-							'name'  => 'cac:Contact',
-							'value' => array(
-								array(
-									'name'  => 'cbc:Name',
-									'value' => wpo_ips_ubl_sanitize_string( $customerPartyContactName ),
-								),
-								array(
-									'name'  => 'cbc:ElectronicMail',
-									'value' => sanitize_email( $this->document->order->get_billing_email() ),
-								),
+							array(
+								'name'  => 'cbc:ElectronicMail',
+								'value' => sanitize_email( $this->document->order->get_billing_email() ),
 							),
 						),
 					),
