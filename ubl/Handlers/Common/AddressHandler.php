@@ -11,10 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AddressHandler extends UblHandler {
 
 	public function handle( $data, $options = array() ) {
-		$root = isset( $options['root'] ) ? $options['root'] : 'AccountingSupplierParty';
+		$root = isset( $options['root'] ) ? $options['root'] : 'cac:AccountingSupplierParty';
 
-		// AccountingSupplierParty or AccountingCustomerParty
-		if ( 'AccountingSupplierParty' === $root ) {
+		// cac:AccountingSupplierParty or cac:AccountingCustomerParty
+		if ( 'cac:AccountingSupplierParty' === $root ) {
 			return $this->return_supplier_party( $data, $options );
 		}
 
