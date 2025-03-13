@@ -61,7 +61,9 @@
 					"symfony/polyfill-iconv"
 				],
 				"namespaces": [],
-				"file_patterns": []
+				"file_patterns": [
+					"/^psr.*$/"
+				]
 			},
 			"namespace_replacement_patterns": {},
 			"delete_vendor_packages": true,
