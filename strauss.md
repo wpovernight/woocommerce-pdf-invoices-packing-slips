@@ -60,6 +60,26 @@ This guide provides detailed steps to correctly install and update Composer libr
    composer dump-autoload -o
    ```
 
+## Additional Manual Fixes
+
+Some files require manual adjustments to ensure proper prefixing when using Strauss. Below are the necessary modifications:
+
+### **File:** `vendor/strauss/dompdf/php-font-lib/src/FontLib/Font.php`
+- **Line 62:**
+  - **Before:** `$class = "FontLib\$class";`
+  - **After:** `$class = "WPO\IPS\Vendor\FontLib\$class";`
+
+### **File:** `vendor/strauss/dompdf/php-font-lib/src/FontLib/TrueType/File.php`
+- **Line 385:**
+  - **Before:** `return $class_parts[1];`
+  - **After:** `return $class_parts[4];`
+
+- **Line 401:**
+  - **Before:** `$class = "FontLib\$type\TableDirectoryEntry";`
+  - **After:** `$class = "WPO\IPS\Vendor\FontLib\$type\TableDirectoryEntry";`
+
+For more details, see the related commit: [61bf71cb90](https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/1091/commits/61bf71cb90f71c2dbd1c80b3441599821ab009bd)
+
 ## Example `composer.json` Configuration
 
 Ensure your `composer.json` is configured correctly for Strauss. Below is an example configuration:
