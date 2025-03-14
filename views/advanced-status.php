@@ -205,7 +205,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					printf(
 						/* translators: directory path */
 						esc_html__( 'If the temporary folders were not automatically created by the plugin, verify that all the font files (from %s) are copied to the fonts folder. Normally, this is fully automated, but if your server has strict security settings, this automated copying may have been prohibited. In that case, you also need to make sure these folders get synchronized on plugin updates!', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>' . wpo_wcpdf_escape_url_path_or_base64( WPO_WCPDF()->plugin_path() . '/vendor/dompdf/dompdf/lib/fonts/' ) . '</code>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						'<code>' . wpo_wcpdf_escape_url_path_or_base64( WPO_WCPDF()->plugin_path() . '/vendor/strauss/dompdf/dompdf/lib/fonts/' ) . '</code>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					);
 				?>
 			</td>
