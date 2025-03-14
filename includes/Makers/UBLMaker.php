@@ -15,9 +15,8 @@ class UBLMaker {
 	protected $tmp_base;
 
 	public function write( $filename, $contents ) {
-		$wp_filesystem  = wpo_wcpdf_get_wp_filesystem();
 		$full_file_name = $this->get_file_path() . $filename;
-		$status         = $wp_filesystem->put_contents( $full_file_name, $contents, FS_CHMOD_FILE );
+		$status         = WPO_WCPDF()->file_system->put_contents( $full_file_name, $contents, FS_CHMOD_FILE );
 
 		if ( false === $status ) {
 			throw new FileWriteException( 'Error writing UBL file' );

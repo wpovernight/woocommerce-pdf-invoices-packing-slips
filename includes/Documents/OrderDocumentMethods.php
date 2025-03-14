@@ -899,18 +899,19 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$thumbnail_path        = ! empty( $contextless_thumbnail_url ) ? str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url ) : $contextless_site_url;
 
 		// fallback if thumbnail file doesn't exist
-		if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
-			if ($thumbnail_id = $this->get_thumbnail_id( $product ) ) {
+		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! WPO_WCPDF()->file_system->exists( $thumbnail_path ) ) {
+			$thumbnail_id = $this->get_thumbnail_id( $product );
+			if ( $thumbnail_id ) {
 				$thumbnail_path = get_attached_file( $thumbnail_id );
 			}
 		}
 
 		// Thumbnail (full img tag)
-		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $thumbnail_path ) ) {
+		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && WPO_WCPDF()->file_system->exists( $thumbnail_path ) ) {
 			// load img with server path by default
 			$thumbnail = sprintf( '<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
 
-		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! file_exists( $thumbnail_path ) ) {
+		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! WPO_WCPDF()->file_system->exists( $thumbnail_path ) ) {
 			// should use paths but file not found, replace // with http(s):// for dompdf compatibility
 			if ( substr( $thumbnail_url, 0, 2 ) === "//" ) {
 				$prefix                = is_ssl() ? 'https://' : 'http://';
