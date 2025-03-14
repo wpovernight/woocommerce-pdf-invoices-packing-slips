@@ -60,6 +60,7 @@ class WPO_WCPDF {
 	 */
 	public function __construct() {
 		require $this->plugin_path() . '/vendor/autoload.php';
+		require $this->plugin_path() . '/vendor/strauss/autoload.php';
 
 		$this->plugin_basename = plugin_basename(__FILE__);
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
