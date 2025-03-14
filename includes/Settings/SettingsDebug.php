@@ -608,6 +608,8 @@ class SettingsDebug {
 		}
 
 		$results = wc_get_orders( $args );
+		
+		remove_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_parse_document_date_for_wp_query', 10, 2 );
 
 		if ( ! is_object( $results ) ) {
 			$message = __( 'Unexpected results from the orders query.', 'woocommerce-pdf-invoices-packing-slips' );
@@ -754,7 +756,6 @@ class SettingsDebug {
 					'default'     => 'logged_in',
 					'options'     => array(
 						'logged_in' => __( 'Logged in (recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
-						'guest'     => __( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ),
 						'full'      => __( 'Full', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 				)
@@ -964,10 +965,6 @@ class SettingsDebug {
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Logged in', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
 				<td><?php esc_html_e( 'Document can be accessed by logged in users only.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-			</tr>
-			<tr>
-				<td class="option"><strong><?php esc_html_e( 'Guest', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
-				<td><?php esc_html_e( 'Document can be accessed by logged in and guest users.', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 			</tr>
 			<tr>
 				<td class="option"><strong><?php esc_html_e( 'Full', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong></td>
@@ -1378,12 +1375,12 @@ class SettingsDebug {
 		// query
 		$chunk_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
-				"SELECT * FROM {$data['table_name']} WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
-				$data['from'], 
-				$data['to'], 
-				$data['orderby'], 
-				$data['order'], 
-				$chunk_size, 
+				"SELECT * FROM `" . esc_sql( $data['table_name'] ) . "` WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
+				$data['from'],
+				$data['to'],
+				$data['orderby'],
+				$data['order'],
+				$chunk_size,
 				$offset
 			)
 		);
@@ -1523,10 +1520,10 @@ class SettingsDebug {
 
 		$table_name = sanitize_text_field( $table_name );
 		$search     = absint( $search );
-		
+
 		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
-				"SELECT * FROM {$table_name} WHERE id = %d",
+				"SELECT * FROM `" . esc_sql( $table_name ) . "` WHERE id = %d",
 				$search
 			)
 		);

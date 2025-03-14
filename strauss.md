@@ -26,9 +26,13 @@ This guide provides detailed steps to correctly install and update Composer libr
    php strauss.phar
    ```
 
-3. **Do Not Run `composer dump-autoload` After Strauss**
+3. **Regenerate the Autoloader**
 
-   Avoid running `composer dump-autoload` after running Strauss, as it will regenerate the autoload files and potentially undo the prefixing work done by Strauss.
+   Since Strauss moves dependencies, you must regenerate the autoloader to ensure everything is correctly registered:
+
+   ```sh
+   composer dump-autoload -o
+   ```
 
 ## Steps to Update Composer Libraries
 
@@ -48,9 +52,33 @@ This guide provides detailed steps to correctly install and update Composer libr
    php strauss.phar
    ```
 
-3. **Do Not Run `composer dump-autoload` After Strauss**
+3. **Regenerate the Autoloader**
 
-   Similar to the installation step, do not run `composer dump-autoload` after running Strauss.
+   Since Strauss deletes the original files when copying them, you must run:
+
+   ```sh
+   composer dump-autoload -o
+   ```
+
+## Additional Manual Fixes
+
+Some files require manual adjustments to ensure proper prefixing when using Strauss. Below are the necessary modifications:
+
+### **File:** `vendor/strauss/dompdf/php-font-lib/src/FontLib/Font.php`
+- **Line 62:**
+  - **Before:** `$class = "FontLib\$class";`
+  - **After:** `$class = "WPO\IPS\Vendor\FontLib\$class";`
+
+### **File:** `vendor/strauss/dompdf/php-font-lib/src/FontLib/TrueType/File.php`
+- **Line 385:**
+  - **Before:** `return $class_parts[1];`
+  - **After:** `return $class_parts[4];`
+
+- **Line 401:**
+  - **Before:** `$class = "FontLib\$type\TableDirectoryEntry";`
+  - **After:** `$class = "WPO\IPS\Vendor\FontLib\$type\TableDirectoryEntry";`
+
+For more details, see the related commit: [61bf71cb90](https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/1091/commits/61bf71cb90f71c2dbd1c80b3441599821ab009bd)
 
 ## Example `composer.json` Configuration
 
@@ -64,50 +92,74 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
 			"WPO\\IPS\\UBL\\": "ubl/"
-		},
-		"classmap": [
-			"vendor/"
-		]
+		}
 	},
 	"require": {
-		"dompdf/dompdf": "^3.0",
-		"symfony/polyfill-mbstring": "^1.27",
-		"symfony/polyfill-iconv": "^1.27",
-		"sabre/xml": "^2.2.5"
+		"dompdf/dompdf": "^3.1",
+		"symfony/polyfill-mbstring": "^1.31",
+		"symfony/polyfill-iconv": "^1.31",
+		"sabre/xml": "^4.0"
 	},
 	"extra": {
 		"strauss": {
-			"target_directory": "vendor",
+			"target_directory": "vendor/strauss",
 			"namespace_prefix": "WPO\\IPS\\Vendor\\",
 			"classmap_prefix": "WPO_IPS_Vendor_",
 			"constant_prefix": "WPO_IPS_VENDOR_",
-			"packages": [],
-			"update_call_sites": false,
-			"override_autoload": {},
+			"packages": [
+				"dompdf/dompdf",
+				"sabberworm/php-css-parser",
+				"sabre/xml",
+				"sabre/uri",
+				"masterminds/html5"
+			],
+			"update_call_sites": true,
+			"override_autoload": {
+				"dompdf/dompdf": {
+					"classmap": ["."]
+				},
+				"dompdf/php-font-lib": {
+					"classmap": ["."]
+				},
+				"dompdf/php-svg-lib": {
+					"classmap": ["."]
+				},
+				"masterminds/html5": {
+					"classmap": ["."]
+				},
+				"sabberworm/php-css-parser": {
+					"classmap": ["."]
+				},
+				"sabre/uri": {
+					"classmap": ["."]
+				},
+				"sabre/xml": {
+					"classmap": ["."]
+				}
+			},
 			"exclude_from_copy": {
 				"packages": [],
 				"namespaces": [],
-				"file_patterns": [
-					"/^psr.*$/"
-				]
+				"file_patterns": []
 			},
 			"exclude_from_prefix": {
 				"packages": [
 					"symfony/polyfill-mbstring",
-					"symfony/polyfill-iconv",
-					"masterminds/html5"
+					"symfony/polyfill-iconv"
 				],
 				"namespaces": [],
 				"file_patterns": []
 			},
 			"namespace_replacement_patterns": {},
-			"delete_vendor_packages": false,
-			"delete_vendor_files": false
+			"delete_vendor_packages": true,
+			"delete_vendor_files": true
 		}
 	},
 	"config": {
 		"platform-check": false
 	}
 }
-
 ```
+
+Now, since we use the Strauss autoloader, always follow the updated installation and update steps to ensure prefixed dependencies load correctly.
+

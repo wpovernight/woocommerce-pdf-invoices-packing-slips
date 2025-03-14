@@ -553,7 +553,7 @@ class Invoice extends OrderDocumentMethods {
 			),
 		);
 
-		if ( 'guest' === WPO_WCPDF()->endpoint->get_document_link_access_type() ) {
+		if ( 'full' === WPO_WCPDF()->endpoint->get_document_link_access_type() ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
 				'id'       => 'include_email_link',
@@ -566,12 +566,7 @@ class Invoice extends OrderDocumentMethods {
 					'options_callback' => array( $this, 'get_wc_emails' ),
 					'multiple'         => true,
 					'enhanced_select'  => true,
-					'description'      => sprintf(
-						/* translators: 1. opening anchor tag, 2. closing anchor tag */
-						__( 'Select emails to include the document link. This applies only to emails sent to "Guest" customers when the "Guest" access type is selected. %1$sCheck document link access type%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a target="_blank" href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=settings' ) ) . '">',
-						'</a>'
-					)
+					'description'      => __( 'Select emails to include the document link.', 'woocommerce-pdf-invoices-packing-slips' )
 				),
 			);
 
