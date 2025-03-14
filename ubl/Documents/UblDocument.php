@@ -56,14 +56,14 @@ class UblDocument extends Document {
 				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Common\AddressHandler::class,
 				'options' => array(
-					'root' => 'AccountingSupplierParty',
+					'root' => 'cac:AccountingSupplierParty',
 				),
 			),
 			'accountingcustomerparty' => array(
 				'enabled' => true,
 				'handler' => \WPO\IPS\UBL\Handlers\Common\AddressHandler::class,
 				'options' => array(
-					'root' => 'AccountingCustomerParty',
+					'root' => 'cac:AccountingCustomerParty',
 				),
 			),
 			'delivery' => array(
