@@ -208,17 +208,22 @@ function wcpdf_pdf_maker_is_default() {
  * @param string      $mode     Delivery mode ('inline' or 'download')
  * @param string|null $pdf      PDF string
  */
-function wcpdf_pdf_headers( string $filename, string $mode = 'inline', string $pdf = null ) {
+function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $pdf = null ) {
+	// Decide whether to display inline or prompt a download
 	$disposition = ( $mode === 'download' ) ? 'attachment' : 'inline';
 
-	header( 'Content-Type: application/pdf' );
+	// PDF-specific headers
+	header( 'Content-Type: application/octet-stream' );
 	header( 'Content-Disposition: ' . $disposition . '; filename="' . rawurlencode( $filename ) . '"' );
 	header( 'Content-Transfer-Encoding: binary' );
 	header( 'Accept-Ranges: bytes' );
+
+	// Cache control headers
 	header( 'Cache-Control: public, must-revalidate, max-age=0' );
 	header( 'Pragma: public' );
 	header( 'Expires: 0' );
 
+	// Allows other developers or code to hook in
 	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
 }
 
