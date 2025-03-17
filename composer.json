@@ -53,7 +53,9 @@
 			"exclude_from_copy": {
 				"packages": [],
 				"namespaces": [],
-				"file_patterns": []
+				"file_patterns": [
+					"/^psr.*$/"
+				]
 			},
 			"exclude_from_prefix": {
 				"packages": [
@@ -61,9 +63,7 @@
 					"symfony/polyfill-iconv"
 				],
 				"namespaces": [],
-				"file_patterns": [
-					"/^psr.*$/"
-				]
+				"file_patterns": []
 			},
 			"namespace_replacement_patterns": {},
 			"delete_vendor_packages": true,
