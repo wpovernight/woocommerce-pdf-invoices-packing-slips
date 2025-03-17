@@ -210,11 +210,12 @@ function wcpdf_pdf_maker_is_default() {
  */
 function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $pdf = null ) {
 	// Decide whether to display inline or prompt a download
-	$disposition = ( $mode === 'download' ) ? 'attachment' : 'inline';
+	$disposition  = ( $mode === 'download' ) ? 'attachment' : 'inline';
+	$content_type = ( $mode === 'download' ) ? 'application/octet-stream' : 'application/pdf';
 
 	// PDF-specific headers
-	header( 'Content-Type: application/octet-stream' );
-	header( 'Content-Disposition: ' . $disposition . '; filename="' . rawurlencode( $filename ) . '"' );
+	header( "Content-Type: $content_type" );
+	header( "Content-Disposition: $disposition; filename=\"" . rawurlencode( $filename ) . "\"" );
 	header( 'Content-Transfer-Encoding: binary' );
 	header( 'Accept-Ranges: bytes' );
 
