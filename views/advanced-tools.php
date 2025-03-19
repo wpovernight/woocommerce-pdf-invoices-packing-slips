@@ -238,10 +238,10 @@
 		<?php
 			$documents  = WPO_WCPDF()->documents->get_documents( 'all' );
 			$date_types = array(
-				'date_created'   => __( 'Order date created', 'woocommerce-pdf-invoices-packing-slips' ),
-				'date_modified'  => __( 'Order date modified', 'woocommerce-pdf-invoices-packing-slips' ),
-				'date_completed' => __( 'Order date completed', 'woocommerce-pdf-invoices-packing-slips' ),
-				'date_paid'      => __( 'Order date paid', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date_created'   => __( 'Order creation date', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date_modified'  => __( 'Order modification date', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date_completed' => __( 'Order completion date', 'woocommerce-pdf-invoices-packing-slips' ),
+				'date_paid'      => __( 'Order payment date', 'woocommerce-pdf-invoices-packing-slips' ),
 				'document_date'  => __( 'Document date', 'woocommerce-pdf-invoices-packing-slips' ),
 			);
 		?>
