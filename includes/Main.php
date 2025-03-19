@@ -690,7 +690,14 @@ class Main {
 		}
 
 		$cache_key = "wpo_wcpdf_subfolder_{$subfolder}_has_files";
-		$tmp_path  = untrailingslashit( $this->get_tmp_path( $subfolder ) );
+
+		// Check cached value
+		$cached_value = get_transient( $cache_key );
+		if ( ! empty( $cached_value ) ) {
+			return wc_string_to_bool( $cached_value );
+		}
+		
+		$tmp_path = untrailingslashit( $this->get_tmp_path( $subfolder ) );
 
 		// Define allowed extensions per subfolder
 		$allowed_extensions = array(
@@ -705,14 +712,14 @@ class Main {
 			foreach ( $iterator as $file ) {
 				// If we don't have a file extension restriction, return true immediately
 				if ( empty( $allowed_extensions[ $subfolder ] ) ) {
-					set_transient( $cache_key, 'yes', HOUR_IN_SECONDS );
+					set_transient( $cache_key, 'yes', DAY_IN_SECONDS );
 					return true;
 				}
 
 				// Check if file extension matches the allowed list
 				$extension = strtolower( pathinfo( $file->getFilename(), PATHINFO_EXTENSION ) );
 				if ( in_array( $extension, $allowed_extensions[ $subfolder ], true ) ) {
-					set_transient( $cache_key, 'yes', HOUR_IN_SECONDS );
+					set_transient( $cache_key, 'yes', DAY_IN_SECONDS );
 					return true;
 				}
 			}
@@ -722,7 +729,7 @@ class Main {
 		}
 
 		// If no files found, cache the result
-		set_transient( $cache_key, 'no', HOUR_IN_SECONDS );
+		set_transient( $cache_key, 'no', DAY_IN_SECONDS );
 		return false;
 	}
 
