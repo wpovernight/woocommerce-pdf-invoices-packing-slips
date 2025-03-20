@@ -680,52 +680,57 @@ class Main {
 	/**
 	 * Checks if the tmp subfolder has files
 	 *
-	 * @param string $subfolder  can be 'attachments', 'fonts' or 'dompdf'
-	 *
+	 * @param string $subfolder Can be 'attachments', 'fonts', or 'dompdf'.
 	 * @return bool
 	 */
-	public function tmp_subfolder_has_files( $subfolder ) {
-		$has_files = false;
-
-		if ( empty( $subfolder ) || ! in_array( $subfolder, $this->subfolders ) ) {
+	public function tmp_subfolder_has_files( string $subfolder ): bool {
+		if ( empty( $subfolder ) || ! in_array( $subfolder, $this->subfolders, true ) ) {
 			wcpdf_log_error( sprintf( 'The directory %s is not a default tmp subfolder from this plugin.', $subfolder ), 'critical' );
-			return $has_files;
+			return false;
 		}
 
-		// we have a cached value
-		if ( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) !== false ) {
-			return wc_string_to_bool( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) );
-		}
+		$cache_key = "wpo_wcpdf_subfolder_{$subfolder}_has_files";
 
-		if ( ! function_exists( 'glob' ) ) {
-			wcpdf_log_error( 'PHP glob function not found.', 'critical' );
-			return $has_files;
+		// Check cached value
+		$cached_value = get_transient( $cache_key );
+		if ( ! empty( $cached_value ) ) {
+			return wc_string_to_bool( $cached_value );
 		}
-
+		
 		$tmp_path = untrailingslashit( $this->get_tmp_path( $subfolder ) );
 
-		switch ( $subfolder ) {
-			case 'attachments':
-				if ( ! empty( glob( $tmp_path.'/*.pdf' ) ) ) {
-					$has_files = true;
+		// Define allowed extensions per subfolder
+		$allowed_extensions = array(
+			'attachments' => array( 'pdf' ),
+			'fonts'       => array( 'ttf' ),
+			'dompdf'      => array(), // All files
+		);
+
+		try {
+			$iterator = new \FilesystemIterator( $tmp_path, \FilesystemIterator::SKIP_DOTS );
+			
+			foreach ( $iterator as $file ) {
+				// If we don't have a file extension restriction, return true immediately
+				if ( empty( $allowed_extensions[ $subfolder ] ) ) {
+					set_transient( $cache_key, 'yes', DAY_IN_SECONDS );
+					return true;
 				}
-				break;
-			case 'fonts':
-				if ( ! empty( glob( $tmp_path.'/*.ttf' ) ) ) {
-					$has_files = true;
+
+				// Check if file extension matches the allowed list
+				$extension = strtolower( pathinfo( $file->getFilename(), PATHINFO_EXTENSION ) );
+				if ( in_array( $extension, $allowed_extensions[ $subfolder ], true ) ) {
+					set_transient( $cache_key, 'yes', DAY_IN_SECONDS );
+					return true;
 				}
-				break;
-			case 'dompdf':
-				if ( ! empty( glob( $tmp_path.'/*.*' ) ) ) {
-					$has_files = true;
-				}
-				break;
+			}
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( 'Error reading directory: ' . $e->getMessage(), 'critical' );
+			return false;
 		}
 
-		// save value to cache
-		set_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files", ( true === $has_files ) ? 'yes' : 'no' , DAY_IN_SECONDS );
-
-		return $has_files;
+		// If no files found, cache the result
+		set_transient( $cache_key, 'no', DAY_IN_SECONDS );
+		return false;
 	}
 
 	/**
@@ -735,8 +740,10 @@ class Main {
 	 *
 	 * @return void
 	 */
-	public function maybe_reinstall_fonts( $force = false ) {
-		if ( false === $this->tmp_subfolder_has_files( 'fonts' ) || true === $force ) {
+	public function maybe_reinstall_fonts( bool $force = false ): void {
+		$has_font_files = $this->tmp_subfolder_has_files( 'fonts' );
+		
+		if ( ! $has_font_files || $force ) {
 			$fonts_path = untrailingslashit( $this->get_tmp_path( 'fonts' ) );
 
 			// clear folder first
