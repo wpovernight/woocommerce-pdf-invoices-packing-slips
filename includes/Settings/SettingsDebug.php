@@ -110,8 +110,7 @@ class SettingsDebug {
 			return;
 		}
 
-		global $wpdb;
-
+		$db_helper					    = WPO_WCPDF()->database_helper;
 		$_GET['_wpnonce']               = $nonce;
 		$number_store_tables            = $this->get_number_store_tables();
 		$invoice_number_store_doc_types = $this->get_additional_invoice_number_store_document_types();
@@ -120,7 +119,7 @@ class SettingsDebug {
 		if ( isset( $_GET['table_name'] ) ) {
 			$selected_table_name = sanitize_text_field( wp_unslash( $_GET['table_name'] ) );
 		} else {
-			$_GET['table_name'] = $selected_table_name = apply_filters( 'wpo_wcpdf_number_store_table_name', "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
+			$_GET['table_name'] = $selected_table_name = apply_filters( 'wpo_wcpdf_number_store_table_name', "{$db_helper->wpdb->prefix}wcpdf_{$store_name}", $store_name, null ); // i.e. wp_wcpdf_invoice_number or wp_wcpdf_invoice_number_2021
 		}
 
 		if ( ! isset( $number_store_tables[ $_GET['table_name'] ] ) ) {
@@ -142,9 +141,8 @@ class SettingsDebug {
 	}
 
 	public function get_number_store_tables() {
-		global $wpdb;
-		
-		$tables          = WPO_WCPDF()->database_helper->get_tables_like( "{$wpdb->prefix}wcpdf_%" );
+		$db_helper       = WPO_WCPDF()->database_helper;
+		$tables          = $db_helper->get_tables_like( "{$db_helper->wpdb->prefix}wcpdf_%" );
 		$document_titles = WPO_WCPDF()->documents->get_document_titles();
 		$table_names     = array();
 

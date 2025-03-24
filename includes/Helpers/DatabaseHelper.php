@@ -120,7 +120,7 @@ class DatabaseHelper {
 		}
 	
 		return (bool) $result;
-	}	
+	}
 	
 	public function rename_table( string $from, string $to ): bool {
 		if ( $this->has_identifier_escape ) {
@@ -138,26 +138,67 @@ class DatabaseHelper {
 		}
 	
 		return (bool) $result;
-	}	
+	}
 	
-	public function log_wpdb_error( string $context ): void {
-		if ( ! empty( $this->wpdb->last_error ) ) {
-			$message = sprintf(
-				'Database error in %s: %s',
-				$context,
-				$this->wpdb->last_error
-			);
+	/**
+	 * Catch MySQL errors
+	 *
+	 * Inspired from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
+	 *
+	 * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
+	 * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
+	 * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
+	 *
+	 * @param string $context  The context in which the errors are caught
+	 * @return array
+	 */
+	public function catch_errors( string $context = __METHOD__ ): array {
+		global $EZSQL_ERROR;
 	
-			if ( function_exists( 'wcpdf_log_error' ) ) {
-				wcpdf_log_error( $message );
-			} else {
-				error_log( $message );
+		$errors = array();
+	
+		if ( ! empty( $this->wpdb->queries ) && is_array( $this->wpdb->queries ) ) {
+			foreach ( $this->wpdb->queries as $query ) {
+				$result = $query['result'] ?? null;
+				if ( is_wp_error( $result ) && is_array( $result->errors ) ) {
+					foreach ( $result->errors as $error ) {
+						$errors[] = reset( $error );
+					}
+				}
 			}
+		}
+	
+		if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
+			foreach ( $EZSQL_ERROR as $error ) {
+				if ( isset( $error['error_str'] ) ) {
+					$errors[] = $error['error_str'];
+				}
+			}
+		}
+	
+		if ( ! empty( $errors ) ) {
+			foreach ( $errors as $message ) {
+				$this->log_wpdb_error( $context, $message );
+			}
+		}
+	
+		return $errors;
+	}
+	
+	public function log_wpdb_error( string $context, ?string $custom_error = null ): void {
+		$message = $custom_error
+			? sprintf( 'Database error in %s: %s', $context, $custom_error )
+			: sprintf( 'Database error in %s: %s', $context, $this->wpdb->last_error );
+	
+		if ( function_exists( 'wcpdf_log_error' ) ) {
+			wcpdf_log_error( $message, 'critical' );
+		} else {
+			error_log( $message );
 		}
 	
 		if ( ! $this->hide_wpdb_errors ) {
 			$this->wpdb->show_errors();
 		}
-	}	
+	}
 		
 }
