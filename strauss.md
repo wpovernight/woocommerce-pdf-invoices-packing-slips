@@ -140,7 +140,9 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 			"exclude_from_copy": {
 				"packages": [],
 				"namespaces": [],
-				"file_patterns": []
+				"file_patterns": [
+					"/^psr.*$/"
+				]
 			},
 			"exclude_from_prefix": {
 				"packages": [

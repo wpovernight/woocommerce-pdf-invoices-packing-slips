@@ -680,52 +680,57 @@ class Main {
 	/**
 	 * Checks if the tmp subfolder has files
 	 *
-	 * @param string $subfolder  can be 'attachments', 'fonts' or 'dompdf'
-	 *
+	 * @param string $subfolder Can be 'attachments', 'fonts', or 'dompdf'.
 	 * @return bool
 	 */
-	public function tmp_subfolder_has_files( $subfolder ) {
-		$has_files = false;
-
-		if ( empty( $subfolder ) || ! in_array( $subfolder, $this->subfolders ) ) {
+	public function tmp_subfolder_has_files( string $subfolder ): bool {
+		if ( empty( $subfolder ) || ! in_array( $subfolder, $this->subfolders, true ) ) {
 			wcpdf_log_error( sprintf( 'The directory %s is not a default tmp subfolder from this plugin.', $subfolder ), 'critical' );
-			return $has_files;
+			return false;
 		}
 
-		// we have a cached value
-		if ( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) !== false ) {
-			return wc_string_to_bool( get_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files" ) );
-		}
+		$cache_key = "wpo_wcpdf_subfolder_{$subfolder}_has_files";
 
-		if ( ! function_exists( 'glob' ) ) {
-			wcpdf_log_error( 'PHP glob function not found.', 'critical' );
-			return $has_files;
+		// Check cached value
+		$cached_value = get_transient( $cache_key );
+		if ( ! empty( $cached_value ) ) {
+			return wc_string_to_bool( $cached_value );
 		}
-
+		
 		$tmp_path = untrailingslashit( $this->get_tmp_path( $subfolder ) );
 
-		switch ( $subfolder ) {
-			case 'attachments':
-				if ( ! empty( glob( $tmp_path.'/*.pdf' ) ) ) {
-					$has_files = true;
+		// Define allowed extensions per subfolder
+		$allowed_extensions = array(
+			'attachments' => array( 'pdf' ),
+			'fonts'       => array( 'ttf' ),
+			'dompdf'      => array(), // All files
+		);
+
+		try {
+			$iterator = new \FilesystemIterator( $tmp_path, \FilesystemIterator::SKIP_DOTS );
+			
+			foreach ( $iterator as $file ) {
+				// If we don't have a file extension restriction, return true immediately
+				if ( empty( $allowed_extensions[ $subfolder ] ) ) {
+					set_transient( $cache_key, 'yes', DAY_IN_SECONDS );
+					return true;
 				}
-				break;
-			case 'fonts':
-				if ( ! empty( glob( $tmp_path.'/*.ttf' ) ) ) {
-					$has_files = true;
+
+				// Check if file extension matches the allowed list
+				$extension = strtolower( pathinfo( $file->getFilename(), PATHINFO_EXTENSION ) );
+				if ( in_array( $extension, $allowed_extensions[ $subfolder ], true ) ) {
+					set_transient( $cache_key, 'yes', DAY_IN_SECONDS );
+					return true;
 				}
-				break;
-			case 'dompdf':
-				if ( ! empty( glob( $tmp_path.'/*.*' ) ) ) {
-					$has_files = true;
-				}
-				break;
+			}
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( 'Error reading directory: ' . $e->getMessage(), 'critical' );
+			return false;
 		}
 
-		// save value to cache
-		set_transient( "wpo_wcpdf_subfolder_{$subfolder}_has_files", ( true === $has_files ) ? 'yes' : 'no' , DAY_IN_SECONDS );
-
-		return $has_files;
+		// If no files found, cache the result
+		set_transient( $cache_key, 'no', DAY_IN_SECONDS );
+		return false;
 	}
 
 	/**
@@ -735,8 +740,10 @@ class Main {
 	 *
 	 * @return void
 	 */
-	public function maybe_reinstall_fonts( $force = false ) {
-		if ( false === $this->tmp_subfolder_has_files( 'fonts' ) || true === $force ) {
+	public function maybe_reinstall_fonts( bool $force = false ): void {
+		$has_font_files = $this->tmp_subfolder_has_files( 'fonts' );
+		
+		if ( ! $has_font_files || $force ) {
 			$fonts_path = untrailingslashit( $this->get_tmp_path( 'fonts' ) );
 
 			// clear folder first
@@ -1689,11 +1696,20 @@ class Main {
 		return $topic_hooks;
 	}
 
-	public function wc_webhook_topic_events( $topic_events ) {
+	/**
+	 * Adds custom webhook topic events.
+	 *
+	 * @param array $topic_events
+	 *
+	 * @return array
+	 */
+	public function wc_webhook_topic_events( array $topic_events = array() ): array {
 		$documents = WPO_WCPDF()->documents->get_documents();
-		foreach ($documents as $document) {
+
+		foreach ( $documents as $document ) {
 			$topic_events[] = "{$document->type}-saved";
 		}
+
 		return $topic_events;
 	}
 
@@ -1707,7 +1723,61 @@ class Main {
 	}
 
 	public function wc_webhook_trigger( $document, $order ) {
+		$this->reload_wpo_custom_webhooks();
 		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
+	}
+
+	/**
+	 * Reloads WooCommerce PDF Invoices webhooks to ensure custom hooks are processed.
+	 *
+	 * This function introduced to resolve an issue where WooCommerce
+	 * webhooks were not enqueuing our plugin's custom hooks.
+	 * The root cause is that the `wc_webhook_topic_hooks()` function, responsible
+	 * for modifying hooks, is not executed in time. The `add_filter()` call that
+	 * registers `wc_webhook_topic_hooks()` is executed after `apply_filters()`,
+	 * preventing the `wpo_wcpdf_webhook_order_{$document->slug}_saved` action hook
+	 * from being included in the list of webhook topics.
+	 *
+	 * https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/issues/1083
+	 *
+	 * @return void
+	 */
+	private function reload_wpo_custom_webhooks() {
+		if (
+			! apply_filters( 'wpo_wcpdf_reload_wpo_custom_webhooks', true ) ||
+			! class_exists( 'WC_Data_Store' ) ||
+			! class_exists( 'WC_Webhook' )
+		) {
+			return;
+		}
+
+		$wpo_topic_hooks = $this->wc_webhook_topic_events();
+		$data_store      = \WC_Data_Store::load( 'webhook' );
+		$webhooks        = $data_store->get_webhooks_ids( 'active' );
+
+		if ( empty( $webhooks ) ) {
+			return;
+		}
+
+		foreach ( $webhooks as $webhook_id ) {
+			$webhook = new \WC_Webhook( $webhook_id );
+
+			if ( $webhook->get_pending_delivery() ) {
+				continue;
+			}
+
+			$webhook_topic = $webhook->get_topic();
+
+			if ( empty( $webhook_topic ) || ! is_string( $webhook_topic ) ) {
+				continue;
+			}
+
+			$topic = str_replace( 'order.', '', $webhook_topic );
+
+			if ( in_array( $topic, $wpo_topic_hooks, true ) ) {
+				$webhook->enqueue();
+			}
+		}
 	}
 
 	/**
