@@ -201,24 +201,30 @@ function wcpdf_pdf_maker_is_default() {
 	return $default_pdf_maker == apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker );
 }
 
-function wcpdf_pdf_headers( $filename, $mode = 'inline', $pdf = null ) {
-	switch ( $mode ) {
-		case 'download':
-			header( 'Content-Description: File Transfer' );
-			header( 'Content-Type: application/pdf' );
-			header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-			header( 'Content-Transfer-Encoding: binary' );
-			header( 'Connection: Keep-Alive' );
-			header( 'Expires: 0' );
-			header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-			header( 'Pragma: public' );
-			break;
-		case 'inline':
-		default:
-			header( 'Content-type: application/pdf' );
-			header( 'Content-Disposition: inline; filename="' . $filename . '"' );
-			break;
-	}
+/**
+ * Send PDF headers for inline viewing or file download.
+ *
+ * @param string      $filename PDF file name
+ * @param string      $mode     Delivery mode ('inline' or 'download')
+ * @param string|null $pdf      PDF string
+ */
+function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $pdf = null ) {
+	// Decide whether to display inline or prompt a download
+	$disposition  = ( $mode === 'download' ) ? 'attachment' : 'inline';
+	$content_type = ( $mode === 'download' ) ? 'application/octet-stream' : 'application/pdf';
+
+	// PDF-specific headers
+	header( "Content-Type: $content_type" );
+	header( "Content-Disposition: $disposition; filename=\"" . rawurlencode( $filename ) . "\"" );
+	header( 'Content-Transfer-Encoding: binary' );
+	header( 'Accept-Ranges: bytes' );
+
+	// Cache control headers
+	header( 'Cache-Control: public, must-revalidate, max-age=0' );
+	header( 'Pragma: public' );
+	header( 'Expires: 0' );
+
+	// Allows other developers or code to hook in
 	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
 }
 
