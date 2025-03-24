@@ -107,6 +107,23 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 4.2.0 (2025-03-24) =
+- New: Improved fonts check and reinstatement in temporary fonts directory
+- New: Function to reload WC webhooks
+- New: Improved autoloading for prefixed dependencies
+- New: Added plugin-specific filter hook for order item name
+- New: Removed the 'Guest' document access type, as it is covered by 'Full'
+- New: Updated DOMPDF to v3.1.0
+- New: Upgrade link on Packing Slip document status
+- New: Added order coupons data to UBL document
+- Tweak: Ensured correct PDF Content-Type for improved browser handling
+- Tweak: Refactored PDF Simple template order details header for cleaner syntax
+- Fix: Improved date field options in Danger Zone tools for clarity
+- Fix: SQL interpolation issues flagged by WP Plugin Check
+- Fix: Removed duplicate `AccountingSupplierParty` and `AccountingCustomerParty` in UBL
+- Fix: Resolved issues rendering the number tab results
+- Translations: Updated translation template (POT)
+
 = 4.1.1 (2025-02-17) =
 - Tweak: Added a documentation link to the System Configuration label
 - Tweak: Improved WP Filesystem implementation
