@@ -1265,12 +1265,22 @@ class Main {
 			$order_id   = $order->get_id();
 			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
 
-			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$wpdb->prepare(
-					"UPDATE " . esc_sql( $table_name ) . " SET order_id = 0 WHERE order_id = %s",
+			if ( version_compare( get_bloginfo( 'version' ), '6.2', '>=' ) ) {
+				$query = $wpdb->prepare(
+					"UPDATE %i SET order_id = 0 WHERE order_id = %d", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
+					$table_name,
 					$order_id
-				)
-			);
+				);
+			} else {
+				$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+
+				$query = $wpdb->prepare(
+					"UPDATE `$table_name_safe` SET order_id = 0 WHERE order_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$order_id
+				);
+			}
+
+			$wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		}
 	}
 
