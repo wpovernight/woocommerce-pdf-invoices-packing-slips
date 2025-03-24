@@ -1345,8 +1345,7 @@ class SettingsDebug {
 	 * @return void
 	 */
 	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', string $from = '', string $to = '', int $chunk_size = 100, int $offset = 0 ): void {
-		global $wpdb;
-		
+		$db_helper  = WPO_WCPDF()->database_helper;
 		$input_data = array(
 			'table_name' => $table_name,
 			'orderby'    => $orderby,
@@ -1354,56 +1353,39 @@ class SettingsDebug {
 			'from'       => $from,
 			'to'         => $to,
 		);
-
+	
 		$data = $this->filter_fetch_request_data( $input_data );
-
-		if ( empty( $data['table_name'] ) || empty( $data['from'] || empty( $data['to'] ) ) ) {
+	
+		if ( empty( $data['table_name'] ) || empty( $data['from'] ) || empty( $data['to'] ) ) {
 			return;
 		}
-
+	
 		$offset      = absint( $offset ?? 0 );
 		$chunk_size  = absint( $chunk_size ?? 100 );
 		$option_name = "wpo_wcpdf_number_data::{$data['table_name']}";
 		$results     = get_option( $option_name, array() );
 		$hook        = 'wpo_wcpdf_number_table_data_fetch';
-		$order       = ( 'DESC' === strtoupper( $data['order'] ) ) ? 'DESC' : 'ASC';
-		$table_name  = $data['table_name'];
-		$orderby     = $data['orderby'];
-
-		if ( version_compare( get_bloginfo( 'version' ), '6.2', '>=' ) ) {
-			$query = $wpdb->prepare(
-				"SELECT * FROM %i WHERE date BETWEEN %s AND %s ORDER BY %i $order LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$table_name,
-				$data['from'],
-				$data['to'],
-				$orderby,
-				$chunk_size,
-				$offset
-			);
-		} else {
-			$query = $wpdb->prepare(
-				"SELECT * FROM `$table_name` WHERE date BETWEEN %s AND %s ORDER BY `$orderby` $order LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$data['from'],
-				$data['to'],
-				$chunk_size,
-				$offset
-			);
-		}
-
-		$chunk_results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
+		$order       = ( strtoupper( $data['order'] ) === 'DESC' ) ? 'DESC' : 'ASC';
+		$table_name  = $db_helper->sanitize_identifier( $data['table_name'] );
+		$orderby     = $db_helper->sanitize_identifier( $data['orderby'] );
+	
+		$query = $db_helper->prepare_identifier_query(
+			"SELECT * FROM %i WHERE date BETWEEN %s AND %s ORDER BY %i $order LIMIT %d OFFSET %d",
+			array( $table_name, $orderby ),
+			array( $data['from'], $data['to'], $chunk_size, $offset )
+		);
+	
+		$chunk_results = $db_helper->wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+	
 		if ( empty( $chunk_results ) ) {
 			as_unschedule_all_actions( $hook );
 			update_option( $option_name . '::last_time', time() );
-			return; // exit if no more results
+			return;
 		}
-
-		$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
-
+	
+		$results = array_merge( $results, $chunk_results );
 		update_option( $option_name, $results );
-
-		$offset += $chunk_size; // increase the offset for the next chunk
-
+	
 		$args = array(
 			'table_name' => $data['table_name'],
 			'orderby'    => $data['orderby'],
@@ -1411,11 +1393,11 @@ class SettingsDebug {
 			'from'       => $data['from'],
 			'to'         => $data['to'],
 			'chunk_size' => $chunk_size,
-			'offset'     => $offset,
+			'offset'     => $offset + $chunk_size,
 		);
-
+	
 		as_enqueue_async_action( $hook, $args );
-	}
+	}	
 
 	/**
 	 * Handle AJAX number table data request
@@ -1516,37 +1498,36 @@ class SettingsDebug {
 	 * @param string $table_name
 	 * @param int    $search
 	 *
-	 * @return array|false
+	 * @return array
 	 */
-	public function search_number_in_database_table( string $table_name, int $search ) {
-		global $wpdb;
+	public function search_number_in_database_table( string $table_name, int $search ): array {
+		$db_helper = WPO_WCPDF()->database_helper;
 
 		if (
-			empty( $search )     ||
+			empty( $search ) ||
 			empty( $table_name ) ||
 			! in_array( $table_name, array_keys( $this->get_number_store_tables() ), true )
 		) {
 			return array();
 		}
 
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
-		$search                = absint( $search );
+		$table_name_safe = $db_helper->sanitize_identifier( $table_name );
+		$search          = absint( $search );
 
-		if ( $has_identifier_escape ) {
-			$query = $wpdb->prepare(
-				"SELECT * FROM %i WHERE id = %d", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-				$table_name,
-				$search
-			);
-		} else {
-			$query = $wpdb->prepare(
-				"SELECT * FROM `{$table_name_safe}` WHERE id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$search
-			);
+		$query = $db_helper->prepare_identifier_query(
+			"SELECT * FROM %i WHERE id = %d",
+			array( $table_name_safe ),
+			array( $search )
+		);
+
+		$results = $db_helper->wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+
+		if ( is_null( $results ) ) {
+			$db_helper->log_wpdb_error( __METHOD__ );
+			return array();
 		}
 
-		return $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return $results;
 	}
 
 	/**
