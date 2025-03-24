@@ -120,7 +120,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - Tweak: Refactored PDF Simple template order details header for cleaner syntax
 - Fix: Improved date field options in Danger Zone tools for clarity
 - Fix: SQL interpolation issues flagged by WP Plugin Check
-- Fix: Removed duplicate AccountingSupplierParty and AccountingCustomerParty in UBL
+- Fix: Removed duplicate `AccountingSupplierParty` and `AccountingCustomerParty` in UBL
 - Fix: Resolved issues rendering the number tab results
 - Translations: Updated translation template (POT)
 
