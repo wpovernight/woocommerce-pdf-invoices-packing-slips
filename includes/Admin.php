@@ -194,18 +194,23 @@ class Admin {
 			SetupWizard::instance();
 		}
 	}
-
-	public function get_invoice_count() {
-		global $wpdb;
-		
-		$invoice_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT count(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
-				'_wcpdf_invoice_number'
-			)
+	
+	public function get_invoice_count(): int {
+		$db_helper = WPO_WCPDF()->database_helper;
+		$table     = $db_helper->sanitize_identifier( $db_helper->wpdb->postmeta );
+	
+		$query = $db_helper->wpdb->prepare(
+			"SELECT count(*) FROM `{$table}` WHERE meta_key = %s",
+			'_wcpdf_invoice_number'
 		);
-		
-		return (int) $invoice_count;
+	
+		$count = $db_helper->wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	
+		if ( is_null( $count ) ) {
+			$db_helper->log_wpdb_error( __METHOD__ );
+		}
+	
+		return (int) $count;
 	}
 
 	public function update_pdf_counter( $document_type, $document ) {

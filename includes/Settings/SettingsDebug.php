@@ -143,11 +143,8 @@ class SettingsDebug {
 
 	public function get_number_store_tables() {
 		global $wpdb;
-
-		$tables = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			"SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'"
-		);
-
+		
+		$tables          = WPO_WCPDF()->database_helper->get_tables_like( "{$wpdb->prefix}wcpdf_%" );
 		$document_titles = WPO_WCPDF()->documents->get_document_titles();
 		$table_names     = array();
 

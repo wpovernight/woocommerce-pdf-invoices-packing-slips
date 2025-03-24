@@ -305,22 +305,18 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 * Check if the number store table exists.
 	 *
 	 * @return bool
-	 */
+	 */	
 	public function store_name_exists(): bool {
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$table_name            = $this->table_name;
-		$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
-
-		if ( $has_identifier_escape ) {
-			$query = $this->wpdb->prepare( "SHOW TABLES LIKE %i", $table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$query = $this->wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
+		$table_name = $this->table_name;
+		$db_helper  = WPO_WCPDF()->database_helper;
+		$exists     = $db_helper->table_exists( $table_name );
+	
+		if ( ! $exists ) {
+			$db_helper->log_wpdb_error( __METHOD__ );
 		}
-
-		$result = $this->wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
-
-		return $result === $table_name_safe;
-	}
+	
+		return $exists;
+	}	
 
 }
 

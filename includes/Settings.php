@@ -779,22 +779,24 @@ class Settings {
 		}
 		die();
 	}
-
+	
 	public function get_sequential_number_store_method() {
-		global $wpdb;
-		$method = isset( $this->debug_settings['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
-
+		$db_helper = WPO_WCPDF()->database_helper;
+		$method    = isset( $this->debug_settings['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
+	
 		// safety first - always use calculate when auto_increment_increment is not 1
-		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			"SHOW VARIABLES LIKE 'auto_increment_increment'"
-		);
-		
+		$row = $db_helper->wpdb->get_row( "SHOW VARIABLES LIKE 'auto_increment_increment'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+	
+		if ( is_null( $row ) ) {
+			$db_helper->log_wpdb_error( __METHOD__ );
+		}
+	
 		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			$method = 'calculate';
 		}
-
+	
 		return $method;
-	}
+	}	
 
 	public function schedule_yearly_reset_numbers() {
 		if ( ! $this->maybe_schedule_yearly_reset_numbers() ) {

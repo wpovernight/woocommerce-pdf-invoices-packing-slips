@@ -760,14 +760,16 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 		return $tax_rate;
 	}
-
+	
 	/**
 	 * Returns the percentage rate (float) for a given tax rate ID.
-	 * @param  int         $rate_id  woocommerce tax rate id
-	 * @return float|bool  $rate     percentage rate
+	 *
+	 * @param  int         $rate_id            WooCommerce tax rate ID
+	 * @param  \WC_Abstract_Order|null $order  Optional order to check for stored rates
+	 * @return float|bool                      Percentage rate or false if not found
 	 */
-	public function get_tax_rate_by_id( $rate_id, $order = null ) {
-		global $wpdb;
+	public function get_tax_rate_by_id( int $rate_id, ?\WC_Abstract_Order $order = null ) {
+		$db_helper = WPO_WCPDF()->database_helper;
 
 		// WC 3.7+ stores rate in tax items!
 		if ( $order_rates = $this->get_tax_rates_from_order( $order ) ) {
@@ -776,18 +778,20 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 
-		$rate = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d;",
-				$rate_id
-			)
+		$table = $db_helper->sanitize_identifier( $db_helper->wpdb->prefix . 'woocommerce_tax_rates' );
+
+		$query = $db_helper->wpdb->prepare(
+			"SELECT tax_rate FROM `{$table}` WHERE tax_rate_id = %d",
+			$rate_id
 		);
 
+		$rate = $db_helper->wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+
 		if ( is_null( $rate ) ) {
-			return false;
-		} else {
-			return (float) $rate;
+			$db_helper->log_wpdb_error( __METHOD__ );
 		}
+
+		return is_null( $rate ) ? false : (float) $rate;
 	}
 
 	public function get_tax_rates_from_order( $order ) {
@@ -820,22 +824,28 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			return false;
 		}
 	}
-
+	
 	/**
-	 * Returns a an array with rate_id => tax rate data (array) of all tax rates in woocommerce
-	 * @return array  $tax_rate_ids  keyed by id
+	 * Returns an array with rate_id => tax rate data (array) of all tax rates in WooCommerce.
+	 *
+	 * @return array  $tax_rate_ids  keyed by tax_rate_id
 	 */
-	public function get_tax_rate_ids() {
-		global $wpdb;
-		$rates = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates"
-		);
+	public function get_tax_rate_ids(): array {
+		$db_helper = WPO_WCPDF()->database_helper;
+
+		$table = $db_helper->sanitize_identifier( $db_helper->wpdb->prefix . 'woocommerce_tax_rates' );
+
+		$rates = $db_helper->wpdb->get_results( "SELECT * FROM `{$table}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+
+		if ( is_null( $rates )) {
+			$db_helper->log_wpdb_error( __METHOD__ );
+		}
 
 		$tax_rate_ids = array();
-		foreach ($rates as $rate) {
+		foreach ( $rates as $rate ) {
 			$rate_id = $rate->tax_rate_id;
-			unset($rate->tax_rate_id);
-			$tax_rate_ids[$rate_id] = (array) $rate;
+			unset( $rate->tax_rate_id );
+			$tax_rate_ids[ $rate_id ] = (array) $rate;
 		}
 
 		return $tax_rate_ids;

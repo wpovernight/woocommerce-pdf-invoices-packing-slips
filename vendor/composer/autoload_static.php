@@ -62,6 +62,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Endpoint' => __DIR__ . '/../..' . '/includes/Endpoint.php',
         'WPO\\IPS\\FontSynchronizer' => __DIR__ . '/../..' . '/includes/FontSynchronizer.php',
         'WPO\\IPS\\Frontend' => __DIR__ . '/../..' . '/includes/Frontend.php',
+        'WPO\\IPS\\Helpers\\DatabaseHelper' => __DIR__ . '/../..' . '/includes/Helpers/DatabaseHelper.php',
         'WPO\\IPS\\Install' => __DIR__ . '/../..' . '/includes/Install.php',
         'WPO\\IPS\\Main' => __DIR__ . '/../..' . '/includes/Main.php',
         'WPO\\IPS\\Makers\\PDFMaker' => __DIR__ . '/../..' . '/includes/Makers/PDFMaker.php',

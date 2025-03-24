@@ -1753,8 +1753,8 @@ abstract class OrderDocument {
 	 * @return string $table_name
 	 */
 	public function get_number_store_table_default_name( $store_base_name, $method ) {
-		global $wpdb;
-		return apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
+		$db_helper = WPO_WCPDF()->database_helper;
+		return apply_filters( "wpo_wcpdf_number_store_table_name", "{$db_helper->wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
 	}
 
 	/**
@@ -1765,20 +1765,23 @@ abstract class OrderDocument {
 	 * when a year lapses, the existing table ('last year') is 'retired' by renaming it with the year appended,
 	 * e.g. wp_wcpdf_invoice_number_2021 (when the current/new year is 2022). If there was a table for the new year,
 	 * this will be renamed to the default store name (e.g. wp_wcdpdf_invoice_number)
+	 * 
+	 * @param  \WC_DateTime $date
+	 * @param  string $store_base_name
+	 * @param  string $method
 	 *
 	 * returns requested year if any error occurs, so that the current store table will be used
 	 *
 	 * @return int $year year of the current number store
 	 */
-	public function maybe_retire_number_store( $date, $store_base_name, $method ) {
+	public function maybe_retire_number_store( \WC_DateTime $date, string $store_base_name, string $method ): int {
 		global $wpdb;
-		
-		$was_showing_errors    = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$default_table_name    = $this->get_number_store_table_default_name( $store_base_name, $method );
-		$now                   = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 
-		// for yearly reset debugging only
+		$db_helper          = WPO_WCPDF()->database_helper;
+		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
+		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+
+		// For yearly reset debugging only
 		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 			$now = new \WC_DateTime( '1st January Next Year' );
 		}
@@ -1787,40 +1790,18 @@ abstract class OrderDocument {
 		$current_store_year = intval( $this->get_number_store_year( $default_table_name ) );
 		$requested_year     = intval( $date->date_i18n( 'Y' ) );
 
-		// nothing to retire if requested year matches current store year or if current store year is not in the past
-		if (
-			empty( $current_store_year )              ||
-			$requested_year === $current_store_year   ||
-			! ( $current_store_year < $current_year )
-		) {
+		// Nothing to retire if requested year matches current store year or if current store year is not in the past
+		if ( empty( $current_store_year ) || $requested_year === $current_store_year || ! ( $current_store_year < $current_year ) ) {
 			return $current_store_year;
 		}
 
 		// current store year is in the past: rename table so that we can replace it with the current year
 		$retired_table_name = "{$default_table_name}_{$current_store_year}";
-		$retired_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $retired_table_name );
+		$retired_table_safe = $db_helper->sanitize_identifier( $retired_table_name );
 
-		if ( $has_identifier_escape ) {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %i", $retired_table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $retired_table_safe );
-		}
-
-		$retired_exists = $wpdb->get_var( $query ) === $retired_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
-		if ( $retired_exists ) {
-			if ( $has_identifier_escape ) {
-				$drop_query = $wpdb->prepare(
-					"DROP TABLE IF EXISTS %i", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$retired_table_name
-				);
-			} else {
-				$drop_query = "DROP TABLE IF EXISTS `{$retired_table_safe}`"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
-			}
-		
-			$table_removed = $wpdb->query( $drop_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		
-			if ( ! $table_removed ) {
+		// Check if retired table exists
+		if ( $db_helper->table_exists( $retired_table_name ) ) {
+			if ( ! $db_helper->drop_table_if_exists( $retired_table_name ) ) {
 				wcpdf_log_error( sprintf(
 					'An error occurred while trying to remove the duplicate number store %s: %s',
 					$retired_table_safe,
@@ -1829,33 +1810,12 @@ abstract class OrderDocument {
 				return $requested_year;
 			}
 		}
+		
+		$default_table_safe = $db_helper->sanitize_identifier( $default_table_name );
 
-		// Sanitize for legacy usage
-		$default_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $default_table_name );
-
-		// Detect if current default table exists
-		if ( $has_identifier_escape ) {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %i", $default_table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $default_table_safe );
-		}
-
-		$default_exists = $wpdb->get_var( $check_query ) === $default_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
-		if ( $default_exists ) {
-			if ( $has_identifier_escape ) {
-				$rename_query = $wpdb->prepare(
-					"ALTER TABLE %i RENAME TO %i", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$default_table_name,
-					$retired_table_name
-				);
-			} else {
-				$rename_query = "ALTER TABLE `{$default_table_safe}` RENAME `{$retired_table_safe}`"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
-			}
-
-			$table_renamed = $wpdb->query( $rename_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
-			if ( ! $table_renamed ) {
+		// Check if current default table exists
+		if ( $db_helper->table_exists( $default_table_name ) ) {
+			if ( ! $db_helper->rename_table( $default_table_name, $retired_table_name ) ) {
 				wcpdf_log_error( sprintf(
 					'An error occurred while trying to rename the number store from %s to %s: %s',
 					$default_table_safe,
@@ -1865,33 +1825,13 @@ abstract class OrderDocument {
 				return $requested_year;
 			}
 		}
-
+		
 		$current_year_table_name = "{$default_table_name}_{$current_year}";
-		$current_year_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $current_year_table_name );
+		$current_year_table_safe = $db_helper->sanitize_identifier( $current_year_table_name );
 
-		// Check if current year table already exists
-		if ( $has_identifier_escape ) {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %i", $current_year_table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $current_year_table_safe );
-		}
-
-		$current_year_exists = $wpdb->get_var( $check_query ) === $current_year_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
-		if ( $current_year_exists ) {
-			if ( $has_identifier_escape ) {
-				$rename_query = $wpdb->prepare(
-					"ALTER TABLE %i RENAME TO %i", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$current_year_table_name,
-					$default_table_name
-				);
-			} else {
-				$rename_query = "ALTER TABLE `{$current_year_table_safe}` RENAME `{$default_table_safe}`"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
-			}
-
-			$table_renamed = $wpdb->query( $rename_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
-			if ( ! $table_renamed ) {
+		// Check if current year table exists
+		if ( $db_helper->table_exists( $current_year_table_name ) ) {
+			if ( ! $db_helper->rename_table( $current_year_table_name, $default_table_name ) ) {
 				wcpdf_log_error( sprintf(
 					'An error occurred while trying to rename the number store from %s to %s: %s',
 					$current_year_table_safe,
@@ -1900,10 +1840,6 @@ abstract class OrderDocument {
 				) );
 				return $requested_year;
 			}
-		}
-
-		if ( $was_showing_errors ) {
-			$wpdb->show_errors();
 		}
 
 		// current store year has been updated to current year, returning this means no year suffix has to be used
@@ -1917,61 +1853,45 @@ abstract class OrderDocument {
 	 * @return int Year (4-digit)
 	 */
 	public function get_number_store_year( string $table_name ): int {
-		global $wpdb;
-
-		$was_showing_errors    = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$current_year          = date_i18n( 'Y' );
-
+		$db_helper    = WPO_WCPDF()->database_helper;
+		$current_year = date_i18n( 'Y' );
+	
 		// for yearly reset debugging only
 		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
 			$next_year    = new \WC_DateTime( '1st January Next Year' );
 			$current_year = intval( $next_year->date_i18n( 'Y' ) );
 		}
-
-		// Fallback sanitization for older WP
-		$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
-
-		// Check if table exists
-		if ( $has_identifier_escape ) {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %i", $table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
-		}
-
-		$table_exists = $wpdb->get_var( $query ) === $table_name_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
+	
+		
+		$table_name_safe = $db_helper->sanitize_identifier( $table_name );
+		$table_exists    = $db_helper->table_exists( $table_name );
+	
 		if ( $table_exists ) {
 			// Get year from the last row
-			if ( $has_identifier_escape ) {
-				$year_query = $wpdb->prepare(
+			if ( $db_helper->has_identifier_escape ) {
+				$year_query = $db_helper->wpdb->prepare(
 					"SELECT YEAR(date) FROM %i ORDER BY id DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
 					$table_name
 				);
 			} else {
 				$year_query = "SELECT YEAR(date) FROM `{$table_name_safe}` ORDER BY id DESC LIMIT 1";
 			}
-
-			$year = $wpdb->get_var( $year_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
+	
+			$year = $db_helper->wpdb->get_var( $year_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+	
 			if ( ! $year ) {
 				$year = $current_year;
-				if ( ! empty( $wpdb->last_error ) ) {
-					wcpdf_log_error( sprintf(
-						'An error occurred while trying to get the current year from the %s table: %s',
-						$has_identifier_escape ? $table_name : $table_name_safe,
-						$wpdb->last_error
-					) );
-				}
+				
+				wcpdf_log_error( sprintf(
+					'An error occurred while trying to get the current year from the %s table.',
+					$has_identifier_escape ? $table_name : $table_name_safe
+				) );
+				$db_helper->log_wpdb_error( __METHOD__ );
 			}
 		} else {
 			$year = $current_year;
 		}
-
-		if ( $was_showing_errors ) {
-			$wpdb->show_errors();
-		}
-
+	
 		return intval( $year );
 	}
 

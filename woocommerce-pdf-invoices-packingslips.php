@@ -28,6 +28,7 @@ class WPO_WCPDF {
 	public $version_wp           = '4.4';
 	public $plugin_basename;
 	public $legacy_addons;
+	public $database_helper;
 	public $third_party_plugins;
 	public $order_util;
 	public $settings;
@@ -148,6 +149,8 @@ class WPO_WCPDF {
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
 
+		// Helpers
+		$this->database_helper     = \WPO\IPS\Helpers\DatabaseHelper::instance();
 		// Third party compatibility
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		// WC OrderUtil compatibility

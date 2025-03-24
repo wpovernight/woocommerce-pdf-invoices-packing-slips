@@ -384,56 +384,56 @@ class Install {
 			wp_delete_file( trailingslashit( $font_path ) . 'dompdf_font_family_cache.dist.php' );
 			wp_delete_file( trailingslashit( $font_path ) . 'mustRead.html' );
 		}
-
+		
 		// 2.12.2-dev-1: change 'date' database table default value to '1000-01-01 00:00:00'
 		if ( version_compare( $installed_version, '2.12.2-dev-1', '<' ) ) {
-			global $wpdb;
+			$db_helper = WPO_WCPDF()->database_helper;
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
-			foreach ( $documents as $document ) {
-				$store_name        = "{$document->slug}_number";
-				$method            = WPO_WCPDF()->settings->get_sequential_number_store_method();
-				$table_name        = apply_filters( 'wpo_wcpdf_number_store_table_name', sanitize_key( "{$wpdb->prefix}wcpdf_{$store_name}" ), $store_name, $method );
-				$table_name_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-					$wpdb->prepare( "SHOW TABLES LIKE %s", $table_name )
-				) === $table_name;
 
-				if ( ! $table_name_exists ) {
+			foreach ( $documents as $document ) {
+				$store_name = "{$document->slug}_number";
+				$method     = WPO_WCPDF()->settings->get_sequential_number_store_method();
+				$table_name = apply_filters(
+					'wpo_wcpdf_number_store_table_name',
+					sanitize_key( "{$db_helper->wpdb->prefix}wcpdf_{$store_name}" ),
+					$store_name,
+					$method
+				);
+
+				if ( ! $db_helper->table_exists( $table_name ) ) {
 					continue;
 				}
-				
+
 				if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
 					$number_store = $document->get_sequential_number_store();
-				
+
 					if ( ! empty( $number_store ) ) {
-						$column_name           = 'date';
-						$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $number_store->table_name );
-						$column_name_safe      = preg_replace( '/[^a-zA-Z0-9_]/', '', $column_name );
-						$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-						
-						if ( $has_identifier_escape ) {
-							$query_result = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
-								$wpdb->prepare(
-									"ALTER TABLE %i ALTER %i SET DEFAULT %s", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-									$table_name_safe,
-									$column_name_safe,
-									'1000-01-01 00:00:00'
-								)
+						$column_name      = 'date';
+						$table_name_safe  = $db_helper->sanitize_identifier( $number_store->table_name );
+						$column_name_safe = $db_helper->sanitize_identifier( $column_name );
+
+						if ( $db_helper->has_identifier_escape ) {
+							$query = $db_helper->prepare_identifier_query(
+								"ALTER TABLE %i ALTER %i SET DEFAULT %s", 
+								array( $table_name_safe, $column_name_safe ),
+								array( '1000-01-01 00:00:00' )
 							);
 						} else {
-							$query_result = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
-								$wpdb->prepare(
-									"ALTER TABLE `{$table_name_safe}` ALTER `{$column_name_safe}` SET DEFAULT %s", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-									'1000-01-01 00:00:00'
-								)
+							$query = $db_helper->wpdb->prepare(
+								"ALTER TABLE `{$table_name_safe}` ALTER `{$column_name_safe}` SET DEFAULT %s",
+								'1000-01-01 00:00:00'
 							);
 						}
-						
-						if ( $query_result ) {
+
+						$result = $db_helper->wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+
+						if ( $result ) {
 							wcpdf_log_error(
 								"Default value changed for 'date' column to '1000-01-01 00:00:00' on database table: {$table_name_safe}",
 								'info'
 							);
 						} else {
+							$db_helper->log_wpdb_error( __METHOD__ );
 							wcpdf_log_error(
 								"An error occurred! The default value for 'date' column couldn't be changed to '1000-01-01 00:00:00' on database table: {$table_name_safe}",
 								'critical'

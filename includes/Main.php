@@ -1252,35 +1252,33 @@ class Main {
 		);
 		return $meta_to_remove + $wcpdf_private_meta;
 	}
-
+	
 	/**
 	 * Remove references to order in number store tables when removing WC data
+	 * 
+	 * @param \WC_Abstract_Order $order
+	 * @return void
 	 */
-	public function remove_order_personal_data( $order ) {
-		global $wpdb;
-		// remove order ID from number stores
-		$number_stores = apply_filters( "wpo_wcpdf_privacy_number_stores", array( 'invoice_number' ) );
+	public function remove_order_personal_data( \WC_Abstract_Order $order ): void {
+		$db_helper     = WPO_WCPDF()->database_helper;
+		$order_id      = $order->get_id();
+		$number_stores = apply_filters( 'wpo_wcpdf_privacy_number_stores', array( 'invoice_number' ) );
 
 		foreach ( $number_stores as $store_name ) {
-			$order_id   = $order->get_id();
-			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
+			$table_name = apply_filters( // i.e. wp_wcpdf_invoice_number
+				'wpo_wcpdf_number_store_table_name',
+				"{$db_helper->wpdb->prefix}wcpdf_{$store_name}",
+				$store_name,
+				'auto_increment'
+			);
 
-			if ( version_compare( get_bloginfo( 'version' ), '6.2', '>=' ) ) {
-				$query = $wpdb->prepare(
-					"UPDATE %i SET order_id = 0 WHERE order_id = %d", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$table_name,
-					$order_id
-				);
-			} else {
-				$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+			$query = $db_helper->prepare_identifier_query(
+				"UPDATE %i SET order_id = 0 WHERE order_id = %d",
+				array( $table_name ),
+				array( $order_id )
+			);
 
-				$query = $wpdb->prepare(
-					"UPDATE `$table_name_safe` SET order_id = 0 WHERE order_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$order_id
-				);
-			}
-
-			$wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$db_helper->wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 

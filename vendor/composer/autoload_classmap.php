@@ -24,6 +24,7 @@ return array(
     'WPO\\IPS\\Endpoint' => $baseDir . '/includes/Endpoint.php',
     'WPO\\IPS\\FontSynchronizer' => $baseDir . '/includes/FontSynchronizer.php',
     'WPO\\IPS\\Frontend' => $baseDir . '/includes/Frontend.php',
+    'WPO\\IPS\\Helpers\\DatabaseHelper' => $baseDir . '/includes/Helpers/DatabaseHelper.php',
     'WPO\\IPS\\Install' => $baseDir . '/includes/Install.php',
     'WPO\\IPS\\Main' => $baseDir . '/includes/Main.php',
     'WPO\\IPS\\Makers\\PDFMaker' => $baseDir . '/includes/Makers/PDFMaker.php',
