@@ -2,6 +2,8 @@
 
 namespace WPO\IPS;
 
+use WPO\IPS\Helpers\DatabaseHelper;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -9,6 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 
 class Semaphore {
+	
+	/**
+	 * Database helper object
+	 * @var DatabaseHelper
+	 */
+	private $db_helper;
 
 	/**
 	 * Prefix for the lock in the WP options table
@@ -83,6 +91,7 @@ class Semaphore {
 	 * @param array  $context     - an array of context for the loggers
 	 */
 	public function __construct( string $name, int $locked_for = 300, int $retries = 0, array $loggers = array(), array $context = array() ) {
+		$this->db_helper   = WPO_WCPDF()->database_helper = WPO_WCPDF()->database_helper ?? DatabaseHelper::instance();
 		$this->option_name = self::$option_prefix . $name;
 		$this->locked_for  = apply_filters( self::$option_prefix . 'time', $locked_for > 0 ? $locked_for : 300, $this->option_name );
 		$this->retries     = apply_filters( self::$option_prefix . 'retries', $retries > 0 ? $retries : 0, $this->option_name );
@@ -96,34 +105,40 @@ class Semaphore {
 	 * @return int - 0 means 'failed' (which could include that someone else concurrently created it); 1 means 'already existed'; 2 means 'exists, because we created it). The intention is that non-zero results mean that the lock exists.
 	 */
 	private function ensure_database_initialised(): int {
-		global $wpdb;
-	
+		$db_helper          = $this->db_helper;
+		$wpdb               = $db_helper->wpdb;
+		$options_table_safe = $db_helper->sanitize_identifier( $wpdb->options );
+		$option_name_safe   = $db_helper->sanitize_identifier( $this->option_name );
+
 		// Check if the lock option already exists
-		$existing_option = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s",
-				$this->option_name
-			)
+		$select_query = $this->db_helper->prepare_identifier_query(
+			"SELECT COUNT(*) FROM %i WHERE option_name = %s",
+			array( $options_table_safe ),
+			array( $option_name_safe )
 		);
-	
+
+		$existing_option = $wpdb->get_var( $select_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+
 		if ( 1 === (int) $existing_option ) {
-			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') already existed in the database', 'debug' );
+			$this->log( "Lock option ({$option_name_safe}, {$options_table_safe}) already existed in the database", 'debug' );
 			return 1;
 		}
-	
+
 		// Insert the lock option with a default value of 0
-		$rows_affected = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, '0', 'no')",
-				$this->option_name
-			)
+		$insert_query = $this->db_helper->prepare_identifier_query(
+			"INSERT INTO %i (option_name, option_value, autoload) VALUES (%s, '0', 'no')",
+			array( $options_table_safe ),
+			array( $option_name_safe )
 		);
-	
+
+		$rows_affected = $wpdb->query( $insert_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+
 		if ( $rows_affected > 0 ) {
-			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') was created in the database', 'debug' );
+			$this->log( "Lock option ({$option_name_safe}, {$options_table_safe}) was created in the database", 'debug' );
 			return 2;
 		} else {
-			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') failed to be created in the database', 'notice' );
+			$this->db_helper->log_wpdb_error( __METHOD__ );
+			$this->log( "Lock option ({$option_name_safe}, {$options_table_safe}) failed to be created in the database", 'notice' );
 			return 0;
 		}
 	}
@@ -139,68 +154,64 @@ class Semaphore {
 		if ( $this->acquired ) {
 			return true;
 		}
-
-		global $wpdb;
-
-		$time_now      = time();
-		$retries       = $retries > 0 ? $retries : $this->retries;
-		$acquire_until = $time_now + $this->locked_for;
-		$query         = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d",
-				$acquire_until,
-				$this->option_name,
-				$time_now
-			)
+	
+		$db_helper        = $this->db_helper;
+		$wpdb             = $db_helper->wpdb;
+		$table_name       = $wpdb->options;
+		$table_name_safe  = $db_helper->sanitize_identifier( $table_name );
+		$option_name_safe = $db_helper->sanitize_identifier( $this->option_name );
+		$time_now         = time();
+		$retries          = $retries > 0 ? $retries : $this->retries;
+		$acquire_until    = $time_now + $this->locked_for;
+	
+		// First attempt to acquire the lock
+		$query = $db_helper->prepare_identifier_query(
+			"UPDATE %i SET option_value = %s WHERE option_name = %s AND option_value < %d",
+			array( $table_name_safe ),
+			array( $acquire_until, $option_name_safe, $time_now )
 		);
-
-		if ( 1 === $query ) {
-			$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') acquired', 'info' );
+	
+		$result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+	
+		if ( 1 === (int) $result ) {
+			$this->log( "Lock ({$option_name_safe}, {$table_name_safe}) acquired", 'info' );
 			$this->acquired = true;
 			return true;
 		}
-
+	
 		// See if the failure was caused by the row not existing (we check this only after failure, because it should only occur once on the site)
 		if ( ! $this->ensure_database_initialised() ) {
 			return false;
 		}
-
+	
 		do {
-			$query = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$wpdb->prepare(
-					"UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d",
-					$acquire_until,
-					$this->option_name,
-					$time_now
-				)
+			$query = $db_helper->prepare_identifier_query(
+				"UPDATE %i SET option_value = %s WHERE option_name = %s AND option_value < %d",
+				array( $table_name_safe ),
+				array( $acquire_until, $option_name_safe, $time_now )
 			);
-			
-			// Now that the row has been created, try again
-			if ( 1 === $query ) {
-				$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') acquired after initialising the database', 'info' );
+	
+			$result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+	
+			if ( 1 === (int) $result ) {
+				$this->log( "Lock ({$option_name_safe}, {$table_name_safe}) acquired after initialisation", 'info' );
 				$this->acquired = true;
 				return true;
 			}
-			
+	
 			$retries--;
-			
+	
 			if ( $retries >= 0 ) {
-				$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') not yet acquired; sleeping', 'debug' );
+				$this->log( "Lock ({$option_name_safe}, {$table_name_safe}) not yet acquired; sleeping", 'debug' );
 				sleep( 1 );
-				// As a second has passed, update the time we are aiming for
-				$time_now = time();
+				$time_now      = time();
 				$acquire_until = $time_now + $this->locked_for;
-				$sql = $wpdb->prepare(
-					"UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %d",
-					$acquire_until,
-					$this->option_name,
-					$time_now
-				);
 			}
 		} while ( $retries >= 0 );
-
-		$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') could not be acquired (it is locked)', 'info' );
-
+	
+		$this->log( "Lock ({$option_name_safe}, {$table_name_safe}) could not be acquired (it is locked)", 'info' );
+		$db_helper->log_wpdb_error( __METHOD__ );
+		
 		return false;
 	}
 
@@ -216,21 +227,26 @@ class Semaphore {
 			return false;
 		}
 
-		global $wpdb;
-		
-		$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') released', 'info' );
+		$db_helper          = $this->db_helper;
+		$wpdb               = $db_helper->wpdb;
+		$options_table_safe = $db_helper->sanitize_identifier( $wpdb->options );
+		$option_name_safe   = $db_helper->sanitize_identifier( $this->option_name );
 
-		$result = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"UPDATE {$wpdb->options} SET option_value = '0' WHERE option_name = %s",
-				$this->option_name
-			)
-		) === 1;
+		$this->log( "Lock option ({$option_name_safe}, {$options_table_safe}) released", 'info' );
+
+		$query = $db_helper->prepare_identifier_query(
+			"UPDATE %i SET option_value = '0' WHERE option_name = %s",
+			array( $options_table_safe ),
+			array( $option_name_safe )
+		);
+
+		$result = $wpdb->query( $query ) === 1; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 
 		$this->acquired = false;
 
 		return $result;
 	}
+
 
 	/**
 	 * Cleans up the DB of any residual data. This should not be used as part of ordinary unlocking; only as part of deinstalling, or if you otherwise know that the lock will not be used again.
@@ -241,15 +257,20 @@ class Semaphore {
 	public function delete(): void {
 		$this->acquired = false;
 
-		global $wpdb;
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"DELETE FROM {$wpdb->options} WHERE option_name = %s",
-				$this->option_name
-			)
+		$db_helper          = $this->db_helper;
+		$wpdb               = $db_helper->wpdb;
+		$options_table_safe = $db_helper->sanitize_identifier( $wpdb->options );
+		$option_name_safe   = $this->option_name;
+
+		$query = $db_helper->prepare_identifier_query(
+			"DELETE FROM %i WHERE option_name = %s",
+			array( $options_table_safe ),
+			array( $option_name_safe )
 		);
 
-		$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') was deleted from the database' );
+		$wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+
+		$this->log( "Lock option ({$option_name_safe}, {$options_table_safe}) was deleted from the database" );
 	}
 
 	/**
@@ -316,16 +337,18 @@ class Semaphore {
 	 * @return void
 	 */
 	public static function cleanup_released_locks( bool $legacy = false ): void {
-		global $wpdb;
-
-		$option_prefix = $legacy ? self::$legacy_option_prefix : self::$option_prefix;
-
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
-				$wpdb->esc_like( $option_prefix ) . '%'
-			)
+		$db_helper          = WPO_WCPDF()->database_helper;
+		$wpdb               = $db_helper->wpdb;
+		$options_table_safe = $db_helper->sanitize_identifier( $wpdb->options );
+		$option_prefix      = $legacy ? self::$legacy_option_prefix : self::$option_prefix;
+	
+		$query = $db_helper->prepare_identifier_query(
+			"DELETE FROM %i WHERE option_name LIKE %s AND option_value = '0'",
+			array( $options_table_safe ),
+			array( $wpdb->esc_like( $option_prefix ) . '%' )
 		);
+	
+		$wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 	}
 
 	/**
@@ -336,17 +359,19 @@ class Semaphore {
 	 * @return int - the number of released locks
 	 */
 	public static function count_released_locks( bool $legacy = false ): int {
-		global $wpdb;
-
-		$option_prefix = $legacy ? self::$legacy_option_prefix : self::$option_prefix;
-
-		$count = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s AND option_value = '0'",
-				$wpdb->esc_like( $option_prefix ) . '%'
-			)
+		$db_helper          = WPO_WCPDF()->database_helper;
+		$wpdb               = $db_helper->wpdb;
+		$options_table_safe = $db_helper->sanitize_identifier( $wpdb->options );
+		$option_prefix      = $legacy ? self::$legacy_option_prefix : self::$option_prefix;
+	
+		$query = $db_helper->prepare_identifier_query(
+			"SELECT COUNT(*) FROM %i WHERE option_name LIKE %s AND option_value = '0'",
+			array( $options_table_safe ),
+			array( $wpdb->esc_like( $option_prefix ) . '%' )
 		);
-
+	
+		$count = (int) $wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+	
 		return $count;
 	}
 

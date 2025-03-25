@@ -1884,7 +1884,7 @@ abstract class OrderDocument {
 				
 				wcpdf_log_error( sprintf(
 					'An error occurred while trying to get the current year from the %s table.',
-					$has_identifier_escape ? $table_name : $table_name_safe
+					$table_name_safe
 				) );
 				$db_helper->log_wpdb_error( __METHOD__ );
 			}

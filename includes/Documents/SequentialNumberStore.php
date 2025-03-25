@@ -51,7 +51,7 @@ class SequentialNumberStore {
 	 * @param string $method     Method used to generate numbers, either 'auto_increment' or 'calculate'
 	 */
 	public function __construct( $store_name, $method = 'auto_increment' ) {
-		$this->db_helper  = WPO_WCPDF()->database_helper ?? DatabaseHelper::instance();
+		$this->db_helper  = WPO_WCPDF()->database_helper = WPO_WCPDF()->database_helper ?? DatabaseHelper::instance();
 		$this->store_name = $store_name;
 		$this->method     = $method;
 		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$this->db_helper->wpdb->prefix}wcpdf_{$this->store_name}", $this->store_name, $this->method ); // e.g. wp_wcpdf_invoice_number
@@ -65,9 +65,11 @@ class SequentialNumberStore {
 	 * @return void
 	 */
 	public function init(): void {
+		$db_helper       = $this->db_helper;
+		$wpdb	         = $db_helper->wpdb;
 		$table_name      = $this->table_name;
-		$table_name_safe = $this->db_helper->sanitize_identifier( $table_name );
-		$table_exists    = $this->db_helper->table_exists( $table_name );
+		$table_name_safe = $db_helper->sanitize_identifier( $table_name );
+		$table_exists    = $db_helper->table_exists( $table_name );
 		
 		// check if table exists
 		if ( ! $table_exists ) {
@@ -75,21 +77,21 @@ class SequentialNumberStore {
 		} else {
 			// Check calculated_number column if using 'calculate' method
 			if ( 'calculate' === $this->method ) {
-				$column_check_query = $this->db_helper->prepare_identifier_query(
+				$column_check_query = $db_helper->prepare_identifier_query(
 					"SHOW COLUMNS FROM %i LIKE %s",
 					array( $table_name_safe ),
 					array( 'calculated_number' )
 				);
 
-				$column_exists = $this->db_helper->wpdb->get_var( $column_check_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+				$column_exists = $wpdb->get_var( $column_check_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 
 				if ( empty( $column_exists ) ) {
-					$alter_query = $this->db_helper->prepare_identifier_query(
+					$alter_query = $db_helper->prepare_identifier_query(
 						"ALTER TABLE %i ADD `calculated_number` INT(16)",
 						array( $table_name_safe )
 					);
 
-					$this->db_helper->wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+					$wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 				}
 			}
 
@@ -97,7 +99,7 @@ class SequentialNumberStore {
 		}
 
 		// create table (in case of concurrent requests, this does no harm if it already exists)
-		$charset_collate = $this->db_helper->wpdb->get_charset_collate();
+		$charset_collate = $wpdb->get_charset_collate();
 		// dbDelta is a sensitive kid, so we omit indentation
 $sql = "CREATE TABLE {$table_name_safe} (
   id int(16) NOT NULL AUTO_INCREMENT,
@@ -111,7 +113,7 @@ $sql = "CREATE TABLE {$table_name_safe} (
 		dbDelta( $sql );
 
 		// catch mysql errors
-		$this->db_helper->catch_errors();
+		$db_helper->catch_errors();
 
 		return;
 	}
@@ -130,24 +132,26 @@ $sql = "CREATE TABLE {$table_name_safe} (
 
 		do_action( 'wpo_wcpdf_before_sequential_number_increment', $this, $order_id, $date );
 
-		$data = array(
+		$db_helper = $this->db_helper;
+		$wpdb	   = $db_helper->wpdb;
+		$data      = array(
 			'order_id' => absint( $order_id ),
 			'date'     => $date,
 		);
 
 		if ( 'auto_increment' === $this->method ) {
-			$inserted = $this->db_helper->wpdb->insert( $this->table_name, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$number   = $this->db_helper->wpdb->insert_id;
+			$inserted = $wpdb->insert( $this->table_name, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$number   = $wpdb->insert_id;
 
 			if ( false === $inserted ) {
-				$this->db_helper->log_wpdb_error( __METHOD__ );
+				$db_helper->log_wpdb_error( __METHOD__ );
 			}
 		} elseif ( 'calculate' === $this->method ) {
 			$number   = $data['calculated_number'] = $this->get_next();
-			$inserted = $this->db_helper->wpdb->insert( $this->table_name, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$inserted = $wpdb->insert( $this->table_name, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 
 			if ( false === $inserted ) {
-				$this->db_helper->log_wpdb_error( __METHOD__ );
+				$db_helper->log_wpdb_error( __METHOD__ );
 			}
 		} else {
 			$number = 0;
@@ -162,40 +166,42 @@ $sql = "CREATE TABLE {$table_name_safe} (
 	 * @return int Next number
 	 */
 	public function get_next(): int {
+		$db_helper       = $this->db_helper;
+		$wpdb	         = $db_helper->wpdb;
 		$table_name      = $this->table_name;
-		$table_name_safe = $this->db_helper->sanitize_identifier( $table_name );
+		$table_name_safe = $db_helper->sanitize_identifier( $table_name );
 		$next            = 1;
 
 		if ( 'auto_increment' === $this->method ) {
 			// Clear cache on MySQL 8.0+ for accurate Auto_increment
-			if ( $this->db_helper->wpdb->get_var( "SHOW VARIABLES LIKE 'information_schema_stats_expiry'" ) ) {
-				$this->db_helper->wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
+			if ( $wpdb->get_var( "SHOW VARIABLES LIKE 'information_schema_stats_expiry'" ) ) {
+				$wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
 			}
 
-			$query = $this->db_helper->prepare_identifier_query(
-				"SHOW TABLE STATUS LIKE %i",
-				array( $table_name_safe )
+			$query = $this->db_helper->wpdb->prepare(
+				"SHOW TABLE STATUS LIKE %s",
+				$table_name_safe
 			);
 
-			$table_status = $this->db_helper->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+			$table_status = $wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 
 			if ( is_null( $table_status ) || ! isset( $table_status->Auto_increment ) ) {
-				$this->db_helper->log_wpdb_error( __METHOD__ );
+				$db_helper->log_wpdb_error( __METHOD__ );
 				return $next;
 			}
 
 			$next = (int) $table_status->Auto_increment;
 
 		} elseif ( 'calculate' === $this->method ) {
-			$query = $this->db_helper->prepare_identifier_query(
+			$query = $db_helper->prepare_identifier_query(
 				"SELECT * FROM %i WHERE id = ( SELECT MAX(id) FROM %i )",
 				array( $table_name_safe, $table_name_safe )
 			);
 
-			$last_row = $this->db_helper->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+			$last_row = $wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 			
 			if ( is_null( $last_row ) ) {
-				$this->db_helper->log_wpdb_error( __METHOD__ );
+				$db_helper->log_wpdb_error( __METHOD__ );
 				return $next;
 			}
 
@@ -216,16 +222,18 @@ $sql = "CREATE TABLE {$table_name_safe} (
 	 * @return void
 	 */
 	public function set_next( int $number = 1 ): void {
+		$db_helper       = $this->db_helper;
+		$wpdb	         = $db_helper->wpdb;
 		$table_name      = $this->table_name;
-		$table_name_safe = $this->db_helper->sanitize_identifier( $table_name );
+		$table_name_safe = $db_helper->sanitize_identifier( $table_name );
 
 		// Delete all rows
-		$truncate_query = $this->db_helper->prepare_identifier_query(
+		$truncate_query = $db_helper->prepare_identifier_query(
 			"TRUNCATE TABLE %i",
 			array( $table_name_safe )
 		);
 
-		$this->db_helper->wpdb->query( $truncate_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+		$wpdb->query( $truncate_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 
 		// Set AUTO_INCREMENT
 		if ( $number > 1 ) {
@@ -233,13 +241,13 @@ $sql = "CREATE TABLE {$table_name_safe} (
 			// https://serverfault.com/questions/228690/mysql-auto-increment-fields-resets-by-itself
 			$highest_number = $number - 1;
 
-			$alter_query = $this->db_helper->prepare_identifier_query(
+			$alter_query = $db_helper->prepare_identifier_query(
 				"ALTER TABLE %i AUTO_INCREMENT = %d",
 				array( $table_name_safe ),
 				array( $highest_number )
 			);
 
-			$this->db_helper->wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+			$wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 
 			$data = array(
 				'order_id' => 0,
@@ -250,20 +258,20 @@ $sql = "CREATE TABLE {$table_name_safe} (
 				$data['calculated_number'] = $highest_number;
 			}
 
-			$inserted = $this->db_helper->wpdb->insert( $table_name, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$inserted = $wpdb->insert( $table_name, $data ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			
 			if ( false === $inserted ) {
-				$this->db_helper->log_wpdb_error( __METHOD__ );
+				$db_helper->log_wpdb_error( __METHOD__ );
 			}
 
 		} else {
-			$alter_query = $this->db_helper->prepare_identifier_query(
+			$alter_query = $db_helper->prepare_identifier_query(
 				"ALTER TABLE %i AUTO_INCREMENT = %d",
 				array( $table_name_safe ),
 				array( $number )
 			);
 
-			$this->db_helper->wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+			$wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 		}
 	}
 	
@@ -274,15 +282,17 @@ $sql = "CREATE TABLE {$table_name_safe} (
 	 * @return string
 	 */
 	public function get_last_date( string $format = 'Y-m-d H:i:s' ): string {
+		$db_helper       = $this->db_helper;
+		$wpdb	         = $db_helper->wpdb;
 		$table_name      = $this->table_name;
-		$table_name_safe = $this->db_helper->sanitize_identifier( $table_name );
+		$table_name_safe = $db_helper->sanitize_identifier( $table_name );
 
-		$query = $this->db_helper->prepare_identifier_query(
+		$query = $db_helper->prepare_identifier_query(
 			"SELECT * FROM %i WHERE id = ( SELECT MAX(id) FROM %i )",
 			array( $table_name_safe, $table_name_safe )
 		);
 
-		$row  = $this->db_helper->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+		$row  = $wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
 		$date = isset( $row->date ) ? $row->date : 'now';
 
 		return gmdate( $format, strtotime( $date ) );

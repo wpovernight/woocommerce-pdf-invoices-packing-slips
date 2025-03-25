@@ -84,11 +84,7 @@ class DatabaseHelper {
 	public function table_exists( string $table_name ): bool {
 		$sanitized = $this->sanitize_identifier( $table_name );
 
-		if ( $this->has_identifier_escape ) {
-			$sql = $this->wpdb->prepare( "SHOW TABLES LIKE %i", $sanitized );
-		} else {
-			$sql = $this->wpdb->prepare( "SHOW TABLES LIKE %s", $sanitized );
-		}
+		$sql = $this->wpdb->prepare( "SHOW TABLES LIKE %s", $sanitized );
 
 		return $this->wpdb->get_var( $sql ) === $sanitized;
 	}
