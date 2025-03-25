@@ -88,10 +88,11 @@ class SettingsDebug {
 	 * @return void
 	 */
 	public function display_status(): void {
-		$server_configs        = $this->get_server_config();
-		$premium_plugins       = $this->get_premium_plugins();
-		$directory_permissions = $this->get_directory_permissions();
-		$yearly_reset_schedule = $this->get_yearly_reset_schedule();
+		$server_configs         = $this->get_server_config();
+		$premium_plugins        = $this->get_premium_plugins();
+		$directory_permissions  = $this->get_directory_permissions();
+		$yearly_reset_schedule  = $this->get_yearly_reset_schedule();
+		$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}
