@@ -1800,11 +1800,8 @@ abstract class OrderDocument {
 		$retired_table_name = "{$default_table_name}_{$current_store_year}";
 		$retired_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $retired_table_name );
 
-		if ( $has_identifier_escape ) {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %i", $retired_table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $retired_table_safe );
-		}
+		// Detect if retired table already exists
+		$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $retired_table_safe );
 
 		$retired_exists = $wpdb->get_var( $query ) === $retired_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
@@ -1834,11 +1831,7 @@ abstract class OrderDocument {
 		$default_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $default_table_name );
 
 		// Detect if current default table exists
-		if ( $has_identifier_escape ) {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %i", $default_table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $default_table_safe );
-		}
+		$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $default_table_safe );
 
 		$default_exists = $wpdb->get_var( $check_query ) === $default_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
@@ -1870,11 +1863,7 @@ abstract class OrderDocument {
 		$current_year_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $current_year_table_name );
 
 		// Check if current year table already exists
-		if ( $has_identifier_escape ) {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %i", $current_year_table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $current_year_table_safe );
-		}
+		$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $current_year_table_safe );
 
 		$current_year_exists = $wpdb->get_var( $check_query ) === $current_year_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
@@ -1933,11 +1922,7 @@ abstract class OrderDocument {
 		$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
 
 		// Check if table exists
-		if ( $has_identifier_escape ) {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %i", $table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
-		}
+		$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
 
 		$table_exists = $wpdb->get_var( $query ) === $table_name_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 

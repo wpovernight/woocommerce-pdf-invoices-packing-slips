@@ -158,18 +158,11 @@ $sql = "CREATE TABLE {$this->table_name} (
 			if ( $this->wpdb->get_var( "SHOW VARIABLES LIKE 'information_schema_stats_expiry'" ) ) {
 				$this->wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
 			}
-
-			if ( $has_identifier_escape ) {
-				$query = $this->wpdb->prepare(
-					"SHOW TABLE STATUS LIKE %i", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$this->table_name
-				);
-			} else {
-				$query = $this->wpdb->prepare(
-					"SHOW TABLE STATUS LIKE %s",
-					$table_name_safe
-				);
-			}
+			
+			$query = $this->wpdb->prepare(
+				"SHOW TABLE STATUS LIKE %s",
+				$table_name_safe
+			);
 
 			// Get next auto_increment value
 			$table_status = $this->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
@@ -307,15 +300,10 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 * @return bool
 	 */
 	public function store_name_exists(): bool {
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$table_name            = $this->table_name;
-		$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
-
-		if ( $has_identifier_escape ) {
-			$query = $this->wpdb->prepare( "SHOW TABLES LIKE %i", $table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$query = $this->wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
-		}
+		$table_name      = $this->table_name;
+		$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+		
+		$query  = $this->wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
 
 		$result = $this->wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
