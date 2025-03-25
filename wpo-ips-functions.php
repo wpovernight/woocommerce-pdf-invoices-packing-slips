@@ -1293,7 +1293,7 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 	
 	// Check if a new prerelease is available
 	$last_seen_option_key = 'wpo_last_seen_prerelease_' . md5( $owner . '/' . $repo );
-	$last_seen_tag        = get_option( $last_seen_option_key, '' );
+	$last_seen_tag        = get_option( $last_seen_option_key );
 
 	if ( ! empty( $unstable['tag'] ) && $unstable['tag'] !== $last_seen_tag ) {
 		update_option( $last_seen_option_key, $unstable['tag'], false );
