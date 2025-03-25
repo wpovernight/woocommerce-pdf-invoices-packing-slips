@@ -101,6 +101,12 @@ class DatabaseHelper {
 		return $this->wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 	}
 	
+	/**
+	 * Drop a table if it exists.
+	 *
+	 * @param string $table_name
+	 * @return boolean
+	 */
 	public function drop_table_if_exists( string $table_name ): bool {
 		if ( $this->has_identifier_escape ) {
 			$query = $this->wpdb->prepare( "DROP TABLE IF EXISTS %i", $table_name );
@@ -118,6 +124,13 @@ class DatabaseHelper {
 		return (bool) $result;
 	}
 	
+	/**
+	 * Rename a table.
+	 *
+	 * @param string $from
+	 * @param string $to
+	 * @return boolean
+	 */
 	public function rename_table( string $from, string $to ): bool {
 		if ( $this->has_identifier_escape ) {
 			$query = $this->wpdb->prepare( "ALTER TABLE %i RENAME TO %i", $from, $to );
@@ -181,6 +194,13 @@ class DatabaseHelper {
 		return $errors;
 	}
 	
+	/**
+	 * Log a WPDB error.
+	 *
+	 * @param string $context
+	 * @param string|null $custom_error
+	 * @return void
+	 */
 	public function log_wpdb_error( string $context, ?string $custom_error = null ): void {
 		$message = $custom_error
 			? sprintf( 'Database error in %s: %s', $context, $custom_error )
