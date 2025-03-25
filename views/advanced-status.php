@@ -20,13 +20,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<td class="title">PDF Invoices & Packing Slips for WooCommerce</td>
 			<td><?php echo esc_attr( WPO_WCPDF()->version ); ?></td>
 			<td>
-				<?php if ( ! empty( $latest_github_releases['stable'] ) ) : ?>
+				<?php if ( ! empty( $latest_github_releases['stable'] ) && WPO_WCPDF()->version !== $latest_github_releases['stable']['name'] ) : ?>
 					<a href="<?php echo esc_url( $latest_github_releases['stable']['download'] ); ?>" target="_blank"><?php echo esc_attr( $latest_github_releases['stable']['name'] ); ?></a>
+				<?php else : ?>
+					<?php echo esc_attr( $latest_github_releases['stable']['name'] ); ?>
 				<?php endif; ?>
 			</td>
 			<td>
-				<?php if ( ! empty( $latest_github_releases['unstable'] ) ) : ?>
+				<?php if ( ! empty( $latest_github_releases['unstable'] ) && version_compare( WPO_WCPDF()->version, $latest_github_releases['unstable']['name'], '<' ) ) : ?>
 					<a href="<?php echo esc_url( $latest_github_releases['unstable']['download'] ); ?>" target="_blank"><?php echo esc_attr( $latest_github_releases['unstable']['name'] ); ?></a>
+				<?php else : ?>
+					-
 				<?php endif; ?>
 			</td>
 			<td class="status-cell valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
