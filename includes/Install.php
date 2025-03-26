@@ -414,7 +414,7 @@ class Install {
 							array( '1000-01-01 00:00:00' )
 						);
 					
-						$query_result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+						$query_result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					
 						if ( $query_result ) {
 							wcpdf_log_error(

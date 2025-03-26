@@ -1227,7 +1227,7 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 	$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
 
 	if ( $has_identifier_escape ) {
-		return $wpdb->prepare( $query, ...array_merge( $identifiers, $values ) );
+		return $wpdb->prepare( $query, ...array_merge( $identifiers, $values ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	foreach ( $identifiers as &$id ) {
@@ -1242,5 +1242,5 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 		$query .= $identifiers[ $index ] . $segment;
 	}
 
-	return $wpdb->prepare( $query, ...$values );
+	return $wpdb->prepare( $query, ...$values ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 }
