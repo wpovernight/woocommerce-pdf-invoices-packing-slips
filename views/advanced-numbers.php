@@ -24,13 +24,14 @@
 	<?php elseif ( ! empty( $selected_table_name ) && ! empty( $number_store_tables[ $selected_table_name ] ) ) : ?>
 		<p>
 			<?php
-				printf(
+				$message = sprintf(
 					/* translators: %1$s: opening strong tag, %2$s: title of the selected number store, %3$s: closing strong tag */
-					esc_html__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the %1$snext %2$s number%3$s value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( 'Below is a list of all the document numbers generated since the last reset (which happens when you set the %1$snext %2$s number%3$s value in the settings).', 'woocommerce-pdf-invoices-packing-slips' ),
 					'<strong>',
-					esc_html( $choose_table_title ),
+					$choose_table_title,
 					'</strong>'
 				);
+				echo wp_kses_post( $message );
 			?>
 		</p>
 		<p><?php esc_html_e( 'Numbers may have been assigned to orders before this.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
