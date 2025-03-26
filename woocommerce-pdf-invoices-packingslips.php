@@ -639,7 +639,7 @@ class WPO_WCPDF {
 				<?php esc_html_e( 'If you\'d like to help improve the plugin by testing early releases on a staging site, you can enable this feature from the advanced settings.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 			</p>
 			<p>
-				<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug' ) ); ?>">
+				<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug#check_unstable_versions' ) ); ?>">
 					<?php esc_html_e( 'Go to settings', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				</a>
 				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>">
