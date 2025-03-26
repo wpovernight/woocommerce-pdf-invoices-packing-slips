@@ -93,12 +93,7 @@ class SettingsDebug {
 		$directory_permissions  = $this->get_directory_permissions();
 		$yearly_reset_schedule  = $this->get_yearly_reset_schedule();
 		$debug_settings         = WPO_WCPDF()->settings->debug_settings;
-		
-		if ( isset( $debug_settings['check_unstable_versions'] ) ) {
-			$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
-		} else {
-			$latest_github_releases = array();
-		}
+		$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}

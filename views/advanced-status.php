@@ -24,8 +24,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<td>
 				<?php if ( ! empty( $latest_github_releases['stable'] ) && WPO_WCPDF()->version !== $latest_github_releases['stable']['name'] ) : ?>
 					<a href="<?php echo esc_url( $latest_github_releases['stable']['download'] ); ?>" target="_blank"><?php echo esc_attr( $latest_github_releases['stable']['name'] ); ?></a>
-				<?php else : ?>
+				<?php elseif ( ! empty( $latest_github_releases['stable']['name'] ) ) : ?>
 					<?php echo esc_attr( $latest_github_releases['stable']['name'] ); ?>
+				<?php else : ?>
+					-
 				<?php endif; ?>
 			</td>
 			<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
