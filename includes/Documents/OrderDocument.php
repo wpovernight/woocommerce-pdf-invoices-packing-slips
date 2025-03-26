@@ -1773,10 +1773,9 @@ abstract class OrderDocument {
 	public function maybe_retire_number_store( $date, $store_base_name, $method ) {
 		global $wpdb;
 		
-		$was_showing_errors    = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$default_table_name    = $this->get_number_store_table_default_name( $store_base_name, $method );
-		$now                   = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
+		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 
 		// for yearly reset debugging only
 		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
@@ -1806,17 +1805,13 @@ abstract class OrderDocument {
 		$retired_exists = $wpdb->get_var( $query ) === $retired_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( $retired_exists ) {
-			if ( $has_identifier_escape ) {
-				$drop_query = $wpdb->prepare(
-					"DROP TABLE IF EXISTS %i", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$retired_table_name
-				);
-			} else {
-				$drop_query = "DROP TABLE IF EXISTS `{$retired_table_safe}`"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
-			}
-		
+			$drop_query = wpo_wcpdf_prepare_identifier_query(
+				"DROP TABLE IF EXISTS %i", 
+				array( $retired_table_name )
+			);
+			
 			$table_removed = $wpdb->query( $drop_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		
+			
 			if ( ! $table_removed ) {
 				wcpdf_log_error( sprintf(
 					'An error occurred while trying to remove the duplicate number store %s: %s',
@@ -1836,18 +1831,13 @@ abstract class OrderDocument {
 		$default_exists = $wpdb->get_var( $check_query ) === $default_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( $default_exists ) {
-			if ( $has_identifier_escape ) {
-				$rename_query = $wpdb->prepare(
-					"ALTER TABLE %i RENAME TO %i", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$default_table_name,
-					$retired_table_name
-				);
-			} else {
-				$rename_query = "ALTER TABLE `{$default_table_safe}` RENAME `{$retired_table_safe}`"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
-			}
-
+			$rename_query = wpo_wcpdf_prepare_identifier_query(
+				"ALTER TABLE %i RENAME TO %i", 
+				array( $default_table_name, $retired_table_name )
+			);
+			
 			$table_renamed = $wpdb->query( $rename_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
+			
 			if ( ! $table_renamed ) {
 				wcpdf_log_error( sprintf(
 					'An error occurred while trying to rename the number store from %s to %s: %s',
@@ -1868,18 +1858,13 @@ abstract class OrderDocument {
 		$current_year_exists = $wpdb->get_var( $check_query ) === $current_year_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( $current_year_exists ) {
-			if ( $has_identifier_escape ) {
-				$rename_query = $wpdb->prepare(
-					"ALTER TABLE %i RENAME TO %i", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$current_year_table_name,
-					$default_table_name
-				);
-			} else {
-				$rename_query = "ALTER TABLE `{$current_year_table_safe}` RENAME `{$default_table_safe}`"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
-			}
-
+			$rename_query = wpo_wcpdf_prepare_identifier_query(
+				"ALTER TABLE %i RENAME TO %i", 
+				array( $current_year_table_name, $default_table_name )
+			);
+			
 			$table_renamed = $wpdb->query( $rename_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
+			
 			if ( ! $table_renamed ) {
 				wcpdf_log_error( sprintf(
 					'An error occurred while trying to rename the number store from %s to %s: %s',
@@ -1908,9 +1893,8 @@ abstract class OrderDocument {
 	public function get_number_store_year( string $table_name ): int {
 		global $wpdb;
 
-		$was_showing_errors    = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$current_year          = date_i18n( 'Y' );
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+		$current_year       = date_i18n( 'Y' );
 
 		// for yearly reset debugging only
 		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
@@ -1928,14 +1912,10 @@ abstract class OrderDocument {
 
 		if ( $table_exists ) {
 			// Get year from the last row
-			if ( $has_identifier_escape ) {
-				$year_query = $wpdb->prepare(
-					"SELECT YEAR(date) FROM %i ORDER BY id DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$table_name
-				);
-			} else {
-				$year_query = "SELECT YEAR(date) FROM `{$table_name_safe}` ORDER BY id DESC LIMIT 1";
-			}
+			$year_query = wpo_wcpdf_prepare_identifier_query(
+				"SELECT YEAR(date) FROM %i ORDER BY id DESC LIMIT 1",
+				array( $table_name )
+			);
 
 			$year = $wpdb->get_var( $year_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
@@ -1944,7 +1924,7 @@ abstract class OrderDocument {
 				if ( ! empty( $wpdb->last_error ) ) {
 					wcpdf_log_error( sprintf(
 						'An error occurred while trying to get the current year from the %s table: %s',
-						$has_identifier_escape ? $table_name : $table_name_safe,
+						$table_name_safe,
 						$wpdb->last_error
 					) );
 				}

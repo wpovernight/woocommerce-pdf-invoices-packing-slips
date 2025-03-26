@@ -403,39 +403,27 @@ class Install {
 				
 				if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
 					$number_store = $document->get_sequential_number_store();
-				
+					
 					if ( ! empty( $number_store ) ) {
-						$column_name           = 'date';
-						$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $number_store->table_name );
-						$column_name_safe      = preg_replace( '/[^a-zA-Z0-9_]/', '', $column_name );
-						$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-						
-						if ( $has_identifier_escape ) {
-							$query_result = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
-								$wpdb->prepare(
-									"ALTER TABLE %i ALTER %i SET DEFAULT %s", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-									$table_name_safe,
-									$column_name_safe,
-									'1000-01-01 00:00:00'
-								)
-							);
-						} else {
-							$query_result = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
-								$wpdb->prepare(
-									"ALTER TABLE `{$table_name_safe}` ALTER `{$column_name_safe}` SET DEFAULT %s", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-									'1000-01-01 00:00:00'
-								)
-							);
-						}
-						
+						$column_name = 'date';
+						$table_name  = $number_store->table_name;
+					
+						$query = wpo_wcpdf_prepare_identifier_query(
+							"ALTER TABLE %i ALTER %i SET DEFAULT %s",
+							array( $table_name, $column_name ),
+							array( '1000-01-01 00:00:00' )
+						);
+					
+						$query_result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.*
+					
 						if ( $query_result ) {
 							wcpdf_log_error(
-								"Default value changed for 'date' column to '1000-01-01 00:00:00' on database table: {$table_name_safe}",
+								"Default value changed for '{$column_name}' column to '1000-01-01 00:00:00' on database table: {$table_name}",
 								'info'
 							);
 						} else {
 							wcpdf_log_error(
-								"An error occurred! The default value for 'date' column couldn't be changed to '1000-01-01 00:00:00' on database table: {$table_name_safe}",
+								"An error occurred! The default value for '{$column_name}' column couldn't be changed to '1000-01-01 00:00:00' on database table: {$table_name}",
 								'critical'
 							);
 						}

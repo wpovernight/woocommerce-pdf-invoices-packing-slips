@@ -59,33 +59,23 @@ class SequentialNumberStore {
 		} else {
 			// Check calculated_number column if using 'calculate' method
 			if ( 'calculate' === $this->method ) {
-				$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-				$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $this->table_name );
+				$table_name = $this->table_name;
 
-				if ( $has_identifier_escape ) {
-					$column_check_query = $this->wpdb->prepare(
-						"SHOW COLUMNS FROM %i LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-						$this->table_name,
-						'calculated_number'
-					);
-				} else {
-					$column_check_query = $this->wpdb->prepare(
-						"SHOW COLUMNS FROM `{$table_name_safe}` LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-						'calculated_number'
-					);
-				}
+				// Check if the column exists
+				$column_check_query = wpo_wcpdf_prepare_identifier_query(
+					"SHOW COLUMNS FROM %i LIKE %s",
+					array( $table_name ),
+					array( 'calculated_number' )
+				);
 
 				$column_exists = $this->wpdb->get_var( $column_check_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
 				if ( empty( $column_exists ) ) {
-					if ( $has_identifier_escape ) {
-						$alter_query = $this->wpdb->prepare(
-							"ALTER TABLE %i ADD `calculated_number` INT(16)", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-							$this->table_name
-						);
-					} else {
-						$alter_query = "ALTER TABLE `{$table_name_safe}` ADD `calculated_number` INT(16)";
-					}
+					// Add calculated_number column
+					$alter_query = wpo_wcpdf_prepare_identifier_query(
+						"ALTER TABLE %i ADD `calculated_number` INT(16)",
+						array( $table_name )
+					);
 
 					$this->wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 				}
@@ -149,16 +139,17 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 *
 	 * @return int Next number
 	 */
-	public function get_next() {
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $this->table_name );
+	public function get_next(): int {
+		$table_name      = $this->table_name;
+		$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+		$next            = 1;
 
 		if ( 'auto_increment' === $this->method ) {
 			// Clear cache on MySQL 8.0+ for accurate Auto_increment
 			if ( $this->wpdb->get_var( "SHOW VARIABLES LIKE 'information_schema_stats_expiry'" ) ) {
 				$this->wpdb->query( "SET SESSION information_schema_stats_expiry = 0" );
 			}
-			
+
 			$query = $this->wpdb->prepare(
 				"SHOW TABLE STATUS LIKE %s",
 				$table_name_safe
@@ -166,51 +157,42 @@ $sql = "CREATE TABLE {$this->table_name} (
 
 			// Get next auto_increment value
 			$table_status = $this->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
-			$next         = $table_status->Auto_increment;
+
+			$next = isset( $table_status->Auto_increment ) ? $table_status->Auto_increment : $next;
 
 		} elseif ( 'calculate' === $this->method ) {
-			if ( $has_identifier_escape ) {
-				$query = $this->wpdb->prepare(
-					"SELECT * FROM %i WHERE id = ( SELECT MAX(id) FROM %i )", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$this->table_name,
-					$this->table_name
-				);
-			} else {
-				$query = "SELECT * FROM `{$table_name_safe}` WHERE id = ( SELECT MAX(id) FROM `{$table_name_safe}` )";
-			}
+			$query = wpo_wcpdf_prepare_identifier_query(
+				"SELECT * FROM %i WHERE id = ( SELECT MAX(id) FROM %i )",
+				array( $table_name, $table_name )
+			);
 
 			$last_row = $this->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
-			if ( empty( $last_row ) ) {
-				$next = 1;
-			} elseif ( ! empty( $last_row->calculated_number ) ) {
+			if ( ! empty( $last_row->calculated_number ) ) {
 				$next = (int) $last_row->calculated_number + 1;
-			} else {
+			} elseif ( ! empty( $last_row->id ) ) {
 				$next = (int) $last_row->id + 1;
 			}
 		}
 
-		return $next;
+		return (int) $next;
 	}
 	
 	/**
 	 * Set the number that will be used on the next increment.
 	 *
 	 * @param int $number
+	 * @return void
 	 */
 	public function set_next( int $number = 1 ): void {
-		$table_name            = $this->table_name;
-		$wpdb                  = $this->wpdb;
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+		$table_name = $this->table_name;
+		$wpdb       = $this->wpdb;
 
 		// Delete all rows
-		if ( $has_identifier_escape ) {
-			$truncate_query = $wpdb->prepare( "TRUNCATE TABLE %i", $table_name ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-		} else {
-			$truncate_query = "TRUNCATE TABLE `{$table_name_safe}`";
-		}
-
+		$truncate_query = wpo_wcpdf_prepare_identifier_query(
+			"TRUNCATE TABLE %i",
+			array( $table_name )
+		);
 		$wpdb->query( $truncate_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
 		// Set AUTO_INCREMENT
@@ -219,18 +201,11 @@ $sql = "CREATE TABLE {$this->table_name} (
 			// https://serverfault.com/questions/228690/mysql-auto-increment-fields-resets-by-itself
 			$highest_number = (int) $number - 1;
 
-			if ( $has_identifier_escape ) {
-				$alter_query = $wpdb->prepare(
-					"ALTER TABLE %i AUTO_INCREMENT = %d", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$table_name,
-					$highest_number
-				);
-			} else {
-				$alter_query = $wpdb->prepare(
-					"ALTER TABLE `{$table_name_safe}` AUTO_INCREMENT = %d", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$highest_number
-				);
-			}
+			$alter_query = wpo_wcpdf_prepare_identifier_query(
+				"ALTER TABLE %i AUTO_INCREMENT = %d", 
+				array( $table_name ), 
+				array( $highest_number )
+			);
 
 			$wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
@@ -250,18 +225,11 @@ $sql = "CREATE TABLE {$this->table_name} (
 			);
 		} else {
 			// Simple scenario, just set the AUTO_INCREMENT
-			if ( $has_identifier_escape ) {
-				$alter_query = $wpdb->prepare(
-					"ALTER TABLE %i AUTO_INCREMENT = %d", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-					$table_name,
-					$number
-				);
-			} else {
-				$alter_query = $wpdb->prepare(
-					"ALTER TABLE `{$table_name_safe}` AUTO_INCREMENT = %d", // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$number
-				);
-			}
+			$alter_query = wpo_wcpdf_prepare_identifier_query(
+				"ALTER TABLE %i AUTO_INCREMENT = %d", 
+				array( $table_name ), 
+				array( $number )
+			);
 
 			$wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 		}
@@ -274,23 +242,16 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 * @return string
 	 */
 	public function get_last_date( string $format = 'Y-m-d H:i:s' ): string {
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$table_name            = $this->table_name;
-		$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
-	
-		if ( $has_identifier_escape ) {
-			$query = $this->wpdb->prepare(
-				"SELECT * FROM %i WHERE id = ( SELECT MAX(id) FROM %i )", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-				$table_name,
-				$table_name
-			);
-		} else {
-			$query = "SELECT * FROM `{$table_name_safe}` WHERE id = ( SELECT MAX(id) FROM `{$table_name_safe}` )";
-		}
-	
+		$table_name = $this->table_name;
+
+		$query = wpo_wcpdf_prepare_identifier_query(
+			"SELECT * FROM %i WHERE id = ( SELECT MAX(id) FROM %i )",
+			array( $table_name, $table_name )
+		);
+
 		$row  = $this->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 		$date = isset( $row->date ) ? $row->date : 'now';
-	
+
 		return gmdate( $format, strtotime( $date ) );
 	}
 	

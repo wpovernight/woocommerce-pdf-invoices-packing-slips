@@ -1212,3 +1212,35 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 
 	return apply_filters( 'wpo_wcpdf_order_customer_vat_number', $vat_number, $order, $meta_key ?? null );
 }
+
+/**
+ * Prepare an identifier query for use with $wpdb->prepare().
+ *
+ * @param string $query
+ * @param array $identifiers
+ * @param array $values
+ * @return string|void
+ */
+function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers = array(), array $values = array() ) {
+	global $wpdb;
+
+	$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
+
+	if ( $has_identifier_escape ) {
+		return $wpdb->prepare( $query, ...array_merge( $identifiers, $values ) );
+	}
+
+	foreach ( $identifiers as &$id ) {
+		$id = '`' . preg_replace( '/[^a-zA-Z0-9_]/', '', $id ) . '`';
+	}
+
+	// Replace %i with sanitized identifiers manually
+	$segments = explode( '%i', $query );
+	$query    = array_shift( $segments );
+
+	foreach ( $segments as $index => $segment ) {
+		$query .= $identifiers[ $index ] . $segment;
+	}
+
+	return $wpdb->prepare( $query, ...$values );
+}

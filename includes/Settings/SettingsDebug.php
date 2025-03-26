@@ -1362,7 +1362,7 @@ class SettingsDebug {
 
 		$data = $this->filter_fetch_request_data( $input_data );
 
-		if ( empty( $data['table_name'] ) || empty( $data['from'] || empty( $data['to'] ) ) ) {
+		if ( empty( $data['table_name'] ) || empty( $data['from'] ) || empty( $data['to'] ) ) {
 			return;
 		}
 
@@ -1375,25 +1375,11 @@ class SettingsDebug {
 		$table_name  = $data['table_name'];
 		$orderby     = $data['orderby'];
 
-		if ( version_compare( get_bloginfo( 'version' ), '6.2', '>=' ) ) {
-			$query = $wpdb->prepare(
-				"SELECT * FROM %i WHERE date BETWEEN %s AND %s ORDER BY %i $order LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$table_name,
-				$data['from'],
-				$data['to'],
-				$orderby,
-				$chunk_size,
-				$offset
-			);
-		} else {
-			$query = $wpdb->prepare(
-				"SELECT * FROM `$table_name` WHERE date BETWEEN %s AND %s ORDER BY `$orderby` $order LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$data['from'],
-				$data['to'],
-				$chunk_size,
-				$offset
-			);
-		}
+		$query = wpo_wcpdf_prepare_identifier_query(
+			"SELECT * FROM %i WHERE date BETWEEN %s AND %s ORDER BY %i $order LIMIT %d OFFSET %d",
+			array( $table_name, $orderby ),
+			array( $data['from'], $data['to'], $chunk_size, $offset )
+		);
 
 		$chunk_results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
@@ -1527,31 +1513,22 @@ class SettingsDebug {
 		global $wpdb;
 
 		if (
-			empty( $search )     ||
+			empty( $search ) ||
 			empty( $table_name ) ||
 			! in_array( $table_name, array_keys( $this->get_number_store_tables() ), true )
 		) {
 			return array();
 		}
 
-		$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
-		$table_name_safe       = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
-		$search                = absint( $search );
+		$search = absint( $search );
+		$query  = wpo_wcpdf_prepare_identifier_query(
+			"SELECT * FROM %i WHERE id = %d",
+			array( $table_name ),
+			array( $search )
+		);
 
-		if ( $has_identifier_escape ) {
-			$query = $wpdb->prepare(
-				"SELECT * FROM %i WHERE id = %d", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder
-				$table_name,
-				$search
-			);
-		} else {
-			$query = $wpdb->prepare(
-				"SELECT * FROM `{$table_name_safe}` WHERE id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$search
-			);
-		}
-
-		return $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_results( $query );
 	}
 
 	/**
