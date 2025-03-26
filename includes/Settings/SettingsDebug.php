@@ -92,7 +92,13 @@ class SettingsDebug {
 		$premium_plugins        = $this->get_premium_plugins();
 		$directory_permissions  = $this->get_directory_permissions();
 		$yearly_reset_schedule  = $this->get_yearly_reset_schedule();
-		$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
+		$debug_settings         = WPO_WCPDF()->settings->debug_settings;
+		
+		if ( isset( $debug_settings['check_unstable_versions'] ) ) {
+			$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
+		} else {
+			$latest_github_releases = array();
+		}
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}
@@ -890,6 +896,23 @@ class SettingsDebug {
 					'option_name' => $option_name,
 					'id'          => 'embed_images',
 					'description' => __( 'Embed images only if you are experiencing issues with them loading in your PDF. Please note that this option can significantly increase the file size.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'check_unstable_versions',
+				'title'    => __( 'Check for unstable versions', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'check_unstable_versions',
+					'description' => sprintf(
+						/* translators: %1$s: open status page link anchor, %2$s: close status page link anchor */
+						__( 'Enable this to check for new beta or pre-release versions and display them in the %1$sstatus page%2$s. A notice will appear when a new version is available.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' ) ) . '">',
+						'</a>'
+					),
 				)
 			),
 			array(

@@ -1272,18 +1272,17 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 			'zipball'  => $release['zipball_url'],
 			'download' => "https://github.com/{$owner}/{$repo}/releases/download/{$tag}/{$repo}.{$name}.zip"
 		), $release, $owner, $repo );
-
-		if ( $release['prerelease'] && empty( $unstable ) ) {
-			$unstable = $release_data;
-		}
-
+		
 		if ( ! $release['prerelease'] && empty( $stable ) ) {
 			$stable = $release_data;
-		}
-
-		if ( ! empty( $stable ) && ! empty( $unstable ) ) {
+			
+			// Once we find the first stable, we stop.
 			break;
 		}
+		
+		if ( $release['prerelease'] && empty( $unstable ) ) {
+			$unstable = $release_data;
+		}		
 	}
 
 	$data = array(

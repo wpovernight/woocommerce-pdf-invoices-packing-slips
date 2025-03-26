@@ -11,7 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<th align="left"><?php esc_html_e( 'Plugin Name', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 			<th align="left"><?php esc_html_e( 'Current', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 			<th align="left"><?php esc_html_e( 'Last stable', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-			<th align="left"><?php esc_html_e( 'Last unstable', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+				<th align="left"><?php esc_html_e( 'Last unstable', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<?php endif; ?>
 			<th align="left"><?php esc_html_e( 'Status', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		</tr>
 	</thead>
@@ -26,13 +28,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php echo esc_attr( $latest_github_releases['stable']['name'] ); ?>
 				<?php endif; ?>
 			</td>
-			<td>
-				<?php if ( ! empty( $latest_github_releases['unstable'] ) && version_compare( WPO_WCPDF()->version, $latest_github_releases['unstable']['name'], '<' ) ) : ?>
-					<a href="<?php echo esc_url( $latest_github_releases['unstable']['download'] ); ?>" target="_blank"><?php echo esc_attr( $latest_github_releases['unstable']['name'] ); ?></a>
-				<?php else : ?>
-					-
-				<?php endif; ?>
-			</td>
+			<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+				<td>
+					<?php if ( ! empty( $latest_github_releases['unstable'] ) && version_compare( WPO_WCPDF()->version, $latest_github_releases['unstable']['name'], '<' ) ) : ?>
+						<a href="<?php echo esc_url( $latest_github_releases['unstable']['download'] ); ?>" target="_blank"><?php echo esc_attr( $latest_github_releases['unstable']['name'] ); ?></a>
+					<?php else : ?>
+						-
+					<?php endif; ?>
+				</td>
+			<?php endif; ?>
 			<td class="status-cell valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 		</tr>
 		<?php
@@ -52,7 +56,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<?php echo esc_attr( $premium_plugin['version'] ); ?>
 						<?php endif; ?>
 					</td>
-					<td>-</td>
+					<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+						<td>-</td>
+					<?php endif; ?>
 					<td class="status-cell <?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $status ); ?></td>
 				</tr>
 				<?php
