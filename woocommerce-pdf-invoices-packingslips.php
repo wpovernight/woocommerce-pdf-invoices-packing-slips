@@ -640,9 +640,6 @@ class WPO_WCPDF {
 					?>
 				</p>
 				<p>
-					<?php esc_html_e( 'We recommend testing this version in a staging environment before using it on a live site. By testing early, you can help us identify potential issues more quickly and contribute to a more stable release.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-				</p>
-				<p>
 					<span class="dashicons dashicons-download"></span>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' ) ); ?>">
 						<?php esc_html_e( 'Download from the status page', 'woocommerce-pdf-invoices-packing-slips' ); ?>

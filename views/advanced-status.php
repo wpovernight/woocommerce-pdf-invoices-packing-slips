@@ -66,6 +66,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		}
 		?>
 	</tbody>
+	<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+		<tfoot>
+			<tr>
+				<td colspan="5">
+					<?php esc_html_e( 'If you choose to test an unstable version, we recommend using a staging environment before deploying it to a live site. Early testing helps us identify potential issues faster and contributes to a more stable final release.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</td>
+			</tr>
+		</tfoot>
+	<?php endif; ?>
 </table>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
