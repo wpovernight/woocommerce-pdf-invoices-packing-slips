@@ -1231,7 +1231,7 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 	}
 
 	foreach ( $identifiers as &$id ) {
-		$id = '`' . preg_replace( '/[^a-zA-Z0-9_]/', '', $id ) . '`';
+		$id = '`' . preg_replace( '/[^a-zA-Z0-9_\-]/', '', $id ) . '`';
 	}
 
 	// Replace %i with sanitized identifiers manually
