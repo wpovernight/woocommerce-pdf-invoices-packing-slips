@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<td><?php echo esc_attr( $premium_plugin['version'] ); ?></td>
 					<td>
 						<?php if ( ! empty( $last_stable ) ) : ?>
-							<a href="<?php echo esc_url( 'https://wpovernight.com/my-account/' ); ?>" target="_blank"><?php echo esc_attr( $last_stable ); ?></a>
+							<a href="<?php echo esc_url( network_admin_url( 'plugins.php?s=' . urlencode( html_entity_decode( $premium_plugin['name'], ENT_QUOTES, 'UTF-8' ) ) ) ); ?>"><?php echo esc_attr( $last_stable ); ?></a>
 						<?php else : ?>
 							<?php echo esc_attr( $premium_plugin['version'] ); ?>
 						<?php endif; ?>
