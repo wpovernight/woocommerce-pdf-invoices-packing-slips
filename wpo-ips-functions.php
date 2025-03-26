@@ -1229,9 +1229,12 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 	if ( $has_identifier_escape ) {
 		return $wpdb->prepare( $query, ...array_merge( $identifiers, $values ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	}
+	
+	// Sanitize identifiers
+	$pattern = apply_filters( 'wpo_wcpdf_prepare_identifier_regex', '/[^a-zA-Z0-9_\-]/' );
 
 	foreach ( $identifiers as &$id ) {
-		$id = '`' . preg_replace( '/[^a-zA-Z0-9_\-]/', '', $id ) . '`';
+		$id = '`' . preg_replace( $pattern, '', $id ) . '`';
 	}
 
 	// Replace %i with sanitized identifiers manually
