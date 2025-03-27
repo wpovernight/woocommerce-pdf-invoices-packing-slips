@@ -1004,9 +1004,12 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_server_config(): array {
+		$debug_settings    = WPO_WCPDF()->settings->debug_settings;
+		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
+		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
+		
 		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
-		$filesystem_method = function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : 'direct';
 		$gmagick           = extension_loaded( 'gmagick' );
 		$imagick           = extension_loaded( 'imagick' );
 		$xc                = extension_loaded( 'xcache' );
@@ -1086,7 +1089,7 @@ class SettingsDebug {
 			'WP Filesystem Method' => array(
 				'required' => __( 'Required to save documents to the server', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'    => $filesystem_method,
-				'result'   => 'direct' === $filesystem_method,
+				'result'   => in_array( $filesystem_method, array( 'direct', 'php' ) ),
 				'fallback' => __( 'Check your server configuration', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'allow_url_fopen' => array (
