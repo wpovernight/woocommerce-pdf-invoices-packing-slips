@@ -1797,7 +1797,7 @@ abstract class OrderDocument {
 
 		// current store year is in the past: rename table so that we can replace it with the current year
 		$retired_table_name = "{$default_table_name}_{$current_store_year}";
-		$retired_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $retired_table_name );
+		$retired_table_safe = wpo_wcpdf_sanitize_identifier( $retired_table_name );
 
 		// Detect if retired table already exists
 		$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $retired_table_safe );
@@ -1823,7 +1823,7 @@ abstract class OrderDocument {
 		}
 
 		// Sanitize for legacy usage
-		$default_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $default_table_name );
+		$default_table_safe = wpo_wcpdf_sanitize_identifier( $default_table_name );
 
 		// Detect if current default table exists
 		$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $default_table_safe );
@@ -1850,7 +1850,7 @@ abstract class OrderDocument {
 		}
 
 		$current_year_table_name = "{$default_table_name}_{$current_year}";
-		$current_year_table_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $current_year_table_name );
+		$current_year_table_safe = wpo_wcpdf_sanitize_identifier( $current_year_table_name );
 
 		// Check if current year table already exists
 		$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $current_year_table_safe );
@@ -1901,9 +1901,8 @@ abstract class OrderDocument {
 			$next_year    = new \WC_DateTime( '1st January Next Year' );
 			$current_year = intval( $next_year->date_i18n( 'Y' ) );
 		}
-
-		// Fallback sanitization for older WP
-		$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+		
+		$table_name_safe = wpo_wcpdf_sanitize_identifier( $table_name );
 
 		// Check if table exists
 		$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );

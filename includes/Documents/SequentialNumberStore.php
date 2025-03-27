@@ -141,7 +141,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 */
 	public function get_next(): int {
 		$table_name      = $this->table_name;
-		$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+		$table_name_safe = wpo_wcpdf_sanitize_identifier( $table_name );
 		$next            = 1;
 
 		if ( 'auto_increment' === $this->method ) {
@@ -262,7 +262,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 */
 	public function store_name_exists(): bool {
 		$table_name      = $this->table_name;
-		$table_name_safe = preg_replace( '/[^a-zA-Z0-9_]/', '', $table_name );
+		$table_name_safe = wpo_wcpdf_sanitize_identifier( $table_name );
 		
 		$query  = $this->wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
 

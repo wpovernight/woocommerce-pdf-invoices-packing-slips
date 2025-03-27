@@ -1261,9 +1261,8 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 	}
 
 	// Fallback for < 6.2: replace %i manually
-	$pattern = apply_filters( 'wpo_wcpdf_prepare_identifier_regex', '/[^a-zA-Z0-9_\-]/' );
 	foreach ( $identifiers as &$id ) {
-		$id = '`' . preg_replace( $pattern, '', $id ) . '`';
+		$id = '`' . wpo_wcpdf_sanitize_identifier( $id ) . '`';
 	}
 
 	// Replace %i manually, leave others for prepare()
@@ -1275,4 +1274,15 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 	}
 
 	return $wpdb->prepare( $query, ...$values ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+}
+
+/**
+ * Sanitize a database identifier (e.g., table or column name).
+ *
+ * @param string $identifier The identifier to sanitize.
+ * @return string The sanitized identifier.
+ */
+function wpo_wcpdf_sanitize_identifier( string $identifier ): string {
+	$pattern = apply_filters( 'wpo_wcpdf_prepare_identifier_regex', '/[^a-zA-Z0-9_\-]/' );
+	return preg_replace( $pattern, '', $identifier );
 }
