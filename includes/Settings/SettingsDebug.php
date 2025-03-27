@@ -1432,21 +1432,73 @@ class SettingsDebug {
 			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
 	}
-
+	
 	/**
 	 * Filter data from number table request
 	 *
 	 * @param array $request_data
-	 *
 	 * @return array
 	 */
 	public function filter_fetch_request_data( array $request_data ): array {
+		// Helper to check if a string already contains a time component
+		$contains_time = function( $str ) {
+			// Look for HH:MM:SS pattern anywhere in the string
+			return (bool) preg_match( '/\d{2}:\d{2}:\d{2}/', $str );
+		};
+
+		// Validate and sanitize table_name
+		$valid_table_name = null;
+		if (
+			isset( $request_data['table_name'] ) 
+			&& in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) )
+		) {
+			$valid_table_name = sanitize_text_field( $request_data['table_name'] );
+		}
+
+		// Validate and sanitize order
+		$valid_order = 'desc';
+		if (
+			isset( $request_data['order'] )
+			&& in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ), true )
+		) {
+			$valid_order = sanitize_text_field( strtolower( $request_data['order'] ) );
+		}
+
+		// Validate and sanitize orderby
+		$valid_orderby = 'id';
+		if (
+			isset( $request_data['orderby'] )
+			&& in_array( strtolower( $request_data['orderby'] ), array( 'id' ), true )
+		) {
+			$valid_orderby = sanitize_text_field( strtolower( $request_data['orderby'] ) );
+		}
+
+		// Handle "from" date
+		$valid_from = null;
+		if ( isset( $request_data['from'] ) && ! empty( $request_data['from'] ) ) {
+			$temp_from = esc_attr( $request_data['from'] );
+			if ( ! $contains_time( $temp_from ) ) {
+				$temp_from .= ' 00:00:00';
+			}
+			$valid_from = $temp_from;
+		}
+
+		// Handle "to" date
+		$valid_to = null;
+		if ( isset( $request_data['to'] ) && ! empty( $request_data['to'] ) ) {
+			$temp_to = esc_attr( $request_data['to'] );
+			if ( ! $contains_time( $temp_to ) ) {
+				$temp_to .= ' 23:59:59';
+			}
+			$valid_to = $temp_to;
+		}
+
 		return array(
-			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
-			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
-			'orderby'    => isset( $request_data['orderby'] )    && in_array( strtolower( $request_data['orderby'] ), array( 'id' ) )                       ? sanitize_text_field( strtolower( $request_data['orderby'] ) ) : 'id',
-			'from'       => isset( $request_data['from'] )       && ! empty( $request_data['from'] )                                                        ? esc_attr( $request_data['from'] ) . ' 00:00:00'               : null,
-			'to'         => isset( $request_data['to'] )         && ! empty( $request_data['to'] )                                                          ? esc_attr( $request_data['to'] ) . ' 23:59:59'                 : null,
+			'table_name' => $valid_table_name,
+			'order'      => $valid_order,
+			'orderby'    => $valid_orderby,
+			'from'       => $valid_from,
+			'to'         => $valid_to,
 		);
 	}
 

@@ -1227,17 +1227,30 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 	$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
 
 	if ( $has_identifier_escape ) {
-		return $wpdb->prepare( $query, ...array_merge( $identifiers, $values ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-	}
-	
-	// Sanitize identifiers
-	$pattern = apply_filters( 'wpo_wcpdf_prepare_identifier_regex', '/[^a-zA-Z0-9_\-]/' );
+		// Combine both arrays in the order the placeholders appear
+		$all_placeholders = array();
+		$identifier_index = 0;
+		$value_index      = 0;
+		$split            = preg_split( '/(%[%a-zA-Z])/', $query, -1, PREG_SPLIT_DELIM_CAPTURE );
+		
+		foreach ( $split as $part ) {
+			if ( '%i' === $part ) {
+				$all_placeholders[] = $identifiers[ $identifier_index++ ] ?? '';
+			} elseif ( preg_match( '/^%[sdfb]/', $part ) ) {
+				$all_placeholders[] = $values[ $value_index++ ] ?? '';
+			}
+		}
 
+		return $wpdb->prepare( $query, ...$all_placeholders ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	}
+
+	// Fallback for < 6.2: replace %i manually
+	$pattern = apply_filters( 'wpo_wcpdf_prepare_identifier_regex', '/[^a-zA-Z0-9_\-]/' );
 	foreach ( $identifiers as &$id ) {
 		$id = '`' . preg_replace( $pattern, '', $id ) . '`';
 	}
 
-	// Replace %i with sanitized identifiers manually
+	// Replace %i manually, leave others for prepare()
 	$segments = explode( '%i', $query );
 	$query    = array_shift( $segments );
 
