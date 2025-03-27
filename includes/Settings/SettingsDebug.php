@@ -1351,7 +1351,7 @@ class SettingsDebug {
 	 */
 	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', string $from = '', string $to = '', int $chunk_size = 100, int $offset = 0 ): void {
 		global $wpdb;
-
+		
 		$input_data = array(
 			'table_name' => $table_name,
 			'orderby'    => $orderby,
@@ -1362,7 +1362,7 @@ class SettingsDebug {
 
 		$data = $this->filter_fetch_request_data( $input_data );
 
-		if ( empty( $data['table_name'] ) || empty( $data['from'] || empty( $data['to'] ) ) ) {
+		if ( empty( $data['table_name'] ) || empty( $data['from'] ) || empty( $data['to'] ) ) {
 			return;
 		}
 
@@ -1371,19 +1371,17 @@ class SettingsDebug {
 		$option_name = "wpo_wcpdf_number_data::{$data['table_name']}";
 		$results     = get_option( $option_name, array() );
 		$hook        = 'wpo_wcpdf_number_table_data_fetch';
+		$order       = ( 'DESC' === strtoupper( $data['order'] ) ) ? 'DESC' : 'ASC';
+		$table_name  = $data['table_name'];
+		$orderby     = $data['orderby'];
 
-		// query
-		$chunk_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT * FROM `" . esc_sql( $data['table_name'] ) . "` WHERE date BETWEEN %s AND %s ORDER BY %s %s LIMIT %d OFFSET %d",
-				$data['from'],
-				$data['to'],
-				$data['orderby'],
-				$data['order'],
-				$chunk_size,
-				$offset
-			)
+		$query = wpo_wcpdf_prepare_identifier_query(
+			"SELECT * FROM %i WHERE date BETWEEN %s AND %s ORDER BY %i $order LIMIT %d OFFSET %d",
+			array( $table_name, $orderby ),
+			array( $data['from'], $data['to'], $chunk_size, $offset )
 		);
+
+		$chunk_results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( empty( $chunk_results ) ) {
 			as_unschedule_all_actions( $hook );
@@ -1434,21 +1432,73 @@ class SettingsDebug {
 			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
 	}
-
+	
 	/**
 	 * Filter data from number table request
 	 *
 	 * @param array $request_data
-	 *
 	 * @return array
 	 */
 	public function filter_fetch_request_data( array $request_data ): array {
+		// Helper to check if a string already contains a time component
+		$contains_time = function( $str ) {
+			// Look for HH:MM:SS pattern anywhere in the string
+			return (bool) preg_match( '/\d{2}:\d{2}:\d{2}/', $str );
+		};
+
+		// Validate and sanitize table_name
+		$valid_table_name = null;
+		if (
+			isset( $request_data['table_name'] ) 
+			&& in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) )
+		) {
+			$valid_table_name = sanitize_text_field( $request_data['table_name'] );
+		}
+
+		// Validate and sanitize order
+		$valid_order = 'desc';
+		if (
+			isset( $request_data['order'] )
+			&& in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ), true )
+		) {
+			$valid_order = sanitize_text_field( strtolower( $request_data['order'] ) );
+		}
+
+		// Validate and sanitize orderby
+		$valid_orderby = 'id';
+		if (
+			isset( $request_data['orderby'] )
+			&& in_array( strtolower( $request_data['orderby'] ), array( 'id' ), true )
+		) {
+			$valid_orderby = sanitize_text_field( strtolower( $request_data['orderby'] ) );
+		}
+
+		// Handle "from" date
+		$valid_from = null;
+		if ( isset( $request_data['from'] ) && ! empty( $request_data['from'] ) ) {
+			$temp_from = esc_attr( $request_data['from'] );
+			if ( ! $contains_time( $temp_from ) ) {
+				$temp_from .= ' 00:00:00';
+			}
+			$valid_from = $temp_from;
+		}
+
+		// Handle "to" date
+		$valid_to = null;
+		if ( isset( $request_data['to'] ) && ! empty( $request_data['to'] ) ) {
+			$temp_to = esc_attr( $request_data['to'] );
+			if ( ! $contains_time( $temp_to ) ) {
+				$temp_to .= ' 23:59:59';
+			}
+			$valid_to = $temp_to;
+		}
+
 		return array(
-			'table_name' => isset( $request_data['table_name'] ) && in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) ) ? sanitize_text_field( $request_data['table_name'] )            : null,
-			'order'      => isset( $request_data['order'] )      && in_array( strtolower( $request_data['order'] ), array( 'desc', 'asc' ) )                ? sanitize_text_field( strtolower( $request_data['order'] ) )   : 'desc',
-			'orderby'    => isset( $request_data['orderby'] )    && in_array( strtolower( $request_data['orderby'] ), array( 'id' ) )                       ? sanitize_text_field( strtolower( $request_data['orderby'] ) ) : 'id',
-			'from'       => isset( $request_data['from'] )       && ! empty( $request_data['from'] )                                                        ? esc_attr( $request_data['from'] ) . ' 00:00:00'               : null,
-			'to'         => isset( $request_data['to'] )         && ! empty( $request_data['to'] )                                                          ? esc_attr( $request_data['to'] ) . ' 23:59:59'                 : null,
+			'table_name' => $valid_table_name,
+			'order'      => $valid_order,
+			'orderby'    => $valid_orderby,
+			'from'       => $valid_from,
+			'to'         => $valid_to,
 		);
 	}
 
@@ -1502,9 +1552,9 @@ class SettingsDebug {
 
 		return $found;
 	}
-
+	
 	/**
-	 * Search for number in number table database
+	 * Search for number in number table database.
 	 *
 	 * @param string $table_name
 	 * @param int    $search
@@ -1514,19 +1564,23 @@ class SettingsDebug {
 	public function search_number_in_database_table( string $table_name, int $search ) {
 		global $wpdb;
 
-		if ( empty( $search ) || empty( $table_name ) || ! in_array( $table_name, array_keys( $this->get_number_store_tables() ) ) ) {
+		if (
+			empty( $search ) ||
+			empty( $table_name ) ||
+			! in_array( $table_name, array_keys( $this->get_number_store_tables() ), true )
+		) {
 			return array();
 		}
 
-		$table_name = sanitize_text_field( $table_name );
-		$search     = absint( $search );
-
-		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT * FROM `" . esc_sql( $table_name ) . "` WHERE id = %d",
-				$search
-			)
+		$search = absint( $search );
+		$query  = wpo_wcpdf_prepare_identifier_query(
+			"SELECT * FROM %i WHERE id = %d",
+			array( $table_name ),
+			array( $search )
 		);
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_results( $query );
 	}
 
 	/**
