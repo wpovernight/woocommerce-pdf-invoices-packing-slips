@@ -1171,7 +1171,8 @@ class Main {
 
 				if ( $listed_files ) {
 					foreach ( $listed_files as $fileinfo ) {
-						$file_path = trailingslashit( $path ) . $fileinfo['name'];
+						$name      = is_array( $fileinfo ) ? $fileinfo['name'] : $fileinfo;
+						$file_path = trailingslashit( $path ) . $name;
 						$basename  = wp_basename( $file_path );
 
 						// Exclude specific files before adding to list

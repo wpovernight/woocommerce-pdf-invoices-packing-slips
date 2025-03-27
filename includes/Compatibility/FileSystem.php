@@ -59,6 +59,10 @@ class FileSystem {
 		
 		if ( 'wp' === $this->system_enabled ) {
 			$this->initialize_wp_filesystem();
+		} else {
+			if ( ! defined( 'FS_CHMOD_FILE' ) ) {
+				define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
+			}
 		}
 	}
 	
