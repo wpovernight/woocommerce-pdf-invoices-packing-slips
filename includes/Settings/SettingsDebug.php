@@ -25,8 +25,11 @@ class SettingsDebug {
 		// Show a notice if the plugin requirements are not met.
 		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
+		add_action( 'admin_init', array( $this, 'maybe_schedule_unstable_version_check' ) );
+		
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
+		add_action( 'wpo_wcpdf_check_unstable_version_daily', array( $this, 'run_unstable_version_check' ) );
 
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
@@ -1585,6 +1588,39 @@ class SettingsDebug {
 		} );
 
 		return $results;
+	}
+	
+	/**
+	 * Schedule or unschedule the daily unstable version check using Action Scheduler.
+	 *
+	 * @return void
+	 */
+	public function maybe_schedule_unstable_version_check(): void {
+		$hook           = 'wpo_wcpdf_check_unstable_version_daily';
+		$debug_settings = WPO_WCPDF()->settings->debug_settings;
+		$enabled        = isset( $debug_settings['check_unstable_versions'] );
+		
+		// Unschedule all pending actions
+		if ( ! $enabled ) {
+			if ( as_next_scheduled_action( $hook ) ) {
+				as_unschedule_all_actions( $hook );
+			}
+			return;
+		}		
+
+		// Schedule the action if not already scheduled
+		if ( ! as_next_scheduled_action( $hook ) ) {
+			as_schedule_recurring_action( time(), DAY_IN_SECONDS, $hook );
+		}
+	}
+	
+	/**
+	 * Run the daily check for unstable versions.
+	 *
+	 * @return void
+	 */
+	public function run_unstable_version_check(): void {
+		wpo_wcpdf_get_latest_releases_from_github();
 	}
 
 }
