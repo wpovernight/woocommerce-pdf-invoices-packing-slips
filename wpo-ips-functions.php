@@ -1217,8 +1217,8 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
  * Prepare an identifier query for use with $wpdb->prepare().
  *
  * @param string $query
- * @param array $identifiers
- * @param array $values
+ * @param array  $identifiers Identifiers for %i placeholders.
+ * @param array  $values      Regular values for %s, %d, etc.
  * @return string|void
  */
 function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers = array(), array $values = array() ) {
@@ -1231,14 +1231,30 @@ function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers =
 		$all_placeholders = array();
 		$identifier_index = 0;
 		$value_index      = 0;
-		$split            = preg_split( '/(%[%a-zA-Z])/', $query, -1, PREG_SPLIT_DELIM_CAPTURE );
-		
+		$split            = preg_split( '/(%[a-zA-Z])/', $query, -1, PREG_SPLIT_DELIM_CAPTURE );
+
 		foreach ( $split as $part ) {
 			if ( '%i' === $part ) {
-				$all_placeholders[] = $identifiers[ $identifier_index++ ] ?? '';
+				$all_placeholders[] = $identifiers[ $identifier_index++ ] ?? null;
 			} elseif ( preg_match( '/^%[sdfb]/', $part ) ) {
-				$all_placeholders[] = $values[ $value_index++ ] ?? '';
+				$all_placeholders[] = $values[ $value_index++ ] ?? null;
 			}
+		}
+
+		$total_placeholders = substr_count( $query, '%i' ) + (int) preg_match_all( '/%[sdfb]/', $query, $matches );
+		if ( count( $all_placeholders ) !== $total_placeholders ) {
+			wcpdf_log_error(
+				sprintf(
+					"The number of passed identifiers/values (%d) does not match the number of placeholders (%d).\nQuery: %s\nIdentifiers: %s\nValues: %s",
+					count( $all_placeholders ),
+					$total_placeholders,
+					$query,
+					wp_json_encode( $identifiers ),
+					wp_json_encode( $values )
+				),
+				'critical'
+			);
+			return;
 		}
 
 		return $wpdb->prepare( $query, ...$all_placeholders ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
