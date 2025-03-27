@@ -54,7 +54,7 @@ class SequentialNumberStore {
 
 	public function init() {
 		// check if table exists
-		if( ! $this->store_name_exists() ) {
+		if ( ! $this->store_name_exists() ) {
 			$this->is_new = true;
 		} else {
 			// Check calculated_number column if using 'calculate' method

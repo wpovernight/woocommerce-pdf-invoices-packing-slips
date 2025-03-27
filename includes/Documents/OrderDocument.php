@@ -1920,6 +1920,9 @@ abstract class OrderDocument {
 
 			if ( ! $year ) {
 				$year = $current_year;
+				// if we don't get a result, this could either mean there's an error,
+				// OR that the first number simply has not been created yet (=no rows)
+				// we only log when there's an actual error
 				if ( ! empty( $wpdb->last_error ) ) {
 					wcpdf_log_error( sprintf(
 						'An error occurred while trying to get the current year from the %s table: %s',

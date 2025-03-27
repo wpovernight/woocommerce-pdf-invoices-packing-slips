@@ -392,7 +392,7 @@ class Install {
 			foreach ( $documents as $document ) {
 				$store_name        = "{$document->slug}_number";
 				$method            = WPO_WCPDF()->settings->get_sequential_number_store_method();
-				$table_name        = apply_filters( 'wpo_wcpdf_number_store_table_name', sanitize_key( "{$wpdb->prefix}wcpdf_{$store_name}" ), $store_name, $method );
+				$table_name        = apply_filters( 'wpo_wcpdf_number_store_table_name', wpo_wcpdf_sanitize_identifier( "{$wpdb->prefix}wcpdf_{$store_name}" ), $store_name, $method );
 				$table_name_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 					$wpdb->prepare( "SHOW TABLES LIKE %s", $table_name )
 				) === $table_name;
