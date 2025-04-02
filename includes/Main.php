@@ -834,7 +834,7 @@ class Main {
 			}
 
 			// copy font files
-			if ( $subfolder == 'fonts' ) {
+			if ( 'fonts' === $subfolder ) {
 				$this->copy_fonts( $path, false );
 			}
 
