@@ -1091,7 +1091,12 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 
-	// If not translated yet, allow custom filter & then fallback to standard WP gettext filters
+	// If not translated yet, try native translate() first, then custom filters
+	if ( $translation === $string && function_exists( 'translate' ) ) {
+		$translation = translate( $string, $textdomain );
+	}
+	
+	// If still not translated, try custom filters
 	if ( $translation === $string ) {
 		$translation = wpo_wcpdf_gettext( $string, $textdomain );
 	}
@@ -1286,3 +1291,128 @@ function wpo_wcpdf_sanitize_identifier( string $identifier ): string {
 	$pattern = apply_filters( 'wpo_wcpdf_prepare_identifier_regex', '/[^a-zA-Z0-9_\-]/' );
 	return preg_replace( $pattern, '', $identifier );
 }
+
+/**
+ * Get the latest stable and prerelease versions from GitHub.
+ *
+ * @param string $owner
+ * @param string $repo
+ * @param int    $cache_duration
+ * @return array {
+ *     @type array $stable   Latest stable release.
+ *     @type array $unstable Latest valid pre-release.
+ * }
+ */
+function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight', string $repo = 'woocommerce-pdf-invoices-packing-slips', int $cache_duration = 1800 ): array {
+	$option_key   = 'wpo_latest_releases_' . md5( $owner . '/' . $repo );
+	$empty_result = array( 'stable' => array(), 'unstable' => array() );
+	$cached       = get_option( $option_key );
+	
+	if ( $cached && isset( $cached['timestamp'], $cached['data'] ) ) {
+		if ( ( time() - $cached['timestamp'] ) < $cache_duration ) {
+			return $cached['data'];
+		}
+	}
+
+	$url     = "https://api.github.com/repos/{$owner}/{$repo}/releases";
+	$options = array(
+		'http' => array(
+			'header' => "User-Agent: " . get_bloginfo( 'name' ) . " (" . home_url() . ")\r\n"
+		)
+	);
+	$context  = stream_context_create( $options );
+	$response = file_get_contents( $url, false, $context );
+
+	if ( ! $response ) {
+		return $empty_result;
+	}
+
+	$releases = json_decode( $response, true );
+	
+	if ( ! is_array( $releases ) ) {
+		return $empty_result;
+	}
+
+	$stable   = array();
+	$unstable = array();
+
+	foreach ( $releases as $release ) {
+		$tag  = $release['tag_name'];
+		$name = ltrim( $release['name'], 'v' );
+
+		if ( preg_match( '/-pr\d+/i', $tag ) ) {
+			continue;
+		}
+
+		$release_data = apply_filters( 'wpo_wcpdf_github_release_data', array(
+			'name'     => $name,
+			'tag'      => $tag,
+			'url'      => $release['html_url'],
+			'zipball'  => $release['zipball_url'],
+			'download' => "https://github.com/{$owner}/{$repo}/releases/download/{$tag}/{$repo}.{$name}.zip"
+		), $release, $owner, $repo );
+		
+		if ( ! $release['prerelease'] && empty( $stable ) ) {
+			$stable = $release_data;
+			
+			// Once we find the first stable, we stop.
+			break;
+		}
+		
+		if ( $release['prerelease'] && empty( $unstable ) ) {
+			$unstable = $release_data;
+		}		
+	}
+
+	$data = array(
+		'stable'   => $stable,
+		'unstable' => $unstable,
+	);
+	
+	// Check if a new prerelease is available
+	$last_seen_option_key = 'wpo_last_seen_prerelease_' . md5( $owner . '/' . $repo );
+	$last_seen_tag        = get_option( $last_seen_option_key );
+
+	if ( ! empty( $unstable['tag'] ) && $unstable['tag'] !== $last_seen_tag ) {
+		update_option( $last_seen_option_key, $unstable['tag'], false );
+
+		/**
+		 * Fires when a new GitHub prerelease becomes available.
+		 *
+		 * @param array  $unstable The new prerelease data.
+		 * @param string $owner    GitHub repo owner.
+		 * @param string $repo     GitHub repo name.
+		 */
+		do_action( 'wpo_wcpdf_new_github_prerelease_available', $unstable, $owner, $repo );
+	}
+
+	update_option( $option_key, array(
+		'timestamp' => time(),
+		'data'      => $data,
+	), false );
+
+	return $data;
+}
+
+/**
+ * Get the latest plugin version from the WordPress.org API.
+ *
+ * @param string $plugin_slug
+ * @return string|false
+ */
+function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
+	// Ensure plugin update info is loaded
+	if ( ! function_exists( 'get_site_transient' ) ) {
+		require_once ABSPATH . 'wp-includes/option.php';
+	}
+
+	$update_plugins = get_site_transient( 'update_plugins' );
+
+	if ( isset( $update_plugins->response[ $plugin_slug ] ) ) {
+		return $update_plugins->response[ $plugin_slug ]->new_version;
+	}
+
+	// No update available or plugin not found
+	return false;
+}
+

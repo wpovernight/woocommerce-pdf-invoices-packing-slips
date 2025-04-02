@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              4.2.1-beta.1
+ * Version:              4.3.0-beta.1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.2.1-beta.1';
+	public $version              = '4.3.0-beta.1';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -79,6 +79,9 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
 		add_action( 'admin_notices', array( $this, 'yearly_reset_action_missing_notice' ) );
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
+		add_action( 'admin_notices', array( $this, 'unstable_option_announcement_notice' ) );
+		add_action( 'admin_notices', array( $this, 'new_unstable_version_available_notice' ) );
+		add_action( 'wpo_wcpdf_new_github_prerelease_available', array( $this, 'set_new_unstable_version_available_option' ), 10, 3 );
 		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
 		// deactivate legacy extensions if activated
@@ -585,6 +588,156 @@ class WPO_WCPDF {
 
 				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 				exit;
+			}
+		}
+	}
+	
+	/**
+	 * Show a one-time notice about the new "Check for unstable versions" option.
+	 *
+	 * @return void
+	 */
+	public function unstable_option_announcement_notice(): void {
+		$dismiss_option = 'wpo_wcpdf_dismiss_unstable_option_announcement';
+		$dismiss_arg    = 'wpo_wcpdf_dismiss_unstable_option_announcement';
+		$nonce_action   = 'wcpdf_dismiss_unstable_option_announcement';
+
+		// Bail if already dismissed
+		if ( wc_string_to_bool( get_option( $dismiss_option ) ) ) {
+			return;
+		}
+
+		// Handle dismissal
+		if ( isset( $_GET[ $dismiss_arg ] ) && isset( $_GET['_wpnonce'] ) ) {
+			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), $nonce_action ) ) {
+				update_option( $dismiss_option, 'yes' );
+			} else {
+				wcpdf_log_error( 'Invalid nonce while dismissing unstable version feature notice.' );
+			}
+
+			wp_redirect( remove_query_arg( array( $dismiss_arg, '_wpnonce' ) ) );
+			exit;
+		}
+
+		// Build dismiss URL
+		$dismiss_url = wp_nonce_url(
+			add_query_arg( $dismiss_arg, '1' ),
+			$nonce_action
+		);
+		?>
+		<div class="notice notice-info">
+			<p>
+				<?php
+					printf(
+						/* translators: %s: Plugin name */
+						esc_html__( 'We\'ve added a new option to %s that lets you check for beta and pre-release versions.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<strong>' . esc_html__( 'PDF Invoices & Packing Slips for WooCommerce', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+					);
+				?>
+			</p>
+			<p>
+				<?php esc_html_e( 'If you\'d like to help improve the plugin by testing early releases on a staging site, you can enable this feature from the advanced settings.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</p>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug#check_unstable_versions' ) ); ?>">
+					<?php esc_html_e( 'Go to settings', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>">
+					<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+			</p>
+		</div>
+		<?php
+	}
+	
+	/**
+	 * Display a notice when a new unstable version is available.
+	 *
+	 * @return void
+	 */
+	public function new_unstable_version_available_notice(): void {
+		$debug_settings         = $this->settings->debug_settings;
+		$check_unstable_enabled = isset( $debug_settings['check_unstable_versions'] );
+		$unstable_state         = get_option( 'wpo_wcpdf_unstable_version_state', array() );
+		$current_tag            = isset( $unstable_state['tag'] ) ? $unstable_state['tag'] : '';
+		$is_dismissed           = isset( $unstable_state['dismissed'] ) ? $unstable_state['dismissed'] : false;
+		$hide_version_arg       = 'wpo_wcpdf_hide_unstable_version';
+
+		// Don't show the notice if disabled or dismissed
+		if ( ! $check_unstable_enabled || empty( $current_tag ) || $is_dismissed ) {
+			return;
+		}
+
+		// Handle dismissal
+		if ( isset( $_GET[ $hide_version_arg ] ) && isset( $_GET['_wpnonce'] ) ) {
+			$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) );
+			if ( wp_verify_nonce( $nonce, 'wcpdf_hide_unstable_version' ) ) {
+				update_option( 'wpo_wcpdf_unstable_version_state', array(
+					'tag'       => $current_tag,
+					'dismissed' => true,
+				) );
+			} else {
+				wcpdf_log_error( 'Invalid nonce while hiding unstable version notice.' );
+			}
+
+			wp_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
+			exit;
+		}
+
+		// Display the notice
+		?>
+		<div class="notice notice-info">
+			<p>
+				<?php
+					printf(
+						/* translators: 1. new unstable version, 2. plugin name */
+						esc_html__( 'A new unstable version (%1$s) of %2$s is available.', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html( $current_tag ),
+						'<strong>' . esc_html__( 'PDF Invoices & Packing Slips for WooCommerce', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+					);
+				?>
+			</p>
+			<p>
+				<span class="dashicons dashicons-download"></span>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' ) ); ?>">
+					<?php esc_html_e( 'Download from the status page', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+			</p>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $hide_version_arg => true ) ), 'wcpdf_hide_unstable_version' ) ); ?>">
+					<?php esc_html_e( 'Hide this version', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+			</p>
+		</div>
+		<?php
+	}
+	
+	/**
+	 * Store the new unstable version if version checking is enabled.
+	 *
+	 * @param array  $unstable The unstable version data.
+	 * @param string $owner    GitHub repo owner.
+	 * @param string $repo     GitHub repo name.
+	 * @return void
+	 */
+	public function set_new_unstable_version_available_option( array $unstable, string $owner, string $repo ): void {
+		$debug_settings = $this->settings->debug_settings;
+		$enabled        = isset( $debug_settings['check_unstable_versions'] );
+		$new_tag        = sanitize_text_field( $unstable['tag'] );
+
+		if (
+			$enabled &&
+			! empty( $new_tag ) &&
+			'wpovernight' === $owner &&
+			'woocommerce-pdf-invoices-packing-slips' === $repo
+		) {
+			$current = get_option( 'wpo_wcpdf_unstable_version_state', array() );
+
+			if ( ! isset( $current['tag'] ) || $current['tag'] !== $new_tag ) {
+				update_option( 'wpo_wcpdf_unstable_version_state', array(
+					'tag'       => $new_tag,
+					'dismissed' => false,
+				) );
 			}
 		}
 	}
