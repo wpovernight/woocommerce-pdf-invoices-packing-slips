@@ -25,8 +25,11 @@ class SettingsDebug {
 		// Show a notice if the plugin requirements are not met.
 		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
+		add_action( 'admin_init', array( $this, 'maybe_schedule_unstable_version_check' ) );
+		
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
+		add_action( 'wpo_wcpdf_check_unstable_version_daily', array( $this, 'run_unstable_version_check' ) );
 
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
@@ -88,10 +91,12 @@ class SettingsDebug {
 	 * @return void
 	 */
 	public function display_status(): void {
-		$server_configs        = $this->get_server_config();
-		$premium_plugins       = $this->get_premium_plugins();
-		$directory_permissions = $this->get_directory_permissions();
-		$yearly_reset_schedule = $this->get_yearly_reset_schedule();
+		$server_configs         = $this->get_server_config();
+		$premium_plugins        = $this->get_premium_plugins();
+		$directory_permissions  = $this->get_directory_permissions();
+		$yearly_reset_schedule  = $this->get_yearly_reset_schedule();
+		$debug_settings         = WPO_WCPDF()->settings->debug_settings;
+		$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
 	}
@@ -893,6 +898,23 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'check_unstable_versions',
+				'title'    => __( 'Check for unstable versions', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'check_unstable_versions',
+					'description' => sprintf(
+						/* translators: %1$s: open status page link anchor, %2$s: close status page link anchor */
+						__( 'Enable this to check for new beta or pre-release versions and display them in the %1$sstatus page%2$s. A notice will appear when a new version is available.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' ) ) . '">',
+						'</a>'
+					),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'log_to_order_notes',
 				'title'    => __( 'Log to order notes', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
@@ -1620,6 +1642,39 @@ class SettingsDebug {
 		} );
 
 		return $results;
+	}
+	
+	/**
+	 * Schedule or unschedule the daily unstable version check using Action Scheduler.
+	 *
+	 * @return void
+	 */
+	public function maybe_schedule_unstable_version_check(): void {
+		$hook           = 'wpo_wcpdf_check_unstable_version_daily';
+		$debug_settings = WPO_WCPDF()->settings->debug_settings;
+		$enabled        = isset( $debug_settings['check_unstable_versions'] );
+		
+		// Unschedule all pending actions
+		if ( ! $enabled ) {
+			if ( as_next_scheduled_action( $hook ) ) {
+				as_unschedule_all_actions( $hook );
+			}
+			return;
+		}		
+
+		// Schedule the action if not already scheduled
+		if ( ! as_next_scheduled_action( $hook ) ) {
+			as_schedule_recurring_action( time(), DAY_IN_SECONDS, $hook );
+		}
+	}
+	
+	/**
+	 * Run the daily check for unstable versions.
+	 *
+	 * @return void
+	 */
+	public function run_unstable_version_check(): void {
+		wpo_wcpdf_get_latest_releases_from_github();
 	}
 
 }
