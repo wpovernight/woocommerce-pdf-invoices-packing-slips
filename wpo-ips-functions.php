@@ -1091,7 +1091,12 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 
-	// If not translated yet, allow custom filter & then fallback to standard WP gettext filters
+	// If not translated yet, try native translate() first, then custom filters
+	if ( $translation === $string && function_exists( 'translate' ) ) {
+		$translation = translate( $string, $textdomain );
+	}
+	
+	// If still not translated, try custom filters
 	if ( $translation === $string ) {
 		$translation = wpo_wcpdf_gettext( $string, $textdomain );
 	}
