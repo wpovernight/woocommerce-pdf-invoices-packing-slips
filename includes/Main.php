@@ -1255,22 +1255,27 @@ class Main {
 
 	/**
 	 * Remove references to order in number store tables when removing WC data
+	 * 
+	 * @param \WC_Abstract_Order $order
+	 * @return void
 	 */
-	public function remove_order_personal_data( $order ) {
+	public function remove_order_personal_data( \WC_Abstract_Order $order ): void {
 		global $wpdb;
-		// remove order ID from number stores
-		$number_stores = apply_filters( "wpo_wcpdf_privacy_number_stores", array( 'invoice_number' ) );
+		
+		// Remove order ID from number stores
+		$number_stores = apply_filters( 'wpo_wcpdf_privacy_number_stores', array( 'invoice_number' ) );
 
 		foreach ( $number_stores as $store_name ) {
 			$order_id   = $order->get_id();
-			$table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
+			$table_name = apply_filters( 'wpo_wcpdf_number_store_table_name', "{$wpdb->prefix}wcpdf_{$store_name}", $store_name, 'auto_increment' ); // i.e. wp_wcpdf_invoice_number
 
-			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$wpdb->prepare(
-					"UPDATE " . esc_sql( $table_name ) . " SET order_id = 0 WHERE order_id = %s",
-					$order_id
-				)
+			$query = wpo_wcpdf_prepare_identifier_query(
+				"UPDATE %i SET order_id = 0 WHERE order_id = %d",
+				array( $table_name ),
+				array( $order_id )
 			);
+
+			$wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		}
 	}
 

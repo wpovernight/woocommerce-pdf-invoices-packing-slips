@@ -1091,7 +1091,12 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 		$translation = $multilingual_class::maybe_get_string_translation( $string, $textdomain );
 	}
 
-	// If not translated yet, allow custom filter & then fallback to standard WP gettext filters
+	// If not translated yet, try native translate() first, then custom filters
+	if ( $translation === $string && function_exists( 'translate' ) ) {
+		$translation = translate( $string, $textdomain );
+	}
+	
+	// If still not translated, try custom filters
 	if ( $translation === $string ) {
 		$translation = wpo_wcpdf_gettext( $string, $textdomain );
 	}
@@ -1212,3 +1217,202 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 
 	return apply_filters( 'wpo_wcpdf_order_customer_vat_number', $vat_number, $order, $meta_key ?? null );
 }
+
+/**
+ * Prepare an identifier query for use with $wpdb->prepare().
+ *
+ * @param string $query
+ * @param array  $identifiers Identifiers for %i placeholders.
+ * @param array  $values      Regular values for %s, %d, etc.
+ * @return string|void
+ */
+function wpo_wcpdf_prepare_identifier_query( string $query, array $identifiers = array(), array $values = array() ) {
+	global $wpdb;
+
+	$has_identifier_escape = version_compare( get_bloginfo( 'version' ), '6.2', '>=' );
+
+	if ( $has_identifier_escape ) {
+		// Combine both arrays in the order the placeholders appear
+		$all_placeholders = array();
+		$identifier_index = 0;
+		$value_index      = 0;
+		$split            = preg_split( '/(%[a-zA-Z])/', $query, -1, PREG_SPLIT_DELIM_CAPTURE );
+
+		foreach ( $split as $part ) {
+			if ( '%i' === $part ) {
+				$all_placeholders[] = $identifiers[ $identifier_index++ ] ?? null;
+			} elseif ( preg_match( '/^%[sdfb]/', $part ) ) {
+				$all_placeholders[] = $values[ $value_index++ ] ?? null;
+			}
+		}
+
+		$total_placeholders = substr_count( $query, '%i' ) + (int) preg_match_all( '/%[sdfb]/', $query, $matches );
+		if ( count( $all_placeholders ) !== $total_placeholders ) {
+			wcpdf_log_error(
+				sprintf(
+					"The number of passed identifiers/values (%d) does not match the number of placeholders (%d).\nQuery: %s\nIdentifiers: %s\nValues: %s",
+					count( $all_placeholders ),
+					$total_placeholders,
+					$query,
+					wp_json_encode( $identifiers ),
+					wp_json_encode( $values )
+				),
+				'critical'
+			);
+			return;
+		}
+
+		return $wpdb->prepare( $query, ...$all_placeholders ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	}
+
+	// Fallback for < 6.2: replace %i manually
+	foreach ( $identifiers as &$id ) {
+		$id = '`' . wpo_wcpdf_sanitize_identifier( $id ) . '`';
+	}
+
+	// Replace %i manually, leave others for prepare()
+	$segments = explode( '%i', $query );
+	$query    = array_shift( $segments );
+
+	foreach ( $segments as $index => $segment ) {
+		$query .= $identifiers[ $index ] . $segment;
+	}
+
+	return $wpdb->prepare( $query, ...$values ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+}
+
+/**
+ * Sanitize a database identifier (e.g., table or column name).
+ *
+ * @param string $identifier The identifier to sanitize.
+ * @return string The sanitized identifier.
+ */
+function wpo_wcpdf_sanitize_identifier( string $identifier ): string {
+	$pattern = apply_filters( 'wpo_wcpdf_prepare_identifier_regex', '/[^a-zA-Z0-9_\-]/' );
+	return preg_replace( $pattern, '', $identifier );
+}
+
+/**
+ * Get the latest stable and prerelease versions from GitHub.
+ *
+ * @param string $owner
+ * @param string $repo
+ * @param int    $cache_duration
+ * @return array {
+ *     @type array $stable   Latest stable release.
+ *     @type array $unstable Latest valid pre-release.
+ * }
+ */
+function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight', string $repo = 'woocommerce-pdf-invoices-packing-slips', int $cache_duration = 1800 ): array {
+	$option_key   = 'wpo_latest_releases_' . md5( $owner . '/' . $repo );
+	$empty_result = array( 'stable' => array(), 'unstable' => array() );
+	$cached       = get_option( $option_key );
+	
+	if ( $cached && isset( $cached['timestamp'], $cached['data'] ) ) {
+		if ( ( time() - $cached['timestamp'] ) < $cache_duration ) {
+			return $cached['data'];
+		}
+	}
+
+	$url     = "https://api.github.com/repos/{$owner}/{$repo}/releases";
+	$options = array(
+		'http' => array(
+			'header' => "User-Agent: " . get_bloginfo( 'name' ) . " (" . home_url() . ")\r\n"
+		)
+	);
+	$context  = stream_context_create( $options );
+	$response = file_get_contents( $url, false, $context );
+
+	if ( ! $response ) {
+		return $empty_result;
+	}
+
+	$releases = json_decode( $response, true );
+	
+	if ( ! is_array( $releases ) ) {
+		return $empty_result;
+	}
+
+	$stable   = array();
+	$unstable = array();
+
+	foreach ( $releases as $release ) {
+		$tag  = $release['tag_name'];
+		$name = ltrim( $release['name'], 'v' );
+
+		if ( preg_match( '/-pr\d+/i', $tag ) ) {
+			continue;
+		}
+
+		$release_data = apply_filters( 'wpo_wcpdf_github_release_data', array(
+			'name'     => $name,
+			'tag'      => $tag,
+			'url'      => $release['html_url'],
+			'zipball'  => $release['zipball_url'],
+			'download' => "https://github.com/{$owner}/{$repo}/releases/download/{$tag}/{$repo}.{$name}.zip"
+		), $release, $owner, $repo );
+		
+		if ( ! $release['prerelease'] && empty( $stable ) ) {
+			$stable = $release_data;
+			
+			// Once we find the first stable, we stop.
+			break;
+		}
+		
+		if ( $release['prerelease'] && empty( $unstable ) ) {
+			$unstable = $release_data;
+		}		
+	}
+
+	$data = array(
+		'stable'   => $stable,
+		'unstable' => $unstable,
+	);
+	
+	// Check if a new prerelease is available
+	$last_seen_option_key = 'wpo_last_seen_prerelease_' . md5( $owner . '/' . $repo );
+	$last_seen_tag        = get_option( $last_seen_option_key );
+
+	if ( ! empty( $unstable['tag'] ) && $unstable['tag'] !== $last_seen_tag ) {
+		update_option( $last_seen_option_key, $unstable['tag'], false );
+
+		/**
+		 * Fires when a new GitHub prerelease becomes available.
+		 *
+		 * @param array  $unstable The new prerelease data.
+		 * @param string $owner    GitHub repo owner.
+		 * @param string $repo     GitHub repo name.
+		 */
+		do_action( 'wpo_wcpdf_new_github_prerelease_available', $unstable, $owner, $repo );
+	}
+
+	update_option( $option_key, array(
+		'timestamp' => time(),
+		'data'      => $data,
+	), false );
+
+	return $data;
+}
+
+/**
+ * Get the latest plugin version from the WordPress.org API.
+ *
+ * @param string $plugin_slug
+ * @return string|false
+ */
+function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
+	// Ensure plugin update info is loaded
+	if ( ! function_exists( 'get_site_transient' ) ) {
+		require_once ABSPATH . 'wp-includes/option.php';
+	}
+
+	$update_plugins = get_site_transient( 'update_plugins' );
+
+	if ( isset( $update_plugins->response[ $plugin_slug ] ) ) {
+		return $update_plugins->response[ $plugin_slug ]->new_version;
+	}
+
+	// No update available or plugin not found
+	return false;
+}
+
