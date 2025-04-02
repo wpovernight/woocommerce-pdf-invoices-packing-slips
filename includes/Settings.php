@@ -302,7 +302,7 @@ class Settings {
 					$document->initiate_date();
 
 					// Update document number.
-					$document_number = $document->generate_document_number();
+					$document_number = $document->get_document_number();
 
 					if ( ! empty( $document_number ) ) {
 						$document->set_number( $document_number );
@@ -491,12 +491,12 @@ class Settings {
 				);
 				// register option separately for singular options
 				if ( is_string( $settings_field['callback'] ) && $settings_field['callback'] == 'singular_text_element') {
-					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic 
+					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 				}
 			}
 		}
 		// $page, $option_group & $option_name are all the same...
-		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic 
+		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
 	}
@@ -719,13 +719,13 @@ class Settings {
 		if ( empty( $absolute_path ) ) {
 			return '';
 		}
-		
+
 		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
 			$base_path = wp_normalize_path( ABSPATH );
 		} else {
 			$base_path = wp_normalize_path( WP_CONTENT_DIR );
 		}
-		
+
 		return str_replace( $base_path, '', wp_normalize_path( $absolute_path ) );
 	}
 
@@ -733,7 +733,7 @@ class Settings {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		// bail if no template is selected yet (fresh install)
 		if ( empty( $this->general_settings['template_path'] ) ) {
 			return;
@@ -774,9 +774,9 @@ class Settings {
 
 	public function set_number_store() {
 		$store = ! empty( $_POST['store'] ) ? sanitize_text_field( wp_unslash( $_POST['store'] ) ) : '';
-		
+
 		check_ajax_referer( "wpo_wcpdf_next_{$store}", 'security' );
-		
+
 		// check permissions
 		if ( ! $this->user_can_manage_settings() ) {
 			die();
@@ -800,7 +800,7 @@ class Settings {
 		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW VARIABLES LIKE 'auto_increment_increment'"
 		);
-		
+
 		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			$method = 'calculate';
 		}
@@ -973,9 +973,9 @@ class Settings {
 
 	public function get_media_upload_setting_html() {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
-		
+
 		$request = stripslashes_deep( $_POST );
-		
+
 		// check permissions
 		if ( ! $this->user_can_manage_settings() ) {
 			wp_send_json_error();
