@@ -880,6 +880,19 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'reload_attachment_translations',
+				'title'    => __( 'Reload translations for attachments', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'default'     => 1,
+					'id'          => 'reload_attachment_translations',
+					'description' => __( 'If enabled, the plugin will reload translations when generating documents for email attachments. Disable this if you are experiencing incomplete or incorrect translations in the attached PDFs.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),			
+			array(
+				'type'     => 'setting',
 				'id'       => 'disable_preview',
 				'title'    => __( 'Disable document preview', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
