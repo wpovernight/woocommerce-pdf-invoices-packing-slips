@@ -290,11 +290,11 @@ abstract class OrderDocument {
 	/**
 	 * Generate the document number.
 	 *
-	 * @param bool $increment
+	 * @param bool $generate
 	 *
 	 * @return mixed
 	 */
-	public function get_document_number( bool $increment = false ) {
+	public function get_document_number( bool $generate = false ) {
 		$document_number = null;
 
 		// If a third-party plugin claims to generate document numbers, trigger this instead
@@ -317,7 +317,7 @@ abstract class OrderDocument {
 		} else {
 			$number_store = $this->get_sequential_number_store();
 
-			if ( $increment ) {
+			if ( $generate ) {
 				$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
 			} else {
 				$document_number = $number_store->get_next();
