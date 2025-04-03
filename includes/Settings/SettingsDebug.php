@@ -838,24 +838,6 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
-				'id'       => 'enable_debug',
-				'title'    => __( 'Enable debug output', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'enable_debug',
-					'description' => __( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues.", 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
-									 __( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefore this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
-									 sprintf(
-										/* translators: &debug=true */
-										__( 'You can also add %s to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
-										'<code>&debug=true</code>'
-									),
-				)
-			),
-			array(
-				'type'     => 'setting',
 				'id'       => 'enable_cleanup',
 				'title'    => __( 'Enable automatic cleanup', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox_text_input',
@@ -898,6 +880,18 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'disable_preview',
+				'title'    => __( 'Disable document preview', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'disable_preview',
+					'description' => __( 'Disables the document preview on the plugin settings pages.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'check_unstable_versions',
 				'title'    => __( 'Check for unstable versions', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
@@ -912,6 +906,41 @@ class SettingsDebug {
 						'</a>'
 					),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'enable_debug',
+				'title'    => __( 'Enable debug output', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'enable_debug',
+					'description' => ( function () {
+						$default_class  = '\\WPO\\IPS\\Makers\\PDFMaker';
+						$filtered_class = apply_filters( 'wpo_wcpdf_pdf_maker', $default_class );
+						$log_url        = str_replace(
+							WP_CONTENT_DIR,
+							content_url(),
+							WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) . '/log.htm'
+						);
+			
+						return implode( '<br>', array(
+							__( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues.", 'woocommerce-pdf-invoices-packing-slips' ),
+							__( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefore this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ),
+							sprintf(
+								/* translators: %s: &debug=true */
+								__( 'You can also add %s to the URL to apply this on a per-order basis.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<code>&debug=true</code>'
+							),
+							( $filtered_class === $default_class ) ? sprintf(
+								/* translators: %s: log.htm link */
+								__( 'When enabled, Dompdf logs will be saved to %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="' . esc_url( $log_url ) . '" target="_blank" rel="noopener noreferrer">log.htm</a>'
+							) : '',
+						) );
+					} )(),
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -935,18 +964,6 @@ class SettingsDebug {
 					'option_name' => $option_name,
 					'id'          => 'log_missing_translations',
 					'description' => __( 'Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'disable_preview',
-				'title'    => __( 'Disable document preview', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'debug_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'disable_preview',
-					'description' => __( 'Disables the document preview on the plugin settings pages.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
