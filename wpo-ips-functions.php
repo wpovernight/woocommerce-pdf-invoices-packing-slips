@@ -276,7 +276,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 
 	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
 
-	if ( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_path ) ) {
+	if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_path ) ) {
 		$error_message = "Couldn't get the attachments temporary folder path: {$tmp_path}.";
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
@@ -864,9 +864,8 @@ function wpo_wcpdf_base64_encode_file( string $local_path ) {
 	if ( empty( $local_path ) ) {
 		return false;
 	}
-
-	$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-	$file_data     = $wp_filesystem->get_contents( $local_path );
+	
+	$file_data = WPO_WCPDF()->file_system->get_contents( $local_path );
 
 	return $file_data ? base64_encode( $file_data ) : false;
 }
@@ -912,13 +911,11 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 
 	// Local path file check
 	} else {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
-		if ( $wp_filesystem->is_readable( $path ) ) {
+		if ( WPO_WCPDF()->file_system->is_readable( $path ) ) {
 			return true;
 		} else {
 			// Fallback to checking file readability by attempting to open it
-			$file_contents = $wp_filesystem->get_contents( $path );
+			$file_contents = WPO_WCPDF()->file_system->get_contents( $path );
 
 			if ( $file_contents ) {
 				return true;
@@ -1012,27 +1009,15 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
  * @throws RuntimeException
  */
 function wpo_wcpdf_get_wp_filesystem() {
-	require_once ABSPATH . 'wp-admin/includes/file.php';
-
-	if ( function_exists( 'get_filesystem_method' ) ) {
-		$filesystem_method = get_filesystem_method();
-
-		if ( 'direct' !== $filesystem_method ) {
-			$error = 'This plugin only supports the direct filesystem method.';
-			wcpdf_log_error( $error, 'critical' );
-			throw new \RuntimeException( esc_html( $error ) );
-		}
+	wcpdf_deprecated_function( 'wpo_wcpdf_get_wp_filesystem', '4.2.0', '\WPO\IPS\Compatibility\FileSystem::instance()->wp_filesystem' );
+	
+	if ( class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) {
+		$filesystem = \WPO\IPS\Compatibility\FileSystem::instance();
+		$filesystem->initialize_wp_filesystem();
+		return $filesystem->wp_filesystem ?? false;
 	}
-
-	global $wp_filesystem;
-
-	if ( ! WP_Filesystem() || ! $wp_filesystem ) {
-		$error = 'Failed to initialize WP_Filesystem.';
-		wcpdf_log_error( $error, 'critical' );
-		throw new \RuntimeException( esc_html( $error ) );
-	}
-
-	return $wp_filesystem;
+	
+	return false;
 }
 
 /**

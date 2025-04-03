@@ -215,7 +215,6 @@ class Main {
 	}
 
 	public function get_document_pdf_attachment( $document, $tmp_path ) {
-		$wp_filesystem    = wpo_wcpdf_get_wp_filesystem();
 		$filename         = $document->get_filename();
 		$pdf_path         = $tmp_path . $filename;
 		$document_type    = $document->get_type();
@@ -227,8 +226,8 @@ class Main {
 
 		try {
 			// Check if the file can be reused
-			if ( $wp_filesystem->exists( $pdf_path ) && $reuse_attachment && $max_reuse_age > 0 ) {
-				$filemtime = filemtime( $pdf_path );
+			if ( WPO_WCPDF()->file_system->exists( $pdf_path ) && $reuse_attachment && $max_reuse_age > 0 ) {
+				$filemtime = WPO_WCPDF()->file_system->mtime( $pdf_path );
 				if ( $filemtime && ( time() - $filemtime < $max_reuse_age ) ) {
 					return $pdf_path;
 				}
@@ -247,7 +246,7 @@ class Main {
 
 			// Write the file
 			if ( $write_file ) {
-				$file_written = $wp_filesystem->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
+				$file_written = WPO_WCPDF()->file_system->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
 				$semaphore->log( "PDF attachment written to {$pdf_path}", 'info' );
 			} else {
 				$semaphore->log( "PDF attachment not written to {$pdf_path} because the lock was not acquired", 'info' );
@@ -564,7 +563,7 @@ class Main {
 	 */
 	private function load_template_functions() {
 		$file = trailingslashit( WPO_WCPDF()->settings->get_template_path() ) . 'template-functions.php';
-		if ( file_exists( $file ) ) {
+		if ( WPO_WCPDF()->file_system->exists( $file ) ) {
 			$loaded = @include_once( $file );
 			if ( $loaded === false ) {
 				wcpdf_log_error( sprintf( 'Failed to load template functions: %s', $file ), 'critical' );
@@ -584,7 +583,7 @@ class Main {
 		}
 
 		// check if tmp folder exists => if not, initialize
-		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) ) {
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
 			$this->init_tmp();
 		}
 
@@ -611,18 +610,16 @@ class Main {
 				break;
 		}
 
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
 		// double check for existence, in case tmp_base was installed, but subfolder not created
-		if ( ! $wp_filesystem->is_dir( $tmp_path ) ) {
-			$dir = $wp_filesystem->mkdir( $tmp_path );
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) ) {
+			$dir = WPO_WCPDF()->file_system->mkdir( $tmp_path );
 
 			if ( ! $dir ) {
 				update_option( 'wpo_wcpdf_no_dir_error', $tmp_path );
 				wcpdf_log_error( "Unable to create folder {$tmp_path}", 'critical' );
 				return false;
 			}
-		} elseif( ! wp_is_writable( $tmp_path ) ) {
+		} elseif( ! WPO_WCPDF()->file_system->is_writable( $tmp_path ) ) {
 			update_option( 'wpo_wcpdf_no_dir_error', $tmp_path );
 			wcpdf_log_error( "Temp folder {$tmp_path} not writable", 'critical' );
 			return false;
@@ -800,12 +797,11 @@ class Main {
 			$this->generate_random_string();
 		}
 
-		$tmp_base      = $this->get_tmp_base(); // get tmp base
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+		$tmp_base = $this->get_tmp_base(); // get tmp base
 
 		// create plugin base temp folder
-		if ( ! $wp_filesystem->is_dir( $tmp_base ) ) {
-			$dir = $wp_filesystem->mkdir( $tmp_base );
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) ) {
+			$dir = WPO_WCPDF()->file_system->mkdir( $tmp_base );
 
 			// don't continue if we don't have an upload dir
 			if ( ! $dir ) {
@@ -813,7 +809,7 @@ class Main {
 				wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
 				return false;
 			}
-		} elseif( ! wp_is_writable( $tmp_base ) ) {
+		} elseif( ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
 			update_option( 'wpo_wcpdf_no_dir_error', $tmp_base );
 			wcpdf_log_error( "Temp folder {$tmp_base} not writable", 'critical' );
 			return false;
@@ -822,8 +818,8 @@ class Main {
 		// create subfolders & protect
 		foreach ( $this->subfolders as $subfolder ) {
 			$path = $tmp_base . $subfolder . '/';
-			if ( ! $wp_filesystem->is_dir( $path ) ) {
-				$dir = $wp_filesystem->mkdir( $path );
+			if ( ! WPO_WCPDF()->file_system->is_dir( $path ) ) {
+				$dir = WPO_WCPDF()->file_system->mkdir( $path );
 
 				// check if we have dir
 				if ( ! $dir ) {
@@ -831,20 +827,20 @@ class Main {
 					wcpdf_log_error( "Unable to create folder {$path}", 'critical' );
 					return false;
 				}
-			} elseif( ! wp_is_writable( $path ) ) {
+			} elseif( ! WPO_WCPDF()->file_system->is_writable( $path ) ) {
 				update_option( 'wpo_wcpdf_no_dir_error', $path );
 				wcpdf_log_error( "Temp folder {$path} not writable", 'critical' );
 				return false;
 			}
 
 			// copy font files
-			if ( $subfolder == 'fonts' ) {
+			if ( 'fonts' === $subfolder ) {
 				$this->copy_fonts( $path, false );
 			}
 
 			// create .htaccess file and empty index.php to protect in case an open webfolder is used!
-			$wp_filesystem->put_contents( $path . '.htaccess', 'deny from all', FS_CHMOD_FILE );
-			$wp_filesystem->put_contents( $path . 'index.php', '', FS_CHMOD_FILE );
+			WPO_WCPDF()->file_system->put_contents( $path . '.htaccess', 'deny from all', FS_CHMOD_FILE );
+			WPO_WCPDF()->file_system->put_contents( $path . 'index.php', '', FS_CHMOD_FILE );
 		}
 	}
 
@@ -901,14 +897,12 @@ class Main {
 			return;
 		}
 
-		if ( ! is_dir( $old_path ) ) {
+		if ( ! WPO_WCPDF()->file_system->is_dir( $old_path ) ) {
 			return;
 		}
 
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
-		if ( ! $wp_filesystem->is_dir( $new_path ) ) {
-			$dir = $wp_filesystem->mkdir( $new_path );
+		if ( ! WPO_WCPDF()->file_system->is_dir( $new_path ) ) {
+			$dir = WPO_WCPDF()->file_system->mkdir( $new_path );
 
 			// check if we have dir
 			if ( ! $dir ) {
@@ -916,7 +910,7 @@ class Main {
 				wcpdf_log_error( "Unable to create folder {$new_path}", 'critical' );
 				return false;
 			}
-		} elseif ( ! wp_is_writable( $new_path ) ) {
+		} elseif ( ! WPO_WCPDF()->file_system->is_writable( $new_path ) ) {
 			update_option( 'wpo_wcpdf_no_dir_error', $new_path );
 			wcpdf_log_error( "Temp folder {$new_path} not writable", 'critical' );
 			return false;
@@ -926,8 +920,8 @@ class Main {
 		try {
 			$result = copy_dir( $old_path, $new_path );
 			// delete old directory with contents
-			if( $result ) {
-				$wp_filesystem->delete( $old_path, true );
+			if ( $result ) {
+				WPO_WCPDF()->file_system->delete( $old_path, true );
 			}
 		} catch ( \Error $e ) {
 			wcpdf_log_error( "Unable to copy directory contents: ".$e->getMessage(), 'critical', $e );
@@ -942,14 +936,14 @@ class Main {
 	{
 		// tmp base
 		$tmp_base = $this->get_tmp_base();
-		if( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) ) {
+		if( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
 			return false;
 		}
 
 		// subfolders
 		foreach( $this->subfolders as $type ) {
 			$tmp_path = $this->get_tmp_path( $type );
-			if( ! @is_dir( $tmp_path ) || ! wp_is_writable( $tmp_base ) ) {
+			if( ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
 				return false;
 			}
 		}
@@ -1154,7 +1148,6 @@ class Main {
 	 * @return array  Output message
 	 */
 	public function temporary_files_cleanup( int $delete_timestamp = 0 ): array {
-		$wp_filesystem    = wpo_wcpdf_get_wp_filesystem();
 		$delete_before    = ! empty( $delete_timestamp ) ? intval( $delete_timestamp ) : time();
 		$paths_to_cleanup = apply_filters( 'wpo_wcpdf_cleanup_tmp_paths', array(
 			$this->get_tmp_path( 'attachments' ),
@@ -1173,16 +1166,17 @@ class Main {
 
 		// Gather all files from the paths
 		foreach ( $paths_to_cleanup as $path ) {
-			if ( $wp_filesystem->is_dir( $path ) ) {
-				$listed_files = $wp_filesystem->dirlist( $path, true, true );
+			if ( WPO_WCPDF()->file_system->is_dir( $path ) ) {
+				$listed_files = WPO_WCPDF()->file_system->dirlist( $path, true, true );
 
 				if ( $listed_files ) {
 					foreach ( $listed_files as $fileinfo ) {
-						$file_path = trailingslashit( $path ) . $fileinfo['name'];
+						$name      = is_array( $fileinfo ) ? $fileinfo['name'] : $fileinfo;
+						$file_path = trailingslashit( $path ) . $name;
 						$basename  = wp_basename( $file_path );
 
 						// Exclude specific files before adding to list
-						if ( ! in_array( $basename, $excluded_files ) && $wp_filesystem->exists( $file_path ) && ! $wp_filesystem->is_dir( $file_path ) ) {
+						if ( ! in_array( $basename, $excluded_files ) && WPO_WCPDF()->file_system->exists( $file_path ) && ! WPO_WCPDF()->file_system->is_dir( $file_path ) ) {
 							$files[] = $file_path;
 						}
 					}
@@ -1198,11 +1192,11 @@ class Main {
 
 		// Process and delete files
 		foreach ( $files as $file ) {
-			$file_timestamp = $wp_filesystem->mtime( $file );
+			$file_timestamp = WPO_WCPDF()->file_system->mtime( $file );
 
 			// Delete file if it's older than the specified timestamp
 			if ( $file_timestamp < $delete_before ) {
-				if ( $wp_filesystem->delete( $file ) ) {
+				if ( WPO_WCPDF()->file_system->delete( $file ) ) {
 					$success++;
 				} else {
 					$error++;
