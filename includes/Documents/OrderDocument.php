@@ -288,7 +288,7 @@ abstract class OrderDocument {
 	}
 
 	/**
-	 * Generate the document number.
+	 * Get the document number.
 	 *
 	 * @param bool $generate
 	 *
@@ -298,15 +298,25 @@ abstract class OrderDocument {
 		$document_number = null;
 
 		// If a third-party plugin claims to generate document numbers, trigger this instead
-		if ( apply_filters( "woocommerce_{$this->slug}_number_by_plugin", false ) || apply_filters( "wpo_wcpdf_external_{$this->slug}_number_enabled", false, $this ) ) {
+		if (
+			apply_filters( "woocommerce_{$this->slug}_number_by_plugin", false ) ||
+			apply_filters( "wpo_wcpdf_external_{$this->slug}_number_enabled", false, $this )
+		) {
 			$document_number = apply_filters( "woocommerce_generate_{$this->slug}_number", $document_number, $this->order );  // legacy (backwards compatibility)
 			$document_number = apply_filters( "woocommerce_{$this->slug}_number", $document_number, $this->order->get_id() ); // legacy (backwards compatibility)
 			$document_number = apply_filters( "wpo_wcpdf_external_{$this->slug}_number", $document_number, $this );
-		} elseif ( isset( $this->settings['display_number'] ) && 'order_number' === $this->settings['display_number'] && ! empty( $this->order ) ) {
+			
+		// If the document number is set to be the order number
+		} elseif (
+			isset( $this->settings['display_number'] ) &&
+			'order_number' === $this->settings['display_number'] &&
+			! empty( $this->order )
+		) {
 			$document_number = $this->order->get_order_number();
 		}
 
-		if ( ! empty( $document_number ) ) { // overridden by plugin or set to order number
+		// Document number overridden by plugin or set to order number
+		if ( ! empty( $document_number ) ) {
 			if ( ! is_numeric( $document_number ) && ! ( $document_number instanceof DocumentNumber ) ) {
 				// document number is not numeric, treat as formatted
 				// try to extract meaningful number data
@@ -314,6 +324,8 @@ abstract class OrderDocument {
 				$number           = (int) preg_replace( '/\D/', '', $document_number );
 				$document_number  = compact( 'number', 'formatted_number' );
 			}
+			
+		// Otherwise, get or generate the document number
 		} else {
 			$number_store = $this->get_sequential_number_store();
 
