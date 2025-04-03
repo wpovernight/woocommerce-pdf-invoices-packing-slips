@@ -138,7 +138,7 @@ class Main {
 		add_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
 
 		// reload translations because WC may have switched to site locale (by setting the plugin_locale filter to site locale in wc_switch_to_site_locale())
-		if ( apply_filters( 'wpo_wcpdf_allow_reload_attachment_translations', ! isset( WPO_WCPDF()->settings->debug_settings['reload_attachment_translations'] ) ) ) {
+		if ( apply_filters( 'wpo_wcpdf_allow_reload_attachment_translations', isset( WPO_WCPDF()->settings->debug_settings['reload_attachment_translations'] ) ) ) {
 			WPO_WCPDF()->translations();
 			do_action( 'wpo_wcpdf_reload_attachment_translations' );
 		}

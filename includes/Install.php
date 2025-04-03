@@ -586,6 +586,13 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
 		}
+		
+		// 4.3.0-rc.2: reload attachment translations
+		if ( version_compare( $installed_version, '4.3.0-rc.2', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			$debug_settings['reload_attachment_translations'] = '1';
+			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+		}
 	}
 
 	/**
