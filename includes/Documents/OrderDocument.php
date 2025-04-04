@@ -1341,10 +1341,10 @@ abstract class OrderDocument {
 		$allowed_tags = wp_kses_allowed_html( 'post' );
 
 		// Allow <style> with type and media attributes.
-		$allowed_tags['style'] = [
+		$allowed_tags['style'] = array(
 			'type'  => true,
 			'media' => true,
-		];
+		);
 
 		echo wp_kses( $this->get_footer(), $allowed_tags );
 	}
