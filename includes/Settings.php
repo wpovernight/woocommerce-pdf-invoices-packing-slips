@@ -656,7 +656,7 @@ class Settings {
 			$outdated = false;
 			// cache could be outdated, so we check whether the folders exist
 			foreach ( $template_list as $path => $template_id ) {
-				if ( @is_dir( $path ) ) {
+				if ( WPO_WCPDF()->file_system->is_dir( $path ) ) {
 					$checked_list[$path] = $template_id; // folder exists
 					continue;
 				}
@@ -668,7 +668,7 @@ class Settings {
 					// try wp-content
 					$relative_path = substr( $path, strrpos( $path, $wp_content_folder ) + strlen( $wp_content_folder ) );
 					$new_path = WP_CONTENT_DIR . $relative_path;
-					if ( @is_dir( $new_path ) ) {
+					if ( WPO_WCPDF()->file_system->is_dir( $new_path ) ) {
 						$checked_list[$new_path] = $template_id;
 					}
 				}

@@ -201,8 +201,6 @@ class Invoice extends OrderDocumentMethods {
 	 * PDF settings fields
 	 */
 	public function get_pdf_settings_fields( $option_name ) {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
 		$settings_fields = array(
 			array(
 				'type'			=> 'section',
@@ -232,7 +230,7 @@ class Invoice extends OrderDocumentMethods {
 					'id'			  => 'attach_to_email_ids',
 					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
-					'description'	  => ! $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+					'description'	  => ! WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
 				)
 			),
 			array(
@@ -609,8 +607,6 @@ class Invoice extends OrderDocumentMethods {
 	 * UBL settings fields
 	 */
 	public function get_ubl_settings_fields( $option_name ) {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -660,7 +656,7 @@ class Invoice extends OrderDocumentMethods {
 					'id'              => 'attach_to_email_ids',
 					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
-					'description'     => ! $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+					'description'     => ! WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
 				)
 			),
 			array(

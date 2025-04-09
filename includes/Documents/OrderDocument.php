@@ -1210,11 +1210,10 @@ abstract class OrderDocument {
 	 * Output template styles
 	 */
 	public function template_styles() {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
 		$css_file_path = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( 'style.css' ) );
 		$css           = '';
 
-		if ( $wp_filesystem->exists( $css_file_path ) ) {
+		if ( WPO_WCPDF()->file_system->exists( $css_file_path ) ) {
 			ob_start();
 			include $css_file_path;
 			$css = ob_get_clean();
@@ -1442,15 +1441,17 @@ abstract class OrderDocument {
 		// maybe we need to reinstall fonts first?
 		WPO_WCPDF()->main->maybe_reinstall_fonts();
 
-		$pdf = null;
+		$pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this );
 
-		if ( $pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this ) ) {
-			$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-			$pdf = $wp_filesystem->get_contents( $pdf_file );
+		if ( $pdf_file ) {
+			$pdf = WPO_WCPDF()->file_system->get_contents( $pdf_file );
+		} else {
+			$pdf = null;
 		}
 
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
-		if ( !empty( $pdf ) ) {
+		
+		if ( ! empty( $pdf ) ) {
 			return $pdf;
 		}
 
@@ -1576,13 +1577,11 @@ abstract class OrderDocument {
 
 		wcpdf_ubl_headers( $quoted, $size );
 
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
 		ob_clean();
 		flush();
 
-		if ( $wp_filesystem->exists( $full_filename ) ) {
-			echo $wp_filesystem->get_contents( $full_filename ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( WPO_WCPDF()->file_system->exists( $full_filename ) ) {
+			echo WPO_WCPDF()->file_system->get_contents( $full_filename ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			wp_delete_file( $full_filename );
 		}
 
@@ -1631,14 +1630,15 @@ abstract class OrderDocument {
 	}
 
 	public function locate_template_file( $file ) {
-		if (empty($file)) {
-			$file = $this->type.'.php';
+		if ( empty( $file ) ) {
+			$file = $this->type . '.php';
 		}
-		$path = $this->get_template_path();
-		$file_path = "{$path}/{$file}";
-
+		
+		$path               = $this->get_template_path();
+		$file_path          = "{$path}/{$file}";
 		$fallback_file_path = WPO_WCPDF()->plugin_path() . '/templates/Simple/' . $file;
-		if ( !file_exists( $file_path ) && file_exists( $fallback_file_path ) ) {
+		
+		if ( ! WPO_WCPDF()->file_system->exists( $file_path ) && WPO_WCPDF()->file_system->exists( $fallback_file_path ) ) {
 			$file_path = $fallback_file_path;
 		}
 
@@ -1653,9 +1653,10 @@ abstract class OrderDocument {
 		if ( ! empty( $args ) && is_array( $args ) ) {
 			extract( $args );
 		}
+		
 		ob_start();
-		if (file_exists($file)) {
-			include($file);
+		if ( WPO_WCPDF()->file_system->exists( $file ) ) {
+			include( $file );
 		}
 		return ob_get_clean();
 	}

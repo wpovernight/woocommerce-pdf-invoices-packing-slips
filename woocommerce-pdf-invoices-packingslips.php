@@ -4,14 +4,14 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              4.3.0-rc.2
+ * Version:              4.4.0-beta.1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 3.3
- * WC tested up to:      9.7
+ * WC tested up to:      9.8
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.3.0-rc.2';
+	public $version              = '4.4.0-beta.1';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -30,6 +30,7 @@ class WPO_WCPDF {
 	public $legacy_addons;
 	public $third_party_plugins;
 	public $order_util;
+	public $file_system;
 	public $settings;
 	public $documents;
 	public $main;
@@ -150,11 +151,12 @@ class WPO_WCPDF {
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
-
-		// Third party compatibility
+		
+		// Compatibility classes
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
-		// WC OrderUtil compatibility
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
+		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
+		
 		// Plugin classes
 		$this->settings            = \WPO\IPS\Settings::instance();
 		$this->documents           = \WPO\IPS\Documents::instance();
