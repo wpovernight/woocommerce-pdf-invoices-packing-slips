@@ -86,7 +86,7 @@ class FileSystem {
 	 * Initialize WP_Filesystem
 	 * @return void
 	 */
-	protected function initialize_wp_filesystem(): void {
+	public function initialize_wp_filesystem(): void {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		global $wp_filesystem;
