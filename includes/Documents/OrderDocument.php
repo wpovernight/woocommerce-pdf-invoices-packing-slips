@@ -1,8 +1,6 @@
 <?php
 namespace WPO\IPS\Documents;
 
-use WPO\IPS\UBL\Builders\SabreBuilder;
-use WPO\IPS\UBL\Documents\UblDocument;
 use WPO\IPS\Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
