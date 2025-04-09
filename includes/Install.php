@@ -96,7 +96,7 @@ class Install {
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
 		// check if tmp folder exists => if not, initialize
-		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) ) {
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
 			WPO_WCPDF()->main->init_tmp();
 		}
 
@@ -211,29 +211,32 @@ class Install {
 	 * @param string $installed_version the currently installed ('old') version
 	 */
 	protected function upgrade( $installed_version ) {
-		// only upgrade when php version or higher
+		// Only upgrade when php version or higher
 		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
 		}
 
-		// sync fonts on every upgrade!
+		// Sync fonts on every upgrade!
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
-		// get fonts folder path
+		// Get fonts folder path
 		$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
 
-		// check if tmp folder exists => if not, initialize
-		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) || ! @is_dir( $font_path ) || ! wp_is_writable( $font_path ) ) {
+		// Check if tmp folder exists => if not, initialize
+		if (
+			! WPO_WCPDF()->file_system->is_dir( $tmp_base ) ||
+			! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ||
+			! WPO_WCPDF()->file_system->is_dir( $font_path ) ||
+			! WPO_WCPDF()->file_system->is_writable( $font_path )
+		) {
 			WPO_WCPDF()->main->init_tmp();
-		} else {
-			// don't try merging fonts with local when updating pre 2.0
-			$pre_2 = ( $installed_version == 'versionless' || version_compare( $installed_version, '2.0-dev', '<' ) );
-			$merge_with_local = !$pre_2;
-			WPO_WCPDF()->main->copy_fonts( $font_path, $merge_with_local );
 		}
 
-		// to ensure fonts will be copied to the upload directory
+		// To ensure fonts will be copied to the upload directory
 		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
+		
+		// Maybe reinstall fonts
+		WPO_WCPDF()->main->maybe_reinstall_fonts();
 
 		// 1.5.28 update: copy next invoice number to separate setting
 		if ( $installed_version == 'versionless' || version_compare( $installed_version, '1.5.28', '<' ) ) {
@@ -602,23 +605,32 @@ class Install {
 	 * @param string $installed_version the currently installed ('old') version (actually higher since this is a downgrade)
 	 */
 	protected function downgrade( $installed_version ) {
-		// make sure fonts match with version: copy from plugin folder
+		// Make sure fonts match with version: copy from plugin folder
 		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
 
-		// make sure we have the fonts directory
+		// Make sure we have the fonts directory
 		$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
 
-		// don't continue if we don't have an upload dir
-		if ($tmp_base === false) {
-			return false;
+		// Don't continue if we don't have an upload dir
+		if ( false === $tmp_base ) {
+			return $tmp_base;
 		}
 
-		// check if tmp folder exists => if not, initialize
-		if ( ! @is_dir( $tmp_base ) || ! wp_is_writable( $tmp_base ) || ! @is_dir( $font_path ) || ! wp_is_writable( $font_path ) ) {
+		// Check if tmp folder exists => if not, initialize
+		if (
+			! WPO_WCPDF()->file_system->is_dir( $tmp_base ) ||
+			! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ||
+			! WPO_WCPDF()->file_system->is_dir( $font_path ) ||
+			! WPO_WCPDF()->file_system->is_writable( $font_path )
+		) {
 			WPO_WCPDF()->main->init_tmp();
-		} else {
-			WPO_WCPDF()->main->copy_fonts( $font_path );
 		}
+		
+		// To ensure fonts will be copied to the upload directory
+		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
+		
+		// Maybe reinstall fonts
+		WPO_WCPDF()->main->maybe_reinstall_fonts();
 	}
 
 }
