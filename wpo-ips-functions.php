@@ -864,7 +864,7 @@ function wpo_wcpdf_base64_encode_file( string $local_path ) {
 	if ( empty( $local_path ) ) {
 		return false;
 	}
-	
+
 	$file_data = WPO_WCPDF()->file_system->get_contents( $local_path );
 
 	return $file_data ? base64_encode( $file_data ) : false;
@@ -1010,13 +1010,13 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
  */
 function wpo_wcpdf_get_wp_filesystem() {
 	wcpdf_deprecated_function( 'wpo_wcpdf_get_wp_filesystem', '4.2.0', '\WPO\IPS\Compatibility\FileSystem::instance()->wp_filesystem' );
-	
+
 	if ( class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) {
 		$filesystem = \WPO\IPS\Compatibility\FileSystem::instance();
 		$filesystem->initialize_wp_filesystem();
 		return $filesystem->wp_filesystem ?? false;
 	}
-	
+
 	return false;
 }
 
@@ -1080,7 +1080,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	if ( $translation === $string && function_exists( 'translate' ) ) {
 		$translation = translate( $string, $textdomain );
 	}
-	
+
 	// If still not translated, try custom filters
 	if ( $translation === $string ) {
 		$translation = wpo_wcpdf_gettext( $string, $textdomain );
@@ -1292,7 +1292,7 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 	$option_key   = 'wpo_latest_releases_' . md5( $owner . '/' . $repo );
 	$empty_result = array( 'stable' => array(), 'unstable' => array() );
 	$cached       = get_option( $option_key );
-	
+
 	if ( $cached && isset( $cached['timestamp'], $cached['data'] ) ) {
 		if ( ( time() - $cached['timestamp'] ) < $cache_duration ) {
 			return $cached['data'];
@@ -1313,7 +1313,7 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 	}
 
 	$releases = json_decode( $response, true );
-	
+
 	if ( ! is_array( $releases ) ) {
 		return $empty_result;
 	}
@@ -1336,24 +1336,24 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 			'zipball'  => $release['zipball_url'],
 			'download' => "https://github.com/{$owner}/{$repo}/releases/download/{$tag}/{$repo}.{$name}.zip"
 		), $release, $owner, $repo );
-		
+
 		if ( ! $release['prerelease'] && empty( $stable ) ) {
 			$stable = $release_data;
-			
+
 			// Once we find the first stable, we stop.
 			break;
 		}
-		
+
 		if ( $release['prerelease'] && empty( $unstable ) ) {
 			$unstable = $release_data;
-		}		
+		}
 	}
 
 	$data = array(
 		'stable'   => $stable,
 		'unstable' => $unstable,
 	);
-	
+
 	// Check if a new prerelease is available
 	$last_seen_option_key = 'wpo_last_seen_prerelease_' . md5( $owner . '/' . $repo );
 	$last_seen_tag        = get_option( $last_seen_option_key );
@@ -1399,5 +1399,63 @@ function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
 
 	// No update available or plugin not found
 	return false;
+}
+
+/**
+ * Write UBL file
+ * 
+ * @param object $document
+ * @param bool   $attachment
+ * @param bool   $contents_only
+ * 
+ * @return string|bool
+ */
+function wpo_ips_write_ubl_file( object $document, bool $attachment = false, bool $contents_only = false ) {
+	$ubl_maker = wcpdf_get_ubl_maker();
+
+	if ( ! $ubl_maker ) {
+		return wcpdf_error_handling( 'UBL Maker not available. Cannot write UBL file.' );
+	}
+
+	if ( $attachment ) {
+		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+		$ubl_maker->set_file_path( $tmp_path );
+	}
+
+	$ubl_document = new \WPO\IPS\UBL\Documents\UblDocument();
+	
+	if ( ! $ubl_document ) {
+		return wcpdf_error_handling( 'UBL Document not available. Cannot write UBL file.' );
+	}
+	
+	$ubl_document->set_order_document( $document );
+
+	$builder = new \WPO\IPS\UBL\Builders\SabreBuilder();
+	
+	if ( ! $builder ) {
+		return wcpdf_error_handling( 'UBL Builder not available. Cannot write UBL file.' );
+	}
+	
+	$contents = apply_filters( 'wpo_ips_ubl_contents',
+		$builder->build( $ubl_document ),
+		$ubl_document,
+		$document
+	);
+
+	if ( $contents_only ) {
+		return $contents;
+	}
+
+	$filename = apply_filters( 'wpo_ips_ubl_filename',
+		$document->get_filename(
+			'download',
+			array( 'output' => 'ubl' )
+		),
+		$document
+	);
+
+	$full_filename = $ubl_maker->write( $filename, $contents );
+
+	return $full_filename;
 }
 
