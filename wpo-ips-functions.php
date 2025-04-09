@@ -1404,13 +1404,13 @@ function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
 /**
  * Write UBL file
  * 
- * @param object $document
- * @param bool   $attachment
- * @param bool   $contents_only
+ * @param \WPO\IPS\Documents\OrderDocument $document
+ * @param bool $attachment
+ * @param bool $contents_only
  * 
  * @return string|bool
  */
-function wpo_ips_write_ubl_file( object $document, bool $attachment = false, bool $contents_only = false ) {
+function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
 	$ubl_maker = wcpdf_get_ubl_maker();
 
 	if ( ! $ubl_maker ) {
@@ -1419,28 +1419,27 @@ function wpo_ips_write_ubl_file( object $document, bool $attachment = false, boo
 
 	if ( $attachment ) {
 		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+		
+		if ( ! $tmp_path ) {
+			return wcpdf_error_handling( 'Temporary path not available. Cannot write UBL file.' );
+		}
+		
 		$ubl_maker->set_file_path( $tmp_path );
 	}
 
 	$ubl_document = new \WPO\IPS\UBL\Documents\UblDocument();
-	
-	if ( ! $ubl_document ) {
-		return wcpdf_error_handling( 'UBL Document not available. Cannot write UBL file.' );
-	}
-	
 	$ubl_document->set_order_document( $document );
 
 	$builder = new \WPO\IPS\UBL\Builders\SabreBuilder();
-	
-	if ( ! $builder ) {
-		return wcpdf_error_handling( 'UBL Builder not available. Cannot write UBL file.' );
-	}
-	
 	$contents = apply_filters( 'wpo_ips_ubl_contents',
 		$builder->build( $ubl_document ),
 		$ubl_document,
 		$document
 	);
+	
+	if ( empty( $contents ) ) {
+		return wcpdf_error_handling( 'Failed to build UBL contents.' );
+	}
 
 	if ( $contents_only ) {
 		return $contents;
