@@ -12,11 +12,11 @@ if ( ! class_exists( '\\WPO\\IPS\\Makers\\PDFMaker' ) ) :
 
 class PDFMaker {
 
-	public $html;
-	public $settings;
-	public $document;
+	public string $html;
+	public array $settings;
+	public ?object $document;
 
-	public function __construct( $html, $settings = array(), $document = null ) {
+	public function __construct( string $html, array $settings = array(), ?object $document = null ) {
 		$this->html     = $html;
 		$this->document = $document;
 
@@ -27,10 +27,15 @@ class PDFMaker {
 		);
 		$this->settings = $settings + $default_settings;
 	}
-
-	public function output() {
+	
+	/**
+	 * Output the PDF.
+	 *
+	 * @return string|null
+	 */
+	public function output(): ?string {
 		if ( empty( $this->html ) ) {
-			return;
+			return null;
 		}
 
 		// set options
@@ -43,9 +48,13 @@ class PDFMaker {
 			'defaultFont'             => 'dejavu sans',
 			'isRemoteEnabled'         => true,
 			'isHtml5ParserEnabled'    => true,
-			'isFontSubsettingEnabled' => $this->settings['font_subsetting'],
+			'isFontSubsettingEnabled' => (bool) $this->settings['font_subsetting'],
 		) ) );
-
+		
+		if ( isset( WPO_WCPDF()->settings->debug_settings['enable_debug'] ) ) {
+			$this->set_additional_debug_options( $options );
+		}
+		
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );
 		$dompdf->loadHtml( $this->html );
@@ -53,22 +62,49 @@ class PDFMaker {
 		$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $this->html, $options, $this->document );
 		$dompdf->render();
 		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html, $options, $this->document );
-
+		
 		return $dompdf->output();
 	}
+	
+	/**
+	 * Get the chroot paths for Dompdf.
+	 *
+	 * @return array
+	 */
+	private function get_chroot_paths(): array {
+		$chroot         = array( WP_CONTENT_DIR ); // default
+		$wp_upload_base = WPO_WCPDF()->main->get_wp_upload_base();
+		$tmp_base       = WPO_WCPDF()->main->get_tmp_base();
 
-	private function get_chroot_paths() {
-		$chroot = array( WP_CONTENT_DIR ); // default
-
-		if( $wp_upload_base = WPO_WCPDF()->main->get_wp_upload_base() ) {
+		if ( ! empty( $wp_upload_base ) ) {
 			$chroot[] = $wp_upload_base;
 		}
-		if( $tmp_base = WPO_WCPDF()->main->get_tmp_base() ) {
+		
+		if ( ! empty( $tmp_base ) ) {
 			$chroot[] = $tmp_base;
 		}
 
 		return apply_filters( 'wpo_wcpdf_dompdf_chroot', $chroot );
 	}
+	
+	/**
+	 * Set additional debug options for Dompdf.
+	 *
+	 * @param Options $options
+	 * @return void
+	 */
+	private function set_additional_debug_options( Options $options ): void {
+		$dompdf_debug_options = apply_filters( 'wpo_wcpdf_dompdf_additional_debug_options', array(
+			'debugPng',
+			'debugCss',
+			'debugLayout',
+		) );
+		
+		foreach ( $dompdf_debug_options as $option ) {
+			$options->set( $option, true );
+		}
+	}
+
 }
 
 endif; // class_exists
