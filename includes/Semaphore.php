@@ -368,7 +368,7 @@ class Semaphore {
 		if ( function_exists( '\\as_next_scheduled_action' ) ) {
 			return \as_next_scheduled_action( self::get_cleanup_hook_name() );
 		} else {
-			wcpdf_log_error( 'Action Scheduler is not available. Cannot check if cleanup is scheduled.' );
+			wcpdf_log_error( 'Action Scheduler is not available. Cannot check if cleanup is scheduled.', 'critical' );
 			return false;
 		}
 	}
@@ -397,7 +397,7 @@ class Semaphore {
 					$action = reset( $actions );
 				}
 			} else {
-				wcpdf_log_error( 'Action Scheduler is not available. Cannot get cleanup action.' );
+				wcpdf_log_error( 'Action Scheduler is not available. Cannot get cleanup action.', 'critical' );
 			}
 		}
 
@@ -416,7 +416,7 @@ class Semaphore {
 			if ( function_exists( '\\as_schedule_recurring_action' ) ) {
 				\as_schedule_recurring_action( time(), $interval, self::get_cleanup_hook_name() );
 			} else {
-				wcpdf_log_error( 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.' );
+				wcpdf_log_error( 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.', 'critical' );
 			}
 		}
 	}

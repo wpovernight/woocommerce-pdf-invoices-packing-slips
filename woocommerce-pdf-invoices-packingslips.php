@@ -471,7 +471,8 @@ class WPO_WCPDF {
 			return;
 		}
 
-		if ( ! function_exists( 'as_get_scheduled_actions' ) ) {
+		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
+			wcpdf_log_error( 'Action Scheduler function not available. Cannot verify if the yearly numbering reset action is scheduled.', 'critical' );
 			return;
 		}
 
