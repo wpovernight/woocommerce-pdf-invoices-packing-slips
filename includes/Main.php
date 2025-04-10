@@ -88,7 +88,7 @@ class Main {
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 
 		// Add document link to emails
-		add_action( 'init', array( $this, 'handle_document_link_in_emails' ) );
+		add_action( 'init', array( $this, 'handle_document_link_in_emails' ), 20 );
 	}
 
 	/**
