@@ -114,6 +114,11 @@ class SettingsDebug {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
+		
+		if ( ! function_exists( '\\as_has_scheduled_action' ) ) {
+			wcpdf_log_error( 'Action Scheduler is not available. Cannot fetch numbers table data.', 'critical' );
+			return;
+		}
 
 		global $wpdb;
 
@@ -134,7 +139,7 @@ class SettingsDebug {
 
 		$document_type = $this->get_document_type_from_store_table_name( sanitize_text_field( wp_unslash( $_GET['table_name'] ) ) );
 		$list_table    = new NumberStoreListTable();
-		$as_actions    = as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' );
+		$as_actions    = \as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' );
 		$last_fetch    = get_option( "wpo_wcpdf_number_data::{$selected_table_name}::last_time" );
 
 		$list_table->prepare_items();
@@ -1348,11 +1353,16 @@ class SettingsDebug {
 	 * @return array|false
 	 */
 	public function get_yearly_reset_schedule() {
-		if ( ! WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() || ! function_exists( 'as_get_scheduled_actions' ) ) {
+		if ( ! WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) {
+			return false;
+		}
+		
+		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
+			wcpdf_log_error( 'Action Scheduler function not available. Cannot retrieve the yearly numbering reset schedule.', 'critical' );
 			return false;
 		}
 
-		$scheduled_actions = as_get_scheduled_actions( array(
+		$scheduled_actions = \as_get_scheduled_actions( array(
 			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
 			'status' => \ActionScheduler_Store::STATUS_PENDING,
 		) );
@@ -1364,7 +1374,7 @@ class SettingsDebug {
 				$action       = reset( $scheduled_actions );
 				$action_date  = is_callable( array( $action->get_schedule(), 'get_date' ) ) ?
 					$action->get_schedule()->get_date() :
-					$action->get_schedule()->get_next( as_get_datetime_object() );
+					$action->get_schedule()->get_next( \as_get_datetime_object() );
 
 				$yearly_reset = array(
 					'value'  => sprintf(
@@ -1461,7 +1471,12 @@ class SettingsDebug {
 		$chunk_results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( empty( $chunk_results ) ) {
-			as_unschedule_all_actions( $hook );
+			if ( function_exists( '\\as_unschedule_all_actions' ) ) {
+				\as_unschedule_all_actions( $hook );
+			} else {
+				wcpdf_log_error( 'Action Scheduler function not available. Cannot unschedule number table data fetch.', 'critical' );
+			}
+			
 			update_option( $option_name . '::last_time', time() );
 			return; // exit if no more results
 		}
@@ -1482,7 +1497,11 @@ class SettingsDebug {
 			'offset'     => $offset,
 		);
 
-		as_enqueue_async_action( $hook, $args );
+		if ( function_exists( '\\as_enqueue_async_action' ) ) {
+			\as_enqueue_async_action( $hook, $args );
+		} else {
+			wcpdf_log_error( 'Action Scheduler function not available. Cannot queue next number table data fetch.', 'critical' );
+		}
 	}
 
 	/**
@@ -1709,17 +1728,26 @@ class SettingsDebug {
 		$debug_settings = WPO_WCPDF()->settings->debug_settings;
 		$enabled        = isset( $debug_settings['check_unstable_versions'] );
 		
+		if (
+			! function_exists( '\\as_next_scheduled_action' ) ||
+			! function_exists( '\\as_unschedule_all_actions' ) ||
+			! function_exists( '\\as_schedule_recurring_action' )
+		) {
+			wcpdf_log_error( 'Action Scheduler functions not available. Cannot schedule or unschedule the daily unstable version check.', 'critical' );
+			return;
+		}
+		
 		// Unschedule all pending actions
 		if ( ! $enabled ) {
-			if ( as_next_scheduled_action( $hook ) ) {
-				as_unschedule_all_actions( $hook );
+			if ( \as_next_scheduled_action( $hook ) ) {
+				\as_unschedule_all_actions( $hook );
 			}
 			return;
 		}		
 
 		// Schedule the action if not already scheduled
-		if ( ! as_next_scheduled_action( $hook ) ) {
-			as_schedule_recurring_action( time(), DAY_IN_SECONDS, $hook );
+		if ( ! \as_next_scheduled_action( $hook ) ) {
+			\as_schedule_recurring_action( time(), DAY_IN_SECONDS, $hook );
 		}
 	}
 	
