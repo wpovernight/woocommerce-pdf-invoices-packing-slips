@@ -151,12 +151,12 @@ class WPO_WCPDF {
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
-		
+
 		// Compatibility classes
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
-		
+
 		// Plugin classes
 		$this->settings            = \WPO\IPS\Settings::instance();
 		$this->documents           = \WPO\IPS\Documents::instance();
@@ -471,7 +471,8 @@ class WPO_WCPDF {
 			return;
 		}
 
-		if ( ! function_exists( 'as_get_scheduled_actions' ) ) {
+		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
+			wcpdf_log_error( 'Action Scheduler function not available. Cannot verify if the yearly numbering reset action is scheduled.', 'critical' );
 			return;
 		}
 
@@ -593,7 +594,7 @@ class WPO_WCPDF {
 			}
 		}
 	}
-	
+
 	/**
 	 * Show a one-time notice about the new "Check for unstable versions" option.
 	 *
@@ -651,7 +652,7 @@ class WPO_WCPDF {
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Display a notice when a new unstable version is available.
 	 *
@@ -713,7 +714,7 @@ class WPO_WCPDF {
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Store the new unstable version if version checking is enabled.
 	 *

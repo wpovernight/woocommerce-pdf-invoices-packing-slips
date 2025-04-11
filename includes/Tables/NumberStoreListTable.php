@@ -201,7 +201,8 @@ class NumberStoreListTable extends \WP_List_Table {
 			empty( $document_type ) ||
 			( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) ||
 			empty( $table_name ) ||
-			as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' )
+			! function_exists( '\\as_has_scheduled_action' ) ||
+			\as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' )
 		) {
 			return array(); // using `invoice_number`
 		}

@@ -814,7 +814,8 @@ class Settings {
 		}
 
 		// checks AS functions existence
-		if ( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_get_scheduled_actions' ) ) {
+		if ( ! function_exists( '\\as_schedule_single_action' ) || ! function_exists( '\\as_get_scheduled_actions' ) ) {
+			wcpdf_log_error( 'Action Scheduler functions not available. Cannot schedule yearly document number reset.', 'critical' );
 			return;
 		}
 
@@ -824,7 +825,7 @@ class Settings {
 		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
 
 		// checks if there are pending actions
-		$scheduled_actions = count( as_get_scheduled_actions( array(
+		$scheduled_actions = count( \as_get_scheduled_actions( array(
 			'hook'   => $hook,
 			'status' => \ActionScheduler_Store::STATUS_PENDING,
 		) ) );
@@ -837,7 +838,7 @@ class Settings {
 				$semaphore->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
 
 				try {
-					$action_id = as_schedule_single_action( $datetime->getTimestamp(), $hook );
+					$action_id = \as_schedule_single_action( $datetime->getTimestamp(), $hook );
 					if ( ! empty( $action_id ) ) {
 						wcpdf_log_error(
 							"Yearly document numbers reset scheduled with the action id: {$action_id}",
@@ -869,8 +870,10 @@ class Settings {
 				'error'
 			);
 
-			if ( function_exists( 'as_unschedule_all_actions' ) ) {
-				as_unschedule_all_actions( $hook );
+			if ( function_exists( '\\as_unschedule_all_actions' ) ) {
+				\as_unschedule_all_actions( $hook );
+			} else {
+				wcpdf_log_error( 'Action Scheduler functions not available. Cannot unschedule yearly document number reset.', 'critical' );
 			}
 
 			// reschedule
@@ -940,16 +943,26 @@ class Settings {
 		}
 
 		// unschedule existing actions
-		if ( ! $schedule && function_exists( 'as_unschedule_all_actions' ) ) {
-			as_unschedule_all_actions( 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+		if ( ! $schedule ) {
+			if ( function_exists( '\\as_unschedule_all_actions' ) ) {
+				\as_unschedule_all_actions( 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+			} else {
+				wcpdf_log_error( 'Action Scheduler functions not available. Cannot unschedule yearly document number reset.', 'critical' );
+			}
 		}
 
 		return $schedule;
 	}
 
 	public function yearly_reset_action_is_scheduled() {
-		$is_scheduled      = false;
-		$scheduled_actions = as_get_scheduled_actions( array(
+		$is_scheduled = false;
+		
+		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
+			wcpdf_log_error( 'Action Scheduler function not available. Cannot check if the yearly numbering reset is scheduled.', 'critical' );
+			return $is_scheduled;
+		}
+		
+		$scheduled_actions = \as_get_scheduled_actions( array(
 			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
 			'status' => \ActionScheduler_Store::STATUS_PENDING,
 		) );
