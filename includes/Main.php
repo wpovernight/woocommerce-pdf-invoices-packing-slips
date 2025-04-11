@@ -1,8 +1,6 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Builders\SabreBuilder;
-use WPO\IPS\UBL\Documents\UblDocument;
 use WPO\IPS\UBL\Exceptions\FileWriteException;
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
 
@@ -279,18 +277,7 @@ class Main {
 	}
 
 	public function get_document_ubl_attachment( $document, $tmp_path ) {
-		$ubl_maker = wcpdf_get_ubl_maker();
-		$ubl_maker->set_file_path( $tmp_path );
-
-		$ubl_document = new UblDocument();
-		$ubl_document->set_order_document( $document );
-
-		$builder       = new SabreBuilder();
-		$contents      = $builder->build( $ubl_document );
-		$filename      = $document->get_filename( 'download', [ 'output' => 'ubl' ] );
-		$full_filename = $ubl_maker->write( $filename, $contents );
-
-		return $full_filename;
+		return wpo_ips_write_ubl_file( $document, true );
 	}
 
 	public function get_documents_for_email( $email_id, $order ) {

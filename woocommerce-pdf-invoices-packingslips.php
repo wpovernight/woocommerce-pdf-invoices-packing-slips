@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              4.4.0-beta.4
+ * Version:              4.4.0-pr1123.1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.4.0-beta.4';
+	public $version              = '4.4.0-pr1123.1';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -151,12 +151,12 @@ class WPO_WCPDF {
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
-		
+
 		// Compatibility classes
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
-		
+
 		// Plugin classes
 		$this->settings            = \WPO\IPS\Settings::instance();
 		$this->documents           = \WPO\IPS\Documents::instance();
@@ -594,7 +594,7 @@ class WPO_WCPDF {
 			}
 		}
 	}
-	
+
 	/**
 	 * Show a one-time notice about the new "Check for unstable versions" option.
 	 *
@@ -652,7 +652,7 @@ class WPO_WCPDF {
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Display a notice when a new unstable version is available.
 	 *
@@ -714,7 +714,7 @@ class WPO_WCPDF {
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Store the new unstable version if version checking is enabled.
 	 *

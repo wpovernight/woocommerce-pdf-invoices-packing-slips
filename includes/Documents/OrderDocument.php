@@ -1,8 +1,6 @@
 <?php
 namespace WPO\IPS\Documents;
 
-use WPO\IPS\UBL\Builders\SabreBuilder;
-use WPO\IPS\UBL\Documents\UblDocument;
 use WPO\IPS\Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -1551,38 +1549,30 @@ abstract class OrderDocument {
 	}
 
 	public function output_ubl( $contents_only = false ) {
-		$ubl_maker    = wcpdf_get_ubl_maker();
-		$ubl_document = new UblDocument();
-
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
-		if ( $document ) {
-			$ubl_document->set_order_document( $document );
-		} else {
+		if ( ! $document ) {
 			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
 			exit();
 		}
-
-		$builder  = new SabreBuilder();
-		$contents = $builder->build( $ubl_document );
+		
+		$filename_or_contents = wpo_ips_write_ubl_file( $document, false, $contents_only );
 
 		if ( $contents_only ) {
-			return $contents;
+			return $filename_or_contents;
 		}
-
-		$filename      = $document->get_filename( 'download', array( 'output' => 'ubl' ) );
-		$full_filename = $ubl_maker->write( $filename, $contents );
-		$quoted        = sprintf( '"%s"', addcslashes( basename( $full_filename ), '"\\' ) );
-		$size          = filesize( $full_filename );
+		
+		$quoted = sprintf( '"%s"', addcslashes( basename( $filename_or_contents ), '"\\' ) );
+		$size   = filesize( $filename_or_contents );
 
 		wcpdf_ubl_headers( $quoted, $size );
-
+		
 		ob_clean();
 		flush();
-
-		if ( WPO_WCPDF()->file_system->exists( $full_filename ) ) {
-			echo WPO_WCPDF()->file_system->get_contents( $full_filename ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			wp_delete_file( $full_filename );
+		
+		if ( WPO_WCPDF()->file_system->exists( $filename_or_contents ) ) {
+			echo WPO_WCPDF()->file_system->get_contents( $filename_or_contents ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			wp_delete_file( $filename_or_contents );
 		}
 
 		exit();
