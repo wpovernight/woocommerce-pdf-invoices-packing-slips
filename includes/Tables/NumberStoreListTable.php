@@ -64,8 +64,9 @@ class NumberStoreListTable extends \WP_List_Table {
 					$value = $item->id;
 					break;
 				case 'type':
-					$value          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
-					$document_types = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
+					$value                          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
+					$document_types                 = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
+					$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
 
 					// document using invoice number, eg. proforma
 					if ( count( $document_types ) > 1 ) {
@@ -82,10 +83,26 @@ class NumberStoreListTable extends \WP_List_Table {
 						$document_slug = str_replace( '-', '_', $document_type );
 						$number_data   = $order->get_meta( "_wcpdf_{$document_slug}_number_data", true );
 						$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
-						$order_id      = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
-
+						$order_id      = $order->get_id();
+						$item_id       = $item->id;
+						
+						
+						// not invoice document but using invoice number system
+						if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
+							$document_type = 'invoice';
+							
+							// using invoice number
+							if ( empty( $number_data ) ) {
+								$number_data   = $order->get_meta( "_wcpdf_invoice_number_data", true );
+								$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
+							// using order number
+							} else {
+								$item_id = $item->order_id;
+							}
+						}
+						
 						// all documents using parent order
-						if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item->id ) ) {
+						if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item_id ) ) {
 							$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
 						// credit notes may have meta saved in the refund order
 						} elseif ( 'credit-note' === $document_type && absint( $order_id ) !== absint( $item->order_id ) ) {
@@ -186,8 +203,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	 * Build all the number data
 	 *
 	 * @since 2.0
-	  * @global object $wpdb Used to query the database using the WordPress
-	 *   Database API
 	 * @return array $numbers All the data for number list table
 	 */
 	public function get_numbers() {
