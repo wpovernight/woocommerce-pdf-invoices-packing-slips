@@ -899,18 +899,19 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$thumbnail_path        = ! empty( $contextless_thumbnail_url ) ? str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url ) : $contextless_site_url;
 
 		// fallback if thumbnail file doesn't exist
-		if (apply_filters('wpo_wcpdf_use_path', true) && !file_exists($thumbnail_path)) {
-			if ($thumbnail_id = $this->get_thumbnail_id( $product ) ) {
+		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! WPO_WCPDF()->file_system->exists( $thumbnail_path ) ) {
+			$thumbnail_id = $this->get_thumbnail_id( $product );
+			if ( $thumbnail_id ) {
 				$thumbnail_path = get_attached_file( $thumbnail_id );
 			}
 		}
 
 		// Thumbnail (full img tag)
-		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && file_exists( $thumbnail_path ) ) {
+		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && WPO_WCPDF()->file_system->exists( $thumbnail_path ) ) {
 			// load img with server path by default
 			$thumbnail = sprintf( '<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
 
-		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! file_exists( $thumbnail_path ) ) {
+		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! WPO_WCPDF()->file_system->exists( $thumbnail_path ) ) {
 			// should use paths but file not found, replace // with http(s):// for dompdf compatibility
 			if ( substr( $thumbnail_url, 0, 2 ) === "//" ) {
 				$prefix                = is_ssl() ? 'https://' : 'http://';
@@ -1307,36 +1308,34 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 	}
 
-	public function document_display_date() {
+	public function document_display_date(): string {
 		$document_display_date = $this->get_display_date( $this->get_type() );
 
-		//If display date data is not available in order meta (for older orders), get the display date information from document settings order meta.
+		// If display date data is not available in order meta (for older orders), get the display date information from document settings order meta.
 		if ( empty( $document_display_date ) ) {
-			$document_settings = $this->settings;
-			if( isset( $document_settings['display_date'] ) ) {
-				$document_display_date = $document_settings['display_date'];
-			}
-			else {
-				$document_display_date = 'invoice_date';
-			}
+			$document_settings     = $this->settings;
+			$document_display_date = $document_settings['display_date'] ?? 'document_date';
 		}
 
-		$formatted_value = $this->get_display_date_label( $document_display_date );
-		return $formatted_value;
+		// Convert the old `invoice_date` slug to the new `document_date` slug.
+		if ( 'invoice_date' === $document_display_date ) {
+			$document_display_date = 'document_date';
+		}
+
+		return $this->get_display_date_label( $document_display_date );
 	}
 
-	public function get_display_date_label( $date_string ) {
-
+	public function get_display_date_label( string $date_string ): string {
 		$date_labels = array(
-			'invoice_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
-			'order_date'	=> __( 'Order Date' , 'woocommerce-pdf-invoices-packing-slips' ),
+			'document_date' => sprintf(
+				/* translators: Document title */
+				__( '%s Date', 'woocommerce-pdf-invoices-packing-slips' ),
+				$this->title
+			),
+			'order_date'    => __( 'Order Date', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		if( isset( $date_labels[$date_string] ) ) {
-			return $date_labels[ $date_string ];
-		} else {
-			return '';
-		}
 
+		return $date_labels[ $date_string ] ?? '';
 	}
 
 	/**

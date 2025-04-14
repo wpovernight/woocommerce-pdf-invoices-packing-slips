@@ -211,17 +211,13 @@ class Assets {
 
 			// status/debug page scripts
 			if ( 'debug' === $tab ) {
-				wp_enqueue_style(
-					'wpo-wcpdf-jquery-ui-styles',
-					WPO_WCPDF()->plugin_url() . '/assets/css/jquery-ui' . $suffix . '.css',
-					'1.14.0'
-				);
-
+				wp_enqueue_style( 'jquery-ui-style' );
 				wp_enqueue_script( 'jquery-ui-datepicker' );
 
 				wp_enqueue_style(
 					'wpo-wcpdf-debug-tools-styles',
 					WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools' . $suffix . '.css',
+					array(),
 					WPO_WCPDF_VERSION
 				);
 

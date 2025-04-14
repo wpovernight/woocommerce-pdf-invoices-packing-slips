@@ -71,17 +71,21 @@ class Documents {
 			$documents = array();
 
 			foreach ( $this->documents as $class_name => $document ) {
+				$document_output_formats = isset( $document->output_formats ) && is_array( $document->output_formats )
+					? $document->output_formats
+					: array( 'pdf' );
+				
 				switch ( $output_format ) {
 					case 'pdf':
 					case 'ubl':
-						if ( in_array( $output_format, $document->output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
-							$documents[$class_name] = $document;
+						if ( in_array( $output_format, $document_output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+							$documents[ $class_name ] = $document;
 						}
 						break;
 					default:
-						foreach ( $document->output_formats as $document_output_format ) {
+						foreach ( $document_output_formats as $document_output_format ) {
 							if ( is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $document_output_format ) ) {
-								$documents[$class_name] = $document;
+								$documents[ $class_name ] = $document;
 								break; // prevents adding the same document twice or more
 							}
 						}

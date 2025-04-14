@@ -9,25 +9,58 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<thead>
 		<tr>
 			<th align="left"><?php esc_html_e( 'Plugin Name', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-			<th align="left"><?php esc_html_e( 'Version', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<th align="left"><?php esc_html_e( 'Current', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<th align="left"><?php esc_html_e( 'Last stable', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+				<th align="left"><?php esc_html_e( 'Last unstable', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+			<?php endif; ?>
 			<th align="left"><?php esc_html_e( 'Status', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			<td class="title">PDF Invoices & Packing Slips for WooCommerce</td>
-			<td><?php echo esc_html( WPO_WCPDF()->version ); ?></td>
+			<td><?php echo esc_attr( WPO_WCPDF()->version ); ?></td>
+			<td>
+				<?php if ( ! empty( $latest_github_releases['stable'] ) && WPO_WCPDF()->version !== $latest_github_releases['stable']['name'] ) : ?>
+					<a href="<?php echo esc_url( $latest_github_releases['stable']['download'] ); ?>" target="_blank"><?php echo esc_attr( $latest_github_releases['stable']['name'] ); ?></a>
+				<?php elseif ( ! empty( $latest_github_releases['stable']['name'] ) ) : ?>
+					<?php echo esc_attr( $latest_github_releases['stable']['name'] ); ?>
+				<?php else : ?>
+					-
+				<?php endif; ?>
+			</td>
+			<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+				<td>
+					<?php if ( ! empty( $latest_github_releases['unstable'] ) && version_compare( WPO_WCPDF()->version, $latest_github_releases['unstable']['name'], '<' ) ) : ?>
+						<a href="<?php echo esc_url( $latest_github_releases['unstable']['download'] ); ?>" target="_blank"><?php echo esc_attr( $latest_github_releases['unstable']['name'] ); ?></a>
+					<?php else : ?>
+						-
+					<?php endif; ?>
+				</td>
+			<?php endif; ?>
 			<td class="status-cell valid-status"><?php esc_html_e( 'Active', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 		</tr>
 		<?php
 		if ( ! empty( $premium_plugins ) ) {
-			foreach ( $premium_plugins as $premium_plugin ) {
-				$class = $premium_plugin['is_active'] ? 'valid-status' : 'invalid-status';
-				$status = $premium_plugin['is_active'] ? esc_html__( 'Active', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Inactive', 'woocommerce-pdf-invoices-packing-slips' );
+			foreach ( $premium_plugins as $plugin_slug => $premium_plugin ) {
+				$last_stable = wpo_wcpdf_get_latest_plugin_version( $plugin_slug );
+				$class       = $premium_plugin['is_active'] ? 'valid-status' : 'invalid-status';
+				$status      = $premium_plugin['is_active'] ? esc_html__( 'Active', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Inactive', 'woocommerce-pdf-invoices-packing-slips' );
 				?>
 				<tr>
 					<td class="title"><?php echo esc_html( $premium_plugin['name'] ); ?></td>
-					<td><?php echo esc_html( $premium_plugin['version'] ); ?></td>
+					<td><?php echo esc_attr( $premium_plugin['version'] ); ?></td>
+					<td>
+						<?php if ( ! empty( $last_stable ) ) : ?>
+							<a href="<?php echo esc_url( network_admin_url( 'plugins.php?s=' . urlencode( html_entity_decode( $premium_plugin['name'], ENT_QUOTES, 'UTF-8' ) ) ) ); ?>"><?php echo esc_attr( $last_stable ); ?></a>
+						<?php else : ?>
+							<?php echo esc_attr( $premium_plugin['version'] ); ?>
+						<?php endif; ?>
+					</td>
+					<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+						<td>-</td>
+					<?php endif; ?>
 					<td class="status-cell <?php echo esc_attr( $class ); ?>"><?php echo wp_kses_post( $status ); ?></td>
 				</tr>
 				<?php
@@ -35,6 +68,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		}
 		?>
 	</tbody>
+	<?php if ( isset( $debug_settings['check_unstable_versions'] ) ) : ?>
+		<tfoot>
+			<tr>
+				<td colspan="5">
+					<?php esc_html_e( 'If you choose to test an unstable version, we recommend using a staging environment before deploying it to a live site. Early testing helps us identify potential issues faster and contributes to a more stable final release.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</td>
+			</tr>
+		</tfoot>
+	<?php endif; ?>
 </table>
 
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">

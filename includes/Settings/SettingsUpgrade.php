@@ -338,12 +338,21 @@ class SettingsUpgrade {
 		}
 
 		update_option( 'wpo_wcpdf_extensions_license_cache', $license_info );
-
-		if ( as_next_scheduled_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing' ) ) {
-			as_unschedule_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
+		
+		if (
+			! function_exists( '\\as_next_scheduled_action' ) ||
+			! function_exists( '\\as_unschedule_action' ) ||
+			! function_exists( '\\as_schedule_single_action' )
+		) {
+			wcpdf_log_error( 'Action Scheduler functions not available. Cannot schedule or clear the extensions license cache.', 'critical' );
+			return $license_info;
 		}
 
-		as_schedule_single_action( strtotime( "+1 week" ), 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
+		if ( \as_next_scheduled_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing' ) ) {
+			\as_unschedule_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
+		}
+
+		\as_schedule_single_action( strtotime( "+1 week" ), 'wpo_wcpdf_schedule_extensions_license_cache_clearing' );
 
 		return $license_info;
 	}
