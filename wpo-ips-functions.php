@@ -415,10 +415,10 @@ function wcpdf_output_error( string $message, string $level = 'error', ?\Throwab
  * @param string $handling_type  How to handle the error: 'exception' (default) or 'output'.
  * @param bool   $log_error      Whether to log the error via wcpdf_log_error().
  * @param string $log_level      Log level to use when logging the error.
- * @return false Always returns false when not throwing.
+ * @return bool Always returns false when not throwing.
  * @throws \Exception When handling_type is 'exception'.
  */
-function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ) {
+function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ): bool {
 	if ( $log_error ) {
 		wcpdf_log_error( $message, $log_level );
 	}
