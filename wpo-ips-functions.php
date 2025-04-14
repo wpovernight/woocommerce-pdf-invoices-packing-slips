@@ -252,7 +252,7 @@ function wcpdf_ubl_headers( $filename, $size ) {
  * @param  string $error_handling
  * @return string|false
  */
-function wcpdf_get_document_file( object $document, string $output_format = 'pdf', $error_handling = 'exception' ) {
+function wcpdf_get_document_file( object $document, string $output_format = 'pdf', string $error_handling = 'exception' ) {
 	$default_output_format = 'pdf';
 
 	if ( ! $document ) {
@@ -398,12 +398,12 @@ function wcpdf_output_error( string $message, string $level = 'error', ?\Throwab
 	}
 	
 	echo '<div style="border: 2px solid red; padding: 5px;">';
-		echo '<h3>' . wp_kses_post( $message ) . '</h3>';
-		
-		if ( $e instanceof \Throwable ) {
-			echo '<pre>' . esc_html( $e->getFile() ) . ' (' . esc_html( (string) $e->getLine() ) . ')</pre>';
-			echo '<pre>' . esc_html( $e->getTraceAsString() ) . '</pre>';
-		}
+	echo '<h3>' . wp_kses_post( $message ) . '</h3>';
+	
+	if ( $e instanceof \Throwable ) {
+		echo '<pre>' . esc_html( $e->getFile() ) . ' (' . esc_html( (string) $e->getLine() ) . ')</pre>';
+		echo '<pre>' . esc_html( $e->getTraceAsString() ) . '</pre>';
+	}
 		
 	echo '</div>';
 }
