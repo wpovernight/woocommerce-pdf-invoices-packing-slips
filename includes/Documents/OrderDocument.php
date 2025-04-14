@@ -1557,6 +1557,11 @@ abstract class OrderDocument {
 		}
 		
 		$filename_or_contents = wpo_ips_write_ubl_file( $document, false, $contents_only );
+		
+		if ( ! $filename_or_contents ) {
+			wcpdf_log_error( 'Error writing UBL file!', 'error' );
+			exit();
+		}
 
 		if ( $contents_only ) {
 			return $filename_or_contents;
