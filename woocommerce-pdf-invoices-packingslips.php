@@ -173,20 +173,37 @@ class WPO_WCPDF {
 	 * Instantiate classes when woocommerce is activated
 	 */
 	public function load_classes() {
-		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
-			add_action( 'admin_notices', array ( $this, 'need_woocommerce' ) );
+		if ( ! $this->dependencies_are_ready() ) {
 			return;
 		}
-
-		if ( ! has_filter( 'wpo_wcpdf_pdf_maker' ) && ! $this->is_dependency_version_supported( 'php' ) ) {
-			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
-			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
-		}
-
+		
 		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
-
+		
 		// all systems ready - GO!
 		$this->includes();
+	}
+	
+	/**
+	 * Check if WooCommerce and PHP dependencies are met.
+	 * If not, show the appropriate admin notices.
+	 *
+	 * @return bool
+	 */
+	public function dependencies_are_ready(): bool {
+		// Check if WooCommerce is activated and meets the minimum version
+		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
+			add_action( 'admin_notices', array( $this, 'need_woocommerce' ) );
+			return false;
+		}
+
+		// Check if PHP version is supported
+		if ( ! has_filter( 'wpo_wcpdf_pdf_maker' ) && ! $this->is_dependency_version_supported( 'php' ) ) {
+			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
+			add_action( 'admin_notices', array( $this, 'required_php_version' ) );
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
