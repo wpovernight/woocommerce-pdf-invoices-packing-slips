@@ -73,7 +73,7 @@ class WPO_WCPDF {
 		// load the localisation & classes
 		add_action( 'init', array( $this, 'translations' ), 8 );
 		add_action( 'init', array( $this, 'load_classes' ), 9 ); // Pro runs on default 10, if this runs after it will not work
-		add_action( 'in_plugin_update_message-'.$this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
+		add_action( 'in_plugin_update_message-' . $this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
 		add_action( 'before_woocommerce_init', array( $this, 'woocommerce_hpos_compatible' ) );
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
