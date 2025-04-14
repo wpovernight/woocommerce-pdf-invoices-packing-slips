@@ -418,7 +418,7 @@ function wcpdf_output_error( string $message, string $level = 'error', ?\Throwab
  * @return false Always returns false when not throwing.
  * @throws \Exception When handling_type is 'exception'.
  */
-function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ): false {
+function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ) {
 	if ( $log_error ) {
 		wcpdf_log_error( $message, $log_level );
 	}
