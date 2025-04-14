@@ -346,6 +346,11 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
  * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
  */
 function wcpdf_log_error( $message, $level = 'error', $e = null ) {
+	if ( ! function_exists( 'WPO_WCPDF' ) || ! is_object( WPO_WCPDF() ) || empty( WPO_WCPDF()->settings ) ) {
+		error_log( '[WPO_WCPDF] ' . $message ); // fallback
+		return;
+	}
+	
 	if ( function_exists( 'wc_get_logger' ) ) {
 		$logger  = wc_get_logger();
 		$context = array( 'source' => 'wpo-wcpdf' );

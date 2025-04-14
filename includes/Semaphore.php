@@ -427,6 +427,11 @@ class Semaphore {
 	 * @return void
 	 */
 	public static function init_cleanup(): void {
+		// This is to prevent the cleanup from running before the plugin is fully loaded
+		if ( WPO_WCPDF()->dependencies_are_ready() ) {
+			return;
+		}
+		
 		// Schedule cleanup of released locks
 		self::schedule_semaphore_cleanup();
 
