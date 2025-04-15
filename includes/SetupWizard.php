@@ -285,7 +285,7 @@ class SetupWizard {
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
 			$user_id = get_current_user_id();
-			$hidden  = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
+			$hidden  = get_user_meta( $user_id, \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ? 'managewoocommerce_page_wc-orderscolumnshidden' : 'manageedit-shop_ordercolumnshidden', true );
 			
 			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
@@ -319,9 +319,11 @@ class SetupWizard {
 				if ( ! empty( $request['wc_show_action_buttons'] ) ) {
 					$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
 					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
+					update_user_meta( $user_id, 'managewoocommerce_page_wc-orderscolumnshidden', $hidden );
 				} else {
 					array_push( $hidden, 'wc_actions' );
 					update_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden );
+					update_user_meta( $user_id, 'managewoocommerce_page_wc-orderscolumnshidden', $hidden );
 				}
 			}
 		}
