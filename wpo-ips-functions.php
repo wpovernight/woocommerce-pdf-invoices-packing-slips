@@ -250,9 +250,9 @@ function wcpdf_ubl_headers( $filename, $size ) {
  * @param  object $document
  * @param  string $output_format
  * @param  string $error_handling
- * @return string
+ * @return string|false
  */
-function wcpdf_get_document_file( object $document, string $output_format = 'pdf', $error_handling = 'exception' ): string {
+function wcpdf_get_document_file( object $document, string $output_format = 'pdf', string $error_handling = 'exception' ) {
 	$default_output_format = 'pdf';
 
 	if ( ! $document ) {
@@ -343,64 +343,82 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 }
 
 /**
- * Logger function to capture errors thrown by this plugin, uses the WC Logger when possible (WC3.0+)
+ * Logs errors thrown by this plugin. 
+ * Uses the WooCommerce logger when available (WC 3.0+), otherwise falls back to PHP error_log().
+ *
+ * @param string           $message Error message to log.
+ * @param string           $level   Log level: debug, info, notice, warning, error, critical, alert, emergency.
+ * @param \Throwable|null  $e       (Optional) Exception or error object.
+ * @return void
  */
-function wcpdf_log_error( $message, $level = 'error', $e = null ) {
-	if ( function_exists( 'wc_get_logger' ) ) {
-		$logger  = wc_get_logger();
-		$context = array( 'source' => 'wpo-wcpdf' );
-
-		if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ) {
+function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable $e = null ): void {
+	/**
+	 * Appends exception details to the message if available.
+	 *
+	 * @param string          $message
+	 * @param \Throwable|null $e
+	 * @return string
+	 */
+	$format_message = static function ( string $message, ?\Throwable $e ): string {
+		if ( $e instanceof \Throwable ) {
 			$message = sprintf( '%s (%s:%d)', $message, $e->getFile(), $e->getLine() );
+			
+			if ( apply_filters( 'wcpdf_log_stacktrace', false ) && is_callable( array( $e, 'getTraceAsString' ) ) ) {
+				$message .= "\n" . $e->getTraceAsString();
+			}
 		}
-
-		if ( apply_filters( 'wcpdf_log_stacktrace', false ) && is_callable( array( $e, 'getTraceAsString' ) ) ) {
-			$message .= "\n" . $e->getTraceAsString();
-		}
-		// The `log` method accepts any valid level as its first argument.
-		// debug     - 'Detailed debug information'
-		// info      - 'Interesting events'
-		// notice    - 'Normal but significant events'
-		// warning   - 'Exceptional occurrences that are not errors'
-		// error     - 'Runtime errors that do not require immediate'
-		// critical  - 'Critical conditions'
-		// alert     - 'Action must be taken immediately'
-		// emergency - 'System is unusable'.
-		$logger->log( $level, $message, $context );
-	} else {
-		wcpdf_log_error( "WCPDF error ({$level}): {$message}", 'warning' );
+		return $message;
+	};
+	
+	$message = $format_message( $message, $e );
+	
+	if ( ! function_exists( 'wc_get_logger' ) ) {
+		error_log( '[WPO_WCPDF] ' . $message );
+		return;
 	}
+	
+	$logger  = wc_get_logger();
+	$context = array( 'source' => 'wpo-wcpdf' );
+	
+	$logger->log( $level, $message, $context );
 }
 
-function wcpdf_output_error( $message, $level = 'error', $e = null ) {
+/**
+ * Outputs an error message in the frontend.
+ *
+ * @param string          $message Error message to display.
+ * @param string          $level   Log level (unused here, but kept for consistency).
+ * @param \Throwable|null $e       (Optional) Exception or error object.
+ * @return void
+ */
+function wcpdf_output_error( string $message, string $level = 'error', ?\Throwable $e = null ): void {
 	if ( ! current_user_can( 'edit_shop_orders' ) ) {
 		esc_html_e( 'Error creating PDF, please contact the site owner.', 'woocommerce-pdf-invoices-packing-slips' );
 		return;
 	}
-	?>
-	<div style="border: 2px solid red; padding: 5px;">
-		<h3><?php echo wp_kses_post( $message ); ?></h3>
-		<?php if ( is_callable( array( $e, 'getFile' ) ) && is_callable( array( $e, 'getLine' ) ) ): ?>
-		<pre><?php echo esc_html( $e->getFile() ); ?> (<?php echo esc_html( $e->getLine() ); ?>)</pre>
-		<?php endif ?>
-		<?php if ( is_callable( array( $e, 'getTraceAsString' ) ) ) : ?>
-		<pre><?php echo esc_html( $e->getTraceAsString() ); ?></pre>
-		<?php endif ?>
-	</div>
-	<?php
+	
+	echo '<div style="border: 2px solid red; padding: 5px;">';
+	echo '<h3>' . wp_kses_post( $message ) . '</h3>';
+	
+	if ( $e instanceof \Throwable ) {
+		echo '<pre>' . esc_html( $e->getFile() ) . ' (' . esc_html( (string) $e->getLine() ) . ')</pre>';
+		echo '<pre>' . esc_html( $e->getTraceAsString() ) . '</pre>';
+	}
+		
+	echo '</div>';
 }
 
 /**
- * Error handling function
+ * Handles errors by either throwing an exception or outputting the error, optionally logging it first.
  *
- * @param string $message
- * @param string $handling_type
- * @param bool   $log_error
- * @param string $log_level
- * @return mixed
- * @throws Exception
+ * @param string $message        The error message.
+ * @param string $handling_type  How to handle the error: 'exception' (default) or 'output'.
+ * @param bool   $log_error      Whether to log the error via wcpdf_log_error().
+ * @param string $log_level      Log level to use when logging the error.
+ * @return bool Always returns false when not throwing.
+ * @throws \Exception When handling_type is 'exception'.
  */
-function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ) {
+function wcpdf_error_handling( string $message, string $handling_type = 'exception', bool $log_error = true, string $log_level = 'error' ): bool {
 	if ( $log_error ) {
 		wcpdf_log_error( $message, $log_level );
 	}
@@ -408,12 +426,15 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
 	switch ( $handling_type ) {
 		case 'exception':
 			throw new \Exception( esc_html( $message ) );
-			break;
 		case 'output':
 			wcpdf_output_error( $message, $log_level );
 			break;
+		default:
+			// Unexpected handling type
+			wcpdf_log_error( sprintf( 'Unknown error handling type: %s', $handling_type ), 'warning' );
+			break;
 	}
-
+	
 	return false;
 }
 
@@ -1408,7 +1429,7 @@ function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
  * @param bool $attachment
  * @param bool $contents_only
  * 
- * @return string|bool
+ * @return string|false
  */
 function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
 	$ubl_maker = wcpdf_get_ubl_maker();

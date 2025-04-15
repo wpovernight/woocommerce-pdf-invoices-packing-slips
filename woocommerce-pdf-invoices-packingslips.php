@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              4.4.0-rc.1
+ * Version:              4.4.0-rc.2
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.4.0-rc.1';
+	public $version              = '4.4.0-rc.2';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -73,7 +73,7 @@ class WPO_WCPDF {
 		// load the localisation & classes
 		add_action( 'init', array( $this, 'translations' ), 8 );
 		add_action( 'init', array( $this, 'load_classes' ), 9 ); // Pro runs on default 10, if this runs after it will not work
-		add_action( 'in_plugin_update_message-'.$this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
+		add_action( 'in_plugin_update_message-' . $this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
 		add_action( 'before_woocommerce_init', array( $this, 'woocommerce_hpos_compatible' ) );
 		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
 		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
@@ -173,20 +173,37 @@ class WPO_WCPDF {
 	 * Instantiate classes when woocommerce is activated
 	 */
 	public function load_classes() {
-		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
-			add_action( 'admin_notices', array ( $this, 'need_woocommerce' ) );
+		if ( ! $this->dependencies_are_ready() ) {
 			return;
 		}
-
-		if ( ! has_filter( 'wpo_wcpdf_pdf_maker' ) && ! $this->is_dependency_version_supported( 'php' ) ) {
-			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
-			add_action( 'admin_notices', array ( $this, 'required_php_version' ) );
-		}
-
+		
 		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
-
+		
 		// all systems ready - GO!
 		$this->includes();
+	}
+	
+	/**
+	 * Check if WooCommerce and PHP dependencies are met.
+	 * If not, show the appropriate admin notices.
+	 *
+	 * @return bool
+	 */
+	public function dependencies_are_ready(): bool {
+		// Check if WooCommerce is activated and meets the minimum version
+		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
+			add_action( 'admin_notices', array( $this, 'need_woocommerce' ) );
+			return false;
+		}
+
+		// Check if PHP version is supported
+		if ( ! has_filter( 'wpo_wcpdf_pdf_maker' ) && ! $this->is_dependency_version_supported( 'php' ) ) {
+			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
+			add_action( 'admin_notices', array( $this, 'required_php_version' ) );
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
