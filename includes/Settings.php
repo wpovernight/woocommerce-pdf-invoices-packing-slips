@@ -134,8 +134,7 @@ class Settings {
 	 */
 	public function user_settings_capability() {
 		$user_capability       = apply_filters( 'wpo_wcpdf_settings_default_user_capability', 'manage_woocommerce' );
-		$user_capability       = ! empty( $user_capability ) && ! is_array( $user_capability ) ? $user_capability : 'manage_woocommerce';
-		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $user_capability ) );
+		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', is_array( $user_capability ) ? $user_capability : array( $user_capability ) );
 
 		foreach ( $capabilities_to_check as $capability ) {
 			if ( current_user_can( $capability ) ) {
