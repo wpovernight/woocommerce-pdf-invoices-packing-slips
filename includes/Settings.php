@@ -133,8 +133,8 @@ class Settings {
 	 * @return string
 	 */
 	public function user_settings_capability() {
-		$user_capability       = 'manage_woocommerce';
-		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $user_capability ) );
+		$user_capability       = '';
+		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( 'manage_woocommerce' ) );
 
 		foreach ( $capabilities_to_check as $capability ) {
 			if ( current_user_can( $capability ) ) {
