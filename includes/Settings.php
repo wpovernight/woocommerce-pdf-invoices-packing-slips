@@ -136,10 +136,12 @@ class Settings {
 		$user_capability       = apply_filters( 'wpo_wcpdf_settings_default_user_capability', 'manage_woocommerce' );
 		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', is_array( $user_capability ) ? $user_capability : array( $user_capability ) );
 
-		foreach ( $capabilities_to_check as $capability ) {
-			if ( current_user_can( $capability ) ) {
-				$user_capability = $capability;
-				break;
+		if ( ! empty( $capabilities_to_check ) && is_array( $capabilities_to_check ) ) {
+			foreach ( $capabilities_to_check as $capability ) {
+				if ( current_user_can( $capability ) ) {
+					$user_capability = $capability;
+					break;
+				}
 			}
 		}
 
