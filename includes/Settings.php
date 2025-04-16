@@ -133,17 +133,20 @@ class Settings {
 	 * @return string
 	 */
 	public function user_settings_capability() {
-		$user_capability       = 'manage_woocommerce';
-		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $user_capability ) );
-
-		foreach ( $capabilities_to_check as $capability ) {
-			if ( current_user_can( $capability ) ) {
-				$user_capability = $capability;
-				break;
+		$manage_woocommerce = 'manage_woocommerce';
+		$default_capability = apply_filters( 'wpo_wcpdf_settings_default_user_capability', $manage_woocommerce );
+		$default_capability = empty( $default_capability ) || ! is_string( $default_capability ) ? $manage_woocommerce : $default_capability;
+		$capabilities       = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $default_capability ) );
+	
+		if ( ! empty( $capabilities ) && is_array( $capabilities ) ) {
+			foreach ( $capabilities as $capability ) {
+				if ( current_user_can( $capability ) ) {
+					return $capability;
+				}
 			}
 		}
 
-		return $user_capability;
+		return $manage_woocommerce;
 	}
 
 	/**
