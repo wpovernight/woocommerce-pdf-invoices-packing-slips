@@ -92,7 +92,8 @@ $sql = "CREATE TABLE {$this->table_name} (
   order_id int(16),
   date datetime DEFAULT '1000-01-01 00:00:00' NOT NULL,
   calculated_number int (16),
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id),
+  KEY order_id (order_id)
 ) $charset_collate;";
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
