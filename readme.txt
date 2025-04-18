@@ -1227,3 +1227,4 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 = 2.1.10 =
 2.X is a BIG update! Make a full site backup before upgrading if you were using version 1.X!
+
