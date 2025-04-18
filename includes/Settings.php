@@ -129,21 +129,30 @@ class Settings {
 	}
 
 	/**
-	 * Get a valid user role settings capability.
-	 * @return string
+	 * Returns the first capability from a filterable list that the current user has access to.
+	 * Falls back to the default capability if none match.
+	 *
+	 * @return string The matched or default user capability.
 	 */
 	public function user_settings_capability() {
-		$user_capability       = 'manage_woocommerce';
-		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $user_capability ) );
-
-		foreach ( $capabilities_to_check as $capability ) {
-			if ( current_user_can( $capability ) ) {
-				$user_capability = $capability;
-				break;
+		$manage_woocommerce = 'manage_woocommerce';
+		
+		// Get the default capability
+		$default_capability = apply_filters( 'wpo_wcpdf_settings_default_user_capability', $manage_woocommerce );
+		$default_capability = ( empty( $default_capability ) || ! is_string( $default_capability ) ) ? $manage_woocommerce : $default_capability;
+		
+		// Get the list of capabilities
+		$capabilities = (array) apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $default_capability ) );
+		
+		// Loop through the list
+		foreach ( $capabilities as $capability ) {
+			if ( is_string( $capability ) && current_user_can( $capability ) ) {
+				return $capability;
 			}
 		}
-
-		return $user_capability;
+		
+		// Fallback
+		return ! empty( $default_capability ) ? $default_capability : $manage_woocommerce;
 	}
 
 	/**
