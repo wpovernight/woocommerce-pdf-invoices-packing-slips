@@ -1448,10 +1448,10 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
 		$ubl_maker->set_file_path( $tmp_path );
 	}
 
-	$ubl_document = new \WPO\IPS\UBL\Documents\UblDocument();
+	$ubl_document = new \WPO\IPS\EInvoice\Formats\Ubl\UblDocument();
 	$ubl_document->set_order_document( $document );
 
-	$builder  = new \WPO\IPS\UBL\Builders\SabreBuilder();
+	$builder  = new \WPO\IPS\EInvoice\SabreBuilder();
 	$contents = apply_filters( 'wpo_ips_ubl_contents',
 		$builder->build( $ubl_document ),
 		$ubl_document,

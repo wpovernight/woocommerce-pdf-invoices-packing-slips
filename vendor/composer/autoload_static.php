@@ -14,7 +14,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
-            'WPO\\IPS\\UBL\\' => 12,
+            'WPO\\IPS\\EInvoice\\' => 17,
             'WPO\\IPS\\' => 8,
         ),
         'S' => 
@@ -25,9 +25,9 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPO\\IPS\\UBL\\' => 
+        'WPO\\IPS\\EInvoice\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/ubl',
+            0 => __DIR__ . '/../..' . '/einvoice',
         ),
         'WPO\\IPS\\' => 
         array (
@@ -49,6 +49,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'WPO\\IPS\\Admin' => __DIR__ . '/../..' . '/includes/Admin.php',
         'WPO\\IPS\\Assets' => __DIR__ . '/../..' . '/includes/Assets.php',
+        'WPO\\IPS\\Compatibility\\FileSystem' => __DIR__ . '/../..' . '/includes/Compatibility/FileSystem.php',
         'WPO\\IPS\\Compatibility\\OrderUtil' => __DIR__ . '/../..' . '/includes/Compatibility/OrderUtil.php',
         'WPO\\IPS\\Compatibility\\ThirdPartyPlugins' => __DIR__ . '/../..' . '/includes/Compatibility/ThirdPartyPlugins.php',
         'WPO\\IPS\\Documents' => __DIR__ . '/../..' . '/includes/Documents.php',
@@ -59,6 +60,29 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Documents\\OrderDocumentMethods' => __DIR__ . '/../..' . '/includes/Documents/OrderDocumentMethods.php',
         'WPO\\IPS\\Documents\\PackingSlip' => __DIR__ . '/../..' . '/includes/Documents/PackingSlip.php',
         'WPO\\IPS\\Documents\\SequentialNumberStore' => __DIR__ . '/../..' . '/includes/Documents/SequentialNumberStore.php',
+        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractBuilder' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractBuilder.php',
+        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractCollection' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractCollection.php',
+        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractDocument' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractDocument.php',
+        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractHandler' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\AdditionalDocumentReferenceHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/AdditionalDocumentReferenceHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\AddressHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/AddressHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\AllowanceChargeHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/AllowanceChargeHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\BuyerReferenceHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/BuyerReferenceHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\DeliveryHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/DeliveryHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\DocumentCurrencyCodeHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/DocumentCurrencyCodeHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\IdHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/IdHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\InvoiceLineHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/InvoiceLineHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\InvoiceTypeCodeHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/InvoiceTypeCodeHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\IssueDateHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/IssueDateHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\LegalMonetaryTotalHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/LegalMonetaryTotalHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\OrderReferenceHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/OrderReferenceHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\PaymentMeansHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/PaymentMeansHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\PaymentTermsHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/PaymentTermsHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\TaxTotalHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/TaxTotalHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\Handlers\\UblVersionIdHandler' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/Handlers/UblVersionIdHandler.php',
+        'WPO\\IPS\\EInvoice\\Formats\\Ubl\\UblDocument' => __DIR__ . '/../..' . '/einvoice/Formats/Ubl/UblDocument.php',
+        'WPO\\IPS\\EInvoice\\SabreBuilder' => __DIR__ . '/../..' . '/einvoice/SabreBuilder.php',
+        'WPO\\IPS\\EInvoice\\TaxesSettings' => __DIR__ . '/../..' . '/einvoice/TaxesSettings.php',
         'WPO\\IPS\\Endpoint' => __DIR__ . '/../..' . '/includes/Endpoint.php',
         'WPO\\IPS\\FontSynchronizer' => __DIR__ . '/../..' . '/includes/FontSynchronizer.php',
         'WPO\\IPS\\Frontend' => __DIR__ . '/../..' . '/includes/Frontend.php',
@@ -76,42 +100,6 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Settings\\SettingsUpgrade' => __DIR__ . '/../..' . '/includes/Settings/SettingsUpgrade.php',
         'WPO\\IPS\\SetupWizard' => __DIR__ . '/../..' . '/includes/SetupWizard.php',
         'WPO\\IPS\\Tables\\NumberStoreListTable' => __DIR__ . '/../..' . '/includes/Tables/NumberStoreListTable.php',
-        'WPO\\IPS\\UBL\\Builders\\Builder' => __DIR__ . '/../..' . '/ubl/Builders/Builder.php',
-        'WPO\\IPS\\UBL\\Builders\\SabreBuilder' => __DIR__ . '/../..' . '/ubl/Builders/SabreBuilder.php',
-        'WPO\\IPS\\UBL\\Collections\\Collection' => __DIR__ . '/../..' . '/ubl/Collections/Collection.php',
-        'WPO\\IPS\\UBL\\Collections\\OrderCollection' => __DIR__ . '/../..' . '/ubl/Collections/OrderCollection.php',
-        'WPO\\IPS\\UBL\\Documents\\Document' => __DIR__ . '/../..' . '/ubl/Documents/Document.php',
-        'WPO\\IPS\\UBL\\Documents\\UblDocument' => __DIR__ . '/../..' . '/ubl/Documents/UblDocument.php',
-        'WPO\\IPS\\UBL\\Exceptions\\FileWriteException' => __DIR__ . '/../..' . '/ubl/Exceptions/FileWriteException.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\AdditionalDocumentReferenceHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/AdditionalDocumentReferenceHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\AddressHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/AddressHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\AllowanceChargeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/AllowanceChargeHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\BuyerReferenceHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/BuyerReferenceHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\DeliveryHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/DeliveryHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\DocumentCurrencyCodeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/DocumentCurrencyCodeHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\IdHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/IdHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\IssueDateHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/IssueDateHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\LegalMonetaryTotalHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/LegalMonetaryTotalHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\OrderReferenceHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/OrderReferenceHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\PaymentMeansHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/PaymentMeansHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\PaymentTermsHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/PaymentTermsHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\TaxTotalHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/TaxTotalHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Common\\UblVersionIdHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Common/UblVersionIdHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Handler' => __DIR__ . '/../..' . '/ubl/Handlers/Handler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Invoice\\InvoiceLineHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Invoice/InvoiceLineHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\Invoice\\InvoiceTypeCodeHandler' => __DIR__ . '/../..' . '/ubl/Handlers/Invoice/InvoiceTypeCodeHandler.php',
-        'WPO\\IPS\\UBL\\Handlers\\UblHandler' => __DIR__ . '/../..' . '/ubl/Handlers/UblHandler.php',
-        'WPO\\IPS\\UBL\\Models\\Address' => __DIR__ . '/../..' . '/ubl/Models/Address.php',
-        'WPO\\IPS\\UBL\\Models\\DateTime' => __DIR__ . '/../..' . '/ubl/Models/DateTime.php',
-        'WPO\\IPS\\UBL\\Models\\Model' => __DIR__ . '/../..' . '/ubl/Models/Model.php',
-        'WPO\\IPS\\UBL\\Models\\Order' => __DIR__ . '/../..' . '/ubl/Models/Order.php',
-        'WPO\\IPS\\UBL\\Repositories\\Contracts\\OrderRepository' => __DIR__ . '/../..' . '/ubl/Repositories/Contracts/OrderRepository.php',
-        'WPO\\IPS\\UBL\\Repositories\\OrderRepository' => __DIR__ . '/../..' . '/ubl/Repositories/OrderRepository.php',
-        'WPO\\IPS\\UBL\\Repositories\\Repository' => __DIR__ . '/../..' . '/ubl/Repositories/Repository.php',
-        'WPO\\IPS\\UBL\\Settings\\TaxesSettings' => __DIR__ . '/../..' . '/ubl/Settings/TaxesSettings.php',
-        'WPO\\IPS\\UBL\\Transformers\\AddressTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/AddressTransformer.php',
-        'WPO\\IPS\\UBL\\Transformers\\DateTimeTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/DateTimeTransformer.php',
-        'WPO\\IPS\\UBL\\Transformers\\OrderTransformer' => __DIR__ . '/../..' . '/ubl/Transformers/OrderTransformer.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

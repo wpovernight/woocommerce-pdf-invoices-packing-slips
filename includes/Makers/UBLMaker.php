@@ -2,8 +2,6 @@
 
 namespace WPO\IPS\Makers;
 
-use WPO\IPS\UBL\Exceptions\FileWriteException;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -19,7 +17,7 @@ class UBLMaker {
 		$status         = WPO_WCPDF()->file_system->put_contents( $full_file_name, $contents, FS_CHMOD_FILE );
 
 		if ( false === $status ) {
-			throw new FileWriteException( 'Error writing UBL file' );
+			throw new \Exception( 'Error writing UBL file' );
 		}
 
 		return $full_file_name;
