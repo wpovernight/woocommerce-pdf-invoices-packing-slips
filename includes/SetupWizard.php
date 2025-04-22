@@ -320,7 +320,7 @@ class SetupWizard {
 					if ( ! empty( $request['wc_show_action_buttons'] ) ) {
 						$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
 					} else {
-						array_push( $hidden, 'wc_actions' );
+						$hidden[] = 'wc_actions';
 					}
 					
 					update_user_meta( $user_id, $orders_column_hidden_key, $hidden );
