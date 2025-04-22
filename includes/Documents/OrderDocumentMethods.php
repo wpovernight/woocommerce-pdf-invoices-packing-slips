@@ -873,15 +873,16 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @access public
 	 * @return string
 	 */
-	public function get_thumbnail ( $product ) {
+	public function get_thumbnail( $product ) {
 		// Get default WooCommerce img tag (url/http)
 		$thumbnail_size        = 'woocommerce_thumbnail';
 		$size                  = apply_filters( 'wpo_wcpdf_thumbnail_size', $thumbnail_size );
 		$thumbnail_img_tag_url = $product->get_image( $size, array( 'title' => '' ) );
 
 		// Extract the url from img
-		preg_match( '/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url );
-		$thumbnail_url = array_pop( $thumbnail_url );
+		preg_match( '/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url_matches );
+		$thumbnail_url = ! empty( $thumbnail_url_matches ) ? array_pop( $thumbnail_url_matches ) : '';
+
 		// remove http/https from image tag url to avoid mixed origin conflicts
 		$contextless_thumbnail_url = ! empty( $thumbnail_url ) ? ltrim( str_replace( array( 'http://', 'https://' ), '', $thumbnail_url ), '/' ) : $thumbnail_url;
 
@@ -913,7 +914,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! WPO_WCPDF()->file_system->exists( $thumbnail_path ) ) {
 			// should use paths but file not found, replace // with http(s):// for dompdf compatibility
-			if ( substr( $thumbnail_url, 0, 2 ) === "//" ) {
+			if ( is_string( $thumbnail_url ) && substr( $thumbnail_url, 0, 2 ) === "//" ) {
 				$prefix                = is_ssl() ? 'https://' : 'http://';
 				$https_thumbnail_url   = $prefix . ltrim( $thumbnail_url, '/' );
 				$thumbnail_img_tag_url = ! empty( $thumbnail_img_tag_url ) ? str_replace( $thumbnail_url, $https_thumbnail_url, $thumbnail_img_tag_url ) : $thumbnail_img_tag_url;
