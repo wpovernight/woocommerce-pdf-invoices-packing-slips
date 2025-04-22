@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.4.0-rc.4
+Stable tag: 4.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,21 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.4.0 (2025-04-22) =
+- New: Add index on `order_id` column to document number database tables
+- New: Add `wpo_wcpdf_settings_default_user_capability` filter and improve user capability fallback logic
+- New: Helper function to handle UBL file writing with error handling
+- New: Hybrid filesystem support
+- Tweak: Minor code improvements in Setup Wizard view
+- Fix: Deprecation warning for `null` value passed to `substr()` when extracting thumbnail URL
+- Fix: Missing log function fallback when dependencies are not loaded
+- Fix: "Gapped" invoices shown when other documents used the invoice numbering
+- Fix: i18n issue in Invoice settings
+- Fix: Fatal error when `null` is passed to `in_array()` in `Documents.php`
+- Fix: Missing global call to AS functions in Semaphore class
+- Fix: PDF preview issues
+- Translations: Updated translation template (POT)
 
 = 4.3.0 (2025-04-07) =
 - New: Adds setting to toggle PDF translation reload for email attachments
