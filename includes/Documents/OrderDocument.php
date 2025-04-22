@@ -1465,7 +1465,7 @@ abstract class OrderDocument {
 			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
 		
-		$pdf_maker    = wcpdf_get_pdf_maker( $this->replace_avif_images( $this->get_html() ), $pdf_settings, $this );
+		$pdf_maker    = wcpdf_get_pdf_maker( wpo_ips_replace_avif_images( $this->get_html() ), $pdf_settings, $this );
 		$pdf          = $pdf_maker->output();
 
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
@@ -1476,59 +1476,6 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 
 		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
-	}
-
-	/**
-	 * Replace .avif images with .jpg images in HTML
-	 * @param string $html The HTML to process
-	 * 
-	 * @return string The processed HTML
-	 */
-	public function replace_avif_images( string $html ): string {
-		$replaced_images = array();
-
-		if ( ! empty( $html ) ) {
-			$dom = new \DOMDocument();
-			$dom->loadHTML( $html );
-			
-			$images = $dom->getElementsByTagName('img');
-			foreach ( $images as $image ) {
-				if ( $image->hasAttribute( 'src' ) ) {
-					$src = $image->getAttribute( 'src' );
-					
-					if ( '.avif' === substr( $src, -5 ) ) {
-						$replaced_images[$src] = substr( $src, 0, -5 ) . '.jpg';
-					}
-				}
-			}
-			
-			if ( ! empty( $replaced_images ) ) {
-				$html = strtr( $html, $replaced_images );
-				foreach ( $replaced_images as $avif_src => $jpg_src ) {
-					// Get the server path from URL
-					if ( ! file_exists( $avif_src ) ) {
-						continue;
-					}
-	
-					// Skip if jpg already exists
-					if ( file_exists( $jpg_src ) ) {
-						continue;
-					}
-					
-					// Load the avif image
-					if ( function_exists( 'imagecreatefromavif' ) ) {
-						$image = imagecreatefromavif( $avif_src );
-						if ( $image ) {
-							// Save as jpg
-							imagejpeg( $image, $jpg_src, 90 );
-							imagedestroy( $image );
-						}
-					}
-				}
-			}
-		}
-
-		return $html;
 	}
 
 	public function preview_pdf() {
