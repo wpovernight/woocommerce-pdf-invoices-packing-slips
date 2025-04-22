@@ -8,12 +8,16 @@
 	<?php
 	$actions = true;
 	$user_id = get_current_user_id();
-	$hidden = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
-	if ( empty( $hidden ) )
+	$hidden  = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
+
+	if ( empty( $hidden ) ) {
 		$hidden = array( 'shipping_address', 'billing_address', 'wc_actions' );
 		update_user_option( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden, true );
-	if ( in_array( 'wc_actions', $hidden ) )
-		$actions = false
+	}
+
+	if ( in_array( 'wc_actions', $hidden ) ) {
+		$actions = false;
+	}
 	?>
 	<input id="show-action-buttons" type="checkbox" <?php echo $actions !== false ? 'checked' : ''; ?> name="wc_show_action_buttons" value="1">
 	<label for="show-action-buttons" class="slider"></label>

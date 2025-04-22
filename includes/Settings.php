@@ -129,21 +129,30 @@ class Settings {
 	}
 
 	/**
-	 * Get a valid user role settings capability.
-	 * @return string
+	 * Returns the first capability from a filterable list that the current user has access to.
+	 * Falls back to the default capability if none match.
+	 *
+	 * @return string The matched or default user capability.
 	 */
 	public function user_settings_capability() {
-		$user_capability       = 'manage_woocommerce';
-		$capabilities_to_check = apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $user_capability ) );
-
-		foreach ( $capabilities_to_check as $capability ) {
-			if ( current_user_can( $capability ) ) {
-				$user_capability = $capability;
-				break;
+		$manage_woocommerce = 'manage_woocommerce';
+		
+		// Get the default capability
+		$default_capability = apply_filters( 'wpo_wcpdf_settings_default_user_capability', $manage_woocommerce );
+		$default_capability = ( empty( $default_capability ) || ! is_string( $default_capability ) ) ? $manage_woocommerce : $default_capability;
+		
+		// Get the list of capabilities
+		$capabilities = (array) apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $default_capability ) );
+		
+		// Loop through the list
+		foreach ( $capabilities as $capability ) {
+			if ( is_string( $capability ) && current_user_can( $capability ) ) {
+				return $capability;
 			}
 		}
-
-		return $user_capability;
+		
+		// Fallback
+		return ! empty( $default_capability ) ? $default_capability : $manage_woocommerce;
 	}
 
 	/**
@@ -298,11 +307,23 @@ class Settings {
 						$document->set_number( $number_store->get_next() );
 					}
 
-					// apply document number formatting
-					if ( $document_number = $document->get_number( $document->get_type() ) ) {
+					// Update document date.
+					$document->initiate_date();
+
+					// Update document number.
+					$document_number = $document->get_document_number();
+
+					if ( ! empty( $document_number ) ) {
+						$document->set_number( $document_number );
+					}
+
+					$document_number = $document->get_number( $document->get_type() );
+
+					// Apply document number formatting.
+					if ( $document_number ) {
 						if ( ! empty( $document->settings['number_format'] ) ) {
 							foreach ( $document->settings['number_format'] as $key => $value ) {
-								$document_number->$key = $document->settings['number_format'][$key];
+								$document_number->$key = $document->settings['number_format'][ $key ];
 							}
 						}
 						$document_number->apply_formatting( $document, $order );
@@ -479,12 +500,12 @@ class Settings {
 				);
 				// register option separately for singular options
 				if ( is_string( $settings_field['callback'] ) && $settings_field['callback'] == 'singular_text_element') {
-					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic 
+					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 				}
 			}
 		}
 		// $page, $option_group & $option_name are all the same...
-		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic 
+		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
 	}
@@ -644,7 +665,7 @@ class Settings {
 			$outdated = false;
 			// cache could be outdated, so we check whether the folders exist
 			foreach ( $template_list as $path => $template_id ) {
-				if ( @is_dir( $path ) ) {
+				if ( WPO_WCPDF()->file_system->is_dir( $path ) ) {
 					$checked_list[$path] = $template_id; // folder exists
 					continue;
 				}
@@ -656,7 +677,7 @@ class Settings {
 					// try wp-content
 					$relative_path = substr( $path, strrpos( $path, $wp_content_folder ) + strlen( $wp_content_folder ) );
 					$new_path = WP_CONTENT_DIR . $relative_path;
-					if ( @is_dir( $new_path ) ) {
+					if ( WPO_WCPDF()->file_system->is_dir( $new_path ) ) {
 						$checked_list[$new_path] = $template_id;
 					}
 				}
@@ -707,13 +728,13 @@ class Settings {
 		if ( empty( $absolute_path ) ) {
 			return '';
 		}
-		
+
 		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
 			$base_path = wp_normalize_path( ABSPATH );
 		} else {
 			$base_path = wp_normalize_path( WP_CONTENT_DIR );
 		}
-		
+
 		return str_replace( $base_path, '', wp_normalize_path( $absolute_path ) );
 	}
 
@@ -721,7 +742,7 @@ class Settings {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		// bail if no template is selected yet (fresh install)
 		if ( empty( $this->general_settings['template_path'] ) ) {
 			return;
@@ -762,9 +783,9 @@ class Settings {
 
 	public function set_number_store() {
 		$store = ! empty( $_POST['store'] ) ? sanitize_text_field( wp_unslash( $_POST['store'] ) ) : '';
-		
+
 		check_ajax_referer( "wpo_wcpdf_next_{$store}", 'security' );
-		
+
 		// check permissions
 		if ( ! $this->user_can_manage_settings() ) {
 			die();
@@ -788,7 +809,7 @@ class Settings {
 		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW VARIABLES LIKE 'auto_increment_increment'"
 		);
-		
+
 		if ( ! empty( $row ) && ! empty( $row->Value ) && $row->Value != 1 ) {
 			$method = 'calculate';
 		}
@@ -802,7 +823,8 @@ class Settings {
 		}
 
 		// checks AS functions existence
-		if ( ! function_exists( 'as_schedule_single_action' ) || ! function_exists( 'as_get_scheduled_actions' ) ) {
+		if ( ! function_exists( '\\as_schedule_single_action' ) || ! function_exists( '\\as_get_scheduled_actions' ) ) {
+			wcpdf_log_error( 'Action Scheduler functions not available. Cannot schedule yearly document number reset.', 'critical' );
 			return;
 		}
 
@@ -812,7 +834,7 @@ class Settings {
 		$hook      = 'wpo_wcpdf_schedule_yearly_reset_numbers';
 
 		// checks if there are pending actions
-		$scheduled_actions = count( as_get_scheduled_actions( array(
+		$scheduled_actions = count( \as_get_scheduled_actions( array(
 			'hook'   => $hook,
 			'status' => \ActionScheduler_Store::STATUS_PENDING,
 		) ) );
@@ -825,7 +847,7 @@ class Settings {
 				$semaphore->log( 'Lock acquired for yearly reset numbers schedule.', 'info' );
 
 				try {
-					$action_id = as_schedule_single_action( $datetime->getTimestamp(), $hook );
+					$action_id = \as_schedule_single_action( $datetime->getTimestamp(), $hook );
 					if ( ! empty( $action_id ) ) {
 						wcpdf_log_error(
 							"Yearly document numbers reset scheduled with the action id: {$action_id}",
@@ -857,8 +879,10 @@ class Settings {
 				'error'
 			);
 
-			if ( function_exists( 'as_unschedule_all_actions' ) ) {
-				as_unschedule_all_actions( $hook );
+			if ( function_exists( '\\as_unschedule_all_actions' ) ) {
+				\as_unschedule_all_actions( $hook );
+			} else {
+				wcpdf_log_error( 'Action Scheduler functions not available. Cannot unschedule yearly document number reset.', 'critical' );
 			}
 
 			// reschedule
@@ -928,16 +952,26 @@ class Settings {
 		}
 
 		// unschedule existing actions
-		if ( ! $schedule && function_exists( 'as_unschedule_all_actions' ) ) {
-			as_unschedule_all_actions( 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+		if ( ! $schedule ) {
+			if ( function_exists( '\\as_unschedule_all_actions' ) ) {
+				\as_unschedule_all_actions( 'wpo_wcpdf_schedule_yearly_reset_numbers' );
+			} else {
+				wcpdf_log_error( 'Action Scheduler functions not available. Cannot unschedule yearly document number reset.', 'critical' );
+			}
 		}
 
 		return $schedule;
 	}
 
 	public function yearly_reset_action_is_scheduled() {
-		$is_scheduled      = false;
-		$scheduled_actions = as_get_scheduled_actions( array(
+		$is_scheduled = false;
+		
+		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
+			wcpdf_log_error( 'Action Scheduler function not available. Cannot check if the yearly numbering reset is scheduled.', 'critical' );
+			return $is_scheduled;
+		}
+		
+		$scheduled_actions = \as_get_scheduled_actions( array(
 			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
 			'status' => \ActionScheduler_Store::STATUS_PENDING,
 		) );
@@ -961,9 +995,9 @@ class Settings {
 
 	public function get_media_upload_setting_html() {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
-		
+
 		$request = stripslashes_deep( $_POST );
-		
+
 		// check permissions
 		if ( ! $this->user_can_manage_settings() ) {
 			wp_send_json_error();

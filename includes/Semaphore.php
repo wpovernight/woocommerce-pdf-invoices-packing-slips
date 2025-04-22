@@ -97,7 +97,7 @@ class Semaphore {
 	 */
 	private function ensure_database_initialised(): int {
 		global $wpdb;
-	
+
 		// Check if the lock option already exists
 		$existing_option = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
@@ -105,12 +105,12 @@ class Semaphore {
 				$this->option_name
 			)
 		);
-	
+
 		if ( 1 === (int) $existing_option ) {
 			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') already existed in the database', 'debug' );
 			return 1;
 		}
-	
+
 		// Insert the lock option with a default value of 0
 		$rows_affected = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
@@ -118,7 +118,7 @@ class Semaphore {
 				$this->option_name
 			)
 		);
-	
+
 		if ( $rows_affected > 0 ) {
 			$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') was created in the database', 'debug' );
 			return 2;
@@ -174,16 +174,16 @@ class Semaphore {
 					$time_now
 				)
 			);
-			
+
 			// Now that the row has been created, try again
 			if ( 1 === $query ) {
 				$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') acquired after initialising the database', 'info' );
 				$this->acquired = true;
 				return true;
 			}
-			
+
 			$retries--;
-			
+
 			if ( $retries >= 0 ) {
 				$this->log( 'Lock (' . $this->option_name . ', ' . $wpdb->options . ') not yet acquired; sleeping', 'debug' );
 				sleep( 1 );
@@ -217,7 +217,7 @@ class Semaphore {
 		}
 
 		global $wpdb;
-		
+
 		$this->log( 'Lock option (' . $this->option_name . ', ' . $wpdb->options . ') released', 'info' );
 
 		$result = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -365,7 +365,12 @@ class Semaphore {
 	 * @return bool - whether the cleanup is scheduled
 	 */
 	public static function is_cleanup_scheduled(): bool {
-		return function_exists( 'as_next_scheduled_action' ) && as_next_scheduled_action( self::get_cleanup_hook_name() );
+		if ( function_exists( '\\as_next_scheduled_action' ) ) {
+			return \as_next_scheduled_action( self::get_cleanup_hook_name() );
+		} else {
+			\wcpdf_log_error( 'Action Scheduler is not available. Cannot check if cleanup is scheduled.', 'critical' );
+			return false;
+		}
 	}
 
 	/**
@@ -377,18 +382,22 @@ class Semaphore {
 		$action = null;
 
 		if ( self::is_cleanup_scheduled() ) {
-			$args = array(
-				'hook'    => self::get_cleanup_hook_name(),
-				'status'  => \ActionScheduler_Store::STATUS_PENDING,
-				'orderby' => 'timestamp',
-				'order'   => 'ASC',
-				'limit'   => 1,
-			);
-
-			$actions = as_get_scheduled_actions( $args );
-
-			if ( ! empty( $actions ) && 1 === count( $actions ) ) {
-				$action = reset( $actions );
+			if ( function_exists( '\\as_get_scheduled_actions' ) ) {
+				$args = array(
+					'hook'    => self::get_cleanup_hook_name(),
+					'status'  => \ActionScheduler_Store::STATUS_PENDING,
+					'orderby' => 'timestamp',
+					'order'   => 'ASC',
+					'limit'   => 1,
+				);
+	
+				$actions = \as_get_scheduled_actions( $args );
+	
+				if ( ! empty( $actions ) && 1 === count( $actions ) ) {
+					$action = reset( $actions );
+				}
+			} else {
+				\wcpdf_log_error( 'Action Scheduler is not available. Cannot get cleanup action.', 'critical' );
 			}
 		}
 
@@ -403,7 +412,12 @@ class Semaphore {
 	public static function schedule_semaphore_cleanup(): void {
 		if ( ! self::is_cleanup_scheduled() ) {
 			$interval = apply_filters( self::get_cleanup_hook_name() . '_interval', 30 * DAY_IN_SECONDS ); // default: every 30 days
-			as_schedule_recurring_action( time(), $interval, self::get_cleanup_hook_name() );
+
+			if ( function_exists( '\\as_schedule_recurring_action' ) ) {
+				\as_schedule_recurring_action( time(), $interval, self::get_cleanup_hook_name() );
+			} else {
+				\wcpdf_log_error( 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.', 'critical' );
+			}
 		}
 	}
 
@@ -413,11 +427,16 @@ class Semaphore {
 	 * @return void
 	 */
 	public static function init_cleanup(): void {
+		// This is to prevent the cleanup from running before the plugin is fully loaded
+		if ( WPO_WCPDF()->dependencies_are_ready() ) {
+			return;
+		}
+		
 		// Schedule cleanup of released locks
 		self::schedule_semaphore_cleanup();
 
 		// Cleanup released locks
-		add_action( self::get_cleanup_hook_name(), array( __CLASS__, 'cleanup_released_locks' ) );
+		\add_action( self::get_cleanup_hook_name(), array( __CLASS__, 'cleanup_released_locks' ) );
 	}
 
 }

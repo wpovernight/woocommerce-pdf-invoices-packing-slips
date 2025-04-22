@@ -78,12 +78,11 @@ class Frontend {
 		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
 			if ( $general_settings = get_option( 'wpo_wcpdf_settings_general' ) ) {
 				if ( isset( $general_settings['download_display'] ) && $general_settings['download_display'] == 'display' ) {
-					$suffix        = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-					$file_path     = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
-					$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
+					$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+					$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
 
-					if ( $wp_filesystem->exists( $file_path ) ) {
-						$script = $wp_filesystem->get_contents( $file_path );
+					if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
+						$script = WPO_WCPDF()->file_system->get_contents( $file_path );
 						
 						if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
 							$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );

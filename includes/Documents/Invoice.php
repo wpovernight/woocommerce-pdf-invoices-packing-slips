@@ -95,15 +95,7 @@ class Invoice extends OrderDocumentMethods {
 	public function init() {
 		// save settings
 		$this->save_settings();
-
-		if ( isset( $this->settings['display_date'] ) && $this->settings['display_date'] == 'order_date' && !empty( $this->order ) ) {
-			$this->set_date( $this->order->get_date_created() );
-			$this->set_display_date( 'order_date' );
-		} elseif( empty( $this->get_date() ) ) {
-			$this->set_date( current_time( 'timestamp', true ) );
-			$this->set_display_date( 'invoice_date' );
-		}
-
+		$this->initiate_date();
 		$this->initiate_number();
 
 		do_action( 'wpo_wcpdf_init_document', $this );
@@ -209,8 +201,6 @@ class Invoice extends OrderDocumentMethods {
 	 * PDF settings fields
 	 */
 	public function get_pdf_settings_fields( $option_name ) {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
 		$settings_fields = array(
 			array(
 				'type'			=> 'section',
@@ -240,7 +230,7 @@ class Invoice extends OrderDocumentMethods {
 					'id'			  => 'attach_to_email_ids',
 					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
-					'description'	  => ! $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+					'description'	  => ! WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
 				)
 			),
 			array(
@@ -321,7 +311,7 @@ class Invoice extends OrderDocumentMethods {
 					'id'			=> 'display_date',
 					'options' 		=> array(
 						''				=> __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'invoice_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'document_date'	=> __( 'Invoice Date' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'order_date'	=> __( 'Order Date' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 				)
@@ -580,12 +570,12 @@ class Invoice extends OrderDocumentMethods {
 					'option_name' => $option_name,
 					'id'          => 'include_email_link_placement',
 					'options'     => apply_filters( 'wpo_wcpdf_document_link_guest_emails_template_hooks_options', array(
-						'order_details'            => 'Order details',
-						'order_meta'               => 'Order meta',
-						'before_order_table'       => 'Before order table',
-						'after_order_table'        => 'After order table',
-						'customer_address_section' => 'Customer address section',
-						'customer_details'         => 'Customer details',
+						'order_details'            => __( 'Order details', 'woocommerce-pdf-invoices-packing-slips' ),
+						'order_meta'               => __( 'Order meta', 'woocommerce-pdf-invoices-packing-slips' ),
+						'before_order_table'       => __( 'Before order table', 'woocommerce-pdf-invoices-packing-slips' ),
+						'after_order_table'        => __( 'After order table', 'woocommerce-pdf-invoices-packing-slips' ),
+						'customer_address_section' => __( 'Customer address section', 'woocommerce-pdf-invoices-packing-slips' ),
+						'customer_details'         => __( 'Customer details', 'woocommerce-pdf-invoices-packing-slips' ),
 					), $this ),
 					'description' => __( 'Select the placement of the document link in the guest customer emails.', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
@@ -617,8 +607,6 @@ class Invoice extends OrderDocumentMethods {
 	 * UBL settings fields
 	 */
 	public function get_ubl_settings_fields( $option_name ) {
-		$wp_filesystem = wpo_wcpdf_get_wp_filesystem();
-
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -668,7 +656,7 @@ class Invoice extends OrderDocumentMethods {
 					'id'              => 'attach_to_email_ids',
 					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
-					'description'     => ! $wp_filesystem->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+					'description'     => ! WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
 				)
 			),
 			array(
