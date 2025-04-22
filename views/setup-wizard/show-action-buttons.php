@@ -16,7 +16,7 @@
 		update_user_option( $user_id, $orders_column_hidden_key, $hidden, true );
 	}
 
-	if ( in_array( 'wc_actions', $hidden ) ) {
+	if ( is_array( $hidden ) && in_array( 'wc_actions', $hidden ) ) {
 		$actions = false;
 	}
 	?>
