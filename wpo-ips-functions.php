@@ -1492,14 +1492,16 @@ function wpo_ips_replace_avif_images( string $html ): string {
 
 	if ( ! empty( $html ) ) {
 		$dom = new \DOMDocument();
-		$dom->loadHTML( $html );
+		libxml_use_internal_errors( true ); // suppress malformed HTML errors 
+		@$dom->loadHTML( '<div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD ); 
+		libxml_clear_errors(); 
 		
 		$images = $dom->getElementsByTagName('img');
 		foreach ( $images as $image ) {
 			if ( $image->hasAttribute( 'src' ) ) {
 				$src = $image->getAttribute( 'src' );
 				
-				if ( '.avif' === substr( $src, -5 ) ) {
+				if ( '.avif' === substr( $src, -5 ) && 'http' !== substr( $src, 0, 4 ) ) {
 					$replaced_images[$src] = substr( $src, 0, -5 ) . '.jpg';
 				}
 			}
