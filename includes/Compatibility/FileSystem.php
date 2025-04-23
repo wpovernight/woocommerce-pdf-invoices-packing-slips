@@ -63,7 +63,7 @@ class FileSystem {
 			'wpo_wcpdf_filesystem_method',
 			$debug_settings['file_system_method'] ?? $this->system_enabled
 		);
-		$this->system_enabled                 = ( 'php' === $debug_settings['file_system_method'] ) ? 'php' : 'wp';
+		$this->system_enabled = ( 'php' === $debug_settings['file_system_method'] ) ? 'php' : 'wp';
 		
 		if ( 'wp' === $this->system_enabled ) {
 			$this->initialize_wp_filesystem();
