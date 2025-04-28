@@ -1464,8 +1464,14 @@ abstract class OrderDocument {
 			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
 			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
 		);
+
+		$html           = $this->get_html();
+		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+		if ( isset( $debug_settings['enable_avif_support'] ) && wc_string_to_bool( $debug_settings['enable_avif_support'] ) ) {
+			$html = wpo_ips_replace_avif_images( $html );
+		}
 		
-		$pdf_maker    = wcpdf_get_pdf_maker( wpo_ips_replace_avif_images( $this->get_html() ), $pdf_settings, $this );
+		$pdf_maker    = wcpdf_get_pdf_maker( $html, $pdf_settings, $this );
 		$pdf          = $pdf_maker->output();
 
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );

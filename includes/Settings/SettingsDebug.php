@@ -1032,6 +1032,20 @@ class SettingsDebug {
 					'description' => __( 'Enables the danger zone tools. The actions performed by these tools are irreversible!', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'enable_avif_support',
+				'title'    => __( 'Enable AVIF support', 'woocommerce-pdf-invoices-packing-slips' ) . ' <sup class="wcpdf_beta">beta</sup>',
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'enable_avif_support',
+					'description' => __( 'Enables AVIF support. This will replace AVIF images with JPG images in the PDF documents.', 'woocommerce-pdf-invoices-packing-slips' )
+									. ( version_compare(PHP_VERSION, '8.0.0', '<') ? ' <strong>' . __( 'This feature requires PHP 8.0 or higher.', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>' : '' )
+									. ( ! extension_loaded( 'gd' ) ? ' <strong>' . __( 'This feature requires the GD extension to be enabled.', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>' : '' )
+				)
+			),
 		);
 
 		// allow plugins to alter settings fields
