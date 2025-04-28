@@ -21,7 +21,7 @@ class Install {
 	public function __construct() {
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-			add_action( 'wp_loaded', array( $this, 'do_install' ) );
+			add_action( 'admin_init', array( $this, 'do_install' ) );
 		}
 	}
 
@@ -234,7 +234,7 @@ class Install {
 
 		// To ensure fonts will be copied to the upload directory
 		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
-		
+
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts();
 
@@ -403,22 +403,22 @@ class Install {
 				if ( ! $table_name_exists ) {
 					continue;
 				}
-				
+
 				if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
 					$number_store = $document->get_sequential_number_store();
-					
+
 					if ( ! empty( $number_store ) ) {
 						$column_name = 'date';
 						$table_name  = $number_store->table_name;
-					
+
 						$query = wpo_wcpdf_prepare_identifier_query(
 							"ALTER TABLE %i ALTER %i SET DEFAULT %s",
 							array( $table_name, $column_name ),
 							array( '1000-01-01 00:00:00' )
 						);
-					
+
 						$query_result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-					
+
 						if ( $query_result ) {
 							wcpdf_log_error(
 								"Default value changed for '{$column_name}' column to '1000-01-01 00:00:00' on database table: {$table_name}",
@@ -589,7 +589,7 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
 		}
-		
+
 		// 4.3.0-rc.2: reload attachment translations
 		if ( version_compare( $installed_version, '4.3.0-rc.2', '<' ) ) {
 			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
@@ -625,10 +625,10 @@ class Install {
 		) {
 			WPO_WCPDF()->main->init_tmp();
 		}
-		
+
 		// To ensure fonts will be copied to the upload directory
 		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
-		
+
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts();
 	}
