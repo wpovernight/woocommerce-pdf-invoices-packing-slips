@@ -1041,7 +1041,7 @@ class SettingsDebug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'enable_avif_support',
-					'description' => __( 'Enables AVIF support. This will replace AVIF images with JPG images in the PDF documents.', 'woocommerce-pdf-invoices-packing-slips' )
+					'description' => __( 'Enables AVIF support. This will replace local AVIF images with JPG images in the PDF documents.', 'woocommerce-pdf-invoices-packing-slips' )
 									. ( version_compare(PHP_VERSION, '8.0.0', '<') ? ' <strong>' . __( 'This feature requires PHP 8.0 or higher.', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>' : '' )
 									. ( ! extension_loaded( 'gd' ) ? ' <strong>' . __( 'This feature requires the GD extension to be enabled.', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>' : '' )
 				)
