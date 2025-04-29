@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Formats\Cii;
+namespace WPO\IPS\EInvoice\Sintax\Cii;
 
 use WPO\IPS\EInvoice\Abstracts\AbstractDocument;
 
@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class CiiDocument extends AbstractDocument {
+	
+	public string $sintax = 'cii';
 
 	public function get_root_element() {
 		return apply_filters( 'wpo_ips_einvoice_cii_document_root_element', 'rsm:CrossIndustryInvoice', $this );
@@ -23,33 +25,33 @@ class CiiDocument extends AbstractDocument {
 			// Exchanged Document Context
 			'exchanged_document_context' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ExchangedDocumentContextHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ExchangedDocumentContextHandler::class,
 			),
 			
 			// Exchanged Document
 			'exchanged_document' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ExchangedDocumentHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ExchangedDocumentHandler::class,
 			),
 			
 			// Header Trade Agreement
 			'seller_trade_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeAgreement\SellerTradePartyHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeAgreement\SellerTradePartyHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeAgreement',
 				),
 			),
 			'buyer_trade_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeAgreement\BuyerTradePartyHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeAgreement\BuyerTradePartyHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeAgreement',
 				),
 			),
 			'contract_referenced_document' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeAgreement\ContractReferencedDocumentHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeAgreement\ContractReferencedDocumentHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeAgreement',
 				),
@@ -58,41 +60,41 @@ class CiiDocument extends AbstractDocument {
 			// Header Trade Delivery
 			'header_trade_delivery' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\HeaderTradeDeliveryHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\HeaderTradeDeliveryHandler::class,
 			),
 			
 			// Header Trade Settlement
 			'payment_reference' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentReferenceHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentReferenceHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'payment_means' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentMeansHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentMeansHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'trade_tax' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeSettlement\TradeTaxHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeSettlement\TradeTaxHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'payment_terms' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentTermsHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentTermsHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'monetary_summation' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeSettlement\MonetarySummationHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeSettlement\MonetarySummationHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
@@ -101,7 +103,7 @@ class CiiDocument extends AbstractDocument {
 			// Line Items
 			'included_supply_chain_trade_line_item' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Cii\Handlers\SupplyChainTradeTransaction\InvoiceLineHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\SupplyChainTradeTransaction\InvoiceLineHandler::class,
 				'options' => array(
 					'root' => 'rsm:SupplyChainTradeTransaction',
 				),

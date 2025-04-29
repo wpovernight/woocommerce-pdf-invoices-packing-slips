@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Formats\Ubl;
+namespace WPO\IPS\EInvoice\Sintax\Ubl;
 
 use WPO\IPS\EInvoice\Abstracts\AbstractDocument;
 
@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class UblDocument extends AbstractDocument {
+	
+	public string $sintax = 'ubl';
 
 	public function get_root_element() {
 		return apply_filters( 'wpo_wc_ubl_document_root_element', 'Invoice', $this );
@@ -22,77 +24,77 @@ class UblDocument extends AbstractDocument {
 		$format = apply_filters( 'wpo_wc_ubl_document_format' , array(
 			'ubl_version_id' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\UblVersionIdHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\UblVersionIdHandler::class,
 			),
 			'id' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\IdHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\IdHandler::class,
 			),
 			'issue_date' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\IssueDateHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\IssueDateHandler::class,
 			),
 			'invoice_type_code' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\InvoiceTypeCodeHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\InvoiceTypeCodeHandler::class,
 			),
 			'document_currency_code' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\DocumentCurrencyCodeHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\DocumentCurrencyCodeHandler::class,
 			),
 			'buyer_reference' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\BuyerReferenceHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\BuyerReferenceHandler::class,
 			),
 			'order_reference' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\OrderReferenceHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\OrderReferenceHandler::class,
 			),
 			'additional_document_reference' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\AdditionalDocumentReferenceHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\AdditionalDocumentReferenceHandler::class,
 			),
 			'accounting_supplier_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\AddressHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\AddressHandler::class,
 				'options' => array(
 					'root' => 'cac:AccountingSupplierParty',
 				),
 			),
 			'accounting_customer_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\AddressHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\AddressHandler::class,
 				'options' => array(
 					'root' => 'cac:AccountingCustomerParty',
 				),
 			),
 			'delivery' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\DeliveryHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\DeliveryHandler::class,
 			),
 			'payment_means' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\PaymentMeansHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\PaymentMeansHandler::class,
 			),
 			'payment_terms' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\PaymentTermsHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\PaymentTermsHandler::class,
 			),
 			'allowance_charge' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\AllowanceChargeHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\AllowanceChargeHandler::class,
 			),
 			'tax_total' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\TaxTotalHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\TaxTotalHandler::class,
 			),
 			'legal_monetary_total' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\LegalMonetaryTotalHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\LegalMonetaryTotalHandler::class,
 			),
 			'invoice_line' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Formats\Ubl\Handlers\InvoiceLineHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\InvoiceLineHandler::class,
 			),
 		), $this );
 

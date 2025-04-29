@@ -9,21 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class AbstractDocument {
-
-	/** @var \WC_Abstract_Order */
-	public $order;
-
-	/** @var array */
-	public $order_tax_data;
 	
-	/** @var array */
-	public $order_coupons_data;
-
-	/** @var string */
-	public $output;
-
-	/** @var OrderDocument */
-	public $order_document;
+	public string $syntax;
+	public string $version;
+	public \WC_Abstract_Order $order;
+	public array $order_tax_data;
+	public array $order_coupons_data;
+	public string $output;
+	public OrderDocument $order_document;
 
 	public function set_order( \WC_Abstract_Order $order ) {
 		$this->order              = $order;

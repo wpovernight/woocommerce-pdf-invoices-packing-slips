@@ -1,5 +1,5 @@
 <?php
-namespace WPO\IPS\EInvoice\Formats\Ubl\Handlers;
+namespace WPO\IPS\EInvoice\Sintax\Ubl\Handlers;
 
 use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
 
