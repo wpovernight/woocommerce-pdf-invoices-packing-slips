@@ -235,9 +235,6 @@ class Install {
 		// To ensure fonts will be copied to the upload directory
 		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
 
-		// Maybe reinstall fonts
-		WPO_WCPDF()->main->maybe_reinstall_fonts();
-
 		// 1.5.28 update: copy next invoice number to separate setting
 		if ( $installed_version == 'versionless' || version_compare( $installed_version, '1.5.28', '<' ) ) {
 			$template_settings = get_option( 'wpo_wcpdf_template_settings' );
@@ -596,6 +593,9 @@ class Install {
 			$debug_settings['reload_attachment_translations'] = '1';
 			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		}
+		
+		// Maybe reinstall fonts
+		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
 	}
 
 	/**
