@@ -104,6 +104,12 @@ jQuery( function( $ ) {
 			$form.find('.wpo-wcpdf-regenerate-document').hide();
 		}
 
+		// Remove previous notice if exists.
+		const $previous_notice = $( this ).closest( '#wpo_wcpdf-data-input-box' ).find( '.notice' );
+		if ( $previous_notice.length ) {
+			$previous_notice.remove();
+		}
+
 		// block ui
 		$form.block( {
 			message: null,
@@ -135,10 +141,10 @@ jQuery( function( $ ) {
 						toggle_edit_mode( $form );
 
 						const notice_type   = response.success ? 'success' : 'error';
-						const $target_filed = $( this ).find( '.wcpdf-data-fields[data-document="' + data.document + '"][data-order_id="' + data.order_id + '"]' );
+						const $target_field = $( this ).find( '.wcpdf-data-fields[data-document="' + data.document + '"][data-order_id="' + data.order_id + '"]' );
 
-						if ( $target_filed.length ) {
-							$target_filed.before(
+						if ( $target_field.length ) {
+							$target_field.before(
 								'<div class="notice notice-' + notice_type + ' inline" style="margin:0 10px 10px 10px;">' +
 								'<p>' + response.data.message + '</p>' +
 								'</div>'
