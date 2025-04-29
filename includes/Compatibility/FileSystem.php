@@ -52,17 +52,26 @@ class FileSystem {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->suppress_errors                = apply_filters( 'wpo_wcpdf_file_system_suppress_errors', true );
-		$debug_settings                       = get_option( 'wpo_wcpdf_settings_debug', array() );
-		$debug_settings['file_system_method'] = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' ); // Override the filesystem method via code snippet
-		$this->system_enabled                 = ( 'php' === $debug_settings['file_system_method'] ) ? 'php' : 'wp';
+		$this->suppress_errors = apply_filters( 'wpo_wcpdf_file_system_suppress_errors', true );
+		$debug_settings        = get_option( 'wpo_wcpdf_settings_debug', array() );
+		
+		if ( ! is_array( $debug_settings ) ) {
+			$debug_settings = array();
+		}
+		
+		$debug_settings['file_system_method'] = apply_filters( // Allow overriding the filesystem method via filter
+			'wpo_wcpdf_filesystem_method',
+			$debug_settings['file_system_method'] ?? $this->system_enabled
+		);
+		
+		$this->system_enabled = ( 'php' === $debug_settings['file_system_method'] )
+			? 'php'
+			: 'wp';
 		
 		if ( 'wp' === $this->system_enabled ) {
 			$this->initialize_wp_filesystem();
-		} else {
-			if ( ! defined( 'FS_CHMOD_FILE' ) ) {
-				define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
-			}
+		} elseif ( ! defined( 'FS_CHMOD_FILE' ) ) {
+			define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
 		}
 	}
 	

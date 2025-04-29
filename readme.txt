@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.4.0
+Stable tag: 4.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,11 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.4.1 (2025-04-28) =
+- Tweak: Improve Invoice My Account link logic for custom status checks and code clarity
+- Fix: Type error when accessing debug settings in FileSystem constructor
+- Translations: Updated translation template (POT)
 
 = 4.4.0 (2025-04-22) =
 - New: Add index on `order_id` column to document number database tables
