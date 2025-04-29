@@ -8,14 +8,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class TaxesSettings {
 
+	/**
+	 * The version of the EN16931 standard that this plugin is based on.
+	 * 
+	 * @see https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/Registry+of+supporting+artefacts+to+implement+EN16931
+	 *
+	 * @var string
+	 */
 	private string $EN16931_version = '15.0';
+	
+	/**
+	 * The settings for the UBL taxes.
+	 *
+	 * @var array
+	 */
 	public array $settings;
-
+	
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 		$this->settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 	}
-
-	public function output() {
+	
+	/**
+	 * Output the settings page for UBL taxes.
+	 * 
+	 * @return void
+	 */
+	public function output(): void {
 		settings_fields( 'wpo_wcpdf_settings_ubl_taxes' );
 		do_settings_sections( 'wpo_wcpdf_settings_ubl_taxes' );
 
@@ -36,8 +57,16 @@ class TaxesSettings {
 
 		submit_button();
 	}
-
-	public function output_table_for_tax_class( $slug, $name ) {
+	
+	/**
+	 * Output the table for a specific tax class.
+	 *
+	 * @param string $slug The slug of the tax class.
+	 * @param string $name The name of the tax class.
+	 *
+	 * @return void
+	 */
+	public function output_table_for_tax_class( string $slug, string $name ): void {
 		global $wpdb;
 		
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
