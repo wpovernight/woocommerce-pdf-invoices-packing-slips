@@ -1,10 +1,4 @@
 <?php
-/**
- * AVIF image converter class.
- *
- * @since 4.2
- */
-
 namespace WPO\IPS\Compatibility\Avif;
 
 defined( 'ABSPATH' ) or exit;
