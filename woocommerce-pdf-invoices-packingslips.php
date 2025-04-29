@@ -40,6 +40,7 @@ class WPO_WCPDF {
 	public $frontend;
 	public $install;
 	public $font_synchronizer;
+	public $avif_compatibility;
 
 	protected static $_instance = null;
 
