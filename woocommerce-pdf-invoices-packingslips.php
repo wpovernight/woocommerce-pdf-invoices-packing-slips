@@ -156,6 +156,7 @@ class WPO_WCPDF {
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
+		$this->avif_compatibility  = \WPO\IPS\Compatibility\Avif\AvifCompatibility::instance();
 
 		// Plugin classes
 		$this->settings            = \WPO\IPS\Settings::instance();
