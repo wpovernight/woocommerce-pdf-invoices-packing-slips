@@ -44,7 +44,7 @@ class OrderUtil {
 	}
 
 	public function custom_orders_table_usage_is_enabled() {
-		if ( $this->wc_order_util_class_object && is_callable( [ $this->wc_order_util_class_object, 'custom_orders_table_usage_is_enabled' ] ) ) {
+		if ( $this->wc_order_util_class_object && is_callable( array( $this->wc_order_util_class_object, 'custom_orders_table_usage_is_enabled' ) ) ) {
 			return $this->wc_order_util_class_object::custom_orders_table_usage_is_enabled();
 		} else {
 			return false;

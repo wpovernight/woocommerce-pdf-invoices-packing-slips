@@ -6,16 +6,22 @@
 </div>
 <div class="wpo-setup-input">
 	<?php
-	$actions = true;
-	$user_id = get_current_user_id();
-	$hidden  = get_user_meta( $user_id, 'manageedit-shop_ordercolumnshidden', true );
-
+	$actions    = true;
+	$user_id    = get_current_user_id();
+	$column_key = 'wc_actions';
+	
+	$orders_column_hidden_key = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled()
+		? 'managewoocommerce_page_wc-orderscolumnshidden'
+		: 'manageedit-shop_ordercolumnshidden';
+	
+	$hidden = get_user_meta( $user_id, $orders_column_hidden_key, true );
+	
 	if ( empty( $hidden ) ) {
-		$hidden = array( 'shipping_address', 'billing_address', 'wc_actions' );
-		update_user_option( $user_id, 'manageedit-shop_ordercolumnshidden', $hidden, true );
+		$hidden = array( 'shipping_address', 'billing_address', $column_key );
+		update_user_option( $user_id, $orders_column_hidden_key, $hidden, true );
 	}
-
-	if ( in_array( 'wc_actions', $hidden ) ) {
+	
+	if ( is_array( $hidden ) && in_array( $column_key, $hidden, true ) ) {
 		$actions = false;
 	}
 	?>
