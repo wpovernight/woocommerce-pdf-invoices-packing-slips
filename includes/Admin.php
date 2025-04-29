@@ -485,7 +485,7 @@ class Admin {
 	 * @return void
 	 */
 	public function add_meta_boxes( $wc_screen_id, $wc_order ) {
-		if ( class_exists( CustomOrdersTableController::class ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
+		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() ) {
 			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
 			$screen_id = 'shop_order';
@@ -883,45 +883,45 @@ class Admin {
 				<div class="read-only">
 					<?php if ( $document->exists() ) : ?>
 						<?php if ( isset( $data['number'] ) ) : ?>
-						<div class="<?php echo esc_attr( $document->get_type() ); ?>-number">
-							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
-								<p>
-									<span><strong><?php echo wp_kses_post( $data['number']['label'] ); ?></strong></span>
-									<span><?php echo esc_attr( $data['number']['formatted'] ); ?></span>
+							<div class="<?php echo esc_attr( $document->get_type() ); ?>-number">
+								<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
+									<p>
+										<span><strong><?php echo wp_kses_post( $data['number']['label'] ); ?></strong></span>
+										<span><?php echo esc_attr( $data['number']['formatted'] ); ?></span>
+									</p>
 								</p>
-							</p>
-						</div>
+							</div>
 						<?php endif; ?>
-						<?php if( isset( $data['date'] ) ) : ?>
-						<div class="<?php echo esc_attr( $document->get_type() ); ?>-date">
-							<p class="form-field form-field-wide">
-								<p>
-									<span><strong><?php echo wp_kses_post( $data['date']['label'] ); ?></strong></span>
-									<span><?php echo esc_attr( $data['date']['formatted'] ); ?></span>
+						<?php if ( isset( $data['date'] ) ) : ?>
+							<div class="<?php echo esc_attr( $document->get_type() ); ?>-date">
+								<p class="form-field form-field-wide">
+									<p>
+										<span><strong><?php echo wp_kses_post( $data['date']['label'] ); ?></strong></span>
+										<span><?php echo esc_attr( $data['date']['formatted'] ); ?></span>
+									</p>
 								</p>
-							</p>
-						</div>
+							</div>
 						<?php endif; ?>
 						<div class="pdf-more-details" style="display:none;">
 							<?php if ( isset( $data['display_date'] ) ) : ?>
-							<div class="<?php echo esc_attr( $document->get_type() ); ?>-display-date">
-								<p class="form-field form-field-wide">
-									<p>
-										<span><strong><?php echo wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
-										<span><?php echo esc_attr( $data['display_date']['value'] ); ?></span>
+								<div class="<?php echo esc_attr( $document->get_type() ); ?>-display-date">
+									<p class="form-field form-field-wide">
+										<p>
+											<span><strong><?php echo wp_kses_post( $data['display_date']['label'] ); ?></strong></span>
+											<span><?php echo esc_attr( $data['display_date']['value'] ); ?></span>
+										</p>
 									</p>
-								</p>
-							</div>
+								</div>
 							<?php endif; ?>
 							<?php if ( isset( $data['creation_trigger'] ) && ! empty( $data['creation_trigger']['value'] ) ) : ?>
-							<div class="<?php echo esc_attr( $document->get_type() ); ?>-creation-status">
-								<p class="form-field form-field-wide">
-									<p>
-										<span><strong><?php echo wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
-										<span><?php echo esc_attr( $data['creation_trigger']['value'] ); ?></span>
+								<div class="<?php echo esc_attr( $document->get_type() ); ?>-creation-status">
+									<p class="form-field form-field-wide">
+										<p>
+											<span><strong><?php echo wp_kses_post( $data['creation_trigger']['label'] ); ?></strong></span>
+											<span><?php echo esc_attr( $data['creation_trigger']['value'] ); ?></span>
+										</p>
 									</p>
-								</p>
-							</div>
+								</div>
 							<?php endif; ?>
 						</div>
 						<?php if ( isset( $data['display_date'] ) || isset( $data['creation_trigger'] ) ) : ?>
@@ -932,67 +932,56 @@ class Admin {
 						<?php endif; ?>
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
-						<?php /* translators: document title */ ?>
-						<?php
-						if ( $this->user_can_manage_document( $document->get_type() ) ) {
-							printf(
-								'<span class="wpo-wcpdf-set-date-number button">%s</span>',
-								sprintf(
+						<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
+							<span class="wpo-wcpdf-set-date-number button">
+								<?php printf(
 									/* translators: document title */
 									esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
 									wp_kses_post( $document->get_title() )
-								)
-							);
-						} else {
-							printf( '<p>%s</p>', esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ) );
-						}
-						?>
-
+								); ?>
+							</span>
+						<?php else : ?>
+							<p><?php echo esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+						<?php endif; ?>
 					<?php endif; ?>
 				</div>
 
 				<!-- Editable -->
 				<div class="editable">
-					<?php if( isset( $data['number'] ) ) : ?>
-					<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
-						<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php echo wp_kses_post( $data['number']['label'] ); ?></label>
-						<input type="text" class="short" style="" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
-					</p>
+					<?php if ( isset( $data['number'] ) ) : ?>
+						<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
+							<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php echo wp_kses_post( $data['number']['label'] ); ?></label>
+							<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo (int) esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+						</p>
 					<?php endif; ?>
-					<?php if( isset( $data['date'] ) ) : ?>
-					<p class="form-field form-field-wide">
-						<label for="<?php echo esc_attr( $data['date']['name'] ); ?>[date]"><?php echo wp_kses_post( $data['date']['label'] ); ?></label>
-						<input type="text" class="date-picker-field" name="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?php echo esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?php echo esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?php echo esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
-					</p>
+					<?php if ( isset( $data['date'] ) ) : ?>
+						<p class="form-field form-field-wide">
+							<label for="<?php echo esc_attr( $data['date']['name'] ); ?>[date]"><?php echo wp_kses_post( $data['date']['label'] ); ?></label>
+							<input type="text" class="date-picker-field" name="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?php echo esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?php echo esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?php echo esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
+						</p>
 					<?php endif; ?>
 				</div>
 
 				<!-- Document Notes -->
-				<?php if( array_key_exists( 'notes', $data ) ) : ?>
-
-				<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
-
-				<!-- Read only -->
-				<div class="read-only">
-					<span><strong><?php echo wp_kses_post( $data['notes']['label'] ); ?></strong></span>
-					<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
-						<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
-					<?php endif; ?>
-					<p><?php echo ( $data['notes']['value'] == wp_strip_all_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
-				</div>
-				<!-- Editable -->
-				<div class="editable-notes">
-					<p class="form-field form-field-wide">
-						<label for="<?php echo esc_attr( $data['notes']['name'] ); ?>"><?php echo wp_kses_post( $data['notes']['label'] ); ?></label>
-						<p><textarea name="<?php echo esc_attr( $data['notes']['name'] ); ?>" class="<?php echo esc_attr( $data['notes']['name'] ); ?>" cols="60" rows="5" disabled="disabled"><?php echo wp_kses_post( $data['notes']['value'] ); ?></textarea></p>
-					</p>
-				</div>
-
-				<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
-
+				<?php if ( array_key_exists( 'notes', $data ) ) : ?>
+					<?php do_action( 'wpo_wcpdf_meta_box_before_document_notes', $document, $document->order ); ?>
+					<!-- Read only -->
+					<div class="read-only">
+						<span><strong><?php echo wp_kses_post( $data['notes']['label'] ); ?></strong></span>
+						<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
+							<span class="wpo-wcpdf-edit-document-notes dashicons dashicons-edit" data-edit="notes"></span>
+						<?php endif; ?>
+						<p><?php echo ( $data['notes']['value'] == wp_strip_all_tags( $data['notes']['value'] ) ) ? wp_kses_post( nl2br( $data['notes']['value'] ) ) : wp_kses_post( $data['notes']['value'] ); ?></p>
+					</div>
+					<!-- Editable -->
+					<div class="editable-notes">
+						<p class="form-field form-field-wide">
+							<label for="<?php echo esc_attr( $data['notes']['name'] ); ?>"><?php echo wp_kses_post( $data['notes']['label'] ); ?></label>
+							<p><textarea name="<?php echo esc_attr( $data['notes']['name'] ); ?>" class="<?php echo esc_attr( $data['notes']['name'] ); ?>" cols="60" rows="5" disabled="disabled"><?php echo wp_kses_post( $data['notes']['value'] ); ?></textarea></p>
+						</p>
+					</div>
+					<?php do_action( 'wpo_wcpdf_meta_box_after_document_notes', $document, $document->order ); ?>
 				<?php endif; ?>
-				<!-- / Document Notes -->
-
 			</section>
 
 			<!-- Save/Cancel buttons -->
@@ -1235,7 +1224,7 @@ class Admin {
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 
-			if( ! empty( $document ) ) {
+			if ( ! empty( $document ) ) {
 
 				// perform legacy date fields replacements check
 				if ( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
@@ -1267,7 +1256,7 @@ class Admin {
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
-					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
+					if ( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
 						$document->initiate_number();
 					}
 
@@ -1352,27 +1341,32 @@ class Admin {
 			return $data;
 		}
 
-		if( isset( $form_data['_wcpdf_'.$document_slug.'_number'] ) ) {
-			$data['number'] = sanitize_text_field( $form_data['_wcpdf_'.$document_slug.'_number'] );
+		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number'] ) ) {
+			$document_number = absint( $form_data['_wcpdf_' . $document_slug . '_number'] );
+			
+			if ( $document_number !== 0 ) {
+				$data['number'] = $document_number;
+			}			
 		}
 
-		$date_entered = ! empty( $form_data['_wcpdf_'.$document_slug.'_date'] ) && ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['date'] );
-		if( $date_entered ) {
-			$date         = $form_data['_wcpdf_'.$document_slug.'_date']['date'];
-			$hour         = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['hour'] : '00';
-			$minute       = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
+		$date_entered = ! empty( $form_data['_wcpdf_' . $document_slug . '_date'] ) && ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['date'] );
+		
+		if ( $date_entered ) {
+			$date         = $form_data['_wcpdf_' . $document_slug . '_date']['date'];
+			$hour         = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['hour'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['hour'] : '00';
+			$minute       = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['minute'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['minute'] : '00';
 
 			// clean & sanitize input
 			$date         = gmdate( 'Y-m-d', strtotime( $date ) );
-			$hour         = sprintf('%02d', intval( $hour ));
-			$minute       = sprintf('%02d', intval( $minute ) );
+			$hour         = sprintf( '%02d', intval( $hour ) );
+			$minute       = sprintf( '%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";
 
-		} elseif ( ! $date_entered && !empty( $_POST['_wcpdf_'.$document_slug.'_number'] ) ) {
+		} elseif ( ! $date_entered && ! empty( $_POST['_wcpdf_' . $document_slug . '_number'] ) ) {
 			$data['date'] = current_time( 'timestamp', true );
 		}
 
-		if ( isset( $form_data['_wcpdf_'.$document_slug.'_notes'] ) ) {
+		if ( isset( $form_data['_wcpdf_' . $document_slug . '_notes'] ) ) {
 			// allowed HTML
 			$allowed_html = array(
 				'a'		=> array(
@@ -1403,7 +1397,7 @@ class Admin {
 				'b'		=> array(),
 			);
 
-			$data['notes'] = wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html );
+			$data['notes'] = wp_kses( $form_data['_wcpdf_' . $document_slug . '_notes'], $allowed_html );
 		}
 
 		return $data;

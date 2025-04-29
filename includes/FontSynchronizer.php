@@ -16,14 +16,14 @@ class FontSynchronizer {
 	 *
 	 * @var string
 	 */
-	public $font_cache_filename = "installed-fonts.json";
+	public string $font_cache_filename = 'installed-fonts.json';
 
 	/**
 	 * Vanilla instance of dompdf
 	 *
 	 * @var Dompdf
 	 */
-	public $dompdf;
+	public Dompdf $dompdf;
 
 	protected static $_instance = null;
 
@@ -45,9 +45,10 @@ class FontSynchronizer {
 	 * Synchronize/update local fonts with plugin fonts, removing duplicates of the dompdf fonts
 	 *
 	 * @param string $destination path to the local fonts
+	 * @param bool   $merge_with_local if true, merge with existing local fonts
 	 * @return void
 	 */
-	public function sync( $destination, $merge_with_local = true ) {
+	public function sync( string $destination, bool $merge_with_local = true ): void {
 		$destination  = trailingslashit( wp_normalize_path( $destination ) );
 		$plugin_fonts = $this->get_plugin_fonts();
 		$dompdf_fonts = $this->get_dompdf_fonts();
@@ -89,18 +90,24 @@ class FontSynchronizer {
 	 * @param array $filenames array of filenames without the extension
 	 * @return void
 	 */
-	public function delete_font_files( $filenames ) {
+	public function delete_font_files( array $filenames ): void {
 		$plugin_folder = wp_normalize_path( WPO_WCPDF()->plugin_path() );
-		$extensions = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
+		$extensions    = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
+		
 		foreach ( $filenames as $filename ) {
 			// never delete files in our own plugin folder
 			if ( ! empty( $filename ) && false !== strpos( $filename, $plugin_folder ) ) {
 				continue;
 			}
+			
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
+				
 				if ( WPO_WCPDF()->file_system->exists( $file ) ) {
 					wp_delete_file( $file );
+				} else {
+					wcpdf_log_error( sprintf( "Could not delete font file (%s)", $file ), 'critical' );
+					continue;
 				}
 			}
 		}
@@ -113,20 +120,27 @@ class FontSynchronizer {
 	 * @param  string $destination path to the local fonts
 	 * @return array
 	 */
-	public function copy_font_files( $filenames, $destination ) {
-		$destination = trailingslashit( $destination );
-		$extensions = array( '.ttf', '.ufm', '.afm' );
+	public function copy_font_files( array $filenames, string $destination ): array {
+		$destination     = trailingslashit( $destination );
+		$extensions      = array( '.ttf', '.ufm', '.afm' );
 		$local_filenames = array();
+		
 		foreach ( $filenames as $variant => $filename ) {
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
+				
 				if ( WPO_WCPDF()->file_system->is_readable( $file ) ) {
 					$local_filename = $destination . basename( $file );
 					copy( $file, $local_filename );
+				} else {
+					wcpdf_log_error( sprintf( "Could not read font file (%s)", $file ), 'critical' );
+					continue;
 				}
 			}
-			$local_filenames[$variant] = $destination . basename( $filename );
+			
+			$local_filenames[ $variant ] = $destination . basename( $filename );
 		}
+		
 		return $local_filenames;
 	}
 
@@ -136,7 +150,7 @@ class FontSynchronizer {
 	 * @param string $path path to the local fonts
 	 * @return array
 	 */
-	public function get_local_fonts( $path ) {
+	public function get_local_fonts( string $path ): array {
 		// prepare variables used in the cache list
 		$fontDir           = $path;
 		$rootDir           = $this->dompdf->getOptions()->getRootDir();
@@ -171,7 +185,7 @@ class FontSynchronizer {
 	 *
 	 * @return array
 	 */
-	public function get_dompdf_fonts() {
+	public function get_dompdf_fonts(): array {
 		$fonts = $this->dompdf->getFontMetrics()->getFontFamilies();
 		return $this->normalize_font_paths( $fonts );
 	}
@@ -181,7 +195,7 @@ class FontSynchronizer {
 	 *
 	 * @return array
 	 */
-	public function get_plugin_fonts() {
+	public function get_plugin_fonts(): array {
 		return array (
 			'open sans'   => array (
 				'normal'      => 'OpenSans-Normal',
@@ -216,15 +230,17 @@ class FontSynchronizer {
 	 * @param  array  $fonts array of font entries
 	 * @return array  Normalized array of font entries
 	 */
-	public function normalize_font_paths( $fonts ) {
-		foreach( $fonts as $font_name => $filenames ) {
+	public function normalize_font_paths( array $fonts ): array {
+		foreach ( $fonts as $font_name => $filenames ) {
 			if ( ! is_array( $filenames ) ) {
 				continue;
 			}
+			
 			foreach ( $filenames as $variant => $filename ) {
-				$fonts[$font_name][$variant] = wp_normalize_path( $filename );
+				$fonts[ $font_name ][ $variant ] = wp_normalize_path( $filename );
 			}
 		}
+		
 		return $fonts;
 	}
 }
