@@ -313,17 +313,26 @@ class SetupWizard {
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
-				$orders_column_hidden_key = \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ? 'managewoocommerce_page_wc-orderscolumnshidden' : 'manageedit-shop_ordercolumnshidden';
-				$user_id                  = get_current_user_id();
-				$hidden                   = get_user_meta( $user_id, $orders_column_hidden_key, true );
+				$orders_column_hidden_key = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled()
+					? 'managewoocommerce_page_wc-orderscolumnshidden'
+					: 'manageedit-shop_ordercolumnshidden';
+				
+				$user_id    = get_current_user_id();
+				$hidden     = get_user_meta( $user_id, $orders_column_hidden_key, true );
+				$column_key = 'wc_actions';
+
 				if ( is_array( $hidden ) ) {
 					if ( ! empty( $request['wc_show_action_buttons'] ) ) {
-						$hidden = array_filter( $hidden, function( $setting ){ return $setting !== 'wc_actions'; } );
+						$new_hidden = array_filter( $hidden, function( $setting ) use ( $column_key ) {
+							return $setting !== $column_key;
+						} );
 					} else {
-						$hidden[] = 'wc_actions';
+						$new_hidden = array_unique( array_merge( $hidden, array( $column_key ) ) );
 					}
-					
-					update_user_meta( $user_id, $orders_column_hidden_key, $hidden );
+
+					if ( $new_hidden !== $hidden ) {
+						update_user_meta( $user_id, $orders_column_hidden_key, $new_hidden );
+					}
 				}
 			}
 		}
