@@ -33,17 +33,28 @@ class TaxesSettings {
 
 		$rates                       = \WC_Tax::get_tax_rate_classes();
 		$formatted_rates             = array();
-		$formatted_rates['standard'] = __( 'Standard', 'woocommerce-pdf-invoices-packing-slips' );
+		$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
 
 		foreach ( $rates as $rate ) {
 			if ( empty( $rate->slug ) ) {
 				continue;
 			}
+			
 			$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
 		}
 
+		// Dropdown selector for tax classes
+		echo '<select id="ubl-tax-class-select" style="margin-bottom: 1em;">';
 		foreach ( $formatted_rates as $slug => $name ) {
-			$this->output_table_for_tax_class( $slug, $name );
+			echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
+		}
+		echo '</select>';
+
+		// Output all tables wrapped in containers
+		foreach ( $formatted_rates as $slug => $name ) {
+			echo '<div class="ubl-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
+			$this->output_table_for_tax_class( $slug );
+			echo '</div>';
 		}
 
 		submit_button();
@@ -53,11 +64,10 @@ class TaxesSettings {
 	 * Output the table for a specific tax class.
 	 *
 	 * @param string $slug The slug of the tax class.
-	 * @param string $name The name of the tax class.
 	 *
 	 * @return void
 	 */
-	public function output_table_for_tax_class( string $slug, string $name ): void {
+	public function output_table_for_tax_class( string $slug ): void {
 		global $wpdb;
 		
 		$tax_settings = self::get_tax_settings();
@@ -84,7 +94,6 @@ class TaxesSettings {
 		);
 		?>
 
-		<h4><?php echo esc_html( $name ); ?></h4>
 		<table class="widefat striped">
 			<thead>
 				<tr>
@@ -93,9 +102,9 @@ class TaxesSettings {
 					<th><?php esc_html_e( 'Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<th><?php esc_html_e( 'City', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<th><?php esc_html_e( 'Rate', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th width="10%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th><?php esc_html_e( 'Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php esc_html_e( 'Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th width="10%"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<th width="15%"><?php esc_html_e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 				</tr>
 			</thead>
@@ -314,8 +323,7 @@ class TaxesSettings {
 	 * @return array
 	 */
 	public static function get_available_reasons(): array {
-		return apply_filters( 'wpo_wcpdf_ubl_tax_reasons', array_merge(
-			array(
+		return apply_filters( 'wpo_wcpdf_ubl_tax_reasons', array(
 				// EU VAT exemptions
 				'VATEX-EU-79-C'    => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 				'VATEX-EU-132'     => __( 'Exempt based on article 132 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -378,8 +386,7 @@ class TaxesSettings {
 				'VATEX-EU-IC'      => __( 'Intra-community supply', 'woocommerce-pdf-invoices-packing-slips' ),
 				'VATEX-EU-J'       => __( 'Collectors items and antiques VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'VATEX-EU-O'       => __( 'Not subject to VAT', 'woocommerce-pdf-invoices-packing-slips' ),
-			),
-			array(
+
 				// France specific VAT exemptions
 				'VATEX-FR-AE'            => __( 'Exempt based on 2 of article 283 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'VATEX-FR-CGI261-1'      => __( 'Exempt based on 1 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -408,7 +415,7 @@ class TaxesSettings {
 				'VATEX-FR-FRANCHISE'     => __( 'France domestic VAT franchise in base', 'woocommerce-pdf-invoices-packing-slips' ),
 				'VATEX-FR-298SEXDECIESA' => __( 'Exempt based on article 298 sexdecies A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
-		) );
+		);
 	}
 	
 	/**
@@ -424,9 +431,8 @@ class TaxesSettings {
 		return apply_filters( 'wpo_wcpdf_ubl_tax_remarks', array(
 			'scheme'   => array(),
 			'category' => array(),
-			'reason'   => array_merge(
-				// EU VAT exemption remarks
-				array(
+			'reason'   => array(
+					// EU VAT exemption remarks
 					'VATEX-EU-AE' => sprintf( $reason_common_remark, '<code>AE</code>' ),
 					'VATEX-EU-D'  => sprintf( $reason_common_remark, '<code>E</code>' ),
 					'VATEX-EU-F'  => sprintf( $reason_common_remark, '<code>E</code>' ),
@@ -435,9 +441,8 @@ class TaxesSettings {
 					'VATEX-EU-IC' => sprintf( $reason_common_remark, '<code>K</code>' ),
 					'VATEX-EU-J'  => sprintf( $reason_common_remark, '<code>E</code>' ),
 					'VATEX-EU-O'  => sprintf( $reason_common_remark, '<code>O</code>' ),
-				),
-				// France specific VAT exemption remarks
-				array(
+					
+					// France specific VAT exemption remarks
 					'VATEX-FR-FRANCHISE'     => __( 'For domestic invoicing in France', 'woocommerce-pdf-invoices-packing-slips' ),
 					'VATEX-FR-CNWVAT'        => __( 'For domestic Credit Notes only in France', 'woocommerce-pdf-invoices-packing-slips' ),
 					'VATEX-FR-CGI261-1'      => $domestic_invoicing_france_remark,
@@ -466,7 +471,7 @@ class TaxesSettings {
 					'VATEX-FR-AE'            => $domestic_invoicing_france_remark,
 				),
 			),
-		) );
+		);
 	}
 	
 	/**
@@ -498,12 +503,6 @@ class TaxesSettings {
 			return;
 		}
 
-		// Generate changes section dynamically
-		$method_name = 'get_changes_from_' . self::$standard . '_' . str_replace( '.', '_', self::$standard_version );
-		$changes     = method_exists( self::class, $method_name )
-			? call_user_func( array( self::class, $method_name ) )
-			: array();
-
 		// Output notice
 		$dismiss_url = wp_nonce_url(
 			add_query_arg( 'dismiss_standard_notice', '1' ),
@@ -513,21 +512,13 @@ class TaxesSettings {
 
 		echo '<div class="notice notice-info is-dismissible">';
 		echo '<p>' . wp_kses_post( sprintf(
-			/* translators: %1$s: plugin name, %2$s: standard name, %3$s: version number */
-			__( 'The %1$s UBL tax settings were updated to %2$s version %3$s. See the changes listed below.', 'woocommerce-pdf-invoices-packing-slips' ),
+			/* translators: %1$s: plugin name, %2$s: standard name, %3$s: version number, %4$s: changelog link */
+			__( 'The %1$s UBL tax settings were updated to %2$s version %3$s. %4$s', 'woocommerce-pdf-invoices-packing-slips' ),
 			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
 			'<strong>' . esc_html( self::$standard ) . '</strong>',
-			'<code>' . esc_html( self::$standard_version ) . '</code>'
-		) ) . '</p>';
-
-		if ( ! empty( $changes ) ) {
-			echo '<div class="ubl-standard-changes">';
-			echo '<ul style="list-style:disc; padding-left:20px;">';
-			foreach ( $changes as $change ) {
-				echo '<li>' . esc_html( $change ) . '</li>';
-			}
-			echo '</ul></div>';
-		}
+			'<code>' . esc_html( self::$standard_version ) . '</code>',
+			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '" id="ubl-toggle-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+		) ) . '</p>';		
 
 		echo '<p>' . sprintf(
 			/* translators: %s: link to documentation */
@@ -544,7 +535,7 @@ class TaxesSettings {
 	 * 
 	 * @return array
 	 */
-	protected static function get_tax_settings(): array {
+	public static function get_tax_settings(): array {
 		return get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 	}
 	
@@ -553,7 +544,7 @@ class TaxesSettings {
 	 *
 	 * @return void
 	 */
-	private static function update_standard_version(): void {
+	public static function update_standard_version(): void {
 		$tax_settings = self::get_tax_settings();
 
 		if (
@@ -573,7 +564,7 @@ class TaxesSettings {
 	 *
 	 * @return array
 	 */	
-	private static function get_changes_from_EN16931_15_0(): array {
+	public static function get_changes_from_EN16931_15_0(): array {
 		return array(
 			'Deprecated all tax schemes except VAT, which is the only one allowed by EN16931 v15.',
 			'Deprecated tax category codes: A, AA, AB, AC, AD, B, C, D, F, H, I, J.',

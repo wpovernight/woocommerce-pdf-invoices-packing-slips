@@ -60,16 +60,32 @@ class SettingsUbl {
 			<?php endif; ?>
 		</div>
 		<?php
+			switch ( $active_section ) {
+				default:
+				case 'taxes':
+					echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+					echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+					
+					$settings = new UblTaxSettings();
+					
+					echo '<p><strong>' . esc_html__( 'Code list standard:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> <code>' . esc_html( $settings::$standard ) . ' v' . esc_html( $settings::$standard_version ) . '</code> ';
+					echo '<a href="#" id="ubl-show-changelog" style="font-size: 0.9em;">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
 
-		switch ( $active_section ) {
-			default:
-			case 'taxes':
-				echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-				echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-				$setting = new UblTaxSettings();
-				$setting->output();
-				break;
-		}
+					// Show changelog if method exists
+					$method = 'get_changes_from_' . $settings::$standard . '_' . str_replace( '.', '_', $settings::$standard_version );
+					
+					if ( method_exists( $settings, $method ) ) {
+						$changes = call_user_func( array( $settings, $method ) );
+						echo '<ul id="ubl-standard-changelog" style="display:none; list-style:disc; padding-left:20px;">';
+						foreach ( $changes as $change ) {
+							echo '<li>' . esc_html( $change ) . '</li>';
+						}
+						echo '</ul>';
+					}
+					
+					$settings->output();
+					break;
+			}
 	}
 
 	public function init_tax_settings() {
