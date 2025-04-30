@@ -30,7 +30,7 @@ class SettingsGeneral {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		settings_fields( $this->option_name );
 		do_settings_sections( $this->option_name );
 
@@ -214,17 +214,73 @@ class SettingsGeneral {
 			),
 			array(
 				'type'		=> 'setting',
-				'id'		=> 'shop_address',
-				'title'		=> __( 'Shop Address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'textarea',
+				'id'		=> 'shop_address_line_1',
+				'title'		=> __( 'Shop Address Line 1', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'text_input',
 				'section'	=> 'general_settings',
 				'args'		=> array(
 					'option_name'	=> $option_name,
-					'id'			=> 'shop_address',
-					'width'			=> '72',
-					'height'		=> '8',
+					'id'			=> 'shop_address_line_1',
 					'translatable'	=> true,
-					//'description'			=> __( '...', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'   => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
+				'id'		=> 'shop_address_line_2',
+				'title'		=> __( 'Shop Address Line 2', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'text_input',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'shop_address_line_2',
+					'translatable'	=> true,
+					'description'   => __( 'An additional, optional address line for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
+				'id'		=> 'shop_address_country',
+				'title'		=> __( 'Shop Country', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'select',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'      => $option_name,
+					'options_callback' => ( function () {
+						$countries = WC()->countries->get_countries();
+						return array_combine( array_values( $countries ), $countries );
+					} ),
+					'id'               => 'shop_address_country',
+					'default'          => 'Netherlands',
+					'translatable'     => true,
+					'enhanced_select'  => true,
+					'description'      => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
+				'id'		=> 'shop_address_city',
+				'title'		=> __( 'Shop City', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'text_input',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'shop_address_city',
+					'translatable'	=> true,
+					'description'   => __( 'The city in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
+				'id'		=> 'shop_address_postcode',
+				'title'		=> __( 'Shop Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'text_input',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'shop_address_postcode',
+					'translatable'	=> true,
+					'description'   => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -239,7 +295,6 @@ class SettingsGeneral {
 					'width'			=> '72',
 					'height'		=> '4',
 					'translatable'	=> true,
-					//'description'			=> __( '...', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -298,7 +353,6 @@ class SettingsGeneral {
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-		return;
 	}
 
 	public function attachment_settings_hint( $active_tab, $active_section ) {
