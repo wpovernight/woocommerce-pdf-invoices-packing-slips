@@ -554,7 +554,7 @@ class TaxesSettings {
 	}
 	
 	/**
-	 * Get changes from version 15.0.
+	 * Get changes from EN16931 version 15.0.
 	 *
 	 * @return array
 	 */	
