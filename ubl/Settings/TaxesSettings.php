@@ -518,13 +518,7 @@ class TaxesSettings {
 			'<strong>' . esc_html( self::$standard ) . '</strong>',
 			'<code>' . esc_html( self::$standard_version ) . '</code>',
 			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '" id="ubl-toggle-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
-		) ) . '</p>';		
-
-		echo '<p>' . sprintf(
-			/* translators: %s: link to documentation */
-			esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<a href="' . esc_url( '#' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
-		) . '</p>';
+		) ) . '</p>';
 
 		echo '<p><a href="' . esc_url( $dismiss_url ) . '" class="button">' . esc_html__( 'Dismiss', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
 		echo '</div>';
