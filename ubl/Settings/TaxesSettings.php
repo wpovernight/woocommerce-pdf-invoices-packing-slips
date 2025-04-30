@@ -70,7 +70,7 @@ class TaxesSettings {
 	public function output_table_for_tax_class( string $slug ): void {
 		global $wpdb;
 		
-		$tax_settings = self::get_tax_settings();
+		$tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 		
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
@@ -480,7 +480,7 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public static function standard_update_notice(): void {
-		$tax_settings     = self::get_tax_settings();
+		$tax_settings     = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 		$current_standard = $tax_settings['standard'] ?? null;
 		$current_version  = $tax_settings['standard_version'] ?? null;
 
@@ -525,21 +525,12 @@ class TaxesSettings {
 	}
 	
 	/**
-	 * Get tax settings
-	 * 
-	 * @return array
-	 */
-	public static function get_tax_settings(): array {
-		return get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
-	}
-	
-	/**
 	 * Check if the standard name and version are set and update them if missing or outdated.
 	 *
 	 * @return void
 	 */
 	public static function update_standard_version(): void {
-		$tax_settings = self::get_tax_settings();
+		$tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 
 		if (
 			! isset( $tax_settings['standard'] ) ||
