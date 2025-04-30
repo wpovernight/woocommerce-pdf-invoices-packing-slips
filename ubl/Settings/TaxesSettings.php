@@ -9,27 +9,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class TaxesSettings {
 
 	/**
-	 * The version of the EN16931 standard that this plugin is based on.
-	 * 
-	 * @see https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/Registry+of+supporting+artefacts+to+implement+EN16931
+	 * The standard.
 	 *
 	 * @var string
 	 */
-	private string $EN16931_version = '15.0';
+	public static string $standard = 'EN16931';
 	
 	/**
-	 * The settings for the UBL taxes.
+	 * The version of the standard.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	public array $settings;
-	
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
-	}
+	public static string $standard_version = '15.0';
 	
 	/**
 	 * Output the settings page for UBL taxes.
@@ -68,6 +59,8 @@ class TaxesSettings {
 	 */
 	public function output_table_for_tax_class( string $slug, string $name ): void {
 		global $wpdb;
+		
+		$tax_settings = self::get_tax_settings();
 		
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
@@ -139,16 +132,16 @@ class TaxesSettings {
 							$postcode         = empty( $postcode ) ? '*' : implode( '; ', $postcode );
 							$city             = empty( $city ) ? '*' : implode( '; ', $city );
 							
-							$scheme           = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
-							$scheme_default   = isset( $this->settings['class'][ $slug ]['scheme'] ) ? $this->settings['class'][ $slug ]['scheme'] : 'default';
+							$scheme           = isset( $tax_settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $tax_settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
+							$scheme_default   = isset( $tax_settings['class'][ $slug ]['scheme'] ) ? $tax_settings['class'][ $slug ]['scheme'] : 'default';
 							$scheme_code      = ( 'default' === $scheme ) ? $scheme_default : $scheme;
 
-							$category         = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
-							$category_default = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
+							$category         = isset( $tax_settings['rate'][ $result->tax_rate_id ]['category'] ) ? $tax_settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
+							$category_default = isset( $tax_settings['class'][ $slug ]['category'] ) ? $tax_settings['class'][ $slug ]['category'] : 'default';
 							$category_code    = ( 'default' === $category ) ? $category_default : $category;
 							
-							$reason           = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
-							$reason_default   = isset( $this->settings['class'][ $slug ]['reason'] ) ? $this->settings['class'][ $slug ]['reason'] : 'default';
+							$reason           = isset( $tax_settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $tax_settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
+							$reason_default   = isset( $tax_settings['class'][ $slug ]['reason'] ) ? $tax_settings['class'][ $slug ]['reason'] : 'default';
 							$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
 							
 							echo '<tr>';
@@ -194,9 +187,9 @@ class TaxesSettings {
 				<tr>
 					<th colspan="5" style="text-align: right;"><?php esc_html_e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
 					<?php
-						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] )   ? $this->settings['class'][ $slug ]['scheme']   : 'default';
-						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
-						$reason   = isset( $this->settings['class'][ $slug ]['reason'] )   ? $this->settings['class'][ $slug ]['reason']   : 'default';
+						$scheme   = isset( $tax_settings['class'][ $slug ]['scheme'] )   ? $tax_settings['class'][ $slug ]['scheme']   : 'default';
+						$category = isset( $tax_settings['class'][ $slug ]['category'] ) ? $tax_settings['class'][ $slug ]['category'] : 'default';
+						$reason   = isset( $tax_settings['class'][ $slug ]['reason'] )   ? $tax_settings['class'][ $slug ]['reason']   : 'default';
 					?>
 					<th>
 						<?php
@@ -286,7 +279,7 @@ class TaxesSettings {
 	}
 
 	/**
-	 * Get available tax schemes according to EN16931 standard.
+	 * Get available tax schemes according to standard.
 	 * 
 	 * @return array
 	 */
@@ -297,7 +290,7 @@ class TaxesSettings {
 	}
 
 	/**
-	 * Get available VAT tax categories according to EN16931 5305 code list.
+	 * Get available VAT tax categories according to standard 5305 code list.
 	 *
 	 * @return array
 	 */
@@ -316,7 +309,7 @@ class TaxesSettings {
 	}
 	
 	/**
-	 * Get available VAT exemption reasons according to EN16931 VATEX code list.
+	 * Get available VAT exemption reasons according to standard VATEX code list.
 	 *
 	 * @return array
 	 */
@@ -419,7 +412,7 @@ class TaxesSettings {
 	}
 	
 	/**
-	 * Get available VAT exemption remarks according to EN16931 VATEX codes.
+	 * Get available VAT exemption remarks according to standard VATEX codes.
 	 *
 	 * @return array
 	 */
@@ -474,6 +467,118 @@ class TaxesSettings {
 				),
 			),
 		) );
+	}
+	
+	/**
+	 * Show notice about the standard update.
+	 *
+	 * @return void
+	 */
+	public static function standard_update_notice(): void {
+		$tax_settings     = self::get_tax_settings();
+		$current_standard = $tax_settings['standard'] ?? null;
+		$current_version  = $tax_settings['standard_version'] ?? null;
+
+		// Handle dismissal
+		if (
+			isset( $_GET['dismiss_standard_notice'], $_GET['dismiss_standard_notice_nonce'] ) &&
+			wp_verify_nonce( $_GET['dismiss_standard_notice_nonce'], 'dismiss_standard_notice' )
+		) {
+			self::update_standard_version();
+
+			wp_safe_redirect( remove_query_arg( array( 'dismiss_standard_notice', 'dismiss_standard_notice_nonce' ) ) );
+			exit;
+		}
+
+		// Only show notice if standard name or version is missing or outdated
+		if (
+			$current_standard === self::$standard &&
+			version_compare( $current_version, self::$standard_version, '>=' )
+		) {
+			return;
+		}
+
+		// Generate changes section dynamically
+		$method_name = 'get_changes_from_' . self::$standard . '_' . str_replace( '.', '_', self::$standard_version );
+		$changes     = method_exists( self::class, $method_name )
+			? call_user_func( array( self::class, $method_name ) )
+			: array();
+
+		// Output notice
+		$dismiss_url = wp_nonce_url(
+			add_query_arg( 'dismiss_standard_notice', '1' ),
+			'dismiss_standard_notice',
+			'dismiss_standard_notice_nonce'
+		);
+
+		echo '<div class="notice notice-info is-dismissible">';
+		echo '<p>' . wp_kses_post( sprintf(
+			/* translators: %1$s: plugin name, %2$s: standard name, %3$s: version number */
+			__( 'The %1$s UBL tax settings were updated to %2$s version %3$s. See the changes listed below.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+			'<strong>' . esc_html( self::$standard ) . '</strong>',
+			'<code>' . esc_html( self::$standard_version ) . '</code>'
+		) ) . '</p>';
+
+		if ( ! empty( $changes ) ) {
+			echo '<div class="ubl-standard-changes">';
+			echo '<ul style="list-style:disc; padding-left:20px;">';
+			foreach ( $changes as $change ) {
+				echo '<li>' . esc_html( $change ) . '</li>';
+			}
+			echo '</ul></div>';
+		}
+
+		echo '<p>' . sprintf(
+			/* translators: %s: link to documentation */
+			esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="' . esc_url( '#' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+		) . '</p>';
+
+		echo '<p><a href="' . esc_url( $dismiss_url ) . '" class="button">' . esc_html__( 'Dismiss', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
+		echo '</div>';
+	}
+	
+	/**
+	 * Get tax settings
+	 * 
+	 * @return array
+	 */
+	protected static function get_tax_settings(): array {
+		return get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+	}
+	
+	/**
+	 * Check if the standard name and version are set and update them if missing or outdated.
+	 *
+	 * @return void
+	 */
+	private static function update_standard_version(): void {
+		$tax_settings = self::get_tax_settings();
+
+		if (
+			! isset( $tax_settings['standard'] ) ||
+			$tax_settings['standard'] !== self::$standard ||
+			! isset( $tax_settings['standard_version'] ) ||
+			version_compare( $tax_settings['standard_version'], self::$standard_version, '<' )
+		) {
+			$tax_settings['standard']          = self::$standard;
+			$tax_settings['standard_version']  = self::$standard_version;
+			update_option( 'wpo_wcpdf_settings_ubl_taxes', $tax_settings );
+		}
+	}
+	
+	/**
+	 * Get changes from version 15.0.
+	 *
+	 * @return array
+	 */	
+	private static function get_changes_from_EN16931_15_0(): array {
+		return array(
+			'Deprecated all tax schemes except VAT, which is the only one allowed by EN16931 v15.',
+			'Deprecated tax category codes: A, AA, AB, AC, AD, B, C, D, F, H, I, J.',
+			'Added VAT exemption reason codes: VATEX-EU-144, VATEX-EU-146-1E, VATEX-EU-151, VATEX-EU-153, VATEX-EU-159, VATEX-FR-CGI261-1, VATEX-FR-CGI261-2, VATEX-FR-CGI261-3, VATEX-FR-CGI261-4, VATEX-FR-CGI261-5, VATEX-FR-CGI261-7, VATEX-FR-CGI261-8, VATEX-FR-CGI261A, VATEX-FR-CGI261B, VATEX-FR-CGI261C-1, VATEX-FR-CGI261C-2, VATEX-FR-CGI261C-3, VATEX-FR-CGI261D-1, VATEX-FR-CGI261D-1BIS, VATEX-FR-CGI261D-2, VATEX-FR-CGI261D-3, VATEX-FR-CGI261D-4, VATEX-FR-CGI261E-1, VATEX-FR-CGI261E-2, VATEX-FR-CGI277A, VATEX-FR-CGI275, VATEX-FR-298SEXDECIESA, VATEX-FR-CGI295, VATEX-FR-AE.',
+		);
 	}
 
 }
