@@ -35,7 +35,7 @@ jQuery( function ( $ ) {
 	function updateTableView() {
 		const selected = $select.val();
 		$tables.hide();
-		$tables.filter( "[data-tax-class=\'" + selected + "\']" ).show();
+		$tables.filter( `[data-tax-class=\'${selected}\']` ).show();
 	}
 
 	$select.on( 'change', updateTableView );
