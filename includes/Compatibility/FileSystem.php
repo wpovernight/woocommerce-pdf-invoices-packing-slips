@@ -37,9 +37,9 @@ class FileSystem {
 	
 	/**
 	 * WP_Filesystem instance.
-	 * @var \WP_Filesystem_Base|null
+	 * @var \WP_Filesystem_Direct|null
 	 */
-	public ?\WP_Filesystem_Base $wp_filesystem = null;
+	public ?\WP_Filesystem_Direct $wp_filesystem = null;
 	
 	/**
 	 * Singleton instance.
