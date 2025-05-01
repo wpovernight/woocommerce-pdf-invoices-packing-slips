@@ -106,24 +106,22 @@ class FileSystem {
 	 * @return void
 	 */
 	public function initialize_wp_filesystem(): void {
+		// Force the use of the direct filesystem method if not already defined
+		if ( ! defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+		}
+
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		global $wp_filesystem;
 
-		if ( ! WP_Filesystem() || ! $wp_filesystem ) {
-			wcpdf_log_error( 'WP_Filesystem initialization failed. Falling back to PHP methods.', 'warning' );
+		if ( ! WP_Filesystem() || ! $wp_filesystem || ! is_a( $wp_filesystem, '\WP_Filesystem_Direct' ) ) {
+			wcpdf_log_error( 'WP_Filesystem initialization failed or not using direct method. Falling back to PHP methods.', 'warning' );
 			$this->system_enabled = $this->change_setting_value( 'php' );
 			return;
 		}
 
 		$this->wp_filesystem = $wp_filesystem;
-
-		// Ensure the filesystem method is 'direct', otherwise log a warning
-		$filesystem_method = get_filesystem_method();
-		if ( 'direct' !== $filesystem_method ) {
-			wcpdf_log_error( "This plugin only supports the direct filesystem method. Current method: {$filesystem_method}", 'warning' );
-			$this->system_enabled = $this->change_setting_value( 'php' );
-		}
 	}
 	
 	/**
