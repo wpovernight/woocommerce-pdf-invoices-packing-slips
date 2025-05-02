@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.5.0-beta.2';
+	public $version              = '4.5.0-beta.3';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -176,13 +176,13 @@ class WPO_WCPDF {
 		if ( ! $this->dependencies_are_ready() ) {
 			return;
 		}
-		
+
 		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
-		
+
 		// all systems ready - GO!
 		$this->includes();
 	}
-	
+
 	/**
 	 * Check if WooCommerce and PHP dependencies are met.
 	 * If not, show the appropriate admin notices.
