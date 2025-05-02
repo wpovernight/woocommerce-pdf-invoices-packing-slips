@@ -14,9 +14,15 @@ class PaymentTermsHandler extends AbstractHandler {
 			? $this->document->order_document->get_due_date()
 			: 0;
 
-		$due_date = $this->normalize_date( $due_date_timestamp, 'Y-m-d' ); // 610 => YYYY-MM-DD
-
-		if ( empty( $due_date ) ) {
+		if ( empty( $due_date_timestamp ) ) {
+			return $data;
+		}
+		
+		$date_format_code = $this->get_date_format_code();
+		$php_date_format  = $this->get_php_date_format_from_code( $date_format_code );
+		$due_date         = $this->normalize_date( $due_date_timestamp, $php_date_format );
+		
+		if ( ! $this->validate_cii_date_format( $due_date, $date_format_code ) ) {
 			return $data;
 		}
 
@@ -30,7 +36,7 @@ class PaymentTermsHandler extends AbstractHandler {
 							'name'       => 'udt:DateTimeString',
 							'value'      => $due_date,
 							'attributes' => array(
-								'format' => '610', // YYYY-MM-DD
+								'format' => $date_format_code,
 							),
 						),
 					),

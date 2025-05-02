@@ -10,6 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ExchangedDocumentHandler extends AbstractHandler {
 
 	public function handle( $data, $options = array() ) {
+		$date_format_code  = $this->get_date_format_code();
+		$php_date_format   = $this->get_php_date_format_from_code( $date_format_code );
+		
 		$exchangedDocument = array(
 			'name'  => 'rsm:ExchangedDocument',
 			'value' => array(
@@ -26,9 +29,9 @@ class ExchangedDocumentHandler extends AbstractHandler {
 					'value' => array(
 						array(
 							'name'       => 'udt:DateTimeString',
-							'value'      => $this->document->order_document->get_date()->date_i18n( 'Y-m-d' ),
+							'value'      => $this->document->order_document->get_date()->date_i18n( $php_date_format ),
 							'attributes' => array(
-								'format' => '610', // YYYY-MM-DD
+								'format' => $date_format_code,
 							),
 						),
 					),

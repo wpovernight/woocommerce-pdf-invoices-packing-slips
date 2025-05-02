@@ -92,7 +92,7 @@ abstract class AbstractHandler {
 	 * Normalize a raw date input into a specific format.
 	 *
 	 * @param mixed  $raw    The input date (DateTime, string, timestamp, etc.)
-	 * @param string $format The output format (default: 'Y-m-d') — e.g. 'Ymd' for format=102
+	 * @param string $format The output format (default: 'Y-m-d')
 	 * @return string
 	 */
 	protected function normalize_date( $raw, string $format = 'Y-m-d' ): string {
