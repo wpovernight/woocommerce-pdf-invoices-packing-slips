@@ -250,13 +250,16 @@ class SettingsGeneral {
 				'args'		=> array(
 					'option_name'      => $option_name,
 					'options_callback' => ( function () {
-						$countries = WC()->countries->get_countries();
-						return array_combine( array_values( $countries ), $countries );
+						$countries[''] = __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' );
+						$woo_countries = WC()->countries->get_countries();
+						$woo_countries = array_combine( array_values( $woo_countries ), $woo_countries );
+
+						return array_merge( $countries, $woo_countries );
 					} ),
 					'id'               => 'shop_address_country',
-					'default'          => 'Netherlands',
 					'translatable'     => true,
 					'enhanced_select'  => true,
+					'placeholder'      => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description'      => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),

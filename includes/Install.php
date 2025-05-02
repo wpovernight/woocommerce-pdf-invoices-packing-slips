@@ -610,6 +610,7 @@ class Install {
 
 			if ( ! empty( $general_settings['shop_address'] ) ) {
 				$general_settings['shop_address_additional'] = $general_settings['shop_address'];
+				unset( $general_settings['shop_address'] );
 				update_option( 'wpo_wcpdf_settings_general', $general_settings );
 			}
 		}
