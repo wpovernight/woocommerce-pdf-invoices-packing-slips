@@ -304,6 +304,7 @@ li.completed .wpo-progress-marker::before {
 .wpo-setup-input .shop-address-line-1,
 .wpo-setup-input .shop-address-line-2,
 .wpo-setup-input .shop-address-country,
+.wpo-setup-input .shop-address-state,
 .wpo-setup-input .shop-address-city,
 .wpo-setup-input .shop-address-postcode {
 	width: 100%;
