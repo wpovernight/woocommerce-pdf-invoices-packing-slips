@@ -294,12 +294,18 @@ class SetupWizard {
 							$value = array_fill_keys( $value, '1' );
 						}
 
+						if ( $key == 'shop_address_additional' && function_exists( 'sanitize_textarea_field' ) ) {
+							$sanitize_function = 'sanitize_textarea_field';
+						} else {
+							$sanitize_function = 'sanitize_text_field';
+						}
+
 						$value = stripslashes_deep( $value );
 
 						if ( is_array( $value ) ) {
-							$settings[$key] = array_map( 'sanitize_text_field', $value );
+							$settings[$key] = array_map( $sanitize_function, $value );
 						} else {
-							$settings[$key] = call_user_func( 'sanitize_text_field', $value );
+							$settings[$key] = call_user_func( $sanitize_function, $value );
 						}
 					}
 

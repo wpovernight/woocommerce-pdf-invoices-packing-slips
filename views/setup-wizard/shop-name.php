@@ -11,6 +11,7 @@
 		'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address' ) ),
 		'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2' ) ),
 		'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country' ) ?? '' ),
+		'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state' ) ?? '' ),
 		'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city' ) ?? '' ),
 		'shop_address_postcode' => array( 'default' => get_option( 'woocommerce_store_postcode' ) ?? '' ),
 	) );
@@ -42,6 +43,13 @@
 		placeholder="<?php esc_attr_e( 'Shop address country', 'woocommerce-pdf-invoices-packing-slips' ); ?>"
 		name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_country][default]"
 		value="<?php echo esc_attr( array_pop( $current_settings['shop_address_country'] ) ); ?>"
+	>
+	<input
+		type="text"
+		class="shop-address-state"
+		placeholder="<?php esc_attr_e( 'Shop address country', 'woocommerce-pdf-invoices-packing-slips' ); ?>"
+		name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_state][default]"
+		value="<?php echo esc_attr( array_pop( $current_settings['shop_address_state'] ) ); ?>"
 	>
 	<input
 		type="text"

@@ -1431,7 +1431,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_address_additional' );
 	}
 	function shop_address_additional(): void {
-		echo esc_html( $this->get_shop_address_postcode() );
+		echo esc_html( $this->get_shop_address_additional() );
 	}
 
 	/**

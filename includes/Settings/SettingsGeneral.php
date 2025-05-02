@@ -303,11 +303,13 @@ class SettingsGeneral {
 				'type'		=> 'setting',
 				'id'		=> 'shop_address_additional',
 				'title'		=> __( 'Shop Additional Info', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'text_input',
+				'callback'	=> 'textarea',
 				'section'	=> 'general_settings',
 				'args'		=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'shop_address_additional',
+					'width'			=> '72',
+					'height'		=> '8',
 					'translatable'	=> true,
 					'description'   => __( 'Any additional info about your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
@@ -516,9 +518,9 @@ class SettingsGeneral {
 			! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional'] ) &&
 			(
 				empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_city'] ) ||
 				empty( WPO_WCPDF()->settings->general_settings['shop_address_country'] ) ||
 				empty( WPO_WCPDF()->settings->general_settings['shop_address_state'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_city'] ) ||
 				empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode'] )
 			)
 		) {

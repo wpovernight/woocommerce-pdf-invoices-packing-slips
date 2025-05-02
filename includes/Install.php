@@ -609,7 +609,7 @@ class Install {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 
 			if ( ! empty( $general_settings['shop_address'] ) ) {
-				$general_settings['shop_address_info'] = $general_settings['shop_address'];
+				$general_settings['shop_address_additional'] = $general_settings['shop_address'];
 				update_option( 'wpo_wcpdf_settings_general', $general_settings );
 			}
 		}
