@@ -24,6 +24,9 @@ class SettingsGeneral {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+
+		// Display an admin notice if shop address fields are empty.
+		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
 	}
 
 	public function output( $section, $nonce ) {
@@ -489,6 +492,57 @@ class SettingsGeneral {
 		}
 
 		return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
+	}
+
+	public function display_admin_notice_for_shop_address(): void {
+		// Return if the notice has been dismissed.
+		if ( get_option( 'wpo_wcpdf_dismiss_shop_address_notice', false ) ) {
+			return;
+		}
+
+		// Handle dismissal action.
+		if ( isset( $_GET['wpo_dismiss_shop_address_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_shop_address_notice' ) ) {
+				update_option( 'wpo_wcpdf_dismiss_shop_address_notice', true );
+				wp_redirect( remove_query_arg( array( 'wpo_dismiss_shop_address_notice', '_wpnonce' ) ) );
+				exit;
+			} else {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
+				return;
+			}
+		}
+
+		if (
+			! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional'] ) &&
+			(
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_city'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_country'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_state'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode'] )
+			)
+		) {
+			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
+			$dismiss_url      = wp_nonce_url( add_query_arg( 'wpo_dismiss_shop_address_notice', true ), 'dismiss_shop_address_notice' );
+			$notice_message   = sprintf(
+				/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
+				__( '%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+				'<a href="' . esc_url( $general_page_url ) . '">',
+				'</a>'
+			);
+
+			?>
+
+			<div class="notice notice-warning">
+				<p><?php echo wp_kses_post( $notice_message ); ?></p>
+				<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
+				      class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				</p>
+			</div>
+
+			<?php
+		}
 	}
 
 }
