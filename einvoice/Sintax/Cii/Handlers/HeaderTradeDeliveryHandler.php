@@ -1,0 +1,47 @@
+<?php
+namespace WPO\IPS\EInvoice\Formats\Cii\Handlers;
+
+use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+class HeaderTradeDeliveryHandler extends AbstractHandler {
+
+	public function handle( $data, $options = array() ) {
+		$order         = $this->document->order;
+		$delivery_date = apply_filters( 'wpo_ips_einvoice_cii_delivery_date', null, $order, $this );
+		$delivery_date = $this->normalize_date( $delivery_date, 'Y-m-d' ); // 610 => YYYY-MM-DD
+
+		if ( empty( $delivery_date ) ) {
+			return $data;
+		}
+
+		$deliveryNode = array(
+			'name'  => 'ram:ApplicableHeaderTradeDelivery',
+			'value' => array(
+				array(
+					'name'  => 'ram:ActualDeliverySupplyChainEvent',
+					'value' => array(
+						array(
+							'name'  => 'ram:OccurrenceDateTime',
+							'value' => array(
+								'name'       => 'udt:DateTimeString',
+								'value'      => $delivery_date,
+								'attributes' => array(
+									'format' => '610', // YYYY-MM-DD
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$data[] = apply_filters( 'wpo_ips_einvoice_cii_handle_HeaderTradeDelivery', $deliveryNode, $data, $options, $this );
+
+		return $data;
+	}
+	
+}
