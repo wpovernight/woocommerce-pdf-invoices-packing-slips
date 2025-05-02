@@ -1395,6 +1395,16 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Return/Show shop/company address state if provided.
+	 */
+	function get_shop_address_state(): string {
+		return $this->get_settings_text( 'shop_address_state' );
+	}
+	function shop_address_state(): void {
+		echo esc_html( $this->get_shop_address_state() );
+	}
+
+	/**
 	 * Return/Show shop/company address city if provided.
 	 */
 	function get_shop_address_city(): string {
@@ -1415,6 +1425,16 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Return/Show shop/company address additional info if provided.
+	 */
+	function get_shop_address_additional(): string {
+		return $this->get_settings_text( 'shop_address_additional' );
+	}
+	function shop_address_additional(): void {
+		echo esc_html( $this->get_shop_address_postcode() );
+	}
+
+	/**
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address(): string {
@@ -1423,7 +1443,9 @@ abstract class OrderDocument {
 			$this->get_settings_text( 'shop_address_line_2', '', false),
 			$this->get_settings_text( 'shop_address_city', '', false),
 			$this->get_settings_text( 'shop_address_postcode', '', false),
+			$this->get_settings_text( 'shop_address_state', '', false),
 			$this->get_settings_text( 'shop_address_country', '', false),
+			$this->get_settings_text( 'shop_address_additional', '', false),
 		) );
 
 		return wpautop( implode( '<br>', $address ) );

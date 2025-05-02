@@ -259,6 +259,19 @@ class SettingsGeneral {
 			),
 			array(
 				'type'		=> 'setting',
+				'id'		=> 'shop_address_state',
+				'title'		=> __( 'Shop State', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'text_input',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'shop_address_state',
+					'translatable'	=> true,
+					'description'   => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
 				'id'		=> 'shop_address_city',
 				'title'		=> __( 'Shop City', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'	=> 'text_input',
@@ -281,6 +294,19 @@ class SettingsGeneral {
 					'id'			=> 'shop_address_postcode',
 					'translatable'	=> true,
 					'description'   => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		=> 'setting',
+				'id'		=> 'shop_address_additional',
+				'title'		=> __( 'Shop Additional Info', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	=> 'text_input',
+				'section'	=> 'general_settings',
+				'args'		=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'shop_address_additional',
+					'translatable'	=> true,
+					'description'   => __( 'Any additional info about your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
