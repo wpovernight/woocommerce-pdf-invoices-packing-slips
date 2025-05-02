@@ -65,7 +65,7 @@ class CiiDocument extends AbstractDocument {
 			
 			// Header Trade Settlement
 			'payment_reference' => array(
-				'enabled' => true,
+				'enabled' => false,
 				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentReferenceHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
