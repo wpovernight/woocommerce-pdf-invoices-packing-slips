@@ -42,16 +42,5 @@ class UblDocument extends AbstractDocument {
 			''    => 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2',
 		), $this );
 	}
-	
-	/**
-	 * Get the available formats
-	 *
-	 * @return array
-	 */
-	public function get_available_formats(): array {
-		return apply_filters( 'wpo_ips_einvoice_formats', array(
-			'ubltwodotone' => \WPO\IPS\EInvoice\Syntax\Ubl\Formats\UblTwoDotOne::class,
-		), $this );
-	}
 
 }

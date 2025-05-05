@@ -39,11 +39,19 @@ abstract class AbstractDocument {
 	abstract public function get_namespaces(): array;
 	
 	/**
-	 * Get the available formats
+	 * Get the syntax formats
 	 *
 	 * @return array
 	 */
-	abstract public function get_available_formats(): array;
+	public function get_syntax_formats(): array {
+		$all_formats = wpo_ips_einvoice_formats();
+		
+		return apply_filters(
+			'wpo_ips_einvoice_syntax_formats',
+			$all_formats[ $this->syntax ] ?? array(),
+			$this
+		);
+	}
 	
 	/**
 	 * Set the order

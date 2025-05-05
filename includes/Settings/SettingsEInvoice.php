@@ -92,6 +92,19 @@ class SettingsEInvoice {
 					'description' => __( 'Allow your store to generate and send electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
+			array(
+				'type'        => 'setting',
+				'id'          => 'syntax',
+				'title'       => __( 'Preferred Syntax', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'    => 'select',
+				'section'     => $section,
+				'args'        => array(
+					'option_name' => $option_name,
+					'id'          => 'syntax',
+					'options'     => wpo_ips_einvoice_syntaxes(),
+					'description' => __( 'Choose the preferred XML syntax standard for e-invoicing documents.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
 		);
 
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_ubl_taxes', $settings_fields, $page, $option_group, $option_name );

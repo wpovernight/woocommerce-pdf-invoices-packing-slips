@@ -126,10 +126,35 @@ function wpo_ips_ubl_is_country_format_extension_active(): bool {
 
 /**
  * Get the e-invoice syntaxes
+ * 
+ * @return array
  */
 function wpo_ips_einvoice_syntaxes(): array {
-	return apply_filters( 'wpo_ips_einvoice_syntaxes', array(
-		'ubl' => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-		'cii' => __( 'Cross Industry Invoice', 'woocommerce-pdf-invoices-packing-slips' ),
-	) );
+	return apply_filters(
+		'wpo_ips_einvoice_syntaxes',
+		array(
+			'ubl' => 'Universal Business Language (UBL)',
+			'cii' => 'Cross Industry Invoice (CII)',
+		)
+	);
+}
+
+/**
+ * Get the e-invoice formats
+ * 
+ * @return array
+ */
+function wpo_ips_einvoice_formats(): array {
+	return apply_filters(
+		'wpo_ips_einvoice_formats',
+		array(
+			'ubl' => array(
+				'ubltwodotone' => array(
+					'name'  => 'UBL 2.1',
+					'class' => \WPO\IPS\EInvoice\Syntax\Ubl\Formats\UblTwoDotOne::class,
+				),
+			),
+			'cii' => array(),
+		)
+	);
 }
