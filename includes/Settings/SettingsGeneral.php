@@ -30,7 +30,7 @@ class SettingsGeneral {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		settings_fields( $this->option_name );
 		do_settings_sections( $this->option_name );
 
@@ -296,9 +296,8 @@ class SettingsGeneral {
 		);
 
 		// allow plugins to alter settings fields
-		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name );
+		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name, $this );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-		return;
 	}
 
 	public function attachment_settings_hint( $active_tab, $active_section ) {
@@ -359,6 +358,50 @@ class SettingsGeneral {
 			$template_list[ $template_id ] = $template_name;
 		}
 		return $template_list;
+	}
+
+	/**
+	 * Get the settings categories.
+	 *
+	 * @return array
+	 */
+	public function get_settings_categories(): array {
+		$settings_categories = array(
+			'display'          => array(
+				'title'   => __( 'Display Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'download_display',
+					'paper_size',
+					'template_path',
+					'test_mode',
+				),
+			),
+			'shop_information' => array(
+				'title'   => __( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'header_logo',
+					'header_logo_height',
+					'shop_name',
+					'shop_address',
+					'vat_number',
+					'coc_number',
+					'shop_phone_number',
+					'footer',
+				)
+			),
+			'advanced_formatting'         => array(
+				'title'   => __( 'Advanced Formatting', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'font_subsetting',
+					'currency_font',
+					'extra_1',
+					'extra_2',
+					'extra_3',
+				)
+			),
+		);
+
+		return apply_filters( 'wpo_wcpdf_general_settings_categories', $settings_categories, $this );
 	}
 
 	/**
