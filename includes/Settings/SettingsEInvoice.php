@@ -70,14 +70,27 @@ class SettingsEInvoice {
 	}
 
 	public function init_tax_settings() {
-		$page = $option_group = $option_name = 'wpo_wcpdf_settings_ubl_taxes';
+		$page    = $option_group = $option_name = 'wpo_wcpdf_settings_ubl_taxes';
+		$section = 'einvoice';
 
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
-				'id'       => 'einvoice',
+				'id'       => $section,
 				'title'    => '',
 				'callback' => 'section',
+			),
+			array(
+				'type'      => 'setting',
+				'id'        => 'enabled',
+				'title'     => __( 'Enable Electronic Invoicing', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'  => 'checkbox',
+				'section'   => $section,
+				'args'      => array(
+					'option_name' => $option_name,
+					'id'          => 'enabled',
+					'description' => __( 'Allow your store to generate and send electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
 			),
 		);
 

@@ -123,3 +123,13 @@ function wpo_ips_ubl_save_order_taxes( \WC_Abstract_Order $order ): void {
 function wpo_ips_ubl_is_country_format_extension_active(): bool {
 	return apply_filters( 'wpo_ips_ubl_is_country_format_extension_active', false );
 }
+
+/**
+ * Get the e-invoice syntaxes
+ */
+function wpo_ips_einvoice_syntaxes(): array {
+	return apply_filters( 'wpo_ips_einvoice_syntaxes', array(
+		'ubl' => __( 'UBL', 'woocommerce-pdf-invoices-packing-slips' ),
+		'cii' => __( 'Cross Industry Invoice', 'woocommerce-pdf-invoices-packing-slips' ),
+	) );
+}
