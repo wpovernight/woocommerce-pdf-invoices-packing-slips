@@ -60,3 +60,17 @@ if ( has_action( 'wpo_wc_ubl_document_format' ) ) {
 		$version
 	);
 }
+
+if ( has_action( 'wpo_wc_ubl_document_data' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_document_data',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_document_data',
+			$version,
+			'wpo_ips_einvoice_document_data'
+		),
+		$version
+	);
+}

@@ -81,7 +81,7 @@ abstract class AbstractDocument {
 			return false;
 		}
 		
-		$structure = ( new $available_formats[ $format ]() )->get_structure();
+		$structure = $available_formats[ $format ]::get_structure();
 		
 		if ( empty( $structure ) ) {
 			return false;
@@ -306,13 +306,6 @@ abstract class AbstractDocument {
 				$data = array_merge( $data, $root_data );
 			}
 		}
-
-		$data = apply_filters_deprecated(
-			'wpo_wc_ubl_document_data',
-			array( $data, $this ),
-			'5.0.0',
-			'wpo_ips_einvoice_document_data'
-		);
 		
 		return apply_filters( 'wpo_ips_einvoice_document_data', $data, $this );
 	}

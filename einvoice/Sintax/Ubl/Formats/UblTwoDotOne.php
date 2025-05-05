@@ -2,21 +2,23 @@
 
 namespace WPO\IPS\EInvoice\Sintax\Ubl\Formats;
 
+use WPO\IPS\EInvoice\Abstracts\AbstractFormat;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class UblTwoDotOne {
+class UblTwoDotOne extends AbstractFormat {
 	
-	public string $slug = 'ubltwodotone';
-	public string $name = 'UBL 2.1';
+	protected static string $slug = 'ubltwodotone';
+	protected static string $name = 'UBL 2.1';
 	
 	/**
 	 * Get the format structure
 	 *
 	 * @return array
 	 */
-	public function get_structure(): array {
+	protected static function get_structure(): array {
 		return apply_filters( 'wpo_ips_einvoice_format_structure' , array(
 			'ubl_version_id' => array(
 				'enabled' => true,
@@ -92,7 +94,7 @@ class UblTwoDotOne {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\InvoiceLineHandler::class,
 			),
-		), $this );
+		), self::$slug, self::$name );
 	}
 
 }
