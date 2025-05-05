@@ -74,7 +74,7 @@ abstract class AbstractDocument {
 	 * @param string $format
 	 * @return array|false
 	 */
-	public function get_format_structure( string $format ): array|false {
+	public function get_format_structure( string $format ) {
 		$available_formats = $this->get_available_formats();
 		
 		if ( ! isset( $available_formats[ $format ] ) ) {
