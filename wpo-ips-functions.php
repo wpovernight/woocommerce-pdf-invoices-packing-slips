@@ -1517,5 +1517,3 @@ function wpo_ips_convert_avif( string $image_html ): string {
 	
 	return str_replace('.avif', '.jpg', $image_html);
 }
-
-
