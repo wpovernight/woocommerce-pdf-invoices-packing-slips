@@ -8,37 +8,69 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class TaxesSettings {
 
-	/** @var array */
-	public $settings;
-
-	public function __construct() {
-		$this->settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
-	}
-
-	public function output() {
+	/**
+	 * The standard.
+	 *
+	 * @var string
+	 */
+	public static string $standard = 'EN16931';
+	
+	/**
+	 * The version of the standard.
+	 *
+	 * @var string
+	 */
+	public static string $standard_version = '15.0';
+	
+	/**
+	 * Output the settings page for UBL taxes.
+	 * 
+	 * @return void
+	 */
+	public function output(): void {
 		settings_fields( 'wpo_wcpdf_settings_ubl_taxes' );
 		do_settings_sections( 'wpo_wcpdf_settings_ubl_taxes' );
 
 		$rates                       = \WC_Tax::get_tax_rate_classes();
 		$formatted_rates             = array();
-		$formatted_rates['standard'] = __( 'Standard', 'woocommerce-pdf-invoices-packing-slips' );
+		$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
 
 		foreach ( $rates as $rate ) {
 			if ( empty( $rate->slug ) ) {
 				continue;
 			}
+			
 			$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
 		}
 
+		// Dropdown selector for tax classes
+		echo '<select id="ubl-tax-class-select" style="margin-bottom: 1em;">';
 		foreach ( $formatted_rates as $slug => $name ) {
-			$this->output_table_for_tax_class( $slug, $name );
+			echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
+		}
+		echo '</select>';
+
+		// Output all tables wrapped in containers
+		foreach ( $formatted_rates as $slug => $name ) {
+			echo '<div class="ubl-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
+			$this->output_table_for_tax_class( $slug );
+			echo '</div>';
 		}
 
 		submit_button();
 	}
-
-	public function output_table_for_tax_class( $slug, $name ) {
+	
+	/**
+	 * Output the table for a specific tax class.
+	 *
+	 * @param string $slug The slug of the tax class.
+	 *
+	 * @return void
+	 */
+	public function output_table_for_tax_class( string $slug ): void {
 		global $wpdb;
+		
+		$tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 		
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
@@ -62,7 +94,6 @@ class TaxesSettings {
 		);
 		?>
 
-		<h4><?php echo esc_html( $name ); ?></h4>
 		<table class="widefat striped">
 			<thead>
 				<tr>
@@ -71,9 +102,9 @@ class TaxesSettings {
 					<th><?php esc_html_e( 'Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<th><?php esc_html_e( 'City', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<th><?php esc_html_e( 'Rate', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><a href="https://service.unece.org/trade/untdid/d00a/tred/tred5153.htm" target="_blank"><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th><a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5305.htm" target="_blank"><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
-					<th width="10%"><a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/vatex/" target="_blank"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></th>
+					<th><?php esc_html_e( 'Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th><?php esc_html_e( 'Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					<th width="10%"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<th width="15%"><?php esc_html_e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 				</tr>
 			</thead>
@@ -110,16 +141,16 @@ class TaxesSettings {
 							$postcode         = empty( $postcode ) ? '*' : implode( '; ', $postcode );
 							$city             = empty( $city ) ? '*' : implode( '; ', $city );
 							
-							$scheme           = isset( $this->settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
-							$scheme_default   = isset( $this->settings['class'][ $slug ]['scheme'] ) ? $this->settings['class'][ $slug ]['scheme'] : 'default';
+							$scheme           = isset( $tax_settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $tax_settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
+							$scheme_default   = isset( $tax_settings['class'][ $slug ]['scheme'] ) ? $tax_settings['class'][ $slug ]['scheme'] : 'default';
 							$scheme_code      = ( 'default' === $scheme ) ? $scheme_default : $scheme;
 
-							$category         = isset( $this->settings['rate'][ $result->tax_rate_id ]['category'] ) ? $this->settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
-							$category_default = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
+							$category         = isset( $tax_settings['rate'][ $result->tax_rate_id ]['category'] ) ? $tax_settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
+							$category_default = isset( $tax_settings['class'][ $slug ]['category'] ) ? $tax_settings['class'][ $slug ]['category'] : 'default';
 							$category_code    = ( 'default' === $category ) ? $category_default : $category;
 							
-							$reason           = isset( $this->settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $this->settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
-							$reason_default   = isset( $this->settings['class'][ $slug ]['reason'] ) ? $this->settings['class'][ $slug ]['reason'] : 'default';
+							$reason           = isset( $tax_settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $tax_settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
+							$reason_default   = isset( $tax_settings['class'][ $slug ]['reason'] ) ? $tax_settings['class'][ $slug ]['reason'] : 'default';
 							$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
 							
 							echo '<tr>';
@@ -165,9 +196,9 @@ class TaxesSettings {
 				<tr>
 					<th colspan="5" style="text-align: right;"><?php esc_html_e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
 					<?php
-						$scheme   = isset( $this->settings['class'][ $slug ]['scheme'] )   ? $this->settings['class'][ $slug ]['scheme']   : 'default';
-						$category = isset( $this->settings['class'][ $slug ]['category'] ) ? $this->settings['class'][ $slug ]['category'] : 'default';
-						$reason   = isset( $this->settings['class'][ $slug ]['reason'] )   ? $this->settings['class'][ $slug ]['reason']   : 'default';
+						$scheme   = isset( $tax_settings['class'][ $slug ]['scheme'] )   ? $tax_settings['class'][ $slug ]['scheme']   : 'default';
+						$category = isset( $tax_settings['class'][ $slug ]['category'] ) ? $tax_settings['class'][ $slug ]['category'] : 'default';
+						$reason   = isset( $tax_settings['class'][ $slug ]['reason'] )   ? $tax_settings['class'][ $slug ]['reason']   : 'default';
 					?>
 					<th>
 						<?php
@@ -256,81 +287,27 @@ class TaxesSettings {
 		return $select;
 	}
 
+	/**
+	 * Get available tax schemes according to standard.
+	 * 
+	 * @return array
+	 */
 	public function get_available_schemes(): array {
 		return apply_filters( 'wpo_wcpdf_ubl_tax_schemes', array(
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'GST' => __( 'Goods and services tax (GST)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAA' => __( 'Petroleum tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAB' => __( 'Provisional countervailing duty cash', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAC' => __( 'Provisional countervailing duty bond', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAD' => __( 'Tobacco tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAE' => __( 'Energy fee', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAF' => __( 'Coffee tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAG' => __( 'Harmonised sales tax, Canadian', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAH' => __( 'Quebec sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAI' => __( 'Canadian provincial sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAJ' => __( 'Tax on replacement part', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAK' => __( 'Mineral oil tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAL' => __( 'Special tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'ADD' => __( 'Anti-dumping duty', 'woocommerce-pdf-invoices-packing-slips' ),
-			'BOL' => __( 'Stamp duty (Imposta di Bollo)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'CAP' => __( 'Agricultural levy', 'woocommerce-pdf-invoices-packing-slips' ),
-			'CAR' => __( 'Car tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'COC' => __( 'Paper consortium tax (Italy)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'CST' => __( 'Commodity specific tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'CUD' => __( 'Customs duty', 'woocommerce-pdf-invoices-packing-slips' ),
-			'CVD' => __( 'Countervailing duty', 'woocommerce-pdf-invoices-packing-slips' ),
-			'ENV' => __( 'Environmental tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'EXC' => __( 'Excise duty', 'woocommerce-pdf-invoices-packing-slips' ),
-			'EXP' => __( 'Agricultural export rebate', 'woocommerce-pdf-invoices-packing-slips' ),
-			'FET' => __( 'Federal excise tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'FRE' => __( 'Free', 'woocommerce-pdf-invoices-packing-slips' ),
-			'GNC' => __( 'General construction tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'ILL' => __( 'Illuminants tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'IMP' => __( 'Import tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'IND' => __( 'Individual tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'LAC' => __( 'Business license fee', 'woocommerce-pdf-invoices-packing-slips' ),
-			'LCN' => __( 'Local construction tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'LDP' => __( 'Light dues payable', 'woocommerce-pdf-invoices-packing-slips' ),
-			'LOC' => __( 'Local sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'LST' => __( 'Lust tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'MCA' => __( 'Monetary compensatory amount', 'woocommerce-pdf-invoices-packing-slips' ),
-			'MCD' => __( 'Miscellaneous cash deposit', 'woocommerce-pdf-invoices-packing-slips' ),
-			'OTH' => __( 'Other taxes', 'woocommerce-pdf-invoices-packing-slips' ),
-			'PDB' => __( 'Provisional duty bond', 'woocommerce-pdf-invoices-packing-slips' ),
-			'PDC' => __( 'Provisional duty cash', 'woocommerce-pdf-invoices-packing-slips' ),
-			'PRF' => __( 'Preference duty', 'woocommerce-pdf-invoices-packing-slips' ),
-			'SCN' => __( 'Special construction tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'SSS' => __( 'Shifted social securities', 'woocommerce-pdf-invoices-packing-slips' ),
-			'STT' => __( 'State/provincial sales tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'SUP' => __( 'Suspended duty', 'woocommerce-pdf-invoices-packing-slips' ),
-			'SUR' => __( 'Surtax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'SWT' => __( 'Shifted wage tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'TAC' => __( 'Alcohol mark tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'TOT' => __( 'Total', 'woocommerce-pdf-invoices-packing-slips' ),
-			'TOX' => __( 'Turnover tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'TTA' => __( 'Tonnage taxes', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VAD' => __( 'Valuation deposit', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
 	}
 
+	/**
+	 * Get available VAT tax categories according to standard 5305 code list.
+	 *
+	 * @return array
+	 */
 	public function get_available_categories(): array {
 		return apply_filters( 'wpo_wcpdf_ubl_tax_categories', array(
-			'A'  => __( 'Mixed tax rate', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AA' => __( 'Lower rate', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AB' => __( 'Exempt for resale', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AC' => __( 'Value Added Tax (VAT) not now due for payment', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AD' => __( 'Value Added Tax (VAT) due from a previous invoice', 'woocommerce-pdf-invoices-packing-slips' ),
 			'AE' => __( 'VAT Reverse Charge', 'woocommerce-pdf-invoices-packing-slips' ),
-			'B'  => __( 'Transferred (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'C'  => __( 'Duty paid by supplier', 'woocommerce-pdf-invoices-packing-slips' ),
-			'D'  => __( 'Value Added Tax (VAT) margin scheme - travel agents', 'woocommerce-pdf-invoices-packing-slips' ),
 			'E'  => __( 'Exempt from tax', 'woocommerce-pdf-invoices-packing-slips' ),
-			'F'  => __( 'Value Added Tax (VAT) margin scheme - second-hand goods', 'woocommerce-pdf-invoices-packing-slips' ),
 			'G'  => __( 'Free export item, tax not charged', 'woocommerce-pdf-invoices-packing-slips' ),
-			'H'  => __( 'Higher rate', 'woocommerce-pdf-invoices-packing-slips' ),
-			'I'  => __( 'Value Added Tax (VAT) margin scheme - works of art', 'woocommerce-pdf-invoices-packing-slips' ),
-			'J'  => __( 'Value Added Tax (VAT) margin scheme - collector\'s items and antiques', 'woocommerce-pdf-invoices-packing-slips' ),
 			'K'  => __( 'VAT exempt for EEA intra-community supply of goods and services', 'woocommerce-pdf-invoices-packing-slips' ),
 			'L'  => __( 'Canary Islands general indirect tax', 'woocommerce-pdf-invoices-packing-slips' ),
 			'M'  => __( 'Tax for production, services and importation in Ceuta and Melilla', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -339,93 +316,245 @@ class TaxesSettings {
 			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
 	}
-
+	
+	/**
+	 * Get available VAT exemption reasons according to standard VATEX code list.
+	 *
+	 * @return array
+	 */
 	public static function get_available_reasons(): array {
 		return apply_filters( 'wpo_wcpdf_ubl_tax_reasons', array(
-			'VATEX-EU-79-C'      => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132'       => __( 'Exempt based on article 132 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1A'    => __( 'Exempt based on article 132, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1B'    => __( 'Exempt based on article 132, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1C'    => __( 'Exempt based on article 132, section 1 (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1D'    => __( 'Exempt based on article 132, section 1 (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1E'    => __( 'Exempt based on article 132, section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1F'    => __( 'Exempt based on article 132, section 1 (f) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1G'    => __( 'Exempt based on article 132, section 1 (g) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1H'    => __( 'Exempt based on article 132, section 1 (h) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1I'    => __( 'Exempt based on article 132, section 1 (i) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1J'    => __( 'Exempt based on article 132, section 1 (j) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1K'    => __( 'Exempt based on article 132, section 1 (k) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1L'    => __( 'Exempt based on article 132, section 1 (l) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1M'    => __( 'Exempt based on article 132, section 1 (m) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1N'    => __( 'Exempt based on article 132, section 1 (n) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1O'    => __( 'Exempt based on article 132, section 1 (o) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1P'    => __( 'Exempt based on article 132, section 1 (p) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-132-1Q'    => __( 'Exempt based on article 132, section 1 (q) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143'       => __( 'Exempt based on article 143 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1A'    => __( 'Exempt based on article 143, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1B'    => __( 'Exempt based on article 143, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1C'    => __( 'Exempt based on article 143, section 1 (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1D'    => __( 'Exempt based on article 143, section 1 (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1E'    => __( 'Exempt based on article 143, section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1F'    => __( 'Exempt based on article 143, section 1 (f) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1FA'   => __( 'Exempt based on article 143, section 1 (fa) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1G'    => __( 'Exempt based on article 143, section 1 (g) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1H'    => __( 'Exempt based on article 143, section 1 (h) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1I'    => __( 'Exempt based on article 143, section 1 (i) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1J'    => __( 'Exempt based on article 143, section 1 (j) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1K'    => __( 'Exempt based on article 143, section 1 (k) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-143-1L'    => __( 'Exempt based on article 143, section 1 (l) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148'       => __( 'Exempt based on article 148 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148-A'     => __( 'Exempt based on article 148, section (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148-B'     => __( 'Exempt based on article 148, section (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148-C'     => __( 'Exempt based on article 148, section (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148-D'     => __( 'Exempt based on article 148, section (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148-E'     => __( 'Exempt based on article 148, section (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148-F'     => __( 'Exempt based on article 148, section (f) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-148-G'     => __( 'Exempt based on article 148, section (g) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-151-1A'    => __( 'Exempt based on article 151, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-151-1AA'   => __( 'Exempt based on article 151, section 1 (aa) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-151-1B'    => __( 'Exempt based on article 151, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-151-1C'    => __( 'Exempt based on article 151, section 1 (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-151-1D'    => __( 'Exempt based on article 151, section 1 (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-151-1E'    => __( 'Exempt based on article 151, section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-309'       => __( 'Exempt based on article 309 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-AE'        => __( 'Reverse charge', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-D'         => __( 'Travel agents VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-F'         => __( 'Second hand goods VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-G'         => __( 'Export outside the EU', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-I'         => __( 'Works of art VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-IC'        => __( 'Intra-community supply', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-J'         => __( 'Collectors items and antiques VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-EU-O'         => __( 'Not subject to VAT', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-FR-FRANCHISE' => __( 'France domestic VAT franchise in base', 'woocommerce-pdf-invoices-packing-slips' ),
-			'VATEX-FR-CNWVAT'    => __( 'France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount', 'woocommerce-pdf-invoices-packing-slips' ),
-		) );
+				// EU VAT exemptions
+				'VATEX-EU-79-C'          => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132'           => __( 'Exempt based on article 132 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1A'        => __( 'Exempt based on article 132, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1B'        => __( 'Exempt based on article 132, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1C'        => __( 'Exempt based on article 132, section 1 (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1D'        => __( 'Exempt based on article 132, section 1 (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1E'        => __( 'Exempt based on article 132, section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1F'        => __( 'Exempt based on article 132, section 1 (f) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1G'        => __( 'Exempt based on article 132, section 1 (g) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1H'        => __( 'Exempt based on article 132, section 1 (h) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1I'        => __( 'Exempt based on article 132, section 1 (i) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1J'        => __( 'Exempt based on article 132, section 1 (j) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1K'        => __( 'Exempt based on article 132, section 1 (k) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1L'        => __( 'Exempt based on article 132, section 1 (l) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1M'        => __( 'Exempt based on article 132, section 1 (m) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1N'        => __( 'Exempt based on article 132, section 1 (n) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1O'        => __( 'Exempt based on article 132, section 1 (o) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1P'        => __( 'Exempt based on article 132, section 1 (p) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-132-1Q'        => __( 'Exempt based on article 132, section 1 (q) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143'           => __( 'Exempt based on article 143 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1A'        => __( 'Exempt based on article 143, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1B'        => __( 'Exempt based on article 143, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1C'        => __( 'Exempt based on article 143, section 1 (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1D'        => __( 'Exempt based on article 143, section 1 (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1E'        => __( 'Exempt based on article 143, section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1F'        => __( 'Exempt based on article 143, section 1 (f) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1FA'       => __( 'Exempt based on article 143, section 1 (fa) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1G'        => __( 'Exempt based on article 143, section 1 (g) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1H'        => __( 'Exempt based on article 143, section 1 (h) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1I'        => __( 'Exempt based on article 143, section 1 (i) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1J'        => __( 'Exempt based on article 143, section 1 (j) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1K'        => __( 'Exempt based on article 143, section 1 (k) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-143-1L'        => __( 'Exempt based on article 143, section 1 (l) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-144'           => __( 'Exempt based on article 144 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-146-1E'        => __( 'Exempt based on article 146 section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148'           => __( 'Exempt based on article 148 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148-A'         => __( 'Exempt based on article 148, section (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148-B'         => __( 'Exempt based on article 148, section (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148-C'         => __( 'Exempt based on article 148, section (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148-D'         => __( 'Exempt based on article 148, section (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148-E'         => __( 'Exempt based on article 148, section (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148-F'         => __( 'Exempt based on article 148, section (f) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-148-G'         => __( 'Exempt based on article 148, section (g) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-151'           => __( 'Exempt based on article 151 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-151-1A'        => __( 'Exempt based on article 151, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-151-1AA'       => __( 'Exempt based on article 151, section 1 (aa) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-151-1B'        => __( 'Exempt based on article 151, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-151-1C'        => __( 'Exempt based on article 151, section 1 (c) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-151-1D'        => __( 'Exempt based on article 151, section 1 (d) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-151-1E'        => __( 'Exempt based on article 151, section 1 (e) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-153'           => __( 'Exempt based on article 153 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-159'           => __( 'Exempt based on article 159 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-309'           => __( 'Exempt based on article 309 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-AE'            => __( 'Reverse charge', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-D'             => __( 'Travel agents VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-F'             => __( 'Second hand goods VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-G'             => __( 'Export outside the EU', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-I'             => __( 'Works of art VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-IC'            => __( 'Intra-community supply', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-J'             => __( 'Collectors items and antiques VAT scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-EU-O'             => __( 'Not subject to VAT', 'woocommerce-pdf-invoices-packing-slips' ),
+
+				// France specific VAT exemptions
+				'VATEX-FR-AE'            => __( 'Exempt based on 2 of article 283 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261-1'      => __( 'Exempt based on 1 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261-2'      => __( 'Exempt based on 2 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261-3'      => __( 'Exempt based on 3 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261-4'      => __( 'Exempt based on 4 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261-5'      => __( 'Exempt based on 5 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261-7'      => __( 'Exempt based on 7 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261-8'      => __( 'Exempt based on 8 of article 261 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261A'       => __( 'Exempt based on article 261 A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261B'       => __( 'Exempt based on article 261 B of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261C-1'     => __( 'Exempt based on 1° of article 261 C of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261C-2'     => __( 'Exempt based on 2° of article 261 C of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261C-3'     => __( 'Exempt based on 3° of article 261 C of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261D-1'     => __( 'Exempt based on 1° of article 261 D of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261D-1BIS'  => __( 'Exempt based on 1°bis of article 261 D of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261D-2'     => __( 'Exempt based on 2° of article 261 D of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261D-3'     => __( 'Exempt based on 3° of article 261 D of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261D-4'     => __( 'Exempt based on 4° of article 261 D of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261E-1'     => __( 'Exempt based on 1° of article 261 E of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI261E-2'     => __( 'Exempt based on 2° of article 261 E of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI277A'       => __( 'Exempt based on article 277 A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI275'        => __( 'Exempt based on article 275 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CGI295'        => __( 'Exempt based on article 295 of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-CNWVAT'        => __( 'France domestic Credit Notes without VAT, due to supplier forfeit of VAT for discount', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-FRANCHISE'     => __( 'France domestic VAT franchise in base', 'woocommerce-pdf-invoices-packing-slips' ),
+				'VATEX-FR-298SEXDECIESA' => __( 'Exempt based on article 298 sexdecies A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+		);
 	}
 	
 	/**
-	 * Get available remarks
+	 * Get available VAT exemption remarks according to standard VATEX codes.
 	 *
 	 * @return array
 	 */
 	public static function get_available_remarks(): array {
 		/* translators: %s: tax category code */
-		$reason_common_remark = __( 'Only use with tax category code %s', 'woocommerce-pdf-invoices-packing-slips' );
+		$reason_common_remark             = __( 'Only use with tax category code %s', 'woocommerce-pdf-invoices-packing-slips' );
+		$domestic_invoicing_france_remark = __( 'Only for domestic invoicing in France', 'woocommerce-pdf-invoices-packing-slips' );
 
 		return apply_filters( 'wpo_wcpdf_ubl_tax_remarks', array(
 			'scheme'   => array(),
 			'category' => array(),
 			'reason'   => array(
-				'VATEX-EU-AE' => sprintf( $reason_common_remark, '<code>AE</code>' ),
-				'VATEX-EU-D'  => sprintf( $reason_common_remark, '<code>E</code>' ),
-				'VATEX-EU-F'  => sprintf( $reason_common_remark, '<code>E</code>' ),
-				'VATEX-EU-G'  => sprintf( $reason_common_remark, '<code>G</code>' ),
-				'VATEX-EU-I'  => sprintf( $reason_common_remark, '<code>E</code>' ),
-				'VATEX-EU-IC' => sprintf( $reason_common_remark, '<code>K</code>' ),
-				'VATEX-EU-J'  => sprintf( $reason_common_remark, '<code>E</code>' ),
-				'VATEX-EU-O'  => sprintf( $reason_common_remark, '<code>O</code>' ),
+					// EU VAT exemption remarks
+					'VATEX-EU-AE'            => sprintf( $reason_common_remark, '<code>AE</code>' ),
+					'VATEX-EU-D'             => sprintf( $reason_common_remark, '<code>E</code>' ),
+					'VATEX-EU-F'             => sprintf( $reason_common_remark, '<code>E</code>' ),
+					'VATEX-EU-G'             => sprintf( $reason_common_remark, '<code>G</code>' ),
+					'VATEX-EU-I'             => sprintf( $reason_common_remark, '<code>E</code>' ),
+					'VATEX-EU-IC'            => sprintf( $reason_common_remark, '<code>K</code>' ),
+					'VATEX-EU-J'             => sprintf( $reason_common_remark, '<code>E</code>' ),
+					'VATEX-EU-O'             => sprintf( $reason_common_remark, '<code>O</code>' ),
+					
+					// France specific VAT exemption remarks
+					'VATEX-FR-FRANCHISE'     => __( 'For domestic invoicing in France', 'woocommerce-pdf-invoices-packing-slips' ),
+					'VATEX-FR-CNWVAT'        => __( 'For domestic Credit Notes only in France', 'woocommerce-pdf-invoices-packing-slips' ),
+					'VATEX-FR-CGI261-1'      => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261-2'      => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261-3'      => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261-4'      => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261-5'      => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261-7'      => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261-8'      => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261A'       => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261B'       => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261C-1'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261C-2'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261C-3'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261D-1'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261D-1BIS'  => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261D-2'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261D-3'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261D-4'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261E-1'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI261E-2'     => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI277A'       => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI275'        => $domestic_invoicing_france_remark,
+					'VATEX-FR-298SEXDECIESA' => $domestic_invoicing_france_remark,
+					'VATEX-FR-CGI295'        => $domestic_invoicing_france_remark,
+					'VATEX-FR-AE'            => $domestic_invoicing_france_remark,
+				),
 			),
-		) );
+		);
+	}
+	
+	/**
+	 * Show notice about the standard update.
+	 *
+	 * @return void
+	 */
+	public static function standard_update_notice(): void {
+		$tax_settings     = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+		$current_standard = $tax_settings['standard'] ?? null;
+		$current_version  = $tax_settings['standard_version'] ?? null;
+
+		// Handle dismissal
+		if (
+			isset( $_GET['dismiss_standard_notice'], $_GET['dismiss_standard_notice_nonce'] ) &&
+			wp_verify_nonce( $_GET['dismiss_standard_notice_nonce'], 'dismiss_standard_notice' )
+		) {
+			self::update_standard_version();
+
+			wp_safe_redirect( remove_query_arg( array( 'dismiss_standard_notice', 'dismiss_standard_notice_nonce' ) ) );
+			exit;
+		}
+
+		// Only show notice if standard name or version is missing or outdated
+		if (
+			$current_standard === self::$standard &&
+			version_compare( $current_version, self::$standard_version, '>=' )
+		) {
+			return;
+		}
+
+		// Output notice
+		$dismiss_url = wp_nonce_url(
+			add_query_arg( 'dismiss_standard_notice', '1' ),
+			'dismiss_standard_notice',
+			'dismiss_standard_notice_nonce'
+		);
+
+		echo '<div class="notice notice-info is-dismissible">';
+		echo '<p>' . wp_kses_post( sprintf(
+			/* translators: %1$s: plugin name, %2$s: standard name, %3$s: version number, %4$s: changelog link */
+			__( 'The %1$s UBL tax settings were updated to %2$s version %3$s. %4$s', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+			'<strong>' . esc_html( self::$standard ) . '</strong>',
+			'<code>' . esc_html( self::$standard_version ) . '</code>',
+			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '" id="ubl-toggle-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+		) ) . '</p>';
+
+		echo '<p><a href="' . esc_url( $dismiss_url ) . '" class="button">' . esc_html__( 'Dismiss', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
+		echo '</div>';
+	}
+	
+	/**
+	 * Check if the standard name and version are set and update them if missing or outdated.
+	 *
+	 * @return void
+	 */
+	public static function update_standard_version(): void {
+		$tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+
+		if (
+			! isset( $tax_settings['standard'] ) ||
+			$tax_settings['standard'] !== self::$standard ||
+			! isset( $tax_settings['standard_version'] ) ||
+			version_compare( $tax_settings['standard_version'], self::$standard_version, '<' )
+		) {
+			$tax_settings['standard']          = self::$standard;
+			$tax_settings['standard_version']  = self::$standard_version;
+			update_option( 'wpo_wcpdf_settings_ubl_taxes', $tax_settings );
+		}
+	}
+	
+	/**
+	 * Get changes from EN16931 version 15.0.
+	 *
+	 * @return array
+	 */	
+	public static function get_changes_from_EN16931_15_0(): array {
+		return array(
+			'Deprecated all tax schemes except VAT, which is the only one allowed by EN16931 v15.',
+			'Deprecated tax category codes: A, AA, AB, AC, AD, B, C, D, F, H, I, J.',
+			'Added VAT exemption reason codes: VATEX-EU-144, VATEX-EU-146-1E, VATEX-EU-151, VATEX-EU-153, VATEX-EU-159, VATEX-FR-CGI261-1, VATEX-FR-CGI261-2, VATEX-FR-CGI261-3, VATEX-FR-CGI261-4, VATEX-FR-CGI261-5, VATEX-FR-CGI261-7, VATEX-FR-CGI261-8, VATEX-FR-CGI261A, VATEX-FR-CGI261B, VATEX-FR-CGI261C-1, VATEX-FR-CGI261C-2, VATEX-FR-CGI261C-3, VATEX-FR-CGI261D-1, VATEX-FR-CGI261D-1BIS, VATEX-FR-CGI261D-2, VATEX-FR-CGI261D-3, VATEX-FR-CGI261D-4, VATEX-FR-CGI261E-1, VATEX-FR-CGI261E-2, VATEX-FR-CGI277A, VATEX-FR-CGI275, VATEX-FR-298SEXDECIESA, VATEX-FR-CGI295, VATEX-FR-AE.',
+		);
 	}
 
 }
