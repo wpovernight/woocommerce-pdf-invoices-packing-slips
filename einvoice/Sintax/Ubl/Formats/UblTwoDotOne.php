@@ -10,15 +10,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class UblTwoDotOne extends AbstractFormat {
 	
-	protected static string $slug = 'ubltwodotone';
-	protected static string $name = 'UBL 2.1';
+	public string $slug = 'ubltwodotone';
+	public string $name = 'UBL 2.1';
 	
 	/**
 	 * Get the format structure
 	 *
 	 * @return array
 	 */
-	protected static function get_structure(): array {
+	public function get_structure(): array {
 		return apply_filters( 'wpo_ips_einvoice_format_structure' , array(
 			'ubl_version_id' => array(
 				'enabled' => true,
@@ -94,7 +94,7 @@ class UblTwoDotOne extends AbstractFormat {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EInvoice\Sintax\Ubl\Handlers\InvoiceLineHandler::class,
 			),
-		), self::$slug, self::$name );
+		), $this );
 	}
 
 }

@@ -8,14 +8,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class AbstractFormat {
 	
-	protected static string $slug;
-	protected static string $name;
+	public string $slug;
+	public string $name;
+	protected static ?AbstractFormat $_instance = null;
+	
+	/**
+	 * Get the instance of the class
+	 *
+	 * @return static
+	 */
+	public static function instance() {
+		if ( is_null( static::$_instance ) ) {
+			static::$_instance = new static();
+		}
+		return static::$_instance;
+	}
 	
 	/**
 	 * Get the format structure
 	 *
 	 * @return array
 	 */
-	abstract protected static function get_structure(): array;
+	abstract public function get_structure(): array;
 
 }
