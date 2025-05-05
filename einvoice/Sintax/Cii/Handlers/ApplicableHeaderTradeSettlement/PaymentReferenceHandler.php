@@ -1,5 +1,5 @@
 <?php
-namespace WPO\IPS\EInvoice\Formats\Cii\Handlers\ApplicableHeaderTradeSettlement;
+namespace WPO\IPS\EInvoice\Sintax\Cii\Handlers\ApplicableHeaderTradeSettlement;
 
 use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
 

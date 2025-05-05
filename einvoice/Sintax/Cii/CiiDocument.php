@@ -103,7 +103,7 @@ class CiiDocument extends AbstractDocument {
 			// Line Items
 			'included_supply_chain_trade_line_item' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\SupplyChainTradeTransaction\InvoiceLineHandler::class,
+				'handler' => \WPO\IPS\EInvoice\Sintax\Cii\Handlers\SupplyChainTradeTransaction\IncludedSupplyChainTradeLineItemHandler::class,
 				'options' => array(
 					'root' => 'rsm:SupplyChainTradeTransaction',
 				),

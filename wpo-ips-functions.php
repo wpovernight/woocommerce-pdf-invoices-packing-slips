@@ -1448,7 +1448,7 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
 		$ubl_maker->set_file_path( $tmp_path );
 	}
 
-	$ubl_document = new \WPO\IPS\EInvoice\Formats\Ubl\UblDocument();
+	$ubl_document = new \WPO\IPS\EInvoice\Sintax\Ubl\UblDocument();
 	$ubl_document->set_order_document( $document );
 
 	$builder  = new \WPO\IPS\EInvoice\SabreBuilder();
