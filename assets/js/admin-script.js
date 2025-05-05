@@ -386,12 +386,12 @@ jQuery( function( $ ) {
 	// Trigger the Preview
 	function triggerPreview( timeoutDuration = 0 ) {
 		$previewStates = $( '#wpo-wcpdf-preview-wrapper' ).data( 'preview-states' );
-		
+
 		// Check if preview is disabled and return
 		if ( 'undefined' === $previewStates || 1 === $previewStates ) {
 			return;
 		}
-		
+
 		timeoutDuration = typeof timeoutDuration == 'number' ? timeoutDuration : 0;
 
 		loadPreviewData();
@@ -616,16 +616,32 @@ jQuery( function( $ ) {
 	//----------> /Preview <----------//
 
 	function settingsAccordion() {
-		// Default to expanded for '#general', collapsed for others.
-		$( '.settings_category' ).not( '#general' ).find( '.form-table' ).hide();
+		// Get current tab.
+		const params      = new URLSearchParams( window.location.search );
+		const tab         = params.get( 'tab' );
+		const allowedTabs = [ 'general', 'documents' ];
+
+		if ( ! allowedTabs.includes( tab ) ) {
+			return;
+		}
+
+		const tabsMainCategory = {
+			'general': 'display',
+			'documents': 'general',
+		};
+
+		// Expand the main category and collapse the rest by default.
+		$( '.settings_category' ).not( '#' + tabsMainCategory[ tab ] ).find( '.form-table' ).hide();
 		$( '#general > h2' ).addClass( 'active' );
 
 		// Retrieve the state from localStorage
 		$( '.settings_category h2' ).each( function( index ) {
-			const state = localStorage.getItem( 'wcpdf_accordion_state_' + index );
-			if ( 'true' === state ) {
-				$( this ).addClass( 'active' ).next( '.form-table' ).show();
-			}
+			const state    = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` );
+			const isActive = 'true' === state;
+			$( this )
+				.toggleClass( 'active', isActive )
+				.next( '.form-table' )
+				.toggle( isActive );
 		} );
 
 		$('.settings_category h2' ).on( 'click', function() {
@@ -634,7 +650,7 @@ jQuery( function( $ ) {
 			$( this ).toggleClass( 'active' ).next( '.form-table' ).slideToggle( 'fast', function() {
 				// Save the state in localStorage
 				const isVisible = $( this ).is( ':visible' );
-				localStorage.setItem( 'wcpdf_accordion_state_' + index, isVisible );
+				localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${index}`, isVisible );
 			} );
 		} );
 	}
