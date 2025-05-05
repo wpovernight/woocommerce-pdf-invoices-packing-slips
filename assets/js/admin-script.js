@@ -637,11 +637,9 @@ jQuery( function( $ ) {
 		// Retrieve the state from localStorage
 		$( '.settings_category h2' ).each( function( index ) {
 			const state    = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` );
-			const isActive = 'true' === state;
-			$( this )
-				.toggleClass( 'active', isActive )
-				.next( '.form-table' )
-				.toggle( isActive );
+			if ( 'true' === state ) {
+				$( this ).addClass( 'active' ).next( '.form-table' ).show();
+			}
 		} );
 
 		$('.settings_category h2' ).on( 'click', function() {
