@@ -36,11 +36,11 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:TypeCode',
-							'value' => strtoupper( $scheme ),
+							'value' => $scheme,
 						),
 						array(
 							'name'  => 'ram:CategoryCode',
-							'value' => strtoupper( $category ),
+							'value' => $category,
 						),
 					)
 				);
