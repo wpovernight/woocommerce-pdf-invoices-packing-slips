@@ -30,6 +30,30 @@ class TaxesSettings {
 	public function output(): void {
 		settings_fields( 'wpo_wcpdf_settings_ubl_taxes' );
 		do_settings_sections( 'wpo_wcpdf_settings_ubl_taxes' );
+		
+		echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+		echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+		
+		echo '<p><strong>' . esc_html__( 'Code list standard:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> <code>' . esc_html( self::$standard ) . ' v' . esc_html( self::$standard_version ) . '</code> ';
+		echo '<a href="#" id="ubl-show-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
+
+		// Show changelog if method exists
+		$method = 'get_changes_from_' . self::$standard . '_' . str_replace( '.', '_', self::$standard_version );
+		
+		if ( method_exists( $this, $method ) ) {
+			$changes = call_user_func( array( $this, $method ) );
+			echo '<ul id="ubl-standard-changelog">';
+			foreach ( $changes as $change ) {
+				echo '<li>' . esc_html( $change ) . '</li>';
+			}
+			echo '</ul>';
+		}
+		
+		echo '<p>' . sprintf(
+			/* translators: %s: link to documentation */
+			esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="' . esc_url( '#' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+		) . '</p>';
 
 		$rates                       = \WC_Tax::get_tax_rate_classes();
 		$formatted_rates             = array();

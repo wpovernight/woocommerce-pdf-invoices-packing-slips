@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Settings\TaxesSettings;
+use WPO\IPS\EInvoice\TaxesSettings as EInvoiceTaxSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -251,10 +251,10 @@ class Assets {
 
 			}
 
-			// ubl taxes
-			if ( 'ubl' === $tab ) {
+			// einvoice
+			if ( 'einvoice' === $tab ) {
 				wp_enqueue_script(
-					'wpo-wcpdf-ubl',
+					'wpo-wcpdf-einvoice',
 					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
 					array( 'jquery' ),
 					WPO_WCPDF_VERSION,
@@ -262,13 +262,13 @@ class Assets {
 				);
 
 				wp_localize_script(
-					'wpo-wcpdf-ubl',
-					'wpo_wcpdf_ubl',
+					'wpo-wcpdf-einvoice',
+					'wpo_wcpdf_einvoice',
 					array(
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => TaxesSettings::get_available_remarks(),
+						'remarks' => EInvoiceTaxSettings::get_available_remarks(),
 					)
 				);
 			}
