@@ -1478,3 +1478,44 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
 
 	return $full_filename;
 }
+
+function wpo_ips_convert_avif( string $image_html ): string {
+	$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+	if ( ! isset( $debug_settings['enable_avif_support'] ) || ! wc_string_to_bool( $debug_settings['enable_avif_support'] ) ) {
+		return $image_html;
+	}
+	
+	$src     = '';
+	$jpg_src = '';
+	
+	if ( preg_match('/src=["\'](.*?)["\']/', $image_html, $matches ) ) {
+		$src = $matches[1];
+		
+		if ( '.avif' === substr( $src, -5 ) && 'http' !== substr( $src, 0, 4 ) ) {
+			$jpg_src = substr( $src, 0, -5 ) . '.jpg';
+			if ( WPO_WCPDF()->file_system->exists( $src ) && ! WPO_WCPDF()->file_system->exists( $jpg_src ) ) {
+				if ( version_compare( PHP_VERSION, '8.1.0', '<' ) && extension_loaded( 'gd' ) ) {
+					$image = imagecreatefromavif( $src );
+					if ( $image ) {
+						imagejpeg( $image, $jpg_src, 90 );
+						imagedestroy( $image );
+					}
+				} elseif ( extension_loaded( 'imagick' ) ) {
+					$image = new Imagick( $src );
+					$image->setImageFormat( 'jpeg' );
+					$image->writeImage( $jpg_src );
+					if ( $image ) {
+						$image->clear();
+						$image->destroy();
+					}
+				} else {
+					return $image_html;
+				}
+			}
+		}
+	}
+	
+	return str_replace('.avif', '.jpg', $image_html);
+}
+
+

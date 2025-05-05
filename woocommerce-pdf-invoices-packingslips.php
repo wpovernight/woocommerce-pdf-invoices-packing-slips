@@ -40,7 +40,6 @@ class WPO_WCPDF {
 	public $frontend;
 	public $install;
 	public $font_synchronizer;
-	public $avif_compatibility;
 
 	protected static $_instance = null;
 
@@ -157,7 +156,6 @@ class WPO_WCPDF {
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
-		$this->avif_compatibility  = \WPO\IPS\Compatibility\Avif\AvifCompatibility::instance();
 
 		// Plugin classes
 		$this->settings            = \WPO\IPS\Settings::instance();
