@@ -1,15 +1,15 @@
 <?php
 namespace WPO\IPS\Settings;
 
-use WPO\IPS\UBL\Settings\TaxesSettings as UblTaxSettings;
+use WPO\IPS\EInvoice\TaxesSettings as EInvoiceTaxSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsUbl' ) ) :
+if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsEInvoice' ) ) :
 
-class SettingsUbl {
+class SettingsEInvoice {
 
 	public $sections;
 
@@ -24,11 +24,11 @@ class SettingsUbl {
 
 	function __construct()	{
 		$this->sections = [
-			'taxes' => __( 'Taxes classification', 'woocommerce-pdf-invoices-packing-slips' ),
+			'einvoice' => __( 'E-Invoicing', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
-		add_action( 'wpo_wcpdf_settings_output_ubl', array( $this, 'output' ), 10, 2 );
+		add_action( 'wpo_wcpdf_settings_output_einvoice', array( $this, 'output' ), 10, 2 );
 
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
@@ -42,7 +42,7 @@ class SettingsUbl {
 			return;
 		}
 		
-		$active_section = ! empty( $active_section ) ? $active_section : 'taxes';
+		$active_section = ! empty( $active_section ) ? $active_section : 'einvoice';
 		?>
 		<div class="wcpdf_ubl_settings_sections">
 			<?php if ( count( $this->sections ) > 1 ) : ?>
@@ -62,10 +62,10 @@ class SettingsUbl {
 
 		switch ( $active_section ) {
 			default:
-			case 'taxes':
+			case 'einvoice':
 				echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 				echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-				$setting = new UblTaxSettings();
+				$setting = new EInvoiceTaxSettings();
 				$setting->output();
 				break;
 		}
@@ -77,7 +77,7 @@ class SettingsUbl {
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
-				'id'       => 'taxes',
+				'id'       => 'einvoice',
 				'title'    => '',
 				'callback' => 'section',
 			),
