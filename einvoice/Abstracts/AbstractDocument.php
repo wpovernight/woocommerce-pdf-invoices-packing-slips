@@ -81,7 +81,7 @@ abstract class AbstractDocument {
 			return false;
 		}
 		
-		$structure = $available_formats[ $format ]::instance()->get_structure();
+		$structure = ( new $available_formats[ $format ]() )->get_structure();
 		
 		if ( empty( $structure ) ) {
 			return false;
