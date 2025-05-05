@@ -147,6 +147,9 @@ class WPO_WCPDF {
 	public function includes() {
 		// plugin legacy class mapping
 		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
+		
+		// deprecated hooks
+		include_once $this->plugin_path() . '/wpo-ips-deprecated-hooks.php';
 
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';

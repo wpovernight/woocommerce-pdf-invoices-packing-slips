@@ -11,30 +11,97 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class AbstractDocument {
 	
 	public string $syntax;
-	public string $version;
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
 	public array $order_coupons_data;
 	public string $output;
 	public OrderDocument $order_document;
-
-	public function set_order( \WC_Abstract_Order $order ) {
+	
+	/**
+	 * Get the root element
+	 *
+	 * @return string
+	 */
+	abstract public function get_root_element(): string;
+	
+	/**
+	 * Get additional root elements
+	 *
+	 * @return array
+	 */
+	abstract public function get_additional_root_elements(): array;
+	
+	/**
+	 * Get the namespaces
+	 *
+	 * @return array
+	 */
+	abstract public function get_namespaces(): array;
+	
+	/**
+	 * Get the available formats
+	 *
+	 * @return array
+	 */
+	abstract public function get_available_formats(): array;
+	
+	/**
+	 * Set the order
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return void
+	 */
+	public function set_order( \WC_Abstract_Order $order ): void {
 		$this->order              = $order;
 		$this->order_tax_data     = $this->get_tax_rates();
 		$this->order_coupons_data = $this->get_order_coupons_data();
 	}
 
-	public function set_order_document( OrderDocument $order_document ) {
+	/**
+	 * Set the order document
+	 *
+	 * @param OrderDocument $order_document
+	 * @return void
+	 */
+	public function set_order_document( OrderDocument $order_document ): void {
 		$this->order_document = $order_document;
 		$this->set_order( $order_document->order );
 	}
+	
+	/**
+	 * Get the format structure
+	 *
+	 * @param string $format
+	 * @return array|false
+	 */
+	public function get_format_structure( string $format ): array|false {
+		$available_formats = $this->get_available_formats();
+		
+		if ( ! isset( $available_formats[ $format ] ) ) {
+			return false;
+		}
+		
+		$structure = ( new $available_formats[ $format ]() )->get_structure();
+		
+		if ( empty( $structure ) ) {
+			return false;
+		}
+		
+		foreach ( $structure as $key => $element ) {
+			if ( false === $element['enabled'] ) {
+				unset( $structure[ $key ] );
+			}
+		}
 
-	abstract public function get_root_element();
-	abstract public function get_additional_root_elements();
-	abstract public function get_format();
-	abstract public function get_namespaces();
-
-	public function get_tax_rates() {
+		return $structure;
+	}
+	
+	/**
+	 * Get tax rates
+	 *
+	 * @return array
+	 */
+	public function get_tax_rates(): array {
 		$order_tax_data = array();
 		$items          = $this->order->get_items( array( 'fee', 'line_item', 'shipping' ) );
 
@@ -209,9 +276,10 @@ abstract class AbstractDocument {
 	 * @return array
 	 */
 	public function get_data(): array {
-		$data = array();
+		$data   = array();
+		$format = ''; // TODO: Get the format from the document
 
-		foreach ( $this->get_format() as $key => $value ) {
+		foreach ( $this->get_format_structure( $format ) as $key => $value ) {
 			$options  = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
 			$handlers = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
 
