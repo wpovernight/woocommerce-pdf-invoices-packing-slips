@@ -69,14 +69,14 @@ class SettingsUbl {
 					$settings = new UblTaxSettings();
 					
 					echo '<p><strong>' . esc_html__( 'Code list standard:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> <code>' . esc_html( $settings::$standard ) . ' v' . esc_html( $settings::$standard_version ) . '</code> ';
-					echo '<a href="#" id="ubl-show-changelog" style="font-size: 0.9em;">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
+					echo '<a href="#" id="ubl-show-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
 
 					// Show changelog if method exists
 					$method = 'get_changes_from_' . $settings::$standard . '_' . str_replace( '.', '_', $settings::$standard_version );
 					
 					if ( method_exists( $settings, $method ) ) {
 						$changes = call_user_func( array( $settings, $method ) );
-						echo '<ul id="ubl-standard-changelog" style="display:none; list-style:disc; padding-left:20px;">';
+						echo '<ul id="ubl-standard-changelog">';
 						foreach ( $changes as $change ) {
 							echo '<li>' . esc_html( $change ) . '</li>';
 						}

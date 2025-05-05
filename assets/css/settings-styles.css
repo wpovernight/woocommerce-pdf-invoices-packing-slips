@@ -498,9 +498,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-top: 1em;
 }
 
-
-/* WPML */
-
 #wpo-wcpdf-settings .form-table .ui-tabs-nav {
 	padding-left: 0!important;
 	margin-left: 0!important;
@@ -1043,6 +1040,13 @@ sup.wcpdf_beta {
 	font-size: 7pt;
 	padding: 1px 2px;
 	border-radius: 2px;
+}
+
+/* UBL Taxes */
+#wpo-wcpdf-preview-wrapper #wpo-wcpdf-settings ul#ubl-standard-changelog {
+	display: none;
+	list-style: disc;
+	padding-left: 20px;
 }
 
 @media screen and (min-width: 1920px) {
