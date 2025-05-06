@@ -14,12 +14,12 @@ class UblTwoDotOne extends AbstractFormat {
 	public string $name = 'UBL 2.1';
 	
 	/**
-	 * Get the format structure
+	 * Get the invoice structure
 	 *
 	 * @return array
 	 */
-	public function get_structure(): array {
-		return apply_filters( 'wpo_ips_einvoice_format_structure' , array(
+	private function get_invoice_structure(): array {
+		return array(
 			'ubl_version_id' => array(
 				'enabled' => true,
 				'handler' => \WPO\IPS\EInvoice\Syntax\Ubl\Handlers\UblVersionIdHandler::class,
@@ -94,7 +94,7 @@ class UblTwoDotOne extends AbstractFormat {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EInvoice\Syntax\Ubl\Handlers\InvoiceLineHandler::class,
 			),
-		), $this );
+		);
 	}
 
 }
