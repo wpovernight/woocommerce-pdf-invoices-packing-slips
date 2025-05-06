@@ -1479,12 +1479,7 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	return $full_filename;
 }
 
-function wpo_ips_maybe_convert_avif_image( string $image_html ): string {
-	$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-	if ( ! isset( $debug_settings['enable_avif_support'] ) || ! wc_string_to_bool( $debug_settings['enable_avif_support'] ) ) {
-		return $image_html;
-	}
-	
+function wpo_ips_maybe_convert_avif_image( string $image_html ): string {	
 	$src     = '';
 	$jpg_src = '';
 	
