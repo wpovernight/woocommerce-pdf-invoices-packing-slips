@@ -123,3 +123,61 @@ function wpo_ips_ubl_save_order_taxes( \WC_Abstract_Order $order ): void {
 function wpo_ips_ubl_is_country_format_extension_active(): bool {
 	return apply_filters( 'wpo_ips_ubl_is_country_format_extension_active', false );
 }
+
+/**
+ * Get the e-invoice syntaxes
+ * 
+ * @return array
+ */
+function wpo_ips_einvoice_syntaxes(): array {
+	return apply_filters(
+		'wpo_ips_einvoice_syntaxes',
+		array(
+			'ubl'       => 'Universal Business Language (UBL)',
+			'cii'       => 'Cross Industry Invoice (CII)',
+			// 'tacturae'  => 'Facturae' . ' (' . __( 'Spain', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
+			// 'fatturapa' => 'FatturaPA' . ' (' . __( 'Italy', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
+			// 'gs1'       => 'GS1',
+		)
+	);
+}
+
+/**
+ * Get the e-invoice formats
+ * 
+ * @return array
+ */
+function wpo_ips_einvoice_formats(): array {
+	return apply_filters(
+		'wpo_ips_einvoice_formats',
+		array(
+			'ubl' => array(
+				'ubltwodotone' => array(
+					'name'  => 'UBL 2.1',
+					'class' => \WPO\IPS\EInvoice\Syntax\Ubl\Formats\UblTwoDotOne::class,
+				),
+				// 'peppolbisthreedotzero' => array(
+				// 	'name'  => 'Peppol BIS Billing 3.0',
+				// 	'class' => '',
+				// ),
+				// 'xrechnung' => array(
+				// 	'name'  => 'XRechnung' . ' (' . __( 'Germany', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
+				// 	'class' => '',
+				// ),
+				// 'ehfbillingthreedotzero' => array(
+				// 	'name'  => 'EHF Billing 3.0' . ' (' . __( 'Norway', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
+				// 	'class' => '',
+				// ),
+				// 'svefakturatwodotzero' => array(
+				// 	'name'  => 'Svefaktura 2.0' . ' (' . __( 'Sweden', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
+				// 	'class' => '',
+				// ),
+				// 'eSENS' => array(
+				// 	'name'  => 'eSENS' . ' (' . __( 'EU', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
+				// 	'class' => '',
+				// ),
+			),
+			'cii' => array(),
+		)
+	);
+}
