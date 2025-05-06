@@ -35,6 +35,7 @@ class SettingsUbl {
 
 		// VAT number or COC number is empty
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
+		add_action( 'admin_notices', array( '\\WPO\\IPS\\UBL\\Settings\\TaxesSettings', 'standard_update_notice' ) );
 	}
 
 	public function output( $active_section, $nonce ) {
@@ -59,16 +60,38 @@ class SettingsUbl {
 			<?php endif; ?>
 		</div>
 		<?php
+			switch ( $active_section ) {
+				default:
+				case 'taxes':
+					echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+					echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+					
+					$settings = new UblTaxSettings();
+					
+					echo '<p><strong>' . esc_html__( 'Code list standard:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> <code>' . esc_html( $settings::$standard ) . ' v' . esc_html( $settings::$standard_version ) . '</code> ';
+					echo '<a href="#" id="ubl-show-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
 
-		switch ( $active_section ) {
-			default:
-			case 'taxes':
-				echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-				echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-				$setting = new UblTaxSettings();
-				$setting->output();
-				break;
-		}
+					// Show changelog if method exists
+					$method = 'get_changes_from_' . $settings::$standard . '_' . str_replace( '.', '_', $settings::$standard_version );
+					
+					if ( method_exists( $settings, $method ) ) {
+						$changes = call_user_func( array( $settings, $method ) );
+						echo '<ul id="ubl-standard-changelog">';
+						foreach ( $changes as $change ) {
+							echo '<li>' . esc_html( $change ) . '</li>';
+						}
+						echo '</ul>';
+					}
+					
+					echo '<p>' . sprintf(
+						/* translators: %s: link to documentation */
+						esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( '#' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+					) . '</p>';
+					
+					$settings->output();
+					break;
+			}
 	}
 
 	public function init_tax_settings() {
