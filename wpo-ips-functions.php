@@ -1491,7 +1491,7 @@ function wpo_ips_maybe_convert_avif_image( string $image_html ): string {
 	if ( preg_match('/src=["\'](.*?)["\']/', $image_html, $matches ) ) {
 		$src = $matches[1];
 		
-		if ( '.avif' === substr( $src, -5 ) && 'http' !== substr( $src, 0, 4 ) ) {
+		if ( preg_match( '/\.avif$/', $src ) && ! preg_match( '/^http/', $src ) ) {
 			$jpg_src = substr( $src, 0, -5 ) . '.jpg';
 			if ( WPO_WCPDF()->file_system->exists( $src ) && ! WPO_WCPDF()->file_system->exists( $jpg_src ) ) {
 				try {
