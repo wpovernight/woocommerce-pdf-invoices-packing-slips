@@ -1294,8 +1294,10 @@ abstract class OrderDocument {
 
 			$img_src     = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
 			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', wpo_wcpdf_escape_url_path_or_base64( $img_src ), esc_attr( $company ) );
-			$img_element = isset( WPO_WCPDF()->settings->debug_settings['enable_avif_support'] ) && wc_string_to_bool( WPO_WCPDF()->settings->debug_settings['enable_avif_support'] ) ? wpo_ips_maybe_convert_avif_image( $img_element ) : $img_element;
 			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
+			$img_element = isset( WPO_WCPDF()->settings->debug_settings['avif_fallback'] ) && wc_string_to_bool( WPO_WCPDF()->settings->debug_settings['avif_fallback'] )
+				? wpo_ips_maybe_convert_avif_img_tag( $img_element )
+				: $img_element;
 
 			echo $img_element; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
