@@ -1499,7 +1499,7 @@ function wpo_ips_maybe_convert_avif_img_tag( string $image_html ): string {
 		// If the src is a URL, try to resolve it to a local file path
 		if ( preg_match( '#^https?://#', $src ) ) {
 			$upload_dir = wp_upload_dir();
-			if ( strpos( $src, $upload_dir['baseurl'] ) === 0 ) {
+			if ( 0 ===strpos( $src, $upload_dir['baseurl'] ) ) {
 				$src_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $src );
 				$jpg_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $jpg_src );
 			} else {
