@@ -621,7 +621,7 @@ jQuery( function( $ ) {
 		const tab         = params.get( 'tab' );
 		const allowedTabs = [ 'general', 'documents' ];
 
-		if ( ! allowedTabs.includes( tab ) ) {
+		if ( ! tab || ! allowedTabs.includes( tab ) ) {
 			return;
 		}
 
@@ -634,8 +634,10 @@ jQuery( function( $ ) {
 		$( '.settings_category' ).not( '#' + tabsMainCategory[ tab ] ).find( '.form-table' ).hide();
 		$( '#general > h2' ).addClass( 'active' );
 
+		const sections = $( '.settings_category h2' );
+
 		// Retrieve the state from localStorage
-		$( '.settings_category h2' ).each( function( index ) {
+		sections.each( function( index ) {
 			const state    = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` );
 			if ( 'true' === state ) {
 				$( this ).addClass( 'active' ).next( '.form-table' ).show();
@@ -643,7 +645,7 @@ jQuery( function( $ ) {
 		} );
 
 		$('.settings_category h2' ).on( 'click', function() {
-			const index = $( '.settings_category h2' ).index( this );
+			const index = sections.index( this );
 
 			$( this ).toggleClass( 'active' ).next( '.form-table' ).slideToggle( 'fast', function() {
 				// Save the state in localStorage

@@ -367,8 +367,8 @@ class SettingsGeneral {
 	 */
 	public function get_settings_categories(): array {
 		$settings_categories = array(
-			'display'          => array(
-				'title'   => __( 'Display Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+			'display' => array(
+				'title' => __( 'Display Settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'download_display',
 					'paper_size',
@@ -377,7 +377,7 @@ class SettingsGeneral {
 				),
 			),
 			'shop_information' => array(
-				'title'   => __( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title' => __( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'header_logo',
 					'header_logo_height',
@@ -389,8 +389,8 @@ class SettingsGeneral {
 					'footer',
 				)
 			),
-			'advanced_formatting'         => array(
-				'title'   => __( 'Advanced Formatting', 'woocommerce-pdf-invoices-packing-slips' ),
+			'advanced_formatting' => array(
+				'title' => __( 'Advanced Formatting', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'font_subsetting',
 					'currency_font',
