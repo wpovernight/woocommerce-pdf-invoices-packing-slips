@@ -199,14 +199,14 @@ class Admin {
 
 	public function get_invoice_count() {
 		global $wpdb;
-		
+
 		$invoice_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
 				"SELECT count(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
 				'_wcpdf_invoice_number'
 			)
 		);
-		
+
 		return (int) $invoice_count;
 	}
 
@@ -487,7 +487,7 @@ class Admin {
 	 * @return void
 	 */
 	public function add_meta_boxes( $wc_screen_id, $wc_order ) {
-		if ( class_exists( CustomOrdersTableController::class ) && function_exists( 'wc_get_container' ) && wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
+		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() ) {
 			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
 			$screen_id = 'shop_order';
@@ -1132,7 +1132,7 @@ class Admin {
 		try {
 			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
 
-			if( ! empty( $document ) ) {
+			if ( ! empty( $document ) ) {
 
 				// perform legacy date fields replacements check
 				if ( isset( $form_data["_wcpdf_{$document->slug}_date"] ) && ! is_array( $form_data["_wcpdf_{$document->slug}_date"] ) ) {
@@ -1164,7 +1164,7 @@ class Admin {
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
-					if( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
+					if ( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
 						$document->initiate_number();
 					}
 
@@ -1249,27 +1249,32 @@ class Admin {
 			return $data;
 		}
 
-		if( isset( $form_data['_wcpdf_'.$document_slug.'_number'] ) ) {
-			$data['number'] = sanitize_text_field( $form_data['_wcpdf_'.$document_slug.'_number'] );
+		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number'] ) ) {
+			$document_number = absint( $form_data['_wcpdf_' . $document_slug . '_number'] );
+
+			if ( $document_number !== 0 ) {
+				$data['number'] = $document_number;
+			}
 		}
 
-		$date_entered = ! empty( $form_data['_wcpdf_'.$document_slug.'_date'] ) && ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['date'] );
-		if( $date_entered ) {
-			$date         = $form_data['_wcpdf_'.$document_slug.'_date']['date'];
-			$hour         = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['hour'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['hour'] : '00';
-			$minute       = ! empty( $form_data['_wcpdf_'.$document_slug.'_date']['minute'] ) ? $form_data['_wcpdf_'.$document_slug.'_date']['minute'] : '00';
+		$date_entered = ! empty( $form_data['_wcpdf_' . $document_slug . '_date'] ) && ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['date'] );
+
+		if ( $date_entered ) {
+			$date         = $form_data['_wcpdf_' . $document_slug . '_date']['date'];
+			$hour         = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['hour'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['hour'] : '00';
+			$minute       = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['minute'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['minute'] : '00';
 
 			// clean & sanitize input
 			$date         = gmdate( 'Y-m-d', strtotime( $date ) );
-			$hour         = sprintf('%02d', intval( $hour ));
-			$minute       = sprintf('%02d', intval( $minute ) );
+			$hour         = sprintf( '%02d', intval( $hour ) );
+			$minute       = sprintf( '%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";
 
-		} elseif ( ! $date_entered && !empty( $_POST['_wcpdf_'.$document_slug.'_number'] ) ) {
+		} elseif ( ! $date_entered && ! empty( $_POST['_wcpdf_' . $document_slug . '_number'] ) ) {
 			$data['date'] = current_time( 'timestamp', true );
 		}
 
-		if ( isset( $form_data['_wcpdf_'.$document_slug.'_notes'] ) ) {
+		if ( isset( $form_data['_wcpdf_' . $document_slug . '_notes'] ) ) {
 			// allowed HTML
 			$allowed_html = array(
 				'a'		=> array(
@@ -1300,7 +1305,7 @@ class Admin {
 				'b'		=> array(),
 			);
 
-			$data['notes'] = wp_kses( $form_data['_wcpdf_'.$document_slug.'_notes'], $allowed_html );
+			$data['notes'] = wp_kses( $form_data['_wcpdf_' . $document_slug . '_notes'], $allowed_html );
 		}
 
 		return $data;

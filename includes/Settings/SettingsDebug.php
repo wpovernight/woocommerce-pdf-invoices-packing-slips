@@ -762,15 +762,16 @@ class SettingsDebug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'file_system_method',
-					'default'     => 'wp_filesystem',
+					'default'     => 'php',
 					'options'     => array(
-						'wp'  => __( 'WP Filesystem API (recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
-						'php' => __( 'PHP filesystem functions', 'woocommerce-pdf-invoices-packing-slips' ),
+						'php' => __( 'PHP Filesystem Functions (recommended)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'wp'  => __( 'WP Filesystem API', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 					'description' => sprintf(
-						/* translators: 1. WP Filesystem, 2. direct */
-						__( 'Choose the filesystem method for file operations. By default, our plugin uses %1$s (only supported in %2$s mode). Select PHP file functions if you encounter issues with %1$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>WP Filesystem</code>',
+						/* translators: 1. PHP Filesystem Functions, 2. WP Filesystem API, 3. direct */
+						__( 'Choose the filesystem method for file operations. By default, our plugin uses %1$s. If you prefer to use the %2$s, please note that only the %3$s method is supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>' . __( 'PHP Filesystem Functions', 'woocommerce-pdf-invoices-packing-slips' ) . '</code>',
+						'<code>' . __( 'WP Filesystem API', 'woocommerce-pdf-invoices-packing-slips' ) . '</code>',
 						'<code>direct</code>'
 					) . ( has_filter( 'wpo_wcpdf_filesystem_method' ) 
 						? '<div class="notice notice-warning inline"><p><strong>' . __( 'Warning:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> ' . __( 'A code snippet is overriding this setting.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>'
@@ -906,6 +907,26 @@ class SettingsDebug {
 					'id'          => 'embed_images',
 					'description' => __( 'Embed images only if you are experiencing issues with them loading in your PDF. Please note that this option can significantly increase the file size.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'avif_fallback',
+				'title'    => __( 'Convert AVIF to JPG', 'woocommerce-pdf-invoices-packing-slips' ) . ' <sup class="wcpdf_beta">beta</sup>',
+				'callback' => 'checkbox',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'avif_fallback',
+					'description' => __( 'Enables AVIF fallback support. Currently, this only applies to the company logo: if a local AVIF image is used, it will be replaced with a JPG version in the PDF documents.', 'woocommerce-pdf-invoices-packing-slips' )
+						. ( version_compare( PHP_VERSION, '8.1.0', '<' ) && ! extension_loaded( 'imagick' )
+							? ' <strong>' . __( 'This feature requires PHP 8.1 or higher with the GD extension, or the Imagick extension.', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+							: ''
+						)
+						. ( version_compare( PHP_VERSION, '8.1.0', '>=' ) && ! extension_loaded( 'gd' ) && ! extension_loaded( 'imagick' )
+							? ' <strong>' . __( 'This feature requires either the GD or Imagick extension to be enabled.', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+							: ''
+						),
+				),
 			),
 			array(
 				'type'     => 'setting',
