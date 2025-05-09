@@ -644,7 +644,7 @@ jQuery( function( $ ) {
 			}
 		} );
 
-		$('.settings_category h2' ).on( 'click', function() {
+		sections.on( 'click', function() {
 			const index = sections.index( this );
 
 			$( this ).toggleClass( 'active' ).next( '.form-table' ).slideToggle( 'fast', function() {
