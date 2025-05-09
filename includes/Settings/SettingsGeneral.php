@@ -258,8 +258,6 @@ class SettingsGeneral {
 					} ),
 					'id'               => 'shop_address_country',
 					'translatable'     => true,
-					'enhanced_select'  => true,
-					'placeholder'      => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description'      => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
@@ -471,7 +469,13 @@ class SettingsGeneral {
 					'header_logo',
 					'header_logo_height',
 					'shop_name',
-					'shop_address',
+					'shop_address_line_1',
+					'shop_address_line_2',
+					'shop_address_country',
+					'shop_address_state',
+					'shop_address_city',
+					'shop_address_postcode',
+					'shop_address_additional',
 					'vat_number',
 					'coc_number',
 					'shop_phone_number',
@@ -562,13 +566,13 @@ class SettingsGeneral {
 		}
 
 		if (
-			! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional'] ) &&
+			! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional']['default'] ) &&
 			(
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_country'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_state'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_city'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode'] )
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1']['default'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_country']['default'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_state']['default'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_city']['default'] ) ||
+				empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode']['default'] )
 			)
 		) {
 			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );

@@ -294,7 +294,7 @@ class SetupWizard {
 							$value = array_fill_keys( $value, '1' );
 						}
 
-						if ( $key == 'shop_address_additional' && function_exists( 'sanitize_textarea_field' ) ) {
+						if ( 'shop_address_additional' === $key && function_exists( 'sanitize_textarea_field' ) ) {
 							$sanitize_function = 'sanitize_textarea_field';
 						} else {
 							$sanitize_function = 'sanitize_text_field';

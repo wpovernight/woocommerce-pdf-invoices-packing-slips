@@ -10,10 +10,10 @@
 		'shop_name'             => array( 'default' => get_bloginfo( 'name' ) ),
 		'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address' ) ),
 		'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2' ) ),
-		'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country' ) ?? '' ),
-		'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state' ) ?? '' ),
-		'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city' ) ?? '' ),
-		'shop_address_postcode' => array( 'default' => get_option( 'woocommerce_store_postcode' ) ?? '' ),
+		'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country' ), '' ),
+		'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state' ), '' ),
+		'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city' ), '' ),
+		'shop_address_postcode' => array( 'default' => get_option( 'woocommerce_store_postcode' ), '' ),
 	) );
 	?>
 	<input

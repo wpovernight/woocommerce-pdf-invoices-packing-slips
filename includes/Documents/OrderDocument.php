@@ -1330,7 +1330,7 @@ abstract class OrderDocument {
 
 		// legacy filters
 		if ( in_array( $settings_key, array( 'shop_name', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
-			$text = apply_filters_deprecated( "wpo_wcpdf_{$settings_key}", array( $text, $this ), '4.4.1', "wpo_wcpdf_{$settings_key}_settings_text" );
+			$text = apply_filters_deprecated( "wpo_wcpdf_{$settings_key}", array( $text, $this ), '4.5.0', "wpo_wcpdf_{$settings_key}_settings_text" );
 		}
 
 		return apply_filters( "wpo_wcpdf_{$settings_key}_settings_text", $text, $this );
@@ -1441,17 +1441,33 @@ abstract class OrderDocument {
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address(): string {
-		$address = array_filter( array(
-			$this->get_settings_text( 'shop_address_line_1', '', false),
-			$this->get_settings_text( 'shop_address_line_2', '', false),
-			$this->get_settings_text( 'shop_address_city', '', false),
-			$this->get_settings_text( 'shop_address_postcode', '', false),
-			$this->get_settings_text( 'shop_address_state', '', false),
-			$this->get_settings_text( 'shop_address_country', '', false),
-			$this->get_settings_text( 'shop_address_additional', '', false),
-		) );
+		$address = array(
+			'address_line_1' => $this->get_settings_text( 'shop_address_line_1', '', false ),
+			'address_line_2' => $this->get_settings_text( 'shop_address_line_2', '', false ),
+			'city'           => $this->get_settings_text( 'shop_address_city', '', false ),
+			'postcode'       => $this->get_settings_text( 'shop_address_postcode', '', false ),
+			'state'          => $this->get_settings_text( 'shop_address_state', '', false ),
+			'country'        => $this->get_settings_text( 'shop_address_country', '', false ),
+			'additional'     => $this->get_settings_text( 'shop_address_additional', '', false ),
+		);
 
-		return wpautop( implode( '<br>', $address ) );
+		$address_format = $this->get_address_format_from_country( $address['country'] );
+
+		// Replace placeholder with $address values, and remove empty placeholders.
+		$address_format = preg_replace_callback( '/\{([a-zA-Z0-9_]+)}/', function ( $matches ) use ( $address ) {
+			return $address[ $matches[1] ] ?? '';
+		}, $address_format );
+
+		// Remove empty spaces and unnecessary commas.
+		$address_format = preg_replace( '/,\s*,/', ',', $address_format );    // Replace ", ," with ","
+		$address_format = preg_replace( '/,\s*$/', '', $address_format );     // Remove trailing commas
+		$address_format = preg_replace( '/,\s*,/', ',', $address_format );    // Handle repeated commas
+		$address_format = preg_replace( '/\n\s*\n/', "\n", $address_format ); // Remove empty lines
+
+		// Convert to HTML line breaks.
+		$address_format = str_replace( "\n", '<br>', $address_format );
+
+		return ( $address_format );
 	}
 	public function shop_address() {
 		echo esc_html( $this->get_shop_address() );
@@ -2145,6 +2161,24 @@ abstract class OrderDocument {
 	 */
 	public function show_due_date(): bool {
 		return $this->get_due_date() > 0;
+	}
+
+	/**
+	 * Get the address format for a given country.
+	 *
+	 * @param string $country Country name, like the Netherlands.
+	 *
+	 * @return string
+	 */
+	private function get_address_format_from_country( string $country ): string {
+		$countries         = \WC()->countries->get_countries();
+		$countries_flipped = array_flip( $countries );
+		$country_code      = $countries_flipped[ $country ] ?? 'default';
+		$address_formats   = \WC()->countries->get_address_formats();
+
+		return ( ! empty( $country ) && ! empty( $address_formats[ $country_code ] ) )
+			? $address_formats[ $country_code ]
+			: $address_formats['default'];
 	}
 
 	protected function add_filters( $filters ) {
