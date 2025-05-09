@@ -92,14 +92,14 @@ class SetupWizard {
 			array( 'dashicons', 'install' ),
 			WPO_WCPDF_VERSION
 		);
-		
+
 		wp_enqueue_style(
 			'wpo-wcpdf-toggle-switch',
 			WPO_WCPDF()->plugin_url() . '/assets/css/toggle-switch' . $suffix . '.css',
 			array(),
 			WPO_WCPDF_VERSION
 		);
-		
+
 		if ( ! wp_style_is( 'woocommerce_admin_styles', 'enqueued' ) ) {
 			wp_enqueue_style(
 				'woocommerce_admin_styles',
@@ -108,20 +108,20 @@ class SetupWizard {
 				WC_VERSION
 			);
 		}
-		
+
 		wp_register_script(
 			'wpo-wcpdf-media-upload',
 			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 			array( 'jquery', 'media-editor', 'mce-view' ),
 			WPO_WCPDF_VERSION
 		);
-		
+
 		wp_localize_script(
 			'wpo-wcpdf-media-upload',
 			'wpo_wcpdf_admin',
 			array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) )
 		);
-		
+
 		wp_register_script(
 			'wpo-wcpdf-setup',
 			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard' . $suffix . '.js',
@@ -137,7 +137,7 @@ class SetupWizard {
 				WC_VERSION
 			);
 		}
-		
+
 		if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
 			wp_register_script(
 				'select2',
@@ -146,7 +146,7 @@ class SetupWizard {
 				WC_VERSION
 			);
 		}
-		
+
 		wp_enqueue_media();
 
 		$step_keys = array_keys( $this->steps );
@@ -278,15 +278,15 @@ class SetupWizard {
 
 	public function save_step() {
 		$request = stripslashes_deep( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		
+
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
 			check_admin_referer( 'wpo-wcpdf-setup' );
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
-		} else {			
+		} else {
 			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
 				check_admin_referer( 'wpo-wcpdf-setup' );
-				
+
 				foreach ( $request['wcpdf_settings'] as $option => $settings ) {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
@@ -294,7 +294,7 @@ class SetupWizard {
 							$value = array_fill_keys( $value, '1' );
 						}
 
-						if ( $key == 'shop_address' && function_exists( 'sanitize_textarea_field' ) ) {
+						if ( 'shop_address_additional' === $key && function_exists( 'sanitize_textarea_field' ) ) {
 							$sanitize_function = 'sanitize_textarea_field';
 						} else {
 							$sanitize_function = 'sanitize_text_field';
@@ -308,6 +308,7 @@ class SetupWizard {
 							$settings[$key] = call_user_func( $sanitize_function, $value );
 						}
 					}
+
 					$current_settings = get_option( $option, array() );
 					$new_settings = $settings + $current_settings;
 					update_option( $option, $new_settings );
@@ -316,7 +317,7 @@ class SetupWizard {
 				$orders_column_hidden_key = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled()
 					? 'managewoocommerce_page_wc-orderscolumnshidden'
 					: 'manageedit-shop_ordercolumnshidden';
-				
+
 				$user_id    = get_current_user_id();
 				$hidden     = get_user_meta( $user_id, $orders_column_hidden_key, true );
 				$column_key = 'wc_actions';

@@ -176,13 +176,13 @@ class WPO_WCPDF {
 		if ( ! $this->dependencies_are_ready() ) {
 			return;
 		}
-		
+
 		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
-		
+
 		// all systems ready - GO!
 		$this->includes();
 	}
-	
+
 	/**
 	 * Check if WooCommerce and PHP dependencies are met.
 	 * If not, show the appropriate admin notices.
