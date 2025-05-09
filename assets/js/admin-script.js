@@ -617,44 +617,47 @@ jQuery( function( $ ) {
 
 	function settingsAccordion() {
 		// Get current tab.
-		const params      = new URLSearchParams( window.location.search );
-		const tab         = params.get( 'tab' );
-		const allowedTabs = [ 'general', 'documents' ];
-
-		if ( ! tab || ! allowedTabs.includes( tab ) ) {
+		const params       = new URLSearchParams( window.location.search );
+		const allowedTabs  = [ 'general', 'documents' ];
+		const tab          = params.get( 'tab' ) || 'general';
+	
+		if ( ! allowedTabs.includes( tab ) ) {
 			return;
 		}
-
+		
 		const tabsMainCategory = {
-			'general': 'display',
-			'documents': 'general',
+			general   : 'display',
+			documents : 'general',
 		};
-
-		// Expand the main category and collapse the rest by default.
-		$( '.settings_category' ).not( '#' + tabsMainCategory[ tab ] ).find( '.form-table' ).hide();
-		$( '#general > h2' ).addClass( 'active' );
-
+		
+		// Collapse all but the main category for this tab.
+		$( '.settings_category' )
+			.not( '#' + tabsMainCategory[ tab ] )
+			.find( '.form-table' )
+			.hide();
+		
 		const sections = $( '.settings_category h2' );
-
-		// Retrieve the state from localStorage
-		sections.each( function( index ) {
-			const state    = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` );
-			if ( 'true' === state ) {
-				$( this ).addClass( 'active' ).next( '.form-table' ).show();
-			}
+		
+		// Restore accordion state from localStorage.
+		sections.each( function ( index ) {
+			const open = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` ) === 'true';
+			$( this ).toggleClass( 'active', open ).next( '.form-table' ).toggle( open );
 		} );
-
-		sections.on( 'click', function() {
+		
+		// Toggle on click and persist state.
+		sections.on( 'click', function () {
 			const index = sections.index( this );
-
-			$( this ).toggleClass( 'active' ).next( '.form-table' ).slideToggle( 'fast', function() {
-				// Save the state in localStorage
-				const isVisible = $( this ).is( ':visible' );
-				localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${index}`, isVisible );
-			} );
+			$( this ).toggleClass( 'active' )
+					 .next( '.form-table' )
+					 .slideToggle( 'fast', function () {
+						 localStorage.setItem(
+							 `wcpdf_${tab}_settings_accordion_state_${index}`,
+							 $( this ).is( ':visible' )
+						 );
+					 } );
 		} );
 	}
-
+	
 	settingsAccordion();
 
 } );
