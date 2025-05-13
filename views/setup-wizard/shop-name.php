@@ -7,9 +7,9 @@
 	<?php
 	// Set default values for current setting to be used in case the user has not set them yet.
 	$current_settings = wp_parse_args( get_option( 'wpo_wcpdf_settings_general', array() ), array(
-		'shop_name'             => array( 'default' => get_bloginfo( 'name' ) ),
-		'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address' ) ),
-		'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2' ) ),
+		'shop_name'             => array( 'default' => get_bloginfo( 'name' ) ?? '' ),
+		'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address' ), '' ),
+		'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2' ), '' ),
 		'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country' ), '' ),
 		'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state' ), '' ),
 		'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city' ), '' ),

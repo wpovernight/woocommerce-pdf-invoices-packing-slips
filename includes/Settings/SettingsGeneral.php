@@ -251,10 +251,7 @@ class SettingsGeneral {
 					'option_name'      => $option_name,
 					'options_callback' => ( function () {
 						$countries[''] = __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' );
-						$woo_countries = WC()->countries->get_countries();
-						$woo_countries = array_combine( array_values( $woo_countries ), $woo_countries );
-
-						return array_merge( $countries, $woo_countries );
+						return array_merge( $countries, \WC()->countries->get_countries() );
 					} ),
 					'id'               => 'shop_address_country',
 					'translatable'     => true,
