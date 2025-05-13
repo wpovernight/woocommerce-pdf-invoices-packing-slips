@@ -562,16 +562,28 @@ class SettingsGeneral {
 			}
 		}
 
-		if (
-			! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional']['default'] ) &&
-			(
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1']['default'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_country']['default'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_state']['default'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_city']['default'] ) ||
-				empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode']['default'] )
-			)
-		) {
+		$display_notice = false;
+		$languages      = wpo_wcpdf_get_multilingual_languages()
+			? array_keys( wpo_wcpdf_get_multilingual_languages() )
+			: array( 'default' );
+
+		foreach ( $languages as $language ) {
+			if (
+				! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional'][ $language ] ) &&
+				(
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_country'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_state'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_city'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode'][ $language ] )
+				)
+			) {
+				$display_notice = true;
+				break;
+			}
+		}
+
+		if ( $display_notice ) {
 			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
 			$dismiss_url      = wp_nonce_url( add_query_arg( 'wpo_dismiss_shop_address_notice', true ), 'dismiss_shop_address_notice' );
 			$notice_message   = sprintf(
@@ -587,12 +599,13 @@ class SettingsGeneral {
 			<div class="notice notice-warning">
 				<p><?php echo wp_kses_post( $notice_message ); ?></p>
 				<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
-				      class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					  class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 				</p>
 			</div>
 
 			<?php
 		}
+
 	}
 
 }
