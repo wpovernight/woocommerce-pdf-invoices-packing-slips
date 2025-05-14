@@ -7,8 +7,8 @@ jQuery( function ( $ ) {
 		let currentValue = $( this ).data( 'current' );
 		let newValue     = $( this ).find( 'option:selected' ).val();
 		let $current     = $( this ).closest( 'td, th' ).find( '.current' );
-		let newHtml      = `${wpo_wcpdf_ubl.new}: <code>${newValue}</code> <strong>(${wpo_wcpdf_ubl.unsaved})</strong>`;
-		let oldHtml      = `${wpo_wcpdf_ubl.code}: <code>${currentValue}</code>`;
+		let newHtml      = `${wpo_wcpdf_einvoice.new}: <code>${newValue}</code> <strong>(${wpo_wcpdf_einvoice.unsaved})</strong>`;
+		let oldHtml      = `${wpo_wcpdf_einvoice.code}: <code>${currentValue}</code>`;
 
 		// Only update the '.current' element if the value has changed
 		if ( newValue !== currentValue ) {
@@ -19,7 +19,7 @@ jQuery( function ( $ ) {
 		
 		// Display the remark if available
 		if ( $( this ).attr( 'name' ).endsWith( '[reason]' ) ) {
-			let remark = wpo_wcpdf_ubl.remarks[ 'reason' ][ newValue ];
+			let remark = wpo_wcpdf_einvoice.remarks[ 'reason' ][ newValue ];
 			
 			if ( remark ) {
 				$( this ).closest( 'tr' ).find( '.remark' ).html( remark );
