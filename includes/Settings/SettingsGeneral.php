@@ -248,11 +248,11 @@ class SettingsGeneral {
 				'callback' => 'select',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'      => $option_name,
-					'options_callback' => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
-					'id'               => 'shop_address_country',
-					'translatable'     => true,
-					'description'      => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'  => $option_name,
+					'options'      => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
+					'id'           => 'shop_address_country',
+					'translatable' => true,
+					'description'  => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
