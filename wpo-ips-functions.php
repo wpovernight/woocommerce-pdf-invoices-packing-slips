@@ -1493,11 +1493,12 @@ function wpo_wcpdf_get_country_from_country_code( string $country_code ): string
 /**
  * Get the address format for a given country.
  *
- * @param string $country_code Country name, like the Netherlands.
+ * @param string $country_code Country code, like the NL.
  *
  * @return string
  */
 function wpo_wcpdf_get_address_format_for_country( string $country_code ): string {
+	$country_code    = strtoupper( trim( $country_code ) );
 	$address_formats = \WC()->countries->get_address_formats();
 
 	return ! empty( $country_code ) && ! empty( $address_formats[ $country_code ] )
@@ -1508,12 +1509,12 @@ function wpo_wcpdf_get_address_format_for_country( string $country_code ): strin
 /**
  * Get the formatted address for a given country code.
  *
- * @param $country_code
- * @param $address
+ * @param string $country_code
+ * @param array $address
  *
  * @return string
  */
-function wpo_wcpdf_get_formatted_address( $country_code, $address ): string {
+function wpo_wcpdf_get_formatted_address( string $country_code, array $address ): string {
 	$address_format = wpo_wcpdf_get_address_format_for_country( $country_code );
 
 	// Replace placeholder with $address values, and remove empty placeholders.
@@ -1521,17 +1522,22 @@ function wpo_wcpdf_get_formatted_address( $country_code, $address ): string {
 		return $address[ $matches[1] ] ?? '';
 	}, $address_format );
 
-	// Remove empty spaces and unnecessary commas.
-	$formatted_address = preg_replace( '/,\s*,/', ',', $formatted_address );    // Replace ", ," with ","
-	$formatted_address = preg_replace( '/,\s*$/', '', $formatted_address );     // Remove trailing commas
-	$formatted_address = preg_replace( '/,\s*,/', ',', $formatted_address );    // Handle repeated commas
-	$formatted_address = preg_replace( '/\n\s*\n/', '\n', $formatted_address ); // Remove empty lines
+	// Normalize commas and remove extra line breaks.
+	$formatted_address = preg_replace(
+		array(
+			'/,\s*,+/',      // Remove consecutive commas
+			'/,\s*$/',       // Remove trailing commas
+			'/\n\s*\n/'      // Remove empty lines
+		),
+		array( ',', '', "\n" ),
+		$formatted_address
+	);
 
 	// Add additional info if provided.
 	if ( ! empty( $address['additional'] ) ) {
-		$formatted_address .= '\n' . $address['additional'];
+		$formatted_address .= "\n" . $address['additional'];
 	}
 
 	// Convert to HTML line breaks.
-	return str_replace( '\n', '<br>', $formatted_address );
+	return nl2br( esc_html( $formatted_address ) );
 }
