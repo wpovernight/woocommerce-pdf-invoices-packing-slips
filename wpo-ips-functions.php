@@ -1487,6 +1487,7 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
  * @return string Country name or empty string if not found.
  */
 function wpo_wcpdf_get_country_from_country_code( string $country_code ): string {
+	$country_code = strtoupper( trim( $country_code ) );
 	return \WC()->countries->get_countries()[ $country_code ] ?? '';
 }
 

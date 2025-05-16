@@ -176,6 +176,7 @@ class SettingsGeneral {
 					'option_name'	=> $option_name,
 					'id'			=> 'shop_name',
 					'translatable'	=> true,
+					'description'   => __( 'The name of your business or shop.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
