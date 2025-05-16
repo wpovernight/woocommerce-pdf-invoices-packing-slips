@@ -24,6 +24,9 @@ class SettingsGeneral {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+
+		// Display an admin notice if shop address fields are empty.
+		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
 	}
 
 	public function output( $section, $nonce ) {
@@ -47,35 +50,35 @@ class SettingsGeneral {
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
 		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 
-		$settings_fields      = array(
+		$settings_fields = array(
 			array(
-				'type'		=> 'section',
-				'id'		=> 'general_settings',
-				'title'		=> __( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'section',
+				'type'     => 'section',
+				'id'       => 'general_settings',
+				'title'    => __( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'section',
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'download_display',
-				'title'		=> __( 'How do you want to view the PDF?', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'select',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'download_display',
-					'options' 		=> array(
-						'download'	=> __( 'Download the PDF' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'display'	=> __( 'Open the PDF in a new browser tab/window' , 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'download_display',
+				'title'    => __( 'How do you want to view the PDF?', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'download_display',
+					'options'     => array(
+						'download' => __( 'Download the PDF' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'display'  => __( 'Open the PDF in a new browser tab/window' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'template_path',
-				'title'		=> __( 'Choose a template', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'select',
-				'section'	=> 'general_settings',
-				'args'		=> array(
+				'type'     => 'setting',
+				'id'       => 'template_path',
+				'title'    => __( 'Choose a template', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
 					'options_callback' => array( $this, 'get_installed_templates_list' ),
@@ -84,63 +87,63 @@ class SettingsGeneral {
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'paper_size',
-				'title'		=> __( 'Paper size', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'select',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'paper_size',
-					'options' 		=> apply_filters( 'wpo_wcpdf_template_settings_paper_size', array(
-						'a4'		=> __( 'A4' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'letter'	=> __( 'Letter' , 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'paper_size',
+				'title'    => __( 'Paper size', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'paper_size',
+					'options'     => apply_filters( 'wpo_wcpdf_template_settings_paper_size', array(
+						'a4'     => __( 'A4' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'letter' => __( 'Letter' , 'woocommerce-pdf-invoices-packing-slips' ),
 					) ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'test_mode',
-				'title'		=> __( 'Test mode', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'checkbox',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'test_mode',
-					'description'		=> __( 'With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created.' , 'woocommerce-pdf-invoices-packing-slips' ) . '<br>'. __( '<strong>Note:</strong> invoice numbers and dates are not affected by this setting and will still be generated.' , 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'test_mode',
+				'title'    => __( 'Test mode', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'test_mode',
+					'description' => __( 'With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created.' , 'woocommerce-pdf-invoices-packing-slips' ) . '<br>'. __( '<strong>Note:</strong> invoice numbers and dates are not affected by this setting and will still be generated.' , 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'currency_font',
-				'title'		=> __( 'Extended currency symbol support', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'checkbox',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'currency_font',
-					'description'		=> __( 'Enable this if your currency symbol is not displaying properly' , 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'currency_font',
+				'title'    => __( 'Extended currency symbol support', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'currency_font',
+					'description' => __( 'Enable this if your currency symbol is not displaying properly' , 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'font_subsetting',
-				'title'		=> __( 'Enable font subsetting', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'checkbox',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'font_subsetting',
-					'description'		=> __( "Font subsetting can reduce file size by only including the characters that are used in the PDF, but limits the ability to edit PDF files later. Recommended if you're using an Asian font." , 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'font_subsetting',
+				'title'    => __( 'Enable font subsetting', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'font_subsetting',
+					'description' => __( "Font subsetting can reduce file size by only including the characters that are used in the PDF, but limits the ability to edit PDF files later. Recommended if you're using an Asian font." , 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'header_logo',
-				'title'		=> __( 'Shop header/logo', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'media_upload',
-				'section'	=> 'general_settings',
-				'args'		=> array(
+				'type'     => 'setting',
+				'id'       => 'header_logo',
+				'title'    => __( 'Shop header/logo', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'media_upload',
+				'section'  => 'general_settings',
+				'args'     => array(
 					'option_name'          => $option_name,
 					'id'                   => 'header_logo',
 					'uploader_title'       => __( 'Select or upload your invoice header/logo', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -150,29 +153,30 @@ class SettingsGeneral {
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'header_logo_height',
-				'title'		=> __( 'Logo height', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'text_input',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'header_logo_height',
-					'size'				=> '5',
-					'placeholder'		=> '3cm',
-					'description'		=> __( 'Enter the total height of the logo in mm, cm or in and use a dot for decimals.<br/>For example: 1.15in or 40mm', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'header_logo_height',
+				'title'    => __( 'Logo height', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'header_logo_height',
+					'size'        => '5',
+					'placeholder' => '3cm',
+					'description' => __( 'Enter the total height of the logo in mm, cm or in and use a dot for decimals.<br/>For example: 1.15in or 40mm', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'shop_name',
-				'title'		=> __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'text_input',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'shop_name',
-					'translatable'	=> true,
+				'type'     => 'setting',
+				'id'       => 'shop_name',
+				'title'    => __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_name',
+					'translatable' => true,
+					'description'  => __( 'The name of your business or shop.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -182,9 +186,9 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'vat_number',
-					'description'  => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
+					'option_name' => $option_name,
+					'id'          => 'vat_number',
+					'description' => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
 				)
 			),
 			array(
@@ -194,9 +198,9 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'coc_number',
-					'description'  => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
+					'option_name' => $option_name,
+					'id'          => 'coc_number',
+					'description' => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
 				)
 			),
 			array(
@@ -213,84 +217,162 @@ class SettingsGeneral {
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'shop_address',
-				'title'		=> __( 'Shop Address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'textarea',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'shop_address',
-					'width'			=> '72',
-					'height'		=> '8',
-					'translatable'	=> true,
-					//'description'			=> __( '...', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'shop_address_line_1',
+				'title'    => __( 'Shop Address Line 1', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_address_line_1',
+					'translatable' => true,
+					'description'  => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'footer',
-				'title'		=> __( 'Footer: terms & conditions, policies, etc.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'textarea',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'footer',
-					'width'			=> '72',
-					'height'		=> '4',
-					'translatable'	=> true,
-					//'description'			=> __( '...', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'shop_address_line_2',
+				'title'    => __( 'Shop Address Line 2', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_address_line_2',
+					'translatable' => true,
+					'description'  => __( 'An additional, optional address line for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'section',
-				'id'		=> 'extra_template_fields',
-				'title'		=> __( 'Extra template fields', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'custom_fields_section',
-			),
-			array(
-				'type'		=> 'setting',
-				'id'		=> 'extra_1',
-				'title'		=> __( 'Extra field 1', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'textarea',
-				'section'	=> 'extra_template_fields',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'extra_1',
-					'width'			=> '72',
-					'height'		=> '8',
-					'description'	=> __( 'This is footer column 1 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
-					'translatable'	=> true,
+				'type'     => 'setting',
+				'id'       => 'shop_address_country',
+				'title'    => __( 'Shop Country', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'options'      => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
+					'id'           => 'shop_address_country',
+					'translatable' => true,
+					'description'  => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'extra_2',
-				'title'		=> __( 'Extra field 2', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'textarea',
-				'section'	=> 'extra_template_fields',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'extra_2',
-					'width'			=> '72',
-					'height'		=> '8',
-					'description'	=> __( 'This is footer column 2 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
-					'translatable'	=> true,
+				'type'     => 'setting',
+				'id'       => 'shop_address_state',
+				'title'    => __( 'Shop State', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_address_state',
+					'translatable' => true,
+					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'extra_3',
-				'title'		=> __( 'Extra field 3', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'textarea',
-				'section'	=> 'extra_template_fields',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'extra_3',
-					'width'			=> '72',
-					'height'		=> '8',
-					'description'	=> __( 'This is footer column 3 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
-					'translatable'	=> true,
+				'type'     => 'setting',
+				'id'       => 'shop_address_city',
+				'title'    => __( 'Shop City', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_address_city',
+					'translatable' => true,
+					'description'  => __( 'The city in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'shop_address_postcode',
+				'title'    => __( 'Shop Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_address_postcode',
+					'translatable' => true,
+					'description'  => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'shop_address_additional',
+				'title'    => __( 'Shop Additional Info', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'textarea',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_address_additional',
+					'width'        => '72',
+					'height'       => '8',
+					'translatable' => true,
+					'description'  => __( 'Any additional info about your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'footer',
+				'title'    => __( 'Footer: terms & conditions, policies, etc.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'textarea',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'footer',
+					'width'        => '72',
+					'height'       => '4',
+					'translatable' => true,
+				)
+			),
+			array(
+				'type'     => 'section',
+				'id'       => 'extra_template_fields',
+				'title'    => __( 'Extra template fields', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'custom_fields_section',
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'extra_1',
+				'title'    => __( 'Extra field 1', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'textarea',
+				'section'  => 'extra_template_fields',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'extra_1',
+					'width'        => '72',
+					'height'       => '8',
+					'description'  => __( 'This is footer column 1 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
+					'translatable' => true,
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'extra_2',
+				'title'    => __( 'Extra field 2', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'textarea',
+				'section'  => 'extra_template_fields',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'extra_2',
+					'width'        => '72',
+					'height'       => '8',
+					'description'  => __( 'This is footer column 2 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
+					'translatable' => true,
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'extra_3',
+				'title'    => __( 'Extra field 3', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'textarea',
+				'section'  => 'extra_template_fields',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'extra_3',
+					'width'        => '72',
+					'height'       => '8',
+					'description'  => __( 'This is footer column 3 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
+					'translatable' => true,
 				)
 			),
 		);
@@ -382,7 +464,13 @@ class SettingsGeneral {
 					'header_logo',
 					'header_logo_height',
 					'shop_name',
-					'shop_address',
+					'shop_address_line_1',
+					'shop_address_line_2',
+					'shop_address_country',
+					'shop_address_state',
+					'shop_address_city',
+					'shop_address_postcode',
+					'shop_address_additional',
 					'vat_number',
 					'coc_number',
 					'shop_phone_number',
@@ -452,6 +540,70 @@ class SettingsGeneral {
 		}
 
 		return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
+	}
+
+	public function display_admin_notice_for_shop_address(): void {
+		// Return if the notice has been dismissed.
+		if ( get_option( 'wpo_wcpdf_dismiss_shop_address_notice', false ) ) {
+			return;
+		}
+
+		// Handle dismissal action.
+		if ( isset( $_GET['wpo_dismiss_shop_address_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_shop_address_notice' ) ) {
+				update_option( 'wpo_wcpdf_dismiss_shop_address_notice', true );
+				wp_redirect( remove_query_arg( array( 'wpo_dismiss_shop_address_notice', '_wpnonce' ) ) );
+				exit;
+			} else {
+				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
+				return;
+			}
+		}
+
+		$display_notice = false;
+		$languages      = wpo_wcpdf_get_multilingual_languages()
+			? array_keys( wpo_wcpdf_get_multilingual_languages() )
+			: array( 'default' );
+
+		foreach ( $languages as $language ) {
+			if (
+				! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional'][ $language ] ) &&
+				(
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_country'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_state'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_city'][ $language ] ) ||
+					empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode'][ $language ] )
+				)
+			) {
+				$display_notice = true;
+				break;
+			}
+		}
+
+		if ( $display_notice ) {
+			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
+			$dismiss_url      = wp_nonce_url( add_query_arg( 'wpo_dismiss_shop_address_notice', true ), 'dismiss_shop_address_notice' );
+			$notice_message   = sprintf(
+				/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
+				__( '%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+				'<a href="' . esc_url( $general_page_url ) . '">',
+				'</a>'
+			);
+
+			?>
+
+			<div class="notice notice-warning">
+				<p><?php echo wp_kses_post( $notice_message ); ?></p>
+				<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
+					  class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+				</p>
+			</div>
+
+			<?php
+		}
+
 	}
 
 }

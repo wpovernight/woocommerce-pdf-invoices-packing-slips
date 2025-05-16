@@ -680,7 +680,7 @@ class Main {
 		if ( ! empty( $cached_value ) ) {
 			return wc_string_to_bool( $cached_value );
 		}
-		
+
 		$tmp_path = untrailingslashit( $this->get_tmp_path( $subfolder ) );
 
 		// Define allowed extensions per subfolder
@@ -692,7 +692,7 @@ class Main {
 
 		try {
 			$iterator = new \FilesystemIterator( $tmp_path, \FilesystemIterator::SKIP_DOTS );
-			
+
 			foreach ( $iterator as $file ) {
 				// If we don't have a file extension restriction, return true immediately
 				if ( empty( $allowed_extensions[ $subfolder ] ) ) {
@@ -726,7 +726,7 @@ class Main {
 	 */
 	public function maybe_reinstall_fonts( bool $force = false ): void {
 		$has_font_files = $this->tmp_subfolder_has_files( 'fonts' );
-		
+
 		if ( ! $has_font_files || $force ) {
 			$fonts_path = untrailingslashit( $this->get_tmp_path( 'fonts' ) );
 
@@ -1236,13 +1236,13 @@ class Main {
 
 	/**
 	 * Remove references to order in number store tables when removing WC data
-	 * 
+	 *
 	 * @param \WC_Abstract_Order $order
 	 * @return void
 	 */
 	public function remove_order_personal_data( \WC_Abstract_Order $order ): void {
 		global $wpdb;
-		
+
 		// Remove order ID from number stores
 		$number_stores = apply_filters( 'wpo_wcpdf_privacy_number_stores', array( 'invoice_number' ) );
 
