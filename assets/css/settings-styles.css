@@ -507,6 +507,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 #wpo-wcpdf-settings .translations textarea,
 #wpo-wcpdf-settings .translations select {
 	width: 100%;
+	max-width: 100%;
 }
 
 #wpo-wcpdf-settings .wcpdf-attachment-settings-hint {
