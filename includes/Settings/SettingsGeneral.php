@@ -216,16 +216,16 @@ class SettingsGeneral {
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'shop_address_line_1',
-				'title'		=> __( 'Shop Address Line 1', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'text_input',
-				'section'	=> 'general_settings',
-				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'shop_address_line_1',
-					'translatable'	=> true,
-					'description'   => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'shop_address_line_1',
+				'title'    => __( 'Shop Address Line 1', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_address_line_1',
+					'translatable' => true,
+					'description'  => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -242,17 +242,14 @@ class SettingsGeneral {
 				)
 			),
 			array(
-				'type'		=> 'setting',
-				'id'		=> 'shop_address_country',
-				'title'		=> __( 'Shop Country', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'	=> 'select',
-				'section'	=> 'general_settings',
-				'args'		=> array(
+				'type'     => 'setting',
+				'id'       => 'shop_address_country',
+				'title'    => __( 'Shop Country', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
 					'option_name'      => $option_name,
-					'options_callback' => ( function () {
-						$countries[''] = __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' );
-						return array_merge( $countries, \WC()->countries->get_countries() );
-					} ),
+					'options_callback' => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
 					'id'               => 'shop_address_country',
 					'translatable'     => true,
 					'description'      => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),

@@ -1455,32 +1455,13 @@ abstract class OrderDocument {
 			'postcode'       => $this->get_settings_text( 'shop_address_postcode', '', false ),
 			'state'          => $this->get_settings_text( 'shop_address_state', '', false ),
 			'country_code'   => $this->get_settings_text( 'shop_address_country', '', false ),
+			'country'        => wpo_wcpdf_get_country_from_country_code(
+				$this->get_settings_text( 'shop_address_country', '', false )
+			),
 			'additional'     => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
-		$address['country'] = $this->get_country_from_country_code( $address['country_code'] );
 
-		$address_format = $this->get_address_format_from_country( $address['country_code'] );
-
-		// Replace placeholder with $address values, and remove empty placeholders.
-		$formatted_address = preg_replace_callback( '/\{([a-zA-Z0-9_]+)}/', function ( $matches ) use ( $address ) {
-			return $address[ $matches[1] ] ?? '';
-		}, $address_format );
-
-		// Remove empty spaces and unnecessary commas.
-		$formatted_address = preg_replace( '/,\s*,/', ',', $formatted_address );    // Replace ", ," with ","
-		$formatted_address = preg_replace( '/,\s*$/', '', $formatted_address );     // Remove trailing commas
-		$formatted_address = preg_replace( '/,\s*,/', ',', $formatted_address );    // Handle repeated commas
-		$formatted_address = preg_replace( '/\n\s*\n/', '\n', $formatted_address ); // Remove empty lines
-
-		// Add additional info if provided.
-		if ( ! empty( $address['additional'] ) ) {
-			$formatted_address .= '\n' . $address['additional'];
-		}
-
-		// Convert to HTML line breaks.
-		$formatted_address = str_replace( '\n', '<br>', $formatted_address );
-
-		return ( $formatted_address );
+		return wpo_wcpdf_get_formatted_address( $address['country_code'], $address );
 	}
 	public function shop_address() {
 		echo esc_html( $this->get_shop_address() );
@@ -2174,32 +2155,6 @@ abstract class OrderDocument {
 	 */
 	public function show_due_date(): bool {
 		return $this->get_due_date() > 0;
-	}
-
-	/**
-	 * Get the country name from the country code.
-	 *
-	 * @param string $country_code
-	 *
-	 * @return string Country name or empty string if not found.
-	 */
-	private function get_country_from_country_code( string $country_code ): string {
-		return \WC()->countries->get_countries()[ $country_code ] ?? '';
-	}
-
-	/**
-	 * Get the address format for a given country.
-	 *
-	 * @param string $country_code Country name, like the Netherlands.
-	 *
-	 * @return string
-	 */
-	private function get_address_format_from_country( string $country_code ): string {
-		$address_formats = \WC()->countries->get_address_formats();
-
-		return ( ! empty( $country_code ) && ! empty( $address_formats[ $country_code ] ) )
-			? $address_formats[ $country_code ]
-			: $address_formats['default'];
 	}
 
 	protected function add_filters( $filters ) {
