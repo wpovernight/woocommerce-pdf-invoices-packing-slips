@@ -81,47 +81,74 @@ class SettingsEDI {
 				'callback' => 'section',
 			),
 			array(
-				'type'      => 'setting',
-				'id'        => 'enabled',
-				'title'     => __( 'Enable Electronic Documents', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'  => 'checkbox',
-				'section'   => $section,
-				'args'      => array(
+				'type'     => 'setting',
+				'id'       => 'enabled',
+				'title'    => __( 'Enable Electronic Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $section,
+				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'enabled',
 					'description' => __( 'Allow your store to generate and send electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'        => 'setting',
-				'id'          => 'syntax',
-				'title'       => __( 'Preferred Syntax', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'    => 'select',
-				'section'     => $section,
-				'args'        => array(
+				'type'     => 'setting',
+				'id'       => 'syntax',
+				'title'    => __( 'Preferred Syntax', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => $section,
+				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'syntax',
-					'options'     => wpo_ips_edi_syntaxes(),
+					'options'     => array_merge(
+						array(
+							'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						),
+						wpo_ips_edi_syntaxes()
+					),
 					'description' => __( 'Choose the preferred XML syntax standard for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 			),
-			array(
-				'type'        => 'setting',
-				'id'          => 'format',
-				'title'       => __( 'Preferred Format', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'    => 'select',
-				'section'     => $section,
-				'args'        => array(
-					'option_name' => $option_name,
-					'id'          => 'format',
-					'options'     => array(),
-					'description' => __( 'Choose the preferred format.', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+		
+		$settings_format = array();
+		foreach ( wpo_ips_edi_syntaxes() as $syntax => $name ) {
+			$formats = wpo_ips_edi_formats( $syntax );
+			
+			$settings_format[] = array(
+				'type'     => 'setting',
+				'id'       => "{$syntax}_format",
+				'title'    => sprintf(
+					/* translators: %s syntax */
+					__( '%s format', 'woocommerce-pdf-invoices-packing-slips' ),
+					strtoupper( trim( $syntax ) )
+				),
+				'callback' => 'select',
+				'section'  => $section,
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => "{$syntax}_format",
+					'options'           => array_combine(
+						array_keys( $formats ),
+						array_column( $formats, 'name' )
+					),
+					'description'       => sprintf(
+						/* translators: %s syntax */
+						__( 'Choose the preferred %s format.', 'woocommerce-pdf-invoices-packing-slips' ),
+						strtoupper( trim( $syntax ) )
+					),
 					'custom_attributes' => array(
-						'data-show_for_option_name' => $option_name . '[syntax]',
+						'data-show_for_option_name'   => $option_name . '[syntax]',
+						'data-show_for_option_values' => json_encode( array( $syntax ) ),
 					),
 				),
-			),
-		);
+			);
+		}
+		
+		if ( ! empty( $settings_format ) ) {
+			$settings_fields = array_merge( $settings_fields, $settings_format );
+		}
 
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_ubl_taxes', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );

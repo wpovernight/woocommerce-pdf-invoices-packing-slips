@@ -147,8 +147,8 @@ function wpo_ips_edi_syntaxes(): array {
  * 
  * @return array
  */
-function wpo_ips_edi_formats(): array {
-	return apply_filters(
+function wpo_ips_edi_formats( string $syntax = '' ): array {
+	$formats = apply_filters(
 		'wpo_ips_edi_formats',
 		array(
 			'ubl' => array(
@@ -177,28 +177,14 @@ function wpo_ips_edi_formats(): array {
 				// 	'class' => '',
 				// ),
 			),
-			'cii' => array(),
+			'cii' => array(
+				'factur-x' => array(
+					'name'  => 'Factur-X',
+					'class' => '',
+				),
+			),
 		)
 	);
-}
-
-/**
- * Get the EDI format options
- * 
- * @param string $syntax
- * @return array
- */
-function wpo_ips_edi_format_options( string $syntax = '' ): array {
-	if ( empty( $syntax ) ) {
-		$syntax = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() )['syntax'] ?? 'ubl';
-	}
 	
-	$edi_formats = wpo_ips_edi_formats();
-	$edi_formats = $edi_formats[ $syntax ] ?? array();
-	$edi_formats = array_combine(
-		array_keys( $edi_formats ),
-		array_column( $edi_formats, 'name' )
-	);
-	
-	return apply_filters( 'wpo_ips_edi_format_options', $edi_formats, $syntax );
+	return isset( $formats[ $syntax ] ) ? $formats[ $syntax ] : $formats;
 }
