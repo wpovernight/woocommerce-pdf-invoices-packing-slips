@@ -1519,9 +1519,15 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 	$address_format = wpo_wcpdf_get_address_format_for_country( $country_code );
 
 	// Replace placeholder with $address values, and remove empty placeholders.
-	$formatted_address = preg_replace_callback( '/\{([a-zA-Z0-9_]+)}/', function ( $matches ) use ( $address ) {
-		return $address[ $matches[1] ] ?? '';
-	}, $address_format );
+	$formatted_address = preg_replace_callback(
+		'/\{([a-zA-Z0-9_]+)}/',
+		function ( $matches ) use ( $country_code, $address ) {
+			if ( 'country_code' === $matches[1] ) {
+				return $country_code;
+			}
+
+			return $address[ $matches[1] ] ?? '';
+		}, $address_format );
 
 	// Normalize commas and remove extra line breaks.
 	$formatted_address = preg_replace(
