@@ -117,7 +117,7 @@ class SettingsEDI {
 					'options'     => array(),
 					'description' => __( 'Choose the preferred format.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'custom_attributes' => array(
-						'data-show_for_option_name' => 'syntax',
+						'data-show_for_option_name' => $option_name . '[syntax]',
 					),
 				),
 			),

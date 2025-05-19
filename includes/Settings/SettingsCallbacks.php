@@ -79,7 +79,7 @@ class SettingsCallbacks {
 
 		// output checkbox
 		printf(
-			'<input type="checkbox" id="%1$s" name="%2$s" value="%3$s" %4$s %5$s%6$s/>',
+			'<input type="checkbox" id="%1$s" name="%2$s" value="%3$s" %4$s %5$s %6$s/>',
 			esc_attr( $id ),
 			esc_attr( $setting_name ),
 			esc_attr( $value ),
@@ -130,7 +130,7 @@ class SettingsCallbacks {
 		$size = ! empty( $size ) ? sprintf( 'size="%s"', esc_attr( $size ) ) : '';
 		
 		printf(
-			'<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s%8$s/>',
+			'<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s %8$s/>',
 			esc_attr( $type ),
 			esc_attr( $id ),
 			esc_attr( $setting_name ),
@@ -174,7 +174,7 @@ class SettingsCallbacks {
 		$size = ! empty( $size ) ? sprintf( 'size="%s"', esc_attr( $size ) ) : '';
 		
 		printf(
-			'<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s%8$s/>',
+			'<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s %8$s/>',
 			esc_attr( $type ),
 			esc_attr( $id ),
 			esc_attr( $setting_name ),
@@ -218,7 +218,7 @@ class SettingsCallbacks {
 		$size = ! empty( $size ) ? sprintf( 'size="%s"', esc_attr( $size ) ) : '';
 		
 		printf(
-			'<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s%8$s/>',
+			'<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s %8$s/>',
 			esc_attr( $type ),
 			esc_attr( $id ),
 			esc_attr( $setting_name ),
@@ -403,7 +403,7 @@ class SettingsCallbacks {
 			$css         = 'width:400px';
 			
 			printf(
-				'<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s %8$s%9$s>',
+				'<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s %8$s %9$s>',
 				esc_attr( $id ),
 				esc_attr( $setting_name ),
 				esc_attr( $placeholder ),
@@ -509,7 +509,7 @@ class SettingsCallbacks {
 
 		foreach ( $options as $key => $label ) {
 			printf(
-				'<input type="radio" class="radio" id="%1$s[%3$s]" name="%2$s" value="%3$s"%4$s%5$s />',
+				'<input type="radio" class="radio" id="%1$s[%3$s]" name="%2$s" value="%3$s"%4$s %5$s />',
 				esc_attr( $id ),
 				esc_attr( $setting_name ),
 				esc_attr( $key ),
@@ -628,7 +628,7 @@ class SettingsCallbacks {
 			
 			// output checkbox
 			printf(
-				'<input type="checkbox" id="%1$s_%3$s" name="%2$s[%3$s]" value="%4$s"%5$s%6$s />',
+				'<input type="checkbox" id="%1$s_%3$s" name="%2$s[%3$s]" value="%4$s"%5$s %6$s/>',
 				esc_attr( $id ),
 				esc_attr( $setting_name ),
 				esc_attr( $name ),
