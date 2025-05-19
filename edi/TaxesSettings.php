@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EInvoice;
+namespace WPO\IPS\EDI;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

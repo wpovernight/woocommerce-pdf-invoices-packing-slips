@@ -1,8 +1,8 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Syntax\Ubl;
+namespace WPO\IPS\EDI\Syntax\Ubl;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractDocument;
+use WPO\IPS\EDI\Abstracts\AbstractDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -18,7 +18,7 @@ class UblDocument extends AbstractDocument {
 	 * @return string
 	 */
 	public function get_root_element(): string {
-		return apply_filters( 'wpo_ips_einvoice_root_element', 'Invoice', $this );
+		return apply_filters( 'wpo_ips_edi_root_element', 'Invoice', $this );
 	}
 	
 	/**
@@ -27,7 +27,7 @@ class UblDocument extends AbstractDocument {
 	 * @return array
 	 */
 	public function get_additional_root_elements(): array {
-		return apply_filters( 'wpo_ips_einvoice_additional_root_elements', array(), $this );
+		return apply_filters( 'wpo_ips_edi_additional_root_elements', array(), $this );
 	}
 	
 	/**
@@ -36,7 +36,7 @@ class UblDocument extends AbstractDocument {
 	 * @return array
 	 */
 	public function get_namespaces(): array {
-		return apply_filters( 'wpo_ips_einvoice_namespaces', array(
+		return apply_filters( 'wpo_ips_edi_namespaces', array(
 			'cac' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
 			'cbc' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
 			''    => 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2',

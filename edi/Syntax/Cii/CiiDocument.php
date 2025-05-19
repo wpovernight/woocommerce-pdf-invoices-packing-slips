@@ -1,8 +1,8 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Syntax\Cii;
+namespace WPO\IPS\EDI\Syntax\Cii;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractDocument;
+use WPO\IPS\EDI\Abstracts\AbstractDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -13,45 +13,45 @@ class CiiDocument extends AbstractDocument {
 	public string $sintax = 'cii';
 
 	public function get_root_element() {
-		return apply_filters( 'wpo_ips_einvoice_cii_document_root_element', 'rsm:CrossIndustryInvoice', $this );
+		return apply_filters( 'wpo_ips_edi_cii_document_root_element', 'rsm:CrossIndustryInvoice', $this );
 	}
 	
 	public function get_additional_root_elements() {
-		return apply_filters( 'wpo_ips_einvoice_cii_document_additional_root_elements', array(), $this );
+		return apply_filters( 'wpo_ips_edi_cii_document_additional_root_elements', array(), $this );
 	}
 	
 	public function get_format() {
-		$format = apply_filters( 'wpo_ips_einvoice_cii_document_format', array(
+		$format = apply_filters( 'wpo_ips_edi_cii_document_format', array(
 			// Exchanged Document Context
 			'exchanged_document_context' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ExchangedDocumentContextHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ExchangedDocumentContextHandler::class,
 			),
 			
 			// Exchanged Document
 			'exchanged_document' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ExchangedDocumentHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ExchangedDocumentHandler::class,
 			),
 			
 			// Header Trade Agreement
 			'seller_trade_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement\SellerTradePartyHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement\SellerTradePartyHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeAgreement',
 				),
 			),
 			'buyer_trade_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement\BuyerTradePartyHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement\BuyerTradePartyHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeAgreement',
 				),
 			),
 			'contract_referenced_document' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement\ContractReferencedDocumentHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement\ContractReferencedDocumentHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeAgreement',
 				),
@@ -60,41 +60,41 @@ class CiiDocument extends AbstractDocument {
 			// Header Trade Delivery
 			'header_trade_delivery' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\HeaderTradeDeliveryHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\HeaderTradeDeliveryHandler::class,
 			),
 			
 			// Header Trade Settlement
 			'payment_reference' => array(
 				'enabled' => false,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentReferenceHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentReferenceHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'payment_means' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentMeansHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentMeansHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'trade_tax' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\TradeTaxHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\TradeTaxHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'payment_terms' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentTermsHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\PaymentTermsHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
 			),
 			'monetary_summation' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\MonetarySummationHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement\MonetarySummationHandler::class,
 				'options' => array(
 					'root' => 'ram:ApplicableHeaderTradeSettlement',
 				),
@@ -103,7 +103,7 @@ class CiiDocument extends AbstractDocument {
 			// Line Items
 			'included_supply_chain_trade_line_item' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EInvoice\Syntax\Cii\Handlers\SupplyChainTradeTransaction\IncludedSupplyChainTradeLineItemHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntax\Cii\Handlers\SupplyChainTradeTransaction\IncludedSupplyChainTradeLineItemHandler::class,
 				'options' => array(
 					'root' => 'rsm:SupplyChainTradeTransaction',
 				),
@@ -121,7 +121,7 @@ class CiiDocument extends AbstractDocument {
 	}
 	
 	public function get_namespaces() {
-		return apply_filters( 'wpo_ips_einvoice_cii_document_namespaces', array(
+		return apply_filters( 'wpo_ips_edi_cii_document_namespaces', array(
 			'rsm' => 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
 			'qdt' => 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
 			'udt' => 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100',
@@ -135,7 +135,7 @@ class CiiDocument extends AbstractDocument {
 	 * @return string The default date format code.
 	 */
 	public function get_date_format_code(): string {
-		return apply_filters( 'wpo_ips_einvoice_cii_document_date_format_code', '102', $this );
+		return apply_filters( 'wpo_ips_edi_cii_document_date_format_code', '102', $this );
 	}
 	
 	/**

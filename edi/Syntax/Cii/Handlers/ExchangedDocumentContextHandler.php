@@ -1,7 +1,7 @@
 <?php
-namespace WPO\IPS\EInvoice\Syntax\Cii\Handlers;
+namespace WPO\IPS\EDI\Syntax\Cii\Handlers;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Abstracts\AbstractHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -25,7 +25,7 @@ class ExchangedDocumentContextHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_einvoice_cii_handle_ExchangedDocumentContext', $exchangedDocumentContext, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_ExchangedDocumentContext', $exchangedDocumentContext, $data, $options, $this );
 
 		return $data;
 	}

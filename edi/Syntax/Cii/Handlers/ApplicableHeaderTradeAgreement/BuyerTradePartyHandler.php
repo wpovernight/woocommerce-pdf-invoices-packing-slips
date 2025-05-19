@@ -1,7 +1,7 @@
 <?php
-namespace WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement;
+namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Abstracts\AbstractHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -19,7 +19,7 @@ class BuyerTradePartyHandler extends AbstractHandler {
 			$customerPartyName = $billingCompany;
 		}
 
-		$vatNumber = apply_filters( 'wpo_ips_einvoice_cii_vat_number', wpo_wcpdf_get_order_customer_vat_number( $order ), $order );
+		$vatNumber = apply_filters( 'wpo_ips_edi_cii_vat_number', wpo_wcpdf_get_order_customer_vat_number( $order ), $order );
 
 		// Buyer Name
 		$buyerTradeParty = array(
@@ -127,7 +127,7 @@ class BuyerTradePartyHandler extends AbstractHandler {
 			);
 		}
 
-		$data[] = apply_filters( 'wpo_ips_einvoice_cii_handle_BuyerTradeParty', $buyerTradeParty, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_BuyerTradeParty', $buyerTradeParty, $data, $options, $this );
 
 		return $data;
 	}

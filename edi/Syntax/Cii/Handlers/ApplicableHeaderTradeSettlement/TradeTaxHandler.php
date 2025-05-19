@@ -1,8 +1,8 @@
 <?php
-namespace WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
+namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
-use WPO\IPS\EInvoice\TaxesSettings;
+use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,7 +27,7 @@ class TradeTaxHandler extends AbstractHandler {
 			);
 		}
 
-		foreach ( apply_filters( 'wpo_ips_einvoice_cii_order_tax_data', $orderTaxData, $data, $options, $this ) as $item ) {
+		foreach ( apply_filters( 'wpo_ips_edi_cii_order_tax_data', $orderTaxData, $data, $options, $this ) as $item ) {
 			$percent   = ! empty( $item['percentage'] ) ? $item['percentage'] : 0;
 			$category  = ! empty( $item['category'] ) ? $item['category'] : wpo_ips_ubl_get_tax_data_from_fallback( 'category', null, $order );
 			$reasonKey = ! empty( $item['reason'] ) ? $item['reason'] : wpo_ips_ubl_get_tax_data_from_fallback( 'reason', null, $order );
@@ -78,7 +78,7 @@ class TradeTaxHandler extends AbstractHandler {
 				);
 			}
 
-			$data[] = apply_filters( 'wpo_ips_einvoice_cii_handle_TradeTax', $taxNode, $item, $options, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_cii_handle_TradeTax', $taxNode, $item, $options, $this );
 		}
 
 		return $data;

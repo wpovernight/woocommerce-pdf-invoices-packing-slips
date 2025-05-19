@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Abstracts;
+namespace WPO\IPS\EDI\Abstracts;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -28,7 +28,7 @@ abstract class AbstractFormat {
 		}
 
 		return apply_filters(
-			'wpo_ips_einvoice_format_structure',
+			'wpo_ips_edi_format_structure',
 			$structure,
 			$document_slug,
 			$this

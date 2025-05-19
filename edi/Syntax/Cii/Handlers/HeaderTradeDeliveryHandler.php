@@ -1,7 +1,7 @@
 <?php
-namespace WPO\IPS\EInvoice\Syntax\Cii\Handlers;
+namespace WPO\IPS\EDI\Syntax\Cii\Handlers;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Abstracts\AbstractHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -11,7 +11,7 @@ class HeaderTradeDeliveryHandler extends AbstractHandler {
 
 	public function handle( $data, $options = array() ) {
 		$order         = $this->document->order;
-		$delivery_date = apply_filters( 'wpo_ips_einvoice_cii_delivery_date', null, $order, $this );
+		$delivery_date = apply_filters( 'wpo_ips_edi_cii_delivery_date', null, $order, $this );
 		
 		if ( empty( $delivery_date ) ) {
 			return $data;
@@ -46,7 +46,7 @@ class HeaderTradeDeliveryHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_einvoice_cii_handle_HeaderTradeDelivery', $deliveryNode, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_HeaderTradeDelivery', $deliveryNode, $data, $options, $this );
 
 		return $data;
 	}

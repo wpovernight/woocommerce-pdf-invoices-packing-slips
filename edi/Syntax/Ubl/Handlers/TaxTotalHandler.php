@@ -1,8 +1,8 @@
 <?php
-namespace WPO\IPS\EInvoice\Syntax\Ubl\Handlers;
+namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
-use WPO\IPS\EInvoice\TaxesSettings;
+use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

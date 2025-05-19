@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Abstracts;
+namespace WPO\IPS\EDI\Abstracts;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -46,7 +46,7 @@ abstract class AbstractHandler {
 		$method_id = $order ? $order->get_payment_method() : '';
 		$title     = $order ? $order->get_payment_method_title() : '';
 
-		$mapping = apply_filters( 'wpo_ips_einvoice_payment_means_code_mapping', array(
+		$mapping = apply_filters( 'wpo_ips_edi_payment_means_code_mapping', array(
 			'bacs'    => '58', // SEPA Credit Transfer
 			'paypal'  => '68', // Online payment
 			'stripe'  => '54', // Credit card

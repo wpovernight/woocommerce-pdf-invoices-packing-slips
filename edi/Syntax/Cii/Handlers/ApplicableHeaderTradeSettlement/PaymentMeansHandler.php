@@ -1,7 +1,7 @@
 <?php
-namespace WPO\IPS\EInvoice\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
+namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Abstracts\AbstractHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -75,7 +75,7 @@ class PaymentMeansHandler extends AbstractHandler {
 			);
 		}
 
-		$data[] = apply_filters( 'wpo_ips_einvoice_cii_handle_PaymentMeans', $node, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_PaymentMeans', $node, $data, $options, $this );
 
 		return $data;
 	}

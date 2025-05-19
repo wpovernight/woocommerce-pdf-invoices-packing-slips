@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Abstracts;
+namespace WPO\IPS\EDI\Abstracts;
 
 use Iterator;
 

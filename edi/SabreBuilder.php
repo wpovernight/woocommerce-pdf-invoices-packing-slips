@@ -1,11 +1,11 @@
 <?php
 
-namespace WPO\IPS\EInvoice;
+namespace WPO\IPS\EDI;
 
 use WPO\IPS\Vendor\Sabre\Xml\Service;
 use WPO\IPS\Vendor\Sabre\Xml\Writer;
-use WPO\IPS\EInvoice\Abstracts\AbstractDocument;
-use WPO\IPS\EInvoice\Abstracts\AbstractBuilder;
+use WPO\IPS\EDI\Abstracts\AbstractDocument;
+use WPO\IPS\EDI\Abstracts\AbstractBuilder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

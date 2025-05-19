@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EInvoice\Abstracts;
+namespace WPO\IPS\EDI\Abstracts;
 
 use WPO\IPS\Documents\OrderDocument;
 
@@ -44,10 +44,10 @@ abstract class AbstractDocument {
 	 * @return array
 	 */
 	public function get_syntax_formats(): array {
-		$all_formats = wpo_ips_einvoice_formats();
+		$all_formats = wpo_ips_edi_formats();
 		
 		return apply_filters(
-			'wpo_ips_einvoice_syntax_formats',
+			'wpo_ips_edi_syntax_formats',
 			$all_formats[ $this->syntax ] ?? array(),
 			$this
 		);
@@ -315,7 +315,7 @@ abstract class AbstractDocument {
 			}
 		}
 		
-		return apply_filters( 'wpo_ips_einvoice_document_data', $data, $this );
+		return apply_filters( 'wpo_ips_edi_document_data', $data, $this );
 	}
 
 }

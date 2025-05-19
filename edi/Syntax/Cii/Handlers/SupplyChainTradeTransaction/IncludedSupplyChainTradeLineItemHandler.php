@@ -1,8 +1,8 @@
 <?php
-namespace WPO\IPS\EInvoice\Syntax\Cii\Handlers\SupplyChainTradeTransaction;
+namespace WPO\IPS\EDI\Syntax\Cii\Handlers\SupplyChainTradeTransaction;
 
-use WPO\IPS\EInvoice\Abstracts\AbstractHandler;
-use WPO\IPS\EInvoice\TaxesSettings;
+use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -122,7 +122,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_ips_einvoice_cii_handle_IncludedSupplyChainTradeLineItem', $lineItem, $data, $options, $item, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_cii_handle_IncludedSupplyChainTradeLineItem', $lineItem, $data, $options, $item, $this );
 		}
 
 		return $data;
