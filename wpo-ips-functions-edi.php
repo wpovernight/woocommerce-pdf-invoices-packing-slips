@@ -125,13 +125,13 @@ function wpo_ips_ubl_is_country_format_extension_active(): bool {
 }
 
 /**
- * Get the e-invoice syntaxes
+ * Get the EDI syntaxes
  * 
  * @return array
  */
-function wpo_ips_einvoice_syntaxes(): array {
+function wpo_ips_edi_syntaxes(): array {
 	return apply_filters(
-		'wpo_ips_einvoice_syntaxes',
+		'wpo_ips_edi_syntaxes',
 		array(
 			'ubl'       => 'Universal Business Language (UBL)',
 			'cii'       => 'Cross Industry Invoice (CII)',
@@ -143,18 +143,18 @@ function wpo_ips_einvoice_syntaxes(): array {
 }
 
 /**
- * Get the e-invoice formats
+ * Get the EDI formats
  * 
  * @return array
  */
-function wpo_ips_einvoice_formats(): array {
+function wpo_ips_edi_formats(): array {
 	return apply_filters(
-		'wpo_ips_einvoice_formats',
+		'wpo_ips_edi_formats',
 		array(
 			'ubl' => array(
 				'ubltwodotone' => array(
 					'name'  => 'UBL 2.1',
-					'class' => \WPO\IPS\EInvoice\Syntax\Ubl\Formats\UblTwoDotOne::class,
+					'class' => \WPO\IPS\edi\Syntax\Ubl\Formats\UblTwoDotOne::class,
 				),
 				// 'peppolbisthreedotzero' => array(
 				// 	'name'  => 'Peppol BIS Billing 3.0',
@@ -180,4 +180,25 @@ function wpo_ips_einvoice_formats(): array {
 			'cii' => array(),
 		)
 	);
+}
+
+/**
+ * Get the EDI format options
+ * 
+ * @param string $syntax
+ * @return array
+ */
+function wpo_ips_edi_format_options( string $syntax = '' ): array {
+	if ( empty( $syntax ) ) {
+		$syntax = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() )['syntax'] ?? 'ubl';
+	}
+	
+	$edi_formats = wpo_ips_edi_formats();
+	$edi_formats = $edi_formats[ $syntax ] ?? array();
+	$edi_formats = array_combine(
+		array_keys( $edi_formats ),
+		array_column( $edi_formats, 'name' )
+	);
+	
+	return apply_filters( 'wpo_ips_edi_format_options', $edi_formats, $syntax );
 }

@@ -1,15 +1,15 @@
 <?php
 namespace WPO\IPS\Settings;
 
-use WPO\IPS\EInvoice\TaxesSettings as EInvoiceTaxSettings;
+use WPO\IPS\EDI\TaxesSettings as EdiTaxSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsEInvoice' ) ) :
+if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsEDI' ) ) :
 
-class SettingsEInvoice {
+class SettingsEDI {
 
 	public $sections;
 
@@ -24,18 +24,18 @@ class SettingsEInvoice {
 
 	function __construct()	{
 		$this->sections = [
-			'einvoice' => __( 'E-Invoicing', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi' => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 
 		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
-		add_action( 'wpo_wcpdf_settings_output_einvoice', array( $this, 'output' ), 10, 2 );
+		add_action( 'wpo_wcpdf_settings_output_edi', array( $this, 'output' ), 10, 2 );
 
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
 
 		// VAT number or COC number is empty
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
-		add_action( 'admin_notices', array( '\\WPO\\IPS\\EInvoice\\TaxesSettings', 'standard_update_notice' ) );
+		add_action( 'admin_notices', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'standard_update_notice' ) );
 	}
 
 	public function output( $active_section, $nonce ) {
@@ -43,7 +43,7 @@ class SettingsEInvoice {
 			return;
 		}
 		
-		$active_section = ! empty( $active_section ) ? $active_section : 'einvoice';
+		$active_section = ! empty( $active_section ) ? $active_section : 'edi';
 		?>
 		<div class="wcpdf_ubl_settings_sections">
 			<?php if ( count( $this->sections ) > 1 ) : ?>
@@ -62,8 +62,8 @@ class SettingsEInvoice {
 		<?php
 			switch ( $active_section ) {
 				default:
-				case 'einvoice':
-					$settings = new EInvoiceTaxSettings();
+				case 'edi':
+					$settings = new EdiTaxSettings();
 					$settings->output();
 					break;
 			}
@@ -71,7 +71,7 @@ class SettingsEInvoice {
 
 	public function init_tax_settings() {
 		$page    = $option_group = $option_name = 'wpo_wcpdf_settings_ubl_taxes';
-		$section = 'einvoice';
+		$section = 'edi';
 
 		$settings_fields = array(
 			array(
@@ -83,7 +83,7 @@ class SettingsEInvoice {
 			array(
 				'type'      => 'setting',
 				'id'        => 'enabled',
-				'title'     => __( 'Enable Electronic Invoicing', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'     => __( 'Enable Electronic Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'  => 'checkbox',
 				'section'   => $section,
 				'args'      => array(
@@ -101,8 +101,21 @@ class SettingsEInvoice {
 				'args'        => array(
 					'option_name' => $option_name,
 					'id'          => 'syntax',
-					'options'     => wpo_ips_einvoice_syntaxes(),
-					'description' => __( 'Choose the preferred XML syntax standard for e-invoicing documents.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'options'     => wpo_ips_edi_syntaxes(),
+					'description' => __( 'Choose the preferred XML syntax standard for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
+			array(
+				'type'        => 'setting',
+				'id'          => 'format',
+				'title'       => __( 'Preferred Format', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'    => 'select',
+				'section'     => $section,
+				'args'        => array(
+					'option_name' => $option_name,
+					'id'          => 'format',
+					'options'     => wpo_ips_edi_formats(),
+					'description' => __( 'Choose the preferred format.', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 			),
 		);

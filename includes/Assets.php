@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\EInvoice\TaxesSettings as EInvoiceTaxSettings;
+use WPO\IPS\EDI\TaxesSettings as EdiTaxSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -251,10 +251,10 @@ class Assets {
 
 			}
 
-			// einvoice
-			if ( 'einvoice' === $tab ) {
+			// edi
+			if ( 'edi' === $tab ) {
 				wp_enqueue_script(
-					'wpo-wcpdf-einvoice',
+					'wpo-wcpdf-edi',
 					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
 					array( 'jquery' ),
 					WPO_WCPDF_VERSION,
@@ -262,13 +262,13 @@ class Assets {
 				);
 
 				wp_localize_script(
-					'wpo-wcpdf-einvoice',
-					'wpo_wcpdf_einvoice',
+					'wpo-wcpdf-edi',
+					'wpo_wcpdf_edi',
 					array(
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => EInvoiceTaxSettings::get_available_remarks(),
+						'remarks' => EdiTaxSettings::get_available_remarks(),
 					)
 				);
 			}

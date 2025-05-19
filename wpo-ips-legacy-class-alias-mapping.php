@@ -33,8 +33,8 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug'           => '\\WPO\\IPS\\Settings\\SettingsDebug',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Documents'       => '\\WPO\\IPS\\Settings\\SettingsDocuments',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_General'         => '\\WPO\\IPS\\Settings\\SettingsGeneral',
-	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL'             => '\\WPO\\IPS\\Settings\\SettingsEInvoice',
-	'\\WPO\\IPS\\Settings\\SettingsUbl'                           => '\\WPO\\IPS\\Settings\\SettingsEInvoice',
+	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL'             => '\\WPO\\IPS\\Settings\\SettingsEDI',
+	'\\WPO\\IPS\\Settings\\SettingsUbl'                           => '\\WPO\\IPS\\Settings\\SettingsEDI',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade'         => '\\WPO\\IPS\\Settings\\SettingsUpgrade',
 
 	// includes/Tables

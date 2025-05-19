@@ -6,7 +6,7 @@ use WPO\IPS\Settings\SettingsCallbacks;
 use WPO\IPS\Settings\SettingsGeneral;
 use WPO\IPS\Settings\SettingsDocuments;
 use WPO\IPS\Settings\SettingsDebug;
-use WPO\IPS\Settings\SettingsEInvoice;
+use WPO\IPS\Settings\SettingsEDI;
 use WPO\IPS\Settings\SettingsUpgrade;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +23,7 @@ class Settings {
 	public $documents;
 	public $debug;
 	public $upgrade;
-	public $einvoice;
+	public $edi;
 	public $general_settings;
 	public $debug_settings;
 	public $ubl_tax_settings;
@@ -46,7 +46,7 @@ class Settings {
 		$this->general          = SettingsGeneral::instance();
 		$this->documents        = SettingsDocuments::instance();
 		$this->debug            = SettingsDebug::instance();
-		$this->einvoice         = SettingsEInvoice::instance();
+		$this->edi              = SettingsEDI::instance();
 		$this->upgrade          = SettingsUpgrade::instance();
 
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
@@ -181,8 +181,8 @@ class Settings {
 			),
 		) );
 
-		$settings_tabs['einvoice'] = array(
-			'title'          => __( 'E-Invoicing', 'woocommerce-pdf-invoices-packing-slips' ),
+		$settings_tabs['edi'] = array(
+			'title'          => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			'preview_states' => 1,
 		);
 

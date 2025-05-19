@@ -14,7 +14,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
-            'WPO\\IPS\\EInvoice\\' => 17,
+            'WPO\\IPS\\EDI\\' => 12,
             'WPO\\IPS\\' => 8,
         ),
         'S' => 
@@ -25,9 +25,9 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPO\\IPS\\EInvoice\\' => 
+        'WPO\\IPS\\EDI\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/einvoice',
+            0 => __DIR__ . '/../..' . '/edi',
         ),
         'WPO\\IPS\\' => 
         array (
@@ -60,44 +60,6 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Documents\\OrderDocumentMethods' => __DIR__ . '/../..' . '/includes/Documents/OrderDocumentMethods.php',
         'WPO\\IPS\\Documents\\PackingSlip' => __DIR__ . '/../..' . '/includes/Documents/PackingSlip.php',
         'WPO\\IPS\\Documents\\SequentialNumberStore' => __DIR__ . '/../..' . '/includes/Documents/SequentialNumberStore.php',
-        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractBuilder' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractBuilder.php',
-        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractCollection' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractCollection.php',
-        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractDocument' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractDocument.php',
-        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractFormat' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractFormat.php',
-        'WPO\\IPS\\EInvoice\\Abstracts\\AbstractHandler' => __DIR__ . '/../..' . '/einvoice/Abstracts/AbstractHandler.php',
-        'WPO\\IPS\\EInvoice\\SabreBuilder' => __DIR__ . '/../..' . '/einvoice/SabreBuilder.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\CiiDocument' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/CiiDocument.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\BuyerTradePartyHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/BuyerTradePartyHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\ContractReferencedDocumentHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/ContractReferencedDocumentHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\SellerTradePartyHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/SellerTradePartyHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeSettlement\\MonetarySummationHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeSettlement/MonetarySummationHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeSettlement\\PaymentMeansHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeSettlement/PaymentMeansHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeSettlement\\PaymentReferenceHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeSettlement/PaymentReferenceHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeSettlement\\PaymentTermsHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeSettlement/PaymentTermsHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeSettlement\\TradeTaxHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ApplicableHeaderTradeSettlement/TradeTaxHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ExchangedDocumentContextHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ExchangedDocumentContextHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\ExchangedDocumentHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/ExchangedDocumentHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\HeaderTradeDeliveryHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/HeaderTradeDeliveryHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Cii\\Handlers\\SupplyChainTradeTransaction\\IncludedSupplyChainTradeLineItemHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Cii/Handlers/SupplyChainTradeTransaction/IncludedSupplyChainTradeLineItemHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Formats\\UblTwoDotOne' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Formats/UblTwoDotOne.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\AdditionalDocumentReferenceHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/AdditionalDocumentReferenceHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\AddressHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/AddressHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\AllowanceChargeHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/AllowanceChargeHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\BuyerReferenceHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/BuyerReferenceHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\DeliveryHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/DeliveryHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\DocumentCurrencyCodeHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/DocumentCurrencyCodeHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\IdHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/IdHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\InvoiceLineHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/InvoiceLineHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\InvoiceTypeCodeHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/InvoiceTypeCodeHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\IssueDateHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/IssueDateHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\LegalMonetaryTotalHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/LegalMonetaryTotalHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\OrderReferenceHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/OrderReferenceHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\PaymentMeansHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/PaymentMeansHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\PaymentTermsHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/PaymentTermsHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\TaxTotalHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/TaxTotalHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\Handlers\\UblVersionIdHandler' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/Handlers/UblVersionIdHandler.php',
-        'WPO\\IPS\\EInvoice\\Syntax\\Ubl\\UblDocument' => __DIR__ . '/../..' . '/einvoice/Syntax/Ubl/UblDocument.php',
-        'WPO\\IPS\\EInvoice\\TaxesSettings' => __DIR__ . '/../..' . '/einvoice/TaxesSettings.php',
         'WPO\\IPS\\Endpoint' => __DIR__ . '/../..' . '/includes/Endpoint.php',
         'WPO\\IPS\\FontSynchronizer' => __DIR__ . '/../..' . '/includes/FontSynchronizer.php',
         'WPO\\IPS\\Frontend' => __DIR__ . '/../..' . '/includes/Frontend.php',
@@ -110,7 +72,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Settings\\SettingsCallbacks' => __DIR__ . '/../..' . '/includes/Settings/SettingsCallbacks.php',
         'WPO\\IPS\\Settings\\SettingsDebug' => __DIR__ . '/../..' . '/includes/Settings/SettingsDebug.php',
         'WPO\\IPS\\Settings\\SettingsDocuments' => __DIR__ . '/../..' . '/includes/Settings/SettingsDocuments.php',
-        'WPO\\IPS\\Settings\\SettingsEInvoice' => __DIR__ . '/../..' . '/includes/Settings/SettingsEInvoice.php',
+        'WPO\\IPS\\Settings\\SettingsEDI' => __DIR__ . '/../..' . '/includes/Settings/SettingsEDI.php',
         'WPO\\IPS\\Settings\\SettingsGeneral' => __DIR__ . '/../..' . '/includes/Settings/SettingsGeneral.php',
         'WPO\\IPS\\Settings\\SettingsUpgrade' => __DIR__ . '/../..' . '/includes/Settings/SettingsUpgrade.php',
         'WPO\\IPS\\SetupWizard' => __DIR__ . '/../..' . '/includes/SetupWizard.php',

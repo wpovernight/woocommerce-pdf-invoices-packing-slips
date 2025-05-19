@@ -4,7 +4,7 @@
 	"autoload": {
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
-			"WPO\\IPS\\EInvoice\\": "einvoice/"
+			"WPO\\IPS\\EDI\\": "edi/"
 		}
 	},
 	"require": {

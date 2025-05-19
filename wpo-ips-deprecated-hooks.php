@@ -13,7 +13,7 @@ if ( has_action( 'wpo_wc_ubl_document_root_element' ) ) {
 			$message,
 			'wpo_wc_ubl_document_root_element',
 			$version,
-			'wpo_ips_einvoice_root_element'
+			'wpo_ips_edi_root_element'
 		),
 		$version
 	);
@@ -27,7 +27,7 @@ if ( has_action( 'wpo_wc_ubl_document_additional_root_elements' ) ) {
 			$message,
 			'wpo_wc_ubl_document_additional_root_elements',
 			$version,
-			'wpo_ips_einvoice_additional_root_elements'
+			'wpo_ips_edi_additional_root_elements'
 		),
 		$version
 	);
@@ -41,7 +41,7 @@ if ( has_action( 'wpo_wc_ubl_document_namespaces' ) ) {
 			$message,
 			'wpo_wc_ubl_document_namespaces',
 			$version,
-			'wpo_ips_einvoice_namespaces'
+			'wpo_ips_edi_namespaces'
 		),
 		$version
 	);
@@ -55,7 +55,7 @@ if ( has_action( 'wpo_wc_ubl_document_format' ) ) {
 			$message,
 			'wpo_wc_ubl_document_format',
 			$version,
-			'wpo_ips_einvoice_format_structure'
+			'wpo_ips_edi_format_structure'
 		),
 		$version
 	);
@@ -69,7 +69,7 @@ if ( has_action( 'wpo_wc_ubl_document_data' ) ) {
 			$message,
 			'wpo_wc_ubl_document_data',
 			$version,
-			'wpo_ips_einvoice_document_data'
+			'wpo_ips_edi_document_data'
 		),
 		$version
 	);
