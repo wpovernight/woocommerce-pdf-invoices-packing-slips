@@ -1450,15 +1450,15 @@ abstract class OrderDocument {
 	public function get_shop_address(): string {
 		$country_code = $this->get_settings_text( 'shop_address_country', '', false );
 		$address      = array(
-			'address_line_1' => $this->get_settings_text( 'shop_address_line_1', '', false ),
-			'address_line_2' => $this->get_settings_text( 'shop_address_line_2', '', false ),
-			'city'           => $this->get_settings_text( 'shop_address_city', '', false ),
-			'postcode'       => $this->get_settings_text( 'shop_address_postcode', '', false ),
-			'state'          => $this->get_settings_text( 'shop_address_state', '', false ),
-			'country'        => wpo_wcpdf_get_country_name_from_code(
+			'address_1'  => $this->get_settings_text( 'shop_address_line_1', '', false ),
+			'address_2'  => $this->get_settings_text( 'shop_address_line_2', '', false ),
+			'city'       => $this->get_settings_text( 'shop_address_city', '', false ),
+			'postcode'   => $this->get_settings_text( 'shop_address_postcode', '', false ),
+			'state'      => $this->get_settings_text( 'shop_address_state', '', false ),
+			'country'    => wpo_wcpdf_get_country_name_from_code(
 				$this->get_settings_text( 'shop_address_country', '', false )
 			),
-			'additional'     => $this->get_settings_text( 'shop_address_additional', '', false ),
+			'additional' => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
 
 		return wpo_wcpdf_format_country_address( $country_code, $address );
