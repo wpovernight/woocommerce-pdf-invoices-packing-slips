@@ -1518,14 +1518,13 @@ function wpo_wcpdf_get_address_format_for_country( string $country_code ): strin
 function wpo_wcpdf_format_country_address( string $country_code, array $address ): string {
 	$address_format = wpo_wcpdf_get_address_format_for_country( $country_code );
 
+	// Set default values for address fields if not provided.
+	$address['country_code'] = $address['country_code'] ?? $country_code;
+
 	// Replace placeholder with $address values, and remove empty placeholders.
 	$formatted_address = preg_replace_callback(
 		'/\{([a-zA-Z0-9_]+)}/',
 		function ( $matches ) use ( $country_code, $address ) {
-			if ( 'country_code' === $matches[1] ) {
-				return $country_code;
-			}
-
 			return $address[ $matches[1] ] ?? '';
 		}, $address_format );
 
