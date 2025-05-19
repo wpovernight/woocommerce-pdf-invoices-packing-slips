@@ -1486,7 +1486,7 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
  *
  * @return string Country name or empty string if not found.
  */
-function wpo_wcpdf_get_country_from_country_code( string $country_code ): string {
+function wpo_wcpdf_get_country_name_from_code( string $country_code ): string {
 	$country_code = strtoupper( trim( $country_code ) );
 	return \WC()->countries->get_countries()[ $country_code ] ?? '';
 }
@@ -1515,7 +1515,7 @@ function wpo_wcpdf_get_address_format_for_country( string $country_code ): strin
  *
  * @return string
  */
-function wpo_wcpdf_get_formatted_address( string $country_code, array $address ): string {
+function wpo_wcpdf_format_country_address( string $country_code, array $address ): string {
 	$address_format = wpo_wcpdf_get_address_format_for_country( $country_code );
 
 	// Replace placeholder with $address values, and remove empty placeholders.
