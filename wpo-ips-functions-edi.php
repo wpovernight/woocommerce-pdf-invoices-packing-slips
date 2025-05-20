@@ -145,6 +145,8 @@ function wpo_ips_edi_syntaxes(): array {
 /**
  * Get the EDI formats
  * 
+ * @param string $syntax
+ * 
  * @return array
  */
 function wpo_ips_edi_formats( string $syntax = '' ): array {
