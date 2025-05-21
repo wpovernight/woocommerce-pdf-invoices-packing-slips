@@ -622,8 +622,8 @@ class WPO_WCPDF {
 		$dismiss_arg    = 'wpo_wcpdf_dismiss_unstable_option_announcement';
 		$nonce_action   = 'wcpdf_dismiss_unstable_option_announcement';
 
-		// Bail if already dismissed
-		if ( wc_string_to_bool( get_option( $dismiss_option ) ) ) {
+		// Bail if already dismissed or user cannot manage settings
+		if ( wc_string_to_bool( get_option( $dismiss_option ) ) || ! $this->settings->user_can_manage_settings() ) {
 			return;
 		}
 
