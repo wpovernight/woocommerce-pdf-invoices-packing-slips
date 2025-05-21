@@ -1539,6 +1539,9 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 		$formatted_address
 	);
 
+	// Trim newline characters from beginning and end.
+	$formatted_address = trim( $formatted_address, "\n" );
+
 	// Add additional info if provided.
 	if ( ! empty( $address['additional'] ) ) {
 		$formatted_address .= "\n" . $address['additional'];
