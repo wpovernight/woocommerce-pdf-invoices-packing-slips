@@ -1,7 +1,6 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Exceptions\FileWriteException;
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -187,9 +186,6 @@ class Main {
 						continue;
 					} catch ( DompdfException $e ) {
 						wcpdf_log_error( 'DOMPDF exception: '.$e->getMessage(), 'critical', $e );
-						continue;
-					} catch ( FileWriteException $e ) {
-						wcpdf_log_error( 'UBL FileWrite exception: '.$e->getMessage(), 'critical', $e );
 						continue;
 					} catch ( \Error $e ) {
 						wcpdf_log_error( $e->getMessage(), 'critical', $e );
@@ -527,10 +523,6 @@ class Main {
 			}
 		} catch ( DompdfException $e ) {
 			$message = 'DOMPDF Exception: '.$e->getMessage();
-			wcpdf_log_error( $message, 'critical', $e );
-			wcpdf_output_error( $message, 'critical', $e );
-		} catch ( FileWriteException $e ) {
-			$message = 'UBL FileWrite Exception: '.$e->getMessage();
 			wcpdf_log_error( $message, 'critical', $e );
 			wcpdf_output_error( $message, 'critical', $e );
 		} catch ( \Exception $e ) {

@@ -659,5 +659,57 @@ jQuery( function( $ ) {
 	}
 	
 	settingsAccordion();
+	
+	// Settings custom attributes
+	$( "[data-show_for_option_name]" ).each( function() {
+		let option_name = $( this ).data( 'show_for_option_name' );
+		$( document ).on( 'change', '[name="' + option_name + '"], [name="' + option_name + '[]"]', toggle_conditional_visibility );
+	} );
+
+	// Trigger the change event after setting up the listeners
+	$( "[data-show_for_option_name]" ).each( function() {
+		let option_name = $( this ).data( 'show_for_option_name' );
+		$( '[name="' + option_name + '"], [name="' + option_name + '[]"]' ).each( function() {
+			toggle_conditional_visibility( { target: this } );
+		} );
+	});
+
+	function toggle_conditional_visibility( e ) {
+		const $this  = $( e.target );
+		let name     = $this.prop( 'name' ).replace( '[]', '' ); // normalize multiselect
+		let value    = $this.val();
+		let checkbox = false;
+
+		if ( $this.is( ':checkbox' ) ) {
+			value    = $this.is( ':checked' );
+			checkbox = true;
+		}
+
+		$( "[data-show_for_option_name='" + name + "']" ).each( function() {
+			let show     = false;
+			let show_for = $( this ).data( 'show_for_option_values' );
+			
+			if ( checkbox ) {
+				show = value; // for checkboxes, checked = show
+			} else if ( Array.isArray( value ) ) { // Multiselect
+				show = value.some( item => show_for.includes( item ) );
+			} else {
+				show = show_for.includes( value );
+			}
+
+			let $row = $( this ).closest( 'tr' );
+
+			if ( show ) {
+				$row.show();
+				
+				if ( checkbox ) {
+					$row.find( ':input[type=checkbox]' ).val( '1' );
+				}
+			} else {
+				$row.hide().find( ':input' ).not( ':checkbox' ).val( '' );
+				$row.find( ':checkbox' ).prop( 'checked', false );
+			}
+		} );
+	}
 
 } );

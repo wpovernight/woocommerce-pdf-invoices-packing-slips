@@ -1043,7 +1043,7 @@ sup.wcpdf_beta {
 }
 
 /* UBL Taxes */
-#wpo-wcpdf-preview-wrapper #wpo-wcpdf-settings ul#ubl-standard-changelog {
+#wpo-wcpdf-settings ul#ubl-standard-changelog {
 	display: none;
 	list-style: disc;
 	padding-left: 20px;
