@@ -1388,7 +1388,7 @@ abstract class OrderDocument {
 	 * Return/Show shop/company address country if provided.
 	 */
 	function get_shop_address_country(): string {
-		return $this->get_country_from_country_code( $this->get_shop_address_country_code() );
+		return wpo_wcpdf_get_country_name_from_code( $this->get_shop_address_country_code() );
 	}
 	function shop_address_country(): void {
 		echo esc_html( $this->get_shop_address_country() );
