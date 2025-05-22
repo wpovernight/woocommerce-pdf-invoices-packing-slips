@@ -593,17 +593,28 @@ class Install {
 			$debug_settings['reload_attachment_translations'] = '1';
 			update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		}
-		
+
 		// 4.5.0-beta.2: set default filesystem method to php
 		if ( version_compare( $installed_version, '4.5.0-beta.2', '<' ) ) {
 			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-			
+
 			if ( ! empty( $debug_settings['file_system_method'] ) && 'wp' === $debug_settings['file_system_method'] ) {
 				$debug_settings['file_system_method'] = 'php';
 				update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 			}
 		}
-		
+
+		// 4.5.0-beta.3: set shop address value for the new shop additional info field.
+		if ( version_compare( $installed_version, '4.5.0-beta.3', '<' ) ) {
+			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+
+			if ( ! empty( $general_settings['shop_address'] ) ) {
+				$general_settings['shop_address_additional'] = $general_settings['shop_address'];
+				unset( $general_settings['shop_address'] );
+				update_option( 'wpo_wcpdf_settings_general', $general_settings );
+			}
+		}
+
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
 	}
