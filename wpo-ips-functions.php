@@ -343,7 +343,7 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
 }
 
 /**
- * Logs errors thrown by this plugin. 
+ * Logs errors thrown by this plugin.
  * Uses the WooCommerce logger when available (WC 3.0+), otherwise falls back to PHP error_log().
  *
  * @param string           $message Error message to log.
@@ -362,24 +362,24 @@ function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable 
 	$format_message = static function ( string $message, ?\Throwable $e ): string {
 		if ( $e instanceof \Throwable ) {
 			$message = sprintf( '%s (%s:%d)', $message, $e->getFile(), $e->getLine() );
-			
+
 			if ( apply_filters( 'wcpdf_log_stacktrace', false ) && is_callable( array( $e, 'getTraceAsString' ) ) ) {
 				$message .= "\n" . $e->getTraceAsString();
 			}
 		}
 		return $message;
 	};
-	
+
 	$message = $format_message( $message, $e );
-	
+
 	if ( ! function_exists( 'wc_get_logger' ) ) {
 		error_log( '[WPO_WCPDF] ' . $message );
 		return;
 	}
-	
+
 	$logger  = wc_get_logger();
 	$context = array( 'source' => 'wpo-wcpdf' );
-	
+
 	$logger->log( $level, $message, $context );
 }
 
@@ -396,15 +396,15 @@ function wcpdf_output_error( string $message, string $level = 'error', ?\Throwab
 		esc_html_e( 'Error creating PDF, please contact the site owner.', 'woocommerce-pdf-invoices-packing-slips' );
 		return;
 	}
-	
+
 	echo '<div style="border: 2px solid red; padding: 5px;">';
 	echo '<h3>' . wp_kses_post( $message ) . '</h3>';
-	
+
 	if ( $e instanceof \Throwable ) {
 		echo '<pre>' . esc_html( $e->getFile() ) . ' (' . esc_html( (string) $e->getLine() ) . ')</pre>';
 		echo '<pre>' . esc_html( $e->getTraceAsString() ) . '</pre>';
 	}
-		
+
 	echo '</div>';
 }
 
@@ -434,7 +434,7 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
 			wcpdf_log_error( sprintf( 'Unknown error handling type: %s', $handling_type ), 'warning' );
 			break;
 	}
-	
+
 	return false;
 }
 
@@ -1424,11 +1424,11 @@ function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
 
 /**
  * Write UBL file
- * 
+ *
  * @param \WPO\IPS\Documents\OrderDocument $document
  * @param bool $attachment
  * @param bool $contents_only
- * 
+ *
  * @return string|false
  */
 function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
@@ -1440,11 +1440,11 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
 
 	if ( $attachment ) {
 		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
-		
+
 		if ( ! $tmp_path ) {
 			return wcpdf_error_handling( 'Temporary path not available. Cannot write UBL file.' );
 		}
-		
+
 		$ubl_maker->set_file_path( $tmp_path );
 	}
 
@@ -1457,7 +1457,7 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
 		$ubl_document,
 		$document
 	);
-	
+
 	if ( empty( $contents ) ) {
 		return wcpdf_error_handling( 'Failed to build UBL contents.' );
 	}
@@ -1479,3 +1479,79 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	return $full_filename;
 }
 
+/**
+ * Get the country name from the country code.
+ *
+ * @param string $country_code
+ *
+ * @return string Country name or empty string if not found.
+ */
+function wpo_wcpdf_get_country_name_from_code( string $country_code ): string {
+	$country_code = strtoupper( trim( $country_code ) );
+	return \WC()->countries->get_countries()[ $country_code ] ?? '';
+}
+
+/**
+ * Get the address format for a given country.
+ *
+ * @param string $country_code Country code, like the NL.
+ *
+ * @return string
+ */
+function wpo_wcpdf_get_address_format_for_country( string $country_code ): string {
+	$country_code    = strtoupper( trim( $country_code ) );
+	$address_formats = \WC()->countries->get_address_formats();
+
+	return ! empty( $country_code ) && ! empty( $address_formats[ $country_code ] )
+		? $address_formats[ $country_code ]
+		: $address_formats['default'];
+}
+
+/**
+ * Get the formatted address for a given country code.
+ *
+ * @param string $country_code
+ * @param array $address
+ *
+ * @return string
+ */
+function wpo_wcpdf_format_country_address( string $country_code, array $address ): string {
+	$address_format = wpo_wcpdf_get_address_format_for_country( $country_code );
+
+	// Set default values for address fields if not provided.
+	$address['country_code'] = $address['country_code'] ?? $country_code;
+
+	// Replace placeholder with $address values, and remove empty placeholders.
+	$formatted_address = preg_replace_callback(
+		'/\{([a-zA-Z0-9_]+)}/',
+		function ( $matches ) use ( $country_code, $address ) {
+			return $address[ $matches[1] ] ?? '';
+		}, $address_format );
+
+	// Normalize commas and remove extra line breaks.
+	$formatted_address = preg_replace(
+		array(
+			'/,\s*,+/',      // Remove consecutive commas
+			'/,\s*$/',       // Remove trailing commas
+			'/\n\s*\n/'      // Remove empty lines
+		),
+		array( ',', '', "\n" ),
+		$formatted_address
+	);
+
+	// Trim newline characters from beginning and end.
+	$formatted_address = trim( $formatted_address, "\n" );
+
+	// Add additional info if provided.
+	if ( ! empty( $address['additional'] ) ) {
+		$formatted_address .= "\n" . $address['additional'];
+	}
+
+	// Convert to HTML line breaks.
+	$formatted_address = nl2br( $formatted_address );
+
+	// Remove any newlines.
+	$formatted_address = str_replace( "\n", '', $formatted_address );
+
+	return esc_html( $formatted_address );
+}
