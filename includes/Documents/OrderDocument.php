@@ -1448,6 +1448,10 @@ abstract class OrderDocument {
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address(): string {
+		if ( $this->use_historical_settings() ) {
+			return $this->get_settings_text( 'shop_address', '', false );
+		}
+		
 		$country_code = $this->get_settings_text( 'shop_address_country', '', false );
 		$address      = array(
 			'address_1'  => $this->get_settings_text( 'shop_address_line_1', '', false ),
