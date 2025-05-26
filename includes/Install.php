@@ -614,16 +614,6 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_general', $general_settings );
 			}
 		}
-		
-		// 4.5.1-beta.1: set shop address value for the new shop additional info field.
-		if ( version_compare( $installed_version, '4.5.1-beta.1', '<' ) ) {
-			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-
-			if ( ! empty( $general_settings['shop_address_additional'] ) ) {
-				$general_settings['shop_address'] = $general_settings['shop_address_additional'];
-				update_option( 'wpo_wcpdf_settings_general', $general_settings );
-			}
-		}
 
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
