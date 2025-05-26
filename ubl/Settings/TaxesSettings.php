@@ -483,11 +483,12 @@ class TaxesSettings {
 		$tax_settings     = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 		$current_standard = $tax_settings['standard'] ?? null;
 		$current_version  = $tax_settings['standard_version'] ?? null;
+		$request          = stripslashes_deep( $_GET );
 
 		// Handle dismissal
 		if (
-			isset( $_GET['dismiss_standard_notice'], $_GET['dismiss_standard_notice_nonce'] ) &&
-			wp_verify_nonce( $_GET['dismiss_standard_notice_nonce'], 'dismiss_standard_notice' )
+			isset( $request['dismiss_standard_notice'], $request['dismiss_standard_notice_nonce'] ) &&
+			wp_verify_nonce( $request['dismiss_standard_notice_nonce'], 'dismiss_standard_notice' )
 		) {
 			self::update_standard_version();
 
