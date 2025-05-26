@@ -1448,7 +1448,7 @@ abstract class OrderDocument {
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address(): string {
-		// Preserve legacy shop address when historical settings are enabled
+		// Preserve legacy shop address, if it exists, when historical settings are enabled
 		$address = $this->get_settings_text( 'shop_address' );
 		if ( $this->use_historical_settings() && ! empty( $address ) ) {
 			return $address;
