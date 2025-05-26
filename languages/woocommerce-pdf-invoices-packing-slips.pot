@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.5.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.5.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-05-26T11:03:28+00:00\n"
+"POT-Creation-Date: 2025-05-26T14:35:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -813,11 +813,11 @@ msgstr ""
 msgid "Customer Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1799
+#: includes/Documents/OrderDocument.php:1806
 msgid "Admin email"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1802
+#: includes/Documents/OrderDocument.php:1809
 msgid "Manual email"
 msgstr ""
 
@@ -1921,7 +1921,7 @@ msgid "Code list standard:"
 msgstr ""
 
 #: includes/Settings/SettingsUbl.php:72
-#: ubl/Settings/TaxesSettings.php:520
+#: ubl/Settings/TaxesSettings.php:521
 msgid "View changelog"
 msgstr ""
 
@@ -2693,12 +2693,12 @@ msgid "For domestic Credit Notes only in France"
 msgstr ""
 
 #. translators: %1$s: plugin name, %2$s: standard name, %3$s: version number, %4$s: changelog link
-#: ubl/Settings/TaxesSettings.php:516
+#: ubl/Settings/TaxesSettings.php:517
 #, php-format
 msgid "The %1$s UBL tax settings were updated to %2$s version %3$s. %4$s"
 msgstr ""
 
-#: ubl/Settings/TaxesSettings.php:523
+#: ubl/Settings/TaxesSettings.php:524
 msgid "Dismiss"
 msgstr ""
 

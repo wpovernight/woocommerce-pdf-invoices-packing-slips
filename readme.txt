@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.5.1-beta.1
+Stable tag: 4.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,10 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.5.1 (2025-05-26) =
+- Fix: Shop address not shown in documents when historical settings are enabled
+- Fix: Validation issues flagged by WP Plugin Check
 
 = 4.5.0 (2025-05-26) =
 - New: Separated shop address fields introduced
