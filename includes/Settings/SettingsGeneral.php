@@ -24,9 +24,17 @@ class SettingsGeneral {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+		add_action( 'pre_update_option_wpo_wcpdf_settings_general', array( $this, 'maybe_remove_legacy_shop_address' ), 10, 3 );
 
 		// Display an admin notice if shop address fields are empty.
 		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
+	}
+	
+	public function maybe_remove_legacy_shop_address( $value, $old_value, $option ) {
+		if ( isset( $value['test_mode'] ) && isset( $value['shop_address'] ) ) {
+			unset( $value['shop_address'] );
+		}
+		return $value;
 	}
 
 	public function output( $section, $nonce ) {
