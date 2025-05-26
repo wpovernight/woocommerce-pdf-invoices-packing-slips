@@ -1448,6 +1448,13 @@ abstract class OrderDocument {
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address(): string {
+		// Preserve legacy shop address, if it exists, when historical settings are enabled
+		$address = $this->get_settings_text( 'shop_address' );
+		if ( $this->use_historical_settings() && ! empty( $address ) ) {
+			return $address;
+		}
+		
+		// Otherwise, build the address from individual fields
 		$country_code = $this->get_settings_text( 'shop_address_country', '', false );
 		$address      = array(
 			'address_1'  => $this->get_settings_text( 'shop_address_line_1', '', false ),

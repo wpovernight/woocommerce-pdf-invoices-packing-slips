@@ -1548,7 +1548,7 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 	}
 
 	// Convert to HTML line breaks.
-	$formatted_address = nl2br( $formatted_address );
+	$formatted_address = nl2br( ltrim( $formatted_address, "\r\n" ) );
 
 	// Remove any newlines.
 	$formatted_address = str_replace( "\n", '', $formatted_address );
