@@ -1448,10 +1448,10 @@ abstract class OrderDocument {
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address(): string {
-		// Legacy compatibility until "Test mode" is enabled
+		// Ensures legacy compatibility until settings are saved after upgrading from version 4.5.0
 		$address = $this->get_settings_text( 'shop_address' );
 		if ( $this->use_historical_settings() && ! empty( $address ) ) {
-			return $this->get_settings_text( $address );
+			return $address;
 		}
 		
 		// New
