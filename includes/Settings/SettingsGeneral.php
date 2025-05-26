@@ -223,10 +223,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_line_1',
-					'translatable' => true,
-					'description'  => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_line_1',
+					'translatable'  => true,
+					'description'   => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -236,10 +242,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_line_2',
-					'translatable' => true,
-					'description'  => __( 'An additional, optional address line for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_line_2',
+					'translatable'  => true,
+					'description'   => __( 'An additional, optional address line for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -249,11 +261,17 @@ class SettingsGeneral {
 				'callback' => 'select',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'options'      => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
-					'id'           => 'shop_address_country',
-					'translatable' => true,
-					'description'  => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'options'       => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
+					'id'            => 'shop_address_country',
+					'translatable'  => true,
+					'description'   => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -263,10 +281,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_state',
-					'translatable' => true,
-					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_state',
+					'translatable'  => true,
+					'description'   => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -276,10 +300,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_city',
-					'translatable' => true,
-					'description'  => __( 'The city in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_city',
+					'translatable'  => true,
+					'description'   => __( 'The city in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -289,10 +319,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_postcode',
-					'translatable' => true,
-					'description'  => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_postcode',
+					'translatable'  => true,
+					'description'   => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(

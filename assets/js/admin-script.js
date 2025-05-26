@@ -614,36 +614,37 @@ jQuery( function( $ ) {
 	}
 
 	//----------> /Preview <----------//
+	//----------> Settings Accordion <----------//
 
 	function settingsAccordion() {
 		// Get current tab.
 		const params       = new URLSearchParams( window.location.search );
 		const allowedTabs  = [ 'general', 'documents' ];
 		const tab          = params.get( 'tab' ) || 'general';
-	
+
 		if ( ! allowedTabs.includes( tab ) ) {
 			return;
 		}
-		
+
 		const tabsMainCategory = {
 			general   : 'display',
 			documents : 'general',
 		};
-		
+
 		// Collapse all but the main category for this tab.
 		$( '.settings_category' )
 			.not( '#' + tabsMainCategory[ tab ] )
 			.find( '.form-table' )
 			.hide();
-		
+
 		const sections = $( '.settings_category h2' );
-		
+
 		// Restore accordion state from localStorage.
 		sections.each( function ( index ) {
 			const open = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` ) === 'true';
 			$( this ).toggleClass( 'active', open ).next( '.form-table' ).toggle( open );
 		} );
-		
+
 		// Toggle on click and persist state.
 		sections.on( 'click', function () {
 			const index = sections.index( this );
@@ -657,7 +658,49 @@ jQuery( function( $ ) {
 					 } );
 		} );
 	}
-	
+
 	settingsAccordion();
+
+	//----------> /Settings Accordion <----------//
+	//----------> Sync Address <----------//
+
+	const syncButtons = $( '.sync-address' );
+
+	syncButtons.on( 'click', function( event ) {
+		event.preventDefault();
+		const $button = $( this );
+		const $icon   = $button.find( 'span.dashicons' );
+		let $field    = $button.closest( 'td' ).find( 'input' );
+
+		if ( $field.length === 0 ) {
+			$field = $button.closest( 'td' ).find( 'select' );
+		}
+
+		// Rotate the icon to indicate processing.
+		$icon.toggleClass( 'rotate' );
+
+		$.ajax( {
+			type: 'POST',
+			url:  wpo_wcpdf_admin.ajaxurl,
+			data: {
+				action:        'wpo_wcpdf_sync_address',
+				security:      wpo_wcpdf_admin.nonce,
+				address_field: $field.attr( 'id' ),
+			},
+			success: function( response ) {
+				if ( response.success ) {
+					// Update the input value with the synced address.
+					$field.val( response.data.value ).trigger( 'paste' );
+				}
+			},
+			complete: function() {
+				// Reset the icon rotation.
+				$icon.toggleClass( 'rotate' );
+			}
+		} );
+
+	} );
+
+	//----------> /Sync Address <----------//
 
 } );

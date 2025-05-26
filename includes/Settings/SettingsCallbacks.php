@@ -107,8 +107,35 @@ class SettingsCallbacks {
 			$type = 'text';
 		}
 
+		if ( ! empty( $action_button ) ) {
+			echo '<div class="wpo-wcpdf-input-wrapper input">';
+		}
+
 		$size = ! empty( $size ) ? sprintf( 'size="%s"', esc_attr( $size ) ) : '';
-		printf( '<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s/>', esc_attr( $type ), esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $current ), esc_attr( $size ), esc_attr( $placeholder ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
+		printf(
+			'<input type="%1$s" id="%2$s" name="%3$s" value="%4$s" %5$s placeholder="%6$s" %7$s/>',
+			esc_attr( $type ),
+			esc_attr( $id ),
+			esc_attr( $setting_name ),
+			esc_attr( $current ),
+			esc_attr( $size ),
+			esc_attr( $placeholder ),
+			! empty( $disabled ) ? 'disabled="disabled"' : ''
+		);
+
+		// Output action button.
+		if ( ! empty( $action_button ) ) {
+			printf(
+				'<button type="button" %1$s %2$s %3$s>%4$s%5$s</button>',
+				! empty( $action_button['class'] ) ? sprintf( 'class="%s"', esc_attr( $action_button['class'] ) ) : '',
+				sprintf( 'id="%s"', esc_attr( $action_button['id'] ?? esc_attr( $id ) ) . '_action' ),
+				! empty( $action_button['title'] ) ? sprintf( 'title="%s"', esc_attr( $action_button['title'] ) ) : '',
+				esc_html( $action_button['text'] ),
+				! empty( $action_button['icon'] ) ? sprintf( '<span class="dashicons dashicons-%s"></span>', esc_attr( $action_button['icon'] ) ) : ''
+			);
+
+			echo '</div>';
+		}
 
 		// output description.
 		if ( ! empty( $description ) ) {
@@ -294,6 +321,10 @@ class SettingsCallbacks {
 	public function select( $args ) {
 		extract( $this->normalize_settings_args( $args ) );
 
+		if ( ! empty( $action_button ) ) {
+			echo '<div class="wpo-wcpdf-input-wrapper select">';
+		}
+
 		if ( ! empty( $enhanced_select ) ) {
 			if ( ! empty( $multiple ) ) {
 				$setting_name = "{$setting_name}[]";
@@ -325,6 +356,20 @@ class SettingsCallbacks {
 		}
 
 		echo '</select>';
+
+		// Output action button.
+		if ( ! empty( $action_button ) ) {
+			printf(
+				'<button type="button" %1$s %2$s %3$s>%4$s%5$s</button>',
+				! empty( $action_button['class'] ) ? sprintf( 'class="%s"', esc_attr( $action_button['class'] ) ) : '',
+				sprintf( 'id="%s"', esc_attr( $action_button['id'] ?? esc_attr( $id ) ) . '_action' ),
+				! empty( $action_button['title'] ) ? sprintf( 'title="%s"', esc_attr( $action_button['title'] ) ) : '',
+				esc_html( $action_button['text'] ),
+				! empty( $action_button['icon'] ) ? sprintf( '<span class="dashicons dashicons-%s"></span>', esc_attr( $action_button['icon'] ) ) : ''
+			);
+
+			echo '</div>';
+		}
 
 		if ( ! empty( $custom ) ) {
 			printf( '<div class="%1$s_custom custom">', esc_attr( $id ) );

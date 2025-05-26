@@ -89,6 +89,9 @@ class Settings {
 
 		// Apply categories to general settings.
 		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
+
+		// Sync address from WooCommerce address.
+		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_address_from_woo' ) );
 	}
 
 	public function menu() {
@@ -1325,6 +1328,66 @@ class Settings {
 		);
 
 		return $settings_categories;
+	}
+
+	/**
+	 * Syncs the address from WooCommerce settings.
+	 *
+	 * @return string|null
+	 */
+	public function sync_address_from_woo(): void {
+		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+
+		$address_field = ! empty( $_POST['address_field'] )
+			? sanitize_text_field( wp_unslash( $_POST['address_field'] ) )
+			: '';
+
+		if ( empty( $address_field ) ) {
+			wp_send_json_error( array( 'message' => 'Address field is required.' ) );
+			return;
+		}
+
+		// Map address fields to the option keys used by WooCommerce.
+		$address_map = array(
+			'shop_address_line_1'   => 'woocommerce_store_address',
+			'shop_address_line_2'   => 'woocommerce_store_address_2',
+			'shop_address_country'  => 'woocommerce_default_country',
+			'shop_address_state'    => 'woocommerce_default_country',
+			'shop_address_city'     => 'woocommerce_store_city',
+			'shop_address_postcode' => 'woocommerce_store_postcode',
+		);
+
+		// Validate the address field against the map.
+		if ( ! array_key_exists( $address_field, $address_map ) ) {
+			wp_send_json_error( array( 'message' => 'Invalid address field.' ) );
+			return;
+		}
+
+		$option_key = $address_map[ $address_field ];
+		$raw_value  = get_option( $option_key, '' );
+
+		// Return, if the value is not set.
+		if ( empty( $raw_value ) ) {
+			wp_send_json_error( array( 'message' => 'Address field is empty.' ) );
+			return;
+		}
+
+		// Parse the value based on the address field.
+		switch ( $address_field ) {
+			case 'shop_address_country':
+				$parsed = wc_format_country_state_string( $raw_value );
+				$value  = $parsed['country'] ?? null;
+				break;
+			case 'shop_address_state':
+				$parsed = wc_format_country_state_string( $raw_value );
+				$states = WC()->countries->get_states( $parsed['country'] ?? '' );
+				$value  = $states[ $parsed['state'] ] ?? $parsed['state'] ?? null;
+				break;
+			default:
+				$value = $raw_value;
+		}
+
+		wp_send_json_success( array( 'value' => $value ) );
 	}
 
 }
