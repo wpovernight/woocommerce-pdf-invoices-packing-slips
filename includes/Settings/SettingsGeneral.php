@@ -266,7 +266,9 @@ class SettingsGeneral {
 					'option_name'  => $option_name,
 					'id'           => 'shop_address_state',
 					'translatable' => true,
-					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => 
+						__( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
+						__( 'This field is ignored in the address format for countries that do not support states, such as the Netherlands, Portugal, Sweden, Finland, and Norway.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
