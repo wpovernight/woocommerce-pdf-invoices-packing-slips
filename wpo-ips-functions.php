@@ -1525,8 +1525,12 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 	$states     = WC()->countries->get_states( $country_code );
 
 	// Reverse lookup: get state code from name, fallback to state name if not found
-	$state_code = array_search( $state_name, $states, true );
-	if ( false === $state_code ) {
+	if ( is_array( $states ) ) {
+		$state_code = array_search( $state_name, $states, true );
+		if ( false === $state_code ) {
+			$state_code = $state_name;
+		}
+	} else {
 		$state_code = $state_name;
 	}
 
