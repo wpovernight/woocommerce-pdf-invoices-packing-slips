@@ -107,6 +107,11 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 4.5.2 (2025-05-27) =
+- Tweak: Suppress log entries for missing font files that are expected and not required
+- Fix: Restore `wpo_wcpdf_shop_address` hook for compatibility
+- Fix: Missing support for placeholders like `{city_upper}` in shop address formatting
+
 = 4.5.1 (2025-05-26) =
 - Fix: Shop address not shown in documents when historical settings are enabled
 - Fix: Validation issues flagged by WP Plugin Check
