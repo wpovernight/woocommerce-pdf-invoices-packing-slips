@@ -1467,11 +1467,11 @@ abstract class OrderDocument {
 			),
 			'additional' => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
-
+		
 		return wpo_wcpdf_format_country_address( $country_code, $address );
 	}
 	public function shop_address() {
-		echo esc_html( $this->get_shop_address() );
+		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
 	}
 
 	/**
