@@ -1521,18 +1521,30 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 	// Set default values for address fields if not provided.
 	$address['country_code'] = $address['country_code'] ?? $country_code;
 
-	// Replace placeholder with $address values, and remove empty placeholders.
+	$state_name = $address['state'] ?? '';
+	$states     = WC()->countries->get_states( $country_code );
+
+	// Reverse lookup: get state code from name, fallback to state name if not found
+	$state_code = array_search( $state_name, $states, true );
+	if ( false === $state_code ) {
+		$state_code = $state_name;
+	}
+
+	// Replace placeholder with $address values and derived values
 	$formatted_address = preg_replace_callback(
 		'/\{([a-zA-Z0-9_]+)}/',
-		function ( $matches ) use ( $address ) {
+		function ( $matches ) use ( $address, $state_name, $state_code ) {
 			$placeholder = $matches[1];
 
-			// Handle derived/uppercase placeholders
 			switch ( $placeholder ) {
+				case 'state':
+					return $state_name;
+				case 'state_code':
+					return strtoupper( $state_code );
+				case 'state_upper':
+					return strtoupper( $state_name );
 				case 'city_upper':
 					return strtoupper( $address['city'] ?? '' );
-				case 'state_upper':
-					return strtoupper( $address['state'] ?? '' );
 				case 'last_name_upper':
 					return strtoupper( $address['last_name'] ?? '' );
 				case 'postcode_upper':
@@ -1540,7 +1552,9 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 				default:
 					return $address[ $placeholder ] ?? '';
 			}
-		}, $address_format );
+		},
+		$address_format
+	);
 
 	// Normalize commas and remove extra line breaks.
 	$formatted_address = preg_replace(
@@ -1564,7 +1578,7 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 	// Convert to HTML line breaks.
 	$formatted_address = nl2br( ltrim( $formatted_address, "\r\n" ) );
 
-	// Remove any newlines.
+	// Remove any new lines.
 	$formatted_address = str_replace( "\n", '', $formatted_address );
 
 	return esc_html( $formatted_address );
