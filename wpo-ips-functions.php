@@ -1524,8 +1524,22 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 	// Replace placeholder with $address values, and remove empty placeholders.
 	$formatted_address = preg_replace_callback(
 		'/\{([a-zA-Z0-9_]+)}/',
-		function ( $matches ) use ( $country_code, $address ) {
-			return $address[ $matches[1] ] ?? '';
+		function ( $matches ) use ( $address ) {
+			$placeholder = $matches[1];
+
+			// Handle derived/uppercase placeholders
+			switch ( $placeholder ) {
+				case 'city_upper':
+					return strtoupper( $address['city'] ?? '' );
+				case 'state_upper':
+					return strtoupper( $address['state'] ?? '' );
+				case 'last_name_upper':
+					return strtoupper( $address['last_name'] ?? '' );
+				case 'postcode_upper':
+					return strtoupper( $address['postcode'] ?? '' );
+				default:
+					return $address[ $placeholder ] ?? '';
+			}
 		}, $address_format );
 
 	// Normalize commas and remove extra line breaks.
