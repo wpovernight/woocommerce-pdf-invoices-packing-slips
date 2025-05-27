@@ -131,7 +131,10 @@ class FontSynchronizer {
 
 				if ( WPO_WCPDF()->file_system->is_readable( $file ) ) {
 					$local_filename = $destination . basename( $file );
-					copy( $file, $local_filename );
+					
+					if ( ! copy( $file, $local_filename ) ) {
+						wcpdf_log_error( sprintf( 'Failed to copy font file: %s to %s', $file, $local_filename ) );
+					}
 				} else {
 					continue;
 				}
