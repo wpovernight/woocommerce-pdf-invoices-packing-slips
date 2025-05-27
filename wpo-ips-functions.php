@@ -1520,42 +1520,33 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 
 	// Set default values for address fields if not provided.
 	$address['country_code'] = $address['country_code'] ?? $country_code;
+	$address['state']        = $address['state'] ?? '';
 
-	$state_name = $address['state'] ?? '';
-	$states     = WC()->countries->get_states( $country_code );
+	// Get states for country
+	$states = WC()->countries->get_states( $country_code );
 
 	// Reverse lookup: get state code from name, fallback to state name if not found
 	if ( is_array( $states ) ) {
-		$state_code = array_search( $state_name, $states, true );
+		$state_code = array_search( $address['state'], $states, true );
 		if ( false === $state_code ) {
-			$state_code = $state_name;
+			$state_code = $address['state'];
 		}
 	} else {
-		$state_code = $state_name;
+		$state_code = $address['state'];
 	}
 
-	// Replace placeholder with $address values and derived values
+	// Add derived fields to the address array
+	$address['state_code']      = strtoupper( $state_code );
+	$address['state_upper']     = strtoupper( $address['state'] );
+	$address['city_upper']      = strtoupper( $address['city'] ?? '' );
+	$address['last_name_upper'] = strtoupper( $address['last_name'] ?? '' );
+	$address['postcode_upper']  = strtoupper( $address['postcode'] ?? '' );
+
+	// Replace placeholders
 	$formatted_address = preg_replace_callback(
 		'/\{([a-zA-Z0-9_]+)}/',
-		function ( $matches ) use ( $address, $state_name, $state_code ) {
-			$placeholder = $matches[1];
-
-			switch ( $placeholder ) {
-				case 'state':
-					return $state_name;
-				case 'state_code':
-					return strtoupper( $state_code );
-				case 'state_upper':
-					return strtoupper( $state_name );
-				case 'city_upper':
-					return strtoupper( $address['city'] ?? '' );
-				case 'last_name_upper':
-					return strtoupper( $address['last_name'] ?? '' );
-				case 'postcode_upper':
-					return strtoupper( $address['postcode'] ?? '' );
-				default:
-					return $address[ $placeholder ] ?? '';
-			}
+		function ( $matches ) use ( $address ) {
+			return $address[ $matches[1] ] ?? '';
 		},
 		$address_format
 	);
@@ -1563,9 +1554,9 @@ function wpo_wcpdf_format_country_address( string $country_code, array $address 
 	// Normalize commas and remove extra line breaks.
 	$formatted_address = preg_replace(
 		array(
-			'/,\s*,+/',      // Remove consecutive commas
-			'/,\s*$/',       // Remove trailing commas
-			'/\n\s*\n/'      // Remove empty lines
+			'/,\s*,+/', // Remove consecutive commas
+			'/,\s*$/',  // Remove trailing commas
+			'/\n\s*\n/' // Remove empty lines
 		),
 		array( ',', '', "\n" ),
 		$formatted_address
