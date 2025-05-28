@@ -944,8 +944,15 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * Return the order totals listing
 	 */
 	public function get_woocommerce_totals() {
-		// Clear cached refunds to avoid corrupted data issues
-		if ( class_exists( 'WC_Cache_Helper' ) && wp_using_ext_object_cache() ) {
+		/**
+		 * Clear cached refunds to avoid corrupted data issues caused by incorrect object caching.
+		 * This issue seems related to the Object Cache Pro plugin caching refund IDs instead of objects.
+		 */
+		if (
+			class_exists( 'WC_Cache_Helper' ) &&
+			wp_using_ext_object_cache() &&
+			class_exists( '\RedisCachePro\Plugin' ) // Object Cache Pro plugin
+		) {
 			wp_cache_delete(
 				\WC_Cache_Helper::get_cache_prefix( 'orders' ) . 'refunds' . $this->order->get_id(),
 				'orders'
