@@ -944,6 +944,14 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * Return the order totals listing
 	 */
 	public function get_woocommerce_totals() {
+		// Clear cached refunds to avoid corrupted data issues
+		if ( class_exists( 'WC_Cache_Helper' ) && wp_using_ext_object_cache() ) {
+			wp_cache_delete(
+				\WC_Cache_Helper::get_cache_prefix( 'orders' ) . 'refunds' . $this->order->get_id(),
+				'orders'
+			);
+		}
+		
 		// get totals and remove the semicolon
 		$totals = apply_filters( 'wpo_wcpdf_raw_order_totals', $this->order->get_order_item_totals(), $this->order );
 
