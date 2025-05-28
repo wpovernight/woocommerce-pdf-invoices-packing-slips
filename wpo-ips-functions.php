@@ -1492,6 +1492,27 @@ function wpo_wcpdf_get_country_name_from_code( string $country_code ): string {
 }
 
 /**
+ * Get the state name from state code and country code.
+ *
+ * @param string $state_code
+ * @param string $country_code
+ *
+ * @return string State name or empty string if not found.
+ */
+function wpo_wcpdf_get_state_name_from_code( string $state_code, string $country_code ): string {
+	$state_code   = strtoupper( trim( $state_code ) );
+	$country_code = strtoupper( trim( $country_code ) );
+	$state_name   = $state_code;
+	$states       = WC()->countries->get_states( $country_code );
+	
+	if ( ! empty( $state_code ) && is_array( $states ) && isset( $states[ $state_code ] ) ) {
+		$state_name = $states[ $state_code ];
+	}
+	
+	return $state_name ?? '';
+}
+
+/**
  * Get the address format for a given country.
  *
  * @param string $country_code Country code, like the NL.
@@ -1508,39 +1529,25 @@ function wpo_wcpdf_get_address_format_for_country( string $country_code ): strin
 }
 
 /**
- * Get the formatted address for a given country code.
+ * Get the formatted address.
  *
- * @param string $country_code
  * @param array $address
  *
  * @return string
  */
-function wpo_wcpdf_format_country_address( string $country_code, array $address ): string {
-	$address_format = wpo_wcpdf_get_address_format_for_country( $country_code );
-
-	// Set default values for address fields if not provided.
-	$address['country_code'] = $address['country_code'] ?? $country_code;
-	$address['state']        = $address['state'] ?? '';
-
-	// Get states for country
-	$states = WC()->countries->get_states( $country_code );
-
-	// Reverse lookup: get state code from name, fallback to state name if not found
-	if ( is_array( $states ) ) {
-		$state_code = array_search( $address['state'], $states, true );
-		if ( false === $state_code ) {
-			$state_code = $address['state'];
-		}
-	} else {
-		$state_code = $address['state'];
-	}
-
-	// Add derived fields to the address array
-	$address['state_code']      = strtoupper( $state_code );
+function wpo_wcpdf_format_address( array $address ): string {
+	// Set default values for missing address fields.
+	$address['country_code']    = strtoupper( $address['country_code'] ?? '' );
+	$address['state_code']      = strtoupper( $address['state_code'] ?? '' );
+	$address['country']         = wpo_wcpdf_get_country_name_from_code( $address['country_code'] );
+	$address['state']           = wpo_wcpdf_get_state_name_from_code( $address['state_code'], $address['country_code'] );
 	$address['state_upper']     = strtoupper( $address['state'] );
 	$address['city_upper']      = strtoupper( $address['city'] ?? '' );
 	$address['last_name_upper'] = strtoupper( $address['last_name'] ?? '' );
 	$address['postcode_upper']  = strtoupper( $address['postcode'] ?? '' );
+	
+	// Get the country address format
+	$address_format = wpo_wcpdf_get_address_format_for_country( $address['country_code'] );
 
 	// Replace placeholders
 	$formatted_address = preg_replace_callback(

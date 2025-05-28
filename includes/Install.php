@@ -614,6 +614,48 @@ class Install {
 				update_option( 'wpo_wcpdf_settings_general', $general_settings );
 			}
 		}
+		
+		// 4.5.3-beta.1: migrate shop address state value.
+		if ( version_compare( $installed_version, '4.5.3-beta.1', '<' ) ) {
+			$general_settings  = get_option( 'wpo_wcpdf_settings_general', array() );
+			$states_setting    = $general_settings['shop_address_state'] ?? null;
+			$countries_setting = $general_settings['shop_address_country'] ?? null;
+
+			// Normalize both settings into arrays with locale keys
+			$states_by_locale    = is_array( $states_setting )    ? $states_setting    : array( 'default' => $states_setting );
+			$countries_by_locale = is_array( $countries_setting ) ? $countries_setting : array( 'default' => $countries_setting );
+
+			// Loop through states and try to match them with the country codes
+			$new_states_by_locale = array();
+			foreach ( $states_by_locale as $locale => $state_name ) {
+				$country_code = $countries_by_locale[ $locale ] ?? $countries_by_locale['default'] ?? '';
+				$country_code = strtoupper( sanitize_text_field( trim( $country_code ) ) );
+				$state_name   = sanitize_text_field( trim( $state_name ) );
+
+				if ( empty( $country_code ) || empty( $state_name ) ) {
+					continue;
+				}
+
+				$states = \WC()->countries->get_states( $country_code );
+
+				if ( is_array( $states ) ) {
+					$state_code = array_search( $state_name, $states, true );
+
+					// If no match found, keep original value
+					$new_states_by_locale[ $locale ] = strtoupper(
+						$state_code !== false ? $state_code : $state_name
+					);
+				} else {
+					$new_states_by_locale[ $locale ] = strtoupper( $state_name );
+				}
+			}
+
+			// Save only if we updated something
+			if ( ! empty( $new_states_by_locale ) ) {
+				$general_settings['shop_address_state'] = $new_states_by_locale;
+				update_option( 'wpo_wcpdf_settings_general', $general_settings );
+			}
+		}
 
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );

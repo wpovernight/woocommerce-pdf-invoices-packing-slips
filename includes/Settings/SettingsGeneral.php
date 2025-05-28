@@ -24,6 +24,7 @@ class SettingsGeneral {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+		add_action( 'wp_ajax_wcpdf_get_country_states', array( $this, 'get_shop_country_states' ) );
 
 		// Display an admin notice if shop address fields are empty.
 		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
@@ -49,7 +50,7 @@ class SettingsGeneral {
 		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
 		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
-
+		
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -260,15 +261,14 @@ class SettingsGeneral {
 				'type'     => 'setting',
 				'id'       => 'shop_address_state',
 				'title'    => __( 'Shop State', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'text_input',
+				'callback' => 'select',
 				'section'  => 'general_settings',
 				'args'     => array(
 					'option_name'  => $option_name,
+					'options'      => $this->get_shop_country_states( strtoupper( $this->get_general_setting( 'shop_address_country' ) ), false ),
 					'id'           => 'shop_address_state',
 					'translatable' => true,
-					'description'  => 
-						__( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
-						__( 'This field is ignored in the address format for countries that do not support states, such as the Netherlands, Portugal, Sweden, Finland, and Norway.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -606,6 +606,71 @@ class SettingsGeneral {
 			<?php
 		}
 
+	}
+	
+	/**
+	 * Get the states for a given country code.
+	 * 
+	 * @param string|null $country_code The country code to get states for. If null, it will try to get it from the POST request.
+	 * @param bool $return_json Whether to return the states as a JSON response or not.
+	 * @return array|void Returns an array of states or sends a JSON response.
+	 */
+	public function get_shop_country_states( ?string $country_code = null, bool $return_json = true ) {
+		$states = array();
+		
+		if ( empty( $country_code ) ) {
+			$request = stripslashes_deep( $_POST );
+			
+			if ( ! empty( $request['country'] ) ) {
+				$country_code = sanitize_text_field( $request['country'] );
+			}
+		}
+		
+		if ( function_exists( 'WC' ) && ! empty( $country_code ) ) {
+			$country_code = strtoupper( $country_code );
+			$states       = \WC()->countries->get_states( $country_code );
+		}
+		
+		if ( $return_json ) {
+			$selected = strtoupper( $this->get_general_setting( 'shop_address_state' ) );
+			wp_send_json_success(
+				array(
+					'states'   => $states ?: array(),
+					'selected' => $selected ?: '',
+				)
+			);	
+		}
+		
+		return $states;
+	}
+	
+	/**
+	 * Get a general setting key value
+	 *
+	 * @param string $key The key of the setting to retrieve.
+	 * @return string The value of the setting.
+	 */
+	private function get_general_setting( string $key ): string {
+		if ( empty( $key ) ) {
+			return '';
+		}
+		
+		$general_settings = get_option( $this->option_name, array() );
+		$country_code     = '';
+
+		if ( ! empty( $general_settings[ $key ] ) ) {
+			$setting = $general_settings[ $key ];
+
+			if ( is_array( $setting ) ) {
+				$country_code = array_key_exists( 'default', $setting )
+					? $setting['default']
+					: reset( $setting );
+			} else {
+				$country_code = $setting;
+			}
+		}
+
+		return wptexturize( trim( $country_code ) );
 	}
 
 }
