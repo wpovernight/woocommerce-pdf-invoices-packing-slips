@@ -615,8 +615,8 @@ class Install {
 			}
 		}
 		
-		// 4.5.3-beta.1: migrate shop address state value.
-		if ( version_compare( $installed_version, '4.5.3-beta.1', '<' ) ) {
+		// 4.5.3-pr1195.1: migrate shop address state value.
+		if ( version_compare( $installed_version, '4.5.3-pr1195.1', '<' ) ) {
 			$general_settings  = get_option( 'wpo_wcpdf_settings_general', array() );
 			$states_setting    = $general_settings['shop_address_state'] ?? null;
 			$countries_setting = $general_settings['shop_address_country'] ?? null;
