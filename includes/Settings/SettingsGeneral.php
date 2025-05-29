@@ -214,7 +214,7 @@ class SettingsGeneral {
 					'option_name'  => $option_name,
 					'id'           => 'shop_phone_number',
 					'translatable' => true,
-					'description'  => __( 'Mandatory for certain UBL formats.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => __( 'The phone number for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
