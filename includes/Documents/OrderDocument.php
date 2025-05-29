@@ -378,9 +378,9 @@ abstract class OrderDocument {
 		$non_historical_settings = $this->get_non_historical_settings();
 
 		if ( in_array( $key, $non_historical_settings ) && isset( $latest_settings ) ) {
-			$setting = isset( $latest_settings[$key] ) ? $latest_settings[$key] : $default;
+			$setting = isset( $latest_settings[ $key ] ) ? $latest_settings[ $key ] : $default;
 		} else {
-			$setting = isset( $settings[$key] ) ? $settings[$key] : $default;
+			$setting = isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
 		}
 
 		return $setting;
