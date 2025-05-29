@@ -299,7 +299,7 @@ class TaxesSettings {
 		
 		$extra = apply_filters( 'wpo_wcpdf_ubl_tax_schemes', array() );
 
-		return array_merge( $defaults, $extra );
+		return $extra + $defaults;
 	}
 
 	/**
@@ -322,7 +322,7 @@ class TaxesSettings {
 		
 		$extra = apply_filters( 'wpo_wcpdf_ubl_tax_categories', array() );
 
-		return array_merge( $defaults, $extra );
+		return $extra + $defaults;
 	}
 	
 	/**
@@ -426,7 +426,7 @@ class TaxesSettings {
 		
 		$extra = apply_filters( 'wpo_wcpdf_ubl_tax_reasons', array() );
 
-		return array_merge( $defaults, $extra );
+		return $extra + $defaults;
 	}
 	
 	/**
@@ -485,7 +485,7 @@ class TaxesSettings {
 		
 		$extra = apply_filters( 'wpo_wcpdf_ubl_tax_remarks', array() );
 
-		return array_merge( $defaults, $extra );
+		return $extra + $defaults;
 	}
 	
 	/**
