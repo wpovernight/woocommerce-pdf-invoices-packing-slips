@@ -643,10 +643,10 @@ class Install {
 
 					// If no match found, keep original value
 					$new_states_by_locale[ $locale ] = strtoupper(
-						$state_code !== false ? $state_code : $state_name
+						$state_code !== false ? $state_code : ''
 					);
 				} else {
-					$new_states_by_locale[ $locale ] = strtoupper( $state_name );
+					$new_states_by_locale[ $locale ] = '';
 				}
 			}
 
