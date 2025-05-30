@@ -1546,6 +1546,9 @@ function wpo_wcpdf_format_address( array $address ): string {
 	$address['last_name_upper'] = strtoupper( $address['last_name'] ?? '' );
 	$address['postcode_upper']  = strtoupper( $address['postcode'] ?? '' );
 	
+	// Filter the address before formatting.
+	$address = apply_filters( 'wpo_wcpdf_format_address', $address );
+	
 	// Get the country address format
 	$address_format = wpo_wcpdf_get_address_format_for_country( $address['country_code'] );
 
