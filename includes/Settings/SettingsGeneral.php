@@ -569,7 +569,6 @@ class SettingsGeneral {
 		$languages_data   = wpo_wcpdf_get_multilingual_languages();
 		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
 
-
 		foreach ( $languages as $language ) {
 			$line_1   = $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '';
 			$country  = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
