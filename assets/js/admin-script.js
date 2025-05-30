@@ -340,16 +340,19 @@ jQuery( function( $ ) {
 	// Check for settings change
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea', settingsChanged );
 	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
-		if ( ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
+		if ( 'shop_address_country' === event.target.id || ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
 			settingsChanged( event );
 		}
 	});
 	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
-
+	
 	function settingsChanged( event, previewDelay ) {
-
+		if ( 'shop_address_country' === event.target.id ) {
+			shopCountryChanged( event );
+		}
+		
 		// Show secondary save button
 		showSaveBtn();
 
@@ -362,7 +365,7 @@ jQuery( function( $ ) {
 				return;
 			}
 
-			if ( jQuery.inArray( event.type, ['keyup', 'paste'] ) !== -1 ) {
+			if ( $.inArray( event.type, ['keyup', 'paste'] ) !== -1 ) {
 				if ( $element.is( 'input[type="checkbox"], select' ) ) {
 					return;
 				} else {
@@ -372,6 +375,71 @@ jQuery( function( $ ) {
 
 			triggerPreview( previewDelay );
 		}
+	}
+	
+	function shopCountryChanged( event ) {
+		const $country        = $( event.target );
+		const selectedCountry = $country.val();
+		const $state          = $country.closest( 'form' ).find( '#shop_address_state' );
+
+		// Clear previous states
+		$state.empty().prop( 'disabled', true );
+
+		// Temporary loading option
+		$state.append(
+			$( '<option>', {
+				value: '',
+				text: wpo_wcpdf_admin.shop_country_changed_messages.loading
+			} )
+		);
+
+		$.ajax( {
+			url: wpo_wcpdf_admin.ajaxurl,
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				action: 'wcpdf_get_country_states',
+				country: selectedCountry
+			},
+			success: function( response ) {
+				$state.empty();
+
+				const states   = response.data?.states;
+				const selected = response.data?.selected;
+
+				if ( response.success && states && Object.keys( states ).length > 0 ) {
+					$.each( states, function( code, name ) {
+						$state.append(
+							$( '<option>', {
+								value: code,
+								text: name,
+								selected: code === selected
+							} )
+						);
+					} );
+					$state.prop( 'disabled', false );
+				} else {
+					$state.append(
+						$( '<option>', {
+							value: '',
+							text: wpo_wcpdf_admin.shop_country_changed_messages.empty
+						} )
+					);
+				}
+				
+				triggerPreview( 0 );
+			},
+			error: function() {
+				$state.empty().append(
+					$( '<option>', {
+						value: '',
+						text: wpo_wcpdf_admin.shop_country_changed_messages.error
+					} )
+				);
+				
+				triggerPreview( 0 );
+			}
+		} );
 	}
 
 	function showSaveBtn( event ) {
