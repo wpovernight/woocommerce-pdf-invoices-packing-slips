@@ -631,12 +631,13 @@ class SettingsGeneral {
 	}
 	
 	/**
-	 * Get a general setting key value
+	 * Get a general setting key value, optionally using a locale-specific sub-key.
 	 *
-	 * @param string $key The key of the setting to retrieve.
+	 * @param string $key     The key of the setting to retrieve.
+	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
 	 * @return string The value of the setting.
 	 */
-	private function get_setting( string $key ): string {
+	private function get_setting( string $key, string $locale = '' ): string {
 		if ( empty( $key ) ) {
 			return '';
 		}
@@ -648,9 +649,13 @@ class SettingsGeneral {
 			$setting = $general_settings[ $key ];
 
 			if ( is_array( $setting ) ) {
-				$setting_text = array_key_exists( 'default', $setting )
-					? $setting['default']
-					: reset( $setting );
+				if ( ! empty( $locale ) && array_key_exists( $locale, $setting ) ) {
+					$setting_text = $setting[ $locale ];
+				} elseif ( array_key_exists( 'default', $setting ) ) {
+					$setting_text = $setting['default'];
+				} else {
+					$setting_text = reset( $setting );
+				}
 			} else {
 				$setting_text = $setting;
 			}
