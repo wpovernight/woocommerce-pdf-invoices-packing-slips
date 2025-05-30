@@ -145,6 +145,7 @@ class Assets {
 				'wpo_wcpdf_admin',
 				array(
 					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'nonce'                     => wp_create_nonce( 'wpo_wcpdf_admin_nonce' ),
 					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
 					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.min.js?ver=' . $pdfjs_version, // taken from https://cdnjs.com/libraries/pdf.js
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
