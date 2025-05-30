@@ -564,21 +564,26 @@ class SettingsGeneral {
 			}
 		}
 
-		$display_notice = false;
-		$languages      = wpo_wcpdf_get_multilingual_languages()
-			? array_keys( wpo_wcpdf_get_multilingual_languages() )
-			: array( 'default' );
+		$general_settings = WPO_WCPDF()->settings->general;
+		$display_notice   = false;
+		$languages_data   = wpo_wcpdf_get_multilingual_languages();
+		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
+
 
 		foreach ( $languages as $language ) {
+			$line_1   = $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '';
+			$country  = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
+			$states   = wpo_wcpdf_get_country_states( $country );
+			$state    = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
+			$city     = $general_settings->get_setting( 'shop_address_city', $language ) ?? '';
+			$postcode = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
+			
 			if (
-				! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional'][ $language ] ) &&
-				(
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_country'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_state'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_city'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode'][ $language ] )
-				)
+				empty( $line_1 )   ||
+				empty( $country )  ||
+				empty( $state )    ||
+				empty( $city )     ||
+				empty( $postcode )
 			) {
 				$display_notice = true;
 				break;
