@@ -265,7 +265,7 @@ class SettingsGeneral {
 				'section'  => 'general_settings',
 				'args'     => array(
 					'option_name'  => $option_name,
-					'options'      => wpo_wcpdf_get_country_states( strtoupper( $this->get_setting( 'shop_address_country' ) ) ),
+					'options'      => wpo_wcpdf_get_country_states( strtoupper( trim( $this->get_setting( 'shop_address_country' ) ) ) ),
 					'id'           => 'shop_address_state',
 					'translatable' => true,
 					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
