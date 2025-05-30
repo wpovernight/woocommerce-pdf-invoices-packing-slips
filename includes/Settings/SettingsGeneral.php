@@ -50,7 +50,7 @@ class SettingsGeneral {
 		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
 		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
-		
+
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -265,7 +265,7 @@ class SettingsGeneral {
 				'section'  => 'general_settings',
 				'args'     => array(
 					'option_name'  => $option_name,
-					'options'      => wpo_wcpdf_get_country_states( strtoupper( trim( $this->get_setting( 'shop_address_country' ) ) ) ),
+					'options'      => wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) ),
 					'id'           => 'shop_address_state',
 					'translatable' => true,
 					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -607,21 +607,21 @@ class SettingsGeneral {
 		}
 
 	}
-	
+
 	/**
 	 * Get the states for a given country code via AJAX.
 	 */
 	public function ajax_get_shop_country_states() {
 		$request = stripslashes_deep( $_POST );
-			
+
 		if ( empty( $request['country'] ) ) {
 			wp_send_json_error( array( 'message' => __( 'No country code provided.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
-		
+
 		$country_code = sanitize_text_field( $request['country'] );
 		$states       = wpo_wcpdf_get_country_states( $country_code );
 		$selected     = strtoupper( trim( $this->get_setting( 'shop_address_state' ) ) );
-		
+
 		wp_send_json_success(
 			array(
 				'states'   => $states ?: array(),
@@ -629,7 +629,7 @@ class SettingsGeneral {
 			)
 		);
 	}
-	
+
 	/**
 	 * Get a general setting key value, optionally using a locale-specific sub-key.
 	 *
@@ -641,7 +641,7 @@ class SettingsGeneral {
 		if ( empty( $key ) ) {
 			return '';
 		}
-		
+
 		$general_settings = get_option( $this->option_name, array() );
 		$setting_text     = '';
 

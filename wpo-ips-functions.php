@@ -1541,7 +1541,7 @@ function wpo_wcpdf_get_country_states( string $country_code ): array {
 		$states       = \WC()->countries->get_states( $country_code );
 	}
 	
-	return $states;
+	return $states ?: array();
 }
 
 /**
