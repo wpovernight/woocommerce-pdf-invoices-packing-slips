@@ -670,7 +670,12 @@ class SettingsGeneral {
 			}
 		}
 
-		return wptexturize( trim( $setting_text ) );
+		return apply_filters(
+			'wpo_wcpdf_get_general_setting_' . $key,
+			wptexturize( trim( $setting_text ) ),
+			$key,
+			$general_settings
+		);
 	}
 
 }
