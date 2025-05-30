@@ -1500,10 +1500,8 @@ function wpo_wcpdf_get_country_name_from_code( string $country_code ): string {
  * @return string State name or empty string if not found.
  */
 function wpo_wcpdf_get_state_name_from_code( string $state_code, string $country_code ): string {
-	$state_code   = strtoupper( trim( $state_code ) );
-	$country_code = strtoupper( trim( $country_code ) );
-	$state_name   = $state_code;
-	$states       = WC()->countries->get_states( $country_code );
+	$state_code = $state_name = strtoupper( trim( $state_code ) );
+	$states     = wpo_wcpdf_get_country_states( $country_code );
 	
 	if ( ! empty( $state_code ) && is_array( $states ) && isset( $states[ $state_code ] ) ) {
 		$state_name = $states[ $state_code ];
@@ -1519,13 +1517,31 @@ function wpo_wcpdf_get_state_name_from_code( string $state_code, string $country
  *
  * @return string
  */
-function wpo_wcpdf_get_address_format_for_country( string $country_code ): string {
+function wpo_wcpdf_get_country_address_format( string $country_code ): string {
 	$country_code    = strtoupper( trim( $country_code ) );
 	$address_formats = \WC()->countries->get_address_formats();
 
 	return ! empty( $country_code ) && ! empty( $address_formats[ $country_code ] )
 		? $address_formats[ $country_code ]
 		: $address_formats['default'];
+}
+
+/**
+ * Get the states for a given country code.
+ * 
+ * @param string $country_code
+ * 
+ * @return array
+ */
+function wpo_wcpdf_get_country_states( string $country_code ): array {
+	$states = array();
+	
+	if ( ! empty( $country_code ) ) {
+		$country_code = strtoupper( trim( $country_code ) );
+		$states       = \WC()->countries->get_states( $country_code );
+	}
+	
+	return $states;
 }
 
 /**
@@ -1550,7 +1566,7 @@ function wpo_wcpdf_format_address( array $address ): string {
 	$address = apply_filters( 'wpo_wcpdf_format_address', $address );
 	
 	// Get the country address format
-	$address_format = wpo_wcpdf_get_address_format_for_country( $address['country_code'] );
+	$address_format = wpo_wcpdf_get_country_address_format( $address['country_code'] );
 
 	// Replace placeholders
 	$formatted_address = preg_replace_callback(
