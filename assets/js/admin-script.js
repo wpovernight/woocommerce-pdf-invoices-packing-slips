@@ -348,9 +348,6 @@ jQuery( function( $ ) {
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
 	
-	// force page load trigger
-	$( '#wpo-wcpdf-settings #shop_address_country' ).trigger( 'change' );
-	
 	function settingsChanged( event, previewDelay ) {
 		if ( 'shop_address_country' === event.target.id ) {
 			shopCountryChanged( event );
