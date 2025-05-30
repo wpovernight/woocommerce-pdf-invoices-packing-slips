@@ -378,9 +378,9 @@ abstract class OrderDocument {
 		$non_historical_settings = $this->get_non_historical_settings();
 
 		if ( in_array( $key, $non_historical_settings ) && isset( $latest_settings ) ) {
-			$setting = isset( $latest_settings[$key] ) ? $latest_settings[$key] : $default;
+			$setting = isset( $latest_settings[ $key ] ) ? $latest_settings[ $key ] : $default;
 		} else {
-			$setting = isset( $settings[$key] ) ? $settings[$key] : $default;
+			$setting = isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
 		}
 
 		return $setting;
@@ -1441,30 +1441,34 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_address_additional' );
 	}
 	function shop_address_additional(): void {
-		echo esc_html( $this->get_shop_address_additional() );
+		echo wp_kses_post( $this->get_shop_address_additional() );
 	}
 
 	/**
 	 * Return/Show shop/company address if provided
 	 */
 	public function get_shop_address(): string {
-		$country_code = $this->get_settings_text( 'shop_address_country', '', false );
-		$address      = array(
-			'address_1'  => $this->get_settings_text( 'shop_address_line_1', '', false ),
-			'address_2'  => $this->get_settings_text( 'shop_address_line_2', '', false ),
-			'city'       => $this->get_settings_text( 'shop_address_city', '', false ),
-			'postcode'   => $this->get_settings_text( 'shop_address_postcode', '', false ),
-			'state'      => $this->get_settings_text( 'shop_address_state', '', false ),
-			'country'    => wpo_wcpdf_get_country_name_from_code(
-				$this->get_settings_text( 'shop_address_country', '', false )
-			),
-			'additional' => $this->get_settings_text( 'shop_address_additional', '', false ),
+		// Preserve legacy shop address, if it exists, when historical settings are enabled
+		$address = $this->get_settings_text( 'shop_address' );
+		if ( $this->use_historical_settings() && ! empty( $address ) ) {
+			return $address;
+		}
+
+		// Otherwise, build the address from individual fields
+		$address = array(
+			'address_1'    => $this->get_settings_text( 'shop_address_line_1', '', false ),
+			'address_2'    => $this->get_settings_text( 'shop_address_line_2', '', false ),
+			'city'         => $this->get_settings_text( 'shop_address_city', '', false ),
+			'postcode'     => $this->get_settings_text( 'shop_address_postcode', '', false ),
+			'state_code'   => $this->get_settings_text( 'shop_address_state', '', false ),
+			'country_code' => $this->get_settings_text( 'shop_address_country', '', false ),
+			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
 
-		return wpo_wcpdf_format_country_address( $country_code, $address );
+		return wpo_wcpdf_format_address( $address );
 	}
 	public function shop_address() {
-		echo esc_html( $this->get_shop_address() );
+		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
 	}
 
 	/**

@@ -372,7 +372,7 @@ class Semaphore {
 		} elseif ( function_exists( 'wcpdf_log_error' ) ) {
 			\wcpdf_log_error( $error_message, 'critical' );
 		} else {
-			error_log( $error_message );
+			error_log( $error_message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		}
 		
 		return false;
@@ -406,7 +406,7 @@ class Semaphore {
 			} elseif ( function_exists( 'wcpdf_log_error' ) ) {
 				\wcpdf_log_error( $error_message, 'critical' );
 			} else {
-				error_log( $error_message );
+				error_log( $error_message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 		}
 
@@ -428,7 +428,7 @@ class Semaphore {
 			} elseif ( function_exists( 'wcpdf_log_error' ) ) {
 				\wcpdf_log_error( $error_message, 'critical' );
 			} else {
-				error_log( $error_message );
+				error_log( $error_message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 		}
 	}
