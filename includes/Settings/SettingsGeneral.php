@@ -664,7 +664,7 @@ class SettingsGeneral {
 		}
 
 		return apply_filters(
-			'wpo_wcpdf_get_general_setting_' . $key,
+			'wpo_wcpdf_get_general_setting',
 			wptexturize( trim( $setting_text ) ),
 			$key,
 			$locale,
