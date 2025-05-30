@@ -115,7 +115,7 @@ class SettingsGeneral {
 					'description' => sprintf(
 						'%1$s<br><strong>%2$s</strong><br><a href="%3$s" target="_blank">%4$s</a>',
 						__( 'With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created.', 'woocommerce-pdf-invoices-packing-slips' ),
-						__( 'NOTE: invoice numbers and dates are not affected by this setting and will still be generated.', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Note: Invoice numbers and dates are not affected by this setting and will still be generated.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/show-pdf-documents-with-the-latest-settings/',
 						__( 'Learn more about test mode', 'woocommerce-pdf-invoices-packing-slips' )
 					),
