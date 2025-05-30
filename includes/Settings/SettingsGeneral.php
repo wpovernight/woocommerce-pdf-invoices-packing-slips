@@ -111,7 +111,6 @@ class SettingsGeneral {
 					'option_name' => $option_name,
 					'id'          => 'test_mode',
 					'description' => sprintf(
-						/* translators: %1$s: description, %2$s: note, %3$s: link, %4$s: link text */
 						'%1$s<br><strong>%2$s</strong><br><a href="%3$s" target="_blank">%4$s</a>',
 						__( 'With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created.', 'woocommerce-pdf-invoices-packing-slips' ),
 						__( 'Note: invoice numbers and dates are not affected by this setting and will still be generated.', 'woocommerce-pdf-invoices-packing-slips' ),
