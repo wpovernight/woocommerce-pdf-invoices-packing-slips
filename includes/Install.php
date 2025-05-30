@@ -620,6 +620,10 @@ class Install {
 			$general_settings  = get_option( 'wpo_wcpdf_settings_general', array() );
 			$states_setting    = $general_settings['shop_address_state'] ?? null;
 			$countries_setting = $general_settings['shop_address_country'] ?? null;
+			
+			if ( empty( $states_setting ) || empty( $countries_setting ) ) {
+				return; // Nothing to migrate
+			}
 
 			// Normalize both settings into arrays with locale keys
 			$states_by_locale    = is_array( $states_setting )    ? $states_setting    : array( 'default' => $states_setting );
