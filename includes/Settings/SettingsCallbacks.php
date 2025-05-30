@@ -308,7 +308,7 @@ class SettingsCallbacks {
 			$css = 'width:400px';
 			printf( '<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s %8$s>', esc_attr( $id ), esc_attr( $setting_name ), esc_attr( $placeholder ), esc_attr( $title ), esc_attr( $class ), esc_attr( $css ), esc_attr( $multiple ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
 		} else {
-			printf( '<select id="%1$s" name="%2$s">', esc_attr( $id ), esc_attr( $setting_name ) );
+			printf( '<select id="%1$s" name="%2$s" %3$s>', esc_attr( $id ), esc_attr( $setting_name ), ! empty( $disabled ) ? 'disabled="disabled"' : '' );
 		}
 
 		if ( ! empty( $options_callback ) ) {

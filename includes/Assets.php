@@ -186,7 +186,16 @@ class Assets {
 						),
 					),
 					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
-					'mysql_int_size_limit'      => __( 'The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'mysql_int_size_limit'      => sprintf(
+						/* translators: mysql int size */
+						__( 'The number should be smaller than %s. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>2147483647</code>'
+					),
+					'shop_country_changed_messages' => array(
+						'loading' => __( 'Loading', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
+						'error'   => __( 'Error loading', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				)
 			);
 
