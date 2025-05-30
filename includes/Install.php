@@ -656,6 +656,9 @@ class Install {
 					$general_settings['shop_address_state'] = $new_states_by_locale;
 					update_option( 'wpo_wcpdf_settings_general', $general_settings );
 				}
+				
+				// reset shop address notice option
+				delete_option( 'wpo_wcpdf_dismiss_shop_address_notice' );
 			}
 		}
 
