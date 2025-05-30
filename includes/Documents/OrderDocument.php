@@ -378,9 +378,9 @@ abstract class OrderDocument {
 		$non_historical_settings = $this->get_non_historical_settings();
 
 		if ( in_array( $key, $non_historical_settings ) && isset( $latest_settings ) ) {
-			$setting = isset( $latest_settings[$key] ) ? $latest_settings[$key] : $default;
+			$setting = isset( $latest_settings[ $key ] ) ? $latest_settings[ $key ] : $default;
 		} else {
-			$setting = isset( $settings[$key] ) ? $settings[$key] : $default;
+			$setting = isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
 		}
 
 		return $setting;
@@ -1455,20 +1455,17 @@ abstract class OrderDocument {
 		}
 
 		// Otherwise, build the address from individual fields
-		$country_code = $this->get_settings_text( 'shop_address_country', '', false );
-		$address      = array(
-			'address_1'  => $this->get_settings_text( 'shop_address_line_1', '', false ),
-			'address_2'  => $this->get_settings_text( 'shop_address_line_2', '', false ),
-			'city'       => $this->get_settings_text( 'shop_address_city', '', false ),
-			'postcode'   => $this->get_settings_text( 'shop_address_postcode', '', false ),
-			'state'      => $this->get_settings_text( 'shop_address_state', '', false ),
-			'country'    => wpo_wcpdf_get_country_name_from_code(
-				$this->get_settings_text( 'shop_address_country', '', false )
-			),
-			'additional' => $this->get_settings_text( 'shop_address_additional', '', false ),
+		$address = array(
+			'address_1'    => $this->get_settings_text( 'shop_address_line_1', '', false ),
+			'address_2'    => $this->get_settings_text( 'shop_address_line_2', '', false ),
+			'city'         => $this->get_settings_text( 'shop_address_city', '', false ),
+			'postcode'     => $this->get_settings_text( 'shop_address_postcode', '', false ),
+			'state_code'   => $this->get_settings_text( 'shop_address_state', '', false ),
+			'country_code' => $this->get_settings_text( 'shop_address_country', '', false ),
+			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
 
-		return wpo_wcpdf_format_country_address( $country_code, $address );
+		return wpo_wcpdf_format_address( $address );
 	}
 	public function shop_address() {
 		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
