@@ -656,21 +656,21 @@ class SettingsGeneral {
 		}
 		
 		$general_settings = get_option( $this->option_name, array() );
-		$country_code     = '';
+		$setting_text     = '';
 
 		if ( ! empty( $general_settings[ $key ] ) ) {
 			$setting = $general_settings[ $key ];
 
 			if ( is_array( $setting ) ) {
-				$country_code = array_key_exists( 'default', $setting )
+				$setting_text = array_key_exists( 'default', $setting )
 					? $setting['default']
 					: reset( $setting );
 			} else {
-				$country_code = $setting;
+				$setting_text = $setting;
 			}
 		}
 
-		return wptexturize( trim( $country_code ) );
+		return wptexturize( trim( $setting_text ) );
 	}
 
 }
