@@ -349,7 +349,7 @@ jQuery( function( $ ) {
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
 	
 	// force page load trigger
-	$( '#wpo-wcpdf-settings select' ).trigger( 'change' );
+	$( '#wpo-wcpdf-settings #shop_address_country' ).trigger( 'change' );
 	
 	function settingsChanged( event, previewDelay ) {
 		if ( 'shop_address_country' === event.target.id ) {
@@ -429,6 +429,8 @@ jQuery( function( $ ) {
 						} )
 					);
 				}
+				
+				triggerPreview( 0 );
 			},
 			error: function() {
 				$state.empty().append(
@@ -437,6 +439,8 @@ jQuery( function( $ ) {
 						text: wpo_wcpdf_admin.shop_country_changed_messages.error
 					} )
 				);
+				
+				triggerPreview( 0 );
 			}
 		} );
 	}
