@@ -1380,8 +1380,7 @@ class Settings {
 				break;
 			case 'shop_address_state':
 				$parsed = wc_format_country_state_string( $raw_value );
-				$states = WC()->countries->get_states( $parsed['country'] ?? '' );
-				$value  = $states[ $parsed['state'] ] ?? $parsed['state'] ?? null;
+				$value  = $parsed['state'] ?? null;
 				break;
 			default:
 				$value = $raw_value;

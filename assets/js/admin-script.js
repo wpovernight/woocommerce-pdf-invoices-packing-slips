@@ -347,12 +347,12 @@ jQuery( function( $ ) {
 	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
-	
+
 	function settingsChanged( event, previewDelay ) {
 		if ( 'shop_address_country' === event.target.id ) {
 			shopCountryChanged( event );
 		}
-		
+
 		// Show secondary save button
 		showSaveBtn();
 
@@ -376,14 +376,16 @@ jQuery( function( $ ) {
 			triggerPreview( previewDelay );
 		}
 	}
-	
+
 	function shopCountryChanged( event ) {
-		const $country        = $( event.target );
-		const selectedCountry = $country.val();
-		const $state          = $country.closest( 'form' ).find( '#shop_address_state' );
+		const $country           = $( event.target );
+		const selectedCountry    = $country.val();
+		const $state             = $country.closest( 'form' ).find( '#shop_address_state' );
+		const $state_sync_button = $country.closest( 'form' ).find( '#shop_address_state_action' );
 
 		// Clear previous states
 		$state.empty().prop( 'disabled', true );
+		$state_sync_button.prop( 'disabled', true );
 
 		// Temporary loading option
 		$state.append(
@@ -418,6 +420,7 @@ jQuery( function( $ ) {
 						);
 					} );
 					$state.prop( 'disabled', false );
+					$state_sync_button.prop( 'disabled', false );
 				} else {
 					$state.append(
 						$( '<option>', {
@@ -426,7 +429,7 @@ jQuery( function( $ ) {
 						} )
 					);
 				}
-				
+
 				triggerPreview( 0 );
 			},
 			error: function() {
@@ -436,7 +439,7 @@ jQuery( function( $ ) {
 						text: wpo_wcpdf_admin.shop_country_changed_messages.error
 					} )
 				);
-				
+
 				triggerPreview( 0 );
 			}
 		} );
@@ -736,6 +739,7 @@ jQuery( function( $ ) {
 
 	syncButtons.on( 'click', function( event ) {
 		event.preventDefault();
+
 		const $button = $( this );
 		const $icon   = $button.find( 'span.dashicons' );
 		let $field    = $button.closest( 'td' ).find( 'input' );
@@ -758,7 +762,8 @@ jQuery( function( $ ) {
 			success: function( response ) {
 				if ( response.success ) {
 					// Update the input value with the synced address.
-					$field.val( response.data.value ).trigger( 'paste' );
+					$field.val( response.data.value );
+					triggerPreview();
 				}
 			},
 			complete: function() {

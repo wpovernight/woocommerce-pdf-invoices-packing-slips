@@ -108,7 +108,7 @@ class SettingsCallbacks {
 		}
 
 		if ( ! empty( $action_button ) ) {
-			echo '<div class="wpo-wcpdf-input-wrapper input">';
+			echo '<div class="wpo-wcpdf-input-wrapper input ', esc_attr( $id ), '">';
 		}
 
 		$size = ! empty( $size ) ? sprintf( 'size="%s"', esc_attr( $size ) ) : '';
@@ -322,7 +322,7 @@ class SettingsCallbacks {
 		extract( $this->normalize_settings_args( $args ) );
 
 		if ( ! empty( $action_button ) ) {
-			echo '<div class="wpo-wcpdf-input-wrapper select">';
+			echo '<div class="wpo-wcpdf-input-wrapper select ', esc_attr( $id ), '">';
 		}
 
 		if ( ! empty( $enhanced_select ) ) {
