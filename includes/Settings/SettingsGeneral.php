@@ -265,7 +265,7 @@ class SettingsGeneral {
 				'section'  => 'general_settings',
 				'args'     => array(
 					'option_name'  => $option_name,
-					'options'      => $this->get_shop_country_states( strtoupper( $this->get_general_setting( 'shop_address_country' ) ), false ),
+					'options'      => $this->get_shop_country_states( strtoupper( $this->get_setting( 'shop_address_country' ) ), false ),
 					'id'           => 'shop_address_state',
 					'translatable' => true,
 					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -632,7 +632,7 @@ class SettingsGeneral {
 		}
 		
 		if ( $return_json ) {
-			$selected = strtoupper( $this->get_general_setting( 'shop_address_state' ) );
+			$selected = strtoupper( $this->get_setting( 'shop_address_state' ) );
 			wp_send_json_success(
 				array(
 					'states'   => $states ?: array(),
@@ -650,7 +650,7 @@ class SettingsGeneral {
 	 * @param string $key The key of the setting to retrieve.
 	 * @return string The value of the setting.
 	 */
-	private function get_general_setting( string $key ): string {
+	private function get_setting( string $key ): string {
 		if ( empty( $key ) ) {
 			return '';
 		}
