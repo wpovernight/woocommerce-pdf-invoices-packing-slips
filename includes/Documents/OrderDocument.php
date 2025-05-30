@@ -1441,7 +1441,7 @@ abstract class OrderDocument {
 		return $this->get_settings_text( 'shop_address_additional' );
 	}
 	function shop_address_additional(): void {
-		echo esc_html( $this->get_shop_address_additional() );
+		echo wp_kses_post( $this->get_shop_address_additional() );
 	}
 
 	/**
@@ -1453,7 +1453,7 @@ abstract class OrderDocument {
 		if ( $this->use_historical_settings() && ! empty( $address ) ) {
 			return $address;
 		}
-		
+
 		// Otherwise, build the address from individual fields
 		$address = array(
 			'address_1'    => $this->get_settings_text( 'shop_address_line_1', '', false ),
@@ -1464,7 +1464,7 @@ abstract class OrderDocument {
 			'country_code' => $this->get_settings_text( 'shop_address_country', '', false ),
 			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
-		
+
 		return wpo_wcpdf_format_address( $address );
 	}
 	public function shop_address() {

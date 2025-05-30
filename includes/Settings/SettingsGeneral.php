@@ -51,7 +51,7 @@ class SettingsGeneral {
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
 		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 		$states               = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
-			
+
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -582,7 +582,7 @@ class SettingsGeneral {
 			$state    = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
 			$city     = $general_settings->get_setting( 'shop_address_city', $language ) ?? '';
 			$postcode = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
-			
+
 			if (
 				empty( $line_1 ) ||
 				empty( $country ) ||
