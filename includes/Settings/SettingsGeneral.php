@@ -578,10 +578,10 @@ class SettingsGeneral {
 			$postcode = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
 			
 			if (
-				empty( $line_1 )   ||
-				empty( $country )  ||
-				empty( $state )    ||
-				empty( $city )     ||
+				empty( $line_1 ) ||
+				empty( $country ) ||
+				( ! empty( $states ) && empty( $state ) ) || // only require state if states exist
+				empty( $city ) ||
 				empty( $postcode )
 			) {
 				$display_notice = true;
