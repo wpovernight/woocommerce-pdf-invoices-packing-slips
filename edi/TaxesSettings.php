@@ -28,8 +28,8 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public function output(): void {
-		settings_fields( 'wpo_ips_settings_edi' );
-		do_settings_sections( 'wpo_ips_settings_edi' );
+		settings_fields( 'wpo_ips_edi_tax_settings' );
+		do_settings_sections( 'wpo_ips_edi_tax_settings' );
 		
 		echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 		echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
@@ -94,7 +94,7 @@ class TaxesSettings {
 	public function output_table_for_tax_class( string $slug ): void {
 		global $wpdb;
 		
-		$tax_settings = get_option( 'wpo_ips_settings_edi', array() );
+		$edi_tax_settings = get_option( 'wpo_ips_edi_tax_settings', array() );
 		
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
@@ -142,8 +142,8 @@ class TaxesSettings {
 									$result->tax_rate_id
 								)
 							);
-							$postcode        = array();
-							$city            = array();
+							$postcode = array();
+							$city     = array();
 							
 							foreach ( $locationResults as $locationResult ) {
 								if ( ! isset( $locationResult->location_type ) ) {
@@ -165,16 +165,16 @@ class TaxesSettings {
 							$postcode         = empty( $postcode ) ? '*' : implode( '; ', $postcode );
 							$city             = empty( $city ) ? '*' : implode( '; ', $city );
 							
-							$scheme           = isset( $tax_settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $tax_settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
-							$scheme_default   = isset( $tax_settings['class'][ $slug ]['scheme'] ) ? $tax_settings['class'][ $slug ]['scheme'] : 'default';
+							$scheme           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
+							$scheme_default   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] ) ? $edi_tax_settings['class'][ $slug ]['scheme'] : 'default';
 							$scheme_code      = ( 'default' === $scheme ) ? $scheme_default : $scheme;
 
-							$category         = isset( $tax_settings['rate'][ $result->tax_rate_id ]['category'] ) ? $tax_settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
-							$category_default = isset( $tax_settings['class'][ $slug ]['category'] ) ? $tax_settings['class'][ $slug ]['category'] : 'default';
+							$category         = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] ) ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
+							$category_default = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
 							$category_code    = ( 'default' === $category ) ? $category_default : $category;
 							
-							$reason           = isset( $tax_settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $tax_settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
-							$reason_default   = isset( $tax_settings['class'][ $slug ]['reason'] ) ? $tax_settings['class'][ $slug ]['reason'] : 'default';
+							$reason           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
+							$reason_default   = isset( $edi_tax_settings['class'][ $slug ]['reason'] ) ? $edi_tax_settings['class'][ $slug ]['reason'] : 'default';
 							$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
 							
 							echo '<tr>';
@@ -220,9 +220,9 @@ class TaxesSettings {
 				<tr>
 					<th colspan="5" style="text-align: right;"><?php esc_html_e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
 					<?php
-						$scheme   = isset( $tax_settings['class'][ $slug ]['scheme'] )   ? $tax_settings['class'][ $slug ]['scheme']   : 'default';
-						$category = isset( $tax_settings['class'][ $slug ]['category'] ) ? $tax_settings['class'][ $slug ]['category'] : 'default';
-						$reason   = isset( $tax_settings['class'][ $slug ]['reason'] )   ? $tax_settings['class'][ $slug ]['reason']   : 'default';
+						$scheme   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] )   ? $edi_tax_settings['class'][ $slug ]['scheme']   : 'default';
+						$category = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
+						$reason   = isset( $edi_tax_settings['class'][ $slug ]['reason'] )   ? $edi_tax_settings['class'][ $slug ]['reason']   : 'default';
 					?>
 					<th>
 						<?php
@@ -292,7 +292,7 @@ class TaxesSettings {
 				$options = array();
 		}
 
-		$select  = '<select name="wpo_ips_settings_edi[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '" style="width:100%; box-sizing:border-box;">';
+		$select  = '<select name="wpo_ips_edi_tax_settings[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '" style="width:100%; box-sizing:border-box;">';
 		
 		foreach ( $defaults as $key => $value ) {
 			if ( 'class' === $type && 'default' === $key ) {
@@ -518,9 +518,9 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public static function standard_update_notice(): void {
-		$tax_settings     = get_option( 'wpo_ips_settings_edi', array() );
-		$current_standard = $tax_settings['standard'] ?? null;
-		$current_version  = $tax_settings['standard_version'] ?? null;
+		$edi_tax_settings = get_option( 'wpo_ips_edi_tax_settings', array() );
+		$current_standard = $edi_tax_settings['standard'] ?? null;
+		$current_version  = $edi_tax_settings['standard_version'] ?? null;
 		$request          = stripslashes_deep( $_GET );
 
 		// Handle dismissal
@@ -569,17 +569,17 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public static function update_standard_version(): void {
-		$tax_settings = get_option( 'wpo_ips_settings_edi', array() );
+		$edi_tax_settings = get_option( 'wpo_ips_edi_tax_settings', array() );
 
 		if (
-			! isset( $tax_settings['standard'] ) ||
-			$tax_settings['standard'] !== self::$standard ||
-			! isset( $tax_settings['standard_version'] ) ||
-			version_compare( $tax_settings['standard_version'], self::$standard_version, '<' )
+			! isset( $edi_tax_settings['standard'] ) ||
+			$edi_tax_settings['standard'] !== self::$standard ||
+			! isset( $edi_tax_settings['standard_version'] ) ||
+			version_compare( $edi_tax_settings['standard_version'], self::$standard_version, '<' )
 		) {
-			$tax_settings['standard']          = self::$standard;
-			$tax_settings['standard_version']  = self::$standard_version;
-			update_option( 'wpo_ips_settings_edi', $tax_settings );
+			$edi_tax_settings['standard']         = self::$standard;
+			$edi_tax_settings['standard_version'] = self::$standard_version;
+			update_option( 'wpo_ips_edi_tax_settings', $edi_tax_settings );
 		}
 	}
 	

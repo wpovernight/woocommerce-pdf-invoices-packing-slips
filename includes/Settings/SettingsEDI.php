@@ -70,7 +70,7 @@ class SettingsEDI {
 	}
 
 	public function init_tax_settings() {
-		$page    = $option_group = $option_name = 'wpo_ips_settings_edi';
+		$page    = $option_group = $option_name = 'wpo_ips_edi_settings';
 		$section = 'edi';
 
 		$settings_fields = array(
@@ -155,7 +155,7 @@ class SettingsEDI {
 			$settings_fields = array_merge( $settings_fields, $settings_format );
 		}
 
-		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_ubl_taxes', $settings_fields, $page, $option_group, $option_name );
+		$settings_fields = apply_filters( 'wpo_ips_edi_settings', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 

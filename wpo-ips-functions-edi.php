@@ -37,14 +37,14 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 		return $result;
 	}
 
-	$tax_rate_class = '';
-	$edi_settings   = get_option( 'wpo_ips_settings_edi', array() );
+	$tax_rate_class   = '';
+	$edi_tax_settings = get_option( 'wpo_ips_edi_tax_settings', array() );
 
 	if ( ! is_null( $rate_id ) && class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
 		if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-			$result         = isset( $edi_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] ) ? $edi_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] : '';
+			$result         = isset( $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] ) ? $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] : '';
 			$tax_rate_class = $tax_rate->tax_rate_class;
 		}
 	}
@@ -54,7 +54,7 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 	}
 
 	if ( empty( $result ) || 'default' === $result ) {
-		$result = isset( $edi_settings['class'][ $tax_rate_class ][ $key ] ) ? $edi_settings['class'][ $tax_rate_class ][ $key ] : '';
+		$result = isset( $edi_tax_settings['class'][ $tax_rate_class ][ $key ] ) ? $edi_tax_settings['class'][ $tax_rate_class ][ $key ] : '';
 	}
 
 	// check if order is tax exempt
@@ -97,11 +97,11 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 					// store percentage in tax item meta
 					wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
 
-					$edi_settings = get_option( 'wpo_ips_settings_edi', array() );
-					$tax_fields   = array( 'category', 'scheme', 'reason' );
+					$edi_tax_settings = get_option( 'wpo_ips_edi_tax_settings', array() );
+					$tax_fields       = array( 'category', 'scheme', 'reason' );
 
 					foreach ( $tax_fields as $field ) {
-						$value = isset( $edi_settings['rate'][ $tax_rate->tax_rate_id ][ $field ] ) ? $edi_settings['rate'][ $tax_rate->tax_rate_id ][ $field ] : '';
+						$value = isset( $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $field ] ) ? $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $field ] : '';
 
 						if ( empty( $value ) || 'default' === $value ) {
 							$value = wpo_ips_edi_get_tax_data_from_fallback( $field, $tax_rate_id, $order );

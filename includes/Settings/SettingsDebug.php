@@ -352,8 +352,11 @@ class SettingsDebug {
 			case 'debug':
 				$settings = WPO_WCPDF()->settings->debug_settings;
 				break;
-			case 'ubl_taxes':
-				$settings = WPO_WCPDF()->settings->ubl_tax_settings;
+			case 'edi':
+				$settings = WPO_WCPDF()->settings->edi_settings;
+				break;
+			case 'edi_tax':
+				$settings = WPO_WCPDF()->settings->edi_tax_settings;
 				break;
 			default:
 				$settings = apply_filters( 'wpo_wcpdf_export_settings', $settings, $type );
@@ -426,8 +429,10 @@ class SettingsDebug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 
-		if ( in_array( $type, array( 'general', 'debug', 'ubl_taxes' ) ) ) {
+		if ( in_array( $type, array( 'general', 'debug' ) ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
+		} elseif ( in_array( $type, array( 'edi', 'edi_tax' ) ) ) {
+			$settings_option = "wpo_ips_{$type}_settings"
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
@@ -489,8 +494,11 @@ class SettingsDebug {
 			case 'debug':
 				$settings_option = 'wpo_wcpdf_settings_debug';
 				break;
-			case 'ubl_taxes':
-				$settings_option = 'wpo_ips_settings_edi';
+			case 'edi':
+				$settings_option = 'wpo_ips_edi_settings';
+				break;
+			case 'edi_tax':
+				$settings_option = 'wpo_ips_edi_tax_settings';
 				break;
 			default:
 				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
@@ -716,26 +724,38 @@ class SettingsDebug {
 		return $return;
 	}
 
-	public function get_setting_types() {
-		$setting_types = [
-			'general'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
-			'debug'     => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
-			'ubl_taxes' => __( 'UBL Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
-		];
+	/**
+	 * Get the available setting types.
+	 * 
+	 * @return array
+	 */
+	public function get_setting_types(): array {
+		$setting_types = array(
+			'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+			'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi'     => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi_tax' => __( 'E-Documents Tax', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+		
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+		
 		foreach ( $documents as $document ) {
-			if ( $document->title != $document->get_title() ) {
-				$title = $document->title.' ('.$document->get_title().')';
+			$document_title = $document->get_title();
+			
+			if ( $document->title !== $document_title ) {
+				$title = $document->title . ' (' . $document_title . ')';
 			} else {
-				$title = $document->get_title();
+				$title = $document_title;
 			}
 
 			foreach ( $document->output_formats as $output_format ) {
 				$slug = $document->get_type();
+				
 				if ( 'pdf' !== $output_format ) {
 					$slug .= "_{$output_format}";
 				}
-				$setting_types[$slug] = strtoupper( $output_format ) . ' ' .  $title;
+				
+				$setting_types[ $slug ] = strtoupper( $output_format ) . ' ' .  $title;
 			}
 		}
 

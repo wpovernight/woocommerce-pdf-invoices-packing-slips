@@ -1,8 +1,8 @@
 jQuery( function ( $ ) {
 	
-	$( 'select[name^="wpo_ips_settings_edi"][name$="[scheme]"],   \
-		select[name^="wpo_ips_settings_edi"][name$="[category]"], \
-		select[name^="wpo_ips_settings_edi"][name$="[reason]"]'
+	$( 'select[name^="wpo_ips_edi_tax_settings"][name$="[scheme]"],   \
+		select[name^="wpo_ips_edi_tax_settings"][name$="[category]"], \
+		select[name^="wpo_ips_edi_tax_settings"][name$="[reason]"]'
 	).on( 'change', function () {
 		let currentValue = $( this ).data( 'current' );
 		let newValue     = $( this ).find( 'option:selected' ).val();
