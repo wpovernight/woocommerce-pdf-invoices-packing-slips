@@ -28,11 +28,11 @@ class TradeTaxHandler extends AbstractHandler {
 		}
 
 		foreach ( apply_filters( 'wpo_ips_edi_cii_order_tax_data', $orderTaxData, $data, $options, $this ) as $item ) {
-			$percent   = ! empty( $item['percentage'] ) ? $item['percentage'] : 0;
-			$category  = ! empty( $item['category'] ) ? $item['category'] : wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
-			$reasonKey = ! empty( $item['reason'] ) ? $item['reason'] : wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order );
+			$percent   = ! empty( $item['percentage'] )       ? $item['percentage']       : 0;
+			$category  = ! empty( $item['category'] )         ? $item['category']         : wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
+			$reasonKey = ! empty( $item['reason'] )           ? $item['reason']           : wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order );
 			$reason    = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
-			$scheme    = ! empty( $item['scheme'] ) ? $item['scheme'] : wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order );
+			$scheme    = ! empty( $item['scheme'] )           ? $item['scheme']           : wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order );
 
 			$taxNode = array(
 				'name'  => 'ram:ApplicableTradeTax',
