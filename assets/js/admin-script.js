@@ -430,7 +430,7 @@ jQuery( function( $ ) {
 					);
 				}
 
-				triggerPreview( 0 );
+				triggerPreview();
 			},
 			error: function() {
 				$state.empty().append(
@@ -440,7 +440,7 @@ jQuery( function( $ ) {
 					} )
 				);
 
-				triggerPreview( 0 );
+				triggerPreview();
 			}
 		} );
 	}
