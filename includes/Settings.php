@@ -27,7 +27,6 @@ class Settings {
 	public $general_settings;
 	public $debug_settings;
 	public $edi_settings;
-	public $edi_tax_settings;
 
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
@@ -53,7 +52,6 @@ class Settings {
 		$this->general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$this->edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
-		$this->edi_tax_settings = get_option( 'wpo_ips_edi_tax_settings', array() );
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu

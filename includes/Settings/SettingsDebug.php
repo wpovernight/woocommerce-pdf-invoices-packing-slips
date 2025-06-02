@@ -355,9 +355,6 @@ class SettingsDebug {
 			case 'edi':
 				$settings = WPO_WCPDF()->settings->edi_settings;
 				break;
-			case 'edi_tax':
-				$settings = WPO_WCPDF()->settings->edi_tax_settings;
-				break;
 			default:
 				$settings = apply_filters( 'wpo_wcpdf_export_settings', $settings, $type );
 				break;
@@ -431,7 +428,7 @@ class SettingsDebug {
 
 		if ( in_array( $type, array( 'general', 'debug' ) ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
-		} elseif ( in_array( $type, array( 'edi', 'edi_tax' ) ) ) {
+		} elseif ( in_array( $type, array( 'edi' ) ) ) {
 			$settings_option = "wpo_ips_{$type}_settings";
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
@@ -496,9 +493,6 @@ class SettingsDebug {
 				break;
 			case 'edi':
 				$settings_option = 'wpo_ips_edi_settings';
-				break;
-			case 'edi_tax':
-				$settings_option = 'wpo_ips_edi_tax_settings';
 				break;
 			default:
 				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
@@ -734,7 +728,6 @@ class SettingsDebug {
 			'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 			'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
 			'edi'     => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
-			'edi_tax' => __( 'E-Documents Tax', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );

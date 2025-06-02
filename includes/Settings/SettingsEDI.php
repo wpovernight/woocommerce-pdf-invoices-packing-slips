@@ -27,7 +27,7 @@ class SettingsEDI {
 			'edi' => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 
-		add_action( 'admin_init', array( $this, 'init_tax_settings' ) );
+		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_edi', array( $this, 'output' ), 10, 2 );
 
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
@@ -69,7 +69,7 @@ class SettingsEDI {
 			}
 	}
 
-	public function init_tax_settings() {
+	public function init_settings() {
 		$page    = $option_group = $option_name = 'wpo_ips_edi_settings';
 		$section = 'edi';
 
@@ -154,6 +154,19 @@ class SettingsEDI {
 		if ( ! empty( $settings_format ) ) {
 			$settings_fields = array_merge( $settings_fields, $settings_format );
 		}
+		
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'attach_encrypted_pdf',
+			'title'    => __( 'Attach encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'option_name' => $option_name,
+				'id'          => 'attach_encrypted_pdf',
+				'description' => __( 'Embed the encrypted PDF invoice file within the e-document. Note that this option may not be valid for all formats.', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
 
 		$settings_fields = apply_filters( 'wpo_ips_edi_settings', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
@@ -190,6 +203,23 @@ class SettingsEDI {
 
 			echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
 		}
+	}
+	
+	/**
+	 * Get setting value by key.
+	 *
+	 * @param string $key
+	 * @param mixed $default
+	 * @return mixed
+	 */
+	public function get_setting( string $key, $default = null ) {
+		$settings = get_option( 'wpo_ips_edi_settings', array() );
+		
+		if ( isset( $settings[ $key ] ) ) {
+			return $settings[ $key ];
+		}
+		
+		return $default;
 	}
 
 }
