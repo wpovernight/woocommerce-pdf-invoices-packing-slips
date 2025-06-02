@@ -432,7 +432,7 @@ class SettingsDebug {
 		if ( in_array( $type, array( 'general', 'debug' ) ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
 		} elseif ( in_array( $type, array( 'edi', 'edi_tax' ) ) ) {
-			$settings_option = "wpo_ips_{$type}_settings"
+			$settings_option = "wpo_ips_{$type}_settings";
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
