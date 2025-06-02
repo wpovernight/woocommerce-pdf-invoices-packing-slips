@@ -36,7 +36,11 @@ class SettingsCallbacks {
 	 * @return void
 	 */
 	public function debug_section(): void {
-		echo wp_kses_post( __( '<b>Warning!</b> The settings below are meant for debugging/development only. Do not use them on a live website!' , 'woocommerce-pdf-invoices-packing-slips' ) );
+		echo wp_kses_post( sprintf(
+			/* translators: %s: warning message */
+			__( '%s The settings below are meant for debugging/development only. Do not use them on a live website!' , 'woocommerce-pdf-invoices-packing-slips' ),
+			'<strong>' . __( 'Warning!', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+		) );
 	}
 
 	/**
@@ -45,7 +49,11 @@ class SettingsCallbacks {
 	 * @return void
 	 */
 	public function custom_fields_section(): void {
-		echo wp_kses_post( __( 'These are used for the (optional) footer columns in the <em>Modern (Premium)</em> template, but can also be used for other elements in your custom template' , 'woocommerce-pdf-invoices-packing-slips' ) );
+		echo wp_kses_post( sprintf(
+			/* translators: %s Modern (Premium) */
+			__( 'These are used for the (optional) footer columns in the %s template, but can also be used for other elements in your custom template.' , 'woocommerce-pdf-invoices-packing-slips' ),
+			'<em>Modern (Premium)</em>'
+		) );
 	}
 
 	/**
