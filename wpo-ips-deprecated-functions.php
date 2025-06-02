@@ -54,3 +54,57 @@ function wpo_ips_ubl_is_country_format_extension_active(): bool {
 	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_is_country_format_extension_active' );
 	return wpo_ips_edi_is_country_format_extension_active();
 }
+
+/**
+ * Get UBL Maker
+ *
+ * @return WPO\IPS\Makers\EDIMaker
+ * 
+ * @deprecated 5.0.0 Use wpo_ips_edi_get_maker() instead.
+ */
+function wcpdf_get_ubl_maker() {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_get_maker' );
+	return wpo_ips_edi_get_maker();
+}
+
+/**
+ * Check if UBL is available
+ *
+ * @return bool
+ * 
+ * @deprecated 5.0.0 Use wpo_ips_edi_is_available() instead.
+ */
+function wcpdf_is_ubl_available(): bool {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_is_available' );
+	return wpo_ips_edi_is_available();
+}
+
+/**
+ * Write UBL file
+ *
+ * @param \WPO\IPS\Documents\OrderDocument $document
+ * @param bool $attachment
+ * @param bool $contents_only
+ *
+ * @return string|false
+ * 
+ * @deprecated 5.0.0 Use wpo_ips_edi_write_file() instead.
+ */
+function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_write_file' );
+	return wpo_ips_edi_write_file();
+}
+
+/**
+ * UBL file headers
+ *
+ * @param string $filename
+ * @param int|false $size
+ * @return void
+ * 
+ * @deprecated 5.0.0 Use wpo_ips_edi_file_headers() instead.
+ */
+function wcpdf_ubl_headers( $filename, $size ): void {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_file_headers' );
+	wpo_ips_edi_file_headers( $filename, $size );
+}

@@ -6,9 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\IPS\\Makers\\UBLMaker' ) ) :
+if ( ! class_exists( '\\WPO\\IPS\\Makers\\EDIMaker' ) ) :
 
-class UBLMaker {
+class EDIMaker {
 
 	protected $tmp_base;
 

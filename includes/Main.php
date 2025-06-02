@@ -273,7 +273,7 @@ class Main {
 	}
 
 	public function get_document_ubl_attachment( $document, $tmp_path ) {
-		return wpo_ips_write_ubl_file( $document, true );
+		return wpo_ips_edi_write_file( $document, true );
 	}
 
 	public function get_documents_for_email( $email_id, $order ) {

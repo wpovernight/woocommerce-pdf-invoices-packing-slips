@@ -116,6 +116,114 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 }
 
 /**
+ * Get EDI Maker
+ * Use `wpo_ips_edi_maker` filter to change the EDI class (which can wrap another EDI library).
+ *
+ * @return WPO\IPS\Makers\EDIMaker
+ */
+function wpo_ips_edi_get_maker() {
+	$class = '\\WPO\\IPS\\Makers\\EDIMaker';
+
+	if ( ! class_exists( $class ) ) {
+		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/EDIMaker.php' );
+	}
+
+	$class = apply_filters( 'wpo_ips_edi_maker', $class );
+
+	return new $class();
+}
+
+/**
+ * Check if EDI is available
+ *
+ * @return bool
+ */
+function wpo_ips_edi_is_available(): bool {
+	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
+	return apply_filters( 'wpo_ips_edi_is_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) );
+}
+
+/**
+ * Write EDI file
+ *
+ * @param \WPO\IPS\Documents\OrderDocument $document
+ * @param bool $attachment
+ * @param bool $contents_only
+ *
+ * @return string|false
+ */
+function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
+	$edi_maker = wpo_ips_edi_get_maker();
+
+	if ( ! $edi_maker ) {
+		return wcpdf_error_handling( 'EDI Maker not available. Cannot write EDI file.' );
+	}
+
+	if ( $attachment ) {
+		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+
+		if ( ! $tmp_path ) {
+			return wcpdf_error_handling( 'Temporary path not available. Cannot write EDI file.' );
+		}
+
+		$edi_maker->set_file_path( $tmp_path );
+	}
+
+	$edi_document = new \WPO\IPS\EDI\Syntax\Ubl\UblDocument(); //TODO: We need to check the sintax/format from settings
+	$edi_document->set_order_document( $document );
+
+	$builder  = new \WPO\IPS\EDI\SabreBuilder();
+	$contents = apply_filters( 'wpo_ips_edi_contents',
+		$builder->build( $edi_document ),
+		$edi_document,
+		$document
+	);
+
+	if ( empty( $contents ) ) {
+		return wcpdf_error_handling( 'Failed to build EDI contents.' );
+	}
+
+	if ( $contents_only ) {
+		return $contents;
+	}
+
+	$filename = apply_filters( 'wpo_ips_edi_filename',
+		$document->get_filename(
+			'download',
+			array( 'output' => 'ubl' ) //TODO: Change this later to 'xml'
+		),
+		$document
+	);
+
+	$full_filename = $edi_maker->write( $filename, $contents );
+
+	return $full_filename;
+}
+
+/**
+ * EDI file headers
+ *
+ * @param string $filename
+ * @param int|false $size
+ * @return void
+ */
+function wpo_ips_edi_file_headers( string $filename, $size ): void {
+	$charset = apply_filters( 'wpo_ips_edi_file_header_content_type_charset', 'UTF-8' );
+
+	header( 'Content-Description: File Transfer' );
+	header( 'Content-Type: text/xml; charset=' . $charset );
+	header( 'Content-Disposition: attachment; filename=' . $filename );
+	header( 'Content-Transfer-Encoding: binary' );
+	header( 'Connection: Keep-Alive' );
+	header( 'Expires: 0' );
+	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+	header( 'Pragma: public' );
+	header( 'Content-Length: ' . $size );
+
+	do_action( 'wpo_ips_edi_after_headers', $filename, $size );
+}
+
+/**
  * Check if the country format extension is active
  *
  * @return bool

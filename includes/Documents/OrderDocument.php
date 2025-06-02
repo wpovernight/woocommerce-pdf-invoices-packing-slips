@@ -540,7 +540,7 @@ abstract class OrderDocument {
 		}
 
 		// ubl
-		if ( $this->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
+		if ( $this->is_enabled( 'ubl' ) && wpo_ips_edi_is_available() ) {
 			wpo_ips_edi_save_order_taxes( $order );
 		}
 
@@ -1653,7 +1653,7 @@ abstract class OrderDocument {
 			exit();
 		}
 
-		$filename_or_contents = wpo_ips_write_ubl_file( $document, false, $contents_only );
+		$filename_or_contents = wpo_ips_edi_write_file( $document, false, $contents_only );
 
 		if ( ! $filename_or_contents ) {
 			wcpdf_log_error( 'Error writing UBL file!', 'error' );
@@ -1667,7 +1667,7 @@ abstract class OrderDocument {
 		$quoted = sprintf( '"%s"', addcslashes( basename( $filename_or_contents ), '"\\' ) );
 		$size   = filesize( $filename_or_contents );
 
-		wcpdf_ubl_headers( $quoted, $size );
+		wpo_ips_edi_file_headers( $quoted, $size );
 
 		ob_clean();
 		flush();

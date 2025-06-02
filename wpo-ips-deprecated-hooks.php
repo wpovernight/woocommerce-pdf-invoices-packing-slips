@@ -102,3 +102,87 @@ if ( has_action( 'wpo_ips_ubl_is_country_format_extension_active' ) ) {
 		$version
 	);
 }
+
+if ( has_action( 'wpo_wcpdf_ubl_maker' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_maker',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_maker',
+			$version,
+			'wpo_ips_edi_maker'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wcpdf_ubl_available' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_available',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_available',
+			$version,
+			'wpo_ips_edi_is_available'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_ips_ubl_contents' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_ips_ubl_contents',
+		sprintf(
+			$message,
+			'wpo_ips_ubl_contents',
+			$version,
+			'wpo_ips_edi_contents'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_ips_ubl_filename' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_ips_ubl_filename',
+		sprintf(
+			$message,
+			'wpo_ips_ubl_filename',
+			$version,
+			'wpo_ips_edi_filename'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wcpdf_ubl_headers_charset' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wcpdf_ubl_headers_charset',
+		sprintf(
+			$message,
+			'wcpdf_ubl_headers_charset',
+			$version,
+			'wpo_ips_edi_file_header_content_type_charset'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_after_ubl_headers' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_after_ubl_headers',
+		sprintf(
+			$message,
+			'wpo_after_ubl_headers',
+			$version,
+			'wpo_ips_edi_after_headers'
+		),
+		$version
+	);
+}
