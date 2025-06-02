@@ -178,8 +178,10 @@ abstract class AbstractDocument {
 				$fields = array( 'category', 'scheme', 'reason' );
 
 				foreach ( $fields as $field ) {
-					$meta_key = '_wcpdf_ubl_tax_' . $field;
-					$value    = wc_get_order_item_meta( $tax_item_key, $meta_key, true );
+					$legacy_meta_key = '_wcpdf_ubl_tax_' . $field;
+					$meta_key        = '_wpo_ips_edi_tax_' . $field;
+					$value           = wc_get_order_item_meta( $tax_item_key, $meta_key, true );
+					$value           = empty( $value ) ? wc_get_order_item_meta( $tax_item_key, $legacy_meta_key, true ) : $value;
 
 					if ( empty( $value ) || 'default' === $value || ! $use_historical_settings ) {
 						$value = wpo_ips_edi_get_tax_data_from_fallback( $field, $tax_rate_id, $this->order );

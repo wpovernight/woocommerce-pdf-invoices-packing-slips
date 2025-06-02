@@ -107,7 +107,7 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 							$value = wpo_ips_edi_get_tax_data_from_fallback( $field, $tax_rate_id, $order );
 						}
 
-						wc_update_order_item_meta( $item_id, '_wcpdf_ubl_tax_' . $field, $value );
+						wc_update_order_item_meta( $item_id, '_wpo_ips_edi_tax_' . $field, $value );
 					}
 				}
 			}
