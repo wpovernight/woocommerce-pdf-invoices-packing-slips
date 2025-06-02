@@ -805,7 +805,7 @@ class SettingsCallbacks {
 	 *
 	 * @return void
 	 */
-	public function output_action_button( array $action_button, string $id ): void {
+	private function output_action_button( array $action_button, string $id ): void {
 		printf(
 			'<button type="button" %1$s %2$s %3$s>%4$s%5$s</button><span class="sync-tooltip">Value is empty</span>',
 			! empty( $action_button['class'] ) ? sprintf( 'class="%s"', esc_attr( $action_button['class'] ) ) : '',

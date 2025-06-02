@@ -735,7 +735,7 @@ jQuery( function( $ ) {
 	//----------> /Settings Accordion <----------//
 	//----------> Sync Address <----------//
 
-	$( '.sync-address' ).on( 'click', function( event ) {
+	$( '#wpo-wcpdf-settings .sync-address' ).on( 'click', function( event ) {
 		event.preventDefault();
 
 		const $button  = $( this );
@@ -764,7 +764,7 @@ jQuery( function( $ ) {
 					$field.val( response.data.value );
 					triggerPreview();
 				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
-					$tooltip.text( response.data.message ).addClass('visible');
+					$tooltip.text( response.data.message ).addClass( 'visible' );
 					setTimeout( function() {
 					    $tooltip.removeClass( 'visible' );
 					}, 3000 );
