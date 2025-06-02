@@ -16,7 +16,7 @@ class SellerTradePartyHandler extends AbstractHandler {
 				// Seller Company Name
 				array(
 					'name'  => 'ram:Name',
-					'value' => wpo_ips_ubl_sanitize_string(
+					'value' => wpo_ips_edi_sanitize_string(
 						! empty( $this->document->order_document )
 							? $this->document->order_document->get_shop_name()
 							: get_bloginfo( 'name' )
@@ -71,11 +71,11 @@ class SellerTradePartyHandler extends AbstractHandler {
 						),
 						array(
 							'name'  => 'ram:LineOne',
-							'value' => wpo_ips_ubl_sanitize_string( get_option( 'woocommerce_store_address' ) ),
+							'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_address' ) ),
 						),
 						array(
 							'name'  => 'ram:CityName',
-							'value' => wpo_ips_ubl_sanitize_string( get_option( 'woocommerce_store_city' ) ),
+							'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_city' ) ),
 						),
 						array(
 							'name'  => 'ram:CountryID',

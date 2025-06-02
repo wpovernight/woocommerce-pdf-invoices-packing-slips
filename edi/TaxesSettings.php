@@ -28,8 +28,8 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public function output(): void {
-		settings_fields( 'wpo_wcpdf_settings_ubl_taxes' );
-		do_settings_sections( 'wpo_wcpdf_settings_ubl_taxes' );
+		settings_fields( 'wpo_ips_settings_edi' );
+		do_settings_sections( 'wpo_ips_settings_edi' );
 		
 		echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 		echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
@@ -94,7 +94,7 @@ class TaxesSettings {
 	public function output_table_for_tax_class( string $slug ): void {
 		global $wpdb;
 		
-		$tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+		$tax_settings = get_option( 'wpo_ips_settings_edi', array() );
 		
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
@@ -292,7 +292,7 @@ class TaxesSettings {
 				$options = array();
 		}
 
-		$select  = '<select name="wpo_wcpdf_settings_ubl_taxes[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '" style="width:100%; box-sizing:border-box;">';
+		$select  = '<select name="wpo_ips_settings_edi[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '" style="width:100%; box-sizing:border-box;">';
 		
 		foreach ( $defaults as $key => $value ) {
 			if ( 'class' === $type && 'default' === $key ) {
@@ -518,7 +518,7 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public static function standard_update_notice(): void {
-		$tax_settings     = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+		$tax_settings     = get_option( 'wpo_ips_settings_edi', array() );
 		$current_standard = $tax_settings['standard'] ?? null;
 		$current_version  = $tax_settings['standard_version'] ?? null;
 		$request          = stripslashes_deep( $_GET );
@@ -569,7 +569,7 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public static function update_standard_version(): void {
-		$tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+		$tax_settings = get_option( 'wpo_ips_settings_edi', array() );
 
 		if (
 			! isset( $tax_settings['standard'] ) ||
@@ -579,7 +579,7 @@ class TaxesSettings {
 		) {
 			$tax_settings['standard']          = self::$standard;
 			$tax_settings['standard_version']  = self::$standard_version;
-			update_option( 'wpo_wcpdf_settings_ubl_taxes', $tax_settings );
+			update_option( 'wpo_ips_settings_edi', $tax_settings );
 		}
 	}
 	

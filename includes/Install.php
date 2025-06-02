@@ -661,6 +661,18 @@ class Install {
 				delete_option( 'wpo_wcpdf_dismiss_shop_address_notice' );
 			}
 		}
+		
+		// 5.0.0-pr1149.1: migrate UBL tax settings to IPS EDI settings
+		if ( version_compare( $installed_version, '5.0.0-pr1149.1', '<' ) ) {
+			$ubl_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+
+			if ( ! empty( $ubl_settings ) ) {
+				$ubl_settings['syntax']     = 'ubl';
+				$ubl_settings['ubl_format'] = 'ubl_2_1'; //TODO: We still need to check for UBL extensions and change this format.
+				update_option( 'wpo_ips_settings_edi', $ubl_settings );
+				delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
+			}
+		}
 
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );

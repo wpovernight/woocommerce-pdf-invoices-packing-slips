@@ -22,7 +22,7 @@ class ContractReferencedDocumentHandler extends AbstractHandler {
 			'value' => array(
 				array(
 					'name'  => 'ram:IssuerAssignedID',
-					'value' => wpo_ips_ubl_sanitize_string( $reference_id ),
+					'value' => wpo_ips_edi_sanitize_string( $reference_id ),
 				),
 			),
 		);

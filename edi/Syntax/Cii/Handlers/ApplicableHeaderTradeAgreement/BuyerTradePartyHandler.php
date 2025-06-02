@@ -27,7 +27,7 @@ class BuyerTradePartyHandler extends AbstractHandler {
 			'value' => array(
 				array(
 					'name'  => 'ram:Name',
-					'value' => wpo_ips_ubl_sanitize_string( $customerPartyName ),
+					'value' => wpo_ips_edi_sanitize_string( $customerPartyName ),
 				),
 			),
 		);
@@ -45,7 +45,7 @@ class BuyerTradePartyHandler extends AbstractHandler {
 
 			$legalOrganization[] = array(
 				'name'  => 'ram:TradingBusinessName',
-				'value' => wpo_ips_ubl_sanitize_string( $billingCompany ),
+				'value' => wpo_ips_edi_sanitize_string( $billingCompany ),
 			);
 
 			$buyerTradeParty['value'][] = array(
@@ -64,16 +64,16 @@ class BuyerTradePartyHandler extends AbstractHandler {
 				),
 				array(
 					'name'  => 'ram:LineOne',
-					'value' => wpo_ips_ubl_sanitize_string( $order ? $order->get_billing_address_1() : '' ),
+					'value' => wpo_ips_edi_sanitize_string( $order ? $order->get_billing_address_1() : '' ),
 				),
 				// Optional LineTwo
 				array(
 					'name'  => 'ram:LineTwo',
-					'value' => wpo_ips_ubl_sanitize_string( $order ? $order->get_billing_address_2() : '' ),
+					'value' => wpo_ips_edi_sanitize_string( $order ? $order->get_billing_address_2() : '' ),
 				),
 				array(
 					'name'  => 'ram:CityName',
-					'value' => wpo_ips_ubl_sanitize_string( $order ? $order->get_billing_city() : '' ),
+					'value' => wpo_ips_edi_sanitize_string( $order ? $order->get_billing_city() : '' ),
 				),
 				array(
 					'name'  => 'ram:CountryID',
@@ -88,7 +88,7 @@ class BuyerTradePartyHandler extends AbstractHandler {
 			'value' => array(
 				array(
 					'name'  => 'ram:PersonName',
-					'value' => wpo_ips_ubl_sanitize_string( $customerPartyContactName ),
+					'value' => wpo_ips_edi_sanitize_string( $customerPartyContactName ),
 				),
 				array(
 					'name'  => 'ram:TelephoneUniversalCommunication',

@@ -541,7 +541,7 @@ abstract class OrderDocument {
 
 		// ubl
 		if ( $this->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
-			wpo_ips_ubl_save_order_taxes( $order );
+			wpo_ips_edi_save_order_taxes( $order );
 		}
 
 		$note = $refund_id ? sprintf(

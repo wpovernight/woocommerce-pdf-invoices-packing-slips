@@ -49,7 +49,7 @@ class AddressHandler extends AbstractHandler {
 				'name'  => 'cac:PartyName',
 				'value' => array(
 					'name'  => 'cbc:Name',
-					'value' => wpo_ips_ubl_sanitize_string( $company ),
+					'value' => wpo_ips_edi_sanitize_string( $company ),
 				),
 			),
 			array(
@@ -57,11 +57,11 @@ class AddressHandler extends AbstractHandler {
 				'value' => array(
 					array(
 						'name'  => 'cbc:StreetName',
-						'value' => wpo_ips_ubl_sanitize_string( get_option( 'woocommerce_store_address' ) ),
+						'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_address' ) ),
 					),
 					array(
 						'name'  => 'cbc:CityName',
-						'value' => wpo_ips_ubl_sanitize_string( get_option( 'woocommerce_store_city' ) ),
+						'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_city' ) ),
 					),
 					array(
 						'name'  => 'cbc:PostalZone',
@@ -71,7 +71,7 @@ class AddressHandler extends AbstractHandler {
 						'name'  => 'cac:AddressLine',
 						'value' => array(
 							'name'  => 'cbc:Line',
-							'value' => wpo_ips_ubl_sanitize_string( $address ),
+							'value' => wpo_ips_edi_sanitize_string( $address ),
 						),
 					),
 					array(
@@ -120,7 +120,7 @@ class AddressHandler extends AbstractHandler {
 				'value' => array(
 					array(
 						'name'  => 'cbc:RegistrationName',
-						'value' => wpo_ips_ubl_sanitize_string( $company ),
+						'value' => wpo_ips_edi_sanitize_string( $company ),
 					),
 					array(
 						'name'       => 'cbc:CompanyID',
@@ -170,7 +170,7 @@ class AddressHandler extends AbstractHandler {
 						'name'  => 'cac:PartyName',
 						'value' => array(
 							'name'  => 'cbc:Name',
-							'value' => wpo_ips_ubl_sanitize_string( $customerPartyName ),
+							'value' => wpo_ips_edi_sanitize_string( $customerPartyName ),
 						),
 					),
 					array(
@@ -178,11 +178,11 @@ class AddressHandler extends AbstractHandler {
 						'value' => array(
 							array(
 								'name'  => 'cbc:StreetName',
-								'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() ),
+								'value' => wpo_ips_edi_sanitize_string( $this->document->order->get_billing_address_1() ),
 							),
 							array(
 								'name'  => 'cbc:CityName',
-								'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_city() ),
+								'value' => wpo_ips_edi_sanitize_string( $this->document->order->get_billing_city() ),
 							),
 							array(
 								'name'  => 'cbc:PostalZone',
@@ -192,7 +192,7 @@ class AddressHandler extends AbstractHandler {
 								'name'  => 'cac:AddressLine',
 								'value' => array(
 									'name'  => 'cbc:Line',
-									'value' => wpo_ips_ubl_sanitize_string( $this->document->order->get_billing_address_1() . ' ' . $this->document->order->get_billing_address_2() ),
+									'value' => wpo_ips_edi_sanitize_string( $this->document->order->get_billing_address_1() . ' ' . $this->document->order->get_billing_address_2() ),
 								),
 							),
 							array(
@@ -235,7 +235,7 @@ class AddressHandler extends AbstractHandler {
 						'value' => array(
 							array(
 								'name'  => 'cbc:Name',
-								'value' => wpo_ips_ubl_sanitize_string( $customerPartyContactName ),
+								'value' => wpo_ips_edi_sanitize_string( $customerPartyContactName ),
 							),
 							array(
 								'name'  => 'cbc:ElectronicMail',

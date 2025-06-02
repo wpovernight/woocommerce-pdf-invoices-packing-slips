@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class UblTwoDotOne extends AbstractFormat {
 	
-	public string $slug = 'ubltwodotone';
+	public string $slug = 'ubl_2_1';
 	public string $name = 'UBL 2.1';
 	
 	/**

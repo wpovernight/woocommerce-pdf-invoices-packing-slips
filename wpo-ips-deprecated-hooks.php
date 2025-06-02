@@ -74,3 +74,31 @@ if ( has_action( 'wpo_wc_ubl_document_data' ) ) {
 		$version
 	);
 }
+
+if ( has_action( 'wpo_ips_ubl_get_tax_data_from_fallback_vat_exempt' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_ips_ubl_get_tax_data_from_fallback_vat_exempt',
+		sprintf(
+			$message,
+			'wpo_ips_ubl_get_tax_data_from_fallback_vat_exempt',
+			$version,
+			'wpo_ips_edi_get_tax_data_from_fallback_vat_exempt'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_ips_ubl_is_country_format_extension_active' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_ips_ubl_is_country_format_extension_active',
+		sprintf(
+			$message,
+			'wpo_ips_ubl_is_country_format_extension_active',
+			$version,
+			'wpo_ips_edi_is_country_format_extension_active'
+		),
+		$version
+	);
+}

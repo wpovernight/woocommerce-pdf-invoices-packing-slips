@@ -135,7 +135,7 @@ class InvoiceLineHandler extends AbstractHandler {
 						'value' => array(
 							array(
 								'name'  => 'cbc:Name',
-								'value' => wpo_ips_ubl_sanitize_string( $item->get_name() ),
+								'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
 							),
 						),
 					),

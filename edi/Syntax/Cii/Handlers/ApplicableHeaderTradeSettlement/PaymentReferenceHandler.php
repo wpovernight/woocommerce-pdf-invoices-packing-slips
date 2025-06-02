@@ -25,7 +25,7 @@ class PaymentReferenceHandler extends AbstractHandler {
 		
 		$paymentReference = array(
 			'name'  => 'ram:PaymentReference',
-			'value' => wpo_ips_ubl_sanitize_string( $reference ),
+			'value' => wpo_ips_edi_sanitize_string( $reference ),
 		);
 		
 		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_PaymentReference', $paymentReference, $data, $options, $this );

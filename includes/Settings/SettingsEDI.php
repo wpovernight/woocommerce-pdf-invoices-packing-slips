@@ -70,7 +70,7 @@ class SettingsEDI {
 	}
 
 	public function init_tax_settings() {
-		$page    = $option_group = $option_name = 'wpo_wcpdf_settings_ubl_taxes';
+		$page    = $option_group = $option_name = 'wpo_ips_settings_edi';
 		$section = 'edi';
 
 		$settings_fields = array(
@@ -163,7 +163,7 @@ class SettingsEDI {
 		// it seems $and taxes is mostly false, meaning taxes are calculated separately,
 		// but we still update just in case anything changed
 		if ( ! empty( $order ) ) {
-			wpo_ips_ubl_save_order_taxes( $order );
+			wpo_ips_edi_save_order_taxes( $order );
 		}
 	}
 
@@ -173,7 +173,7 @@ class SettingsEDI {
 		}
 
 		if ( $order ) {
-			wpo_ips_ubl_save_order_taxes( $order );
+			wpo_ips_edi_save_order_taxes( $order );
 		}
 	}
 

@@ -42,7 +42,7 @@ class PaymentMeansHandler extends AbstractHandler {
 			if ( ! empty( $payment['account_name'] ) ) {
 				$account['value'][] = array(
 					'name'  => 'ram:AccountName',
-					'value' => wpo_ips_ubl_sanitize_string( $payment['account_name'] ),
+					'value' => wpo_ips_edi_sanitize_string( $payment['account_name'] ),
 				);
 			}
 

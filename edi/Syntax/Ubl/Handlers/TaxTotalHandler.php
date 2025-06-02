@@ -28,10 +28,10 @@ class TaxTotalHandler extends AbstractHandler {
 		
 		$formatted_tax_array = array_map( function( $item ) use ( $taxReasons ) {
 			$itemTaxPercentage = ! empty( $item['percentage'] )              ? $item['percentage']              : 0;
-			$itemTaxCategory   = ! empty( $item['category'] )                ? $item['category']                : wpo_ips_ubl_get_tax_data_from_fallback( 'category', null, $this->document->order );
-			$itemTaxReasonKey  = ! empty( $item['reason'] )                  ? $item['reason']                  : wpo_ips_ubl_get_tax_data_from_fallback( 'reason', null, $this->document->order );
+			$itemTaxCategory   = ! empty( $item['category'] )                ? $item['category']                : wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
+			$itemTaxReasonKey  = ! empty( $item['reason'] )                  ? $item['reason']                  : wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $this->document->order );
 			$itemTaxReason     = ! empty( $taxReasons[ $itemTaxReasonKey ] ) ? $taxReasons[ $itemTaxReasonKey ] : $itemTaxReasonKey;
-			$itemTaxScheme     = ! empty( $item['scheme'] )                  ? $item['scheme']                  : wpo_ips_ubl_get_tax_data_from_fallback( 'scheme', null, $this->document->order );
+			$itemTaxScheme     = ! empty( $item['scheme'] )                  ? $item['scheme']                  : wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $this->document->order );
 			
 			$taxCategory = array(
 				array(

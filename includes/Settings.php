@@ -26,7 +26,7 @@ class Settings {
 	public $edi;
 	public $general_settings;
 	public $debug_settings;
-	public $ubl_tax_settings;
+	public $edi_settings;
 
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
@@ -49,9 +49,9 @@ class Settings {
 		$this->edi              = SettingsEDI::instance();
 		$this->upgrade          = SettingsUpgrade::instance();
 
-		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
-		$this->ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
+		$this->general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$this->edi_settings     = get_option( 'wpo_ips_settings_edi', array() );
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu

@@ -490,7 +490,7 @@ class SettingsDebug {
 				$settings_option = 'wpo_wcpdf_settings_debug';
 				break;
 			case 'ubl_taxes':
-				$settings_option = 'wpo_wcpdf_settings_ubl_taxes';
+				$settings_option = 'wpo_ips_settings_edi';
 				break;
 			default:
 				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
