@@ -347,12 +347,12 @@ jQuery( function( $ ) {
 	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
-	
+
 	function settingsChanged( event, previewDelay ) {
 		if ( 'shop_address_country' === event.target.id ) {
 			shopCountryChanged( event );
 		}
-		
+
 		// Show secondary save button
 		showSaveBtn();
 
@@ -376,14 +376,16 @@ jQuery( function( $ ) {
 			triggerPreview( previewDelay );
 		}
 	}
-	
+
 	function shopCountryChanged( event ) {
-		const $country        = $( event.target );
-		const selectedCountry = $country.val();
-		const $state          = $country.closest( 'form' ).find( '#shop_address_state' );
+		const $country           = $( event.target );
+		const selectedCountry    = $country.val();
+		const $state             = $country.closest( 'form' ).find( '#shop_address_state' );
+		const $state_sync_button = $country.closest( 'form' ).find( '#shop_address_state_action' );
 
 		// Clear previous states
 		$state.empty().prop( 'disabled', true );
+		$state_sync_button.prop( 'disabled', true );
 
 		// Temporary loading option
 		$state.append(
@@ -418,6 +420,7 @@ jQuery( function( $ ) {
 						);
 					} );
 					$state.prop( 'disabled', false );
+					$state_sync_button.prop( 'disabled', false );
 				} else {
 					$state.append(
 						$( '<option>', {
@@ -426,7 +429,7 @@ jQuery( function( $ ) {
 						} )
 					);
 				}
-				
+
 				triggerPreview();
 			},
 			error: function() {
@@ -436,7 +439,7 @@ jQuery( function( $ ) {
 						text: wpo_wcpdf_admin.shop_country_changed_messages.error
 					} )
 				);
-				
+
 				triggerPreview();
 			}
 		} );
@@ -682,36 +685,37 @@ jQuery( function( $ ) {
 	}
 
 	//----------> /Preview <----------//
+	//----------> Settings Accordion <----------//
 
 	function settingsAccordion() {
 		// Get current tab.
 		const params       = new URLSearchParams( window.location.search );
 		const allowedTabs  = [ 'general', 'documents' ];
 		const tab          = params.get( 'tab' ) || 'general';
-	
+
 		if ( ! allowedTabs.includes( tab ) ) {
 			return;
 		}
-		
+
 		const tabsMainCategory = {
 			general   : 'display',
 			documents : 'general',
 		};
-		
+
 		// Collapse all but the main category for this tab.
 		$( '.settings_category' )
 			.not( '#' + tabsMainCategory[ tab ] )
 			.find( '.form-table' )
 			.hide();
-		
+
 		const sections = $( '.settings_category h2' );
-		
+
 		// Restore accordion state from localStorage.
 		sections.each( function ( index ) {
 			const open = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` ) === 'true';
 			$( this ).toggleClass( 'active', open ).next( '.form-table' ).toggle( open );
 		} );
-		
+
 		// Toggle on click and persist state.
 		sections.on( 'click', function () {
 			const index = sections.index( this );
@@ -725,7 +729,55 @@ jQuery( function( $ ) {
 					 } );
 		} );
 	}
-	
+
 	settingsAccordion();
+
+	//----------> /Settings Accordion <----------//
+	//----------> Sync Address <----------//
+
+	$( '#wpo-wcpdf-settings .sync-address' ).on( 'click', function( event ) {
+		event.preventDefault();
+
+		const $button  = $( this );
+		const $icon    = $button.find( 'span.dashicons' );
+		const $tooltip = $button.closest( 'td' ).find( '.sync-tooltip' );
+		let $field     = $button.closest( 'td' ).find( 'input' );
+
+		if ( $field.length === 0 ) {
+			$field = $button.closest( 'td' ).find( 'select' );
+		}
+
+		// Rotate the icon to indicate processing.
+		$icon.toggleClass( 'rotate' );
+
+		$.ajax( {
+			type: 'POST',
+			url:  wpo_wcpdf_admin.ajaxurl,
+			data: {
+				action:        'wpo_wcpdf_sync_address',
+				security:      wpo_wcpdf_admin.nonce,
+				address_field: $field.attr( 'id' ),
+			},
+			success: function( response ) {
+				if ( response.success && response.data.value && '' !== response.data.value.trim() ) {
+					// Update the input value with the synced address.
+					$field.val( response.data.value );
+					triggerPreview();
+				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
+					$tooltip.text( response.data.message ).addClass( 'visible' );
+					setTimeout( function() {
+					    $tooltip.removeClass( 'visible' );
+					}, 3000 );
+				}
+			},
+			complete: function() {
+				// Reset the icon rotation.
+				$icon.toggleClass( 'rotate' );
+			}
+		} );
+
+	} );
+
+	//----------> /Sync Address <----------//
 
 } );
