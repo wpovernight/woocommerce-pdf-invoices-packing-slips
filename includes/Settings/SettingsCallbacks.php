@@ -312,7 +312,6 @@ class SettingsCallbacks {
 		}
 	}
 
-
 	/**
 	 * Single text option (not part of any settings array)
 	 * 
@@ -1095,7 +1094,6 @@ class SettingsCallbacks {
 			! empty( $action_button['icon'] ) ? sprintf( '<span class="dashicons dashicons-%s"></span>', esc_attr( $action_button['icon'] ) ) : ''
 		);
 	}
-
 	
 }
 
