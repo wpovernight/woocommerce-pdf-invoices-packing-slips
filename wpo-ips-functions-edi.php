@@ -190,7 +190,7 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	$filename = apply_filters( 'wpo_ips_edi_filename',
 		$document->get_filename(
 			'download',
-			array( 'output' => 'ubl' ) //TODO: Change this later to 'xml'
+			array( 'output' => 'xml' )
 		),
 		$document
 	);

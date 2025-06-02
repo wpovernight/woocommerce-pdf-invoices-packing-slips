@@ -95,7 +95,7 @@ class SettingsDocuments {
 					<h2 class="nav-tab-wrapper">
 						<?php
 							foreach ( $section_document->output_formats as $document_output_format ) {
-								if ( ! wpo_ips_edi_is_available() && 'ubl' === $document_output_format ) {
+								if ( ! wpo_ips_edi_is_available() && 'xml' === $document_output_format ) {
 									continue;
 								}
 

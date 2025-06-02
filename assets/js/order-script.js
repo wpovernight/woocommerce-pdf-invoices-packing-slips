@@ -10,9 +10,9 @@ jQuery( function( $ ) {
 			let checked    = [];
 			let ubl_output = false;
 
-			// is UBL action
-			if ( action.indexOf( 'ubl' ) != -1 ) {
-				template   = template.replace( '_ubl', '' );
+			// is XML action
+			if ( action.indexOf( 'xml' ) != -1 ) {
+				template   = template.replace( '_xml', '' );
 				ubl_output = true;
 			}
 
@@ -39,7 +39,7 @@ jQuery( function( $ ) {
 			// ubl
 			if ( ubl_output ) {
 				$.each( checked, function( i, order_id ) {
-					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
+					full_url = partial_url + '&order_ids='+order_id+'&output=xml';
 					window.open( full_url, '_blank' );
 				} );
 

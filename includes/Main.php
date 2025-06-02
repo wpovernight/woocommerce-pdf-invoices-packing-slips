@@ -306,7 +306,7 @@ class Main {
 				}
 
 				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $output_format );
-				if ( 'ubl' === $output_format ) {
+				if ( 'xml' === $output_format ) {
 					$extra_condition = apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document_type, $output_format ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' );
 				}
 
@@ -497,7 +497,7 @@ class Main {
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document, $request );
 
 				switch ( $output_format ) {
-					case 'ubl':
+					case 'xml':
 						$document->output_ubl();
 						break;
 					case 'html':
@@ -574,8 +574,8 @@ class Main {
 			case 'dompdf':
 				$tmp_path = $tmp_base . 'dompdf';
 				break;
-			case 'ubl':
-				$tmp_path = $tmp_base . 'ubl';
+			case 'xml':
+				$tmp_path = $tmp_base . 'xml';
 				break;
 			case 'font_cache':
 			case 'fonts':

@@ -32,7 +32,7 @@ class EDIMaker {
 			return $this->tmp_base;
 		}
 
-		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'ubl' ) );
+		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'xml' ) );
 		return $this->tmp_base;
 	}
 }

@@ -264,7 +264,7 @@ class Admin {
 								);
 							}
 							break;
-						case 'ubl':
+						case 'xml':
 							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() ) {
 								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
@@ -304,7 +304,7 @@ class Admin {
 			$printed = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 
 			// ubl replaces exists
-			$exists  = isset( $data['output_format'] ) && 'ubl' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
+			$exists  = isset( $data['output_format'] ) && 'xml' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
 
 			$allowed_svg_tags = array(
 				'svg' => array(
@@ -319,7 +319,7 @@ class Admin {
 				),
 			);
 
-			if ( isset( $data['output_format'] ) && ( 'ubl' !== $data['output_format'] || $data['exists'] ) ) {
+			if ( isset( $data['output_format'] ) && ( 'xml' !== $data['output_format'] || $data['exists'] ) ) {
 				printf(
 					'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
 					esc_url( $data['url'] ),
@@ -692,15 +692,15 @@ class Admin {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
 
 		foreach ( $documents as $document ) {
-			if ( in_array( 'ubl', $document->output_formats ) ) {
+			if ( in_array( 'xml', $document->output_formats ) ) {
 				$document_title = $document->get_title();
 				$document       = wcpdf_get_document( $document->get_type(), $order );
 
 				if ( $document ) {
-					$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'ubl' ) );
+					$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'xml' ) );
 					$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 					$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-					$class           = array( $document->get_type(), 'ubl' );
+					$class           = array( $document->get_type(), 'xml' );
 
 					if ( $document_exists ) {
 						$class[] = 'exists';
@@ -708,8 +708,8 @@ class Admin {
 
 					$meta_box_actions[ $document->get_type() ] = array(
 						'url'    => $document_url,
-						'alt'    => "UBL " . $document_title,
-						'title'  => "UBL " . $document_title,
+						'alt'    => "E-" . $document_title,
+						'title'  => "E-" . $document_title,
 						'exists' => $document_exists,
 						'class'  => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
 					);

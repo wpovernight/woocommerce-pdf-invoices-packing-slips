@@ -28,7 +28,7 @@ class Invoice extends OrderDocumentMethods {
 		parent::__construct( $order );
 
 		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf', 'ubl' ), $this );
+		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf', 'xml' ), $this );
 	}
 
 	public function use_historical_settings() {
@@ -175,7 +175,7 @@ class Invoice extends OrderDocumentMethods {
 					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
 					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
 					break;
-				case 'ubl':
+				case 'xml':
 					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output_format}";
 					$settings_fields = $this->get_ubl_settings_fields( $option_name );
 					break;
