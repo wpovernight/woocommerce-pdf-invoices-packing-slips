@@ -437,6 +437,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper {
 	display: flex;
 	gap: 5px;
+	position: relative;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > input,
@@ -450,6 +451,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 30px;
 	line-height: 1;
 	vertical-align: middle;
+	border-radius: 4px;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > button.sync-address > .dashicons {
@@ -459,6 +461,38 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding: 0;
 	width: auto;
 	height: auto;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > .sync-tooltip {
+	position: absolute;
+	background-color: #555;
+	color: #fff;
+	padding: 5px 8px;
+	font-size: 12px;
+	border-radius: 4px;
+	white-space: nowrap;
+	opacity: 0;
+	transition: opacity 0.3s;
+	pointer-events: none;
+	z-index: 9999;
+	right: 0;
+	top: 115%;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > .sync-tooltip::after {
+	content: "";
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: transparent transparent #555 transparent;
+}
+
+/* Add a visible state class when showing the tooltip */
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > .sync-tooltip.visible {
+	opacity: 1;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input[type="text"],

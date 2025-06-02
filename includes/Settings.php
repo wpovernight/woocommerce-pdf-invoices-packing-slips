@@ -91,7 +91,7 @@ class Settings {
 		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
 
 		// Sync address from WooCommerce address.
-		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_address_from_woo' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
 
 	public function menu() {
@@ -1333,9 +1333,9 @@ class Settings {
 	/**
 	 * Syncs the address from WooCommerce settings.
 	 *
-	 * @return string|null
+	 * @return void
 	 */
-	public function sync_address_from_woo(): void {
+	public function sync_shop_address_with_woo(): void {
 		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
 
 		$address_field = ! empty( $_POST['address_field'] )
@@ -1343,7 +1343,7 @@ class Settings {
 			: '';
 
 		if ( empty( $address_field ) ) {
-			wp_send_json_error( array( 'message' => 'Address field is required.' ) );
+			wp_send_json_error( array( 'message' => __( 'Address field is required.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			return;
 		}
 
@@ -1359,7 +1359,7 @@ class Settings {
 
 		// Validate the address field against the map.
 		if ( ! array_key_exists( $address_field, $address_map ) ) {
-			wp_send_json_error( array( 'message' => 'Invalid address field.' ) );
+			wp_send_json_error( array( 'message' => __( 'Invalid address field.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			return;
 		}
 
@@ -1368,7 +1368,7 @@ class Settings {
 
 		// Return, if the value is not set.
 		if ( empty( $raw_value ) ) {
-			wp_send_json_error( array( 'message' => 'Address field is empty.' ) );
+			wp_send_json_error( array( 'message' => __( 'The field is empty.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 			return;
 		}
 

@@ -125,15 +125,7 @@ class SettingsCallbacks {
 
 		// Output action button.
 		if ( ! empty( $action_button ) ) {
-			printf(
-				'<button type="button" %1$s %2$s %3$s>%4$s%5$s</button>',
-				! empty( $action_button['class'] ) ? sprintf( 'class="%s"', esc_attr( $action_button['class'] ) ) : '',
-				sprintf( 'id="%s"', esc_attr( $action_button['id'] ?? esc_attr( $id ) ) . '_action' ),
-				! empty( $action_button['title'] ) ? sprintf( 'title="%s"', esc_attr( $action_button['title'] ) ) : '',
-				esc_html( $action_button['text'] ),
-				! empty( $action_button['icon'] ) ? sprintf( '<span class="dashicons dashicons-%s"></span>', esc_attr( $action_button['icon'] ) ) : ''
-			);
-
+			$this->output_action_button( $action_button, $id );
 			echo '</div>';
 		}
 
@@ -359,15 +351,7 @@ class SettingsCallbacks {
 
 		// Output action button.
 		if ( ! empty( $action_button ) ) {
-			printf(
-				'<button type="button" %1$s %2$s %3$s>%4$s%5$s</button>',
-				! empty( $action_button['class'] ) ? sprintf( 'class="%s"', esc_attr( $action_button['class'] ) ) : '',
-				sprintf( 'id="%s"', esc_attr( $action_button['id'] ?? esc_attr( $id ) ) . '_action' ),
-				! empty( $action_button['title'] ) ? sprintf( 'title="%s"', esc_attr( $action_button['title'] ) ) : '',
-				esc_html( $action_button['text'] ),
-				! empty( $action_button['icon'] ) ? sprintf( '<span class="dashicons dashicons-%s"></span>', esc_attr( $action_button['icon'] ) ) : ''
-			);
-
+			$this->output_action_button( $action_button, $id );
 			echo '</div>';
 		}
 
@@ -812,6 +796,26 @@ class SettingsCallbacks {
 			return $setting;
 		}
 	}
+
+	/**
+	 * Output the action button.
+	 *
+	 * @param array $action_button
+	 * @param string $id
+	 *
+	 * @return void
+	 */
+	public function output_action_button( array $action_button, string $id ): void {
+		printf(
+			'<button type="button" %1$s %2$s %3$s>%4$s%5$s</button><span class="sync-tooltip">Value is empty</span>',
+			! empty( $action_button['class'] ) ? sprintf( 'class="%s"', esc_attr( $action_button['class'] ) ) : '',
+			sprintf( 'id="%s"', esc_attr( $action_button['id'] ?? esc_attr( $id ) ) . '_action' ),
+			! empty( $action_button['title'] ) ? sprintf( 'title="%s"', esc_attr( $action_button['title'] ) ) : '',
+			esc_html( $action_button['text'] ),
+			! empty( $action_button['icon'] ) ? sprintf( '<span class="dashicons dashicons-%s"></span>', esc_attr( $action_button['icon'] ) ) : ''
+		);
+	}
+
 }
 
 

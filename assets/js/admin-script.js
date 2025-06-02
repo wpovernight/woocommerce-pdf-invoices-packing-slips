@@ -735,14 +735,13 @@ jQuery( function( $ ) {
 	//----------> /Settings Accordion <----------//
 	//----------> Sync Address <----------//
 
-	const syncButtons = $( '.sync-address' );
-
-	syncButtons.on( 'click', function( event ) {
+	$( '.sync-address' ).on( 'click', function( event ) {
 		event.preventDefault();
 
-		const $button = $( this );
-		const $icon   = $button.find( 'span.dashicons' );
-		let $field    = $button.closest( 'td' ).find( 'input' );
+		const $button  = $( this );
+		const $icon    = $button.find( 'span.dashicons' );
+		const $tooltip = $button.closest( 'td' ).find( '.sync-tooltip' );
+		let $field     = $button.closest( 'td' ).find( 'input' );
 
 		if ( $field.length === 0 ) {
 			$field = $button.closest( 'td' ).find( 'select' );
@@ -760,10 +759,15 @@ jQuery( function( $ ) {
 				address_field: $field.attr( 'id' ),
 			},
 			success: function( response ) {
-				if ( response.success ) {
+				if ( response.success && response.data.value && '' !== response.data.value.trim() ) {
 					// Update the input value with the synced address.
 					$field.val( response.data.value );
 					triggerPreview();
+				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
+					$tooltip.text( response.data.message ).addClass('visible');
+					setTimeout( function() {
+					    $tooltip.removeClass( 'visible' );
+					}, 3000 );
 				}
 			},
 			complete: function() {
