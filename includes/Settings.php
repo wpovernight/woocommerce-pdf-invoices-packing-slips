@@ -89,6 +89,9 @@ class Settings {
 
 		// Apply categories to general settings.
 		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
+
+		// Sync address from WooCommerce address.
+		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
 
 	public function menu() {
@@ -519,19 +522,25 @@ class Settings {
 	 */
 	public function get_common_document_settings(): array {
 		return array(
-			'paper_size'         => $this->general_settings['paper_size'] ?? '',
-			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
-			'header_logo'        => $this->general_settings['header_logo'] ?? '',
-			'header_logo_height' => $this->general_settings['header_logo_height'] ?? '',
-			'vat_number'         => $this->general_settings['vat_number'] ?? '',
-			'coc_number'         => $this->general_settings['coc_number'] ?? '',
-			'shop_name'          => $this->general_settings['shop_name'] ?? '',
-			'shop_phone_number'  => $this->general_settings['shop_phone_number'] ?? '',
-			'shop_address'       => $this->general_settings['shop_address'] ?? '',
-			'footer'             => $this->general_settings['footer'] ?? '',
-			'extra_1'            => $this->general_settings['extra_1'] ?? '',
-			'extra_2'            => $this->general_settings['extra_2'] ?? '',
-			'extra_3'            => $this->general_settings['extra_3'] ?? '',
+			'paper_size'              => $this->general_settings['paper_size'] ?? '',
+			'font_subsetting'         => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
+			'header_logo'             => $this->general_settings['header_logo'] ?? '',
+			'header_logo_height'      => $this->general_settings['header_logo_height'] ?? '',
+			'vat_number'              => $this->general_settings['vat_number'] ?? '',
+			'coc_number'              => $this->general_settings['coc_number'] ?? '',
+			'shop_name'               => $this->general_settings['shop_name'] ?? '',
+			'shop_phone_number'       => $this->general_settings['shop_phone_number'] ?? '',
+			'shop_address_line_1'     => $this->general_settings['shop_address_line_1'] ?? '',
+			'shop_address_line_2'     => $this->general_settings['shop_address_line_2'] ?? '',
+			'shop_address_country'    => $this->general_settings['shop_address_country'] ?? '',
+			'shop_address_state'      => $this->general_settings['shop_address_state'] ?? '',
+			'shop_address_city'       => $this->general_settings['shop_address_city'] ?? '',
+			'shop_address_postcode'   => $this->general_settings['shop_address_postcode'] ?? '',
+			'shop_address_additional' => $this->general_settings['shop_address_additional'] ?? '',
+			'footer'                  => $this->general_settings['footer'] ?? '',
+			'extra_1'                 => $this->general_settings['extra_1'] ?? '',
+			'extra_2'                 => $this->general_settings['extra_2'] ?? '',
+			'extra_3'                 => $this->general_settings['extra_3'] ?? '',
 		);
 	}
 
@@ -1318,6 +1327,65 @@ class Settings {
 		);
 
 		return $settings_categories;
+	}
+
+	/**
+	 * Syncs the address from WooCommerce settings.
+	 *
+	 * @return void
+	 */
+	public function sync_shop_address_with_woo(): void {
+		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+
+		$address_field = ! empty( $_POST['address_field'] )
+			? sanitize_text_field( wp_unslash( $_POST['address_field'] ) )
+			: '';
+
+		if ( empty( $address_field ) ) {
+			wp_send_json_error( array( 'message' => __( 'Address field is required.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		// Map address fields to the option keys used by WooCommerce.
+		$address_map = array(
+			'shop_address_line_1'   => 'woocommerce_store_address',
+			'shop_address_line_2'   => 'woocommerce_store_address_2',
+			'shop_address_country'  => 'woocommerce_default_country',
+			'shop_address_state'    => 'woocommerce_default_country',
+			'shop_address_city'     => 'woocommerce_store_city',
+			'shop_address_postcode' => 'woocommerce_store_postcode',
+		);
+
+		// Validate the address field against the map.
+		if ( ! array_key_exists( $address_field, $address_map ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid address field.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		$option_key = $address_map[ $address_field ];
+		$raw_value  = get_option( $option_key, '' );
+
+		// Return, if the value is not set.
+		if ( empty( $raw_value ) ) {
+			wp_send_json_error( array( 'message' => __( 'The field is empty.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		// Parse the value based on the address field.
+		switch ( $address_field ) {
+			case 'shop_address_country':
+				$parsed = wc_format_country_state_string( $raw_value );
+				$value  = $parsed['country'] ?? null;
+				break;
+			case 'shop_address_state':
+				$parsed = wc_format_country_state_string( $raw_value );
+				$value  = $parsed['state'] ?? null;
+				break;
+			default:
+				$value = $raw_value;
+		}
+
+		wp_send_json_success( array( 'value' => $value ) );
 	}
 
 }

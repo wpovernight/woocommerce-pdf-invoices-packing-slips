@@ -303,7 +303,7 @@ abstract class OrderDocument {
 			$document_number = apply_filters( "woocommerce_generate_{$this->slug}_number", $document_number, $this->order );  // legacy (backwards compatibility)
 			$document_number = apply_filters( "woocommerce_{$this->slug}_number", $document_number, $this->order->get_id() ); // legacy (backwards compatibility)
 			$document_number = apply_filters( "wpo_wcpdf_external_{$this->slug}_number", $document_number, $this );
-			
+
 		// If the document number is set to be the order number
 		} elseif (
 			isset( $this->settings['display_number'] ) &&
@@ -322,7 +322,7 @@ abstract class OrderDocument {
 				$number           = (int) preg_replace( '/\D/', '', $document_number );
 				$document_number  = compact( 'number', 'formatted_number' );
 			}
-			
+
 		// Otherwise, get or generate the document number
 		} else {
 			$number_store = $this->get_sequential_number_store();
@@ -378,9 +378,9 @@ abstract class OrderDocument {
 		$non_historical_settings = $this->get_non_historical_settings();
 
 		if ( in_array( $key, $non_historical_settings ) && isset( $latest_settings ) ) {
-			$setting = isset( $latest_settings[$key] ) ? $latest_settings[$key] : $default;
+			$setting = isset( $latest_settings[ $key ] ) ? $latest_settings[ $key ] : $default;
 		} else {
-			$setting = isset( $settings[$key] ) ? $settings[$key] : $default;
+			$setting = isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
 		}
 
 		return $setting;
@@ -1326,8 +1326,8 @@ abstract class OrderDocument {
 		}
 
 		// legacy filters
-		if ( in_array( $settings_key, array( 'shop_name', 'shop_address', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
-			$text = apply_filters( "wpo_wcpdf_{$settings_key}", $text, $this );
+		if ( in_array( $settings_key, array( 'shop_name', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
+			$text = apply_filters_deprecated( "wpo_wcpdf_{$settings_key}", array( $text, $this ), '4.5.0', "wpo_wcpdf_{$settings_key}_settings_text" );
 		}
 
 		return apply_filters( "wpo_wcpdf_{$settings_key}_settings_text", $text, $this );
@@ -1365,13 +1365,110 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Return/Show shop/company address line 1 if provided.
+	 */
+	function get_shop_address_line_1(): string {
+		return $this->get_settings_text( 'shop_address_line_1' );
+	}
+	function shop_address_line_1(): void {
+		echo esc_html( $this->get_shop_address_line_1() );
+	}
+
+	/**
+	 * Return/Show shop/company address line 2 if provided.
+	 */
+	function get_shop_address_line_2(): string {
+		return $this->get_settings_text( 'shop_address_line_2' );
+	}
+	function shop_address_line_2(): void {
+		echo esc_html( $this->get_shop_address_line_2() );
+	}
+
+	/**
+	 * Return/Show shop/company address country if provided.
+	 */
+	function get_shop_address_country(): string {
+		return wpo_wcpdf_get_country_name_from_code( $this->get_shop_address_country_code() );
+	}
+	function shop_address_country(): void {
+		echo esc_html( $this->get_shop_address_country() );
+	}
+
+	/**
+	 * Return/Show shop/company address country code if provided.
+	 */
+	function get_shop_address_country_code(): string {
+		return $this->get_settings_text( 'shop_address_country' );
+	}
+	function shop_address_country_code(): void {
+		echo esc_html( $this->get_shop_address_country_code() );
+	}
+
+	/**
+	 * Return/Show shop/company address state if provided.
+	 */
+	function get_shop_address_state(): string {
+		return $this->get_settings_text( 'shop_address_state' );
+	}
+	function shop_address_state(): void {
+		echo esc_html( $this->get_shop_address_state() );
+	}
+
+	/**
+	 * Return/Show shop/company address city if provided.
+	 */
+	function get_shop_address_city(): string {
+		return $this->get_settings_text( 'shop_address_city' );
+	}
+	function shop_address_city(): void {
+		echo esc_html( $this->get_shop_address_city() );
+	}
+
+	/**
+	 * Return/Show shop/company address postcode if provided.
+	 */
+	function get_shop_address_postcode(): string {
+		return $this->get_settings_text( 'shop_address_postcode' );
+	}
+	function shop_address_postcode(): void {
+		echo esc_html( $this->get_shop_address_postcode() );
+	}
+
+	/**
+	 * Return/Show shop/company address additional info if provided.
+	 */
+	function get_shop_address_additional(): string {
+		return $this->get_settings_text( 'shop_address_additional' );
+	}
+	function shop_address_additional(): void {
+		echo wp_kses_post( $this->get_shop_address_additional() );
+	}
+
+	/**
 	 * Return/Show shop/company address if provided
 	 */
-	public function get_shop_address() {
-		return $this->get_settings_text( 'shop_address' );
+	public function get_shop_address(): string {
+		// Preserve legacy shop address, if it exists, when historical settings are enabled
+		$address = $this->get_settings_text( 'shop_address' );
+		if ( $this->use_historical_settings() && ! empty( $address ) ) {
+			return $address;
+		}
+
+		// Otherwise, build the address from individual fields
+		$address = array(
+			'address_1'    => $this->get_settings_text( 'shop_address_line_1', '', false ),
+			'address_2'    => $this->get_settings_text( 'shop_address_line_2', '', false ),
+			'city'         => $this->get_settings_text( 'shop_address_city', '', false ),
+			'postcode'     => $this->get_settings_text( 'shop_address_postcode', '', false ),
+			'state_code'   => $this->get_settings_text( 'shop_address_state', '', false ),
+			'country_code' => $this->get_settings_text( 'shop_address_country', '', false ),
+			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
+		);
+
+		return wpo_wcpdf_format_address( $address );
 	}
 	public function shop_address() {
-		echo esc_html( $this->get_shop_address() );
+		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
 	}
 
 	/**
@@ -1448,7 +1545,7 @@ abstract class OrderDocument {
 		}
 
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
-		
+
 		if ( ! empty( $pdf ) ) {
 			return $pdf;
 		}
@@ -1555,9 +1652,9 @@ abstract class OrderDocument {
 			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
 			exit();
 		}
-		
+
 		$filename_or_contents = wpo_ips_write_ubl_file( $document, false, $contents_only );
-		
+
 		if ( ! $filename_or_contents ) {
 			wcpdf_log_error( 'Error writing UBL file!', 'error' );
 			exit();
@@ -1566,15 +1663,15 @@ abstract class OrderDocument {
 		if ( $contents_only ) {
 			return $filename_or_contents;
 		}
-		
+
 		$quoted = sprintf( '"%s"', addcslashes( basename( $filename_or_contents ), '"\\' ) );
 		$size   = filesize( $filename_or_contents );
 
 		wcpdf_ubl_headers( $quoted, $size );
-		
+
 		ob_clean();
 		flush();
-		
+
 		if ( WPO_WCPDF()->file_system->exists( $filename_or_contents ) ) {
 			echo WPO_WCPDF()->file_system->get_contents( $filename_or_contents ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			wp_delete_file( $filename_or_contents );
@@ -1628,11 +1725,11 @@ abstract class OrderDocument {
 		if ( empty( $file ) ) {
 			$file = $this->type . '.php';
 		}
-		
+
 		$path               = $this->get_template_path();
 		$file_path          = "{$path}/{$file}";
 		$fallback_file_path = WPO_WCPDF()->plugin_path() . '/templates/Simple/' . $file;
-		
+
 		if ( ! WPO_WCPDF()->file_system->exists( $file_path ) && WPO_WCPDF()->file_system->exists( $fallback_file_path ) ) {
 			$file_path = $fallback_file_path;
 		}
@@ -1648,7 +1745,7 @@ abstract class OrderDocument {
 		if ( ! empty( $args ) && is_array( $args ) ) {
 			extract( $args );
 		}
-		
+
 		ob_start();
 		if ( WPO_WCPDF()->file_system->exists( $file ) ) {
 			include( $file );

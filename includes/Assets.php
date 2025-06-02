@@ -145,6 +145,7 @@ class Assets {
 				'wpo_wcpdf_admin',
 				array(
 					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'nonce'                     => wp_create_nonce( 'wpo_wcpdf_admin_nonce' ),
 					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
 					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.min.js?ver=' . $pdfjs_version, // taken from https://cdnjs.com/libraries/pdf.js
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
@@ -186,7 +187,16 @@ class Assets {
 						),
 					),
 					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
-					'mysql_int_size_limit'      => __( 'The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'mysql_int_size_limit'      => sprintf(
+						/* translators: mysql int size */
+						__( 'The number should be smaller than %s. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>2147483647</code>'
+					),
+					'shop_country_changed_messages' => array(
+						'loading' => __( 'Loading', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
+						'error'   => __( 'Error loading', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				)
 			);
 

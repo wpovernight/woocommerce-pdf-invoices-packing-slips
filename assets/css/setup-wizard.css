@@ -300,27 +300,19 @@ li.completed .wpo-progress-marker::before {
 
 /* Shop address */
 
-.wpo-setup-input .shop-name {
+.wpo-setup-input .shop-name,
+.wpo-setup-input .shop-address-line-1,
+.wpo-setup-input .shop-address-line-2,
+.wpo-setup-input .shop-address-country,
+.wpo-setup-input .shop-address-state,
+.wpo-setup-input .shop-address-city,
+.wpo-setup-input .shop-address-postcode {
 	width: 100%;
 	height: 40px;
 	padding: 10px 15px;
 	box-sizing: border-box;
 	font-size: 1.2em;
 	margin-bottom: 20px;
-}
-
-.wpo-setup-input .shop-address {
-	width: 100%;
-	height: 200px;
-	padding: 15px 15px;
-	font-size: 1.2em;
-	line-height: 1.4em;
-	box-sizing: border-box;
-	border: 1px solid #8c8f94;
-	resize: none;
-	float: left;
-	margin: 0;
-	text-align: left !important;
 }
 
 /* Your logo */

@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.5.0-beta.4
+Stable tag: 4.6.0-rc.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,31 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.5.2 (2025-05-27) =
+- Tweak: Suppress log entries for missing font files that are expected and not required
+- Fix: Support for `{state_code}` in shop address formatting
+- Fix: Restore `wpo_wcpdf_shop_address` hook for compatibility
+- Fix: Missing support for placeholders like `{city_upper}` in shop address formatting
+
+= 4.5.1 (2025-05-26) =
+- Fix: Shop address not shown in documents when historical settings are enabled
+- Fix: Validation issues flagged by WP Plugin Check
+
+= 4.5.0 (2025-05-26) =
+- New: Separated shop address fields introduced
+- New: Categories added to General settings
+- New: E-Invoicing tax categories, schemes, and exemption reasons aligned with EN16931 standard
+- New: Setup wizard option to display PDF action buttons in orders list
+- Tweak: Added permission check to pre-release notice display
+- Tweak: Default to PHP file functions in Filesystem class due to `WP_Filesystem` instability
+- Fix: "Reload Attachment Translations" setting always shown as checked
+- Fix: Fatal error in Semaphore class when `wcpdf_log_error()` is undefined
+- Fix: Restrict document number input to valid positive integers
+- Fix: Fonts not reinstalled properly after upgrade when temporary folder is cleared
+- Fix: Delay in updating PDF Document Data
+- Translations: Updated translation template (POT)
+- Tested: Tested up to WooCommerce 9.9
 
 = 4.4.1 (2025-04-28) =
 - Tweak: Improve Invoice My Account link logic for custom status checks and code clarity
