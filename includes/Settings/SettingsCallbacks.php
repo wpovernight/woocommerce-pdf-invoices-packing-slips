@@ -350,7 +350,6 @@ class SettingsCallbacks {
 		}
 	}
 
-
 	/**
 	 * Textarea callback.
 	 *

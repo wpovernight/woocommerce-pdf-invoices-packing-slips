@@ -129,9 +129,14 @@ class SettingsEDI {
 				'args'     => array(
 					'option_name'       => $option_name,
 					'id'                => "{$syntax}_format",
-					'options'           => array_combine(
-						array_keys( $formats ),
-						array_column( $formats, 'name' )
+					'options'           =>  array_merge(
+						array(
+							'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						),
+						array_combine(
+							array_keys( $formats ),
+							array_column( $formats, 'name' )
+						)
 					),
 					'description'       => sprintf(
 						/* translators: %s syntax */
