@@ -272,7 +272,7 @@ class Main {
 		return $pdf_path;
 	}
 
-	public function get_document_ubl_attachment( $document, $tmp_path ) {
+	public function get_document_xml_attachment( $document, $tmp_path ) {
 		return wpo_ips_edi_write_file( $document, true );
 	}
 
@@ -306,9 +306,6 @@ class Main {
 				}
 
 				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $output_format );
-				if ( 'xml' === $output_format ) {
-					$extra_condition = apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document_type, $output_format ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' );
-				}
 
 				if ( in_array( $email_id, $attach_to_email_ids ) && $extra_condition ) {
 					$document_types[ $output_format ][] = $document_type;
@@ -498,7 +495,7 @@ class Main {
 
 				switch ( $output_format ) {
 					case 'xml':
-						$document->output_ubl();
+						$document->output_xml();
 						break;
 					case 'html':
 						add_filter( 'wpo_wcpdf_use_path', '__return_false' );

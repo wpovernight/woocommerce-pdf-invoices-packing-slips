@@ -342,7 +342,7 @@ class Settings {
 							$preview_data = base64_encode( $document->preview_pdf() );
 							break;
 						case 'xml':
-							$preview_data = $document->preview_ubl();
+							$preview_data = $document->preview_xml();
 							break;
 					}
 

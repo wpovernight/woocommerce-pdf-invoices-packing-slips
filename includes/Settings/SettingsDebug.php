@@ -365,10 +365,8 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+				
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings = get_option( "wpo_wcpdf_documents_settings_{$type}", [] );
 					break;
 				}
@@ -434,10 +432,8 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+				
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
 				}
@@ -504,10 +500,8 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+				
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
 				}

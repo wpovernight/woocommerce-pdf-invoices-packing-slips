@@ -1626,14 +1626,14 @@ abstract class OrderDocument {
 		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
-	public function preview_ubl() {
+	public function preview_xml() {
 		// get last settings
 		$this->settings = $this->get_settings( true );
 
-		return $this->output_ubl( true );
+		return $this->output_xml( true );
 	}
 
-	public function output_ubl( $contents_only = false ) {
+	public function output_xml( $contents_only = false ) {
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
 		if ( ! $document ) {

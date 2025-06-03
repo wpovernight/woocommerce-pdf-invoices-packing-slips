@@ -5,6 +5,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $message = 'The hook "%s" is deprecated since version %s. Use "%s" instead.';
 
+if ( has_action( 'wpo_wcpdf_custom_ubl_attachment_condition' ) ) {
+	$version = '3.6.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_custom_ubl_attachment_condition',
+		sprintf(
+			$message,
+			'wpo_wcpdf_custom_ubl_attachment_condition',
+			$version,
+			'wpo_wcpdf_custom_attachment_condition'
+		),
+		$version
+	);
+}
+
 if ( has_action( 'wpo_wc_ubl_document_root_element' ) ) {
 	$version = '5.0.0';
 	_doing_it_wrong(
@@ -210,6 +224,62 @@ if ( has_action( 'wpo_wcpdf_ubl_meta_box_actions' ) ) {
 			'wpo_wcpdf_ubl_meta_box_actions',
 			$version,
 			'wpo_ips_edi_meta_box_actions'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wcpdf_ubl_tax_schemes' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_tax_schemes',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_tax_schemes',
+			$version,
+			'wpo_ips_edi_tax_schemes'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wcpdf_ubl_tax_categories' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_tax_categories',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_tax_categories',
+			$version,
+			'wpo_ips_edi_tax_categories'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wcpdf_ubl_tax_reasons' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_tax_reasons',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_tax_reasons',
+			$version,
+			'wpo_ips_edi_tax_reasons'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wcpdf_ubl_tax_remarks' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_tax_remarks',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_tax_remarks',
+			$version,
+			'wpo_ips_edi_tax_remarks'
 		),
 		$version
 	);

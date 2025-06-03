@@ -423,7 +423,7 @@ class TaxesSettings {
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_wcpdf_ubl_tax_schemes', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_tax_schemes', array() );
 
 		return $extra + $defaults;
 	}
@@ -446,7 +446,7 @@ class TaxesSettings {
 			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_wcpdf_ubl_tax_categories', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_tax_categories', array() );
 
 		return $extra + $defaults;
 	}
@@ -550,7 +550,7 @@ class TaxesSettings {
 			'VATEX-FR-298SEXDECIESA' => __( 'Exempt based on article 298 sexdecies A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_wcpdf_ubl_tax_reasons', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_tax_reasons', array() );
 
 		return $extra + $defaults;
 	}
@@ -609,7 +609,7 @@ class TaxesSettings {
 			),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_wcpdf_ubl_tax_remarks', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_tax_remarks', array() );
 
 		return $extra + $defaults;
 	}
