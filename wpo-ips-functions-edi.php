@@ -233,6 +233,43 @@ function wpo_ips_edi_is_country_format_extension_active(): bool {
 }
 
 /**
+ * Get the current EDI syntax
+ *
+ * @return string
+ */
+function wpo_ips_edi_get_current_syntax(): string {
+	$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+	$syntax       = 'ubl';
+
+	if ( ! empty( $edi_settings['syntax'] ) ) {
+		$syntax = $edi_settings['syntax'];
+	}
+
+	return apply_filters( 'wpo_ips_edi_current_syntax', $syntax, $edi_settings );
+}
+
+/**
+ * Get the current EDI format
+ *
+ * @return string
+ */
+function wpo_ips_edi_get_current_format(): string {
+	$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+	$format       = 'ubl_2_1';
+	
+	if ( ! empty( $edi_settings['syntax'] ) ) {
+		$syntax     = $edi_settings['syntax'];
+		$format_key = "{$syntax}_format";
+		
+		if ( ! empty( $edi_settings[ $format_key ] ) ) {
+			$format = $edi_settings[ $format_key ];
+		}
+	}
+	
+	return apply_filters( 'wpo_ips_edi_current_format', $format, $edi_settings );
+}
+
+/**
  * Get the EDI syntaxes
  * 
  * @return array
@@ -264,7 +301,7 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 			'ubl' => array(
 				'ubl_2_1' => array(
 					'name'  => 'UBL 2.1',
-					'class' => \WPO\IPS\edi\Syntax\Ubl\Formats\UblTwoDotOne::class,
+					'class' => \WPO\IPS\EDI\Syntax\Ubl\Formats\UblTwoDotOne::class,
 				),
 				// 'peppol_bis_3_0' => array(
 				// 	'name'  => 'Peppol BIS Billing 3.0',

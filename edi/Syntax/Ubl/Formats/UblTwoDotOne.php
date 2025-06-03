@@ -18,7 +18,7 @@ class UblTwoDotOne extends AbstractFormat {
 	 *
 	 * @return array
 	 */
-	private function get_invoice_structure(): array {
+	public function get_invoice_structure(): array {
 		return array(
 			'ubl_version_id' => array(
 				'enabled' => true,

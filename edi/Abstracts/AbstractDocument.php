@@ -79,17 +79,18 @@ abstract class AbstractDocument {
 	/**
 	 * Get the format structure
 	 *
+	 * @param string $syntax
 	 * @param string $format
 	 * @return array|false
 	 */
-	public function get_format_structure( string $format ) {
-		$available_formats = $this->get_available_formats();
+	public function get_format_structure( string $syntax, string $format ) {
+		$available_formats = wpo_ips_edi_formats( $syntax );
 		
 		if ( ! isset( $available_formats[ $format ] ) ) {
 			return false;
 		}
 		
-		$structure = ( new $available_formats[ $format ]() )->get_structure();
+		$structure = ( new $available_formats[ $format ]['class']() )->get_structure( $this->order_document->slug );
 		
 		if ( empty( $structure ) ) {
 			return false;
@@ -291,9 +292,10 @@ abstract class AbstractDocument {
 	 */
 	public function get_data(): array {
 		$data   = array();
-		$format = ''; // TODO: Get the format from the document
+		$syntax = wpo_ips_edi_get_current_syntax();
+		$format = wpo_ips_edi_get_current_format();
 
-		foreach ( $this->get_format_structure( $format ) as $key => $value ) {
+		foreach ( $this->get_format_structure( $syntax, $format ) as $key => $value ) {
 			$options  = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
 			$handlers = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
 
