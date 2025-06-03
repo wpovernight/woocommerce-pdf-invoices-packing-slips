@@ -142,7 +142,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 					<h2 class="doc-output-toggle-group">
 						<?php
 							foreach ( $document->output_formats as $document_output_format ) {
-								if ( ! wpo_ips_edi_is_available() && 'xml' === $document_output_format ) {
+								if ( 'xml' === $document_output_format && ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_preview_is_enabled() ) ) {
 									continue;
 								}
 

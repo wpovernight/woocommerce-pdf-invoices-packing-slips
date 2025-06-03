@@ -61,7 +61,7 @@ class SettingsDocuments {
 					if( $document->get_type() != $section ) {
 						$title = wp_strip_all_tags( $document->get_title() );
 						if ( empty( trim( $title ) ) ) {
-							$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
+							$title = '[' . __( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ) . ']';
 						}
 						$active = $document->get_type() == $section ? 'active' : '';
 						printf( '<li class="%2$s"><a href="%1$s" class="%2$s">%3$s</a></li>', esc_url( add_query_arg( 'section', $document->get_type() ) ), esc_attr( $active ), esc_html( $title ) );

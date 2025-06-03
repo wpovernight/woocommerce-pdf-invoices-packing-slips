@@ -47,16 +47,16 @@ class SettingsEDI {
 		?>
 		<div class="wcpdf_ubl_settings_sections">
 			<?php if ( count( $this->sections ) > 1 ) : ?>
-			<h2 class="nav-tab-wrapper">
-				<?php
-					foreach ( $this->sections as $section => $title ) {
-						$active = ( $section == $active_section ) ? 'nav-tab-active' : '';
-						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
-					}
-				?>
-			</h2>
+				<h2 class="nav-tab-wrapper">
+					<?php
+						foreach ( $this->sections as $section => $title ) {
+							$active = ( $section == $active_section ) ? 'nav-tab-active' : '';
+							printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
+						}
+					?>
+				</h2>
 			<?php else : ?>
-			<h3><?php echo esc_html( $this->sections[ $active_section ] ); ?></h3>
+				<h3><?php echo esc_html( $this->sections[ $active_section ] ); ?></h3>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -165,6 +165,19 @@ class SettingsEDI {
 				'option_name' => $option_name,
 				'id'          => 'embed_encrypted_pdf',
 				'description' => __( 'Embed the encrypted PDF invoice file within the e-document. Note that this option may not be valid for all formats.', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
+		
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'enabled_preview',
+			'title'    => __( 'Enable XML Preview', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'option_name' => $option_name,
+				'id'          => 'enabled_preview',
+				'description' => __( 'Enable the XML preview for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
 

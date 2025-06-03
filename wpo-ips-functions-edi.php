@@ -270,6 +270,16 @@ function wpo_ips_edi_get_current_format(): string {
 }
 
 /**
+ * Check if EDI preview is enabled
+ * 
+ * @return bool
+ */
+function wpo_ips_edi_preview_is_enabled(): bool {
+	$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+	return ! empty( $edi_settings['enabled_preview'] );
+}
+
+/**
  * Get the EDI syntaxes
  * 
  * @return array
