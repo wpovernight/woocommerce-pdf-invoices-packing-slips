@@ -264,7 +264,7 @@ class Assets {
 			// edi
 			if ( 'edi' === $tab ) {
 				wp_enqueue_script(
-					'wpo-wcpdf-edi',
+					'wpo-ips-edi',
 					WPO_WCPDF()->plugin_url() . '/assets/js/edi-script' . $suffix . '.js',
 					array( 'jquery' ),
 					WPO_WCPDF_VERSION,
@@ -272,10 +272,11 @@ class Assets {
 				);
 
 				wp_localize_script(
-					'wpo-wcpdf-edi',
-					'wpo_wcpdf_edi',
+					'wpo-ips-edi',
+					'wpo_ips_edi',
 					array(
 						'ajaxurl' => admin_url( 'admin-ajax.php' ),
+						'nonce'   => wp_create_nonce( 'wpo_ips_edi_nonce' ),
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),

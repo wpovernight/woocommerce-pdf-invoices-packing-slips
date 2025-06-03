@@ -33,10 +33,12 @@ class SettingsEDI {
 
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
-
-		// VAT number or COC number is empty
+		
+		// Admin notices
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
 		add_action( 'admin_notices', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'standard_update_notice' ) );
+		
+		// AJAX
 		add_action( 'wp_ajax_wpo_ips_edi_save_taxes', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'ajax_save_taxes' ) );
 		add_action( 'wp_ajax_wpo_ips_edi_reload_tax_table', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'ajax_reload_tax_table' ) );
 	}

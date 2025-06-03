@@ -58,7 +58,7 @@ jQuery( function ( $ ) {
 		const payload = data + '&action=' + encodeURIComponent( action ) + '&nonce=' + encodeURIComponent( nonce );
 		const $notice = $( '#edi-tax-save-notice' );
 
-		$.post( wpo_wcpdf_edi.ajaxurl, payload, function ( response ) {
+		$.post( wpo_ips_edi.ajaxurl, payload, function ( response ) {
 			const message   = response.data || 'Unknown response.';
 			let noticeClass = 'notice';
 
@@ -88,8 +88,9 @@ jQuery( function ( $ ) {
 	function reloadTaxTable() {
 		const selectedClass = $( '.edi-tax-class-select' ).val();
 
-		$.get( wpo_wcpdf_edi.ajaxurl, {
+		$.get( wpo_ips_edi.ajaxurl, {
 			action: 'wpo_ips_edi_reload_tax_table',
+			nonce: wpo_ips_edi.nonce,
 			tax_class: selectedClass
 		}, function ( html ) {
 			const $container = $( `.edi-tax-class-table[data-tax-class="${selectedClass}"]` );

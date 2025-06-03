@@ -63,12 +63,19 @@ class TaxesSettings {
 		wp_send_json_success( __( 'Tax settings saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 	
-	public static function ajax_reload_tax_table () {
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( -1 );
+	/**
+	 * Reload the tax table via AJAX.
+	 * 
+	 * @return void
+	 */
+	public static function ajax_reload_tax_table(): void {
+		if ( ! check_ajax_referer( 'wpo_ips_edi_nonce', 'nonce', false ) ) {
+			wp_send_json_error( __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
-
-		$tax_class = isset( $_GET['tax_class'] ) ? sanitize_text_field( $_GET['tax_class'] ) : '';
+		
+		$request   = stripslashes_deep( $_GET );
+		$tax_class = isset( $request['tax_class'] ) ? sanitize_text_field( $request['tax_class'] ) : '';
+		
 		ob_start();
 		self::output_table_for_tax_class( $tax_class );
 		$html = ob_get_clean();
