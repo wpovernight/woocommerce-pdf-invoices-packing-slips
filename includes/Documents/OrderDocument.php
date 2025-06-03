@@ -395,7 +395,8 @@ abstract class OrderDocument {
 	}
 
 	public function is_enabled( $output_format = 'pdf' ) {
-		$is_enabled = $this->get_setting( 'enabled', false, $output_format );
+		$output_format = ( 'xml' === $output_format ) ? 'pdf' : $output_format; // currently not using separated settings for EDI
+		$is_enabled    = $this->get_setting( 'enabled', false, $output_format );
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}

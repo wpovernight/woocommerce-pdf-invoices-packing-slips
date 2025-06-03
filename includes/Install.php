@@ -675,8 +675,9 @@ class Install {
 			
 			if ( ! empty( $invoice_settings['ubl'] ) ) {
 				$edi_settings = array(
-					'syntax'     => 'ubl',
-					'ubl_format' => 'ubl_2_1',
+					'document_types' => array( 'invoice' ),
+					'syntax'         => 'ubl',
+					'ubl_format'     => 'ubl_2_1',
 				);
 				
 				if ( ! empty( $invoice_settings['ubl']['enabled'] ) ) {

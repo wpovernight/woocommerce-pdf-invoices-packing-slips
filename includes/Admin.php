@@ -516,7 +516,7 @@ class Admin {
 		);
 
 
-		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
+		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
 		if ( count( $ubl_documents ) > 0 ) {
 			// create UBL buttons
 			add_meta_box(
@@ -689,7 +689,7 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
+		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
 			if ( in_array( 'xml', $document->output_formats ) ) {

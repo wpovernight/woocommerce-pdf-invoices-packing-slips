@@ -102,6 +102,33 @@ class SettingsEDI {
 				)
 			),
 			array(
+				'type'			=> 'setting',
+				'id'			=> 'document_types',
+				'title'			=> __( 'Document Types', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'select',
+				'section'		=> $section,
+				'args'			=> array(
+					'option_name'     => $option_name,
+					'id'              => 'document_types',
+					'options'         => $this->get_document_types(),
+					'multiple'        => true,
+					'enhanced_select' => true,
+					'placeholder'     => __( 'Select one or more document types with electronic format.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'send_attachments',
+				'title'    => __( 'Send Attachments', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => $section,
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'send_attachments',
+					'description' => __( 'When sending a document by e-mail, automatically include the electronic version attachment along with the PDF.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
+			array(
 				'type'     => 'setting',
 				'id'       => 'syntax',
 				'title'    => __( 'Preferred Syntax', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -242,6 +269,24 @@ class SettingsEDI {
 		}
 		
 		return $default;
+	}
+	
+	/**
+	 * Get the available EDI document types.
+	 *
+	 * @return array
+	 */
+	private function get_document_types(): array {
+		$xml_documents  = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
+		$document_types = array();
+		
+		foreach ( $xml_documents as $document ) {
+			if ( isset( $document->output_formats ) && is_array( $document->output_formats ) && in_array( 'xml', $document->output_formats ) ) {
+				$document_types[ $document->get_type() ] = $document->get_title();
+			}
+		}
+		
+		return apply_filters( 'wpo_ips_edi_document_types', $document_types );
 	}
 
 }
