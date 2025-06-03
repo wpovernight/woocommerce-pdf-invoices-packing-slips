@@ -663,18 +663,6 @@ class Invoice extends OrderDocumentMethods {
 					'description'     => ! WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
 				)
 			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'include_encrypted_pdf',
-				'title'    => __( 'Include encrypted PDF:', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => $this->type . '_ubl',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'include_encrypted_pdf',
-					'description' => __( 'Embed the encrypted PDF invoice file within the UBL document. Note that this option may not be supported by all UBL formats.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
 		);
 
 		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );

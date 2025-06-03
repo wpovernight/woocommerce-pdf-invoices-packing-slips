@@ -362,7 +362,7 @@ abstract class OrderDocument {
 			'invoice_date_column',
 			'paper_size',
 			'font_subsetting',
-			'include_encrypted_pdf',
+			'embed_encrypted_pdf',
 		), $this );
 	}
 

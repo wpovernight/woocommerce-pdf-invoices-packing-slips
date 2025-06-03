@@ -669,6 +669,8 @@ class Install {
 			if ( ! empty( $ubl_settings ) ) {
 				$ubl_settings['syntax']     = 'ubl';
 				$ubl_settings['ubl_format'] = 'ubl_2_1'; //TODO: We still need to check for UBL extensions and change this format.
+				//TODO: Migrate tax settings
+				//TODO: Migrate `embed_encrypted_pdf`
 				update_option( 'wpo_ips_edi_tax_settings', $ubl_settings );
 				delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
 			}

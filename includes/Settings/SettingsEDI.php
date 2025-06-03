@@ -157,13 +157,13 @@ class SettingsEDI {
 		
 		$settings_fields[] = array(
 			'type'     => 'setting',
-			'id'       => 'attach_encrypted_pdf',
-			'title'    => __( 'Attach encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+			'id'       => 'embed_encrypted_pdf',
+			'title'    => __( 'Embed encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
 			'callback' => 'checkbox',
 			'section'  => $section,
 			'args'     => array(
 				'option_name' => $option_name,
-				'id'          => 'attach_encrypted_pdf',
+				'id'          => 'embed_encrypted_pdf',
 				'description' => __( 'Embed the encrypted PDF invoice file within the e-document. Note that this option may not be valid for all formats.', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);

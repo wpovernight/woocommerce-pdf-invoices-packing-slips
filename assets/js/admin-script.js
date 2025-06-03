@@ -58,7 +58,7 @@ jQuery( function( $ ) {
 
 	// disable encrypted pdf option for non UBL 2.1 formats
 	$( "[name='wpo_wcpdf_documents_settings_invoice_ubl[ubl_format]']" ).on( 'change', function( event ) {
-		let $encryptedPdfCheckbox = $( this ).closest( 'form' ).find( "[name='wpo_wcpdf_documents_settings_invoice_ubl[include_encrypted_pdf]']" );
+		let $encryptedPdfCheckbox = $( this ).closest( 'form' ).find( "[name='wpo_wcpdf_documents_settings_invoice_ubl[embed_encrypted_pdf]']" );
 
 		if ( $( this ).val() !== 'ubl_2_1' ) {
 			$encryptedPdfCheckbox.prop( 'checked', false ).prop( 'disabled', true );

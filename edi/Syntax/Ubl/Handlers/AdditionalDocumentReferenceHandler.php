@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AdditionalDocumentReferenceHandler extends AbstractHandler {
 
 	public function handle( $data, $options = array() ) {
-		if ( $this->document->order_document && $this->document->order_document->exists() && $this->document->order_document->get_setting( 'include_encrypted_pdf', false, 'ubl' ) ) {
+		if ( $this->document->order_document && $this->document->order_document->exists() && $this->document->order_document->get_setting( 'embed_encrypted_pdf', false, 'ubl' ) ) {
 			$additionalDocumentReference = array(
 				'name'  => 'cac:AdditionalDocumentReference',
 				'value' => array(
