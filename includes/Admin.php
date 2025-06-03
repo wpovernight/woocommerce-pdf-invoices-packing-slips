@@ -720,7 +720,7 @@ class Admin {
 		?>
 		<ul class="wpo_ips_edi_actions">
 			<?php
-				$ubl_documents = 0;
+				$edi_documents = 0;
 
 				foreach ( $meta_box_actions as $document_type => $data ) {
 					$url    = isset( $data['url'] ) ? $data['url'] : '';
@@ -752,11 +752,11 @@ class Admin {
 							! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : ''
 						);
 
-						$ubl_documents++;
+						$edi_documents++;
 					}
 				}
 
-				if ( 0 === $ubl_documents ) {
+				if ( 0 === $edi_documents ) {
 					esc_html_e( 'E-Documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 			?>
