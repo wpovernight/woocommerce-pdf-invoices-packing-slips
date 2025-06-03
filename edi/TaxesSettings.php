@@ -654,11 +654,11 @@ class TaxesSettings {
 		echo '<div class="notice notice-info is-dismissible">';
 		echo '<p>' . wp_kses_post( sprintf(
 			/* translators: %1$s: plugin name, %2$s: standard name, %3$s: version number, %4$s: changelog link */
-			__( 'The %1$s UBL tax settings were updated to %2$s version %3$s. %4$s', 'woocommerce-pdf-invoices-packing-slips' ),
+			__( 'The %1$s E-Documents tax settings were updated to %2$s version %3$s. %4$s', 'woocommerce-pdf-invoices-packing-slips' ),
 			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
 			'<strong>' . esc_html( self::$standard ) . '</strong>',
 			'<code>' . esc_html( self::$standard_version ) . '</code>',
-			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '" id="ubl-toggle-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi&section=taxes' ) ) . '">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 		) ) . '</p>';
 
 		echo '<p><a href="' . esc_url( $dismiss_url ) . '" class="button">' . esc_html__( 'Dismiss', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
