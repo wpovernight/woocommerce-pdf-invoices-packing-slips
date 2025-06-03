@@ -128,12 +128,14 @@ function wcpdf_get_bulk_actions() {
 	foreach ( $documents as $document ) {
 		foreach ( $document->output_formats as $output_format ) {
 			$slug = $document->get_type();
+			
 			if ( 'pdf' !== $output_format ) {
 				$slug .= "_{$output_format}";
 			}
 
 			if ( $document->is_enabled( $output_format ) ) {
-				$actions[$slug] = strtoupper( $output_format ) . ' ' . $document->get_title();
+				$prefix = ( 'xml' === $output_format ) ? 'E-' : strtoupper( $output_format )  . ' ';
+				$actions[ $slug ] = $prefix . $document->get_title();
 			}
 		}
 	}

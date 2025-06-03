@@ -38,13 +38,9 @@ class SettingsDocuments {
 		}
 		
 		$section          = ! empty( $section ) ? $section : 'invoice';
+		$option_name      = "wpo_wcpdf_documents_settings_{$section}";
 		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
-		$output_format    = 'pdf';
 		$section_document = null;
-
-		if ( ! empty( $_REQUEST['output_format'] ) ) {
-			$output_format = sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) );
-		}
 
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() == $section ) {
@@ -89,12 +85,6 @@ class SettingsDocuments {
 			<?php endif; ?>
 		</div>
 		<?php
-			$output_format_compatible = false;
-			if ( 'pdf' !== $output_format && in_array( $output_format, $section_document->output_formats ) ) {
-				$output_format_compatible = true;
-			}
-
-			$option_name = ( 'pdf' === $output_format || ! $output_format_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output_format}";
 			settings_fields( $option_name );
 			do_settings_sections( $option_name );
 			submit_button();

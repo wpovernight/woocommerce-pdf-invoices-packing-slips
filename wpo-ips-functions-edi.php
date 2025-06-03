@@ -315,7 +315,7 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 				// 	'name'  => 'EHF Billing 3.0' . ' (' . __( 'Norway', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
 				// 	'class' => '',
 				// ),
-				// 'svefakturatwodotzero' => array(
+				// 'svefaktura_2_0' => array(
 				// 	'name'  => 'Svefaktura 2.0' . ' (' . __( 'Sweden', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
 				// 	'class' => '',
 				// ),

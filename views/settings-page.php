@@ -109,32 +109,20 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 				$document      = null;
 				$output_format = 'pdf';
 
-				if ( ! empty( $_REQUEST['section'] ) ) {
-					$document_type = sanitize_text_field( wp_unslash( $_REQUEST['section'] ) );
-				} elseif ( ! empty( $_REQUEST['preview'] ) ) {
-					$document_type = sanitize_text_field( wp_unslash( $_REQUEST['preview'] ) );
+				if ( ! empty( $_GET['section'] ) ) {
+					$document_type = sanitize_text_field( wp_unslash( $_GET['section'] ) );
+				} elseif ( ! empty( $_GET['preview'] ) ) {
+					$document_type = sanitize_text_field( wp_unslash( $_GET['preview'] ) );
 				}
 				
 				if ( $document_type ) {
 					$document = WPO_WCPDF()->documents->get_document( $document_type, null );
 				}
+				
+				if ( ! empty( $_GET['output_format'] ) ) {
+					$output_format = sanitize_text_field( wp_unslash( $_GET['output_format'] ) );
+				}
 			?>
-			<?php if ( $document ) : ?>
-				<h2 class="nav-tab-wrapper">
-					<?php
-						foreach ( $document->output_formats as $document_output_format ) {
-							if ( ! wpo_ips_edi_is_available() && 'xml' === $document_output_format ) {
-								continue;
-							}
-
-							$active    = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) ) ? 'nav-tab-active' : '';
-							$tab_title = strtoupper( esc_html( $document_output_format ) );
-							
-							printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), esc_attr( $active ), wp_kses_post( $tab_title ) );
-						}
-					?>
-				</h2>
-			<?php endif; ?>
 			<div class="preview-data-wrapper">
 				<div class="save-settings"><?php submit_button(); ?></div>
 				<div class="preview-data preview-order-data">
@@ -150,6 +138,28 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 					</ul>
 					<div id="preview-order-search-results"><!-- Results populated with JS --></div>
 				</div>
+				<?php if ( $document ) : ?>
+					<h2 class="doc-output-toggle-group">
+						<?php
+							foreach ( $document->output_formats as $document_output_format ) {
+								if ( ! wpo_ips_edi_is_available() && 'xml' === $document_output_format ) {
+									continue;
+								}
+
+								$is_active = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) );
+								$active_class = $is_active ? 'active' : '';
+								$tab_title = strtoupper( esc_html( $document_output_format ) );
+
+								printf(
+									'<a href="%1$s" class="doc-output-toggle %2$s">%3$s</a>',
+									esc_url( add_query_arg( 'output_format', $document_output_format ) ),
+									esc_attr( $active_class ),
+									wp_kses_post( $tab_title )
+								);
+							}
+						?>
+					</h2>
+				<?php endif; ?>
 				<?php if ( 'documents' !== $active_tab ) : ?>
 					<div class="preview-data preview-document-type">
 						<?php

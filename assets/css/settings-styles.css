@@ -358,6 +358,48 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-bottom: 3px solid #51266b;
 }
 
+.doc-output-toggle-group {
+	display: inline-flex;
+	border-radius: 4px;
+	overflow: hidden;
+	border: 1px solid #ccc;
+	font-size: 13px;
+}
+
+.doc-output-toggle {
+	display: inline-block;
+	padding: 4px 10px;
+	text-decoration: none;
+	background-color: #f8f8f8;
+	color: #333;
+	border: none;
+	border-right: 1px solid #ccc;
+	transition: background 0.2s, color 0.2s;
+	line-height: 1.4;
+}
+
+.doc-output-toggle:last-child {
+	border-right: none;
+}
+
+.doc-output-toggle:hover,
+.doc-output-toggle:focus {
+	background-color: #e6e6e6;
+	color: #333;
+}
+
+.doc-output-toggle.active {
+	background-color: #51266b;
+	color: #fff;
+	font-weight: 600;
+}
+
+.doc-output-toggle.active:hover,
+.doc-output-toggle.active:focus {
+	background-color: #51266b;
+	color: #fff;
+}
+
 #wpo-wcpdf-preview-wrapper {
 	width: 100%;
 	height: auto;
