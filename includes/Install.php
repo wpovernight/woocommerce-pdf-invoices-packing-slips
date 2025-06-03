@@ -667,12 +667,29 @@ class Install {
 			$ubl_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 
 			if ( ! empty( $ubl_settings ) ) {
-				$ubl_settings['syntax']     = 'ubl';
-				$ubl_settings['ubl_format'] = 'ubl_2_1'; //TODO: We still need to check for UBL extensions and change this format.
-				//TODO: Migrate tax settings
-				//TODO: Migrate `embed_encrypted_pdf`
 				update_option( 'wpo_ips_edi_tax_settings', $ubl_settings );
 				delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
+			}
+			
+			$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+			
+			if ( ! empty( $invoice_settings['ubl'] ) ) {
+				$edi_settings = array(
+					'syntax'     => 'ubl',
+					'ubl_format' => 'ubl_2_1',
+				);
+				
+				if ( ! empty( $invoice_settings['ubl']['enabled'] ) ) {
+					$edi_settings['enabled'] = $invoice_settings['ubl']['enabled'];
+				}
+				
+				if ( ! empty( $invoice_settings['ubl']['include_encrypted_pdf'] ) ) {
+					$edi_settings['embed_encrypted_pdf'] = $invoice_settings['ubl']['include_encrypted_pdf'];
+				}
+				
+				update_option( 'wpo_ips_edi_settings', $edi_settings );
+				unset( $invoice_settings['ubl'] );
+				update_option( 'wpo_wcpdf_documents_settings_invoice', $invoice_settings );
 			}
 		}
 
