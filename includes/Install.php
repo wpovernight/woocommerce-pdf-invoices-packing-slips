@@ -688,6 +688,10 @@ class Install {
 					$edi_settings['embed_encrypted_pdf'] = $invoice_settings['ubl']['include_encrypted_pdf'];
 				}
 				
+				if ( ! empty( $invoice_settings['ubl']['attach_to_email_ids'] ) ) {
+					$edi_settings['send_attachments'] = '1';
+				}
+				
 				update_option( 'wpo_ips_edi_settings', $edi_settings );
 				unset( $invoice_settings['ubl'] );
 				update_option( 'wpo_wcpdf_documents_settings_invoice', $invoice_settings );
