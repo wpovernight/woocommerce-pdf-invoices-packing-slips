@@ -265,7 +265,7 @@ class Assets {
 			if ( 'edi' === $tab ) {
 				wp_enqueue_script(
 					'wpo-wcpdf-edi',
-					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
+					WPO_WCPDF()->plugin_url() . '/assets/js/edi-script' . $suffix . '.js',
 					array( 'jquery' ),
 					WPO_WCPDF_VERSION,
 					true
