@@ -275,6 +275,7 @@ class Assets {
 					'wpo-wcpdf-edi',
 					'wpo_wcpdf_edi',
 					array(
+						'ajaxurl' => admin_url( 'admin-ajax.php' ),
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),

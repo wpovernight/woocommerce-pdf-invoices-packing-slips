@@ -28,20 +28,55 @@ class TaxesSettings {
 	 * @return array
 	 */
 	public static function get_tax_settings(): array {
-		$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
-		return $edi_settings['tax'] ?? array();
+		return get_option( 'wpo_ips_edi_tax_settings', array() );
 	}
 	
 	/**
 	 * Save the tax settings
 	 * 
+	 * @param array $tax_settings
 	 * @return void
 	 */
-	public static function save_tax_settings( $tax_settings = array() ): void {
-		$edi_settings        = get_option( 'wpo_ips_edi_settings', array() );
-		$edi_settings['tax'] = $tax_settings;
-		update_option( 'wpo_ips_edi_settings', $edi_settings );
+	public static function save_tax_settings( array $tax_settings = array() ): void {
+		update_option( 'wpo_ips_edi_tax_settings', $tax_settings );
 	}
+	
+	/**
+	 * Save taxes from AJAX request.
+	 *
+	 * @return void
+	 */
+	public static function ajax_save_taxes(): void {
+		if (
+			! isset( $_POST['action'] ) ||
+			'wpo_ips_edi_save_taxes' !== $_POST['action'] ||
+			! wp_verify_nonce( $_POST['nonce'], 'edi_save_taxes' )
+		) {
+			wp_send_json_error( __( 'Invalid request.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+		
+		$request      = stripslashes_deep( $_POST );
+		$tax_settings = isset( $request['wpo_ips_edi_tax_settings'] ) ? $request['wpo_ips_edi_tax_settings'] : array();
+		
+		self::save_tax_settings( $tax_settings );
+
+		wp_send_json_success( __( 'Tax settings saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+	
+	public static function ajax_reload_tax_table () {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( -1 );
+		}
+
+		$tax_class = isset( $_GET['tax_class'] ) ? sanitize_text_field( $_GET['tax_class'] ) : '';
+		ob_start();
+		self::output_table_for_tax_class( $tax_class );
+		$html = ob_get_clean();
+
+		echo $html;
+		wp_die();
+	}
+
 	
 	/**
 	 * Output the settings page for UBL taxes.
@@ -98,6 +133,7 @@ class TaxesSettings {
 				);
 			?>
 		</p>
+		<div id="edi-tax-save-notice" class="notice" style="display:none;"></div>
 		<?php
 			$rates                       = \WC_Tax::get_tax_rate_classes();
 			$formatted_rates             = array();
@@ -117,7 +153,7 @@ class TaxesSettings {
 			// Output all tables wrapped in containers
 			foreach ( $formatted_rates as $slug => $name ) {
 				echo '<div class="edi-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
-				$this->output_table_for_tax_class( $slug );
+				self::output_table_for_tax_class( $slug );
 				echo '</div>';
 			}
 			
@@ -139,7 +175,7 @@ class TaxesSettings {
 				<option value="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $name ); ?></option>
 			<?php endforeach; ?>
 			</select>
-			<a class="button button-primary button-edi-save-taxes" data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>"><?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+			<a class="button button-primary button-edi-save-taxes" data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>" data-action="wpo_ips_edi_save_taxes"><?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 		</p>
 		<?php
 	}
@@ -151,7 +187,7 @@ class TaxesSettings {
 	 *
 	 * @return void
 	 */
-	public function output_table_for_tax_class( string $slug ): void {
+	public static function output_table_for_tax_class( string $slug ): void {
 		global $wpdb;
 		
 		$edi_tax_settings = self::get_tax_settings();
@@ -244,17 +280,17 @@ class TaxesSettings {
 							echo '<td>' . esc_html( $city ) . '</td>';
 							echo '<td>' . esc_html( wc_round_tax_total( $result->tax_rate ) ) . '%</td>';
 							echo '<td>';
-							$select_for_scheme = $this->get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
+							$select_for_scheme = self::get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
 							echo wp_kses( $select_for_scheme, $allowed_html );
 							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
 							echo '</td>';
 							echo '<td>';
-							$select_for_category = $this->get_select_for( 'category', 'rate', $result->tax_rate_id, $category );
+							$select_for_category = self::get_select_for( 'category', 'rate', $result->tax_rate_id, $category );
 							echo wp_kses( $select_for_category, $allowed_html );
 							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
 							echo '</td>';
 							echo '<td>';
-							$select_for_reason = $this->get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
+							$select_for_reason = self::get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
 							echo wp_kses( $select_for_reason, $allowed_html );
 							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
 							echo '</td>';
@@ -286,21 +322,21 @@ class TaxesSettings {
 					?>
 					<th>
 						<?php
-							$select_for_scheme = $this->get_select_for( 'scheme', 'class', $slug, $scheme );
+							$select_for_scheme = self::get_select_for( 'scheme', 'class', $slug, $scheme );
 							echo wp_kses( $select_for_scheme, $allowed_html );
 							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme ) . '</code></div>';
 						?>
 					</th>
 					<th>
 						<?php
-							$select_for_category = $this->get_select_for( 'category', 'class', $slug, $category );
+							$select_for_category = self::get_select_for( 'category', 'class', $slug, $category );
 							echo wp_kses( $select_for_category, $allowed_html );
 							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category ) . '</code></div>';
 						?>
 					</th>
 					<th>
 						<?php
-							$select_for_reason = $this->get_select_for( 'reason', 'class', $slug, $reason );
+							$select_for_reason = self::get_select_for( 'reason', 'class', $slug, $reason );
 							echo wp_kses( $select_for_reason, $allowed_html );
 							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason ) . '</code></div>';
 						?>
@@ -332,17 +368,17 @@ class TaxesSettings {
 	 *
 	 * @return string
 	 */
-	public function get_select_for( string $for, string $type, string $id, string $selected ): string {
+	public static function get_select_for( string $for, string $type, string $id, string $selected ): string {
 		$defaults = array(
 			'default' => __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
 		switch ( $for ) {
 			case 'scheme':
-				$options = $this->get_available_schemes();
+				$options = self::get_available_schemes();
 				break;
 			case 'category':
-				$options = $this->get_available_categories();
+				$options = self::get_available_categories();
 				break;
 			case 'reason':
 				$defaults['none'] = __( 'None', 'woocommerce-pdf-invoices-packing-slips' );
@@ -376,7 +412,7 @@ class TaxesSettings {
 	 * 
 	 * @return array
 	 */
-	public function get_available_schemes(): array {
+	public static function get_available_schemes(): array {
 		$defaults = array(
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
@@ -391,7 +427,7 @@ class TaxesSettings {
 	 *
 	 * @return array
 	 */
-	public function get_available_categories(): array {
+	public static function get_available_categories(): array {
 		$defaults = array(
 			'AE' => __( 'VAT Reverse Charge', 'woocommerce-pdf-invoices-packing-slips' ),
 			'E'  => __( 'Exempt from tax', 'woocommerce-pdf-invoices-packing-slips' ),

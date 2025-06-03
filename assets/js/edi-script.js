@@ -46,4 +46,55 @@ jQuery( function ( $ ) {
 		$( '#ubl-standard-changelog' ).slideToggle();
 	} );
 	
+	// Handle the save taxes
+	$( '.button-edi-save-taxes' ).on( 'click', function ( e ) {
+		e.preventDefault();
+
+		const $button = $( this );
+		const nonce   = $button.data( 'nonce' );
+		const action  = $button.data( 'action' );
+		const $form   = $button.closest( 'form#wpo-wcpdf-settings' );
+		const data    = $form.serialize();
+		const payload = data + '&action=' + encodeURIComponent( action ) + '&nonce=' + encodeURIComponent( nonce );
+		const $notice = $( '#edi-tax-save-notice' );
+
+		$.post( wpo_wcpdf_edi.ajaxurl, payload, function ( response ) {
+			const message   = response.data || 'Unknown response.';
+			let noticeClass = 'notice';
+
+			if ( response.success ) {
+				noticeClass += ' notice-success';
+			} else {
+				noticeClass += ' notice-error';
+			}
+
+			$notice
+				.removeClass()
+				.addClass( noticeClass )
+				.html( `<p><strong>${message}</strong></p>` )
+				.slideDown();
+
+			setTimeout( function () {
+				$notice.slideUp();
+			}, 5000 );
+
+			// Reload the tax table
+			if ( response.success ) {
+				reloadTaxTable();
+			}
+		} );
+	} );
+	
+	function reloadTaxTable() {
+		const selectedClass = $( '.edi-tax-class-select' ).val();
+
+		$.get( wpo_wcpdf_edi.ajaxurl, {
+			action: 'wpo_ips_edi_reload_tax_table',
+			tax_class: selectedClass
+		}, function ( html ) {
+			const $container = $( `.edi-tax-class-table[data-tax-class="${selectedClass}"]` );
+			$container.html( html );
+		} );
+	}
+	
 } );

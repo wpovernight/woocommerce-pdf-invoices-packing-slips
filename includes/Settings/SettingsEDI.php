@@ -37,6 +37,8 @@ class SettingsEDI {
 		// VAT number or COC number is empty
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
 		add_action( 'admin_notices', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'standard_update_notice' ) );
+		add_action( 'wp_ajax_wpo_ips_edi_save_taxes', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'ajax_save_taxes' ) );
+		add_action( 'wp_ajax_wpo_ips_edi_reload_tax_table', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'ajax_reload_tax_table' ) );
 	}
 
 	public function output( $active_section, $nonce ) {
