@@ -300,6 +300,16 @@ function wpo_ips_edi_send_attachments(): bool {
 }
 
 /**
+ * Check if EDI encrypted PDF should be embedded
+ * 
+ * @return bool
+ */
+function wpo_ips_edi_embed_encrypted_pdf(): bool {
+	$edi_settings = wpo_ips_edi_get_settings();
+	return apply_filters( 'wpo_ips_edi_embed_encrypted_pdf', ! empty( $edi_settings['embed_encrypted_pdf'] ) );
+}
+
+/**
  * Check if EDI preview is enabled
  * 
  * @return bool

@@ -166,7 +166,6 @@ class Assets {
 						'use_latest_settings',
 						'mark_printed',
 						'unmark_printed',
-						'embed_encrypted_pdf',
 						'include_email_link',
 						'include_email_link_placement',
 					) ),
