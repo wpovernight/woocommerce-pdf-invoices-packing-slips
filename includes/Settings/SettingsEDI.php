@@ -121,7 +121,7 @@ class SettingsEDI {
 				'id'       => "{$syntax}_format",
 				'title'    => sprintf(
 					/* translators: %s syntax */
-					__( '%s format', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( '%s Format', 'woocommerce-pdf-invoices-packing-slips' ),
 					strtoupper( trim( $syntax ) )
 				),
 				'callback' => 'select',
@@ -158,7 +158,7 @@ class SettingsEDI {
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'embed_encrypted_pdf',
-			'title'    => __( 'Embed encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title'    => __( 'Embed Encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
 			'callback' => 'checkbox',
 			'section'  => $section,
 			'args'     => array(

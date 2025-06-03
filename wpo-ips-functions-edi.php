@@ -134,13 +134,23 @@ function wpo_ips_edi_get_maker() {
 }
 
 /**
+ * Get EDI settings
+ *
+ * @return array
+ */
+function wpo_ips_edi_get_settings(): array {
+	return get_option( 'wpo_ips_edi_settings', array() );
+}
+
+/**
  * Check if EDI is available
  *
  * @return bool
  */
 function wpo_ips_edi_is_available(): bool {
+	$edi_settings = wpo_ips_edi_get_settings();
 	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
-	return apply_filters( 'wpo_ips_edi_is_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) );
+	return apply_filters( 'wpo_ips_edi_is_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) && ! empty( $edi_settings['enabled'] ) );
 }
 
 /**
@@ -238,7 +248,7 @@ function wpo_ips_edi_is_country_format_extension_active(): bool {
  * @return string
  */
 function wpo_ips_edi_get_current_syntax(): string {
-	$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+	$edi_settings = wpo_ips_edi_get_settings();
 	$syntax       = 'ubl';
 
 	if ( ! empty( $edi_settings['syntax'] ) ) {
@@ -254,7 +264,7 @@ function wpo_ips_edi_get_current_syntax(): string {
  * @return string
  */
 function wpo_ips_edi_get_current_format(): string {
-	$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+	$edi_settings = wpo_ips_edi_get_settings();
 	$format       = 'ubl_2_1';
 	
 	if ( ! empty( $edi_settings['syntax'] ) ) {
@@ -275,7 +285,7 @@ function wpo_ips_edi_get_current_format(): string {
  * @return bool
  */
 function wpo_ips_edi_preview_is_enabled(): bool {
-	$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+	$edi_settings = wpo_ips_edi_get_settings();
 	return ! empty( $edi_settings['enabled_preview'] );
 }
 
