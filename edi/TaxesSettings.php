@@ -86,22 +86,31 @@ class TaxesSettings {
 		}
 
 		// Dropdown selector for tax classes
-		echo '<select id="ubl-tax-class-select" style="margin-bottom: 1em;">';
+		echo '<p>';
+		echo '<select class="edi-tax-class-select">';
 		foreach ( $formatted_rates as $slug => $name ) {
 			echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
 		}
 		echo '</select>';
-
 		echo '<a href="" class="button button-primary button-edi-save-taxes">' . __( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
+		echo '</p>';
 
 		// Output all tables wrapped in containers
 		foreach ( $formatted_rates as $slug => $name ) {
-			echo '<div class="ubl-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
+			echo '<div class="edi-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
 			$this->output_table_for_tax_class( $slug );
 			echo '</div>';
 		}
 		
-		echo '<p><a href="" class="button button-primary button-edi-save-taxes">' . __( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
+		// Dropdown selector for tax classes
+		echo '<p>';
+		echo '<select class="edi-tax-class-select">';
+		foreach ( $formatted_rates as $slug => $name ) {
+			echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
+		}
+		echo '</select>';
+		echo '<a href="" class="button button-primary button-edi-save-taxes">' . __( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
+		echo '</p>';
 	}
 	
 	/**

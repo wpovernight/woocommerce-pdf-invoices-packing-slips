@@ -29,8 +29,8 @@ jQuery( function ( $ ) {
 		}
 	} );
 	
-	const $tables = $( '.ubl-tax-class-table' );
-	const $select = $( '#ubl-tax-class-select' );
+	const $tables = $( '.edi-tax-class-table' );
+	const $select = $( '.edi-tax-class-select' );
 
 	function updateTableView() {
 		const selected = $select.val();
