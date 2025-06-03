@@ -281,8 +281,8 @@ class Admin {
 									'alt'           => "UBL " . $document_title,
 									'exists'        => $document_exists,
 									'printed'       => false,
-									'ubl'           => true,
-									'class'         => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
+									'edi'           => true,
+									'class'         => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 									'output_format' => $output_format,
 								);
 							}
@@ -303,8 +303,8 @@ class Admin {
 			$exists  = $data['exists']  ? '<svg class="icon-exists" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 			$printed = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 
-			// ubl replaces exists
-			$exists  = isset( $data['output_format'] ) && 'xml' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
+			// EDI replaces exists
+			$exists  = isset( $data['output_format'] ) && 'xml' === $data['output_format'] ? '<svg class="icon-edi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
 
 			$allowed_svg_tags = array(
 				'svg' => array(

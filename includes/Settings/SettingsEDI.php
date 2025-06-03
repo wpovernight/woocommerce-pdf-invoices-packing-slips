@@ -35,7 +35,7 @@ class SettingsEDI {
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
 		
 		// Admin notices
-		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
+		add_action( 'admin_notices', array( $this, 'vat_coc_required') );
 		add_action( 'admin_notices', array( '\\WPO\\IPS\\EDI\\TaxesSettings', 'standard_update_notice' ) );
 		
 		// AJAX
@@ -239,15 +239,19 @@ class SettingsEDI {
 		}
 	}
 
-	public function vat_coc_required_for_ubl_invoice() {
-		$invoice_ubl_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice', 'ubl' );
-
-		if ( isset( $invoice_ubl_settings['enabled'] ) && ( ! isset( WPO_WCPDF()->settings->general_settings['vat_number'] ) || ! isset( WPO_WCPDF()->settings->general_settings['coc_number'] ) ) ) {
+	public function vat_coc_required() {
+		if (
+			wpo_ips_edi_is_available() &&
+			(
+				! isset( WPO_WCPDF()->settings->general_settings['vat_number'] ) ||
+				! isset( WPO_WCPDF()->settings->general_settings['coc_number'] )
+			)
+		) {
 			$message = sprintf(
-				/* translators: 1. General Settings, 2. UBL Settings  */
-				__( 'You\'ve enabled UBL output for a document, but some essential details are missing. Please ensure you\'ve added your VAT and CoC numbers in the %1$s. Also, specify your tax rates in the %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				/* translators: 1. General Settings, 2. EDI Settings  */
+				__( 'You\'ve enabled E-Documents output, but some essential details are missing. Please ensure you\'ve added your VAT and CoC numbers in the %1$s. Also, specify your tax rates in the %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) ) . '">' . __( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
-				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=ubl' ) ) . '">' . __( 'UBL settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi' ) ) . '">' . __( 'E-Documents settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 			);
 
 			echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';

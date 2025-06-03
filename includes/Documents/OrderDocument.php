@@ -527,8 +527,8 @@ abstract class OrderDocument {
 			$order     = wc_get_order( $order->get_parent_id() );
 		}
 
-		// ubl
-		if ( $this->is_enabled( 'ubl' ) && wpo_ips_edi_is_available() ) {
+		// EDI
+		if ( $this->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
 			wpo_ips_edi_save_order_taxes( $order );
 		}
 
@@ -1628,7 +1628,7 @@ abstract class OrderDocument {
 
 	public function preview_ubl() {
 		// get last settings
-		$this->settings = $this->get_settings( true, 'ubl' );
+		$this->settings = $this->get_settings( true );
 
 		return $this->output_ubl( true );
 	}
