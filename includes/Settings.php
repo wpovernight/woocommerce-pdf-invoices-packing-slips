@@ -6,7 +6,7 @@ use WPO\IPS\Settings\SettingsCallbacks;
 use WPO\IPS\Settings\SettingsGeneral;
 use WPO\IPS\Settings\SettingsDocuments;
 use WPO\IPS\Settings\SettingsDebug;
-use WPO\IPS\Settings\SettingsUbl;
+use WPO\IPS\Settings\SettingsEDI;
 use WPO\IPS\Settings\SettingsUpgrade;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,10 +23,10 @@ class Settings {
 	public $documents;
 	public $debug;
 	public $upgrade;
-	public $ubl;
+	public $edi;
 	public $general_settings;
 	public $debug_settings;
-	public $ubl_tax_settings;
+	public $edi_settings;
 
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
@@ -46,12 +46,12 @@ class Settings {
 		$this->general          = SettingsGeneral::instance();
 		$this->documents        = SettingsDocuments::instance();
 		$this->debug            = SettingsDebug::instance();
-		$this->ubl              = SettingsUbl::instance();
+		$this->edi              = SettingsEDI::instance();
 		$this->upgrade          = SettingsUpgrade::instance();
 
-		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
-		$this->ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
+		$this->general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$this->edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -184,10 +184,9 @@ class Settings {
 			),
 		) );
 
-		$settings_tabs['ubl'] = array(
-			'title'          => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+		$settings_tabs['edi'] = array(
+			'title'          => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			'preview_states' => 1,
-			//'beta'           => true,
 		);
 
 		// add status and upgrade tabs last in row
@@ -342,8 +341,8 @@ class Settings {
 						case 'pdf':
 							$preview_data = base64_encode( $document->preview_pdf() );
 							break;
-						case 'ubl':
-							$preview_data = $document->preview_ubl();
+						case 'xml':
+							$preview_data = $document->preview_xml();
 							break;
 					}
 

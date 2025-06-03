@@ -264,8 +264,8 @@ class Admin {
 								);
 							}
 							break;
-						case 'ubl':
-							if ( $document->is_enabled( $output_format ) && wcpdf_is_ubl_available() ) {
+						case 'xml':
+							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() ) {
 								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
@@ -281,8 +281,8 @@ class Admin {
 									'alt'           => "UBL " . $document_title,
 									'exists'        => $document_exists,
 									'printed'       => false,
-									'ubl'           => true,
-									'class'         => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
+									'edi'           => true,
+									'class'         => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 									'output_format' => $output_format,
 								);
 							}
@@ -303,8 +303,8 @@ class Admin {
 			$exists  = $data['exists']  ? '<svg class="icon-exists" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 			$printed = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 
-			// ubl replaces exists
-			$exists  = isset( $data['output_format'] ) && 'ubl' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
+			// EDI replaces exists
+			$exists  = isset( $data['output_format'] ) && 'xml' === $data['output_format'] ? '<svg class="icon-edi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
 
 			$allowed_svg_tags = array(
 				'svg' => array(
@@ -319,7 +319,7 @@ class Admin {
 				),
 			);
 
-			if ( isset( $data['output_format'] ) && ( 'ubl' !== $data['output_format'] || $data['exists'] ) ) {
+			if ( isset( $data['output_format'] ) && ( 'xml' !== $data['output_format'] || $data['exists'] ) ) {
 				printf(
 					'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
 					esc_url( $data['url'] ),
@@ -515,14 +515,12 @@ class Admin {
 			'default'
 		);
 
-
-		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
-		if ( count( $ubl_documents ) > 0 ) {
-			// create UBL buttons
+		// create EDI buttons
+		if ( wpo_ips_edi_is_available() && count( wpo_ips_edi_get_document_types() ) > 0 ) {
 			add_meta_box(
-				'wpo_wcpdf-ubl-box',
-				__( 'Create UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-				array( $this, 'ubl_actions_meta_box' ),
+				'wpo_ips-edi-box',
+				__( 'Create E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'edi_actions_meta_box' ),
 				$screen_id,
 				'side',
 				'default'
@@ -681,50 +679,48 @@ class Admin {
 	}
 
 	/**
-	 * Create the UBL meta box content on the single order page
+	 * Create the EDI meta box content on the single order page
 	 */
-	public function ubl_actions_meta_box( $post_or_order_object ) {
+	public function edi_actions_meta_box( $post_or_order_object ) {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
+		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
-			if ( in_array( 'ubl', $document->output_formats ) ) {
-				$document_title = $document->get_title();
-				$document       = wcpdf_get_document( $document->get_type(), $order );
+			$document_title = $document->get_title();
+			$document       = wcpdf_get_document( $document->get_type(), $order );
 
-				if ( $document ) {
-					$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'ubl' ) );
-					$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-					$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-					$class           = array( $document->get_type(), 'ubl' );
+			if ( $document ) {
+				$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'xml' ) );
+				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+				$class           = array( $document->get_type(), 'xml' );
 
-					if ( $document_exists ) {
-						$class[] = 'exists';
-					}
-
-					$meta_box_actions[ $document->get_type() ] = array(
-						'url'    => $document_url,
-						'alt'    => "UBL " . $document_title,
-						'title'  => "UBL " . $document_title,
-						'exists' => $document_exists,
-						'class'  => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
-					);
+				if ( $document_exists ) {
+					$class[] = 'exists';
 				}
+
+				$meta_box_actions[ $document->get_type() ] = array(
+					'url'    => $document_url,
+					'alt'    => "E-" . $document_title,
+					'title'  => "E-" . $document_title,
+					'exists' => $document_exists,
+					'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
+				);
 			}
 		}
 
-		$meta_box_actions = apply_filters( 'wpo_wcpdf_ubl_meta_box_actions', $meta_box_actions, $order->get_id() );
-		if ( empty( $meta_box_actions ) || ! wcpdf_is_ubl_available() ) {
+		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
+		if ( empty( $meta_box_actions ) || ! wpo_ips_edi_is_available() ) {
 			return;
 		}
 		?>
-		<ul class="wpo_wcpdf-ubl-actions">
+		<ul class="wpo_ips_edi_actions">
 			<?php
-				$ubl_documents = 0;
+				$edi_documents = 0;
 
 				foreach ( $meta_box_actions as $document_type => $data ) {
 					$url    = isset( $data['url'] ) ? $data['url'] : '';
@@ -756,12 +752,12 @@ class Admin {
 							! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : ''
 						);
 
-						$ubl_documents++;
+						$edi_documents++;
 					}
 				}
 
-				if ( 0 === $ubl_documents ) {
-					esc_html_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
+				if ( 0 === $edi_documents ) {
+					esc_html_e( 'E-Documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 			?>
 		</ul>

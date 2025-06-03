@@ -56,17 +56,6 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 
-	// disable encrypted pdf option for non UBL 2.1 formats
-	$( "[name='wpo_wcpdf_documents_settings_invoice_ubl[ubl_format]']" ).on( 'change', function( event ) {
-		let $encryptedPdfCheckbox = $( this ).closest( 'form' ).find( "[name='wpo_wcpdf_documents_settings_invoice_ubl[include_encrypted_pdf]']" );
-
-		if ( $( this ).val() !== 'ubl_2_1' ) {
-			$encryptedPdfCheckbox.prop( 'checked', false ).prop( 'disabled', true );
-		} else {
-			$encryptedPdfCheckbox.prop( 'disabled', false );
-		}
-	} ).trigger( 'change' );
-
 	// enable settings document switch
 	$( '.wcpdf_document_settings_sections > h2' ).on( 'click', function() {
 		$( this ).parent().find( 'ul' ).toggleClass( 'active' );
@@ -565,10 +554,10 @@ jQuery( function( $ ) {
 							$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );
 							renderPdf( worker, canvasId, response.data.preview_data );
 							break;
-						case 'ubl':
+						case 'xml':
 							let xml         = response.data.preview_data;
 							let xml_escaped = xml.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
-							$preview.html( '<div id="preview-ubl">'+xml_escaped+'</div>' );
+							$preview.html( '<div id="preview-xml">'+xml_escaped+'</div>' );
 							break;
 					}
 				}
@@ -731,6 +720,58 @@ jQuery( function( $ ) {
 	}
 
 	settingsAccordion();
+	
+	// Settings custom attributes
+	$( "[data-show_for_option_name]" ).each( function() {
+		let option_name = $( this ).data( 'show_for_option_name' );
+		$( document ).on( 'change', '[name="' + option_name + '"], [name="' + option_name + '[]"]', toggle_conditional_visibility );
+	} );
+
+	// Trigger the change event after setting up the listeners
+	$( "[data-show_for_option_name]" ).each( function() {
+		let option_name = $( this ).data( 'show_for_option_name' );
+		$( '[name="' + option_name + '"], [name="' + option_name + '[]"]' ).each( function() {
+			toggle_conditional_visibility( { target: this } );
+		} );
+	});
+
+	function toggle_conditional_visibility( e ) {
+		const $this  = $( e.target );
+		let name     = $this.prop( 'name' ).replace( '[]', '' ); // normalize multiselect
+		let value    = $this.val();
+		let checkbox = false;
+
+		if ( $this.is( ':checkbox' ) ) {
+			value    = $this.is( ':checked' );
+			checkbox = true;
+		}
+
+		$( "[data-show_for_option_name='" + name + "']" ).each( function() {
+			let show     = false;
+			let show_for = $( this ).data( 'show_for_option_values' );
+			
+			if ( checkbox ) {
+				show = value; // for checkboxes, checked = show
+			} else if ( Array.isArray( value ) ) { // Multiselect
+				show = value.some( item => show_for.includes( item ) );
+			} else {
+				show = show_for.includes( value );
+			}
+
+			let $row = $( this ).closest( 'tr' );
+
+			if ( show ) {
+				$row.show();
+				
+				if ( checkbox ) {
+					$row.find( ':input[type=checkbox]' ).val( '1' );
+				}
+			} else {
+				$row.hide().find( ':input' ).not( ':checkbox' ).val( '' );
+				$row.find( ':checkbox' ).prop( 'checked', false );
+			}
+		} );
+	}
 
 	//----------> /Settings Accordion <----------//
 	//----------> Sync Address <----------//
