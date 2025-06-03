@@ -49,70 +49,101 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public function output(): void {
-		echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-		echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-		
-		echo '<p><strong>' . esc_html__( 'Code list standard:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> <code>' . esc_html( self::$standard ) . ' v' . esc_html( self::$standard_version ) . '</code> ';
-		echo '<a href="#" id="ubl-show-changelog">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
-
-		// Show changelog if method exists
-		$method = 'get_changes_from_' . self::$standard . '_' . str_replace( '.', '_', self::$standard_version );
-		
-		if ( method_exists( $this, $method ) ) {
-			$changes = call_user_func( array( $this, $method ) );
-			echo '<ul id="ubl-standard-changelog">';
-			foreach ( $changes as $change ) {
-				echo '<li>' . esc_html( $change ) . '</li>';
+		?>
+		<p><?php esc_html_e( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+		<p>
+			<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: %s: strong tag with note */
+						__( '%s: Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+					)
+				);
+			?>
+		</p>
+		<p>
+			<?php
+				echo wp_kses_post(
+					sprintf(
+						'<strong>%s:</strong> <code>%s v%s</code>',
+						esc_html__( 'Code list standard', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html( self::$standard ),
+						esc_html( self::$standard_version )
+					)
+				);
+			?>
+			<a href="#" id="ubl-show-changelog"><?php esc_html_e( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+		</p>
+		<?php
+			// Show changelog if method exists
+			$method = 'get_changes_from_' . self::$standard . '_' . str_replace( '.', '_', self::$standard_version );
+			
+			if ( method_exists( $this, $method ) ) {
+				$changes = call_user_func( array( $this, $method ) );
+				echo '<ul id="ubl-standard-changelog">';
+				foreach ( $changes as $change ) {
+					echo '<li>' . esc_html( $change ) . '</li>';
+				}
+				echo '</ul>';
 			}
-			echo '</ul>';
-		}
-		
-		echo '<p>' . sprintf(
-			/* translators: %s: link to documentation */
-			esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/ubl-tax-classification-filter-hooks/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
-		) . '</p>';
+		?>
+		<p>
+			<?php
+				printf(
+					/* translators: %1$s: open link anchor, %2$s: close link anchor */
+					esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %1$sdocumentation%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/ubl-tax-classification-filter-hooks/" target="_blank" rel="noopener noreferrer">',
+					'</a>'
+				);
+			?>
+		</p>
+		<?php
+			$rates                       = \WC_Tax::get_tax_rate_classes();
+			$formatted_rates             = array();
+			$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
 
-		$rates                       = \WC_Tax::get_tax_rate_classes();
-		$formatted_rates             = array();
-		$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
-
-		foreach ( $rates as $rate ) {
-			if ( empty( $rate->slug ) ) {
-				continue;
+			foreach ( $rates as $rate ) {
+				if ( empty( $rate->slug ) ) {
+					continue;
+				}
+				
+				$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
 			}
 			
-			$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
-		}
-
-		// Dropdown selector for tax classes
-		echo '<p>';
-		echo '<select class="edi-tax-class-select">';
-		foreach ( $formatted_rates as $slug => $name ) {
-			echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
-		}
-		echo '</select>';
-		echo '<a href="" class="button button-primary button-edi-save-taxes">' . __( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
-		echo '</p>';
-
-		// Output all tables wrapped in containers
-		foreach ( $formatted_rates as $slug => $name ) {
-			echo '<div class="edi-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
-			$this->output_table_for_tax_class( $slug );
-			echo '</div>';
-		}
-		
-		// Dropdown selector for tax classes
-		echo '<p>';
-		echo '<select class="edi-tax-class-select">';
-		foreach ( $formatted_rates as $slug => $name ) {
-			echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
-		}
-		echo '</select>';
-		echo '<a href="" class="button button-primary button-edi-save-taxes">' . __( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
-		echo '</p>';
+			// Output tax class selector and action button
+			$this->output_tax_class_selector_and_action( $formatted_rates );
+			
+			// Output all tables wrapped in containers
+			foreach ( $formatted_rates as $slug => $name ) {
+				echo '<div class="edi-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
+				$this->output_table_for_tax_class( $slug );
+				echo '</div>';
+			}
+			
+			// Output tax class selector and action button
+			$this->output_tax_class_selector_and_action( $formatted_rates );
 	}
 	
+	/**
+	 * Output the tax class selector and action button.
+	 * 
+	 * @param array $formatted_rates An associative array of tax class slugs and names.
+	 * @return void
+	 */
+	private function output_tax_class_selector_and_action( array $formatted_rates ): void {
+		?>
+		<p>
+			<select class="edi-tax-class-select">
+			<?php foreach ( $formatted_rates as $slug => $name ) : ?>
+				<option value="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $name ); ?></option>
+			<?php endforeach; ?>
+			</select>
+			<a href="" class="button button-primary button-edi-save-taxes"><?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+		</p>
+		<?php
+	}
+
 	/**
 	 * Output the table for a specific tax class.
 	 *
