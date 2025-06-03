@@ -49,9 +49,6 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public function output(): void {
-		settings_fields( 'wpo_ips_edi_settings' );
-		do_settings_sections( 'wpo_ips_edi_settings' );
-		
 		echo '<p>' . esc_html__( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 		echo '<p><strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . esc_html__( 'Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 		
@@ -95,14 +92,16 @@ class TaxesSettings {
 		}
 		echo '</select>';
 
+		echo '<a href="" class="button button-primary button-edi-save-taxes">' . __( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
+
 		// Output all tables wrapped in containers
 		foreach ( $formatted_rates as $slug => $name ) {
 			echo '<div class="ubl-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
 			$this->output_table_for_tax_class( $slug );
 			echo '</div>';
 		}
-
-		submit_button();
+		
+		echo '<p><a href="" class="button button-primary button-edi-save-taxes">' . __( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
 	}
 	
 	/**

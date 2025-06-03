@@ -24,7 +24,8 @@ class SettingsEDI {
 
 	function __construct()	{
 		$this->sections = [
-			'edi' => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+			'taxes'    => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 		];
 
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
@@ -43,9 +44,9 @@ class SettingsEDI {
 			return;
 		}
 		
-		$active_section = ! empty( $active_section ) ? $active_section : 'edi';
+		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
 		?>
-		<div class="wcpdf_ubl_settings_sections">
+		<div class="wcpdf_settings_sections">
 			<?php if ( count( $this->sections ) > 1 ) : ?>
 				<h2 class="nav-tab-wrapper">
 					<?php
@@ -61,8 +62,12 @@ class SettingsEDI {
 		</div>
 		<?php
 			switch ( $active_section ) {
-				default:
-				case 'edi':
+				case 'settings':
+					settings_fields( 'wpo_ips_edi_settings' );
+					do_settings_sections( 'wpo_ips_edi_settings' );
+					submit_button();
+					break;
+				case 'taxes':
 					$settings = new EdiTaxSettings();
 					$settings->output();
 					break;
