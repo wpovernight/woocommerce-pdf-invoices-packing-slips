@@ -360,44 +360,45 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .doc-output-toggle-group {
 	display: inline-flex;
-	border-radius: 4px;
+	border-radius: 6px;
+	border: 1px solid #d1d5db;
 	overflow: hidden;
-	border: 1px solid #ccc;
-	font-size: 13px;
+	background-color: #fff;
 }
 
 .doc-output-toggle {
 	display: inline-block;
-	padding: 4px 10px;
+	padding: 6px 16px;
+	font-size: 14px;
 	text-decoration: none;
-	background-color: #f8f8f8;
-	color: #333;
 	border: none;
-	border-right: 1px solid #ccc;
-	transition: background 0.2s, color 0.2s;
+	background-color: #fff;
+	color: #374151;
+	font-weight: 500;
 	line-height: 1.4;
+	cursor: pointer;
+	transition: background-color 0.2s, color 0.2s;
+	border-right: 1px solid #e5e7eb;
 }
 
 .doc-output-toggle:last-child {
 	border-right: none;
 }
 
-.doc-output-toggle:hover,
-.doc-output-toggle:focus {
-	background-color: #e6e6e6;
-	color: #333;
-}
-
 .doc-output-toggle.active {
-	background-color: #51266b;
-	color: #fff;
-	font-weight: 600;
+	background-color: #f9fafb;
+	color: #111827;
+	font-weight: 700;
 }
 
+.doc-output-toggle:hover,
+.doc-output-toggle:focus,
 .doc-output-toggle.active:hover,
 .doc-output-toggle.active:focus {
-	background-color: #51266b;
-	color: #fff;
+	background-color: inherit;
+	color: inherit;
+	outline: none;
+	box-shadow: none;
 }
 
 #wpo-wcpdf-preview-wrapper {
@@ -415,7 +416,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .sidebar {
 	height: auto;
-	padding: 1.2em 0 0 0;
+	padding: 1.4em 0 0 0;
 	box-sizing: border-box;
 	background: transparent;
 	flex: 0 0 35%;
