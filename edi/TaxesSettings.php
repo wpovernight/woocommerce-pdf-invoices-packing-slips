@@ -590,7 +590,7 @@ class TaxesSettings {
 	 * @return void
 	 */
 	public static function update_standard_version(): void {
-		$edi_tax_settings = $this->get_tax_settings();
+		$edi_tax_settings = self::get_tax_settings();
 
 		if (
 			! isset( $edi_tax_settings['standard'] ) ||
