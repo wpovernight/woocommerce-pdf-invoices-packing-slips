@@ -280,6 +280,26 @@ function wpo_ips_edi_get_current_format(): string {
 }
 
 /**
+ * Get the EDI document types
+ * 
+ * @return array
+ */
+function wpo_ips_edi_get_document_types(): array {
+	$edi_settings = wpo_ips_edi_get_settings();
+	return apply_filters( 'wpo_ips_edi_document_types', $edi_settings['document_types'] ?? array() );
+}
+
+/**
+ * Check if EDI attachments should be sent
+ * 
+ * @return bool
+ */
+function wpo_ips_edi_send_attachments(): bool {
+	$edi_settings = wpo_ips_edi_get_settings();
+	return ! empty( $edi_settings['send_attachments'] );
+}
+
+/**
  * Check if EDI preview is enabled
  * 
  * @return bool

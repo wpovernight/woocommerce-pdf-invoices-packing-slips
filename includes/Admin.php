@@ -515,14 +515,12 @@ class Admin {
 			'default'
 		);
 
-
-		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
-		if ( count( $ubl_documents ) > 0 ) {
-			// create UBL buttons
+		// create EDI buttons
+		if ( wpo_ips_edi_is_available() && count( wpo_ips_edi_get_document_types() ) > 0 ) {
 			add_meta_box(
-				'wpo_wcpdf-ubl-box',
-				__( 'Create UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-				array( $this, 'ubl_actions_meta_box' ),
+				'wpo_ips-edi-box',
+				__( 'Create E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'edi_actions_meta_box' ),
 				$screen_id,
 				'side',
 				'default'
@@ -681,9 +679,9 @@ class Admin {
 	}
 
 	/**
-	 * Create the UBL meta box content on the single order page
+	 * Create the EDI meta box content on the single order page
 	 */
-	public function ubl_actions_meta_box( $post_or_order_object ) {
+	public function edi_actions_meta_box( $post_or_order_object ) {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
@@ -692,37 +690,35 @@ class Admin {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
-			if ( in_array( 'xml', $document->output_formats ) ) {
-				$document_title = $document->get_title();
-				$document       = wcpdf_get_document( $document->get_type(), $order );
+			$document_title = $document->get_title();
+			$document       = wcpdf_get_document( $document->get_type(), $order );
 
-				if ( $document ) {
-					$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'xml' ) );
-					$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-					$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-					$class           = array( $document->get_type(), 'xml' );
+			if ( $document ) {
+				$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'xml' ) );
+				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+				$class           = array( $document->get_type(), 'xml' );
 
-					if ( $document_exists ) {
-						$class[] = 'exists';
-					}
-
-					$meta_box_actions[ $document->get_type() ] = array(
-						'url'    => $document_url,
-						'alt'    => "E-" . $document_title,
-						'title'  => "E-" . $document_title,
-						'exists' => $document_exists,
-						'class'  => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
-					);
+				if ( $document_exists ) {
+					$class[] = 'exists';
 				}
+
+				$meta_box_actions[ $document->get_type() ] = array(
+					'url'    => $document_url,
+					'alt'    => "E-" . $document_title,
+					'title'  => "E-" . $document_title,
+					'exists' => $document_exists,
+					'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
+				);
 			}
 		}
 
-		$meta_box_actions = apply_filters( 'wpo_wcpdf_ubl_meta_box_actions', $meta_box_actions, $order->get_id() );
+		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
 		if ( empty( $meta_box_actions ) || ! wpo_ips_edi_is_available() ) {
 			return;
 		}
 		?>
-		<ul class="wpo_wcpdf-ubl-actions">
+		<ul class="wpo_ips_edi_actions">
 			<?php
 				$ubl_documents = 0;
 
@@ -761,7 +757,7 @@ class Admin {
 				}
 
 				if ( 0 === $ubl_documents ) {
-					esc_html_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
+					esc_html_e( 'E-Documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 			?>
 		</ul>

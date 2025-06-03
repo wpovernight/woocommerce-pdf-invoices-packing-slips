@@ -186,3 +186,31 @@ if ( has_action( 'wpo_after_ubl_headers' ) ) {
 		$version
 	);
 }
+
+if ( has_action( 'wpo_wcpdf_ubl_action_button_class' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_action_button_class',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_action_button_class',
+			$version,
+			'wpo_ips_edi_action_button_class'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wcpdf_ubl_meta_box_actions' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wcpdf_ubl_meta_box_actions',
+		sprintf(
+			$message,
+			'wpo_wcpdf_ubl_meta_box_actions',
+			$version,
+			'wpo_ips_edi_meta_box_actions'
+		),
+		$version
+	);
+}
