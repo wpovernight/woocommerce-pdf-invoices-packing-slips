@@ -83,7 +83,6 @@ class TaxesSettings {
 		echo $html;
 		wp_die();
 	}
-
 	
 	/**
 	 * Output the settings page for UBL taxes.
