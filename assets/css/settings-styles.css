@@ -434,19 +434,19 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	}
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper {
 	display: flex;
 	gap: 5px;
 	position: relative;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > input,
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > select {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > input,
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > select {
 	flex: 1;
 	max-width: none;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > button.sync-address {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > button.sync-address {
 	padding: 0;
 	width: 30px;
 	line-height: 1;
@@ -454,7 +454,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-radius: 4px;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > button.sync-address > .dashicons {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > button.sync-address > .dashicons {
 	transform: rotate(-45deg);
 	vertical-align: middle;
 	font-size: 1.8em;
@@ -463,7 +463,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	height: auto;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > .sync-tooltip {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > .sync-tooltip {
 	position: absolute;
 	background-color: #555;
 	color: #fff;
@@ -479,7 +479,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	top: 115%;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > .sync-tooltip::after {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > .sync-tooltip::after {
 	content: "";
 	position: absolute;
 	bottom: 100%;
@@ -491,7 +491,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 /* Add a visible state class when showing the tooltip */
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > .wpo-wcpdf-input-wrapper > .sync-tooltip.visible {
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > .sync-tooltip.visible {
 	opacity: 1;
 }
 
