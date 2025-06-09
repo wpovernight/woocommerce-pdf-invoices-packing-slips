@@ -378,10 +378,22 @@ jQuery( function( $ ) {
 	}
 
 	function shopCountryChanged( event ) {
-		const $country           = $( event.target );
-		const selectedCountry    = $country.val();
-		const $state             = $country.closest( 'form' ).find( '#shop_address_state' );
-		const $state_sync_button = $country.closest( 'form' ).find( '#shop_address_state_action' );
+		const $country        = $( event.target );
+		const selectedCountry = $country.val();
+
+		// Get the language key and $form once
+		const nameMatch = $country.attr( 'name' )
+			.match( /\[shop_address_country]\[(.*?)\]/ ); // 'pt-pt', 'default', etc.
+		const lang      = nameMatch ? nameMatch[1] : 'default';
+		const $form     = $country.closest( 'form' );
+
+		// Find the matching state field for that language
+		const $state = $form.find( `select[name="wpo_wcpdf_settings_general[shop_address_state][${lang}]"]` );
+
+		// Keep the original button lookup, but relative to $state
+		const $state_sync_button = $state
+			.closest( '.wpo-wcpdf-input-wrapper' )
+			.find( '#shop_address_state_action' );
 
 		// Clear previous states
 		$state.empty().prop( 'disabled', true );
