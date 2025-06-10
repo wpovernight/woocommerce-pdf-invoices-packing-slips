@@ -934,11 +934,13 @@ class Admin {
 					<?php else : ?>
 						<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
 							<span class="wpo-wcpdf-set-date-number button">
-								<?php printf(
-									/* translators: document title */
-									esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
-									wp_kses_post( $document->get_title() )
-								); ?>
+								<?php
+									printf(
+										/* translators: document title */
+										esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
+										esc_html( $document->get_title() )
+									);
+								?>
 							</span>
 						<?php else : ?>
 							<p><?php echo esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
@@ -956,11 +958,27 @@ class Admin {
 					?>
 						<?php if ( isset( $data['number'] ) ) : ?>
 							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
-								<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php printf( esc_html__( '%s plain number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
+								<label for="<?php echo esc_attr( $data['number']['name'] ); ?>">
+									<?php
+										printf(
+											/* translators: %s document title */
+											esc_html__( '%s plain number:', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $document->get_title() )
+										);
+									?>
+								</label>
 								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>" disabled="disabled">
 							</p>
 							<p class="form-field <?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>_field">
-								<label for="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>"><?php printf( esc_html__( '%s formatted number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
+								<label for="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>">
+									<?php
+										printf(
+											/* translators: %s document title */
+											esc_html__( '%s formatted number:', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $document->get_title() )
+										);
+									?>
+								</label>
 								<input type="text" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled">
 								<input type="hidden" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>"> (<?php esc_html_e( 'Displayed in the PDF', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 							</p>
@@ -981,7 +999,7 @@ class Admin {
 											sprintf(
 												/* translators: %s document title */
 												esc_html__( 'Editing of %s number and date is currently disabled.', 'woocommerce-pdf-invoices-packing-slips' ),
-												esc_attr( $document->get_title() )
+												esc_html( $document->get_title() )
 											),
 											sprintf(
 												/* translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name */
