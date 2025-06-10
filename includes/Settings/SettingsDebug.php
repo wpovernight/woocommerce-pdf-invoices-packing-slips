@@ -868,15 +868,15 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
-				'id'       => 'enable_alphanumeric_document_number',
-				'title'    => __( 'Alphanumeric document number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'id'       => 'enable_editable_formatted_document_number',
+				'title'    => __( 'Editable formatted document number', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
 				'section'  => 'debug_settings',
 				'args'     => array(
 					'option_name' => $option_name,
-					'id'          => 'enable_alphanumeric_document_number',
-					'description' => __( 'Allow letters in the document number field when editing the PDF document data on the order page.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
-									__( 'By default, only numeric values are accepted.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'id'          => 'enable_editable_formatted_document_number',
+					'description' => __( 'Allow the formatted document number to be editable on the order page.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+									__( 'By default, only the plain number is editable.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
