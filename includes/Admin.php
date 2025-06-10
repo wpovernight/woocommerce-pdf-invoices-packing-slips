@@ -934,11 +934,13 @@ class Admin {
 					<?php else : ?>
 						<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
 							<span class="wpo-wcpdf-set-date-number button">
-								<?php printf(
-									/* translators: document title */
-									esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
-									wp_kses_post( $document->get_title() )
-								); ?>
+								<?php
+									printf(
+										/* translators: document title */
+										esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
+										esc_html( $document->get_title() )
+									);
+								?>
 							</span>
 						<?php else : ?>
 							<p><?php echo esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
@@ -948,17 +950,69 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable">
-					<?php if ( isset( $data['number'] ) ) : ?>
-						<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
-							<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php echo wp_kses_post( $data['number']['label'] ); ?></label>
-							<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo (int) esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
-						</p>
-					<?php endif; ?>
-					<?php if ( isset( $data['date'] ) ) : ?>
-						<p class="form-field form-field-wide">
-							<label for="<?php echo esc_attr( $data['date']['name'] ); ?>[date]"><?php echo wp_kses_post( $data['date']['label'] ); ?></label>
-							<input type="text" class="date-picker-field" name="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?php echo esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?php echo esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?php echo esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
-						</p>
+					<?php
+						if (
+							\WPO_WCPDF()->settings->user_can_manage_settings() &&
+							( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) )
+						) :
+					?>
+						<?php if ( isset( $data['number'] ) ) : ?>
+							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
+								<label for="<?php echo esc_attr( $data['number']['name'] ); ?>">
+									<?php
+										printf(
+											/* translators: %s document title */
+											esc_html__( '%s plain number:', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $document->get_title() )
+										);
+									?>
+								</label>
+								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>" disabled="disabled">
+							</p>
+							<p class="form-field <?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>_field">
+								<label for="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>">
+									<?php
+										printf(
+											/* translators: %s document title */
+											esc_html__( '%s formatted number:', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $document->get_title() )
+										);
+									?>
+								</label>
+								<input type="text" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled">
+								<input type="hidden" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>"> (<?php esc_html_e( 'Displayed in the PDF', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+							</p>
+						<?php endif; ?>
+						<?php if ( isset( $data['date'] ) ) : ?>
+							<p class="form-field form-field-wide">
+								<label for="<?php echo esc_attr( $data['date']['name'] ); ?>[date]"><?php echo wp_kses_post( $data['date']['label'] ); ?></label>
+								<input type="text" class="date-picker-field" name="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?php echo esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?php echo esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?php echo esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
+							</p>
+						<?php endif; ?>
+					<?php else : ?>
+						<div class="notice notice-warning inline" style="margin:0;">
+							<p>
+								<?php
+									echo wp_kses_post(
+										sprintf(
+											'%s %s',
+											sprintf(
+												/* translators: %s document title */
+												esc_html__( 'Editing of %s number and date is currently disabled.', 'woocommerce-pdf-invoices-packing-slips' ),
+												esc_html( $document->get_title() )
+											),
+											sprintf(
+												/* translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name */
+												esc_html__( 'If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+												'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug' ) ) . '" target="_blank">',
+												'</a>',
+												'<strong>' . esc_html__( 'Enable document data editing', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+											)
+										)
+									);
+								?>
+							</p>
+						</div>
 					<?php endif; ?>
 				</div>
 
@@ -1342,11 +1396,22 @@ class Admin {
 		}
 
 		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number'] ) ) {
-			$document_number = absint( $form_data['_wcpdf_' . $document_slug . '_number'] );
-			
+			$document_number = absint( $form_data['_wcpdf_' . $document_slug . '_number'] );	
 			if ( $document_number !== 0 ) {
 				$data['number'] = $document_number;
-			}			
+			}
+		}
+
+		if ( isset( $form_data['_wcpdf_' . $document_slug . '_formatted_number'] ) && isset( $form_data['_wcpdf_' . $document_slug . '_formatted_number_current'] ) ) {
+			$formatted_number         = sanitize_text_field( $form_data['_wcpdf_' . $document_slug . '_formatted_number'] );
+			$formatted_number_current = sanitize_text_field( $form_data['_wcpdf_' . $document_slug . '_formatted_number_current'] );
+			
+			if ( $formatted_number !== $formatted_number_current ) {
+				$plain_number                       = $data['number'];
+				$data['number']                     = array();
+				$data['number']['number']           = $plain_number;
+				$data['number']['formatted_number'] = $formatted_number;
+			}
 		}
 
 		$date_entered = ! empty( $form_data['_wcpdf_' . $document_slug . '_date'] ) && ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['date'] );

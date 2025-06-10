@@ -86,6 +86,15 @@ jQuery( function( $ ) {
 		let data       = $form.data();
 		let serialized = $form.find(":input:visible:not(:disabled)").serialize();
 
+		// Manually append any hidden field that ends with '_formatted_number_current'
+		$form.find( 'input[type="hidden"]' ).each( function() {
+			if ( $( this ).attr( 'name' ).endsWith( '_formatted_number_current' ) ) {
+				const name  = $( this ).attr( 'name' );
+				const value = $( this ).val();
+				serialized += '&' + encodeURIComponent( name ) + '=' + encodeURIComponent( value );
+			}
+		} );
+
 		// regenerate specific
 		if( action == 'regenerate' ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
