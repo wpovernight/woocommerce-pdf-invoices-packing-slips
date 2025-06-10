@@ -980,7 +980,7 @@ class Admin {
 											'%s %s',
 											sprintf(
 												/* translators: %s document title */
-												esc_html__( 'Editing of %s data is currently disabled to comply with legal requirements in some countries.', 'woocommerce-pdf-invoices-packing-slips' ),
+												esc_html__( 'Editing of %s number and date is currently disabled.', 'woocommerce-pdf-invoices-packing-slips' ),
 												esc_attr( $document->get_title() )
 											),
 											sprintf(

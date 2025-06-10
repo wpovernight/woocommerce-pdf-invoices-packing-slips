@@ -875,7 +875,7 @@ class SettingsDebug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'enable_document_data_editing',
-					'description' => __( 'Allow editing of document data on the order page.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
+					'description' => __( 'Allow editing of document number and date on the order page.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
 									sprintf(
 										__( '%s: Changing document data is prohibited in some countries. This setting is disabled by default to comply with legal requirements. Only the following document types are affected: Invoice and Credit Note.', 'woocommerce-pdf-invoices-packing-slips' ),
 										'<strong>' . __( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
