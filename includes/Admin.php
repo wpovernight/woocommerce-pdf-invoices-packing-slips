@@ -947,8 +947,8 @@ class Admin {
 				</div>
 
 				<!-- Editable -->
-				<?php if ( ! empty( WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) ) : ?>
-					<div class="editable">
+				<div class="editable">
+					<?php if ( ! empty( WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) ) : ?>
 						<?php if ( isset( $data['number'] ) ) : ?>
 							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
 								<label><?php printf( esc_html__( '%s plain number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
@@ -966,9 +966,7 @@ class Admin {
 								<input type="text" class="date-picker-field" name="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[date]" maxlength="10" value="<?php echo esc_attr( $data['date']['date'] ); ?>" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])" disabled="disabled"/>@<input type="number" class="hour" disabled="disabled" placeholder="<?php esc_attr_e( 'h', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[hour]" min="0" max="23" size="2" value="<?php echo esc_attr( $data['date']['hour'] ); ?>" pattern="([01]?[0-9]{1}|2[0-3]{1})" />:<input type="number" class="minute" placeholder="<?php esc_attr_e( 'm', 'woocommerce-pdf-invoices-packing-slips' ); ?>" name="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" id="<?php echo esc_attr( $data['date']['name'] ); ?>[minute]" min="0" max="59" size="2" value="<?php echo esc_attr( $data['date']['minute'] ); ?>" pattern="[0-5]{1}[0-9]{1}"  disabled="disabled" />
 							</p>
 						<?php endif; ?>
-					</div>
-				<?php else : ?>
-					<div class="editable">
+					<?php else : ?>
 						<div class="notice notice-warning inline" style="margin:0;">
 							<p>
 								<?php
@@ -993,8 +991,8 @@ class Admin {
 								?>
 							</p>
 						</div>
-					</div>
-				<?php endif; ?>
+					<?php endif; ?>
+				</div>
 
 				<!-- Document Notes -->
 				<?php if ( array_key_exists( 'notes', $data ) ) : ?>
