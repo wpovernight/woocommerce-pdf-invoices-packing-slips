@@ -947,7 +947,7 @@ class Admin {
 				</div>
 
 				<!-- Editable -->
-				<?php if ( ! empty( WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) ) : ?>
+				<?php if ( ! empty( WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) ) : ?>
 					<div class="editable">
 						<?php if ( isset( $data['number'] ) ) : ?>
 							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
@@ -975,7 +975,11 @@ class Admin {
 									echo wp_kses_post(
 										sprintf(
 											'%s %s %s',
-											esc_html__( 'Editing of document data is currently disabled to comply with legal requirements in some countries.', 'woocommerce-pdf-invoices-packing-slips' ),
+											sprintf(
+												/* translators: %s document title */
+												esc_html__( 'Editing of %s data is currently disabled to comply with legal requirements in some countries.', 'woocommerce-pdf-invoices-packing-slips' ),
+												esc_attr( $document->get_title() )
+											),
 											sprintf(
 												/* translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name */
 												esc_html__( 'If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
