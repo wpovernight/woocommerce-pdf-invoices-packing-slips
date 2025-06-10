@@ -86,6 +86,14 @@ jQuery( function( $ ) {
 		let data       = $form.data();
 		let serialized = $form.find(":input:visible:not(:disabled)").serialize();
 
+		// Manually append the hidden field `_wcpdf_invoice_number` if it exists
+		const hiddenNumberField = $form.find( 'input[type="hidden"][name="_wcpdf_invoice_number"]' );
+		if ( hiddenNumberField.length ) {
+			const name  = hiddenNumberField.attr( 'name' );
+			const value = hiddenNumberField.val();
+			serialized += '&' + encodeURIComponent( name ) + '=' + encodeURIComponent( value );
+		}
+
 		// regenerate specific
 		if( action == 'regenerate' ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {

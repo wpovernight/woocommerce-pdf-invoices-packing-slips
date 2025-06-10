@@ -951,10 +951,11 @@ class Admin {
 					<?php if ( isset( $data['number'] ) ) : ?>
 						<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
 							<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php echo wp_kses_post( $data['number']['label'] ); ?></label>
-							<?php if ( ! isset( WPO_WCPDF()->settings->debug_settings['enable_alphanumeric_number'] ) ) : ?>
-								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo (int) esc_attr( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+							<?php if ( ! isset( WPO_WCPDF()->settings->debug_settings['enable_alphanumeric_document_number'] ) ) : ?>
+								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 							<?php else : ?>
-								<input type="text" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'formatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+								<input type="hidden" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>"><!-- Hidden input to store the plain number -->
+								<input type="text" class="short" name="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'formatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 							<?php endif; ?>
 						</p>
 					<?php endif; ?>
@@ -1346,16 +1347,17 @@ class Admin {
 		}
 
 		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number'] ) ) {
-			$document_number = $form_data['_wcpdf_' . $document_slug . '_number'];
-			
-			if ( ! isset( WPO_WCPDF()->settings->debug_settings['enable_alphanumeric_number'] ) ) {		
-				$document_number = absint( $document_number );	
-				if ( $document_number !== 0 ) {
-					$data['number'] = $document_number;
-				}
-			} else {
-				$data['number']['formatted_number'] = sanitize_text_field( $document_number );
+			$document_number = absint( $form_data['_wcpdf_' . $document_slug . '_number'] );	
+			if ( $document_number !== 0 ) {
+				$data['number'] = $document_number;
 			}
+		}
+		
+		if ( isset( $form_data['_wcpdf_' . $document_slug . '_formatted_number'] ) ) {
+			$plain_number                       = $data['number'];
+			$data['number']                     = array();
+			$data['number']['number']           = $plain_number;
+			$data['number']['formatted_number'] = sanitize_text_field( $form_data['_wcpdf_' . $document_slug . '_formatted_number'] );
 		}
 
 		$date_entered = ! empty( $form_data['_wcpdf_' . $document_slug . '_date'] ) && ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['date'] );
