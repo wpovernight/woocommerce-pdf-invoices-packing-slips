@@ -952,10 +952,10 @@ class Admin {
 						<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
 							<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php echo wp_kses_post( $data['number']['label'] ); ?></label>
 							<?php if ( ! isset( WPO_WCPDF()->settings->debug_settings['enable_alphanumeric_document_number'] ) ) : ?>
-								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'unformatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>" disabled="disabled" > (<?php esc_html_e( 'plain number!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 							<?php else : ?>
 								<input type="hidden" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>"><!-- Hidden input to store the plain number -->
-								<input type="text" class="short" name="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled" > (<?php echo esc_html__( 'formatted!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+								<input type="text" class="short" name="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled" > (<?php esc_html_e( 'formatted number!', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 							<?php endif; ?>
 						</p>
 					<?php endif; ?>
