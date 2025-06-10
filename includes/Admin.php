@@ -956,8 +956,8 @@ class Admin {
 							</p>
 							<p class="form-field <?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>_field">
 								<label><?php printf( esc_html__( '%s formatted number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
-								<input type="text" class="short" name="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . $document->slug . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled">
-								<input type="hidden" class="short" name="<?php echo '_wcpdf_' . $document->slug . '_formatted_number_current'; ?>" id="<?php echo '_wcpdf_' . $document->slug . '_formatted_number_current'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>"> (<?php esc_html_e( 'Displayed in the PDF', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
+								<input type="text" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled">
+								<input type="hidden" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>"> (<?php esc_html_e( 'Displayed in the PDF', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 							</p>
 						<?php endif; ?>
 						<?php if ( isset( $data['date'] ) ) : ?>
