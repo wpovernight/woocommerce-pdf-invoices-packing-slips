@@ -868,15 +868,18 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
-				'id'       => 'enable_editable_formatted_document_number',
-				'title'    => __( 'Editable formatted document number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'id'       => 'enable_document_data_editing',
+				'title'    => __( 'Enable document data editing', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
 				'section'  => 'debug_settings',
 				'args'     => array(
 					'option_name' => $option_name,
-					'id'          => 'enable_editable_formatted_document_number',
-					'description' => __( 'Allow the formatted document number to be editable on the order page.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
-									__( 'By default, only the plain number is editable.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'id'          => 'enable_document_data_editing',
+					'description' => __( 'Allow editing of document data on the order page.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' .
+									sprintf(
+										__( '%s: Changing document data is prohibited in some countries. This setting is disabled by default to comply with legal requirements.', 'woocommerce-pdf-invoices-packing-slips' ),
+										'<strong>' . __( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+									),
 				)
 			),
 			array(

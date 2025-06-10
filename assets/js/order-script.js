@@ -86,11 +86,11 @@ jQuery( function( $ ) {
 		let data       = $form.data();
 		let serialized = $form.find(":input:visible:not(:disabled)").serialize();
 
-		// Manually append the hidden field `_wcpdf_invoice_number` if it exists
-		const hiddenNumberField = $form.find( 'input[type="hidden"][name="_wcpdf_invoice_number"]' );
-		if ( hiddenNumberField.length ) {
-			const name  = hiddenNumberField.attr( 'name' );
-			const value = hiddenNumberField.val();
+		// Manually append the hidden field `_wcpdf_invoice_formatted_number_current` if it exists
+		const hiddenFormattedNumberCurrentField = $form.find( 'input[type="hidden"][name="_wcpdf_invoice_formatted_number_current"]' );
+		if ( hiddenFormattedNumberCurrentField.length ) {
+			const name  = hiddenFormattedNumberCurrentField.attr( 'name' );
+			const value = hiddenFormattedNumberCurrentField.val();
 			serialized += '&' + encodeURIComponent( name ) + '=' + encodeURIComponent( value );
 		}
 
