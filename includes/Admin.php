@@ -948,7 +948,12 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable">
-					<?php if ( ! empty( WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) ) : ?>
+					<?php
+						if (
+							\WPO_WCPDF()->settings->user_can_manage_settings() &&
+							( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) )
+						) :
+					?>
 						<?php if ( isset( $data['number'] ) ) : ?>
 							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
 								<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php printf( esc_html__( '%s plain number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
@@ -972,7 +977,7 @@ class Admin {
 								<?php
 									echo wp_kses_post(
 										sprintf(
-											'%s %s %s',
+											'%s %s',
 											sprintf(
 												/* translators: %s document title */
 												esc_html__( 'Editing of %s data is currently disabled to comply with legal requirements in some countries.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -984,8 +989,7 @@ class Admin {
 												'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug' ) ) . '" target="_blank">',
 												'</a>',
 												'<strong>' . esc_html__( 'Enable document data editing', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
-											),
-											esc_html__( 'Please ensure that enabling this feature complies with the legal requirements of your country.', 'woocommerce-pdf-invoices-packing-slips' )
+											)
 										)
 									);
 								?>
