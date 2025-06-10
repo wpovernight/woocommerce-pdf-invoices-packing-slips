@@ -951,11 +951,11 @@ class Admin {
 					<?php if ( ! empty( WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) ) : ?>
 						<?php if ( isset( $data['number'] ) ) : ?>
 							<p class="form-field <?php echo esc_attr( $data['number']['name'] ); ?>_field">
-								<label><?php printf( esc_html__( '%s plain number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
+								<label for="<?php echo esc_attr( $data['number']['name'] ); ?>"><?php printf( esc_html__( '%s plain number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
 								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['name'] ); ?>" value="<?php echo absint( $data['number']['plain'] ); ?>" disabled="disabled">
 							</p>
 							<p class="form-field <?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>_field">
-								<label><?php printf( esc_html__( '%s formatted number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
+								<label for="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>"><?php printf( esc_html__( '%s formatted number:', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ); ?></label>
 								<input type="text" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>" disabled="disabled">
 								<input type="hidden" class="short" name="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" id="<?php echo '_wcpdf_' . esc_attr( $document->slug ) . '_formatted_number_current'; ?>" value="<?php echo esc_attr( $data['number']['formatted'] ); ?>"> (<?php esc_html_e( 'Displayed in the PDF', 'woocommerce-pdf-invoices-packing-slips' ); ?>)
 							</p>
