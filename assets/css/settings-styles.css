@@ -776,6 +776,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	background-color: #222;
 	color: white;
 	padding: 2em;
+	border-radius: 4px;
 }
 
 .preview-document .preview > #preview-canvas {
