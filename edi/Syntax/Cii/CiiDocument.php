@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class CiiDocument extends AbstractDocument {
 	
-	public string $sintax = 'cii';
+	public string $syntax = 'cii';
 
 	public function get_root_element() {
 		return apply_filters( 'wpo_ips_edi_cii_document_root_element', 'rsm:CrossIndustryInvoice', $this );

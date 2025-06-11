@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class UblDocument extends AbstractDocument {
 	
-	public string $sintax = 'ubl';
+	public string $syntax = 'ubl';
 
 	/**
 	 * Get the root element

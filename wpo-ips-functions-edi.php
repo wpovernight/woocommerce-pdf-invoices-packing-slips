@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /*
 |--------------------------------------------------------------------------
-| UBL Document global functions
+| EDI Document global functions
 |--------------------------------------------------------------------------
 */
 
@@ -179,7 +179,14 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 		$edi_maker->set_file_path( $tmp_path );
 	}
 
-	$edi_document = new \WPO\IPS\EDI\Syntax\Ubl\UblDocument(); //TODO: We need to check the sintax/format from settings
+	$syntax = wpo_ips_edi_get_current_syntax();
+	$class  = wpo_ips_edi_syntaxes( 'class', $syntax );
+	
+	if ( ! $class ) {
+		return wcpdf_error_handling( 'EDI Document class not found.' );
+	}
+
+	$edi_document = new $class();
 	$edi_document->set_order_document( $document );
 
 	$builder  = new \WPO\IPS\EDI\SabreBuilder();
@@ -266,22 +273,22 @@ function wpo_ips_edi_get_current_syntax(): string {
 function wpo_ips_edi_get_current_format(): string {
 	$edi_settings = wpo_ips_edi_get_settings();
 	$format       = 'ubl_2_1';
-	
+
 	if ( ! empty( $edi_settings['syntax'] ) ) {
 		$syntax     = $edi_settings['syntax'];
 		$format_key = "{$syntax}_format";
-		
+
 		if ( ! empty( $edi_settings[ $format_key ] ) ) {
 			$format = $edi_settings[ $format_key ];
 		}
 	}
-	
+
 	return apply_filters( 'wpo_ips_edi_current_format', $format, $edi_settings );
 }
 
 /**
  * Get the EDI document types
- * 
+ *
  * @return array
  */
 function wpo_ips_edi_get_document_types(): array {
@@ -291,7 +298,7 @@ function wpo_ips_edi_get_document_types(): array {
 
 /**
  * Check if EDI attachments should be sent
- * 
+ *
  * @return bool
  */
 function wpo_ips_edi_send_attachments(): bool {
@@ -301,7 +308,7 @@ function wpo_ips_edi_send_attachments(): bool {
 
 /**
  * Check if EDI encrypted PDF should be embedded
- * 
+ *
  * @return bool
  */
 function wpo_ips_edi_embed_encrypted_pdf(): bool {
@@ -311,7 +318,7 @@ function wpo_ips_edi_embed_encrypted_pdf(): bool {
 
 /**
  * Check if EDI preview is enabled
- * 
+ *
  * @return bool
  */
 function wpo_ips_edi_preview_is_enabled(): bool {
@@ -320,28 +327,41 @@ function wpo_ips_edi_preview_is_enabled(): bool {
 }
 
 /**
- * Get the EDI syntaxes
- * 
- * @return array
+ * Get the EDI syntaxes or a specific syntax value.
+ *
+ * @param string      $value_type Either 'label' or 'class'. Defaults to 'label'.
+ * @param string|null $syntax     Optional. The syntax slug (e.g. 'ubl', 'cii'). If set, returns a single value.
+ * @return array|string|null
  */
-function wpo_ips_edi_syntaxes(): array {
-	return apply_filters(
-		'wpo_ips_edi_syntaxes',
-		array(
-			'ubl'       => 'Universal Business Language (UBL)',
-			'cii'       => 'Cross Industry Invoice (CII)',
-			// 'tacturae'  => 'Facturae' . ' (' . __( 'Spain', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
-			// 'fatturapa' => 'FatturaPA' . ' (' . __( 'Italy', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
-			// 'gs1'       => 'GS1',
-		)
-	);
+function wpo_ips_edi_syntaxes( string $value_type = 'label', ?string $syntax = null ) {
+	$syntaxes = apply_filters( 'wpo_ips_edi_syntaxes', array(
+		'ubl' => array(
+			'label' => 'Universal Business Language (UBL)',
+			'class' => '\WPO\IPS\EDI\Syntax\Ubl\UblDocument',
+		),
+		'cii' => array(
+			'label' => 'Cross Industry Invoice (CII)',
+			'class' => '\WPO\IPS\EDI\Syntax\Cii\CiiDocument',
+		),
+	), $value_type, $syntax );
+
+	if ( ! empty( $syntax ) ) {
+		return $syntaxes[ $syntax ][ $value_type ] ?? null;
+	}
+
+	$output = array();
+	foreach ( $syntaxes as $slug => $data ) {
+		$output[ $slug ] = $data[ $value_type ] ?? null;
+	}
+
+	return $output;
 }
 
 /**
  * Get the EDI formats
- * 
+ *
  * @param string $syntax
- * 
+ *
  * @return array
  */
 function wpo_ips_edi_formats( string $syntax = '' ): array {
@@ -382,6 +402,6 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 			),
 		)
 	);
-	
+
 	return isset( $formats[ $syntax ] ) ? $formats[ $syntax ] : $formats;
 }

@@ -559,10 +559,7 @@ class Settings {
 		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats ) ) {
-			$document_settings = $this->get_document_settings( $document->get_type(), esc_attr( $request['output'] ) );
-			if ( isset( $document_settings['enabled'] ) ) {
-				$output_format = esc_attr( $request['output'] );
-			}
+			$output_format = esc_attr( $request['output'] );
 		}
 
 		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document );

@@ -9,35 +9,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class AbstractDocument {
-	
+
 	public string $syntax;
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
 	public array $order_coupons_data;
 	public string $output;
 	public OrderDocument $order_document;
-	
+
 	/**
 	 * Get the root element
 	 *
 	 * @return string
 	 */
 	abstract public function get_root_element(): string;
-	
+
 	/**
 	 * Get additional root elements
 	 *
 	 * @return array
 	 */
 	abstract public function get_additional_root_elements(): array;
-	
+
 	/**
 	 * Get the namespaces
 	 *
 	 * @return array
 	 */
 	abstract public function get_namespaces(): array;
-	
+
 	/**
 	 * Get the syntax formats
 	 *
@@ -45,14 +45,14 @@ abstract class AbstractDocument {
 	 */
 	public function get_syntax_formats(): array {
 		$all_formats = wpo_ips_edi_formats();
-		
+
 		return apply_filters(
 			'wpo_ips_edi_syntax_formats',
 			$all_formats[ $this->syntax ] ?? array(),
 			$this
 		);
 	}
-	
+
 	/**
 	 * Set the order
 	 *
@@ -75,27 +75,26 @@ abstract class AbstractDocument {
 		$this->order_document = $order_document;
 		$this->set_order( $order_document->order );
 	}
-	
+
 	/**
 	 * Get the format structure
 	 *
-	 * @param string $syntax
-	 * @param string $format
 	 * @return array|false
 	 */
-	public function get_format_structure( string $syntax, string $format ) {
-		$available_formats = wpo_ips_edi_formats( $syntax );
-		
+	public function get_format_structure() {
+		$format            = wpo_ips_edi_get_current_format();
+		$available_formats = wpo_ips_edi_formats( $this->syntax );
+
 		if ( ! isset( $available_formats[ $format ] ) ) {
 			return false;
 		}
-		
+
 		$structure = ( new $available_formats[ $format ]['class']() )->get_structure( $this->order_document->slug );
-		
+
 		if ( empty( $structure ) ) {
 			return false;
 		}
-		
+
 		foreach ( $structure as $key => $element ) {
 			if ( false === $element['enabled'] ) {
 				unset( $structure[ $key ] );
@@ -104,7 +103,7 @@ abstract class AbstractDocument {
 
 		return $structure;
 	}
-	
+
 	/**
 	 * Get tax rates
 	 *
@@ -181,7 +180,7 @@ abstract class AbstractDocument {
 				foreach ( $fields as $field ) {
 					$meta_key = '_wpo_ips_edi_tax_' . $field;
 					$value    = wc_get_order_item_meta( $tax_item_key, $meta_key, true );
-					
+
 					// If the value is empty, try to get it from legacy meta key
 					if ( empty( $value ) ) {
 						$legacy_meta_key = '_wcpdf_ubl_tax_' . $field;
@@ -209,7 +208,7 @@ abstract class AbstractDocument {
 
 		return $order_tax_data;
 	}
-	
+
 	/**
 	 * Get order coupons data
 	 *
@@ -218,11 +217,11 @@ abstract class AbstractDocument {
 	public function get_order_coupons_data(): array {
 		$order      = $this->order;
 		$order_data = array();
-	
+
 		// Get applied coupons
 		$applied_coupons = $order->get_coupon_codes();
 		$coupons_data    = array();
-	
+
 		foreach ( $applied_coupons as $coupon_code ) {
 			$coupon         = new \WC_Coupon( $coupon_code );
 			$coupons_data[] = array(
@@ -231,15 +230,15 @@ abstract class AbstractDocument {
 				'amount' => $coupon->get_amount(),
 			);
 		}
-	
+
 		// Get item-level discounts
 		$items_data = array();
-	
+
 		foreach ( $order->get_items() as $item_id => $item ) {
 			$subtotal = $item->get_subtotal();
 			$total    = $item->get_total();
 			$discount = $subtotal - $total;
-	
+
 			$items_data[ $item_id ] = [
 				'name'     => $item->get_name(),
 				'subtotal' => $subtotal,
@@ -247,12 +246,12 @@ abstract class AbstractDocument {
 				'discount' => (float) $discount,
 			];
 		}
-	
+
 		$order_data['coupons'] = $coupons_data;
 		$order_data['items']   = $items_data;
-	
+
 		return $order_data;
-	}	
+	}
 
 	/**
 	 * Get percentage from fallback
@@ -284,18 +283,16 @@ abstract class AbstractDocument {
 
 		return $percentage;
 	}
-	
+
 	/**
 	 * Get the document data
 	 *
 	 * @return array
 	 */
 	public function get_data(): array {
-		$data   = array();
-		$syntax = wpo_ips_edi_get_current_syntax();
-		$format = wpo_ips_edi_get_current_format();
+		$data = array();
 
-		foreach ( $this->get_format_structure( $syntax, $format ) as $key => $value ) {
+		foreach ( $this->get_format_structure() as $key => $value ) {
 			$options  = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
 			$handlers = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
 
@@ -304,7 +301,7 @@ abstract class AbstractDocument {
 			$root_data = array();
 
 			foreach ( $handlers as $handler_class ) {
-				if (  ! class_exists( $handler_class ) ) {
+				if ( ! class_exists( $handler_class ) ) {
 					continue;
 				}
 
@@ -322,7 +319,7 @@ abstract class AbstractDocument {
 				$data = array_merge( $data, $root_data );
 			}
 		}
-		
+
 		return apply_filters( 'wpo_ips_edi_document_data', $data, $this );
 	}
 
