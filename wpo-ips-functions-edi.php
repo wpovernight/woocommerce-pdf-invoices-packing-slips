@@ -443,10 +443,6 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 						'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B\Invoice::class,
 					),
 				),
-				// 'factur-x' => array(
-				// 	'name'  => 'Factur-X',
-				// 	'class' => '',
-				// ),
 			),
 		)
 	);

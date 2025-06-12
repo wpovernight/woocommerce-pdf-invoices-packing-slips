@@ -18,7 +18,7 @@ class ExchangedDocumentContextHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:ID',
-							'value' => 'urn:cen.eu:en16931:2017', // Standard EN16931 guideline
+							'value' => $this->format_document->get_context(),
 						),
 					),
 				),

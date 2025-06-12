@@ -15,6 +15,15 @@ class Invoice extends AbstractCiiFormat {
 	public string $name = 'CII D16B';
 	
 	/**
+	 * Get the invoice context
+	 *
+	 * @return string
+	 */
+	public function get_context(): string {
+		return 'urn:cen.eu:en16931:2017';
+	}
+	
+	/**
 	 * Get the invoice type code
 	 *
 	 * @return string

@@ -13,7 +13,14 @@ abstract class AbstractCiiFormat implements FormatInterface {
 	public string $syntax = 'cii';
 	
 	/**
-	 * Get the invoice type code
+	 * Get the format context
+	 *
+	 * @var string
+	 */
+	abstract public function get_context(): string;
+	
+	/**
+	 * Get the format type code
 	 *
 	 * @return string
 	 */
