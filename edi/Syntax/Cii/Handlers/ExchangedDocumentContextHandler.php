@@ -18,7 +18,7 @@ class ExchangedDocumentContextHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:ID',
-							'value' => $this->format_document->get_context(),
+							'value' => $this->document->format_document->get_context(),
 						),
 					),
 				),

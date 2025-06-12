@@ -16,7 +16,7 @@ class Document {
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
 	public array $order_coupons_data;
-	private ?object $format_document;
+	public ?object $format_document;
 	public string $output;
 
 	/**

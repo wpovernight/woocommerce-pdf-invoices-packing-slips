@@ -32,6 +32,7 @@ return array(
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Abstracts\\AbstractCiiFormat' => $baseDir . '/edi/Syntax/Cii/Abstracts/AbstractCiiFormat.php',
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Abstracts\\AbstractCiiHandler' => $baseDir . '/edi/Syntax/Cii/Abstracts/AbstractCiiHandler.php',
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Formats\\CiiD16B\\Invoice' => $baseDir . '/edi/Syntax/Cii/Formats/CiiD16B/Invoice.php',
+    'WPO\\IPS\\EDI\\Syntax\\Cii\\Formats\\FacturX\\Invoice' => $baseDir . '/edi/Syntax/Cii/Formats/FacturX/Invoice.php',
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\BuyerTradePartyHandler' => $baseDir . '/edi/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/BuyerTradePartyHandler.php',
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\ContractReferencedDocumentHandler' => $baseDir . '/edi/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/ContractReferencedDocumentHandler.php',
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\SellerTradePartyHandler' => $baseDir . '/edi/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/SellerTradePartyHandler.php',

@@ -70,6 +70,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\EDI\\Syntax\\Cii\\Abstracts\\AbstractCiiFormat' => __DIR__ . '/../..' . '/edi/Syntax/Cii/Abstracts/AbstractCiiFormat.php',
         'WPO\\IPS\\EDI\\Syntax\\Cii\\Abstracts\\AbstractCiiHandler' => __DIR__ . '/../..' . '/edi/Syntax/Cii/Abstracts/AbstractCiiHandler.php',
         'WPO\\IPS\\EDI\\Syntax\\Cii\\Formats\\CiiD16B\\Invoice' => __DIR__ . '/../..' . '/edi/Syntax/Cii/Formats/CiiD16B/Invoice.php',
+        'WPO\\IPS\\EDI\\Syntax\\Cii\\Formats\\FacturX\\Invoice' => __DIR__ . '/../..' . '/edi/Syntax/Cii/Formats/FacturX/Invoice.php',
         'WPO\\IPS\\EDI\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\BuyerTradePartyHandler' => __DIR__ . '/../..' . '/edi/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/BuyerTradePartyHandler.php',
         'WPO\\IPS\\EDI\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\ContractReferencedDocumentHandler' => __DIR__ . '/../..' . '/edi/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/ContractReferencedDocumentHandler.php',
         'WPO\\IPS\\EDI\\Syntax\\Cii\\Handlers\\ApplicableHeaderTradeAgreement\\SellerTradePartyHandler' => __DIR__ . '/../..' . '/edi/Syntax/Cii/Handlers/ApplicableHeaderTradeAgreement/SellerTradePartyHandler.php',
