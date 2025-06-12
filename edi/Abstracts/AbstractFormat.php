@@ -8,48 +8,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class AbstractFormat {
 
+	public string $type;
 	public string $slug;
 	public string $name;
+	public string $syntax;
 
 	/**
-	 * Dynamic method handler for document-specific getters.
-	 * Example: get_invoice_structure(), get_credit_note_root_element()
+	 * Get the format root element
 	 *
-	 * @param string $name
-	 * @param array  $arguments
-	 * @return mixed|null
+	 * @return string
 	 */
-	public function __call( string $name, array $arguments ) {
-		if ( preg_match( '/^get_([a-z0-9_]+)_([a-z0-9_]+)$/', strtolower( $name ), $matches ) ) {
-			return $this->get_method( $matches[1], $matches[2] );
-		}
-		
-		if ( function_exists( 'doing_it_wrong' ) ) {
-			doing_it_wrong(
-				__METHOD__,
-				sprintf( 'Call to undefined method %s::%s()', static::class, $name ),
-				WPO_WCPDF()->version
-			);
-		}
-
-		return null;
-	}
+	abstract public function get_root_element(): string;
+	
+	/**
+	 * Get the format additional attributes
+	 *
+	 * @return array
+	 */
+	abstract public function get_additional_attributes(): array;
 
 	/**
-	 * Call a document-specific method if it exists.
+	 * Get the format namespaces
 	 *
-	 * @param string $slug
-	 * @param string $suffix
-	 * @return mixed|null
+	 * @return array
 	 */
-	public function get_method( string $slug, string $suffix ) {
-		$method = "get_{$slug}_{$suffix}";
+	abstract public function get_namespaces(): array;
 
-		if ( method_exists( $this, $method ) ) {
-			return $this->$method();
-		}
-
-		return null;
-	}
+	/**
+	 * Get the format structure
+	 *
+	 * @return array
+	 */
+	abstract public function get_structure(): array;
 
 }

@@ -12,12 +12,12 @@ class Document {
 
 	public string $syntax;
 	public string $format;
-	public object $format_instance;
+	public OrderDocument $order_document;
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
 	public array $order_coupons_data;
+	public ?object $format_instance;
 	public string $output;
-	public OrderDocument $order_document;
 
 	/**
 	 * Constructor
@@ -25,47 +25,37 @@ class Document {
 	 * @param string $syntax
 	 * @param string $format
 	 */
-	public function __construct( string $syntax, string $format ) {
-		$this->syntax          = $syntax;
-		$this->format          = $format;
-		$this->format_instance = $this->get_format_instance();
-		
+	public function __construct( string $syntax, string $format, OrderDocument $order_document ) {
+		$this->syntax             = $syntax;
+		$this->format             = $format;
+		$this->order_document     = $order_document;
+		$this->order              = $this->order_document->order;
+		$this->order_tax_data     = $this->get_tax_rates();
+		$this->order_coupons_data = $this->get_order_coupons_data();
+		$this->format_instance    = $this->get_format_instance();
+
 		if ( ! $this->format_instance ) {
 			throw new \Exception( sprintf( 'Format "%s" for syntax "%s" is not available.', $format, $syntax ) );
 		}
 	}
-
+	
 	/**
-	 * Get the syntax formats
+	 * Get the format instance
 	 *
-	 * @return array
+	 * @return null|object
 	 */
-	public function get_syntax_formats(): array {
-		$all_formats = wpo_ips_edi_formats();
-		return $all_formats[ $this->syntax ] ?? array();
-	}
+	public function get_format_instance(): ?object {
+		$available_formats = wpo_ips_edi_formats( $this->syntax );
 
-	/**
-	 * Set the order
-	 *
-	 * @param \WC_Abstract_Order $order
-	 * @return void
-	 */
-	public function set_order( \WC_Abstract_Order $order ): void {
-		$this->order              = $order;
-		$this->order_tax_data     = $this->get_tax_rates();
-		$this->order_coupons_data = $this->get_order_coupons_data();
-	}
-
-	/**
-	 * Set the order document
-	 *
-	 * @param OrderDocument $order_document
-	 * @return void
-	 */
-	public function set_order_document( OrderDocument $order_document ): void {
-		$this->order_document = $order_document;
-		$this->set_order( $order_document->order );
+		if ( ! isset( $available_formats[ $this->format ] ) ) {
+			return null;
+		}
+		
+		if ( ! in_array( $this->order_document->get_type(), array_keys( $available_formats[ $this->format ]['documents'] ) ) ) {
+			return null;
+		}
+		
+		return new $available_formats[ $this->format ]['documents'][ $this->order_document->get_type() ]();
 	}
 
 	/**
@@ -76,7 +66,7 @@ class Document {
 	public function get_structure() {
 		$structure = apply_filters(
 			'wpo_ips_edi_document_structure',
-			$this->format_instance->get_method( $this->order_document->slug, 'structure' ),
+			$this->format_instance->get_structure(),
 			$this
 		);
 
@@ -101,7 +91,7 @@ class Document {
 	public function get_root_element(): string {
 		return apply_filters(
 			'wpo_ips_edi_document_root_element',
-			$this->format_instance->get_method( $this->order_document->slug, 'root_element' ),
+			$this->format_instance->get_root_element(),
 			$this
 		);
 	}
@@ -114,7 +104,7 @@ class Document {
 	public function get_additional_attributes(): array {
 		return apply_filters(
 			'wpo_ips_edi_document_additional_attributes',
-			$this->format_instance->get_method( $this->order_document->slug, 'additional_attributes' ),
+			$this->format_instance->get_additional_attributes(),
 			$this
 		);
 	}
@@ -127,7 +117,7 @@ class Document {
 	public function get_namespaces(): array {
 		return apply_filters(
 			'wpo_ips_edi_document_namespaces',
-			$this->format_instance->get_method( $this->order_document->slug, 'namespaces' ),
+			$this->format_instance->get_namespaces(),
 			$this
 		);
 	}
@@ -364,21 +354,6 @@ class Document {
 		}
 
 		return $percentage;
-	}
-	
-	/**
-	 * Get the format instance
-	 *
-	 * @return false|object
-	 */
-	private function get_format_instance() {
-		$available_formats = wpo_ips_edi_formats( $this->syntax );
-
-		if ( ! isset( $available_formats[ $this->format ] ) ) {
-			return false;
-		}
-
-		return new $available_formats[ $this->format ]['class']();
 	}
 
 }

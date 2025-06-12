@@ -191,10 +191,9 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 		return wcpdf_error_handling( 'EDI syntax not set. Cannot write EDI file.' );
 	}
 
-	$edi_document = new \WPO\IPS\EDI\Document( $syntax, $format );
-	$edi_document->set_order_document( $document );
-
-	$builder  = new \WPO\IPS\EDI\SabreBuilder();
+	$edi_document = new \WPO\IPS\EDI\Document( $syntax, $format, $document );
+	$builder      = new \WPO\IPS\EDI\SabreBuilder();
+	
 	$contents = apply_filters( 'wpo_ips_edi_contents',
 		$builder->build( $edi_document ),
 		$edi_document,
@@ -357,7 +356,9 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 			'ubl' => array(
 				'ubl-2-1' => array(
 					'name'  => 'UBL 2.1',
-					'class' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21::class,
+					'documents' => array(
+						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21\Invoice::class,
+					),
 				),
 				// 'peppol_bis_3_0' => array(
 				// 	'name'  => 'Peppol BIS Billing 3.0',
@@ -383,7 +384,9 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 			'cii' => array(
 				'cii-d16b' => array(
 					'name'  => 'CII D16B',
-					'class' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B::class,
+					'documents' => array(
+						'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B\Invoice::class,
+					),
 				),
 				// 'factur-x' => array(
 				// 	'name'  => 'Factur-X',

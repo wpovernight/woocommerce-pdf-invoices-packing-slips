@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI\Syntax\Ubl\Formats;
+namespace WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21;
 
 use WPO\IPS\EDI\Abstracts\AbstractFormat;
 
@@ -8,36 +8,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Ubl21 extends AbstractFormat {
+class Invoice extends AbstractFormat {
 	
+	public string $type   = 'invoice';
 	public string $slug   = 'ubl-2-1';
 	public string $name   = 'UBL 2.1';
 	public string $syntax = 'ubl';
 
 	/**
-	 * Get the invoice root element
+	 * Get the format root element
 	 *
 	 * @return string
 	 */
-	public function get_invoice_root_element(): string {
+	public function get_root_element(): string {
 		return 'Invoice';
 	}
 	
 	/**
-	 * Get the invoice additional attributes
+	 * Get the format additional attributes
 	 *
 	 * @return array
 	 */
-	public function get_invoice_additional_attributes(): array {
+	public function get_additional_attributes(): array {
 		return array();
 	}
 
 	/**
-	 * Get the invoice namespaces
+	 * Get the format namespaces
 	 *
 	 * @return array
 	 */
-	public function get_invoice_namespaces(): array {
+	public function get_namespaces(): array {
 		return array(
 			'cac' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
 			'cbc' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
@@ -46,11 +47,11 @@ class Ubl21 extends AbstractFormat {
 	}
 	
 	/**
-	 * Get the invoice structure
+	 * Get the format structure
 	 *
 	 * @return array
 	 */
-	public function get_invoice_structure(): array {
+	public function get_structure(): array {
 		return array(
 			'ubl_version_id' => array(
 				'enabled' => true,

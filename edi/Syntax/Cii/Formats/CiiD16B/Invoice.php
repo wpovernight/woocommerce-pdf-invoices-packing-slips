@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI\Syntax\Cii\Formats;
+namespace WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B;
 
 use WPO\IPS\EDI\Abstracts\AbstractFormat;
 
@@ -8,8 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class CiiD16B extends AbstractFormat {
+class Invoice extends AbstractFormat {
 	
+	public string $type   = 'invoice';
 	public string $slug   = 'cii-d16b';
 	public string $name   = 'CII D16B';
 	public string $syntax = 'cii';
@@ -19,7 +20,7 @@ class CiiD16B extends AbstractFormat {
 	 *
 	 * @return string
 	 */
-	public function get_invoice_root_element(): string {
+	public function get_root_element(): string {
 		return 'rsm:CrossIndustryInvoice';
 	}
 	
@@ -28,7 +29,7 @@ class CiiD16B extends AbstractFormat {
 	 *
 	 * @return array
 	 */
-	public function get_invoice_additional_attributes(): array {
+	public function get_additional_attributes(): array {
 		return array();
 	}
 	
@@ -37,7 +38,7 @@ class CiiD16B extends AbstractFormat {
 	 *
 	 * @return array
 	 */
-	public function get_invoice_namespaces(): array {
+	public function get_namespaces(): array {
 		return array(
 			'rsm' => 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
 			'qdt' => 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
@@ -51,7 +52,7 @@ class CiiD16B extends AbstractFormat {
 	 *
 	 * @return array
 	 */
-	public function get_invoice_structure(): array {
+	public function get_structure(): array {
 		return array(
 			// Exchanged Document Context
 			'exchanged_document_context' => array(
