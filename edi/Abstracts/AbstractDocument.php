@@ -299,33 +299,48 @@ abstract class AbstractDocument {
 	 * @return array
 	 */
 	public function get_data(): array {
-		$data = array();
+		$data_by_root = array();
 
 		foreach ( $this->get_format_structure() as $key => $value ) {
-			$options  = isset( $value['options'] ) && is_array( $value['options'] ) ? $value['options'] : array();
-			$handlers = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
-
-			// Get the root from options if defined
-			$root_name = isset( $options['root'] ) ? $options['root'] : null;
-			$root_data = array();
-
-			foreach ( $handlers as $handler_class ) {
-				if ( ! class_exists( $handler_class ) ) {
-					continue;
-				}
-
-				$handler   = new $handler_class( $this );
-				$root_data = $handler->handle( $root_data, $options );
+			if ( empty( $value['enabled'] ) || empty( $value['handler'] ) ) {
+				continue;
 			}
 
-			// Add to $data under the root name if specified, otherwise merge directly
+			$options     = isset( $value['options'] ) ? $value['options'] : array();
+			$handlers    = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
+			$root_name   = $options['root'] ?? null;
+			$root_output = array();
+
+			foreach ( $handlers as $handler_class ) {
+				if ( class_exists( $handler_class ) ) {
+					$handler     = new $handler_class( $this );
+					$root_output = $handler->handle( $root_output, $options );
+				}
+			}
+
 			if ( $root_name ) {
+				if ( ! isset( $data_by_root[ $root_name ] ) ) {
+					$data_by_root[ $root_name ] = array();
+				}
+				$data_by_root[ $root_name ] = array_merge( $data_by_root[ $root_name ], $root_output );
+			} else {
+				if ( ! isset( $data_by_root[ null ] ) ) {
+					$data_by_root[ null ] = array();
+				}
+				$data_by_root[ null ] = array_merge( $data_by_root[ null ], $root_output );
+			}
+		}
+
+		// Convert grouped data to the expected format
+		$data = array();
+		foreach ( $data_by_root as $root => $value ) {
+			if ( $root ) {
 				$data[] = array(
-					'name'  => $root_name,
-					'value' => $root_data,
+					'name'  => $root,
+					'value' => $value,
 				);
 			} else {
-				$data = array_merge( $data, $root_data );
+				$data = array_merge( $data, $value );
 			}
 		}
 
