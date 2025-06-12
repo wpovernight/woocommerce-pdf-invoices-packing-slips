@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class AbstractHandler {
-	
+
 	public AbstractDocument $document;
 
 	/**
@@ -27,7 +27,7 @@ abstract class AbstractHandler {
 	 * @return array
 	 */
 	abstract public function handle( $data, $options = array() );
-	
+
 	/**
 	 * Get normalized WooCommerce payment data for the current order.
 	 *
@@ -87,7 +87,7 @@ abstract class AbstractHandler {
 
 		return $data;
 	}
-	
+
 	/**
 	 * Normalize a raw date input into a specific format.
 	 *
@@ -99,37 +99,41 @@ abstract class AbstractHandler {
 		if ( empty( $raw ) ) {
 			return '';
 		}
-	
-		// If it's already a DateTimeInterface, just format
+
+		// Handle UNIX timestamp (int or numeric string)
+		if ( is_numeric( $raw ) && (int) $raw > 1000000000 ) {
+			try {
+				$datetime = new \DateTimeImmutable( '@' . (int) $raw );
+				$datetime = $datetime->setTimezone( function_exists( 'wc_timezone' ) ? \wc_timezone() : new \DateTimeZone( 'UTC' ) );
+				return $datetime->format( $format );
+			} catch ( \Exception $e ) {
+				return '';
+			}
+		}
+
+		// Handle DateTimeInterface objects
 		if ( $raw instanceof \DateTimeInterface ) {
 			return $raw->format( $format );
 		}
-	
-		// If it's a valid timestamp
-		if ( is_numeric( $raw ) && (int) $raw > 1000000000 && function_exists( 'wc_timezone' ) ) {
-			$datetime = new \DateTimeImmutable( '@' . $raw );
-			$datetime = $datetime->setTimezone( \wc_timezone() );
-			return $datetime->format( $format );
-		}
-	
-		// If it's a string, parse it respecting WC timezone
+
+		// Try WooCommerce string parser
 		if ( function_exists( 'wc_string_to_datetime' ) ) {
 			try {
 				$datetime = \wc_string_to_datetime( $raw );
 				return $datetime->format( $format );
 			} catch ( \Exception $e ) {
-				// Silently ignore and fall back to strtotime()
+				// fallback below
 			}
 		}
-	
-		// Fallback for non-WC: parse with strtotime()
+
+		// Fallback with strtotime
 		$timestamp = strtotime( $raw );
-		if ( $timestamp && function_exists( 'wp_timezone' ) ) {
+		if ( $timestamp ) {
 			$datetime = new \DateTimeImmutable( '@' . $timestamp );
-			$datetime = $datetime->setTimezone( \wp_timezone() );
+			$datetime = $datetime->setTimezone( function_exists( 'wp_timezone' ) ? \wp_timezone() : new \DateTimeZone( 'UTC' ) );
 			return $datetime->format( $format );
 		}
-	
+
 		return '';
 	}
 
