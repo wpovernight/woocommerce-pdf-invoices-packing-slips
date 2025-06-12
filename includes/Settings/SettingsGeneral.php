@@ -226,6 +226,19 @@ class SettingsGeneral {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'shop_email_address',
+				'title'    => __( 'Shop Email Address', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_email_address',
+					'translatable' => true,
+					'description'  => __( 'The email address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'shop_address_line_1',
 				'title'    => __( 'Shop Address Line 1', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'text_input',
@@ -520,6 +533,7 @@ class SettingsGeneral {
 					'vat_number',
 					'coc_number',
 					'shop_phone_number',
+					'shop_email_address',
 					'footer',
 				)
 			),
