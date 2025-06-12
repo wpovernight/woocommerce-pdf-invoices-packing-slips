@@ -55,12 +55,13 @@ class PDFMaker {
 			$this->set_additional_debug_options( $options );
 		}
 		
-		if ( wpo_ips_edi_is_available() ) {
-			$format = wpo_ips_edi_get_current_format( true );
-			if ( is_array( $format ) && $format['pdfa'] ) {
-				$this->set_pdfa_enabled( $options );
-			}
-		}
+		//TODO: Dompdf 3.1.1 (not yet released) supports PDF/A-3 embedding, so this can be enabled in the future [https://github.com/dompdf/dompdf/wiki/PDFA-Support]
+		// if ( wpo_ips_edi_is_available() ) {
+		// 	$format = wpo_ips_edi_get_current_format( true );
+		// 	if ( is_array( $format ) && $format['pdfa'] ) {
+		// 		$this->set_pdfa_enabled( $options );
+		// 	}
+		// }
 		
 		// instantiate and use the dompdf class
 		$dompdf = new Dompdf( $options );

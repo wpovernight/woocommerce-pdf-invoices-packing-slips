@@ -451,13 +451,14 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 						'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B\Invoice::class,
 					),
 				),
-				'factur-x' => array(
-					'name'      => 'Factur-X',
-					'pdfa'      => true,
-					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\FacturX\Invoice::class,
-					),
-				),
+				//TODO: Dompdf 3.1.1 (not yet released) supports PDF/A-3 embedding, so this can be enabled in the future [https://github.com/dompdf/dompdf/wiki/PDFA-Support]
+				// 'factur-x' => array(
+				// 	'name'      => 'Factur-X',
+				// 	'pdfa'      => true,
+				// 	'documents' => array(
+				// 		'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\FacturX\Invoice::class,
+				// 	),
+				// ),
 			),
 		)
 	);
