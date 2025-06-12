@@ -48,7 +48,7 @@ class LegalMonetaryTotalHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_LegalMonetaryTotal', $legalMonetaryTotal, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_legal_monetary_total', $legalMonetaryTotal, $data, $options, $this );
 
 		return $data;
 	}

@@ -74,7 +74,7 @@ class PaymentMeansHandler extends AbstractHandler {
 			);
 		}
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_PaymentMeans', $node, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_payment_means', $node, $options, $this );
 
 		return $data;
 	}

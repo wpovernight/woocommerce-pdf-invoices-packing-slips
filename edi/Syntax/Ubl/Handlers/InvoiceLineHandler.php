@@ -161,7 +161,7 @@ class InvoiceLineHandler extends AbstractHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_wc_ubl_handle_InvoiceLine', $invoiceLine, $data, $options, $item, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_line', $invoiceLine, $data, $options, $item, $this );
 
 			// Empty this array at the end of the loop per item, so data doesn't stack
 			$taxSubtotal = [];

@@ -39,7 +39,7 @@ class ExchangedDocumentHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_ExchangedDocument', $exchangedDocument, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_exchanged_document', $exchangedDocument, $data, $options, $this );
 
 		return $data;
 	}

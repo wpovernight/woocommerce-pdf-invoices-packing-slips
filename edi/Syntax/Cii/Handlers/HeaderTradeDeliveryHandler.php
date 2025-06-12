@@ -46,7 +46,7 @@ class HeaderTradeDeliveryHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_HeaderTradeDelivery', $deliveryNode, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_header_trade_delivery', $deliveryNode, $data, $options, $this );
 
 		return $data;
 	}

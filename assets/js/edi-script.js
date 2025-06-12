@@ -41,9 +41,9 @@ jQuery( function ( $ ) {
 	$select.on( 'change', updateTableView );
 	updateTableView(); // Initialize on page load
 	
-	$( '#ubl-show-changelog' ).on( 'click', function( e ) {
+	$( '#edi-show-changelog' ).on( 'click', function( e ) {
 		e.preventDefault();
-		$( '#ubl-standard-changelog' ).slideToggle();
+		$( '#edi-standard-changelog' ).slideToggle();
 	} );
 	
 	// Handle the save taxes

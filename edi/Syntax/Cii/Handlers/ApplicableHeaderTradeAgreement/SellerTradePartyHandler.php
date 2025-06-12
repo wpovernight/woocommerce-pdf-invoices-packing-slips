@@ -102,7 +102,7 @@ class SellerTradePartyHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_SellerTradeParty', $sellerTradeParty, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_seller_trade_party', $sellerTradeParty, $data, $options, $this );
 
 		return $data;
 	}

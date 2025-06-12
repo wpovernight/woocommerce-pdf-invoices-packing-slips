@@ -284,3 +284,269 @@ if ( has_action( 'wpo_wcpdf_ubl_tax_remarks' ) ) {
 		$version
 	);
 }
+
+if ( has_action( 'wpo_wc_ubl_handle_AdditionalDocumentReference' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_AdditionalDocumentReference',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_AdditionalDocumentReference',
+			$version,
+			'wpo_ips_edi_ubl_additional_document_reference'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_AccountingSupplierParty' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_AccountingSupplierParty',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_AccountingSupplierParty',
+			$version,
+			'wpo_ips_edi_ubl_accounting_supplier_party'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_vat_number' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_vat_number',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_vat_number',
+			$version,
+			'wpo_ips_edi_ubl_vat_number'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_AccountingCustomerParty' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_AccountingCustomerParty',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_AccountingCustomerParty',
+			$version,
+			'wpo_ips_edi_ubl_accounting_customer_party'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_AllowanceCharge' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_AllowanceCharge',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_AllowanceCharge',
+			$version,
+			'wpo_ips_edi_ubl_allowance_charge'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_BuyerReference' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_BuyerReference',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_BuyerReference',
+			$version,
+			'wpo_ips_edi_ubl_buyer_reference'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_Delivery' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_Delivery',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_Delivery',
+			$version,
+			'wpo_ips_edi_ubl_delivery'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_DocumentCurrencyCode' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_DocumentCurrencyCode',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_DocumentCurrencyCode',
+			$version,
+			'wpo_ips_edi_ubl_document_currency_code'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_ID' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_ID',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_ID',
+			$version,
+			'wpo_ips_edi_ubl_id'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_InvoiceLine' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_InvoiceLine',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_InvoiceLine',
+			$version,
+			'wpo_ips_edi_ubl_invoice_line'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_InvoiceTypeCode' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_InvoiceTypeCode',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_InvoiceTypeCode',
+			$version,
+			'wpo_ips_edi_ubl_invoice_type_code'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_IssueDate' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_IssueDate',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_IssueDate',
+			$version,
+			'wpo_ips_edi_ubl_issue_date'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_LegalMonetaryTotal' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_LegalMonetaryTotal',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_LegalMonetaryTotal',
+			$version,
+			'wpo_ips_edi_ubl_legal_monetary_total'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_OrderReference' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_OrderReference',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_OrderReference',
+			$version,
+			'wpo_ips_edi_ubl_order_reference'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_PaymentMeans' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_PaymentMeans',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_PaymentMeans',
+			$version,
+			'wpo_ips_edi_ubl_payment_means'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_PaymentTerms' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_PaymentTerms',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_PaymentTerms',
+			$version,
+			'wpo_ips_edi_ubl_payment_terms'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_orderTaxData' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_orderTaxData',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_orderTaxData',
+			$version,
+			'wpo_ips_edi_ubl_order_tax_data'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_TaxTotal' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_TaxTotal',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_TaxTotal',
+			$version,
+			'wpo_ips_edi_ubl_tax_total'
+		),
+		$version
+	);
+}
+
+if ( has_action( 'wpo_wc_ubl_handle_UBLVersionID' ) ) {
+	$version = '5.0.0';
+	_doing_it_wrong(
+		'wpo_wc_ubl_handle_UBLVersionID',
+		sprintf(
+			$message,
+			'wpo_wc_ubl_handle_UBLVersionID',
+			$version,
+			'wpo_ips_edi_ubl_version_id'
+		),
+		$version
+	);
+}

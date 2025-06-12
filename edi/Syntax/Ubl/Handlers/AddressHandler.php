@@ -33,7 +33,7 @@ class AddressHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_AccountingSupplierParty', $supplierParty, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_accounting_supplier_party', $supplierParty, $data, $options, $this );
 
 		return $data;
 	}
@@ -147,7 +147,7 @@ class AddressHandler extends AbstractHandler {
 	}
 
 	public function return_customer_party( $data, $options = array() ) {
-		$vat_number        = apply_filters( 'wpo_wc_ubl_vat_number', wpo_wcpdf_get_order_customer_vat_number( $this->document->order ), $this->document->order );
+		$vat_number        = apply_filters( 'wpo_ips_edi_ubl_vat_number', wpo_wcpdf_get_order_customer_vat_number( $this->document->order ), $this->document->order );
 		$customerPartyName = $customerPartyContactName = $this->document->order->get_formatted_billing_full_name();
 		$billing_company   = $this->document->order->get_billing_company();
 
@@ -247,7 +247,7 @@ class AddressHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_AccountingCustomerParty', $customerParty, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_accounting_customer_party', $customerParty, $data, $options, $this );
 
 		return $data;
 	}

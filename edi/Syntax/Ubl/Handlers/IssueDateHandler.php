@@ -15,7 +15,7 @@ class IssueDateHandler extends AbstractHandler {
 			'value' => $this->document->order_document->get_date()->date_i18n( 'Y-m-d' ),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_IssueDate', $issueDate, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_issue_date', $issueDate, $data, $options, $this );
 
 		return $data;
 	}

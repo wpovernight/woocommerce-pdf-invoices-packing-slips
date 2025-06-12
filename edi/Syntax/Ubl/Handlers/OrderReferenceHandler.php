@@ -18,7 +18,7 @@ class OrderReferenceHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_OrderReference', $orderReference, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_order_reference', $orderReference, $data, $options, $this );
 
 		return $data;
 	}

@@ -15,7 +15,7 @@ class IdHandler extends AbstractHandler {
 			'value' => $this->document->order_document->get_number()->get_formatted(),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_ID', $ID, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_id', $ID, $data, $options, $this );
 
 		return $data;
 	}

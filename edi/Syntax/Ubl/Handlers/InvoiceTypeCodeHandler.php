@@ -19,7 +19,7 @@ class InvoiceTypeCodeHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_InvoiceTypeCode', $invoiceTypeCode, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_type_code', $invoiceTypeCode, $data, $options, $this );
 
 		return $data;
 	}

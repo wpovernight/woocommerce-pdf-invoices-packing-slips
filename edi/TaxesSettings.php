@@ -114,7 +114,7 @@ class TaxesSettings {
 					)
 				);
 			?>
-			<a href="#" id="ubl-show-changelog"><?php esc_html_e( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+			<a href="#" id="edi-show-changelog"><?php esc_html_e( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 		</p>
 		<?php
 			// Show changelog if method exists
@@ -122,7 +122,7 @@ class TaxesSettings {
 			
 			if ( method_exists( $this, $method ) ) {
 				$changes = call_user_func( array( $this, $method ) );
-				echo '<ul id="ubl-standard-changelog">';
+				echo '<ul id="edi-standard-changelog">';
 				foreach ( $changes as $change ) {
 					echo '<li>' . esc_html( $change ) . '</li>';
 				}

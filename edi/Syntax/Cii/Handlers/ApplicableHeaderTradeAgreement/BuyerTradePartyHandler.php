@@ -127,7 +127,7 @@ class BuyerTradePartyHandler extends AbstractHandler {
 			);
 		}
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_BuyerTradeParty', $buyerTradeParty, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_buyer_trade_party', $buyerTradeParty, $data, $options, $this );
 
 		return $data;
 	}

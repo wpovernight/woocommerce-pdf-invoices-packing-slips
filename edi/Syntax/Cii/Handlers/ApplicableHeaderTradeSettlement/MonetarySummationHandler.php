@@ -49,7 +49,7 @@ class MonetarySummationHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_MonetarySummation', $node, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_monetary_summation', $node, $data, $options, $this );
 
 		return $data;
 	}

@@ -92,7 +92,7 @@ class TaxTotalHandler extends AbstractHandler {
 					),
 				),
 			);
-		}, apply_filters( 'wpo_wc_ubl_orderTaxData', $orderTaxData, $data, $options, $this ) );
+		}, apply_filters( 'wpo_ips_edi_ubl_order_tax_data', $orderTaxData, $data, $options, $this ) );
 
 		$array = array(
 			'name'  => 'cac:TaxTotal',
@@ -108,7 +108,7 @@ class TaxTotalHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_TaxTotal', $array, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_tax_total', $array, $data, $options, $this );
 
 		return $data;
 	}

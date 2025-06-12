@@ -78,7 +78,7 @@ class TradeTaxHandler extends AbstractHandler {
 				);
 			}
 
-			$data[] = apply_filters( 'wpo_ips_edi_cii_handle_TradeTax', $taxNode, $item, $options, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_cii_trade_tax', $taxNode, $item, $options, $this );
 		}
 
 		return $data;

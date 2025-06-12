@@ -122,7 +122,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_ips_edi_cii_handle_IncludedSupplyChainTradeLineItem', $lineItem, $data, $options, $item, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_cii_included_supply_chain_trade_line_item', $lineItem, $data, $options, $item, $this );
 		}
 
 		return $data;

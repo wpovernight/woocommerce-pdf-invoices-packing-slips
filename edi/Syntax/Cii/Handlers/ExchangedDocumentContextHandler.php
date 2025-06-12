@@ -25,7 +25,7 @@ class ExchangedDocumentContextHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_ExchangedDocumentContext', $exchangedDocumentContext, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_exchanged_document_context', $exchangedDocumentContext, $data, $options, $this );
 
 		return $data;
 	}

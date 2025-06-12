@@ -15,7 +15,7 @@ class DeliveryHandler extends AbstractHandler {
 			'value' => array(),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_Delivery', $delivery, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_delivery', $delivery, $data, $options, $this );
 
 		return $data;
 	}

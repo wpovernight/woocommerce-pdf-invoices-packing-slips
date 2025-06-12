@@ -66,6 +66,8 @@ class WPO_WCPDF {
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
 			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
 			'woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
+			//TODO: deprecated UBL extensions here
+			//TODO: also this `woocommerce-pdf-ips-ubl-extender`
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );

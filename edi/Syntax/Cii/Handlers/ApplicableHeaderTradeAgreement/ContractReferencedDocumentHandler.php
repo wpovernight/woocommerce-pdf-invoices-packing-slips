@@ -27,7 +27,7 @@ class ContractReferencedDocumentHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_ContractReferencedDocument', $contractDocument, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_contract_referenced_document', $contractDocument, $data, $options, $this );
 
 		return $data;
 	}

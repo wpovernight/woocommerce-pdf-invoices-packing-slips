@@ -15,7 +15,7 @@ class BuyerReferenceHandler extends AbstractHandler {
 			'value' => $this->document->order->get_id(),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_BuyerReference', $buyerReference, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_buyer_reference', $buyerReference, $data, $options, $this );
 
 		return $data;
 	}

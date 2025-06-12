@@ -20,7 +20,7 @@ class PaymentTermsHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_PaymentTerms', $paymentTerms, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_payment_terms', $paymentTerms, $data, $options, $this );
 
 		return $data;
 	}

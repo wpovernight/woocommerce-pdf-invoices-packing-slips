@@ -36,7 +36,7 @@ class AdditionalDocumentReferenceHandler extends AbstractHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_wc_ubl_handle_AdditionalDocumentReference', $additionalDocumentReference, $data, $options, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_ubl_additional_document_reference', $additionalDocumentReference, $data, $options, $this );
 		}
 
 		return $data;

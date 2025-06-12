@@ -15,7 +15,7 @@ class UblVersionIdHandler extends AbstractHandler {
 			'value' => '2.1',
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_UBLVersionID', $UBLVersionID, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_version_id', $UBLVersionID, $data, $options, $this );
 
 		return $data;
 	}

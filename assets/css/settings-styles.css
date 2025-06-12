@@ -697,7 +697,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	flex: 0 0 100%;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"].ubl .sidebar > form {
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"].edi .sidebar > form {
 	max-width: 100%;
 }
 
@@ -1157,8 +1157,8 @@ sup.wcpdf_beta {
 	border-radius: 2px;
 }
 
-/* UBL Taxes */
-#wpo-wcpdf-settings ul#ubl-standard-changelog {
+/* EDI Taxes */
+#wpo-wcpdf-settings ul#edi-standard-changelog {
 	display: none;
 	list-style: disc;
 	padding-left: 20px;

@@ -44,7 +44,7 @@ class PaymentTermsHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_handle_PaymentTerms', $node, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_payment_terms', $node, $data, $options, $this );
 
 		return $data;
 	}

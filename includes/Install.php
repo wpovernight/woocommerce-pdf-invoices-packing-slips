@@ -696,8 +696,6 @@ class Install {
 				unset( $invoice_settings['ubl'] );
 				update_option( 'wpo_wcpdf_documents_settings_invoice', $invoice_settings );
 			}
-			
-			//TODO: We may need to disable the UBL extensions, probably not needed anymore
 		}
 
 		// Maybe reinstall fonts

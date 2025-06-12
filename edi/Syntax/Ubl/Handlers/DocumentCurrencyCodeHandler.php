@@ -19,7 +19,7 @@ class DocumentCurrencyCodeHandler extends AbstractHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_wc_ubl_handle_DocumentCurrencyCode', $documentCurrencyCode, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_document_currency_code', $documentCurrencyCode, $data, $options, $this );
 
 		return $data;
 	}
