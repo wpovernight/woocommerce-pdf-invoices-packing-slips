@@ -409,10 +409,10 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 		'wpo_ips_edi_formats',
 		array(
 			'ubl' => array(
-				'ubl-2-1' => array(
+				'ubl-2p1' => array(
 					'name'      => 'UBL 2.1',
 					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21\Invoice::class,
+						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl2p1\Invoice::class,
 					),
 				),
 				// 'peppol_bis_3_0' => array(

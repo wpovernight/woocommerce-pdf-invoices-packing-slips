@@ -1,19 +1,18 @@
 <?php
 
-namespace WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21;
+namespace WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl2p1;
 
-use WPO\IPS\EDI\Interfaces\FormatInterface;
+use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblFormat;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Invoice implements FormatInterface {
-	
-	public string $type   = 'invoice';
-	public string $slug   = 'ubl-2-1';
-	public string $name   = 'UBL 2.1';
-	public string $syntax = 'ubl';
+class Invoice extends AbstractUblFormat {
+
+	public string $type = 'invoice';
+	public string $slug = 'ubl-2p1';
+	public string $name = 'UBL 2.1';
 	
 	/**
 	 * Get the invoice type code
