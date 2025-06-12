@@ -16,11 +16,7 @@ class SellerTradePartyHandler extends AbstractCiiHandler {
 				// Seller Company Name
 				array(
 					'name'  => 'ram:Name',
-					'value' => wpo_ips_edi_sanitize_string(
-						! empty( $this->document->order_document )
-							? $this->document->order_document->get_shop_name()
-							: get_bloginfo( 'name' )
-					),
+					'value' => wpo_ips_edi_sanitize_string( $this->get_shop_data( 'name' ) ),
 				),
 
 				// Legal Organization ID (if available)
@@ -29,9 +25,7 @@ class SellerTradePartyHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:ID',
-							'value' => ! empty( $this->document->order_document ) 
-								? $this->document->order_document->get_shop_coc_number() 
-								: '',
+							'value' => $this->get_shop_data( 'coc_number' ),
 						),
 					),
 				),
@@ -45,7 +39,7 @@ class SellerTradePartyHandler extends AbstractCiiHandler {
 							'value' => array(
 								array(
 									'name'  => 'ram:CompleteNumber',
-									'value' => get_option( 'woocommerce_store_phone' ),
+									'value' => $this->get_shop_data( 'phone_number' ),
 								),
 							),
 						),
@@ -54,7 +48,7 @@ class SellerTradePartyHandler extends AbstractCiiHandler {
 							'value' => array(
 								array(
 									'name'  => 'ram:URIID',
-									'value' => get_option( 'woocommerce_email_from_address' ),
+									'value' => get_option( 'woocommerce_email_from_address' ), //TODO: wait Mohamad create the respective function
 								),
 							),
 						),
@@ -67,19 +61,19 @@ class SellerTradePartyHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:PostcodeCode',
-							'value' => get_option( 'woocommerce_store_postcode' ),
+							'value' => $this->get_shop_data( 'address_postcode' ),
 						),
 						array(
 							'name'  => 'ram:LineOne',
-							'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_address' ) ),
+							'value' => wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_line_1' ) ),
 						),
 						array(
 							'name'  => 'ram:CityName',
-							'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_city' ) ),
+							'value' => wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_city' ) ),
 						),
 						array(
 							'name'  => 'ram:CountryID',
-							'value' => wc_format_country_state_string( get_option( 'woocommerce_default_country', '' ) )['country'],
+							'value' => wc_format_country_state_string( $this->get_shop_data( 'address_country' ) )['country'],
 						),
 					),
 				),
@@ -90,9 +84,7 @@ class SellerTradePartyHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'       => 'ram:ID',
-							'value'      => ! empty( $this->document->order_document )
-								? $this->document->order_document->get_shop_vat_number()
-								: '',
+							'value'      => $this->get_shop_data( 'vat_number' ),
 							'attributes' => array(
 								'schemeID' => 'VA',
 							),

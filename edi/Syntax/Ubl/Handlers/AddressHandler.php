@@ -39,10 +39,10 @@ class AddressHandler extends AbstractUblHandler {
 	}
 
 	public function return_supplier_party_details() {
-		$company    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_name()       : '';
-		$address    = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_address()    : get_option( 'woocommerce_store_address' );
-		$vat_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_vat_number() : '';
-		$coc_number = ! empty( $this->document->order_document ) ? $this->document->order_document->get_shop_coc_number() : '';
+		$company    = $this->get_shop_data( 'name' );
+		$address    = $this->get_shop_data( 'address_line_1' );
+		$vat_number = $this->get_shop_data( 'vat_number' );
+		$coc_number = $this->get_shop_data( 'coc_number' );
 
 		$supplierPartyDetails = array(
 			array(
@@ -57,15 +57,15 @@ class AddressHandler extends AbstractUblHandler {
 				'value' => array(
 					array(
 						'name'  => 'cbc:StreetName',
-						'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_address' ) ),
+						'value' => wpo_ips_edi_sanitize_string( $address ),
 					),
 					array(
 						'name'  => 'cbc:CityName',
-						'value' => wpo_ips_edi_sanitize_string( get_option( 'woocommerce_store_city' ) ),
+						'value' => wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_city' ) ),
 					),
 					array(
 						'name'  => 'cbc:PostalZone',
-						'value' => get_option( 'woocommerce_store_postcode' ),
+						'value' => $this->get_shop_data( 'address_postcode' ),
 					),
 					array(
 						'name'  => 'cac:AddressLine',
@@ -78,7 +78,7 @@ class AddressHandler extends AbstractUblHandler {
 						'name'  => 'cac:Country',
 						'value' => array(
 							'name'       => 'cbc:IdentificationCode',
-							'value'      => wc_format_country_state_string( get_option( 'woocommerce_default_country', '' ) )['country'],
+							'value'      => wc_format_country_state_string( $this->get_shop_data( 'address_country' ) )['country'],
 							'attributes' => array(
 								'listID'       => 'ISO3166-1:Alpha2',
 								'listAgencyID' => '6',
@@ -138,7 +138,7 @@ class AddressHandler extends AbstractUblHandler {
 			'value' => array(
 				array(
 					'name'  => 'cbc:ElectronicMail',
-					'value' => get_option( 'woocommerce_email_from_address' ),
+					'value' => get_option( 'woocommerce_email_from_address' ), //TODO: wait Mohamad create the respective function
 				),
 			),
 		);

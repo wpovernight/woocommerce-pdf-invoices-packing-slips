@@ -29,6 +29,32 @@ abstract class AbstractHandler {
 	 * @return array
 	 */
 	abstract public function handle( $data, $options = array() );
+	
+	/**
+	 * Get the shop data.
+	 *
+	 * @param string $suffix The data suffix (e.g., 'name', 'coc_number', 'phone_number', 'address_postcode').
+	 * @return string
+	 */
+	protected function get_shop_data( string $suffix ): string {
+		$value = '';
+		
+		// Generic access to shop data
+		if ( ! empty( $this->document->order_document ) ) {
+			$method = 'get_shop_' . $suffix;
+
+			if ( method_exists( $this->document->order_document, $method ) ) {
+				$value = $this->document->order_document->$method();
+			}
+		}
+		
+		if ( empty( $value ) ) {
+			wpo_ips_edi_log( sprintf( 'Shop %s is empty.', $suffix ), 'warning' );
+		}
+
+		return $value;
+	}
+
 
 	/**
 	 * Get normalized WooCommerce payment data for the current order.
