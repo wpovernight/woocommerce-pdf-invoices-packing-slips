@@ -272,9 +272,10 @@ function wpo_ips_edi_get_current_syntax(): string {
 /**
  * Get the current EDI format
  *
+ * @param bool $full_details Optional. If true, returns full format details.
  * @return string
  */
-function wpo_ips_edi_get_current_format(): string {
+function wpo_ips_edi_get_current_format( bool $full_details = false ): string {
 	$edi_settings = wpo_ips_edi_get_settings();
 	$format       = 'ubl_2_1';
 
@@ -284,6 +285,10 @@ function wpo_ips_edi_get_current_format(): string {
 
 		if ( ! empty( $edi_settings[ $format_key ] ) ) {
 			$format = $edi_settings[ $format_key ];
+			
+			if ( $full_details ) {
+				$format = wpo_ips_edi_formats( $syntax, $format );
+			}
 		}
 	}
 
@@ -400,11 +405,12 @@ function wpo_ips_edi_syntaxes(): array {
 /**
  * Get the EDI formats
  *
- * @param string $syntax
+ * @param string $syntax Optional. The syntax key (e.g., 'ubl', 'cii').
+ * @param string $format Optional. The format key (e.g., 'ubl-2p1', 'factur-x').
  *
  * @return array
  */
-function wpo_ips_edi_formats( string $syntax = '' ): array {
+function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array {
 	$formats = apply_filters(
 		'wpo_ips_edi_formats',
 		array(
@@ -456,5 +462,13 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 		)
 	);
 
-	return isset( $formats[ $syntax ] ) ? $formats[ $syntax ] : $formats;
+	if ( $syntax && isset( $formats[ $syntax ] ) ) {
+		if ( $format && isset( $formats[ $syntax ][ $format ] ) ) {
+			return $formats[ $syntax ][ $format ];
+		}
+
+		return $formats[ $syntax ];
+	}
+
+	return $formats;
 }
