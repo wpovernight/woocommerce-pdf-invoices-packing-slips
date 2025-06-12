@@ -234,6 +234,7 @@ class SettingsGeneral {
 					'option_name'  => $option_name,
 					'id'           => 'shop_email_address',
 					'translatable' => true,
+					'type'         => 'email',
 					'description'  => __( 'The email address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
