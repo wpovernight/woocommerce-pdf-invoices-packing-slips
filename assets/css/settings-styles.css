@@ -811,10 +811,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .preview-document .preview-data-wrapper .preview-order-data,
 .preview-document .preview-data-wrapper .preview-document-type {
 	float: right;
-}
-
-.preview-document .preview-data-wrapper .preview-document-type {
-	margin-right: 30px;
+	margin-right: 26px;
 }
 
 .preview-document .preview-data-wrapper .preview-document-type ul > li {
