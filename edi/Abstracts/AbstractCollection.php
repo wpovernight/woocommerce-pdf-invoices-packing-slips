@@ -10,33 +10,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class AbstractCollection implements Iterator {
 
-	/** @var array */
-	private $items = array();
+	private array $items  = array();
+	private int $position = 0;
 
-	/** @var int */
-	private $position = 0;
-
+	/**
+	 * Constructor to initialize the collection.
+	 */
 	public function __construct() {
 		$this->position = 0;
 	}
 
-	public function rewind() {
+	/**
+	 * Rewind the iterator to the first element.
+	 *
+	 * @return void
+	 */
+	public function rewind(): void {
 		$this->position = 0;
 	}
 
-	public function current() {
+	/**
+	 * Current element in the collection.
+	 */
+	public function current(): mixed {
 		return $this->items[ $this->position ];
 	}
 
-	public function key() {
+	/**
+	 * Get the current key
+	 *
+	 * @return int
+	 */
+	public function key(): int {
 		return $this->position;
 	}
 
-	public function next() {
+	/**
+	 * Next element in the collection.
+	 * 
+	 * @return void
+	 */
+	public function next(): void {
 		++$this->position;
 	}
 
-	public function valid() {
+	/**
+	 * Check if the current position is valid.
+	 *
+	 * @return bool
+	 */
+	public function valid(): bool {
 		return isset( $this->items[ $this->position ] );
 	}
 

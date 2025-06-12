@@ -16,10 +16,19 @@ class SabreBuilder extends AbstractBuilder {
 	private Service $service;
 	private Document $document;
 
+	/**
+	 * SabreBuilder constructor.
+	 */
 	public function __construct() {
 		$this->service = new Service();
 	}
 
+	/**
+	 * Build the EDI document using Sabre XML serializer.
+	 *
+	 * @param Document $document The EDI document to build.
+	 * @return string The serialized XML string.
+	 */
 	public function build( Document $document ): string {
 		$this->document = $document;
 
@@ -38,6 +47,11 @@ class SabreBuilder extends AbstractBuilder {
 		);
 	}
 
+	/**
+	 * Serialize the document to XML using Sabre's Writer.
+	 *
+	 * @param Writer $writer The Sabre XML writer.
+	 */
 	public function xmlSerialize( Writer $writer ): void {
 		$additionalElements = $this->document->get_additional_attributes();
 
