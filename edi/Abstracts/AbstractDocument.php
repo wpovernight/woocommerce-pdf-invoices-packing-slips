@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class AbstractDocument {
 
+	public string $format;
 	public string $syntax;
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
@@ -37,6 +38,15 @@ abstract class AbstractDocument {
 	 * @return array
 	 */
 	abstract public function get_namespaces(): array;
+	
+	/**
+	 * Constructor
+	 *
+	 * @param string $format
+	 */
+	public function __construct( string $format ) {
+		$this->format = $format;
+	}
 
 	/**
 	 * Get the syntax formats
@@ -82,14 +92,13 @@ abstract class AbstractDocument {
 	 * @return array|false
 	 */
 	public function get_format_structure() {
-		$format            = wpo_ips_edi_get_current_format();
 		$available_formats = wpo_ips_edi_formats( $this->syntax );
 
-		if ( ! isset( $available_formats[ $format ] ) ) {
+		if ( ! isset( $available_formats[ $this->format ] ) ) {
 			return false;
 		}
 
-		$structure = ( new $available_formats[ $format ]['class']() )->get_structure( $this->order_document->slug );
+		$structure = ( new $available_formats[ $this->format ]['class']() )->get_structure( $this->order_document->slug );
 
 		if ( empty( $structure ) ) {
 			return false;

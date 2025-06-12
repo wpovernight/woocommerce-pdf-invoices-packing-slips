@@ -179,14 +179,25 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 		$edi_maker->set_file_path( $tmp_path );
 	}
 
+	$format = wpo_ips_edi_get_current_format();
+	
+	if ( empty( $format ) ) {
+		return wcpdf_error_handling( 'EDI format not set. Cannot write EDI file.' );
+	}
+	
 	$syntax = wpo_ips_edi_get_current_syntax();
+	
+	if ( empty( $syntax ) ) {
+		return wcpdf_error_handling( 'EDI syntax not set. Cannot write EDI file.' );
+	}
+	
 	$class  = wpo_ips_edi_syntaxes( 'class', $syntax );
 	
 	if ( ! $class ) {
 		return wcpdf_error_handling( 'EDI Document class not found.' );
 	}
 
-	$edi_document = new $class();
+	$edi_document = new $class( $format );
 	$edi_document->set_order_document( $document );
 
 	$builder  = new \WPO\IPS\EDI\SabreBuilder();
