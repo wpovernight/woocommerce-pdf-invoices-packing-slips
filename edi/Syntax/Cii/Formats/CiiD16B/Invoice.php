@@ -164,11 +164,9 @@ class Invoice extends AbstractCiiFormat {
 	 * Get the RDF metadata for the invoice format
 	 *
 	 * @param string $filename The name of the file to be embedded.
-	 * @param string $profile  The conformance profile, default is 'EN16931'.
-	 * 
 	 * @return string RDF metadata string.
 	 */
-	public function get_rdf_metadata( string $filename, string $profile = 'EN16931' ): string {
+	public function get_rdf_metadata( string $filename ): string {
 		return ''; // Not supported in this format
 	}
 

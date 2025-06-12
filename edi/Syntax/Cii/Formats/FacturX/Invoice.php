@@ -17,12 +17,11 @@ class Invoice extends CiiD16BInvoice {
 	 * Get RDF metadata for embedding XML in PDF/A-3.
 	 *
 	 * @param string $filename The name of the file to be embedded.
-	 * @param string $profile  The conformance profile, default is 'EN16931'.
-	 * 
 	 * @return string RDF metadata string.
 	 */
-	public function get_rdf_metadata( string $filename, string $profile = 'EN16931' ): string {
+	public function get_rdf_metadata( string $filename ): string {
 		$document_type    = str_replace( '-', '_', $this->type );
+		$profile          = 'EN16931';
 		$version          = '1.0';
 		$namespace_prefix = 'fx';
 		$namespace_uri    = 'urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#';

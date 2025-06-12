@@ -58,10 +58,8 @@ abstract class AbstractCiiFormat implements FormatInterface {
 	 * Get the format RDF metadata
 	 *
 	 * @param string $filename The name of the file to be embedded.
-	 * @param string $profile  The conformance profile, default is 'EN16931'.
-	 * 
 	 * @return string RDF metadata string.
 	 */
-	abstract public function get_rdf_metadata( string $filename, string $profile = 'EN16931' ): string;
+	abstract public function get_rdf_metadata( string $filename ): string;
 
 }
