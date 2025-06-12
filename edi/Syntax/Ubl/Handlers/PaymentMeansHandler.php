@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class PaymentMeansHandler extends AbstractHandler {
+class PaymentMeansHandler extends AbstractUblHandler {
 
 	public function handle( $data, $options = array() ) {
 		$payment = $this->get_payment_means_data();

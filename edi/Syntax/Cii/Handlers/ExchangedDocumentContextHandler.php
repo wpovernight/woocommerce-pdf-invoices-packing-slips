@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class ExchangedDocumentContextHandler extends AbstractHandler {
+class ExchangedDocumentContextHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$exchangedDocumentContext = array(

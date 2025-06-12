@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeAgreement;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class SellerTradePartyHandler extends AbstractHandler {
+class SellerTradePartyHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$sellerTradeParty = array(

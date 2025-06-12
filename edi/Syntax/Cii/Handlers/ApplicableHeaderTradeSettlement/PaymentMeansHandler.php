@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class PaymentMeansHandler extends AbstractHandler {
+class PaymentMeansHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$payment = $this->get_payment_means_data();

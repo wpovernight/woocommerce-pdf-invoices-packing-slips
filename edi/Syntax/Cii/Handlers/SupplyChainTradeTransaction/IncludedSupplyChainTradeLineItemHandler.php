@@ -1,14 +1,14 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers\SupplyChainTradeTransaction;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 use WPO\IPS\EDI\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class IncludedSupplyChainTradeLineItemHandler extends AbstractHandler {
+class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$order       = $this->document->order;

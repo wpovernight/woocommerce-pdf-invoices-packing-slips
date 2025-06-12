@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class ExchangedDocumentHandler extends AbstractHandler {
+class ExchangedDocumentHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$date_format_code  = $this->get_date_format_code();

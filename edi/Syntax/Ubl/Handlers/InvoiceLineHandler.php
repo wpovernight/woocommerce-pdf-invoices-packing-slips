@@ -1,14 +1,14 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblHandler;
 use WPO\IPS\EDI\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class InvoiceLineHandler extends AbstractHandler {
+class InvoiceLineHandler extends AbstractUblHandler {
 
 	public function handle( $data, $options = array() ) {
 		$items      = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );

@@ -8,9 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class UblTwoDotOne extends AbstractFormat {
+class Ubl21 extends AbstractFormat {
 	
-	public string $slug = 'ubl_2_1';
+	public string $slug = 'ubl-2-1';
 	public string $name = 'UBL 2.1';
 	
 	/**

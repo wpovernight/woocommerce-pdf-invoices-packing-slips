@@ -380,9 +380,9 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 		'wpo_ips_edi_formats',
 		array(
 			'ubl' => array(
-				'ubl_2_1' => array(
+				'ubl-2-1' => array(
 					'name'  => 'UBL 2.1',
-					'class' => \WPO\IPS\EDI\Syntax\Ubl\Formats\UblTwoDotOne::class,
+					'class' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21::class,
 				),
 				// 'peppol_bis_3_0' => array(
 				// 	'name'  => 'Peppol BIS Billing 3.0',
@@ -406,10 +406,14 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 				// ),
 			),
 			'cii' => array(
-				'factur-x' => array(
-					'name'  => 'Factur-X',
-					'class' => '',
+				'cii-d16b' => array(
+					'name'  => 'CII D16B',
+					'class' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B::class,
 				),
+				// 'factur-x' => array(
+				// 	'name'  => 'Factur-X',
+				// 	'class' => '',
+				// ),
 			),
 		)
 	);

@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PaymentTermsHandler extends AbstractHandler {
+class PaymentTermsHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$due_date_timestamp = is_callable( array( $this->document->order_document, 'get_due_date' ) )
@@ -22,7 +22,7 @@ class PaymentTermsHandler extends AbstractHandler {
 		$php_date_format  = $this->get_php_date_format_from_code( $date_format_code );
 		$due_date         = $this->normalize_date( $due_date_timestamp, $php_date_format );
 		
-		if ( ! $this->validate_cii_date_format( $due_date, $date_format_code ) ) {
+		if ( ! $this->validate_date_format( $due_date, $date_format_code ) ) {
 			return $data;
 		}
 

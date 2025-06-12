@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class MonetarySummationHandler extends AbstractHandler {
+class MonetarySummationHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$order    = $this->document->order;

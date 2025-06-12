@@ -106,16 +106,16 @@ abstract class AbstractHandler {
 		}
 	
 		// If it's a valid timestamp
-		if ( is_numeric( $raw ) && (int) $raw > 1000000000 ) {
+		if ( is_numeric( $raw ) && (int) $raw > 1000000000 && function_exists( 'wc_timezone' ) ) {
 			$datetime = new \DateTimeImmutable( '@' . $raw );
-			$datetime = $datetime->setTimezone( wc_timezone() );
+			$datetime = $datetime->setTimezone( \wc_timezone() );
 			return $datetime->format( $format );
 		}
 	
 		// If it's a string, parse it respecting WC timezone
 		if ( function_exists( 'wc_string_to_datetime' ) ) {
 			try {
-				$datetime = wc_string_to_datetime( $raw );
+				$datetime = \wc_string_to_datetime( $raw );
 				return $datetime->format( $format );
 			} catch ( \Exception $e ) {
 				// Silently ignore and fall back to strtotime()
@@ -124,9 +124,9 @@ abstract class AbstractHandler {
 	
 		// Fallback for non-WC: parse with strtotime()
 		$timestamp = strtotime( $raw );
-		if ( $timestamp ) {
+		if ( $timestamp && function_exists( 'wp_timezone' ) ) {
 			$datetime = new \DateTimeImmutable( '@' . $timestamp );
-			$datetime = $datetime->setTimezone( wp_timezone() );
+			$datetime = $datetime->setTimezone( \wp_timezone() );
 			return $datetime->format( $format );
 		}
 	

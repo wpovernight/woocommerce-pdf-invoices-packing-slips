@@ -1,14 +1,14 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblHandler;
 use WPO\IPS\EDI\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class TaxTotalHandler extends AbstractHandler {
+class TaxTotalHandler extends AbstractUblHandler {
 
 	public function handle( $data, $options = array() ) {
 		$taxReasons   = TaxesSettings::get_available_reasons();

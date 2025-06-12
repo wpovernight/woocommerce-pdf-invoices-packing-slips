@@ -1,14 +1,14 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Cii\Handlers\ApplicableHeaderTradeSettlement;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiHandler;
 use WPO\IPS\EDI\TaxesSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class TradeTaxHandler extends AbstractHandler {
+class TradeTaxHandler extends AbstractCiiHandler {
 
 	public function handle( $data, $options = array() ) {
 		$taxReasons   = TaxesSettings::get_available_reasons();

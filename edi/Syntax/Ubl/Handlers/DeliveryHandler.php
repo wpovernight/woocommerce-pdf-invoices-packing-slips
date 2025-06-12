@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class DeliveryHandler extends AbstractHandler {
+class DeliveryHandler extends AbstractUblHandler {
 
 	public function handle( $data, $options = array() ) {
 		$delivery = array(

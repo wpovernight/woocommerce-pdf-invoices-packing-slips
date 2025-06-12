@@ -1,13 +1,13 @@
 <?php
 namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
 
-use WPO\IPS\EDI\Abstracts\AbstractHandler;
+use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class LegalMonetaryTotalHandler extends AbstractHandler {
+class LegalMonetaryTotalHandler extends AbstractUblHandler {
 
 	public function handle( $data, $options = array() ) {
 		$total         = $this->document->order->get_total();
