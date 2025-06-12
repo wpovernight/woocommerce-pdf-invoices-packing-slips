@@ -2,16 +2,16 @@
 
 namespace WPO\IPS\EDI;
 
+use WPO\IPS\EDI\Interfaces\BuilderInterface;
 use WPO\IPS\Vendor\Sabre\Xml\Service;
 use WPO\IPS\Vendor\Sabre\Xml\Writer;
 use WPO\IPS\EDI\Document;
-use WPO\IPS\EDI\Abstracts\AbstractBuilder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class SabreBuilder extends AbstractBuilder {
+class SabreBuilder implements BuilderInterface {
 
 	private Service $service;
 	private Document $document;

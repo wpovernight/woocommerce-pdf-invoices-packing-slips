@@ -2,13 +2,13 @@
 
 namespace WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21;
 
-use WPO\IPS\EDI\Abstracts\AbstractFormat;
+use WPO\IPS\EDI\Interfaces\FormatInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Invoice extends AbstractFormat {
+class Invoice implements FormatInterface {
 	
 	public string $type   = 'invoice';
 	public string $slug   = 'ubl-2-1';

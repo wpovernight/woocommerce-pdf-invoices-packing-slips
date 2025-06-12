@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI\Abstracts;
+namespace WPO\IPS\EDI\Interfaces;
 
 use WPO\IPS\EDI\Document;
 
@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-abstract class AbstractBuilder {
+interface BuilderInterface {
 
 	/**
 	 * Build the EDI document.
@@ -16,6 +16,6 @@ abstract class AbstractBuilder {
 	 * @param Document $document The EDI document to build.
 	 * @return string The serialized XML string.
 	 */
-	abstract public function build( Document $document ): string;
+	public function build( Document $document ): string;
 
 }
