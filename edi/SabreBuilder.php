@@ -4,7 +4,7 @@ namespace WPO\IPS\EDI;
 
 use WPO\IPS\Vendor\Sabre\Xml\Service;
 use WPO\IPS\Vendor\Sabre\Xml\Writer;
-use WPO\IPS\EDI\Abstracts\AbstractDocument;
+use WPO\IPS\EDI\Document;
 use WPO\IPS\EDI\Abstracts\AbstractBuilder;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,13 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class SabreBuilder extends AbstractBuilder {
 
 	private Service $service;
-	private AbstractDocument $document;
+	private Document $document;
 
 	public function __construct() {
 		$this->service = new Service();
 	}
 
-	public function build( AbstractDocument $document ): string {
+	public function build( Document $document ): string {
 		$this->document = $document;
 
 		// Map namespaces (Sabre requires URI => prefix)
@@ -39,7 +39,7 @@ class SabreBuilder extends AbstractBuilder {
 	}
 
 	public function xmlSerialize( Writer $writer ): void {
-		$additionalElements = $this->document->get_additional_root_elements();
+		$additionalElements = $this->document->get_additional_attributes();
 
 		if ( ! empty( $additionalElements ) && is_array( $additionalElements ) ) {
 			$writer->writeAttributes( $additionalElements );

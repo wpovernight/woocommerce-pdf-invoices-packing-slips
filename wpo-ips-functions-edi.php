@@ -190,14 +190,8 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	if ( empty( $syntax ) ) {
 		return wcpdf_error_handling( 'EDI syntax not set. Cannot write EDI file.' );
 	}
-	
-	$class  = wpo_ips_edi_syntaxes( 'class', $syntax );
-	
-	if ( ! $class ) {
-		return wcpdf_error_handling( 'EDI Document class not found.' );
-	}
 
-	$edi_document = new $class( $format );
+	$edi_document = new \WPO\IPS\EDI\Document( $syntax, $format );
 	$edi_document->set_order_document( $document );
 
 	$builder  = new \WPO\IPS\EDI\SabreBuilder();
@@ -338,34 +332,15 @@ function wpo_ips_edi_preview_is_enabled(): bool {
 }
 
 /**
- * Get the EDI syntaxes or a specific syntax value.
+ * Get the EDI syntaxes.
  *
- * @param string      $value_type Either 'label' or 'class'. Defaults to 'label'.
- * @param string|null $syntax     Optional. The syntax slug (e.g. 'ubl', 'cii'). If set, returns a single value.
- * @return array|string|null
+ * @return array
  */
-function wpo_ips_edi_syntaxes( string $value_type = 'label', ?string $syntax = null ) {
-	$syntaxes = apply_filters( 'wpo_ips_edi_syntaxes', array(
-		'ubl' => array(
-			'label' => 'Universal Business Language (UBL)',
-			'class' => '\WPO\IPS\EDI\Syntax\Ubl\UblDocument',
-		),
-		'cii' => array(
-			'label' => 'Cross Industry Invoice (CII)',
-			'class' => '\WPO\IPS\EDI\Syntax\Cii\CiiDocument',
-		),
-	), $value_type, $syntax );
-
-	if ( ! empty( $syntax ) ) {
-		return $syntaxes[ $syntax ][ $value_type ] ?? null;
-	}
-
-	$output = array();
-	foreach ( $syntaxes as $slug => $data ) {
-		$output[ $slug ] = $data[ $value_type ] ?? null;
-	}
-
-	return $output;
+function wpo_ips_edi_syntaxes(): array {
+	return apply_filters( 'wpo_ips_edi_syntaxes', array(
+		'ubl' => 'Universal Business Language (UBL)',
+		'cii' => 'Cross Industry Invoice (CII)',
+	) );
 }
 
 /**

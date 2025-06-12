@@ -10,8 +10,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class CiiD16B extends AbstractFormat {
 	
-	public string $slug = 'cii-d16b';
-	public string $name = 'CII D16B';
+	public string $slug   = 'cii-d16b';
+	public string $name   = 'CII D16B';
+	public string $syntax = 'cii';
+
+	/**
+	 * Get the invoice root element
+	 *
+	 * @return string
+	 */
+	public function get_invoice_root_element(): string {
+		return 'rsm:CrossIndustryInvoice';
+	}
+	
+	/**
+	 * Get the invoice additional attributes
+	 *
+	 * @return array
+	 */
+	public function get_invoice_additional_attributes(): array {
+		return array();
+	}
+	
+	/**
+	 * Get the invoice namespaces
+	 *
+	 * @return array
+	 */
+	public function get_invoice_namespaces(): array {
+		return array(
+			'rsm' => 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
+			'qdt' => 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
+			'udt' => 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100',
+			'ram' => 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100',
+		);
+	}
 	
 	/**
 	 * Get the invoice structure

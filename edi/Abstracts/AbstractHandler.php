@@ -2,20 +2,22 @@
 
 namespace WPO\IPS\EDI\Abstracts;
 
+use WPO\IPS\EDI\Document;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
 abstract class AbstractHandler {
 
-	public AbstractDocument $document;
+	public Document $document;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param AbstractDocument $document The document instance.
+	 * @param Document $document The document instance.
 	 */
-	public function __construct( AbstractDocument $document ) {
+	public function __construct( Document $document ) {
 		$this->document = $document;
 	}
 

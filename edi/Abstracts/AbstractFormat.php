@@ -7,32 +7,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 abstract class AbstractFormat {
-	
+
 	public string $slug;
 	public string $name;
-		
-	/**
-	 * Get the format structure for the given document.
-	 *
-	 * @param string $document_slug
-	 * @return array
-	 */
-	public function get_structure( string $document_slug ): array {
-		$normalized_slug = strtolower( preg_replace( '/[^a-z0-9]+/', '_', $document_slug ) );
-		$method          = 'get_' . $normalized_slug . '_structure';
 
-		if ( method_exists( $this, $method ) ) {
-			$structure = $this->$method();
-		} else {
-			$structure = array();
+	/**
+	 * Dynamic method handler for document-specific getters.
+	 * Example: get_invoice_structure(), get_credit_note_root_element()
+	 *
+	 * @param string $name
+	 * @param array  $arguments
+	 * @return mixed|null
+	 */
+	public function __call( string $name, array $arguments ) {
+		if ( preg_match( '/^get_([a-z0-9_]+)_([a-z0-9_]+)$/', strtolower( $name ), $matches ) ) {
+			return $this->get_method( $matches[1], $matches[2] );
+		}
+		
+		if ( function_exists( 'doing_it_wrong' ) ) {
+			doing_it_wrong(
+				__METHOD__,
+				sprintf( 'Call to undefined method %s::%s()', static::class, $name ),
+				WPO_WCPDF()->version
+			);
 		}
 
-		return apply_filters(
-			'wpo_ips_edi_format_structure',
-			$structure,
-			$document_slug,
-			$this
-		);
+		return null;
+	}
+
+	/**
+	 * Call a document-specific method if it exists.
+	 *
+	 * @param string $slug
+	 * @param string $suffix
+	 * @return mixed|null
+	 */
+	public function get_method( string $slug, string $suffix ) {
+		$method = "get_{$slug}_{$suffix}";
+
+		if ( method_exists( $this, $method ) ) {
+			return $this->$method();
+		}
+
+		return null;
 	}
 
 }

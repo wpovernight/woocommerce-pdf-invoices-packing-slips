@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI\Abstracts;
+namespace WPO\IPS\EDI;
 
 use WPO\IPS\Documents\OrderDocument;
 
@@ -8,10 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-abstract class AbstractDocument {
+class Document {
 
-	public string $format;
 	public string $syntax;
+	public string $format;
+	public object $format_instance;
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
 	public array $order_coupons_data;
@@ -19,33 +20,19 @@ abstract class AbstractDocument {
 	public OrderDocument $order_document;
 
 	/**
-	 * Get the root element
-	 *
-	 * @return string
-	 */
-	abstract public function get_root_element(): string;
-
-	/**
-	 * Get additional root elements
-	 *
-	 * @return array
-	 */
-	abstract public function get_additional_root_elements(): array;
-
-	/**
-	 * Get the namespaces
-	 *
-	 * @return array
-	 */
-	abstract public function get_namespaces(): array;
-	
-	/**
 	 * Constructor
 	 *
+	 * @param string $syntax
 	 * @param string $format
 	 */
-	public function __construct( string $format ) {
-		$this->format = $format;
+	public function __construct( string $syntax, string $format ) {
+		$this->syntax          = $syntax;
+		$this->format          = $format;
+		$this->format_instance = $this->get_format_instance();
+		
+		if ( ! $this->format_instance ) {
+			throw new \Exception( sprintf( 'Format "%s" for syntax "%s" is not available.', $format, $syntax ) );
+		}
 	}
 
 	/**
@@ -55,12 +42,7 @@ abstract class AbstractDocument {
 	 */
 	public function get_syntax_formats(): array {
 		$all_formats = wpo_ips_edi_formats();
-
-		return apply_filters(
-			'wpo_ips_edi_syntax_formats',
-			$all_formats[ $this->syntax ] ?? array(),
-			$this
-		);
+		return $all_formats[ $this->syntax ] ?? array();
 	}
 
 	/**
@@ -87,18 +69,16 @@ abstract class AbstractDocument {
 	}
 
 	/**
-	 * Get the format structure
+	 * Get the document structure
 	 *
 	 * @return array|false
 	 */
-	public function get_format_structure() {
-		$available_formats = wpo_ips_edi_formats( $this->syntax );
-
-		if ( ! isset( $available_formats[ $this->format ] ) ) {
-			return false;
-		}
-
-		$structure = ( new $available_formats[ $this->format ]['class']() )->get_structure( $this->order_document->slug );
+	public function get_structure() {
+		$structure = apply_filters(
+			'wpo_ips_edi_document_structure',
+			$this->format_instance->get_method( $this->order_document->slug, 'structure' ),
+			$this
+		);
 
 		if ( empty( $structure ) ) {
 			return false;
@@ -111,6 +91,99 @@ abstract class AbstractDocument {
 		}
 
 		return $structure;
+	}
+	
+	/**
+	 * Get the document root element
+	 *
+	 * @return string
+	 */
+	public function get_root_element(): string {
+		return apply_filters(
+			'wpo_ips_edi_document_root_element',
+			$this->format_instance->get_method( $this->order_document->slug, 'root_element' ),
+			$this
+		);
+	}
+	
+	/**
+	 * Get the document additional attributes
+	 *
+	 * @return array
+	 */
+	public function get_additional_attributes(): array {
+		return apply_filters(
+			'wpo_ips_edi_document_additional_attributes',
+			$this->format_instance->get_method( $this->order_document->slug, 'additional_attributes' ),
+			$this
+		);
+	}
+	
+	/**
+	 * Get the document namespaces
+	 *
+	 * @return array
+	 */
+	public function get_namespaces(): array {
+		return apply_filters(
+			'wpo_ips_edi_document_namespaces',
+			$this->format_instance->get_method( $this->order_document->slug, 'namespaces' ),
+			$this
+		);
+	}
+	
+	/**
+	 * Get the document data
+	 *
+	 * @return array
+	 */
+	public function get_data(): array {
+		$data_by_root = array();
+
+		foreach ( $this->get_structure() as $key => $value ) {
+			if ( empty( $value['enabled'] ) || empty( $value['handler'] ) ) {
+				continue;
+			}
+
+			$options     = isset( $value['options'] ) ? $value['options'] : array();
+			$handlers    = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
+			$root_name   = $options['root'] ?? null;
+			$root_output = array();
+
+			foreach ( $handlers as $handler_class ) {
+				if ( class_exists( $handler_class ) ) {
+					$handler     = new $handler_class( $this );
+					$root_output = $handler->handle( $root_output, $options );
+				}
+			}
+
+			if ( $root_name ) {
+				if ( ! isset( $data_by_root[ $root_name ] ) ) {
+					$data_by_root[ $root_name ] = array();
+				}
+				$data_by_root[ $root_name ] = array_merge( $data_by_root[ $root_name ], $root_output );
+			} else {
+				if ( ! isset( $data_by_root[ null ] ) ) {
+					$data_by_root[ null ] = array();
+				}
+				$data_by_root[ null ] = array_merge( $data_by_root[ null ], $root_output );
+			}
+		}
+
+		// Convert grouped data to the expected format
+		$data = array();
+		foreach ( $data_by_root as $root => $value ) {
+			if ( $root ) {
+				$data[] = array(
+					'name'  => $root,
+					'value' => $value,
+				);
+			} else {
+				$data = array_merge( $data, $value );
+			}
+		}
+
+		return apply_filters( 'wpo_ips_edi_document_data', $data, $this );
 	}
 
 	/**
@@ -292,59 +365,20 @@ abstract class AbstractDocument {
 
 		return $percentage;
 	}
-
+	
 	/**
-	 * Get the document data
+	 * Get the format instance
 	 *
-	 * @return array
+	 * @return false|object
 	 */
-	public function get_data(): array {
-		$data_by_root = array();
+	private function get_format_instance() {
+		$available_formats = wpo_ips_edi_formats( $this->syntax );
 
-		foreach ( $this->get_format_structure() as $key => $value ) {
-			if ( empty( $value['enabled'] ) || empty( $value['handler'] ) ) {
-				continue;
-			}
-
-			$options     = isset( $value['options'] ) ? $value['options'] : array();
-			$handlers    = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
-			$root_name   = $options['root'] ?? null;
-			$root_output = array();
-
-			foreach ( $handlers as $handler_class ) {
-				if ( class_exists( $handler_class ) ) {
-					$handler     = new $handler_class( $this );
-					$root_output = $handler->handle( $root_output, $options );
-				}
-			}
-
-			if ( $root_name ) {
-				if ( ! isset( $data_by_root[ $root_name ] ) ) {
-					$data_by_root[ $root_name ] = array();
-				}
-				$data_by_root[ $root_name ] = array_merge( $data_by_root[ $root_name ], $root_output );
-			} else {
-				if ( ! isset( $data_by_root[ null ] ) ) {
-					$data_by_root[ null ] = array();
-				}
-				$data_by_root[ null ] = array_merge( $data_by_root[ null ], $root_output );
-			}
+		if ( ! isset( $available_formats[ $this->format ] ) ) {
+			return false;
 		}
 
-		// Convert grouped data to the expected format
-		$data = array();
-		foreach ( $data_by_root as $root => $value ) {
-			if ( $root ) {
-				$data[] = array(
-					'name'  => $root,
-					'value' => $value,
-				);
-			} else {
-				$data = array_merge( $data, $value );
-			}
-		}
-
-		return apply_filters( 'wpo_ips_edi_document_data', $data, $this );
+		return new $available_formats[ $this->format ]['class']();
 	}
 
 }

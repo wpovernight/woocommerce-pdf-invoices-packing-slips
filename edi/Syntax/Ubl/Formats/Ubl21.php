@@ -10,8 +10,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Ubl21 extends AbstractFormat {
 	
-	public string $slug = 'ubl-2-1';
-	public string $name = 'UBL 2.1';
+	public string $slug   = 'ubl-2-1';
+	public string $name   = 'UBL 2.1';
+	public string $syntax = 'ubl';
+
+	/**
+	 * Get the invoice root element
+	 *
+	 * @return string
+	 */
+	public function get_invoice_root_element(): string {
+		return 'Invoice';
+	}
+	
+	/**
+	 * Get the invoice additional attributes
+	 *
+	 * @return array
+	 */
+	public function get_invoice_additional_attributes(): array {
+		return array();
+	}
+
+	/**
+	 * Get the invoice namespaces
+	 *
+	 * @return array
+	 */
+	public function get_invoice_namespaces(): array {
+		return array(
+			'cac' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
+			'cbc' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
+			''    => 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2',
+		);
+	}
 	
 	/**
 	 * Get the invoice structure
