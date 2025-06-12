@@ -2,18 +2,17 @@
 
 namespace WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B;
 
-use WPO\IPS\EDI\Interfaces\FormatInterface;
+use WPO\IPS\EDI\Syntax\Cii\Abstracts\AbstractCiiFormat;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Invoice implements FormatInterface {
+class Invoice extends AbstractCiiFormat {
 	
-	public string $type   = 'invoice';
-	public string $slug   = 'cii-d16b';
-	public string $name   = 'CII D16B';
-	public string $syntax = 'cii';
+	public string $type = 'invoice';
+	public string $slug = 'cii-d16b';
+	public string $name = 'CII D16B';
 	
 	/**
 	 * Get the invoice type code
