@@ -16,7 +16,7 @@ class Document {
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
 	public array $order_coupons_data;
-	public ?object $format_instance;
+	private ?object $format_document;
 	public string $output;
 
 	/**
@@ -32,19 +32,19 @@ class Document {
 		$this->order              = $this->order_document->order;
 		$this->order_tax_data     = $this->get_tax_rates();
 		$this->order_coupons_data = $this->get_order_coupons_data();
-		$this->format_instance    = $this->get_format_instance();
+		$this->format_document    = $this->get_format_document();
 
-		if ( ! $this->format_instance ) {
+		if ( ! $this->format_document ) {
 			throw new \Exception( sprintf( 'Format "%s" for syntax "%s" is not available.', $format, $syntax ) );
 		}
 	}
 	
 	/**
-	 * Get the format instance
+	 * Get the format document instance
 	 *
-	 * @return null|object
+	 * @return object|null
 	 */
-	public function get_format_instance(): ?object {
+	public function get_format_document(): ?object {
 		$available_formats = wpo_ips_edi_formats( $this->syntax );
 
 		if ( ! isset( $available_formats[ $this->format ] ) ) {
@@ -66,7 +66,7 @@ class Document {
 	public function get_structure() {
 		$structure = apply_filters(
 			'wpo_ips_edi_document_structure',
-			$this->format_instance->get_structure(),
+			$this->format_document->get_structure(),
 			$this
 		);
 
@@ -91,7 +91,7 @@ class Document {
 	public function get_root_element(): string {
 		return apply_filters(
 			'wpo_ips_edi_document_root_element',
-			$this->format_instance->get_root_element(),
+			$this->format_document->get_root_element(),
 			$this
 		);
 	}
@@ -104,7 +104,7 @@ class Document {
 	public function get_additional_attributes(): array {
 		return apply_filters(
 			'wpo_ips_edi_document_additional_attributes',
-			$this->format_instance->get_additional_attributes(),
+			$this->format_document->get_additional_attributes(),
 			$this
 		);
 	}
@@ -117,7 +117,7 @@ class Document {
 	public function get_namespaces(): array {
 		return apply_filters(
 			'wpo_ips_edi_document_namespaces',
-			$this->format_instance->get_namespaces(),
+			$this->format_document->get_namespaces(),
 			$this
 		);
 	}
