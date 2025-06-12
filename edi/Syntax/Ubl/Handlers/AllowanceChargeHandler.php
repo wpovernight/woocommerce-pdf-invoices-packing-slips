@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class AllowanceChargeHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$allowanceCharge = array(
 			'name'  => 'cac:AllowanceCharge',
 			'value' => array(),

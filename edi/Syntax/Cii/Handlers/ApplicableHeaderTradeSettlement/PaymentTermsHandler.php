@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class PaymentTermsHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$due_date_timestamp = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ContractReferencedDocumentHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$order        = $this->document->order;
 		$reference_id = apply_filters( 'wpo_ips_edi_cii_contract_reference_id', null, $order, $this );
 

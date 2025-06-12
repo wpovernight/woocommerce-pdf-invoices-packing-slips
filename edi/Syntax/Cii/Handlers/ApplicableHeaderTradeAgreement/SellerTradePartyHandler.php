@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SellerTradePartyHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$sellerTradeParty = array(
 			'name'  => 'ram:SellerTradeParty',
 			'value' => array(

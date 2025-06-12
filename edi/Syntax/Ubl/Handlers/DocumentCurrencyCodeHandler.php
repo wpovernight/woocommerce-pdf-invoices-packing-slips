@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class DocumentCurrencyCodeHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$documentCurrencyCode = array(
 			'name'       => 'cbc:DocumentCurrencyCode',
 			'value'      => $this->document->order->get_currency(),

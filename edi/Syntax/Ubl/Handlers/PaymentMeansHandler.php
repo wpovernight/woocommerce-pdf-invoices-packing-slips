@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class PaymentMeansHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$payment = $this->get_payment_means_data();
 
 		// If no usable type code, skip

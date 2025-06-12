@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class DeliveryHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$delivery = array(
 			'name'  => 'cac:Delivery',
 			'value' => array(),

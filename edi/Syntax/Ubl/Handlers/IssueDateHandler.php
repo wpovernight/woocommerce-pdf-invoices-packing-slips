@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class IssueDateHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$issueDate = array(
 			'name'  => 'cbc:IssueDate',
 			'value' => $this->document->order_document->get_date()->date_i18n( 'Y-m-d' ),

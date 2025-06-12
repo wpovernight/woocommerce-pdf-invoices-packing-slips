@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class AddressHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$root = isset( $options['root'] ) ? $options['root'] : 'cac:AccountingSupplierParty';
 
 		// cac:AccountingSupplierParty or cac:AccountingCustomerParty

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class UblVersionIdHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$UBLVersionID = array(
 			'name'  => 'cbc:UBLVersionID',
 			'value' => '2.1',

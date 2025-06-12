@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class OrderReferenceHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$orderReference = array(
 			'name'  => 'cac:OrderReference',
 			'value' => array(

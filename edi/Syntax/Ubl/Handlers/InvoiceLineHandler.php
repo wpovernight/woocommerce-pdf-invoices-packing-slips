@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class InvoiceLineHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$items      = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$taxReasons = TaxesSettings::get_available_reasons();
 

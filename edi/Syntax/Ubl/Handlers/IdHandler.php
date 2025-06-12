@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class IdHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$ID = array(
 			'name'  => 'cbc:ID',
 			'value' => $this->document->order_document->get_number()->get_formatted(),

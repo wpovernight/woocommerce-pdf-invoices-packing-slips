@@ -16,6 +16,6 @@ abstract class AbstractBuilder {
 	 * @param Document $document The EDI document to build.
 	 * @return string The serialized XML string.
 	 */
-	abstract public function build( Document $document );
+	abstract public function build( Document $document ): string;
 
 }

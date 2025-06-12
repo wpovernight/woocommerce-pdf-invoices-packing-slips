@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$order       = $this->document->order;
 		$items       = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$taxReasons  = TaxesSettings::get_available_reasons();

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ExchangedDocumentHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$date_format_code  = $this->get_date_format_code();
 		$php_date_format   = $this->get_php_date_format_from_code( $date_format_code );
 		

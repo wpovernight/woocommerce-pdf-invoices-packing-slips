@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class MonetarySummationHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$order    = $this->document->order;
 		$currency = $order ? $order->get_currency() : get_woocommerce_currency();
 

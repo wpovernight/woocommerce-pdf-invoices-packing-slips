@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class TaxTotalHandler extends AbstractUblHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$taxReasons   = TaxesSettings::get_available_reasons();
 		$orderTaxData = $this->document->order_tax_data;
 		

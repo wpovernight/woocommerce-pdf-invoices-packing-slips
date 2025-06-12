@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ExchangedDocumentContextHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$exchangedDocumentContext = array(
 			'name'  => 'rsm:ExchangedDocumentContext',
 			'value' => array(

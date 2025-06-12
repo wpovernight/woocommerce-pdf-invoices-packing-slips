@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class BuyerTradePartyHandler extends AbstractCiiHandler {
 
-	public function handle( $data, $options = array() ) {
+	public function handle( array $data, array $options = array() ): array {
 		$order = $this->document->order;
 
 		$customerPartyName = $customerPartyContactName = $order ? $order->get_formatted_billing_full_name() : '';

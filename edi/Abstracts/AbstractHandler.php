@@ -28,7 +28,7 @@ abstract class AbstractHandler {
 	 * @param array $options Additional options for handling.
 	 * @return array
 	 */
-	abstract public function handle( $data, $options = array() );
+	abstract public function handle( array $data, array $options = array() ): array;
 	
 	/**
 	 * Get the shop data.
