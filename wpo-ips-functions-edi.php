@@ -410,7 +410,7 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 		array(
 			'ubl' => array(
 				'ubl-2-1' => array(
-					'name'  => 'UBL 2.1',
+					'name'      => 'UBL 2.1',
 					'documents' => array(
 						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl21\Invoice::class,
 					),
@@ -438,7 +438,7 @@ function wpo_ips_edi_formats( string $syntax = '' ): array {
 			),
 			'cii' => array(
 				'cii-d16b' => array(
-					'name'  => 'CII D16B',
+					'name'      => 'CII D16B',
 					'documents' => array(
 						'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B\Invoice::class,
 					),

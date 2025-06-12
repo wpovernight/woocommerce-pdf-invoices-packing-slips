@@ -9,6 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 interface FormatInterface {
 	
 	/**
+	 * Get the format type code
+	 *
+	 * @return string
+	 */
+	public function get_type_code(): string;
+	
+	/**
 	 * Get the format root element
 	 *
 	 * @return string

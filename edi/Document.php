@@ -84,6 +84,19 @@ class Document {
 	}
 	
 	/**
+	 * Get the document type code
+	 *
+	 * @return string
+	 */
+	public function get_type_code(): string {
+		return apply_filters(
+			'wpo_ips_edi_document_type_code',
+			$this->format_document->get_type_code(),
+			$this
+		);
+	}
+	
+	/**
 	 * Get the document root element
 	 *
 	 * @return string

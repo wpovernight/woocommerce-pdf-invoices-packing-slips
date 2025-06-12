@@ -14,6 +14,15 @@ class Invoice implements FormatInterface {
 	public string $slug   = 'cii-d16b';
 	public string $name   = 'CII D16B';
 	public string $syntax = 'cii';
+	
+	/**
+	 * Get the invoice type code
+	 *
+	 * @return string
+	 */
+	public function get_type_code(): string {
+		return '380';
+	}
 
 	/**
 	 * Get the invoice root element

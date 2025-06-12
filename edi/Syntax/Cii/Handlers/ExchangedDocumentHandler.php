@@ -22,7 +22,7 @@ class ExchangedDocumentHandler extends AbstractCiiHandler {
 				),
 				array(
 					'name'  => 'ram:TypeCode',
-					'value' => '380', // Commercial Invoice
+					'value' => $this->document->get_type_code(),
 				),
 				array(
 					'name'  => 'ram:IssueDateTime',

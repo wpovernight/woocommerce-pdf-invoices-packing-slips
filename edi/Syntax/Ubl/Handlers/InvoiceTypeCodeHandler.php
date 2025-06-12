@@ -12,7 +12,7 @@ class InvoiceTypeCodeHandler extends AbstractUblHandler {
 	public function handle( array $data, array $options = array() ): array {
 		$invoiceTypeCode = array(
 			'name'       => 'cbc:InvoiceTypeCode',
-			'value'      => '380',
+			'value'      => $this->document->get_type_code(),
 			'attributes' => array(
 				'listID'       => 'UNCL1001',
 				'listAgencyID' => '6',

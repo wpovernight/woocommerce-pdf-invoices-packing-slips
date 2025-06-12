@@ -14,6 +14,15 @@ class Invoice implements FormatInterface {
 	public string $slug   = 'ubl-2-1';
 	public string $name   = 'UBL 2.1';
 	public string $syntax = 'ubl';
+	
+	/**
+	 * Get the invoice type code
+	 *
+	 * @return string
+	 */
+	public function get_type_code(): string {
+		return '380';
+	}
 
 	/**
 	 * Get the format root element
