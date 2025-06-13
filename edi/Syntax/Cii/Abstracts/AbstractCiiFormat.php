@@ -53,13 +53,5 @@ abstract class AbstractCiiFormat implements FormatInterface {
 	 * @return array
 	 */
 	abstract public function get_structure(): array;
-	
-	/**
-	 * Get the format RDF metadata
-	 *
-	 * @param string $filename The name of the file to be embedded.
-	 * @return string RDF metadata string.
-	 */
-	abstract public function get_rdf_metadata( string $filename ): string;
 
 }

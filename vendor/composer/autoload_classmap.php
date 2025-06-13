@@ -28,6 +28,7 @@ return array(
     'WPO\\IPS\\EDI\\Interfaces\\BuilderInterface' => $baseDir . '/edi/Interfaces/BuilderInterface.php',
     'WPO\\IPS\\EDI\\Interfaces\\FormatInterface' => $baseDir . '/edi/Interfaces/FormatInterface.php',
     'WPO\\IPS\\EDI\\Interfaces\\HandlerInterface' => $baseDir . '/edi/Interfaces/HandlerInterface.php',
+    'WPO\\IPS\\EDI\\Interfaces\\HybridFormatInterface' => $baseDir . '/edi/Interfaces/HybridFormatInterface.php',
     'WPO\\IPS\\EDI\\SabreBuilder' => $baseDir . '/edi/SabreBuilder.php',
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Abstracts\\AbstractCiiFormat' => $baseDir . '/edi/Syntax/Cii/Abstracts/AbstractCiiFormat.php',
     'WPO\\IPS\\EDI\\Syntax\\Cii\\Abstracts\\AbstractCiiHandler' => $baseDir . '/edi/Syntax/Cii/Abstracts/AbstractCiiHandler.php',

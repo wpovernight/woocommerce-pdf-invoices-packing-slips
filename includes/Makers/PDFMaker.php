@@ -58,7 +58,7 @@ class PDFMaker {
 		//TODO: Dompdf 3.1.1 (not yet released) supports PDF/A-3 embedding, so this can be enabled in the future [https://github.com/dompdf/dompdf/wiki/PDFA-Support]
 		// if ( wpo_ips_edi_is_available() ) {
 		// 	$format = wpo_ips_edi_get_current_format( true );
-		// 	if ( is_array( $format ) && $format['pdfa'] ) {
+		// 	if ( is_array( $format ) && $format['hybrid'] ) {
 		// 		$this->set_pdfa_enabled( $options );
 		// 	}
 		// }
