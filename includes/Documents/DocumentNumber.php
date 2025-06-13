@@ -31,7 +31,7 @@ class DocumentNumber {
 		// Normalize data from either a raw number or a full array
 		$data = is_array( $number ) ? $number : ( ! empty( $number ) ? array_merge( array( 'number' => $number ), $settings ) : array() );
 
-		$this->load_data( $data );
+		$this->load_number_data( $data );
 
 		if ( null !== $document ) {
 			$this->document_type = $document->get_type();
@@ -47,13 +47,13 @@ class DocumentNumber {
 	}
 	
 	/**
-	 * Loads data values into the object, applying casting and normalization.
+	 * Loads number data values into the object, applying casting and normalization.
 	 *
 	 * @param array $data Associative array of values to load into object properties.
 	 *
 	 * @return void
 	 */
-	public function load_data( array $data ): void {
+	public function load_number_data( array $data ): void {
 		$numeric_properties = apply_filters(
 			'wpo_wcpdf_document_number_numeric_properties',
 			array( 'number', 'order_id', 'padding' ),
