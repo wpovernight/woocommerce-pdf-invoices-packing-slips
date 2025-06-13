@@ -531,6 +531,7 @@ class Settings {
 			'coc_number'              => $this->general_settings['coc_number'] ?? '',
 			'shop_name'               => $this->general_settings['shop_name'] ?? '',
 			'shop_phone_number'       => $this->general_settings['shop_phone_number'] ?? '',
+			'shop_email_address'      => $this->general_settings['shop_email_address'] ?? '',
 			'shop_address_line_1'     => $this->general_settings['shop_address_line_1'] ?? '',
 			'shop_address_line_2'     => $this->general_settings['shop_address_line_2'] ?? '',
 			'shop_address_country'    => $this->general_settings['shop_address_country'] ?? '',

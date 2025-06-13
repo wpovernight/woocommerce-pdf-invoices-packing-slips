@@ -1482,6 +1482,16 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Return/Show shop/company email address if provided.
+	 */
+	public function get_shop_email_address() {
+		return $this->get_settings_text( 'shop_email_address', '', false );
+	}
+	public function shop_email_address() {
+		echo esc_html( $this->get_shop_email_address() );
+	}
+
+	/**
 	 * Return/Show shop/company footer imprint, copyright etc.
 	 */
 	public function get_footer() {
