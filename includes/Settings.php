@@ -327,21 +327,8 @@ class Settings {
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) ) {
-							$numeric_keys = array( 'number', 'order_id', 'padding' );
-
-							foreach ( $document->settings['number_format'] as $key => $value ) {
-								if ( in_array( $key, $numeric_keys, true ) ) {
-									$value = (int) $value;
-
-									// Only treat 0 as null for numeric keys
-									if ( $value === 0 ) {
-										$value = null;
-									}
-								}
-
-								$document_number->$key = $value;
-							}
+						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
+							$document_number->load_data( $document->settings['number_format'] );
 						}
 
 						$document_number->apply_formatting( $document, $order );

@@ -26,24 +26,12 @@ class DocumentNumber {
 	 * @param \WC_Abstract_Order|null               $order    Optional related order object.
 	 */
 	public function __construct( $number, array $settings = array(), ?\WPO\IPS\Documents\OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
-		$number       = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
-		$numeric_keys = array( 'number', 'order_id', 'padding' );
+		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
 
 		// Normalize data from either a raw number or a full array
 		$data = is_array( $number ) ? $number : ( ! empty( $number ) ? array_merge( array( 'number' => $number ), $settings ) : array() );
 
-		foreach ( $data as $key => $value ) {
-			if ( in_array( $key, $numeric_keys, true ) ) {
-				$value = (int) $value;
-
-				// Only treat 0 as null for numeric keys
-				if ( $value === 0 ) {
-					$value = null;
-				}
-			}
-
-			$this->{$key} = $value;
-		}
+		$this->load_data( $data );
 
 		if ( null !== $document ) {
 			$this->document_type = $document->get_type();
@@ -55,6 +43,34 @@ class DocumentNumber {
 
 		if ( ! isset( $this->formatted_number ) && null !== $document ) {
 			$this->apply_formatting( $document, $document->order ?? $order );
+		}
+	}
+	
+	/**
+	 * Loads data values into the object, applying casting and normalization.
+	 *
+	 * @param array $data Associative array of values to load into object properties.
+	 *
+	 * @return void
+	 */
+	public function load_data( array $data ): void {
+		$numeric_properties = apply_filters(
+			'wpo_wcpdf_document_number_numeric_properties',
+			array( 'number', 'order_id', 'padding' ),
+			$this
+		);
+
+		foreach ( $data as $key => $value ) {
+			if ( in_array( $key, $numeric_properties, true ) ) {
+				$value = (int) $value;
+
+				// Only treat 0 as null for numeric keys
+				if ( $value === 0 ) {
+					$value = null;
+				}
+			}
+
+			$this->{$key} = $value;
 		}
 	}
 
