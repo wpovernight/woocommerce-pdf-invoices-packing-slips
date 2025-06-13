@@ -199,7 +199,7 @@ jQuery( function( $ ) {
 		}
 	} );
 	
-	function updatePreviewNumber($table) {
+	function updatePreviewNumber( $table ) {
 		var prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
 		var suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
 		var padding  = $table.find( 'input[name$="_number_padding"]' ).val();
@@ -219,7 +219,7 @@ jQuery( function( $ ) {
 				document: document,
 				order_id: orderId,
 			},
-			success: function(response) {
+			success: function( response ) {
 				if ( response.success && response.data.formatted ) {
 					var $preview = $table.find( '.preview-number' );
 					var $code    = $preview.find( 'code' );

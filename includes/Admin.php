@@ -1264,12 +1264,13 @@ class Admin {
 				return;
 			}
 
-			$form_data = [];
+			$form_data = array();
 
 			if ( $invoice = wcpdf_get_invoice( $order ) ) {
 				$is_new        = false === $invoice->exists();
 				$form_data     = stripslashes_deep( $_POST );
-				$document_data = $this->process_order_document_form_data( $form_data, $invoice->slug );
+				$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
+				
 				if ( empty( $document_data ) ) {
 					return;
 				}
@@ -1461,7 +1462,7 @@ class Admin {
 				}
 
 				// save document data
-				$document_data = $this->process_order_document_form_data( $form_data, $document );
+				$document_data = $this->process_order_document_form_data( (array) $form_data, $document );
 
 				// on regenerate
 				if ( 'regenerate' === $action_type && $document->exists() ) {
@@ -1595,8 +1596,14 @@ class Admin {
 		wp_send_json_success( array( 'formatted' => $formatted ) );
 	}
 
-	public function process_order_document_form_data( $form_data, $document )
-	{
+	/**
+	 * Process the order document form data and return an array with the data to be saved.
+	 *
+	 * @param array $form_data The form data submitted via AJAX.
+	 * @param \WPO\IPS\Documents\OrderDocument $document The document object.
+	 * @return array Processed data ready to be saved.
+	 */
+	public function process_order_document_form_data( array $form_data, \WPO\IPS\Documents\OrderDocument $document ): array {
 		$data = array();
 
 		if (
