@@ -334,8 +334,8 @@ class Settings {
 								if ( in_array( $key, $numeric_keys, true ) ) {
 									$value = (int) $value;
 
-									// Normalize 0 to null for specific keys
-									if ( $value === 0 && in_array( $key, $numeric_keys, true ) ) {
+									// Only treat 0 as null for numeric keys
+									if ( $value === 0 ) {
 										$value = null;
 									}
 								}
