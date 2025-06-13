@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Settings\TaxesSettings;
+use WPO\IPS\EDI\TaxesSettings as EdiTaxSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -166,7 +166,6 @@ class Assets {
 						'use_latest_settings',
 						'mark_printed',
 						'unmark_printed',
-						'include_encrypted_pdf',
 						'include_email_link',
 						'include_email_link_placement',
 					) ),
@@ -261,24 +260,26 @@ class Assets {
 
 			}
 
-			// ubl taxes
-			if ( 'ubl' === $tab ) {
+			// edi
+			if ( 'edi' === $tab ) {
 				wp_enqueue_script(
-					'wpo-wcpdf-ubl',
-					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
+					'wpo-ips-edi',
+					WPO_WCPDF()->plugin_url() . '/assets/js/edi-script' . $suffix . '.js',
 					array( 'jquery' ),
 					WPO_WCPDF_VERSION,
 					true
 				);
 
 				wp_localize_script(
-					'wpo-wcpdf-ubl',
-					'wpo_wcpdf_ubl',
+					'wpo-ips-edi',
+					'wpo_ips_edi',
 					array(
+						'ajaxurl' => admin_url( 'admin-ajax.php' ),
+						'nonce'   => wp_create_nonce( 'wpo_ips_edi_nonce' ),
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => TaxesSettings::get_available_remarks(),
+						'remarks' => EdiTaxSettings::get_available_remarks(),
 					)
 				);
 			}

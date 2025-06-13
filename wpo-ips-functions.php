@@ -128,12 +128,14 @@ function wcpdf_get_bulk_actions() {
 	foreach ( $documents as $document ) {
 		foreach ( $document->output_formats as $output_format ) {
 			$slug = $document->get_type();
+			
 			if ( 'pdf' !== $output_format ) {
 				$slug .= "_{$output_format}";
 			}
 
 			if ( $document->is_enabled( $output_format ) ) {
-				$actions[$slug] = strtoupper( $output_format ) . ' ' . $document->get_title();
+				$prefix = ( 'xml' === $output_format ) ? 'E-' : strtoupper( $output_format )  . ' ';
+				$actions[ $slug ] = $prefix . $document->get_title();
 			}
 		}
 	}
@@ -160,34 +162,6 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
 	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
 
 	return new $class( $html, $settings, $document );
-}
-
-/**
- * Get UBL Maker
- * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
- *
- * @return WPO\IPS\Makers\UBLMaker
- */
-function wcpdf_get_ubl_maker() {
-	$class = '\\WPO\\IPS\\Makers\\UBLMaker';
-
-	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/UBLMaker.php' );
-	}
-
-	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
-
-	return new $class();
-}
-
-/**
- * Check if UBL is available
- *
- * @return bool
- */
-function wcpdf_is_ubl_available(): bool {
-	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
-	return apply_filters( 'wpo_wcpdf_ubl_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) );
 }
 
 /**
@@ -228,22 +202,6 @@ function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $
 	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
 }
 
-function wcpdf_ubl_headers( $filename, $size ) {
-	$charset = apply_filters( 'wcpdf_ubl_headers_charset', 'UTF-8' );
-
-	header( 'Content-Description: File Transfer' );
-	header( 'Content-Type: text/xml; charset=' . $charset );
-	header( 'Content-Disposition: attachment; filename=' . $filename );
-	header( 'Content-Transfer-Encoding: binary' );
-	header( 'Connection: Keep-Alive' );
-	header( 'Expires: 0' );
-	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-	header( 'Pragma: public' );
-	header( 'Content-Length: ' . $size );
-
-	do_action( 'wpo_after_ubl_headers', $filename, $size );
-}
-
 /**
  * Get the document file
  *
@@ -281,7 +239,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$function = "get_document_{$output_format}_attachment"; // 'get_document_pdf_attachment' or 'get_document_ubl_attachment'
+	$function = "get_document_{$output_format}_attachment"; // 'get_document_pdf_attachment' or 'get_document_xml_attachment'
 
 	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
 		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
@@ -302,7 +260,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 function wcpdf_get_document_output_format_extension( string $output_format ): string {
 	$output_formats = array(
 		'pdf' => '.pdf',
-		'ubl' => '.xml',
+		'xml' => '.xml',
 	);
 
 	return isset( $output_formats[ $output_format ] ) ? $output_formats[ $output_format ] : $output_formats['pdf'];
@@ -1420,63 +1378,6 @@ function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
 
 	// No update available or plugin not found
 	return false;
-}
-
-/**
- * Write UBL file
- *
- * @param \WPO\IPS\Documents\OrderDocument $document
- * @param bool $attachment
- * @param bool $contents_only
- *
- * @return string|false
- */
-function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
-	$ubl_maker = wcpdf_get_ubl_maker();
-
-	if ( ! $ubl_maker ) {
-		return wcpdf_error_handling( 'UBL Maker not available. Cannot write UBL file.' );
-	}
-
-	if ( $attachment ) {
-		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
-
-		if ( ! $tmp_path ) {
-			return wcpdf_error_handling( 'Temporary path not available. Cannot write UBL file.' );
-		}
-
-		$ubl_maker->set_file_path( $tmp_path );
-	}
-
-	$ubl_document = new \WPO\IPS\UBL\Documents\UblDocument();
-	$ubl_document->set_order_document( $document );
-
-	$builder  = new \WPO\IPS\UBL\Builders\SabreBuilder();
-	$contents = apply_filters( 'wpo_ips_ubl_contents',
-		$builder->build( $ubl_document ),
-		$ubl_document,
-		$document
-	);
-
-	if ( empty( $contents ) ) {
-		return wcpdf_error_handling( 'Failed to build UBL contents.' );
-	}
-
-	if ( $contents_only ) {
-		return $contents;
-	}
-
-	$filename = apply_filters( 'wpo_ips_ubl_filename',
-		$document->get_filename(
-			'download',
-			array( 'output' => 'ubl' )
-		),
-		$document
-	);
-
-	$full_filename = $ubl_maker->write( $filename, $contents );
-
-	return $full_filename;
 }
 
 /**

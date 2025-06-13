@@ -1,0 +1,28 @@
+<?php
+namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
+
+use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblHandler;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+class PaymentTermsHandler extends AbstractUblHandler {
+
+	public function handle( array $data, array $options = array() ): array {
+		$paymentTerms = array(
+			'name'  => 'cac:PaymentTerms',
+			'value' => array(
+				array(
+					'name'  => 'cbc:Note',
+					'value' => '',
+				),
+			),
+		);
+
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_payment_terms', $paymentTerms, $data, $options, $this );
+
+		return $data;
+	}
+
+}
