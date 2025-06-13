@@ -817,38 +817,44 @@ class Admin {
 	public function get_current_values_for_document_data( \WPO\IPS\Documents\OrderDocument $document, array $data ): array {
 		$document_number_instance = $document->get_number();
 		$document_date_instance   = $document->get_date();
+		$current                  = array();
 		
-		$current = array(
-			'number' => array(
-				'prefix' => array(
-					'value' => $document->exists() && ! empty( $document_number_instance ) ? $document_number_instance->get_prefix() : '',
-					'name'  => "_wcpdf_{$document->slug}_number_prefix",	
-				),
-				'plain' => array(
-					'value' => $document->exists() && ! empty( $document_number_instance ) ? $document_number_instance->get_plain() : '',
-					'name'  => "_wcpdf_{$document->slug}_number_plain",
-				),
-				'suffix' => array(
-					'value' => $document->exists() && ! empty( $document_number_instance ) ? $document_number_instance->get_suffix() : '',
-					'name'  => "_wcpdf_{$document->slug}_number_suffix",
-				),
-				'padding' => array(
-					'value' => $document->exists() && ! empty( $document_number_instance ) ? $document_number_instance->get_padding() : '',
-					'name'  => "_wcpdf_{$document->slug}_number_padding",
-				),
-				'formatted' => array(
-					'value' => $document->exists() && ! empty( $document_number_instance ) ? $document_number_instance->get_formatted() : '',
-					'name'  => "_wcpdf_{$document->slug}_number_formatted",
-				),
-			),
-			'date' => array(
-				'formatted' => $document->exists() && ! empty( $document_date_instance ) ? $document_date_instance->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '',
-				'date'      => $document->exists() && ! empty( $document_date_instance ) ? $document_date_instance->date_i18n( 'Y-m-d' ) : date_i18n( 'Y-m-d' ),
-				'hour'      => $document->exists() && ! empty( $document_date_instance ) ? $document_date_instance->date_i18n( 'H' ) : date_i18n( 'H' ),
-				'minute'    => $document->exists() && ! empty( $document_date_instance ) ? $document_date_instance->date_i18n( 'i' ) : date_i18n( 'i' ),
-				'name'      => "_wcpdf_{$document->slug}_date",
-			),
-		);
+		if ( $document->exists() ) {
+			if ( ! empty( $document_number_instance ) ) {
+				$current['number'] = array(
+					'prefix' => array(
+						'value' => $document_number_instance->get_prefix() ?: '',
+						'name'  => "_wcpdf_{$document->slug}_number_prefix",	
+					),
+					'plain' => array(
+						'value' => $document_number_instance->get_plain() ?: '',
+						'name'  => "_wcpdf_{$document->slug}_number_plain",
+					),
+					'suffix' => array(
+						'value' => $document_number_instance->get_suffix() ?: '',
+						'name'  => "_wcpdf_{$document->slug}_number_suffix",
+					),
+					'padding' => array(
+						'value' => $document_number_instance->get_padding() ?: '',
+						'name'  => "_wcpdf_{$document->slug}_number_padding",
+					),
+					'formatted' => array(
+						'value' => $document_number_instance->get_formatted() ?: '',
+						'name'  => "_wcpdf_{$document->slug}_number_formatted",
+					),
+				);
+			}
+			
+			if ( ! empty( $document_date_instance ) ) {
+				$current['date'] = array(
+					'formatted' => $document_date_instance->date_i18n( wc_date_format().' @ '.wc_time_format() ) ?: '',
+					'date'      => $document_date_instance->date_i18n( 'Y-m-d' ) ?: date_i18n( 'Y-m-d' ),
+					'hour'      => $document_date_instance->date_i18n( 'H' ) ?: date_i18n( 'H' ),
+					'minute'    => $document_date_instance->date_i18n( 'i' ) ?: date_i18n( 'i' ),
+					'name'      => "_wcpdf_{$document->slug}_date",
+				);
+			}
+		}
 
 		if ( ! empty( $data['notes'] ) ) {
 			$current['notes'] = array(
