@@ -452,6 +452,7 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 					),
 				),
 				//TODO: Dompdf 3.1.1 (not yet released) supports PDF/A-3 embedding, so this can be enabled in the future [https://github.com/dompdf/dompdf/wiki/PDFA-Support]
+				//TODO: More info [https://fnfe-mpe.org/factur-x/implementer-factur-x/]
 				// 'factur-x' => array(
 				// 	'name'      => 'Factur-X',
 				// 	'hybrid'    => true,
