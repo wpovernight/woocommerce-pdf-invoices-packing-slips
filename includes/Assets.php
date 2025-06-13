@@ -40,7 +40,7 @@ class Assets {
 
 			wp_enqueue_style(
 				'wpo-wcpdf-order-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/order-styles'.$suffix.'.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/order-styles' . $suffix . '.css',
 				array(),
 				WPO_WCPDF_VERSION
 			);
@@ -50,7 +50,7 @@ class Assets {
 				// also applied to WC3.3+ but without affect due to .column-order_actions class being deprecated in 3.3+
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38'.$suffix.'.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38' . $suffix . '.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
@@ -58,7 +58,7 @@ class Assets {
 				// WP5.3 or newer is used: realign img inside buttons
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39'.$suffix.'.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39' . $suffix . '.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
@@ -67,7 +67,7 @@ class Assets {
 			// SCRIPTS
 			wp_enqueue_script(
 				'wpo-wcpdf',
-				WPO_WCPDF()->plugin_url() . '/assets/js/order-script'.$suffix.'.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/order-script' . $suffix . '.js',
 				array( 'jquery', 'jquery-blockui' ),
 				WPO_WCPDF_VERSION
 			);
@@ -95,7 +95,7 @@ class Assets {
 
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles' . $suffix . '.css',
 				array('woocommerce_admin_styles'),
 				WPO_WCPDF_VERSION
 			);
