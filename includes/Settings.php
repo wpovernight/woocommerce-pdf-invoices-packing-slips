@@ -328,10 +328,22 @@ class Settings {
 					// Apply document number formatting.
 					if ( $document_number ) {
 						if ( ! empty( $document->settings['number_format'] ) ) {
+							$numeric_keys = array( 'number', 'order_id', 'padding' );
+
 							foreach ( $document->settings['number_format'] as $key => $value ) {
-								$document_number->$key = $document->settings['number_format'][ $key ];
+								if ( in_array( $key, $numeric_keys, true ) ) {
+									$value = (int) $value;
+
+									// Normalize 0 to null for specific keys
+									if ( $value === 0 && in_array( $key, $numeric_keys, true ) ) {
+										$value = null;
+									}
+								}
+
+								$document_number->$key = $value;
 							}
 						}
+
 						$document_number->apply_formatting( $document, $order );
 					}
 

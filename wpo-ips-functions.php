@@ -1616,16 +1616,16 @@ function wpo_wcpdf_format_address( array $address ): string {
  * - [order_number]
  * - [order_date="{date_format}"], [invoice_date="{date_format}"] (with $document->slug as type)
  *
- * @param int                              $plain_number The base document number (unformatted).
- * @param string                           $prefix       The prefix string (may contain placeholders).
- * @param string                           $suffix       The suffix string (may contain placeholders).
- * @param int                              $padding      Number of digits for zero-padding the base number.
+ * @param int|null                         $plain_number The base document number (unformatted).
+ * @param string|null                      $prefix       The prefix string (may contain placeholders).
+ * @param string|null                      $suffix       The suffix string (may contain placeholders).
+ * @param int|null                         $padding      Number of digits for zero-padding the base number.
  * @param \WPO\IPS\Documents\OrderDocument $document     The document object (e.g. invoice or credit note).
  * @param \WC_Abstract_Order               $order        The WooCommerce order associated with the document.
  *
  * @return string The fully formatted document number.
  */
-function wpo_wcpdf_format_document_number( int $plain_number, string $prefix, string $suffix, int $padding, \WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order ): string {
+function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, ?string $suffix, ?int $padding, \WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order ): string {
 	// Get dates
 	$order_date = $order->get_date_created();
 	
@@ -1708,7 +1708,7 @@ function wpo_wcpdf_format_document_number( int $plain_number, string $prefix, st
 			$padding_string = (string) $padding;
 		}
 	} elseif ( ! empty( $padding ) ) {
-		$padding_string = (string) absint( $padding );
+		$padding_string = (string) $padding;
 	}
 
 	if ( ! empty( $padding_string ) ) {

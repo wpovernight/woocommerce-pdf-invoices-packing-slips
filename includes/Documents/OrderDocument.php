@@ -1097,7 +1097,7 @@ abstract class OrderDocument {
 		$order = empty( $order ) ? $this->order : $order;
 		try {
 			if ( empty( $value ) ) {
-				$this->data[ 'date' ] = null;
+				$this->data['date'] = null;
 				return;
 			}
 
@@ -1124,7 +1124,7 @@ abstract class OrderDocument {
 				$datetime->set_utc_offset( wc_timezone_offset() );
 			}
 
-			$this->data[ 'date' ] = $datetime;
+			$this->data['date'] = $datetime;
 		} catch ( \Exception $e ) {
 			wcpdf_log_error( $e->getMessage() );
 		} catch ( \Error $e ) {
@@ -1154,7 +1154,7 @@ abstract class OrderDocument {
 			$document_number = new DocumentNumber( $value, $this->get_number_settings(), $this, $order );
 		}
 
-		$this->data[ 'number' ] = $document_number;
+		$this->data['number'] = $document_number;
 	}
 
 	public function set_notes( $value, $order = null ) {
@@ -1162,11 +1162,11 @@ abstract class OrderDocument {
 
 		try {
 			if ( empty( $value ) ) {
-				$this->data[ 'notes' ] = null;
+				$this->data['notes'] = null;
 				return;
 			}
 
-			$this->data[ 'notes' ] = $value;
+			$this->data['notes'] = $value;
 		} catch ( \Exception $e ) {
 			wcpdf_log_error( $e->getMessage() );
 		} catch ( \Error $e ) {

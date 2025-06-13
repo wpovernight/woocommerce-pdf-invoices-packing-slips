@@ -14,43 +14,47 @@ class DocumentNumber {
 	public ?string $prefix;
 	public ?string $suffix;
 	public string $document_type;
-	public int $order_id;
+	public ?int $order_id;
 	public ?int $padding;
 
+	/**
+	 * Document number constructor.
+	 *
+	 * @param mixed                                 $number   Raw number value or full number array.
+	 * @param array                                 $settings Additional settings used when building the number (e.g. prefix, suffix, padding).
+	 * @param \WPO\IPS\Documents\OrderDocument|null $document Optional related document object.
+	 * @param \WC_Abstract_Order|null               $order    Optional related order object.
+	 */
 	public function __construct( $number, array $settings = array(), ?\WPO\IPS\Documents\OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
-		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
-		
-		if ( ! is_array( $number ) && ! empty( $number ) ) {
-			// we're creating a new number with settings as passed
-			$this->number = $number;
+		$number       = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
+		$numeric_keys = array( 'number', 'order_id', 'padding' );
 
-			foreach ( $settings as $key => $value ) {
-				if ( in_array( $key, array( 'number', 'order_id', 'padding' ) ) ) {
-					$value = absint( $value );
+		// Normalize data from either a raw number or a full array
+		$data = is_array( $number ) ? $number : ( ! empty( $number ) ? array_merge( array( 'number' => $number ), $settings ) : array() );
+
+		foreach ( $data as $key => $value ) {
+			if ( in_array( $key, $numeric_keys, true ) ) {
+				$value = (int) $value;
+
+				// Only treat 0 as null for numeric keys
+				if ( $value === 0 ) {
+					$value = null;
 				}
-				$this->{$key} = $value;
 			}
 
-		} elseif ( is_array( $number ) ) {
-			// loaded with full number data
-			foreach ( $number as $key => $value ) {
-				if ( in_array( $key, array( 'number', 'order_id', 'padding' ) ) ) {
-					$value = absint( $value );
-				}
-				$this->{$key} = $value;
-			}
+			$this->{$key} = $value;
 		}
 
-		if ( ! empty( $document ) ) {
+		if ( null !== $document ) {
 			$this->document_type = $document->get_type();
 		}
-		
-		if ( ! empty( $order ) ) {
+
+		if ( null !== $order ) {
 			$this->order_id = $order->get_id();
 		}
-		
-		if ( ! isset( $this->formatted_number ) && ! empty( $document ) ) {
-			$this->apply_formatting( $document, ( ! empty( $document->order ) ? $document->order : $order ) );
+
+		if ( ! isset( $this->formatted_number ) && null !== $document ) {
+			$this->apply_formatting( $document, $document->order ?? $order );
 		}
 	}
 
@@ -79,7 +83,7 @@ class DocumentNumber {
 	 * @return int|null
 	 */
 	public function get_plain(): ?int {
-		return $this->number;
+		return $this->number ?? null;
 	}
 	
 	/**
@@ -88,7 +92,7 @@ class DocumentNumber {
 	 * @return string|null
 	 */
 	public function get_prefix(): ?string {
-		return $this->prefix;
+		return $this->prefix ?? null;
 	}
 
 	/**
@@ -97,16 +101,16 @@ class DocumentNumber {
 	 * @return string|null
 	 */
 	public function get_suffix(): ?string {
-		return $this->suffix;
+		return $this->suffix ?? null;
 	}
-	
+
 	/**
 	 * Returns the document number padding.
 	 *
 	 * @return int|null
 	 */
 	public function get_padding(): ?int {
-		return $this->padding;
+		return $this->padding ?? null;
 	}
 
 	/**
@@ -121,9 +125,9 @@ class DocumentNumber {
 			$this->formatted_number = $this->number;
 			return $this->formatted_number;
 		}
-		
-		$formatted_number = wpo_wcpdf_format_document_number( $this->number, $this->prefix, $this->suffix, $this->padding, $document, $order );
-		
+
+		$formatted_number = wpo_wcpdf_format_document_number( $this->get_plain(), $this->get_prefix(), $this->get_suffix(), $this->get_padding(), $document, $order );
+
 		// Apply filters and store
 		$this->formatted_number = apply_filters(
 			'wpo_wcpdf_format_document_number',
