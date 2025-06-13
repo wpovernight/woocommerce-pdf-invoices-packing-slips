@@ -9,13 +9,13 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents\\DocumentNumber' ) ) :
 
 class DocumentNumber {
 
-	public int|null $number;
+	public ?int $number;
 	public string $formatted_number;
-	public string|null $prefix;
-	public string|null $suffix;
+	public ?string $prefix;
+	public ?string $suffix;
 	public string $document_type;
 	public int $order_id;
-	public int|null $padding;
+	public ?int $padding;
 
 	public function __construct( $number, array $settings = array(), ?\WPO\IPS\Documents\OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
 		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
