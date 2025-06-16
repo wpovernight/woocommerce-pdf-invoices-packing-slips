@@ -341,7 +341,7 @@ class SettingsEDI {
 			$state        = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
 			$vat_number   = $general_settings->get_setting( 'vat_number', $language ) ?? '';
 			$reg_number   = $general_settings->get_setting( 'coc_number', $language ) ?? '';
-			$email        = $general_settings->get_setting( 'shop_email', $language ) ?? '';
+			$email        = $general_settings->get_setting( 'shop_email_address', $language ) ?? '';
 
 			echo '<div class="language-block" id="lang-' . esc_attr( $language ) . '">';
 			echo '<table class="widefat striped">';
