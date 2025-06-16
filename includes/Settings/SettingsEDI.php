@@ -310,8 +310,8 @@ class SettingsEDI {
 		echo '<p>' . esc_html__( 'Please fill in your company identifiers. These details are essential for generating electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 
 		if ( count( $languages ) > 1 ) {
-			echo '<label for="wcpdf-language-selector"><strong>' . esc_html__( 'Select language', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong></label> ';
-			echo '<select id="wcpdf-language-selector" class="wcpdf-language-selector" style="margin-bottom: 10px;">';
+			echo '<label for="wpo-ips-edi-language-selector"><strong>' . esc_html__( 'Select language', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong></label> ';
+			echo '<select id="wpo-ips-edi-language-selector" class="wpo-ips-edi-language-selector" style="margin-bottom: 10px;">';
 			foreach ( $languages as $language ) {
 				echo '<option value="' . esc_attr( $language ) . '">' . esc_html( $language ) . '</option>';
 			}
