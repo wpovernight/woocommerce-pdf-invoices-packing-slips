@@ -367,26 +367,6 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl2p1\Invoice::class,
 					),
 				),
-				// 'peppol_bis_3_0' => array(
-				// 	'name'  => 'Peppol BIS Billing 3.0',
-				// 	'class' => '',
-				// ),
-				// 'xrechnung' => array(
-				// 	'name'  => 'XRechnung' . ' (' . __( 'Germany', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
-				// 	'class' => '',
-				// ),
-				// 'ehfbilling_3_0' => array(
-				// 	'name'  => 'EHF Billing 3.0' . ' (' . __( 'Norway', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
-				// 	'class' => '',
-				// ),
-				// 'svefaktura_2_0' => array(
-				// 	'name'  => 'Svefaktura 2.0' . ' (' . __( 'Sweden', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
-				// 	'class' => '',
-				// ),
-				// 'eSENS' => array(
-				// 	'name'  => 'eSENS' . ' (' . __( 'EU', 'woocommerce-pdf-invoices-packing-slips' ) . ')',
-				// 	'class' => '',
-				// ),
 			),
 			'cii' => array(
 				'cii-d16b' => array(
@@ -396,15 +376,6 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 						'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B\Invoice::class,
 					),
 				),
-				//TODO: Dompdf 3.1.1 (not yet released) supports PDF/A-3 embedding, so this can be enabled in the future [https://github.com/dompdf/dompdf/wiki/PDFA-Support]
-				//TODO: More info [https://fnfe-mpe.org/factur-x/implementer-factur-x/]
-				// 'factur-x' => array(
-				// 	'name'      => 'Factur-X',
-				// 	'hybrid'    => true,
-				// 	'documents' => array(
-				// 		'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\FacturX\Invoice::class,
-				// 	),
-				// ),
 			),
 		)
 	);

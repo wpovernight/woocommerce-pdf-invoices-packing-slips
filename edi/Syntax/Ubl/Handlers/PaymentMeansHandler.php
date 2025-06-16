@@ -33,6 +33,14 @@ class PaymentMeansHandler extends AbstractUblHandler {
 				),
 			),
 		);
+		
+		// Fallback: instruction note
+		if ( ! empty( $payment['title'] ) ) {
+			$node['value'][] = array(
+				'name'  => 'cbc:InstructionNote',
+				'value' => $payment['title'],
+			);
+		}
 
 		// Add IBAN
 		if ( ! empty( $payment['iban'] ) ) {
@@ -70,14 +78,6 @@ class PaymentMeansHandler extends AbstractUblHandler {
 						'value' => $name,
 					),
 				),
-			);
-		}
-
-		// Fallback: instruction note
-		if ( ! empty( $payment['title'] ) ) {
-			$node['value'][] = array(
-				'name'  => 'cbc:InstructionNote',
-				'value' => $payment['title'],
 			);
 		}
 

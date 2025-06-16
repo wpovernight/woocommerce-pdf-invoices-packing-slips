@@ -136,53 +136,64 @@ class Document {
 	}
 	
 	/**
-	 * Get the document data
+	 * Assemble the element list for the XML writer.
 	 *
-	 * @return array
+	 * Works for both UBL and CII syntaxes:
+	 *
+	 * • If a handler sets `options[root]`, its output is wrapped in that tag  
+	 *   (e.g. `cac:AccountingSupplierParty`, `ram:SupplyChainTradeTransaction`).
+	 * • Without a root option, the fragment is written directly under the
+	 *   document root.
+	 * • The order of handlers in `get_structure()` is preserved, so the final
+	 *   sequence respects the schema of either standard.
+	 *
+	 * @return array Structured data ready for the XML builder.
 	 */
 	public function get_data(): array {
 		$data_by_root = array();
 
 		foreach ( $this->get_structure() as $key => $value ) {
+			// skip disabled or mis-configured entries
 			if ( empty( $value['enabled'] ) || empty( $value['handler'] ) ) {
 				continue;
 			}
 
-			$options     = isset( $value['options'] ) ? $value['options'] : array();
-			$handlers    = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
-			$root_name   = $options['root'] ?? null;
-			$root_output = array();
+			$options   = $value['options'] ?? array();
+			$handlers  = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
+			$root_name = $options['root'] ?? null;
+			$fragment  = array();
 
 			foreach ( $handlers as $handler_class ) {
 				if ( class_exists( $handler_class ) ) {
-					$handler     = new $handler_class( $this );
-					$root_output = $handler->handle( $root_output, $options );
+					$handler  = new $handler_class( $this );
+					$fragment = $handler->handle( $fragment, $options );
 				}
 			}
 
 			if ( $root_name ) {
+				// merge with any previous output for the same root
 				if ( ! isset( $data_by_root[ $root_name ] ) ) {
 					$data_by_root[ $root_name ] = array();
 				}
-				$data_by_root[ $root_name ] = array_merge( $data_by_root[ $root_name ], $root_output );
+				$data_by_root[ $root_name ] = array_merge( $data_by_root[ $root_name ], $fragment );
 			} else {
-				if ( ! isset( $data_by_root[ null ] ) ) {
-					$data_by_root[ null ] = array();
-				}
-				$data_by_root[ null ] = array_merge( $data_by_root[ null ], $root_output );
+				// append root-less fragment under a *numeric* key -> preserves order
+				$data_by_root[] = $fragment;
 			}
 		}
 
-		// Convert grouped data to the expected format
 		$data = array();
+
 		foreach ( $data_by_root as $root => $value ) {
-			if ( $root ) {
+			if ( is_string( $root ) ) {
+				// named root -> wrap
 				$data[] = array(
 					'name'  => $root,
 					'value' => $value,
 				);
 			} else {
-				$data = array_merge( $data, $value );
+				// numeric key -> flatten directly
+				$data   = array_merge( $data, $value );
 			}
 		}
 
