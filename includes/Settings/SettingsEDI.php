@@ -220,19 +220,6 @@ class SettingsEDI {
 				'description' => __( 'Enable the XML preview for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
-		
-		$settings_fields[] = array(
-			'type'     => 'setting',
-			'id'       => 'enabled_logging',
-			'title'    => __( 'Enable Logging', 'woocommerce-pdf-invoices-packing-slips' ),
-			'callback' => 'checkbox',
-			'section'  => $section,
-			'args'     => array(
-				'option_name' => $option_name,
-				'id'          => 'enabled_logging',
-				'description' => __( 'Enable logging for electronic document generation.', 'woocommerce-pdf-invoices-packing-slips' ),
-			)
-		);
 
 		$settings_fields = apply_filters( 'wpo_ips_edi_settings', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
@@ -323,10 +310,10 @@ class SettingsEDI {
 		echo '<p>' . esc_html__( 'Please fill in your company identifiers. These details are essential for generating electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 		
 		if ( count( $languages ) > 1 ) {
-			echo '<label for="language-selector"><strong>' . esc_html__( 'Select language', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong></label> ';
-			echo '<select id="language-selector" style="margin-bottom: 10px;">';
+			echo '<label for="wcpdf-language-selector"><strong>' . esc_html__( 'Select language', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong></label> ';
+			echo '<select id="wcpdf-language-selector" class="wcpdf-language-selector" style="margin-bottom: 10px;">';
 			foreach ( $languages as $language ) {
-				echo '<option value="' . esc_attr( $language ) . '">' . esc_html( ucfirst( $language ) ) . '</option>';
+				echo '<option value="' . esc_attr( $language ) . '">' . esc_html( $language ) . '</option>';
 			}
 			echo '</select>';
 		}
@@ -343,7 +330,7 @@ class SettingsEDI {
 			$reg_number   = $general_settings->get_setting( 'coc_number', $language ) ?? '';
 			$email        = $general_settings->get_setting( 'shop_email_address', $language ) ?? '';
 
-			echo '<div class="language-block" id="lang-' . esc_attr( $language ) . '">';
+			echo '<div class="language-block" id="lang-' . esc_attr( $language ) . '" style="display:none;">';
 			echo '<table class="widefat striped">';
 			echo '<thead><tr><th>' . esc_html__( 'Field', 'woocommerce-pdf-invoices-packing-slips' ) . '</th><th>' . esc_html__( 'Value', 'woocommerce-pdf-invoices-packing-slips' ) . '</th></tr></thead>';
 			echo '<tbody>';
@@ -366,7 +353,7 @@ class SettingsEDI {
 
 				$display = $value ?: sprintf(
 					'<span style="color:%s">%s</span>',
-					$required ? 'red' : 'orange',
+					$required ? '#d63638' : '#2271b1',
 					$required ? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' ),
 				);
 

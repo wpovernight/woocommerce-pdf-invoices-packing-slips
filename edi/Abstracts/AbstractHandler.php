@@ -48,10 +48,6 @@ abstract class AbstractHandler implements HandlerInterface {
 				$value = $this->document->order_document->$method();
 			}
 		}
-		
-		if ( empty( $value ) ) {
-			wpo_ips_edi_log( sprintf( 'Shop %s is empty.', $suffix ), 'warning' );
-		}
 
 		return $value;
 	}

@@ -832,5 +832,25 @@ jQuery( function( $ ) {
 	} );
 
 	//----------> /Sync Address <----------//
+	
+	function initEdiCompanyIdentifierLanguageSelector() {
+		const $selector = $( '.wcpdf-language-selector' );
+		const $blocks   = $( '.language-block' );
 
+		function show( lang ) {
+			$blocks.hide();
+			$( '#lang-' + lang ).show();
+		}
+
+		$selector.on( 'change', function () {
+			show( this.value );
+		} );
+
+		if ( $selector.length ) {
+			show( $selector.val() );
+		}
+	}
+
+	initEdiCompanyIdentifierLanguageSelector();
+	
 } );

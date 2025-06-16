@@ -336,61 +336,6 @@ function wpo_ips_edi_preview_is_enabled(): bool {
 }
 
 /**
- * Check if EDI logging is enabled
- *
- * @return bool
- */
-function wpo_ips_edi_logging_is_enabled(): bool {
-	$edi_settings = wpo_ips_edi_get_settings();
-	return ! empty( $edi_settings['enabled_logging'] );
-}
-
-/**
- * Logs errors thrown by EDI implementation.
- * Uses the WooCommerce logger when available (WC 3.0+), otherwise falls back to PHP error_log().
- *
- * @param string           $message Error message to log.
- * @param string           $level   Log level: debug, info, notice, warning, error, critical, alert, emergency.
- * @param \Throwable|null  $e       (Optional) Exception or error object.
- * @return void
- */
-function wpo_ips_edi_log( string $message, string $level = 'error', ?\Throwable $e = null ): void {
-	if ( ! wpo_ips_edi_logging_is_enabled() ) {
-		return; // Logging is disabled, do nothing.
-	}
-	
-	/**
-	 * Appends exception details to the message if available.
-	 *
-	 * @param string          $message
-	 * @param \Throwable|null $e
-	 * @return string
-	 */
-	$format_message = static function ( string $message, ?\Throwable $e ): string {
-		if ( $e instanceof \Throwable ) {
-			$message = sprintf( '%s (%s:%d)', $message, $e->getFile(), $e->getLine() );
-
-			if ( apply_filters( 'wcpdf_log_stacktrace', false ) && is_callable( array( $e, 'getTraceAsString' ) ) ) {
-				$message .= "\n" . $e->getTraceAsString();
-			}
-		}
-		return $message;
-	};
-
-	$message = $format_message( $message, $e );
-
-	if ( ! function_exists( 'wc_get_logger' ) ) {
-		error_log( '[WPO_IPS_EDI] ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		return;
-	}
-
-	$logger  = wc_get_logger();
-	$context = array( 'source' => 'wpo-ips-edi' );
-
-	$logger->log( $level, $message, $context );
-}
-
-/**
  * Get the EDI syntaxes.
  *
  * @return array
