@@ -9,6 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class AdditionalDocumentReferenceHandler extends AbstractUblHandler {
 
+	/**
+	 * Handle the data and return the formatted output.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
 	public function handle( array $data, array $options = array() ): array {
 		if ( $this->document->order_document && $this->document->order_document->exists() && wpo_ips_edi_embed_encrypted_pdf() ) {
 			$additionalDocumentReference = array(

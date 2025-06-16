@@ -9,6 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class HeaderTradeDeliveryHandler extends AbstractCiiHandler {
 
+	/**
+	 * Handle the data and return the formatted output.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
 	public function handle( array $data, array $options = array() ): array {
 		$order         = $this->document->order;
 		$delivery_date = apply_filters( 'wpo_ips_edi_cii_delivery_date', null, $order, $this );

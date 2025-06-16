@@ -10,6 +10,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
+	/**
+	 * Handle the data and return the formatted output.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
 	public function handle( array $data, array $options = array() ): array {
 		$applicableHeaderTradeSettlement = array(
 			'name'  => 'ram:ApplicableHeaderTradeSettlement',

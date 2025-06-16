@@ -9,6 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class LegalMonetaryTotalHandler extends AbstractUblHandler {
 
+	/**
+	 * Handle the data and return the formatted output.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
 	public function handle( array $data, array $options = array() ): array {
 		$total         = $this->document->order->get_total();
 		$total_inc_tax = $total;

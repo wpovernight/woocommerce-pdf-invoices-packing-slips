@@ -10,6 +10,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class InvoiceLineHandler extends AbstractUblHandler {
 
+	/**
+	 * Handle the data and return the formatted output.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
 	public function handle( array $data, array $options = array() ): array {
 		$items      = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$taxReasons = TaxesSettings::get_available_reasons();
@@ -173,10 +180,10 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	/**
 	 * Get the unit price of an item
 	 *
-	 * @param WC_Order_Item $item
+	 * @param \WC_Order_Item $item
 	 * @return int|float
 	 */
-	private function get_item_unit_price( $item ) {
+	private function get_item_unit_price( \WC_Order_Item $item ) {
 		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
 			return $item->get_subtotal() / $item->get_quantity();
 		} elseif ( is_a( $item, 'WC_Order_Item_Shipping' ) || is_a( $item, 'WC_Order_Item_Fee' ) ) {

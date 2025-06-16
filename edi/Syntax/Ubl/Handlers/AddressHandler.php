@@ -9,6 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class AddressHandler extends AbstractUblHandler {
 
+	/**
+	 * Handle the data and return the formatted output.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
 	public function handle( array $data, array $options = array() ): array {
 		$root = isset( $options['root'] ) ? $options['root'] : 'cac:AccountingSupplierParty';
 
@@ -20,8 +27,14 @@ class AddressHandler extends AbstractUblHandler {
 		return $this->return_customer_party( $data, $options );
 	}
 
-	public function return_supplier_party( $data, $options = array() ) {
-
+	/**
+	 * Returns the supplier party details for the UBL document.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
+	public function return_supplier_party( array $data, array $options = array() ): array {
 		$supplierParty = array(
 			array(
 				'name'  => 'cbc:CustomerAssignedAccountID',
@@ -38,7 +51,12 @@ class AddressHandler extends AbstractUblHandler {
 		return $data;
 	}
 
-	public function return_supplier_party_details() {
+	/**
+	 * Returns the supplier party details for the UBL document.
+	 *
+	 * @return array
+	 */
+	public function return_supplier_party_details(): array {
 		$company    = $this->get_shop_data( 'name' );
 		$address    = $this->get_shop_data( 'address_line_1' );
 		$vat_number = $this->get_shop_data( 'vat_number' );
@@ -146,7 +164,14 @@ class AddressHandler extends AbstractUblHandler {
 		return $supplierPartyDetails;
 	}
 
-	public function return_customer_party( $data, $options = array() ) {
+	/**
+	 * Returns the customer party details for the UBL document.
+	 *
+	 * @param array $data    The data to be handled.
+	 * @param array $options Additional options for handling.
+	 * @return array
+	 */
+	public function return_customer_party( array $data, array $options = array() ): array {
 		$vat_number        = apply_filters( 'wpo_ips_edi_ubl_vat_number', wpo_wcpdf_get_order_customer_vat_number( $this->document->order ), $this->document->order );
 		$customerPartyName = $customerPartyContactName = $this->document->order->get_formatted_billing_full_name();
 		$billing_company   = $this->document->order->get_billing_company();
@@ -251,4 +276,5 @@ class AddressHandler extends AbstractUblHandler {
 
 		return $data;
 	}
+	
 }
