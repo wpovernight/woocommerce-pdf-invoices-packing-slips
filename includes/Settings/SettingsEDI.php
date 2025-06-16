@@ -332,19 +332,15 @@ class SettingsEDI {
 
 			echo '<div class="language-block" id="lang-' . esc_attr( $language ) . '" style="display:none;">';
 			echo '<table class="widefat striped">';
-			echo '<thead><tr><th>' . esc_html__( 'Field', 'woocommerce-pdf-invoices-packing-slips' ) . '</th><th>' . esc_html__( 'Value', 'woocommerce-pdf-invoices-packing-slips' ) . '</th></tr></thead>';
 			echo '<tbody>';
 
 			$rows = array(
-				__( 'Company name', 'woocommerce-pdf-invoices-packing-slips' )        => array( $company_name, true ),
-				__( 'Street address', 'woocommerce-pdf-invoices-packing-slips' )      => array( $line_1, true ),
-				__( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' )            => array( $postcode, true ),
-				__( 'City', 'woocommerce-pdf-invoices-packing-slips' )                => array( $city, true ),
-				__( 'State', 'woocommerce-pdf-invoices-packing-slips' )               => array( $state, false ),
-				__( 'Country', 'woocommerce-pdf-invoices-packing-slips' )             => array( $country, true ),
-				__( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' )          => array( $vat_number, true ),
-				__( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ) => array( $reg_number, false ),
-				__( 'Email', 'woocommerce-pdf-invoices-packing-slips' )               => array( $email, true ),
+				__( 'Company name', 'woocommerce-pdf-invoices-packing-slips' )   => array( $company_name, true ),
+				__( 'Street address', 'woocommerce-pdf-invoices-packing-slips' ) => array( $line_1, true ),
+				__( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' )       => array( $postcode, true ),
+				__( 'City', 'woocommerce-pdf-invoices-packing-slips' )           => array( $city, true ),
+				__( 'State', 'woocommerce-pdf-invoices-packing-slips' )          => array( $state, false ),
+				__( 'Country', 'woocommerce-pdf-invoices-packing-slips' )        => array( $country, true ),
 			);
 
 			foreach ( $rows as $label => $data ) {
@@ -363,7 +359,31 @@ class SettingsEDI {
 				echo '</tr>';
 			}
 
-			echo '</tbody></table>';
+			echo '</tbody><tfoot>';
+			
+			$footer = array(
+				__( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' )          => array( $vat_number, true ),
+				__( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ) => array( $reg_number, false ),
+				__( 'Email', 'woocommerce-pdf-invoices-packing-slips' )               => array( $email, true ),
+			);
+
+			foreach ( $footer as $label => $data ) {
+				$value    = $data[0];
+				$required = $data[1];
+
+				$display = $value ?: sprintf(
+					'<span style="color:%s">%s</span>',
+					$required ? '#d63638' : '#2271b1',
+					$required ? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' ),
+				);
+
+				echo '<tr>';
+				echo '<td>' . esc_html( $label ) . '</td>';
+				echo '<td>' . $display . '</td>';
+				echo '</tr>';
+			}
+			
+			echo '</tfoot></table>';
 			echo '</div>';
 		}
 	}
