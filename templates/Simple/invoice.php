@@ -25,6 +25,10 @@
 				<div class="shop-phone-number"><?php $this->shop_phone_number(); ?></div>
 			<?php endif; ?>
 			<?php do_action( 'wpo_wcpdf_after_shop_phone_number', $this->get_type(), $this->order ); ?>
+			<?php if ( ! empty( $this->get_shop_email_address() ) ) : ?>
+				<div class="shop_email_address"><?php $this->shop_email_address(); ?></div>
+			<?php endif; ?>
+			<?php do_action( 'wpo_wcpdf_after_shop_email_address', $this->get_type(), $this->order ); ?>
 		</td>
 	</tr>
 </table>
