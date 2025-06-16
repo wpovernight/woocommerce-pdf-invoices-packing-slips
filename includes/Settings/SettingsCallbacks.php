@@ -1043,16 +1043,19 @@ class SettingsCallbacks {
 
 		// Loop through each of the incoming options.
 		foreach ( $input as $key => $value ) {
-			// Check to see if the current option has a value. If so, process it.
-			if ( isset( $input[ $key ] ) ) {
-				if ( is_array( $input[ $key ] ) ) {
-					foreach ( $input[ $key ] as $sub_key => $sub_value ) {
-						$output[ $key ][$sub_key] = $input[ $key ][ $sub_key ];
+			if ( is_array( $value ) ) {
+				foreach ( $value as $sub_key => $sub_value ) {
+					if ( false !== strpos( $key, 'email' ) ) {
+						// Validate email
+						if ( is_email( $sub_value ) ) {
+							$output[ $key ][ $sub_key ] = $sub_value;
+						}
+					} else {
+						$output[ $key ][ $sub_key ] = $sub_value;
 					}
-					
-				} else {
-					$output[ $key ] = $input[ $key ];
 				}
+			} else {
+				$output[ $key ] = $value;
 			}
 		}
 
