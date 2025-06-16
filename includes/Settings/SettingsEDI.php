@@ -306,9 +306,9 @@ class SettingsEDI {
 		$general_settings = WPO_WCPDF()->settings->general;
 		$languages_data   = wpo_wcpdf_get_multilingual_languages();
 		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
-		
+
 		echo '<p>' . esc_html__( 'Please fill in your company identifiers. These details are essential for generating electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
-		
+
 		if ( count( $languages ) > 1 ) {
 			echo '<label for="wcpdf-language-selector"><strong>' . esc_html__( 'Select language', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong></label> ';
 			echo '<select id="wcpdf-language-selector" class="wcpdf-language-selector" style="margin-bottom: 10px;">';
@@ -319,72 +319,84 @@ class SettingsEDI {
 		}
 
 		foreach ( $languages as $language ) {
-			$company_name = $general_settings->get_setting( 'shop_name', $language ) ?? '';
-			$line_1       = $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '';
-			$postcode     = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
-			$city         = $general_settings->get_setting( 'shop_address_city', $language ) ?? '';
-			$country      = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
-			$states       = wpo_wcpdf_get_country_states( $country );
-			$state        = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
-			$vat_number   = $general_settings->get_setting( 'vat_number', $language ) ?? '';
-			$reg_number   = $general_settings->get_setting( 'coc_number', $language ) ?? '';
-			$email        = $general_settings->get_setting( 'shop_email_address', $language ) ?? '';
+			$fields = array(
+				'company_name' => array(
+					'label'    => __( 'Company name', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => true,
+				),
+				'line_1' => array(
+					'label'    => __( 'Street address', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => true,
+				),
+				'postcode' => array(
+					'label'    => __( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => true,
+				),
+				'city' => array(
+					'label'    => __( 'City', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => true,
+				),
+				'state' => array(
+					'label'    => __( 'State', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => false,
+				),
+				'country' => array(
+					'label'    => __( 'Country', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => true,
+				),
+				'vat_number' => array(
+					'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => true,
+				),
+				'reg_number' => array(
+					'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => false,
+				),
+				'email' => array(
+					'label'    => __( 'Email', 'woocommerce-pdf-invoices-packing-slips' ),
+					'required' => true,
+				),
+			);
+
+			// Get state only if country has states
+			$country  = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
+			$states   = wpo_wcpdf_get_country_states( $country );
+			$state    = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
+
+			// Map data
+			$data = array(
+				'company_name' => $general_settings->get_setting( 'shop_name', $language ) ?? '',
+				'line_1'       => $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '',
+				'postcode'     => $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '',
+				'city'         => $general_settings->get_setting( 'shop_address_city', $language ) ?? '',
+				'state'        => $state,
+				'country'      => $country,
+				'vat_number'   => $general_settings->get_setting( 'vat_number', $language ) ?? '',
+				'reg_number'   => $general_settings->get_setting( 'coc_number', $language ) ?? '',
+				'email'        => $general_settings->get_setting( 'shop_email_address', $language ) ?? '',
+			);
 
 			echo '<div class="language-block" id="lang-' . esc_attr( $language ) . '" style="display:none;">';
-			echo '<table class="widefat striped">';
-			echo '<tbody>';
+			echo '<table class="widefat striped"><tbody>';
 
-			$rows = array(
-				__( 'Company name', 'woocommerce-pdf-invoices-packing-slips' )   => array( $company_name, true ),
-				__( 'Street address', 'woocommerce-pdf-invoices-packing-slips' ) => array( $line_1, true ),
-				__( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' )       => array( $postcode, true ),
-				__( 'City', 'woocommerce-pdf-invoices-packing-slips' )           => array( $city, true ),
-				__( 'State', 'woocommerce-pdf-invoices-packing-slips' )          => array( $state, false ),
-				__( 'Country', 'woocommerce-pdf-invoices-packing-slips' )        => array( $country, true ),
-			);
-
-			foreach ( $rows as $label => $data ) {
-				$value    = $data[0];
-				$required = $data[1];
-
-				$display = $value ?: sprintf(
+			foreach ( $fields as $key => $field ) {
+				$value    = $data[ $key ];
+				$required = $field['required'];
+				$display  = $value ?: sprintf(
 					'<span style="color:%s">%s</span>',
 					$required ? '#d63638' : '#2271b1',
-					$required ? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' ),
+					$required
+						? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+						: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
 				);
 
 				echo '<tr>';
-				echo '<td>' . esc_html( $label ) . '</td>';
+				echo '<td>' . esc_html( $field['label'] ) . '</td>';
 				echo '<td>' . $display . '</td>';
 				echo '</tr>';
 			}
 
-			echo '</tbody><tfoot>';
-			
-			$footer = array(
-				__( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' )          => array( $vat_number, true ),
-				__( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ) => array( $reg_number, false ),
-				__( 'Email', 'woocommerce-pdf-invoices-packing-slips' )               => array( $email, true ),
-			);
-
-			foreach ( $footer as $label => $data ) {
-				$value    = $data[0];
-				$required = $data[1];
-
-				$display = $value ?: sprintf(
-					'<span style="color:%s">%s</span>',
-					$required ? '#d63638' : '#2271b1',
-					$required ? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' ),
-				);
-
-				echo '<tr>';
-				echo '<td>' . esc_html( $label ) . '</td>';
-				echo '<td>' . $display . '</td>';
-				echo '</tr>';
-			}
-			
-			echo '</tfoot></table>';
-			echo '</div>';
+			echo '</tbody></table></div>';
 		}
 	}
 
