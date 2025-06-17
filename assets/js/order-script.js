@@ -244,7 +244,7 @@ jQuery( function( $ ) {
 	}
 	
 	$( document ).on( 'input change', '.wcpdf-data-fields .number-specs-table input, .wcpdf-data-fields .number-table input', function() {
-		var $table = $( this ).closest( '.wcpdf-data-fields' );
+		let $table = $( this ).closest( '.wcpdf-data-fields' );
 		updatePreviewNumber( $table );
 	} );
 
