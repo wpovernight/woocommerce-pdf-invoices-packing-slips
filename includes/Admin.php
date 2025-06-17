@@ -854,6 +854,9 @@ class Admin {
 					'name'      => "_wcpdf_{$document->slug}_date",
 				);
 			}
+		} else {
+			unset( $data['number'] );
+			unset( $data['date'] );
 		}
 
 		if ( ! empty( $data['notes'] ) ) {
