@@ -34,7 +34,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 			);
 		}
 		
-		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons ) {
+		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons, $currency ) {
 			$item_tax_percentage = ! empty( $item['percentage'] )
 				? $item['percentage']
 				: 0;
