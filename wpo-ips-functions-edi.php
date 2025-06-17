@@ -367,6 +367,13 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl2p1\Invoice::class,
 					),
 				),
+				'peppol-bis-3p0' => array(
+					'name'      => 'PEPPOL BIS 3.0',
+					'hybrid'    => false,
+					'documents' => array(
+						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\PeppolBis3p0\Invoice::class,
+					),
+				),
 			),
 			'cii' => array(
 				'cii-d16b' => array(
