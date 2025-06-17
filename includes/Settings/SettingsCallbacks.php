@@ -1045,14 +1045,7 @@ class SettingsCallbacks {
 		foreach ( $input as $key => $value ) {
 			if ( is_array( $value ) ) {
 				foreach ( $value as $sub_key => $sub_value ) {
-					if ( false !== strpos( $key, 'email' ) ) {
-						// Validate email
-						if ( is_email( $sub_value ) ) {
-							$output[ $key ][ $sub_key ] = $sub_value;
-						}
-					} else {
-						$output[ $key ][ $sub_key ] = $sub_value;
-					}
+					$output[ $key ][ $sub_key ] = $sub_value;
 				}
 			} else {
 				$output[ $key ] = $value;
