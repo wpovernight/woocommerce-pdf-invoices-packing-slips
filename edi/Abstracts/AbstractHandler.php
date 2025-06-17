@@ -34,9 +34,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	/**
 	 * Get the order customer VAT number.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	protected function get_order_customer_vat_number(): string {
+	protected function get_order_customer_vat_number(): ?string {
 		return apply_filters(
 			'wpo_ips_edi_ubl_vat_number',
 			wpo_wcpdf_get_order_customer_vat_number( $this->document->order ),

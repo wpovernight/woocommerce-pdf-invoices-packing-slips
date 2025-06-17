@@ -12,48 +12,48 @@ interface UblPartyInterface {
 	 * Returns the party identification.
 	 * {cac:PartyIdentification}
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function get_party_identification(): array;
+	public function get_party_identification(): ?array;
 
 	/**
 	 * Returns the party name.
 	 * {cac:PartyName}
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function get_party_name(): array;
+	public function get_party_name(): ?array;
 	
 	/**
 	 * Returns the party postal address.
 	 * {cac:PostalAddress}
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function get_party_postal_address(): array;
+	public function get_party_postal_address(): ?array;
 	
 	/**
 	 * Returns the party tax scheme.
 	 * {cac:PartyTaxScheme}
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function get_party_tax_scheme(): array;
+	public function get_party_tax_scheme(): ?array;
 	
 	/**
 	 * Returns the party legal entity.
 	 * {cac:PartyLegalEntity}
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function get_party_legal_entity(): array;
+	public function get_party_legal_entity(): ?array;
 	
 	/**
 	 * Returns the party contact information.
 	 * {cac:Contact}
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function get_party_contact(): array;
+	public function get_party_contact(): ?array;
 
 }

@@ -108,12 +108,11 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$order             = $this->document->order;
 		$customerPartyName = $customerPartyContactName = $order ? $order->get_formatted_billing_full_name() : '';
 		$billingCompany    = $order ? $order->get_billing_company() : '';
+		$vatNumber         = $this->get_order_customer_vat_number();
 
 		if ( ! empty( $billingCompany ) ) {
 			$customerPartyName = $billingCompany;
 		}
-
-		$vatNumber = apply_filters( 'wpo_ips_edi_cii_vat_number', wpo_wcpdf_get_order_customer_vat_number( $order ), $order );
 
 		// Buyer Name
 		$buyerTradeParty = array(

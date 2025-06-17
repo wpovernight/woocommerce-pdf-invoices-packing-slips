@@ -95,17 +95,11 @@ class Invoice extends AbstractUblFormat {
 			),
 			'accounting_supplier_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntax\Ubl\Handlers\AddressHandler::class,
-				'options' => array(
-					'root' => 'cac:AccountingSupplierParty',
-				),
+				'handler' => \WPO\IPS\EDI\Syntax\Ubl\Handlers\AccountingSupplierPartyHandler::class,
 			),
 			'accounting_customer_party' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntax\Ubl\Handlers\AddressHandler::class,
-				'options' => array(
-					'root' => 'cac:AccountingCustomerParty',
-				),
+				'handler' => \WPO\IPS\EDI\Syntax\Ubl\Handlers\AccountingCustomerPartyHandler::class,
 			),
 			'delivery' => array(
 				'enabled' => false,
