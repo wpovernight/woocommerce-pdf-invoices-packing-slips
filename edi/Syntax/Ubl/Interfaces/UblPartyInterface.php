@@ -9,6 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 interface UblPartyInterface {
 
 	/**
+	 * Returns the party identification.
+	 * {cac:PartyIdentification}
+	 *
+	 * @return array
+	 */
+	public function get_party_identification(): array;
+
+	/**
 	 * Returns the party name.
 	 * {cac:PartyName}
 	 *
@@ -31,6 +39,14 @@ interface UblPartyInterface {
 	 * @return array
 	 */
 	public function get_party_tax_scheme(): array;
+	
+	/**
+	 * Returns the party legal entity.
+	 * {cac:PartyLegalEntity}
+	 *
+	 * @return array
+	 */
+	public function get_party_legal_entity(): array;
 	
 	/**
 	 * Returns the party contact information.

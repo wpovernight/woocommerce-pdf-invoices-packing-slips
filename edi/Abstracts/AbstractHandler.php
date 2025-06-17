@@ -32,6 +32,19 @@ abstract class AbstractHandler implements HandlerInterface {
 	abstract public function handle( array $data, array $options = array() ): array;
 	
 	/**
+	 * Get the order customer VAT number.
+	 *
+	 * @return string
+	 */
+	protected function get_order_customer_vat_number(): string {
+		return apply_filters(
+			'wpo_ips_edi_ubl_vat_number',
+			wpo_wcpdf_get_order_customer_vat_number( $this->document->order ),
+			$this->document->order
+		);
+	}
+	
+	/**
 	 * Get the shop data.
 	 *
 	 * @param string $suffix The data suffix (e.g., 'name', 'coc_number', 'phone_number', 'address_postcode').
