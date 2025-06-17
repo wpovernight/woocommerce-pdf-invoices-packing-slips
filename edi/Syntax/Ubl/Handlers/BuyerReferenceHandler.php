@@ -17,12 +17,12 @@ class BuyerReferenceHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$buyerReference = array(
+		$buyer_reference = array(
 			'name'  => 'cbc:BuyerReference',
 			'value' => $this->document->order->get_id(),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_buyer_reference', $buyerReference, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_buyer_reference', $buyer_reference, $data, $options, $this );
 
 		return $data;
 	}

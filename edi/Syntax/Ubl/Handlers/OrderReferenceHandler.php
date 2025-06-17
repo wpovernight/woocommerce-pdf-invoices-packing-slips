@@ -17,7 +17,7 @@ class OrderReferenceHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$orderReference = array(
+		$order_reference = array(
 			'name'  => 'cac:OrderReference',
 			'value' => array(
 				'name'  => 'cbc:ID',
@@ -25,7 +25,7 @@ class OrderReferenceHandler extends AbstractUblHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_order_reference', $orderReference, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_order_reference', $order_reference, $data, $options, $this );
 
 		return $data;
 	}

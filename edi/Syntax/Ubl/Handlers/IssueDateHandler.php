@@ -17,12 +17,12 @@ class IssueDateHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$issueDate = array(
+		$issue_date = array(
 			'name'  => 'cbc:IssueDate',
 			'value' => $this->document->order_document->get_date()->date_i18n( 'Y-m-d' ),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_issue_date', $issueDate, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_issue_date', $issue_date, $data, $options, $this );
 
 		return $data;
 	}

@@ -18,18 +18,19 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$items      = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
-		$taxReasons = TaxesSettings::get_available_reasons();
+		$items       = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+		$tax_reasons = TaxesSettings::get_available_reasons();
+		$currency    = $this->document->order->get_currency();
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$taxSubtotal      = [];
-			$taxDataContainer = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-			$taxDataKey       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
-			$lineTotalKey     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
-			$line_tax_data    = $item[ $taxDataContainer ];
+			$tax_subtotal       = array();
+			$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
+			$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
+			$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
+			$line_tax_data      = $item[ $tax_data_container ];
 
-			foreach ( $line_tax_data[ $taxDataKey ] as $tax_id => $tax ) {
+			foreach ( $line_tax_data[ $tax_data_key ] as $tax_id => $tax ) {
 				if ( empty( $tax ) ) {
 					$tax = 0;
 				}
@@ -38,75 +39,75 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					continue;
 				}
 
-				$taxOrderData = $this->document->order_tax_data[ $tax_id ];
+				$tax_order_data = $this->document->order_tax_data[ $tax_id ];
 
 				// Build the TaxCategory array
-				$taxCategory = array(
+				$tax_category = array(
 					array(
 						'name'  => 'cbc:ID',
-						'value' => strtoupper( $taxOrderData['category'] ),
+						'value' => strtoupper( $tax_order_data['category'] ),
 					),
 					array(
 						'name'  => 'cbc:Name',
-						'value' => $taxOrderData['name'],
+						'value' => $tax_order_data['name'],
 					),
 					array(
 						'name'  => 'cbc:Percent',
-						'value' => round( $taxOrderData['percentage'], 2 ),
+						'value' => round( $tax_order_data['percentage'], 2 ),
 					),
 				);
 
 				// Add TaxExemptionReason only if it's not empty
-				if ( ! empty( $taxOrderData['reason'] ) && 'none' !== $taxOrderData['reason'] ) {
-					$reasonKey     = $taxOrderData['reason'];
-					$reason        = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
-					$taxCategory[] = array(
+				if ( ! empty( $tax_order_data['reason'] ) && 'none' !== $tax_order_data['reason'] ) {
+					$reason_key     = $tax_order_data['reason'];
+					$reason         = ! empty( $tax_reasons[ $reason_key ] ) ? $tax_reasons[ $reason_key ] : $reason_key;
+					$tax_category[] = array(
 						'name'  => 'cbc:TaxExemptionReasonCode',
-						'value' => $reasonKey,
+						'value' => $reason_key,
 					);
-					$taxCategory[] = array(
+					$tax_category[] = array(
 						'name'  => 'cbc:TaxExemptionReason',
 						'value' => $reason,
 					);
 				}
 
 				// Place the TaxScheme after the TaxExemptionReason
-				$taxCategory[] = array(
+				$tax_category[] = array(
 					'name'  => 'cac:TaxScheme',
 					'value' => array(
 						array(
 							'name'  => 'cbc:ID',
-							'value' => strtoupper( $taxOrderData['scheme'] ),
+							'value' => strtoupper( $tax_order_data['scheme'] ),
 						),
 					),
 				);
 
-				$taxSubtotal[] = array(
+				$tax_subtotal[] = array(
 					'name'  => 'cac:TaxSubtotal',
 					'value' => array(
 						array(
 							'name'       => 'cbc:TaxableAmount',
-							'value'      => wc_round_tax_total( $item[ $lineTotalKey ] ),
+							'value'      => wc_round_tax_total( $item[ $line_total_key ] ),
 							'attributes' => array(
-								'currencyID' => $this->document->order->get_currency(),
+								'currencyID' => $currency,
 							),
 						),
 						array(
 							'name'       => 'cbc:TaxAmount',
 							'value'      => wc_round_tax_total( $tax ),
 							'attributes' => array(
-								'currencyID' => $this->document->order->get_currency(),
+								'currencyID' => $currency,
 							),
 						),
 						array(
 							'name'  => 'cac:TaxCategory',
-							'value' => $taxCategory,
+							'value' => $tax_category,
 						),
 					),
 				);
 			}
 
-			$invoiceLine = array(
+			$invoice_line = array(
 				'name'  => 'cac:InvoiceLine',
 				'value' => array(
 					array(
@@ -121,7 +122,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						'name'       => 'cbc:LineExtensionAmount',
 						'value'      => round( $item->get_total(), 2 ),
 						'attributes' => array(
-							'currencyID' => $this->document->order->get_currency(),
+							'currencyID' => $currency,
 						),
 					),
 					array(
@@ -131,10 +132,10 @@ class InvoiceLineHandler extends AbstractUblHandler {
 								'name'       => 'cbc:TaxAmount',
 								'value'      => wc_round_tax_total( $item->get_total_tax() ),
 								'attributes' => array(
-									'currencyID' => $this->document->order->get_currency(),
+									'currencyID' => $currency,
 								),
 							),
-							$taxSubtotal,
+							$tax_subtotal,
 						),
 					),
 					array(
@@ -153,7 +154,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 								'name'       => 'cbc:PriceAmount',
 								'value'      => round( $this->get_item_unit_price( $item ), 2 ),
 								'attributes' => array(
-									'currencyID' => $this->document->order->get_currency(),
+									'currencyID' => $currency,
 								),
 							),
 							array(
@@ -168,29 +169,13 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_line', $invoiceLine, $data, $options, $item, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_line', $invoice_line, $data, $options, $item, $this );
 
 			// Empty this array at the end of the loop per item, so data doesn't stack
-			$taxSubtotal = [];
+			$tax_subtotal = [];
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Get the unit price of an item
-	 *
-	 * @param \WC_Order_Item $item
-	 * @return int|float
-	 */
-	private function get_item_unit_price( \WC_Order_Item $item ) {
-		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
-			return $item->get_subtotal() / $item->get_quantity();
-		} elseif ( is_a( $item, 'WC_Order_Item_Shipping' ) || is_a( $item, 'WC_Order_Item_Fee' ) ) {
-			return $item->get_total();
-		} else {
-			return 0;
-		}
 	}
 
 }

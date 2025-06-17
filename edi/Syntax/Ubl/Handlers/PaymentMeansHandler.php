@@ -24,7 +24,7 @@ class PaymentMeansHandler extends AbstractUblHandler {
 			return $data;
 		}
 
-		$node = array(
+		$payment_means = array(
 			'name'  => 'cac:PaymentMeans',
 			'value' => array(
 				array(
@@ -36,7 +36,7 @@ class PaymentMeansHandler extends AbstractUblHandler {
 		
 		// Fallback: instruction note
 		if ( ! empty( $payment['title'] ) ) {
-			$node['value'][] = array(
+			$payment_means['value'][] = array(
 				'name'  => 'cbc:InstructionNote',
 				'value' => $payment['title'],
 			);
@@ -61,12 +61,13 @@ class PaymentMeansHandler extends AbstractUblHandler {
 				);
 			}
 
-			$node['value'][] = $account;
+			$payment_means['value'][] = $account;
 
 		// Add transaction ID
 		} elseif ( ! empty( $payment['transaction_id'] ) ) {
 			$name = ucfirst( $payment['method'] ); // PayPal, Stripe...
-			$node['value'][] = array(
+			
+			$payment_means['value'][] = array(
 				'name'  => 'cac:PayeeFinancialAccount',
 				'value' => array(
 					array(
@@ -81,7 +82,7 @@ class PaymentMeansHandler extends AbstractUblHandler {
 			);
 		}
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_payment_means', $node, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_payment_means', $payment_means, $options, $this );
 
 		return $data;
 	}

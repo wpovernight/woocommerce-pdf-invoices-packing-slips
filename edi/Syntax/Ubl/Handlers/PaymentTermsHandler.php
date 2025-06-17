@@ -17,7 +17,7 @@ class PaymentTermsHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$paymentTerms = array(
+		$payment_terms = array(
 			'name'  => 'cac:PaymentTerms',
 			'value' => array(
 				array(
@@ -27,7 +27,7 @@ class PaymentTermsHandler extends AbstractUblHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_payment_terms', $paymentTerms, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_payment_terms', $payment_terms, $data, $options, $this );
 
 		return $data;
 	}

@@ -18,12 +18,13 @@ class TaxTotalHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$taxReasons   = TaxesSettings::get_available_reasons();
-		$orderTaxData = $this->document->order_tax_data;
+		$tax_reasons    = TaxesSettings::get_available_reasons();
+		$order_tax_data = $this->document->order_tax_data;
+		$currency       = $this->document->order->get_currency();
 		
 		// Fallback if no tax data is available
-		if ( empty( $orderTaxData ) ) {
-			$orderTaxData = array(
+		if ( empty( $order_tax_data ) ) {
+			$order_tax_data = array(
 				0 => array(
 					'total_ex'  => $this->document->order->get_total(),
 					'total_tax' => 0,
@@ -33,17 +34,27 @@ class TaxTotalHandler extends AbstractUblHandler {
 			);
 		}
 		
-		$formatted_tax_array = array_map( function( $item ) use ( $taxReasons ) {
-			$itemTaxPercentage = ! empty( $item['percentage'] )              ? $item['percentage']              : 0;
-			$itemTaxCategory   = ! empty( $item['category'] )                ? $item['category']                : wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
-			$itemTaxReasonKey  = ! empty( $item['reason'] )                  ? $item['reason']                  : wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $this->document->order );
-			$itemTaxReason     = ! empty( $taxReasons[ $itemTaxReasonKey ] ) ? $taxReasons[ $itemTaxReasonKey ] : $itemTaxReasonKey;
-			$itemTaxScheme     = ! empty( $item['scheme'] )                  ? $item['scheme']                  : wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $this->document->order );
+		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons ) {
+			$item_tax_percentage = ! empty( $item['percentage'] )
+				? $item['percentage']
+				: 0;
+			$item_tax_category   = ! empty( $item['category'] )
+				? $item['category']
+				: wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
+			$item_tax_reason_key = ! empty( $item['reason'] )
+				? $item['reason']
+				: wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $this->document->order );
+			$item_tax_reason     = ! empty( $tax_reasons[ $item_tax_reason_key ] )
+				? $tax_reasons[ $item_tax_reason_key ]
+				: $item_tax_reason_key;
+			$item_tax_scheme     = ! empty( $item['scheme'] )
+				? $item['scheme']
+				: wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $this->document->order );
 			
-			$taxCategory = array(
+			$tax_category = array(
 				array(
 					'name'  => 'cbc:ID',
-					'value' => strtoupper( $itemTaxCategory ),
+					'value' => strtoupper( $item_tax_category ),
 				),
 				array(
 					'name'  => 'cbc:Name',
@@ -51,27 +62,27 @@ class TaxTotalHandler extends AbstractUblHandler {
 				),
 				array(
 					'name'  => 'cbc:Percent',
-					'value' => round( $itemTaxPercentage, 1 ),
+					'value' => round( $item_tax_percentage, 1 ),
 				),
 			);
 			
-			if ( 'none' !== $itemTaxReasonKey ) {
-				$taxCategory[] = array(
+			if ( 'none' !== $item_tax_reason_key ) {
+				$tax_category[] = array(
 					'name'  => 'cbc:TaxExemptionReasonCode',
-					'value' => $itemTaxReasonKey,
+					'value' => $item_tax_reason_key,
 				);
-				$taxCategory[] = array(
+				$tax_category[] = array(
 					'name'  => 'cbc:TaxExemptionReason',
-					'value' => $itemTaxReason,
+					'value' => $item_tax_reason,
 				);
 			}
 			
-			$taxCategory[] = array(
+			$tax_category[] = array(
 				'name'  => 'cac:TaxScheme',
 				'value' => array(
 					array(
 						'name'  => 'cbc:ID',
-						'value' => strtoupper( $itemTaxScheme ),
+						'value' => strtoupper( $item_tax_scheme ),
 					),
 				),
 			);
@@ -83,39 +94,39 @@ class TaxTotalHandler extends AbstractUblHandler {
 						'name'       => 'cbc:TaxableAmount',
 						'value'      => wc_round_tax_total( $item['total_ex'] ),
 						'attributes' => array(
-							'currencyID' => $this->document->order->get_currency(),
+							'currencyID' => $currency,
 						),
 					),
 					array(
 						'name'       => 'cbc:TaxAmount',
 						'value'      => wc_round_tax_total( $item['total_tax'] ),
 						'attributes' => array(
-							'currencyID' => $this->document->order->get_currency(),
+							'currencyID' => $currency,
 						),
 					),
 					array(
 						'name'  => 'cac:TaxCategory',
-						'value' => $taxCategory,
+						'value' => $tax_category,
 					),
 				),
 			);
-		}, apply_filters( 'wpo_ips_edi_ubl_order_tax_data', $orderTaxData, $data, $options, $this ) );
+		}, apply_filters( 'wpo_ips_edi_ubl_order_tax_data', $order_tax_data, $data, $options, $this ) );
 
-		$array = array(
+		$tax_total = array(
 			'name'  => 'cac:TaxTotal',
 			'value' => array(
 				array(
 					'name'       => 'cbc:TaxAmount',
 					'value'      => round( $this->document->order->get_total_tax(), 2 ),
 					'attributes' => array(
-						'currencyID' => $this->document->order->get_currency(),
+						'currencyID' => $currency,
 					),
 				),
 				$formatted_tax_array
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_tax_total', $array, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_tax_total', $tax_total, $data, $options, $this );
 
 		return $data;
 	}

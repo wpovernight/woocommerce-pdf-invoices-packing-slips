@@ -17,12 +17,12 @@ class AllowanceChargeHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$allowanceCharge = array(
+		$allowance_charge = array(
 			'name'  => 'cac:AllowanceCharge',
 			'value' => array(),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_allowance_charge', $allowanceCharge, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_allowance_charge', $allowance_charge, $data, $options, $this );
 
 		return $data;
 	}

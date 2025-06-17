@@ -17,7 +17,7 @@ class InvoiceTypeCodeHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$invoiceTypeCode = array(
+		$invoice_type_code = array(
 			'name'       => 'cbc:InvoiceTypeCode',
 			'value'      => $this->document->get_type_code(),
 			'attributes' => array(
@@ -26,7 +26,7 @@ class InvoiceTypeCodeHandler extends AbstractUblHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_type_code', $invoiceTypeCode, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_type_code', $invoice_type_code, $data, $options, $this );
 
 		return $data;
 	}

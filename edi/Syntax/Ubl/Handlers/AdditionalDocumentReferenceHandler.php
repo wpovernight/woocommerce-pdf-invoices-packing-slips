@@ -18,12 +18,14 @@ class AdditionalDocumentReferenceHandler extends AbstractUblHandler {
 	 */
 	public function handle( array $data, array $options = array() ): array {
 		if ( $this->document->order_document && $this->document->order_document->exists() && wpo_ips_edi_embed_encrypted_pdf() ) {
-			$additionalDocumentReference = array(
+			$number_instance = $this->document->order_document->get_number();
+			
+			$additional_document_reference = array(
 				'name'  => 'cac:AdditionalDocumentReference',
 				'value' => array(
 					array(
 						'name'  => 'cbc:ID',
-						'value' => ! empty( $this->document->order_document->get_number() ) ? $this->document->order_document->get_number()->get_formatted() : '',
+						'value' => ! empty( $number_instance ) ? $number_instance->get_formatted() : '',
 					),
 					array(
 						'name'  => 'cbc:DocumentType',
@@ -43,7 +45,7 @@ class AdditionalDocumentReferenceHandler extends AbstractUblHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_ips_edi_ubl_additional_document_reference', $additionalDocumentReference, $data, $options, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_ubl_additional_document_reference', $additional_document_reference, $data, $options, $this );
 		}
 
 		return $data;

@@ -125,6 +125,22 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $data;
 	}
+	
+	/**
+	 * Get the unit price of an item
+	 *
+	 * @param \WC_Order_Item $item
+	 * @return int|float
+	 */
+	protected function get_item_unit_price( \WC_Order_Item $item ) {
+		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+			return $item->get_subtotal() / $item->get_quantity();
+		} elseif ( is_a( $item, 'WC_Order_Item_Shipping' ) || is_a( $item, 'WC_Order_Item_Fee' ) ) {
+			return $item->get_total();
+		} else {
+			return 0;
+		}
+	}
 
 	/**
 	 * Normalize a raw date input into a specific format.
