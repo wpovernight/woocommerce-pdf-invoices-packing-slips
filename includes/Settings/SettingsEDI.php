@@ -398,6 +398,14 @@ class SettingsEDI {
 
 			echo '</tbody></table></div>';
 		}
+
+		echo '<div class="notice notice-info inline"><p>';
+		echo sprintf(
+			/* translators: %s General Settings */
+			__( 'You can fill in your company identifiers in the %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) ) . '">' . __( 'General Settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+		);
+		echo'</p></div>';
 	}
 
 }
