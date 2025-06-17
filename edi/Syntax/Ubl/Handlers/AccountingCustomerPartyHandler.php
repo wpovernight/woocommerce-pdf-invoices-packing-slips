@@ -36,7 +36,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 *
 	 * @return array
 	 */
-	private function get_customer_assigned_account_id(): array {
+	public function get_customer_assigned_account_id(): array {
 		$customerAssignedAccountId = array(
 			'name'  => 'cbc:CustomerAssignedAccountID',
 			'value' => '',
@@ -50,7 +50,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 *
 	 * @return array
 	 */
-	private function get_party(): array {
+	public function get_party(): array {
 		$customerParty = array(
 			'name'  => 'cac:Party',
 			'value' => array(
