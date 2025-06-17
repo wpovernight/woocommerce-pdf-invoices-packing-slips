@@ -1569,6 +1569,10 @@ class Admin {
 	 * @return void
 	 */
 	public function ajax_preview_formatted_number(): void {
+		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+		
 		$request       = stripslashes_deep( $_POST );
 		$prefix        = isset( $request['prefix'] )   ? sanitize_text_field( $request['prefix'] )   : '';
 		$suffix        = isset( $request['suffix'] )   ? sanitize_text_field( $request['suffix'] )   : '';

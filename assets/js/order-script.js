@@ -200,18 +200,19 @@ jQuery( function( $ ) {
 	} );
 	
 	function updatePreviewNumber( $table ) {
-		var prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
-		var suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
-		var padding  = $table.find( 'input[name$="_number_padding"]' ).val();
-		var plain    = $table.find( 'input[name$="_number_plain"]' ).val();
-		var document = $table.data( 'document' );
-		var orderId  = $table.data( 'order_id' );
+		let prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
+		let suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
+		let padding  = $table.find( 'input[name$="_number_padding"]' ).val();
+		let plain    = $table.find( 'input[name$="_number_plain"]' ).val();
+		let document = $table.data( 'document' );
+		let orderId  = $table.data( 'order_id' );
 
 		$.ajax( {
 			url:    wpo_wcpdf_ajax.ajaxurl,
 			method: 'POST',
 			data: {
 				action:   'wpo_wcpdf_preview_formatted_number',
+				security: wpo_wcpdf_ajax.nonce,
 				prefix:   prefix,
 				suffix:   suffix,
 				padding:  padding,
@@ -221,10 +222,10 @@ jQuery( function( $ ) {
 			},
 			success: function( response ) {
 				if ( response.success && response.data.formatted ) {
-					var $preview = $table.find( '.preview-number' );
-					var $code    = $preview.find( 'code' );
-					var current  = $preview.data( 'current' );
-					var updated  = response.data.formatted;
+					let $preview = $table.find( '.preview-number' );
+					let $code    = $preview.find( 'code' );
+					let current  = $preview.data( 'current' );
+					let updated  = response.data.formatted;
 
 					$code.text( updated );
 
