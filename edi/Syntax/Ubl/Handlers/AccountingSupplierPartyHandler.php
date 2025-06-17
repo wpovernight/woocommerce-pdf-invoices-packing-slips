@@ -2,12 +2,13 @@
 namespace WPO\IPS\EDI\Syntax\Ubl\Handlers;
 
 use WPO\IPS\EDI\Syntax\Ubl\Abstracts\AbstractUblHandler;
+use WPO\IPS\EDI\Syntax\Ubl\Interfaces\UblPartyInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class AccountingSupplierPartyHandler extends AbstractUblHandler {
+class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPartyInterface {
 
 	/**
 	 * Handle the data and return the formatted output.
@@ -20,7 +21,6 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler {
 		$accounting_supplier_party = array(
 			'name'  => 'cac:AccountingSupplierParty',
 			'value' => array(
-				$this->get_customer_assigned_account_id(),
 				$this->get_party(),
 			),
 		);
@@ -28,20 +28,6 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler {
 		$data[] = apply_filters( 'wpo_ips_edi_ubl_accounting_supplier_party', $accounting_supplier_party, $data, $options, $this );
 
 		return $data;
-	}
-
-	/**
-	 * Returns the customer assigned account ID for the supplier party.
-	 *
-	 * @return array
-	 */
-	private function get_customer_assigned_account_id(): array {
-		$customer_assigned_account_id = array(
-			'name'  => 'cbc:CustomerAssignedAccountID',
-			'value' => '',
-		);
-		
-		return apply_filters( 'wpo_ips_edi_ubl_customer_assigned_account_id', $customer_assigned_account_id, $this );
 	}
 	
 	/**

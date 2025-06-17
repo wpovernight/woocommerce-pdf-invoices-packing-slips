@@ -21,7 +21,6 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$accounting_customer_party = array(
 			'name'  => 'cac:AccountingCustomerParty',
 			'value' => array(
-				$this->get_customer_assigned_account_id(),
 				$this->get_party(),
 			),
 		);
@@ -29,20 +28,6 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$data[] = apply_filters( 'wpo_ips_edi_ubl_accounting_customer_party', $accounting_customer_party, $data, $options, $this );
 
 		return $data;
-	}
-	
-	/**
-	 * Returns the customer assigned account ID for the supplier party.
-	 *
-	 * @return array
-	 */
-	public function get_customer_assigned_account_id(): array {
-		$customer_assigned_account_id = array(
-			'name'  => 'cbc:CustomerAssignedAccountID',
-			'value' => '',
-		);
-		
-		return apply_filters( 'wpo_ips_edi_ubl_customer_assigned_account_id', $customer_assigned_account_id, $this );
 	}
 
 	/**
