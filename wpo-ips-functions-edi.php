@@ -364,14 +364,14 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 					'name'      => 'UBL 2.1',
 					'hybrid'    => false,
 					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\Ubl2p1\Invoice::class,
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\Ubl2p1\Invoice::class,
 					),
 				),
 				'peppol-bis-3p0' => array(
 					'name'      => 'PEPPOL BIS 3.0',
 					'hybrid'    => false,
 					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntax\Ubl\Formats\PeppolBis3p0\Invoice::class,
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0\Invoice::class,
 					),
 				),
 			),
@@ -380,7 +380,7 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 					'name'      => 'CII D16B',
 					'hybrid'    => false,
 					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntax\Cii\Formats\CiiD16B\Invoice::class,
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice::class,
 					),
 				),
 			),
