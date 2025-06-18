@@ -37,9 +37,16 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_endpoint_id(): ?array {
-		$endpoint_id = $this->get_order_customer_vat_number();
+		$user_id = $this->document->order->get_customer_id();
 
-		if ( empty( $endpoint_id ) ) {
+		if ( ! $user_id ) {
+			return null;
+		}
+
+		$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		$scheme_id   = get_user_meta( $user_id, 'peppol_eas', true );
+
+		if ( empty( $endpoint_id ) || empty( $scheme_id ) ) {
 			return null;
 		}
 
@@ -47,7 +54,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			'name'       => 'cbc:EndpointID',
 			'value'      => $endpoint_id,
 			'attributes' => array(
-				'schemeID' => '0002', // Scheme ID for VAT number
+				'schemeID' => $scheme_id,
 			),
 		);
 
