@@ -86,6 +86,62 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	}
 	
 	/**
+	 * Returns the party legal entity for the customer.
+	 *
+	 * @return array|null
+	 */
+	public function get_party_legal_entity(): ?array {
+		$billing_company = $this->document->order->get_billing_company();
+		$identifier      = $this->get_peppol_identifier();
+
+		// Only add PartyLegalEntity if there's a billing company or a valid identifier
+		if ( empty( $billing_company ) && empty( $identifier['value'] ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Both billing company and customer identifier are missing or invalid for PartyLegalEntity in order ID %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
+			return null;
+		}
+
+		$elements = array();
+
+		if ( ! empty( $billing_company ) ) {
+			$elements[] = array(
+				'name'  => 'cbc:RegistrationName',
+				'value' => wpo_ips_edi_sanitize_string( $billing_company ),
+			);
+		}
+
+		if ( ! empty( $identifier['value'] ) && ! empty( $identifier['schemeID'] ) ) {
+			$elements[] = array(
+				'name'       => 'cbc:CompanyID',
+				'value'      => $identifier['value'],
+				'attributes' => array(
+					'schemeID' => $identifier['schemeID'],
+				),
+			);
+		} else {
+			wpo_ips_edi_log(
+				sprintf(
+					'Customer identifier is missing or invalid for PartyLegalEntity in order ID %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
+		}
+
+		$party_legal_entity = array(
+			'name'  => 'cac:PartyLegalEntity',
+			'value' => $elements,
+		);
+
+		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );
+	}
+	
+	/**
 	 * Gets the Peppol identifier and scheme ID for the order's customer.
 	 *
 	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.

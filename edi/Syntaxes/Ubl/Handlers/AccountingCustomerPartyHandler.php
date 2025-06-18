@@ -157,12 +157,8 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			'name'  => 'cac:TaxScheme',
 			'value' => array(
 				array(
-					'name'       => 'cbc:ID',
-					'value'      => 'VAT',
-					'attributes' => array(
-						'schemeID'       => 'UN/ECE 5153',
-						'schemeAgencyID' => '6',
-					),
+					'name'  => 'cbc:ID',
+					'value' => 'VAT',
 				),
 			),
 		);
