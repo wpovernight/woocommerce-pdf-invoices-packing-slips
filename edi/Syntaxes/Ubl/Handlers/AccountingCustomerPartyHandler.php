@@ -143,6 +143,14 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 				'name'  => 'cbc:CompanyID',
 				'value' => $vat_number,
 			);
+		} else {
+			wpo_ips_edi_log(
+				sprintf(
+					'Customer VAT number is missing or invalid for PartyTaxScheme in order ID %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 		}
 
 		$values[] = array(
@@ -195,6 +203,14 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 				'name'  => 'cbc:CompanyID',
 				'value' => $vat_number,
 			);
+		} else {
+			wpo_ips_edi_log(
+				sprintf(
+					'Customer VAT number is missing or invalid for PartyLegalEntity in order ID %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 		}
 
 		$party_legal_entity = array(
@@ -225,12 +241,28 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 				'name'  => 'cbc:Name',
 				'value' => $name,
 			);
+		} else {
+			wpo_ips_edi_log(
+				sprintf(
+					'Customer name is missing or invalid for PartyContact in order ID %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 		}
 
 		if ( ! empty( $email ) ) {
 			$values[] = array(
 				'name'  => 'cbc:ElectronicMail',
 				'value' => $email,
+			);
+		} else {
+			wpo_ips_edi_log(
+				sprintf(
+					'Customer email is missing or invalid for PartyContact in order ID %d.',
+					$this->document->order->get_id()
+				),
+				'error'
 			);
 		}
 

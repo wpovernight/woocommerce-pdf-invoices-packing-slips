@@ -41,6 +41,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		$identifier = $this->get_peppol_identifier();
 
 		if ( ! $identifier ) {
+			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for supplier EndpointID.', 'error' );
 			return null;
 		}
 
@@ -64,6 +65,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		$identifier = $this->get_peppol_identifier();
 
 		if ( ! $identifier ) {
+			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for supplier PartyIdentification.', 'error' );
 			return null;
 		}
 
@@ -108,6 +110,5 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			'scheme' => $scheme,
 		);
 	}
-
 	
 }

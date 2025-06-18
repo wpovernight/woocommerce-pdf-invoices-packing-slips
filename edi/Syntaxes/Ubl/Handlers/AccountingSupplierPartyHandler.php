@@ -59,6 +59,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$company = $this->get_shop_data( 'name' );
 		
 		if ( empty( $company ) ) {
+			wpo_ips_edi_log( 'Supplier company name is missing for PartyName.', 'error' );
 			return null;
 		}
 		
@@ -139,6 +140,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 				'name'  => 'cbc:CompanyID',
 				'value' => $vat_number,
 			);
+		} else {
+			wpo_ips_edi_log( 'Supplier VAT number is missing for PartyTaxScheme.', 'error' );
+			return null;
 		}
 
 		$values[] = array(
@@ -171,30 +175,25 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	public function get_party_legal_entity(): ?array {
 		$company    = $this->get_shop_data( 'name' );
 		$coc_number = $this->get_shop_data( 'coc_number' );
+		$elements   = array();
 		
 		if ( empty( $company ) && empty( $coc_number ) ) {
+			wpo_ips_edi_log( 'Both company name and CoC number are missing for PartyLegalEntity.', 'error' );
 			return null;
-		}
-
-		$elements = array();
-
-		if ( ! empty( $company ) ) {
-			$elements[] = array(
-				'name'  => 'cbc:RegistrationName',
-				'value' => wpo_ips_edi_sanitize_string( $company ),
-			);
-		}
-
-		if ( ! empty( $coc_number ) ) {
-			$elements[] = array(
-				'name'  => 'cbc:CompanyID',
-				'value' => $coc_number,
-			);
 		}
 
 		$party_legal_entity = array(
 			'name'  => 'cac:PartyLegalEntity',
-			'value' => $elements,
+			'value' => array(
+				array(
+					'name'  => 'cbc:RegistrationName',
+					'value' => wpo_ips_edi_sanitize_string( $company ),
+				),
+				array(
+					'name'  => 'cbc:CompanyID',
+					'value' => $coc_number,
+				),
+			),
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_legal_entity', $party_legal_entity, $this );
@@ -209,6 +208,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$email_address = $this->get_shop_data( 'email_address' );
 
 		if ( empty( $email_address ) ) {
+			wpo_ips_edi_log( 'Supplier email address is missing for PartyContact.', 'error' );
 			return null;
 		}
 

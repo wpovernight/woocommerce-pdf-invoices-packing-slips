@@ -41,6 +41,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		$identifier = $this->get_peppol_identifier();
 
 		if ( ! $identifier ) {
+			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for customer EndpointID.', 'error' );
 			return null;
 		}
 
@@ -64,6 +65,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		$identifier = $this->get_peppol_identifier();
 
 		if ( ! $identifier ) {
+			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for customer PartyIdentification.', 'error' );
 			return null;
 		}
 
