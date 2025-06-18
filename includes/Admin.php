@@ -1274,16 +1274,16 @@ class Admin {
 			}
 
 			$form_data = array();
-
-			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				$is_new        = false === $invoice->exists();
+			$invoice   = wcpdf_get_invoice( $order );
+			
+			if ( $invoice ) {
+				$is_new        = ( false === $invoice->exists() );
 				$form_data     = stripslashes_deep( $_POST );
 				$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
 				
 				if ( empty( $document_data ) ) {
 					return;
 				}
-
 
 				$invoice->set_data( $document_data, $order );
 
