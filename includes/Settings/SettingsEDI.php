@@ -66,7 +66,7 @@ class SettingsEDI {
 				<h2 class="nav-tab-wrapper">
 					<?php
 						foreach ( $this->sections as $section => $title ) {
-							$active = ( $section == $active_section ) ? 'nav-tab-active' : '';
+							$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
 							printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
 						}
 					?>
