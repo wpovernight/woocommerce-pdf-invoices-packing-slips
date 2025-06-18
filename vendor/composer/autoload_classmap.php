@@ -43,6 +43,8 @@ return array(
     'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Handlers\\SupplyChainTradeTransaction\\IncludedSupplyChainTradeLineItemHandler' => $baseDir . '/edi/Syntaxes/Cii/Handlers/SupplyChainTradeTransaction/IncludedSupplyChainTradeLineItemHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Abstracts\\AbstractUblFormat' => $baseDir . '/edi/Syntaxes/Ubl/Abstracts/AbstractUblFormat.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Abstracts\\AbstractUblHandler' => $baseDir . '/edi/Syntaxes/Ubl/Abstracts/AbstractUblHandler.php',
+    'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\AccountingCustomerPartyHandler' => $baseDir . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/AccountingCustomerPartyHandler.php',
+    'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\AccountingSupplierPartyHandler' => $baseDir . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/AccountingSupplierPartyHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\CustomizationIdHandler' => $baseDir . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/CustomizationIdHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\ProfileIdHandler' => $baseDir . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/ProfileIdHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Invoice' => $baseDir . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Invoice.php',

@@ -81,6 +81,8 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Handlers\\SupplyChainTradeTransaction\\IncludedSupplyChainTradeLineItemHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Handlers/SupplyChainTradeTransaction/IncludedSupplyChainTradeLineItemHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Abstracts\\AbstractUblFormat' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Abstracts/AbstractUblFormat.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Abstracts\\AbstractUblHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Abstracts/AbstractUblHandler.php',
+        'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\AccountingCustomerPartyHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/AccountingCustomerPartyHandler.php',
+        'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\AccountingSupplierPartyHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/AccountingSupplierPartyHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\CustomizationIdHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/CustomizationIdHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Handlers\\ProfileIdHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Handlers/ProfileIdHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Formats\\PeppolBis3p0\\Invoice' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Formats/PeppolBis3p0/Invoice.php',

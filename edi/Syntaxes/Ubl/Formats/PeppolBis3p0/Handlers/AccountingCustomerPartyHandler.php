@@ -1,21 +1,21 @@
 <?php
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0\Handlers;
 
-use WPO\IPS\EDI\Syntaxes\Ubl\Handlers\AccountingSupplierPartyHandler as BaseAccountingSupplierPartyHandler;
+use WPO\IPS\EDI\Syntaxes\Ubl\Handlers\AccountingCustomerPartyHandler as BaseAccountingCustomerPartyHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler {
-	
+class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler {
+
 	/**
-	 * Returns the supplier party details for the UBL document.
+	 * Returns the customer party details for the UBL document.
 	 *
 	 * @return array
 	 */
 	public function get_party(): array {
-		$supplier_party = array(
+		$customer_party = array(
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
 				$this->get_party_endpoint_id(),
@@ -28,17 +28,16 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			) ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_supplier_party', $supplier_party, $this );
+		return apply_filters( 'wpo_ips_edi_ubl_customer_party', $customer_party, $this );
 	}
 	
 	/**
-	 * Returns the endpoint ID for the supplier.
+	 * Returns the endpoint ID for the customer.
 	 *
 	 * @return array|null
 	 */
 	public function get_party_endpoint_id(): ?array {
-		$edi_settings = wpo_ips_edi_get_settings();
-		$endpoint_id  = $edi_settings['peppol_endpoint_id'] ?? null;
+		$endpoint_id = $this->get_order_customer_vat_number();
 
 		if ( empty( $endpoint_id ) ) {
 			return null;
@@ -48,11 +47,11 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			'name'       => 'cbc:EndpointID',
 			'value'      => $endpoint_id,
 			'attributes' => array(
-				'schemeID' => '0088', // Scheme ID for Peppol Endpoint ID
+				'schemeID' => '0002', // Scheme ID for VAT number
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_endpoint_id', $endpoint, $this );
+		return apply_filters( 'wpo_ips_edi_ubl_customer_party_endpoint_id', $endpoint, $this );
 	}
 	
 }

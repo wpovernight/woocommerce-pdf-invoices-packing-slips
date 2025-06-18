@@ -195,6 +195,24 @@ class SettingsEDI {
 			$settings_fields = array_merge( $settings_fields, $settings_format );
 		}
 		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_endpoint_id',
+			'title'    => __( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'text_input',
+			'section'  => $section,
+			'args'     => array(
+				'option_name'       => $option_name,
+				'id'                => 'peppol_endpoint_id',
+				'description'       => __( 'Specify the Peppol Endpoint ID for this format.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+				),
+			),
+		);
+		
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'embed_encrypted_pdf',
