@@ -220,11 +220,15 @@ class SettingsEDI {
 			'args'     => array(
 				'option_name'       => $option_name,
 				'id'                => 'peppol_eas',
-				'options'           =>  array_merge(
+				'options'           => array_merge(
 					array(
 						'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
 					),
-					EN16931::get_electronic_address_schemes()
+					array_map(
+						fn( $label, $code ) => "[$code] $label",
+						EN16931::get_electronic_address_schemes(),
+						array_keys( EN16931::get_electronic_address_schemes() )
+					)
 				),
 				'description'       => __( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint below.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'custom_attributes' => array(

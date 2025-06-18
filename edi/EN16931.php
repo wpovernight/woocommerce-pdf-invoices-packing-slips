@@ -329,10 +329,6 @@ class EN16931 {
 			'EM'   => 'Electronic mail (SMPT)',
 		);
 		
-		foreach ( $defaults as $code => $description ) {
-			$defaults[ $code ] = sprintf( '[%s] %s', $code, $description );
-		}
-		
 		$extra = (array) apply_filters( 'wpo_ips_edi_electronic_address_schemes', array() );
 
 		return $extra + $defaults;
