@@ -322,6 +322,7 @@ class SettingsEDI {
 
 		if ( $order ) {
 			wpo_ips_edi_save_order_taxes( $order );
+			wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
 		}
 	}
 	

@@ -530,6 +530,7 @@ abstract class OrderDocument {
 		// EDI
 		if ( $this->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
 			wpo_ips_edi_save_order_taxes( $order );
+			wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
 		}
 
 		$note = $refund_id ? sprintf(

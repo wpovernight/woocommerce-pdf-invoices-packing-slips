@@ -38,19 +38,23 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_endpoint_id(): ?array {
-		$user_id = $this->document->order->get_customer_id();
+		$order       = $this->document->order;
+		$user_id     = $order->get_customer_id();
+		$endpoint_id = $order->get_meta( '_peppol_endpoint_id' );
+		$scheme_id   = $order->get_meta( '_peppol_eas' );
 
-		if ( ! $user_id ) {
-			return null;
+		// Fallback to user meta if empty
+		if ( empty( $endpoint_id ) && $user_id ) {
+			$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		}
-
-		$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		$scheme_id   = get_user_meta( $user_id, 'peppol_eas', true );
+		if ( empty( $scheme_id ) && $user_id ) {
+			$scheme_id = get_user_meta( $user_id, 'peppol_eas', true );
+		}
 
 		if ( empty( $endpoint_id ) || empty( $scheme_id ) ) {
 			return null;
 		}
-		
+
 		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
 		if ( ! in_array( $scheme_id, $valid_schemes, true ) ) {
 			return null;

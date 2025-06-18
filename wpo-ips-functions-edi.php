@@ -116,6 +116,37 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 }
 
 /**
+ * Maybe save EDI order customer Peppol data.
+ *
+ * @param \WC_Abstract_Order $order
+ * @return void
+ */
+function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $order ): void {
+	if ( false === strpos( wpo_ips_edi_get_current_format(), 'peppol' ) ) {
+		return; // only save for Peppol formats
+	}
+	
+	$user_id = $order->get_customer_id();
+
+	if ( ! $user_id ) {
+		return;
+	}
+
+	$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+	$scheme_id   = get_user_meta( $user_id, 'peppol_eas', true );
+
+	if ( ! empty( $endpoint_id ) ) {
+		$order->update_meta_data( '_peppol_endpoint_id', $endpoint_id );
+	}
+
+	if ( ! empty( $scheme_id ) ) {
+		$order->update_meta_data( '_peppol_eas', $scheme_id );
+	}
+	
+	$order->save_meta_data();
+}
+
+/**
  * Get EDI Maker
  * Use `wpo_ips_edi_maker` filter to change the EDI class (which can wrap another EDI library).
  *

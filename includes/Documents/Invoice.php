@@ -31,19 +31,30 @@ class Invoice extends OrderDocumentMethods {
 		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf', 'xml' ), $this );
 	}
 
-	public function use_historical_settings() {
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		// this setting is inverted on the frontend so that it needs to be actively/purposely enabled to be used
-		if (!empty($document_settings) && isset($document_settings['use_latest_settings'])) {
-			$use_historical_settings = false;
-		} else {
-			$use_historical_settings = true;
-		}
-		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', $use_historical_settings, $this );
+	/**
+	 * Checks if Invoice uses historical settings
+	 * 
+	 * @return void
+	 */
+	public function use_historical_settings(): bool {
+		return apply_filters(
+			'wpo_wcpdf_document_use_historical_settings',
+			wpo_wcpdf_is_document_using_historical_settings( $this->get_type() ),
+			$this
+		);
 	}
 
-	public function storing_settings_enabled() {
-		return apply_filters( 'wpo_wcpdf_document_store_settings', true, $this );
+	/**
+	 * Checks if Invoice has storing settings enabled
+	 * 
+	 * @return void
+	 */
+	public function storing_settings_enabled(): bool {
+		return apply_filters(
+			'wpo_wcpdf_document_store_settings',
+			true,
+			$this
+		);
 	}
 
 	/**
