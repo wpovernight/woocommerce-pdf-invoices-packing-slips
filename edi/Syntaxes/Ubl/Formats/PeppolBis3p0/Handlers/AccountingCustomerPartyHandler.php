@@ -2,6 +2,7 @@
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0\Handlers;
 
 use WPO\IPS\EDI\Syntaxes\Ubl\Handlers\AccountingCustomerPartyHandler as BaseAccountingCustomerPartyHandler;
+use WPO\IPS\EDI\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -47,6 +48,11 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		$scheme_id   = get_user_meta( $user_id, 'peppol_eas', true );
 
 		if ( empty( $endpoint_id ) || empty( $scheme_id ) ) {
+			return null;
+		}
+		
+		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
+		if ( ! in_array( $scheme_id, $valid_schemes, true ) ) {
 			return null;
 		}
 

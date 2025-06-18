@@ -2,6 +2,7 @@
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0\Handlers;
 
 use WPO\IPS\EDI\Syntaxes\Ubl\Handlers\AccountingSupplierPartyHandler as BaseAccountingSupplierPartyHandler;
+use WPO\IPS\EDI\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -39,8 +40,14 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	public function get_party_endpoint_id(): ?array {
 		$edi_settings = wpo_ips_edi_get_settings();
 		$endpoint_id  = $edi_settings['peppol_endpoint_id'] ?? null;
+		$scheme_id    = $edi_settings['peppol_eas'] ?? null;
 
-		if ( empty( $endpoint_id ) ) {
+		if ( empty( $endpoint_id ) || empty( $scheme_id ) ) {
+			return null;
+		}
+		
+		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
+		if ( ! in_array( $scheme_id, $valid_schemes, true ) ) {
 			return null;
 		}
 
@@ -48,7 +55,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			'name'       => 'cbc:EndpointID',
 			'value'      => $endpoint_id,
 			'attributes' => array(
-				'schemeID' => '0088', // Scheme ID for Peppol Endpoint ID
+				'schemeID' => $scheme_id,
 			),
 		);
 
