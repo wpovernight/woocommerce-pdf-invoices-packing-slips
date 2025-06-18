@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS;
 
+use WPO\IPS\EDI\EN16931;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -22,6 +24,9 @@ class Frontend {
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_pdf_link' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
 		add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_number' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
+		add_action( 'woocommerce_edit_account_form_fields', array( $this, 'add_edi_peppol_user_fields' ) ); // Woo 8.7+
+		add_action( 'woocommerce_save_account_details', array( $this, 'save_edi_peppol_user_fields' ) );    // Woo 3.6+
+		
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
@@ -208,6 +213,76 @@ class Frontend {
 	public function return_false(){
 		return false;
 	}
+	
+	/**
+	 * Add EDI Peppol user fields to the edit account form.
+	 * 
+	 * @return void
+	 */
+	public function add_edi_peppol_user_fields(): void {
+		if ( ! wpo_ips_edi_is_available() ) {
+			return;
+		}
+		
+		if ( false === strpos( wpo_ips_edi_get_current_format(), 'peppol' ) ) {
+			return; // only show for Peppol formats
+		}
+
+		$user_id         = get_current_user_id();
+		$eas             = get_user_meta( $user_id, 'peppol_eas', true );
+		$endpoint_id     = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		$eas_options_raw = EN16931::get_electronic_address_schemes();
+		$eas_options     = array_map(
+			fn( $label, $code ) => "[$code] $label",
+			$eas_options_raw,
+			array_keys( $eas_options_raw )
+		);
+		?>
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="peppol_eas"><?php esc_html_e( 'Electronic Address Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+			<select name="peppol_eas" id="peppol_eas" class="woocommerce-Input input-select">
+				<option value=""><?php esc_html_e( 'Select...', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
+				<?php foreach ( $eas_options as $code => $label ) : ?>
+					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $eas, $code ); ?>>
+						<?php echo esc_html( $label ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+		</p>
+
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="peppol_endpoint_id"><?php esc_html_e( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+			<input type="text" class="woocommerce-Input input-text" name="peppol_endpoint_id" id="peppol_endpoint_id" value="<?php echo esc_attr( $endpoint_id ); ?>" />
+			<small>
+				<?php
+				echo wp_kses_post( sprintf(
+					/* translators: %1$s: open link, %2$s: close link */
+					__( 'If you don\'t know the ID, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
+					'</a>'
+				) );
+				?>
+			</small>
+		</p>
+		<?php
+	}
+	
+	/**
+	 * Save EDI Peppol user fields from the Edit Account form.
+	 *
+	 * @param int $user_id The ID of the user being saved.
+	 * @return void
+	 */
+	public function save_edi_peppol_user_fields( int $user_id ): void {
+		if ( isset( $_POST['peppol_eas'] ) ) {
+			update_user_meta( $user_id, 'peppol_eas', sanitize_text_field( wp_unslash( $_POST['peppol_eas'] ) ) );
+		}
+
+		if ( isset( $_POST['peppol_endpoint_id'] ) ) {
+			update_user_meta( $user_id, 'peppol_endpoint_id', sanitize_text_field( wp_unslash( $_POST['peppol_endpoint_id'] ) ) );
+		}
+	}
+	
 }
 
 endif; // class_exists
