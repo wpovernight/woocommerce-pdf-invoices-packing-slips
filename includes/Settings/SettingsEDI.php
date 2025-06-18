@@ -83,7 +83,7 @@ class SettingsEDI {
 					submit_button();
 					break;
 				case 'identifiers':
-					$this->display_company_identifiers();
+					$this->output_company_identifiers();
 					break;
 				case 'taxes':
 					$this->output_taxes();
@@ -361,11 +361,11 @@ class SettingsEDI {
 	}
 	
 	/**
-	 * Display company identifiers.
+	 * Output company identifiers.
 	 *
 	 * @return void
 	 */
-	private function display_company_identifiers(): void {
+	private function output_company_identifiers(): void {
 		$general_settings = WPO_WCPDF()->settings->general;
 		$languages_data   = wpo_wcpdf_get_multilingual_languages();
 		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
