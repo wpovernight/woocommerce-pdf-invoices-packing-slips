@@ -307,9 +307,10 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
  * @param string           $message Error message to log.
  * @param string           $level   Log level: debug, info, notice, warning, error, critical, alert, emergency.
  * @param \Throwable|null  $e       (Optional) Exception or error object.
+ * @param string           $source  Source of the log entry, defaults to 'wpo-wcpdf'.
  * @return void
  */
-function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable $e = null ): void {
+function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable $e = null, string $source = 'wpo-wcpdf' ): void {
 	/**
 	 * Appends exception details to the message if available.
 	 *
@@ -331,12 +332,12 @@ function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable 
 	$message = $format_message( $message, $e );
 
 	if ( ! function_exists( 'wc_get_logger' ) ) {
-		error_log( '[WPO_WCPDF] ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[' . $source . '] ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		return;
 	}
 
 	$logger  = wc_get_logger();
-	$context = array( 'source' => 'wpo-wcpdf' );
+	$context = array( 'source' => $source );
 
 	$logger->log( $level, $message, $context );
 }

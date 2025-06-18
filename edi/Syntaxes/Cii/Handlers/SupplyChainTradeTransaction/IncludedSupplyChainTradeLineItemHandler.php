@@ -2,7 +2,7 @@
 namespace WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction;
 
 use WPO\IPS\EDI\Syntaxes\Cii\Abstracts\AbstractCiiHandler;
-use WPO\IPS\EDI\TaxesSettings;
+use WPO\IPS\EDI\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -20,7 +20,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 	public function handle( array $data, array $options = array() ): array {
 		$order       = $this->document->order;
 		$items       = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
-		$taxReasons  = TaxesSettings::get_available_reasons();
+		$taxReasons  = EN16931::get_available_reasons();
 		$taxData     = $this->document->order_tax_data;
 
 		foreach ( $items as $item_id => $item ) {

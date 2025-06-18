@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\EDI\TaxesSettings as EdiTaxSettings;
+use WPO\IPS\EDI\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -279,7 +279,7 @@ class Assets {
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => EdiTaxSettings::get_available_remarks(),
+						'remarks' => EN16931::get_available_remarks(),
 					)
 				);
 			}

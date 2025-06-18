@@ -2,7 +2,7 @@
 namespace WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction;
 
 use WPO\IPS\EDI\Syntaxes\Cii\Abstracts\AbstractCiiHandler;
-use WPO\IPS\EDI\TaxesSettings;
+use WPO\IPS\EDI\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -141,7 +141,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function getTradeTax(): array {
-		$taxReasons   = TaxesSettings::get_available_reasons();
+		$taxReasons   = EN16931::get_available_reasons();
 		$order        = $this->document->order;
 		$orderTaxData = $this->document->order_tax_data;
 

@@ -38,7 +38,7 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 	}
 
 	$tax_rate_class   = '';
-	$edi_tax_settings = \WPO\IPS\EDI\TaxesSettings::get_tax_settings();
+	$edi_tax_settings = wpo_ips_edi_get_tax_settings();
 
 	if ( ! is_null( $rate_id ) && class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
@@ -97,7 +97,7 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 					// store percentage in tax item meta
 					wc_update_order_item_meta( $item_id, '_wcpdf_rate_percentage', $tax_rate->tax_rate );
 
-					$edi_tax_settings = \WPO\IPS\EDI\TaxesSettings::get_tax_settings();
+					$edi_tax_settings = wpo_ips_edi_get_tax_settings();
 					$tax_fields       = array( 'category', 'scheme', 'reason' );
 
 					foreach ( $tax_fields as $field ) {
@@ -140,6 +140,15 @@ function wpo_ips_edi_get_maker() {
  */
 function wpo_ips_edi_get_settings(): array {
 	return get_option( 'wpo_ips_edi_settings', array() );
+}
+
+/**
+ * Get EDI Tax settings
+ *
+ * @return array
+ */
+function wpo_ips_edi_get_tax_settings(): array {
+	return get_option( 'wpo_ips_edi_tax_settings', array() );
 }
 
 /**

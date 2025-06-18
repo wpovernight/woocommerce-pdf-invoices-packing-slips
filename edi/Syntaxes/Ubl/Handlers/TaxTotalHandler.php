@@ -2,7 +2,7 @@
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Handlers;
 
 use WPO\IPS\EDI\Syntaxes\Ubl\Abstracts\AbstractUblHandler;
-use WPO\IPS\EDI\TaxesSettings;
+use WPO\IPS\EDI\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -18,7 +18,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$tax_reasons    = TaxesSettings::get_available_reasons();
+		$tax_reasons    = EN16931::get_available_reasons();
 		$order_tax_data = $this->document->order_tax_data;
 		$currency       = $this->document->order->get_currency();
 		

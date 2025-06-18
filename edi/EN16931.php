@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class TaxesSettings {
+class EN16931 {
 
 	/**
 	 * The standard.
@@ -21,397 +21,6 @@ class TaxesSettings {
 	 * @var string
 	 */
 	public static string $standard_version = '15.0';
-	
-	/**
-	 * Get the tax settings
-	 * 
-	 * @return array
-	 */
-	public static function get_tax_settings(): array {
-		return get_option( 'wpo_ips_edi_tax_settings', array() );
-	}
-	
-	/**
-	 * Save the tax settings
-	 * 
-	 * @param array $tax_settings
-	 * @return void
-	 */
-	public static function save_tax_settings( array $tax_settings = array() ): void {
-		update_option( 'wpo_ips_edi_tax_settings', $tax_settings );
-	}
-	
-	/**
-	 * Save taxes from AJAX request.
-	 *
-	 * @return void
-	 */
-	public static function ajax_save_taxes(): void {
-		if (
-			! isset( $_POST['action'] ) ||
-			'wpo_ips_edi_save_taxes' !== $_POST['action'] ||
-			! wp_verify_nonce( $_POST['nonce'], 'edi_save_taxes' )
-		) {
-			wp_send_json_error( __( 'Invalid request.', 'woocommerce-pdf-invoices-packing-slips' ) );
-		}
-		
-		$request      = stripslashes_deep( $_POST );
-		$tax_settings = isset( $request['wpo_ips_edi_tax_settings'] ) ? $request['wpo_ips_edi_tax_settings'] : array();
-		
-		self::save_tax_settings( $tax_settings );
-
-		wp_send_json_success( __( 'Tax settings saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ) );
-	}
-	
-	/**
-	 * Reload the tax table via AJAX.
-	 * 
-	 * @return void
-	 */
-	public static function ajax_reload_tax_table(): void {
-		if ( ! check_ajax_referer( 'wpo_ips_edi_nonce', 'nonce', false ) ) {
-			wp_send_json_error( __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) );
-		}
-		
-		$request   = stripslashes_deep( $_GET );
-		$tax_class = isset( $request['tax_class'] ) ? sanitize_text_field( $request['tax_class'] ) : '';
-		
-		ob_start();
-		self::output_table_for_tax_class( $tax_class );
-		$html = ob_get_clean();
-
-		echo $html;
-		wp_die();
-	}
-	
-	/**
-	 * Output the settings page for UBL taxes.
-	 * 
-	 * @return void
-	 */
-	public function output(): void {
-		?>
-		<p><?php esc_html_e( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-		<p>
-			<?php
-				echo wp_kses_post(
-					sprintf(
-						/* translators: %s: strong tag with note */
-						__( '%s: Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
-					)
-				);
-			?>
-		</p>
-		<p>
-			<?php
-				echo wp_kses_post(
-					sprintf(
-						'<strong>%s:</strong> <code>%s v%s</code>',
-						esc_html__( 'Code list standard', 'woocommerce-pdf-invoices-packing-slips' ),
-						esc_html( self::$standard ),
-						esc_html( self::$standard_version )
-					)
-				);
-			?>
-			<a href="#" id="edi-show-changelog"><?php esc_html_e( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-		</p>
-		<?php
-			// Show changelog if method exists
-			$method = 'get_changes_from_' . self::$standard . '_' . str_replace( '.', '_', self::$standard_version );
-			
-			if ( method_exists( $this, $method ) ) {
-				$changes = call_user_func( array( $this, $method ) );
-				echo '<ul id="edi-standard-changelog">';
-				foreach ( $changes as $change ) {
-					echo '<li>' . esc_html( $change ) . '</li>';
-				}
-				echo '</ul>';
-			}
-		?>
-		<p>
-			<?php
-				printf(
-					/* translators: %1$s: open link anchor, %2$s: close link anchor */
-					esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %1$sdocumentation%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/ubl-tax-classification-filter-hooks/" target="_blank" rel="noopener noreferrer">',
-					'</a>'
-				);
-			?>
-		</p>
-		<div id="edi-tax-save-notice" class="notice" style="display:none;"></div>
-		<?php
-			$rates                       = \WC_Tax::get_tax_rate_classes();
-			$formatted_rates             = array();
-			$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
-
-			foreach ( $rates as $rate ) {
-				if ( empty( $rate->slug ) ) {
-					continue;
-				}
-				
-				$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
-			}
-			
-			// Output tax class selector and action button
-			$this->output_tax_class_selector_and_action( $formatted_rates );
-			
-			// Output all tables wrapped in containers
-			foreach ( $formatted_rates as $slug => $name ) {
-				echo '<div class="edi-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
-				self::output_table_for_tax_class( $slug );
-				echo '</div>';
-			}
-			
-			// Output tax class selector and action button
-			$this->output_tax_class_selector_and_action( $formatted_rates );
-	}
-	
-	/**
-	 * Output the tax class selector and action button.
-	 * 
-	 * @param array $formatted_rates An associative array of tax class slugs and names.
-	 * @return void
-	 */
-	private function output_tax_class_selector_and_action( array $formatted_rates ): void {
-		?>
-		<p>
-			<select class="edi-tax-class-select">
-			<?php foreach ( $formatted_rates as $slug => $name ) : ?>
-				<option value="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $name ); ?></option>
-			<?php endforeach; ?>
-			</select>
-			<a class="button button-primary button-edi-save-taxes" data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>" data-action="wpo_ips_edi_save_taxes"><?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-		</p>
-		<?php
-	}
-
-	/**
-	 * Output the table for a specific tax class.
-	 *
-	 * @param string $slug The slug of the tax class.
-	 *
-	 * @return void
-	 */
-	public static function output_table_for_tax_class( string $slug ): void {
-		global $wpdb;
-		
-		$edi_tax_settings = self::get_tax_settings();
-		
-		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_class = %s;",
-				( $slug == 'standard' ) ? '' : $slug
-			)
-		);
-		
-		$allowed_html = array(
-			'select' => array(
-				'name'         => true,
-				'id'           => true,
-				'class'        => true,
-				'style'        => true,
-				'data-current' => true
-			),
-			'option' => array(
-				'value'        => true,
-				'selected'     => true,
-			)
-		);
-		?>
-
-		<table class="widefat striped">
-			<thead>
-				<tr>
-					<th><?php esc_html_e( 'Country code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'State code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'City', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Rate', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th width="10%"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th width="15%"><?php esc_html_e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-				</tr>
-			</thead>
-			<tbody id="rates">
-				<?php
-					if ( ! empty( $results ) ) {
-						foreach ( $results as $result ) {
-							$locationResults = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-								$wpdb->prepare(
-									"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;",
-									$result->tax_rate_id
-								)
-							);
-							$postcode = array();
-							$city     = array();
-							
-							foreach ( $locationResults as $locationResult ) {
-								if ( ! isset( $locationResult->location_type ) ) {
-									continue;
-								}
-								
-								switch ( $locationResult->location_type ) {
-									case 'postcode':
-										$postcode[] = $locationResult->location_code;
-										break;
-									case 'city':
-										$city[] = $locationResult->location_code;
-										break;
-								}
-							}
-							
-							$country          = empty( $result->tax_rate_country ) ? '*' : $result->tax_rate_country;
-							$state            = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
-							$postcode         = empty( $postcode ) ? '*' : implode( '; ', $postcode );
-							$city             = empty( $city ) ? '*' : implode( '; ', $city );
-							
-							$scheme           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
-							$scheme_default   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] ) ? $edi_tax_settings['class'][ $slug ]['scheme'] : 'default';
-							$scheme_code      = ( 'default' === $scheme ) ? $scheme_default : $scheme;
-
-							$category         = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] ) ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
-							$category_default = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
-							$category_code    = ( 'default' === $category ) ? $category_default : $category;
-							
-							$reason           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
-							$reason_default   = isset( $edi_tax_settings['class'][ $slug ]['reason'] ) ? $edi_tax_settings['class'][ $slug ]['reason'] : 'default';
-							$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
-							
-							echo '<tr>';
-							echo '<td>' . esc_html( $country ) . '</td>';
-							echo '<td>' . esc_html( $state ) . '</td>';
-							echo '<td>' . esc_html( $postcode ) . '</td>';
-							echo '<td>' . esc_html( $city ) . '</td>';
-							echo '<td>' . esc_html( wc_round_tax_total( $result->tax_rate ) ) . '%</td>';
-							echo '<td>';
-							$select_for_scheme = self::get_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
-							echo wp_kses( $select_for_scheme, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
-							echo '</td>';
-							echo '<td>';
-							$select_for_category = self::get_select_for( 'category', 'rate', $result->tax_rate_id, $category );
-							echo wp_kses( $select_for_category, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
-							echo '</td>';
-							echo '<td>';
-							$select_for_reason = self::get_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
-							echo wp_kses( $select_for_reason, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
-							echo '</td>';
-							echo '<td class="remark">';
-							
-							foreach ( self::get_available_remarks() as $field => $remarks ) {
-								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
-									if ( isset( $remarks[ ${$f} ] ) ) {
-										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
-									}
-								}
-							}
-							
-							echo '</td>';
-							echo '</tr>';
-						}
-					} else {
-						echo '<tr><td colspan="9">' . esc_html__( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
-					}
-				?>
-			</tbody>
-			<tfoot>
-				<tr>
-					<th colspan="5" style="text-align: right;"><?php esc_html_e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
-					<?php
-						$scheme   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] )   ? $edi_tax_settings['class'][ $slug ]['scheme']   : 'default';
-						$category = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
-						$reason   = isset( $edi_tax_settings['class'][ $slug ]['reason'] )   ? $edi_tax_settings['class'][ $slug ]['reason']   : 'default';
-					?>
-					<th>
-						<?php
-							$select_for_scheme = self::get_select_for( 'scheme', 'class', $slug, $scheme );
-							echo wp_kses( $select_for_scheme, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme ) . '</code></div>';
-						?>
-					</th>
-					<th>
-						<?php
-							$select_for_category = self::get_select_for( 'category', 'class', $slug, $category );
-							echo wp_kses( $select_for_category, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category ) . '</code></div>';
-						?>
-					</th>
-					<th>
-						<?php
-							$select_for_reason = self::get_select_for( 'reason', 'class', $slug, $reason );
-							echo wp_kses( $select_for_reason, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason ) . '</code></div>';
-						?>
-					</th>
-					<th class="remark">
-						<?php
-							foreach ( self::get_available_remarks() as $field => $remarks ) {
-								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
-									if ( isset( $remarks[ ${$f} ] ) ) {
-										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
-									}
-								}
-							}
-						?>
-					</th>
-				</tr>
-			</tfoot>
-		</table>
-		<?php
-	}
-
-	/**
-	 * Get select field for tax rate
-	 *
-	 * @param string $for
-	 * @param string $type
-	 * @param string $id
-	 * @param string $selected
-	 *
-	 * @return string
-	 */
-	public static function get_select_for( string $for, string $type, string $id, string $selected ): string {
-		$defaults = array(
-			'default' => __( 'Default', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
-		
-		switch ( $for ) {
-			case 'scheme':
-				$options = self::get_available_schemes();
-				break;
-			case 'category':
-				$options = self::get_available_categories();
-				break;
-			case 'reason':
-				$defaults['none'] = __( 'None', 'woocommerce-pdf-invoices-packing-slips' );
-				$options          = self::get_available_reasons();
-				break;
-			default:
-				$options = array();
-		}
-
-		$select  = '<select name="wpo_ips_edi_tax_settings[' . $type . '][' . $id . '][' . $for . ']" data-current="' . $selected . '" style="width:100%; box-sizing:border-box;">';
-		
-		foreach ( $defaults as $key => $value ) {
-			if ( 'class' === $type && 'default' === $key ) {
-				continue;
-			}
-			
-			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
-		}
-		
-		foreach ( $options as $key => $value ) {
-			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
-		}
-		
-		$select .= '</select>';
-		
-		return $select;
-	}
 
 	/**
 	 * Get available tax schemes according to standard.
@@ -615,75 +224,118 @@ class TaxesSettings {
 	}
 	
 	/**
-	 * Show notice about the standard update.
+	 * Get available electronic address schemes according to standard.
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public static function standard_update_notice(): void {
-		$edi_tax_settings = self::get_tax_settings();
-		$current_standard = $edi_tax_settings['standard'] ?? null;
-		$current_version  = $edi_tax_settings['standard_version'] ?? null;
-		$request          = stripslashes_deep( $_GET );
-
-		// Handle dismissal
-		if (
-			isset( $request['dismiss_standard_notice'], $request['dismiss_standard_notice_nonce'] ) &&
-			wp_verify_nonce( $request['dismiss_standard_notice_nonce'], 'dismiss_standard_notice' )
-		) {
-			self::update_standard_version();
-
-			wp_safe_redirect( remove_query_arg( array( 'dismiss_standard_notice', 'dismiss_standard_notice_nonce' ) ) );
-			exit;
-		}
-
-		// Only show notice if standard name or version is missing or outdated
-		if (
-			$current_standard === self::$standard &&
-			version_compare( $current_version, self::$standard_version, '>=' )
-		) {
-			return;
-		}
-
-		// Output notice
-		$dismiss_url = wp_nonce_url(
-			add_query_arg( 'dismiss_standard_notice', '1' ),
-			'dismiss_standard_notice',
-			'dismiss_standard_notice_nonce'
+	public static function get_electronic_address_schemes(): array {
+		$defaults = array(
+			'0002' => 'System Information et Repertoire des Entreprise et des Etablissements: SIRENE',
+			'0007' => 'Organisationsnummer',
+			'0009' => 'SIRET-CODE',
+			'0037' => 'LY-tunnus',
+			'0060' => 'Data Universal Numbering System (D-U-N-S Number)',
+			'0088' => 'EAN Location Code',
+			'0096' => 'The Danish Business Authority - P-number (DK:P)',
+			'0097' => 'FTI - Ediforum Italia, (EDIRA compliant)',
+			'0106' => 'Vereniging van Kamers van Koophandel en Fabrieken in Nederland (Association of Chambers of Commerce and Industry in the Netherlands), Scheme (EDIRA compliant)',
+			'0130' => 'Directorates of the European Commission',
+			'0135' => 'SIA Object Identifiers',
+			'0142' => 'SECETI Object Identifiers',
+			'0147' => 'Standard Company Code',
+			'0151' => 'Australian Business Number (ABN) Scheme',
+			'0154' => 'Identification number of economic subjects: (ICO)',
+			'0158' => 'Identification number of economic subject (ICO) Act on State Statistics of 29 November 2001, § 27',
+			'0170' => 'Teikoku Company Code',
+			'0177' => 'Odette International Limited',
+			'0183' => "Numéro d'identification suisse des enterprises (IDE), Swiss Unique Business Identification Number (UIDB)",
+			'0184' => 'DIGSTORG',
+			'0188' => 'Corporate Number of The Social Security and Tax Number System',
+			'0190' => "Dutch Originator's Identification Number",
+			'0191' => 'Centre of Registers and Information Systems of the Ministry of Justice',
+			'0192' => 'Enhetsregisteret ved Bronnoysundregisterne',
+			'0193' => 'UBL.BE party identifier',
+			'0194' => 'KOIOS Open Technical Dictionary',
+			'0195' => 'Singapore UEN identifier',
+			'0196' => 'Kennitala - Iceland legal id for individuals and legal entities',
+			'0198' => 'ERSTORG',
+			'0199' => 'Global legal entity identifier (GLEIF)',
+			'0200' => 'Legal entity code (Lithuania)',
+			'0201' => 'Codice Univoco Unità Organizzativa iPA',
+			'0202' => 'Indirizzo di Posta Elettronica Certificata',
+			'0203' => 'eDelivery Network Participant identifier',
+			'0204' => 'Leitweg-ID',
+			'0205' => 'CODDEST',
+			'0208' => "Numero d'entreprise / ondernemingsnummer / Unternehmensnummer",
+			'0209' => 'GS1 identification keys',
+			'0210' => 'CODICE FISCALE',
+			'0211' => 'PARTITA IVA',
+			'0212' => 'Finnish Organization Identifier',
+			'0213' => 'Finnish Organization Value Add Tax Identifier',
+			'0215' => 'Net service ID',
+			'0216' => 'OVTcode',
+			'0217' => 'The Netherlands Chamber of Commerce and Industry establishment number',
+			'0218' => 'Unified registration number (Latvia)',
+			'0221' => 'The registered number of the qualified invoice issuer',
+			'0225' => 'FRCTC ELECTRONIC ADDRESS',
+			'0230' => 'National e-Invoicing Framework',
+			'0235' => 'UAE Tax Identification Number (TIN)',
+			'0240' => 'Register of legal persons (in French : Répertoire des personnes morales)',
+			'9910' => 'Hungary VAT number',
+			'9913' => 'Business Registers Network',
+			'9914' => 'Österreichische Umsatzsteuer-Identifikationsnummer',
+			'9915' => 'Österreichisches Verwaltungs bzw. Organisationskennzeichen',
+			'9918' => 'SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL, TELECOMMUNICATION S.W.I.F.T',
+			'9919' => 'Kennziffer des Unternehmensregisters',
+			'9920' => 'Agencia Española de Administración Tributaria',
+			'9922' => 'Andorra VAT number',
+			'9923' => 'Albania VAT number',
+			'9924' => 'Bosnia and Herzegovina VAT number',
+			'9925' => 'Belgium VAT number',
+			'9926' => 'Bulgaria VAT number',
+			'9927' => 'Switzerland VAT number',
+			'9928' => 'Cyprus VAT number',
+			'9929' => 'Czech Republic VAT number',
+			'9930' => 'Germany VAT number',
+			'9931' => 'Estonia VAT number',
+			'9932' => 'United Kingdom VAT number',
+			'9933' => 'Greece VAT number',
+			'9934' => 'Croatia VAT number',
+			'9935' => 'Ireland VAT number',
+			'9936' => 'Liechtenstein VAT number',
+			'9937' => 'Lithuania VAT number',
+			'9938' => 'Luxemburg VAT number',
+			'9939' => 'Latvia VAT number',
+			'9940' => 'Monaco VAT number',
+			'9941' => 'Montenegro VAT number',
+			'9942' => 'Macedonia, the former Yugoslav Republic of VAT number',
+			'9943' => 'Malta VAT number',
+			'9944' => 'Netherlands VAT number',
+			'9945' => 'Poland VAT number',
+			'9946' => 'Portugal VAT number',
+			'9947' => 'Romania VAT number',
+			'9948' => 'Serbia VAT number',
+			'9949' => 'Slovenia VAT number',
+			'9950' => 'Slovakia VAT number',
+			'9951' => 'San Marino VAT number',
+			'9952' => 'Turkey VAT number',
+			'9953' => 'Holy See (Vatican City State) VAT number',
+			'9957' => 'French VAT number',
+			'9959' => 'Employer Identification Number (EIN, USA)',
+			'AN'   => 'O.F.T.P. (ODETTE File Transfer Protocol)',
+			'AQ'   => 'X.400 address for mail text',
+			'AS'   => 'AS2 exchange',
+			'AU'   => 'File Transfer Protocol',
+			'EM'   => 'Electronic mail (SMPT)',
 		);
-
-		echo '<div class="notice notice-info is-dismissible">';
-		echo '<p>' . wp_kses_post( sprintf(
-			/* translators: %1$s: plugin name, %2$s: standard name, %3$s: version number, %4$s: changelog link */
-			__( 'The %1$s E-Documents tax settings were updated to %2$s version %3$s. %4$s', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-			'<strong>' . esc_html( self::$standard ) . '</strong>',
-			'<code>' . esc_html( self::$standard_version ) . '</code>',
-			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi&section=taxes' ) ) . '">' . esc_html__( 'View changelog', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
-		) ) . '</p>';
-
-		echo '<p><a href="' . esc_url( $dismiss_url ) . '" class="button">' . esc_html__( 'Dismiss', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>';
-		echo '</div>';
-	}
-	
-	/**
-	 * Check if the standard name and version are set and update them if missing or outdated.
-	 *
-	 * @return void
-	 */
-	public static function update_standard_version(): void {
-		$edi_tax_settings = self::get_tax_settings();
-
-		if (
-			! isset( $edi_tax_settings['standard'] ) ||
-			$edi_tax_settings['standard'] !== self::$standard ||
-			! isset( $edi_tax_settings['standard_version'] ) ||
-			version_compare( $edi_tax_settings['standard_version'], self::$standard_version, '<' )
-		) {
-			$edi_tax_settings['standard']         = self::$standard;
-			$edi_tax_settings['standard_version'] = self::$standard_version;
-			
-			self::save_tax_settings( $edi_tax_settings );
+		
+		foreach ( $defaults as $code => $description ) {
+			$defaults[ $code ] = sprintf( '[%s] %s', $code, $description );
 		}
+		
+		$extra = (array) apply_filters( 'wpo_ips_edi_electronic_address_schemes', array() );
+
+		return $extra + $defaults;
 	}
 	
 	/**
