@@ -38,37 +38,83 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_endpoint_id(): ?array {
-		$order       = $this->document->order;
-		$user_id     = $order->get_customer_id();
-		$endpoint_id = $order->get_meta( '_peppol_endpoint_id' );
-		$scheme_id   = $order->get_meta( '_peppol_eas' );
+		$identifier = $this->get_peppol_identifier();
 
-		// Fallback to user meta if empty
-		if ( empty( $endpoint_id ) && $user_id ) {
-			$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		}
-		if ( empty( $scheme_id ) && $user_id ) {
-			$scheme_id = get_user_meta( $user_id, 'peppol_eas', true );
-		}
-
-		if ( empty( $endpoint_id ) || empty( $scheme_id ) ) {
-			return null;
-		}
-
-		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
-		if ( ! in_array( $scheme_id, $valid_schemes, true ) ) {
+		if ( ! $identifier ) {
 			return null;
 		}
 
 		$endpoint = array(
 			'name'       => 'cbc:EndpointID',
-			'value'      => $endpoint_id,
+			'value'      => $identifier['id'],
 			'attributes' => array(
-				'schemeID' => $scheme_id,
+				'schemeID' => $identifier['scheme'],
 			),
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_endpoint_id', $endpoint, $this );
+	}
+	
+	/**
+	 * Returns the PartyIdentification element for the customer.
+	 *
+	 * @return array|null
+	 */
+	public function get_party_identification(): ?array {
+		$identifier = $this->get_peppol_identifier();
+
+		if ( ! $identifier ) {
+			return null;
+		}
+
+		$party_id = array(
+			'name'     => 'cac:PartyIdentification',
+			'children' => array(
+				array(
+					'name'       => 'cbc:ID',
+					'value'      => $identifier['id'],
+					'attributes' => array(
+						'schemeID' => $identifier['scheme'],
+					),
+				),
+			),
+		);
+
+		return apply_filters( 'wpo_ips_edi_ubl_customer_party_identification', $party_id, $this );
+	}
+	
+	/**
+	 * Gets the Peppol identifier and scheme ID for the order's customer.
+	 *
+	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
+	 */
+	private function get_peppol_identifier(): ?array {
+		$order   = $this->document->order;
+		$user_id = $order->get_customer_id();
+
+		$id     = $order->get_meta( '_peppol_endpoint_id' );
+		$scheme = $order->get_meta( '_peppol_eas' );
+
+		if ( empty( $id ) && $user_id ) {
+			$id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		}
+		if ( empty( $scheme ) && $user_id ) {
+			$scheme = get_user_meta( $user_id, 'peppol_eas', true );
+		}
+
+		if ( empty( $id ) || empty( $scheme ) ) {
+			return null;
+		}
+
+		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
+		if ( ! in_array( $scheme, $valid_schemes, true ) ) {
+			return null;
+		}
+
+		return array(
+			'id'     => $id,
+			'scheme' => $scheme,
+		);
 	}
 	
 }

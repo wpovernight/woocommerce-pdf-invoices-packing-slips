@@ -39,7 +39,6 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$customer_party = array(
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
-				$this->get_party_identification(),
 				$this->get_party_name(),
 				$this->get_party_postal_address(),
 				$this->get_party_tax_scheme(),
@@ -49,34 +48,6 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party', $customer_party, $this );
-	}
-	
-	/**
-	 * Returns the party identification for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_identification(): ?array {
-		$vat_number = $this->get_order_customer_vat_number();
-
-		if ( empty( $vat_number ) ) {
-			return null;
-		}
-
-		$party_identification = array(
-			'name'       => 'cac:PartyIdentification',
-			'value'      => array(
-				array(
-					'name'       => 'cbc:ID',
-					'attributes' => array(
-						'schemeID' => '0088', // VAT
-					),
-					'value'      => $vat_number,
-				),
-			),
-		);
-
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_identification', $party_identification, $this );
 	}
 	
 	/**

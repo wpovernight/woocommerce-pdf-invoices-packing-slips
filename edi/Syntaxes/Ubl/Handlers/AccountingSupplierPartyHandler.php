@@ -39,7 +39,6 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$supplier_party = array(
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
-				$this->get_party_identification(),
 				$this->get_party_name(),
 				$this->get_party_postal_address(),
 				$this->get_party_tax_scheme(),
@@ -49,35 +48,6 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party', $supplier_party, $this );
-	}
-	
-	/**
-	 * Returns the party identification for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_identification(): ?array {
-		$vat_number = $this->get_shop_data( 'vat_number' );
-		$coc_number = $this->get_shop_data( 'coc_number' );
-
-		// Prefer VAT number, fallback to CoC number
-		$identifier = $vat_number ?: $coc_number;
-
-		if ( empty( $identifier ) ) {
-			return null;
-		}
-
-		$party_identification = array(
-			'name'  => 'cac:PartyIdentification',
-			'value' => array(
-				array(
-					'name'  => 'cbc:ID',
-					'value' => $identifier,
-				),
-			),
-		);
-
-		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_identification', $party_identification, $this );
 	}
 	
 	/**

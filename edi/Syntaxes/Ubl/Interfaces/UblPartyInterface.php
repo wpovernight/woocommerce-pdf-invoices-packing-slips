@@ -9,14 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 interface UblPartyInterface {
 
 	/**
-	 * Returns the party identification.
-	 * {cac:PartyIdentification}
-	 *
-	 * @return array|null
-	 */
-	public function get_party_identification(): ?array;
-
-	/**
 	 * Returns the party name.
 	 * {cac:PartyName}
 	 *

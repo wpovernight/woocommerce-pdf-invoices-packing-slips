@@ -38,28 +38,76 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_endpoint_id(): ?array {
-		$edi_settings = wpo_ips_edi_get_settings();
-		$endpoint_id  = $edi_settings['peppol_endpoint_id'] ?? null;
-		$scheme_id    = $edi_settings['peppol_eas'] ?? null;
+		$identifier = $this->get_peppol_identifier();
 
-		if ( empty( $endpoint_id ) || empty( $scheme_id ) ) {
-			return null;
-		}
-		
-		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
-		if ( ! in_array( $scheme_id, $valid_schemes, true ) ) {
+		if ( ! $identifier ) {
 			return null;
 		}
 
 		$endpoint = array(
 			'name'       => 'cbc:EndpointID',
-			'value'      => $endpoint_id,
+			'value'      => $identifier['id'],
 			'attributes' => array(
-				'schemeID' => $scheme_id,
+				'schemeID' => $identifier['scheme'],
 			),
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_endpoint_id', $endpoint, $this );
 	}
+	
+	/**
+	 * Returns the PartyIdentification element for the supplier.
+	 *
+	 * @return array|null
+	 */
+	public function get_party_identification(): ?array {
+		$identifier = $this->get_peppol_identifier();
+
+		if ( ! $identifier ) {
+			return null;
+		}
+
+		$party_id = array(
+			'name'     => 'cac:PartyIdentification',
+			'children' => array(
+				array(
+					'name'       => 'cbc:ID',
+					'value'      => $identifier['id'],
+					'attributes' => array(
+						'schemeID' => $identifier['scheme'],
+					),
+				),
+			),
+		);
+
+		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_identification', $party_id, $this );
+	}
+	
+	/**
+	 * Gets the Peppol identifier and scheme ID for the supplier from plugin settings.
+	 *
+	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
+	 */
+	private function get_peppol_identifier(): ?array {
+		$settings = wpo_ips_edi_get_settings();
+
+		$id     = $settings['peppol_endpoint_id'] ?? null;
+		$scheme = $settings['peppol_eas'] ?? null;
+
+		if ( empty( $id ) || empty( $scheme ) ) {
+			return null;
+		}
+
+		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
+		if ( ! in_array( $scheme, $valid_schemes, true ) ) {
+			return null;
+		}
+
+		return array(
+			'id'     => $id,
+			'scheme' => $scheme,
+		);
+	}
+
 	
 }
