@@ -117,6 +117,9 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					array(
 						'name'  => 'cbc:InvoicedQuantity',
 						'value' => $item->get_quantity(),
+						'attributes' => array(
+							'unitCode' => 'C62', // https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/
+						),
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
@@ -161,7 +164,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 								'name'       => 'cbc:BaseQuantity',
 								'value'      => 1, // value should be 1, as we're using the unit price
 								'attributes' => array(
-									'unitCode' => 'EA', // EA = Each (https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/)
+									'unitCode' => 'C62', // https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/
 								),
 							),
 						),
