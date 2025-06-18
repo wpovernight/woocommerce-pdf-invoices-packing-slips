@@ -17,12 +17,12 @@ class ProfileIdHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$profileId = array(
+		$profile_id = array(
 			'name'  => 'cbc:ProfileID',
 			'value' => 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0',
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_profile_id', $profileId, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_profile_id', $profile_id, $data, $options, $this );
 
 		return $data;
 	}

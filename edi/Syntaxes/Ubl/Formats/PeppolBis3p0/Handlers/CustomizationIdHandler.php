@@ -17,12 +17,12 @@ class CustomizationIdHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$customizationId = array(
+		$customization_id = array(
 			'name'  => 'cbc:CustomizationID',
 			'value' => 'urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0',
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_customization_id', $customizationId, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_customization_id', $customization_id, $data, $options, $this );
 
 		return $data;
 	}
