@@ -18,18 +18,18 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$applicableHeaderTradeSettlement = array(
+		$applicable_header_trade_settlement = array(
 			'name'  => 'ram:ApplicableHeaderTradeSettlement',
-			'value' => array_merge(
-				array( $this->getPaymentReference() ),
-				array( $this->getPaymentMeans() ),
-				$this->getTradeTax(),
-				array( $this->getPaymentTerms() ),
-				array( $this->getMonetarySummation() )
-			),
+			'value' => array_filter( array(
+				$this->get_payment_reference(),
+				$this->get_payment_means(),
+				$this->get_trade_tax(),
+				$this->get_payment_terms(),
+				$this->get_monetary_summation(),
+			) ),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_applicable_header_trade_settlement', $applicableHeaderTradeSettlement, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_applicable_header_trade_settlement', $applicable_header_trade_settlement, $data, $options, $this );
 
 		return $data;
 	}
@@ -37,44 +37,40 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	/**
 	 * Get the payment reference for the order.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	private function getPaymentReference(): array {
-		$order = $this->document->order;
-
-		if ( ! $order ) {
-			return array();
-		}
-		
+	private function get_payment_reference(): ?array {
+		$order     = $this->document->order;
 		$reference = $order->get_order_number(); // Default to WooCommerce order number
 		$reference = apply_filters( 'wpo_ips_edi_cii_payment_reference', $reference, $order, $this );
 
 		if ( empty( $reference ) ) {
-			return array();
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeSettlementHandler: Payment reference is empty.' );
+			return null;
 		}
 		
-		$paymentReference = array(
+		$payment_reference = array(
 			'name'  => 'ram:PaymentReference',
 			'value' => wpo_ips_edi_sanitize_string( $reference ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_payment_reference', $paymentReference, $this );
+		return apply_filters( 'wpo_ips_edi_cii_payment_reference', $payment_reference, $this );
 	}
 	
 	/**
 	 * Get the payment means data for the order.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	private function getPaymentMeans(): array {
+	private function get_payment_means(): ?array {
 		$payment = $this->get_payment_means_data();
 
 		// If no usable payment data, exit early
 		if ( empty( $payment['type_code'] ) ) {
-			return array();
+			return null;
 		}
 
-		$node = array(
+		$payment_means = array(
 			'name'  => 'ram:SpecifiedTradeSettlementPaymentMeans',
 			'value' => array(
 				array(
@@ -103,12 +99,12 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				);
 			}
 
-			$node['value'][] = $account;
+			$payment_means['value'][] = $account;
 		}
 
 		// Add transaction ID if applicable (e.g., PayPal, Stripe)
 		elseif ( ! empty( $payment['transaction_id'] ) ) {
-			$node['value'][] = array(
+			$payment_means['value'][] = array(
 				'name'  => 'ram:PayeePartyCreditorFinancialAccount',
 				'value' => array(
 					array(
@@ -121,7 +117,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 		// Add BIC if available (only relevant when IBAN is used)
 		if ( ! empty( $payment['bic'] ) ) {
-			$node['value'][] = array(
+			$payment_means['value'][] = array(
 				'name'  => 'ram:PayeeSpecifiedCreditorFinancialInstitution',
 				'value' => array(
 					array(
@@ -132,22 +128,22 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			);
 		}
 
-		return apply_filters( 'wpo_ips_edi_cii_payment_means', $node, $this );
+		return apply_filters( 'wpo_ips_edi_cii_payment_means', $payment_means, $this );
 	}
 	
 	/**
 	 * Get the trade tax data for the order.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function getTradeTax(): array {
-		$taxReasons   = EN16931::get_available_reasons();
-		$order        = $this->document->order;
-		$orderTaxData = $this->document->order_tax_data;
+	public function get_trade_tax(): ?array {
+		$tax_reasons    = EN16931::get_available_reasons();
+		$order          = $this->document->order;
+		$order_tax_data = $this->document->order_tax_data;
 
 		// Fallback
-		if ( empty( $orderTaxData ) ) {
-			$orderTaxData = array(
+		if ( empty( $order_tax_data ) ) {
+			$order_tax_data = array(
 				0 => array(
 					'total_ex'  => $order->get_total(),
 					'total_tax' => 0,
@@ -157,21 +153,31 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			);
 		}
 		
-		$orderTaxData = apply_filters( 'wpo_ips_edi_cii_order_tax_data', $orderTaxData, $this );
-		if ( empty( $orderTaxData ) ) {
-			return array(); // No tax data available
+		$order_tax_data = apply_filters( 'wpo_ips_edi_cii_order_tax_data', $order_tax_data, $this );
+		if ( empty( $order_tax_data ) ) {
+			return null; // No tax data available
 		}
 		
-		$tradeTax = array();
+		$trade_tax = array();
 
-		foreach ( $orderTaxData as $item ) {
-			$percent   = ! empty( $item['percentage'] )       ? $item['percentage']       : 0;
-			$category  = ! empty( $item['category'] )         ? $item['category']         : wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
-			$reasonKey = ! empty( $item['reason'] )           ? $item['reason']           : wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order );
-			$reason    = ! empty( $taxReasons[ $reasonKey ] ) ? $taxReasons[ $reasonKey ] : $reasonKey;
-			$scheme    = ! empty( $item['scheme'] )           ? $item['scheme']           : wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order );
+		foreach ( $order_tax_data as $item ) {
+			$percent    = ! empty( $item['percentage'] )
+				? $item['percentage']
+				: 0;
+			$category   = ! empty( $item['category'] )
+				? $item['category']
+				: wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
+			$reason_key = ! empty( $item['reason'] )
+				? $item['reason']
+				: wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order );
+			$reason     = ! empty( $tax_reasons[ $reason_key ] )
+				? $tax_reasons[ $reason_key ]
+				: $reason_key;
+			$scheme     = ! empty( $item['scheme'] )
+				? $item['scheme']
+				: wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order );
 
-			$taxNode = array(
+			$tax_node = array(
 				'name'  => 'ram:ApplicableTradeTax',
 				'value' => array(
 					array(
@@ -204,35 +210,35 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			);
 
 			// Exemption if any
-			if ( 'none' !== $reasonKey ) {
-				$taxNode['value'][] = array(
+			if ( 'none' !== $reason_key ) {
+				$tax_node['value'][] = array(
 					'name'  => 'ram:ExemptionReasonCode',
-					'value' => $reasonKey,
+					'value' => $reason_key,
 				);
-				$taxNode['value'][] = array(
+				$tax_node['value'][] = array(
 					'name'  => 'ram:ExemptionReason',
 					'value' => $reason,
 				);
 			}
 
-			$tradeTax[] = apply_filters( 'wpo_ips_edi_cii_trade_tax', $taxNode, $this );
+			$trade_tax[] = $tax_node;
 		}
 
-		return $tradeTax;
+		return apply_filters( 'wpo_ips_edi_cii_trade_tax', $trade_tax, $this );
 	}
 	
 	/**
 	 * Get the payment terms for the order.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	private function getPaymentTerms(): array {
+	private function get_payment_terms(): ?array {
 		$due_date_timestamp = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;
 
 		if ( empty( $due_date_timestamp ) ) {
-			return array();
+			return null;
 		}
 		
 		$date_format_code = $this->get_date_format_code();
@@ -240,10 +246,11 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		$due_date         = $this->normalize_date( $due_date_timestamp, $php_date_format );
 		
 		if ( ! $this->validate_date_format( $due_date, $date_format_code ) ) {
-			return array();
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeSettlementHandler: Invalid due date format.' );
+			return null;
 		}
 
-		$paymentTerms = array(
+		$payment_terms = array(
 			'name'  => 'ram:SpecifiedTradePaymentTerms',
 			'value' => array(
 				array(
@@ -261,24 +268,24 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_payment_terms', $paymentTerms, $this );
+		return apply_filters( 'wpo_ips_edi_cii_payment_terms', $payment_terms, $this );
 	}
 	
 	/**
 	 * Get the monetary summation for the order.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	public function getMonetarySummation(): array {
-		$order    = $this->document->order;
-		$currency = $order ? $order->get_currency() : get_woocommerce_currency();
+	public function get_monetary_summation(): ?array {
+		$order         = $this->document->order;
+		$currency      = $order ? $order->get_currency() : get_woocommerce_currency();
 
 		$total         = $order->get_total();
 		$total_inc_tax = $total;
 		$total_tax     = $order->get_total_tax();
 		$total_exc_tax = $total - $total_tax;
 
-		$monetarySummation = array(
+		$monetary_summation = array(
 			'name'  => 'ram:SpecifiedTradeSettlementHeaderMonetarySummation',
 			'value' => array(
 				array(
@@ -309,7 +316,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_monetary_summation', $monetarySummation, $this );
+		return apply_filters( 'wpo_ips_edi_cii_monetary_summation', $monetary_summation, $this );
 	}
 
 }

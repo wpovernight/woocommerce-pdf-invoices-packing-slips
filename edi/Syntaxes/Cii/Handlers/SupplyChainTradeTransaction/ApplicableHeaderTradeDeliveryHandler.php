@@ -17,12 +17,12 @@ class ApplicableHeaderTradeDeliveryHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$applicableHeaderTradeDelivery = array(
+		$applicable_header_trade_delivery = array(
 			'name'  => 'ram:ApplicableHeaderTradeDelivery',
 			'value' => array(),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_applicable_header_trade_delivery', $applicableHeaderTradeDelivery, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_applicable_header_trade_delivery', $applicable_header_trade_delivery, $data, $options, $this );
 
 		return $data;
 	}

@@ -20,7 +20,7 @@ class ExchangedDocumentHandler extends AbstractCiiHandler {
 		$date_format_code  = $this->get_date_format_code();
 		$php_date_format   = $this->get_php_date_format_from_code( $date_format_code );
 		
-		$exchangedDocument = array(
+		$exchanged_document = array(
 			'name'  => 'rsm:ExchangedDocument',
 			'value' => array(
 				array(
@@ -46,7 +46,7 @@ class ExchangedDocumentHandler extends AbstractCiiHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_exchanged_document', $exchangedDocument, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_exchanged_document', $exchanged_document, $data, $options, $this );
 
 		return $data;
 	}

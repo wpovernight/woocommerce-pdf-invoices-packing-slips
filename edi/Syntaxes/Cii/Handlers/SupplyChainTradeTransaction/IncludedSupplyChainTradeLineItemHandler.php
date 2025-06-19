@@ -18,27 +18,26 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$order       = $this->document->order;
-		$items       = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
-		$taxReasons  = EN16931::get_available_reasons();
-		$taxData     = $this->document->order_tax_data;
+		$order    = $this->document->order;
+		$items    = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+		$tax_data = $this->document->order_tax_data;
 
 		foreach ( $items as $item_id => $item ) {
-			$taxSubtotal = array();
-			$taxes       = $item->get_taxes();
-			$lineTotal   = $item->get_total();
+			$tax_subtotal = array();
+			$taxes        = $item->get_taxes();
+			$line_total   = $item->get_total();
 
 			foreach ( $taxes['total'] as $tax_id => $tax_amount ) {
 				if ( ! is_numeric( $tax_amount ) ) {
 					continue;
 				}
 
-				$taxInfo  = isset( $taxData[ $tax_id ] ) ? $taxData[ $tax_id ] : array();
-				$category = strtoupper( $taxInfo['category'] ?? 'S' );
-				$scheme   = strtoupper( $taxInfo['scheme'] ?? 'VAT' );
-				$rate     = round( $taxInfo['percentage'] ?? 0, 2 );
+				$tax_info = isset( $tax_data[ $tax_id ] ) ? $tax_data[ $tax_id ] : array();
+				$category = strtoupper( $tax_info['category'] ?? 'S' );
+				$scheme   = strtoupper( $tax_info['scheme'] ?? 'VAT' );
+				$rate     = round( $tax_info['percentage'] ?? 0, 2 );
 
-				$taxNode = array(
+				$tax_node = array(
 					'name'  => 'ram:ApplicableTradeTax',
 					'value' => array(
 						array(
@@ -53,16 +52,16 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				);
 
 				if ( $rate > 0 ) {
-					$taxNode['value'][] = array(
+					$tax_node['value'][] = array(
 						'name'  => 'ram:RateApplicablePercent',
 						'value' => $rate,
 					);
 				}
 
-				$taxSubtotal[] = $taxNode;
+				$tax_subtotal[] = $tax_node;
 			}
 
-			$lineItem = array(
+			$line_item = array(
 				'name'  => 'ram:IncludedSupplyChainTradeLineItem',
 				'value' => array(
 					array(
@@ -112,14 +111,14 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					array(
 						'name'  => 'ram:SpecifiedLineTradeSettlement',
 						'value' => array_merge(
-							$taxSubtotal,
+							$tax_subtotal,
 							array(
 								array(
 									'name'  => 'ram:SpecifiedTradeSettlementLineMonetarySummation',
 									'value' => array(
 										array(
 											'name' => 'ram:LineTotalAmount',
-											'value' => round( $lineTotal, 2 ),
+											'value' => round( $line_total, 2 ),
 										),
 									),
 								),
@@ -129,7 +128,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_ips_edi_cii_included_supply_chain_trade_line_item', $lineItem, $data, $options, $item, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_cii_included_supply_chain_trade_line_item', $line_item, $data, $options, $item, $this );
 		}
 
 		return $data;

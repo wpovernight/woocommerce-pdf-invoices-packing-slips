@@ -17,7 +17,7 @@ class ExchangedDocumentContextHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$exchangedDocumentContext = array(
+		$exchanged_document_context = array(
 			'name'  => 'rsm:ExchangedDocumentContext',
 			'value' => array(
 				array(
@@ -32,7 +32,7 @@ class ExchangedDocumentContextHandler extends AbstractCiiHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_exchanged_document_context', $exchangedDocumentContext, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_exchanged_document_context', $exchanged_document_context, $data, $options, $this );
 
 		return $data;
 	}

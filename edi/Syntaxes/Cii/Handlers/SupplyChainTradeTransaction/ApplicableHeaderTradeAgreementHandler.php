@@ -17,16 +17,16 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$applicableHeaderTradeAgreement = array(
+		$applicable_header_trade_agreement = array(
 			'name'  => 'ram:ApplicableHeaderTradeAgreement',
-			'value' => array(
-				$this->getSellerTradeParty(),
-				$this->getBuyerTradeParty(),
-				$this->getContractReferencedDocument(),
-			),
+			'value' => array_filter( array(
+				$this->get_seller_trade_party(),
+				$this->get_buyer_trade_party(),
+				$this->get_contract_referenced_document(),
+			) ),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_applicable_header_trade_agreement', $applicableHeaderTradeAgreement, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_applicable_header_trade_agreement', $applicable_header_trade_agreement, $data, $options, $this );
 
 		return $data;
 	}
@@ -34,16 +34,35 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	/**
 	 * Get the seller trade party details.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	private function getSellerTradeParty(): array {
-		$sellerTradeParty = array(
+	private function get_seller_trade_party(): ?array {
+		$name       = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'name' ) );
+		$vat_number = $this->get_shop_data( 'vat_number' );
+		$coc_number = $this->get_shop_data( 'coc_number' );
+		
+		if ( empty( $name ) ) {
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.' );
+			return null;
+		}
+		
+		if ( empty( $vat_number ) ) {
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty. Please check your shop settings.' );
+			return null;
+		}
+		
+		$postcode       = $this->get_shop_data( 'address_postcode' );
+		$address_line_1 = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_line_1' ) );
+		$address_city   = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_city' ) );
+		$country_code   = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_country_code' ) );
+
+		$seller_trade_party = array(
 			'name'  => 'ram:SellerTradeParty',
 			'value' => array(
 				// Seller Company Name
 				array(
 					'name'  => 'ram:Name',
-					'value' => wpo_ips_edi_sanitize_string( $this->get_shop_data( 'name' ) ),
+					'value' => $name,
 				),
 
 				// Legal Organization ID (if available)
@@ -52,7 +71,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:ID',
-							'value' => $this->get_shop_data( 'coc_number' ),
+							'value' => $vat_number ?: $coc_number,
 						),
 					),
 				),
@@ -63,19 +82,19 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:PostcodeCode',
-							'value' => $this->get_shop_data( 'address_postcode' ),
+							'value' => $postcode,
 						),
 						array(
 							'name'  => 'ram:LineOne',
-							'value' => wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_line_1' ) ),
+							'value' => $address_line_1,
 						),
 						array(
 							'name'  => 'ram:CityName',
-							'value' => wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_city' ) ),
+							'value' => $address_city,
 						),
 						array(
 							'name'  => 'ram:CountryID',
-							'value' => wc_format_country_state_string( $this->get_shop_data( 'address_country' ) )['country'],
+							'value' => $country_code,
 						),
 					),
 				),
@@ -86,7 +105,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'       => 'ram:ID',
-							'value'      => $this->get_shop_data( 'vat_number' ),
+							'value'      => $vat_number,
 							'attributes' => array(
 								'schemeID' => 'VA',
 							),
@@ -96,93 +115,100 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_seller_trade_party', $sellerTradeParty, $this );
+		return apply_filters( 'wpo_ips_edi_cii_seller_trade_party', $seller_trade_party, $this );
 	}
 	
 	/**
 	 * Get the buyer trade party details.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	private function getBuyerTradeParty(): array {
-		$order             = $this->document->order;
-		$customerPartyName = $customerPartyContactName = $order ? $order->get_formatted_billing_full_name() : '';
-		$billingCompany    = $order ? $order->get_billing_company() : '';
-		$vatNumber         = $this->get_order_customer_vat_number();
+	private function get_buyer_trade_party(): ?array {
+		$order               = $this->document->order;
+		$customer_party_name = $order ? $order->get_formatted_billing_full_name() : '';
+		$billing_company     = $order ? $order->get_billing_company() : '';
+		$vat_number          = $this->get_order_customer_vat_number();
 
-		if ( ! empty( $billingCompany ) ) {
-			$customerPartyName = $billingCompany;
+		if ( ! empty( $billing_company ) ) {
+			$customer_party_name = $billing_company;
 		}
 
 		// Buyer Name
-		$buyerTradeParty = array(
+		$buyer_trade_party = array(
 			'name'  => 'ram:BuyerTradeParty',
 			'value' => array(
 				array(
 					'name'  => 'ram:Name',
-					'value' => wpo_ips_edi_sanitize_string( $customerPartyName ),
+					'value' => wpo_ips_edi_sanitize_string( $customer_party_name ),
 				),
 			),
 		);
 
 		// Legal Organization (if company)
-		if ( ! empty( $billingCompany ) ) {
-			$legalOrganization = array();
+		if ( ! empty( $billing_company ) ) {
+			$legal_organization = array();
 			
-			if ( ! empty( $vatNumber ) ) {
-				$legalOrganization[] = array(
+			if ( ! empty( $vat_number ) ) {
+				$legal_organization[] = array(
 					'name'  => 'ram:ID',
-					'value' => $vatNumber,
+					'value' => $vat_number,
 				);
+			} else {
+				wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty for buyer. Please check the order data.' );
 			}
 
-			$legalOrganization[] = array(
+			$legal_organization[] = array(
 				'name'  => 'ram:TradingBusinessName',
-				'value' => wpo_ips_edi_sanitize_string( $billingCompany ),
+				'value' => wpo_ips_edi_sanitize_string( $billing_company ),
 			);
 
-			$buyerTradeParty['value'][] = array(
+			$buyer_trade_party['value'][] = array(
 				'name'  => 'ram:SpecifiedLegalOrganization',
-				'value' => $legalOrganization,
+				'value' => $legal_organization,
 			);
 		}
 
+		$postcode       = $order->get_billing_postcode() ?: '';
+		$address_line_1 = wpo_ips_edi_sanitize_string( $order->get_billing_address_1() ?: '' );
+		$address_line_2 = wpo_ips_edi_sanitize_string( $order->get_billing_address_2() ?: '' );
+		$address_city   = wpo_ips_edi_sanitize_string( $order->get_billing_city() ?: '' );
+		$country_code   = $order->get_billing_country() ?: '';
+
 		// Postal Address
-		$buyerTradeParty['value'][] = array(
+		$buyer_trade_party['value'][] = array(
 			'name'  => 'ram:PostalTradeAddress',
 			'value' => array(
 				array(
 					'name'  => 'ram:PostcodeCode',
-					'value' => $order ? $order->get_billing_postcode() : '',
+					'value' => $postcode,
 				),
 				array(
 					'name'  => 'ram:LineOne',
-					'value' => wpo_ips_edi_sanitize_string( $order ? $order->get_billing_address_1() : '' ),
+					'value' => $address_line_1,
 				),
-				// Optional LineTwo
 				array(
 					'name'  => 'ram:LineTwo',
-					'value' => wpo_ips_edi_sanitize_string( $order ? $order->get_billing_address_2() : '' ),
+					'value' => $address_line_2,
 				),
 				array(
 					'name'  => 'ram:CityName',
-					'value' => wpo_ips_edi_sanitize_string( $order ? $order->get_billing_city() : '' ),
+					'value' => $address_city,
 				),
 				array(
 					'name'  => 'ram:CountryID',
-					'value' => $order ? $order->get_billing_country() : '',
+					'value' => $country_code,
 				),
 			),
 		);
 
 		// VAT number
-		if ( ! empty( $vatNumber ) ) {
-			$buyerTradeParty['value'][] = array(
+		if ( ! empty( $vat_number ) ) {
+			$buyer_trade_party['value'][] = array(
 				'name'  => 'ram:SpecifiedTaxRegistration',
 				'value' => array(
 					array(
 						'name'       => 'ram:ID',
-						'value'      => $vatNumber,
+						'value'      => $vat_number,
 						'attributes' => array(
 							'schemeID' => 'VA',
 						),
@@ -191,23 +217,23 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			);
 		}
 
-		return apply_filters( 'wpo_ips_edi_cii_buyer_trade_party', $buyerTradeParty, $this );
+		return apply_filters( 'wpo_ips_edi_cii_buyer_trade_party', $buyer_trade_party, $this );
 	}
 	
 	/**
 	 * Get the contract referenced document.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
-	private function getContractReferencedDocument(): array {
+	private function get_contract_referenced_document(): ?array {
 		$order        = $this->document->order;
 		$reference_id = apply_filters( 'wpo_ips_edi_cii_contract_reference_id', null, $order, $this );
 
 		if ( empty( $reference_id ) ) {
-			return array(); // Don't output anything if empty
+			return null;
 		}
 
-		$contractDocument = array(
+		$contract_document = array(
 			'name'  => 'ram:ContractReferencedDocument',
 			'value' => array(
 				array(
@@ -217,7 +243,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_contract_referenced_document', $contractDocument, $this );
+		return apply_filters( 'wpo_ips_edi_cii_contract_referenced_document', $contract_document, $this );
 	}
 
 }

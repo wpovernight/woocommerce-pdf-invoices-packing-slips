@@ -774,14 +774,27 @@ jQuery( function( $ ) {
 
 			if ( show ) {
 				$row.show();
-				
+
 				if ( checkbox ) {
 					$row.find( ':input[type=checkbox]' ).val( '1' );
 				}
 			} else {
-				$row.hide().find( ':input' ).not( ':checkbox' ).val( '' );
-				$row.find( ':checkbox' ).prop( 'checked', false );
+				$row.hide()
+					.find( ':input' ).each( function () {
+						const $input = $( this );
+
+						// clear value
+						if ( ! $input.is( ':checkbox' ) ) {
+							$input.val( '' );
+						} else {
+							$input.prop( 'checked', false );
+						}
+
+						// propagate visibility update to anything that depends on this input
+						$input.trigger( 'change' );
+					} );
 			}
+
 		} );
 	}
 

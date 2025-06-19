@@ -32,7 +32,7 @@ class HeaderTradeDeliveryHandler extends AbstractCiiHandler {
 			return $data;
 		}
 
-		$deliveryNode = array(
+		$delivery_node = array(
 			'name'  => 'ram:ApplicableHeaderTradeDelivery',
 			'value' => array(
 				array(
@@ -53,7 +53,7 @@ class HeaderTradeDeliveryHandler extends AbstractCiiHandler {
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_header_trade_delivery', $deliveryNode, $data, $options, $this );
+		$data[] = apply_filters( 'wpo_ips_edi_cii_header_trade_delivery', $delivery_node, $data, $options, $this );
 
 		return $data;
 	}

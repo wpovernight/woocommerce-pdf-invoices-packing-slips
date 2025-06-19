@@ -98,29 +98,29 @@ class Invoice extends AbstractCiiFormat {
 				),
 			),
 			
-			'applicable_header_trade_agreement' => array(
-				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeAgreementHandler::class,
-				'options' => array(
-					'root' => 'rsm:SupplyChainTradeTransaction',
+				'applicable_header_trade_agreement' => array(
+					'enabled' => true,
+					'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeAgreementHandler::class,
+					'options' => array(
+						'root' => 'rsm:SupplyChainTradeTransaction',
+					),
 				),
-			),
-			
-			'applicable_header_trade_delivery' => array(
-				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeDeliveryHandler::class,
-				'options' => array(
-					'root' => 'rsm:SupplyChainTradeTransaction',
+				
+				'applicable_header_trade_delivery' => array(
+					'enabled' => true,
+					'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeDeliveryHandler::class,
+					'options' => array(
+						'root' => 'rsm:SupplyChainTradeTransaction',
+					),
 				),
-			),
-			
-			'applicable_header_trade_settlement' => array(
-				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeSettlementHandler::class,
-				'options' => array(
-					'root' => 'rsm:SupplyChainTradeTransaction',
+				
+				'applicable_header_trade_settlement' => array(
+					'enabled' => true,
+					'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeSettlementHandler::class,
+					'options' => array(
+						'root' => 'rsm:SupplyChainTradeTransaction',
+					),
 				),
-			),
 		);
 	}
 
