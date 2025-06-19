@@ -82,7 +82,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	public function get_party_postal_address(): ?array {
 		$address_line   = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_line_1' ) );
 		$city_name      = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_city' ) );
-		$postal_zone    = $this->get_shop_data( 'address_postcode' );
+		$postal_zone    = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_postcode' ) );
 		$country_string = $this->get_shop_data( 'address_country' );
 		$country_parts  = wc_format_country_state_string( $country_string );
 		$country_code   = isset( $country_parts['country'] ) ? $country_parts['country'] : '';

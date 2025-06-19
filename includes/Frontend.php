@@ -248,6 +248,9 @@ class Frontend {
 					</option>
 				<?php endforeach; ?>
 			</select>
+			<small>
+				<?php esc_html_e( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint below.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</small>
 		</p>
 
 		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">

@@ -86,7 +86,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$address_1   = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_address_1() );
 		$address_2   = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_address_2() );
 		$city        = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_city() );
-		$postcode    = $this->document->order->get_billing_postcode();
+		$postcode    = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_postcode() );
 		$country     = $this->document->order->get_billing_country();
 		$addressLine = trim( "{$address_1} {$address_2}" );
 
