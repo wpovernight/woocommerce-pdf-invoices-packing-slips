@@ -148,6 +148,30 @@ class InvoiceLineHandler extends AbstractUblHandler {
 								'name'  => 'cbc:Name',
 								'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
 							),
+							! empty( $tax_order_data )
+								? array(
+									'name'  => 'cac:ClassifiedTaxCategory',
+									'value' => array(
+										array(
+											'name'  => 'cbc:ID',
+											'value' => strtoupper( $tax_order_data['category'] ),
+										),
+										array(
+											'name'  => 'cbc:Percent',
+											'value' => round( $tax_order_data['percentage'], 2 ),
+										),
+										array(
+											'name'  => 'cac:TaxScheme',
+											'value' => array(
+												array(
+													'name'  => 'cbc:ID',
+													'value' => strtoupper( $tax_order_data['scheme'] ),
+												),
+											),
+										),
+									),
+								)
+								: array(),
 						),
 					),
 					array(

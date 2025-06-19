@@ -182,8 +182,13 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
 		$vat_number        = $this->get_order_customer_vat_number();
 
-		if ( empty( $registration_name ) && empty( $vat_number ) ) {
-			wpo_ips_edi_log( 'Both registration name and VAT number are missing for customer PartyLegalEntity.', 'error' );
+		if ( empty( $registration_name ) ) {
+			wpo_ips_edi_log( 'Registration name is missing for customer PartyLegalEntity.', 'error' );
+			return null;
+		}
+
+		if ( empty( $vat_number ) ) {
+			wpo_ips_edi_log( 'VAT number is missing for customer PartyLegalEntity.', 'error' );
 			return null;
 		}
 		

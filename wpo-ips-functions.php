@@ -1152,6 +1152,7 @@ function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
  */
 function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?string {
 	$vat_meta_keys = apply_filters( 'wpo_wcpdf_order_customer_vat_number_meta_keys', array(
+		'vat_number',             // Manually added to the order's custom fields
 		'_vat_number',            // WooCommerce EU VAT Number
 		'_billing_vat_number',    // WooCommerce EU VAT Number 2.3.21+
 		'VAT Number',             // WooCommerce EU VAT Compliance
