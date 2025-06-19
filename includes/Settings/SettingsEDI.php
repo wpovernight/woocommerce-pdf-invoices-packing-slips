@@ -221,10 +221,14 @@ class SettingsEDI {
 				'option_name'       => $option_name,
 				'id'                => 'peppol_endpoint_id',
 				'description'       => sprintf(
-					/* translators: %1$s: open link anchor, %2$s: close link anchor */
-					__( 'Specify the Peppol Endpoint ID for the supplier. If you don\'t know the ID, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
-					'</a>'
+					'%s<br>%s',
+					__( 'Specify the Peppol Endpoint ID for the supplier.', 'woocommerce-pdf-invoices-packing-slips' ),
+					sprintf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						__( 'If you don\'t know the ID, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					),
 				),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
@@ -251,7 +255,16 @@ class SettingsEDI {
 					}
 					return $options;
 				} )(),
-				'description'       => __( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint above.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'description'       => sprintf(
+					'%s<br>%s',
+					__( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint above.', 'woocommerce-pdf-invoices-packing-slips' ),
+					sprintf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						__( 'For more information on each Endpoint Address Scheme (EAS), refer to the %1$sofficial Peppol EAS list%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/eas/" target="_blank">',
+						'</a>'
+					)
+				),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
@@ -276,10 +289,14 @@ class SettingsEDI {
 					'coc_number' => __( 'Shop COC Number', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 				'description'       => sprintf(
-					/* translators: %1$s: open link anchor, %2$s: close link anchor */
-					__( 'Specify the Peppol Legal Identifier for the supplier. Please make sure the field is filled out in the %1$sGeneral Settings%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_ips_edi_settings&tab=general' ) ) . '" target="_blank" rel="noopener noreferrer">',
-					'</a>'
+					'%s<br>%s',
+					__( 'Specify the Peppol Legal Identifier for the supplier.', 'woocommerce-pdf-invoices-packing-slips' ),
+					sprintf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						__( 'Please make sure the field is filled out in the %1$sGeneral Settings%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_ips_edi_settings&tab=general' ) ) . '" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					),
 				),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
@@ -306,7 +323,16 @@ class SettingsEDI {
 					}
 					return $options;
 				} )(),
-				'description'       => __( 'Specify the Peppol Legal Identifier Scheme (ICD) for the supplier.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'description'       => sprintf(
+					'%s<br>%s',
+					__( 'Specify the Peppol Legal Identifier Scheme (ICD) for the supplier.', 'woocommerce-pdf-invoices-packing-slips' ),
+					sprintf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						__( 'For detailed information on each Identification Code (ICD), see the %1$sofficial Peppol ICD list%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/ICD/" target="_blank">',
+						'</a>'
+					)
+				),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
