@@ -115,12 +115,8 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 				array(
 					'name'  => 'cac:Country',
 					'value' => array(
-						'name'       => 'cbc:IdentificationCode',
-						'value'      => $country,
-						'attributes' => array(
-							'listID'       => 'ISO3166-1:Alpha2',
-							'listAgencyID' => '6',
-						),
+						'name'  => 'cbc:IdentificationCode',
+						'value' => $country,
 					),
 				),
 			),
@@ -139,6 +135,10 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$values     = array();
 
 		if ( ! empty( $vat_number ) ) {
+			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
+				wpo_ips_edi_log( 'VAT number does not have a country prefix for customer PartyTaxScheme.', 'error' );
+			}
+		
 			$values[] = array(
 				'name'  => 'cbc:CompanyID',
 				'value' => $vat_number,
@@ -177,41 +177,32 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$billing_company = $this->document->order->get_billing_company();
-		$vat_number      = $this->get_order_customer_vat_number();
+		$billing_company   = $this->document->order->get_billing_company();
+		$billing_name      = $this->document->order->get_formatted_billing_full_name();
+		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
+		$vat_number        = $this->get_order_customer_vat_number();
 
-		// Only add PartyLegalEntity if there's a billing company or VAT number
-		if ( empty( $billing_company ) && empty( $vat_number ) ) {
+		if ( empty( $registration_name ) && empty( $vat_number ) ) {
+			wpo_ips_edi_log( 'Both registration name and VAT number are missing for customer PartyLegalEntity.', 'error' );
 			return null;
 		}
-
-		$elements = array();
-
-		if ( ! empty( $billing_company ) ) {
-			$elements[] = array(
-				'name'  => 'cbc:RegistrationName',
-				'value' => wpo_ips_edi_sanitize_string( $billing_company ),
-			);
-		}
-
-		if ( ! empty( $vat_number ) ) {
-			$elements[] = array(
-				'name'  => 'cbc:CompanyID',
-				'value' => $vat_number,
-			);
-		} else {
-			wpo_ips_edi_log(
-				sprintf(
-					'Customer VAT number is missing or invalid for PartyLegalEntity in order ID %d.',
-					$this->document->order->get_id()
-				),
-				'error'
-			);
+		
+		if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
+			wpo_ips_edi_log( 'VAT number does not have a country prefix for customer PartyLegalEntity.', 'error' );
 		}
 
 		$party_legal_entity = array(
 			'name'  => 'cac:PartyLegalEntity',
-			'value' => $elements,
+			'value' => array(
+				array(
+					'name'  => 'cbc:RegistrationName',
+					'value' => wpo_ips_edi_sanitize_string( $registration_name ),
+				),
+				array(
+					'name'  => 'cbc:CompanyID',
+					'value' => $vat_number,
+				),
+			),
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );

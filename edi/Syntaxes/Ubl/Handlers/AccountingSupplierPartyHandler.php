@@ -83,9 +83,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$address_line   = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_line_1' ) );
 		$city_name      = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_city' ) );
 		$postal_zone    = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_postcode' ) );
-		$country_string = $this->get_shop_data( 'address_country' );
-		$country_parts  = wc_format_country_state_string( $country_string );
-		$country_code   = isset( $country_parts['country'] ) ? $country_parts['country'] : '';
+		$country_code   = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_country_code' ) );
 
 		$postal_address = array(
 			'name'  => 'cac:PostalAddress',
@@ -112,12 +110,8 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 				array(
 					'name'  => 'cac:Country',
 					'value' => array(
-						'name'       => 'cbc:IdentificationCode',
-						'value'      => $country_code,
-						'attributes' => array(
-							'listID'       => 'ISO3166-1:Alpha2',
-							'listAgencyID' => '6',
-						),
+						'name'  => 'cbc:IdentificationCode',
+						'value' => $country_code,
 					),
 				),
 			),
@@ -136,6 +130,10 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$values     = array();
 
 		if ( ! empty( $vat_number ) ) {
+			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
+				wpo_ips_edi_log( 'VAT number does not have a country prefix for supplier PartyTaxScheme.', 'error' );
+			}
+			
 			$values[] = array(
 				'name'  => 'cbc:CompanyID',
 				'value' => $vat_number,
@@ -149,12 +147,8 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 			'name'  => 'cac:TaxScheme',
 			'value' => array(
 				array(
-					'name'       => 'cbc:ID',
-					'value'      => 'VAT',
-					'attributes' => array(
-						'schemeID'       => 'UN/ECE 5153',
-						'schemeAgencyID' => '6',
-					),
+					'name'  => 'cbc:ID',
+					'value' => 'VAT',
 				),
 			),
 		);
@@ -175,7 +169,6 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	public function get_party_legal_entity(): ?array {
 		$company    = $this->get_shop_data( 'name' );
 		$coc_number = $this->get_shop_data( 'coc_number' );
-		$elements   = array();
 		
 		if ( empty( $company ) && empty( $coc_number ) ) {
 			wpo_ips_edi_log( 'Both company name and CoC number are missing for PartyLegalEntity.', 'error' );

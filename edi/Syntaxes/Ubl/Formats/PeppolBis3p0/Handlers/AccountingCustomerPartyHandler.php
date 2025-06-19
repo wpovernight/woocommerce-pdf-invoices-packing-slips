@@ -64,14 +64,14 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	public function get_party_identification(): ?array {
 		$identifier = $this->get_peppol_identifier();
 
-		if ( ! $identifier ) {
+		if ( empty( $identifier ) ) {
 			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for customer PartyIdentification.', 'error' );
 			return null;
 		}
 
 		$party_id = array(
-			'name'     => 'cac:PartyIdentification',
-			'children' => array(
+			'name'  => 'cac:PartyIdentification',
+			'value' => array(
 				array(
 					'name'       => 'cbc:ID',
 					'value'      => $identifier['id'],
@@ -91,14 +91,15 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$billing_company = $this->document->order->get_billing_company();
-		$identifier      = $this->get_peppol_identifier();
+		$billing_company   = $this->document->order->get_billing_company();
+		$billing_name      = $this->document->order->get_formatted_billing_full_name();
+		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
+		$identifier        = $this->get_peppol_identifier();
 
-		// Only add PartyLegalEntity if there's a billing company or a valid identifier
-		if ( empty( $billing_company ) && empty( $identifier['value'] ) ) {
+		if ( empty( $registration_name ) && empty( $identifier ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'Both billing company and customer identifier are missing or invalid for PartyLegalEntity in order ID %d.',
+					'Both registration name and customer identifier are missing or invalid for customer PartyLegalEntity in order ID %d.',
 					$this->document->order->get_id()
 				),
 				'error'
@@ -106,36 +107,21 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			return null;
 		}
 
-		$elements = array();
-
-		if ( ! empty( $billing_company ) ) {
-			$elements[] = array(
-				'name'  => 'cbc:RegistrationName',
-				'value' => wpo_ips_edi_sanitize_string( $billing_company ),
-			);
-		}
-
-		if ( ! empty( $identifier['value'] ) && ! empty( $identifier['schemeID'] ) ) {
-			$elements[] = array(
-				'name'       => 'cbc:CompanyID',
-				'value'      => $identifier['value'],
-				'attributes' => array(
-					'schemeID' => $identifier['schemeID'],
-				),
-			);
-		} else {
-			wpo_ips_edi_log(
-				sprintf(
-					'Customer identifier is missing or invalid for PartyLegalEntity in order ID %d.',
-					$this->document->order->get_id()
-				),
-				'error'
-			);
-		}
-
 		$party_legal_entity = array(
 			'name'  => 'cac:PartyLegalEntity',
-			'value' => $elements,
+			'value' => array(
+				array(
+					'name'  => 'cbc:RegistrationName',
+					'value' => wpo_ips_edi_sanitize_string( $registration_name ),
+				),
+				array(
+					'name'       => 'cbc:CompanyID',
+					'value'      => $identifier['id'],
+					'attributes' => array(
+						'schemeID' => $identifier['scheme'],
+					),
+				),
+			),
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );
@@ -149,9 +135,8 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	private function get_peppol_identifier(): ?array {
 		$order   = $this->document->order;
 		$user_id = $order->get_customer_id();
-
-		$id     = $order->get_meta( '_peppol_endpoint_id' );
-		$scheme = $order->get_meta( '_peppol_eas' );
+		$id      = $order->get_meta( '_peppol_endpoint_id' );
+		$scheme  = $order->get_meta( '_peppol_eas' );
 
 		if ( empty( $id ) && $user_id ) {
 			$id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
@@ -163,9 +148,9 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		if ( empty( $id ) || empty( $scheme ) ) {
 			return null;
 		}
-
-		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
-		if ( ! in_array( $scheme, $valid_schemes, true ) ) {
+		
+		$schemes = EN16931::get_electronic_address_schemes();
+		if ( ! array_key_exists( $scheme, $schemes ) ) {
 			return null;
 		}
 

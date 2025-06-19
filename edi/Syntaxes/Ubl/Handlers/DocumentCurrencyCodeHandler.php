@@ -18,12 +18,8 @@ class DocumentCurrencyCodeHandler extends AbstractUblHandler {
 	 */
 	public function handle( array $data, array $options = array() ): array {
 		$document_currency_code = array(
-			'name'       => 'cbc:DocumentCurrencyCode',
-			'value'      => $this->document->order->get_currency(),
-			'attributes' => array(
-				'listID'       => 'ISO4217',
-				'listAgencyID' => '6',
-			),
+			'name'  => 'cbc:DocumentCurrencyCode',
+			'value' => $this->document->order->get_currency(),
 		);
 
 		$data[] = apply_filters( 'wpo_ips_edi_ubl_document_currency_code', $document_currency_code, $data, $options, $this );

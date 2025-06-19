@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler {
-	
+
 	/**
 	 * Returns the supplier party details for the UBL document.
 	 *
@@ -31,7 +31,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party', $supplier_party, $this );
 	}
-	
+
 	/**
 	 * Returns the endpoint ID for the supplier.
 	 *
@@ -55,7 +55,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_endpoint_id', $endpoint, $this );
 	}
-	
+
 	/**
 	 * Returns the PartyIdentification element for the supplier.
 	 *
@@ -70,8 +70,8 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		}
 
 		$party_id = array(
-			'name'     => 'cac:PartyIdentification',
-			'children' => array(
+			'name'  => 'cac:PartyIdentification',
+			'value' => array(
 				array(
 					'name'       => 'cbc:ID',
 					'value'      => $identifier['id'],
@@ -84,7 +84,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_identification', $party_id, $this );
 	}
-	
+
 	/**
 	 * Gets the Peppol identifier and scheme ID for the supplier from plugin settings.
 	 *
@@ -100,8 +100,8 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			return null;
 		}
 
-		$valid_schemes = array_keys( EN16931::get_electronic_address_schemes() );
-		if ( ! in_array( $scheme, $valid_schemes, true ) ) {
+		$schemes = EN16931::get_electronic_address_schemes();
+		if ( ! array_key_exists( $scheme, $schemes ) ) {
 			return null;
 		}
 
@@ -110,5 +110,5 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			'scheme' => $scheme,
 		);
 	}
-	
+
 }

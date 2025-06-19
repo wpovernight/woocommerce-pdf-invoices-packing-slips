@@ -232,11 +232,11 @@ class Frontend {
 		$eas             = get_user_meta( $user_id, 'peppol_eas', true );
 		$endpoint_id     = get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		$eas_options_raw = EN16931::get_electronic_address_schemes();
-		$eas_options     = array_map(
-			fn( $label, $code ) => "[$code] $label",
-			$eas_options_raw,
-			array_keys( $eas_options_raw )
-		);
+		$eas_options     = array();
+
+		foreach ( $eas_options_raw as $code => $label ) {
+			$eas_options[ $code ] = "[$code] $label";
+		}
 		?>
 		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 			<label for="peppol_eas"><?php esc_html_e( 'Electronic Address Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
