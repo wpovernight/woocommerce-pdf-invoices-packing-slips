@@ -1401,7 +1401,7 @@ abstract class OrderDocument {
 	 * Return/Show shop/company address country code if provided.
 	 */
 	function get_shop_address_country_code(): string {
-		return $this->get_settings_text( 'shop_address_country' );
+		return $this->get_settings_text( 'shop_address_country', '', false );
 	}
 	function shop_address_country_code(): void {
 		echo esc_html( $this->get_shop_address_country_code() );
