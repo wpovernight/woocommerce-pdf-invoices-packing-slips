@@ -213,10 +213,11 @@ class SettingsEDI {
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'peppol_endpoint_id',
-			'title'    => __( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title'    => '',
 			'callback' => 'text_input',
 			'section'  => $section,
 			'args'     => array(
+				'title'             => __( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'peppol_endpoint_id',
 				'description'       => sprintf(
@@ -236,13 +237,14 @@ class SettingsEDI {
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'peppol_endpoint_eas',
-			'title'    => __( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title'    => '',
 			'callback' => 'select',
 			'section'  => $section,
 			'args'     => array(
+				'title'             => __( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'peppol_endpoint_eas',
-				'options'            => ( function () {
+				'options'           => ( function () {
 					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
 					foreach ( EN16931::get_electronic_address_schemes() as $code => $label ) {
 						$options[ $code ] = "[$code] $label";
@@ -261,10 +263,11 @@ class SettingsEDI {
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'peppol_legal_identifier',
-			'title'    => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title'    => '',
 			'callback' => 'select',
 			'section'  => $section,
 			'args'     => array(
+				'title'             => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'peppol_legal_identifier',
 				'options'           => array(
@@ -289,13 +292,14 @@ class SettingsEDI {
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'peppol_legal_identifier_icd',
-			'title'    => __( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'title'    => '',
 			'callback' => 'select',
 			'section'  => $section,
 			'args'     => array(
+				'title'             => __( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'peppol_legal_identifier_icd',
-				'options'            => ( function () {
+				'options'           => ( function () {
 					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
 					foreach ( EN16931::get_icd_schemes() as $code => $label ) {
 						$options[ $code ] = "[$code] $label";

@@ -118,6 +118,7 @@ class SettingsCallbacks {
 	 * Text input callback.
 	 *
 	 * args:
+	 *   title       - secondary title of the input (optional)
 	 *   option_name - name of the main option
 	 *   id          - key of the setting
 	 *   size        - size of the text input (em)
@@ -137,6 +138,14 @@ class SettingsCallbacks {
 
 		if ( ! empty( $action_button ) ) {
 			echo '<div class="wpo-wcpdf-input-wrapper input ', esc_attr( $id ), '">';
+		}
+		
+		if ( ! empty( $title ) ) {
+			printf(
+				'<label for="%1$s">%2$s</label>',
+				esc_attr( $id ),
+				esc_html( $title )
+			);
 		}
 
 		$size = ! empty( $size ) ? sprintf( 'size="%s"', esc_attr( $size ) ) : '';
@@ -362,6 +371,7 @@ class SettingsCallbacks {
 	 * Textarea callback.
 	 *
 	 * args:
+	 *   title       - secondary title of the input (optional)
 	 *   option_name - name of the main option
 	 *   id          - key of the setting
 	 *   width       - width of the text input (em)
@@ -406,6 +416,14 @@ class SettingsCallbacks {
 
 		if ( ! empty( $action_button ) ) {
 			echo '<div class="wpo-wcpdf-input-wrapper select ', esc_attr( $id ), '">';
+		}
+		
+		if ( ! empty( $title ) ) {
+			printf(
+				'<label for="%1$s">%2$s</label>',
+				esc_attr( $id ),
+				esc_html( $title )
+			);
 		}
 
 		if ( ! empty( $enhanced_select ) ) {
