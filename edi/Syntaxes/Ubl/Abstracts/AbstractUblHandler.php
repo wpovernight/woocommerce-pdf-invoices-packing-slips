@@ -10,15 +10,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class AbstractUblHandler extends AbstractHandler {
 
-	/**
-	 * Returns the due date days for the document.
-	 *
-	 * @return int
-	 */
-	public function get_due_date_days(): int {
-		return is_callable( array( $this->document->order_document, 'get_setting' ) )
-			? absint( $this->document->order_document->get_setting( 'due_date_days' ) )
-			: 0;
-	}
 
 }

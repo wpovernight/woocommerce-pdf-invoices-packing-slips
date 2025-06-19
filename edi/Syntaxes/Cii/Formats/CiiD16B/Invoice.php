@@ -116,7 +116,7 @@ class Invoice extends AbstractCiiFormat {
 				
 				'applicable_header_trade_settlement' => array(
 					'enabled' => true,
-					'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeSettlementHandler::class,
+					'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Handlers\SupplyChainTradeTransaction\ApplicableHeaderTradeSettlementHandler::class,
 					'options' => array(
 						'root' => 'rsm:SupplyChainTradeTransaction',
 					),

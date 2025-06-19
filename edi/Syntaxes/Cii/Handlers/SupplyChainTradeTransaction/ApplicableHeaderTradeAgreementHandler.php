@@ -36,7 +36,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	 *
 	 * @return array|null
 	 */
-	private function get_seller_trade_party(): ?array {
+	public function get_seller_trade_party(): ?array {
 		$name       = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'name' ) );
 		$vat_number = $this->get_shop_data( 'vat_number' );
 		$coc_number = $this->get_shop_data( 'coc_number' );
@@ -123,7 +123,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	 *
 	 * @return array|null
 	 */
-	private function get_buyer_trade_party(): ?array {
+	public function get_buyer_trade_party(): ?array {
 		$order               = $this->document->order;
 		$customer_party_name = $order ? $order->get_formatted_billing_full_name() : '';
 		$billing_company     = $order ? $order->get_billing_company() : '';
@@ -225,7 +225,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	 *
 	 * @return array|null
 	 */
-	private function get_contract_referenced_document(): ?array {
+	public function get_contract_referenced_document(): ?array {
 		$order        = $this->document->order;
 		$reference_id = apply_filters( 'wpo_ips_edi_cii_contract_reference_id', null, $order, $this );
 

@@ -432,6 +432,13 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice::class,
 					),
 				),
+				'factur-x' => array(
+					'name'      => 'Factur-X',
+					'hybrid'    => true,
+					'documents' => array(
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX\Invoice::class,
+					),
+				),
 			),
 		)
 	);

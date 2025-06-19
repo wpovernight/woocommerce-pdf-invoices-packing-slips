@@ -33,6 +33,7 @@ return array(
     'WPO\\IPS\\EDI\\SabreBuilder' => $baseDir . '/edi/SabreBuilder.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Abstracts\\AbstractCiiFormat' => $baseDir . '/edi/Syntaxes/Cii/Abstracts/AbstractCiiFormat.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Abstracts\\AbstractCiiHandler' => $baseDir . '/edi/Syntaxes/Cii/Abstracts/AbstractCiiHandler.php',
+    'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Formats\\CiiD16B\\Handlers\\SupplyChainTradeTransaction\\ApplicableHeaderTradeSettlementHandler' => $baseDir . '/edi/Syntaxes/Cii/Formats/CiiD16B/Handlers/SupplyChainTradeTransaction/ApplicableHeaderTradeSettlementHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Formats\\CiiD16B\\Invoice' => $baseDir . '/edi/Syntaxes/Cii/Formats/CiiD16B/Invoice.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Formats\\FacturX\\Invoice' => $baseDir . '/edi/Syntaxes/Cii/Formats/FacturX/Invoice.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Handlers\\ExchangedDocumentContextHandler' => $baseDir . '/edi/Syntaxes/Cii/Handlers/ExchangedDocumentContextHandler.php',

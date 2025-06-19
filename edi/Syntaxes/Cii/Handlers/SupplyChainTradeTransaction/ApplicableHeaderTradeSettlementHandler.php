@@ -39,7 +39,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 *
 	 * @return array|null
 	 */
-	private function get_payment_reference(): ?array {
+	public function get_payment_reference(): ?array {
 		$order     = $this->document->order;
 		$reference = $order->get_order_number(); // Default to WooCommerce order number
 		$reference = apply_filters( 'wpo_ips_edi_cii_payment_reference', $reference, $order, $this );
@@ -62,7 +62,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 *
 	 * @return array|null
 	 */
-	private function get_payment_means(): ?array {
+	public function get_payment_means(): ?array {
 		$payment = $this->get_payment_means_data();
 
 		// If no usable payment data, exit early
@@ -181,22 +181,16 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				'name'  => 'ram:ApplicableTradeTax',
 				'value' => array(
 					array(
-						'name'       => 'ram:CalculatedAmount',
-						'value'      => wc_round_tax_total( $item['total_tax'] ),
-						'attributes' => array(
-							'currencyID' => $order->get_currency(),
-						),
+						'name'  => 'ram:CalculatedAmount',
+						'value' => wc_round_tax_total( $item['total_tax'] ),
 					),
 					array(
 						'name'  => 'ram:TypeCode',
 						'value' => strtoupper( $scheme ),
 					),
 					array(
-						'name'       => 'ram:BasisAmount',
-						'value'      => wc_round_tax_total( $item['total_ex'] ),
-						'attributes' => array(
-							'currencyID' => $order->get_currency(),
-						),
+						'name'  => 'ram:BasisAmount',
+						'value' => wc_round_tax_total( $item['total_ex'] ),
 					),
 					array(
 						'name'  => 'ram:CategoryCode',
@@ -232,7 +226,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 *
 	 * @return array|null
 	 */
-	private function get_payment_terms(): ?array {
+	public function get_payment_terms(): ?array {
 		$due_date_timestamp = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;
@@ -277,46 +271,68 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_monetary_summation(): ?array {
-		$order         = $this->document->order;
-		$currency      = $order ? $order->get_currency() : get_woocommerce_currency();
+		$order           = $this->document->order;
+		$total           = $order->get_total();
+		$total_tax       = $order->get_total_tax();
+		$total_exc_tax   = $total - $total_tax;
+		$total_inc_tax   = $total;
+		$currency        = $order->get_currency();
+		$has_due_days    = ! empty( $this->get_due_date_days() );
 
-		$total         = $order->get_total();
-		$total_inc_tax = $total;
-		$total_tax     = $order->get_total_tax();
-		$total_exc_tax = $total - $total_tax;
+		$prepaid_amount  = $has_due_days ? 0 : $total_inc_tax;
+		$payable_amount  = $total_inc_tax - $prepaid_amount;
+		$rounding_diff   = round( $total - $total_inc_tax, 2 );
+
+		if ( abs( $rounding_diff ) >= 0.01 ) {
+			$payable_amount += $rounding_diff;
+		}
 
 		$monetary_summation = array(
 			'name'  => 'ram:SpecifiedTradeSettlementHeaderMonetarySummation',
 			'value' => array(
 				array(
-					'name'       => 'ram:LineTotalAmount',
-					'value'      => $total_exc_tax,
-					'attributes' => array( 'currencyID' => $currency ),
+					'name'  => 'ram:LineTotalAmount',
+					'value' => $total_exc_tax,
 				),
 				array(
-					'name'       => 'ram:TaxBasisTotalAmount',
-					'value'      => $total_exc_tax,
-					'attributes' => array( 'currencyID' => $currency ),
+					'name'  => 'ram:TaxBasisTotalAmount',
+					'value' => $total_exc_tax,
 				),
 				array(
 					'name'       => 'ram:TaxTotalAmount',
 					'value'      => $total_tax,
-					'attributes' => array( 'currencyID' => $currency ),
+					'attributes' => array(
+						'currencyID' => $currency,
+					),
 				),
 				array(
-					'name'       => 'ram:GrandTotalAmount',
-					'value'      => $total_inc_tax,
-					'attributes' => array( 'currencyID' => $currency ),
-				),
-				array(
-					'name'       => 'ram:DuePayableAmount',
-					'value'      => $total_inc_tax,
-					'attributes' => array( 'currencyID' => $currency ),
+					'name'  => 'ram:GrandTotalAmount',
+					'value' => $total_inc_tax,
 				),
 			),
 		);
 
+		if ( ! $has_due_days ) {
+			$monetary_summation['value'][] = array(
+				'name'  => 'ram:TotalPrepaidAmount',
+				'value' => $prepaid_amount,
+			);
+		}
+
+		if ( abs( $rounding_diff ) >= 0.01 ) {
+			$monetary_summation['value'][] = array(
+				'name'  => 'ram:RoundingAmount',
+				'value' => $rounding_diff,
+			);
+		}
+
+		$monetary_summation['value'][] = array(
+			'name'  => 'ram:DuePayableAmount',
+			'value' => $payable_amount,
+		);
+
 		return apply_filters( 'wpo_ips_edi_cii_monetary_summation', $monetary_summation, $this );
 	}
+
 
 }

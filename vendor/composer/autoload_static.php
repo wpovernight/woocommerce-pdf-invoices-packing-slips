@@ -71,6 +71,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\EDI\\SabreBuilder' => __DIR__ . '/../..' . '/edi/SabreBuilder.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Abstracts\\AbstractCiiFormat' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Abstracts/AbstractCiiFormat.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Abstracts\\AbstractCiiHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Abstracts/AbstractCiiHandler.php',
+        'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Formats\\CiiD16B\\Handlers\\SupplyChainTradeTransaction\\ApplicableHeaderTradeSettlementHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Formats/CiiD16B/Handlers/SupplyChainTradeTransaction/ApplicableHeaderTradeSettlementHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Formats\\CiiD16B\\Invoice' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Formats/CiiD16B/Invoice.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Formats\\FacturX\\Invoice' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Formats/FacturX/Invoice.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Handlers\\ExchangedDocumentContextHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Handlers/ExchangedDocumentContextHandler.php',
