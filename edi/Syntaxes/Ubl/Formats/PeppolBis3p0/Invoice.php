@@ -118,7 +118,7 @@ class Invoice extends AbstractUblFormat {
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\PaymentMeansHandler::class,
 			),
 			'payment_terms' => array(
-				'enabled' => false,
+				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\PaymentTermsHandler::class,
 			),
 			'allowance_charge' => array(

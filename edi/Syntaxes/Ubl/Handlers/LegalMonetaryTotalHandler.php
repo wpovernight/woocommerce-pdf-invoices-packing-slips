@@ -17,12 +17,22 @@ class LegalMonetaryTotalHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$total         = $this->document->order->get_total();
-		$total_inc_tax = $total;
-		$total_exc_tax = $total - $this->document->order->get_total_tax();
-		$currency      = $this->document->order->get_currency();
+		$total          = $this->document->order->get_total();
+		$total_tax      = $this->document->order->get_total_tax();
+		$total_exc_tax  = $total - $total_tax;
+		$total_inc_tax  = $total_exc_tax + $total_tax;
+		$currency       = $this->document->order->get_currency();
+		$has_due_days   = ! empty( $this->get_due_date_days() );
 
-		$legal_monetary_total = array(
+		$prepaid_amount = $has_due_days ? 0 : $total;
+		$payable_amount = $total_inc_tax - $prepaid_amount;
+		$rounding_diff  = round( $total - $total_inc_tax, 2 );
+
+		if ( abs( $rounding_diff ) >= 0.01 ) {
+			$payable_amount += $rounding_diff;
+		}
+
+		$legal_total = array(
 			'name'  => 'cac:LegalMonetaryTotal',
 			'value' => array(
 				array(
@@ -46,17 +56,38 @@ class LegalMonetaryTotalHandler extends AbstractUblHandler {
 						'currencyID' => $currency,
 					),
 				),
-				array(
-					'name'       => 'cbc:PayableAmount',
-					'value'      => $total,
-					'attributes' => array(
-						'currencyID' => $currency,
-					),
-				),
 			),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_legal_monetary_total', $legal_monetary_total, $data, $options, $this );
+		if ( ! $has_due_days ) {
+			$legal_total['value'][] = array(
+				'name'       => 'cbc:PrepaidAmount',
+				'value'      => $prepaid_amount,
+				'attributes' => array(
+					'currencyID' => $currency,
+				),
+			);
+		}
+
+		if ( abs( $rounding_diff ) >= 0.01 ) {
+			$legal_total['value'][] = array(
+				'name'       => 'cbc:PayableRoundingAmount',
+				'value'      => $rounding_diff,
+				'attributes' => array(
+					'currencyID' => $currency,
+				),
+			);
+		}
+
+		$legal_total['value'][] = array(
+			'name'       => 'cbc:PayableAmount',
+			'value'      => $payable_amount,
+			'attributes' => array(
+				'currencyID' => $currency,
+			),
+		);
+
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_legal_monetary_total', $legal_total, $data, $options, $this );
 
 		return $data;
 	}
