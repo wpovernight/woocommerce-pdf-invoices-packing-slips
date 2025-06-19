@@ -86,17 +86,8 @@ jQuery( function( $ ) {
 		let data       = $form.data();
 		let serialized = $form.find(":input:visible:not(:disabled)").serialize();
 
-		// Manually append any hidden field that ends with '_formatted_number_current'
-		$form.find( 'input[type="hidden"]' ).each( function() {
-			if ( $( this ).attr( 'name' ).endsWith( '_formatted_number_current' ) ) {
-				const name  = $( this ).attr( 'name' );
-				const value = $( this ).val();
-				serialized += '&' + encodeURIComponent( name ) + '=' + encodeURIComponent( value );
-			}
-		} );
-
 		// regenerate specific
-		if( action == 'regenerate' ) {
+		if ( action == 'regenerate' ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
 				return; // having second thoughts
 			}
@@ -104,7 +95,7 @@ jQuery( function( $ ) {
 			$form.find('.wpo-wcpdf-regenerate-document').addClass('wcpdf-regenerate-spin');
 
 		// delete specific
-		} else if( action == 'delete' ) {
+		} else if ( action == 'delete' ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_delete ) === false ) {
 				return; // having second thoughts
 			}
@@ -206,6 +197,55 @@ jQuery( function( $ ) {
 		} else {
 			$( '.view-more' ).show();
 		}
+	} );
+	
+	function updatePreviewNumber( $table ) {
+		let prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
+		let suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
+		let padding  = $table.find( 'input[name$="_number_padding"]' ).val();
+		let plain    = $table.find( 'input[name$="_number_plain"]' ).val();
+		let document = $table.data( 'document' );
+		let orderId  = $table.data( 'order_id' );
+
+		$.ajax( {
+			url:    wpo_wcpdf_ajax.ajaxurl,
+			method: 'POST',
+			data: {
+				action:   'wpo_wcpdf_preview_formatted_number',
+				security: wpo_wcpdf_ajax.nonce,
+				prefix:   prefix,
+				suffix:   suffix,
+				padding:  padding,
+				plain:    plain,
+				document: document,
+				order_id: orderId,
+			},
+			success: function( response ) {
+				if ( response.success && response.data.formatted ) {
+					let $preview = $table.find( '.preview-number' );
+					let $code    = $preview.find( 'code' );
+					let current  = $preview.data( 'current' );
+					let updated  = response.data.formatted;
+
+					$code.text( updated );
+
+					if ( current !== updated ) {
+						$code.css( 'background-color', '#fff3cd' );
+					} else {
+						$code.css( 'background-color', '' ); // reset
+					}
+				}
+			},
+			error: function( xhr, status, error ) {
+				console.error( 'AJAX error:', status, error );
+				$table.find( '.preview-number code' ).text( 'Error loading preview' );
+			}
+		} );
+	}
+	
+	$( document ).on( 'input change', '.wcpdf-data-fields .number-specs-table input, .wcpdf-data-fields .number-table input', function() {
+		let $table = $( this ).closest( '.wcpdf-data-fields' );
+		updatePreviewNumber( $table );
 	} );
 
 } );

@@ -1604,3 +1604,117 @@ function wpo_wcpdf_format_address( array $address ): string {
 
 	return esc_html( $formatted_address );
 }
+
+
+/**
+ * Formats a document number by applying a prefix, suffix, and optional padding,
+ * with support for dynamic placeholders based on order and document dates.
+ *
+ * Available placeholders in prefix and suffix:
+ * - [order_year], [order_month], [order_day]
+ * - [invoice_year], [invoice_month], [invoice_day] (uses $document->slug)
+ * - [order_number]
+ * - [order_date="{date_format}"], [invoice_date="{date_format}"] (with $document->slug as type)
+ *
+ * @param int|null                         $plain_number The base document number (unformatted).
+ * @param string|null                      $prefix       The prefix string (may contain placeholders).
+ * @param string|null                      $suffix       The suffix string (may contain placeholders).
+ * @param int|null                         $padding      Number of digits for zero-padding the base number.
+ * @param \WPO\IPS\Documents\OrderDocument $document     The document object (e.g. invoice or credit note).
+ * @param \WC_Abstract_Order               $order        The WooCommerce order associated with the document.
+ *
+ * @return string The fully formatted document number.
+ */
+function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, ?string $suffix, ?int $padding, \WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order ): string {
+	// Get dates
+	$order_date = $order->get_date_created();
+	
+	// Order date can be empty when order is being saved, fallback to current time
+	if ( empty( $order_date ) && function_exists( 'wc_string_to_datetime' ) ) {
+		$order_date = wc_string_to_datetime( date_i18n( 'Y-m-d H:i:s' ) );
+	}
+
+	$document_date = $document->get_date();
+	// fallback to order date if no document date available
+	if ( empty( $document_date ) ) {
+		$document_date = $order_date;
+	}
+
+	// load replacement values
+	$order_year     = $order_date->date_i18n( 'Y' );
+	$order_month    = $order_date->date_i18n( 'm' );
+	$order_day      = $order_date->date_i18n( 'd' );
+	$document_year  = $document_date->date_i18n( 'Y' );
+	$document_month = $document_date->date_i18n( 'm' );
+	$document_day   = $document_date->date_i18n( 'd' );
+
+	// get order number
+	if ( is_callable( array( $order, 'get_order_number' ) ) ) { // order
+		$order_number = $order->get_order_number();
+	} elseif ( $document->is_refund( $order ) ) { // refund order
+		$parent_order = $document->get_refund_parent( $order );
+
+		if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'get_order_number' ) ) ) {
+			$order_number = $parent_order->get_order_number();
+		}
+	} else {
+		$order_number = '';
+	}
+	
+	// get format settings
+	$formats = array(
+		'prefix' => $prefix,
+		'suffix' => $suffix,
+	);
+
+	// make replacements
+	foreach ( $formats as $key => $value ) {
+		if ( empty( $value ) ) {
+			continue;
+		}
+
+		$value = str_replace( '[order_year]', $order_year, $value );
+		$value = str_replace( '[order_month]', $order_month, $value );
+		$value = str_replace( '[order_day]', $order_day, $value );
+		$value = str_replace( "[{$document->slug}_year]", $document_year, $value );
+		$value = str_replace( "[{$document->slug}_month]", $document_month, $value );
+		$value = str_replace( "[{$document->slug}_day]", $document_day, $value );
+		$value = str_replace( '[order_number]', $order_number, $value );
+
+		// replace date tag in the form [invoice_date="{$date_format}"] or [order_date="{$date_format}"]
+		$date_types = array( 'order', $document->slug );
+		foreach ( $date_types as $date_type ) {
+			if ( false !== strpos( $value, "[{$date_type}_date=" ) ) {
+				preg_match_all( "/\[{$date_type}_date=\"(.*?)\"\]/", $value, $document_date_tags );
+
+				if ( ! empty( $document_date_tags[1] ) ) {
+					foreach ( $document_date_tags[1] as $match_id => $date_format ) {
+						if ( 'order' === $date_type ) {
+							$value = str_replace( $document_date_tags[0][ $match_id ], $order_date->date_i18n( $date_format ), $value );
+						} else {
+							$value = str_replace( $document_date_tags[0][ $match_id ], $document_date->date_i18n( $date_format ), $value );
+						}
+					}
+				}
+			}
+		}
+		$formats[ $key ] = $value;
+	}
+
+	// Padding
+	$padding_string = '';
+	if ( function_exists( 'ctype_digit' ) ) { // requires the Ctype extension
+		if ( ctype_digit( (string) $padding ) ) {
+			$padding_string = (string) $padding;
+		}
+	} elseif ( ! empty( $padding ) ) {
+		$padding_string = (string) $padding;
+	}
+
+	if ( ! empty( $padding_string ) ) {
+		$plain_number = sprintf( '%0' . $padding_string . 'd', $plain_number );
+	}
+
+	// Add prefix & suffix
+	return $formats['prefix'] . $plain_number . $formats['suffix'];
+}
