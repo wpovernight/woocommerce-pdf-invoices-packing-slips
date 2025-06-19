@@ -228,7 +228,7 @@ class SettingsEDI {
 						__( 'If you don\'t know the ID, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
 						'</a>'
-					),
+					)
 				),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
@@ -296,7 +296,7 @@ class SettingsEDI {
 						__( 'Please make sure the field is filled out in the %1$sGeneral Settings%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_ips_edi_settings&tab=general' ) ) . '" target="_blank" rel="noopener noreferrer">',
 						'</a>'
-					),
+					)
 				),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',

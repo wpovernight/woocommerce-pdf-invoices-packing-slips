@@ -122,7 +122,7 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
  * @return void
  */
 function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $order ): void {
-	if ( false === strpos( wpo_ips_edi_get_current_format(), 'peppol' ) ) {
+	if ( ! wpo_ips_edi_peppol_is_available() ) {
 		return; // only save for Peppol formats
 	}
 	
@@ -191,6 +191,15 @@ function wpo_ips_edi_is_available(): bool {
 	$edi_settings = wpo_ips_edi_get_settings();
 	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
 	return apply_filters( 'wpo_ips_edi_is_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) && ! empty( $edi_settings['enabled'] ) );
+}
+
+/**
+ * Check if EDI Peppol is available
+ *
+ * @return bool
+ */
+function wpo_ips_edi_peppol_is_available(): bool {
+	return apply_filters( 'wpo_ips_edi_peppol_is_available', wpo_ips_edi_is_available() && false !== strpos( wpo_ips_edi_get_current_format(), 'peppol' ) );
 }
 
 /**
