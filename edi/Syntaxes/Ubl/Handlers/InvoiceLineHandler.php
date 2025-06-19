@@ -24,7 +24,6 @@ class InvoiceLineHandler extends AbstractUblHandler {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$tax_subtotal       = array();
 			$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
 			$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
 			$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
@@ -81,30 +80,6 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						),
 					),
 				);
-
-				$tax_subtotal[] = array(
-					'name'  => 'cac:TaxSubtotal',
-					'value' => array(
-						array(
-							'name'       => 'cbc:TaxableAmount',
-							'value'      => wc_round_tax_total( $item[ $line_total_key ] ),
-							'attributes' => array(
-								'currencyID' => $currency,
-							),
-						),
-						array(
-							'name'       => 'cbc:TaxAmount',
-							'value'      => wc_round_tax_total( $tax ),
-							'attributes' => array(
-								'currencyID' => $currency,
-							),
-						),
-						array(
-							'name'  => 'cac:TaxCategory',
-							'value' => $tax_category,
-						),
-					),
-				);
 			}
 
 			$invoice_line = array(
@@ -126,19 +101,6 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						'value'      => round( $item->get_total(), 2 ),
 						'attributes' => array(
 							'currencyID' => $currency,
-						),
-					),
-					array(
-						'name'  => 'cac:TaxTotal',
-						'value' => array(
-							array(
-								'name'       => 'cbc:TaxAmount',
-								'value'      => wc_round_tax_total( $item->get_total_tax() ),
-								'attributes' => array(
-									'currencyID' => $currency,
-								),
-							),
-							$tax_subtotal,
 						),
 					),
 					array(
@@ -197,9 +159,6 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			);
 
 			$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_line', $invoice_line, $data, $options, $item, $this );
-
-			// Empty this array at the end of the loop per item, so data doesn't stack
-			$tax_subtotal = [];
 		}
 
 		return $data;

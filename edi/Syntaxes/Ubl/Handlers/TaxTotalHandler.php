@@ -57,10 +57,6 @@ class TaxTotalHandler extends AbstractUblHandler {
 					'value' => strtoupper( $item_tax_category ),
 				),
 				array(
-					'name'  => 'cbc:Name',
-					'value' => $item['name'],
-				),
-				array(
 					'name'  => 'cbc:Percent',
 					'value' => round( $item_tax_percentage, 1 ),
 				),

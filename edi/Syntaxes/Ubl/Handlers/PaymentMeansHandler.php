@@ -33,14 +33,6 @@ class PaymentMeansHandler extends AbstractUblHandler {
 				),
 			),
 		);
-		
-		// Fallback: instruction note
-		if ( ! empty( $payment['title'] ) ) {
-			$payment_means['value'][] = array(
-				'name'  => 'cbc:InstructionNote',
-				'value' => $payment['title'],
-			);
-		}
 
 		// Add IBAN
 		if ( ! empty( $payment['iban'] ) ) {
