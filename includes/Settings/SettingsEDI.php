@@ -212,31 +212,6 @@ class SettingsEDI {
 		// Peppol specific field
 		$settings_fields[] = array(
 			'type'     => 'setting',
-			'id'       => 'peppol_eas',
-			'title'    => __( 'Electronic Address Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'callback' => 'select',
-			'section'  => $section,
-			'args'     => array(
-				'option_name'       => $option_name,
-				'id'                => 'peppol_eas',
-				'options' => ( function () {
-					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
-					foreach ( EN16931::get_electronic_address_schemes() as $code => $label ) {
-						$options[ $code ] = "[$code] $label";
-					}
-					return $options;
-				} )(),
-				'description'       => __( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint below.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'custom_attributes' => array(
-					'data-show_for_option_name'   => $option_name . '[ubl_format]',
-					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
-				),
-			),
-		);
-		
-		// Peppol specific field
-		$settings_fields[] = array(
-			'type'     => 'setting',
 			'id'       => 'peppol_endpoint_id',
 			'title'    => __( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 			'callback' => 'text_input',
@@ -250,6 +225,84 @@ class SettingsEDI {
 					'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
 					'</a>'
 				),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+				),
+			),
+		);
+		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_endpoint_eas',
+			'title'    => __( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'option_name'       => $option_name,
+				'id'                => 'peppol_endpoint_eas',
+				'options'            => ( function () {
+					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
+					foreach ( EN16931::get_electronic_address_schemes() as $code => $label ) {
+						$options[ $code ] = "[$code] $label";
+					}
+					return $options;
+				} )(),
+				'description'       => __( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint above.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+				),
+			),
+		);
+		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_legal_identifier',
+			'title'    => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'option_name'       => $option_name,
+				'id'                => 'peppol_legal_identifier',
+				'options'           => array(
+					''           => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+					'vat_number' => __( 'Shop VAT Number', 'woocommerce-pdf-invoices-packing-slips' ),
+					'coc_number' => __( 'Shop COC Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				'description'       => sprintf(
+					/* translators: %1$s: open link anchor, %2$s: close link anchor */
+					__( 'Specify the Peppol Legal Identifier for the supplier. Please make sure the field is filled out in the %1$sGeneral Settings%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_ips_edi_settings&tab=general' ) ) . '" target="_blank" rel="noopener noreferrer">',
+					'</a>'
+				),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+				),
+			),
+		);
+		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_legal_identifier_icd',
+			'title'    => __( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'option_name'       => $option_name,
+				'id'                => 'peppol_legal_identifier_icd',
+				'options'            => ( function () {
+					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
+					foreach ( EN16931::get_icd_schemes() as $code => $label ) {
+						$options[ $code ] = "[$code] $label";
+					}
+					return $options;
+				} )(),
+				'description'       => __( 'Specify the Peppol Legal Identifier Scheme (ICD) for the supplier.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),

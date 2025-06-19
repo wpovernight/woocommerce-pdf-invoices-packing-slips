@@ -171,7 +171,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$coc_number = $this->get_shop_data( 'coc_number' );
 		
 		if ( empty( $company ) && empty( $coc_number ) ) {
-			wpo_ips_edi_log( 'Both company name and CoC number are missing for PartyLegalEntity.', 'error' );
+			wpo_ips_edi_log( 'Both company name and CoC number are missing for supplier PartyLegalEntity.', 'error' );
 			return null;
 		}
 

@@ -38,18 +38,18 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_endpoint_id(): ?array {
-		$identifier = $this->get_peppol_identifier();
+		$endpoint = $this->get_endpoint();
 
-		if ( ! $identifier ) {
-			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for customer EndpointID.', 'error' );
+		if ( ! $endpoint ) {
+			wpo_ips_edi_log( 'Peppol Endpoint ID or scheme is missing for customer EndpointID.', 'error' );
 			return null;
 		}
 
 		$endpoint = array(
 			'name'       => 'cbc:EndpointID',
-			'value'      => $identifier['id'],
+			'value'      => $endpoint['endpoint_id'],
 			'attributes' => array(
-				'schemeID' => $identifier['scheme'],
+				'schemeID' => $endpoint['endpoint_eas'],
 			),
 		);
 
@@ -62,7 +62,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_identification(): ?array {
-		$identifier = $this->get_peppol_identifier();
+		$identifier = $this->get_legal_identifier();
 
 		if ( empty( $identifier ) ) {
 			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for customer PartyIdentification.', 'error' );
@@ -74,9 +74,9 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			'value' => array(
 				array(
 					'name'       => 'cbc:ID',
-					'value'      => $identifier['id'],
+					'value'      => $identifier['identifier'],
 					'attributes' => array(
-						'schemeID' => $identifier['scheme'],
+						'schemeID' => $identifier['identifier_icd'],
 					),
 				),
 			),
@@ -94,12 +94,23 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		$billing_company   = $this->document->order->get_billing_company();
 		$billing_name      = $this->document->order->get_formatted_billing_full_name();
 		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
-		$identifier        = $this->get_peppol_identifier();
+		$identifier        = $this->get_legal_identifier();
 
-		if ( empty( $registration_name ) && empty( $identifier ) ) {
+		if ( empty( $registration_name ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'Both registration name and customer identifier are missing or invalid for customer PartyLegalEntity in order ID %d.',
+					'Registration name is missing for customer PartyLegalEntity in order ID %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
+			return null;
+		}
+		
+		if ( empty( $identifier['identifier'] ) || empty( $identifier['identifier_icd'] ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Customer identifier is missing for customer PartyLegalEntity in order ID %d.',
 					$this->document->order->get_id()
 				),
 				'error'
@@ -116,9 +127,9 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 				),
 				array(
 					'name'       => 'cbc:CompanyID',
-					'value'      => $identifier['id'],
+					'value'      => $identifier['identifier'],
 					'attributes' => array(
-						'schemeID' => $identifier['scheme'],
+						'schemeID' => $identifier['identifier_icd'],
 					),
 				),
 			),
@@ -128,35 +139,68 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	}
 	
 	/**
-	 * Gets the Peppol identifier and scheme ID for the order's customer.
+	 * Gets the Peppol Endpoint ID and scheme for the customer from user meta.
 	 *
-	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
+	 * @return array|null Array with 'endpoint_id' and 'endpoint_eas' keys, or null if invalid/missing.
 	 */
-	private function get_peppol_identifier(): ?array {
-		$order   = $this->document->order;
-		$user_id = $order->get_customer_id();
-		$id      = $order->get_meta( '_peppol_endpoint_id' );
-		$scheme  = $order->get_meta( '_peppol_eas' );
+	private function get_endpoint(): ?array {
+		$order        = $this->document->order;
+		$user_id      = $order->get_customer_id();
+		$endpoint_id  = $order->get_meta( '_peppol_endpoint_id' );
+		$endpoint_eas = $order->get_meta( '_peppol_endpoint_eas' );
 
-		if ( empty( $id ) && $user_id ) {
-			$id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		if ( empty( $endpoint_id ) && $user_id ) {
+			$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		}
-		if ( empty( $scheme ) && $user_id ) {
-			$scheme = get_user_meta( $user_id, 'peppol_eas', true );
+		if ( empty( $endpoint_eas ) && $user_id ) {
+			$endpoint_eas = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 		}
 
-		if ( empty( $id ) || empty( $scheme ) ) {
+		if ( empty( $endpoint_id ) || empty( $endpoint_eas ) ) {
 			return null;
 		}
 		
-		$schemes = EN16931::get_electronic_address_schemes();
-		if ( ! array_key_exists( $scheme, $schemes ) ) {
+		$eas_schemes = EN16931::get_electronic_address_schemes();
+		if ( ! array_key_exists( $endpoint_eas, $eas_schemes ) ) {
 			return null;
 		}
 
 		return array(
-			'id'     => $id,
-			'scheme' => $scheme,
+			'endpoint_id'  => $endpoint_id,
+			'endpoint_eas' => $endpoint_eas,
+		);
+	}
+	
+	/**
+	 * Gets the Peppol Legal Identifier and scheme for the order's customer.
+	 *
+	 * @return array|null Array with 'identifier' and 'identifier_icd' keys, or null if invalid/missing.
+	 */
+	private function get_legal_identifier(): ?array {
+		$order                = $this->document->order;
+		$user_id              = $order->get_customer_id();
+		$legal_identifier     = $order->get_meta( '_peppol_legal_identifier' );
+		$legal_identifier_icd = $order->get_meta( '_peppol_legal_identifier_icd' );
+
+		if ( empty( $legal_identifier ) && $user_id ) {
+			$legal_identifier = get_user_meta( $user_id, 'peppol_legal_identifier', true );
+		}
+		if ( empty( $legal_identifier_icd ) && $user_id ) {
+			$legal_identifier_icd = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
+		}
+
+		if ( empty( $legal_identifier ) || empty( $legal_identifier_icd ) ) {
+			return null;
+		}
+		
+		$icd_schemes = EN16931::get_icd_schemes();
+		if ( ! array_key_exists( $legal_identifier_icd, $icd_schemes ) ) {
+			return null;
+		}
+
+		return array(
+			'identifier'     => $legal_identifier,
+			'identifier_icd' => $legal_identifier_icd,
 		);
 	}
 	

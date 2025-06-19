@@ -132,15 +132,15 @@ function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $
 		return;
 	}
 
-	$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-	$scheme_id   = get_user_meta( $user_id, 'peppol_eas', true );
+	$legal_identifier     = get_user_meta( $user_id, 'peppol_legal_identifier', true );
+	$legal_identifier_icd = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
 
-	if ( ! empty( $endpoint_id ) ) {
-		$order->update_meta_data( '_peppol_endpoint_id', $endpoint_id );
+	if ( ! empty( $legal_identifier ) ) {
+		$order->update_meta_data( '_peppol_legal_identifier', $legal_identifier );
 	}
 
-	if ( ! empty( $scheme_id ) ) {
-		$order->update_meta_data( '_peppol_eas', $scheme_id );
+	if ( ! empty( $legal_identifier_icd ) ) {
+		$order->update_meta_data( '_peppol_legal_identifier_icd', $legal_identifier_icd );
 	}
 	
 	$order->save_meta_data();

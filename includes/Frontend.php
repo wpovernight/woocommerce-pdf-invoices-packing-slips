@@ -228,43 +228,74 @@ class Frontend {
 			return; // only show for Peppol formats
 		}
 
-		$user_id         = get_current_user_id();
-		$eas             = get_user_meta( $user_id, 'peppol_eas', true );
-		$endpoint_id     = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		$eas_options_raw = EN16931::get_electronic_address_schemes();
-		$eas_options     = array();
+		$user_id              = get_current_user_id();
+		
+		$endpoint_id          = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		$endpoint_eas         = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+		$legal_identifier_icd = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
+		$legal_identifier     = get_user_meta( $user_id, 'peppol_legal_identifier', true );
+		
+		$eas_options_raw      = EN16931::get_electronic_address_schemes();
+		$eas_options          = array();
 
 		foreach ( $eas_options_raw as $code => $label ) {
 			$eas_options[ $code ] = "[$code] $label";
 		}
+
+		$icd_options_raw      = EN16931::get_icd_schemes();
+		$icd_options          = array();
+
+		foreach ( $icd_options_raw as $code => $label ) {
+			$icd_options[ $code ] = "[$code] $label";
+		}
 		?>
 		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-			<label for="peppol_eas"><?php esc_html_e( 'Electronic Address Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-			<select name="peppol_eas" id="peppol_eas" class="woocommerce-Input input-select">
+			<label for="peppol_endpoint_id"><?php esc_html_e( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+			<input type="text" class="woocommerce-Input input-text" name="peppol_endpoint_id" id="peppol_endpoint_id" value="<?php echo esc_attr( $endpoint_id ); ?>" />
+		</p>
+		
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="peppol_endpoint_eas"><?php esc_html_e( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+			<select name="peppol_endpoint_eas" id="peppol_endpoint_eas" class="woocommerce-Input input-select">
 				<option value=""><?php esc_html_e( 'Select...', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
 				<?php foreach ( $eas_options as $code => $label ) : ?>
-					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $eas, $code ); ?>>
+					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $endpoint_eas, $code ); ?>>
 						<?php echo esc_html( $label ); ?>
 					</option>
 				<?php endforeach; ?>
 			</select>
 			<small>
-				<?php esc_html_e( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint below.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				<?php esc_html_e( 'Specify the Electronic Address Scheme (EAS) for the supplier Endpoint above', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 			</small>
 		</p>
-
+		
 		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-			<label for="peppol_endpoint_id"><?php esc_html_e( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-			<input type="text" class="woocommerce-Input input-text" name="peppol_endpoint_id" id="peppol_endpoint_id" value="<?php echo esc_attr( $endpoint_id ); ?>" />
+			<label for="peppol_legal_identifier"><?php esc_html_e( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+			<input type="text" class="woocommerce-Input input-text" name="peppol_legal_identifier" id="peppol_legal_identifier" value="<?php echo esc_attr( $legal_identifier ); ?>" />
 			<small>
 				<?php
 				echo wp_kses_post( sprintf(
 					/* translators: %1$s: open link, %2$s: close link */
-					__( 'If you don\'t know the ID, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( 'If you don\'t know the Legal Identifier, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
 					'</a>'
 				) );
 				?>
+			</small>
+		</p>
+		
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="peppol_legal_identifier_icd"><?php esc_html_e( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+			<select name="peppol_legal_identifier_icd" id="peppol_legal_identifier_icd" class="woocommerce-Input input-select">
+				<option value=""><?php esc_html_e( 'Select...', 'woocommerce-pdf-invoices-packing-slips' ); ?></option>
+				<?php foreach ( $icd_options as $code => $label ) : ?>
+					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $legal_identifier_icd, $code ); ?>>
+						<?php echo esc_html( $label ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+			<small>
+				<?php esc_html_e( 'Specify the Peppol Scheme (ICD) for the identifier above.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 			</small>
 		</p>
 		<?php
@@ -277,12 +308,20 @@ class Frontend {
 	 * @return void
 	 */
 	public function save_edi_peppol_user_fields( int $user_id ): void {
-		if ( isset( $_POST['peppol_eas'] ) ) {
-			update_user_meta( $user_id, 'peppol_eas', sanitize_text_field( wp_unslash( $_POST['peppol_eas'] ) ) );
-		}
-
 		if ( isset( $_POST['peppol_endpoint_id'] ) ) {
 			update_user_meta( $user_id, 'peppol_endpoint_id', sanitize_text_field( wp_unslash( $_POST['peppol_endpoint_id'] ) ) );
+		}
+		
+		if ( isset( $_POST['peppol_endpoint_eas'] ) ) {
+			update_user_meta( $user_id, 'peppol_endpoint_eas', sanitize_text_field( wp_unslash( $_POST['peppol_endpoint_eas'] ) ) );
+		}
+		
+		if ( isset( $_POST['peppol_legal_identifier'] ) ) {
+			update_user_meta( $user_id, 'peppol_legal_identifier', sanitize_text_field( wp_unslash( $_POST['peppol_legal_identifier'] ) ) );
+		}
+		
+		if ( isset( $_POST['peppol_legal_identifier_icd'] ) ) {
+			update_user_meta( $user_id, 'peppol_legal_identifier_icd', sanitize_text_field( wp_unslash( $_POST['peppol_legal_identifier_icd'] ) ) );
 		}
 	}
 	

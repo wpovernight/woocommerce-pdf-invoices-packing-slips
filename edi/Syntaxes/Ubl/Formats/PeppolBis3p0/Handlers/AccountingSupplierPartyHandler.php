@@ -38,18 +38,18 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_endpoint_id(): ?array {
-		$identifier = $this->get_peppol_identifier();
+		$endpoint = $this->get_endpoint();
 
-		if ( ! $identifier ) {
-			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for supplier EndpointID.', 'error' );
+		if ( ! $endpoint ) {
+			wpo_ips_edi_log( 'Peppol Endpoint ID or scheme is missing for supplier EndpointID.', 'error' );
 			return null;
 		}
 
 		$endpoint = array(
 			'name'       => 'cbc:EndpointID',
-			'value'      => $identifier['id'],
+			'value'      => $endpoint['id'],
 			'attributes' => array(
-				'schemeID' => $identifier['scheme'],
+				'schemeID' => $endpoint['scheme'],
 			),
 		);
 
@@ -62,10 +62,10 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_identification(): ?array {
-		$identifier = $this->get_peppol_identifier();
+		$identifier = $this->get_legal_identifier();
 
 		if ( ! $identifier ) {
-			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for supplier PartyIdentification.', 'error' );
+			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing for supplier PartyIdentification.', 'error' );
 			return null;
 		}
 
@@ -74,9 +74,9 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			'value' => array(
 				array(
 					'name'       => 'cbc:ID',
-					'value'      => $identifier['id'],
+					'value'      => $identifier['legal_identifier'],
 					'attributes' => array(
-						'schemeID' => $identifier['scheme'],
+						'schemeID' => $identifier['legal_identifier_icd'],
 					),
 				),
 			),
@@ -84,30 +84,93 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_identification', $party_id, $this );
 	}
+	
+	/**
+	 * Returns the party legal entity for the supplier.
+	 *
+	 * @return array|null
+	 */
+	public function get_party_legal_entity(): ?array {
+		$company    = $this->get_shop_data( 'name' );
+		$identifier = $this->get_legal_identifier();
+
+		if ( empty( $company ) ) {
+			wpo_ips_edi_log( 'Company name is missing for supplier PartyLegalEntity.', 'error' );
+			return null;
+		}
+		
+		if ( empty( $identifier['legal_identifier'] ) && empty( $identifier['legal_identifier_icd'] ) ) {
+			wpo_ips_edi_log( 'Legal Identifier is missing for supplier PartyLegalEntity.', 'error' );
+			return null;
+		}
+
+		$party_legal_entity = array(
+			'name'  => 'cac:PartyLegalEntity',
+			'value' => array(
+				array(
+					'name'  => 'cbc:RegistrationName',
+					'value' => wpo_ips_edi_sanitize_string( $company ),
+				),
+				array(
+					'name'  => 'cbc:CompanyID',
+					'value' => $identifier['legal_identifier'],
+					'attributes' => array(
+						'schemeID' => $identifier['legal_identifier_icd'],
+					),
+				),
+			),
+		);
+
+		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_legal_entity', $party_legal_entity, $this );
+	}
 
 	/**
-	 * Gets the Peppol identifier and scheme ID for the supplier from plugin settings.
+	 * Gets the Peppol Endpoint ID and scheme for the supplier from plugin settings.
 	 *
 	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
 	 */
-	private function get_peppol_identifier(): ?array {
+	private function get_endpoint(): ?array {
 		$settings = wpo_ips_edi_get_settings();
-
-		$id     = $settings['peppol_endpoint_id'] ?? null;
-		$scheme = $settings['peppol_eas'] ?? null;
+		$id       = $settings['peppol_endpoint_id'] ?? null;
+		$scheme   = $settings['peppol_endpoint_eas'] ?? null;
 
 		if ( empty( $id ) || empty( $scheme ) ) {
 			return null;
 		}
 
-		$schemes = EN16931::get_electronic_address_schemes();
-		if ( ! array_key_exists( $scheme, $schemes ) ) {
+		$eas_schemes = EN16931::get_electronic_address_schemes();
+		if ( ! array_key_exists( $scheme, $eas_schemes ) ) {
 			return null;
 		}
 
 		return array(
 			'id'     => $id,
 			'scheme' => $scheme,
+		);
+	}
+	
+	/**
+	 * Gets the Peppol Legal Identifier and scheme for the supplier from plugin settings.
+	 *
+	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
+	 */
+	private function get_legal_identifier(): ?array {
+		$settings             = wpo_ips_edi_get_settings();
+		$legal_identifier     = $settings['peppol_legal_identifier'] ?? null;
+		$legal_identifier_icd = $settings['peppol_legal_identifier_icd'] ?? null;
+
+		if ( empty( $legal_identifier ) || empty( $legal_identifier_icd ) ) {
+			return null;
+		}
+
+		$icd_schemes = EN16931::get_icd_schemes();
+		if ( ! array_key_exists( $legal_identifier_icd, $icd_schemes ) ) {
+			return null;
+		}
+
+		return array(
+			'legal_identifier'     => $this->get_shop_data( $legal_identifier ),
+			'legal_identifier_icd' => $legal_identifier_icd,
 		);
 	}
 
