@@ -50,11 +50,13 @@ class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 	
 	/**
 	 * Get the conformance level for this format.
+	 * 
+	 * - Can be: MINIMUM, BASIC WL, EN 16931
 	 *
 	 * @return string The conformance level.
 	 */
 	public function get_conformance_level(): string {
-		return 'EN16931';
+		return 'EN 16931';
 	}
 	
 	/**
@@ -63,7 +65,7 @@ class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 	 * @return string The version of the format.
 	 */
 	public function get_version(): string {
-		return '2.0';
+		return '2p0'; // not 2.0
 	}
 	
 	/**
