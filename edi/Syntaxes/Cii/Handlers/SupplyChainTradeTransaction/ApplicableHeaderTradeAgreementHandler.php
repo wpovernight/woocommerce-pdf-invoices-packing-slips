@@ -37,9 +37,9 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_seller_trade_party(): ?array {
-		$name       = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'name' ) );
-		$vat_number = $this->get_shop_data( 'vat_number' );
-		$coc_number = $this->get_shop_data( 'coc_number' );
+		$name       = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_name' ) );
+		$vat_number = $this->get_identifiers_data( 'vat_number' );
+		$coc_number = $this->get_identifiers_data( 'coc_number' );
 		
 		if ( empty( $name ) ) {
 			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.' );
@@ -51,10 +51,10 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			return null;
 		}
 		
-		$postcode       = $this->get_shop_data( 'address_postcode' );
-		$address_line_1 = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_line_1' ) );
-		$address_city   = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_city' ) );
-		$country_code   = wpo_ips_edi_sanitize_string( $this->get_shop_data( 'address_country_code' ) );
+		$postcode       = $this->get_identifiers_data( 'shop_address_postcode' );
+		$address_line_1 = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_address_line_1' ) );
+		$address_city   = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_address_city' ) );
+		$country_code   = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_address_country' ) );
 
 		$seller_trade_party = array(
 			'name'  => 'ram:SellerTradeParty',

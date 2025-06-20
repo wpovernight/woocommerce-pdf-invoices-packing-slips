@@ -45,24 +45,17 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 	
 	/**
-	 * Get the shop data.
+	 * Get the identifiers data.
 	 *
-	 * @param string $suffix The data suffix (e.g., 'name', 'coc_number', 'phone_number', 'address_postcode').
+	 * @param string $key The data key (e.g., 'shop_name', 'coc_number', 'shop_address_line_1', 'shop_address_postcode').
 	 * @return string
 	 */
-	protected function get_shop_data( string $suffix ): string {
-		$value = '';
+	protected function get_identifiers_data( string $key ): string {
+		$general_settings = WPO_WCPDF()->settings->general;
+		$edi_settings     = wpo_ips_edi_get_settings();
+		$language         = ! empty( $edi_settings['identifiers_language'] ) ? $edi_settings['identifiers_language'] : 'default';
 		
-		// Generic access to shop data
-		if ( ! empty( $this->document->order_document ) ) {
-			$method = 'get_shop_' . $suffix;
-
-			if ( method_exists( $this->document->order_document, $method ) ) {
-				$value = $this->document->order_document->$method();
-			}
-		}
-
-		return $value;
+		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
 	
 	/**
