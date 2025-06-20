@@ -8,12 +8,12 @@ jQuery( function( $ ) {
 			e.preventDefault();
 			let template   = action;
 			let checked    = [];
-			let ubl_output = false;
+			let xml_output = false;
 
-			// is UBL action
-			if ( action.indexOf( 'ubl' ) != -1 ) {
-				template   = template.replace( '_ubl', '' );
-				ubl_output = true;
+			// is XML action
+			if ( action.indexOf( 'xml' ) != -1 ) {
+				template   = template.replace( '_xml', '' );
+				xml_output = true;
 			}
 
 			$( 'tbody th.check-column input[type="checkbox"]:checked' ).each(
@@ -36,10 +36,10 @@ jQuery( function( $ ) {
 				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			}
 
-			// ubl
-			if ( ubl_output ) {
+			// xml
+			if ( xml_output ) {
 				$.each( checked, function( i, order_id ) {
-					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
+					full_url = partial_url + '&order_ids='+order_id+'&output=xml';
 					window.open( full_url, '_blank' );
 				} );
 

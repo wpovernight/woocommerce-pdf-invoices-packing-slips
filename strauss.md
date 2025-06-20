@@ -91,7 +91,7 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 	"autoload": {
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
-			"WPO\\IPS\\UBL\\": "ubl/"
+			"WPO\\IPS\\UBL\\": "edi/"
 		}
 	},
 	"require": {
