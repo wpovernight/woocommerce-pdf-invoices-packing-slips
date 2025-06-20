@@ -10,22 +10,51 @@ interface HybridFormatInterface {
 	
 	/**
 	 * Generate RDF metadata string for embedding in PDF/A-3.
-	 *
-	 * @param string $filename
-	 * @param string $document_type
-	 * @param string $profile
-	 * @param string $version
-	 * @param string $namespace_prefix
-	 * @param string $namespace_uri
+
 	 * @return string
 	 */
-	public function get_rdf_metadata(
-		string $filename,
-		string $document_type = 'INVOICE',
-		string $profile = 'EN16931',
-		string $version = '1.0',
-		string $namespace_prefix = 'fx',
-		string $namespace_uri = 'urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#'
-	): string;
+	public function get_rdf_metadata(): string;
+	
+	/**
+	 * Get the filename for this format.
+	 *
+	 * @return string
+	 */
+	public function get_document_filename(): string;
+	
+	/**
+	 * Get the slug for this format.
+	 *
+	 * @return string
+	 */
+	public function get_document_type(): string;
+	
+	/**
+	 * Get the conformance level for this format.
+	 *
+	 * @return string
+	 */
+	public function get_conformance_level(): string;
+	
+	/**
+	 * Get the version of this format.
+	 *
+	 * @return string
+	 */
+	public function get_version(): string;
+	
+	/**
+	 * Get the prefix for this format.
+	 *
+	 * @return string
+	 */
+	public function get_prefix(): string;
+	
+	/**
+	 * Get the namespace for this format.
+	 *
+	 * @return string
+	 */
+	public function get_namespace(): string;
 
 }

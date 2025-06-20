@@ -322,9 +322,9 @@ function wpo_ips_edi_get_current_syntax(): string {
  * Get the current EDI format
  *
  * @param bool $full_details Optional. If true, returns full format details.
- * @return string
+ * @return string|array
  */
-function wpo_ips_edi_get_current_format( bool $full_details = false ): string {
+function wpo_ips_edi_get_current_format( bool $full_details = false ) {
 	$edi_settings = wpo_ips_edi_get_settings();
 	$format       = 'ubl_2_1';
 
@@ -432,18 +432,25 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice::class,
 					),
 				),
-				'factur-x-1p07p3' => array(
-					'name'      => 'Factur-X 1.07.3',
+				'factur-x-1p0' => array(
+					'name'      => 'Factur-X 1.0',
 					'hybrid'    => true,
 					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p07p3\Invoice::class,
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p0\Invoice::class,
 					),
 				),
-				'zugferd-2p3p3' => array(
-					'name'      => 'ZUGFeRD 2.3.3',
+				'zugferd-1p0' => array(
+					'name'      => 'ZUGFeRD 1.0',
 					'hybrid'    => true,
 					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p3p3\Invoice::class,
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd1p0\Invoice::class,
+					),
+				),
+				'zugferd-2p0' => array(
+					'name'      => 'ZUGFeRD 2.0',
+					'hybrid'    => true,
+					'documents' => array(
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p0\Invoice::class,
 					),
 				),
 			),
