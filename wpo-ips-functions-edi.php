@@ -439,6 +439,13 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
 						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p07p3\Invoice::class,
 					),
 				),
+				'zugferd-2p3p3' => array(
+					'name'      => 'ZUGFeRD 2.3.3',
+					'hybrid'    => true,
+					'documents' => array(
+						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p3p3\Invoice::class,
+					),
+				),
 			),
 		)
 	);

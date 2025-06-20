@@ -982,6 +982,15 @@ class SettingsEDI {
 						) ); ?>
 					</td>
 				</tr>
+				<tr>
+					<td colspan="4">
+						<?php echo wp_kses_post( sprintf(
+							/* translators: %s EN16931 */
+							__( 'All supported formats are compliant with the European standard %s, ensuring semantic and structural consistency for cross-border electronic invoicing within the EU.', 'woocommerce-pdf-invoices-packing-slips' ),
+							'<strong>EN16931</strong>'
+						) ); ?>
+					</td>
+				</tr>
 			<tfoot>
 		</table>
 		<?php
