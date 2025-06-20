@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX;
+namespace WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p07p3;
 
 use WPO\IPS\EDI\Interfaces\HybridFormatInterface;
 use WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice as CiiD16BInvoice;
@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 
-	public string $slug = 'factur-x';
-	public string $name = 'Factur-X';
-	
+	public string $slug = 'factur-x-1p07p3';
+	public string $name = 'Factur-X 1.07.3';
+
 	/**
 	 * Get RDF metadata for embedding XML in PDF/A-3.
 	 *
