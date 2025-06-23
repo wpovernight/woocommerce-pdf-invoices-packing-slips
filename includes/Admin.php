@@ -1169,7 +1169,7 @@ class Admin {
 											sprintf(
 												/* translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name */
 												esc_html__( 'If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-												'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug' ) ) . '" target="_blank">',
+												'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug#enable_document_data_editing' ) ) . '" target="_blank">',
 												'</a>',
 												'<strong>' . esc_html__( 'Enable document data editing', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
 											)
