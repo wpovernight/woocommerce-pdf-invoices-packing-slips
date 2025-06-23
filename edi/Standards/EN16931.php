@@ -2,25 +2,17 @@
 
 namespace WPO\IPS\EDI\Standards;
 
+use WPO\IPS\EDI\Abstracts\AbstractStandard;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class EN16931 {
+class EN16931 extends AbstractStandard {
 
-	/**
-	 * The standard.
-	 *
-	 * @var string
-	 */
-	public static string $standard = 'EN16931';
-	
-	/**
-	 * The version of the standard.
-	 *
-	 * @var string
-	 */
-	public static string $standard_version = '15.0';
+	public static string $slug    = 'en16931';
+	public static string $name    = 'EN16931';
+	public static string $version = '15.0';
 
 	/**
 	 * Get the VAT category codes according to code list.
@@ -34,7 +26,7 @@ class EN16931 {
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vat_cat', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_vat_cat', array() );
 
 		return $extra + $defaults;
 	}
@@ -59,7 +51,7 @@ class EN16931 {
 			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_5305', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_5305', array() );
 
 		return $extra + $defaults;
 	}
@@ -165,7 +157,7 @@ class EN16931 {
 			'VATEX-FR-298SEXDECIESA' => __( 'Exempt based on article 298 sexdecies A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_vatex', array() );
 
 		return $extra + $defaults;
 	}
@@ -226,7 +218,7 @@ class EN16931 {
 			),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex_remarks', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_vatex_remarks', array() );
 
 		return $extra + $defaults;
 	}
@@ -339,7 +331,7 @@ class EN16931 {
 			'EM'   => 'Electronic mail (SMPT)',
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_eas', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_eas', array() );
 
 		return $extra + $defaults;
 	}
@@ -590,7 +582,7 @@ class EN16931 {
 			'0240' => 'Register of legal persons (in French : Répertoire des personnes morales)',
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_icd', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_icd', array() );
 
 		return $extra + $defaults;
 	}

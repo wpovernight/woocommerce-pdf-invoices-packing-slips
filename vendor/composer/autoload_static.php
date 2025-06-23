@@ -62,6 +62,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Documents\\SequentialNumberStore' => __DIR__ . '/../..' . '/includes/Documents/SequentialNumberStore.php',
         'WPO\\IPS\\EDI\\Abstracts\\AbstractCollection' => __DIR__ . '/../..' . '/edi/Abstracts/AbstractCollection.php',
         'WPO\\IPS\\EDI\\Abstracts\\AbstractHandler' => __DIR__ . '/../..' . '/edi/Abstracts/AbstractHandler.php',
+        'WPO\\IPS\\EDI\\Abstracts\\AbstractStandard' => __DIR__ . '/../..' . '/edi/Abstracts/AbstractStandard.php',
         'WPO\\IPS\\EDI\\Document' => __DIR__ . '/../..' . '/edi/Document.php',
         'WPO\\IPS\\EDI\\Interfaces\\BuilderInterface' => __DIR__ . '/../..' . '/edi/Interfaces/BuilderInterface.php',
         'WPO\\IPS\\EDI\\Interfaces\\FormatInterface' => __DIR__ . '/../..' . '/edi/Interfaces/FormatInterface.php',

@@ -24,6 +24,7 @@ return array(
     'WPO\\IPS\\Documents\\SequentialNumberStore' => $baseDir . '/includes/Documents/SequentialNumberStore.php',
     'WPO\\IPS\\EDI\\Abstracts\\AbstractCollection' => $baseDir . '/edi/Abstracts/AbstractCollection.php',
     'WPO\\IPS\\EDI\\Abstracts\\AbstractHandler' => $baseDir . '/edi/Abstracts/AbstractHandler.php',
+    'WPO\\IPS\\EDI\\Abstracts\\AbstractStandard' => $baseDir . '/edi/Abstracts/AbstractStandard.php',
     'WPO\\IPS\\EDI\\Document' => $baseDir . '/edi/Document.php',
     'WPO\\IPS\\EDI\\Interfaces\\BuilderInterface' => $baseDir . '/edi/Interfaces/BuilderInterface.php',
     'WPO\\IPS\\EDI\\Interfaces\\FormatInterface' => $baseDir . '/edi/Interfaces/FormatInterface.php',
