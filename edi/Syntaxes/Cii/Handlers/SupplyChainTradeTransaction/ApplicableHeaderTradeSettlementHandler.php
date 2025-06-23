@@ -47,7 +47,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		if ( empty( $reference ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'CII ApplicableHeaderTradeSettlementHandler: Payment reference is empty for order %d.',
+					'CII ApplicableHeaderTradeSettlementHandler: Payment reference is empty in order %d.',
 					$order->get_id()
 				),
 				'error'
@@ -75,7 +75,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		if ( empty( $payment['type_code'] ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'CII ApplicableHeaderTradeSettlementHandler: No usable payment means data found for order %d.',
+					'CII ApplicableHeaderTradeSettlementHandler: No usable payment means data found in order %d.',
 					$this->document->order->get_id()
 				),
 				'error'
@@ -170,7 +170,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		if ( empty( $order_tax_data ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'CII ApplicableHeaderTradeSettlementHandler: No tax data available for order %d.',
+					'CII ApplicableHeaderTradeSettlementHandler: No tax data available in order %d.',
 					$order->get_id()
 				),
 				'error'

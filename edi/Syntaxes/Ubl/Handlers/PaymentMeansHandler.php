@@ -18,9 +18,27 @@ class PaymentMeansHandler extends AbstractUblHandler {
 	 */
 	public function handle( array $data, array $options = array() ): array {
 		$payment = $this->get_payment_means_data();
+		
+		if ( ! $payment ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'UBL PaymentMeans: No payment means data for order %d',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
+			return $data; // No payment means data available
+		}
 
 		// If no usable type code, skip
 		if ( empty( $payment['type_code'] ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'UBL PaymentMeans: No usable type code for order %d',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 			return $data;
 		}
 

@@ -57,7 +57,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 */
 	public function get_party_name(): ?array {
 		$customer_party_name = $this->document->order->get_formatted_billing_full_name();
-		$billing_company   = $this->document->order->get_billing_company();
+		$billing_company     = $this->document->order->get_billing_company();
 
 		if ( ! empty( $billing_company ) ) {
 			// $customer_party_name = "{$billing_company} ({$customer_party_name})";
@@ -136,7 +136,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 
 		if ( ! empty( $vat_number ) ) {
 			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-				wpo_ips_edi_log( 'VAT number does not have a country prefix for customer PartyTaxScheme.', 'error' );
+				wpo_ips_edi_log( 'UBL PartyTaxScheme: VAT number does not have a country prefix for customer.', 'error' );
 			}
 		
 			$values[] = array(
@@ -146,7 +146,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		} else {
 			wpo_ips_edi_log(
 				sprintf(
-					'Customer VAT number is missing or invalid for PartyTaxScheme in order ID %d.',
+					'UBL PartyTaxScheme: Customer VAT number is missing or invalid in order %d.',
 					$this->document->order->get_id()
 				),
 				'error'
@@ -183,17 +183,35 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$vat_number        = $this->get_order_customer_vat_number();
 
 		if ( empty( $registration_name ) ) {
-			wpo_ips_edi_log( 'Registration name is missing for customer PartyLegalEntity.', 'error' );
+			wpo_ips_edi_log(
+				sprintf(
+					'UBL PartyLegalEntity: Registration name is missing for customer in order %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 			return null;
 		}
 
 		if ( empty( $vat_number ) ) {
-			wpo_ips_edi_log( 'VAT number is missing for customer PartyLegalEntity.', 'error' );
+			wpo_ips_edi_log(
+				sprintf(
+					'UBL PartyLegalEntity: VAT number is missing for customer in order %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 			return null;
 		}
 		
 		if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-			wpo_ips_edi_log( 'VAT number does not have a country prefix for customer PartyLegalEntity.', 'error' );
+			wpo_ips_edi_log(
+				sprintf(
+					'UBL PartyLegalEntity: VAT number does not have a country prefix for customer in order %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 		}
 
 		$party_legal_entity = array(
@@ -236,7 +254,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		} else {
 			wpo_ips_edi_log(
 				sprintf(
-					'Customer name is missing or invalid for PartyContact in order ID %d.',
+					'UBL PartyContact: Customer name is missing or invalid in order %d.',
 					$this->document->order->get_id()
 				),
 				'error'
@@ -251,7 +269,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		} else {
 			wpo_ips_edi_log(
 				sprintf(
-					'Customer email is missing or invalid for PartyContact in order ID %d.',
+					'UBL PartyContact: Customer email is missing or invalid in order %d.',
 					$this->document->order->get_id()
 				),
 				'error'

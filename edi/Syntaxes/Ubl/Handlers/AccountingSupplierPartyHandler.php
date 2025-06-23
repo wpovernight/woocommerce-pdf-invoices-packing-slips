@@ -59,7 +59,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$company = $this->get_identifiers_data( 'shop_name' );
 		
 		if ( empty( $company ) ) {
-			wpo_ips_edi_log( 'Supplier company name is missing for PartyName.', 'error' );
+			wpo_ips_edi_log( 'UBL PartyName: Supplier company name is missing.', 'error' );
 			return null;
 		}
 		
@@ -131,7 +131,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 
 		if ( ! empty( $vat_number ) ) {
 			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-				wpo_ips_edi_log( 'VAT number does not have a country prefix for supplier PartyTaxScheme.', 'error' );
+				wpo_ips_edi_log( 'UBL PartyTaxScheme: VAT number does not have a country prefix for supplier.', 'error' );
 			}
 			
 			$values[] = array(
@@ -139,7 +139,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 				'value' => $vat_number,
 			);
 		} else {
-			wpo_ips_edi_log( 'Supplier VAT number is missing for PartyTaxScheme.', 'error' );
+			wpo_ips_edi_log( 'UBL PartyTaxScheme: Supplier VAT number is missing.', 'error' );
 			return null;
 		}
 
@@ -171,7 +171,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$coc_number = $this->get_identifiers_data( 'coc_number' );
 		
 		if ( empty( $company ) && empty( $coc_number ) ) {
-			wpo_ips_edi_log( 'Both company name and CoC number are missing for supplier PartyLegalEntity.', 'error' );
+			wpo_ips_edi_log( 'UBL PartyLegalEntity: Both company name and CoC number are missing for supplier.', 'error' );
 			return null;
 		}
 
@@ -201,7 +201,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		$email_address = $this->get_identifiers_data( 'shop_email_address' );
 
 		if ( empty( $email_address ) ) {
-			wpo_ips_edi_log( 'Supplier email address is missing for PartyContact.', 'error' );
+			wpo_ips_edi_log( 'UBL PartyContact: Supplier email address is missing.', 'error' );
 			return null;
 		}
 
