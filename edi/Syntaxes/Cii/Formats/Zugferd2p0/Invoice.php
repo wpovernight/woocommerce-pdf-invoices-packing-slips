@@ -30,7 +30,7 @@ class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 		$rdf .= sprintf( '  <%s:ConformanceLevel>%s</%s:ConformanceLevel>', $this->get_prefix(), strtoupper( $this->get_conformance_level() ), $this->get_prefix() ) . "\n";
 		$rdf .= '</rdf:Description>' . "\n\n";
 
-		// PDF/A Extension schema for ZUGFeRD
+		// PDF/A Extension schema
 		$rdf .= '<rdf:Description rdf:about=""' . "\n";
 		$rdf .= '      xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/"' . "\n";
 		$rdf .= '      xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#"' . "\n";

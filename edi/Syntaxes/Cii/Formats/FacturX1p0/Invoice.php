@@ -15,14 +15,14 @@ class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 	public string $name = 'Factur-X 1.0';
 
 	/**
-	 * Get RDF metadata for embedding XML in PDF/A-3 (Factur-X 1.0).
+	 * Get RDF metadata for embedding XML in PDF/A-3.
 	 * 
 	 * Schema: https://www.pdflib.com/fileadmin/pdf-knowledge-base/zugferd/Factur-X_extension_schema.xmp
 	 *
 	 * @return string RDF metadata.
 	 */
 	public function get_rdf_metadata(): string {
-		// Actual Factur‑X description
+		// Factur‑X actual description
 		$rdf  = sprintf( '<rdf:Description rdf:about="" xmlns:%s="%s">', $this->get_prefix(), $this->get_namespace() ) . "\n";
 		$rdf .= sprintf( '  <%s:DocumentType>%s</%s:DocumentType>', $this->get_prefix(), strtoupper( $this->get_document_type() ), $this->get_prefix() ) . "\n";
 		$rdf .= sprintf( '  <%s:DocumentFileName>%s</%s:DocumentFileName>', $this->get_prefix(), $this->get_document_filename(), $this->get_prefix() ) . "\n";

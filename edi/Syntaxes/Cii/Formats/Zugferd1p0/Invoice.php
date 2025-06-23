@@ -15,14 +15,14 @@ class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 	public string $name = 'ZUGFeRD 1.0';
 
 	/**
-	 * Get RDF metadata for embedding XML in PDF/A-3 (ZUGFeRD 1.0).
+	 * Get RDF metadata for embedding XML in PDF/A-3.
 	 * 
 	 * Schema: https://www.pdflib.com/fileadmin/pdf-knowledge-base/zugferd/ZUGFeRD1_extension_schema.xmp
 	 *
 	 * @return string RDF metadata.
 	 */
 	public function get_rdf_metadata(): string {
-		// Actual ZUGFeRD properties
+		// ZUGFeRD actual description
 		$rdf  = sprintf( '<rdf:Description rdf:about="" xmlns:%s="%s">', $this->get_prefix(), $this->get_namespace() ) . "\n";
 		$rdf .= sprintf( '  <%s:DocumentType>%s</%s:DocumentType>', $this->get_prefix(), strtoupper( $this->get_document_type() ), $this->get_prefix() ) . "\n";
 		$rdf .= sprintf( '  <%s:DocumentFileName>%s</%s:DocumentFileName>', $this->get_prefix(), $this->get_document_filename(), $this->get_prefix() ) . "\n";
