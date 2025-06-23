@@ -4,6 +4,7 @@ namespace WPO\IPS\EDI\Abstracts;
 
 use WPO\IPS\EDI\Interfaces\HandlerInterface;
 use WPO\IPS\EDI\Document;
+use WPO\IPS\EDI\Standards\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -88,13 +89,14 @@ abstract class AbstractHandler implements HandlerInterface {
 		$method_id = $order ? $order->get_payment_method() : '';
 		$title     = $order ? $order->get_payment_method_title() : '';
 
+		
 		$mapping = apply_filters( 'wpo_ips_edi_payment_means_code_mapping', array(
 			'bacs'    => '58', // SEPA Credit Transfer
 			'paypal'  => '68', // Online payment
 			'stripe'  => '54', // Credit card
 			'cod'     => '46', // Interbank debit transfer
 			'default' => '97', // Clearing between partners
-		), $method_id, $this );
+		), $method_id, EN16931::get_payment(), $this );
 
 		$type_code = $mapping[ $method_id ] ?? $mapping['default'];
 
