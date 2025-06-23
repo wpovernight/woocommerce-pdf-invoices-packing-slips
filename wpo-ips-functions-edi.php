@@ -474,8 +474,15 @@ function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array 
  * @param string $message The log message.
  * @param string $level   The log level (default: 'info').
  * @param \Throwable|null $e Optional. Exception to log.
+ * @return void
  */
 function wpo_ips_edi_log( string $message, string $level = 'info', ?\Throwable $e = null ): void {
+	$edi_settings = wpo_ips_edi_get_settings();
+	
+	if ( empty( $edi_settings['enabled_logs'] ) ) {
+		return;
+	}
+	
 	wcpdf_log_error( $message, $level, $e, 'wpo-ips-edi' );
 }
 

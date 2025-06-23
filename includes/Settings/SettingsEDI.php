@@ -392,6 +392,19 @@ class SettingsEDI {
 				'description' => __( 'Enable the XML preview for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
+		
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'enabled_logs',
+			'title'    => __( 'Enable Debug Logs', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'option_name' => $option_name,
+				'id'          => 'enabled_logs',
+				'description' => __( 'Enable logging for debugging purposes.', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
 
 		$settings_fields = apply_filters( 'wpo_ips_edi_settings', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
