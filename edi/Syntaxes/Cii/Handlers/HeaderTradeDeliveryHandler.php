@@ -29,6 +29,14 @@ class HeaderTradeDeliveryHandler extends AbstractCiiHandler {
 		$delivery_date    = $this->normalize_date( $delivery_date, $php_date_format );
 		
 		if ( ! $this->validate_date_format( $delivery_date, $date_format_code ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'CII ApplicableHeaderTradeDelivery: Invalid delivery date format for %s in order %d.',
+					$delivery_date,
+					$order->get_id()
+				),
+				'error'
+			);
 			return $data;
 		}
 

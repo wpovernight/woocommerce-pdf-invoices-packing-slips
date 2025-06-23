@@ -45,7 +45,13 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		$reference = apply_filters( 'wpo_ips_edi_cii_payment_reference', $reference, $order, $this );
 
 		if ( empty( $reference ) ) {
-			wpo_ips_edi_log( 'CII ApplicableHeaderTradeSettlementHandler: Payment reference is empty.' );
+			wpo_ips_edi_log(
+				sprintf(
+					'CII ApplicableHeaderTradeSettlementHandler: Payment reference is empty for order %d.',
+					$order->get_id()
+				),
+				'error'
+			);
 			return null;
 		}
 		
@@ -67,6 +73,13 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 		// If no usable payment data, exit early
 		if ( empty( $payment['type_code'] ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'CII ApplicableHeaderTradeSettlementHandler: No usable payment means data found for order %d.',
+					$this->document->order->get_id()
+				),
+				'error'
+			);
 			return null;
 		}
 
@@ -155,6 +168,13 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		
 		$order_tax_data = apply_filters( 'wpo_ips_edi_cii_order_tax_data', $order_tax_data, $this );
 		if ( empty( $order_tax_data ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'CII ApplicableHeaderTradeSettlementHandler: No tax data available for order %d.',
+					$order->get_id()
+				),
+				'error'
+			);
 			return null; // No tax data available
 		}
 		
@@ -271,17 +291,17 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_monetary_summation(): ?array {
-		$order           = $this->document->order;
-		$total           = $order->get_total();
-		$total_tax       = $order->get_total_tax();
-		$total_exc_tax   = $total - $total_tax;
-		$total_inc_tax   = $total;
-		$currency        = $order->get_currency();
-		$has_due_days    = ! empty( $this->get_due_date_days() );
+		$order          = $this->document->order;
+		$total          = $order->get_total();
+		$total_tax      = $order->get_total_tax();
+		$total_exc_tax  = $total - $total_tax;
+		$total_inc_tax  = $total;
+		$currency       = $order->get_currency();
+		$has_due_days   = ! empty( $this->get_due_date_days() );
 
-		$prepaid_amount  = $has_due_days ? 0 : $total_inc_tax;
-		$payable_amount  = $total_inc_tax - $prepaid_amount;
-		$rounding_diff   = round( $total - $total_inc_tax, 2 );
+		$prepaid_amount = $has_due_days ? 0 : $total_inc_tax;
+		$payable_amount = $total_inc_tax - $prepaid_amount;
+		$rounding_diff  = round( $total - $total_inc_tax, 2 );
 
 		if ( abs( $rounding_diff ) >= 0.01 ) {
 			$payable_amount += $rounding_diff;
@@ -333,6 +353,5 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 		return apply_filters( 'wpo_ips_edi_cii_monetary_summation', $monetary_summation, $this );
 	}
-
 
 }

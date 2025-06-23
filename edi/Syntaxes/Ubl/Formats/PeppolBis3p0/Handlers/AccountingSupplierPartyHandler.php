@@ -41,7 +41,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		$endpoint = $this->get_endpoint();
 
 		if ( ! $endpoint ) {
-			wpo_ips_edi_log( 'Peppol Endpoint ID or scheme is missing for supplier EndpointID.', 'error' );
+			wpo_ips_edi_log( 'UBL/Peppol EndpointID: Endpoint ID or scheme is missing for supplier.', 'error' );
 			return null;
 		}
 
@@ -65,7 +65,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		$identifier = $this->get_legal_identifier();
 
 		if ( ! $identifier ) {
-			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing for supplier PartyIdentification.', 'error' );
+			wpo_ips_edi_log( 'UBL/Peppol PartyIdentification: Identifier or scheme ID is missing for supplier.', 'error' );
 			return null;
 		}
 
@@ -95,12 +95,12 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		$identifier = $this->get_legal_identifier();
 
 		if ( empty( $company ) ) {
-			wpo_ips_edi_log( 'Company name is missing for supplier PartyLegalEntity.', 'error' );
+			wpo_ips_edi_log( 'UBL/Peppol PartyLegalEntity: Company name is missing for supplier.', 'error' );
 			return null;
 		}
 		
 		if ( empty( $identifier['legal_identifier'] ) && empty( $identifier['legal_identifier_icd'] ) ) {
-			wpo_ips_edi_log( 'Legal Identifier is missing for supplier PartyLegalEntity.', 'error' );
+			wpo_ips_edi_log( 'UBL/Peppol PartyLegalEntity: Legal Identifier is missing for supplier.', 'error' );
 			return null;
 		}
 

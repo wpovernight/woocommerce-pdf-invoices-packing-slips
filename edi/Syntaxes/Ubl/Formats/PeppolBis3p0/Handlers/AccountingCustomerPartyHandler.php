@@ -41,7 +41,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		$endpoint = $this->get_endpoint();
 
 		if ( ! $endpoint ) {
-			wpo_ips_edi_log( 'Peppol Endpoint ID or scheme is missing for customer EndpointID.', 'error' );
+			wpo_ips_edi_log( 'UBL/Peppol EndpointID: Endpoint ID or scheme is missing for customer.', 'error' );
 			return null;
 		}
 
@@ -65,7 +65,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		$identifier = $this->get_legal_identifier();
 
 		if ( empty( $identifier ) ) {
-			wpo_ips_edi_log( 'Peppol identifier or scheme ID is missing or invalid for customer PartyIdentification.', 'error' );
+			wpo_ips_edi_log( 'UBL/Peppol PartyIdentification: Identifier or scheme ID is missing or invalid for customer.', 'error' );
 			return null;
 		}
 
@@ -99,7 +99,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		if ( empty( $registration_name ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'Registration name is missing for customer PartyLegalEntity in order ID %d.',
+					'UBL/Peppol PartyLegalEntity: Registration name is missing for customer in order ID %d.',
 					$this->document->order->get_id()
 				),
 				'error'
@@ -110,7 +110,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		if ( empty( $identifier['identifier'] ) || empty( $identifier['identifier_icd'] ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'Customer identifier is missing for customer PartyLegalEntity in order ID %d.',
+					'UBL/Peppol PartyLegalEntity: Customer identifier is missing for customer in order ID %d.',
 					$this->document->order->get_id()
 				),
 				'error'
