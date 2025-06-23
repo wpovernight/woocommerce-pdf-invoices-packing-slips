@@ -1,279 +1,279 @@
-jQuery(function ($) {
+jQuery( function( $ ) {
 
-	$('#debug-tools .tool').on('click', 'input[type="submit"]', function (e) {
+	$( '#debug-tools .tool' ).on( 'click', 'input[type="submit"]', function( e ) {
 		e.preventDefault();
-		let $form = $(this).closest('form');
-		let tool = $form.find('input[name="debug_tool"]').val();
-		let formData = new FormData($form[0]);
-		formData.append('action', 'wpo_wcpdf_debug_tools');
-		formData.append('nonce', wpo_wcpdf_debug.nonce);
+		let $form    = $( this ).closest( 'form' );
+		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
+		let formData = new FormData( $form[0] );
+		formData.append( 'action', 'wpo_wcpdf_debug_tools' );
+		formData.append( 'nonce', wpo_wcpdf_debug.nonce );
 
 		// block ui
-		$form.closest('.tool').block({
+		$form.closest( '.tool' ).block( {
 			message: null,
 			overlayCSS: {
 				background: '#fff',
 				opacity: 0.6
 			}
-		});
+		} );
 
 		let reset = false;
-		if ('reset-settings' === tool) {
-			reset = window.confirm(wpo_wcpdf_debug.confirm_reset);
+		if ( 'reset-settings' === tool ) {
+			reset = window.confirm( wpo_wcpdf_debug.confirm_reset );
 		} else {
 			reset = true;
 		}
 
-		if (reset) {
-			$.ajax({
-				url: wpo_wcpdf_debug.ajaxurl,
-				data: formData,
-				type: 'POST',
-				cache: false,
+		if ( reset ) {
+			$.ajax( {
+				url:         wpo_wcpdf_debug.ajaxurl,
+				data:        formData,
+				type:        'POST',
+				cache:       false,
 				processData: false,
 				contentType: false,
-				success(response) {
-					process_form_response(tool, response, $form);
-					$form.closest('.tool').unblock();
+				success ( response ) {
+					process_form_response( tool, response, $form );
+					$form.closest( '.tool' ).unblock();
 				},
-				error(xhr, error, status) {
+				error ( xhr, error, status ) {
 					//console.log( error, status );
-					$form.closest('.tool').unblock();
+					$form.closest( '.tool' ).unblock();
 				}
-			});
+			} );
 		}
-	});
+	} );
 
-	function process_form_response(tool, response, $form) {
-		let $notice = $form.find('fieldset > .notice');
+	function process_form_response( tool, response, $form ) {
+		let $notice = $form.find( 'fieldset > .notice' );
 		$notice.hide();
-		$notice.removeClass('notice-error');
-		$notice.removeClass('notice-success');
+		$notice.removeClass( 'notice-error' );
+		$notice.removeClass( 'notice-success' );
 
-		switch (tool) {
+		switch ( tool ) {
 			case 'export_settings':
-				if (response.success && response.data.filename && response.data.settings) {
-					$form.find('.download_file').remove();
+				if ( response.success && response.data.filename && response.data.settings ) {
+					$form.find( '.download_file' ).remove();
 					let data = {
-						'type': $form.find('select[name="type"').val(),
+						'type':     $form.find( 'select[name="type"' ).val(),
 						'settings': response.data.settings,
 					}
-					data = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
-					$form.append($('<div class="download_file"><label>' + wpo_wcpdf_debug.download_label + ':</label> <a href="data:' + data + '" download="' + response.data.filename + '">' + response.data.filename + '</a></div>'));
-				} else if (!response.success && response.data.message) {
-					$notice.addClass('notice-error');
-					$notice.find('p').text(response.data.message);
+					data = 'data:text/plain;charset=utf-8,' + encodeURIComponent( JSON.stringify( data ) );
+					$form.append( $('<div class="download_file"><label>'+wpo_wcpdf_debug.download_label+':</label> <a href="data:' + data + '" download="'+response.data.filename+'">'+response.data.filename+'</a></div>') );
+				} else if ( ! response.success && response.data.message ) {
+					$notice.addClass( 'notice-error' );
+					$notice.find( 'p' ).text( response.data.message );
 					$notice.show();
 				}
 				break;
 			default:
-				if (response.success && response.data.message) {
-					$notice.addClass('notice-success');
-					$form.find('> .notice-warning').remove();
-				} else if (!response.success && response.data.message) {
-					$notice.addClass('notice-error');
+				if ( response.success && response.data.message ) {
+					$notice.addClass( 'notice-success' );
+					$form.find( '> .notice-warning' ).remove();
+				} else if ( ! response.success && response.data.message ) {
+					$notice.addClass( 'notice-error' );
 				}
-				$notice.find('p').text(response.data.message);
+				$notice.find( 'p' ).text( response.data.message );
 				$notice.show();
 				break;
 		}
 	}
 
 	// toggle custom redirect page
-	$("[name='wpo_wcpdf_settings_debug[document_access_denied_redirect_page]']").on('change', function (event) {
-		let $custom_page_field = $(this).closest('table').find('#document_custom_redirect_page');
-		let $field_description = $custom_page_field.closest('td').find('.description');
+	$( "[name='wpo_wcpdf_settings_debug[document_access_denied_redirect_page]']" ).on( 'change', function( event ) {
+		let $custom_page_field = $( this ).closest( 'table' ).find( '#document_custom_redirect_page' );
+		let $field_description = $custom_page_field.closest( 'td' ).find( '.description' );
 
-		if ('custom_page' === $(this).val()) {
+		if ( 'custom_page' === $( this ).val() ) {
 			$custom_page_field.show();
 			$field_description.show();
 		} else {
 			$custom_page_field.hide();
 			$field_description.hide();
 		}
-	}).trigger('change');
+	} ).trigger( 'change' );
 
 	// danger zone enabled notice
-	if (true === wpo_wcpdf_debug.danger_zone['enabled']) {
+	if ( true === wpo_wcpdf_debug.danger_zone['enabled'] ) {
 		let notice = '<div class="notice notice-warning inline"><p>' + wpo_wcpdf_debug.danger_zone['message'] + '</p></div>';
-		$("input#enable_danger_zone_tools").closest('td').find('.description').append(notice);
+		$( "input#enable_danger_zone_tools" ).closest( 'td' ).find( '.description' ).append( notice );
 	}
 
 	// number search
-	$(document.body).on('click', '#wpo-wcpdf-settings a.number-search-button', function (e) {
+	$( document.body ).on( 'click', '#wpo-wcpdf-settings a.number-search-button', function( e ) {
 		e.preventDefault();
 
-		let search_val = $(this).closest('div').find(':input[name="number_search_input"]').val();
+		let search_val = $( this ).closest( 'div' ).find( ':input[name="number_search_input"]' ).val();
 		window.location.href = window.location.href + '&s=' + search_val;
-	});
+	} );
 
 	// datepicker
-	$('#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to, #fetch-numbers-data-date-from, #fetch-numbers-data-date-to').datepicker({ dateFormat: 'yy-mm-dd' });
+	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to, #fetch-numbers-data-date-from, #fetch-numbers-data-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
 	// danger zone tools
-	$(document.body).on('click', '#debug-tools .number-tools-btn', function (event) {
+	$( document.body ).on( 'click', '#debug-tools .number-tools-btn', function( event ) {
 		event.preventDefault();
 
-		let documentType = '';
-		let dateFrom = '';
-		let dateTo = '';
+		let documentType     = '';
+		let dateFrom         = '';
+		let dateTo           = '';
 		let deleteOrRenumber = '';
-		let pageCount = 1;
-		let documentCount = 0;
+		let pageCount        = 1;
+		let documentCount    = 0;
 
-		if ('renumber-documents-btn' === this.id) {
-			documentType = $('#renumber-document-type').val();
-			dateType = $('#renumber-date-type').val();
-			dateFrom = $('#renumber-date-from').val();
-			dateTo = $('#renumber-date-to').val();
+		if ( 'renumber-documents-btn' === this.id ) {
+			documentType     = $( '#renumber-document-type' ).val();
+			dateType         = $( '#renumber-date-type' ).val();
+			dateFrom         = $( '#renumber-date-from' ).val();
+			dateTo           = $( '#renumber-date-to' ).val();
 			deleteOrRenumber = 'renumber';
 
-		} else if ('delete-documents-btn' === this.id) {
-			documentType = $('#delete-document-type').val();
-			dateType = $('#delete-date-type').val();
-			dateFrom = $('#delete-date-from').val();
-			dateTo = $('#delete-date-to').val();
+		} else if ( 'delete-documents-btn' === this.id ) {
+			documentType     = $( '#delete-document-type' ).val();
+			dateType         = $( '#delete-date-type' ).val();
+			dateFrom         = $( '#delete-date-from' ).val();
+			dateTo           = $( '#delete-date-to' ).val();
 			deleteOrRenumber = 'delete';
 		}
 
-		if ('' === documentType || 'undefined' === documentType) {
-			alert(wpo_wcpdf_debug.select_document_type);
+		if ( '' === documentType || 'undefined' === documentType ) {
+			alert( wpo_wcpdf_debug.select_document_type );
 			return;
 		}
 
-		if ('renumber' === deleteOrRenumber) {
-			$('.renumber-spinner').css('visibility', 'visible');
-		} else if ('delete' === deleteOrRenumber) {
-			$('.delete-spinner').css('visibility', 'visible');
+		if ( 'renumber' === deleteOrRenumber ) {
+			$( '.renumber-spinner' ).css( 'visibility', 'visible' );
+		} else if ( 'delete' === deleteOrRenumber ) {
+			$( '.delete-spinner' ).css( 'visibility', 'visible' );
 		}
 
-		$('#renumber-documents-btn, #delete-documents-btn').attr('disabled', true);
-		$('#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to').prop('disabled', true);
+		$( '#renumber-documents-btn, #delete-documents-btn' ).attr( 'disabled', true );
+		$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).prop( 'disabled', true );
 
 		// first call
-		renumberOrDeleteDocuments(documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber);
-	});
+		renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
+	} );
 
 	// disable `document_date` when selecting `all` documents
-	$('#debug-tools #delete-document-type').on('change', function (event) {
+	$( '#debug-tools #delete-document-type' ).on( 'change', function( event ) {
 		event.preventDefault();
 
-		if ('all' === $(this).val()) {
-			$(this).closest('form').find('#delete-date-type option[value="document_date"]').prop('disabled', true);
+		if ( 'all' === $( this ).val() ) {
+			$( this ).closest( 'form' ).find( '#delete-date-type option[value="document_date"]' ).prop( 'disabled', true );
 		} else {
-			$(this).closest('form').find('#delete-date-type option[value="document_date"]').prop('disabled', false);
+			$( this ).closest( 'form' ).find( '#delete-date-type option[value="document_date"]' ).prop( 'disabled', false );
 		}
-	}).trigger('change');
+	} ).trigger( 'change' );
 
-	$('#debug-tools #delete-date-type').on('change', function (event) {
+	$( '#debug-tools #delete-date-type' ).on( 'change', function( event ) {
 		event.preventDefault();
 
-		let $document_type_selector = $(this).closest('form').find('#delete-document-type');
+		let $document_type_selector = $( this ).closest( 'form' ).find( '#delete-document-type' );
 
-		if ('' === $document_type_selector.val() || 'all' === $document_type_selector.val()) {
-			$(this).find('option[value="document_date"]').prop('disabled', true);
+		if ( '' === $document_type_selector.val() || 'all' === $document_type_selector.val() ) {
+			$( this ).find( 'option[value="document_date"]' ).prop( 'disabled', true );
 		} else {
-			$(this).find('option[value="document_date"]').prop('disabled', false);
+			$( this ).find( 'option[value="document_date"]' ).prop( 'disabled', false );
 
 		}
-	}).trigger('change');
+	} ).trigger( 'change' );
 
-	function renumberOrDeleteDocuments(documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber) {
+	function renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber ) {
 		let data = {
-			'action': 'wpo_wcpdf_danger_zone_tools',
+			'action':             'wpo_wcpdf_danger_zone_tools',
 			'delete_or_renumber': deleteOrRenumber,
-			'document_type': documentType,
-			'date_type': dateType,
-			'date_from': dateFrom,
-			'date_to': dateTo,
-			'page_count': pageCount,
-			'document_count': documentCount,
-			'nonce': wpo_wcpdf_debug.nonce,
+			'document_type':      documentType,
+			'date_type':          dateType,
+			'date_from':          dateFrom,
+			'date_to':            dateTo,
+			'page_count':         pageCount,
+			'document_count':     documentCount,
+			'nonce':              wpo_wcpdf_debug.nonce,
 		};
 
-		$.ajax({
-			type: 'POST',
-			url: wpo_wcpdf_debug.ajaxurl,
-			data: data,
+		$.ajax( {
+			type:     'POST',
+			url:      wpo_wcpdf_debug.ajaxurl,
+			data:     data,
 			dataType: 'json',
-			success: function (response) {
-				if (false === response.data.finished) {
+			success: function( response ) {
+				if ( false === response.data.finished ) {
 					// update page count and document count
-					pageCount = response.data.pageCount;
+					pageCount     = response.data.pageCount;
 					documentCount = response.data.documentCount;
 
 					// recall function
-					renumberOrDeleteDocuments(documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber);
+					renumberOrDeleteDocuments( documentType, dateType, dateFrom, dateTo, pageCount, documentCount, deleteOrRenumber );
 
 				} else {
-					$('.renumber-spinner, .delete-spinner').css('visibility', 'hidden');
-					$('#renumber-documents-btn, #delete-documents-btn').removeAttr('disabled');
-					$('#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to').prop('disabled', false);
+					$( '.renumber-spinner, .delete-spinner' ).css( 'visibility', 'hidden' );
+					$( '#renumber-documents-btn, #delete-documents-btn' ).removeAttr( 'disabled' );
+					$( '#renumber-document-type, #renumber-date-from, #renumber-date-to, #delete-document-type, #delete-date-from, #delete-date-to' ).prop( 'disabled', false );
 					let message = response.data.message;
-					alert(documentCount + message);
+					alert( documentCount + message );
 				}
 			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert(xhr.status + ':' + thrownError);
+			error: function( xhr, ajaxOptions, thrownError ) {
+				alert( xhr.status + ':'+ thrownError );
 			}
-		});
+		} );
 	}
-
+	
 	// fetch/delete number table data
-	$('#wpo-wcpdf-settings').on('click', '#fetch-numbers-data, #delete-numbers-data', function (e) {
+	$( '#wpo-wcpdf-settings' ).on( 'click', '#fetch-numbers-data, #delete-numbers-data', function( e ) {
 		e.preventDefault();
-
-		let $button = $(this);
-		let table_name = $button.data('table_name');
-		let operation = $button.data('operation');
-		let from = $button.closest('.number-table-data-info').find('#fetch-numbers-data-date-from').val();
-		let to = $button.closest('.number-table-data-info').find('#fetch-numbers-data-date-to').val();
-		let order = get_number_table_url_query_string('order');
-		let orderby = get_number_table_url_query_string('orderby');
-
+		
+		let $button    = $( this );
+		let table_name = $button.data( 'table_name' );
+		let operation  = $button.data( 'operation' );
+		let from       = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-from' ).val();
+		let to         = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-to' ).val();
+		let order      = get_number_table_url_query_string( 'order' );
+		let orderby    = get_number_table_url_query_string( 'orderby' );
+		
 		// block ui
-		$button.closest('.wcpdf_advanced_numbers_choose_table').block({
+		$button.closest( '.wcpdf_advanced_numbers_choose_table' ).block( {
 			message: null,
 			overlayCSS: {
 				background: '#fff',
 				opacity: 0.6
 			}
-		});
-
-		$.ajax({
+		} );
+		
+		$.ajax( {
 			url: wpo_wcpdf_debug.ajaxurl,
 			data: {
-				action: 'wpo_wcpdf_numbers_data',
-				nonce: wpo_wcpdf_debug.nonce,
+				action:     'wpo_wcpdf_numbers_data',
+				nonce:      wpo_wcpdf_debug.nonce,
 				table_name: table_name,
-				operation: operation,
-				order: order,
-				orderby: orderby,
-				from: from,
-				to: to,
+				operation:  operation,
+				order:      order,
+				orderby:    orderby,
+				from:       from,
+				to:         to,
 			},
 			type: 'POST',
-			success: function (response) {
-				if (response.success) {
-					window.location.replace(response.data);
+			success: function( response ) {
+				if ( response.success ) {
+					window.location.replace( response.data );
 				} else {
 					location.reload();
 				}
 			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert(xhr.status + ':' + thrownError);
-
-				$button.closest('.wcpdf_advanced_numbers_choose_table').unblock();
+			error: function( xhr, ajaxOptions, thrownError ) {
+				alert( xhr.status + ':'+ thrownError );
+				
+				$button.closest( '.wcpdf_advanced_numbers_choose_table' ).unblock();
 			}
-		});
-
-	});
-
-	function get_number_table_url_query_string(key) {
+		} );
+		
+	} );
+	
+	function get_number_table_url_query_string( key ) {
 		let url_string = window.location.href;
-		let url = new URL(url_string);
-
-		return url.searchParams.get(key);
+		let url        = new URL( url_string );
+		
+		return url.searchParams.get( key );
 	}
-
-});
+	
+} );
