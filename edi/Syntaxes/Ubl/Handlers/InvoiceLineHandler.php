@@ -19,7 +19,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	 */
 	public function handle( array $data, array $options = array() ): array {
 		$items       = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
-		$tax_reasons = EN16931::get_available_reasons();
+		$tax_reasons = EN16931::get_vatex();
 		$currency    = $this->document->order->get_currency();
 
 		// Build the tax totals array

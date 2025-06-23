@@ -254,7 +254,7 @@ class SettingsEDI {
 				'id'                => 'peppol_endpoint_eas',
 				'options'           => ( function () {
 					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
-					foreach ( EN16931::get_electronic_address_schemes() as $code => $label ) {
+					foreach ( EN16931::get_eas() as $code => $label ) {
 						$options[ $code ] = "[$code] $label";
 					}
 					return $options;
@@ -322,7 +322,7 @@ class SettingsEDI {
 				'id'                => 'peppol_legal_identifier_icd',
 				'options'           => ( function () {
 					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
-					foreach ( EN16931::get_icd_schemes() as $code => $label ) {
+					foreach ( EN16931::get_icd() as $code => $label ) {
 						$options[ $code ] = "[$code] $label";
 					}
 					return $options;
@@ -831,7 +831,7 @@ class SettingsEDI {
 							echo '</td>';
 							echo '<td class="remark">';
 
-							foreach ( EN16931::get_available_remarks() as $field => $remarks ) {
+							foreach ( EN16931::get_vatex_remarks() as $field => $remarks ) {
 								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
 									if ( isset( $remarks[ ${$f} ] ) ) {
 										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
@@ -878,7 +878,7 @@ class SettingsEDI {
 					</th>
 					<th class="remark">
 						<?php
-							foreach ( EN16931::get_available_remarks() as $field => $remarks ) {
+							foreach ( EN16931::get_vatex_remarks() as $field => $remarks ) {
 								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
 									if ( isset( $remarks[ ${$f} ] ) ) {
 										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
@@ -910,14 +910,14 @@ class SettingsEDI {
 
 		switch ( $for ) {
 			case 'scheme':
-				$options = EN16931::get_available_schemes();
+				$options = EN16931::get_vat_cat();
 				break;
 			case 'category':
-				$options = EN16931::get_available_categories();
+				$options = EN16931::get_5305();
 				break;
 			case 'reason':
 				$defaults['none'] = __( 'None', 'woocommerce-pdf-invoices-packing-slips' );
-				$options          = EN16931::get_available_reasons();
+				$options          = EN16931::get_vatex();
 				break;
 			default:
 				$options = array();

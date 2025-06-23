@@ -23,26 +23,30 @@ class EN16931 {
 	public static string $standard_version = '15.0';
 
 	/**
-	 * Get available tax schemes according to standard.
+	 * Get the VAT category codes according to code list.
+	 * 
+	 * - Column [VAT CAT]
 	 * 
 	 * @return array
 	 */
-	public static function get_available_schemes(): array {
+	public static function get_vat_cat(): array {
 		$defaults = array(
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_tax_schemes', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vat_cat', array() );
 
 		return $extra + $defaults;
 	}
 
 	/**
-	 * Get available VAT tax categories according to standard 5305 code list.
+	 * Get the Duty, tax or fee categories according to code list.
+	 * 
+	 * - Column [5305]
 	 *
 	 * @return array
 	 */
-	public static function get_available_categories(): array {
+	public static function get_5305(): array {
 		$defaults = array(
 			'AE' => __( 'VAT Reverse Charge', 'woocommerce-pdf-invoices-packing-slips' ),
 			'E'  => __( 'Exempt from tax', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -55,17 +59,19 @@ class EN16931 {
 			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_tax_categories', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_5305', array() );
 
 		return $extra + $defaults;
 	}
 	
 	/**
-	 * Get available VAT exemption reasons according to standard VATEX code list.
+	 * Get the VAT exemption reason codes according to code list.
+	 * 
+	 * - Column [VATEX]
 	 *
 	 * @return array
 	 */
-	public static function get_available_reasons(): array {
+	public static function get_vatex(): array {
 		$defaults = array(
 			// EU VAT exemptions
 			'VATEX-EU-79-C'          => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -159,17 +165,19 @@ class EN16931 {
 			'VATEX-FR-298SEXDECIESA' => __( 'Exempt based on article 298 sexdecies A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_tax_reasons', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex', array() );
 
 		return $extra + $defaults;
 	}
 	
 	/**
-	 * Get available VAT exemption remarks according to standard VATEX codes.
+	 * Get VATEX remarks according to code list.
+	 * 
+	 * - Column [VATEX]
 	 *
 	 * @return array
 	 */
-	public static function get_available_remarks(): array {
+	public static function get_vatex_remarks(): array {
 		/* translators: %s: tax category code */
 		$reason_common_remark             = __( 'Only use with tax category code %s', 'woocommerce-pdf-invoices-packing-slips' );
 		$domestic_invoicing_france_remark = __( 'Only for domestic invoicing in France', 'woocommerce-pdf-invoices-packing-slips' );
@@ -218,17 +226,19 @@ class EN16931 {
 			),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_tax_remarks', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex_remarks', array() );
 
 		return $extra + $defaults;
 	}
 	
 	/**
-	 * Get available electronic address schemes according to standard.
+	 * Get the Electronic address scheme identifier according to code list.
+	 * 
+	 * - Column [EAS]
 	 *
 	 * @return array
 	 */
-	public static function get_electronic_address_schemes(): array {
+	public static function get_eas(): array {
 		$defaults = array(
 			'0002' => 'System Information et Repertoire des Entreprise et des Etablissements: SIRENE',
 			'0007' => 'Organisationsnummer',
@@ -329,17 +339,19 @@ class EN16931 {
 			'EM'   => 'Electronic mail (SMPT)',
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_electronic_address_schemes', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_eas', array() );
 
 		return $extra + $defaults;
 	}
 	
 	/**
-	 * Get available ICD schemes.
+	 * Get the Identifier scheme code according to code list.
+	 * 
+	 * - Column [ICD]
 	 *
 	 * @return array
 	 */
-	public static function get_icd_schemes(): array {
+	public static function get_icd(): array {
 		$defaults = array(
 			'0002' => 'System Information et Repertoire des Entreprise et des Etablissements: SIRENE',
 			'0003' => 'Codification Numerique des Etablissments Financiers En Belgique',
@@ -578,7 +590,7 @@ class EN16931 {
 			'0240' => 'Register of legal persons (in French : Répertoire des personnes morales)',
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_icd_schemes', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_icd', array() );
 
 		return $extra + $defaults;
 	}

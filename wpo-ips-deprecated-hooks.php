@@ -237,7 +237,7 @@ if ( has_action( 'wpo_wcpdf_ubl_tax_schemes' ) ) {
 			$message,
 			'wpo_wcpdf_ubl_tax_schemes',
 			$version,
-			'wpo_ips_edi_tax_schemes'
+			'wpo_ips_edi_en16931_vat_cat'
 		),
 		$version
 	);
@@ -251,7 +251,7 @@ if ( has_action( 'wpo_wcpdf_ubl_tax_categories' ) ) {
 			$message,
 			'wpo_wcpdf_ubl_tax_categories',
 			$version,
-			'wpo_ips_edi_tax_categories'
+			'wpo_ips_edi_en16931_5305'
 		),
 		$version
 	);
@@ -265,7 +265,7 @@ if ( has_action( 'wpo_wcpdf_ubl_tax_reasons' ) ) {
 			$message,
 			'wpo_wcpdf_ubl_tax_reasons',
 			$version,
-			'wpo_ips_edi_tax_reasons'
+			'wpo_ips_edi_en16931_vatex'
 		),
 		$version
 	);
@@ -279,7 +279,7 @@ if ( has_action( 'wpo_wcpdf_ubl_tax_remarks' ) ) {
 			$message,
 			'wpo_wcpdf_ubl_tax_remarks',
 			$version,
-			'wpo_ips_edi_tax_remarks'
+			'wpo_ips_edi_en16931_vatex_remarks'
 		),
 		$version
 	);

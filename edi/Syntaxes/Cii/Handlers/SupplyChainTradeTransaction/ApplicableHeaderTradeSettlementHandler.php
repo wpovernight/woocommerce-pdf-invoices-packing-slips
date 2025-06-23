@@ -137,7 +137,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_trade_tax(): ?array {
-		$tax_reasons    = EN16931::get_available_reasons();
+		$tax_reasons    = EN16931::get_vatex();
 		$order          = $this->document->order;
 		$order_tax_data = $this->document->order_tax_data;
 

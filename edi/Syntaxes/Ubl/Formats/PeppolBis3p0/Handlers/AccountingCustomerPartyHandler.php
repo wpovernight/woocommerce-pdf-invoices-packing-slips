@@ -160,7 +160,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			return null;
 		}
 		
-		$eas_schemes = EN16931::get_electronic_address_schemes();
+		$eas_schemes = EN16931::get_eas();
 		if ( ! array_key_exists( $endpoint_eas, $eas_schemes ) ) {
 			return null;
 		}
@@ -193,7 +193,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			return null;
 		}
 		
-		$icd_schemes = EN16931::get_icd_schemes();
+		$icd_schemes = EN16931::get_icd();
 		if ( ! array_key_exists( $legal_identifier_icd, $icd_schemes ) ) {
 			return null;
 		}

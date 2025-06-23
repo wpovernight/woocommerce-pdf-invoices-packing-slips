@@ -279,7 +279,7 @@ class Assets {
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => EN16931::get_available_remarks(),
+						'remarks' => EN16931::get_vatex_remarks(),
 					)
 				);
 			}

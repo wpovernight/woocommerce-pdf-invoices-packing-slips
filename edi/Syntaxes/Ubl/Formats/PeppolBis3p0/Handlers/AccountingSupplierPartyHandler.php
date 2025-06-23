@@ -138,7 +138,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			return null;
 		}
 
-		$eas_schemes = EN16931::get_electronic_address_schemes();
+		$eas_schemes = EN16931::get_eas();
 		if ( ! array_key_exists( $scheme, $eas_schemes ) ) {
 			return null;
 		}
@@ -163,7 +163,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			return null;
 		}
 
-		$icd_schemes = EN16931::get_icd_schemes();
+		$icd_schemes = EN16931::get_icd();
 		if ( ! array_key_exists( $legal_identifier_icd, $icd_schemes ) ) {
 			return null;
 		}

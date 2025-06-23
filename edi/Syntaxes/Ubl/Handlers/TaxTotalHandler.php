@@ -18,7 +18,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$tax_reasons    = EN16931::get_available_reasons();
+		$tax_reasons    = EN16931::get_vatex();
 		$order_tax_data = $this->document->order_tax_data;
 		$currency       = $this->document->order->get_currency();
 		

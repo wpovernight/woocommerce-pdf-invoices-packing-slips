@@ -256,14 +256,14 @@ class Frontend {
 		$legal_identifier_icd = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
 		$legal_identifier     = get_user_meta( $user_id, 'peppol_legal_identifier', true );
 		
-		$eas_options_raw      = EN16931::get_electronic_address_schemes();
+		$eas_options_raw      = EN16931::get_eas();
 		$eas_options          = array();
 
 		foreach ( $eas_options_raw as $code => $label ) {
 			$eas_options[ $code ] = "[$code] $label";
 		}
 
-		$icd_options_raw      = EN16931::get_icd_schemes();
+		$icd_options_raw      = EN16931::get_icd();
 		$icd_options          = array();
 
 		foreach ( $icd_options_raw as $code => $label ) {
