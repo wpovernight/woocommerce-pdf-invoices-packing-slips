@@ -31,8 +31,10 @@ abstract class AbstractCollection implements Iterator {
 
 	/**
 	 * Current element in the collection.
+	 * 
+	 * @return mixed
 	 */
-	public function current(): mixed {
+	public function current() {
 		return $this->items[ $this->position ];
 	}
 
