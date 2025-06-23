@@ -2,7 +2,8 @@
 
 namespace WPO\IPS;
 
-use \Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
+use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
+use WPO\IPS\Documents\OrderDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -809,12 +810,12 @@ class Admin {
 	/**
 	 * Returns the current values for the document data.
 	 * 
-	 * @param \WPO\IPS\Documents\OrderDocument $document The document instance.
+	 * @param OrderDocument $document The document instance.
 	 * @param array $data The data to be processed.
 	 * 
 	 * @return array The current values for the document data.
 	 */
-	public function get_current_values_for_document_data( \WPO\IPS\Documents\OrderDocument $document, array $data ): array {
+	public function get_current_values_for_document_data( OrderDocument $document, array $data ): array {
 		$document_number_instance = $document->get_number();
 		$document_date_instance   = $document->get_date();
 		$current                  = array();
@@ -1632,10 +1633,10 @@ class Admin {
 	 * Process the order document form data and return an array with the data to be saved.
 	 *
 	 * @param array $form_data The form data submitted via AJAX.
-	 * @param \WPO\IPS\Documents\OrderDocument $document The document object.
+	 * @param OrderDocument $document The document object.
 	 * @return array Processed data ready to be saved.
 	 */
-	public function process_order_document_form_data( array $form_data, \WPO\IPS\Documents\OrderDocument $document ): array {
+	public function process_order_document_form_data( array $form_data, OrderDocument $document ): array {
 		$data = array();
 
 		if (
@@ -1811,10 +1812,10 @@ class Admin {
 	/**
 	 * Document data editing disabled notice
 	 * 
-	 * @param \WPO\IPS\Documents\OrderDocument $document
+	 * @param OrderDocument $document
 	 * @return void
 	 */
-	private function document_data_editing_disabled_notice( \WPO\IPS\Documents\OrderDocument $document ): void {
+	private function document_data_editing_disabled_notice( OrderDocument $document ): void {
 		?>
 		<div class="notice notice-warning inline" style="margin:0;">
 			<p>
