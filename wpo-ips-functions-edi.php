@@ -496,7 +496,7 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
 	$vat_number = strtoupper( trim( $vat_number ) );
 
 	// Special handling for Greece
-	if ( substr( $vat_number, 0, 2 ) === 'EL' ) {
+	if ( 'EL' === substr( $vat_number, 0, 2 ) ) {
 		return true;
 	}
 
