@@ -594,18 +594,5 @@ class EN16931 {
 
 		return $extra + $defaults;
 	}
-	
-	/**
-	 * Get changes from EN16931 version 15.0.
-	 *
-	 * @return array
-	 */	
-	public static function get_changes_from_EN16931_15_0(): array {
-		return array(
-			'Deprecated all tax schemes except VAT, which is the only one allowed by EN16931 v15.',
-			'Deprecated tax category codes: A, AA, AB, AC, AD, B, C, D, F, H, I, J.',
-			'Added VAT exemption reason codes: VATEX-EU-144, VATEX-EU-146-1E, VATEX-EU-151, VATEX-EU-153, VATEX-EU-159, VATEX-FR-CGI261-1, VATEX-FR-CGI261-2, VATEX-FR-CGI261-3, VATEX-FR-CGI261-4, VATEX-FR-CGI261-5, VATEX-FR-CGI261-7, VATEX-FR-CGI261-8, VATEX-FR-CGI261A, VATEX-FR-CGI261B, VATEX-FR-CGI261C-1, VATEX-FR-CGI261C-2, VATEX-FR-CGI261C-3, VATEX-FR-CGI261D-1, VATEX-FR-CGI261D-1BIS, VATEX-FR-CGI261D-2, VATEX-FR-CGI261D-3, VATEX-FR-CGI261D-4, VATEX-FR-CGI261E-1, VATEX-FR-CGI261E-2, VATEX-FR-CGI277A, VATEX-FR-CGI275, VATEX-FR-298SEXDECIESA, VATEX-FR-CGI295, VATEX-FR-AE.',
-		);
-	}
 
 }
