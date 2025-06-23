@@ -854,9 +854,6 @@ class Admin {
 					'name'      => "_wcpdf_{$document->slug}_date",
 				);
 			}
-		} else {
-			unset( $data['number'] );
-			unset( $data['date'] );
 		}
 
 		if ( ! empty( $data['notes'] ) ) {
@@ -903,6 +900,9 @@ class Admin {
 		}
 
 		$data = $this->get_current_values_for_document_data( $document, $data );
+		
+		$enable_document_data_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
+			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) )
 		?>
 		<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
@@ -969,7 +969,7 @@ class Admin {
 						<?php endif; ?>
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
-						<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
+						<?php if ( $this->user_can_manage_document( $document->get_type() ) && $enable_document_data_enabled ) : ?>
 							<span class="wpo-wcpdf-set-date-number button">
 								<?php
 									printf(
@@ -987,12 +987,7 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable editable-number-date">
-					<?php
-						if (
-							\WPO_WCPDF()->settings->user_can_manage_settings() &&
-							( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) )
-						) :
-					?>
+					<?php if ( $enable_document_data_enabled ) : ?>
 						<?php if ( ! empty( $data['number'] ) ) : ?>
 							<table class="number-specs-table">
 								<thead>
