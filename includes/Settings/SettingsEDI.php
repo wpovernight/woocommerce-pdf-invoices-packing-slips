@@ -68,7 +68,13 @@ class SettingsEDI {
 					<?php
 						foreach ( $this->sections as $section => $title ) {
 							$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
-							printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
+							printf(
+								'<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>',
+								esc_url( add_query_arg( 'section', $section ) ),
+								esc_attr( $section ),
+								esc_attr( $active ),
+								esc_html( $title )
+							);
 						}
 					?>
 				</h2>
@@ -78,6 +84,7 @@ class SettingsEDI {
 		</div>
 		<?php
 			switch ( $active_section ) {
+				default:
 				case 'settings':
 					settings_fields( 'wpo_ips_edi_settings' );
 					do_settings_sections( 'wpo_ips_edi_settings' );
@@ -92,7 +99,10 @@ class SettingsEDI {
 				case 'status':
 					$this->output_status();
 					break;
+					
 			}
+
+			do_action( 'wpo_ips_edi_settings_after_output', $active_section, $this->sections );
 	}
 
 	/**

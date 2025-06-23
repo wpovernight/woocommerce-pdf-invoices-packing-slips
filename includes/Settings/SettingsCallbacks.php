@@ -562,9 +562,8 @@ class SettingsCallbacks {
 			);
 			
 			printf(
-				'<label for="%1$s[%3$s]"> %4$s</label><br>',
+				'<label for="%1$s[%2$s]"> %3$s</label><br>',
 				esc_attr( $id ),
-				esc_attr( $setting_name ),
 				esc_attr( $key ),
 				esc_html( $label )
 			);
