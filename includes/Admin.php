@@ -943,7 +943,7 @@ class Admin {
 
 		$data = $this->get_current_values_for_document_data( $document, $data );
 		
-		$enable_document_data_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
+		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
 			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) )
 		?>
 		<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
@@ -1011,16 +1011,20 @@ class Admin {
 						<?php endif; ?>
 						<?php do_action( 'wpo_wcpdf_meta_box_after_document_data', $document, $document->order ); ?>
 					<?php else : ?>
-						<?php if ( $this->user_can_manage_document( $document->get_type() ) && $enable_document_data_enabled ) : ?>
-							<span class="wpo-wcpdf-set-date-number button">
-								<?php
-									printf(
-										/* translators: document title */
-										esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $document->get_title() )
-									);
-								?>
-							</span>
+						<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
+							<?php if ( $document_data_editing_enabled ) : ?>
+								<span class="wpo-wcpdf-set-date-number button">
+									<?php
+										printf(
+											/* translators: document title */
+											esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $document->get_title() )
+										);
+									?>
+								</span>
+							<?php else : ?>
+								<?php $this->document_data_editing_disabled_notice( $document ); ?>
+							<?php endif; ?>
 						<?php else : ?>
 							<p><?php echo esc_html__( 'You do not have sufficient permissions to edit this document.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 						<?php endif; ?>
@@ -1029,7 +1033,7 @@ class Admin {
 
 				<!-- Editable -->
 				<div class="editable editable-number-date">
-					<?php if ( $enable_document_data_enabled ) : ?>
+					<?php if ( $document_data_editing_enabled ) : ?>
 						<?php if ( ! empty( $data['number'] ) ) : ?>
 							<table class="number-specs-table">
 								<thead>
@@ -1192,29 +1196,7 @@ class Admin {
 							</table>
 						<?php endif; ?>
 					<?php else : ?>
-						<div class="notice notice-warning inline" style="margin:0;">
-							<p>
-								<?php
-									echo wp_kses_post(
-										sprintf(
-											'%s %s',
-											sprintf(
-												/* translators: %s document title */
-												esc_html__( 'Editing of %s number and date is currently disabled.', 'woocommerce-pdf-invoices-packing-slips' ),
-												esc_html( $document->get_title() )
-											),
-											sprintf(
-												/* translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name */
-												esc_html__( 'If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-												'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug#enable_document_data_editing' ) ) . '" target="_blank">',
-												'</a>',
-												'<strong>' . esc_html__( 'Enable document data editing', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
-											)
-										)
-									);
-								?>
-							</p>
-						</div>
+						<?php $this->document_data_editing_disabled_notice( $document ); ?>
 					<?php endif; ?>
 				</div>
 
@@ -1824,6 +1806,40 @@ class Admin {
 							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
 		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
+	}
+	
+	/**
+	 * Document data editing disabled notice
+	 * 
+	 * @param \WPO\IPS\Documents\OrderDocument $document
+	 * @return void
+	 */
+	private function document_data_editing_disabled_notice( \WPO\IPS\Documents\OrderDocument $document ): void {
+		?>
+		<div class="notice notice-warning inline" style="margin:0;">
+			<p>
+				<?php
+					echo wp_kses_post(
+						sprintf(
+							'%s %s',
+							sprintf(
+								/* translators: %s document title */
+								esc_html__( 'Editing of %s number and date is currently disabled.', 'woocommerce-pdf-invoices-packing-slips' ),
+								esc_html( $document->get_title() )
+							),
+							sprintf(
+								/* translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name */
+								esc_html__( 'If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug#enable_document_data_editing' ) ) . '" target="_blank">',
+								'</a>',
+								'<strong>' . esc_html__( 'Enable document data editing', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+							)
+						)
+					);
+				?>
+			</p>
+		</div>
+		<?php
 	}
 
 }
