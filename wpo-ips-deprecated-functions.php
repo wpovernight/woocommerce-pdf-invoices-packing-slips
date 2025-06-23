@@ -92,7 +92,7 @@ function wcpdf_is_ubl_available(): bool {
  */
 function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
 	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_write_file' );
-	return wpo_ips_edi_write_file();
+	return wpo_ips_edi_write_file( $document, $attachment, $contents_only );
 }
 
 /**
