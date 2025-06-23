@@ -880,7 +880,7 @@ class SettingsDebug {
 										/* translators: 1. Note, 2. Document types */
 										__( '%1$s: Changing document data is prohibited in some countries. This setting is disabled by default to comply with legal requirements. Only the following document types are affected: %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 										'<strong>' . __( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>',
-										'<code>Invoice</code>' . ( function_exists( 'WPO_WCPDF_Pro' ) ? ', <code>Credit Note</code>' : '' )
+										'<code>' . __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ) . '</code>' . ( function_exists( 'WPO_WCPDF_Pro' ) ? ', <code>' . __( 'Credit Note',  ) . '</code>' : 'woocommerce-pdf-invoices-packing-slips' )
 									),
 				)
 			),
