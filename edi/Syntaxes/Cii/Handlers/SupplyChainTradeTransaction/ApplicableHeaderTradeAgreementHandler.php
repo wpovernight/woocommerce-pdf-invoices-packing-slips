@@ -42,12 +42,12 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$coc_number = $this->get_identifiers_data( 'coc_number' );
 		
 		if ( empty( $name ) ) {
-			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.' );
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.', 'error' );
 			return null;
 		}
 		
 		if ( empty( $vat_number ) ) {
-			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty. Please check your shop settings.' );
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty. Please check your shop settings.', 'error' );
 			return null;
 		}
 		
@@ -154,7 +154,13 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					'value' => $vat_number,
 				);
 			} else {
-				wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty for buyer. Please check the order data.' );
+				wpo_ips_edi_log(
+					sprintf(
+						'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty for buyer in order %d.',
+						$order->get_id()
+					),
+					'error'
+				);
 			}
 
 			$legal_organization[] = array(

@@ -260,7 +260,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		$due_date         = $this->normalize_date( $due_date_timestamp, $php_date_format );
 		
 		if ( ! $this->validate_date_format( $due_date, $date_format_code ) ) {
-			wpo_ips_edi_log( 'CII ApplicableHeaderTradeSettlementHandler: Invalid due date format.' );
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeSettlementHandler: Invalid due date format.', 'error' );
 			return null;
 		}
 

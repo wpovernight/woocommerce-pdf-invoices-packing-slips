@@ -50,12 +50,26 @@ class Document {
 		$available_formats = wpo_ips_edi_formats( $this->syntax );
 
 		if ( ! isset( $available_formats[ $this->format ] ) ) {
-			wpo_ips_edi_log( sprintf( 'Format "%s" for syntax "%s" is not available.', $this->format, $this->syntax ), 'critical' );
+			wpo_ips_edi_log(
+				sprintf(
+					'Format "%s" for syntax "%s" is not available.',
+					$this->format,
+					$this->syntax
+				),
+				'critical'
+			);
 			return null;
 		}
 		
 		if ( ! in_array( $this->order_document->get_type(), array_keys( $available_formats[ $this->format ]['documents'] ) ) ) {
-			wpo_ips_edi_log( sprintf( 'Document type "%s" is not supported for format "%s".', $this->order_document->get_type(), $this->format ), 'critical' );
+			wpo_ips_edi_log(
+				sprintf(
+					'Document type "%s" is not supported for format "%s".',
+					$this->order_document->get_type(),
+					$this->format
+				),
+				'critical'
+			);
 			return null;
 		}
 		
