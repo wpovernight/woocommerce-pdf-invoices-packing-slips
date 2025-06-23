@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI;
+namespace WPO\IPS\EDI\Standards;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

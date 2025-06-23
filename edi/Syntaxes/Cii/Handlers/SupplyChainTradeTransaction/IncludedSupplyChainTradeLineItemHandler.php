@@ -2,7 +2,6 @@
 namespace WPO\IPS\EDI\Syntaxes\Cii\Handlers\SupplyChainTradeTransaction;
 
 use WPO\IPS\EDI\Syntaxes\Cii\Abstracts\AbstractCiiHandler;
-use WPO\IPS\EDI\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS\Settings;
 
-use WPO\IPS\EDI\EN16931;
+use WPO\IPS\EDI\Standards\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
