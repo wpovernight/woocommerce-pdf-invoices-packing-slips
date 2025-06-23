@@ -26,7 +26,7 @@ class EN16931 extends AbstractStandard {
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_vat_cat', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vat_cat', array() );
 
 		return $extra + $defaults;
 	}
@@ -51,7 +51,7 @@ class EN16931 extends AbstractStandard {
 			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_5305', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_5305', array() );
 
 		return $extra + $defaults;
 	}
@@ -157,7 +157,7 @@ class EN16931 extends AbstractStandard {
 			'VATEX-FR-298SEXDECIESA' => __( 'Exempt based on article 298 sexdecies A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_vatex', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex', array() );
 
 		return $extra + $defaults;
 	}
@@ -218,7 +218,7 @@ class EN16931 extends AbstractStandard {
 			),
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_vatex_remarks', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex_remarks', array() );
 
 		return $extra + $defaults;
 	}
@@ -331,7 +331,7 @@ class EN16931 extends AbstractStandard {
 			'EM'   => 'Electronic mail (SMPT)',
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_eas', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_eas', array() );
 
 		return $extra + $defaults;
 	}
@@ -582,7 +582,7 @@ class EN16931 extends AbstractStandard {
 			'0240' => 'Register of legal persons (in French : Répertoire des personnes morales)',
 		);
 		
-		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_icd', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_icd', array() );
 
 		return $extra + $defaults;
 	}
@@ -682,7 +682,7 @@ class EN16931 extends AbstractStandard {
 			'ZZZ' => 'Mutually defined',
 		);
 
-		$extra = (array) apply_filters( 'wpo_ips_edi_' . self::$slug . '_payment', array() );
+		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_payment', array() );
 
 		return $extra + $defaults;
 	}

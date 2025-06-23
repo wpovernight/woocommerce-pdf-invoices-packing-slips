@@ -53,10 +53,10 @@ class SabreBuilder implements BuilderInterface {
 	 * @param Writer $writer The Sabre XML writer.
 	 */
 	public function xmlSerialize( Writer $writer ): void {
-		$additionalElements = $this->document->get_additional_attributes();
+		$additional_attributes = $this->document->get_additional_attributes();
 
-		if ( ! empty( $additionalElements ) && is_array( $additionalElements ) ) {
-			$writer->writeAttributes( $additionalElements );
+		if ( ! empty( $additional_attributes ) && is_array( $additional_attributes ) ) {
+			$writer->writeAttributes( $additional_attributes );
 		}
 
 		$writer->write( $this->document->get_data() );

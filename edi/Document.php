@@ -216,21 +216,21 @@ class Document {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$taxDataContainer = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-			$taxDataKey       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
-			$lineTotalKey     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
-
-			$line_tax_data = $item[ $taxDataContainer ];
-			foreach ( $line_tax_data[ $taxDataKey ] as $tax_id => $tax ) {
+			$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
+			$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
+			$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
+			$line_tax_data      = $item[ $tax_data_container ];
+			
+			foreach ( $line_tax_data[ $tax_data_key ] as $tax_id => $tax ) {
 				if ( is_numeric( $tax ) ) {
 					if ( empty( $order_tax_data[ $tax_id ] ) ) {
 						$order_tax_data[ $tax_id ] = array(
-							'total_ex'  => $item[ $lineTotalKey ],
+							'total_ex'  => $item[ $line_total_key ],
 							'total_tax' => $tax,
 							'items'     => array( $item_id ),
 						);
 					} else {
-						$order_tax_data[ $tax_id ]['total_ex']  += $item[ $lineTotalKey ];
+						$order_tax_data[ $tax_id ]['total_ex']  += $item[ $line_total_key ];
 						$order_tax_data[ $tax_id ]['total_tax'] += $tax;
 						$order_tax_data[ $tax_id ]['items'][]    = $item_id;
 					}
