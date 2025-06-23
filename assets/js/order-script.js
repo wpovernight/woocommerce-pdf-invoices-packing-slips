@@ -6,14 +6,15 @@ jQuery( function( $ ) {
 
 		if ( $.inArray( action, wpo_wcpdf_ajax.bulk_actions ) !== -1 ) {
 			e.preventDefault();
-			let template   = action;
-			let checked    = [];
-			let xml_output = false;
+			
+			let document_type = action;
+			let checked       = [];
+			let xml_output    = false;
 
 			// is XML action
 			if ( action.indexOf( 'xml' ) != -1 ) {
-				template   = template.replace( '_xml', '' );
-				xml_output = true;
+				document_type = document_type.replace( '_xml', '' );
+				xml_output    = true;
 			}
 
 			$( 'tbody th.check-column input[type="checkbox"]:checked' ).each(
@@ -31,9 +32,9 @@ jQuery( function( $ ) {
 			let full_url    = '';
 
 			if ( wpo_wcpdf_ajax.ajaxurl.indexOf ("?" ) != -1 ) {
-				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+document_type+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			} else {
-				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+document_type+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			}
 
 			// xml
