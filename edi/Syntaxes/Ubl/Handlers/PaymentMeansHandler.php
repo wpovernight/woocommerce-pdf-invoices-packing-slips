@@ -22,7 +22,7 @@ class PaymentMeansHandler extends AbstractUblHandler {
 		if ( ! $payment ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'UBL PaymentMeans: No payment means data for order %d',
+					'UBL PaymentMeans: No payment means data in order %d',
 					$this->document->order->get_id()
 				),
 				'error'
@@ -34,7 +34,7 @@ class PaymentMeansHandler extends AbstractUblHandler {
 		if ( empty( $payment['type_code'] ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'UBL PaymentMeans: No usable type code for order %d',
+					'UBL PaymentMeans: No usable type code in order %d',
 					$this->document->order->get_id()
 				),
 				'error'

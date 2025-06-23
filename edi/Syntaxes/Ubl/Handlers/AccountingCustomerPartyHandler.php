@@ -136,7 +136,13 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 
 		if ( ! empty( $vat_number ) ) {
 			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-				wpo_ips_edi_log( 'UBL PartyTaxScheme: VAT number does not have a country prefix for customer.', 'error' );
+				wpo_ips_edi_log(
+					sprintf(
+						'UBL PartyTaxScheme: VAT number does not have a country prefix for customer in order %d.',
+						$this->document->order->get_id()
+					),
+					'error'
+				);
 			}
 		
 			$values[] = array(
