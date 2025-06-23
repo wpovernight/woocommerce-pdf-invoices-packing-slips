@@ -35,7 +35,9 @@ class Document {
 		$this->format_document    = $this->get_format_document();
 
 		if ( ! $this->format_document ) {
-			throw new \Exception( sprintf( 'Format "%s" for syntax "%s" is not available.', $format, $syntax ) );
+			$error = sprintf( 'Format "%s" for syntax "%s" is not available.', $format, $syntax );
+			wpo_ips_edi_log( $error, 'critical' );
+			throw new \Exception( $error );
 		}
 	}
 	
@@ -48,10 +50,12 @@ class Document {
 		$available_formats = wpo_ips_edi_formats( $this->syntax );
 
 		if ( ! isset( $available_formats[ $this->format ] ) ) {
+			wpo_ips_edi_log( sprintf( 'Format "%s" for syntax "%s" is not available.', $this->format, $this->syntax ), 'critical' );
 			return null;
 		}
 		
 		if ( ! in_array( $this->order_document->get_type(), array_keys( $available_formats[ $this->format ]['documents'] ) ) ) {
+			wpo_ips_edi_log( sprintf( 'Document type "%s" is not supported for format "%s".', $this->order_document->get_type(), $this->format ), 'critical' );
 			return null;
 		}
 		
@@ -71,6 +75,7 @@ class Document {
 		);
 
 		if ( empty( $structure ) ) {
+			wpo_ips_edi_log( 'Document structure is empty.', 'error' );
 			return false;
 		}
 
@@ -193,7 +198,7 @@ class Document {
 				);
 			} else {
 				// numeric key -> flatten directly
-				$data   = array_merge( $data, $value );
+				$data = array_merge( $data, $value );
 			}
 		}
 
