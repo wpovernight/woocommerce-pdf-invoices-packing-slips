@@ -823,23 +823,23 @@ class Admin {
 			if ( ! empty( $document_number_instance ) ) {
 				$current['number'] = array(
 					'prefix' => array(
-						'value' => $document_number_instance->get_prefix() ?: '',
+						'value' => $document_number_instance->get_prefix() ?: null,
 						'name'  => "_wcpdf_{$document->slug}_number_prefix",	
 					),
 					'plain' => array(
-						'value' => $document_number_instance->get_plain() ?: '',
+						'value' => $document_number_instance->get_plain() ?: null,
 						'name'  => "_wcpdf_{$document->slug}_number_plain",
 					),
 					'suffix' => array(
-						'value' => $document_number_instance->get_suffix() ?: '',
+						'value' => $document_number_instance->get_suffix() ?: null,
 						'name'  => "_wcpdf_{$document->slug}_number_suffix",
 					),
 					'padding' => array(
-						'value' => $document_number_instance->get_padding() ?: '',
+						'value' => $document_number_instance->get_padding() ?: null,
 						'name'  => "_wcpdf_{$document->slug}_number_padding",
 					),
 					'formatted' => array(
-						'value' => $document_number_instance->get_formatted() ?: '',
+						'value' => $document_number_instance->get_formatted() ?: null,
 						'name'  => "_wcpdf_{$document->slug}_number_formatted",
 					),
 				);
@@ -847,13 +847,55 @@ class Admin {
 			
 			if ( ! empty( $document_date_instance ) ) {
 				$current['date'] = array(
-					'formatted' => $document_date_instance->date_i18n( wc_date_format().' @ '.wc_time_format() ) ?: '',
+					'formatted' => $document_date_instance->date_i18n( wc_date_format().' @ '.wc_time_format() ) ?: null,
 					'date'      => $document_date_instance->date_i18n( 'Y-m-d' ) ?: date_i18n( 'Y-m-d' ),
 					'hour'      => $document_date_instance->date_i18n( 'H' ) ?: date_i18n( 'H' ),
 					'minute'    => $document_date_instance->date_i18n( 'i' ) ?: date_i18n( 'i' ),
 					'name'      => "_wcpdf_{$document->slug}_date",
 				);
 			}
+		} else {
+			$number_store    = $document->get_sequential_number_store();
+			$number_settings = $document->get_number_settings();
+			
+			$current['number'] = array(
+				'prefix' => array(
+					'value' => $number_settings['prefix'] ?: null,
+					'name'  => "_wcpdf_{$document->slug}_number_prefix",	
+				),
+				'plain' => array(
+					'value' => $number_store->get_next() ?: null,
+					'name'  => "_wcpdf_{$document->slug}_number_plain",
+				),
+				'suffix' => array(
+					'value' => $number_settings['suffix'] ?: null,
+					'name'  => "_wcpdf_{$document->slug}_number_suffix",
+				),
+				'padding' => array(
+					'value' => $number_settings['padding'] ?: null,
+					'name'  => "_wcpdf_{$document->slug}_number_padding",
+				),
+			);
+			
+			$current['number']['formatted'] = array(
+				'value' => wpo_wcpdf_format_document_number(
+					$current['number']['plain']['value'],
+					$current['number']['prefix']['value'],
+					$current['number']['suffix']['value'],
+					$current['number']['padding']['value'],
+					$document,
+					$document->order
+				),
+				'name'  => "_wcpdf_{$document->slug}_number_formatted",
+			);
+			
+			$current['date'] = array(
+				'formatted' => date_i18n( wc_date_format() . ' @ ' . wc_time_format() ),
+				'date'      => date_i18n( 'Y-m-d' ),
+				'hour'      => date_i18n( 'H' ),
+				'minute'    => date_i18n( 'i' ),
+				'name'      => "_wcpdf_{$document->slug}_date",
+			);
 		}
 
 		if ( ! empty( $data['notes'] ) ) {
