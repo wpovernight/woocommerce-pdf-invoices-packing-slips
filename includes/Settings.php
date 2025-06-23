@@ -547,7 +547,9 @@ class Settings {
 
 	public function get_document_settings( $document_type, $output_format = 'pdf' ) {
 		if ( ! empty( $document_type ) ) {
-			$option_name = ( 'pdf' === $output_format ) ? "wpo_wcpdf_documents_settings_{$document_type}" : "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
+			$option_name = ( 'pdf' === $output_format || 'xml' === $output_format ) // In 5.0.0 and later, E‑Documents settings are isolated from document settings, so PDF is the default.
+				? "wpo_wcpdf_documents_settings_{$document_type}"
+				: "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
 			return get_option( $option_name, array() );
 		} else {
 			return false;
