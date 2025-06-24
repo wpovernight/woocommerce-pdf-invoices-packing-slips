@@ -12,7 +12,7 @@ class Invoice extends AbstractUblFormat {
 
 	public string $type = 'invoice';
 	public string $slug = 'peppol-bis-3p0';
-	public string $name = 'PEPPOL BIS 3.0';
+	public string $name = 'PEPPOL BIS 3.0 Invoice';
 
 	/**
 	 * Get the invoice type code

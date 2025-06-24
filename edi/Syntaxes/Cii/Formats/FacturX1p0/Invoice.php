@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 
 	public string $slug = 'factur-x-1p0';
-	public string $name = 'Factur-X 1.0';
+	public string $name = 'Factur-X Invoice 1.0';
 
 	/**
 	 * Get RDF metadata for embedding XML in PDF/A-3.

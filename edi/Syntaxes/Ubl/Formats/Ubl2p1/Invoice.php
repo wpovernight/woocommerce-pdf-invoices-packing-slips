@@ -12,7 +12,7 @@ class Invoice extends AbstractUblFormat {
 
 	public string $type = 'invoice';
 	public string $slug = 'ubl-2p1';
-	public string $name = 'UBL 2.1';
+	public string $name = 'UBL Invoice 2.1';
 	
 	/**
 	 * Get the invoice type code
@@ -64,6 +64,10 @@ class Invoice extends AbstractUblFormat {
 			'ubl_version_id' => array(
 				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\UblVersionIdHandler::class,
+			),
+			'customization_id' => array(
+				'enabled' => true,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\CustomizationIdHandler::class,
 			),
 			'id' => array(
 				'enabled' => true,

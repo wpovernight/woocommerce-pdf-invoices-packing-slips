@@ -97,6 +97,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\AdditionalDocumentReferenceHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Handlers/AdditionalDocumentReferenceHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\AllowanceChargeHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Handlers/AllowanceChargeHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\BuyerReferenceHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Handlers/BuyerReferenceHandler.php',
+        'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\CustomizationIdHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Handlers/CustomizationIdHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\DeliveryHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Handlers/DeliveryHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\DocumentCurrencyCodeHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Handlers/DocumentCurrencyCodeHandler.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\IdHandler' => __DIR__ . '/../..' . '/edi/Syntaxes/Ubl/Handlers/IdHandler.php',

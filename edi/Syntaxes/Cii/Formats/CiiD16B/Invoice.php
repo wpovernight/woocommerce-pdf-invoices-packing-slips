@@ -12,7 +12,7 @@ class Invoice extends AbstractCiiFormat {
 	
 	public string $type = 'invoice';
 	public string $slug = 'cii-d16b';
-	public string $name = 'CII D16B';
+	public string $name = 'CII Invoice D16B';
 	
 	/**
 	 * Get the invoice context

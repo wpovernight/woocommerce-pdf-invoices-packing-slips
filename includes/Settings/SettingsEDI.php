@@ -34,7 +34,7 @@ class SettingsEDI {
 			'settings'    => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
 			'identifiers' => __( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
 			'taxes'       => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
-			'status'      => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
+			'info'        => __( 'Info', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
 
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
@@ -96,8 +96,8 @@ class SettingsEDI {
 				case 'taxes':
 					$this->output_taxes();
 					break;
-				case 'status':
-					$this->output_status();
+				case 'info':
+					$this->output_info();
 					break;
 					
 			}
@@ -966,56 +966,97 @@ class SettingsEDI {
 	}
 	
 	/**
-	 * Output the status content.
+	 * Output the info content.
 	 * 
 	 * @return void
 	 */
-	public function output_status(): void {
+	public function output_info(): void {
 		?>
-		<h3><?php esc_html_e( 'Available Formats', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-		<table class="widefat striped" styles="margin-top:12px;">
-			<thead>
-				<tr>
-					<td><?php esc_html_e( 'Format', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-					<td><?php esc_html_e( 'Syntax', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-					<td><?php esc_html_e( 'Hybrid', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-					<td><?php esc_html_e( 'Supported Documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-				</tr>
-			</thead>
-			<tbody>
-				<?php foreach ( wpo_ips_edi_formats() as $syntax => $syntax_formats ) : ?>
-					<?php foreach ( $syntax_formats as $format ) : ?>
+		<div>
+			<h3><?php esc_html_e( 'Available Formats', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+			<table class="widefat striped" styles="margin-top:12px;">
+				<thead>
 					<tr>
-						<td><?php echo esc_html( $format['name'] ); ?></td>
-						<td><?php echo esc_html( strtoupper( $syntax ) ); ?></td>
-						<td><?php echo esc_html( $format['hybrid'] ? '&#x2713;' : '&#x10102;' ); ?></td>
-						<td><?php echo esc_html( implode( ', ', array_keys( $format['documents'] ) ) ); ?></td>
+						<td><?php esc_html_e( 'Format', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td><?php esc_html_e( 'Syntax', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td><?php esc_html_e( 'Hybrid', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td><?php esc_html_e( 'Supported Documents', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ( wpo_ips_edi_formats() as $syntax => $syntax_formats ) : ?>
+						<?php foreach ( $syntax_formats as $format ) : ?>
+							<tr>
+								<td><?php echo esc_html( $format['name'] ); ?></td>
+								<td><?php echo esc_html( strtoupper( $syntax ) ); ?></td>
+								<td><?php echo esc_html( $format['hybrid'] ? '&#x2713;' : '&#x10102;' ); ?></td>
+								<td><?php echo esc_html( implode( ', ', array_keys( $format['documents'] ) ) ); ?></td>
+							</tr>
+						<?php endforeach; ?>
 					<?php endforeach; ?>
-				<?php endforeach; ?>
-			</tbody>
-			<tfoot>
-				<tr>
-					<td colspan="4">
-						<?php echo wp_kses_post( sprintf(
-							/* translators: %1$s: open link anchor, %2$s: close link anchor */ 
-							__( 'Hybrid formats require PDF/A-3 support, which is only available with our %1$smPDF extension%2$s version 2.6.0 or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="" target="_blank" rel="noopener noreferrer">',
-							'</a>'
-						) ); ?>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="4">
-						<?php echo wp_kses_post( sprintf(
-							/* translators: %s EN16931 */
-							__( 'All supported formats are compliant with the European standard %s, ensuring semantic and structural consistency for cross-border electronic invoicing within the EU.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<strong>EN16931</strong>'
-						) ); ?>
-					</td>
-				</tr>
-			<tfoot>
-		</table>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="4">
+							<?php echo wp_kses_post( sprintf(
+								/* translators: %1$s: open link anchor, %2$s: close link anchor */ 
+								__( 'Hybrid formats require PDF/A-3 support, which is only available with our %1$smPDF extension%2$s version 2.6.0 or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="" target="_blank" rel="noopener noreferrer">',
+								'</a>'
+							) ); ?>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<?php echo wp_kses_post( sprintf(
+								/* translators: %s EN16931 */
+								__( 'All supported formats are compliant with the European standard %s, ensuring semantic and structural consistency for cross-border electronic invoicing within the EU.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<strong>EN16931</strong>'
+							) ); ?>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+		<div>
+			<h3><?php esc_html_e( 'Validation', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+			<table class="widefat striped" styles="margin-top:12px;">
+				<thead>
+					<tr>
+						<td><?php esc_html_e( 'Type', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td><?php esc_html_e( 'Validators', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+						$validators = array(
+							'xml' => array(
+								'ecosio'  => 'https://ecosio.com/en/peppol-and-xml-document-validator/',
+								'DIGIT'   => 'https://www.itb.ec.europa.eu/invoice/upload',
+							),
+							'pdfa3' => array(
+								'veraPDF' => 'https://demo.verapdf.org/',
+								'BFO'     => 'https://bfo.com/blog/2017/11/08/verify_pdfa_online/',
+							),
+						);
+						
+						foreach ( $validators as $type => $urls ) : ?>
+							<tr>
+								<td><?php echo esc_html( $type === 'xml' ? 'XML' : 'PDF/A-3' ); ?></td>
+								<td>
+									<?php
+										$links = array();
+										foreach ( $urls as $name => $url ) {
+											$links[] = '<a href="' . esc_url( $url ) . '" target="_blank">' . esc_html( $name ) . '</a>';
+										}
+										echo implode( ', ', $links );
+									?>
+								</td>
+							</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
 		<?php
 	}
 
