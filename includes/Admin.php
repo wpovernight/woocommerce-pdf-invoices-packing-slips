@@ -861,19 +861,19 @@ class Admin {
 			
 			$current['number'] = array(
 				'prefix' => array(
-					'value' => $number_settings['prefix'] ?: null,
+					'value' => $number_settings['prefix'] ?? null,
 					'name'  => "_wcpdf_{$document->slug}_number_prefix",	
 				),
 				'plain' => array(
-					'value' => $number_store->get_next() ?: null,
+					'value' => $number_store->get_next() ?? null,
 					'name'  => "_wcpdf_{$document->slug}_number_plain",
 				),
 				'suffix' => array(
-					'value' => $number_settings['suffix'] ?: null,
+					'value' => $number_settings['suffix'] ?? null,
 					'name'  => "_wcpdf_{$document->slug}_number_suffix",
 				),
 				'padding' => array(
-					'value' => $number_settings['padding'] ?: null,
+					'value' => $number_settings['padding'] ?? null,
 					'name'  => "_wcpdf_{$document->slug}_number_padding",
 				),
 			);
