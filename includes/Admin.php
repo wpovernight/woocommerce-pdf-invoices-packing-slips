@@ -1650,10 +1650,33 @@ class Admin {
 	 * Process the order document form data and return an array with the data to be saved.
 	 *
 	 * @param array $form_data The form data submitted via AJAX.
-	 * @param OrderDocument $document The document object.
+	 * @param string|OrderDocument $document The document object. It accepted a document type string before 4.6.0.
 	 * @return array Processed data ready to be saved.
 	 */
-	public function process_order_document_form_data( array $form_data, OrderDocument $document ): array {
+	public function process_order_document_form_data( array $form_data, $document ): array {
+		if ( ! $document instanceof OrderDocument ) {
+			// Before this parameter accepted a document type string, but now we require a document object.
+			// If a string is passed it's because an old version of the Professional or Proposal extension is active.
+			$extension_needs_update = array();
+
+			// Check if the Professional extension is active
+			if ( function_exists( 'WPO_WCPDF_Pro' ) ) {
+				$extension_needs_update[] = 'Professional';
+			}
+
+			// Check if the Proposal extension is active
+			if ( function_exists( 'wc_order_proposal' ) ) {
+				$extension_needs_update[] = 'Proposal';
+			}
+
+			if ( ! empty( $extension_needs_update ) ) {
+				$message = __METHOD__ . ': The parameter passed is a string (legacy behavior). This method now requires a document object. Please update the following extension' . ( count( $extension_needs_update ) > 1 ? 's' : '' ) . ': ' . implode( ' and ', $extension_needs_update ) . '.';
+				wcpdf_log_error( $message, 'critical' );
+			}
+
+			return array();
+		}
+		
 		$data = array();
 
 		if (
