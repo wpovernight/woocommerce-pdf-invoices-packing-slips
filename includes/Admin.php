@@ -1275,9 +1275,26 @@ class Admin {
 	 * Save invoice number date
 	 */
 	public function save_invoice_number_date( $order_id, $order ) {
-		if ( ( empty( $order ) || ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) ) && ! empty( $order_id ) ) {
+		// Skip any auto-draft or draft request
+		if (
+			( isset( $_POST['original_post_status'] ) && in_array( $_POST['original_post_status'], array( 'auto-draft', 'draft' ), true ) ) ||
+			( isset( $_POST['post_status'] ) && in_array( $_POST['post_status'], array( 'auto-draft', 'draft' ), true ) )
+		) {
+			return;
+		}
+		
+		if (
+			( empty( $order ) || ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order' ) ) ) &&
+			! empty( $order_id )
+		) {
 			$order = wc_get_order( $order_id );
-		} else {
+		}
+		
+		if (
+			! $order ||
+			! $order instanceof \WC_Order ||
+			$order->get_status() === 'auto-draft'
+		) {
 			return;
 		}
 
