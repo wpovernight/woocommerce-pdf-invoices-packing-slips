@@ -555,22 +555,43 @@ jQuery( function( $ ) {
 			},
 			success: function( response, textStatus, jqXHR ) {
 				if ( response.data.error ) {
-					$( '#'+canvasId ).remove();
-					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
+					$( '#' + canvasId ).remove();
+					$preview.append( '<div class="notice notice-error inline"><p>' + response.data.error + '</p></div>' );
 				} else if ( response.data.preview_data && response.data.output_format ) {
-					$( '#'+canvasId ).remove();
+					$( '#' + canvasId ).remove();
 
 					switch ( response.data.output_format ) {
 						default:
 						case 'pdf':
-							$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );
+							$preview.append( '<canvas id="' + canvasId + '" style="width:100%;"></canvas>' );
 							renderPdf( worker, canvasId, response.data.preview_data );
 							break;
-						case 'xml':
-							let xml         = response.data.preview_data;
-							let xml_escaped = xml.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
-							$preview.html( '<div id="preview-xml">'+xml_escaped+'</div>' );
+						case 'xml': {
+							let rawXml = response.data.preview_data;
+
+							/**
+							 * Break *every* namespace declaration onto a new line.
+							 * - looks for any run of whitespace followed by xmlns or xmlns:prefix
+							 * - inserts a newline before it, keeping one leading space for indent
+							 */
+							rawXml = rawXml.replace(
+								/\s+(xmlns(?::[\w.-]+)?=)/g,
+								'\n $1'
+							);
+
+							/* Escape just &, <, > */
+							const xmlEscaped = rawXml
+								.replace( /&/g, '&amp;' )
+								.replace( /</g, '&lt;' )
+								.replace( />/g, '&gt;' );
+
+							/* Render */
+							$preview.html(
+								'<pre><code class="language-xml">' + xmlEscaped + '</code></pre>'
+							);
+							Prism.highlightAll();
 							break;
+						}
 					}
 				}
 
@@ -579,8 +600,8 @@ jQuery( function( $ ) {
 			error: function( jqXHR, textStatus, errorThrown ) {
 				if ( textStatus != 'abort' ) {
 					let errorMessage = jqXHR.status + ': ' + jqXHR.statusText
-					$( '#'+canvasId ).remove();
-					$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
+					$( '#' + canvasId ).remove();
+					$preview.append( '<div class="notice notice-error inline"><p>' + errorMessage + '</p></div>' );
 					$preview.unblock();
 				}
 			},
@@ -832,7 +853,7 @@ jQuery( function( $ ) {
 				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
 					$tooltip.text( response.data.message ).addClass( 'visible' );
 					setTimeout( function() {
-					    $tooltip.removeClass( 'visible' );
+						$tooltip.removeClass( 'visible' );
 					}, 3000 );
 				}
 			},

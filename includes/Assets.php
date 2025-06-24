@@ -132,11 +132,29 @@ class Assets {
 			if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
 				wp_enqueue_script( 'jquery-tiptip' );
 			}
+			
+			// edi preview prismjs
+			if ( wpo_ips_edi_preview_is_enabled() ) {
+				wp_enqueue_style(
+					'wpo-ips-edi-prism',
+					WPO_WCPDF()->plugin_url() . '/assets/css/prism.min.css',
+					array(),
+					'1.30.0'
+				);
+				
+				wp_enqueue_script(
+					'wpo-ips-edi-prism',
+					WPO_WCPDF()->plugin_url() . '/assets/js/prism.min.js',
+					array(),
+					'1.30.0',
+					true
+				);
+			}
 
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' ),
+				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'wpo-ips-edi-prism' ),
 				WPO_WCPDF_VERSION
 			);
 
@@ -283,7 +301,6 @@ class Assets {
 					)
 				);
 			}
-
 		}
 
 		if (

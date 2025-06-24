@@ -771,7 +771,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding-right: 5%;
 }
 
-.preview-document .preview > #preview-xml {
+.preview-document .preview > pre {
 	width: 100%;
 	height: 100%;
 	overflow-wrap: anywhere;
