@@ -1293,7 +1293,7 @@ class Admin {
 		if (
 			! $order ||
 			! $order instanceof \WC_Order ||
-			$order->get_status() === 'auto-draft'
+			'auto-draft' === $order->get_status()
 		) {
 			return;
 		}
