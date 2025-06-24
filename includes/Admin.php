@@ -880,10 +880,10 @@ class Admin {
 			
 			$current['number']['formatted'] = array(
 				'value' => wpo_wcpdf_format_document_number(
-					$current['number']['plain']['value'],
+					absint( $current['number']['plain']['value'] ),
 					$current['number']['prefix']['value'],
 					$current['number']['suffix']['value'],
-					$current['number']['padding']['value'],
+					absint( $current['number']['padding']['value'] ),
 					$document,
 					$document->order
 				),
