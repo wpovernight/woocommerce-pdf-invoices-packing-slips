@@ -1671,8 +1671,11 @@ class Admin {
 
 			if ( ! empty( $extension_needs_update ) ) {
 				$message = __METHOD__ . ': The parameter passed is a string (legacy behavior). This method now requires a document object. Please update the following extension' . ( count( $extension_needs_update ) > 1 ? 's' : '' ) . ': ' . implode( ' and ', $extension_needs_update ) . '.';
-				wcpdf_log_error( $message, 'critical' );
+			} else {
+				$message = __METHOD__ . ': The parameter passed is a string (legacy behavior). This method now requires a document object. An outdated or third-party plugin may be using the old method.'; 
 			}
+			
+			wcpdf_log_error( $message, 'critical' );
 
 			return array();
 		}
