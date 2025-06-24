@@ -22,6 +22,7 @@ class Assets {
 
 	public function __construct()	{
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
+		add_filter( 'script_loader_tag', array( $this, 'edi_prism_add_data_manual_attr' ), 10, 3 );
 	}
 
 	/**
@@ -143,7 +144,7 @@ class Assets {
 				);
 				
 				wp_enqueue_script(
-					'wpo-ips-edi-prism',
+					'wpo-ips-edi-prism-core',
 					WPO_WCPDF()->plugin_url() . '/assets/js/prism.min.js',
 					array(),
 					'1.30.0',
@@ -154,7 +155,7 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'wpo-ips-edi-prism' ),
+				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'wpo-ips-edi-prism-core' ),
 				WPO_WCPDF_VERSION
 			);
 
@@ -324,6 +325,23 @@ class Assets {
 			);
 		}
 
+	}
+	
+	/**
+	 * Adds the `data-manual` attribute to Prism’s <script> tag so that Prism
+	 * stays in “manual” mode (i.e. it won’t auto-highlight the entire page;
+	 * you will call `Prism.highlightElement()` yourself).
+	 *
+	 * @param string $tag
+	 * @param string $handle
+	 * @param string $src
+	 *
+	 * @return string
+	 */
+	public function edi_prism_add_data_manual_attr( string $tag, string $handle, string $src ): string {
+		return ( $handle === 'wpo-ips-edi-prism-core' )
+        	? str_replace( '<script ', '<script data-manual ', $tag )
+        	: $tag;
 	}
 
 }

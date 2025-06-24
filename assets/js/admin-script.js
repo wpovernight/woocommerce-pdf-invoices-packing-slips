@@ -567,29 +567,17 @@ jQuery( function( $ ) {
 							renderPdf( worker, canvasId, response.data.preview_data );
 							break;
 						case 'xml': {
-							let rawXml = response.data.preview_data;
+							const rawXml = response.data.preview_data;
 
-							/**
-							 * Break *every* namespace declaration onto a new line.
-							 * - looks for any run of whitespace followed by xmlns or xmlns:prefix
-							 * - inserts a newline before it, keeping one leading space for indent
-							 */
-							rawXml = rawXml.replace(
-								/\s+(xmlns(?::[\w.-]+)?=)/g,
-								'\n $1'
-							);
+							// pretty-print xmlns declarations:
+							const pretty = rawXml.replace( /\s+(xmlns(?::[\w.-]+)?=)/g, '\n $1' );
 
-							/* Escape just &, <, > */
-							const xmlEscaped = rawXml
-								.replace( /&/g, '&amp;' )
-								.replace( /</g, '&lt;' )
-								.replace( />/g, '&gt;' );
+							// build <pre><code> safely
+							const $code = $( '<code>', { class: 'language-xml' } ).text( pretty );
+							$preview.empty().append( $( '<pre>' ).append( $code ) );
 
-							/* Render */
-							$preview.html(
-								'<pre><code class="language-xml">' + xmlEscaped + '</code></pre>'
-							);
-							Prism.highlightAll();
+							// highlight just this element
+							Prism.highlightElement( $code[0] );
 							break;
 						}
 					}
