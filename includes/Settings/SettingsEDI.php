@@ -35,6 +35,7 @@ class SettingsEDI {
 			'identifiers' => __( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
 			'taxes'       => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 			'info'        => __( 'Info', 'woocommerce-pdf-invoices-packing-slips' ),
+			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
 
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
@@ -99,7 +100,9 @@ class SettingsEDI {
 				case 'info':
 					$this->output_info();
 					break;
-					
+				case 'network':
+					$this->output_network();
+					break;
 			}
 
 			do_action( 'wpo_ips_edi_settings_after_output', $active_section, $this->sections );
@@ -1056,6 +1059,29 @@ class SettingsEDI {
 					<?php endforeach; ?>
 				</tbody>
 			</table>
+		</div>
+		<?php
+	}
+	
+	/**
+	 * Output the network settings.
+	 *
+	 * @return void
+	 */
+	public function output_network(): void {
+		?>
+		<p><?php esc_html_e( 'Send your documents via the Peppol network directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+		<div class="notice notice-info inline">
+			<p>
+				<?php
+					echo wp_kses_post( sprintf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						__( 'This feature is available exclusively with the %1$sProfessional extension%2$s and is currently under development.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					) );
+				?>
+			</p>
 		</div>
 		<?php
 	}
