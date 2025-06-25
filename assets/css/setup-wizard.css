@@ -310,7 +310,7 @@ li.completed .wpo-progress-marker::before {
 	width: 100%;
 	height: 40px;
 	max-width: 100%;
-	padding: 10px 15px;
+	padding: 6px 15px;
 	box-sizing: border-box;
 	font-size: 1.2em;
 	margin-bottom: 20px;

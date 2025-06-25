@@ -5,7 +5,7 @@ jQuery( function( $ ) {
 	$( '.tab' ).on( 'click', function() {
 		$( this ).closest( '.extra-field' ).find( '.tab' ).removeClass( 'active' );
 		$( this ).addClass( 'active' );
-		var $language = $( this ).attr( 'id' );
+		let $language = $( this ).attr( 'id' );
 		$( this ).siblings( '.extra-field-input' ).hide();
 		$( '.' + $language ).show();
 	} );
