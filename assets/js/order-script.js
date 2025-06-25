@@ -80,22 +80,22 @@ jQuery( function( $ ) {
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-save-document, .wpo-wcpdf-regenerate-document, .wpo-wcpdf-delete-document', function( e ) {
 		e.preventDefault();
 
-		let $form      = $(this).closest('.wcpdf-data-fields');
-		let action     = $(this).data('action');
-		let nonce      = $(this).data('nonce');
+		let $form      = $( this ).closest( '.wcpdf-data-fields' );
+		let action     = $( this ).data( 'action' );
+		let nonce      = $( this ).data( 'nonce' );
 		let data       = $form.data();
-		let serialized = $form.find(":input:visible:not(:disabled)").serialize();
+		let serialized = $form.find( ":input:visible:not(:disabled)" ).serialize();
 
 		// regenerate specific
-		if ( action == 'regenerate' ) {
+		if ( 'regenerate' === action ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_regenerate ) === false ) {
 				return; // having second thoughts
 			}
 
-			$form.find('.wpo-wcpdf-regenerate-document').addClass('wcpdf-regenerate-spin');
+			$form.find( '.wpo-wcpdf-regenerate-document' ).addClass( 'wcpdf-regenerate-spin' );
 
 		// delete specific
-		} else if ( action == 'delete' ) {
+		} else if ( 'delete' === action ) {
 			if ( window.confirm( wpo_wcpdf_ajax.confirm_delete ) === false ) {
 				return; // having second thoughts
 			}

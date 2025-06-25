@@ -1528,7 +1528,7 @@ class Admin {
 
 				// on save
 				} elseif ( 'save' === $action_type ) {
-					$is_new = false === $document->exists();
+					$is_new = ( false === $document->exists() );
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
