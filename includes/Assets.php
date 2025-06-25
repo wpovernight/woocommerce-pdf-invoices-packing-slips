@@ -95,7 +95,7 @@ class Assets {
 
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles' . $suffix . '.css',
 				array('woocommerce_admin_styles'),
 				WPO_WCPDF_VERSION
 			);

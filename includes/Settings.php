@@ -316,22 +316,22 @@ class Settings {
 					// Update document date.
 					$document->initiate_date();
 
-					// Update document number.
-					$document_number = $document->get_document_number();
-
-					if ( ! empty( $document_number ) ) {
-						$document->set_number( $document_number );
+					// Update document number only if it is not already set.
+					if ( empty( $document->get_number() ) ) {
+						$document_number = $document->get_document_number();
+						if ( ! empty( $document_number ) ) {
+							$document->set_number( $document_number );
+						}
 					}
 
 					$document_number = $document->get_number( $document->get_type() );
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) ) {
-							foreach ( $document->settings['number_format'] as $key => $value ) {
-								$document_number->$key = $document->settings['number_format'][ $key ];
-							}
+						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
+							$document_number->load_number_data( $document->settings['number_format'] );
 						}
+
 						$document_number->apply_formatting( $document, $order );
 					}
 
