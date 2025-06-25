@@ -6,15 +6,21 @@
 <div class="wpo-setup-input">
 	<?php
 	// Set default values for current setting to be used in case the user has not set them yet.
-	$current_settings = wp_parse_args( get_option( 'wpo_wcpdf_settings_general', array() ), array(
-		'shop_name'             => array( 'default' => get_bloginfo( 'name' ) ?? '' ),
-		'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address' ), '' ),
-		'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2' ), '' ),
-		'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country' ), '' ),
-		'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state' ), '' ),
-		'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city' ), '' ),
-		'shop_address_postcode' => array( 'default' => get_option( 'woocommerce_store_postcode' ), '' ),
-	) );
+	$current_settings = wp_parse_args(
+		get_option( 'wpo_wcpdf_settings_general', array() ),
+		array(
+			'shop_name'             => array( 'default' => get_bloginfo( 'name' ) ?? '' ),
+			'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address' ), '' ),
+			'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2' ), '' ),
+			'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country' ), '' ),
+			'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state' ), '' ),
+			'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city' ), '' ),
+			'shop_address_postcode' => array( 'default' => get_option( 'woocommerce_store_postcode' ), '' ),
+		)
+	);
+	$countries       = array_merge( array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ), \WC()->countries->get_countries() );
+	$states          = wpo_wcpdf_get_country_states( $current_settings['shop_address_country']['default'] );
+	$states_disabled = empty( $states ) ? 'disabled' : '';
 	?>
 	<input
 		type="text"
@@ -37,20 +43,38 @@
 		name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_line_2][default]"
 		value="<?php echo esc_attr( array_pop( $current_settings['shop_address_line_2'] ) ); ?>"
 	>
-	<input
-		type="text"
-		class="shop-address-country"
-		placeholder="<?php esc_attr_e( 'Shop address country', 'woocommerce-pdf-invoices-packing-slips' ); ?>"
-		name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_country][default]"
-		value="<?php echo esc_attr( array_pop( $current_settings['shop_address_country'] ) ); ?>"
-	>
-	<input
-		type="text"
-		class="shop-address-state"
-		placeholder="<?php esc_attr_e( 'Shop address country', 'woocommerce-pdf-invoices-packing-slips' ); ?>"
-		name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_state][default]"
-		value="<?php echo esc_attr( array_pop( $current_settings['shop_address_state'] ) ); ?>"
-	>
+	<select class="shop-address-country" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_country][default]" style="width: 100%;">
+		<?php
+			foreach ( $countries as $country_code => $country_name ) {
+				printf(
+					'<option value="%s" %s>%s</option>',
+					esc_attr( $country_code ),
+					selected( $current_settings['shop_address_country']['default'], $country_code, false ),
+					esc_html( $country_name )
+				);
+			}
+		?>
+	</select>
+	<select class="shop-address-state" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_state][default]" <?php echo esc_attr( $states_disabled ); ?>>
+		<?php
+			if ( ! empty( $states ) ) {
+				foreach ( $states as $state_code => $state_name ) {
+					printf(
+						'<option value="%s" %s>%s</option>',
+						esc_attr( $state_code ),
+						selected( $current_settings['shop_address_state']['default'], $state_code, false ),
+						esc_html( $state_name )
+					);
+				}
+			} else {
+				printf(
+					'<option value="" %s>%s</option>',
+					selected( $current_settings['shop_address_state']['default'], '', false ),
+					esc_html__( 'No states available', 'woocommerce-pdf-invoices-packing-slips' )
+				);
+			}
+		?>
+	</select>
 	<input
 		type="text"
 		class="shop-address-city"

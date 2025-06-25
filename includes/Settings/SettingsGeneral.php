@@ -303,12 +303,12 @@ class SettingsGeneral {
 				'callback' => 'select',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'options'      => $states ?: array( '' => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ) ),
-					'id'           => 'shop_address_state',
-					'translatable' => true,
-					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'disabled'     => empty( $states ),
+					'option_name'   => $option_name,
+					'options'       => $states ?: array( '' => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ) ),
+					'id'            => 'shop_address_state',
+					'translatable'  => true,
+					'description'   => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'disabled'      => empty( $states ),
 					'action_button' => array(
 						'class' => 'button sync-address',
 						'icon'  => 'update',
