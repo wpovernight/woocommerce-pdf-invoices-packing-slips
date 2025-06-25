@@ -1314,6 +1314,9 @@ class Admin {
 			$invoice   = wcpdf_get_invoice( $order );
 			
 			if ( $invoice ) {
+				// IMPORTANT: $is_new must be set before calling initiate_number().
+				// The exists() method uses the number to determine existence, so
+				// if we call initiate_number() first, it may affect the result of exists().
 				$is_new        = ( false === $invoice->exists() );
 				$form_data     = stripslashes_deep( $_POST );
 				$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
@@ -1528,7 +1531,11 @@ class Admin {
 
 				// on save
 				} elseif ( 'save' === $action_type ) {
+					// IMPORTANT: $is_new must be set before calling initiate_number().
+					// The exists() method uses the number to determine existence, so
+					// if we call initiate_number() first, it may affect the result of exists().
 					$is_new = ( false === $document->exists() );
+					
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
