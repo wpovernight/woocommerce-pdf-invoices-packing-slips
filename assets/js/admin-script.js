@@ -343,7 +343,7 @@ jQuery( function( $ ) {
 		if ( 'shop_address_country' === event.target.id || ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
 			settingsChanged( event );
 		}
-	});
+	} );
 	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
