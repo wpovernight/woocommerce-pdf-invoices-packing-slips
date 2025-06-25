@@ -56,17 +56,6 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 
-	// disable encrypted pdf option for non UBL 2.1 formats
-	$( "[name='wpo_wcpdf_documents_settings_invoice_ubl[ubl_format]']" ).on( 'change', function( event ) {
-		let $encryptedPdfCheckbox = $( this ).closest( 'form' ).find( "[name='wpo_wcpdf_documents_settings_invoice_ubl[include_encrypted_pdf]']" );
-
-		if ( $( this ).val() !== 'ubl_2_1' ) {
-			$encryptedPdfCheckbox.prop( 'checked', false ).prop( 'disabled', true );
-		} else {
-			$encryptedPdfCheckbox.prop( 'disabled', false );
-		}
-	} ).trigger( 'change' );
-
 	// enable settings document switch
 	$( '.wcpdf_document_settings_sections > h2' ).on( 'click', function() {
 		$( this ).parent().find( 'ul' ).toggleClass( 'active' );
@@ -566,22 +555,31 @@ jQuery( function( $ ) {
 			},
 			success: function( response, textStatus, jqXHR ) {
 				if ( response.data.error ) {
-					$( '#'+canvasId ).remove();
-					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
+					$( '#' + canvasId ).remove();
+					$preview.append( '<div class="notice notice-error inline"><p>' + response.data.error + '</p></div>' );
 				} else if ( response.data.preview_data && response.data.output_format ) {
-					$( '#'+canvasId ).remove();
+					$( '#' + canvasId ).remove();
 
 					switch ( response.data.output_format ) {
 						default:
 						case 'pdf':
-							$preview.append( '<canvas id="'+canvasId+'" style="width:100%;"></canvas>' );
+							$preview.append( '<canvas id="' + canvasId + '" style="width:100%;"></canvas>' );
 							renderPdf( worker, canvasId, response.data.preview_data );
 							break;
-						case 'ubl':
-							let xml         = response.data.preview_data;
-							let xml_escaped = xml.replace( /&/g,'&amp;' ).replace( /</g,'&lt;' ).replace( />/g,'&gt;' ).replace( / /g, '&nbsp;' ).replace( /\n/g,'<br />' );
-							$preview.html( '<div id="preview-ubl">'+xml_escaped+'</div>' );
+						case 'xml': {
+							const rawXml = response.data.preview_data;
+
+							// pretty-print xmlns declarations:
+							const pretty = rawXml.replace( /\s+(xmlns(?::[\w.-]+)?=)/g, '\n $1' );
+
+							// build <pre><code> safely
+							const $code = $( '<code>', { class: 'language-xml' } ).text( pretty );
+							$preview.empty().append( $( '<pre>' ).append( $code ) );
+
+							// highlight just this element
+							Prism.highlightElement( $code[0] );
 							break;
+						}
 					}
 				}
 
@@ -590,8 +588,8 @@ jQuery( function( $ ) {
 			error: function( jqXHR, textStatus, errorThrown ) {
 				if ( textStatus != 'abort' ) {
 					let errorMessage = jqXHR.status + ': ' + jqXHR.statusText
-					$( '#'+canvasId ).remove();
-					$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
+					$( '#' + canvasId ).remove();
+					$preview.append( '<div class="notice notice-error inline"><p>' + errorMessage + '</p></div>' );
 					$preview.unblock();
 				}
 			},
@@ -743,6 +741,71 @@ jQuery( function( $ ) {
 	}
 
 	settingsAccordion();
+	
+	// Settings custom attributes
+	$( "[data-show_for_option_name]" ).each( function() {
+		let option_name = $( this ).data( 'show_for_option_name' );
+		$( document ).on( 'change', '[name="' + option_name + '"], [name="' + option_name + '[]"]', toggle_conditional_visibility );
+	} );
+
+	// Trigger the change event after setting up the listeners
+	$( "[data-show_for_option_name]" ).each( function() {
+		let option_name = $( this ).data( 'show_for_option_name' );
+		$( '[name="' + option_name + '"], [name="' + option_name + '[]"]' ).each( function() {
+			toggle_conditional_visibility( { target: this } );
+		} );
+	});
+
+	function toggle_conditional_visibility( e ) {
+		const $this  = $( e.target );
+		let name     = $this.prop( 'name' ).replace( '[]', '' ); // normalize multiselect
+		let value    = $this.val();
+		let checkbox = false;
+
+		if ( $this.is( ':checkbox' ) ) {
+			value    = $this.is( ':checked' );
+			checkbox = true;
+		}
+
+		$( "[data-show_for_option_name='" + name + "']" ).each( function() {
+			let show     = false;
+			let show_for = $( this ).data( 'show_for_option_values' );
+			
+			if ( checkbox ) {
+				show = value; // for checkboxes, checked = show
+			} else if ( Array.isArray( value ) ) { // Multiselect
+				show = value.some( item => show_for.includes( item ) );
+			} else {
+				show = show_for.includes( value );
+			}
+
+			let $row = $( this ).closest( 'tr' );
+
+			if ( show ) {
+				$row.show();
+
+				if ( checkbox ) {
+					$row.find( ':input[type=checkbox]' ).val( '1' );
+				}
+			} else {
+				$row.hide()
+					.find( ':input' ).each( function () {
+						const $input = $( this );
+
+						// clear value
+						if ( ! $input.is( ':checkbox' ) ) {
+							$input.val( '' );
+						} else {
+							$input.prop( 'checked', false );
+						}
+
+						// propagate visibility update to anything that depends on this input
+						$input.trigger( 'change' );
+					} );
+			}
+
+		} );
+	}
 
 	//----------> /Settings Accordion <----------//
 	//----------> Sync Address <----------//
@@ -778,7 +841,7 @@ jQuery( function( $ ) {
 				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
 					$tooltip.text( response.data.message ).addClass( 'visible' );
 					setTimeout( function() {
-					    $tooltip.removeClass( 'visible' );
+						$tooltip.removeClass( 'visible' );
 					}, 3000 );
 				}
 			},
@@ -791,5 +854,5 @@ jQuery( function( $ ) {
 	} );
 
 	//----------> /Sync Address <----------//
-
+	
 } );

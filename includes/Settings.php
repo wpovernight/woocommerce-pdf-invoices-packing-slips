@@ -6,7 +6,7 @@ use WPO\IPS\Settings\SettingsCallbacks;
 use WPO\IPS\Settings\SettingsGeneral;
 use WPO\IPS\Settings\SettingsDocuments;
 use WPO\IPS\Settings\SettingsDebug;
-use WPO\IPS\Settings\SettingsUbl;
+use WPO\IPS\Settings\SettingsEDI;
 use WPO\IPS\Settings\SettingsUpgrade;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,10 +23,10 @@ class Settings {
 	public $documents;
 	public $debug;
 	public $upgrade;
-	public $ubl;
+	public $edi;
 	public $general_settings;
 	public $debug_settings;
-	public $ubl_tax_settings;
+	public $edi_settings;
 
 	private $installed_templates       = array();
 	private $installed_templates_cache = array();
@@ -46,12 +46,12 @@ class Settings {
 		$this->general          = SettingsGeneral::instance();
 		$this->documents        = SettingsDocuments::instance();
 		$this->debug            = SettingsDebug::instance();
-		$this->ubl              = SettingsUbl::instance();
+		$this->edi              = SettingsEDI::instance();
 		$this->upgrade          = SettingsUpgrade::instance();
 
-		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
-		$this->ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
+		$this->general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$this->edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -184,10 +184,9 @@ class Settings {
 			),
 		) );
 
-		$settings_tabs['ubl'] = array(
-			'title'          => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+		$settings_tabs['edi'] = array(
+			'title'          => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			'preview_states' => 1,
-			//'beta'           => true,
 		);
 
 		// add status and upgrade tabs last in row
@@ -342,8 +341,8 @@ class Settings {
 						case 'pdf':
 							$preview_data = base64_encode( $document->preview_pdf() );
 							break;
-						case 'ubl':
-							$preview_data = $document->preview_ubl();
+						case 'xml':
+							$preview_data = $document->preview_xml();
 							break;
 					}
 
@@ -548,7 +547,9 @@ class Settings {
 
 	public function get_document_settings( $document_type, $output_format = 'pdf' ) {
 		if ( ! empty( $document_type ) ) {
-			$option_name = ( 'pdf' === $output_format ) ? "wpo_wcpdf_documents_settings_{$document_type}" : "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
+			$option_name = ( 'pdf' === $output_format || 'xml' === $output_format ) // In 5.0.0 and later, E‑Documents settings are isolated from document settings, so PDF is the default.
+				? "wpo_wcpdf_documents_settings_{$document_type}"
+				: "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
 			return get_option( $option_name, array() );
 		} else {
 			return false;
@@ -561,10 +562,7 @@ class Settings {
 		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats ) ) {
-			$document_settings = $this->get_document_settings( $document->get_type(), esc_attr( $request['output'] ) );
-			if ( isset( $document_settings['enabled'] ) ) {
-				$output_format = esc_attr( $request['output'] );
-			}
+			$output_format = esc_attr( $request['output'] );
 		}
 
 		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document );

@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Settings\TaxesSettings;
+use WPO\IPS\EDI\Standards\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -22,6 +22,7 @@ class Assets {
 
 	public function __construct()	{
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
+		add_filter( 'script_loader_tag', array( $this, 'edi_prism_add_data_manual_attr' ), 10, 3 );
 	}
 
 	/**
@@ -132,11 +133,29 @@ class Assets {
 			if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
 				wp_enqueue_script( 'jquery-tiptip' );
 			}
+			
+			// edi preview prismjs
+			if ( wpo_ips_edi_preview_is_enabled() ) {
+				wp_enqueue_style(
+					'wpo-ips-edi-prism',
+					WPO_WCPDF()->plugin_url() . '/assets/css/prism.min.css',
+					array(),
+					'1.30.0'
+				);
+				
+				wp_enqueue_script(
+					'wpo-ips-edi-prism-core',
+					WPO_WCPDF()->plugin_url() . '/assets/js/prism.min.js',
+					array(),
+					'1.30.0',
+					true
+				);
+			}
 
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' ),
+				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'wpo-ips-edi-prism-core' ),
 				WPO_WCPDF_VERSION
 			);
 
@@ -166,7 +185,6 @@ class Assets {
 						'use_latest_settings',
 						'mark_printed',
 						'unmark_printed',
-						'include_encrypted_pdf',
 						'include_email_link',
 						'include_email_link_placement',
 					) ),
@@ -261,28 +279,29 @@ class Assets {
 
 			}
 
-			// ubl taxes
-			if ( 'ubl' === $tab ) {
+			// edi
+			if ( 'edi' === $tab ) {
 				wp_enqueue_script(
-					'wpo-wcpdf-ubl',
-					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
+					'wpo-ips-edi',
+					WPO_WCPDF()->plugin_url() . '/assets/js/edi-script' . $suffix . '.js',
 					array( 'jquery' ),
 					WPO_WCPDF_VERSION,
 					true
 				);
 
 				wp_localize_script(
-					'wpo-wcpdf-ubl',
-					'wpo_wcpdf_ubl',
+					'wpo-ips-edi',
+					'wpo_ips_edi',
 					array(
+						'ajaxurl' => admin_url( 'admin-ajax.php' ),
+						'nonce'   => wp_create_nonce( 'wpo_ips_edi_nonce' ),
 						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
 						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
 						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => TaxesSettings::get_available_remarks(),
+						'remarks' => EN16931::get_vatex_remarks(),
 					)
 				);
 			}
-
 		}
 
 		if (
@@ -306,6 +325,23 @@ class Assets {
 			);
 		}
 
+	}
+	
+	/**
+	 * Adds the `data-manual` attribute to Prism’s <script> tag so that Prism
+	 * stays in “manual” mode (i.e. it won’t auto-highlight the entire page;
+	 * you will call `Prism.highlightElement()` yourself).
+	 *
+	 * @param string $tag
+	 * @param string $handle
+	 * @param string $src
+	 *
+	 * @return string
+	 */
+	public function edi_prism_add_data_manual_attr( string $tag, string $handle, string $src ): string {
+		return ( $handle === 'wpo-ips-edi-prism-core' )
+        	? str_replace( '<script ', '<script data-manual ', $tag )
+        	: $tag;
 	}
 
 }

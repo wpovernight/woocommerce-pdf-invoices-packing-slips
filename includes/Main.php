@@ -1,7 +1,6 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Exceptions\FileWriteException;
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -188,9 +187,6 @@ class Main {
 					} catch ( DompdfException $e ) {
 						wcpdf_log_error( 'DOMPDF exception: '.$e->getMessage(), 'critical', $e );
 						continue;
-					} catch ( FileWriteException $e ) {
-						wcpdf_log_error( 'UBL FileWrite exception: '.$e->getMessage(), 'critical', $e );
-						continue;
 					} catch ( \Error $e ) {
 						wcpdf_log_error( $e->getMessage(), 'critical', $e );
 						continue;
@@ -276,8 +272,8 @@ class Main {
 		return $pdf_path;
 	}
 
-	public function get_document_ubl_attachment( $document, $tmp_path ) {
-		return wpo_ips_write_ubl_file( $document, true );
+	public function get_document_xml_attachment( $document, $tmp_path ) {
+		return wpo_ips_edi_write_file( $document, true );
 	}
 
 	public function get_documents_for_email( $email_id, $order ) {
@@ -310,9 +306,6 @@ class Main {
 				}
 
 				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $output_format );
-				if ( 'ubl' === $output_format ) {
-					$extra_condition = apply_filters_deprecated( 'wpo_wcpdf_custom_ubl_attachment_condition', array( true, $order, $email_id, $document_type, $output_format ), '3.6.0', 'wpo_wcpdf_custom_attachment_condition' );
-				}
 
 				if ( in_array( $email_id, $attach_to_email_ids ) && $extra_condition ) {
 					$document_types[ $output_format ][] = $document_type;
@@ -501,8 +494,8 @@ class Main {
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document, $request );
 
 				switch ( $output_format ) {
-					case 'ubl':
-						$document->output_ubl();
+					case 'xml':
+						$document->output_xml();
 						break;
 					case 'html':
 						add_filter( 'wpo_wcpdf_use_path', '__return_false' );
@@ -527,10 +520,6 @@ class Main {
 			}
 		} catch ( DompdfException $e ) {
 			$message = 'DOMPDF Exception: '.$e->getMessage();
-			wcpdf_log_error( $message, 'critical', $e );
-			wcpdf_output_error( $message, 'critical', $e );
-		} catch ( FileWriteException $e ) {
-			$message = 'UBL FileWrite Exception: '.$e->getMessage();
 			wcpdf_log_error( $message, 'critical', $e );
 			wcpdf_output_error( $message, 'critical', $e );
 		} catch ( \Exception $e ) {
@@ -582,8 +571,8 @@ class Main {
 			case 'dompdf':
 				$tmp_path = $tmp_base . 'dompdf';
 				break;
-			case 'ubl':
-				$tmp_path = $tmp_base . 'ubl';
+			case 'xml':
+				$tmp_path = $tmp_base . 'xml';
 				break;
 			case 'font_cache':
 			case 'fonts':
