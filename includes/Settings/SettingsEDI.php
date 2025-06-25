@@ -35,7 +35,7 @@ class SettingsEDI {
 			'identifiers' => __( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
 			'taxes'       => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 			'info'        => __( 'Info', 'woocommerce-pdf-invoices-packing-slips' ),
-			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ),
+			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ) . ' <sup class="wcpdf_beta">Pro</sup>',
 		) );
 
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
@@ -74,7 +74,7 @@ class SettingsEDI {
 								esc_url( add_query_arg( 'section', $section ) ),
 								esc_attr( $section ),
 								esc_attr( $active ),
-								esc_html( $title )
+								wp_kses_post( $title )
 							);
 						}
 					?>
