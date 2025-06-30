@@ -743,6 +743,7 @@ jQuery( function( $ ) {
 	settingsAccordion();
 	//----------> /Settings Accordion <----------//
 	
+	//----------> Conditional Visibility <----------//
 	const bound = new Set();
 
 	$( '[data-show_for_option_name]' ).each( function () {
@@ -811,6 +812,7 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
+	//----------> /Conditional Visibility <----------//
 	
 	//----------> Sync Address <----------//
 
