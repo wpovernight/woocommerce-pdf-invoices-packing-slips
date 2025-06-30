@@ -1647,38 +1647,38 @@ class Admin {
 			return $data;
 		}
 		
-		$document_slug                   = $document->slug;
 		$data['number']['document_type'] = $document->get_type();
 		$data['number']['order_id']      = $document->order->get_id();
+		$key_prefix                      = "_wcpdf_{$document->slug}_";
 		
 		// Number
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number_prefix'] ) ) {
-			$data['number']['prefix'] = sanitize_text_field( $form_data['_wcpdf_' . $document_slug . '_number_prefix'] );
+		if ( isset( $form_data["{$key_prefix}number_prefix"] ) ) {
+			$data['number']['prefix'] = sanitize_text_field( $form_data["{$key_prefix}number_prefix"] );
+		}
+
+		if ( isset( $form_data["{$key_prefix}number_plain"] ) ) {
+			$data['number']['number'] = absint( $form_data["{$key_prefix}number_plain"] );
 		}
 		
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number_plain'] ) ) {
-			$data['number']['number'] = absint( $form_data['_wcpdf_' . $document_slug . '_number_plain'] );
+		if ( isset( $form_data["{$key_prefix}number_suffix"] ) ) {
+			$data['number']['suffix'] = sanitize_text_field( $form_data["{$key_prefix}number_suffix"] );
 		}
 		
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number_suffix'] ) ) {
-			$data['number']['suffix'] = sanitize_text_field( $form_data['_wcpdf_' . $document_slug . '_number_suffix'] );
+		if ( isset( $form_data["{$key_prefix}number_padding"] ) ) {
+			$data['number']['padding'] = absint( $form_data["{$key_prefix}number_padding"] );
 		}
 		
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number_padding'] ) ) {
-			$data['number']['padding'] = absint( $form_data['_wcpdf_' . $document_slug . '_number_padding'] );
-		}
-		
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number_formatted'] ) ) {
-			$data['number']['formatted_number'] = sanitize_text_field( $form_data['_wcpdf_' . $document_slug . '_number_formatted'] );
+		if ( isset( $form_data["{$key_prefix}number_formatted"] ) ) {
+			$data['number']['formatted_number'] = sanitize_text_field( $form_data["{$key_prefix}number_formatted"] );
 		}
 
 		// Date
-		$date_entered = ! empty( $form_data['_wcpdf_' . $document_slug . '_date'] ) && ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['date'] );
+		$date_entered = ! empty( $form_data["{$key_prefix}date"] ) && ! empty( $form_data["{$key_prefix}date"]['date'] );
 		
 		if ( $date_entered ) {
-			$date         = $form_data['_wcpdf_' . $document_slug . '_date']['date'];
-			$hour         = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['hour'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['hour'] : '00';
-			$minute       = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['minute'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['minute'] : '00';
+			$date         = $form_data["{$key_prefix}date"]['date'];
+			$hour         = ! empty( $form_data["{$key_prefix}date"]['hour'] ) ? $form_data["{$key_prefix}date"]['hour'] : '00';
+			$minute       = ! empty( $form_data["{$key_prefix}date"]['minute'] ) ? $form_data["{$key_prefix}date"]['minute'] : '00';
 
 			// clean & sanitize input
 			$date         = gmdate( 'Y-m-d', strtotime( $date ) );
@@ -1686,12 +1686,12 @@ class Admin {
 			$minute       = sprintf( '%02d', intval( $minute ) );
 			$data['date'] = "{$date} {$hour}:{$minute}:00";
 
-		} elseif ( ! $date_entered && ! empty( $_POST['_wcpdf_' . $document_slug . '_number'] ) ) {
+		} elseif ( ! $date_entered && ! empty( $_POST["{$key_prefix}number"] ) ) {
 			$data['date'] = current_time( 'timestamp', true );
 		}
 
 		// Notes
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_notes'] ) ) {
+		if ( isset( $form_data["{$key_prefix}notes"] ) ) {
 			// allowed HTML
 			$allowed_html = array(
 				'a'		=> array(
@@ -1722,7 +1722,7 @@ class Admin {
 				'b'		=> array(),
 			);
 
-			$data['notes'] = wp_kses( $form_data['_wcpdf_' . $document_slug . '_notes'], $allowed_html );
+			$data['notes'] = wp_kses( $form_data["{$key_prefix}notes"], $allowed_html );
 		}
 
 		return $data;
