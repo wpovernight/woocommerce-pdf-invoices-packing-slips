@@ -243,9 +243,14 @@ jQuery( function( $ ) {
 		} );
 	}
 	
-	$( document ).on( 'input change', '.wcpdf-data-fields .number-specs-table input, .wcpdf-data-fields .number-table input', function() {
-		let $table = $( this ).closest( '.wcpdf-data-fields' );
-		updatePreviewNumber( $table );
+	let previewTimer;
+	$( document ).on( 'input', '.wcpdf-data-fields .number-specs-table input, .wcpdf-data-fields .number-table input', function () {
+		const $table = $( this ).closest( '.wcpdf-data-fields' );
+
+		clearTimeout( previewTimer );
+		previewTimer = setTimeout( () => {
+			updatePreviewNumber( $table );
+		}, 300 );
 	} );
 
 } );
