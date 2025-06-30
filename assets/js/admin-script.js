@@ -741,20 +741,22 @@ jQuery( function( $ ) {
 	}
 
 	settingsAccordion();
+	//----------> /Settings Accordion <----------//
 	
-	// Settings custom attributes
-	$( "[data-show_for_option_name]" ).each( function() {
-		let option_name = $( this ).data( 'show_for_option_name' );
-		$( document ).on( 'change', '[name="' + option_name + '"], [name="' + option_name + '[]"]', toggle_conditional_visibility );
-	} );
+	const bound = new Set();
 
-	// Trigger the change event after setting up the listeners
-	$( "[data-show_for_option_name]" ).each( function() {
-		let option_name = $( this ).data( 'show_for_option_name' );
-		$( '[name="' + option_name + '"], [name="' + option_name + '[]"]' ).each( function() {
+	$( '[data-show_for_option_name]' ).each( function () {
+		const opt = $( this ).data( 'show_for_option_name' );
+		if ( bound.has( opt ) ) {
+			return;
+		}
+
+		$( document ).on( 'change', `[name="${opt}"], [name="${opt}[]"]`, toggle_conditional_visibility );
+		$( `[name="${opt}"], [name="${opt}[]"]` ).each( function () {
 			toggle_conditional_visibility( { target: this } );
 		} );
-	});
+		bound.add( opt );
+	} );
 
 	function toggle_conditional_visibility( e ) {
 		const $this  = $( e.target );
@@ -792,22 +794,24 @@ jQuery( function( $ ) {
 					.find( ':input' ).each( function () {
 						const $input = $( this );
 
-						// clear value
-						if ( ! $input.is( ':checkbox' ) ) {
-							$input.val( '' );
-						} else {
+						if ( $input.is( 'select' ) ) {
+							if ( $input.prop( 'multiple' ) ) {
+								$input.val( [] );
+							} else {
+								$input.prop( 'selectedIndex', 0 );
+							}
+						} else if ( $input.is( ':checkbox' ) ) {
 							$input.prop( 'checked', false );
+						} else {
+							$input.val( '' );
 						}
 
-						// propagate visibility update to anything that depends on this input
 						$input.trigger( 'change' );
 					} );
 			}
-
 		} );
 	}
-
-	//----------> /Settings Accordion <----------//
+	
 	//----------> Sync Address <----------//
 
 	$( '#wpo-wcpdf-settings .sync-address' ).on( 'click', function( event ) {
