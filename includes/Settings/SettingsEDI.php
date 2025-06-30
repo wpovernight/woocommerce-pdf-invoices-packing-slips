@@ -149,6 +149,7 @@ class SettingsEDI {
 					'multiple'        => true,
 					'enhanced_select' => true,
 					'placeholder'     => __( 'Select one or more document types with electronic format.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'     => __( 'E-Documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
