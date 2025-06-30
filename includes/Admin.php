@@ -816,35 +816,38 @@ class Admin {
 	 * @return array The current values for the document data.
 	 */
 	public function get_current_values_for_document_data( OrderDocument $document, array $data ): array {
-		$document_number_instance = $document->get_number();
-		$document_date_instance   = $document->get_date();
-		$current                  = array();
+		$current     = array();
+		$name_prefix = "_wcpdf_{$document->slug}_";
 		
 		if ( $document->exists() ) {
+			$document_number_instance = $document->get_number();
+			
 			if ( ! empty( $document_number_instance ) ) {
 				$current['number'] = array(
 					'prefix' => array(
 						'value' => $document_number_instance->get_prefix() ?: null,
-						'name'  => "_wcpdf_{$document->slug}_number_prefix",	
+						'name'  => "{$name_prefix}number_prefix",	
 					),
 					'plain' => array(
 						'value' => $document_number_instance->get_plain() ?: null,
-						'name'  => "_wcpdf_{$document->slug}_number_plain",
+						'name'  => "{$name_prefix}number_plain",
 					),
 					'suffix' => array(
 						'value' => $document_number_instance->get_suffix() ?: null,
-						'name'  => "_wcpdf_{$document->slug}_number_suffix",
+						'name'  => "{$name_prefix}number_suffix",
 					),
 					'padding' => array(
 						'value' => $document_number_instance->get_padding() ?: null,
-						'name'  => "_wcpdf_{$document->slug}_number_padding",
+						'name'  => "{$name_prefix}number_padding",
 					),
 					'formatted' => array(
 						'value' => $document_number_instance->get_formatted() ?: null,
-						'name'  => "_wcpdf_{$document->slug}_number_formatted",
+						'name'  => "{$name_prefix}number_formatted",
 					),
 				);
 			}
+			
+			$document_date_instance = $document->get_date();
 			
 			if ( ! empty( $document_date_instance ) ) {
 				$current['date'] = array(
@@ -852,7 +855,7 @@ class Admin {
 					'date'      => $document_date_instance->date_i18n( 'Y-m-d' ) ?: date_i18n( 'Y-m-d' ),
 					'hour'      => $document_date_instance->date_i18n( 'H' ) ?: date_i18n( 'H' ),
 					'minute'    => $document_date_instance->date_i18n( 'i' ) ?: date_i18n( 'i' ),
-					'name'      => "_wcpdf_{$document->slug}_date",
+					'name'      => "{$name_prefix}date",
 				);
 			}
 		} else {
@@ -862,19 +865,19 @@ class Admin {
 			$current['number'] = array(
 				'prefix' => array(
 					'value' => $number_settings['prefix'] ?? null,
-					'name'  => "_wcpdf_{$document->slug}_number_prefix",	
+					'name'  => "{$name_prefix}number_prefix",	
 				),
 				'plain' => array(
 					'value' => $number_store->get_next() ?? null,
-					'name'  => "_wcpdf_{$document->slug}_number_plain",
+					'name'  => "{$name_prefix}number_plain",
 				),
 				'suffix' => array(
 					'value' => $number_settings['suffix'] ?? null,
-					'name'  => "_wcpdf_{$document->slug}_number_suffix",
+					'name'  => "{$name_prefix}number_suffix",
 				),
 				'padding' => array(
-					'value' => $number_settings['padding'] ?? null,
-					'name'  => "_wcpdf_{$document->slug}_number_padding",
+					'value' => $number_settings['padding'] ?: 1,
+					'name'  => "{$name_prefix}number_padding",
 				),
 			);
 			
@@ -887,7 +890,7 @@ class Admin {
 					$document,
 					$document->order
 				),
-				'name'  => "_wcpdf_{$document->slug}_number_formatted",
+				'name'  => "{$name_prefix}number_formatted",
 			);
 			
 			$current['date'] = array(
@@ -895,21 +898,21 @@ class Admin {
 				'date'      => date_i18n( 'Y-m-d' ),
 				'hour'      => date_i18n( 'H' ),
 				'minute'    => date_i18n( 'i' ),
-				'name'      => "_wcpdf_{$document->slug}_date",
+				'name'      => "{$name_prefix}date",
 			);
 		}
 
 		if ( ! empty( $data['notes'] ) ) {
 			$current['notes'] = array(
 				'value' => $document->get_document_notes(),
-				'name'  => "_wcpdf_{$document->slug}_notes",
+				'name'  => "{$name_prefix}notes",
 			);
 		}
 
 		if ( ! empty( $data['display_date'] ) ) {
 			$current['display_date'] = array(
 				'value' => $document->document_display_date(),
-				'name'  => "_wcpdf_{$document->slug}_display_date",
+				'name'  => "{$name_prefix}display_date",
 			);
 		}
 
@@ -918,7 +921,7 @@ class Admin {
 			$creation_trigger  = $document->get_creation_trigger();
 			$current['creation_trigger'] = array(
 				'value' => isset( $document_triggers[ $creation_trigger ] ) ? $document_triggers[ $creation_trigger] : '',
-				'name'  => "_wcpdf_{$document->slug}_creation_trigger",
+				'name'  => "{$name_prefix}creation_trigger",
 			);
 		}
 
@@ -1151,8 +1154,8 @@ class Admin {
 								<tfoot>
 									<tr>
 										<td colspan="3">
-											<label><?php esc_html_e( 'Preview:', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-											<span class="preview-number" data-current="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>"><code><?php echo esc_html( $data['number']['formatted']['value'] ); ?></code></span>
+											<?php esc_html_e( 'Please note that changing the document number may create gaps in the numbering sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+											<span class="preview-number" data-current="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>"><?php esc_html_e( 'Preview:', 'woocommerce-pdf-invoices-packing-slips' ); ?> <code><?php echo esc_html( $data['number']['formatted']['value'] ); ?></code></span>
 										</td>
 									</tr>
 								</tfoot>
@@ -1283,18 +1286,11 @@ class Admin {
 			return;
 		}
 		
-		if (
-			( empty( $order ) || ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order' ) ) ) &&
-			! empty( $order_id )
-		) {
+		if ( ! ( $order instanceof \WC_Order ) && ! empty( $order_id ) ) {
 			$order = wc_get_order( $order_id );
 		}
 		
-		if (
-			! $order ||
-			! $order instanceof \WC_Order ||
-			'auto-draft' === $order->get_status()
-		) {
+		if ( ! ( $order instanceof \WC_Order ) || 'auto-draft' === $order->get_status() ) {
 			return;
 		}
 

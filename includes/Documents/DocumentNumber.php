@@ -29,7 +29,9 @@ class DocumentNumber {
 		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
 
 		// Normalize data from either a raw number or a full array
-		$data = is_array( $number ) ? $number : ( ! empty( $number ) ? array_merge( array( 'number' => $number ), $settings ) : array() );
+		$data = is_array( $number )
+			? $number
+			: ( ! empty( $number ) ? array_merge( array( 'number' => $number ), $settings ) : array() );
 
 		$this->load_number_data( $data );
 
@@ -80,7 +82,7 @@ class DocumentNumber {
 	 * @return string
 	 */
 	public function __toString(): string {
-		return (string) $this->get_formatted();
+		return $this->get_formatted();
 	}
 
 	/**
@@ -137,11 +139,6 @@ class DocumentNumber {
 	 * @return string
 	 */
 	public function apply_formatting( \WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order ): string {
-		if ( empty( $document ) || empty( $order ) ) {
-			$this->formatted_number = $this->number;
-			return $this->formatted_number;
-		}
-
 		$formatted_number = wpo_wcpdf_format_document_number( $this->get_plain(), $this->get_prefix(), $this->get_suffix(), $this->get_padding(), $document, $order );
 
 		// Apply filters and store
