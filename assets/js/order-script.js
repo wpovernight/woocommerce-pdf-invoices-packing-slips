@@ -247,7 +247,7 @@ jQuery( function( $ ) {
 			},
 			error: function( xhr, status, error ) {
 				console.error( 'AJAX error:', status, error );
-				$table.find( '.preview-number code' ).text( 'Error loading preview' );
+				$table.find( '.preview-number' ).value( wpo_wcpdf_ajax.error_loading_number_preview );
 			}
 		} );
 	}
