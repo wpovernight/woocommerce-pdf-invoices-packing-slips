@@ -285,10 +285,18 @@ class Main {
 		$attach_documents = array();
 
 		foreach ( $documents as $document ) {
-			// Pro not activated, only attach Invoice
-			if ( ! function_exists( 'WPO_WCPDF_Pro' ) && 'invoice' !== $document->get_type() ) {
+			/**
+			 * Filter documents for email attachment based on plugin availability.
+			 * 
+			 * - If Pro plugin is not active, only allow 'invoice' and 'proposal' document types
+			 * - 'proposal' document type is only available if the Order Proposal plugin is active
+			 * - Skip documents that don't meet these criteria
+			 */
+			if ( 
+				( ! function_exists( 'WPO_WCPDF_Pro' ) && ! in_array( $document->get_type(), array( 'invoice', 'proposal' ) ) ) ||
+				( 'proposal' === $document->get_type() && ! function_exists( 'wc_order_proposal' ) ) ) {
 				continue;
-			};
+			}
 
 			foreach ( $document->output_formats as $output_format ) {
 				if ( $document->is_enabled( $output_format ) ) {
