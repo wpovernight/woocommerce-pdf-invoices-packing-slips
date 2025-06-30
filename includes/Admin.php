@@ -1126,7 +1126,7 @@ class Admin {
 									</div>
 									<div class="field-group">
 										<label><?php esc_html_e( 'Number preview', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-										<input type="text" class="preview-number no-disable" data-current="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" value="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" disabled="disabled">
+										<input type="text" class="preview-number keep-disabled" data-current="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" value="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" disabled="disabled">
 									</div>
 									<div class="field-group placeholder"></div> <!-- Empty cell -->
 									<div class="row-note">
