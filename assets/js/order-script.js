@@ -232,7 +232,7 @@ jQuery( function( $ ) {
 			},
 			success: function( response ) {
 				if ( response.success && response.data.formatted ) {
-					let $preview = $table.find( '.preview-number' );
+					let $preview = $table.find( '.formatted-number' );
 					let current  = $preview.data( 'current' );
 					let updated  = response.data.formatted;
 
@@ -247,7 +247,7 @@ jQuery( function( $ ) {
 			},
 			error: function( xhr, status, error ) {
 				console.error( 'AJAX error:', status, error );
-				$table.find( '.preview-number' ).value( wpo_wcpdf_ajax.error_loading_number_preview );
+				$table.find( '.formatted-number' ).value( wpo_wcpdf_ajax.error_loading_number_preview );
 			}
 		} );
 	}

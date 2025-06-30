@@ -1125,11 +1125,17 @@ class Admin {
 										<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['plain']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['plain']['name'] ); ?>" value="<?php echo absint( $data['number']['plain']['value'] ); ?>" disabled="disabled">
 									</div>
 									<div class="field-group">
-										<label><?php esc_html_e( 'Number preview', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-										<input type="text" class="preview-number keep-disabled" data-current="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" value="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" disabled="disabled">
+										<label><?php esc_html_e( 'Formatted number', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+										<input type="text" class="formatted-number keep-disabled" data-current="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" value="<?php echo esc_html( $data['number']['formatted']['value'] ); ?>" disabled="disabled">
 									</div>
 									<div class="field-group placeholder"></div> <!-- Empty cell -->
 									<div class="row-note">
+										<?php echo wp_kses_post( sprintf(
+											/* translators: %1$s: open anchor tag, %2$s: close anchor tag */
+											__( 'Manually changing the document\'s plain number also requires updating the next document number in the %1$sdocument settings%2$s.' ),
+											'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents&section=' . $document->get_type() ) ) . '#next_invoice_number" target="_blank">',
+											'</a>'
+										) ); ?>
 										<?php esc_html_e( 'Please note that changing the document number may create gaps in the numbering sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 									</div>
 								</div>

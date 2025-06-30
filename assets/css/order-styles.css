@@ -158,7 +158,7 @@
 	margin-bottom: .4rem;
 }
 
-.wcpdf-data-fields .data-fields-row .field-group input.preview-number.changed {
+.wcpdf-data-fields .data-fields-row .field-group input.formatted-number.changed {
 	background-color: #fff3cd;
 }
 

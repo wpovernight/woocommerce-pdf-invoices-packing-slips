@@ -254,7 +254,9 @@ abstract class OrderDocument {
 	 */
 	public function initiate_number( bool $force_new_number = false ) {
 		$semaphore       = new Semaphore( "initiate_{$this->slug}_number" );
-		$document_number = $force_new_number ? null : ( $this->exists() ? $this->get_data( 'number' ) : null );
+		$document_number = $force_new_number
+			? null
+			: ( $this->exists() ? $this->get_data( 'number' ) : null );
 		$document_number = apply_filters( 'wpo_wcpdf_initiate_number', $document_number, $this );
 
 		if ( ! empty( $document_number ) ) {
