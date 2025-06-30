@@ -130,6 +130,48 @@
 	border-bottom: 1px solid #dfdfdf;
 }
 
+.wcpdf-data-fields .data-fields-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	max-width: 50%;
+}
+
+.wcpdf-data-fields .data-fields-row {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1rem;
+	align-items: start;
+	position: relative;
+}
+
+.wcpdf-data-fields .data-fields-row-spaced {
+	margin-top: 1.5rem;
+}
+
+.wcpdf-data-fields .data-fields-row .field-group {
+	display: flex;
+	flex-direction: column;
+}
+
+.wcpdf-data-fields .data-fields-row .field-group label {
+	margin-bottom: .4rem;
+}
+
+.wcpdf-data-fields .data-fields-row .field-group input.preview-number.changed {
+	background-color: #fff3cd;
+}
+
+.wcpdf-data-fields .data-fields-row .placeholder {
+	visibility: hidden;
+}
+
+.wcpdf-data-fields .data-fields-row .row-note {
+	grid-column: 1 / -1; /* makes the note span across all columns */
+	font-size: 0.8em;
+	color: #999;
+}
+
 .wcpdf-data-fields h4 {
 	padding: 10px;
 	border-bottom: 1px solid #dfdfdf;
