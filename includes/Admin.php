@@ -819,6 +819,7 @@ class Admin {
 		$current     = array();
 		$name_prefix = "_wcpdf_{$document->slug}_";
 		
+		// Document number + date data
 		if ( $document->exists() ) {
 			$document_number_instance = $document->get_number();
 			
@@ -858,7 +859,10 @@ class Admin {
 					'name'      => "{$name_prefix}date",
 				);
 			}
-		} else {
+		}
+		
+		// Default number data
+		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
 			
 			$current['number'] = array(
@@ -891,7 +895,10 @@ class Admin {
 				),
 				'name'  => "{$name_prefix}number_formatted",
 			);
-			
+		}
+		
+		// Default date data
+		if ( ! isset( $current['date'] ) ) {
 			$current['date'] = array(
 				'formatted' => date_i18n( wc_date_format() . ' @ ' . wc_time_format() ),
 				'date'      => date_i18n( 'Y-m-d' ),
@@ -901,6 +908,7 @@ class Admin {
 			);
 		}
 
+		// Other complementary data
 		if ( ! empty( $data['notes'] ) ) {
 			$current['notes'] = array(
 				'value' => $document->get_document_notes(),
