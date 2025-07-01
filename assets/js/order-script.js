@@ -187,6 +187,13 @@ jQuery( function( $ ) {
 					keepAlive: true,
 				} )
 				.css( 'cursor', 'help' );
+
+			// re-initialize datepicker
+			$( '.wcpdf-data-fields .date-picker-field, .date-picker' ).datepicker( {
+				dateFormat: 'yy-mm-dd',
+				numberOfMonths: 1,
+				showButtonPanel: true,
+			} );
 		} else {
 			$form.find( '.read-only' ).show();
 			$form.find( '.editable' ).hide();
