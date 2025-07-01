@@ -859,7 +859,6 @@ class Admin {
 				);
 			}
 		} else {
-			$number_store    = $document->get_sequential_number_store();
 			$number_settings = $document->get_number_settings();
 			
 			$current['number'] = array(
@@ -868,7 +867,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_prefix",	
 				),
 				'plain' => array(
-					'value' => $number_store->get_next() ?? null,
+					'value' => 0,
 					'name'  => "{$name_prefix}number_plain",
 				),
 				'suffix' => array(
