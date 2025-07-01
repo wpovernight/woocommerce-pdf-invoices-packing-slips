@@ -948,7 +948,7 @@ class Admin {
 		$data = $this->get_current_values_for_document_data( $document, $data );
 		
 		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
-			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) )
+			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
 		?>
 		<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
@@ -1653,47 +1653,52 @@ class Admin {
 			return $data;
 		}
 		
-		$data['number']['document_type'] = $document->get_type();
-		$data['number']['order_id']      = $document->order->get_id();
-		$key_prefix                      = "_wcpdf_{$document->slug}_";
+		$key_prefix                    = "_wcpdf_{$document->slug}_";
+		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
+			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
 		
-		// Number
-		if ( isset( $form_data["{$key_prefix}number_prefix"] ) ) {
-			$data['number']['prefix'] = sanitize_text_field( $form_data["{$key_prefix}number_prefix"] );
-		}
+		if ( $document_data_editing_enabled ) {
+			$data['number']['document_type'] = $document->get_type();
+			$data['number']['order_id']      = $document->order->get_id();
+			
+			// Number
+			if ( isset( $form_data["{$key_prefix}number_prefix"] ) ) {
+				$data['number']['prefix'] = sanitize_text_field( $form_data["{$key_prefix}number_prefix"] );
+			}
 
-		if ( isset( $form_data["{$key_prefix}number_plain"] ) ) {
-			$data['number']['number'] = absint( $form_data["{$key_prefix}number_plain"] );
-		}
-		
-		if ( isset( $form_data["{$key_prefix}number_suffix"] ) ) {
-			$data['number']['suffix'] = sanitize_text_field( $form_data["{$key_prefix}number_suffix"] );
-		}
-		
-		if ( isset( $form_data["{$key_prefix}number_padding"] ) ) {
-			$data['number']['padding'] = absint( $form_data["{$key_prefix}number_padding"] );
-		}
-		
-		if ( isset( $form_data["{$key_prefix}number_formatted"] ) ) {
-			$data['number']['formatted_number'] = sanitize_text_field( $form_data["{$key_prefix}number_formatted"] );
-		}
+			if ( isset( $form_data["{$key_prefix}number_plain"] ) ) {
+				$data['number']['number'] = absint( $form_data["{$key_prefix}number_plain"] );
+			}
+			
+			if ( isset( $form_data["{$key_prefix}number_suffix"] ) ) {
+				$data['number']['suffix'] = sanitize_text_field( $form_data["{$key_prefix}number_suffix"] );
+			}
+			
+			if ( isset( $form_data["{$key_prefix}number_padding"] ) ) {
+				$data['number']['padding'] = absint( $form_data["{$key_prefix}number_padding"] );
+			}
+			
+			if ( isset( $form_data["{$key_prefix}number_formatted"] ) ) {
+				$data['number']['formatted_number'] = sanitize_text_field( $form_data["{$key_prefix}number_formatted"] );
+			}
 
-		// Date
-		$date_entered = ! empty( $form_data["{$key_prefix}date"] ) && ! empty( $form_data["{$key_prefix}date"]['date'] );
-		
-		if ( $date_entered ) {
-			$date         = $form_data["{$key_prefix}date"]['date'];
-			$hour         = ! empty( $form_data["{$key_prefix}date"]['hour'] ) ? $form_data["{$key_prefix}date"]['hour'] : '00';
-			$minute       = ! empty( $form_data["{$key_prefix}date"]['minute'] ) ? $form_data["{$key_prefix}date"]['minute'] : '00';
+			// Date
+			$date_entered = ! empty( $form_data["{$key_prefix}date"] ) && ! empty( $form_data["{$key_prefix}date"]['date'] );
+			
+			if ( $date_entered ) {
+				$date         = $form_data["{$key_prefix}date"]['date'];
+				$hour         = ! empty( $form_data["{$key_prefix}date"]['hour'] ) ? $form_data["{$key_prefix}date"]['hour'] : '00';
+				$minute       = ! empty( $form_data["{$key_prefix}date"]['minute'] ) ? $form_data["{$key_prefix}date"]['minute'] : '00';
 
-			// clean & sanitize input
-			$date         = gmdate( 'Y-m-d', strtotime( $date ) );
-			$hour         = sprintf( '%02d', intval( $hour ) );
-			$minute       = sprintf( '%02d', intval( $minute ) );
-			$data['date'] = "{$date} {$hour}:{$minute}:00";
+				// clean & sanitize input
+				$date         = gmdate( 'Y-m-d', strtotime( $date ) );
+				$hour         = sprintf( '%02d', intval( $hour ) );
+				$minute       = sprintf( '%02d', intval( $minute ) );
+				$data['date'] = "{$date} {$hour}:{$minute}:00";
 
-		} elseif ( ! $date_entered && ! empty( $_POST["{$key_prefix}number"] ) ) {
-			$data['date'] = current_time( 'timestamp', true );
+			} elseif ( ! $date_entered && ! empty( $_POST["{$key_prefix}number"] ) ) {
+				$data['date'] = current_time( 'timestamp', true );
+			}
 		}
 
 		// Notes
