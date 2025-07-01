@@ -1658,9 +1658,6 @@ class Admin {
 			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
 		
 		if ( $document_data_editing_enabled ) {
-			$data['number']['document_type'] = $document->get_type();
-			$data['number']['order_id']      = $document->order->get_id();
-			
 			// Number
 			if ( isset( $form_data["{$key_prefix}number_prefix"] ) ) {
 				$data['number']['prefix'] = sanitize_text_field( $form_data["{$key_prefix}number_prefix"] );
@@ -1680,6 +1677,11 @@ class Admin {
 			
 			if ( isset( $form_data["{$key_prefix}number_formatted"] ) ) {
 				$data['number']['formatted_number'] = sanitize_text_field( $form_data["{$key_prefix}number_formatted"] );
+			}
+			
+			if ( ! empty( $data['number'] ) ) {
+				$data['number']['document_type'] = $document->get_type();
+				$data['number']['order_id']      = $document->order->get_id();
 			}
 
 			// Date
