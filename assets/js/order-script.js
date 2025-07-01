@@ -171,7 +171,7 @@ jQuery( function( $ ) {
 				$form.find( '.editable-notes :input' ).attr( 'disabled', false );
 			} else {
 				$form.find( '.editable' ).show();
-				$form.find( ':input:not(.keep-disabled)' ).attr( 'disabled', false );
+				$form.find( ':input' ).attr( 'disabled', false );
 			}
 
 			$form.find( '.read-only' ).hide();

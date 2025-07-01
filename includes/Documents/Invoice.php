@@ -407,10 +407,9 @@ class Invoice extends OrderDocumentMethods {
 							__( 'For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
 							'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/number-format-explained/" target="_blank">',
 							'</a>'
-						) . '.<br><br>'. sprintf(
-							/* translators: %1$s: strong Note tag, %2$s: document type */
-							__( '%1$s: Changes made to the number format will only be reflected on new orders. Also, if you have already created a custom %2$s number format with a filter, the above settings will be ignored.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<strong>' . __( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>',
+						) . '.<br><br><strong>' . __( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>: ' . sprintf(
+							/* translators: document type */
+							__( 'Changes made to the number format will only be reflected on new orders. Also, if you have already created a custom %s number format with a filter, the above settings will be ignored.', 'woocommerce-pdf-invoices-packing-slips' ),
 							__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' )
 						),
 				)

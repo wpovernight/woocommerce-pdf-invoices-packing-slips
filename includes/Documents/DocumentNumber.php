@@ -20,12 +20,12 @@ class DocumentNumber {
 	/**
 	 * Document number constructor.
 	 *
-	 * @param mixed                                 $number   Raw number value or full number array.
-	 * @param array                                 $settings Additional settings used when building the number (e.g. prefix, suffix, padding).
-	 * @param \WPO\IPS\Documents\OrderDocument|null $document Optional related document object.
-	 * @param \WC_Abstract_Order|null               $order    Optional related order object.
+	 * @param mixed                    $number   Raw number value or full number array.
+	 * @param array                    $settings Additional settings used when building the number (e.g. prefix, suffix, padding).
+	 * @param OrderDocument|null       $document Optional related document object.
+	 * @param \WC_Abstract_Order|null  $order    Optional related order object.
 	 */
-	public function __construct( $number, array $settings = array(), ?\WPO\IPS\Documents\OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
+	public function __construct( $number, array $settings = array(), ?OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
 		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
 
 		// Normalize data from either a raw number or a full array
@@ -64,7 +64,7 @@ class DocumentNumber {
 
 		foreach ( $data as $key => $value ) {
 			if ( in_array( $key, $numeric_properties, true ) ) {
-				$value = (int) $value;
+				$value = absint( $value );
 
 				// Only treat 0 as null for numeric keys
 				if ( $value === 0 ) {
@@ -134,11 +134,11 @@ class DocumentNumber {
 	/**
 	 * Applies formatting to the document number based on the settings and order/document data.
 	 *
-	 * @param \WPO\IPS\Documents\OrderDocument $document
+	 * @param OrderDocument $document
 	 * @param \WC_Abstract_Order $order
 	 * @return string
 	 */
-	public function apply_formatting( \WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order ): string {
+	public function apply_formatting( OrderDocument $document, \WC_Abstract_Order $order ): string {
 		$formatted_number = wpo_wcpdf_format_document_number( $this->get_plain(), $this->get_prefix(), $this->get_suffix(), $this->get_padding(), $document, $order );
 
 		// Apply filters and store
