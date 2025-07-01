@@ -140,13 +140,9 @@
 .wcpdf-data-fields .data-fields-row {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 1rem;
+	gap: 1.5rem;
 	align-items: start;
 	position: relative;
-}
-
-.wcpdf-data-fields .data-fields-row-spaced {
-	margin-top: 1.5rem;
 }
 
 .wcpdf-data-fields .data-fields-row .field-group {

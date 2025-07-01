@@ -1143,7 +1143,7 @@ class Admin {
 						<?php endif; ?>
 						<?php if ( isset( $data['date'] ) ) : ?>
 							<div class="data-fields-grid">
-								<div class="data-fields-row data-fields-row-spaced">
+								<div class="data-fields-row">
 									<div class="field-group">
 										<label for="<?php echo esc_attr( $data['date']['name'] ); ?>[date]">
 											<?php
