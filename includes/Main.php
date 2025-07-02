@@ -285,16 +285,8 @@ class Main {
 		$attach_documents = array();
 
 		foreach ( $documents as $document ) {
-			/**
-			 * Filter documents for email attachment based on plugin availability.
-			 * 
-			 * - If Pro plugin is not active, only allow 'invoice' and 'proposal' document types
-			 * - 'proposal' document type is only available if the Order Proposal plugin is active
-			 * - Skip documents that don't meet these criteria
-			 */
-			if ( 
-				( ! function_exists( 'WPO_WCPDF_Pro' ) && ! in_array( $document->get_type(), array( 'invoice', 'proposal' ) ) ) ||
-				( 'proposal' === $document->get_type() && ! function_exists( 'wc_order_proposal' ) ) ) {
+			// This condition skips document types that require the Pro plugin unless it's an invoice or proposal
+			if ( ! in_array( $document->get_type(), array( 'invoice', 'proposal' ) ) && ! function_exists( 'WPO_WCPDF_Pro' ) ) {
 				continue;
 			}
 
