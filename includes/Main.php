@@ -286,7 +286,7 @@ class Main {
 
 		foreach ( $documents as $document ) {
 			// This condition skips document types that require the Pro plugin unless it's an invoice or proposal
-			if ( ! in_array( $document->get_type(), array( 'invoice', 'proposal' ) ) && ! function_exists( 'WPO_WCPDF_Pro' ) ) {
+			if ( ! in_array( $document->get_type(), array( 'invoice', 'proposal' ), true ) && ! function_exists( 'WPO_WCPDF_Pro' ) ) {
 				continue;
 			}
 
