@@ -199,14 +199,14 @@ class Admin {
 
 	public function get_invoice_count() {
 		global $wpdb;
-		
+
 		$invoice_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->prepare(
 				"SELECT count(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
 				'_wcpdf_invoice_number'
 			)
 		);
-		
+
 		return (int) $invoice_count;
 	}
 
@@ -809,25 +809,25 @@ class Admin {
 
 	/**
 	 * Returns the current values for the document data.
-	 * 
+	 *
 	 * @param OrderDocument $document The document instance.
 	 * @param array $data The data to be processed.
-	 * 
+	 *
 	 * @return array The current values for the document data.
 	 */
 	public function get_current_values_for_document_data( OrderDocument $document, array $data ): array {
 		$current     = array();
 		$name_prefix = "_wcpdf_{$document->slug}_";
-		
+
 		// Document number + date data
 		if ( $document->exists() ) {
 			$document_number_instance = $document->get_number();
-			
+
 			if ( ! empty( $document_number_instance ) ) {
 				$current['number'] = array(
 					'prefix' => array(
 						'value' => $document_number_instance->get_prefix() ?: null,
-						'name'  => "{$name_prefix}number_prefix",	
+						'name'  => "{$name_prefix}number_prefix",
 					),
 					'plain' => array(
 						'value' => $document_number_instance->get_plain() ?: null,
@@ -847,9 +847,9 @@ class Admin {
 					),
 				);
 			}
-			
+
 			$document_date_instance = $document->get_date();
-			
+
 			if ( ! empty( $document_date_instance ) ) {
 				$current['date'] = array(
 					'formatted' => $document_date_instance->date_i18n( wc_date_format().' @ '.wc_time_format() ) ?: null,
@@ -860,15 +860,15 @@ class Admin {
 				);
 			}
 		}
-		
+
 		// Default number data
 		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
-			
+
 			$current['number'] = array(
 				'prefix' => array(
 					'value' => $number_settings['prefix'] ?? null,
-					'name'  => "{$name_prefix}number_prefix",	
+					'name'  => "{$name_prefix}number_prefix",
 				),
 				'plain' => array(
 					'value' => 0,
@@ -883,7 +883,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_padding",
 				),
 			);
-			
+
 			$current['number']['formatted'] = array(
 				'value' => wpo_wcpdf_format_document_number(
 					absint( $current['number']['plain']['value'] ),
@@ -896,7 +896,7 @@ class Admin {
 				'name'  => "{$name_prefix}number_formatted",
 			);
 		}
-		
+
 		// Default date data
 		if ( ! isset( $current['date'] ) ) {
 			$current['date'] = array(
@@ -953,7 +953,7 @@ class Admin {
 		}
 
 		$data = $this->get_current_values_for_document_data( $document, $data );
-		
+
 		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
 			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
 		?>
@@ -1056,11 +1056,11 @@ class Admin {
 													'%s %s',
 													__( 'If set, this value will be used as number prefix.' , 'woocommerce-pdf-invoices-packing-slips' ),
 													sprintf(
-														/* translators: 1. document type, 2-3 placeholders */
+														/* translators: 1. document title, 2-3 placeholders */
 														__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
-														__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ),
-														'<strong>[invoice_year]</strong>',
-														'<strong>[invoice_month]</strong>'
+														esc_html( $document->get_title() ),
+														'<strong>[' . esc_html( $document->slug ) . '_year]</strong>',
+														'<strong>[' . esc_html( $document->slug ) . '_month]</strong>'
 													)
 												);
 												echo wc_help_tip( wp_kses_post( $tip_text ), true );
@@ -1076,11 +1076,11 @@ class Admin {
 													'%s %s',
 													__( 'If set, this value will be used as number suffix.' , 'woocommerce-pdf-invoices-packing-slips' ),
 													sprintf(
-														/* translators: 1. document type, 2-3 placeholders */
+														/* translators: 1. document title, 2-3 placeholders */
 														__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
-														__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ),
-														'<strong>[invoice_year]</strong>',
-														'<strong>[invoice_month]</strong>'
+														esc_html( $document->get_title() ),
+														'<strong>[' . esc_html( $document->slug ) . '_year]</strong>',
+														'<strong>[' . esc_html( $document->slug ) . '_month]</strong>'
 													)
 												);
 												echo wc_help_tip( wp_kses_post( $tip_text ), true );
@@ -1093,10 +1093,10 @@ class Admin {
 											<?php esc_html_e( 'Number padding', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 											<?php
 												$tip_text = sprintf(
-													/* translators: %1$s: code, %2$s: document type, %3$s: number, %4$s: padded number */
+													/* translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number */
 													__( 'Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ),
 													'<code>6</code>',
-													__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ),
+													esc_html( $document->get_title() ),
 													'<code>123</code>',
 													'<code>000123</code>'
 												);
@@ -1248,11 +1248,11 @@ class Admin {
 		) {
 			return;
 		}
-		
+
 		if ( ! ( $order instanceof \WC_Order ) && ! empty( $order_id ) ) {
 			$order = wc_get_order( $order_id );
 		}
-		
+
 		if ( ! ( $order instanceof \WC_Order ) || 'auto-draft' === $order->get_status() ) {
 			return;
 		}
@@ -1271,7 +1271,7 @@ class Admin {
 
 			$form_data = array();
 			$invoice   = wcpdf_get_invoice( $order );
-			
+
 			if ( $invoice ) {
 				// IMPORTANT: $is_new must be set before calling initiate_number().
 				// The exists() method uses the number to determine existence, so
@@ -1279,7 +1279,7 @@ class Admin {
 				$is_new        = ( false === $invoice->exists() );
 				$form_data     = stripslashes_deep( $_POST );
 				$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
-				
+
 				if ( empty( $document_data ) ) {
 					return;
 				}
@@ -1494,7 +1494,7 @@ class Admin {
 					// The exists() method uses the number to determine existence, so
 					// if we call initiate_number() first, it may affect the result of exists().
 					$is_new = ( false === $document->exists() );
-					
+
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
@@ -1568,17 +1568,17 @@ class Admin {
 			$wp_admin_bar->add_node( $args );
 		}
 	}
-	
+
 	/**
 	 * AJAX handler to preview a formatted number
-	 * 
+	 *
 	 * @return void
 	 */
 	public function ajax_preview_formatted_number(): void {
 		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
-		
+
 		$request       = stripslashes_deep( $_POST );
 		$prefix        = isset( $request['prefix'] )   ? sanitize_text_field( $request['prefix'] )   : '';
 		$suffix        = isset( $request['suffix'] )   ? sanitize_text_field( $request['suffix'] )   : '';
@@ -1586,23 +1586,23 @@ class Admin {
 		$plain         = isset( $request['plain'] )    ? absint( $request['plain'] )                 : 0;
 		$document_type = isset( $request['document'] ) ? sanitize_text_field( $request['document'] ) : '';
 		$order_id      = isset( $request['order_id'] ) ? absint( $request['order_id'] )              : 0;
-		
+
 		if ( empty( $order_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid order ID.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
-		
+
 		$order = wc_get_order( $order_id );
-		
+
 		if ( ! $order ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid order.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
-		
+
 		if ( empty( $document_type ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid document type.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
-		
+
 		$document = wcpdf_get_document( $document_type, $order );
-		
+
 		if ( ! $document ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid document.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
@@ -1634,20 +1634,20 @@ class Admin {
 			if ( function_exists( 'wc_order_proposal' ) ) {
 				$extension_needs_update[] = 'Proposal';
 			}
-			
+
 			$message = __METHOD__ . ': The parameter passed is a string (legacy behavior). This method now requires a document object.';
 
 			if ( ! empty( $extension_needs_update ) ) {
 				$message .= ' Please update the following extension' . ( count( $extension_needs_update ) > 1 ? 's' : '' ) . ': ' . implode( ' and ', $extension_needs_update ) . '.';
 			} else {
-				$message .= ' An outdated or third-party plugin or code snippet may be using the old method.'; 
+				$message .= ' An outdated or third-party plugin or code snippet may be using the old method.';
 			}
-			
+
 			wcpdf_log_error( $message, 'critical' );
 
 			return array();
 		}
-		
+
 		$data = array();
 
 		if (
@@ -1659,11 +1659,11 @@ class Admin {
 		) {
 			return $data;
 		}
-		
+
 		$key_prefix                    = "_wcpdf_{$document->slug}_";
 		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
 			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
-		
+
 		if ( $document_data_editing_enabled ) {
 			// Number
 			if ( isset( $form_data["{$key_prefix}number_prefix"] ) ) {
@@ -1673,19 +1673,19 @@ class Admin {
 			if ( isset( $form_data["{$key_prefix}number_plain"] ) ) {
 				$data['number']['number'] = absint( $form_data["{$key_prefix}number_plain"] );
 			}
-			
+
 			if ( isset( $form_data["{$key_prefix}number_suffix"] ) ) {
 				$data['number']['suffix'] = sanitize_text_field( $form_data["{$key_prefix}number_suffix"] );
 			}
-			
+
 			if ( isset( $form_data["{$key_prefix}number_padding"] ) ) {
 				$data['number']['padding'] = absint( $form_data["{$key_prefix}number_padding"] );
 			}
-			
+
 			if ( isset( $form_data["{$key_prefix}number_formatted"] ) ) {
 				$data['number']['formatted_number'] = sanitize_text_field( $form_data["{$key_prefix}number_formatted"] );
 			}
-			
+
 			if ( ! empty( $data['number'] ) ) {
 				$data['number']['document_type'] = $document->get_type();
 				$data['number']['order_id']      = $document->order->get_id();
@@ -1693,7 +1693,7 @@ class Admin {
 
 			// Date
 			$date_entered = ! empty( $form_data["{$key_prefix}date"] ) && ! empty( $form_data["{$key_prefix}date"]['date'] );
-			
+
 			if ( $date_entered ) {
 				$date         = $form_data["{$key_prefix}date"]['date'];
 				$hour         = ! empty( $form_data["{$key_prefix}date"]['hour'] ) ? $form_data["{$key_prefix}date"]['hour'] : '00';
@@ -1826,10 +1826,10 @@ class Admin {
 
 		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
 	}
-	
+
 	/**
 	 * Document data editing disabled notice
-	 * 
+	 *
 	 * @param OrderDocument $document
 	 * @return void
 	 */
