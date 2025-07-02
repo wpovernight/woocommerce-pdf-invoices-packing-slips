@@ -350,7 +350,7 @@ jQuery( function( $ ) {
 
 	function settingsChanged( event, previewDelay ) {
 		if ( 'shop_address_country' === event.target.id ) {
-			shopCountryChanged( event );
+			shopCountryChanged( $( event.target ) );
 		}
 
 		// Show secondary save button
@@ -377,13 +377,12 @@ jQuery( function( $ ) {
 		}
 	}
 
-	function shopCountryChanged( event ) {
-		const $country        = $( event.target );
-		const selectedCountry = $country.val();
-		const $form           = $country.closest( 'form' );
+	function shopCountryChanged( $countryField ) {
+		const selectedCountry = $countryField.val();
+		const $form           = $countryField.closest( 'form' );
 
 		// Get the language key
-		const nameMatch = $country.attr( 'name' )
+		const nameMatch = $countryField.attr( 'name' )
 			.match( /\[shop_address_country]\[(.*?)\]/ ); // 'pt-pt', 'default', etc.
 		const lang      = nameMatch ? nameMatch[1] : 'default';
 
@@ -774,6 +773,12 @@ jQuery( function( $ ) {
 				if ( response.success && response.data.value && '' !== response.data.value.trim() ) {
 					// Update the input value with the synced address.
 					$field.val( response.data.value );
+
+					// Update states if the country changed.
+					if ( 'shop_address_country' === $field.attr( 'id' ) ) {
+						shopCountryChanged( $field );
+					}
+
 					triggerPreview();
 				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
 					$tooltip.text( response.data.message ).addClass( 'visible' );
