@@ -137,10 +137,14 @@
 	max-width: 50%;
 }
 
+.wcpdf-data-fields .data-fields-grid:first-of-type {
+	margin-bottom: 1rem;
+}
+
 .wcpdf-data-fields .data-fields-row {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 1.5rem;
+	gap: 1rem;
 	align-items: start;
 	position: relative;
 }
