@@ -1140,7 +1140,7 @@ class Admin {
 										<?php echo wp_kses_post( sprintf(
 											/* translators: %1$s: open anchor tag, %2$s: close anchor tag */
 											__( 'Manually changing the document\'s plain number also requires updating the next document number in the %1$sdocument settings%2$s.' ),
-											'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents&section=' . $document->get_type() ) ) . '#next_invoice_number" target="_blank">',
+											'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents&section=' . $document->get_type() ) ) . '#next_' . $document->slug . '_number" target="_blank">',
 											'</a>'
 										) ); ?>
 										<?php esc_html_e( 'Please note that changing the document number may create gaps in the numbering sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
