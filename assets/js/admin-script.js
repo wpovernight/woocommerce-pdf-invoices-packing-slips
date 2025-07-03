@@ -406,7 +406,7 @@ jQuery( function( $ ) {
 			} )
 		);
 
-		$.ajax( {
+		return $.ajax( {
 			url: wpo_wcpdf_admin.ajaxurl,
 			type: 'POST',
 			dataType: 'json',
@@ -750,6 +750,7 @@ jQuery( function( $ ) {
 		event.preventDefault();
 
 		const $button  = $( this );
+		const $form    = $( this ).closest('form');
 		const $icon    = $button.find( 'span.dashicons' );
 		const $tooltip = $button.closest( 'td' ).find( '.sync-tooltip' );
 		let $field     = $button.closest( 'td' ).find( 'input' );
@@ -771,12 +772,23 @@ jQuery( function( $ ) {
 			},
 			success: function( response ) {
 				if ( response.success && response.data.value && '' !== response.data.value.trim() ) {
-					// Update the input value with the synced address.
-					$field.val( response.data.value );
-
-					// Update states if the country changed.
 					if ( 'shop_address_country' === $field.attr( 'id' ) ) {
-						shopCountryChanged( $field );
+						const country_state = response.data.value.split( ':' );
+						$field.val( country_state[0] );
+
+						// Update states if the country changed.
+						shopCountryChanged( $field ).done( function() {
+							const matches     = $field.attr( 'name' ).match( /\[([^\]]+)\]/g ); // matches all bracket parts
+							const lang        = matches ? matches[ matches.length - 1 ].replace( /[\[\]]/g, '' ) : 'default';
+							const $stateField = $form.find( `select[name="wpo_wcpdf_settings_general[shop_address_state][${lang}]"]` );
+
+							// Update the selected state.
+							if ( $stateField.length !== 0 ) {
+                                $stateField.val( country_state[1] );
+							}
+						} );
+					} else {
+						$field.val( response.data.value );
 					}
 
 					triggerPreview();
