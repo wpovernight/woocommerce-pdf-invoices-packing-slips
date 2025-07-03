@@ -358,6 +358,14 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-bottom: 3px solid #51266b;
 }
 
+#wpo-wcpdf-settings .subsubsub {
+	margin-bottom: 2em;
+	margin-top: -1em;
+	border-bottom: 1px solid #c3c4c7;
+	padding-bottom: 1em;
+	width: 100%;
+}
+
 #wpo-wcpdf-preview-wrapper {
 	width: 100%;
 	height: auto;
