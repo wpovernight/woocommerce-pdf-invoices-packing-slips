@@ -1149,22 +1149,21 @@ class Settings {
 			return $settings_fields;
 		}
 
-		// Remove all sections first.
-		foreach ( $settings_fields as $key => $field ) {
-			if ( 'section' === $field['type'] ) {
-				unset( $settings_fields[ $key ] );
-			}
-		}
-
 		$modified_settings_fields = array();
 		$settings_lookup          = array();
 		$processed_keys           = array();
 
-		// Create a lookup array for settings fields by id.
-		// This allows for quick access to settings fields by their id, reducing the time complexity
-		// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
-		// and m is the number of settings fields.
 		foreach ( $settings_fields as $key => $settings_field ) {
+			if ( 'section' === $settings_field['type'] ) {
+				// Remove all sections.
+				unset( $settings_fields[ $key ] );
+				continue;
+			}
+
+			// Create a lookup array for settings fields by id.
+			// This allows for quick access to settings fields by their id, reducing the time complexity
+			// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
+			// and m is the number of settings fields.
 			$settings_lookup[ $settings_field['id'] ] = $key;
 		}
 
