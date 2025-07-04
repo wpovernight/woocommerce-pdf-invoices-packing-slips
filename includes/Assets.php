@@ -80,10 +80,11 @@ class Assets {
 					'ajaxurl'                      => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page
 					'nonce'                        => wp_create_nonce( 'generate_wpo_wcpdf' ),
 					'bulk_actions'                 => array_keys( wcpdf_get_bulk_actions() ),
-					'select_orders'                => __( 'You have to select order(s) first!', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_delete'               => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
+					'select_orders'                => __( 'You have to select order(s) first!', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_delete'               => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
+					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' )
 				)
 			);
 		}
@@ -96,7 +97,7 @@ class Assets {
 
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles' . $suffix . '.css',
 				array('woocommerce_admin_styles'),
 				WPO_WCPDF_VERSION
 			);
@@ -154,7 +155,7 @@ class Assets {
 				);
 			}
 			
-			$admin_deps = array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' );
+			$admin_deps = array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'jquery-ui-datepicker' );
 
 			if ( $edi_preview_enabled ) {
 				$admin_deps[] = 'wpo-ips-edi-prism-core';

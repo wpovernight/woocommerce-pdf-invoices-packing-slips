@@ -315,22 +315,22 @@ class Settings {
 					// Update document date.
 					$document->initiate_date();
 
-					// Update document number.
-					$document_number = $document->get_document_number();
-
-					if ( ! empty( $document_number ) ) {
-						$document->set_number( $document_number );
+					// Update document number only if it is not already set.
+					if ( empty( $document->get_number() ) ) {
+						$document_number = $document->get_document_number();
+						if ( ! empty( $document_number ) ) {
+							$document->set_number( $document_number );
+						}
 					}
 
 					$document_number = $document->get_number( $document->get_type() );
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) ) {
-							foreach ( $document->settings['number_format'] as $key => $value ) {
-								$document_number->$key = $document->settings['number_format'][ $key ];
-							}
+						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
+							$document_number->load_number_data( $document->settings['number_format'] );
 						}
+
 						$document_number->apply_formatting( $document, $order );
 					}
 
@@ -1147,22 +1147,21 @@ class Settings {
 			return $settings_fields;
 		}
 
-		// Remove all sections first.
-		foreach ( $settings_fields as $key => $field ) {
-			if ( 'section' === $field['type'] ) {
-				unset( $settings_fields[ $key ] );
-			}
-		}
-
 		$modified_settings_fields = array();
 		$settings_lookup          = array();
 		$processed_keys           = array();
 
-		// Create a lookup array for settings fields by id.
-		// This allows for quick access to settings fields by their id, reducing the time complexity
-		// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
-		// and m is the number of settings fields.
 		foreach ( $settings_fields as $key => $settings_field ) {
+			if ( 'section' === $settings_field['type'] ) {
+				// Remove all sections.
+				unset( $settings_fields[ $key ] );
+				continue;
+			}
+
+			// Create a lookup array for settings fields by id.
+			// This allows for quick access to settings fields by their id, reducing the time complexity
+			// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
+			// and m is the number of settings fields.
 			$settings_lookup[ $settings_field['id'] ] = $key;
 		}
 
@@ -1373,10 +1372,6 @@ class Settings {
 
 		// Parse the value based on the address field.
 		switch ( $address_field ) {
-			case 'shop_address_country':
-				$parsed = wc_format_country_state_string( $raw_value );
-				$value  = $parsed['country'] ?? null;
-				break;
 			case 'shop_address_state':
 				$parsed = wc_format_country_state_string( $raw_value );
 				$value  = $parsed['state'] ?? null;
