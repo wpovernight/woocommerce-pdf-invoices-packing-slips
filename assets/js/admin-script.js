@@ -347,6 +347,16 @@ jQuery( function( $ ) {
 	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
+	
+	// On Multilingual
+	if ( $( '#wpo_wcpdf_settings_general-shop_address_country-translations' ).length > 0 ) {
+		$( '#wpo-wcpdf-settings select[name^="wpo_wcpdf_settings_general[shop_address_country]"]' ).each( function() {
+			const $select = $( this );
+			if ( $select.val() ) {
+				shopCountryChanged( $select );
+			}
+		} );
+	}
 
 	function settingsChanged( event, previewDelay ) {
 		if ( 'shop_address_country' === event.target.id ) {
@@ -784,7 +794,7 @@ jQuery( function( $ ) {
 
 							// Update the selected state.
 							if ( $stateField.length !== 0 ) {
-                                $stateField.val( country_state[1] );
+								$stateField.val( country_state[1] );
 							}
 						} );
 					} else {
@@ -795,7 +805,7 @@ jQuery( function( $ ) {
 				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
 					$tooltip.text( response.data.message ).addClass( 'visible' );
 					setTimeout( function() {
-					    $tooltip.removeClass( 'visible' );
+						$tooltip.removeClass( 'visible' );
 					}, 3000 );
 				}
 			},
