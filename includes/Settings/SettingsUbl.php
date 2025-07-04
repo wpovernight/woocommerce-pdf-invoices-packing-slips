@@ -86,7 +86,7 @@ class SettingsUbl {
 					echo '<p>' . sprintf(
 						/* translators: %s: link to documentation */
 						esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="' . esc_url( '#' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+						'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/ubl-tax-classification-filter-hooks/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 					) . '</p>';
 					
 					$settings->output();

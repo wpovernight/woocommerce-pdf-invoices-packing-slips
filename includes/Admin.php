@@ -2,7 +2,8 @@
 
 namespace WPO\IPS;
 
-use \Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
+use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
+use WPO\IPS\Documents\OrderDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -67,6 +68,7 @@ class Admin {
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_preview_formatted_number', array( $this, 'ajax_preview_formatted_number' ) );
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -788,33 +790,119 @@ class Admin {
 		do_action( 'wpo_wcpdf_meta_box_end', $order, $this );
 	}
 
-	public function get_current_values_for_document( $document, $data ) {
-		$current = array(
-			'number' => array(
-				'plain'     => $document->exists() && ! empty( $document->get_number() ) ? $document->get_number()->get_plain() : '',
-				'formatted' => $document->exists() && ! empty( $document->get_number() ) ? $document->get_number()->get_formatted() : '',
-				'name'      => "_wcpdf_{$document->slug}_number",
-			),
-			'date' => array(
-				'formatted' => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( wc_date_format().' @ '.wc_time_format() ) : '',
-				'date'      => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'Y-m-d' ) : date_i18n( 'Y-m-d' ),
-				'hour'      => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'H' ) : date_i18n( 'H' ),
-				'minute'    => $document->exists() && ! empty( $document->get_date() ) ? $document->get_date()->date_i18n( 'i' ) : date_i18n( 'i' ),
-				'name'      => "_wcpdf_{$document->slug}_date",
-			),
-		);
+	/**
+	 * Returns the current values for the document data.
+	 *
+	 * @param OrderDocument $document The document instance.
+	 * @param array $data The data to be processed.
+	 *
+	 * @return array The current values for the document data.
+	 */
+	public function get_current_values_for_document_data( OrderDocument $document, array $data ): array {
+		$current     = array();
+		$name_prefix = "_wcpdf_{$document->slug}_";
 
+		// Document number + date data
+		if ( $document->exists() ) {
+			$document_number_instance = $document->get_number();
+
+			if ( ! empty( $document_number_instance ) ) {
+				$current['number'] = array(
+					'prefix' => array(
+						'value' => $document_number_instance->get_prefix() ?: null,
+						'name'  => "{$name_prefix}number_prefix",
+					),
+					'plain' => array(
+						'value' => $document_number_instance->get_plain() ?: null,
+						'name'  => "{$name_prefix}number_plain",
+					),
+					'suffix' => array(
+						'value' => $document_number_instance->get_suffix() ?: null,
+						'name'  => "{$name_prefix}number_suffix",
+					),
+					'padding' => array(
+						'value' => $document_number_instance->get_padding() ?: null,
+						'name'  => "{$name_prefix}number_padding",
+					),
+					'formatted' => array(
+						'value' => $document_number_instance->get_formatted() ?: null,
+						'name'  => "{$name_prefix}number_formatted",
+					),
+				);
+			}
+
+			$document_date_instance = $document->get_date();
+
+			if ( ! empty( $document_date_instance ) ) {
+				$current['date'] = array(
+					'formatted' => $document_date_instance->date_i18n( wc_date_format().' @ '.wc_time_format() ) ?: null,
+					'date'      => $document_date_instance->date_i18n( 'Y-m-d' ) ?: date_i18n( 'Y-m-d' ),
+					'hour'      => $document_date_instance->date_i18n( 'H' ) ?: date_i18n( 'H' ),
+					'minute'    => $document_date_instance->date_i18n( 'i' ) ?: date_i18n( 'i' ),
+					'name'      => "{$name_prefix}date",
+				);
+			}
+		}
+
+		// Default number data
+		if ( ! isset( $current['number'] ) ) {
+			$number_settings = $document->get_number_settings();
+
+			$current['number'] = array(
+				'prefix' => array(
+					'value' => $number_settings['prefix'] ?? null,
+					'name'  => "{$name_prefix}number_prefix",
+				),
+				'plain' => array(
+					'value' => 0,
+					'name'  => "{$name_prefix}number_plain",
+				),
+				'suffix' => array(
+					'value' => $number_settings['suffix'] ?? null,
+					'name'  => "{$name_prefix}number_suffix",
+				),
+				'padding' => array(
+					'value' => $number_settings['padding'] ?: 1,
+					'name'  => "{$name_prefix}number_padding",
+				),
+			);
+
+			$current['number']['formatted'] = array(
+				'value' => wpo_wcpdf_format_document_number(
+					absint( $current['number']['plain']['value'] ),
+					$current['number']['prefix']['value'],
+					$current['number']['suffix']['value'],
+					absint( $current['number']['padding']['value'] ),
+					$document,
+					$document->order
+				),
+				'name'  => "{$name_prefix}number_formatted",
+			);
+		}
+
+		// Default date data
+		if ( ! isset( $current['date'] ) ) {
+			$current['date'] = array(
+				'formatted' => date_i18n( wc_date_format() . ' @ ' . wc_time_format() ),
+				'date'      => date_i18n( 'Y-m-d' ),
+				'hour'      => date_i18n( 'H' ),
+				'minute'    => date_i18n( 'i' ),
+				'name'      => "{$name_prefix}date",
+			);
+		}
+
+		// Other complementary data
 		if ( ! empty( $data['notes'] ) ) {
 			$current['notes'] = array(
 				'value' => $document->get_document_notes(),
-				'name'  => "_wcpdf_{$document->slug}_notes",
+				'name'  => "{$name_prefix}notes",
 			);
 		}
 
 		if ( ! empty( $data['display_date'] ) ) {
 			$current['display_date'] = array(
 				'value' => $document->document_display_date(),
-				'name'  => "_wcpdf_{$document->slug}_display_date",
+				'name'  => "{$name_prefix}display_date",
 			);
 		}
 
@@ -822,13 +910,13 @@ class Admin {
 			$document_triggers           = WPO_WCPDF()->main->get_document_triggers();
 			$creation_trigger            = $document->get_creation_trigger();
 			$current['creation_trigger'] = array(
-				'value' => isset( $document_triggers[ $creation_trigger ] ) ? $document_triggers[ $creation_trigger ] : '',
-				'name'  => "_wcpdf_{$document->slug}_creation_trigger",
+				'value' => isset( $document_triggers[ $creation_trigger ] ) ? $document_triggers[ $creation_trigger] : '',
+				'name'  => "{$name_prefix}creation_trigger",
 			);
 		}
 
 		foreach ( $data as $key => $value ) {
-			if ( isset( $current[$key] ) ) {
+			if ( isset( $current[ $key ] ) ) {
 				$data[ $key ] = array_merge( $current[ $key ], $value );
 			}
 		}
@@ -901,6 +989,9 @@ class Admin {
 			return;
 		}
 
+		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
+										 ( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
+
 		include WPO_WCPDF()->plugin_path() . '/views/document-data-metabox.php';
 	}
 
@@ -925,9 +1016,19 @@ class Admin {
 	 * Save invoice number date
 	 */
 	public function save_invoice_number_date( $order_id, $order ) {
-		if ( ( empty( $order ) || ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) ) && ! empty( $order_id ) ) {
+		// Skip any auto-draft or draft request
+		if (
+			( isset( $_POST['original_post_status'] ) && in_array( $_POST['original_post_status'], array( 'auto-draft', 'draft' ), true ) ) ||
+			( isset( $_POST['post_status'] ) && in_array( $_POST['post_status'], array( 'auto-draft', 'draft' ), true ) )
+		) {
+			return;
+		}
+
+		if ( ! ( $order instanceof \WC_Order ) && ! empty( $order_id ) ) {
 			$order = wc_get_order( $order_id );
-		} else {
+		}
+
+		if ( ! ( $order instanceof \WC_Order ) || 'auto-draft' === $order->get_status() ) {
 			return;
 		}
 
@@ -943,16 +1044,20 @@ class Admin {
 				return;
 			}
 
-			$form_data = [];
+			$form_data = array();
+			$invoice   = wcpdf_get_invoice( $order );
 
-			if ( $invoice = wcpdf_get_invoice( $order ) ) {
-				$is_new        = false === $invoice->exists();
+			if ( $invoice ) {
+				// IMPORTANT: $is_new must be set before calling initiate_number().
+				// The exists() method uses the number to determine existence, so
+				// if we call initiate_number() first, it may affect the result of exists().
+				$is_new        = ( false === $invoice->exists() );
 				$form_data     = stripslashes_deep( $_POST );
-				$document_data = $this->process_order_document_form_data( $form_data, $invoice->slug );
+				$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
+
 				if ( empty( $document_data ) ) {
 					return;
 				}
-
 
 				$invoice->set_data( $document_data, $order );
 
@@ -1140,10 +1245,10 @@ class Admin {
 				}
 
 				// save document data
-				$document_data = $this->process_order_document_form_data( $form_data, $document->slug );
+				$document_data = $this->process_order_document_form_data( (array) $form_data, $document );
 
 				// on regenerate
-				if ( $action_type == 'regenerate' && $document->exists() ) {
+				if ( 'regenerate' === $action_type && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
 					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
 					$response = array(
@@ -1151,7 +1256,7 @@ class Admin {
 					);
 
 				// on delete
-				} elseif ( $action_type == 'delete' && $document->exists() ) {
+				} elseif ( 'delete' === $action_type && $document->exists() ) {
 					$document->delete();
 
 					$response = array(
@@ -1159,8 +1264,12 @@ class Admin {
 					);
 
 				// on save
-				} elseif ( $action_type == 'save' ) {
-					$is_new = false === $document->exists();
+				} elseif ( 'save' === $action_type ) {
+					// IMPORTANT: $is_new must be set before calling initiate_number().
+					// The exists() method uses the number to determine existence, so
+					// if we call initiate_number() first, it may affect the result of exists().
+					$is_new = ( false === $document->exists() );
+
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
@@ -1235,8 +1344,85 @@ class Admin {
 		}
 	}
 
-	public function process_order_document_form_data( $form_data, $document_slug )
-	{
+	/**
+	 * AJAX handler to preview a formatted number
+	 *
+	 * @return void
+	 */
+	public function ajax_preview_formatted_number(): void {
+		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+
+		$request       = stripslashes_deep( $_POST );
+		$prefix        = isset( $request['prefix'] )   ? sanitize_text_field( $request['prefix'] )   : '';
+		$suffix        = isset( $request['suffix'] )   ? sanitize_text_field( $request['suffix'] )   : '';
+		$padding       = isset( $request['padding'] )  ? absint( $request['padding'] )               : 0;
+		$plain         = isset( $request['plain'] )    ? absint( $request['plain'] )                 : 0;
+		$document_type = isset( $request['document'] ) ? sanitize_text_field( $request['document'] ) : '';
+		$order_id      = isset( $request['order_id'] ) ? absint( $request['order_id'] )              : 0;
+
+		if ( empty( $order_id ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid order ID.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid order.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+
+		if ( empty( $document_type ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid document type.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+
+		$document = wcpdf_get_document( $document_type, $order );
+
+		if ( ! $document ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid document.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+
+		$formatted = wpo_wcpdf_format_document_number( $plain, $prefix, $suffix, $padding, $document, $order );
+
+		wp_send_json_success( array( 'formatted' => $formatted ) );
+	}
+
+	/**
+	 * Process the order document form data and return an array with the data to be saved.
+	 *
+	 * @param array $form_data The form data submitted via AJAX.
+	 * @param string|OrderDocument $document The document object. It accepted a document type string before 4.6.0.
+	 * @return array Processed data ready to be saved.
+	 */
+	public function process_order_document_form_data( array $form_data, $document ): array {
+		if ( ! $document instanceof OrderDocument ) {
+			// Before this parameter accepted a document type string, but now we require a document object.
+			// If a string is passed it's because an old version of the Professional or Proposal extension is active.
+			$extension_needs_update = array();
+
+			// Check if the Professional extension is active
+			if ( function_exists( 'WPO_WCPDF_Pro' ) ) {
+				$extension_needs_update[] = 'Professional';
+			}
+
+			// Check if the Proposal extension is active
+			if ( function_exists( 'wc_order_proposal' ) ) {
+				$extension_needs_update[] = 'Proposal';
+			}
+
+			$message = __METHOD__ . ': The parameter passed is a string (legacy behavior). This method now requires a document object.';
+
+			if ( ! empty( $extension_needs_update ) ) {
+				$message .= ' Please update the following extension' . ( count( $extension_needs_update ) > 1 ? 's' : '' ) . ': ' . implode( ' and ', $extension_needs_update ) . '.';
+			} else {
+				$message .= ' An outdated or third-party plugin or code snippet may be using the old method.';
+			}
+
+			wcpdf_log_error( $message, 'critical' );
+
+			return array();
+		}
+
 		$data = array();
 
 		if (
@@ -1249,32 +1435,58 @@ class Admin {
 			return $data;
 		}
 
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_number'] ) ) {
-			$document_number = absint( $form_data['_wcpdf_' . $document_slug . '_number'] );
+		$key_prefix                    = "_wcpdf_{$document->slug}_";
+		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
+			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
 
-			if ( $document_number !== 0 ) {
-				$data['number'] = $document_number;
+		if ( $document_data_editing_enabled ) {
+			// Number
+			if ( isset( $form_data["{$key_prefix}number_prefix"] ) ) {
+				$data['number']['prefix'] = sanitize_text_field( $form_data["{$key_prefix}number_prefix"] );
+			}
+
+			if ( isset( $form_data["{$key_prefix}number_plain"] ) ) {
+				$data['number']['number'] = absint( $form_data["{$key_prefix}number_plain"] );
+			}
+
+			if ( isset( $form_data["{$key_prefix}number_suffix"] ) ) {
+				$data['number']['suffix'] = sanitize_text_field( $form_data["{$key_prefix}number_suffix"] );
+			}
+
+			if ( isset( $form_data["{$key_prefix}number_padding"] ) ) {
+				$data['number']['padding'] = absint( $form_data["{$key_prefix}number_padding"] );
+			}
+
+			if ( isset( $form_data["{$key_prefix}number_formatted"] ) ) {
+				$data['number']['formatted_number'] = sanitize_text_field( $form_data["{$key_prefix}number_formatted"] );
+			}
+
+			if ( ! empty( $data['number'] ) ) {
+				$data['number']['document_type'] = $document->get_type();
+				$data['number']['order_id']      = $document->order->get_id();
+			}
+
+			// Date
+			$date_entered = ! empty( $form_data["{$key_prefix}date"] ) && ! empty( $form_data["{$key_prefix}date"]['date'] );
+
+			if ( $date_entered ) {
+				$date         = $form_data["{$key_prefix}date"]['date'];
+				$hour         = ! empty( $form_data["{$key_prefix}date"]['hour'] ) ? $form_data["{$key_prefix}date"]['hour'] : '00';
+				$minute       = ! empty( $form_data["{$key_prefix}date"]['minute'] ) ? $form_data["{$key_prefix}date"]['minute'] : '00';
+
+				// clean & sanitize input
+				$date         = gmdate( 'Y-m-d', strtotime( $date ) );
+				$hour         = sprintf( '%02d', intval( $hour ) );
+				$minute       = sprintf( '%02d', intval( $minute ) );
+				$data['date'] = "{$date} {$hour}:{$minute}:00";
+
+			} elseif ( ! $date_entered && ! empty( $_POST["{$key_prefix}number"] ) ) {
+				$data['date'] = current_time( 'timestamp', true );
 			}
 		}
 
-		$date_entered = ! empty( $form_data['_wcpdf_' . $document_slug . '_date'] ) && ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['date'] );
-
-		if ( $date_entered ) {
-			$date         = $form_data['_wcpdf_' . $document_slug . '_date']['date'];
-			$hour         = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['hour'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['hour'] : '00';
-			$minute       = ! empty( $form_data['_wcpdf_' . $document_slug . '_date']['minute'] ) ? $form_data['_wcpdf_' . $document_slug . '_date']['minute'] : '00';
-
-			// clean & sanitize input
-			$date         = gmdate( 'Y-m-d', strtotime( $date ) );
-			$hour         = sprintf( '%02d', intval( $hour ) );
-			$minute       = sprintf( '%02d', intval( $minute ) );
-			$data['date'] = "{$date} {$hour}:{$minute}:00";
-
-		} elseif ( ! $date_entered && ! empty( $_POST['_wcpdf_' . $document_slug . '_number'] ) ) {
-			$data['date'] = current_time( 'timestamp', true );
-		}
-
-		if ( isset( $form_data['_wcpdf_' . $document_slug . '_notes'] ) ) {
+		// Notes
+		if ( isset( $form_data["{$key_prefix}notes"] ) ) {
 			// allowed HTML
 			$allowed_html = array(
 				'a'		=> array(
@@ -1305,7 +1517,7 @@ class Admin {
 				'b'		=> array(),
 			);
 
-			$data['notes'] = wp_kses( $form_data['_wcpdf_' . $document_slug . '_notes'], $allowed_html );
+			$data['notes'] = wp_kses( $form_data["{$key_prefix}notes"], $allowed_html );
 		}
 
 		return $data;
@@ -1432,6 +1644,40 @@ class Admin {
 		wp_send_json_error( array(
 			'message' => esc_html__( 'Documents data is empty!', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
+	}
+
+	/**
+	 * Document data editing disabled notice
+	 *
+	 * @param OrderDocument $document
+	 * @return void
+	 */
+	private function document_data_editing_disabled_notice( OrderDocument $document ): void {
+		?>
+		<div class="notice notice-warning inline" style="margin:0;">
+			<p>
+				<?php
+					echo wp_kses_post(
+						sprintf(
+							'%s %s',
+							sprintf(
+								/* translators: %s document title */
+								esc_html__( 'Editing of %s number and date is currently disabled.', 'woocommerce-pdf-invoices-packing-slips' ),
+								esc_html( $document->get_title() )
+							),
+							sprintf(
+								/* translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name */
+								esc_html__( 'If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug#enable_document_data_editing' ) ) . '" target="_blank">',
+								'</a>',
+								'<strong>' . esc_html__( 'Enable document data editing', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
+							)
+						)
+					);
+				?>
+			</p>
+		</div>
+		<?php
 	}
 
 }

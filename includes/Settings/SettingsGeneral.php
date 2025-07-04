@@ -24,6 +24,7 @@ class SettingsGeneral {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+		add_action( 'wp_ajax_wcpdf_get_country_states', array( $this, 'ajax_get_shop_country_states' ) );
 
 		// Display an admin notice if shop address fields are empty.
 		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
@@ -49,6 +50,7 @@ class SettingsGeneral {
 		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
 		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
 		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
+		$states               = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
 
 		$settings_fields = array(
 			array(
@@ -110,7 +112,13 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'test_mode',
-					'description' => __( 'With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created.' , 'woocommerce-pdf-invoices-packing-slips' ) . '<br>'. __( '<strong>Note:</strong> invoice numbers and dates are not affected by this setting and will still be generated.' , 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						'%1$s<br><strong>%2$s</strong><br><a href="%3$s" target="_blank">%4$s</a>',
+						__( 'With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created.', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Note: Invoice numbers and dates are not affected by this setting and will still be generated.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/show-pdf-documents-with-the-latest-settings/',
+						__( 'Learn more about test mode', 'woocommerce-pdf-invoices-packing-slips' )
+					),
 				)
 			),
 			array(
@@ -188,7 +196,7 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'vat_number',
-					'description' => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
+					'description' => __( 'You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
 				)
 			),
 			array(
@@ -200,7 +208,7 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'coc_number',
-					'description' => __( 'Required for UBL output format.<br>You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
+					'description' => __( 'You can display this number on the invoice from the document settings.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $requires_pro,
 				)
 			),
 			array(
@@ -213,7 +221,21 @@ class SettingsGeneral {
 					'option_name'  => $option_name,
 					'id'           => 'shop_phone_number',
 					'translatable' => true,
-					'description'  => __( 'Mandatory for certain UBL formats.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => __( 'The phone number for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'shop_email_address',
+				'title'    => __( 'Shop Email Address', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'  => $option_name,
+					'id'           => 'shop_email_address',
+					'translatable' => true,
+					'type'         => 'email',
+					'description'  => __( 'The email address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -223,10 +245,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_line_1',
-					'translatable' => true,
-					'description'  => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_line_1',
+					'translatable'  => true,
+					'description'   => __( 'The street address for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -236,10 +264,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_line_2',
-					'translatable' => true,
-					'description'  => __( 'An additional, optional address line for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_line_2',
+					'translatable'  => true,
+					'description'   => __( 'An additional, optional address line for your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -249,24 +283,38 @@ class SettingsGeneral {
 				'callback' => 'select',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'options'      => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
-					'id'           => 'shop_address_country',
-					'translatable' => true,
-					'description'  => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'options'       => array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ) + \WC()->countries->get_countries(),
+					'id'            => 'shop_address_country',
+					'translatable'  => true,
+					'description'   => __( 'The country in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
 				'type'     => 'setting',
 				'id'       => 'shop_address_state',
 				'title'    => __( 'Shop State', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'text_input',
+				'callback' => 'select',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_state',
-					'translatable' => true,
-					'description'  => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'options'       => $states ?: array( '' => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ) ),
+					'id'            => 'shop_address_state',
+					'translatable'  => true,
+					'description'   => __( 'The state in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'disabled'      => empty( $states ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -276,10 +324,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_city',
-					'translatable' => true,
-					'description'  => __( 'The city in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_city',
+					'translatable'  => true,
+					'description'   => __( 'The city in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -289,10 +343,16 @@ class SettingsGeneral {
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name'  => $option_name,
-					'id'           => 'shop_address_postcode',
-					'translatable' => true,
-					'description'  => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'   => $option_name,
+					'id'            => 'shop_address_postcode',
+					'translatable'  => true,
+					'description'   => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'action_button' => array(
+						'class' => 'button sync-address',
+						'icon'  => 'update',
+						'title' => __( 'Sync with WooCommerce address', 'woocommerce-pdf-invoices-packing-slips' ),
+						'text'  => '',
+					),
 				)
 			),
 			array(
@@ -474,6 +534,7 @@ class SettingsGeneral {
 					'vat_number',
 					'coc_number',
 					'shop_phone_number',
+					'shop_email_address',
 					'footer',
 				)
 			),
@@ -560,21 +621,25 @@ class SettingsGeneral {
 			}
 		}
 
-		$display_notice = false;
-		$languages      = wpo_wcpdf_get_multilingual_languages()
-			? array_keys( wpo_wcpdf_get_multilingual_languages() )
-			: array( 'default' );
+		$general_settings = WPO_WCPDF()->settings->general;
+		$display_notice   = false;
+		$languages_data   = wpo_wcpdf_get_multilingual_languages();
+		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
 
 		foreach ( $languages as $language ) {
+			$line_1   = $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '';
+			$country  = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
+			$states   = wpo_wcpdf_get_country_states( $country );
+			$state    = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
+			$city     = $general_settings->get_setting( 'shop_address_city', $language ) ?? '';
+			$postcode = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
+
 			if (
-				! empty( WPO_WCPDF()->settings->general_settings['shop_address_additional'][ $language ] ) &&
-				(
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_line_1'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_country'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_state'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_city'][ $language ] ) ||
-					empty( WPO_WCPDF()->settings->general_settings['shop_address_postcode'][ $language ] )
-				)
+				empty( $line_1 ) ||
+				empty( $country ) ||
+				( ! empty( $states ) && empty( $state ) ) || // only require state if states exist
+				empty( $city ) ||
+				empty( $postcode )
 			) {
 				$display_notice = true;
 				break;
@@ -604,6 +669,68 @@ class SettingsGeneral {
 			<?php
 		}
 
+	}
+
+	/**
+	 * Get the states for a given country code via AJAX.
+	 */
+	public function ajax_get_shop_country_states() {
+		$request = stripslashes_deep( $_POST );
+
+		if ( empty( $request['country'] ) ) {
+			wp_send_json_error( array( 'message' => __( 'No country code provided.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+
+		$country_code = sanitize_text_field( $request['country'] );
+		$states       = wpo_wcpdf_get_country_states( $country_code );
+		$selected     = strtoupper( trim( $this->get_setting( 'shop_address_state' ) ) );
+
+		wp_send_json_success(
+			array(
+				'states'   => $states ?: array(),
+				'selected' => $selected ?: '',
+			)
+		);
+	}
+
+	/**
+	 * Get a general setting key value, optionally using a locale-specific sub-key.
+	 *
+	 * @param string $key     The key of the setting to retrieve.
+	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
+	 * @return string The value of the setting.
+	 */
+	private function get_setting( string $key, string $locale = '' ): string {
+		if ( empty( $key ) ) {
+			return '';
+		}
+
+		$general_settings = get_option( $this->option_name, array() );
+		$setting_text     = '';
+
+		if ( ! empty( $general_settings[ $key ] ) ) {
+			$setting = $general_settings[ $key ];
+
+			if ( is_array( $setting ) ) {
+				if ( ! empty( $locale ) && array_key_exists( $locale, $setting ) ) {
+					$setting_text = $setting[ $locale ];
+				} elseif ( array_key_exists( 'default', $setting ) ) {
+					$setting_text = $setting['default'];
+				} else {
+					$setting_text = reset( $setting );
+				}
+			} else {
+				$setting_text = $setting;
+			}
+		}
+
+		return apply_filters(
+			'wpo_wcpdf_get_general_setting',
+			wptexturize( trim( $setting_text ) ),
+			$key,
+			$locale,
+			$general_settings
+		);
 	}
 
 }

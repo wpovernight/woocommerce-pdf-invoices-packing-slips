@@ -285,10 +285,10 @@ class Main {
 		$attach_documents = array();
 
 		foreach ( $documents as $document ) {
-			// Pro not activated, only attach Invoice
-			if ( ! function_exists( 'WPO_WCPDF_Pro' ) && 'invoice' !== $document->get_type() ) {
+			// This condition skips document types that require the Pro plugin unless it's an invoice or proposal
+			if ( ! in_array( $document->get_type(), array( 'invoice', 'proposal' ), true ) && ! function_exists( 'WPO_WCPDF_Pro' ) ) {
 				continue;
-			};
+			}
 
 			foreach ( $document->output_formats as $output_format ) {
 				if ( $document->is_enabled( $output_format ) ) {

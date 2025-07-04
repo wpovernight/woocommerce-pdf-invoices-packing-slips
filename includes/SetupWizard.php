@@ -128,6 +128,19 @@ class SetupWizard {
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
 			WPO_WCPDF_VERSION
 		);
+		
+		wp_localize_script(
+			'wpo-wcpdf-setup',
+			'wpo_wcpdf_setup',
+			array(
+				'ajaxurl'                       => admin_url( 'admin-ajax.php' ),
+				'shop_country_changed_messages' => array(
+					'loading' => __( 'Loading', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+					'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
+					'error'   => __( 'Error loading', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			)
+		);
 
 		if ( ! wp_script_is( 'jquery-blockui', 'enqueued' ) ) {
 			wp_register_script(

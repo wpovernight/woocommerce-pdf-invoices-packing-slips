@@ -309,10 +309,12 @@ li.completed .wpo-progress-marker::before {
 .wpo-setup-input .shop-address-postcode {
 	width: 100%;
 	height: 40px;
-	padding: 10px 15px;
+	max-width: 100%;
+	padding: 6px 15px;
 	box-sizing: border-box;
 	font-size: 1.2em;
 	margin-bottom: 20px;
+	line-height: 20px;
 }
 
 /* Your logo */

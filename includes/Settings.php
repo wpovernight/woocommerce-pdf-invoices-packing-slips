@@ -89,6 +89,9 @@ class Settings {
 
 		// Apply categories to general settings.
 		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
+
+		// Sync address from WooCommerce address.
+		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
 
 	public function menu() {
@@ -313,22 +316,22 @@ class Settings {
 					// Update document date.
 					$document->initiate_date();
 
-					// Update document number.
-					$document_number = $document->get_document_number();
-
-					if ( ! empty( $document_number ) ) {
-						$document->set_number( $document_number );
+					// Update document number only if it is not already set.
+					if ( empty( $document->get_number() ) ) {
+						$document_number = $document->get_document_number();
+						if ( ! empty( $document_number ) ) {
+							$document->set_number( $document_number );
+						}
 					}
 
 					$document_number = $document->get_number( $document->get_type() );
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) ) {
-							foreach ( $document->settings['number_format'] as $key => $value ) {
-								$document_number->$key = $document->settings['number_format'][ $key ];
-							}
+						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
+							$document_number->load_number_data( $document->settings['number_format'] );
 						}
+
 						$document_number->apply_formatting( $document, $order );
 					}
 
@@ -528,6 +531,7 @@ class Settings {
 			'coc_number'              => $this->general_settings['coc_number'] ?? '',
 			'shop_name'               => $this->general_settings['shop_name'] ?? '',
 			'shop_phone_number'       => $this->general_settings['shop_phone_number'] ?? '',
+			'shop_email_address'      => $this->general_settings['shop_email_address'] ?? '',
 			'shop_address_line_1'     => $this->general_settings['shop_address_line_1'] ?? '',
 			'shop_address_line_2'     => $this->general_settings['shop_address_line_2'] ?? '',
 			'shop_address_country'    => $this->general_settings['shop_address_country'] ?? '',
@@ -1145,22 +1149,21 @@ class Settings {
 			return $settings_fields;
 		}
 
-		// Remove all sections first.
-		foreach ( $settings_fields as $key => $field ) {
-			if ( 'section' === $field['type'] ) {
-				unset( $settings_fields[ $key ] );
-			}
-		}
-
 		$modified_settings_fields = array();
 		$settings_lookup          = array();
 		$processed_keys           = array();
 
-		// Create a lookup array for settings fields by id.
-		// This allows for quick access to settings fields by their id, reducing the time complexity
-		// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
-		// and m is the number of settings fields.
 		foreach ( $settings_fields as $key => $settings_field ) {
+			if ( 'section' === $settings_field['type'] ) {
+				// Remove all sections.
+				unset( $settings_fields[ $key ] );
+				continue;
+			}
+
+			// Create a lookup array for settings fields by id.
+			// This allows for quick access to settings fields by their id, reducing the time complexity
+			// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
+			// and m is the number of settings fields.
 			$settings_lookup[ $settings_field['id'] ] = $key;
 		}
 
@@ -1325,6 +1328,61 @@ class Settings {
 		);
 
 		return $settings_categories;
+	}
+
+	/**
+	 * Syncs the address from WooCommerce settings.
+	 *
+	 * @return void
+	 */
+	public function sync_shop_address_with_woo(): void {
+		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+
+		$address_field = ! empty( $_POST['address_field'] )
+			? sanitize_text_field( wp_unslash( $_POST['address_field'] ) )
+			: '';
+
+		if ( empty( $address_field ) ) {
+			wp_send_json_error( array( 'message' => __( 'Address field is required.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		// Map address fields to the option keys used by WooCommerce.
+		$address_map = array(
+			'shop_address_line_1'   => 'woocommerce_store_address',
+			'shop_address_line_2'   => 'woocommerce_store_address_2',
+			'shop_address_country'  => 'woocommerce_default_country',
+			'shop_address_state'    => 'woocommerce_default_country',
+			'shop_address_city'     => 'woocommerce_store_city',
+			'shop_address_postcode' => 'woocommerce_store_postcode',
+		);
+
+		// Validate the address field against the map.
+		if ( ! array_key_exists( $address_field, $address_map ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid address field.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		$option_key = $address_map[ $address_field ];
+		$raw_value  = get_option( $option_key, '' );
+
+		// Return, if the value is not set.
+		if ( empty( $raw_value ) ) {
+			wp_send_json_error( array( 'message' => __( 'The field is empty.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		// Parse the value based on the address field.
+		switch ( $address_field ) {
+			case 'shop_address_state':
+				$parsed = wc_format_country_state_string( $raw_value );
+				$value  = $parsed['state'] ?? null;
+				break;
+			default:
+				$value = $raw_value;
+		}
+
+		wp_send_json_success( array( 'value' => $value ) );
 	}
 
 }

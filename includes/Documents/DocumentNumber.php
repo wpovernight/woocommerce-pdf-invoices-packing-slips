@@ -9,197 +9,156 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents\\DocumentNumber' ) ) :
 
 class DocumentNumber {
 
-	/**
-	 * The raw, unformatted number
-	 * @var int
-	 */
-	public $number;
+	public ?int $number;
+	public string $formatted_number;
+	public ?string $prefix;
+	public ?string $suffix;
+	public string $document_type;
+	public ?int $order_id;
+	public ?int $padding;
 
 	/**
-	 * Document number formatted for display
-	 * @var String
+	 * Document number constructor.
+	 *
+	 * @param mixed                    $number   Raw number value or full number array.
+	 * @param array                    $settings Additional settings used when building the number (e.g. prefix, suffix, padding).
+	 * @param OrderDocument|null       $document Optional related document object.
+	 * @param \WC_Abstract_Order|null  $order    Optional related order object.
 	 */
-	public $formatted_number;
-
-	/**
-	 * Number prefix
-	 * @var string
-	 */
-	public $prefix;
-
-	/**
-	 * Number suffix
-	 * @var string
-	 */
-	public $suffix;
-
-	/**
-	 * Document Type
-	 * @var string
-	 */
-	public $document_type;
-
-	/**
-	 * Order ID
-	 * @var int
-	 */
-	public $order_id;
-
-	/**
-	 * Zeros padding (total number of digits including leading zeros)
-	 * @var int
-	 */
-	public $padding;
-
-	public function __construct( $number, $settings = array(), $document = null, $order = null ) {
+	public function __construct( $number, array $settings = array(), ?OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
 		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
-		if ( !is_array( $number ) && !empty( $number ) ) {
-			// we're creating a new number with settings as passed
-			$this->number = $number;
 
-			foreach ($settings as $key => $value) {
-				$this->{$key} = $value;
-			}
+		// Normalize data from either a raw number or a full array
+		$data = is_array( $number )
+			? $number
+			: ( ! empty( $number ) ? array_merge( array( 'number' => $number ), $settings ) : array() );
 
-			if ( !isset( $this->formatted_number ) ) {
-				$this->apply_formatting( $document, ( !empty( $document->order ) ? $document->order : $order ) );
-			}
+		$this->load_number_data( $data );
 
-		} elseif ( is_array( $number ) ) {
-			// loaded with full number data
-			foreach ($number as $key => $value) {
-				$this->{$key} = $value;
-			}
-		}
-
-		if (!empty($document)) {
+		if ( null !== $document ) {
 			$this->document_type = $document->get_type();
 		}
-		if (!empty($order)) {
+
+		if ( null !== $order ) {
 			$this->order_id = $order->get_id();
 		}
-	}
 
-	public function __toString() {
-		return (string) $this->get_formatted();
-	}
-
-	public function get_formatted() {
-		$formatted_number = isset( $this->formatted_number ) ? $this->formatted_number : '';
-		$formatted_number = apply_filters( 'wpo_wcpdf_formatted_document_number', $formatted_number, $this, $this->document_type, $this->order_id );
-		return $formatted_number;
-	}
-
-	public function get_plain() {
-		return $this->number;
-	}
-
-	public function apply_formatting( $document, $order ) {
-		if ( empty( $document ) || empty( $order ) ) {
-			$this->formatted_number = $this->number;
-			return;
+		if ( ! isset( $this->formatted_number ) && null !== $document ) {
+			$this->apply_formatting( $document, $document->order ?? $order );
 		}
-
-		// load plain number
-		$number = $this->number;
-
-		// get dates
-		$order_date = $order->get_date_created();
-		// order date can be empty when order is being saved, fallback to current time
-		if ( empty( $order_date ) && function_exists('wc_string_to_datetime') ) {
-			$order_date = wc_string_to_datetime( date_i18n('Y-m-d H:i:s') );
-		}
-
-		$document_date = $document->get_date();
-		// fallback to order date if no document date available
-		if (empty($document_date)) {
-			$document_date = $order_date;
-		}
-
-		// get format settings
-		$formats = array(
-			'prefix'	=> $this->prefix,
-			'suffix'	=> $this->suffix,
+	}
+	
+	/**
+	 * Loads number data values into the object, applying casting and normalization.
+	 *
+	 * @param array $data Associative array of values to load into object properties.
+	 *
+	 * @return void
+	 */
+	public function load_number_data( array $data ): void {
+		$numeric_properties = apply_filters(
+			'wpo_wcpdf_document_number_numeric_properties',
+			array( 'number', 'order_id', 'padding' ),
+			$this
 		);
 
-		// load replacement values
-		$order_year		= $order_date->date_i18n( 'Y' );
-		$order_month	= $order_date->date_i18n( 'm' );
-		$order_day		= $order_date->date_i18n( 'd' );
-		$document_year	= $document_date->date_i18n( 'Y' );
-		$document_month	= $document_date->date_i18n( 'm' );
-		$document_day	= $document_date->date_i18n( 'd' );
+		foreach ( $data as $key => $value ) {
+			if ( in_array( $key, $numeric_properties, true ) ) {
+				$value = absint( $value );
 
-		// get order number
-		if ( is_callable( array( $order, 'get_order_number' ) ) ) { // order
-			$order_number = $order->get_order_number();
-		} elseif ( $document->is_refund( $order ) ) { // refund order
-			$parent_order = $document->get_refund_parent( $order );
-
-			if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'get_order_number' ) ) ) {
-				$order_number = $parent_order->get_order_number();
-			}
-		} else {
-			$order_number = '';
-		}
-
-		// make replacements
-		foreach ( $formats as $key => $value ) {
-			if ( empty( $value ) ) {
-				continue;
-			}
-
-			$value = str_replace( '[order_year]', $order_year, $value );
-			$value = str_replace( '[order_month]', $order_month, $value );
-			$value = str_replace( '[order_day]', $order_day, $value );
-			$value = str_replace( "[{$document->slug}_year]", $document_year, $value );
-			$value = str_replace( "[{$document->slug}_month]", $document_month, $value );
-			$value = str_replace( "[{$document->slug}_day]", $document_day, $value );
-			$value = str_replace( '[order_number]', $order_number, $value );
-
-			// replace date tag in the form [invoice_date="{$date_format}"] or [order_date="{$date_format}"]
-			$date_types = array( 'order', $document->slug );
-			foreach ( $date_types as $date_type ) {
-				if ( false !== strpos( $value, "[{$date_type}_date=" ) ) {
-					preg_match_all( "/\[{$date_type}_date=\"(.*?)\"\]/", $value, $document_date_tags );
-
-					if ( ! empty( $document_date_tags[1] ) ) {
-						foreach ( $document_date_tags[1] as $match_id => $date_format ) {
-							if ( 'order' === $date_type ) {
-								$value = str_replace( $document_date_tags[0][$match_id], $order_date->date_i18n( $date_format ), $value );
-							} else {
-								$value = str_replace( $document_date_tags[0][$match_id], $document_date->date_i18n( $date_format ), $value );
-							}
-						}
-					}
+				// Only treat 0 as null for numeric keys
+				if ( $value === 0 ) {
+					$value = null;
 				}
 			}
-			$formats[$key] = $value;
-		}
 
-		// Padding
-		$padding_string = '';
-		if ( function_exists('ctype_digit') ) { // requires the Ctype extension
-			if ( ctype_digit( (string) $this->padding ) ) {
-				$padding_string = (string) $this->padding;
-			}
-		} elseif ( !empty( $this->padding ) ) {
-			$padding_string = (string) absint($this->padding);
+			$this->{$key} = $value;
 		}
+	}
 
-		if ( !empty( $padding_string ) ) {
-			$number = sprintf('%0'.$padding_string.'d', $number);
-		}
+	/**
+	 * Returns the formatted string representation of the object.
+	 *
+	 * @return string
+	 */
+	public function __toString(): string {
+		return $this->get_formatted();
+	}
 
-		// Add prefix & suffix
-		$this->formatted_number = $formats['prefix'] . $number . $formats['suffix'];
+	/**
+	 * Returns the formatted document number.
+	 *
+	 * @return string
+	 */
+	public function get_formatted(): string {
+		$formatted_number = isset( $this->formatted_number ) ? $this->formatted_number : '';
+		return apply_filters( 'wpo_wcpdf_formatted_document_number', $formatted_number, $this, $this->document_type, $this->order_id );
+	}
+
+	/**
+	 * Returns the plain document number.
+	 *
+	 * @return int|null
+	 */
+	public function get_plain(): ?int {
+		return $this->number ?? null;
+	}
+	
+	/**
+	 * Returns the document number prefix.
+	 *
+	 * @return string|null
+	 */
+	public function get_prefix(): ?string {
+		return $this->prefix ?? null;
+	}
+
+	/**
+	 * Returns the document number suffix.
+	 *
+	 * @return string|null
+	 */
+	public function get_suffix(): ?string {
+		return $this->suffix ?? null;
+	}
+
+	/**
+	 * Returns the document number padding.
+	 *
+	 * @return int|null
+	 */
+	public function get_padding(): ?int {
+		return $this->padding ?? null;
+	}
+
+	/**
+	 * Applies formatting to the document number based on the settings and order/document data.
+	 *
+	 * @param OrderDocument $document
+	 * @param \WC_Abstract_Order $order
+	 * @return string
+	 */
+	public function apply_formatting( OrderDocument $document, \WC_Abstract_Order $order ): string {
+		$formatted_number = wpo_wcpdf_format_document_number( $this->get_plain(), $this->get_prefix(), $this->get_suffix(), $this->get_padding(), $document, $order );
+
 		// Apply filters and store
-		$this->formatted_number = apply_filters( 'wpo_wcpdf_format_document_number', $this->formatted_number, $this, $document, $order );
+		$this->formatted_number = apply_filters(
+			'wpo_wcpdf_format_document_number',
+			$formatted_number,
+			$this,
+			$document,
+			$order
+		);
 
 		return $this->formatted_number;
 	}
 
-	public function to_array() {
+	/**
+	 * Returns the document number as an array.
+	 *
+	 * @return array
+	 */
+	public function to_array(): array {
 		return (array) $this;
 	}
 }

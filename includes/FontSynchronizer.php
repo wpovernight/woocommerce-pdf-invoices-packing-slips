@@ -52,7 +52,7 @@ class FontSynchronizer {
 		$destination  = trailingslashit( wp_normalize_path( $destination ) );
 		$plugin_fonts = $this->get_plugin_fonts();
 		$dompdf_fonts = $this->get_dompdf_fonts();
-		
+
 		if ( $merge_with_local ) {
 			$local_fonts = $this->get_local_fonts( $destination );
 		} else {
@@ -93,16 +93,16 @@ class FontSynchronizer {
 	public function delete_font_files( array $filenames ): void {
 		$plugin_folder = wp_normalize_path( WPO_WCPDF()->plugin_path() );
 		$extensions    = array( '.ttf', '.ufm', '.ufm.php', '.afm', '.afm.php' );
-		
+
 		foreach ( $filenames as $filename ) {
 			// never delete files in our own plugin folder
 			if ( ! empty( $filename ) && false !== strpos( $filename, $plugin_folder ) ) {
 				continue;
 			}
-			
+
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
-				
+
 				if ( WPO_WCPDF()->file_system->exists( $file ) ) {
 					wp_delete_file( $file );
 				} else {
@@ -124,23 +124,25 @@ class FontSynchronizer {
 		$destination     = trailingslashit( $destination );
 		$extensions      = array( '.ttf', '.ufm', '.afm' );
 		$local_filenames = array();
-		
+
 		foreach ( $filenames as $variant => $filename ) {
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
-				
+
 				if ( WPO_WCPDF()->file_system->is_readable( $file ) ) {
 					$local_filename = $destination . basename( $file );
-					copy( $file, $local_filename );
+					
+					if ( ! copy( $file, $local_filename ) ) {
+						wcpdf_log_error( sprintf( 'Failed to copy font file: %s to %s', $file, $local_filename ) );
+					}
 				} else {
-					wcpdf_log_error( sprintf( "Could not read font file (%s)", $file ), 'critical' );
 					continue;
 				}
 			}
-			
+
 			$local_filenames[ $variant ] = $destination . basename( $filename );
 		}
-		
+
 		return $local_filenames;
 	}
 
@@ -235,12 +237,12 @@ class FontSynchronizer {
 			if ( ! is_array( $filenames ) ) {
 				continue;
 			}
-			
+
 			foreach ( $filenames as $variant => $filename ) {
 				$fonts[ $font_name ][ $variant ] = wp_normalize_path( $filename );
 			}
 		}
-		
+
 		return $fonts;
 	}
 }

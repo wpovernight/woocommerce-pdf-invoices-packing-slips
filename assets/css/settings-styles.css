@@ -345,17 +345,27 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin: 15px 0 0;
 }
 
-.nav-tab-wrapper:not( .wcpdf_debug_settings_sections > .nav-tab-wrapper) a.nav-tab {
+.nav-tab-wrapper a.nav-tab {
 	background: transparent;
 	border: none;
 	border-bottom: 3px solid transparent;
-	padding: 1em 0em;
+	padding-bottom: 0.5em;
 	margin: 0 1.2em;
 	font-size: 15px;
 }
 
-.nav-tab-wrapper:not( .wcpdf_debug_settings_sections > .nav-tab-wrapper) a.nav-tab.nav-tab-active {
+.nav-tab-wrapper a.nav-tab.nav-tab-active {
 	border-bottom: 3px solid #51266b;
+}
+
+.wcpdf-settings-sub-sections {
+	margin-top: -1em;
+	margin-left: -2em;
+	margin-bottom: 3em;
+}
+
+#wpo-wcpdf-settings .wcpdf-settings-sub-sections a.nav-tab {
+	font-size: 13px;
 }
 
 #wpo-wcpdf-preview-wrapper {
@@ -373,7 +383,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .sidebar {
 	height: auto;
-	padding: 4em 0 0 0;
+	padding: 2em 0 0 0;
 	box-sizing: border-box;
 	background: transparent;
 	flex: 0 0 35%;
@@ -421,6 +431,78 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	width: 100%;
 	box-sizing: border-box;
 	word-wrap: break-word;
+}
+
+.rotate {
+	animation: rotate 1s linear infinite;
+	transition: transform 0.2s ease;
+}
+
+@keyframes rotate {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper {
+	display: flex;
+	gap: 5px;
+	position: relative;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > input,
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > select {
+	flex: 1;
+	max-width: none;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > button.sync-address {
+	padding: 0;
+	width: 30px;
+	line-height: 1;
+	vertical-align: middle;
+	border-radius: 4px;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > button.sync-address > .dashicons {
+	transform: rotate(-45deg);
+	vertical-align: middle;
+	font-size: 1.8em;
+	padding: 0;
+	width: auto;
+	height: auto;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > .sync-tooltip {
+	position: absolute;
+	background-color: #555;
+	color: #fff;
+	padding: 5px 8px;
+	font-size: 12px;
+	border-radius: 4px;
+	white-space: nowrap;
+	opacity: 0;
+	transition: opacity 0.3s;
+	pointer-events: none;
+	z-index: 9999;
+	right: 0;
+	top: 115%;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > .sync-tooltip::after {
+	content: "";
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: transparent transparent #555 transparent;
+}
+
+/* Add a visible state class when showing the tooltip */
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper > .sync-tooltip.visible {
+	opacity: 1;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > input[type="text"],
