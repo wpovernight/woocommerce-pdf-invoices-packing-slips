@@ -1375,10 +1375,6 @@ class Settings {
 
 		// Parse the value based on the address field.
 		switch ( $address_field ) {
-			case 'shop_address_country':
-				$parsed = wc_format_country_state_string( $raw_value );
-				$value  = $parsed['country'] ?? null;
-				break;
 			case 'shop_address_state':
 				$parsed = wc_format_country_state_string( $raw_value );
 				$value  = $parsed['state'] ?? null;
