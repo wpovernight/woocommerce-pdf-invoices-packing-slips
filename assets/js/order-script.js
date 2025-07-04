@@ -177,7 +177,7 @@ jQuery( function( $ ) {
 			$form.find( '.read-only' ).hide();
 			$form.find( '.editable-notes' ).show();
 			$form.closest( '.wcpdf-data-fields' ).find( '.wpo-wcpdf-document-buttons' ).show();
-			
+
 			// re-initialize WooCommerce tooltips
 			$( '.wcpdf-data-fields .woocommerce-help-tip' ).tipTip( {
 					attribute: 'data-tip',
@@ -215,7 +215,7 @@ jQuery( function( $ ) {
 			$( '.view-more' ).show();
 		}
 	} );
-	
+
 	function updatePreviewNumber( $table ) {
 		let prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
 		let suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
@@ -258,7 +258,7 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
-	
+
 	let previewTimer;
 	$( document ).on( 'input', '.wcpdf-data-fields input', function () {
 		const $table = $( this ).closest( '.wcpdf-data-fields' );
@@ -281,10 +281,10 @@ jQuery( function( $ ) {
 	}
 
 	// Fetch data for pending documents if documents were pending and now are generated.
-	const pending_documents = get_pending_documents();
+	let pending_documents = get_pending_documents();
 	let ajax_count          = 0;
-	const ajax_max_count    = 3;
-	const ajax_interval     = 2000;
+	const ajax_max_count    = 3;		// Limit the frequency of this AJAX request to prevent a performance burden.
+	const ajax_interval     = 3000;
 	const ajax_timer        = function() {
 		if ( pending_documents.length <= 0 ) {
 			return;
@@ -303,6 +303,9 @@ jQuery( function( $ ) {
 				$.each( response.data, function ( key, value ) {
 					$( '.wcpdf-data-fields[data-document="' + key + '"]' ).replaceWith( value );
 				} );
+
+				// Update pending document to prevent reloading data that is already loaded.
+				pending_documents = get_pending_documents();
 			},
 			error:   function ( response ) {
 				console.log( response.message );
