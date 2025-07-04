@@ -347,7 +347,7 @@ jQuery( function( $ ) {
 	$( document ).on( 'select2:select select2:unselect', '#wpo-wcpdf-settings select.wc-enhanced-select', settingsChanged );
 	$( document.body ).on( 'wpo-wcpdf-media-upload-setting-updated', settingsChanged );
 	$( document ).on( 'click', '.wpo_remove_image_button, #wpo-wcpdf-settings .remove-requirement', settingsChanged );
-	
+
 	// On Multilingual
 	if ( $( '#wpo_wcpdf_settings_general-shop_address_country-translations' ).length > 0 ) {
 		$( '#wpo-wcpdf-settings select[name^="wpo_wcpdf_settings_general[shop_address_country]"]' ).each( function() {
@@ -762,11 +762,11 @@ jQuery( function( $ ) {
 		const $button  = $( this );
 		const $form    = $( this ).closest('form');
 		const $icon    = $button.find( 'span.dashicons' );
-		const $tooltip = $button.closest( 'td' ).find( '.sync-tooltip' );
-		let $field     = $button.closest( 'td' ).find( 'input' );
+		const $tooltip = $button.closest( '.wpo-wcpdf-input-wrapper' ).find( '.sync-tooltip' );
+		let $field     = $button.closest( '.wpo-wcpdf-input-wrapper' ).find( 'input' );
 
 		if ( $field.length === 0 ) {
-			$field = $button.closest( 'td' ).find( 'select' );
+			$field = $button.closest( '.wpo-wcpdf-input-wrapper' ).find( 'select' );
 		}
 
 		// Rotate the icon to indicate processing.
