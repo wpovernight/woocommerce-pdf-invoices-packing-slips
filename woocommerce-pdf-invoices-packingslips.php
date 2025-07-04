@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              4.6.0-rc.8
+ * Version:              5.0.0-pr1149.5
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.6.0-rc.8';
+	public $version              = '5.0.0-pr1149.5';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -66,6 +66,8 @@ class WPO_WCPDF {
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
 			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
 			'woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
+			//TODO: deprecated UBL extensions here
+			//TODO: also this `woocommerce-pdf-ips-ubl-extender`
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
@@ -148,9 +150,13 @@ class WPO_WCPDF {
 		// plugin legacy class mapping
 		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
 
+		// deprecated
+		include_once $this->plugin_path() . '/wpo-ips-deprecated-hooks.php';
+		include_once $this->plugin_path() . '/wpo-ips-deprecated-functions.php';
+
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
-		include_once $this->plugin_path() . '/wpo-ips-functions-ubl.php';
+		include_once $this->plugin_path() . '/wpo-ips-functions-edi.php';
 
 		// Compatibility classes
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
