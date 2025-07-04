@@ -63,7 +63,7 @@ class SettingsEDI {
 
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
 		?>
-		<div class="wcpdf_settings_sections">
+		<div class="wcpdf-settings-sub-sections wcpdf_settings_sections">
 			<?php if ( count( $this->sections ) > 1 ) : ?>
 				<h2 class="nav-tab-wrapper">
 					<?php
