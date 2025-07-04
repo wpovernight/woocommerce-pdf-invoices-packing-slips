@@ -350,7 +350,7 @@ jQuery( function( $ ) {
 
 	function settingsChanged( event, previewDelay ) {
 		if ( 'shop_address_country' === event.target.id ) {
-			shopCountryChanged( event );
+			shopCountryChanged( $( event.target ) );
 		}
 
 		// Show secondary save button
@@ -377,13 +377,12 @@ jQuery( function( $ ) {
 		}
 	}
 
-	function shopCountryChanged( event ) {
-		const $country        = $( event.target );
-		const selectedCountry = $country.val();
-		const $form           = $country.closest( 'form' );
+	function shopCountryChanged( $countryField ) {
+		const selectedCountry = $countryField.val();
+		const $form           = $countryField.closest( 'form' );
 
 		// Get the language key
-		const nameMatch = $country.attr( 'name' )
+		const nameMatch = $countryField.attr( 'name' )
 			.match( /\[shop_address_country]\[(.*?)\]/ ); // 'pt-pt', 'default', etc.
 		const lang      = nameMatch ? nameMatch[1] : 'default';
 
@@ -407,7 +406,7 @@ jQuery( function( $ ) {
 			} )
 		);
 
-		$.ajax( {
+		return $.ajax( {
 			url: wpo_wcpdf_admin.ajaxurl,
 			type: 'POST',
 			dataType: 'json',
@@ -751,6 +750,7 @@ jQuery( function( $ ) {
 		event.preventDefault();
 
 		const $button  = $( this );
+		const $form    = $( this ).closest('form');
 		const $icon    = $button.find( 'span.dashicons' );
 		const $tooltip = $button.closest( 'td' ).find( '.sync-tooltip' );
 		let $field     = $button.closest( 'td' ).find( 'input' );
@@ -772,8 +772,25 @@ jQuery( function( $ ) {
 			},
 			success: function( response ) {
 				if ( response.success && response.data.value && '' !== response.data.value.trim() ) {
-					// Update the input value with the synced address.
-					$field.val( response.data.value );
+					if ( 'shop_address_country' === $field.attr( 'id' ) ) {
+						const country_state = response.data.value.split( ':' );
+						$field.val( country_state[0] );
+
+						// Update states if the country changed.
+						shopCountryChanged( $field ).done( function() {
+							const matches     = $field.attr( 'name' ).match( /\[([^\]]+)\]/g ); // matches all bracket parts
+							const lang        = matches ? matches[ matches.length - 1 ].replace( /[\[\]]/g, '' ) : 'default';
+							const $stateField = $form.find( `select[name="wpo_wcpdf_settings_general[shop_address_state][${lang}]"]` );
+
+							// Update the selected state.
+							if ( $stateField.length !== 0 ) {
+                                $stateField.val( country_state[1] );
+							}
+						} );
+					} else {
+						$field.val( response.data.value );
+					}
+
 					triggerPreview();
 				} else if ( ! response.success && response.data.message && '' !== response.data.message.trim() ) {
 					$tooltip.text( response.data.message ).addClass( 'visible' );
