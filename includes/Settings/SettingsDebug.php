@@ -26,7 +26,7 @@ class SettingsDebug {
 		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'admin_init', array( $this, 'maybe_schedule_unstable_version_check' ) );
-		
+
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 		add_action( 'wpo_wcpdf_check_unstable_version_daily', array( $this, 'run_unstable_version_check' ) );
@@ -45,13 +45,13 @@ class SettingsDebug {
 		$sections       = $this->get_settings_sections();
 
 		?>
-		<div class="wcpdf_debug_settings_sections">
+		<div class="wcpdf-settings-sub-sections wcpdf-settings-debug">
 			<h2 class="nav-tab-wrapper">
 				<?php
-					foreach ( $sections as $section => $title ) {
-						$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
-						printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
-					}
+				foreach ( $sections as $section => $title ) {
+					$active = ( $section === $active_section ) ? 'nav-tab-active' : '';
+					printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'section', $section ) ), esc_attr( $section ), esc_attr( $active ), esc_html( $title ) );
+				}
 				?>
 			</h2>
 		</div>
@@ -114,7 +114,7 @@ class SettingsDebug {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		if ( ! function_exists( '\\as_has_scheduled_action' ) ) {
 			wcpdf_log_error( 'Action Scheduler is not available. Cannot fetch numbers table data.', 'critical' );
 			return;
@@ -617,7 +617,7 @@ class SettingsDebug {
 		}
 
 		$results = wc_get_orders( $args );
-		
+
 		remove_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_parse_document_date_for_wp_query', 10, 2 );
 
 		if ( ! is_object( $results ) ) {
@@ -773,7 +773,7 @@ class SettingsDebug {
 						'<code>' . __( 'PHP Filesystem Functions', 'woocommerce-pdf-invoices-packing-slips' ) . '</code>',
 						'<code>' . __( 'WP Filesystem API', 'woocommerce-pdf-invoices-packing-slips' ) . '</code>',
 						'<code>direct</code>'
-					) . ( has_filter( 'wpo_wcpdf_filesystem_method' ) 
+					) . ( has_filter( 'wpo_wcpdf_filesystem_method' )
 						? '<div class="notice notice-warning inline"><p><strong>' . __( 'Warning:', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong> ' . __( 'A code snippet is overriding this setting.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>'
 						: ''
 					),
@@ -935,7 +935,7 @@ class SettingsDebug {
 					'id'          => 'reload_attachment_translations',
 					'description' => __( 'If enabled, the plugin will reload translations when generating documents for email attachments. Disable this if you are experiencing incomplete or incorrect translations in the attached PDFs.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
-			),			
+			),
 			array(
 				'type'     => 'setting',
 				'id'       => 'disable_preview',
@@ -982,7 +982,7 @@ class SettingsDebug {
 							content_url(),
 							WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) . '/log.htm'
 						);
-			
+
 						return implode( '<br>', array(
 							__( "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues.", 'woocommerce-pdf-invoices-packing-slips' ),
 							__( '<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefore this is not recommended to leave it enabled on live sites.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1080,7 +1080,7 @@ class SettingsDebug {
 		$debug_settings    = WPO_WCPDF()->settings->debug_settings;
 		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
 		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
-		
+
 		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
 		$gmagick           = extension_loaded( 'gmagick' );
@@ -1372,7 +1372,7 @@ class SettingsDebug {
 		if ( ! WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) {
 			return false;
 		}
-		
+
 		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
 			wcpdf_log_error( 'Action Scheduler function not available. Cannot retrieve the yearly numbering reset schedule.', 'critical' );
 			return false;
@@ -1454,7 +1454,7 @@ class SettingsDebug {
 	 */
 	public function fetch_number_table_data( string $table_name, string $orderby = 'id', string $order = 'desc', string $from = '', string $to = '', int $chunk_size = 100, int $offset = 0 ): void {
 		global $wpdb;
-		
+
 		$input_data = array(
 			'table_name' => $table_name,
 			'orderby'    => $orderby,
@@ -1492,7 +1492,7 @@ class SettingsDebug {
 			} else {
 				wcpdf_log_error( 'Action Scheduler function not available. Cannot unschedule number table data fetch.', 'critical' );
 			}
-			
+
 			update_option( $option_name . '::last_time', time() );
 			return; // exit if no more results
 		}
@@ -1544,7 +1544,7 @@ class SettingsDebug {
 			wp_send_json_error( array( __( 'Invalid request', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
 	}
-	
+
 	/**
 	 * Filter data from number table request
 	 *
@@ -1561,7 +1561,7 @@ class SettingsDebug {
 		// Validate and sanitize table_name
 		$valid_table_name = null;
 		if (
-			isset( $request_data['table_name'] ) 
+			isset( $request_data['table_name'] )
 			&& in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) )
 		) {
 			$valid_table_name = sanitize_text_field( $request_data['table_name'] );
@@ -1664,7 +1664,7 @@ class SettingsDebug {
 
 		return $found;
 	}
-	
+
 	/**
 	 * Search for number in number table database.
 	 *
@@ -1733,7 +1733,7 @@ class SettingsDebug {
 
 		return $results;
 	}
-	
+
 	/**
 	 * Schedule or unschedule the daily unstable version check using Action Scheduler.
 	 *
@@ -1743,7 +1743,7 @@ class SettingsDebug {
 		$hook           = 'wpo_wcpdf_check_unstable_version_daily';
 		$debug_settings = WPO_WCPDF()->settings->debug_settings;
 		$enabled        = isset( $debug_settings['check_unstable_versions'] );
-		
+
 		if (
 			! function_exists( '\\as_next_scheduled_action' ) ||
 			! function_exists( '\\as_unschedule_all_actions' ) ||
@@ -1752,21 +1752,21 @@ class SettingsDebug {
 			wcpdf_log_error( 'Action Scheduler functions not available. Cannot schedule or unschedule the daily unstable version check.', 'critical' );
 			return;
 		}
-		
+
 		// Unschedule all pending actions
 		if ( ! $enabled ) {
 			if ( \as_next_scheduled_action( $hook ) ) {
 				\as_unschedule_all_actions( $hook );
 			}
 			return;
-		}		
+		}
 
 		// Schedule the action if not already scheduled
 		if ( ! \as_next_scheduled_action( $hook ) ) {
 			\as_schedule_recurring_action( time(), DAY_IN_SECONDS, $hook );
 		}
 	}
-	
+
 	/**
 	 * Run the daily check for unstable versions.
 	 *
