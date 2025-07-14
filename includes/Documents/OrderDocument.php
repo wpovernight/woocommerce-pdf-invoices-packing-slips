@@ -1332,7 +1332,19 @@ abstract class OrderDocument {
 
 		// legacy filters
 		if ( in_array( $settings_key, array( 'shop_name', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
-			$text = apply_filters_deprecated( "wpo_wcpdf_{$settings_key}", array( $text, $this ), '4.5.0', "wpo_wcpdf_{$settings_key}_settings_text" );
+			$text = apply_filters_deprecated(
+				"wpo_wcpdf_{$settings_key}",
+				array( $text, $this ),
+				'4.5.0',
+				"wpo_wcpdf_{$settings_key}_settings_text"
+			);
+		} elseif ( 'shop_address' === $settings_key ) {
+			$text = apply_filters_deprecated(
+				'wpo_wcpdf_shop_address_settings_text',
+				array( $text, $this ),
+				'4.6.0',
+				'wpo_wcpdf_get_shop_address'
+			);
 		}
 
 		return apply_filters( "wpo_wcpdf_{$settings_key}_settings_text", $text, $this );
@@ -1470,15 +1482,12 @@ abstract class OrderDocument {
 			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
 
-		$formatted_address = wpo_wcpdf_format_address( $address );
-		$formatted_address = apply_filters_deprecated(
-			'wpo_wcpdf_shop_address_settings_text',
-			array( $formatted_address, $this ),
-			'4.5.0',
-			'wpo_wcpdf_get_shop_address'
+		return apply_filters(
+			'wpo_wcpdf_get_shop_address',
+			wpo_wcpdf_format_address( $address ),
+			$address,
+			$this
 		);
-
-		return apply_filters( 'wpo_wcpdf_get_shop_address', $formatted_address, $address, $this );
 	}
 	public function shop_address() {
 		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
