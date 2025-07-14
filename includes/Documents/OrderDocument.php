@@ -1470,7 +1470,15 @@ abstract class OrderDocument {
 			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
 
-		return apply_filters( 'wpo_wcpdf_get_shop_address', wpo_wcpdf_format_address( $address ), $address, $this );
+		$formatted_address = wpo_wcpdf_format_address( $address );
+		$formatted_address = apply_filters_deprecated(
+			'wpo_wcpdf_shop_address_settings_text',
+			array( $formatted_address, $this ),
+			'4.5.0',
+			'wpo_wcpdf_get_shop_address'
+		);
+
+		return apply_filters( 'wpo_wcpdf_get_shop_address', $formatted_address, $address, $this );
 	}
 	public function shop_address() {
 		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
