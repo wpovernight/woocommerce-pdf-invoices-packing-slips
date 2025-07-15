@@ -387,7 +387,7 @@ class Invoice extends OrderDocumentMethods {
 							'label'       => __( 'Prefix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'        => 20,
 							'description' => __( 'If set, this value will be used as number prefix.' , 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . sprintf(
-								/* translators: 1. document type, 2-3 placeholders */
+								/* translators: 1. document slug, 2-3 placeholders */
 								__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
 								__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>[invoice_year]</strong>', '<strong>[invoice_month]</strong>'
 							) . ' ' . __( 'Check the Docs article below to see all the available placeholders for prefix/suffix.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -396,7 +396,7 @@ class Invoice extends OrderDocumentMethods {
 							'label'       => __( 'Suffix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'        => 20,
 							'description' => __( 'If set, this value will be used as number suffix.' , 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . sprintf(
-								/* translators: 1. document type, 2-3 placeholders */
+								/* translators: 1. document slug, 2-3 placeholders */
 								__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
 								__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>[invoice_year]</strong>', '<strong>[invoice_month]</strong>'
 							) . ' ' . __( 'Check the Docs article below to see all the available placeholders for prefix/suffix.', 'woocommerce-pdf-invoices-packing-slips' ),
