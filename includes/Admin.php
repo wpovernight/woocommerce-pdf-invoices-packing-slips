@@ -1056,7 +1056,7 @@ class Admin {
 													'%s %s',
 													__( 'If set, this value will be used as number prefix.' , 'woocommerce-pdf-invoices-packing-slips' ),
 													sprintf(
-														/* translators: 1. document title, 2-3 placeholders */
+														/* translators: 1. document slug, 2-3 placeholders */
 														__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
 														esc_html( $document->get_title() ),
 														'<strong>[' . esc_html( $document->slug ) . '_year]</strong>',
@@ -1076,7 +1076,7 @@ class Admin {
 													'%s %s',
 													__( 'If set, this value will be used as number suffix.' , 'woocommerce-pdf-invoices-packing-slips' ),
 													sprintf(
-														/* translators: 1. document title, 2-3 placeholders */
+														/* translators: 1. document slug, 2-3 placeholders */
 														__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
 														esc_html( $document->get_title() ),
 														'<strong>[' . esc_html( $document->slug ) . '_year]</strong>',

@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.6.0-rc.9
+Stable tag: 4.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,25 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.6.0 (2025-07-15) =
+- New: Added filter to modify the return value of `get_shop_address()`
+- New: Enhanced document data editing on the order page
+- New: Refined styling for settings submenus
+- New: Improved Country/State selection in the Setup Wizard Shop Address step
+- New: Added "Email Address" to Shop Address fields
+- New: Document data editing for Invoices and Credit Notes is now disabled by default. Enable via Advanced settings
+- New: Added sync action button to Shop Address fields
+- New: Linked documentation to historical settings descriptions
+- New: Displayed shop phone number below address in the Simple template
+- Tweak: Deprecated legacy `shop_address` text hook
+- Tweak: Updated UBL tax filters to append values instead of overriding defaults
+- Fix: Resolved issue where Order Proposal plugin email attachments failed without the Professional extension
+- Fix: Allowed HTML in the "Shop Additional Info" field
+- Fix: Replaced free-text state input with a select field to ensure valid WooCommerce state codes
+- Fix: Added missing documentation link to UBL Tax settings
+- Translations: Updated POT file for translations
+- Tested: Confirmed compatibility with WooCommerce 10.0
 
 = 4.5.2 (2025-05-27) =
 - Tweak: Suppress log entries for missing font files that are expected and not required
