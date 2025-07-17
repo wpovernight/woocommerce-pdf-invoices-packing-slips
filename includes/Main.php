@@ -1847,8 +1847,28 @@ class Main {
 		$email_hooks = apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks );
 
 		foreach ( $email_hooks as $email_hook ) {
-			add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
+			if ( 'woocommerce_email_customer_address_section' === $email_hook ) {
+				add_action( $email_hook, array( $this, 'add_document_link_to_address_section' ), 10, 4 );
+			} else {
+				add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
+			}
 		}
+	}
+
+	/**
+	 * Wrapper for woocommerce_email_customer_address_section hook.
+	 * Since different parameters sent to this hook, we use a wrapper for it.
+	 *
+	 * @param string $type
+	 * @param \WC_Abstract_Order $order
+	 * @param bool $sent_to_admin
+	 * @param bool $plain_text
+	 *
+	 * @return void
+	 */
+	public function add_document_link_to_address_section( string $type, \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text ): void {
+		// Since this hook doesn’t pass the $email object, we pass null (or create a dummy if needed).
+		$this->add_document_link_to_email( $order, $sent_to_admin, $plain_text, null );
 	}
 
 	/**
@@ -1857,11 +1877,11 @@ class Main {
 	 * @param \WC_Abstract_Order $order
 	 * @param bool $sent_to_admin
 	 * @param bool $plain_text
-	 * @param \WC_Email $email
+	 * @param mixed|\WC_Email $email Some third-parties might send different values.
 	 *
 	 * @return void
 	 */
-	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, \WC_Email $email ): void {
+	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, $email ): void {
 		// Check if document access type is 'full'.
 		$is_full_access_type = 'full' === WPO_WCPDF()->endpoint->get_document_link_access_type();
 
@@ -1877,7 +1897,8 @@ class Main {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
 			$selected_emails   = $document_settings['include_email_link'] ?? array();
 
-			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email->id, $selected_emails, true );
+			$email_id   = ( $email instanceof \WC_Email ) ? $email->id : '';
+			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email_id, $selected_emails, true );
 
 			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
 				continue;
