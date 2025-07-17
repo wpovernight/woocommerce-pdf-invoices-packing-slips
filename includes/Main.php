@@ -1847,7 +1847,7 @@ class Main {
 		$email_hooks = apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks );
 
 		foreach ( $email_hooks as $email_hook ) {
-			if ( $email_hook === 'woocommerce_email_customer_address_section' ) {
+			if ( 'woocommerce_email_customer_address_section' === $email_hook ) {
 				add_action( $email_hook, array( $this, 'add_document_link_to_address_section' ), 10, 4 );
 			} else {
 				add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
