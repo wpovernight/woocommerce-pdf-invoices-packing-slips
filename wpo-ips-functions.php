@@ -1319,22 +1319,33 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 			return $cached['data'];
 		}
 	}
-
-	$url     = "https://api.github.com/repos/{$owner}/{$repo}/releases";
-	$options = array(
-		'http' => array(
-			'header' => "User-Agent: " . get_bloginfo( 'name' ) . " (" . home_url() . ")\r\n"
+	
+	$url      = "https://api.github.com/repos/$owner/$repo/releases?per_page=10";
+	$response = wp_remote_get(
+		$url,
+		array(
+			'headers' => array(
+				'User-Agent' => sprintf(
+					'%s (%s)',
+					wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ),
+					home_url()
+				),
+			),
+			'timeout' => 15,
+			'accept'  => 'application/vnd.github.v3+json',
 		)
 	);
-	$context  = stream_context_create( $options );
-	$response = file_get_contents( $url, false, $context );
 
-	if ( ! $response ) {
+	if ( is_wp_error( $response ) ) {
 		return $empty_result;
 	}
 
-	$releases = json_decode( $response, true );
+	$code = wp_remote_retrieve_response_code( $response );
+	if ( 200 !== $code ) {
+		return $empty_result;
+	}
 
+	$releases = json_decode( wp_remote_retrieve_body( $response ), true );
 	if ( ! is_array( $releases ) ) {
 		return $empty_result;
 	}
