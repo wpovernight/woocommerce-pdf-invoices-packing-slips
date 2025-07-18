@@ -346,7 +346,18 @@ class SettingsGeneral {
 					'option_name'   => $option_name,
 					'id'            => 'shop_address_postcode',
 					'translatable'  => true,
-					'description'   => __( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						'%s%s',
+						__( 'The postal code, if any, in which your business is located.', 'woocommerce-pdf-invoices-packing-slips' ),
+						! function_exists( 'WPO_WCNLPC' )
+							? '<br><br>' . sprintf(
+								/** translators: 1: tool name, 2: plugin URL */
+								__( 'You can validate your address using the %1$s tool in the %2$s plugin.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<strong>' . __( 'Address Lookup', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>',
+								'<a href="https://wpovernight.com/downloads/woocommerce-postcode-checker/" target="_blank">Postcode Checker for WooCommerce</a>'
+							)
+							: ''
+					),
 					'action_button' => array(
 						'class' => 'button sync-address',
 						'icon'  => 'update',
