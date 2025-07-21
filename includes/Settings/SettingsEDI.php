@@ -991,7 +991,7 @@ class SettingsEDI {
 							<tr>
 								<td><?php echo esc_html( $format['name'] ); ?></td>
 								<td><?php echo esc_html( strtoupper( $syntax ) ); ?></td>
-								<td><?php echo esc_html( $format['hybrid'] ? '&#x2713;' : '&#x10102;' ); ?></td>
+								<td><?php echo wp_kses_post( $format['hybrid'] ? '<span class="dashicons dashicons-yes"></span>' : '<span class="dashicons dashicons-no"></span>' ); ?></td>
 								<td><?php echo esc_html( implode( ', ', array_keys( $format['documents'] ) ) ); ?></td>
 							</tr>
 						<?php endforeach; ?>
