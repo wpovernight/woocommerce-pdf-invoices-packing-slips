@@ -709,7 +709,11 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	background-color: #dedede;
 }
 
-#wpo-wcpdf-settings button.button-edi-save-taxes {
+#wpo-wcpdf-settings .edi-tax-class-group {
+	margin: 1em 0;
+}
+
+#wpo-wcpdf-settings .edi-tax-class-group button.button-edi-save-taxes {
 	float: right;
 }
 

@@ -721,14 +721,27 @@ class SettingsEDI {
 	 */
 	public function output_tax_class_selector_and_action( array $formatted_rates ): void {
 		?>
-		<p>
-			<select class="edi-tax-class-select">
-			<?php foreach ( $formatted_rates as $slug => $name ) : ?>
-				<option value="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $name ); ?></option>
-			<?php endforeach; ?>
+		<div class="edi-tax-class-group">
+			<label for="edi-tax-class" class="screen-reader-text">
+				<?php esc_html_e( 'Tax class', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</label>
+
+			<select id="edi-tax-class" class="edi-tax-class-select">
+				<?php foreach ( $formatted_rates as $slug => $name ) : ?>
+					<option value="<?php echo esc_attr( $slug ); ?>">
+						<?php echo esc_html( $name ); ?>
+					</option>
+				<?php endforeach; ?>
 			</select>
-			<button class="button-primary button-edi-save-taxes" data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>" data-action="wpo_ips_edi_save_taxes"><?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
-		</p>
+
+			<button
+				type="button"
+				class="button button-primary button-edi-save-taxes"
+				data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>"
+				data-action="wpo_ips_edi_save_taxes">
+				<?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
