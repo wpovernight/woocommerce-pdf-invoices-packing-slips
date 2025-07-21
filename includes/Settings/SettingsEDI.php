@@ -499,9 +499,23 @@ class SettingsEDI {
 	private function output_company_identifiers(): void {
 		$general_settings = WPO_WCPDF()->settings->general;
 		$languages_data   = wpo_wcpdf_get_multilingual_languages();
-		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
+		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );		
+		$settings_link    = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) ),
+			esc_html__( 'General Settings', 'woocommerce-pdf-invoices-packing-slips' )
+		);
 
-		echo '<p>' . esc_html__( 'Please fill in your company identifiers. These details are essential for generating electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+		printf(
+			'<p>%s</p>',
+			wp_kses_post(
+				sprintf(
+					/* translators: %s: linked "General Settings" */
+					__( 'Please fill in your company identifiers under %s. These details are essential for generating electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
+					$settings_link
+				)
+			)
+		);
 
 		if ( count( $languages ) > 1 ) {
 			echo '<label for="wpo-ips-edi-language-selector"><strong>' . esc_html__( 'Select language', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong></label> ';
@@ -597,14 +611,6 @@ class SettingsEDI {
 
 			echo '</tbody></table></div>';
 		}
-
-		echo '<div class="notice notice-info inline"><p>';
-		echo sprintf(
-			/* translators: %s General Settings */
-			__( 'You can fill in your identifiers in the %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) ) . '">' . __( 'General Settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
-		);
-		echo'</p></div>';
 	}
 
 	/**
