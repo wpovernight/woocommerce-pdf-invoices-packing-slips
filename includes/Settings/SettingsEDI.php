@@ -1065,7 +1065,7 @@ class SettingsEDI {
 	 */
 	public function output_network(): void {
 		?>
-		<p><?php esc_html_e( 'Send your documents via the Peppol network directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+		<p><?php esc_html_e( 'Send your documents through supported delivery networks directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="notice notice-info inline">
 			<p>
 				<?php
