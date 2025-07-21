@@ -318,7 +318,7 @@ function wpo_ips_edi_get_current_syntax(): string {
 		$syntax = 'ubl';
 	}
 
-	return apply_filters( 'wpo_ips_edi_current_syntax', $syntax, $edi_settings );
+	return apply_filters( 'wpo_ips_edi_current_syntax', $syntax );
 }
 
 /**
@@ -342,7 +342,7 @@ function wpo_ips_edi_get_current_format( bool $full_details = false ) {
 		$format = 'ubl_2_1';
 	}
 
-	return apply_filters( 'wpo_ips_edi_current_format', $format, $edi_settings );
+	return apply_filters( 'wpo_ips_edi_current_format', $format, $syntax, $full_details );
 }
 
 /**
