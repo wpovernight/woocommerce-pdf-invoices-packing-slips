@@ -727,7 +727,7 @@ class SettingsEDI {
 				<option value="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $name ); ?></option>
 			<?php endforeach; ?>
 			</select>
-			<a class="button button-primary button-edi-save-taxes" data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>" data-action="wpo_ips_edi_save_taxes"><?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+			<button class="button-primary button-edi-save-taxes" data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>" data-action="wpo_ips_edi_save_taxes"><?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
 		</p>
 		<?php
 	}

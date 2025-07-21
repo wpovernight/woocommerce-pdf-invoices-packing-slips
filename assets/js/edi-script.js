@@ -47,7 +47,7 @@ jQuery( function ( $ ) {
 	} );
 	
 	// Handle the save taxes
-	$( '.button-edi-save-taxes' ).on( 'click', function ( e ) {
+	$( 'button.button-edi-save-taxes' ).on( 'click', function ( e ) {
 		e.preventDefault();
 
 		const $button = $( this );
