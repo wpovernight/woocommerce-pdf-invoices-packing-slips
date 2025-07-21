@@ -45,7 +45,7 @@ class SettingsDebug {
 		$sections       = $this->get_settings_sections();
 
 		?>
-		<div class="wcpdf-settings-sub-sections wcpdf_settings_sections">
+		<div class="wcpdf-settings-sub-sections">
 			<h2 class="nav-tab-wrapper">
 				<?php
 				foreach ( $sections as $section => $title ) {
