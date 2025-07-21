@@ -437,7 +437,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	overflow-x: hidden;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar > form {
+#wpo-wcpdf-preview-wrapper .sidebar > form:not(.taxes) {
 	background: transparent !important;
 	overflow: visible;
 	padding: 0;
