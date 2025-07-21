@@ -178,14 +178,12 @@ class Invoice extends OrderDocumentMethods {
 		do_action( "wpo_wcpdf_before_{$this->type}_init_settings", $this );
 
 		foreach ( $this->output_formats as $output_format ) {
-			$page = $option_group = $option_name = '';
+			$page            = $option_group = $option_name = '';
 			$settings_fields = array();
-
-			switch ( $output_format ) {
-				case 'pdf':
-					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
-					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
-					break;
+			
+			if ( 'pdf' === $output_format ) {
+				$page            = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
+				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
 			}
 
 			// custom output format

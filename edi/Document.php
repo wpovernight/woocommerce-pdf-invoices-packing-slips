@@ -24,6 +24,7 @@ class Document {
 	 *
 	 * @param string $syntax
 	 * @param string $format
+	 * @param OrderDocument $order_document
 	 */
 	public function __construct( string $syntax, string $format, OrderDocument $order_document ) {
 		$this->syntax             = $syntax;

@@ -5,7 +5,6 @@ namespace WPO\IPS\EDI;
 use WPO\IPS\EDI\Interfaces\BuilderInterface;
 use WPO\IPS\Vendor\Sabre\Xml\Service;
 use WPO\IPS\Vendor\Sabre\Xml\Writer;
-use WPO\IPS\EDI\Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -56,7 +55,7 @@ class SabreBuilder implements BuilderInterface {
 	public function xmlSerialize( Writer $writer ): void {
 		$additional_attributes = $this->document->get_additional_attributes();
 
-		if ( ! empty( $additional_attributes ) && is_array( $additional_attributes ) ) {
+		if ( ! empty( $additional_attributes ) ) {
 			$writer->writeAttributes( $additional_attributes );
 		}
 

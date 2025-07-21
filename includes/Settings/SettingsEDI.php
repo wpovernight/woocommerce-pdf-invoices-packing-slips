@@ -433,9 +433,7 @@ class SettingsEDI {
 	public function save_taxes_on_calculate_order_totals( bool $and_taxes, \WC_Abstract_Order $order ): void {
 		// it seems $and_taxes is mostly false, meaning taxes are calculated separately,
 		// but we still update just in case anything changed
-		if ( ! empty( $order ) ) {
-			wpo_ips_edi_save_order_taxes( $order );
-		}
+		wpo_ips_edi_save_order_taxes( $order );
 	}
 
 	/**
@@ -443,11 +441,11 @@ class SettingsEDI {
 	 *
 	 * @param int $order_id
 	 * @param array $posted_data
-	 * @param \WC_Abstract_Order $order
+	 * @param \WC_Abstract_Order|null $order
 	 *
 	 * @return void
 	 */
-	public function save_taxes_on_checkout( int $order_id, array $posted_data, \WC_Abstract_Order $order ): void {
+	public function save_taxes_on_checkout( int $order_id, array $posted_data, ?\WC_Abstract_Order $order ): void {
 		if ( empty( $order ) && ! empty( $order_id ) ) {
 			$order = wc_get_order( $order_id );
 		}
@@ -587,12 +585,10 @@ class SettingsEDI {
 				);
 
 				echo '<tr>';
-				echo '<td>';
 				echo '<td>' . esc_html( $field['label'] ) . '</td>';
 				echo '<td>';
 				echo $display;
-
-				if ( $key === 'vat_number' && ! wpo_ips_edi_vat_number_has_country_prefix( $display ) ) {
+				if ( 'vat_number' === $key && ! wpo_ips_edi_vat_number_has_country_prefix( $display ) ) {
 					echo '<br><small class="notice-warning" style="color:#996800;">' . esc_html__( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ) . '</small>';
 				}
 				echo '</td>';

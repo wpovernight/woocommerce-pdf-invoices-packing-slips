@@ -36,11 +36,8 @@ class SettingsCallbacks {
 	 * @return void
 	 */
 	public function debug_section(): void {
-		echo wp_kses_post( sprintf(
-			/* translators: %s: warning message */
-			__( '%s The settings below are meant for debugging/development only. Do not use them on a live website!' , 'woocommerce-pdf-invoices-packing-slips' ),
-			'<strong>' . __( 'Warning!', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
-		) );
+		echo '<strong>' . __( 'Warning!', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>' . ' ' .
+			__( 'The settings below are meant for debugging/development only. Do not use them on a live website!' , 'woocommerce-pdf-invoices-packing-slips' );
 	}
 
 	/**
@@ -73,11 +70,12 @@ class SettingsCallbacks {
 	 * Checkbox callback.
 	 *
 	 * args:
-	 *   option_name - name of the main option
-	 *   id          - key of the setting
-	 *   value       - value if not 1 (optional)
-	 *   default     - default setting (optional)
-	 *   description - description (optional)
+	 *   option_name       - name of the main option
+	 *   id                - key of the setting
+	 *   value             - value if not 1 (optional)
+	 *   default           - default setting (optional)
+	 *   description       - description (optional)
+	 *   custom_attributes - custom attributes (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -355,7 +353,7 @@ class SettingsCallbacks {
 			esc_attr( $current ),
 			esc_attr( $size ),
 			esc_attr( $class ),
-			wp_kses_post( $custom_attributes )
+			wp_kses_post( $args['custom_attributes'] ?? '' )
 		);
 
 		// output description.

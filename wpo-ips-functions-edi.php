@@ -150,16 +150,21 @@ function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $
  * Get EDI Maker
  * Use `wpo_ips_edi_maker` filter to change the EDI class (which can wrap another EDI library).
  *
- * @return WPO\IPS\Makers\EDIMaker
+ * @return WPO\IPS\Makers\EDIMaker|null
  */
-function wpo_ips_edi_get_maker() {
+function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
 	$class = '\\WPO\\IPS\\Makers\\EDIMaker';
 
 	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/EDIMaker.php' );
+		include_once WPO_WCPDF()->plugin_path() . '/includes/Makers/EDIMaker.php';
 	}
 
 	$class = apply_filters( 'wpo_ips_edi_maker', $class );
+	
+	if ( ! class_exists( $class ) ) {
+		wcpdf_error_handling( 'EDI Maker class not found: ' . $class );
+		return null;
+	}
 
 	return new $class();
 }
@@ -265,9 +270,7 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 		$document
 	);
 
-	$full_filename = $edi_maker->write( $filename, $contents );
-
-	return $full_filename;
+	return $edi_maker->write( $filename, $contents );
 }
 
 /**

@@ -424,9 +424,9 @@ class SettingsDebug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 
-		if ( in_array( $type, array( 'general', 'debug' ) ) ) {
+		if ( in_array( $type, array( 'general', 'debug' ), true ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
-		} elseif ( in_array( $type, array( 'edi' ) ) ) {
+		} elseif ( in_array( $type, array( 'edi' ), true ) ) {
 			$settings_option = "wpo_ips_{$type}_settings";
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );

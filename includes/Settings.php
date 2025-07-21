@@ -17,24 +17,24 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings' ) ) :
 
 class Settings {
 
-	public $options_page_hook;
-	public $callbacks;
-	public $general;
-	public $documents;
-	public $debug;
-	public $upgrade;
-	public $edi;
-	public $general_settings;
-	public $debug_settings;
-	public $edi_settings;
+	public string|false $options_page_hook;
+	public SettingsCallbacks $callbacks;
+	public SettingsGeneral $general;
+	public SettingsDocuments $documents;
+	public SettingsDebug $debug;
+	public SettingsUpgrade $upgrade;
+	public SettingsEDI $edi;
+	public array $general_settings;
+	public array $debug_settings;
+	public array $edi_settings;
 
-	private $installed_templates       = array();
-	private $installed_templates_cache = array();
-	private $template_list_cache       = array();
+	private array $installed_templates       = array();
+	private array $installed_templates_cache = array();
+	private array $template_list_cache       = array();
 
-	protected static $_instance = null;
+	protected static self|null $_instance = null;
 
-	public static function instance() {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
