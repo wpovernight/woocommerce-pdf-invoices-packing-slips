@@ -139,7 +139,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 					<div id="preview-order-search-results"><!-- Results populated with JS --></div>
 				</div>
 				<?php if ( $document ) : ?>
-					<h2 class="doc-output-toggle-group">
+					<div class="doc-output-toggle-group">
 						<?php
 							foreach ( $document->output_formats as $document_output_format ) {
 								if ( 'xml' === $document_output_format && ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_preview_is_enabled() ) ) {
@@ -158,7 +158,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 								);
 							}
 						?>
-					</h2>
+					</div>
 				<?php endif; ?>
 				<?php if ( 'documents' !== $active_tab ) : ?>
 					<div class="preview-data preview-document-type">
