@@ -53,9 +53,12 @@ abstract class AbstractHandler implements HandlerInterface {
 	 */
 	protected function get_identifiers_data( string $key ): string {
 		$general_settings = WPO_WCPDF()->settings->general;
-		$edi_settings     = wpo_ips_edi_get_settings();
-		$language         = ! empty( $edi_settings['identifiers_language'] ) ? $edi_settings['identifiers_language'] : 'default';
+		$language         = wpo_ips_edi_get_settings( 'identifiers_language' );
 		
+		if ( empty( $language ) ) {
+			$language = 'default';
+		}
+
 		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
 	

@@ -130,9 +130,8 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
 	 */
 	private function get_endpoint(): ?array {
-		$settings = wpo_ips_edi_get_settings();
-		$id       = $settings['peppol_endpoint_id'] ?? null;
-		$scheme   = $settings['peppol_endpoint_eas'] ?? null;
+		$id     = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
+		$scheme = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
 
 		if ( empty( $id ) || empty( $scheme ) ) {
 			return null;
@@ -155,9 +154,8 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
 	 */
 	private function get_legal_identifier(): ?array {
-		$settings             = wpo_ips_edi_get_settings();
-		$legal_identifier     = $settings['peppol_legal_identifier'] ?? null;
-		$legal_identifier_icd = $settings['peppol_legal_identifier_icd'] ?? null;
+		$legal_identifier     = wpo_ips_edi_get_settings( 'peppol_legal_identifier' );
+		$legal_identifier_icd = wpo_ips_edi_get_settings( 'peppol_legal_identifier_icd' );
 
 		if ( empty( $legal_identifier ) || empty( $legal_identifier_icd ) ) {
 			return null;

@@ -172,10 +172,12 @@ function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
 /**
  * Get EDI settings
  *
- * @return array
+ * @param string|null $key
+ * @return mixed
  */
-function wpo_ips_edi_get_settings(): array {
-	return get_option( 'wpo_ips_edi_settings', array() );
+function wpo_ips_edi_get_settings( ?string $key = null ) {
+	$settings = get_option( 'wpo_ips_edi_settings', array() );
+	return $key ? ( $settings[ $key ] ?? null ) : $settings;
 }
 
 /**
@@ -193,9 +195,8 @@ function wpo_ips_edi_get_tax_settings(): array {
  * @return bool
  */
 function wpo_ips_edi_is_available(): bool {
-	$edi_settings = wpo_ips_edi_get_settings();
 	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
-	return apply_filters( 'wpo_ips_edi_is_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) && ! empty( $edi_settings['enabled'] ) );
+	return apply_filters( 'wpo_ips_edi_is_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) && ! empty( wpo_ips_edi_get_settings( 'enabled' ) ) );
 }
 
 /**
@@ -311,11 +312,10 @@ function wpo_ips_edi_is_country_format_extension_active(): bool {
  * @return string
  */
 function wpo_ips_edi_get_current_syntax(): string {
-	$edi_settings = wpo_ips_edi_get_settings();
-	$syntax       = 'ubl';
-
-	if ( ! empty( $edi_settings['syntax'] ) ) {
-		$syntax = $edi_settings['syntax'];
+	$syntax = wpo_ips_edi_get_settings( 'syntax' );
+	
+	if ( empty( $syntax ) ) {
+		$syntax = 'ubl';
 	}
 
 	return apply_filters( 'wpo_ips_edi_current_syntax', $syntax, $edi_settings );
@@ -328,20 +328,18 @@ function wpo_ips_edi_get_current_syntax(): string {
  * @return string|array
  */
 function wpo_ips_edi_get_current_format( bool $full_details = false ) {
-	$edi_settings = wpo_ips_edi_get_settings();
-	$format       = 'ubl_2_1';
+	$syntax = wpo_ips_edi_get_settings( 'syntax' );
 
-	if ( ! empty( $edi_settings['syntax'] ) ) {
-		$syntax     = $edi_settings['syntax'];
-		$format_key = "{$syntax}_format";
+	if ( ! empty( $syntax ) ) {
+		$format = wpo_ips_edi_get_settings( "{$syntax}_format" );
 
-		if ( ! empty( $edi_settings[ $format_key ] ) ) {
-			$format = $edi_settings[ $format_key ];
-			
-			if ( $full_details ) {
-				$format = wpo_ips_edi_syntax_formats( $syntax, $format );
-			}
+		if ( ! empty( $format ) && $full_details ) {
+			$format = wpo_ips_edi_syntax_formats( $syntax, $format );
 		}
+	}
+	
+	if ( empty( $format ) ) {
+		$format = 'ubl_2_1';
 	}
 
 	return apply_filters( 'wpo_ips_edi_current_format', $format, $edi_settings );
@@ -353,8 +351,7 @@ function wpo_ips_edi_get_current_format( bool $full_details = false ) {
  * @return array
  */
 function wpo_ips_edi_get_document_types(): array {
-	$edi_settings = wpo_ips_edi_get_settings();
-	return apply_filters( 'wpo_ips_edi_document_types', $edi_settings['document_types'] ?? array() );
+	return apply_filters( 'wpo_ips_edi_document_types', wpo_ips_edi_get_settings( 'document_types' ) ?? array() );
 }
 
 /**
@@ -363,8 +360,7 @@ function wpo_ips_edi_get_document_types(): array {
  * @return bool
  */
 function wpo_ips_edi_send_attachments(): bool {
-	$edi_settings = wpo_ips_edi_get_settings();
-	return ! empty( $edi_settings['send_attachments'] );
+	return ! empty( wpo_ips_edi_get_settings( 'send_attachments' ) );
 }
 
 /**
@@ -373,8 +369,7 @@ function wpo_ips_edi_send_attachments(): bool {
  * @return bool
  */
 function wpo_ips_edi_embed_encrypted_pdf(): bool {
-	$edi_settings = wpo_ips_edi_get_settings();
-	return apply_filters( 'wpo_ips_edi_embed_encrypted_pdf', ! empty( $edi_settings['embed_encrypted_pdf'] ) );
+	return apply_filters( 'wpo_ips_edi_embed_encrypted_pdf', ! empty( wpo_ips_edi_get_settings( 'embed_encrypted_pdf' ) ) );
 }
 
 /**
@@ -383,8 +378,7 @@ function wpo_ips_edi_embed_encrypted_pdf(): bool {
  * @return bool
  */
 function wpo_ips_edi_preview_is_enabled(): bool {
-	$edi_settings = wpo_ips_edi_get_settings();
-	return ! empty( $edi_settings['enabled_preview'] );
+	return ! empty( wpo_ips_edi_get_settings( 'enabled_preview' ) );
 }
 
 /**
@@ -498,9 +492,7 @@ function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ):
  * @return void
  */
 function wpo_ips_edi_log( string $message, string $level = 'info', ?\Throwable $e = null ): void {
-	$edi_settings = wpo_ips_edi_get_settings();
-	
-	if ( empty( $edi_settings['enabled_logs'] ) ) {
+	if ( empty( wpo_ips_edi_get_settings( 'enabled_logs' ) ) ) {
 		return;
 	}
 	
