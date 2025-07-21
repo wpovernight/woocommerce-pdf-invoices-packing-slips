@@ -336,7 +336,7 @@ function wpo_ips_edi_get_current_format( bool $full_details = false ) {
 			$format = $edi_settings[ $format_key ];
 			
 			if ( $full_details ) {
-				$format = wpo_ips_edi_formats( $syntax, $format );
+				$format = wpo_ips_edi_syntax_formats( $syntax, $format );
 			}
 		}
 	}
@@ -385,87 +385,105 @@ function wpo_ips_edi_preview_is_enabled(): bool {
 }
 
 /**
- * Get the EDI syntaxes.
+ * Get the list of syntaxes (slug ⇒ human‑readable name).
  *
  * @return array
  */
 function wpo_ips_edi_syntaxes(): array {
-	return apply_filters( 'wpo_ips_edi_syntaxes', array(
-		'ubl' => 'Universal Business Language (UBL)',
-		'cii' => 'Cross Industry Invoice (CII)',
-	) );
+	$syntaxes = array();
+
+	foreach ( wpo_ips_edi_syntax_formats() as $slug => $data ) {
+		$syntaxes[ $slug ] = $data['name'];
+	}
+
+	return apply_filters( 'wpo_ips_edi_syntaxes', $syntaxes );
 }
 
 /**
- * Get the EDI formats
+ * Get the complete "syntax → formats" map, or a slice of it.
  *
- * @param string $syntax Optional. The syntax key (e.g., 'ubl', 'cii').
- * @param string $format Optional. The format key (e.g., 'ubl-2p1', 'factur-x').
+ * `wpo_ips_edi_syntax_formats()`                   → everything
+ * `wpo_ips_edi_syntax_formats( 'ubl' )`            → only the UBL block
+ * `wpo_ips_edi_syntax_formats( 'ubl', 'ubl-2p1' )` → just that format
+ *
+ * @param string $syntax Optional. Syntax key (e.g. 'ubl', 'cii').
+ * @param string $format Optional. Format key (e.g. 'ubl‑2p1').
  *
  * @return array
  */
-function wpo_ips_edi_formats( string $syntax = '', string $format = '' ): array {
-	$formats = apply_filters(
-		'wpo_ips_edi_formats',
+function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ): array {
+	$map = apply_filters(
+		'wpo_ips_edi_syntax_formats',
 		array(
 			'ubl' => array(
-				'ubl-2p1' => array(
-					'name'      => 'UBL 2.1',
-					'hybrid'    => false,
-					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\Ubl2p1\Invoice::class,
+				'name'    => 'Universal Business Language (UBL)',
+				'formats' => array(
+					'ubl-2p1' => array(
+						'name'      => 'UBL 2.1',
+						'hybrid'    => false,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\Ubl2p1\Invoice::class,
+						),
 					),
-				),
-				'peppol-bis-3p0' => array(
-					'name'      => 'PEPPOL BIS 3.0',
-					'hybrid'    => false,
-					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0\Invoice::class,
+					'peppol-bis-3p0' => array(
+						'name'      => 'PEPPOL BIS 3.0',
+						'hybrid'    => false,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0\Invoice::class,
+						),
 					),
 				),
 			),
 			'cii' => array(
-				'cii-d16b' => array(
-					'name'      => 'CII D16B',
-					'hybrid'    => false,
-					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice::class,
+				'name'    => 'Cross Industry Invoice (CII)',
+				'formats' => array(
+					'cii-d16b' => array(
+						'name'      => 'CII D16B',
+						'hybrid'    => false,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice::class,
+						),
 					),
-				),
-				'factur-x-1p0' => array(
-					'name'      => 'Factur-X 1.0',
-					'hybrid'    => true,
-					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p0\Invoice::class,
+					'factur-x-1p0' => array(
+						'name'      => 'Factur-X 1.0',
+						'hybrid'    => true,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p0\Invoice::class,
+						),
 					),
-				),
-				'zugferd-1p0' => array(
-					'name'      => 'ZUGFeRD 1.0',
-					'hybrid'    => true,
-					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd1p0\Invoice::class,
+					'zugferd-1p0' => array(
+						'name'      => 'ZUGFeRD 1.0',
+						'hybrid'    => true,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd1p0\Invoice::class,
+						),
 					),
-				),
-				'zugferd-2p0' => array(
-					'name'      => 'ZUGFeRD 2.0',
-					'hybrid'    => true,
-					'documents' => array(
-						'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p0\Invoice::class,
+					'zugferd-2p0' => array(
+						'name'      => 'ZUGFeRD 2.0',
+						'hybrid'    => true,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p0\Invoice::class,
+						),
 					),
 				),
 			),
 		)
 	);
 
-	if ( $syntax && isset( $formats[ $syntax ] ) ) {
-		if ( $format && isset( $formats[ $syntax ][ $format ] ) ) {
-			return $formats[ $syntax ][ $format ];
-		}
-
-		return $formats[ $syntax ];
+	// Slicing
+	if ( '' === $syntax ) {
+		return $map;
 	}
 
-	return $formats;
+	if ( ! isset( $map[ $syntax ] ) ) {
+		return array();
+	}
+
+	if ( '' === $format ) {
+		return $map[ $syntax ];
+	}
+
+	return $map[ $syntax ]['formats'][ $format ] ?? array();
 }
 
 /**

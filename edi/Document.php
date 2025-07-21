@@ -47,9 +47,10 @@ class Document {
 	 * @return object|null
 	 */
 	public function get_format_document(): ?object {
-		$available_formats = wpo_ips_edi_formats( $this->syntax );
+		$format        = wpo_ips_edi_syntax_formats( $this->syntax, $this->format );
+		$document_type = $this->order_document->get_type();
 
-		if ( ! isset( $available_formats[ $this->format ] ) ) {
+		if ( ! $format ) {
 			wpo_ips_edi_log(
 				sprintf(
 					'Format "%s" for syntax "%s" is not available.',
@@ -61,11 +62,11 @@ class Document {
 			return null;
 		}
 		
-		if ( ! in_array( $this->order_document->get_type(), array_keys( $available_formats[ $this->format ]['documents'] ) ) ) {
+		if ( ! in_array( $document_type, array_keys( $format['documents'] ) ) ) {
 			wpo_ips_edi_log(
 				sprintf(
 					'Document type "%s" is not supported for format "%s".',
-					$this->order_document->get_type(),
+					$document_type,
 					$this->format
 				),
 				'critical'
@@ -73,7 +74,7 @@ class Document {
 			return null;
 		}
 		
-		return new $available_formats[ $this->format ]['documents'][ $this->order_document->get_type() ]();
+		return new $format['documents'][ $document_type ]();
 	}
 
 	/**

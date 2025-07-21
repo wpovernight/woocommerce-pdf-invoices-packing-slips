@@ -185,9 +185,7 @@ class SettingsEDI {
 		);
 
 		$settings_format = array();
-		foreach ( wpo_ips_edi_syntaxes() as $syntax => $name ) {
-			$formats = wpo_ips_edi_formats( $syntax );
-
+		foreach ( wpo_ips_edi_syntax_formats() as $syntax => $data ) {
 			$settings_format[] = array(
 				'type'     => 'setting',
 				'id'       => "{$syntax}_format",
@@ -206,8 +204,8 @@ class SettingsEDI {
 							'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
 						),
 						array_combine(
-							array_keys( $formats ),
-							array_column( $formats, 'name' )
+							array_keys( $data['formats'] ),
+							array_column( $data['formats'], 'name' )
 						)
 					),
 					'description'       => sprintf(
@@ -988,8 +986,8 @@ class SettingsEDI {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ( wpo_ips_edi_formats() as $syntax => $syntax_formats ) : ?>
-						<?php foreach ( $syntax_formats as $format ) : ?>
+					<?php foreach ( wpo_ips_edi_syntax_formats() as $syntax => $data ) : ?>
+						<?php foreach ( $data['formats'] as $format ) : ?>
 							<tr>
 								<td><?php echo esc_html( $format['name'] ); ?></td>
 								<td><?php echo esc_html( strtoupper( $syntax ) ); ?></td>
