@@ -173,12 +173,7 @@ class SettingsEDI {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'syntax',
-					'options'     => array_merge(
-						array(
-							'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
-						),
-						wpo_ips_edi_syntaxes()
-					),
+					'options'     => wpo_ips_edi_syntaxes(),
 					'description' => __( 'Choose the preferred XML syntax standard for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 			),
@@ -199,14 +194,9 @@ class SettingsEDI {
 				'args'     => array(
 					'option_name'       => $option_name,
 					'id'                => "{$syntax}_format",
-					'options'           =>  array_merge(
-						array(
-							'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
-						),
-						array_combine(
-							array_keys( $data['formats'] ),
-							array_column( $data['formats'], 'name' )
-						)
+					'options'           => array_combine(
+						array_keys( $data['formats'] ),
+						array_column( $data['formats'], 'name' )
 					),
 					'description'       => sprintf(
 						/* translators: %s syntax */
