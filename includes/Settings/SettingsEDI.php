@@ -400,17 +400,17 @@ class SettingsEDI {
 		if ( count( $languages ) > 0 ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
-				'id'       => 'identifiers_language',
-				'title'    => __( 'Identifiers Language', 'woocommerce-pdf-invoices-packing-slips' ),
+				'id'       => 'supplier_identifiers_language',
+				'title'    => __( 'Supplier Identifiers Language', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
 				'section'  => $section,
 				'args'     => array(
 					'option_name' => $option_name,
-					'id'          => 'identifiers_language',
+					'id'          => 'supplier_identifiers_language',
 					'options'     => $languages,
 					'description' => sprintf(
 						/* translators: %1$s: open link anchor, %2$s: close link anchor */
-						__( 'Select the language for the identifier data. This option is available because multilingual support is enabled. You can check the currently available data %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Select the language for the supplier identifiers data. This option is available because multilingual support is enabled. You can check the currently available data %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi&section=identifiers' ) ) . '" target="_blank">',
 						'</a>'
 					),

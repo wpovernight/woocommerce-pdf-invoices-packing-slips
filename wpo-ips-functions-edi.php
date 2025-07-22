@@ -554,7 +554,7 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
  */
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings = WPO_WCPDF()->settings->general;
-	$language         = wpo_ips_edi_get_settings( 'identifiers_language' );
+	$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 		
 	if ( empty( $language ) ) {
 		$language = 'default';
