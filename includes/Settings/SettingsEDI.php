@@ -346,6 +346,53 @@ class SettingsEDI {
 			),
 		);
 		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_customer_identifiers_input_mode',
+			'title'    => '',
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'title'             => __( 'Customer Peppol Identifiers Input Mode', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name'       => $option_name,
+				'id'                => 'peppol_customer_identifiers_input_mode',
+				'options'           => array(
+					'select' => __( 'Customer selects scheme and enters identifier separately', 'woocommerce-pdf-invoices-packing-slips' ),
+					'full'   => __( 'Customer enters full ID (e.g., 0088:123456789)', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				'description'       => __( 'Determines how the customer provides their Peppol Endpoint ID and Legal Entity Identifier. This applies to both fields.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+				),
+			),
+		);
+		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_customer_identifier_fields_location',
+			'title'    => '',
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'title'             => __( 'Customer Peppol Identifier Fields Location', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name'       => $option_name,
+				'id'                => 'peppol_customer_identifier_fields_location',
+				'options'           => array(
+					'checkout'   => __( 'Checkout only', 'woocommerce-pdf-invoices-packing-slips' ),
+					'my_account' => __( 'My Account only', 'woocommerce-pdf-invoices-packing-slips' ),
+					'both'       => __( 'Both Checkout and My Account', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				'description'       => __( 'Choose where customers can provide their Peppol identifiers (both Endpoint ID and Legal Entity Identifier).', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+				),
+			),
+		);
+		
 		$languages = wpo_wcpdf_get_multilingual_languages();
 		
 		if ( count( $languages ) > 0 ) {
