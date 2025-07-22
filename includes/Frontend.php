@@ -310,8 +310,8 @@ class Frontend {
 		
 		$endpoint_id          = get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		$endpoint_eas         = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-		$legal_identifier_icd = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
 		$legal_identifier     = get_user_meta( $user_id, 'peppol_legal_identifier', true );
+		$legal_identifier_icd = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
 		
 		$eas_options_raw      = EN16931::get_eas();
 		$eas_options          = array();

@@ -302,12 +302,16 @@ class Assets {
 					'wpo-ips-edi',
 					'wpo_ips_edi',
 					array(
-						'ajaxurl' => admin_url( 'admin-ajax.php' ),
-						'nonce'   => wp_create_nonce( 'wpo_ips_edi_nonce' ),
-						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
-						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
-						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => EN16931::get_vatex_remarks(),
+						'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+						'nonce'                     => wp_create_nonce( 'wpo_ips_edi_nonce' ),
+						'code'                      => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
+						'new'                       => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
+						'unsaved'                   => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
+						'remarks'                   => EN16931::get_vatex_remarks(),
+						'missing'                   => __( 'Missing', 'woocommerce-pdf-invoices-packing-slips' ),
+						'optional'                  => __( 'Optional', 'woocommerce-pdf-invoices-packing-slips' ),
+						'vat_warning'               => __( 'VAT number should start with a country prefix (e.g. NL123456789B01).', 'woocommerce-pdf-invoices-packing-slips' ),
+						'error_loading_identifiers' => __( 'Error loading identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
 					)
 				);
 			}

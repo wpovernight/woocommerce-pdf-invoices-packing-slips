@@ -100,7 +100,7 @@ jQuery( function ( $ ) {
 	
 	function initEdiCompanyIdentifierLanguageSelector() {
 		const $selector = $( '.wpo-ips-edi-language-selector' );
-		const $blocks   = $( '.language-block' );
+		const $blocks   = $( '.edi-supplier-identifier' );
 
 		function show( lang ) {
 			$blocks.hide();
@@ -120,5 +120,64 @@ jQuery( function ( $ ) {
 	}
 
 	initEdiCompanyIdentifierLanguageSelector();
+	
+	// load customer order identifiers
+	$( 'button.button-edi-load-customer-order-identifiers' ).on( 'click', function( e ) {
+		e.preventDefault();
+
+		const $this   = $( this );
+		const $table  = $this.closest( 'table' );
+		const orderId = $this.closest( '.edi-search-wrap' ).find( ':input' ).val();
+
+		$.get( wpo_ips_edi.ajaxurl, {
+			action:   'wpo_ips_edi_load_customer_order_identifiers',
+			nonce:    wpo_ips_edi.nonce,
+			order_id: orderId
+		}, function( response ) {
+			$table.find( 'tbody' ).empty();
+
+			if ( response.success && response.data && response.data.data ) {
+				const data = response.data.data;
+
+				$.each( data, function( key, identifier ) {
+					let value = identifier.value;
+					let color = '';
+					let note  = '';
+
+					if ( ! value ) {
+						color = identifier.required ? '#d63638' : '#996800';
+						value = `<span style="color:${color};">${identifier.required ? wpo_ips_edi.missing : wpo_ips_edi.optional}</span>`;
+					}
+
+					// VAT number extra check
+					if ( key === 'vat_number' && identifier.value && ! wpo_ips_edi_has_country_prefix( identifier.value ) ) {
+						note = `<br><small style="color:#996800;">${wpo_ips_edi.vat_warning}</small>`;
+					}
+
+					$table.find( 'tbody' ).append(`
+						<tr>
+							<td>${identifier.label}</td>
+							<td>${value}${note}</td>
+						</tr>
+					`);
+				} );
+			} else {
+				const message = response.data || wpo_ips_edi.error_loading_identifiers;
+				$table.find( 'tbody' ).append( `<tr><td colspan="2">${message}</td></tr>` );
+			}
+		} );
+	} );
+	
+	// Prevent form submission on Enter key in the customer order ID input
+	$( '#edi-customer-order-id' ).on( 'keydown', function( e ) {
+		if ( e.key === 'Enter' || e.keyCode === 13 ) {
+			e.preventDefault();
+			return false;
+		}
+	} );
+	
+	function wpo_ips_edi_has_country_prefix( vat ) {
+		return /^[A-Z]{2}/.test( vat );
+	}
 	
 } );
