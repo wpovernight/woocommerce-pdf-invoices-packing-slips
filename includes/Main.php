@@ -288,6 +288,9 @@ class Main {
 
 			foreach ( $document->output_formats as $output_format ) {
 				if ( $document->is_enabled( $output_format ) ) {
+					if ( 'xml' === $output_format && ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_send_attachments() ) ) {
+						continue;
+					}
 					$attach_documents[ $output_format ][ $document->get_type() ] = $document->get_attach_to_email_ids( $output_format );
 				}
 			}

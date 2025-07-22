@@ -27,6 +27,11 @@ class Invoice extends OrderDocumentMethods {
 		// call parent constructor
 		parent::__construct( $order );
 		
+		// Add XML without wiping what the parent put in $this->output_formats
+		if ( ! in_array( 'xml', $this->output_formats, true ) ) {
+			$this->output_formats[] = 'xml';
+		}
+		
 		$this->output_formats = apply_filters(
 			'wpo_wcpdf_document_output_formats',
 			$this->output_formats,
