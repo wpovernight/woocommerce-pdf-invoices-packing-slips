@@ -91,7 +91,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$company    = $this->get_identifiers_data( 'shop_name' );
+		$company    = $this->get_supplier_identifiers_data( 'shop_name' );
 		$identifier = $this->get_legal_identifier();
 
 		if ( empty( $company ) ) {
@@ -167,7 +167,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		}
 
 		return array(
-			'legal_identifier'     => $this->get_identifiers_data( $legal_identifier ),
+			'legal_identifier'     => $this->get_supplier_identifiers_data( $legal_identifier ),
 			'legal_identifier_icd' => $legal_identifier_icd,
 		);
 	}

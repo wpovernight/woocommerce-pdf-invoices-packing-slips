@@ -537,30 +537,14 @@ class SettingsEDI {
 	 */
 	private function output_supplier_identifiers(): void {
 		$identifiers_data = wpo_ips_edi_get_supplier_identifiers_data();
-		$languages        = array_keys( $identifiers_data );
 
-		// Display language selector if multiple languages are available
-		if ( count( $languages ) > 1 ) {
-			?>
-			<label for="wpo-ips-edi-language-selector">
-				<strong><?php esc_html_e( 'Select language', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</strong>
-			</label>
-			<select id="wpo-ips-edi-language-selector" class="wpo-ips-edi-language-selector" style="margin-bottom: 10px;">
-				<?php foreach ( $languages as $language ) : ?>
-					<option value="<?php echo esc_attr( $language ); ?>"><?php echo esc_html( $language ); ?></option>
-				<?php endforeach; ?>
-			</select>
-			<?php
-		}
-
-		// Output identifiers for each language
 		foreach ( $identifiers_data as $language_slug => $language_data ) :
 			?>
-			<div class="edi-supplier-identifier" id="lang-<?php echo esc_attr( $language_slug ); ?>" style="display:none;">
+			<div class="edi-supplier-identifier" id="lang-<?php echo esc_attr( $language_slug ); ?>">
 				<table class="widefat striped">
 					<thead>
 						<tr>
-							<td colspan="2"><?php esc_html_e( 'Supplier', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td colspan="2"><?php esc_html_e( 'Supplier', 'woocommerce-pdf-invoices-packing-slips' ); ?> <small>[<?php echo esc_attr( $language_slug ); ?>]</small></td>
 						</tr>
 					</thead>
 					<tbody>

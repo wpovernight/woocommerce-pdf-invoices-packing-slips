@@ -554,91 +554,92 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
  */
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings = WPO_WCPDF()->settings->general;
-	$languages_data   = wpo_wcpdf_get_multilingual_languages();
-	$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
-	$data             = array();
+	$language         = wpo_ips_edi_get_settings( 'identifiers_language' );
+		
+	if ( empty( $language ) ) {
+		$language = 'default';
+	}
+
+	$data    = array();
+	$country = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
+	$states  = wpo_wcpdf_get_country_states( $country );
+	$state   = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
+		
+	$data[ $language ] = array(
+		'name' => array(
+			'label'    => __( 'Name', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $general_settings->get_setting( 'shop_name', $language ) ?? '',
+			'required' => true,
+		),
+		'address' => array(
+			'label'    => __( 'Street address', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '',
+			'required' => true,
+		),
+		'postcode' => array(
+			'label'    => __( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '',
+			'required' => true,
+		),
+		'city' => array(
+			'label'    => __( 'City', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $general_settings->get_setting( 'shop_address_city', $language ) ?? '',
+			'required' => true,
+		),
+		'state' => array(
+			'label'    => __( 'State', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $state,
+			'required' => false,
+		),
+		'country' => array(
+			'label'    => __( 'Country Code', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $country,
+			'required' => true,
+		),
+		'vat_number' => array(
+			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $general_settings->get_setting( 'vat_number', $language ) ?? '',
+			'required' => true,
+		),
+		'coc_number' => array(
+			'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $general_settings->get_setting( 'coc_number', $language ) ?? '',
+			'required' => false,
+		),
+		'email' => array(
+			'label'    => __( 'Email', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => $general_settings->get_setting( 'shop_email_address', $language ) ?? '',
+			'required' => true,
+		),
+	);
 	
-	foreach ( $languages as $language ) {
-		$country = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
-		$states  = wpo_wcpdf_get_country_states( $country );
-		$state   = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
-			
-		$data[ $language ] = array(
-			'name' => array(
-				'label'    => __( 'Name', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $general_settings->get_setting( 'shop_name', $language ) ?? '',
-				'required' => true,
-			),
-			'address' => array(
-				'label'    => __( 'Street address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '',
-				'required' => true,
-			),
-			'postcode' => array(
-				'label'    => __( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '',
-				'required' => true,
-			),
-			'city' => array(
-				'label'    => __( 'City', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $general_settings->get_setting( 'shop_address_city', $language ) ?? '',
-				'required' => true,
-			),
-			'state' => array(
-				'label'    => __( 'State', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $state,
-				'required' => false,
-			),
-			'country' => array(
-				'label'    => __( 'Country Code', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $country,
-				'required' => true,
-			),
-			'vat_number' => array(
-				'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $general_settings->get_setting( 'vat_number', $language ) ?? '',
-				'required' => true,
-			),
-			'coc_number' => array(
-				'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $general_settings->get_setting( 'coc_number', $language ) ?? '',
-				'required' => false,
-			),
-			'email' => array(
-				'label'    => __( 'Email', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => $general_settings->get_setting( 'shop_email_address', $language ) ?? '',
-				'required' => true,
-			),
+	if ( wpo_ips_edi_peppol_is_available() ) {
+		$endpoint_id             = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
+		$endpoint_scheme         = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
+		$legal_identifier        = wpo_ips_edi_get_settings( 'peppol_legal_identifier' );
+		$legal_identifier_scheme = wpo_ips_edi_get_settings( 'peppol_legal_identifier_icd' );
+
+		$data[ $language ]['peppol_endpoint_id'] = array(
+			'label'    => __( 'PEPPOL Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => ! empty( $endpoint_scheme ) && ! empty( $endpoint_id )
+				? sprintf( '%s:%s', $endpoint_scheme, $endpoint_id )
+				: '',
+			'required' => true,
 		);
 		
-		if ( wpo_ips_edi_peppol_is_available() ) {
-			$endpoint_id             = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
-			$endpoint_scheme         = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
-			$legal_identifier        = wpo_ips_edi_get_settings( 'peppol_legal_identifier' );
-			$legal_identifier_scheme = wpo_ips_edi_get_settings( 'peppol_legal_identifier_icd' );
-
-			$data[ $language ]['peppol_endpoint_id'] = array(
-				'label'    => __( 'PEPPOL Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => ! empty( $endpoint_scheme ) && ! empty( $endpoint_id )
-					? sprintf( '%s:%s', $endpoint_scheme, $endpoint_id )
-					: '',
-				'required' => true,
-			);
-			
-			$data[ $language ]['peppol_legal_identifier'] = array(
-				'label'    => __( 'PEPPOL Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier )
-					? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier )
-					: '',
-				'required' => true,
-			);
-		}
+		$data[ $language ]['peppol_legal_identifier'] = array(
+			'label'    => __( 'PEPPOL Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier )
+				? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier )
+				: '',
+			'required' => true,
+		);
 	}
 	
 	return apply_filters(
 		'wpo_ips_edi_supplier_identifier_data',
 		$data,
-		$languages,
+		$language,
 		$general_settings
 	);
 }

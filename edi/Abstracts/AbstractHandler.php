@@ -46,12 +46,12 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 	
 	/**
-	 * Get the identifiers data.
+	 * Get the supplier identifiers data.
 	 *
 	 * @param string $key The data key (e.g., 'shop_name', 'coc_number', 'shop_address_line_1', 'shop_address_postcode').
 	 * @return string
 	 */
-	protected function get_identifiers_data( string $key ): string {
+	protected function get_supplier_identifiers_data( string $key ): string {
 		$general_settings = WPO_WCPDF()->settings->general;
 		$language         = wpo_ips_edi_get_settings( 'identifiers_language' );
 		

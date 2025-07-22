@@ -56,7 +56,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_name(): ?array {
-		$company = $this->get_identifiers_data( 'shop_name' );
+		$company = $this->get_supplier_identifiers_data( 'shop_name' );
 		
 		if ( empty( $company ) ) {
 			wpo_ips_edi_log( 'UBL PartyName: Supplier company name is missing.', 'error' );
@@ -80,10 +80,10 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_postal_address(): ?array {
-		$address_line   = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_address_line_1' ) );
-		$city_name      = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_address_city' ) );
-		$postal_zone    = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_address_postcode' ) );
-		$country_code   = wpo_ips_edi_sanitize_string( $this->get_identifiers_data( 'shop_address_country' ) );
+		$address_line   = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_line_1' ) );
+		$city_name      = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_city' ) );
+		$postal_zone    = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_postcode' ) );
+		$country_code   = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_country' ) );
 
 		$postal_address = array(
 			'name'  => 'cac:PostalAddress',
@@ -126,7 +126,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_tax_scheme(): ?array {
-		$vat_number = $this->get_identifiers_data( 'vat_number' );
+		$vat_number = $this->get_supplier_identifiers_data( 'vat_number' );
 		$values     = array();
 
 		if ( ! empty( $vat_number ) ) {
@@ -167,8 +167,8 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$company    = $this->get_identifiers_data( 'shop_name' );
-		$coc_number = $this->get_identifiers_data( 'coc_number' );
+		$company    = $this->get_supplier_identifiers_data( 'shop_name' );
+		$coc_number = $this->get_supplier_identifiers_data( 'coc_number' );
 		
 		if ( empty( $company ) && empty( $coc_number ) ) {
 			wpo_ips_edi_log( 'UBL PartyLegalEntity: Both company name and CoC number are missing for supplier.', 'error' );
@@ -198,7 +198,7 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_contact(): ?array {
-		$email_address = $this->get_identifiers_data( 'shop_email_address' );
+		$email_address = $this->get_supplier_identifiers_data( 'shop_email_address' );
 
 		if ( empty( $email_address ) ) {
 			wpo_ips_edi_log( 'UBL PartyContact: Supplier email address is missing.', 'error' );

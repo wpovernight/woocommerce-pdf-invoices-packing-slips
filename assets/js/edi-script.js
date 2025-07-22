@@ -98,29 +98,6 @@ jQuery( function ( $ ) {
 		} );
 	}
 	
-	function initEdiCompanyIdentifierLanguageSelector() {
-		const $selector = $( '.wpo-ips-edi-language-selector' );
-		const $blocks   = $( '.edi-supplier-identifier' );
-
-		function show( lang ) {
-			$blocks.hide();
-			$( '#lang-' + lang ).show();
-		}
-
-		if ( $selector.length ) {
-			// Multi-language: show selected
-			$selector.on( 'change', function () {
-				show( this.value );
-			} );
-			show( $selector.val() );
-		} else if ( $blocks.length === 1 ) {
-			// Single-language: show the only block
-			$blocks.show();
-		}
-	}
-
-	initEdiCompanyIdentifierLanguageSelector();
-	
 	// load customer order identifiers
 	$( 'button.button-edi-load-customer-order-identifiers' ).on( 'click', function( e ) {
 		e.preventDefault();
