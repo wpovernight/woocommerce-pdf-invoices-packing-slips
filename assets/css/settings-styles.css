@@ -360,11 +360,14 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .wcpdf-settings-sub-sections {
 	margin-top: -1em;
+}
+
+#wpo-wcpdf-settings .wcpdf-settings-sub-sections {
 	margin-left: -2em;
 	margin-bottom: 3em;
 }
 
-#wpo-wcpdf-settings .wcpdf-settings-sub-sections a.nav-tab {
+.wcpdf-settings-sub-sections a.nav-tab {
 	font-size: 13px;
 }
 
