@@ -548,11 +548,11 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
 }
 
 /**
- * Get supplier identifier data for EDI.
+ * Get supplier identifiers data for EDI.
  *
  * @return array
  */
-function wpo_ips_edi_get_supplier_identifier_data(): array {
+function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings = WPO_WCPDF()->settings->general;
 	$languages_data   = wpo_wcpdf_get_multilingual_languages();
 	$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
@@ -644,12 +644,12 @@ function wpo_ips_edi_get_supplier_identifier_data(): array {
 }
 
 /**
- * Get order customer identifier data for EDI.
+ * Get order customer identifiers data for EDI.
  *
  * @param \WC_Abstract_Order $order The order object.
  * @return array
  */
-function wpo_ips_edi_get_order_customer_identifier_data( \WC_Abstract_Order $order ): array {
+function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Abstract_Order $order ): array {
 	$data = array(
 		'name' => array(
 			'label'    => __( 'Name', 'woocommerce-pdf-invoices-packing-slips' ),

@@ -536,8 +536,8 @@ class SettingsEDI {
 	 * @return void
 	 */
 	private function output_supplier_identifiers(): void {
-		$languages_data = wpo_ips_edi_get_supplier_identifier_data();
-		$languages      = array_keys( $languages_data );
+		$identifiers_data = wpo_ips_edi_get_supplier_identifiers_data();
+		$languages        = array_keys( $identifiers_data );
 
 		// Display language selector if multiple languages are available
 		if ( count( $languages ) > 1 ) {
@@ -554,7 +554,7 @@ class SettingsEDI {
 		}
 
 		// Output identifiers for each language
-		foreach ( $languages_data as $language_slug => $language_data ) :
+		foreach ( $identifiers_data as $language_slug => $language_data ) :
 			?>
 			<div class="edi-supplier-identifier" id="lang-<?php echo esc_attr( $language_slug ); ?>" style="display:none;">
 				<table class="widefat striped">
@@ -650,7 +650,7 @@ class SettingsEDI {
 			wp_send_json_error( __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 		
-		$data = wpo_ips_edi_get_order_customer_identifier_data( $order );
+		$data = wpo_ips_edi_get_order_customer_identifiers_data( $order );
 		
 		wp_send_json_success( compact( 'data' ) );
 	}
