@@ -727,7 +727,44 @@ class Admin {
 		if ( empty( $meta_box_actions ) || ! wpo_ips_edi_is_available() ) {
 			return;
 		}
+		
+		$identifiers_data = wpo_ips_edi_get_order_customer_identifiers_data( $order );
 		?>
+		<div class="edi-customer-identifiers">
+			<table class="widefat striped">
+				<thead>
+					<tr>
+						<td colspan="2"><?php esc_html_e( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					foreach ( $identifiers_data as $key => $identifier ) {
+						$value    = $identifier['value'];
+						$required = $identifier['required'];
+						$display  = $value ?: sprintf(
+							'<span style="color:%s">%s</span>',
+							$required ? '#d63638' : '#996800',
+							$required
+								? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+								: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+						);
+						?>
+						<tr>
+							<td><?php echo esc_html( $identifier['label'] ); ?></td>
+							<td>
+								<?php echo $display; ?>
+								<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+									<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
+								<?php endif; ?>
+							</td>
+						</tr>
+						<?php
+					}
+					?>
+				</tbody>
+			</table>
+		</div>
 		<ul class="wpo_ips_edi_actions">
 			<?php
 				$edi_documents = 0;

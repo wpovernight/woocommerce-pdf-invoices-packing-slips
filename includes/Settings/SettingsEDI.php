@@ -569,7 +569,7 @@ class SettingsEDI {
 								<td><?php echo esc_html( $data['label'] ); ?></td>
 								<td>
 									<?php echo $display; ?>
-									<?php if ( 'vat_number' === $key && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+									<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 										<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
 									<?php endif; ?>
 								</td>
@@ -591,7 +591,7 @@ class SettingsEDI {
 	 */
 	private function output_customer_identifiers(): void {
 		?>
-		<div class="edi-customer-identifier">
+		<div class="edi-customer-identifiers">
 			<table class="widefat striped">
 				<thead>
 					<tr>
