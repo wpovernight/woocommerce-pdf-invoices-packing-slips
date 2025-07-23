@@ -360,11 +360,14 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .wcpdf-settings-sub-sections {
 	margin-top: -1em;
+}
+
+#wpo-wcpdf-settings .wcpdf-settings-sub-sections {
 	margin-left: -2em;
 	margin-bottom: 3em;
 }
 
-#wpo-wcpdf-settings .wcpdf-settings-sub-sections a.nav-tab {
+.wcpdf-settings-sub-sections a.nav-tab {
 	font-size: 13px;
 }
 
@@ -1144,18 +1147,6 @@ sup.wcpdf_beta {
 		max-width: 680px;
 	}
 
-	.nav-tab-wrapper a.nav-tab {
-		padding: 1em 2em;
-		margin: 0 0.5em 0.5em 0;
-		border: 1px solid #ccc;
-		box-sizing: border-box;
-		height: 4em;
-	}
-
-	.nav-tab-wrapper a.nav-tab.nav-tab-active {
-		border: 3px solid #51266b;
-	}
-
 	.preview-document .preview > #preview-canvas {
 		width: 80vw!important;
 	}
@@ -1508,6 +1499,14 @@ div.upgrade-table-description a,
 
 	#plugin-recommendations .card-container {
 		justify-content: center;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.nav-tab-wrapper {
+		overflow: auto;
+		flex-wrap: nowrap;
+		display: flex;
 	}
 }
 
