@@ -544,7 +544,12 @@ class SettingsEDI {
 				<table class="widefat striped">
 					<thead>
 						<tr>
-							<td colspan="2"><?php esc_html_e( 'Supplier', 'woocommerce-pdf-invoices-packing-slips' ); ?> <small>[<?php echo esc_attr( $language_slug ); ?>]</small></td>
+							<td colspan="2">
+								<?php esc_html_e( 'Supplier', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+								<?php if ( 'default' !== $language_slug ) : ?>
+									<small>[<?php echo esc_attr( $language_slug ); ?>]</small>
+								<?php endif; ?>
+							</td>
 						</tr>
 					</thead>
 					<tbody>
