@@ -70,6 +70,8 @@ class Frontend {
 	public function my_account_invoice_actions( array $actions, \WC_Abstract_Order $order ): array {
 		$this->disable_storing_document_settings();
 
+		$document_type   = 'invoice';
+		$document_title  = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$invoice         = wcpdf_get_invoice( $order );
 		$invoice_allowed = false;
 		
@@ -98,15 +100,15 @@ class Frontend {
 
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
 			if ( $invoice_allowed || in_array( $order->get_status(), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
-				$name               = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : 'Invoice';
-				$actions['invoice'] = array(
-					'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) ),
+				$name                      = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : $document_title;
+				$actions[ $document_type ] = array(
+					'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice )
 				);
 				
-				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
-					$actions['invoice_xml'] = array(
-						'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'output' => 'xml', 'my-account' => 'true' ) ),
+				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
+					$actions[ $document_type . '_xml' ] = array(
+						'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
 						'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
 					);
 				}

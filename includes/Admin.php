@@ -268,7 +268,7 @@ class Admin {
 							}
 							break;
 						case 'xml':
-							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() ) {
+							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
 								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
@@ -700,19 +700,20 @@ class Admin {
 
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
-			$document       = wcpdf_get_document( $document->get_type(), $order );
+			$document_type  = $document->get_type();
+			$document       = wcpdf_get_document( $document_type, $order );
 
-			if ( $document ) {
-				$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'xml' ) );
+			if ( $document && $document->is_enabled( 'xml' ) && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
+				$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
 				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-				$class           = array( $document->get_type(), 'xml' );
+				$class           = array( $document_type, 'xml' );
 
 				if ( $document_exists ) {
 					$class[] = 'exists';
 				}
 
-				$meta_box_actions[ $document->get_type() ] = array(
+				$meta_box_actions[ $document_type ] = array(
 					'url'    => $document_url,
 					'alt'    => "E-{$document_title}",
 					'title'  => "E-{$document_title}",
