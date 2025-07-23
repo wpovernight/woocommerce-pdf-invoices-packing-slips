@@ -714,8 +714,8 @@ class Admin {
 
 				$meta_box_actions[ $document->get_type() ] = array(
 					'url'    => $document_url,
-					'alt'    => "E-" . $document_title,
-					'title'  => "E-" . $document_title,
+					'alt'    => "E-{$document_title}",
+					'title'  => "E-{$document_title}",
 					'exists' => $document_exists,
 					'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 				);

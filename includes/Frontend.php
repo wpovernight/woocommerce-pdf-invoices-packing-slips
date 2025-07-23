@@ -30,7 +30,7 @@ class Frontend {
 	 */
 	public function __construct() {
 		// PDF download link on My Account page
-		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_pdf_link' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
+		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
 		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
 		
 		// REST API
@@ -61,13 +61,13 @@ class Frontend {
 	}
 
 	/**
-	 * Display Invoice download link on My Account page
+	 * Display My Account invoice actions.
 	 * 
 	 * @param array $actions
 	 * @param \WC_Abstract_Order $order
 	 * @return array
 	 */
-	public function my_account_invoice_pdf_link( array $actions, \WC_Abstract_Order $order ): array {
+	public function my_account_invoice_actions( array $actions, \WC_Abstract_Order $order ): array {
 		$this->disable_storing_document_settings();
 
 		$invoice         = wcpdf_get_invoice( $order );
@@ -98,10 +98,18 @@ class Frontend {
 
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
 			if ( $invoice_allowed || in_array( $order->get_status(), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+				$name               = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : 'Invoice';
 				$actions['invoice'] = array(
 					'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) ),
-					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $invoice->get_title(), $invoice )
+					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice )
 				);
+				
+				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
+					$actions['invoice_xml'] = array(
+						'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'output' => 'xml', 'my-account' => 'true' ) ),
+						'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
+					);
+				}
 			}
 		}
 
