@@ -17,7 +17,8 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings' ) ) :
 
 class Settings {
 
-	public string|false $options_page_hook;
+	/** @var string|false */
+	public $options_page_hook;
 	public SettingsCallbacks $callbacks;
 	public SettingsGeneral $general;
 	public SettingsDocuments $documents;
@@ -32,7 +33,7 @@ class Settings {
 	private array $installed_templates_cache = array();
 	private array $template_list_cache       = array();
 
-	protected static self|null $_instance = null;
+	protected static ?self $_instance = null;
 
 	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
