@@ -1502,6 +1502,14 @@ div.upgrade-table-description a,
 	}
 }
 
+@media screen and (max-width: 500px) {
+	.nav-tab-wrapper {
+		overflow: auto;
+		flex-wrap: nowrap;
+		display: flex;
+	}
+}
+
 /* Override WordPress default form style */
 @media screen and (max-width: 782px) {
 	input[type="radio"], input[type="checkbox"] {
