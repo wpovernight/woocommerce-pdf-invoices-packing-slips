@@ -31,7 +31,7 @@ class Frontend {
 	public function __construct() {
 		// PDF download link on My Account page
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
-		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
 		
 		// REST API
 		add_filter( 'woocommerce_api_order_response', array( $this, 'woocommerce_api_invoice_number' ), 10, 2 );
@@ -119,11 +119,11 @@ class Frontend {
 	}
 
 	/**
-	 * Open PDF on My Account page in a new browser tab/window
+	 * Open link on My Account page in a new browser tab/window
 	 * 
 	 * @return void
 	 */
-	public function open_my_account_pdf_link_on_new_tab(): void {
+	public function open_my_account_link_on_new_tab(): void {
 		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 			
