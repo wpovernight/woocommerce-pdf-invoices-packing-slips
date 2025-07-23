@@ -18,6 +18,7 @@ $deprecated_hooks = [
 	'wpo_wc_ubl_document_format'                        => array( 'wpo_ips_edi_format_structure',                      '5.0.0' ),
 	'wpo_wc_ubl_document_data'                          => array( 'wpo_ips_edi_document_data',                         '5.0.0' ),
 	'wpo_ips_ubl_get_tax_data_from_fallback_vat_exempt' => array( 'wpo_ips_edi_get_tax_data_from_fallback_vat_exempt', '5.0.0' ),
+	'wpo_ips_ubl_is_country_format_extension_active'    => array( '',                                                  '5.0.0' ),
 	'wpo_wcpdf_ubl_maker'                               => array( 'wpo_ips_edi_maker',                                 '5.0.0' ),
 	'wpo_wcpdf_ubl_available'                           => array( 'wpo_ips_edi_is_available',                          '5.0.0' ),
 	'wpo_ips_ubl_contents'                              => array( 'wpo_ips_edi_contents',                              '5.0.0' ),
