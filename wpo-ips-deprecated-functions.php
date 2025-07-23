@@ -51,8 +51,8 @@ function wpo_ips_ubl_save_order_taxes( \WC_Abstract_Order $order ): void {
  * @deprecated 5.0.0 Use wpo_ips_edi_save_order_taxes() instead.
  */
 function wpo_ips_ubl_is_country_format_extension_active(): bool {
-	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_is_country_format_extension_active' );
-	return wpo_ips_edi_is_country_format_extension_active();
+	_deprecated_function( __FUNCTION__, '5.0.0', '' );
+	return false;
 }
 
 /**

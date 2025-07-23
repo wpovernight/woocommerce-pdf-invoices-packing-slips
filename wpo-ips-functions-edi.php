@@ -128,29 +128,29 @@ function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $
 	
 	$user_id = $order->get_customer_id();
 
-	if ( ! $user_id ) {
+	if ( empty( $user_id ) ) {
 		return;
 	}
 	
-	$endpoint_id          = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-	$endpoint_eas         = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-	$legal_identifier     = get_user_meta( $user_id, 'peppol_legal_identifier', true );
-	$legal_identifier_icd = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
+	$endpoint_id             = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+	$endpoint_scheme         = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+	$legal_identifier        = get_user_meta( $user_id, 'peppol_legal_identifier', true );
+	$legal_identifier_scheme = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
 	
 	if ( ! empty( $endpoint_id ) ) {
 		$order->update_meta_data( '_peppol_endpoint_id', $endpoint_id );
 	}
 	
-	if ( ! empty( $endpoint_eas ) ) {
-		$order->update_meta_data( '_peppol_endpoint_eas', $endpoint_eas );
+	if ( ! empty( $endpoint_scheme ) ) {
+		$order->update_meta_data( '_peppol_endpoint_eas', $endpoint_scheme );
 	}
 
 	if ( ! empty( $legal_identifier ) ) {
 		$order->update_meta_data( '_peppol_legal_identifier', $legal_identifier );
 	}
 
-	if ( ! empty( $legal_identifier_icd ) ) {
-		$order->update_meta_data( '_peppol_legal_identifier_icd', $legal_identifier_icd );
+	if ( ! empty( $legal_identifier_scheme ) ) {
+		$order->update_meta_data( '_peppol_legal_identifier_icd', $legal_identifier_scheme );
 	}
 	
 	$order->save_meta_data();
@@ -305,15 +305,6 @@ function wpo_ips_edi_file_headers( string $filename, $size ): void {
 	header( 'Content-Length: ' . $size );
 
 	do_action( 'wpo_ips_edi_after_headers', $filename, $size );
-}
-
-/**
- * Check if the country format extension is active
- *
- * @return bool
- */
-function wpo_ips_edi_is_country_format_extension_active(): bool {
-	return apply_filters( 'wpo_ips_edi_is_country_format_extension_active', false );
 }
 
 /**
