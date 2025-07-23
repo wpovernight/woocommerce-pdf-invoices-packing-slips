@@ -298,6 +298,7 @@ class Main {
 					) {
 						continue;
 					}
+					
 					$attach_documents[ $output_format ][ $document->get_type() ] = $document->get_attach_to_email_ids( $output_format );
 				}
 			}
