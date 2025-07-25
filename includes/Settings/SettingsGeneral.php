@@ -713,16 +713,12 @@ class SettingsGeneral {
 			$setting = $general_settings[ $key ];
 
 			if ( is_array( $setting ) ) {
-				if ( $this->is_multilingual_array( $setting ) ) {
-					if ( ! empty( $locale ) && array_key_exists( $locale, $setting ) ) {
-						$setting_text = $setting[ $locale ];
-					} elseif ( array_key_exists( 'default', $setting ) ) {
-						$setting_text = $setting['default'];
-					} else {
-						$setting_text = reset( $setting );
-					}
+				if ( ! empty( $locale ) && array_key_exists( $locale, $setting ) ) {
+					$setting_text = $setting[ $locale ];
+				} elseif ( array_key_exists( 'default', $setting ) ) {
+					$setting_text = $setting['default'];
 				} else {
-					$setting_text = $setting;
+					$setting_text = reset( $setting );
 				}
 			} else {
 				$setting_text = $setting;
@@ -736,23 +732,6 @@ class SettingsGeneral {
 			$locale,
 			$general_settings
 		);
-	}
-
-	/**
-	 * Check if an array is a multilingual array (all keys are 2-letter locale codes or 'default').
-	 *
-	 * @param array $setting
-	 *
-	 * @return bool
-	 */
-	private function is_multilingual_array( array $setting ): bool {
-		foreach ( array_keys( $setting ) as $key ) {
-			if ( ! preg_match( '/^[a-z]{2}$/i', strtolower( $key ) ) && 'default' !== $key ) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 }
