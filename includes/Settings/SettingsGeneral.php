@@ -698,9 +698,10 @@ class SettingsGeneral {
 	 *
 	 * @param string $key     The key of the setting to retrieve.
 	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
-	 * @return string The value of the setting.
+	 *
+	 * @return string|array  The value of the setting.
 	 */
-	private function get_setting( string $key, string $locale = '' ): string {
+	public function get_setting( string $key, string $locale = '' ) {
 		if ( empty( $key ) ) {
 			return '';
 		}
@@ -726,7 +727,7 @@ class SettingsGeneral {
 
 		return apply_filters(
 			'wpo_wcpdf_get_general_setting',
-			wptexturize( trim( $setting_text ) ),
+			is_string( $setting_text ) ? wptexturize( trim( $setting_text ) ) : $setting_text,
 			$key,
 			$locale,
 			$general_settings
