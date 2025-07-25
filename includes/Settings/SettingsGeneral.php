@@ -698,9 +698,10 @@ class SettingsGeneral {
 	 *
 	 * @param string $key     The key of the setting to retrieve.
 	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
-	 * @return string The value of the setting.
+	 *
+	 * @return string|array  The value of the setting.
 	 */
-	private function get_setting( string $key, string $locale = '' ): string {
+	public function get_setting( string $key, string $locale = '' ) {
 		if ( empty( $key ) ) {
 			return '';
 		}
@@ -712,12 +713,16 @@ class SettingsGeneral {
 			$setting = $general_settings[ $key ];
 
 			if ( is_array( $setting ) ) {
-				if ( ! empty( $locale ) && array_key_exists( $locale, $setting ) ) {
-					$setting_text = $setting[ $locale ];
-				} elseif ( array_key_exists( 'default', $setting ) ) {
-					$setting_text = $setting['default'];
+				if ( $this->is_multilingual_array( $setting ) ) {
+					if ( ! empty( $locale ) && array_key_exists( $locale, $setting ) ) {
+						$setting_text = $setting[ $locale ];
+					} elseif ( array_key_exists( 'default', $setting ) ) {
+						$setting_text = $setting['default'];
+					} else {
+						$setting_text = reset( $setting );
+					}
 				} else {
-					$setting_text = reset( $setting );
+					$setting_text = $setting;
 				}
 			} else {
 				$setting_text = $setting;
@@ -726,11 +731,28 @@ class SettingsGeneral {
 
 		return apply_filters(
 			'wpo_wcpdf_get_general_setting',
-			wptexturize( trim( $setting_text ) ),
+			is_string( $setting_text ) ? wptexturize( trim( $setting_text ) ) : $setting_text,
 			$key,
 			$locale,
 			$general_settings
 		);
+	}
+
+	/**
+	 * Check if an array is a multilingual array (all keys are 2-letter locale codes or 'default').
+	 *
+	 * @param array $setting
+	 *
+	 * @return bool
+	 */
+	private function is_multilingual_array( array $setting ): bool {
+		foreach ( array_keys( $setting ) as $key ) {
+			if ( ! preg_match( '/^[a-z]{2}$/i', strtolower( $key ) ) && 'default' !== $key ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 }
