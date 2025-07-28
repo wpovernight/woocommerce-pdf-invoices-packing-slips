@@ -28,6 +28,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
 			$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
 			$line_tax_data      = $item[ $tax_data_container ];
+			$tax_category       = array();
 
 			foreach ( $line_tax_data[ $tax_data_key ] as $tax_id => $tax ) {
 				if ( empty( $tax ) ) {
@@ -47,36 +48,45 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						'value' => strtoupper( $tax_order_data['category'] ),
 					),
 					array(
-						'name'  => 'cbc:Name',
-						'value' => $tax_order_data['name'],
-					),
-					array(
 						'name'  => 'cbc:Percent',
 						'value' => round( $tax_order_data['percentage'], 2 ),
 					),
+					array(
+						'name'  => 'cac:TaxScheme',
+						'value' => array(
+							array(
+								'name'  => 'cbc:ID',
+								'value' => strtoupper( $tax_order_data['scheme'] ),
+							),
+						),
+					),
+				);
+			}
+			
+			// Fallback if no tax rows were found
+			if ( empty( $tax_category ) ) {
+				$first_tax = reset( $this->document->order_tax_data ) ?: array(
+					'category'   => 'AE',
+					'percentage' => 0,
+					'scheme'     => 'VAT',
 				);
 
-				// Add TaxExemptionReason only if it's not empty
-				if ( ! empty( $tax_order_data['reason'] ) && 'none' !== $tax_order_data['reason'] ) {
-					$reason_key     = $tax_order_data['reason'];
-					$reason         = ! empty( $tax_reasons[ $reason_key ] ) ? $tax_reasons[ $reason_key ] : $reason_key;
-					$tax_category[] = array(
-						'name'  => 'cbc:TaxExemptionReasonCode',
-						'value' => $reason_key,
-					);
-					$tax_category[] = array(
-						'name'  => 'cbc:TaxExemptionReason',
-						'value' => $reason,
-					);
-				}
-
-				// Place the TaxScheme after the TaxExemptionReason
-				$tax_category[] = array(
-					'name'  => 'cac:TaxScheme',
-					'value' => array(
-						array(
-							'name'  => 'cbc:ID',
-							'value' => strtoupper( $tax_order_data['scheme'] ),
+				$tax_category = array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => strtoupper( $first_tax['category'] ),
+					),
+					array(
+						'name'  => 'cbc:Percent',
+						'value' => round( $first_tax['percentage'], 2 ),
+					),
+					array(
+						'name'  => 'cac:TaxScheme',
+						'value' => array(
+							array(
+								'name'  => 'cbc:ID',
+								'value' => strtoupper( $first_tax['scheme'] ),
+							),
 						),
 					),
 				);
@@ -112,43 +122,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 							),
 							array(
 								'name'  => 'cac:ClassifiedTaxCategory',
-								'value' => array_filter(
-									array_merge(
-										array(
-											array(
-												'name'  => 'cbc:ID',
-												'value' => strtoupper( $tax_order_data['category'] ?? 'AE' ),
-											),
-											array(
-												'name'  => 'cbc:Percent',
-												'value' => round( $tax_order_data['percentage'] ?? 0, 2 ),
-											),
-										),
-										( ! empty( $tax_order_data['reason'] ) && 'none' !== $tax_order_data['reason'] )
-											? array(
-												array(
-													'name'  => 'cbc:TaxExemptionReasonCode',
-													'value' => $tax_order_data['reason'],
-												),
-												array(
-													'name'  => 'cbc:TaxExemptionReason',
-													'value' => $tax_reasons[ $tax_order_data['reason'] ] ?? $tax_order_data['reason'],
-												),
-											)
-											: array(),
-										array(
-											array(
-												'name'  => 'cac:TaxScheme',
-												'value' => array(
-													array(
-														'name'  => 'cbc:ID',
-														'value' => strtoupper( $tax_order_data['scheme'] ?? 'VAT' ),
-													),
-												),
-											),
-										)
-									)
-								),
+								'value' => $tax_category,
 							),
 						),
 					),

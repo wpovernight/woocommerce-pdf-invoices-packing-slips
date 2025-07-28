@@ -232,9 +232,9 @@ class Document {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-			$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
-			$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
+			$tax_data_container = ( 'line_item' === $item['type'] ) ? 'line_tax_data' : 'taxes';
+			$tax_data_key       = ( 'line_item' === $item['type'] ) ? 'subtotal'      : 'total';
+			$line_total_key     = ( 'line_item' === $item['type'] ) ? 'line_total'    : 'total';
 			$line_tax_data      = $item[ $tax_data_container ];
 			
 			foreach ( $line_tax_data[ $tax_data_key ] as $tax_id => $tax ) {

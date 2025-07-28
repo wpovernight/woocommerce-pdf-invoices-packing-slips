@@ -37,10 +37,14 @@ class TaxTotalHandler extends AbstractUblHandler {
 		// Group tax data by rate, category, reason, and scheme
 		$grouped_tax_data = array();
 		foreach ( apply_filters( 'wpo_ips_edi_ubl_order_tax_data', $order_tax_data, $data, $options, $this ) as $item ) {
-			$percentage = $item['percentage'] ?? 0;
-			$category   = $item['category']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
-			$reason     = $item['reason']     ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $this->document->order );
-			$scheme     = $item['scheme']     ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $this->document->order );
+			$percentage = (float) ( $item['percentage'] ?? 0 );
+			$category   = strtoupper( trim( $item['category'] ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order ) ) );
+			$reason     = strtoupper( trim( $item['reason']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order ) ) );
+			$scheme     = strtoupper( trim( $item['scheme']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order ) ) );
+			
+			if ( '' === $reason || 'NONE' === $reason ) {
+				$reason = 'VATEX-EU-AE';
+			}
 			
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
 
@@ -53,6 +57,40 @@ class TaxTotalHandler extends AbstractUblHandler {
 			} else {
 				$grouped_tax_data[ $key ]['total_ex']  += $item['total_ex'];
 				$grouped_tax_data[ $key ]['total_tax'] += $item['total_tax'];
+			}
+		}
+		
+		// Fallback for zero‑tax lines
+		$lines_total_ex = 0;
+		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $i ) {
+			$lines_total_ex += $i->get_total();
+		}
+		
+		$grouped_total_ex = array_reduce(
+			$grouped_tax_data,
+			function ( $carry, $item ) {
+				return $carry + ( $item['total_ex'] ?? 0 );
+			},
+			0
+		);
+		
+		$missing_ex = wc_round_tax_total( $lines_total_ex - $grouped_total_ex );
+
+		if ( $missing_ex > 0 ) {
+			$ae_key = '0|AE|VATEX-EU-AE|VAT';
+			
+			if ( ! isset( $grouped_tax_data[ $ae_key ] ) ) {
+				$grouped_tax_data[ $ae_key ] = array(
+					'total_ex'   => $missing_ex,
+					'total_tax'  => 0,
+					'percentage' => 0,
+					'category'   => 'AE',
+					'reason'     => 'VATEX-EU-AE',
+					'scheme'     => 'VAT',
+					'name'       => '',
+				);
+			} else {
+				$grouped_tax_data[ $ae_key ]['total_ex'] += $missing_ex;
 			}
 		}
 
@@ -84,7 +122,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 				),
 			);
 			
-			if ( 'none' !== $item_tax_reason_key ) {
+			if ( $item_tax_percentage == 0 && strcasecmp( $item_tax_reason_key, 'none' ) !== 0 ) {
 				$tax_category[] = array(
 					'name'  => 'cbc:TaxExemptionReasonCode',
 					'value' => $item_tax_reason_key,
