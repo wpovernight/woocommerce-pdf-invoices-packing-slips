@@ -355,6 +355,9 @@ class SettingsDebug {
 			case 'edi':
 				$settings = WPO_WCPDF()->settings->edi_settings;
 				break;
+			case 'edi_tax':
+				$settings = wpo_ips_edi_get_tax_settings();
+				break;
 			default:
 				$settings = apply_filters( 'wpo_wcpdf_export_settings', $settings, $type );
 				break;
@@ -389,7 +392,7 @@ class SettingsDebug {
 
 		extract( $data );
 
-		$file_data = [];
+		$file_data = array();
 
 		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
 			$json_data = WPO_WCPDF()->file_system->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -426,7 +429,7 @@ class SettingsDebug {
 
 		if ( in_array( $type, array( 'general', 'debug' ), true ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
-		} elseif ( in_array( $type, array( 'edi' ), true ) ) {
+		} elseif ( in_array( $type, array( 'edi', 'edi_tax' ), true ) ) {
 			$settings_option = "wpo_ips_{$type}_settings";
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
@@ -490,6 +493,9 @@ class SettingsDebug {
 			case 'edi':
 				$settings_option = 'wpo_ips_edi_settings';
 				break;
+			case 'edi_tax':
+				$settings_option = 'wpo_ips_edi_tax_settings';
+				break;
 			default:
 				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
 				break;
@@ -519,7 +525,7 @@ class SettingsDebug {
 		}
 
 		// settings already reset
-		$current_settings = get_option( $settings_option, [] );
+		$current_settings = get_option( $settings_option, array() );
 		if ( empty( $current_settings ) ) {
 			$message = sprintf(
 				/* translators: settings type */
@@ -531,7 +537,7 @@ class SettingsDebug {
 		}
 
 		// reset settings
-		$updated = update_option( $settings_option, [] );
+		$updated = update_option( $settings_option, array() );
 		if ( $updated ) {
 			$message = sprintf(
 				/* translators: settings type */
@@ -722,6 +728,7 @@ class SettingsDebug {
 			'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 			'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
 			'edi'     => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi_tax' => __( 'E-Document Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
