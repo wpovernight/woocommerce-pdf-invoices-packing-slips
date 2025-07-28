@@ -51,7 +51,7 @@ class Frontend {
 		if ( wpo_wcpdf_checkout_is_block() ) {
 			$this->edi_peppol_display_checkout_block_fields();
 			$this->edi_peppol_set_checkout_block_fields_value();
-			add_action( 'woocommerce_set_additional_field_value', array( $this, 'edi_peppol_save_checkout_block_fields' ), 10, 4 );
+			add_action( 'woocommerce_sanitize_additional_field', array( $this, 'edi_peppol_save_checkout_block_fields' ), 10, 2 );
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'edi_peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
 		} else {
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'edi_peppol_display_classic_checkout_fields' ), 10, 1 );
@@ -600,75 +600,52 @@ class Frontend {
 	 *
 	 * @return string
 	 */
-	public function edi_peppol_prefill_checkout_block_field_from_user_meta( $value, string $group, object $wc_object ): string {
-		if ( 'other' !== $group ) {
+	public function edi_peppol_prefill_checkout_block_field_from_user_meta( $value, $group, $wc_object ) {
+		if ( $wc_object instanceof \WC_Order ) {
 			return (string) $value;
 		}
 
-		$user_id = 0;
-
-		// Determine user ID.
-		if ( $wc_object instanceof \WC_Customer ) {
-			$user_id = $wc_object->get_id();
-		} elseif ( $wc_object instanceof \WC_Order ) {
-			$user_id = $wc_object->get_customer_id();
-		}
-
-		if ( empty( $user_id ) ) {
+		if ( 'other' !== $group || ! $wc_object instanceof \WC_Customer ) {
 			return (string) $value;
 		}
-		
-		// Get the meta key from the filter name.
-		if ( ! str_starts_with( current_filter(), 'woocommerce_get_default_value_for_wpo-ips-edi/' ) ) {
+
+		$user_id = $wc_object->get_id();
+		if ( ! $user_id ) {
 			return (string) $value;
 		}
-		
+
 		$key      = str_replace( 'woocommerce_get_default_value_for_', '', current_filter() );
 		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
-		
-		// Get the value from user meta.
-		$value = get_user_meta( $user_id, $meta_key, true );
 
-		return (string) $value;
+		return (string) get_user_meta( $user_id, $meta_key, true );
 	}
 	
 	/**
 	 * Save EDI Peppol fields from Checkout Block.
 	 *
-	 * @param string $key Field key.
-	 * @param mixed $value Field value.
-	 * @param string $group Group name.
-	 * @param object $wc_object WC object (e.g. order).
-	 * @return void
+	 * @param mixed $field_value
+	 * @param string $field_key
+	 * @return mixed
 	 */
-	public function edi_peppol_save_checkout_block_fields( string $key, $value, string $group, object $wc_object ): void {
-		if ( ! $this->edi_peppol_enabled_for_location( 'checkout' ) ) {
-			return;
-		}
-
+	public function edi_peppol_save_checkout_block_fields( $field_value, string $field_key ) {
 		$allowed = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
 			'wpo-ips-edi/peppol-legal-identifier',
 			'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
-		
-		if ( ! in_array( $key, $allowed, true ) ) {
-			return;
+
+		if ( ! in_array( $field_key, $allowed, true ) || ! is_user_logged_in() ) {
+			return $field_value;
 		}
 
-		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
-		$value    = trim( sanitize_text_field( wp_unslash( $value ) ) );
+		update_user_meta(
+			get_current_user_id(),
+			str_replace( array( 'wpo-ips-edi/', '-' ), array( '', '_' ), $field_key ),
+			trim( sanitize_text_field( $field_value ) )
+		);
 
-		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) )
-			? absint( $wc_object->get_customer_id() )
-			: 0;
-			
-		if ( empty( $customer_id ) ) {
-			return;
-		}
-
-		$this->edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
+		return $field_value;
 	}
 	
 	/**

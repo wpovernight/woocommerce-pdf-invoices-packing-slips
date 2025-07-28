@@ -33,7 +33,29 @@ class TaxTotalHandler extends AbstractUblHandler {
 				),
 			);
 		}
-		
+
+		// Group tax data by rate, category, reason, and scheme
+		$grouped_tax_data = array();
+		foreach ( apply_filters( 'wpo_ips_edi_ubl_order_tax_data', $order_tax_data, $data, $options, $this ) as $item ) {
+			$percentage = $item['percentage'] ?? 0;
+			$category   = $item['category']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
+			$reason     = $item['reason']     ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $this->document->order );
+			$scheme     = $item['scheme']     ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $this->document->order );
+			
+			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
+
+			if ( ! isset( $grouped_tax_data[ $key ] ) ) {
+				$grouped_tax_data[ $key ]               = $item;
+				$grouped_tax_data[ $key ]['percentage'] = $percentage;
+				$grouped_tax_data[ $key ]['category']   = $category;
+				$grouped_tax_data[ $key ]['reason']     = $reason;
+				$grouped_tax_data[ $key ]['scheme']     = $scheme;
+			} else {
+				$grouped_tax_data[ $key ]['total_ex']  += $item['total_ex'];
+				$grouped_tax_data[ $key ]['total_tax'] += $item['total_tax'];
+			}
+		}
+
 		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons, $currency ) {
 			$item_tax_percentage = ! empty( $item['percentage'] )
 				? $item['percentage']
@@ -106,7 +128,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 					),
 				),
 			);
-		}, apply_filters( 'wpo_ips_edi_ubl_order_tax_data', $order_tax_data, $data, $options, $this ) );
+		}, array_values( $grouped_tax_data ) );
 
 		$tax_total = array(
 			'name'  => 'cac:TaxTotal',
