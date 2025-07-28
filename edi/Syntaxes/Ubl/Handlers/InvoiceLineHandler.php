@@ -110,30 +110,46 @@ class InvoiceLineHandler extends AbstractUblHandler {
 								'name'  => 'cbc:Name',
 								'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
 							),
-							! empty( $tax_order_data )
-								? array(
-									'name'  => 'cac:ClassifiedTaxCategory',
-									'value' => array(
+							array(
+								'name'  => 'cac:ClassifiedTaxCategory',
+								'value' => array_filter(
+									array_merge(
 										array(
-											'name'  => 'cbc:ID',
-											'value' => strtoupper( $tax_order_data['category'] ),
-										),
-										array(
-											'name'  => 'cbc:Percent',
-											'value' => round( $tax_order_data['percentage'], 2 ),
-										),
-										array(
-											'name'  => 'cac:TaxScheme',
-											'value' => array(
-												array(
-													'name'  => 'cbc:ID',
-													'value' => strtoupper( $tax_order_data['scheme'] ),
-												),
+											array(
+												'name'  => 'cbc:ID',
+												'value' => strtoupper( $tax_order_data['category'] ?? 'AE' ),
+											),
+											array(
+												'name'  => 'cbc:Percent',
+												'value' => round( $tax_order_data['percentage'] ?? 0, 2 ),
 											),
 										),
-									),
-								)
-								: array(),
+										( ! empty( $tax_order_data['reason'] ) && 'none' !== $tax_order_data['reason'] )
+											? array(
+												array(
+													'name'  => 'cbc:TaxExemptionReasonCode',
+													'value' => $tax_order_data['reason'],
+												),
+												array(
+													'name'  => 'cbc:TaxExemptionReason',
+													'value' => $tax_reasons[ $tax_order_data['reason'] ] ?? $tax_order_data['reason'],
+												),
+											)
+											: array(),
+										array(
+											array(
+												'name'  => 'cac:TaxScheme',
+												'value' => array(
+													array(
+														'name'  => 'cbc:ID',
+														'value' => strtoupper( $tax_order_data['scheme'] ?? 'VAT' ),
+													),
+												),
+											),
+										)
+									)
+								),
+							),
 						),
 					),
 					array(
