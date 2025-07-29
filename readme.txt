@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.6.1-rc.1
+Stable tag: 4.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,14 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.6.1 (2025-07-29) =
+- Tweak: Updated CSS class name used for the shop email in templates
+- Fix: Resolved issue with date format for "Mark as printed"
+- Fix: Improved settings menu tab styling on smaller screens
+- Fix: Prevented PHP warnings when `allow_url_fopen` is disabled
+- Fix: Corrected argument mismatch in `add_document_link_to_email()`
+- Translations: Updated translation template (POT)
 
 = 4.6.0 (2025-07-15) =
 - New: Added filter to modify the return value of `get_shop_address()`
