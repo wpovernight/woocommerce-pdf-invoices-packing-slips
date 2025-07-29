@@ -635,14 +635,7 @@ class Admin {
 		?>
 		<ul class="wpo_wcpdf-actions">
 			<?php
-			$timezone = new \DateTimeZone( wc_timezone_string() );
 			foreach ( $meta_box_actions as $document_type => $data ) {
-				$printed_data_date_local = '';
-				if ( isset( $data['printed_data']['date'] ) ) {
-					$printed_data_date       = new \DateTime( '@' . $data['printed_data']['date'] );
-					$timezone_offset         = timezone_offset_get( $timezone , $printed_data_date );
-					$printed_data_date_local = $printed_data_date->getTimestamp() + $timezone_offset;
-				}
 
 				$url                   = isset( $data['url'] ) ? $data['url'] : '';
 				$class                 = isset( $data['class'] ) ? $data['class'] : '';
@@ -652,7 +645,7 @@ class Admin {
 				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="' . $data['mark_printed_url'] . '">' . __( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>' : '';
 				$printed               = isset( $data['printed'] ) && $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="' . $data['unmark_printed_url'].'">' . __( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ).'</a>' : '';
-				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( wc_date_format() . ' ' . wc_time_format(), $printed_data_date_local ) . '' . $unmark_printed . '</p>' : '';
+				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d H:i:s', (int) $data['printed_data']['date'] ) . '' . $unmark_printed . '</p>' : '';
 
 				$allowed_tags = array(
 					'svg' => array(
