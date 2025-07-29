@@ -13,7 +13,7 @@ class SettingsGeneral {
 
 	protected static ?self $_instance = null;
 
-	public static function instance(): ?SettingsGeneral {
+	public static function instance(): ?self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
