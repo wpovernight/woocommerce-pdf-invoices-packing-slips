@@ -9,18 +9,18 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsGeneral' ) ) :
 
 class SettingsGeneral {
 
-	protected $option_name = 'wpo_wcpdf_settings_general';
+	protected string $option_name = 'wpo_wcpdf_settings_general';
 
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	public static function instance(): ?SettingsGeneral {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
@@ -28,6 +28,9 @@ class SettingsGeneral {
 
 		// Display an admin notice if shop address fields are empty.
 		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
+
+		// Add "default" value for settings.
+		add_filter( 'pre_update_option_' . $this->option_name, array( $this, 'add_default_element_to_options' ), 10 );
 	}
 
 	public function output( $section, $nonce ) {
@@ -732,6 +735,35 @@ class SettingsGeneral {
 			$locale,
 			$general_settings
 		);
+	}
+
+	/**
+	 * Normalize multilingual fields in a settings array to ensure each has a 'default' fallback.
+	 *
+	 * @param mixed $new_value
+	 *
+	 * @return mixed
+	 */
+	public function add_default_element_to_options( $new_value ) {
+		if ( empty( $new_value ) || ! is_array( $new_value ) ) {
+			return $new_value;
+		}
+
+		foreach ( $new_value as $field_key => $field_value ) {
+			// Not a multilingual value.
+			if ( ! is_array( $field_value ) ) {
+				continue;
+			}
+
+			// Ensure 'default' key exists.
+			if ( empty( $field_value['default'] ) ) {
+				$field_value['default'] = reset( $field_value );
+			}
+
+			$new_value[ $field_key ] = $field_value;
+		}
+
+		return $new_value;
 	}
 
 }
