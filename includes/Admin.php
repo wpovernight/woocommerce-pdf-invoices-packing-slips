@@ -880,7 +880,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_suffix",
 				),
 				'padding' => array(
-					'value' => $number_settings['padding'] ?: 1,
+					'value' => ! empty( $number_settings['padding'] ) ? absint( $number_settings['padding'] ) : 1,
 					'name'  => "{$name_prefix}number_padding",
 				),
 			);
