@@ -27,6 +27,7 @@ class PaymentTermsHandler extends AbstractUblHandler {
 					array(
 						'name'  => 'cbc:Note',
 						'value' => sprintf(
+							/* translators: %d: days */
 							__( 'Payment due within %d days', 'woocommerce-pdf-invoices-packing-slips' ),
 							$due_date_days
 						)
