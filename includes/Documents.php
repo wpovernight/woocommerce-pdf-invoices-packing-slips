@@ -57,7 +57,7 @@ class Documents {
 	 * Return the document classes - used in admin to load settings.
 	 *
 	 * @param $filter
-	 * @param $output_format  Can be 'pdf', 'ubl' or anything for all
+	 * @param $output_format  Can be 'pdf', 'xml' or anything for all
 	 *
 	 * @return array
 	 */
@@ -77,7 +77,7 @@ class Documents {
 				
 				switch ( $output_format ) {
 					case 'pdf':
-					case 'ubl':
+					case 'xml':
 						if ( in_array( $output_format, $document_output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
 							$documents[ $class_name ] = $document;
 						}
