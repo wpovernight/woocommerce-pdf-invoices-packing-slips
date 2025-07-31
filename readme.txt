@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.6.2-rc.1
+Stable tag: 4.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,11 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.6.2 (2025-07-31) =
+- Fix: Restore full item meta display in PDF
+- Fix: Undefined array key "padding"
+- Translations: Updated translation template (POT)
 
 = 4.6.1 (2025-07-29) =
 - Tweak: Updated CSS class name used for the shop email in templates
