@@ -3,11 +3,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$message = 'The hook "%s" is deprecated since version %s. Use "%s" instead.';
+$message_with_replacement    = 'The hook "%s" is deprecated since version %s. Use "%s" instead.';
+$message_without_replacement = 'The hook "%s" is deprecated since version %s and no longer has a replacement.';
 
 /**
- * Map of deprecated hooks to their replacement and the version in which
- * the deprecation started.
+ * Hooks that have a replacement.
  * Format: 'old_hook' => array( 'new_hook', 'since_version' )
  */
 $deprecated_hooks = array(
@@ -18,7 +18,6 @@ $deprecated_hooks = array(
 	'wpo_wc_ubl_document_format'                        => array( 'wpo_ips_edi_format_structure',                      '5.0.0' ),
 	'wpo_wc_ubl_document_data'                          => array( 'wpo_ips_edi_document_data',                         '5.0.0' ),
 	'wpo_ips_ubl_get_tax_data_from_fallback_vat_exempt' => array( 'wpo_ips_edi_get_tax_data_from_fallback_vat_exempt', '5.0.0' ),
-	'wpo_ips_ubl_is_country_format_extension_active'    => array( '',                                                  '5.0.0' ),
 	'wpo_wcpdf_ubl_maker'                               => array( 'wpo_ips_edi_maker',                                 '5.0.0' ),
 	'wpo_wcpdf_ubl_available'                           => array( 'wpo_ips_edi_is_available',                          '5.0.0' ),
 	'wpo_ips_ubl_contents'                              => array( 'wpo_ips_edi_contents',                              '5.0.0' ),
@@ -52,13 +51,32 @@ $deprecated_hooks = array(
 	'wpo_wc_ubl_handle_UBLVersionID'                    => array( 'wpo_ips_edi_ubl_version_id',                        '5.0.0' ),
 );
 
+
 foreach ( $deprecated_hooks as $old_hook => $meta ) {
 	[ $new_hook, $version ] = $meta;
 
 	if ( has_action( $old_hook ) ) {
 		_doing_it_wrong(
 			$old_hook,
-			sprintf( $message, $old_hook, $version, $new_hook ),
+			sprintf( $message_with_replacement, $old_hook, $version, $new_hook ),
+			$version
+		);
+	}
+}
+
+/**
+ * Hooks that are deprecated without a replacement.
+ * Format: 'old_hook' => 'since_version'
+ */
+$deprecated_hooks_no_replacement = array(
+	'wpo_ips_ubl_is_country_format_extension_active' => '5.0.0',
+);
+
+foreach ( $deprecated_hooks_no_replacement as $old_hook => $version ) {
+	if ( has_action( $old_hook ) ) {
+		_doing_it_wrong(
+			$old_hook,
+			sprintf( $message_without_replacement, $old_hook, $version ),
 			$version
 		);
 	}
