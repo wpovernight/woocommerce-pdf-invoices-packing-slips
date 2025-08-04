@@ -592,17 +592,13 @@ class Frontend {
 	 * Provide a default value for the Checkout Block additional field
 	 * using the value we store in user meta.
 	 *
-	 * @param mixed                  $value     Current default (usually empty).
-	 * @param string                 $group     'billing' | 'shipping' | 'other'. Our field is in the 'order' location, so this will be 'other'.
-	 * @param \WC_Customer|\WC_Order $wc_object Object for which the default is being requested.
+	 * @param null     $value     Current default (usually empty).
+	 * @param string   $group     'billing' | 'shipping' | 'other'. Our field is in the 'order' location, so this will be 'other'.
+	 * @param \WC_Data $wc_object Object for which the default is being requested.
 	 *
 	 * @return string
 	 */
-	public function edi_peppol_prefill_checkout_block_field_from_user_meta( $value, $group, $wc_object ) {
-		if ( $wc_object instanceof \WC_Order ) {
-			return (string) $value;
-		}
-
+	public function edi_peppol_prefill_checkout_block_field_from_user_meta( $value, string $group, object $wc_object ): string {
 		if ( 'other' !== $group || ! $wc_object instanceof \WC_Customer ) {
 			return (string) $value;
 		}
@@ -636,12 +632,16 @@ class Frontend {
 		if ( ! in_array( $field_key, $allowed, true ) || ! is_user_logged_in() ) {
 			return $field_value;
 		}
-
-		update_user_meta(
-			get_current_user_id(),
-			str_replace( array( 'wpo-ips-edi/', '-' ), array( '', '_' ), $field_key ),
-			trim( sanitize_text_field( $field_value ) )
-		);
+		
+		$user_id = get_current_user_id();
+		
+		if ( $user_id > 0 ) {
+			update_user_meta(
+				get_current_user_id(),
+				str_replace( array( 'wpo-ips-edi/', '-' ), array( '', '_' ), $field_key ),
+				trim( sanitize_text_field( $field_value ) )
+			);	
+		}
 
 		return $field_value;
 	}
@@ -747,8 +747,9 @@ class Frontend {
 	 *
 	 * @param array    $data   All posted checkout fields.
 	 * @param WP_Error $errors Errors object to add validation errors to.
+	 * @return void
 	 */
-	public function edi_peppol_validate_classic_checkout_field_values( array $data, \WP_Error $errors ) {
+	public function edi_peppol_validate_classic_checkout_field_values( array $data, \WP_Error $errors ): void {
 		if ( ! $this->edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
@@ -808,12 +809,11 @@ class Frontend {
 	 * @return bool True if fields should be shown in the given location.
 	 */
 	private function edi_peppol_enabled_for_location( string $location ): bool {
-		$edi_settings = wpo_ips_edi_get_settings();
-
-		if ( empty( $edi_settings['enabled'] ) ) {
+		if ( ! wpo_ips_edi_is_available() ) {
 			return false;
 		}
 
+		$edi_settings     = wpo_ips_edi_get_settings();
 		$location_setting = $edi_settings['peppol_customer_identifier_fields_location'] ?? '';
 
 		// Always return false if the field is not properly set
