@@ -183,7 +183,7 @@ function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
  * Get EDI settings
  *
  * @param string|null $key
- * @return mixed
+ * @return array|string|null
  */
 function wpo_ips_edi_get_settings( ?string $key = null ) {
 	$settings = get_option( 'wpo_ips_edi_settings', array() );
@@ -215,7 +215,8 @@ function wpo_ips_edi_is_available(): bool {
  * @return bool
  */
 function wpo_ips_edi_peppol_is_available(): bool {
-	return apply_filters( 'wpo_ips_edi_peppol_is_available', wpo_ips_edi_is_available() && false !== strpos( wpo_ips_edi_get_current_format(), 'peppol' ) );
+	$format = wpo_ips_edi_get_current_format();
+	return apply_filters( 'wpo_ips_edi_peppol_is_available', wpo_ips_edi_is_available() && ! empty( $format ) && false !== strpos( $format, 'peppol' ) );
 }
 
 /**
@@ -310,23 +311,18 @@ function wpo_ips_edi_file_headers( string $filename, $size ): void {
 /**
  * Get the current EDI syntax
  *
- * @return string
+ * @return string|null
  */
-function wpo_ips_edi_get_current_syntax(): string {
+function wpo_ips_edi_get_current_syntax(): ?string {
 	$syntax = wpo_ips_edi_get_settings( 'syntax' );
-	
-	if ( empty( $syntax ) ) {
-		$syntax = 'ubl';
-	}
-
-	return apply_filters( 'wpo_ips_edi_current_syntax', $syntax );
+	return apply_filters( 'wpo_ips_edi_current_syntax', $syntax ?: null );
 }
 
 /**
  * Get the current EDI format
  *
  * @param bool $full_details Optional. If true, returns full format details.
- * @return string|array
+ * @return string|array|null
  */
 function wpo_ips_edi_get_current_format( bool $full_details = false ) {
 	$syntax = wpo_ips_edi_get_settings( 'syntax' );
@@ -338,12 +334,8 @@ function wpo_ips_edi_get_current_format( bool $full_details = false ) {
 			$format = wpo_ips_edi_syntax_formats( $syntax, $format );
 		}
 	}
-	
-	if ( empty( $format ) ) {
-		$format = 'ubl_2_1';
-	}
 
-	return apply_filters( 'wpo_ips_edi_current_format', $format, $syntax, $full_details );
+	return apply_filters( 'wpo_ips_edi_current_format', $format ?: null, $syntax, $full_details );
 }
 
 /**

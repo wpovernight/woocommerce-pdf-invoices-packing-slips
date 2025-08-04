@@ -10,7 +10,7 @@ $message = 'The hook "%s" is deprecated since version %s. Use "%s" instead.';
  * the deprecation started.
  * Format: 'old_hook' => array( 'new_hook', 'since_version' )
  */
-$deprecated_hooks = [
+$deprecated_hooks = array(
 	'wpo_wcpdf_custom_ubl_attachment_condition'         => array( 'wpo_wcpdf_custom_attachment_condition',             '3.6.0' ),
 	'wpo_wc_ubl_document_root_element'                  => array( 'wpo_ips_edi_root_element',                          '5.0.0' ),
 	'wpo_wc_ubl_document_additional_root_elements'      => array( 'wpo_ips_edi_additional_root_elements',              '5.0.0' ),
@@ -50,7 +50,7 @@ $deprecated_hooks = [
 	'wpo_wc_ubl_orderTaxData'                           => array( 'wpo_ips_edi_ubl_order_tax_data',                    '5.0.0' ),
 	'wpo_wc_ubl_handle_TaxTotal'                        => array( 'wpo_ips_edi_ubl_tax_total',                         '5.0.0' ),
 	'wpo_wc_ubl_handle_UBLVersionID'                    => array( 'wpo_ips_edi_ubl_version_id',                        '5.0.0' ),
-];
+);
 
 foreach ( $deprecated_hooks as $old_hook => $meta ) {
 	[ $new_hook, $version ] = $meta;

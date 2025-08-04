@@ -542,16 +542,12 @@ class SettingsEDI {
 			?>
 			<div class="edi-supplier-identifier" id="lang-<?php echo esc_attr( $language_slug ); ?>">
 				<table class="widefat striped">
-					<thead>
-						<tr>
-							<td colspan="2">
-								<?php esc_html_e( 'Supplier', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-								<?php if ( 'default' !== $language_slug ) : ?>
-									<small>[<?php echo esc_attr( $language_slug ); ?>]</small>
-								<?php endif; ?>
-							</td>
-						</tr>
-					</thead>
+					<caption>
+						<?php esc_html_e( 'Supplier', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+						<?php if ( 'default' !== $language_slug ) : ?>
+							<small>[<?php echo esc_attr( $language_slug ); ?>]</small>
+						<?php endif; ?>
+					</caption>
 					<tbody>
 						<?php
 						foreach ( $language_data as $key => $data ) {
@@ -593,10 +589,10 @@ class SettingsEDI {
 		?>
 		<div class="edi-customer-identifiers">
 			<table class="widefat striped">
+				<caption><?php esc_html_e( 'Customer', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
 				<thead>
 					<tr>
-						<td><?php esc_html_e( 'Customer', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-						<td>
+						<td colspan="2">
 							<div class="edi-search-wrap">
 								<input type="number" id="edi-customer-order-id" placeholder="<?php esc_html_e( 'Order ID', 'woocommerce-pdf-invoices-packing-slips' ); ?>" value="">
 								<button type="button" class="button button-primary button-edi-load-customer-order-identifiers">
@@ -1041,7 +1037,17 @@ class SettingsEDI {
 								<td><?php echo esc_html( $format['name'] ); ?></td>
 								<td><?php echo esc_html( strtoupper( $syntax ) ); ?></td>
 								<td><?php echo wp_kses_post( $format['hybrid'] ? '<span class="dashicons dashicons-yes"></span>' : '<span class="dashicons dashicons-no"></span>' ); ?></td>
-								<td><?php echo esc_html( implode( ', ', array_keys( $format['documents'] ) ) ); ?></td>
+								<td>
+									<?php
+										echo esc_html( implode(
+											', ',
+											array_map(
+												'ucfirst',
+												array_keys( $format['documents'] )
+											)
+										) );
+									?>
+								</td>
 							</tr>
 						<?php endforeach; ?>
 					<?php endforeach; ?>
