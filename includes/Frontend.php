@@ -126,8 +126,9 @@ class Frontend {
 	public function open_my_account_link_on_new_tab(): void {
 		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+			$download_display = $general_settings->get_setting( 'download_display' );
 			
-			if ( isset( $general_settings['download_display'] ) && 'display' === $general_settings['download_display'] ) {
+			if ( 'display' === $download_display ) {
 				$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 				$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
 
@@ -314,10 +315,7 @@ class Frontend {
 			return;
 		}
 
-		$edi_settings         = wpo_ips_edi_get_settings();
-		$can_select_scheme    = isset( $edi_settings['peppol_customer_identifiers_input_mode'] ) && 'select' === $edi_settings['peppol_customer_identifiers_input_mode'];
 		$user_id              = get_current_user_id();
-		
 		$endpoint_id          = get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		$endpoint_eas         = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 		$legal_identifier     = get_user_meta( $user_id, 'peppol_legal_identifier', true );
