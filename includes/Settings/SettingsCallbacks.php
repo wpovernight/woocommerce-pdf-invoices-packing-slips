@@ -116,13 +116,14 @@ class SettingsCallbacks {
 	 * Text input callback.
 	 *
 	 * args:
-	 *   title       - secondary title of the input (optional)
-	 *   option_name - name of the main option
-	 *   id          - key of the setting
-	 *   size        - size of the text input (em)
-	 *   default     - default setting (optional)
-	 *   description - description (optional)
-	 *   type        - type (optional)
+	 *   title             - secondary title of the input (optional)
+	 *   option_name       - name of the main option
+	 *   id                - key of the setting
+	 *   size              - size of the text input (em)
+	 *   default           - default setting (optional)
+	 *   description       - description (optional)
+	 *   type              - type (optional)
+	 *   custom_attributes - custom attributes (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -178,12 +179,13 @@ class SettingsCallbacks {
 	 * URL input callback.
 	 *
 	 * args:
-	 *   option_name - name of the main option
-	 *   id          - key of the setting
-	 *   size        - size of the text input (em)
-	 *   default     - default setting (optional)
-	 *   description - description (optional)
-	 *   type        - type (optional)
+	 *   option_name       - name of the main option
+	 *   id                - key of the setting
+	 *   size              - size of the text input (em)
+	 *   default           - default setting (optional)
+	 *   description       - description (optional)
+	 *   type              - type (optional)
+	 *   custom_attributes - custom attributes (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -222,12 +224,13 @@ class SettingsCallbacks {
 	 * Email input callback.
 	 *
 	 * args:
-	 *   option_name - name of the main option
-	 *   id          - key of the setting
-	 *   size        - size of the text input (em)
-	 *   default     - default setting (optional)
-	 *   description - description (optional)
-	 *   type        - type (optional)
+	 *   option_name       - name of the main option
+	 *   id                - key of the setting
+	 *   size              - size of the text input (em)
+	 *   default           - default setting (optional)
+	 *   description       - description (optional)
+	 *   type              - type (optional)
+	 *   custom_attributes - custom attributes (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -330,6 +333,13 @@ class SettingsCallbacks {
 	/**
 	 * Single text option (not part of any settings array)
 	 * 
+	 * args:
+	 *   option_name       - name of the main option
+	 *   id                - key of the setting
+	 *   default           - default setting (optional)
+	 *   description       - description (optional)
+	 *   custom_attributes - custom attributes (optional)
+	 * 
 	 * @param array $args Field arguments.
 	 * @return void
 	 */
@@ -369,13 +379,14 @@ class SettingsCallbacks {
 	 * Textarea callback.
 	 *
 	 * args:
-	 *   title       - secondary title of the input (optional)
-	 *   option_name - name of the main option
-	 *   id          - key of the setting
-	 *   width       - width of the text input (em)
-	 *   height      - height of the text input (lines)
-	 *   default     - default setting (optional)
-	 *   description - description (optional)
+	 *   title             - secondary title of the input (optional)
+	 *   option_name       - name of the main option
+	 *   id                - key of the setting
+	 *   width             - width of the text input (em)
+	 *   height            - height of the text input (lines)
+	 *   default           - default setting (optional)
+	 *   description       - description (optional)
+	 *   custom_attributes - custom attributes (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -405,6 +416,16 @@ class SettingsCallbacks {
 
 	/**
 	 * Select element callback.
+	 * 
+	 * args:
+	 *   title             - secondary title of the input (optional)
+	 *   setting_name      - name of the main setting
+	 *   id                - key of the setting
+	 *   multiple          - whether the select is multiple (optional)
+	 *   options           - array of options for the select
+	 *   current           - current value(s) of the setting
+	 *   disabled          - whether the select is disabled (optional)
+	 *   custom_attributes - custom attributes (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -538,6 +559,15 @@ class SettingsCallbacks {
 
 	/**
 	 * Radio button callback.
+	 * 
+	 * args:
+	 *  title             - secondary title of the input (optional)
+	 *  setting_name      - name of the main setting
+	 *  id                - key of the setting
+	 *  options           - array of options for the radio buttons
+	 *  current           - current value of the setting
+	 *  disabled          - whether the radio buttons are disabled (optional)
+	 *  custom_attributes - custom attributes (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -580,6 +610,16 @@ class SettingsCallbacks {
 
 	/**
 	 * Multiple text element callback.
+	 * 
+	 * args:
+	 *  id                   - key of the setting
+	 *  setting_name         - name of the main setting
+	 *  fields_callback      - callback function to get the fields
+	 *  fields_callback_args - arguments for the fields callback (optional)
+	 *  current              - current values of the setting
+	 *  header               - header for the table (optional)
+	 *  description          - description for the table (optional)
+	 *  custom_attributes    - custom attributes for the input fields (optional)
 	 * 
 	 * @param  array $args Field arguments.
 	 * @return void
@@ -654,6 +694,16 @@ class SettingsCallbacks {
 	/**
 	 * Multiple text element callback.
 	 * 
+	 * args:
+	 *  id                   - key of the setting
+	 *  setting_name         - name of the main setting
+	 *  fields_callback      - callback function to get the fields
+	 *  fields_callback_args - arguments for the fields callback (optional)
+	 *  current              - current values of the setting
+	 *  header               - header for the table (optional)
+	 *  description          - description for the table (optional)
+	 *  custom_attributes    - custom attributes for the input fields (optional)
+	 * 
 	 * @param  array $args Field arguments.
 	 * @return void
 	 */
@@ -699,6 +749,16 @@ class SettingsCallbacks {
 
 	/**
 	 * Media upload callback.
+	 * 
+	 * args:
+	 *  id                   - key of the setting
+	 *  setting_name         - name of the main setting
+	 *  current              - current value of the setting
+	 *  uploader_title       - title of the media uploader
+	 *  uploader_button_text - text of the media uploader button
+	 *  remove_button_text   - text of the remove button
+	 *  description          - description for the media upload field
+	 *  custom_attributes    - custom attributes for the input field
 	 *
 	 * @param  array $args Field arguments.
 	 * @return void
@@ -804,6 +864,13 @@ class SettingsCallbacks {
 
 	/**
 	 * Next document number edit callback.
+	 * 
+	 * args:
+	 *  store               - name of the store (e.g. 'invoice', 'packing_slip')
+	 *  size                - size of the input field (optional)
+	 *  description         - description of the field (optional)
+	 *  store_callback      - callback function to get the store (optional)
+	 *  store_callback_args - arguments for the store callback (optional)
 	 *
 	 * @param array $args Field arguments.
 	 * @return void
@@ -848,6 +915,13 @@ class SettingsCallbacks {
 
 	/**
 	 * Wrapper function to create tabs for settings in different languages
+	 * 
+	 * args:
+	 *  option_name       - name of the main option
+	 *  id                - key of the setting
+	 *  callback          - callback function to render the fields
+	 *  fields            - array of fields to render (optional, used for multiple_text_input)
+	 *  i18n_description  - description for the internationalized fields
 	 *
 	 * @param array $args
 	 *

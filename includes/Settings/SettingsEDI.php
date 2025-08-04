@@ -480,19 +480,13 @@ class SettingsEDI {
 	 *
 	 * @param int $order_id
 	 * @param array $posted_data
-	 * @param \WC_Abstract_Order|null $order
+	 * @param \WC_Order $order
 	 *
 	 * @return void
 	 */
-	public function save_taxes_on_checkout( int $order_id, array $posted_data, ?\WC_Abstract_Order $order ): void {
-		if ( empty( $order ) && ! empty( $order_id ) ) {
-			$order = wc_get_order( $order_id );
-		}
-
-		if ( $order ) {
-			wpo_ips_edi_save_order_taxes( $order );
-			wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
-		}
+	public function save_taxes_on_checkout( int $order_id, array $posted_data, \WC_Order $order ): void {
+		wpo_ips_edi_save_order_taxes( $order );
+		wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
 	}
 
 	/**
