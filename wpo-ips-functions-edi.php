@@ -626,10 +626,10 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 /**
  * Get order customer identifiers data for EDI.
  *
- * @param \WC_Abstract_Order $order The order object.
+ * @param \WC_Order $order The order object.
  * @return array
  */
-function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Abstract_Order $order ): array {
+function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): array {
 	$data = array(
 		'name' => array(
 			'label'    => __( 'Name', 'woocommerce-pdf-invoices-packing-slips' ),
