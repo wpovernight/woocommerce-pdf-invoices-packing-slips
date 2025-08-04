@@ -108,6 +108,11 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 4.6.2 (2025-07-31) =
+- Fix: Restore full item meta display in PDF
+- Fix: Undefined array key "padding"
+- Translations: Updated translation template (POT)
+
 = 4.6.1 (2025-07-29) =
 - Tweak: Updated CSS class name used for the shop email in templates
 - Fix: Resolved issue with date format for "Mark as printed"
