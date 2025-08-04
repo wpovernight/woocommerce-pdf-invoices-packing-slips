@@ -1098,8 +1098,8 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 		if ( ! empty( $order_fees ) && is_array( $order_fees ) ) {
 			foreach ( $order_fees as $id => $fee ) {
-				$line_total = $fee->get_total();
-				$line_tax   = $fee->get_total_tax();
+				$line_total = (float) $fee->get_total();
+				$line_tax   = (float) $fee->get_total_tax();
 
 				$fee_price = ( 'excl' === $tax )
 					? $this->format_price( $line_total )
