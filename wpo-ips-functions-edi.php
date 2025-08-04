@@ -538,60 +538,56 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings = WPO_WCPDF()->settings->general;
 	$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
+	$data             = array();
 		
 	if ( empty( $language ) ) {
 		$language = 'default';
 	}
 
-	$data    = array();
-	$country = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
-	$states  = wpo_wcpdf_get_country_states( $country );
-	$state   = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
-		
 	$data[ $language ] = array(
 		'name' => array(
 			'label'    => __( 'Name', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_name', $language ) ?? '',
+			'value'    => $general_settings->get_setting( 'shop_name', $language ),
 			'required' => true,
 		),
 		'address' => array(
 			'label'    => __( 'Street address', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '',
+			'value'    => $general_settings->get_setting( 'shop_address_line_1', $language ),
 			'required' => true,
 		),
 		'postcode' => array(
 			'label'    => __( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '',
+			'value'    => $general_settings->get_setting( 'shop_address_postcode', $language ),
 			'required' => true,
 		),
 		'city' => array(
 			'label'    => __( 'City', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_city', $language ) ?? '',
+			'value'    => $general_settings->get_setting( 'shop_address_city', $language ),
 			'required' => true,
 		),
 		'state' => array(
 			'label'    => __( 'State', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $state,
+			'value'    => $general_settings->get_setting( 'shop_address_state', $language ),
 			'required' => false,
 		),
 		'country' => array(
 			'label'    => __( 'Country Code', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $country,
+			'value'    => $general_settings->get_setting( 'shop_address_country', $language ),
 			'required' => true,
 		),
 		'vat_number' => array(
 			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'vat_number', $language ) ?? '',
+			'value'    => $general_settings->get_setting( 'vat_number', $language ),
 			'required' => true,
 		),
 		'coc_number' => array(
 			'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'coc_number', $language ) ?? '',
+			'value'    => $general_settings->get_setting( 'coc_number', $language ),
 			'required' => false,
 		),
 		'email' => array(
 			'label'    => __( 'Email', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_email_address', $language ) ?? '',
+			'value'    => $general_settings->get_setting( 'shop_email_address', $language ),
 			'required' => true,
 		),
 	);
