@@ -886,13 +886,20 @@ class Frontend {
 				$scheme = ''; // invalid scheme, discard
 			}
 
-			// Save meta when changed
-			if ( ! empty( $identifier ) && get_user_meta( $user_id, $id_key, true ) !== $identifier ) {
-				update_user_meta( $user_id, $id_key, $identifier );
+			// Save identifier if changed
+			if ( ! empty( $identifier ) ) {
+				$existing_identifier = get_user_meta( $user_id, $id_key, true );
+				if ( $existing_identifier !== $identifier ) {
+					update_user_meta( $user_id, $id_key, $identifier, $existing_identifier );
+				}
 			}
-			
-			if ( ! empty( $scheme ) && get_user_meta( $user_id, $scheme_key, true ) !== $scheme ) {
-				update_user_meta( $user_id, $scheme_key, $scheme );
+
+			// Save scheme if changed
+			if ( ! empty( $scheme ) ) {
+				$existing_scheme = get_user_meta( $user_id, $scheme_key, true );
+				if ( $existing_scheme !== $scheme ) {
+					update_user_meta( $user_id, $scheme_key, $scheme, $existing_scheme );
+				}
 			}
 		}
 	}
