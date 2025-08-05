@@ -589,9 +589,6 @@ class SettingsEDI {
 						<td colspan="2">
 							<div class="edi-search-wrap">
 								<input type="number" id="edi-customer-order-id" placeholder="<?php esc_html_e( 'Order ID', 'woocommerce-pdf-invoices-packing-slips' ); ?>" value="">
-								<button type="button" class="button button-primary button-edi-load-customer-order-identifiers">
-									<?php esc_html_e( 'Load', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-								</button>
 							</div>
 						</td>
 					</tr>

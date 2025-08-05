@@ -99,60 +99,75 @@ jQuery( function ( $ ) {
 	}
 	
 	// load customer order identifiers
-	$( 'button.button-edi-load-customer-order-identifiers' ).on( 'click', function( e ) {
-		e.preventDefault();
-
-		const $this   = $( this );
-		const $table  = $this.closest( 'table' );
-		const orderId = $this.closest( '.edi-search-wrap' ).find( ':input' ).val();
-
-		$.get( wpo_ips_edi.ajaxurl, {
-			action:   'wpo_ips_edi_load_customer_order_identifiers',
-			nonce:    wpo_ips_edi.nonce,
-			order_id: orderId
-		}, function( response ) {
-			$table.find( 'tbody' ).empty();
-
-			if ( response.success && response.data && response.data.data ) {
-				const data = response.data.data;
-
-				$.each( data, function( key, identifier ) {
-					let value = identifier.value;
-					let color = '';
-					let note  = '';
-
-					if ( ! value ) {
-						color = identifier.required ? '#d63638' : '#996800';
-						value = `<span style="color:${color};">${identifier.required ? wpo_ips_edi.missing : wpo_ips_edi.optional}</span>`;
-					}
-
-					// VAT number extra check
-					if ( key === 'vat_number' && identifier.value && ! wpo_ips_edi_has_country_prefix( identifier.value ) ) {
-						note = `<br><small style="color:#996800;">${wpo_ips_edi.vat_warning}</small>`;
-					}
-
-					$table.find( 'tbody' ).append(`
-						<tr>
-							<td>${identifier.label}</td>
-							<td>${value}${note}</td>
-						</tr>
-					`);
-				} );
-			} else {
-				const message = response.data || wpo_ips_edi.error_loading_identifiers;
-				$table.find( 'tbody' ).append( `<tr><td colspan="2">${message}</td></tr>` );
-			}
-		} );
-	} );
-	
-	// Prevent form submission on Enter key in the customer order ID input
 	$( '#edi-customer-order-id' ).on( 'keydown', function( e ) {
 		if ( e.key === 'Enter' || e.keyCode === 13 ) {
 			e.preventDefault();
+
+			const $input  = $( this );
+			const orderId = $input.val();
+			const $table  = $input.closest( 'table' );
+			const $tbody  = $table.find( 'tbody' );
+
+			if ( ! orderId ) {
+				$tbody.empty().append(
+					`<tr><td colspan="2">${wpo_ips_edi.enter_order_id}</td></tr>`
+				);
+				return false;
+			}
+
+			$tbody.empty().append(
+				`<tr><td colspan="2">${wpo_ips_edi.loading}</td></tr>`
+			);
+
+			$.get( wpo_ips_edi.ajaxurl, {
+				action:   'wpo_ips_edi_load_customer_order_identifiers',
+				nonce:    wpo_ips_edi.nonce,
+				order_id: orderId
+			}, function( response ) {
+				$tbody.empty();
+
+				if (
+					response.success &&
+					response.data &&
+					response.data.data &&
+					Object.keys( response.data.data ).length > 0
+				) {
+					const data = response.data.data;
+
+					$.each( data, function( key, identifier ) {
+						let label = identifier.label || key;
+						let value = identifier.value;
+						let color = '';
+						let note  = '';
+
+						if ( typeof value === 'undefined' || value === null || value === '' ) {
+							color = identifier.required ? '#d63638' : '#996800';
+							value = `<span style="color:${color};">${identifier.required ? wpo_ips_edi.missing : wpo_ips_edi.optional}</span>`;
+						}
+
+						if ( key === 'vat_number' && identifier.value && ! wpo_ips_edi_has_country_prefix( identifier.value ) ) {
+							note = `<br><small style="color:#996800;">${wpo_ips_edi.vat_warning}</small>`;
+						}
+
+						$tbody.append(`
+							<tr>
+								<td>${label}</td>
+								<td>${value}${note}</td>
+							</tr>
+						`);
+					} );
+				} else {
+					const message = response.data || wpo_ips_edi.no_identifiers_found;
+					$tbody.append(
+						`<tr><td colspan="2">${message}</td></tr>`
+					);
+				}
+			} );
+
 			return false;
 		}
 	} );
-	
+
 	function wpo_ips_edi_has_country_prefix( vat ) {
 		return /^[A-Z]{2}/.test( vat );
 	}
