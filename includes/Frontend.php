@@ -622,6 +622,13 @@ class Frontend {
 	 * @return mixed
 	 */
 	public function edi_peppol_save_checkout_block_fields( $field_value, string $field_key ) {
+		if ( ! is_user_logged_in() ) {
+			return $field_value;
+		}
+
+		$user_id = get_current_user_id();
+
+		// Only process known fields
 		$allowed = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
@@ -629,19 +636,17 @@ class Frontend {
 			'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
 
-		if ( ! in_array( $field_key, $allowed, true ) || ! is_user_logged_in() ) {
+		if ( ! in_array( $field_key, $allowed, true ) ) {
 			return $field_value;
 		}
-		
-		$user_id = get_current_user_id();
-		
-		if ( $user_id > 0 ) {
-			update_user_meta(
-				get_current_user_id(),
-				str_replace( array( 'wpo-ips-edi/', '-' ), array( '', '_' ), $field_key ),
-				trim( sanitize_text_field( $field_value ) )
-			);	
-		}
+
+		// Convert block key to meta key format
+		$meta_key = str_replace( array( 'wpo-ips-edi/', '-' ), array( '', '_' ), $field_key );
+
+		// Build a partial request array
+		$this->edi_peppol_save_customer_identifiers( $user_id, array(
+			$meta_key => $field_value,
+		) );
 
 		return $field_value;
 	}
