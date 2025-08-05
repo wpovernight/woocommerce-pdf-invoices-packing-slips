@@ -1685,8 +1685,12 @@ function wpo_ips_display_item_meta( \WC_Order_Item $item, array $args = array() 
 			'label_after'  => ':</strong> ',
 		)
 	);
+	
+	$meta_data = method_exists( $item, 'get_all_formatted_meta_data' )
+		? $item->get_all_formatted_meta_data()
+		: $item->get_formatted_meta_data();
 
-	foreach ( $item->get_all_formatted_meta_data() as $meta_id => $meta ) {
+	foreach ( $meta_data as $meta_id => $meta ) {
 		$value     = $args['autop'] ? wp_kses_post( $meta->display_value ) : wp_kses_post( make_clickable( trim( $meta->display_value ) ) );
 		$strings[] = $args['label_before'] . wp_kses_post( $meta->display_key ) . $args['label_after'] . $value;
 	}
