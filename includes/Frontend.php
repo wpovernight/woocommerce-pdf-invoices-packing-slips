@@ -105,7 +105,9 @@ class Frontend {
 	public function woocommerce_api_invoice_number ( $data, $order ) {
 		$this->disable_storing_document_settings();
 		$data['wpo_wcpdf_invoice_number'] = '';
-		if ( $invoice = wcpdf_get_document( 'invoice', $order ) ) {
+		$invoice                          = wcpdf_get_document( 'invoice', $order );
+
+		if ( $invoice ) {
 			$invoice_number = $invoice->get_number();
 			if ( !empty( $invoice_number ) ) {
 				$data['wpo_wcpdf_invoice_number'] = $invoice_number->get_formatted();
