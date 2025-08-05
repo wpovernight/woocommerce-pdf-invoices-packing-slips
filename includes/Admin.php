@@ -347,7 +347,7 @@ class Admin {
 		}
 
 		// get invoice settings
-		$invoice          = wcpdf_get_invoice( null );
+		$invoice          = wcpdf_get_document( 'invoice', null );
 		$invoice_settings = $invoice->get_settings();
 		$invoice_columns  = array(
 			'invoice_number_column' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -388,7 +388,7 @@ class Admin {
 
 		$this->disable_storing_document_settings();
 
-		$invoice = wcpdf_get_invoice( $order );
+		$invoice = wcpdf_get_document( 'invoice', $order );
 
 		switch ( $column ) {
 			case 'invoice_number_column':
@@ -1271,7 +1271,7 @@ class Admin {
 			}
 
 			$form_data = array();
-			$invoice   = wcpdf_get_invoice( $order );
+			$invoice   = wcpdf_get_document( 'invoice', $order );
 
 			if ( $invoice ) {
 				// IMPORTANT: $is_new must be set before calling initiate_number().
