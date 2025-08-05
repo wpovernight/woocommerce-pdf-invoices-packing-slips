@@ -344,16 +344,17 @@ class SettingsCallbacks {
 	 * @return void
 	 */
 	public function singular_text_element( array $args ): void {
-		$option_name = $args['option_name'];
-		$id          = $args['id'];
-		$size        = isset( $args['size'] ) ? $args['size'] : '25';
-		$class       = isset( $args['translatable'] ) && true === $args['translatable'] ? 'translatable' : '';
-		$option      = get_option( $option_name );
+		$args = $this->normalize_settings_args( $args );
+		extract( $args );
+		
+		$size   = $size ?? '25';
+		$class  = isset( $translatable ) && true === $translatable ? 'translatable' : '';
+		$option = get_option( $option_name ?? '' );
 
-		if ( isset( $option ) ) {
+		if ( ! empty( $option ) ) {
 			$current = $option;
 		} else {
-			$current = isset( $args['default'] ) ? $args['default'] : '';
+			$current = $default ?? '';
 		}
 
 		printf(
@@ -363,14 +364,14 @@ class SettingsCallbacks {
 			esc_attr( $current ),
 			esc_attr( $size ),
 			esc_attr( $class ),
-			wp_kses_post( $args['custom_attributes'] ?? '' )
+			wp_kses_post( $custom_attributes )
 		);
 
 		// output description.
-		if ( isset( $args['description'] ) ) {
+		if ( ! empty( $description ) ) {
 			printf(
 				'<p class="description">%s</p>',
-				wp_kses_post( $args['description'] )
+				wp_kses_post( $description )
 			);
 		}
 	}
