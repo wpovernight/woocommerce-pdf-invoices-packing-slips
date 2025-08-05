@@ -680,11 +680,11 @@ class Frontend {
 
 		$input_mode           = $this->edi_peppol_identifier_input_mode();
 		$placeholder_endpoint = ( 'select' !== $input_mode )
-			? __( 'e.g. 0088:123456789', 'woocommerce-pdf-invoices-packing-slips' )
-			: __( 'e.g. 123456789', 'woocommerce-pdf-invoices-packing-slips' );
+			? '0088:123456789'
+			: '123456789';
 		$placeholder_legal    = ( 'select' !== $input_mode )
-			? __( 'e.g. 0208:1234567890', 'woocommerce-pdf-invoices-packing-slips' )
-			: __( 'e.g. 1234567890', 'woocommerce-pdf-invoices-packing-slips' );
+			? '0208:1234567890'
+			: '1234567890';
 		$peppol_fields        = array();
 
 		$peppol_fields['peppol_endpoint_id'] = array(
