@@ -29,7 +29,7 @@ class Frontend {
 
 	/**
 	 * Display Invoice download link on My Account page
-	 * 
+	 *
 	 * @param array $actions
 	 * @param \WC_Abstract_Order $order
 	 * @return array
@@ -37,13 +37,13 @@ class Frontend {
 	public function my_account_invoice_pdf_link( array $actions, \WC_Abstract_Order $order ): array {
 		$this->disable_storing_document_settings();
 
-		$invoice         = wcpdf_get_invoice( $order );
+		$invoice         = wcpdf_get_document( 'invoice', $order );
 		$invoice_allowed = false;
-		
+
 		if ( $invoice && $invoice->is_enabled() ) {
 			// check my account button settings
 			$button_setting = $invoice->get_setting( 'my_account_buttons', 'available' );
-			
+
 			switch ( $button_setting ) {
 				case 'available':
 					$invoice_allowed = $invoice->exists();
@@ -53,9 +53,9 @@ class Frontend {
 					break;
 				case 'custom':
 					$allowed_statuses = $invoice->get_setting( 'my_account_restrict', array() );
-					
+
 					if ( ! empty( $allowed_statuses ) && in_array( $order->get_status(), array_keys( $allowed_statuses ), true ) ) {
-						$invoice_allowed = true;						
+						$invoice_allowed = true;
 					}
 					break;
 				case 'never':
@@ -87,7 +87,7 @@ class Frontend {
 
 					if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
 						$script = WPO_WCPDF()->file_system->get_contents( $file_path );
-						
+
 						if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
 							$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
 						}
@@ -105,7 +105,9 @@ class Frontend {
 	public function woocommerce_api_invoice_number ( $data, $order ) {
 		$this->disable_storing_document_settings();
 		$data['wpo_wcpdf_invoice_number'] = '';
-		if ( $invoice = wcpdf_get_invoice( $order ) ) {
+		$invoice                          = wcpdf_get_document( 'invoice', $order );
+
+		if ( $invoice ) {
 			$invoice_number = $invoice->get_number();
 			if ( !empty( $invoice_number ) ) {
 				$data['wpo_wcpdf_invoice_number'] = $invoice_number->get_formatted();
