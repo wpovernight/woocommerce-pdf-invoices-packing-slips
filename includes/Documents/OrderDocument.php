@@ -355,7 +355,6 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
 			'enabled',
 			'attach_to_email_ids',
-			'ubl_format',
 			'disable_for_statuses',
 			'number_format', // this is stored in the number data already!
 			'my_account_buttons',
@@ -364,7 +363,6 @@ abstract class OrderDocument {
 			'invoice_date_column',
 			'paper_size',
 			'font_subsetting',
-			'include_encrypted_pdf',
 		), $this );
 	}
 
@@ -399,20 +397,10 @@ abstract class OrderDocument {
 	}
 
 	public function is_enabled( $output_format = 'pdf' ) {
-		$is_enabled = $this->get_setting( 'enabled', false, $output_format );
+		$output_format = ( 'xml' === $output_format ) ? 'pdf' : $output_format; // currently not using separated settings for EDI
+		$is_enabled    = $this->get_setting( 'enabled', false, $output_format );
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
-	}
-
-	/**
-	 * Get the UBL format
-	 *
-	 * @return string|false
-	 */
-	public function get_ubl_format() {
-		$ubl_format = $this->get_setting( 'ubl_format', false, 'ubl' );
-
-		return apply_filters( 'wpo_wcpdf_document_ubl_format', $ubl_format, $this );
 	}
 
 	public function get_hook_prefix() {
@@ -542,9 +530,10 @@ abstract class OrderDocument {
 			$order     = wc_get_order( $order->get_parent_id() );
 		}
 
-		// ubl
-		if ( $this->is_enabled( 'ubl' ) && wcpdf_is_ubl_available() ) {
-			wpo_ips_ubl_save_order_taxes( $order );
+		// EDI
+		if ( $this->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
+			wpo_ips_edi_save_order_taxes( $order );
+			wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
 		}
 
 		$note = $refund_id ? sprintf(
@@ -1670,14 +1659,14 @@ abstract class OrderDocument {
 		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
-	public function preview_ubl() {
+	public function preview_xml() {
 		// get last settings
-		$this->settings = $this->get_settings( true, 'ubl' );
+		$this->settings = $this->get_settings( true );
 
-		return $this->output_ubl( true );
+		return $this->output_xml( true );
 	}
 
-	public function output_ubl( $contents_only = false ) {
+	public function output_xml( $contents_only = false ) {
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
 		if ( ! $document ) {
@@ -1685,7 +1674,7 @@ abstract class OrderDocument {
 			exit();
 		}
 
-		$filename_or_contents = wpo_ips_write_ubl_file( $document, false, $contents_only );
+		$filename_or_contents = wpo_ips_edi_write_file( $document, false, $contents_only );
 
 		if ( ! $filename_or_contents ) {
 			wcpdf_log_error( 'Error writing UBL file!', 'error' );
@@ -1699,7 +1688,7 @@ abstract class OrderDocument {
 		$quoted = sprintf( '"%s"', addcslashes( basename( $filename_or_contents ), '"\\' ) );
 		$size   = filesize( $filename_or_contents );
 
-		wcpdf_ubl_headers( $quoted, $size );
+		wpo_ips_edi_file_headers( $quoted, $size );
 
 		ob_clean();
 		flush();
