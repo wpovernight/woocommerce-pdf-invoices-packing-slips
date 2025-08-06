@@ -125,7 +125,7 @@ class Frontend {
 	 */
 	public function open_my_account_link_on_new_tab(): void {
 		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
-			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+			$general_settings = WPO_WCPDF()->settings->general;
 			$download_display = $general_settings->get_setting( 'download_display' );
 			
 			if ( 'display' === $download_display ) {
