@@ -7,7 +7,7 @@
 	<table>
 	<?php
 	$current_settings  = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
-	$invoice           = wcpdf_get_invoice( null ); // load invoice to reuse method to get wc emails
+	$invoice           = wcpdf_get_document( 'invoice', null ); // load invoice to reuse method to get wc emails
 	$wc_emails         = $invoice->get_wc_emails();
 	$default           = isset( $current_settings['attach_to_email_ids'] ) ? array_keys( array_filter( $current_settings['attach_to_email_ids'], function( $value ) { return $value === '1'; } ) ) : array();
 	$attach_to_setting = array(
