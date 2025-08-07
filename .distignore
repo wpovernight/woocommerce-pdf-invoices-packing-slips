@@ -1,4 +1,4 @@
-# Git-related
+# Version-control & CI
 .git*
 .github*
 **/.git*
@@ -7,8 +7,11 @@
 .gitattributes
 .gitmodules
 .gitkeep
+.gitlab-ci.yml
+.travis.yml
+.circleci/
 
-# Node and composer
+# Node & Composer
 node_modules/
 composer.json
 composer.lock
@@ -16,25 +19,38 @@ package.json
 package-lock.json
 yarn.lock
 
-# WordPress.org and build config
+# WordPress-specific meta/config
 .wordpress-org/
 .distignore
+wp-cli.local.yml
 
-# Development files/tools
+# Dev & Test tooling
 phpcs.xml
+phpcs.ruleset.xml
 phpstan.neon
 phpunit.xml
+phpunit.xml.dist
+multisite.xml
+multisite.xml.dist
 .editorconfig
 .env
 .vscode/
+bin/
 tests/
 
-# macOS metadata
+# OS/IDE cruft
 .DS_Store
+Thumbs.db
 
-# Other tools
-*.phar
+# Binaries & scripts
 *.sh
+*.phar
+
+# Archives & dumps
+*.sql
+*.tar.gz
+*.zip
 
 # Docs
 strauss.md
+docs/
