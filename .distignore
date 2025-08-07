@@ -1,14 +1,39 @@
-*.wordpress-org
-*node_modules
-*.git*
-*.DS_Store
-*.gitignore
-*.gitkeep
-*.gitmodules
-*.distignore
-*.gitattributes
-*.editorconfig
-*composer.json
-*composer.lock
-*strauss.phar
-*strauss.md
+# Git-related
+.git*
+.github*
+**/.git*
+**/.github*
+.gitignore
+.gitattributes
+.gitmodules
+.gitkeep
+
+# Node and composer
+node_modules/
+composer.json
+composer.lock
+package.json
+package-lock.json
+yarn.lock
+
+# WordPress.org and build config
+.wordpress-org/
+.distignore
+
+# Development files/tools
+phpcs.xml
+phpstan.neon
+phpunit.xml
+.editorconfig
+.env
+.vscode/
+tests/
+
+# macOS metadata
+.DS_Store
+
+# PHP tools
+*.phar
+
+# Docs
+strauss.md
