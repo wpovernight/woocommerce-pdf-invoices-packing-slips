@@ -54,3 +54,7 @@ Thumbs.db
 # Docs
 strauss.md
 docs/
+
+# Languages
+/languages/cache/
+languages.json
