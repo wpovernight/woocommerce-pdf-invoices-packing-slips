@@ -32,8 +32,9 @@ tests/
 # macOS metadata
 .DS_Store
 
-# PHP tools
+# Other tools
 *.phar
+*.sh
 
 # Docs
 strauss.md
