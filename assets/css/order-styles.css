@@ -100,6 +100,43 @@
 	width: auto;
 }
 
+#wpo_ips-edi-box .inside {
+	margin: 0;
+	padding: 12px;
+}
+
+#wpo_ips-edi-box .inside > .notice {
+	margin: 0 0 12px 0 !important;
+}
+
+#wpo_ips-edi-box .inside > .notice > p {
+	font-size: 12px !important;
+}
+
+#wpo_ips-edi-box .inside > .peppol {
+	margin-top: 12px;
+}
+
+#wpo_ips-edi-box .inside table td {
+	font-size: 12px !important;
+}
+
+#wpo_ips-edi-box .inside table td.right {
+	text-align: right;
+}
+
+#wpo_ips-edi-box .inside table thead td {
+	background-color: #f4f4f4;
+}
+
+#wpo_ips-edi-box .inside table thead td:first-of-type {
+	font-weight: bold;
+}
+
+#wpo_ips-edi-box .inside table > tbody > tr:not(:last-of-type) > td {
+	border-bottom: 1px solid #f4f4f4;
+}
+
 .wcpdf-data-fields {
 	margin-left: 10px;
 	margin-right: 10px;

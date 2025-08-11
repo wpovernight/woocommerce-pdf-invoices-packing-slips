@@ -690,8 +690,11 @@ class Admin {
 
 	/**
 	 * Create the EDI meta box content on the single order page
+	 * 
+	 * @param \WC_Order|\WP_Post $post_or_order_object
+	 * @return void
 	 */
-	public function edi_actions_meta_box( $post_or_order_object ) {
+	public function edi_actions_meta_box( object $post_or_order_object ): void {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
@@ -712,6 +715,8 @@ class Admin {
 
 				if ( $document_exists ) {
 					$class[] = 'exists';
+				} else {
+					continue;
 				}
 
 				$meta_box_actions[ $document_type ] = array(
@@ -725,17 +730,29 @@ class Admin {
 		}
 
 		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
-		if ( empty( $meta_box_actions ) || ! wpo_ips_edi_is_available() ) {
-			return;
+		
+		if ( 0 === count( $meta_box_actions ) ) {
+			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
 		
-		$identifiers_data = wpo_ips_edi_get_order_customer_identifiers_data( $order );
+		$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
+		$peppol_identifiers = array();
+
+		foreach ( $identifiers_data as $key => $value ) {
+			if ( false !== strpos( $key, 'peppol' ) ) {
+				$peppol_identifiers[ $key ] = $value;
+				unset( $identifiers_data[ $key ] );
+			}
+		}
 		?>
 		<div class="edi-customer-identifiers">
-			<table class="widefat striped">
+			<table class="widefat">
 				<thead>
 					<tr>
-						<td colspan="2"><?php esc_html_e( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td><?php esc_html_e( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td class="right">
+							<a href="#"><?php esc_html_e( 'Hide', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						</td>
 					</tr>
 				</thead>
 				<tbody>
@@ -753,7 +770,7 @@ class Admin {
 						?>
 						<tr>
 							<td><?php echo esc_html( $identifier['label'] ); ?></td>
-							<td>
+							<td class="right">
 								<?php echo $display; ?>
 								<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 									<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
@@ -766,50 +783,79 @@ class Admin {
 				</tbody>
 			</table>
 		</div>
-		<ul class="wpo_ips_edi_actions">
-			<?php
-				$edi_documents = 0;
+		<?php if ( ! empty( $peppol_identifiers ) ) : ?>
+			<div class="edi-customer-identifiers peppol">
+				<table class="widefat">
+					<thead>
+						<tr>
+							<td><?php esc_html_e( 'Peppol Identifiers', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td class="right">
+								<a href="#"><?php esc_html_e( 'Edit', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							</td>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+						foreach ( $peppol_identifiers as $key => $identifier ) {
+							$value    = $identifier['value'];
+							$required = $identifier['required'];
+							$display  = $value ?: sprintf(
+								'<span style="color:%s">%s</span>',
+								$required ? '#d63638' : '#996800',
+								$required
+									? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+									: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+							);
+							?>
+							<tr>
+								<td><?php echo esc_html( $identifier['label'] ); ?></td>
+								<td class="right"><?php echo $display; ?></td>
+							</tr>
+							<?php
+						}
+						?>
+					</tbody>
+				</table>
+			</div>
+		<?php endif; ?>
+		<?php if ( count( $meta_box_actions ) > 0 ) : ?>
+			<ul class="wpo_ips_edi_actions">
+				<?php
+					foreach ( $meta_box_actions as $document_type => $data ) {
+						$url    = isset( $data['url'] ) ? $data['url'] : '';
+						$class  = isset( $data['class'] ) ? $data['class'] : '';
+						$alt    = isset( $data['alt'] ) ? $data['alt'] : '';
+						$title  = isset( $data['title'] ) ? $data['title'] : '';
+						$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
 
-				foreach ( $meta_box_actions as $document_type => $data ) {
-					$url    = isset( $data['url'] ) ? $data['url'] : '';
-					$class  = isset( $data['class'] ) ? $data['class'] : '';
-					$alt    = isset( $data['alt'] ) ? $data['alt'] : '';
-					$title  = isset( $data['title'] ) ? $data['title'] : '';
-					$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
-
-					$allowed_svg_tags = array(
-						'svg' => array(
-							'class'   => true,
-							'xmlns'   => true,
-							'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
-						),
-						'path' => array(
-							'fill-rule' => true,
-							'clip-rule' => true,
-							'd'         => true,
-						),
-					);
-
-					if ( ! empty( $exists ) ) {
-						printf(
-							'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
-							esc_url( $url ),
-							esc_attr( $class ),
-							esc_attr( $alt ),
-							esc_html( $title ),
-							! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : ''
+						$allowed_svg_tags = array(
+							'svg' => array(
+								'class'   => true,
+								'xmlns'   => true,
+								'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+							),
+							'path' => array(
+								'fill-rule' => true,
+								'clip-rule' => true,
+								'd'         => true,
+							),
 						);
 
-						$edi_documents++;
+						if ( ! empty( $exists ) ) {
+							printf(
+								'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
+								esc_url( $url ),
+								esc_attr( $class ),
+								esc_attr( $alt ),
+								esc_html( $title ),
+								! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : ''
+							);
+						}
 					}
-				}
-
-				if ( 0 === $edi_documents ) {
-					esc_html_e( 'E-Documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
-				}
-			?>
-		</ul>
+				?>
+			</ul>
 		<?php
+		endif;
 	}
 
 	public function data_input_box_content( $post_or_order_object ) {
