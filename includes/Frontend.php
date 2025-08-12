@@ -73,7 +73,7 @@ class Frontend {
 
 		$document_type   = 'invoice';
 		$document_title  = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$invoice         = wcpdf_get_document( 'invoice', $order );
+		$invoice         = wcpdf_get_document( $document_type, $order );
 		$invoice_allowed = false;
 
 		if ( $invoice && $invoice->is_enabled() ) {
