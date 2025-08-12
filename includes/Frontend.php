@@ -63,7 +63,7 @@ class Frontend {
 
 	/**
 	 * Display My Account invoice actions.
-	 * 
+	 *
 	 * @param array $actions
 	 * @param \WC_Abstract_Order $order
 	 * @return array
@@ -73,13 +73,13 @@ class Frontend {
 
 		$document_type   = 'invoice';
 		$document_title  = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$invoice         = wcpdf_get_invoice( $order );
+		$invoice         = wcpdf_get_document( 'invoice', $order );
 		$invoice_allowed = false;
-		
+
 		if ( $invoice && $invoice->is_enabled() ) {
 			// check my account button settings
 			$button_setting = $invoice->get_setting( 'my_account_buttons', 'available' );
-			
+
 			switch ( $button_setting ) {
 				case 'available':
 					$invoice_allowed = $invoice->exists();
@@ -89,9 +89,9 @@ class Frontend {
 					break;
 				case 'custom':
 					$allowed_statuses = $invoice->get_setting( 'my_account_restrict', array() );
-					
+
 					if ( ! empty( $allowed_statuses ) && in_array( $order->get_status(), array_keys( $allowed_statuses ), true ) ) {
-						$invoice_allowed = true;						
+						$invoice_allowed = true;
 					}
 					break;
 				case 'never':
@@ -157,8 +157,8 @@ class Frontend {
 		$this->disable_storing_document_settings();
 		
 		$data['wpo_wcpdf_invoice_number'] = '';
-		$invoice                          = wcpdf_get_invoice( $order );
-		
+		$invoice                          = wcpdf_get_document( 'invoice', $order );
+
 		if ( $invoice ) {
 			$invoice_number = $invoice->get_number();
 			

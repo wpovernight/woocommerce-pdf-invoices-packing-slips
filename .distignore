@@ -1,14 +1,60 @@
-*.wordpress-org
-*node_modules
-*.git*
-*.DS_Store
-*.gitignore
-*.gitkeep
-*.gitmodules
-*.distignore
-*.gitattributes
-*.editorconfig
-*composer.json
-*composer.lock
-*strauss.phar
-*strauss.md
+# Version-control & CI
+.git*
+.github*
+**/.git*
+**/.github*
+.gitignore
+.gitattributes
+.gitmodules
+.gitkeep
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Node & Composer
+node_modules/
+composer.json
+composer.lock
+package.json
+package-lock.json
+yarn.lock
+
+# WordPress-specific meta/config
+.wordpress-org/
+.distignore
+wp-cli.local.yml
+
+# Dev & Test tooling
+phpcs.xml
+phpcs.ruleset.xml
+phpstan.neon
+phpunit.xml
+phpunit.xml.dist
+multisite.xml
+multisite.xml.dist
+.editorconfig
+.env
+.vscode/
+bin/
+tests/
+
+# OS/IDE cruft
+.DS_Store
+Thumbs.db
+
+# Binaries & scripts
+*.sh
+*.phar
+
+# Archives & dumps
+*.sql
+*.tar.gz
+*.zip
+
+# Docs
+strauss.md
+docs/
+
+# Languages
+/languages/cache/
+languages.json
