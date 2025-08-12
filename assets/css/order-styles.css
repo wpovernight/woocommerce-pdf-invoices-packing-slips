@@ -40,8 +40,16 @@
 	fill: #51266b;
 }
 
+ul.wpo-ips-edi-actions {
+	margin: 0;
+}
+
+ul.wpo-ips-edi-actions > li {
+	margin: 12px 0 0 0;
+}
+
 .wpo_wcpdf-actions a.button.exists > svg,
-.wpo_ips_edi_actions a.button.exists > svg {
+.wpo-ips-edi-actions a.button.exists > svg {
 	width: 14px;
 	height: 14px;
 	line-height: 30px;

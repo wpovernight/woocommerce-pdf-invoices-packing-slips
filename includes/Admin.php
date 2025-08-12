@@ -528,7 +528,7 @@ class Admin {
 		if ( wpo_ips_edi_is_available() && count( wpo_ips_edi_get_document_types() ) > 0 ) {
 			add_meta_box(
 				'wpo_ips-edi-box',
-				__( 'Create E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				__( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				array( $this, 'edi_actions_meta_box' ),
 				$screen_id,
 				'side',
@@ -749,7 +749,7 @@ class Admin {
 			<table class="widefat">
 				<thead>
 					<tr>
-						<td><?php esc_html_e( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td><?php esc_html_e( 'Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 						<td class="right">
 							<a href="#"><?php esc_html_e( 'Hide', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</td>
@@ -771,7 +771,7 @@ class Admin {
 						<tr>
 							<td><?php echo esc_html( $identifier['label'] ); ?></td>
 							<td class="right">
-								<?php echo $display; ?>
+								<?php echo wp_kses_post( $display ); ?>
 								<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 									<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
 								<?php endif; ?>
@@ -788,7 +788,7 @@ class Admin {
 				<table class="widefat">
 					<thead>
 						<tr>
-							<td><?php esc_html_e( 'Peppol Identifiers', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td><?php esc_html_e( 'Peppol', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 							<td class="right">
 								<a href="#"><?php esc_html_e( 'Edit', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							</td>
@@ -809,7 +809,7 @@ class Admin {
 							?>
 							<tr>
 								<td><?php echo esc_html( $identifier['label'] ); ?></td>
-								<td class="right"><?php echo $display; ?></td>
+								<td class="right"><?php echo wp_kses_post( $display ); ?></td>
 							</tr>
 							<?php
 						}
@@ -819,7 +819,7 @@ class Admin {
 			</div>
 		<?php endif; ?>
 		<?php if ( count( $meta_box_actions ) > 0 ) : ?>
-			<ul class="wpo_ips_edi_actions">
+			<ul class="wpo-ips-edi-actions">
 				<?php
 					foreach ( $meta_box_actions as $document_type => $data ) {
 						$url    = isset( $data['url'] ) ? $data['url'] : '';
