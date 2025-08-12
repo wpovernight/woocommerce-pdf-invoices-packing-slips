@@ -6,7 +6,7 @@ jQuery( function( $ ) {
 
 		if ( $.inArray( action, wpo_wcpdf_ajax.bulk_actions ) !== -1 ) {
 			e.preventDefault();
-			
+
 			let document_type = action;
 			let checked       = [];
 			let xml_output    = false;
@@ -178,7 +178,7 @@ jQuery( function( $ ) {
 			$form.find( '.read-only' ).hide();
 			$form.find( '.editable-notes' ).show();
 			$form.closest( '.wcpdf-data-fields' ).find( '.wpo-wcpdf-document-buttons' ).show();
-			
+
 			// re-initialize WooCommerce tooltips
 			$( '.wcpdf-data-fields .woocommerce-help-tip' ).tipTip( {
 					attribute: 'data-tip',
@@ -216,7 +216,7 @@ jQuery( function( $ ) {
 			$( '.view-more' ).show();
 		}
 	} );
-	
+
 	function updatePreviewNumber( $table ) {
 		let prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
 		let suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
@@ -259,7 +259,7 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
-	
+
 	let previewTimer;
 	$( document ).on( 'input', '.wcpdf-data-fields input', function () {
 		const $table = $( this ).closest( '.wcpdf-data-fields' );
@@ -268,6 +268,87 @@ jQuery( function( $ ) {
 		previewTimer = setTimeout( () => {
 			updatePreviewNumber( $table );
 		}, 300 );
+	} );
+
+	// Edi identifiers
+	const root = '#wpo_ips-edi-box .edi-customer-identifiers';
+
+	$( document.body ).on( 'click', root + ' td.collapse > a', function( e ) {
+		e.preventDefault();
+		let $this  = $( this );
+		let $tbody = $this.closest( 'table' ).find( 'tbody' );
+
+		if ( $tbody.is( ':visible' ) ) {
+			$tbody.slideUp( 'fast' );
+			$this.text( wpo_wcpdf_ajax.edi_metabox.show );
+		} else {
+			$tbody.slideDown( 'fast' );
+			$this.text( wpo_wcpdf_ajax.edi_metabox.hide );
+		}
+	} );
+
+	// Peppol identifiers
+	const peppolRoot = `${root}.peppol`;
+
+	// Edit
+	$( document.body ).on( 'click', peppolRoot + ' thead .editable a', function ( e ) {
+		e.preventDefault();
+		$( this ).closest( 'table' ).addClass( 'is-editing' );
+	} );
+
+	// Cancel
+	$( document.body ).on( 'click', peppolRoot + ' tfoot .button.cancel', function ( e ) {
+		e.preventDefault();
+		$( this ).closest( 'table' ).removeClass( 'is-editing' );
+	} );
+
+	// Save (AJAX)
+	$( document.body ).on( 'click', peppolRoot + ' tfoot .button-primary', function ( e ) {
+		e.preventDefault();
+
+		const $btn       = $( this );
+		const customerId = $btn.data( 'customer_id' );
+		const $table     = $btn.closest( 'table' );
+		const $box       = $table.closest( peppolRoot );
+
+		const pairs      = $box.find( 'tbody input[type="text"]' ).serializeArray();
+		const values     = {};
+
+		$.each( pairs, function ( _, p ) { values[p.name] = p.value; } );
+
+		const data = {
+			action:      'wpo_ips_edi_save_order_customer_peppol_identifiers',
+			security:    wpo_wcpdf_ajax.nonce,
+			customer_id: customerId,
+			values:      values
+		};
+
+		$btn.prop( 'disabled', true );
+
+		$.post( wpo_wcpdf_ajax.ajaxurl, data )
+			.done( function ( response ) {
+				$box.find( 'tbody tr' ).each( function () {
+					const row = $( this );
+					const val = row.find( 'td.edit input[type="text"]' ).val();
+					row.find( 'td.display' ).text( val || '—' );
+				} );
+				
+				$table.removeClass( 'is-editing' );
+
+				const msg = ( response && response.data && response.data.message ) || wpo_wcpdf_ajax.saved;
+				if ( window.wp && wp.a11y && wp.a11y.speak ) {
+					wp.a11y.speak( msg );
+				} else {
+					alert( msg );
+				}
+			} )
+			.fail( function ( jqXHR ) {
+				const msg = ( jqXHR.responseJSON && jqXHR.responseJSON.data && jqXHR.responseJSON.data.message ) || wpo_wcpdf_ajax.fail;
+				alert( msg );
+			} )
+			.always( function () {
+				$btn.prop( 'disabled', false );
+			} );
 	} );
 
 } );

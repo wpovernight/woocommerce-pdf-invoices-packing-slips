@@ -719,3 +719,105 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		$order
 	);
 }
+
+/**
+ * Check if EDI Peppol customer fields are enabled for a specific location.
+ *
+ * @param string $location Can be 'checkout' or 'my_account'.
+ * @return bool True if fields should be shown in the given location.
+ */
+function wpo_ips_edi_peppol_enabled_for_location( string $location ): bool {
+	if ( ! wpo_ips_edi_is_available() ) {
+		return false;
+	}
+
+	$edi_settings     = wpo_ips_edi_get_settings();
+	$location_setting = $edi_settings['peppol_customer_identifier_fields_location'] ?? '';
+
+	// Always return false if the field is not properly set
+	if ( ! in_array( $location_setting, array( 'checkout', 'my_account', 'both' ), true ) ) {
+		return false;
+	}
+
+	// Return true if location matches or if both locations are enabled
+	return $location === $location_setting || 'both' === $location_setting;
+}
+
+/**
+ * Get the input mode for customer Peppol identifiers.
+ *
+ * @return string 'select' or 'full'. Defaults to 'full'.
+ */
+function wpo_ips_edi_peppol_identifier_input_mode(): string {
+	$mode = wpo_ips_edi_get_settings( 'peppol_customer_identifiers_input_mode' );
+	return 'select' === $mode ? 'select' : 'full';
+}
+
+/**
+ * Save Peppol identifiers to user‑meta (only if new or different).
+ *
+ * - full   mode: text = scheme:identifier
+ * - select mode: text = identifier; scheme from <select>
+ *                (but if user typed scheme:identifier we respect that)
+ *
+ * @param int   $user_id User ID.
+ * @param array $request $_POST / REST payload.
+ */
+function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $request ): void {
+	$mode = wpo_ips_edi_peppol_identifier_input_mode();
+
+	// [ text‑field , scheme‑field ]
+	$pairs = array(
+		array( 'peppol_endpoint_id',      'peppol_endpoint_eas' ),
+		array( 'peppol_legal_identifier', 'peppol_legal_identifier_icd' ),
+	);
+
+	foreach ( $pairs as list( $id_key, $scheme_key ) ) {
+		if ( ! isset( $request[ $id_key ] ) ) {
+			continue;
+		}
+
+		$raw    = trim( sanitize_text_field( wp_unslash( $request[ $id_key ] ) ) );
+		$scheme = $identifier = '';
+
+		// Determine parts
+		if ( 'full' === $mode || false !== strpos( $raw, ':' ) ) {
+			[ $scheme, $identifier ] = array_map(
+				'trim',
+				explode( ':', $raw, 2 ) + array( '', '' )
+			);
+		} else {  // select mode, plain identifier
+			$identifier = $raw;
+		}
+
+		// fallback to <select> value when scheme still empty
+		if ( empty( $scheme ) && isset( $request[ $scheme_key ] ) ) {
+			$scheme = trim( sanitize_text_field( wp_unslash( $request[ $scheme_key ] ) ) );
+		}
+
+		// Validate scheme list
+		$valid_schemes = false !== strpos( $scheme_key, '_eas' )
+			? \WPO\IPS\EDI\Standards\EN16931::get_eas()
+			: \WPO\IPS\EDI\Standards\EN16931::get_icd();
+
+		if ( ! empty( $scheme ) && ! isset( $valid_schemes[ $scheme ] ) ) {
+			$scheme = ''; // invalid scheme, discard
+		}
+
+		// Save identifier if changed
+		if ( ! empty( $identifier ) ) {
+			$existing_identifier = get_user_meta( $user_id, $id_key, true );
+			if ( $existing_identifier !== $identifier ) {
+				update_user_meta( $user_id, $id_key, $identifier, $existing_identifier );
+			}
+		}
+
+		// Save scheme if changed
+		if ( ! empty( $scheme ) ) {
+			$existing_scheme = get_user_meta( $user_id, $scheme_key, true );
+			if ( $existing_scheme !== $scheme ) {
+				update_user_meta( $user_id, $scheme_key, $scheme, $existing_scheme );
+			}
+		}
+	}
+}

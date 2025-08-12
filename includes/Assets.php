@@ -84,7 +84,12 @@ class Assets {
 					'confirm_delete'               => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
-					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' )
+					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' ),
+					'edi_metabox'                  => array(
+						'show' => __( 'Show', 'woocommerce-pdf-invoices-packing-slips' ),
+						'hide' => __( 'Hide', 'woocommerce-pdf-invoices-packing-slips' ),
+						'fail' => __( 'Could not save identifiers. Please try again.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				)
 			);
 		}

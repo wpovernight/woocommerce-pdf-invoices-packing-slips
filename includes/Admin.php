@@ -69,6 +69,7 @@ class Admin {
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_preview_formatted_number', array( $this, 'ajax_preview_formatted_number' ) );
+		add_action( 'wp_ajax_wpo_ips_edi_save_order_customer_peppol_identifiers', array( $this, 'ajax_edi_save_order_customer_peppol_identifiers' ) );
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -750,35 +751,37 @@ class Admin {
 				<thead>
 					<tr>
 						<td><?php esc_html_e( 'Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-						<td class="right">
-							<a href="#"><?php esc_html_e( 'Hide', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+						<td class="right collapse">
+							<a href="#"><?php esc_html_e( 'Show', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 						</td>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody style="display:none;">
 					<?php
-					foreach ( $identifiers_data as $key => $identifier ) {
-						$value    = $identifier['value'];
-						$required = $identifier['required'];
-						$display  = $value ?: sprintf(
-							'<span style="color:%s">%s</span>',
-							$required ? '#d63638' : '#996800',
-							$required
-								? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
-								: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
-						);
-						?>
-						<tr>
-							<td><?php echo esc_html( $identifier['label'] ); ?></td>
-							<td class="right">
-								<?php echo wp_kses_post( $display ); ?>
-								<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
-									<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
-								<?php endif; ?>
-							</td>
-						</tr>
-						<?php
-					}
+						foreach ( $identifiers_data as $key => $identifier ) {
+							$value    = $identifier['value'];
+							$required = $identifier['required'];
+							$display  = $value ?: sprintf(
+								'<span style="color:%s">%s</span>',
+								$required
+									? '#d63638'
+									: '#996800',
+								$required
+									? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+									: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+							);
+							?>
+							<tr>
+								<td><?php echo esc_html( $identifier['label'] ); ?></td>
+								<td class="right">
+									<?php echo wp_kses_post( $display ); ?>
+									<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+										<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<?php
+						}
 					?>
 				</tbody>
 			</table>
@@ -789,32 +792,45 @@ class Admin {
 					<thead>
 						<tr>
 							<td><?php esc_html_e( 'Peppol', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-							<td class="right">
+							<td class="right editable">
 								<a href="#"><?php esc_html_e( 'Edit', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							</td>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
-						foreach ( $peppol_identifiers as $key => $identifier ) {
-							$value    = $identifier['value'];
-							$required = $identifier['required'];
-							$display  = $value ?: sprintf(
-								'<span style="color:%s">%s</span>',
-								$required ? '#d63638' : '#996800',
-								$required
-									? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
-									: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
-							);
-							?>
-							<tr>
-								<td><?php echo esc_html( $identifier['label'] ); ?></td>
-								<td class="right"><?php echo wp_kses_post( $display ); ?></td>
-							</tr>
-							<?php
-						}
+							foreach ( $peppol_identifiers as $key => $identifier ) {
+								$value    = $identifier['value'];
+								$required = $identifier['required'];
+								$display  = $value ?: sprintf(
+									'<span style="color:%s">%s</span>',
+									$required
+										? '#d63638'
+										: '#996800',
+									$required
+										? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+										: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+								);
+								?>
+								<tr>
+									<td><?php echo esc_html( $identifier['label'] ); ?></td>
+									<td class="right display"><?php echo wp_kses_post( $display ); ?></td>
+									<td class="right edit">
+										<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
+									</td>
+								</tr>
+								<?php
+							}
 						?>
 					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="2" class="right">
+								<a href="#" class="button button-primary" data-customer_id="<?php echo absint( $order->get_customer_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="#" class="button cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							</td>
+						</tr>
+					</tfoot>
 				</table>
 			</div>
 		<?php endif; ?>
@@ -856,6 +872,31 @@ class Admin {
 			</ul>
 		<?php
 		endif;
+	}
+	
+	/**
+	 * AJAX handler to save the EDI customer identifiers.
+	 * 
+	 * @return void
+	 */
+	public function ajax_edi_save_order_customer_peppol_identifiers(): void {
+		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+		
+		$request     = stripslashes_deep( $_POST );
+		$customer_id = isset( $request['customer_id'] ) ? absint( $request['customer_id'] ) : 0;
+		$values      = isset( $request['values'] ) ? $request['values'] : array();
+		
+		if ( empty( $customer_id ) || empty( $values ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+		}
+		
+		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
+		
+		wp_send_json_success( array(
+			'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
 	}
 
 	public function data_input_box_content( $post_or_order_object ) {

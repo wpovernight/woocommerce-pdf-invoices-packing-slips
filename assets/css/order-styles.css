@@ -145,6 +145,25 @@ ul.wpo-ips-edi-actions > li {
 	border-bottom: 1px solid #f4f4f4;
 }
 
+#wpo_ips-edi-box .inside .peppol tbody td.edit,
+#wpo_ips-edi-box .inside .peppol tfoot,
+#wpo_ips-edi-box .inside .peppol table.is-editing thead .editable a,
+#wpo_ips-edi-box .inside .peppol table.is-editing tbody td.display {
+	display: none;
+}
+
+#wpo_ips-edi-box .inside .peppol tbody td.edit input {
+	width: 100%;
+}
+
+#wpo_ips-edi-box .inside .peppol table.is-editing tbody td.edit {
+	display: table-cell;
+}
+
+#wpo_ips-edi-box .inside .peppol table.is-editing tfoot {
+	display: table-row-group;
+}
+
 .wcpdf-data-fields {
 	margin-left: 10px;
 	margin-right: 10px;
@@ -159,15 +178,15 @@ ul.wpo-ips-edi-actions > li {
 }
 
 .wcpdf-data-fields .read-only {
-	height:auto;
-	display:block;
+	height: auto;
+	display: block;
 	padding: 10px;
 }
 
 .wcpdf-data-fields .editable,
 .wcpdf-data-fields .editable-notes {
-	height:auto;
-	display:none;
+	height: auto;
+	display: none;
 	padding: 10px;
 }
 
