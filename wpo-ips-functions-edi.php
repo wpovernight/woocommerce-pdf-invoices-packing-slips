@@ -786,11 +786,13 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 				'trim',
 				explode( ':', $raw, 2 ) + array( '', '' )
 			);
-		} else {  // select mode, plain identifier
+			
+		// Select mode, plain identifier
+		} else {
 			$identifier = $raw;
 		}
 
-		// fallback to <select> value when scheme still empty
+		// Fallback to select mode value when scheme still empty
 		if ( empty( $scheme ) && isset( $request[ $scheme_key ] ) ) {
 			$scheme = trim( sanitize_text_field( wp_unslash( $request[ $scheme_key ] ) ) );
 		}

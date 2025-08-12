@@ -881,7 +881,9 @@ class Admin {
 	 */
 	public function ajax_edi_save_order_customer_peppol_identifiers(): void {
 		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			wp_send_json_error( array(
+				'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
 		}
 		
 		$request     = stripslashes_deep( $_POST );
@@ -889,7 +891,9 @@ class Admin {
 		$values      = isset( $request['values'] ) ? $request['values'] : array();
 		
 		if ( empty( $customer_id ) || empty( $values ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			wp_send_json_error( array(
+				'message' => __( 'Invalid customer ID or values.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
 		}
 		
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
