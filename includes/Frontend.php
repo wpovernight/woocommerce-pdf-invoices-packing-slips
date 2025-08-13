@@ -681,6 +681,10 @@ class Frontend {
 		}
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
+		
+		if ( $wc_object instanceof \WC_Order ) {
+			wpo_ips_edi_maybe_save_order_customer_peppol_data( $wc_object );
+		}
 	}
 	
 	/**

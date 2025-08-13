@@ -826,7 +826,7 @@ class Admin {
 					<tfoot>
 						<tr>
 							<td colspan="2" class="right">
-								<a href="#" class="button button-primary" data-customer_id="<?php echo absint( $order->get_customer_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<a href="#" class="button button-primary" data-order_id="<?php echo absint( $order->get_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 								<a href="#" class="button cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							</td>
 						</tr>
@@ -886,17 +886,36 @@ class Admin {
 			) );
 		}
 		
-		$request     = stripslashes_deep( $_POST );
-		$customer_id = isset( $request['customer_id'] ) ? absint( $request['customer_id'] ) : 0;
-		$values      = isset( $request['values'] ) ? $request['values'] : array();
+		$request  = stripslashes_deep( $_POST );
+		$order_id = isset( $request['order_id'] ) ? absint( $request['order_id'] ) : 0;
+		$values   = isset( $request['values'] ) ? $request['values'] : array();
 		
-		if ( empty( $customer_id ) || empty( $values ) ) {
+		if ( empty( $order_id ) || empty( $values ) ) {
 			wp_send_json_error( array(
-				'message' => __( 'Invalid customer ID or values.', 'woocommerce-pdf-invoices-packing-slips' )
+				'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
+		}
+		
+		$order = wc_get_order( $order_id );
+		
+		if ( ! $order ) {
+			wp_send_json_error( array(
+				'message' => __( 'Order not found.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
+		}
+		
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
+			? $order->get_customer_id()
+			: 0;
+		
+		if ( empty( $customer_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Customer ID is missing.', 'woocommerce-pdf-invoices-packing-slips' )
 			) );
 		}
 		
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
+		wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
 		
 		wp_send_json_success( array(
 			'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),

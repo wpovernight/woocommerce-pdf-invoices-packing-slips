@@ -306,21 +306,21 @@ jQuery( function( $ ) {
 	$( document.body ).on( 'click', peppolRoot + ' tfoot .button-primary', function ( e ) {
 		e.preventDefault();
 
-		const $btn       = $( this );
-		const customerId = $btn.data( 'customer_id' );
-		const $table     = $btn.closest( 'table' );
-		const $box       = $table.closest( peppolRoot );
+		const $btn    = $( this );
+		const orderId = $btn.data( 'order_id' );
+		const $table  = $btn.closest( 'table' );
+		const $box    = $table.closest( peppolRoot );
 
-		const pairs      = $box.find( 'tbody input[type="text"]' ).serializeArray();
-		const values     = {};
+		const pairs   = $box.find( 'tbody input[type="text"]' ).serializeArray();
+		const values  = {};
 
 		$.each( pairs, function ( _, p ) { values[p.name] = p.value; } );
 
 		const data = {
-			action:      'wpo_ips_edi_save_order_customer_peppol_identifiers',
-			security:    wpo_wcpdf_ajax.nonce,
-			customer_id: customerId,
-			values:      values
+			action:   'wpo_ips_edi_save_order_customer_peppol_identifiers',
+			security: wpo_wcpdf_ajax.nonce,
+			order_id: orderId,
+			values:   values
 		};
 
 		$btn.prop( 'disabled', true );
