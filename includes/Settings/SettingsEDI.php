@@ -35,7 +35,7 @@ class SettingsEDI {
 			'identifiers' => __( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
 			'taxes'       => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 			'info'        => __( 'Info', 'woocommerce-pdf-invoices-packing-slips' ),
-			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ) . ' <sup class="wcpdf_beta">Pro</sup>',
+			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ) . ' <sup class="wcpdf_pro">Pro</sup>',
 		) );
 
 		add_action( 'admin_init', array( $this, 'init_settings' ) );

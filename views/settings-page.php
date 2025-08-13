@@ -28,10 +28,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 	foreach ( $settings_tabs as $tab_slug => $tab_data ) {
 		$tab_title = is_array( $tab_data ) ? esc_html( $tab_data['title'] ) : esc_html( $tab_data );
 		$tab_link  = esc_url( "?page=wpo_wcpdf_options_page&tab={$tab_slug}" );
-		$tab_beta  = isset( $tab_data['beta'] ) ? true : false;
-		if ( $tab_beta ) {
-			$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
-		}
+
 		printf(
 			'<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>',
 			esc_url( $tab_link ),
