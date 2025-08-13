@@ -23,12 +23,15 @@ class PackingSlip extends OrderDocumentMethods {
 		$this->type  = 'packing-slip';
 		$this->title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
 		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
-
+		
 		// call parent constructor
 		parent::__construct( $order );
 
-		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
+		$this->output_formats = apply_filters(
+			'wpo_wcpdf_document_output_formats',
+			$this->output_formats,
+			$this
+		);
 	}
 
 	/**
