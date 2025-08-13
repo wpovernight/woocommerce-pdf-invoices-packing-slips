@@ -440,7 +440,7 @@ class Semaphore {
 	 */
 	public static function init_cleanup(): void {
 		// This is to prevent the cleanup from running before the plugin is fully loaded
-		if ( WPO_WCPDF()->dependencies_are_ready() ) {
+		if ( ! WPO_WCPDF()->dependencies_are_ready() ) {
 			return;
 		}
 		
