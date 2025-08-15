@@ -1018,7 +1018,7 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
 		'price'    => __( 'Price', 'woocommerce-pdf-invoices-packing-slips' ),
 	);
 
-	if ( 'packing-slip' === $document->get_type() ) {
+	if ( in_array( $document->get_type(), array( 'packing-slip', 'delivery-note' ), true ) ) {
 		unset( $headers['price'] );
 	}
 
