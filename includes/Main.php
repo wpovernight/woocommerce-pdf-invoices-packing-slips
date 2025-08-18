@@ -1831,7 +1831,7 @@ class Main {
 		}
 	}
 
-	function handle_document_link_in_emails(): void {
+	public function handle_document_link_in_emails(): void {
 		$email_hooks = array();
 		$documents   = WPO_WCPDF()->documents->get_documents();
 

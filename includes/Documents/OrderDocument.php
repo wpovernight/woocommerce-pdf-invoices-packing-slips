@@ -1373,80 +1373,80 @@ abstract class OrderDocument {
 	/**
 	 * Return/Show shop/company address line 1 if provided.
 	 */
-	function get_shop_address_line_1(): string {
+	public function get_shop_address_line_1(): string {
 		return $this->get_settings_text( 'shop_address_line_1' );
 	}
-	function shop_address_line_1(): void {
+	public function shop_address_line_1(): void {
 		echo esc_html( $this->get_shop_address_line_1() );
 	}
 
 	/**
 	 * Return/Show shop/company address line 2 if provided.
 	 */
-	function get_shop_address_line_2(): string {
+	public function get_shop_address_line_2(): string {
 		return $this->get_settings_text( 'shop_address_line_2' );
 	}
-	function shop_address_line_2(): void {
+	public function shop_address_line_2(): void {
 		echo esc_html( $this->get_shop_address_line_2() );
 	}
 
 	/**
 	 * Return/Show shop/company address country if provided.
 	 */
-	function get_shop_address_country(): string {
+	public function get_shop_address_country(): string {
 		return wpo_wcpdf_get_country_name_from_code( $this->get_shop_address_country_code() );
 	}
-	function shop_address_country(): void {
+	public function shop_address_country(): void {
 		echo esc_html( $this->get_shop_address_country() );
 	}
 
 	/**
 	 * Return/Show shop/company address country code if provided.
 	 */
-	function get_shop_address_country_code(): string {
+	public function get_shop_address_country_code(): string {
 		return $this->get_settings_text( 'shop_address_country', '', false );
 	}
-	function shop_address_country_code(): void {
+	public function shop_address_country_code(): void {
 		echo esc_html( $this->get_shop_address_country_code() );
 	}
 
 	/**
 	 * Return/Show shop/company address state if provided.
 	 */
-	function get_shop_address_state(): string {
+	public function get_shop_address_state(): string {
 		return $this->get_settings_text( 'shop_address_state' );
 	}
-	function shop_address_state(): void {
+	public function shop_address_state(): void {
 		echo esc_html( $this->get_shop_address_state() );
 	}
 
 	/**
 	 * Return/Show shop/company address city if provided.
 	 */
-	function get_shop_address_city(): string {
+	public function get_shop_address_city(): string {
 		return $this->get_settings_text( 'shop_address_city' );
 	}
-	function shop_address_city(): void {
+	public function shop_address_city(): void {
 		echo esc_html( $this->get_shop_address_city() );
 	}
 
 	/**
 	 * Return/Show shop/company address postcode if provided.
 	 */
-	function get_shop_address_postcode(): string {
+	public function get_shop_address_postcode(): string {
 		return $this->get_settings_text( 'shop_address_postcode' );
 	}
-	function shop_address_postcode(): void {
+	public function shop_address_postcode(): void {
 		echo esc_html( $this->get_shop_address_postcode() );
 	}
 
 	/**
 	 * Return/Show shop/company address additional info if provided.
 	 */
-	function get_shop_address_additional(): string {
+	public function get_shop_address_additional(): string {
 		return $this->get_settings_text( 'shop_address_additional' );
 	}
-	function shop_address_additional(): void {
+	public function shop_address_additional(): void {
 		echo wp_kses_post( $this->get_shop_address_additional() );
 	}
 

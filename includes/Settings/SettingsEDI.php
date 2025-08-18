@@ -29,7 +29,7 @@ class SettingsEDI {
 	/**
 	 * Constructor.
 	 */
-	function __construct()	{
+	public function __construct()	{
 		$this->sections = apply_filters( 'wpo_ips_edi_settings_sections', array(
 			'settings'    => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
 			'identifiers' => __( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
