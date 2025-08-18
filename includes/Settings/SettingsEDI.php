@@ -35,7 +35,7 @@ class SettingsEDI {
 			'identifiers' => __( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
 			'taxes'       => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 			'info'        => __( 'Info', 'woocommerce-pdf-invoices-packing-slips' ),
-			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ) . ' <sup class="wcpdf_pro">Pro</sup>',
+			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
 
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
@@ -1118,14 +1118,7 @@ class SettingsEDI {
 		<p><?php esc_html_e( 'Send your documents through supported delivery networks directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="notice notice-info inline">
 			<p>
-				<?php
-					echo wp_kses_post( sprintf(
-						/* translators: %1$s: open link anchor, %2$s: close link anchor */
-						__( 'This feature is available exclusively with the %1$sProfessional extension%2$s and is currently under development.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/" target="_blank" rel="noopener noreferrer">',
-						'</a>'
-					) );
-				?>
+				<?php esc_html_e( 'This feature is currently under development.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 			</p>
 		</div>
 		<?php
