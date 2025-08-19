@@ -1123,9 +1123,7 @@ class SettingsEDI {
 			</p>
 		</div>
 		<?php
-		$html = apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this );
-		
-		echo $html;
+		echo apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this );
 	}
 
 }
