@@ -1114,6 +1114,7 @@ class SettingsEDI {
 	 * @return void
 	 */
 	public function output_network(): void {
+		ob_start();
 		?>
 		<p><?php esc_html_e( 'Send your documents through supported delivery networks directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="notice notice-info inline">
@@ -1122,6 +1123,9 @@ class SettingsEDI {
 			</p>
 		</div>
 		<?php
+		$html = apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this );
+		
+		echo $html;
 	}
 
 }
