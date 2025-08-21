@@ -18,6 +18,12 @@ composer.lock
 package.json
 package-lock.json
 yarn.lock
+**/composer.json
+**/composer.lock
+**/composer.phar
+**/package.json
+**/package-lock.json
+**/yarn.lock
 
 # WordPress-specific meta/config
 .wordpress-org/
