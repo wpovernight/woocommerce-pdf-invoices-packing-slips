@@ -742,7 +742,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	gap: 8px;
 }
 
-#wpo-wcpdf-settings .edi-customer-identifiers input[type="number"]{
+#wpo-wcpdf-settings .edi-customer-identifiers input[type="text"]{
 	max-width: 120px;
 	padding: 0 6px;
 }

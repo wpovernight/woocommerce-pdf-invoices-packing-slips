@@ -318,6 +318,7 @@ class Assets {
 						'vat_warning'               => __( 'VAT number should start with a country prefix (e.g. NL123456789B01).', 'woocommerce-pdf-invoices-packing-slips' ),
 						'error_loading_identifiers' => __( 'Error loading identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
 						'loading'                   => __( 'Loading...', 'woocommerce-pdf-invoices-packing-slips' ),
+						'valid_number'              => __( 'Order ID must be a valid number', 'woocommerce-pdf-invoices-packing-slips' ),
 						'enter_order_id'            => __( 'Please enter an Order ID.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'no_identifiers_found'      => __( 'No customer identifiers found.', 'woocommerce-pdf-invoices-packing-slips' ),
 					)
