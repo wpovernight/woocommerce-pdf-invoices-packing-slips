@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.6.2\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.6.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-31T08:52:08+00:00\n"
+"POT-Creation-Date: 2025-08-18T13:29:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -482,7 +482,7 @@ msgid "Invoice"
 msgstr ""
 
 #: includes/Documents/Invoice.php:68
-#: includes/Documents/OrderDocumentMethods.php:1350
+#: includes/Documents/OrderDocumentMethods.php:1359
 msgid "Invoice Number:"
 msgstr ""
 
@@ -582,7 +582,7 @@ msgid "Display invoice date"
 msgstr ""
 
 #: includes/Documents/Invoice.php:315
-#: includes/Documents/OrderDocumentMethods.php:1336
+#: includes/Documents/OrderDocumentMethods.php:1345
 #: views/setup-wizard/display-options.php:63
 msgid "Order Date"
 msgstr ""
@@ -966,22 +966,22 @@ msgstr ""
 msgid "Discount"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1141
+#: includes/Documents/OrderDocumentMethods.php:1150
 msgid "Total ex. VAT"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1144
+#: includes/Documents/OrderDocumentMethods.php:1153
 #: includes/Settings.php:451
 msgid "Total"
 msgstr ""
 
 #. translators: Document title
-#: includes/Documents/OrderDocumentMethods.php:1333
+#: includes/Documents/OrderDocumentMethods.php:1342
 #, php-format
 msgid "%s Date"
 msgstr ""
 
-#: includes/Documents/OrderDocumentMethods.php:1373
+#: includes/Documents/OrderDocumentMethods.php:1382
 msgid "Reason for refund:"
 msgstr ""
 
@@ -1017,7 +1017,7 @@ msgid "Upgrade to our Professional extension to attach packing slips to any emai
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Frontend.php:146
+#: includes/Frontend.php:148
 #, php-format
 msgid "Download %s (PDF)"
 msgstr ""
@@ -2389,17 +2389,17 @@ msgid "SKU"
 msgstr ""
 
 #: languages/strings.php:14
-#: wpo-ips-functions.php:1014
+#: wpo-ips-functions.php:1016
 msgid "Product"
 msgstr ""
 
 #: languages/strings.php:15
-#: wpo-ips-functions.php:1015
+#: wpo-ips-functions.php:1017
 msgid "Quantity"
 msgstr ""
 
 #: languages/strings.php:16
-#: wpo-ips-functions.php:1016
+#: wpo-ips-functions.php:1018
 msgid "Price"
 msgstr ""
 
@@ -3692,6 +3692,6 @@ msgstr ""
 msgid "Hide this version"
 msgstr ""
 
-#: wpo-ips-functions.php:396
+#: wpo-ips-functions.php:398
 msgid "Error creating PDF, please contact the site owner."
 msgstr ""
