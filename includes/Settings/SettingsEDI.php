@@ -568,6 +568,17 @@ class SettingsEDI {
 						}
 						?>
 					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="2">
+								<?php printf(
+									/* translators: General settings link */
+									esc_html__( 'Missing details can be completed in the %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+									'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#shop_information' ) ) . '" class="edi-complete-details">' . esc_html__( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+								); ?>
+							</td>
+						</tr>
+					</tfoot>
 				</table>
 			</div>
 			<?php
