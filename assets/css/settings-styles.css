@@ -440,7 +440,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	overflow-x: hidden;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar > form:not(.taxes) {
+#wpo-wcpdf-preview-wrapper .sidebar > form {
 	background: transparent !important;
 	overflow: visible;
 	padding: 0;
@@ -448,6 +448,10 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	box-sizing: border-box;
 	width: calc(100% - 4em);
 	max-width: 50vw;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar > form.taxes {
+	max-width: none;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form.editor {
