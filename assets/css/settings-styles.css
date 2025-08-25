@@ -418,6 +418,101 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	box-shadow: none;
 }
 
+/* EDI Tax Defaults Card */
+.edi-tax-defaults-card {
+	background: #F9F9F9;
+	border: 1px solid #D5D7DA;
+	border-radius: 8px;
+	padding: 20px;
+	margin: 20px 0;
+}
+
+.edi-tax-defaults-card h3 {
+	margin: 0 0 10px;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.edi-tax-defaults-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.edi-tax-defaults-field {
+	display: flex;
+	flex-direction: column;
+}
+
+.edi-tax-defaults-field label {
+	margin-bottom: 6px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #1d2327;
+}
+
+.edi-tax-defaults-control select {
+	width: 100%;
+	max-width: 100%;
+	padding: 6px 8px;
+	border: 1px solid #d1d5db;
+	border-radius: 4px;
+	background-color: #fff;
+	font-size: 13px;
+}
+
+.edi-tax-defaults-control .current {
+	margin-top: 6px;
+}
+
+.edi-tax-defaults-control .current code {
+	background: #D5D7DA;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 12px;
+	color: #414651;
+}
+
+/* EDI tax table */
+.edi-tax-class-table table {
+	border: 0;
+	box-shadow: none;
+}
+
+.edi-tax-class-table table > tbody > tr {
+	background-color: transparent !important;
+}
+
+.edi-tax-class-table table > thead > tr > th {
+	background-color: #fafafa;
+	border-bottom: 1px solid #E9EAEB !important;
+	padding: 16px;
+}
+
+.edi-tax-class-table table > tbody > tr > td {
+	border-bottom: 1px solid #E9EAEB !important;
+	padding: 16px;
+}
+
+.edi-tax-class-table table > tbody > tr > td > select {
+	width: 100%;
+	max-width: 100%;
+	padding: 6px 8px;
+	border: 1px solid #d1d5db;
+	border-radius: 4px;
+	background-color: #fff;
+	font-size: 13px;
+}
+
+.edi-tax-class-table table > tbody > tr > td code {
+	background: #D5D7DA;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 12px;
+	color: #414651;
+}
+
 #wpo-wcpdf-preview-wrapper {
 	width: 100%;
 	height: auto;
@@ -1412,16 +1507,16 @@ div.upgrade-table-description a,
 
 #plugin-recommendations {
 	border-radius: 8px;
-    background-color: #f1e9fc;
+	background-color: #f1e9fc;
 	padding: 4em 3em;
 }
 
 #plugin-recommendations .card-container {
 	max-width: 1100px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 3em;
-    padding: 2em 0;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-gap: 3em;
+	padding: 2em 0;
 }
 
 #plugin-recommendations .recommendation-card {
@@ -1457,9 +1552,9 @@ div.upgrade-table-description a,
 
 #plugin-recommendations .recommendation-card h5 {
 	text-align: left;
-    font-size: 1.4em;
+	font-size: 1.4em;
 	line-height: 1.3em;
-    font-weight: bold;
+	font-weight: bold;
 	margin: 1em 0;
 }
 

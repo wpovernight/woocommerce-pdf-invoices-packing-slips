@@ -702,52 +702,37 @@ class SettingsEDI {
 	 * @return void
 	 */
 	public function output_taxes(): void {
+		$rates                       = \WC_Tax::get_tax_rate_classes();
+		$formatted_rates             = array();
+		$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
+
+		foreach ( $rates as $rate ) {
+			if ( empty( $rate->slug ) ) {
+				continue;
+			}
+
+			$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
+		}
 		?>
 		<p><?php esc_html_e( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-		<p>
-			<?php
-				echo wp_kses_post(
-					sprintf(
-						/* translators: %s: strong tag with note */
-						__( '%s: Each rate line allows you to configure the tax scheme, category, and reason. If these values are set to "Default," they will automatically inherit the settings selected in the "Tax class default" dropdowns at the bottom of the table.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<strong>' . esc_html__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>'
-					)
-				);
-			?>
-		</p>
-		<p>
-			<?php
-				printf(
-					/* translators: %1$s: open link anchor, %2$s: close link anchor */
-					esc_html__( 'You can add custom tax schemes, categories or reasons by following the instructions in our %1$sdocumentation%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/ubl-tax-classification-filter-hooks/" target="_blank" rel="noopener noreferrer">',
-					'</a>'
-				);
-			?>
-		</p>
+		<?php $this->output_tax_class_selector_and_action( $formatted_rates ); // Output tax class selector and action button ?>
+		<?php $this->output_default_tax_classification_panel(); ?>
 		<div id="edi-tax-save-notice" class="notice" style="display:none;"></div>
+		<?php foreach ( $formatted_rates as $slug => $name ) : ?>
+			<div class="edi-tax-class-table" data-tax-class="<?php echo esc_attr( $slug ); ?>" style="display:none;">
+				<?php $this->output_table_for_tax_class( $slug ); ?>
+			</div>
+		<?php endforeach; ?>
+		<p>
+			<button
+				type="button"
+				class="button button-primary button-edi-save-taxes"
+				data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>"
+				data-action="wpo_ips_edi_save_taxes">
+				<?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</button>
+		</p>
 		<?php
-			$rates                       = \WC_Tax::get_tax_rate_classes();
-			$formatted_rates             = array();
-			$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
-
-			foreach ( $rates as $rate ) {
-				if ( empty( $rate->slug ) ) {
-					continue;
-				}
-
-				$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
-			}
-
-			// Output tax class selector and action button
-			$this->output_tax_class_selector_and_action( $formatted_rates );
-
-			// Output all tables wrapped in containers
-			foreach ( $formatted_rates as $slug => $name ) {
-				echo '<div class="edi-tax-class-table" data-tax-class="' . esc_attr( $slug ) . '" style="display:none;">';
-				$this->output_table_for_tax_class( $slug );
-				echo '</div>';
-			}
 	}
 
 	/**
@@ -779,6 +764,109 @@ class SettingsEDI {
 						<?php echo esc_html( $name ); ?>
 					</a>
 				<?php endforeach; ?>
+			</div>
+		</div>
+		<?php
+	}
+	
+	/**
+	 * Output the default tax classification panel.
+	 * 
+	 * @return void
+	 */
+	public function output_default_tax_classification_panel(): void {
+		$edi_tax_settings = wpo_ips_edi_get_tax_settings();
+
+		$allowed_html = array(
+			'select' => array(
+				'name'         => true,
+				'id'           => true,
+				'class'        => true,
+				'style'        => true,
+				'data-current' => true,
+			),
+			'option' => array(
+				'value'    => true,
+				'selected' => true,
+			),
+		);
+
+		// Defaults live under ['class']['default'].
+		$defaults = isset( $edi_tax_settings['class']['default'] ) && is_array( $edi_tax_settings['class']['default'] )
+			? $edi_tax_settings['class']['default']
+			: array();
+
+		$scheme   = isset( $defaults['scheme'] )   ? $defaults['scheme']   : 'default';
+		$category = isset( $defaults['category'] ) ? $defaults['category'] : 'default';
+		$reason   = isset( $defaults['reason'] )   ? $defaults['reason']   : 'default';
+
+		// We use a pseudo "slug" of 'default' to point the selects to the defaults bucket.
+		$slug = 'default';
+		?>
+		<div class="edi-tax-defaults-card" aria-labelledby="edi-tax-defaults-title">
+			<h3><?php esc_html_e( 'Configure default tax classifications', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
+
+			<p class="description">
+				<?php
+					esc_html_e(
+						'These defaults will be applied when "Default" is selected for individual tax rates.',
+						'woocommerce-pdf-invoices-packing-slips'
+					);
+				?>
+			</p>
+			<p class="description">
+				<?php
+					printf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						esc_html__( 'For more information on setting up the tax table, please see our %1$sarticle%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="#" target="_blank" rel="noopener noreferrer">', // TODO: add link
+						'</a>'
+					);
+				?>
+			</p>
+
+			<div class="edi-tax-defaults-grid">
+				<div class="edi-tax-defaults-field">
+					<label><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+					<div class="edi-tax-defaults-control">
+						<?php
+							$select_for_scheme = $this->get_tax_select_for( 'scheme', 'class', $slug, $scheme );
+							echo wp_kses( $select_for_scheme, $allowed_html );
+						?>
+						<div class="current">
+							<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
+							<code><?php echo esc_html( $scheme ); ?></code>
+						</div>
+					</div>
+				</div>
+
+				<div class="edi-tax-defaults-field">
+					<label><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+					<div class="edi-tax-defaults-control">
+						<?php
+							$select_for_category = $this->get_tax_select_for( 'category', 'class', $slug, $category );
+							echo wp_kses( $select_for_category, $allowed_html );
+						?>
+						<div class="current">
+							<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
+							<code><?php echo esc_html( $category ); ?></code>
+						</div>
+					</div>
+				</div>
+
+				<div class="edi-tax-defaults-field">
+					<label><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+					<div class="edi-tax-defaults-control">
+						<?php
+							$select_for_reason = $this->get_tax_select_for( 'reason', 'class', $slug, $reason );
+							echo wp_kses( $select_for_reason, $allowed_html );
+						?>
+						<div class="current">
+							<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
+							<code><?php echo esc_html( $reason ); ?></code>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<?php
@@ -919,48 +1007,6 @@ class SettingsEDI {
 					}
 				?>
 			</tbody>
-			<tfoot>
-				<tr>
-					<th colspan="5" style="text-align: right;"><?php esc_html_e( 'Tax class default', 'woocommerce-pdf-invoices-packing-slips' ); ?>:</th>
-					<?php
-						$scheme   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] )   ? $edi_tax_settings['class'][ $slug ]['scheme']   : 'default';
-						$category = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
-						$reason   = isset( $edi_tax_settings['class'][ $slug ]['reason'] )   ? $edi_tax_settings['class'][ $slug ]['reason']   : 'default';
-					?>
-					<th>
-						<?php
-							$select_for_scheme = $this->get_tax_select_for( 'scheme', 'class', $slug, $scheme );
-							echo wp_kses( $select_for_scheme, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme ) . '</code></div>';
-						?>
-					</th>
-					<th>
-						<?php
-							$select_for_category = $this->get_tax_select_for( 'category', 'class', $slug, $category );
-							echo wp_kses( $select_for_category, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category ) . '</code></div>';
-						?>
-					</th>
-					<th>
-						<?php
-							$select_for_reason = $this->get_tax_select_for( 'reason', 'class', $slug, $reason );
-							echo wp_kses( $select_for_reason, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason ) . '</code></div>';
-						?>
-					</th>
-					<th class="remark">
-						<?php
-							foreach ( EN16931::get_vatex_remarks() as $field => $remarks ) {
-								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
-									if ( isset( $remarks[ ${$f} ] ) ) {
-										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
-									}
-								}
-							}
-						?>
-					</th>
-				</tr>
-			</tfoot>
 		</table>
 		<?php
 	}

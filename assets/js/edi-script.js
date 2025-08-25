@@ -1,12 +1,12 @@
 jQuery( function ( $ ) {
-	
-	$( 'select[name^="wpo_ips_edi_tax_settings"][name$="[scheme]"],   \
-		select[name^="wpo_ips_edi_tax_settings"][name$="[category]"], \
-		select[name^="wpo_ips_edi_tax_settings"][name$="[reason]"]'
+
+	$( `select[name^="wpo_ips_edi_tax_settings"][name$="[scheme]"],
+		select[name^="wpo_ips_edi_tax_settings"][name$="[category]"],
+		select[name^="wpo_ips_edi_tax_settings"][name$="[reason]"]`
 	).on( 'change', function () {
 		let currentValue = $( this ).data( 'current' );
 		let newValue     = $( this ).find( 'option:selected' ).val();
-		let $current     = $( this ).closest( 'td, th' ).find( '.current' );
+		let $current     = $( this ).closest( 'td, th, div' ).find( '.current' );
 		let newHtml      = `${wpo_ips_edi.new}: <code>${newValue}</code> <strong>(${wpo_ips_edi.unsaved})</strong>`;
 		let oldHtml      = `${wpo_ips_edi.code}: <code>${currentValue}</code>`;
 
@@ -16,11 +16,11 @@ jQuery( function ( $ ) {
 		} else {
 			$current.html( oldHtml );
 		}
-		
+
 		// Display the remark if available
 		if ( $( this ).attr( 'name' ).endsWith( '[reason]' ) ) {
 			let remark = wpo_ips_edi.remarks[ 'reason' ][ newValue ];
-			
+
 			if ( remark ) {
 				$( this ).closest( 'tr' ).find( '.remark' ).html( remark );
 			} else {
@@ -28,7 +28,7 @@ jQuery( function ( $ ) {
 			}
 		}
 	} );
-	
+
 	// Handles switching between tax class tables when clicking the toggle links
 	const $group  = $( '.edi-tax-class-group' );
 	const $links  = $group.find( '.doc-output-toggle' );
@@ -38,10 +38,10 @@ jQuery( function ( $ ) {
 		if ( ! slug ) {
 			return;
 		}
-		
+
 		// toggle tables
 		$tables.hide().filter( `[data-tax-class="${slug}"]` ).show();
-		
+
 		// toggle active state on links
 		$links.removeClass( 'active' ).attr( 'aria-pressed', 'false' )
 			  .filter( `[data-tax-class="${slug}"]` )
@@ -60,7 +60,7 @@ jQuery( function ( $ ) {
 		$tables.first().data( 'tax-class' );
 
 	showTable( initial );
-	
+
 	// Handle the save taxes
 	$( 'button.button-edi-save-taxes' ).on( 'click', function ( e ) {
 		e.preventDefault();
@@ -99,7 +99,7 @@ jQuery( function ( $ ) {
 			}
 		} );
 	} );
-	
+
 	function reloadTaxTable() {
 		const selectedClass = $( '.edi-tax-class-select' ).val();
 
@@ -112,21 +112,21 @@ jQuery( function ( $ ) {
 			$container.html( html );
 		} );
 	}
-	
+
 	// Shared function to load customer order identifiers
 	function loadCustomerOrderIdentifiers() {
 		const $input  = $( '#edi-customer-order-id' );
 		const orderId = $input.val();
 		const $table  = $input.closest( 'table' );
 		const $tbody  = $table.find( 'tbody' );
-		
+
 		if ( ! orderId ) {
 			$tbody.empty().append(
 				`<tr><td colspan="2">${wpo_ips_edi.enter_order_id}</td></tr>`
 			);
 			return false;
 		}
-		
+
 		// Check if orderId is a valid number
 		const trimmedOrderId = $.trim( orderId );
 		if ( isNaN( trimmedOrderId ) || trimmedOrderId === '' ) {
@@ -135,11 +135,11 @@ jQuery( function ( $ ) {
 			);
 			return false;
 		}
-		
+
 		$tbody.empty().append(
 			`<tr><td colspan="2">${wpo_ips_edi.loading}</td></tr>`
 		);
-		
+
 		$.get( wpo_ips_edi.ajaxurl, {
 			action:   'wpo_ips_edi_load_customer_order_identifiers',
 			nonce:    wpo_ips_edi.nonce,
@@ -158,16 +158,16 @@ jQuery( function ( $ ) {
 					let value = identifier.value;
 					let color = '';
 					let note  = '';
-					
+
 					if ( typeof value === 'undefined' || value === null || value === '' ) {
 						color = identifier.required ? '#d63638' : '#996800';
 						value = `<span style="color:${color};">${identifier.required ? wpo_ips_edi.missing : wpo_ips_edi.optional}</span>`;
 					}
-					
+
 					if ( key === 'vat_number' && identifier.value && ! wpo_ips_edi_has_country_prefix( identifier.value ) ) {
 						note = `<br><small style="color:#996800;">${wpo_ips_edi.vat_warning}</small>`;
 					}
-					
+
 					$tbody.append(`
 						<tr>
 							<td>${label}</td>
@@ -182,7 +182,7 @@ jQuery( function ( $ ) {
 				);
 			}
 		} );
-		
+
 		return false;
 	}
 
@@ -203,5 +203,5 @@ jQuery( function ( $ ) {
 	function wpo_ips_edi_has_country_prefix( vat ) {
 		return /^[A-Z]{2}/.test( vat );
 	}
-	
+
 } );
