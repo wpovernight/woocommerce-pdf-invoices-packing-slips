@@ -797,12 +797,12 @@ class SettingsEDI {
 
 		$edi_tax_settings = wpo_ips_edi_get_tax_settings();
 		$table_name       = "{$wpdb->prefix}woocommerce_tax_rates";
-		$slug             = ( 'standard' === strtolower( $slug ) ) ? '' : sanitize_key( $slug );
+		$slug             = sanitize_key( strtolower( $slug ) );
 			
 		$query = wpo_wcpdf_prepare_identifier_query(
 			"SELECT * FROM %i WHERE tax_rate_class = %s;",
 			array( $table_name ),
-			array( $slug )
+			array( ( 'standard' === $slug ) ? '' : $slug )
 		);
 
 		$results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
