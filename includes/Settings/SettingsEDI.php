@@ -748,9 +748,6 @@ class SettingsEDI {
 				$this->output_table_for_tax_class( $slug );
 				echo '</div>';
 			}
-
-			// Output tax class selector and action button
-			$this->output_tax_class_selector_and_action( $formatted_rates );
 	}
 
 	/**
@@ -760,27 +757,29 @@ class SettingsEDI {
 	 * @return void
 	 */
 	public function output_tax_class_selector_and_action( array $formatted_rates ): void {
+		$nonce  = wp_create_nonce( 'edi_save_taxes' );
+		$action = 'wpo_ips_edi_save_taxes';
+
+		if ( empty( $current_slug ) && ! empty( $formatted_rates ) ) {
+			$current_slug = (string) array_key_first( $formatted_rates );
+		}
 		?>
-		<div class="edi-tax-class-group">
-			<label for="edi-tax-class" class="screen-reader-text">
-				<?php esc_html_e( 'Tax class', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-			</label>
-
-			<select id="edi-tax-class" class="edi-tax-class-select">
-				<?php foreach ( $formatted_rates as $slug => $name ) : ?>
-					<option value="<?php echo esc_attr( $slug ); ?>">
+		<div class="edi-tax-class-group" data-nonce="<?php echo esc_attr( $nonce ); ?>" data-action="<?php echo esc_attr( $action ); ?>">
+			<div class="doc-output-toggle-group">
+				<?php foreach ( $formatted_rates as $slug => $name ) :
+					$is_active    = ( $slug === $current_slug );
+					$active_class = $is_active ? 'active' : '';
+					$href         = add_query_arg( 'edi_tax_class', $slug ); // graceful fallback
+					?>
+					<a
+						href="<?php echo esc_url( $href ); ?>"
+						class="doc-output-toggle <?php echo esc_attr( $active_class ); ?>"
+						data-tax-class="<?php echo esc_attr( $slug ); ?>"
+						aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
 						<?php echo esc_html( $name ); ?>
-					</option>
+					</a>
 				<?php endforeach; ?>
-			</select>
-
-			<button
-				type="button"
-				class="button button-primary button-edi-save-taxes"
-				data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>"
-				data-action="wpo_ips_edi_save_taxes">
-				<?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-			</button>
+			</div>
 		</div>
 		<?php
 	}

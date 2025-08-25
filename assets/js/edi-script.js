@@ -29,22 +29,37 @@ jQuery( function ( $ ) {
 		}
 	} );
 	
+	// Handles switching between tax class tables when clicking the toggle links
+	const $group  = $( '.edi-tax-class-group' );
+	const $links  = $group.find( '.doc-output-toggle' );
 	const $tables = $( '.edi-tax-class-table' );
-	const $select = $( '.edi-tax-class-select' );
 
-	function updateTableView() {
-		const selected = $select.val();
-		$tables.hide();
-		$tables.filter( `[data-tax-class=\'${selected}\']` ).show();
+	function showTable( slug ) {
+		if ( ! slug ) {
+			return;
+		}
+		
+		// toggle tables
+		$tables.hide().filter( `[data-tax-class="${slug}"]` ).show();
+		
+		// toggle active state on links
+		$links.removeClass( 'active' ).attr( 'aria-pressed', 'false' )
+			  .filter( `[data-tax-class="${slug}"]` )
+			  .addClass( 'active' ).attr( 'aria-pressed', 'true' );
 	}
 
-	$select.on( 'change', updateTableView );
-	updateTableView(); // Initialize on page load
-	
-	$( '#edi-show-changelog' ).on( 'click', function( e ) {
+	// Click handler
+	$group.on( 'click', '.doc-output-toggle', function ( e ) {
 		e.preventDefault();
-		$( '#edi-standard-changelog' ).slideToggle();
+		showTable( $( this ).data( 'tax-class' ) );
 	} );
+
+	// Initialize
+	const initial = $links.filter( '.active' ).data( 'tax-class' ) ||
+		$links.first().data( 'tax-class' ) ||
+		$tables.first().data( 'tax-class' );
+
+	showTable( initial );
 	
 	// Handle the save taxes
 	$( 'button.button-edi-save-taxes' ).on( 'click', function ( e ) {
