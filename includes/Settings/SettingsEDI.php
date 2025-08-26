@@ -702,16 +702,35 @@ class SettingsEDI {
 	 * @return void
 	 */
 	public function output_taxes(): void {
-		$rates                       = \WC_Tax::get_tax_rate_classes();
-		$formatted_rates             = array();
-		$formatted_rates['standard'] = __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' );
-
-		foreach ( $rates as $rate ) {
-			if ( empty( $rate->slug ) ) {
-				continue;
+		$formatted_rates = array(
+			'standard' => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' )
+		);
+		
+		// Woo 5.2+
+		if ( is_callable( array( '\WC_Tax', 'get_tax_rate_classes' ) ) ) {
+			$rates = \WC_Tax::get_tax_rate_classes();
+			
+			foreach ( $rates as $rate ) {
+				if ( empty( $rate->slug ) ) {
+					continue;
+				}
+			
+				$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? $rate->name : $rate->slug;
 			}
-
-			$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? esc_attr( $rate->name ) : esc_attr( $rate->slug );
+			
+		// Older Woo versions
+		} else {
+			$slugs = \WC_Tax::get_tax_class_slugs();
+			$names = \WC_Tax::get_tax_classes();
+			
+			foreach ( $slugs as $i => $slug ) {
+				if ( empty( $slug ) ) {
+					continue;
+				}
+				
+				$name                     = ! empty( $names[ $i ] ) ? $names[ $i ] : $slug;
+				$formatted_rates[ $slug ] = $name;
+			}
 		}
 		?>
 		<p><?php esc_html_e( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
