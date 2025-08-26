@@ -113,6 +113,7 @@ jQuery( function ( $ ) {
 		} );
 	} );
 
+	// Reload the currently visible tax table
 	function reloadTaxTable() {
 		const selectedClass =
 			$( '.edi-tax-class-group .doc-output-toggle.active' ).data( 'tax-class' ) ||
