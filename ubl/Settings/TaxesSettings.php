@@ -47,7 +47,7 @@ class TaxesSettings {
 				$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? $rate->name : $rate->slug;
 			}
 			
-		// Older Woocommerce versions
+		// Older Woo versions
 		} else {
 			$slugs = \WC_Tax::get_tax_class_slugs();
 			$names = \WC_Tax::get_tax_classes();
