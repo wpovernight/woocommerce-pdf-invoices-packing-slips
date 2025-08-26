@@ -1,5 +1,6 @@
 jQuery( function ( $ ) {
 
+	// Handle changes to tax settings dropdowns
 	$( `select[name^="wpo_ips_edi_tax_settings"][name$="[scheme]"],
 		select[name^="wpo_ips_edi_tax_settings"][name$="[category]"],
 		select[name^="wpo_ips_edi_tax_settings"][name$="[reason]"]`
@@ -72,6 +73,15 @@ jQuery( function ( $ ) {
 		const data    = $form.serialize();
 		const payload = data + '&action=' + encodeURIComponent( action ) + '&nonce=' + encodeURIComponent( nonce );
 		const $notice = $( '#edi-tax-save-notice' );
+		
+		// block ui
+		$form.block( {
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6
+			}
+		} );
 
 		$.post( wpo_ips_edi.ajaxurl, payload, function ( response ) {
 			const message   = response.data || 'Unknown response.';
@@ -91,21 +101,28 @@ jQuery( function ( $ ) {
 
 			setTimeout( function () {
 				$notice.slideUp();
-			}, 5000 );
+			}, 8000 );
 
 			// Reload the tax table
 			if ( response.success ) {
 				reloadTaxTable();
 			}
+			
+			// Unblock UI
+			$form.unblock();
 		} );
 	} );
 
 	function reloadTaxTable() {
-		const selectedClass = $( '.edi-tax-class-select' ).val();
+		const selectedClass =
+			$( '.edi-tax-class-group .doc-output-toggle.active' ).data( 'tax-class' ) ||
+			$( '.edi-tax-class-group .doc-output-toggle' ).first().data( 'tax-class' ) ||
+			$( '.edi-tax-class-table:visible' ).data( 'tax-class' ) ||
+			$( '.edi-tax-class-table' ).first().data( 'tax-class' );
 
 		$.get( wpo_ips_edi.ajaxurl, {
-			action: 'wpo_ips_edi_reload_tax_table',
-			nonce: wpo_ips_edi.nonce,
+			action:    'wpo_ips_edi_reload_tax_table',
+			nonce:     wpo_ips_edi.nonce,
 			tax_class: selectedClass
 		}, function ( html ) {
 			const $container = $( `.edi-tax-class-table[data-tax-class="${selectedClass}"]` );

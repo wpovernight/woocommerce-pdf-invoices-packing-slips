@@ -735,10 +735,8 @@ class SettingsEDI {
 		?>
 			<p><?php esc_html_e( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 			<?php $this->output_tax_class_selector_and_action( $formatted_rates ); // Output tax class selector and action button ?>
-			<div id="edi-tax-save-notice" class="notice" style="display:none;"></div>
 			<?php foreach ( $formatted_rates as $slug => $name ) : ?>
 				<div class="edi-tax-class-table" data-tax-class="<?php echo esc_attr( $slug ); ?>" style="display:none;">
-					<?php $this->output_default_tax_classification_panel( $slug ); ?>
 					<?php $this->output_table_for_tax_class( $slug ); ?>
 				</div>
 			<?php endforeach; ?>
@@ -751,6 +749,7 @@ class SettingsEDI {
 					<?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				</button>
 			</p>
+			<div id="edi-tax-save-notice" class="notice inline" style="display:none;"></div>
 		<?php
 	}
 
@@ -818,7 +817,6 @@ class SettingsEDI {
 		?>
 			<div class="edi-tax-defaults-card" aria-labelledby="edi-tax-defaults-title">
 				<h3><?php esc_html_e( 'Configure default tax classifications', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-
 				<p class="description">
 					<?php
 						esc_html_e(
@@ -917,107 +915,108 @@ class SettingsEDI {
 				'selected'     => true,
 			)
 		);
+		
+		$this->output_default_tax_classification_panel( $slug );
 		?>
+			<table class="widefat striped">
+				<thead>
+					<tr>
+						<th><?php esc_html_e( 'Country code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th><?php esc_html_e( 'State code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th><?php esc_html_e( 'Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th><?php esc_html_e( 'City', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th><?php esc_html_e( 'Rate', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th><?php esc_html_e( 'Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th><?php esc_html_e( 'Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th width="10%"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+						<th width="15%"><?php esc_html_e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
+					</tr>
+				</thead>
+				<tbody id="rates">
+					<?php
+						if ( ! empty( $results ) ) {
+							foreach ( $results as $result ) {
+								$locationResults = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+									$wpdb->prepare(
+										"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;",
+										$result->tax_rate_id
+									)
+								);
+								$postcode = array();
+								$city     = array();
 
-		<table class="widefat striped">
-			<thead>
-				<tr>
-					<th><?php esc_html_e( 'Country code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'State code', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Postcode / ZIP', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'City', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Rate', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th><?php esc_html_e( 'Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th width="10%"><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<th width="15%"><?php esc_html_e( 'Remarks', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-				</tr>
-			</thead>
-			<tbody id="rates">
-				<?php
-					if ( ! empty( $results ) ) {
-						foreach ( $results as $result ) {
-							$locationResults = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-								$wpdb->prepare(
-									"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;",
-									$result->tax_rate_id
-								)
-							);
-							$postcode = array();
-							$city     = array();
+								foreach ( $locationResults as $locationResult ) {
+									if ( ! isset( $locationResult->location_type ) ) {
+										continue;
+									}
 
-							foreach ( $locationResults as $locationResult ) {
-								if ( ! isset( $locationResult->location_type ) ) {
-									continue;
-								}
-
-								switch ( $locationResult->location_type ) {
-									case 'postcode':
-										$postcode[] = $locationResult->location_code;
-										break;
-									case 'city':
-										$city[] = $locationResult->location_code;
-										break;
-								}
-							}
-
-							$country          = empty( $result->tax_rate_country ) ? '*' : $result->tax_rate_country;
-							$state            = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
-							$postcode         = empty( $postcode ) ? '*' : implode( '; ', $postcode );
-							$city             = empty( $city ) ? '*' : implode( '; ', $city );
-
-							$scheme           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
-							$scheme_default   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] ) ? $edi_tax_settings['class'][ $slug ]['scheme'] : 'default';
-							$scheme_code      = ( 'default' === $scheme ) ? $scheme_default : $scheme;
-
-							$category         = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] ) ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
-							$category_default = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
-							$category_code    = ( 'default' === $category ) ? $category_default : $category;
-
-							$reason           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
-							$reason_default   = isset( $edi_tax_settings['class'][ $slug ]['reason'] ) ? $edi_tax_settings['class'][ $slug ]['reason'] : 'default';
-							$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
-
-							echo '<tr>';
-							echo '<td>' . esc_html( $country ) . '</td>';
-							echo '<td>' . esc_html( $state ) . '</td>';
-							echo '<td>' . esc_html( $postcode ) . '</td>';
-							echo '<td>' . esc_html( $city ) . '</td>';
-							echo '<td>' . esc_html( wc_round_tax_total( $result->tax_rate ) ) . '%</td>';
-							echo '<td>';
-							$select_for_scheme = $this->get_tax_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
-							echo wp_kses( $select_for_scheme, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
-							echo '</td>';
-							echo '<td>';
-							$select_for_category = $this->get_tax_select_for( 'category', 'rate', $result->tax_rate_id, $category );
-							echo wp_kses( $select_for_category, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
-							echo '</td>';
-							echo '<td>';
-							$select_for_reason = $this->get_tax_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
-							echo wp_kses( $select_for_reason, $allowed_html );
-							echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
-							echo '</td>';
-							echo '<td class="remark">';
-
-							foreach ( EN16931::get_vatex_remarks() as $field => $remarks ) {
-								foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
-									if ( isset( $remarks[ ${$f} ] ) ) {
-										echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
+									switch ( $locationResult->location_type ) {
+										case 'postcode':
+											$postcode[] = $locationResult->location_code;
+											break;
+										case 'city':
+											$city[] = $locationResult->location_code;
+											break;
 									}
 								}
-							}
 
-							echo '</td>';
-							echo '</tr>';
+								$country          = empty( $result->tax_rate_country ) ? '*' : $result->tax_rate_country;
+								$state            = empty( $result->tax_rate_state ) ? '*' : $result->tax_rate_state;
+								$postcode         = empty( $postcode ) ? '*' : implode( '; ', $postcode );
+								$city             = empty( $city ) ? '*' : implode( '; ', $city );
+
+								$scheme           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['scheme']   : 'default';
+								$scheme_default   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] ) ? $edi_tax_settings['class'][ $slug ]['scheme'] : 'default';
+								$scheme_code      = ( 'default' === $scheme ) ? $scheme_default : $scheme;
+
+								$category         = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] ) ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['category'] : 'default';
+								$category_default = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
+								$category_code    = ( 'default' === $category ) ? $category_default : $category;
+
+								$reason           = isset( $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason'] )   ? $edi_tax_settings['rate'][ $result->tax_rate_id ]['reason']   : 'default';
+								$reason_default   = isset( $edi_tax_settings['class'][ $slug ]['reason'] ) ? $edi_tax_settings['class'][ $slug ]['reason'] : 'default';
+								$reason_code      = ( 'default' === $reason ) ? $reason_default : $reason;
+
+								echo '<tr>';
+								echo '<td>' . esc_html( $country ) . '</td>';
+								echo '<td>' . esc_html( $state ) . '</td>';
+								echo '<td>' . esc_html( $postcode ) . '</td>';
+								echo '<td>' . esc_html( $city ) . '</td>';
+								echo '<td>' . esc_html( wc_round_tax_total( $result->tax_rate ) ) . '%</td>';
+								echo '<td>';
+								$select_for_scheme = $this->get_tax_select_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
+								echo wp_kses( $select_for_scheme, $allowed_html );
+								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
+								echo '</td>';
+								echo '<td>';
+								$select_for_category = $this->get_tax_select_for( 'category', 'rate', $result->tax_rate_id, $category );
+								echo wp_kses( $select_for_category, $allowed_html );
+								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
+								echo '</td>';
+								echo '<td>';
+								$select_for_reason = $this->get_tax_select_for( 'reason', 'rate', $result->tax_rate_id, $reason );
+								echo wp_kses( $select_for_reason, $allowed_html );
+								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
+								echo '</td>';
+								echo '<td class="remark">';
+
+								foreach ( EN16931::get_vatex_remarks() as $field => $remarks ) {
+									foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
+										if ( isset( $remarks[ ${$f} ] ) ) {
+											echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
+										}
+									}
+								}
+
+								echo '</td>';
+								echo '</tr>';
+							}
+						} else {
+							echo '<tr><td colspan="9">' . esc_html__( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
 						}
-					} else {
-						echo '<tr><td colspan="9">' . esc_html__( 'No taxes found for this class.', 'woocommerce-pdf-invoices-packing-slips' ) . '</td></tr>';
-					}
-				?>
-			</tbody>
-		</table>
+					?>
+				</tbody>
+			</table>
 		<?php
 	}
 

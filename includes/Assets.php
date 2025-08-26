@@ -298,7 +298,7 @@ class Assets {
 				wp_enqueue_script(
 					'wpo-ips-edi',
 					WPO_WCPDF()->plugin_url() . '/assets/js/edi-script' . $suffix . '.js',
-					array( 'jquery' ),
+					array( 'jquery', 'jquery-blockui' ),
 					WPO_WCPDF_VERSION,
 					true
 				);
