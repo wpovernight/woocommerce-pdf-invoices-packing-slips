@@ -19,7 +19,7 @@
 		)
 	);
 	$countries       = array_merge( array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ), \WC()->countries->get_countries() );
-	$states          = wpo_wcpdf_get_country_states( $current_settings['shop_address_country']['default'] );
+	$states          = wpo_wcpdf_get_country_states( $current_settings['shop_address_country']['default'] ?? '' );
 	$states_disabled = empty( $states ) ? 'disabled' : '';
 	?>
 	<input
