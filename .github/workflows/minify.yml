@@ -12,19 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
 
-      - name: HTML/CSS/JS Minifier
-        uses: docker://devatherock/minify-js:3.1.0
+      - name: Auto Minify
+        uses: alexmigf/auto-minify@exclude-dirs
         with:
           directory: 'assets'
-          add_suffix: true
-          inclusions: |-
-            .*\.js$
-            .*\.css$
-          exclusions: |-
-            (^|/)js/pdf_js/.*
+          exclude_directories: 'js/pdf_js'
 
       - name: Auto committing minified files
         uses: stefanzweifel/git-auto-commit-action@v4
