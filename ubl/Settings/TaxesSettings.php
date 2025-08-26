@@ -57,7 +57,7 @@ class TaxesSettings {
 					continue;
 				}
 				
-				$name = ! empty( $names[ $i ] ) ? $names[ $i ] : $slug;
+				$name                     = ! empty( $names[ $i ] ) ? $names[ $i ] : $slug;
 				$formatted_rates[ $slug ] = $name;
 			}
 		}
