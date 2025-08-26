@@ -735,10 +735,10 @@ class SettingsEDI {
 		?>
 		<p><?php esc_html_e( 'To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<?php $this->output_tax_class_selector_and_action( $formatted_rates ); // Output tax class selector and action button ?>
-		<?php $this->output_default_tax_classification_panel(); ?>
 		<div id="edi-tax-save-notice" class="notice" style="display:none;"></div>
 		<?php foreach ( $formatted_rates as $slug => $name ) : ?>
 			<div class="edi-tax-class-table" data-tax-class="<?php echo esc_attr( $slug ); ?>" style="display:none;">
+				<?php $this->output_default_tax_classification_panel( $slug ); ?>
 				<?php $this->output_table_for_tax_class( $slug ); ?>
 			</div>
 		<?php endforeach; ?>
@@ -791,9 +791,11 @@ class SettingsEDI {
 	/**
 	 * Output the default tax classification panel.
 	 * 
+	 * @param string $slug The slug of the tax class.
+	 * 
 	 * @return void
 	 */
-	public function output_default_tax_classification_panel(): void {
+	public function output_default_tax_classification_panel( string $slug ): void {
 		$edi_tax_settings = wpo_ips_edi_get_tax_settings();
 
 		$allowed_html = array(
@@ -810,17 +812,9 @@ class SettingsEDI {
 			),
 		);
 
-		// Defaults live under ['class']['default'].
-		$defaults = isset( $edi_tax_settings['class']['default'] ) && is_array( $edi_tax_settings['class']['default'] )
-			? $edi_tax_settings['class']['default']
-			: array();
-
-		$scheme   = isset( $defaults['scheme'] )   ? $defaults['scheme']   : 'default';
-		$category = isset( $defaults['category'] ) ? $defaults['category'] : 'default';
-		$reason   = isset( $defaults['reason'] )   ? $defaults['reason']   : 'default';
-
-		// We use a pseudo "slug" of 'default' to point the selects to the defaults bucket.
-		$slug = 'default';
+		$scheme   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] )   ? $edi_tax_settings['class'][ $slug ]['scheme']   : 'default';
+		$category = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
+		$reason   = isset( $edi_tax_settings['class'][ $slug ]['reason'] )   ? $edi_tax_settings['class'][ $slug ]['reason']   : 'default';
 		?>
 		<div class="edi-tax-defaults-card" aria-labelledby="edi-tax-defaults-title">
 			<h3><?php esc_html_e( 'Configure default tax classifications', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
