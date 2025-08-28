@@ -54,7 +54,8 @@
             "step": "setSiteOptions",
             "options": {
                 "wpo_wcpdf_dismiss_unstable_option_announcement": "yes",
-                "wpo_wcpdf_dismiss_shop_address_notice": true
+                "wpo_wcpdf_dismiss_shop_address_notice": true,
+                "wpo_wcpdf_install_notice_dismissed": true
             }
         },
         {
