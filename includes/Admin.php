@@ -865,6 +865,15 @@ class Admin {
 		// Default number data
 		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
+			$default_number  = 0;
+
+			if (
+				'invoice' === $document->get_type() &&
+				! empty( \WPO_WCPDF()->settings->debug_settings['default_manual_invoice_number'] ) &&
+				'next_invoice_number' === \WPO_WCPDF()->settings->debug_settings['default_manual_invoice_number']
+			) {
+				$default_number = $document->get_sequential_number_store()->get_next() ?? 0;
+			}
 
 			$current['number'] = array(
 				'prefix' => array(
@@ -872,7 +881,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_prefix",
 				),
 				'plain' => array(
-					'value' => 0,
+					'value' => $default_number,
 					'name'  => "{$name_prefix}number_plain",
 				),
 				'suffix' => array(
