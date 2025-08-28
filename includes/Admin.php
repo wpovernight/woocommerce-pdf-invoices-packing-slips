@@ -1144,7 +1144,11 @@ class Admin {
 											'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents&section=' . $document->get_type() ) ) . '#next_' . $document->slug . '_number" target="_blank">',
 											'</a>'
 										) ); ?>
-										<?php esc_html_e( 'Please note that changing the document number may create gaps in the numbering sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+										<?php echo wp_kses_post( sprintf(
+											/* translators: %s 0 (zero) */
+											__( 'Please note that changing the document number may create gaps in the numbering sequence. Keeping it set to %s will automatically use the next invoice number and increment the sequence.', 'woocommerce-pdf-invoices-packing-slips' ),
+											'<code>0</code>'
+										) ); ?>
 									</div>
 								</div>
 							</div>
@@ -1499,8 +1503,12 @@ class Admin {
 					$document->set_data( $document_data, $order );
 
 					// check if we have number, and if not generate one
-					if ( $document->get_date() && ! $document->get_number() && is_callable( array( $document, 'initiate_number' ) ) ) {
-						$document->initiate_number();
+					if (
+						$document->get_date() &&
+						( empty( $document->get_number() ) || empty( $document->get_number()->number ) ) &&
+						is_callable( array( $document, 'initiate_number' ) )
+					) {
+						$document->initiate_number( true );
 					}
 
 					$document->save();

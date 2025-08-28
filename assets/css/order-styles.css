@@ -171,6 +171,9 @@
 	font-size: 0.8em;
 	color: #999;
 }
+.wcpdf-data-fields .data-fields-row .row-note code {
+	font-size: inherit;
+}
 
 .wcpdf-data-fields h4 {
 	padding: 10px;
@@ -237,25 +240,25 @@
 }
 
 @media screen and (max-width: 782px) {
-	
+
 	.wp-list-table .column-pdf_invoice_number, .wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number:not(.check-column) {
 		display: none;
 	}
-	
+
 	.wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number {
 		padding: 3px 8px 3px 35%
 	}
-	
+
 }
 
 @media screen and (max-width: 1200px) {
-	
+
 	.wcpdf-data-fields .editable > table,
 	.wcpdf-data-fields .editable-notes > table {
 		width: 100% !important;
 		max-width: 100% !important;
 	}
-	
+
 }
 
 /* Safari */
