@@ -700,7 +700,7 @@ class WPO_WCPDF {
 				wcpdf_log_error( 'Invalid nonce while hiding unstable version notice.' );
 			}
 
-			wp_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
+			wp_redirect( remove_query_arg( array( $hide_version_arg, '_wpnonce' ), $_SERVER['REQUEST_URI'] ) );
 			exit;
 		}
 
