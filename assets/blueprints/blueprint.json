@@ -1,0 +1,663 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/wp-admin/admin.php?page=wpo_wcpdf_options_page",
+  "preferredVersions": {
+    "php": "8.1",
+    "wp": "latest"
+  },
+  "steps": [
+    {
+      "step": "login",
+      "username": "admin"
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "woocommerce"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "woocommerce-pdf-invoices-packing-slips"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "installTheme",
+      "themeData": {
+        "resource": "wordpress.org/themes",
+        "slug": "storefront"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "woocommerce_store_address": "Keizersgracht 99999",
+        "woocommerce_store_address_2": "",
+        "woocommerce_store_city": "Amsterdam",
+        "woocommerce_default_country": "NL",
+        "woocommerce_store_postcode": "1017 EG",
+        "woocommerce_allowed_countries": "all",
+        "woocommerce_all_except_countries": [],
+        "woocommerce_specific_allowed_countries": [],
+        "woocommerce_ship_to_countries": "",
+        "woocommerce_specific_ship_to_countries": [],
+        "woocommerce_default_customer_address": "base",
+        "woocommerce_calc_taxes": "yes",
+        "woocommerce_enable_coupons": "yes",
+        "woocommerce_calc_discounts_sequentially": "no",
+        "woocommerce_currency": "EUR",
+        "woocommerce_currency_pos": "left_space",
+        "woocommerce_price_thousand_sep": ".",
+        "woocommerce_price_decimal_sep": ",",
+        "woocommerce_price_num_decimals": "2"
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "woocommerce_shop_page_id": "7",
+        "woocommerce_cart_redirect_after_add": "no",
+        "woocommerce_enable_ajax_add_to_cart": "yes",
+        "woocommerce_placeholder_image": "6",
+        "woocommerce_weight_unit": "kg",
+        "woocommerce_dimension_unit": "cm",
+        "woocommerce_enable_reviews": "yes",
+        "woocommerce_review_rating_verification_label": "yes",
+        "woocommerce_review_rating_verification_required": "no",
+        "woocommerce_enable_review_rating": "yes",
+        "woocommerce_review_rating_required": "yes",
+        "woocommerce_manage_stock": "yes",
+        "woocommerce_hold_stock_minutes": "60",
+        "woocommerce_notify_low_stock": "yes",
+        "woocommerce_notify_no_stock": "yes",
+        "woocommerce_stock_email_recipient": "support@wpovernight.com",
+        "woocommerce_notify_low_stock_amount": "2",
+        "woocommerce_notify_no_stock_amount": "0",
+        "woocommerce_hide_out_of_stock_items": "no",
+        "woocommerce_stock_format": "",
+        "woocommerce_file_download_method": "force",
+        "woocommerce_downloads_redirect_fallback_allowed": "no",
+        "woocommerce_downloads_require_login": "no",
+        "woocommerce_downloads_grant_access_after_payment": "yes",
+        "woocommerce_downloads_deliver_inline": "",
+        "woocommerce_downloads_add_hash_to_filename": "yes",
+        "woocommerce_downloads_count_partial": "yes",
+        "woocommerce_attribute_lookup_enabled": "no",
+        "woocommerce_attribute_lookup_direct_updates": "no",
+        "woocommerce_attribute_lookup_optimized_updates": "no",
+        "woocommerce_product_match_featured_image_by_sku": "no"
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "woocommerce_prices_include_tax": "yes",
+        "woocommerce_tax_based_on": "shipping",
+        "woocommerce_shipping_tax_class": "inherit",
+        "woocommerce_tax_round_at_subtotal": "no",
+        "woocommerce_tax_classes": "",
+        "woocommerce_tax_display_shop": "incl",
+        "woocommerce_tax_display_cart": "incl",
+        "woocommerce_price_display_suffix": "",
+        "woocommerce_tax_total_display": "itemized"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_wc_tax_rate_classes` (`tax_rate_class_id`, `name`, `slug`) VALUES ('1', 'Reduced rate', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_wc_tax_rate_classes` (`tax_rate_class_id`, `name`, `slug`) VALUES ('2', 'Zero rate', 'zero-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('1', 'AT', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('2', 'BE', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('3', 'BG', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('4', 'CY', '', '19.0000', 'VAT (19%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('5', 'CZ', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('6', 'DK', '', '25.0000', 'VAT (25%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('7', 'DE', '', '19.0000', 'VAT (19%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('8', 'EE', '', '24.0000', 'VAT (24%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('9', 'GR', '', '24.0000', 'VAT (24%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('10', 'ES', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('11', 'FI', '', '25.5000', 'VAT (25.5%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('12', 'FR', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('13', 'HR', '', '25.0000', 'VAT (25%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('14', 'IT', '', '22.0000', 'VAT (22%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('15', 'LV', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('16', 'LT', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('17', 'LU', '', '17.0000', 'VAT (17%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('18', 'HU', '', '27.0000', 'VAT (27%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('19', 'IE', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('20', 'MT', '', '18.0000', 'VAT (18%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('21', 'NL', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('22', 'PL', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('23', 'PT', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('24', 'RO', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('25', 'SI', '', '22.0000', 'VAT (22%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('26', 'SK', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('27', 'SE', '', '25.0000', 'VAT (25%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('28', 'MC', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('29', 'AT', '', '10.0000', 'VAT (10%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('30', 'BE', '', '12.0000', 'VAT (12%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('31', 'BG', '', '9.0000', 'VAT (9%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('32', 'CY', '', '9.0000', 'VAT (9%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('33', 'CZ', '', '12.0000', 'VAT (12%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('34', 'DK', '', '25.0000', 'VAT (25%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('35', 'DE', '', '7.0000', 'VAT (7%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('36', 'EE', '', '9.0000', 'VAT (9%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('37', 'GR', '', '13.0000', 'VAT (13%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('38', 'ES', '', '10.0000', 'VAT (10%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('39', 'FI', '', '14.0000', 'VAT (14%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('40', 'FR', '', '10.0000', 'VAT (10%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('41', 'HR', '', '13.0000', 'VAT (13%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('42', 'IT', '', '10.0000', 'VAT (10%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('43', 'LV', '', '12.0000', 'VAT (12%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('44', 'LT', '', '9.0000', 'VAT (9%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('45', 'LU', '', '14.0000', 'VAT (14%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('46', 'HU', '', '18.0000', 'VAT (18%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('47', 'IE', '', '13.5000', 'VAT (13.5%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('48', 'MT', '', '7.0000', 'VAT (7%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('49', 'NL', '', '9.0000', 'VAT (9%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('50', 'PL', '', '8.0000', 'VAT (8%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('51', 'PT', '', '13.0000', 'VAT (13%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('52', 'RO', '', '11.0000', 'VAT (11%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('53', 'SI', '', '9.5000', 'VAT (9.5%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('54', 'SK', '', '19.0000', 'VAT (19%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('55', 'SE', '', '12.0000', 'VAT (12%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('56', 'MC', '', '10.0000', 'VAT (10%)', '1', '0', '1', '0', 'reduced-rate');"
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "woocommerce_enable_shipping_calc": "yes",
+        "woocommerce_shipping_cost_requires_address": "no",
+        "woocommerce_shipping_hide_rates_when_free": "no",
+        "woocommerce_ship_to_destination": "billing",
+        "woocommerce_shipping_debug_mode": "no"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_shipping_zones` (`zone_id`, `zone_name`, `zone_order`) VALUES ('1', 'Europe', '0');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_shipping_zone_locations` (`location_id`, `zone_id`, `location_code`, `location_type`) VALUES ('1', '1', 'EU', 'continent');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_woocommerce_shipping_zone_methods` (`zone_id`, `instance_id`, `method_id`, `method_order`, `is_enabled`) VALUES ('1', '1', 'flat_rate', '1', '1');"
+      }
+    },
+    {
+      "step": "runSql",
+      "sql": {
+        "resource": "literal",
+        "name": "schema.sql",
+        "contents": "replace into `wp_options` (`option_id`, `option_name`, `option_value`, `autoload`) VALUES ('561', 'woocommerce_flat_rate_1_settings', 'a:3:{s:5:\\\"title\\\";s:9:\\\"Flat rate\\\";s:10:\\\"tax_status\\\";s:7:\\\"taxable\\\";s:4:\\\"cost\\\";s:2:\\\"20\\\";}', 'on');"
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "woocommerce_pickup_location_settings": [],
+        "pickup_location_pickup_locations": []
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "woocommerce_bacs_settings": {
+          "enabled": "yes",
+          "title": "Direct bank transfer",
+          "description": "Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.",
+          "instructions": "",
+          "account_details": "",
+          "account_name": "",
+          "account_number": "",
+          "sort_code": "",
+          "bank_name": "",
+          "iban": "",
+          "bic": ""
+        },
+        "woocommerce_cheque_settings": {
+          "enabled": "yes",
+          "title": "Check payments",
+          "description": "Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.",
+          "instructions": ""
+        },
+        "woocommerce_cod_settings": {
+          "enabled": "yes",
+          "title": "Cash on delivery",
+          "description": "Pay with cash upon delivery.",
+          "instructions": "Pay with cash upon delivery.",
+          "enable_for_methods": [],
+          "enable_for_virtual": "yes"
+        }
+      }
+    }
+  ]
+}
