@@ -35,7 +35,7 @@ class SettingsUbl {
 
 		// VAT number or COC number is empty
 		add_action( 'admin_notices', array( $this, 'vat_coc_required_for_ubl_invoice') );
-		add_action( 'admin_notices', array( '\\WPO\\IPS\\UBL\\Settings\\TaxesSettings', 'standard_update_notice' ) );
+		//add_action( 'admin_notices', array( '\\WPO\\IPS\\UBL\\Settings\\TaxesSettings', 'standard_update_notice' ) );
 	}
 
 	public function output( $active_section, $nonce ) {
