@@ -53,14 +53,6 @@
         {
             "step": "setSiteOptions",
             "options": {
-                "wpo_wcpdf_dismiss_unstable_option_announcement": "yes",
-                "wpo_wcpdf_dismiss_shop_address_notice": true,
-                "wpo_wcpdf_install_notice_dismissed": true
-            }
-        },
-        {
-            "step": "setSiteOptions",
-            "options": {
                 "woocommerce_onboarding_profile": "a:8:{s:15:\"business_choice\";s:28:\"im_just_starting_my_business\";s:8:\"industry\";a:1:{i:0;s:5:\"other\";}s:18:\"is_agree_marketing\";b:0;s:11:\"store_email\";s:15:\"support@wpovernight.com\";s:20:\"is_store_country_set\";b:1;s:9:\"completed\";b:1;s:7:\"skipped\";b:0;s:23:\"is_plugins_page_skipped\";b:1;}",
                 "woocommerce_onboarding_opt_in": "no",
                 "woocommerce_task_list_hidden": "yes",
@@ -141,6 +133,14 @@
                 "woocommerce_tax_display_cart": "incl",
                 "woocommerce_price_display_suffix": "",
                 "woocommerce_tax_total_display": "itemized"
+            }
+        },
+        {
+            "step": "setSiteOptions",
+            "options": {
+                "wpo_wcpdf_dismiss_unstable_option_announcement": "yes",
+                "wpo_wcpdf_dismiss_shop_address_notice": true,
+                "wpo_wcpdf_install_notice_dismissed": true
             }
         },
         {
