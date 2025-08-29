@@ -420,7 +420,7 @@ class Semaphore {
 	 */
 	public static function schedule_semaphore_cleanup(): void {
 		if ( ! self::is_cleanup_scheduled() ) {
-			$frequency     = apply_filters( self::get_cleanup_hook_name() . '_frequency', ( WPO_WCPDF()->settings->debug_settings['semaphore_cleanup_frequency'] ?? 15 ) * DAY_IN_SECONDS ); // default: every 15 days
+			$frequency     = apply_filters( self::get_cleanup_hook_name() . '_frequency', ( (int) ( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ?? 7 ) ) * DAY_IN_SECONDS );
 			$frequency     = apply_filters_deprecated( self::get_cleanup_hook_name() . '_interval', array( $frequency ), '4.7.0', self::get_cleanup_hook_name() . '_frequency' );
 			$error_message = 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.';
 
