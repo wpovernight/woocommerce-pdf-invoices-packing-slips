@@ -531,15 +531,17 @@ class Admin {
 			);
 		}
 
-		// Invoice number & date
-		add_meta_box(
-			'wpo_wcpdf-data-input-box',
-			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'data_input_box_content' ),
-			$screen_id,
-			'normal',
-			'default'
-		);
+		if ( ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'pdf' ) ) ) {
+			// Invoice number & date
+			add_meta_box(
+				'wpo_wcpdf-data-input-box',
+				__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'data_input_box_content' ),
+				$screen_id,
+				'normal',
+				'default'
+			);
+		}
 	}
 
 	/**
