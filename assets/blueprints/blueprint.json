@@ -46,86 +46,46 @@
         {
             "step": "setSiteOptions",
             "options": {
-                "woocommerce_onboarding_profile": "a:8:{s:15:\"business_choice\";s:28:\"im_just_starting_my_business\";s:8:\"industry\";a:1:{i:0;s:5:\"other\";}s:18:\"is_agree_marketing\";b:0;s:11:\"store_email\";s:15:\"support@wpovernight.com\";s:20:\"is_store_country_set\";b:1;s:9:\"completed\";b:1;s:7:\"skipped\";b:0;s:23:\"is_plugins_page_skipped\";b:1;}",
-                "woocommerce_onboarding_opt_in": "no",
-                "woocommerce_task_list_hidden": "yes",
-                "woocommerce_task_list_visited": "yes",
-                "woocommerce_allow_tracking": "no",
-                "woocommerce_show_marketplace_suggestions": "no"
-            }
-        },
-        {
-            "step": "setSiteOptions",
-            "options": {
-                "woocommerce_store_address": "Keizersgracht 99999",
-                "woocommerce_store_address_2": "",
+                "blogname": "My WooCommerce Store",
                 "woocommerce_store_city": "Amsterdam",
-                "woocommerce_default_country": "NL",
+                "woocommerce_store_address": "Keizersgracht 99999",
                 "woocommerce_store_postcode": "1017 EG",
-                "woocommerce_allowed_countries": "all",
-                "woocommerce_all_except_countries": [],
-                "woocommerce_specific_allowed_countries": [],
-                "woocommerce_ship_to_countries": "",
-                "woocommerce_specific_ship_to_countries": [],
-                "woocommerce_default_customer_address": "base",
-                "woocommerce_calc_taxes": "yes",
-                "woocommerce_enable_coupons": "yes",
-                "woocommerce_calc_discounts_sequentially": "no",
+                "woocommerce_default_country": "NL",
+                "woocommerce_onboarding_profile": {
+                    "skipped": true
+                },
                 "woocommerce_currency": "EUR",
-                "woocommerce_currency_pos": "left_space",
-                "woocommerce_price_thousand_sep": ".",
-                "woocommerce_price_decimal_sep": ",",
-                "woocommerce_price_num_decimals": "2"
-            }
-        },
-        {
-            "step": "setSiteOptions",
-            "options": {
-                "woocommerce_shop_page_id": "7",
-                "woocommerce_cart_redirect_after_add": "no",
-                "woocommerce_enable_ajax_add_to_cart": "yes",
-                "woocommerce_placeholder_image": "6",
                 "woocommerce_weight_unit": "kg",
                 "woocommerce_dimension_unit": "cm",
+                "woocommerce_allow_tracking": "no",
+                "woocommerce_cheque_settings": {
+                    "enabled": "yes"
+                },
+                "woocommerce_cod_settings": {
+                    "enabled": "yes"
+                },
+                "woocommerce_bacs_settings": {
+                    "enabled": "yes"
+                },
+                "woocommerce_calc_taxes": "yes",
+                "woocommerce_enable_coupons": "yes",
                 "woocommerce_enable_reviews": "yes",
-                "woocommerce_review_rating_verification_label": "yes",
-                "woocommerce_review_rating_verification_required": "no",
                 "woocommerce_enable_review_rating": "yes",
-                "woocommerce_review_rating_required": "yes",
                 "woocommerce_manage_stock": "yes",
-                "woocommerce_hold_stock_minutes": "60",
                 "woocommerce_notify_low_stock": "yes",
                 "woocommerce_notify_no_stock": "yes",
-                "woocommerce_stock_email_recipient": "support@wpovernight.com",
-                "woocommerce_notify_low_stock_amount": "2",
-                "woocommerce_notify_no_stock_amount": "0",
-                "woocommerce_hide_out_of_stock_items": "no",
-                "woocommerce_stock_format": "",
-                "woocommerce_file_download_method": "force",
-                "woocommerce_downloads_redirect_fallback_allowed": "no",
-                "woocommerce_downloads_require_login": "no",
-                "woocommerce_downloads_grant_access_after_payment": "yes",
-                "woocommerce_downloads_deliver_inline": "",
-                "woocommerce_downloads_add_hash_to_filename": "yes",
-                "woocommerce_downloads_count_partial": "yes",
-                "woocommerce_attribute_lookup_enabled": "no",
-                "woocommerce_attribute_lookup_direct_updates": "no",
-                "woocommerce_attribute_lookup_optimized_updates": "no",
-                "woocommerce_product_match_featured_image_by_sku": "no"
-            }
-        },
-        {
-            "step": "setSiteOptions",
-            "options": {
-                "woocommerce_prices_include_tax": "yes",
-                "woocommerce_tax_based_on": "shipping",
-                "woocommerce_shipping_tax_class": "inherit",
-                "woocommerce_tax_round_at_subtotal": "no",
-                "woocommerce_tax_classes": "",
-                "woocommerce_tax_display_shop": "incl",
-                "woocommerce_tax_display_cart": "incl",
-                "woocommerce_price_display_suffix": "",
-                "woocommerce_tax_total_display": "itemized"
+                "woocommerce_stock_email_recipient": "admin@example.com",
+                "woocommerce_notify_low_stock_amount": 2,
+                "woocommerce_notify_no_stock_amount": 0,
+                "woocommerce_enable_guest_checkout": "yes",
+                "woocommerce_enable_checkout_login_reminder": "yes",
+                "woocommerce_enable_signup_and_login_from_checkout": "yes",
+                "woocommerce_enable_myaccount_registration": "yes",
+                "woocommerce_registration_generate_username": "yes",
+                "woocommerce_registration_generate_password": "yes",
+                "wpo_wcpdf_dismiss_unstable_option_announcement": "yes",
+                "wpo_wcpdf_dismiss_shop_address_notice": true,
+                "wpo_wcpdf_install_notice_dismissed": true
             }
         },
         {
@@ -593,16 +553,6 @@
             }
         },
         {
-            "step": "setSiteOptions",
-            "options": {
-                "woocommerce_enable_shipping_calc": "yes",
-                "woocommerce_shipping_cost_requires_address": "no",
-                "woocommerce_shipping_hide_rates_when_free": "no",
-                "woocommerce_ship_to_destination": "billing",
-                "woocommerce_shipping_debug_mode": "no"
-            }
-        },
-        {
             "step": "runSql",
             "sql": {
                 "resource": "literal",
@@ -635,88 +585,12 @@
             }
         },
         {
-            "step": "setSiteOptions",
-            "options": {
-                "woocommerce_pickup_location_settings": [],
-                "pickup_location_pickup_locations": []
-            }
+            "step": "runPHP",
+            "code": "<?php\n// This script creates sample WooCommerce products without requiring WXR import\n// It runs after WooCommerce is activated and ready\n\n// Load WordPress\nrequire_once '/wordpress/wp-load.php';\n\n// Wait for WooCommerce to be fully loaded\nif ( ! class_exists( 'WC_Product' ) ) {\n\t// Try to load WooCommerce manually if not already loaded\n\t$wc_plugin_file = '/wordpress/wp-content/plugins/woocommerce/woocommerce.php';\n\tif ( file_exists( $wc_plugin_file ) ) {\n\t\trequire_once $wc_plugin_file;\n\t}\n}\n\n// Double-check WooCommerce is active\nif ( ! class_exists( 'WC_Product' ) ) {\n\techo 'WooCommerce is not active. Skipping product creation.';\n\texit(0);\n}\n\n// Load required WordPress functions for media handling\nrequire_once( ABSPATH . 'wp-admin/includes/media.php' );\nrequire_once( ABSPATH . 'wp-admin/includes/file.php' );\nrequire_once( ABSPATH . 'wp-admin/includes/image.php' );\n\n// Helper function to download and attach image to product\nfunction attach_product_thumbnail( $image_url, $product_id, $filename = '' ) {\n\tif ( empty( $image_url ) ) {\n\t\treturn false;\n\t}\n\n\t// Download the image\n\t$tmp = download_url( $image_url );\n\tif ( is_wp_error( $tmp ) ) {\n\t\treturn false;\n\t}\n\n\t// Set up file array\n\t$file_array = array(\n\t\t'name'     => $filename ?: basename( $image_url ),\n\t\t'tmp_name' => $tmp,\n\t);\n\n\t// If filename doesn't have an extension, add one based on mime type\n\tif ( ! preg_match( '/\\\\.(jpg|jpeg|png|gif|webp)$/i', $file_array['name'] ) ) {\n\t\t$file_array['name'] = $file_array['name'] . '.jpg';\n\t}\n\n\t// Upload the image and attach it to the product\n\t$attachment_id = media_handle_sideload( $file_array, $product_id );\n\n\t// Clean up temp file\n\t@unlink( $tmp );\n\n\tif ( is_wp_error( $attachment_id ) ) {\n\t\treturn false;\n\t}\n\n\t// Set as product thumbnail\n\tset_post_thumbnail( $product_id, $attachment_id );\n\n\treturn $attachment_id;\n}\n\n$sample_products = array(\n\tarray(\n\t\t'name'              => 'V-Neck T-Shirt',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a variable product.',\n\t\t'regular_price'     => '19',\n\t\t'sale_price'        => '15',\n\t\t'sku'               => 'woo-vneck-tee',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Tshirts' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/vneck-tee-2.jpg',\n\t\t'image_name'        => 'vneck-tee-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Hoodie',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a variable product.',\n\t\t'regular_price'     => '26',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-hoodie',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Hoodies' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/hoodie-2.jpg',\n\t\t'image_name'        => 'hoodie-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'T-Shirt',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '18',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-tshirt',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Tshirts' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/tshirt-2.jpg',\n\t\t'image_name'        => 'tshirt-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Beanie',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '20',\n\t\t'sale_price'        => '18',\n\t\t'sku'               => 'woo-beanie',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/beanie-2.jpg',\n\t\t'image_name'        => 'beanie-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Belt',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '65',\n\t\t'sale_price'        => '55',\n\t\t'sku'               => 'woo-belt',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/belt-2.jpg',\n\t\t'image_name'        => 'belt-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Cap',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '18',\n\t\t'sale_price'        => '16',\n\t\t'sku'               => 'woo-cap',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/cap-2.jpg',\n\t\t'image_name'        => 'cap-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Sunglasses',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '90',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-sunglasses',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/sunglasses-2.jpg',\n\t\t'image_name'        => 'sunglasses-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Polo',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '20',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-polo',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Tshirts' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/polo-2.jpg',\n\t\t'image_name'        => 'polo-2.jpg'\n\t)\n);\n\n$default_categories = array(\n\t'Clothing'    => 'Apparel and fashion items',\n\t'Tshirts'     => 'T-shirt products',\n\t'Hoodies'     => 'Hooded sweatshirts',\n\t'Accessories' => 'Accessories such as caps, belts, sunglasses'\n);\n\nforeach ( $default_categories as $name => $description ) {\n\tif ( ! term_exists( $name, 'product_cat' ) ) {\n\t\twp_insert_term(\n\t\t\t$name,\n\t\t\t'product_cat',\n\t\t\tarray(\n\t\t\t\t'description' => $description,\n\t\t\t)\n\t\t);\n\t}\n}\n\n$created_count   = 0;\n$failed_count    = 0;\n$images_attached = 0;\n\nforeach ( $sample_products as $product_data ) {\n\ttry {\n\t\t// Create product\n\t\t$product = new WC_Product_Simple();\n\n\t\t$product->set_name( $product_data['name'] );\n\t\t$product->set_description( $product_data['description'] );\n\t\t$product->set_short_description( $product_data['short_description'] );\n\t\t$product->set_regular_price( $product_data['regular_price'] );\n\n\t\tif ( ! empty( $product_data['sale_price'] ) ) {\n\t\t\t$product->set_sale_price( $product_data['sale_price'] );\n\t\t}\n\n\t\t$product->set_sku( $product_data['sku'] );\n\t\t$product->set_stock_status( $product_data['stock_status'] );\n\t\t$product->set_manage_stock( false );\n\t\t$product->set_status( 'publish' );\n\n\t\t// Set categories\n\t\t$category_ids = array();\n\t\tforeach ( $product_data['categories'] as $category_name ) {\n\t\t\t$term = get_term_by( 'name', $category_name, 'product_cat' );\n\t\t\tif ( ! $term ) {\n\t\t\t\t$term_data = wp_insert_term( $category_name, 'product_cat' );\n\t\t\t\tif ( ! is_wp_error( $term_data ) ) {\n\t\t\t\t\t$category_ids[] = $term_data['term_id'];\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t$category_ids[] = $term->term_id;\n\t\t\t}\n\t\t}\n\t\t$product->set_category_ids( $category_ids );\n\n\t\t// Save product first to get ID\n\t\t$product_id = $product->save();\n\n\t\tif ( $product_id ) {\n\t\t\t$created_count++;\n\n\t\t\t// Download and attach the image\n\t\t\tif ( ! empty( $product_data['image_url'] ) ) {\n\t\t\t\t$attachment_id = attach_product_thumbnail(\n\t\t\t\t\t$product_data['image_url'],\n\t\t\t\t\t$product_id,\n\t\t\t\t\t$product_data['image_name']\n\t\t\t\t);\n\n\t\t\t\tif ( $attachment_id ) {\n\t\t\t\t\t$images_attached++;\n\n\t\t\t\t\t// Also set it as the product image in WooCommerce\n\t\t\t\t\t$product = wc_get_product( $product_id );\n\t\t\t\t\t$product->set_image_id( $attachment_id );\n\t\t\t\t\t$product->save();\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t} catch ( Exception $e ) {\n\t\t$failed_count++;\n\t\terror_log( 'Failed to create product: ' . $e->getMessage() );\n\t}\n}\n\necho \"Sample product import completed. Created $created_count products with $images_attached images attached.\";\n\nif ( $failed_count > 0 ) {\n\techo \" Failed to create $failed_count products.\";\n}\n\n// Flush rewrite rules to ensure product permalinks work\nflush_rewrite_rules();\n?>"
         },
         {
-            "step": "setSiteOptions",
-            "options": {
-                "woocommerce_bacs_settings": {
-                    "enabled": "yes",
-                    "title": "Direct bank transfer",
-                    "description": "Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.",
-                    "instructions": "",
-                    "account_details": "",
-                    "account_name": "",
-                    "account_number": "",
-                    "sort_code": "",
-                    "bank_name": "",
-                    "iban": "",
-                    "bic": ""
-                },
-                "woocommerce_cheque_settings": {
-                    "enabled": "yes",
-                    "title": "Check payments",
-                    "description": "Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.",
-                    "instructions": ""
-                },
-                "woocommerce_cod_settings": {
-                    "enabled": "yes",
-                    "title": "Cash on delivery",
-                    "description": "Pay with cash upon delivery.",
-                    "instructions": "Pay with cash upon delivery.",
-                    "enable_for_methods": [],
-                    "enable_for_virtual": "yes"
-                }
-            }
-        },
-        {
-            "step": "setSiteOptions",
-            "options": {
-                "woocommerce_enable_guest_checkout": "yes",
-                "woocommerce_enable_checkout_login_reminder": "no",
-                "woocommerce_enable_signup_and_login_from_checkout": "no",
-                "woocommerce_enable_myaccount_registration": "no",
-                "woocommerce_registration_generate_password": "yes",
-                "woocommerce_erasure_request_removes_order_data": "no",
-                "woocommerce_erasure_request_removes_download_data": "no",
-                "woocommerce_allow_bulk_remove_personal_data": "no",
-                "woocommerce_registration_privacy_policy_text": "Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our [privacy_policy].",
-                "woocommerce_checkout_privacy_policy_text": "Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our [privacy_policy].",
-                "woocommerce_delete_inactive_accounts": {
-                    "number": "",
-                    "unit": "months"
-                },
-                "woocommerce_trash_pending_orders": "",
-                "woocommerce_trash_failed_orders": "",
-                "woocommerce_trash_cancelled_orders": "",
-                "woocommerce_anonymize_refunded_orders": {
-                    "number": "",
-                    "unit": "months"
-                },
-                "woocommerce_anonymize_completed_orders": {
-                    "number": "",
-                    "unit": "months"
-                }
-            }
-        },
-        {
-            "step": "setSiteOptions",
-            "options": {
-                "wpo_wcpdf_dismiss_unstable_option_announcement": "yes",
-                "wpo_wcpdf_dismiss_shop_address_notice": true,
-                "wpo_wcpdf_install_notice_dismissed": true
-            }
-        },
-        {
-            "step": "importWxr",
-            "file": {
-                "resource": "url",
-                "url": "https://raw.githubusercontent.com/wpovernight/woocommerce-pdf-invoices-packing-slips/refs/heads/main/assets/blueprints/data/sample_products.xml"
-            }
+            "step": "runPHP",
+            "code": "<?php\nrequire_once '/wordpress/wp-load.php';\nif(!function_exists('wc_create_order')){return;}\n$product_ids=[];\nforeach(['woo-beanie','woo-tshirt'] as $sku){\n$pid=wc_get_product_id_by_sku($sku);\nif($pid){$product_ids[]=$pid;}\n}\nif(empty($product_ids)){return;}\n$order=wc_create_order();\nif(!$order){return;}\n$order->set_customer_id(1);\n$address=['first_name'=>'John','last_name'=>'Doe','company'=>'ACME Inc.','email'=>'demo_customer@example.com','phone'=>'+31 20 123 4567','address_1'=>'Damrak 123','address_2'=>'','city'=>'Amsterdam','state'=>'','postcode'=>'1012 ZJ','country'=>'NL'];\n$order->set_address($address,'billing');\n$order->set_address($address,'shipping');\nforeach($product_ids as $i=>$pid){\n$qty=$i?2:1;\n$order->add_product(wc_get_product($pid),$qty);\n}\n$zones=WC_Shipping_Zones::get_zones();\nforeach($zones as $zone){\nforeach($zone['shipping_methods'] as $method){\nif('flat_rate'===$method->id&&'yes'===$method->enabled){\n$rate=new WC_Shipping_Rate($method->get_rate_id(),$method->get_title(),(float)$method->get_option('cost',0),[],'flat_rate');\n$order->add_shipping($rate);\nbreak 2;\n}\n}\n}\n$order->set_payment_method('bacs');\n$order->calculate_totals();\n$order->update_status('completed','Demo order created by script.');"
         }
     ]
 }
