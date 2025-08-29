@@ -900,10 +900,11 @@ class SettingsDebug {
 			array(
 				'type'     => 'setting',
 				'id'       => 'default_manual_document_number',
-				'title'    => __( 'Default manual document number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => '',
 				'callback' => 'select',
 				'section'  => 'debug_settings',
 				'args'     => array(
+					'title'       => __( 'Default manual document number', 'woocommerce-pdf-invoices-packing-slips' ),
 					'option_name' => $option_name,
 					'id'          => 'default_manual_document_number',
 					'default'     => 'zero',
@@ -912,6 +913,10 @@ class SettingsDebug {
 						'next_document_number' => __( 'Next document number', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 					'description' => __( 'Select the default value for the document number field in the "PDF document data" meta box when manually creating a new document.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[enable_document_data_editing]',
+						'data-show_for_option_values' => json_encode( array( 'yes' ) ),
+					),
 				)
 			),
 			array(
