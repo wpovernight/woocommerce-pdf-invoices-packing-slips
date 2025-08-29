@@ -285,8 +285,8 @@ class Main {
 		$attach_documents = array();
 
 		foreach ( $documents as $document ) {
-			// This condition skips document types that require the Pro plugin unless it's an invoice or proposal
-			if ( ! in_array( $document->get_type(), array( 'invoice', 'proposal' ), true ) && ! function_exists( 'WPO_WCPDF_Pro' ) ) {
+			// Only invoice is allowed in the free version.
+			if ( ! function_exists( 'WPO_WCPDF_Pro' ) && 'packing-slip' === $document->get_type() ) {
 				continue;
 			}
 
