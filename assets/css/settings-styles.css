@@ -575,6 +575,9 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	font-size: 0.85em;
 	padding-top: 0.7em;
 }
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description > code {
+	font-size: inherit;
+}
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description > span.wpo-warning {
 	width: 100%;
