@@ -507,16 +507,27 @@ class Admin {
 			'high'
 		);
 
-		// create PDF buttons
-		add_meta_box(
-			'wpo_wcpdf-box',
-			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'pdf_actions_meta_box' ),
-			$screen_id,
-			'side',
-			'default'
-		);
+		if ( ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'pdf' ) ) ) {
+			// create PDF buttons
+			add_meta_box(
+				'wpo_wcpdf-box',
+				__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'pdf_actions_meta_box' ),
+				$screen_id,
+				'side',
+				'default'
+			);
 
+			// Invoice number & date
+			add_meta_box(
+				'wpo_wcpdf-data-input-box',
+				__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'data_input_box_content' ),
+				$screen_id,
+				'normal',
+				'default'
+			);
+		}
 
 		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
 		if ( count( $ubl_documents ) > 0 ) {
@@ -527,18 +538,6 @@ class Admin {
 				array( $this, 'ubl_actions_meta_box' ),
 				$screen_id,
 				'side',
-				'default'
-			);
-		}
-
-		if ( ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'pdf' ) ) ) {
-			// Invoice number & date
-			add_meta_box(
-				'wpo_wcpdf-data-input-box',
-				__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
-				array( $this, 'data_input_box_content' ),
-				$screen_id,
-				'normal',
 				'default'
 			);
 		}
