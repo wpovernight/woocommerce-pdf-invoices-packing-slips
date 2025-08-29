@@ -868,9 +868,8 @@ class Admin {
 			$default_number  = 0;
 
 			if (
-				'invoice' === $document->get_type() &&
-				! empty( \WPO_WCPDF()->settings->debug_settings['default_manual_invoice_number'] ) &&
-				'next_invoice_number' === \WPO_WCPDF()->settings->debug_settings['default_manual_invoice_number']
+				! empty( \WPO_WCPDF()->settings->debug_settings['default_manual_document_number'] ) &&
+				'next_document_number' === \WPO_WCPDF()->settings->debug_settings['default_manual_document_number']
 			) {
 				$default_number = $document->get_sequential_number_store()->get_next() ?? 0;
 			}

@@ -885,19 +885,19 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
-				'id'       => 'default_manual_invoice_number',
-				'title'    => __( 'Default manual invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'id'       => 'default_manual_document_number',
+				'title'    => __( 'Default manual document number', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
 				'section'  => 'debug_settings',
 				'args'     => array(
 					'option_name' => $option_name,
-					'id'          => 'default_manual_invoice_number',
+					'id'          => 'default_manual_document_number',
 					'default'     => 'zero',
 					'options'     => array(
-						'zero'                => __( '0 (zero)', 'woocommerce-pdf-invoices-packing-slips' ),
-						'next_invoice_number' => __( 'Next invoice number', 'woocommerce-pdf-invoices-packing-slips' ),
+						'zero'                 => __( '0 (zero)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'next_document_number' => __( 'Next document number', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					'description' => __( 'Select the default value for the invoice number field in the "PDF document data" meta box when manually creating a new invoice.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Select the default value for the document number field in the "PDF document data" meta box when manually creating a new document.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
