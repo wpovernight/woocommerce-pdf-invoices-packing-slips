@@ -1016,6 +1016,14 @@ class Admin {
 		// Default number data
 		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
+			$default_number  = 0;
+
+			if (
+				! empty( \WPO_WCPDF()->settings->debug_settings['default_manual_document_number'] ) &&
+				'next_document_number' === \WPO_WCPDF()->settings->debug_settings['default_manual_document_number']
+			) {
+				$default_number = $document->get_sequential_number_store()->get_next() ?? 0;
+			}
 
 			$current['number'] = array(
 				'prefix' => array(
@@ -1023,7 +1031,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_prefix",
 				),
 				'plain' => array(
-					'value' => 0,
+					'value' => $default_number,
 					'name'  => "{$name_prefix}number_plain",
 				),
 				'suffix' => array(
