@@ -1056,6 +1056,33 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'semaphore_cleanup_frequency',
+				'title'    => __( 'Semaphore cleanup frequency', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'semaphore_cleanup_frequency',
+					'default'     => '15',
+					'options'     => array_reduce(
+						array( 1, 3, 7, 15, 30 ),
+						function( $carry, $n ) {
+							$carry[ (string) $n ] = sprintf(
+								/* translators: %s: number of days */
+								_n( '%s day', '%s days', $n, 'woocommerce-pdf-invoices-packing-slips' ),
+								$n
+							);
+							return $carry;
+						},
+						array()
+					),
+					'description' => sprintf(
+						__( 'Choose how often (in days) the cleanup task should run to remove old semaphore locks. These locks prevent conflicts when generating document numbers.', 'woocommerce-pdf-invoices-packing-slips' )
+					),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'enable_danger_zone_tools',
 				'title'    => __( 'Enable danger zone tools', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
