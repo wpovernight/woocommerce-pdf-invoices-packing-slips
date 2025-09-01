@@ -1887,14 +1887,15 @@ $sql = "CREATE TABLE $table (
 	
 	/**
 	 * Extracts the document slug from a number table like "{$wpdb->prefix}wcpdf_{slug}_number".
+	 * 
+	 * @param string $table_name Full number table name (e.g. "{$wpdb->prefix}wcpdf_invoice_number")
+	 * @return string|null Document slug or null if not matched
 	 */
 	private function get_doc_slug_from_number_table( string $table_name ): ?string {
 		global $wpdb;
 		$prefix = preg_quote( $wpdb->prefix, '/' );
 		if ( preg_match( '/^' . $prefix . 'wcpdf_([a-z0-9_-]+)_number$/i', $table_name, $m ) ) {
-			$slug = strtolower( $m[1] );
-			// Allow remapping if needed.
-			return apply_filters( 'wpo_wcpdf_deleted_doc_slug', $slug, $table_name );
+			return strtolower( $m[1] );
 		}
 		return null;
 	}

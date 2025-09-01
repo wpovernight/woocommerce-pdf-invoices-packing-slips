@@ -127,12 +127,11 @@ class NumberStoreListTable extends \WP_List_Table {
 				if ( $order ) {
 					$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : $item->order_id;
 					$order_id     = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
+					$url          = sprintf( 'post.php?post=%s&action=edit', $order_id );
+					$value        = sprintf( '<a href="%s">#%s</a>', $url, $order_number );
 				} else {
-					$order_number = $item->order_id;
-					$order_id     = $item->order_id;
+					$value        = sprintf( '#%s', $item->order_id );
 				}
-				$url          = sprintf( 'post.php?post=%s&action=edit', $order_id );
-				$value        = sprintf( '<a href="%s">#%s</a>', $url, $order_number );
 				break;
 			case 'order_status':
 				if ( $order ) {
