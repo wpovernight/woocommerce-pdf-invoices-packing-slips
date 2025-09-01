@@ -125,11 +125,11 @@ class NumberStoreListTable extends \WP_List_Table {
 				break;
 			case 'order':
 				if ( $order ) {
-					$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
-					$url      = sprintf( 'post.php?post=%s&action=edit', $order_id );
-					$value    = sprintf( '<a href="%s">#%s</a>', esc_url( admin_url( $url ) ), $order_id );
+					$order_id = (int) is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
+					$url      = sprintf( 'post.php?post=%d&action=edit', $order_id );
+					$value    = sprintf( '<a href="%s">#%d</a>', esc_url( admin_url( $url ) ), $order_id );
 				} else {
-					$value    = sprintf( '#%s', $item->order_id );
+					$value    = sprintf( '#%d', (int) $item->order_id );
 				}
 				break;
 			case 'order_status':
@@ -145,7 +145,7 @@ class NumberStoreListTable extends \WP_List_Table {
 				);
 				break;
 			default:
-				$value = isset( $item->$column_name ) ? $item->$column_name : null;
+				$value = $item->$column_name ?? null;
 				break;
 		}
 
