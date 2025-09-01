@@ -1514,7 +1514,7 @@ class SettingsDebug {
 			update_option( $option_name . '::last_time', time() );
 			return; // exit if no more results
 		}
-		
+
 		$results = array_merge( $results, $chunk_results ); // append the chunk results to the main results array
 
 		update_option( $option_name, $results );
