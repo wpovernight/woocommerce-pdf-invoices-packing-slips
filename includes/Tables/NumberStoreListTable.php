@@ -137,12 +137,12 @@ class NumberStoreListTable extends \WP_List_Table {
 				if ( $order ) {
 					$status = $order->get_status();
 				} else {
-					$status = __( 'deleted', 'woocommerce-pdf-invoices-packing-slips' );
+					$status = __( 'Deleted', 'woocommerce-pdf-invoices-packing-slips' );
 				}
 				$value = sprintf(
 					'<mark class="order-status %s"><span>%s</span></mark>',
 					esc_attr( sanitize_html_class( 'status-' . $status ) ),
-					esc_html( wc_get_order_status_name( $status ) )
+					esc_html( ucfirst( wc_get_order_status_name( $status ) ) )
 				);
 				break;
 			default:

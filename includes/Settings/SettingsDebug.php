@@ -1932,34 +1932,46 @@ $sql = "CREATE TABLE $table (
 
 		$deleted_table = $wpdb->prefix . 'wpo_ips_deleted_orders';
 
-		// Build query (objects). Use COALESCE(date) when fallback is enabled.
+		// Use "document_date or deleted_at" and exclude IDs present in the number table for the same date window.
 		if ( $fallback_to_deleted_at ) {
 			$deleted_query = wpo_wcpdf_prepare_identifier_query(
 				"SELECT
-						document_number AS id,
-						order_id,
-						COALESCE(document_date, deleted_at) AS date,
+						d.document_number AS id,
+						d.order_id,
+						COALESCE(d.document_date, d.deleted_at) AS date,
 						NULL AS calculated_number
-				FROM %i
-				WHERE document_slug = %s
-				AND COALESCE(document_date, deleted_at) BETWEEN %s AND %s
+				FROM %i d
+				WHERE d.document_slug = %s
+				AND COALESCE(d.document_date, d.deleted_at) BETWEEN %s AND %s
+				AND NOT EXISTS (
+					SELECT 1 FROM %i n
+					WHERE n.%i = d.document_number
+					AND n.%i BETWEEN %s AND %s
+				)
 				ORDER BY %i $order_dir",
-				array( $deleted_table, $orderby ),
-				array( $doc_slug, $from, $to )
+				array( $deleted_table, $table_name, 'id', 'date', $orderby ),
+				array( $doc_slug, $from, $to, $from, $to )
 			);
+			
+		// Strictly use "document_date"
 		} else {
 			$deleted_query = wpo_wcpdf_prepare_identifier_query(
 				"SELECT
-						document_number AS id,
-						order_id,
+						d.document_number AS id,
+						d.order_id,
 						%i AS date,
 						NULL AS calculated_number
-				FROM %i
-				WHERE document_slug = %s
+				FROM %i d
+				WHERE d.document_slug = %s
 				AND %i BETWEEN %s AND %s
+				AND NOT EXISTS (
+					SELECT 1 FROM %i n
+					WHERE n.%i = d.document_number
+					AND n.%i BETWEEN %s AND %s
+				)
 				ORDER BY %i $order_dir",
-				array( 'document_date', $deleted_table, 'document_date', $orderby ),
-				array( $doc_slug, $from, $to )
+				array( 'document_date', $deleted_table, 'document_date', $table_name, 'id', 'date', $orderby ),
+				array( $doc_slug, $from, $to, $from, $to )
 			);
 		}
 
