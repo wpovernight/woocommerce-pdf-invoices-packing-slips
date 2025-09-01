@@ -81,10 +81,10 @@ class NumberStoreListTable extends \WP_List_Table {
 				if ( ! empty( $document_type ) && $order ) {
 					$document_slug = str_replace( '-', '_', $document_type );
 					$number_data   = $order->get_meta( "_wcpdf_{$document_slug}_number_data", true );
-					$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
-					$order_id      = $order->get_id() ?? 0;
-					$item_order_id = $item->order_id ?? 0;
-					$item_id       = $item->id;
+					$saved_number  = (int) $number_data['number'] ?? 0;
+					$order_id      = (int) $order->get_id();
+					$item_order_id = (int) $item->order_id ?? 0;
+					$item_id       = (int) $item->id ?? 0;
 					
 					// not invoice document but using invoice number system
 					if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
@@ -93,7 +93,7 @@ class NumberStoreListTable extends \WP_List_Table {
 						// using invoice number
 						if ( empty( $number_data ) ) {
 							$number_data   = $order->get_meta( "_wcpdf_invoice_number_data", true );
-							$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
+							$saved_number  = (int) $number_data['number'] ?? 0;
 							
 						// using order number
 						} else {
@@ -102,10 +102,10 @@ class NumberStoreListTable extends \WP_List_Table {
 					}
 					
 					// all documents using parent order
-					if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item_id ) ) {
+					if ( ! empty( $saved_number ) && $saved_number === $item_id ) {
 						$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
 					// credit notes may have meta saved in the refund order
-					} elseif ( 'credit-note' === $document_type && absint( $order_id ) !== absint( $item_order_id ) ) {
+					} elseif ( 'credit-note' === $document_type && $order_id !== $item_order_id ) {
 						$value = sprintf(
 							'<span class="item-number number-doc-type">%s</span><p style="margin-top:6px;"><span class="item-number number-refund">%s #%s</span></p>',
 							$document_type,
@@ -118,19 +118,18 @@ class NumberStoreListTable extends \WP_List_Table {
 				}
 				break;
 			case 'calculated_number':
-				$value = isset( $item->calculated_number ) ? $item->calculated_number : '-';
+				$value = $item->calculated_number ?? '-';
 				break;
 			case 'date':
-				$value = $item->date;
+				$value = $item->date ?? '-';
 				break;
 			case 'order':
 				if ( $order ) {
-					$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : $item->order_id;
-					$order_id     = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
-					$url          = sprintf( 'post.php?post=%s&action=edit', $order_id );
-					$value        = sprintf( '<a href="%s">#%s</a>', $url, $order_number );
+					$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
+					$url      = sprintf( 'post.php?post=%s&action=edit', $order_id );
+					$value    = sprintf( '<a href="%s">#%s</a>', esc_url( admin_url( $url ) ), $order_id );
 				} else {
-					$value        = sprintf( '#%s', $item->order_id );
+					$value    = sprintf( '#%s', $item->order_id );
 				}
 				break;
 			case 'order_status':
