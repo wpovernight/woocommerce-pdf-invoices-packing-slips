@@ -60,7 +60,7 @@ class NumberStoreListTable extends \WP_List_Table {
 
 		switch ( $column_name ) {
 			case 'number':
-				$value = $item->id;
+				$value = $item->id ?? '-';
 				break;
 			case 'type':
 				$value                          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
@@ -87,7 +87,7 @@ class NumberStoreListTable extends \WP_List_Table {
 					$item_id       = (int) $item->id ?? 0;
 					
 					// not invoice document but using invoice number system
-					if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
+					if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) {
 						$document_type = 'invoice';
 						
 						// using invoice number
