@@ -81,11 +81,11 @@ class NumberStoreListTable extends \WP_List_Table {
 				if ( ! empty( $document_type ) && $order ) {
 					$document_slug = str_replace( '-', '_', $document_type );
 					$number_data   = $order->get_meta( "_wcpdf_{$document_slug}_number_data", true );
-					$saved_number  = (int) $number_data['number'] ?? 0;
-					$order_id      = (int) $order->get_id();
-					$item_order_id = (int) $item->order_id ?? 0;
-					$item_id       = (int) $item->id ?? 0;
-					
+					$saved_number  = (int) ( $number_data['number'] ?? 0 );
+					$order_id      = (int) ( $order->get_id() );
+					$item_order_id = (int) ( $item->order_id ?? 0 );
+					$item_id       = (int) ( $item->id ?? 0 );
+
 					// not invoice document but using invoice number system
 					if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) {
 						$document_type = 'invoice';
@@ -93,7 +93,7 @@ class NumberStoreListTable extends \WP_List_Table {
 						// using invoice number
 						if ( empty( $number_data ) ) {
 							$number_data   = $order->get_meta( "_wcpdf_invoice_number_data", true );
-							$saved_number  = (int) $number_data['number'] ?? 0;
+							$saved_number  = (int) ( $number_data['number'] ?? 0 );
 							
 						// using order number
 						} else {
@@ -125,7 +125,7 @@ class NumberStoreListTable extends \WP_List_Table {
 				break;
 			case 'order':
 				if ( $order ) {
-					$order_id = (int) is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
+					$order_id = (int) ( is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id );
 					$url      = sprintf( 'post.php?post=%d&action=edit', $order_id );
 					$value    = sprintf( '<a href="%s">#%d</a>', esc_url( admin_url( $url ) ), $order_id );
 				} else {
