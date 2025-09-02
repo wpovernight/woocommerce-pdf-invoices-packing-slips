@@ -89,18 +89,18 @@ class NumberStoreListTable extends \WP_List_Table {
 					// not invoice document but using invoice number system
 					if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) {
 						$document_type = 'invoice';
-						
+
 						// using invoice number
 						if ( empty( $number_data ) ) {
 							$number_data   = $order->get_meta( "_wcpdf_invoice_number_data", true );
 							$saved_number  = (int) ( $number_data['number'] ?? 0 );
-							
+
 						// using order number
 						} else {
 							$item_id = $item_order_id;
 						}
 					}
-					
+
 					// all documents using parent order
 					if ( ! empty( $saved_number ) && $saved_number === $item_id ) {
 						$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
@@ -125,7 +125,7 @@ class NumberStoreListTable extends \WP_List_Table {
 				break;
 			case 'order':
 				if ( $order ) {
-					$order_id = (int) ( is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id );
+					$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : (int) $item->order_id;
 					$url      = sprintf( 'post.php?post=%d&action=edit', $order_id );
 					$value    = sprintf( '<a href="%s">#%d</a>', esc_url( admin_url( $url ) ), $order_id );
 				} else {
