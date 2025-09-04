@@ -176,7 +176,11 @@ class SettingsEDI {
 					'option_name' => $option_name,
 					'id'          => 'syntax',
 					'options'     => wpo_ips_edi_syntaxes(),
-					'description' => __( 'Choose the preferred XML syntax standard for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						/* translators: %s: link to documentation */
+						__( 'Choose the preferred XML syntax standard for electronic documents. Need help deciding? %s', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi&section=info' ) ) . '" target="_blank">' . __( 'See the format comparison guide', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+					),
 				),
 			),
 		);
