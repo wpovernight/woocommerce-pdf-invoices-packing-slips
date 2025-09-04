@@ -811,9 +811,9 @@ class SettingsEDI {
 			),
 		);
 
-		$scheme   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] )   ? $edi_tax_settings['class'][ $slug ]['scheme']   : 'default';
-		$category = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : 'default';
-		$reason   = isset( $edi_tax_settings['class'][ $slug ]['reason'] )   ? $edi_tax_settings['class'][ $slug ]['reason']   : 'default';
+		$scheme   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] )   ? $edi_tax_settings['class'][ $slug ]['scheme']   : '';
+		$category = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : '';
+		$reason   = isset( $edi_tax_settings['class'][ $slug ]['reason'] )   ? $edi_tax_settings['class'][ $slug ]['reason']   : '';
 		?>
 			<div class="edi-tax-defaults-card" aria-labelledby="edi-tax-defaults-title">
 				<h3><?php esc_html_e( 'Configure default tax classifications', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
@@ -1054,7 +1054,8 @@ class SettingsEDI {
 
 		foreach ( $defaults as $key => $value ) {
 			if ( 'class' === $type && 'default' === $key ) {
-				continue;
+				$key   = '';
+				$value = __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...';
 			}
 
 			$select .= '<option ' . selected( $key, $selected, false ) . ' value="' . $key . '">' . $value . '</option>';
