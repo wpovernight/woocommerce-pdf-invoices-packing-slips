@@ -132,33 +132,27 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 */
 	public function get_party_tax_scheme(): ?array {
 		$vat_number = $this->get_order_customer_vat_number();
-		$values     = array();
 
-		if ( ! empty( $vat_number ) ) {
-			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-				wpo_ips_edi_log(
-					sprintf(
-						'UBL PartyTaxScheme: VAT number does not have a country prefix for customer in order %d.',
-						$this->document->order->get_id()
-					),
-					'error'
-				);
-			}
-		
-			$values[] = array(
-				'name'  => 'cbc:CompanyID',
-				'value' => $vat_number,
-			);
-		} else {
+		// B2C (no VAT): omit PartyTaxScheme entirely
+		if ( empty( $vat_number ) ) {
+			return null;
+		}
+
+		if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
 			wpo_ips_edi_log(
 				sprintf(
-					'UBL PartyTaxScheme: Customer VAT number is missing or invalid in order %d.',
+					'UBL PartyTaxScheme: VAT number does not have a country prefix for customer in order %d.',
 					$this->document->order->get_id()
 				),
 				'error'
 			);
 		}
 
+		$values   = array();
+		$values[] = array(
+			'name'  => 'cbc:CompanyID',
+			'value' => strtoupper( preg_replace( '/\s+/', '', $vat_number ) ),
+		);
 		$values[] = array(
 			'name'  => 'cac:TaxScheme',
 			'value' => array(
@@ -199,39 +193,32 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			return null;
 		}
 
-		if ( empty( $vat_number ) ) {
-			wpo_ips_edi_log(
-				sprintf(
-					'UBL PartyLegalEntity: VAT number is missing for customer in order %d.',
-					$this->document->order->get_id()
-				),
-				'error'
-			);
-			return null;
-		}
-		
-		if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-			wpo_ips_edi_log(
-				sprintf(
-					'UBL PartyLegalEntity: VAT number does not have a country prefix for customer in order %d.',
-					$this->document->order->get_id()
-				),
-				'error'
+		$values   = array();
+		$values[] = array(
+			'name'  => 'cbc:RegistrationName',
+			'value' => wpo_ips_edi_sanitize_string( $registration_name ),
+		);
+
+		// CompanyID is optional; add only when VAT exists
+		if ( ! empty( $vat_number ) ) {
+			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
+				wpo_ips_edi_log(
+					sprintf(
+						'UBL PartyLegalEntity: VAT number does not have a country prefix for customer in order %d.',
+						$this->document->order->get_id()
+					),
+					'error'
+				);
+			}
+			$values[] = array(
+				'name'  => 'cbc:CompanyID',
+				'value' => strtoupper( preg_replace( '/\s+/', '', $vat_number ) ),
 			);
 		}
 
 		$party_legal_entity = array(
 			'name'  => 'cac:PartyLegalEntity',
-			'value' => array(
-				array(
-					'name'  => 'cbc:RegistrationName',
-					'value' => wpo_ips_edi_sanitize_string( $registration_name ),
-				),
-				array(
-					'name'  => 'cbc:CompanyID',
-					'value' => $vat_number,
-				),
-			),
+			'value' => $values,
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );
