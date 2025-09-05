@@ -914,7 +914,7 @@ class SettingsDebug {
 					'text_input_size'    => 4,
 					'text_input_id'      => 'cleanup_days',
 					'text_input_default' => 7,
-					'description'        => __( "Automatically clean up PDF files stored in the temporary folder (used for email attachments)", 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'        => __( 'Automatically clean up PDF files stored in the temporary folder (used for email attachments), and remove old document locks that prevent conflicts when generating document numbers.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
