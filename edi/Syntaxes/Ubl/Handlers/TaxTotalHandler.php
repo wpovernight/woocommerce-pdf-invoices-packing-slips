@@ -43,7 +43,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 			$scheme     = strtoupper( trim( $item['scheme']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order ) ) );
 			
 			if ( '' === $reason || 'NONE' === $reason ) {
-				$reason = 'VATEX-EU-AE';
+				$reason = 'NONE';
 			}
 			
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
@@ -55,43 +55,89 @@ class TaxTotalHandler extends AbstractUblHandler {
 				$grouped_tax_data[ $key ]['reason']     = $reason;
 				$grouped_tax_data[ $key ]['scheme']     = $scheme;
 			} else {
-				$grouped_tax_data[ $key ]['total_ex']  += $item['total_ex'];
-				$grouped_tax_data[ $key ]['total_tax'] += $item['total_tax'];
+				$grouped_tax_data[ $key ]['total_ex']  += ( $item['total_ex']  ?? 0 );
+				$grouped_tax_data[ $key ]['total_tax'] += ( $item['total_tax'] ?? 0 );
 			}
 		}
 		
-		// Fallback for zero‑tax lines
-		$lines_total_ex = 0;
-		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $i ) {
-			$lines_total_ex += $i->get_total();
-		}
-		
-		$grouped_total_ex = array_reduce(
-			$grouped_tax_data,
-			function ( $carry, $item ) {
-				return $carry + ( $item['total_ex'] ?? 0 );
-			},
-			0
-		);
-		
-		$missing_ex = wc_round_tax_total( $lines_total_ex - $grouped_total_ex );
+		// Consolidate any existing Z groups from $order_tax_data
+		$z_total_ex   = 0.0;
+		$z_total_tax  = 0.0;
+		$z_first_key  = null;
+		$z_other_keys = array();
 
-		if ( $missing_ex > 0 ) {
-			$ae_key = '0|AE|VATEX-EU-AE|VAT';
-			
-			if ( ! isset( $grouped_tax_data[ $ae_key ] ) ) {
-				$grouped_tax_data[ $ae_key ] = array(
-					'total_ex'   => $missing_ex,
-					'total_tax'  => 0,
-					'percentage' => 0,
-					'category'   => 'AE',
-					'reason'     => 'VATEX-EU-AE',
-					'scheme'     => 'VAT',
-					'name'       => '',
-				);
-			} else {
-				$grouped_tax_data[ $ae_key ]['total_ex'] += $missing_ex;
+		foreach ( $grouped_tax_data as $key => $g ) {
+			if ( 'Z' === strtoupper( $g['category'] ?? '' ) ) {
+				if ( is_null( $z_first_key ) ) {
+					$z_first_key    = $key;
+				} else {
+					$z_other_keys[] = $key;
+				}
+				
+				$z_total_ex  += (float) ( $g['total_ex']  ?? 0 );
+				$z_total_tax += (float) ( $g['total_tax'] ?? 0 );
 			}
+		}
+
+		// Remove duplicate Z groups (keep the first; we'll rewrite it later)
+		foreach ( $z_other_keys as $dup_key ) {
+			unset( $grouped_tax_data[ $dup_key ] );
+		}
+
+		// Compute the Z basis from lines
+		$z_missing_ex = 0.0;
+		$has_z_line   = false;
+
+		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $it ) {
+			$line_total = (float) $it->get_total();
+			$taxes      = $it->get_taxes();
+			$has_rows   = ! empty( $taxes['total'] ) && is_array( $taxes['total'] );
+			$line_is_z  = false;
+
+			if ( $has_rows ) {
+				foreach ( $taxes['total'] as $tax_id => $amt ) {
+					if ( ! is_numeric( $amt ) ) {
+						continue;
+					}
+					
+					$info = $this->document->order_tax_data[ $tax_id ] ?? array();
+					$cat  = strtoupper( $info['category'] ?? '' );
+					$rate = (float) ( $info['percentage'] ?? 0 );
+					
+					if ( 'Z' === $cat || 0.0 === $rate ) {
+						$line_is_z = true;
+						break;
+					}
+				}
+			} else {
+				// Shipping without tax rows: treat as zero-rated
+				if ( 'shipping' === $it->get_type() ) {
+					$line_is_z = true;
+				}
+			}
+
+			if ( $line_is_z ) {
+				$has_z_line    = true;
+				$z_missing_ex += $line_total;
+			}
+		}
+
+		$z_total_ex += $z_missing_ex;
+		$z_total_tax = 0.0;
+
+		// Ensure exactly one Z group if there is any Z line (even with basis 0)
+		if ( $has_z_line || $z_first_key ) {
+			$z_key = $z_first_key ?: '0|Z|NONE|VAT';
+
+			$grouped_tax_data[ $z_key ] = array(
+				'total_ex'   => wc_round_tax_total( $z_total_ex ),
+				'total_tax'  => 0,
+				'percentage' => 0,
+				'category'   => 'Z',
+				'reason'     => 'NONE',
+				'scheme'     => 'VAT',
+				'name'       => $grouped_tax_data[ $z_first_key ]['name'] ?? '',
+			);
 		}
 
 		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons, $currency ) {
@@ -122,7 +168,8 @@ class TaxTotalHandler extends AbstractUblHandler {
 				),
 			);
 			
-			if ( $item_tax_percentage == 0 && strcasecmp( $item_tax_reason_key, 'none' ) !== 0 ) {
+			// Only emit exemption reason for 0% non-Z categories (e.g., E/AE/K)
+			if ( $item_tax_percentage == 0 && 'Z' !== strtoupper( $item_tax_category ) && strcasecmp( $item_tax_reason_key, 'none' ) !== 0 ) {
 				$tax_category[] = array(
 					'name'  => 'cbc:TaxExemptionReasonCode',
 					'value' => $item_tax_reason_key,
@@ -148,14 +195,14 @@ class TaxTotalHandler extends AbstractUblHandler {
 				'value' => array(
 					array(
 						'name'       => 'cbc:TaxableAmount',
-						'value'      => wc_round_tax_total( $item['total_ex'] ),
+						'value'      => wc_round_tax_total( $item['total_ex'] ?? 0 ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
 					),
 					array(
 						'name'       => 'cbc:TaxAmount',
-						'value'      => wc_round_tax_total( $item['total_tax'] ),
+						'value'      => wc_round_tax_total( $item['total_tax'] ?? 0 ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
@@ -170,12 +217,14 @@ class TaxTotalHandler extends AbstractUblHandler {
 
 		$tax_total = array(
 			'name'  => 'cac:TaxTotal',
-			'value' => array(
+			'value' => array_merge(
 				array(
-					'name'       => 'cbc:TaxAmount',
-					'value'      => round( $this->document->order->get_total_tax(), 2 ),
-					'attributes' => array(
-						'currencyID' => $currency,
+					array(
+						'name'       => 'cbc:TaxAmount',
+						'value'      => round( $this->document->order->get_total_tax(), 2 ),
+						'attributes' => array(
+							'currencyID' => $currency,
+						),
 					),
 				),
 				$formatted_tax_array

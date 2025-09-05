@@ -65,31 +65,39 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			
 			// Fallback if no tax rows were found
 			if ( empty( $tax_category ) ) {
-				$first_tax = reset( $this->document->order_tax_data ) ?: array(
-					'category'   => 'AE',
-					'percentage' => 0,
-					'scheme'     => 'VAT',
-				);
+				$is_shipping = ( 'shipping' === $item->get_type() );
 
-				$tax_category = array(
-					array(
-						'name'  => 'cbc:ID',
-						'value' => strtoupper( $first_tax['category'] ),
-					),
-					array(
-						'name'  => 'cbc:Percent',
-						'value' => round( $first_tax['percentage'], 2 ),
-					),
-					array(
-						'name'  => 'cac:TaxScheme',
-						'value' => array(
-							array(
-								'name'  => 'cbc:ID',
-								'value' => strtoupper( $first_tax['scheme'] ),
+				if ( $is_shipping ) {
+					// Mirror CII: shipping with no tax -> Zero-rated Z/0%
+					$tax_category = array(
+						array( 'name' => 'cbc:ID',      'value' => 'Z' ),
+						array( 'name' => 'cbc:Percent', 'value' => 0 ),
+						array(
+							'name'  => 'cac:TaxScheme',
+							'value' => array(
+								array( 'name' => 'cbc:ID', 'value' => 'VAT' ),
 							),
 						),
-					),
-				);
+					);
+				} else {
+					// Non-shipping without tax rows: choose your policy.
+					// If you also want these as Z, copy the block above.
+					// Otherwise, inherit the first standard rate found (S):
+					$std = null;
+					foreach ( (array) $this->document->order_tax_data as $row ) {
+						if ( strtoupper( $row['category'] ?? '' ) === 'S' ) { $std = $row; break; }
+					}
+					$tax_category = array(
+						array( 'name' => 'cbc:ID',      'value' => strtoupper( $std['category'] ?? 'Z' ) ),
+						array( 'name' => 'cbc:Percent', 'value' => round( $std['percentage'] ?? 0, 2 ) ),
+						array(
+							'name'  => 'cac:TaxScheme',
+							'value' => array(
+								array( 'name' => 'cbc:ID', 'value' => strtoupper( $std['scheme'] ?? 'VAT' ) ),
+							),
+						),
+					);
+				}
 			}
 
 			$invoice_line = array(
