@@ -237,6 +237,119 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 			$trade_tax[] = $tax_node;
 		}
+		
+		// Check if Z already exists in the header breakdown.
+		$has_z_in_breakdown = false;
+		foreach ( $trade_tax as $node ) {
+			foreach ( $node['value'] as $v ) {
+				if ( 'ram:CategoryCode' === $v['name'] && 'Z' === strtoupper( (string) $v['value'] ) ) {
+					$has_z_in_breakdown = true;
+					break 2;
+				}
+			}
+		}
+
+		// Compute the Z basis from lines
+		$z_basis    = 0.0;
+		$has_z_line = false;
+
+		foreach ( $order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $it ) {
+			$line_total = (float) $it->get_total();
+			$taxes      = $it->get_taxes();
+			$has_rows   = ! empty( $taxes['total'] ) && is_array( $taxes['total'] );
+			$line_is_z  = false;
+
+			if ( $has_rows ) {
+				foreach ( $taxes['total'] as $tax_id => $amt ) {
+					if ( ! is_numeric( $amt ) ) {
+						continue;
+					}
+					
+					$info = $this->document->order_tax_data[ $tax_id ] ?? array();
+					$cat  = strtoupper( $info['category'] ?? '' );
+					$rate = (float) ( $info['percentage'] ?? 0 );
+					
+					// Consider Z if category is Z (preferred).
+					if ( 'Z' === $cat || 0.0 === $rate ) {
+						$line_is_z = true;
+						break;
+					}
+				}
+			} else {
+				// Shipping without tax rows: treat as zero-rated
+				if ( 'shipping' === $it->get_type() ) {
+					$line_is_z = true;
+				}
+			}
+
+			if ( $line_is_z ) {
+				$has_z_line = true;
+				$z_basis   += $line_total;
+			}
+		}
+
+		// If we have Z exposure:
+		if ( $has_z_line ) {
+			$updated = false;
+			
+			foreach ( $trade_tax as &$node ) {
+				$cat = null;
+				foreach ( $node['value'] as $v ) {
+					if ( 'ram:CategoryCode' === $v['name'] ) {
+						$cat = strtoupper( (string) $v['value'] );
+						break;
+					}
+				}
+				
+				if ( 'Z' === $cat ) {
+					foreach ( $node['value'] as &$v ) {
+						if ( 'ram:BasisAmount' === $v['name'] ) {
+							$v['value'] = wc_round_tax_total( $z_basis );
+						}
+						if ( 'ram:CalculatedAmount' === $v['name'] ) {
+							$v['value'] = 0;
+						}
+						if ( 'ram:RateApplicablePercent' === $v['name'] ) {
+							$v['value'] = 0;
+						}
+					}
+					
+					unset( $v );
+					$updated = true;
+					break;
+				}
+			}
+			
+			unset( $node );
+
+			if ( ! $updated ) {
+				$trade_tax[] = array(
+					'name'  => 'ram:ApplicableTradeTax',
+					'value' => array(
+						array(
+							'name'  => 'ram:CalculatedAmount',
+							'value' => 0
+						),
+						array(
+							'name'  => 'ram:TypeCode',
+							'value' => 'VAT',
+						),
+						array(
+							'name'  => 'ram:BasisAmount',
+							'value' => wc_round_tax_total( $z_basis ),
+						),
+						array(
+							'name'  => 'ram:CategoryCode',
+							'value' => 'Z',
+						),
+						array(
+							'name'  => 'ram:RateApplicablePercent',
+							'value' => 0,
+						),
+					),
+				);
+			}
+		}
 
 		return apply_filters( 'wpo_ips_edi_cii_trade_tax', $trade_tax, $this );
 	}

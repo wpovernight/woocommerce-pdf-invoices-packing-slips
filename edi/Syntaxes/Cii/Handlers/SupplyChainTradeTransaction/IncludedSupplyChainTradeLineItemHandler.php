@@ -22,43 +22,49 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 		$tax_data = $this->document->order_tax_data;
 
 		foreach ( $items as $item_id => $item ) {
-			$tax_subtotal = array();
-			$taxes        = $item->get_taxes();
-			$line_total   = $item->get_total();
+			$taxes      = $item->get_taxes();
+			$line_total = $item->get_total();
 
-			foreach ( $taxes['total'] as $tax_id => $tax_amount ) {
-				if ( ! is_numeric( $tax_amount ) ) {
-					continue;
+			// --- Build exactly ONE ApplicableTradeTax node per line ---
+			$effective_rate = 0.0;
+			$category       = null;
+			$scheme         = 'VAT';
+			$has_tax_rows   = false;
+
+			if ( ! empty( $taxes['total'] ) && is_array( $taxes['total'] ) ) {
+				foreach ( $taxes['total'] as $tax_id => $tax_amount ) {
+					if ( ! is_numeric( $tax_amount ) ) {
+						continue;
+					}
+					$has_tax_rows = true;
+
+					$tax_info = $tax_data[ $tax_id ] ?? array();
+					// Use the first category we see; keep one per line
+					$category       = $category ?: strtoupper( $tax_info['category'] ?? 'S' );
+					$scheme         = strtoupper( $tax_info['scheme'] ?? 'VAT' );
+					$effective_rate += (float) ( $tax_info['percentage'] ?? 0 );
 				}
+			}
 
-				$tax_info = isset( $tax_data[ $tax_id ] ) ? $tax_data[ $tax_id ] : array();
-				$category = strtoupper( $tax_info['category'] ?? 'S' );
-				$scheme   = strtoupper( $tax_info['scheme'] ?? 'VAT' );
-				$rate     = round( $tax_info['percentage'] ?? 0, 2 );
+			// Fallback: shipping with no tax rows -> Zero-rated Z / 0%
+			if ( 'shipping' === $item->get_type() && ! $has_tax_rows ) {
+				$category       = 'Z';
+				$scheme         = 'VAT';
+				$effective_rate = 0.0;
+			}
 
-				$tax_node = array(
+			// Always output exactly one node (rate included even if 0)
+			$tax_nodes = array(
+				array(
 					'name'  => 'ram:ApplicableTradeTax',
 					'value' => array(
-						array(
-							'name'  => 'ram:TypeCode',
-							'value' => $scheme,
-						),
-						array(
-							'name'  => 'ram:CategoryCode',
-							'value' => $category,
-						),
-					)
-				);
+						array( 'name' => 'ram:TypeCode',             'value' => $scheme ),
+						array( 'name' => 'ram:CategoryCode',         'value' => $category ?: 'S' ),
+						array( 'name' => 'ram:RateApplicablePercent','value' => round( $effective_rate, 2 ) ),
+					),
+				),
+			);
 
-				if ( $rate > 0 ) {
-					$tax_node['value'][] = array(
-						'name'  => 'ram:RateApplicablePercent',
-						'value' => $rate,
-					);
-				}
-
-				$tax_subtotal[] = $tax_node;
-			}
 
 			$line_item = array(
 				'name'  => 'ram:IncludedSupplyChainTradeLineItem',
@@ -110,7 +116,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					array(
 						'name'  => 'ram:SpecifiedLineTradeSettlement',
 						'value' => array_merge(
-							$tax_subtotal,
+							$tax_nodes,
 							array(
 								array(
 									'name'  => 'ram:SpecifiedTradeSettlementLineMonetarySummation',
