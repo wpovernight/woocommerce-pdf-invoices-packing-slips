@@ -80,23 +80,24 @@ class Frontend {
 	 * Open PDF links in a new browser tab/window on the My Account and Thank You (Order Received) pages
 	 */
 	public function open_my_account_pdf_link_on_new_tab() {
-		$is_account = function_exists( 'is_account_page' ) && is_account_page();
+		$is_account        = function_exists( 'is_account_page' )        && is_account_page();
 		$is_order_received = function_exists( 'is_order_received_page' ) && is_order_received_page();
+		
 		if ( $is_account || $is_order_received ) {
-			if ( $general_settings = get_option( 'wpo_wcpdf_settings_general' ) ) {
-				if ( isset( $general_settings['download_display'] ) && $general_settings['download_display'] == 'display' ) {
-					$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-					$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+			
+			if ( isset( $general_settings['download_display'] ) && 'display' === $general_settings['download_display'] ) {
+				$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+				$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
 
-					if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
-						$script = WPO_WCPDF()->file_system->get_contents( $file_path );
+				if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
+					$script = WPO_WCPDF()->file_system->get_contents( $file_path );
 
-						if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
-							$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
-						}
-
-						wp_add_inline_script( 'jquery', $script );
+					if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
+						$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
 					}
+
+					wp_add_inline_script( 'jquery', $script );
 				}
 			}
 		}
