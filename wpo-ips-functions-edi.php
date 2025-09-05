@@ -727,7 +727,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
  * @return bool True if fields should be shown in the given location.
  */
 function wpo_ips_edi_peppol_enabled_for_location( string $location ): bool {
-	if ( ! wpo_ips_edi_is_available() ) {
+	if ( ! wpo_ips_edi_peppol_is_available() ) {
 		return false;
 	}
 
