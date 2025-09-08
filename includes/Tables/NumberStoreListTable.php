@@ -88,12 +88,10 @@ class NumberStoreListTable extends \WP_List_Table {
 
 					// not invoice document but using invoice number system
 					if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) {
-						$document_type = 'invoice';
-
 						// using invoice number
 						if ( empty( $number_data ) ) {
-							$number_data   = $order->get_meta( "_wcpdf_invoice_number_data", true );
-							$saved_number  = (int) ( $number_data['number'] ?? 0 );
+							$number_data  = $order->get_meta( "_wcpdf_invoice_number_data", true );
+							$saved_number = (int) ( $number_data['number'] ?? 0 );
 
 						// using order number
 						} else {
@@ -114,7 +112,7 @@ class NumberStoreListTable extends \WP_List_Table {
 						);
 					}
 				} else {
-					$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
+					$value = '<span class="item-number">' . __( 'unknown', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
 				}
 				break;
 			case 'calculated_number':
@@ -223,7 +221,7 @@ class NumberStoreListTable extends \WP_List_Table {
 
 		if (
 			empty( $document_type ) ||
-			( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) ||
+			( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) ||
 			empty( $table_name ) ||
 			! function_exists( '\\as_has_scheduled_action' ) ||
 			\as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' )
@@ -252,7 +250,34 @@ class NumberStoreListTable extends \WP_List_Table {
 				}
 
 				if ( 'invoice' === $document_type && ! empty( $invoice_number_store_doc_types ) ) {
-					$document_types = array_merge( $document_types, $invoice_number_store_doc_types );
+					foreach ( $invoice_number_store_doc_types as $doc_type ) {
+						$doc_slug     = str_replace( '-', '_', $doc_type );
+						$number_data  = get_post_meta( $order_id, "_wcpdf_{$doc_slug}_number_data", true );
+						$saved_number = (int) ( $number_data['number'] ?? 0 );
+
+						// Check if the saved number matches the result ID (using invoice number)
+						if ( ! empty( $saved_number ) && $saved_number === (int) ( $result['id'] ?? 0 ) ) {
+							$document_types[] = $doc_type;
+
+						// Credit Notes store the number under the refund order
+						} elseif ( 'credit-note' === $doc_type ) {
+							$refund_order = wc_get_order( $order_id );
+							
+							if ( ! $refund_order instanceof \WC_Order_Refund ) {
+								continue;
+							}
+							
+							$refund_doc = wcpdf_get_document( $doc_type, $refund_order );
+								
+							if ( $refund_doc->exists() ) {
+								$refund_number_data = $refund_doc->get_number();
+								
+								if ( ! empty( $refund_number_data ) && isset( $refund_number_data->number ) && (int) $refund_number_data->number === (int) ( $result['id'] ?? 0 ) ) {
+									$document_types[] = $doc_type;
+								}
+							}
+						}
+					}
 				}
 
 				$results[ $key ]->document_types = $document_types;
