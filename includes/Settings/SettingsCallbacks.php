@@ -83,6 +83,14 @@ class SettingsCallbacks {
 	public function checkbox( array $args ): void {
 		extract( $this->normalize_settings_args( $args ) );
 
+		if ( ! empty( $title ) ) {
+			printf(
+				'<label for="%1$s">%2$s</label>',
+				esc_attr( $id ),
+				esc_html( $title )
+			);
+		}
+		
 		// output checkbox
 		printf(
 			'<input type="checkbox" id="%1$s" name="%2$s" value="%3$s" %4$s %5$s %6$s/>',

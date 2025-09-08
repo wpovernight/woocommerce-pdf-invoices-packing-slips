@@ -399,6 +399,24 @@ class SettingsEDI {
 			),
 		);
 		
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'embed_encrypted_pdf',
+			'title'    => '',
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'title'       => __( 'Embed Encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name' => $option_name,
+				'id'          => 'embed_encrypted_pdf',
+				'description' => __( 'Embed the encrypted PDF invoice file within the e-document.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[syntax]',
+					'data-show_for_option_values' => json_encode( array( 'ubl' ) ),
+				),
+			)
+		);
+		
 		$languages = wpo_wcpdf_get_multilingual_languages();
 		
 		if ( count( $languages ) > 0 ) {
@@ -421,19 +439,6 @@ class SettingsEDI {
 				)
 			);
 		}
-
-		$settings_fields[] = array(
-			'type'     => 'setting',
-			'id'       => 'embed_encrypted_pdf',
-			'title'    => __( 'Embed Encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
-			'callback' => 'checkbox',
-			'section'  => $section,
-			'args'     => array(
-				'option_name' => $option_name,
-				'id'          => 'embed_encrypted_pdf',
-				'description' => __( 'Embed the encrypted PDF invoice file within the e-document. Note that this option may not be valid for all formats.', 'woocommerce-pdf-invoices-packing-slips' ),
-			)
-		);
 
 		$settings_fields[] = array(
 			'type'     => 'setting',
