@@ -749,8 +749,9 @@ function wpo_ips_edi_peppol_enabled_for_location( string $location ): bool {
  * @return string 'select' or 'full'. Defaults to 'full'.
  */
 function wpo_ips_edi_peppol_identifier_input_mode(): string {
-	$mode = wpo_ips_edi_get_settings( 'peppol_customer_identifiers_input_mode' );
-	return 'select' === $mode ? 'select' : 'full';
+	return 'full'; // Default is full mode; may change in the future.
+	// $mode = wpo_ips_edi_get_settings( 'peppol_customer_identifiers_input_mode' );
+	// return 'select' === $mode ? 'select' : 'full';
 }
 
 /**

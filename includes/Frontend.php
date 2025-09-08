@@ -569,48 +569,49 @@ class Frontend {
 			);
 		}
 
-		woocommerce_register_additional_checkout_field(
-			array(
-				'id'                => 'wpo-ips-edi/peppol-legal-identifier',
-				'label'             => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-				'location'          => 'order',
-				'type'              => 'text',
-				'sanitize_callback' => function ( $val ) {
-					return preg_replace( '/\s+/', '', trim( (string) $val ) );
-				},
-				'validate_callback' => function ( $val ) use ( $input_mode ) {
-					if ( 'full' === $input_mode && false === strpos( $val, ':' ) ) {
-						return new \WP_Error( 'invalid_legal_id', __( 'Use scheme:identifier format.', 'woocommerce-pdf-invoices-packing-slips' ) );
-					}
-					return true;
-				},
-			)
-		);
+		// // We chose not to display the Legal Identifier at Checkout; it's only shown in My Account for now. This may change later.
+		// woocommerce_register_additional_checkout_field(
+		// 	array(
+		// 		'id'                => 'wpo-ips-edi/peppol-legal-identifier',
+		// 		'label'             => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+		// 		'location'          => 'order',
+		// 		'type'              => 'text',
+		// 		'sanitize_callback' => function ( $val ) {
+		// 			return preg_replace( '/\s+/', '', trim( (string) $val ) );
+		// 		},
+		// 		'validate_callback' => function ( $val ) use ( $input_mode ) {
+		// 			if ( 'full' === $input_mode && false === strpos( $val, ':' ) ) {
+		// 				return new \WP_Error( 'invalid_legal_id', __( 'Use scheme:identifier format.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		// 			}
+		// 			return true;
+		// 		},
+		// 	)
+		// );
 
-		if ( 'select' === $input_mode ) {
-			woocommerce_register_additional_checkout_field(
-				array(
-					'id'       => 'wpo-ips-edi/peppol-legal-identifier-icd',
-					'label'    => __( 'Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
-					'location' => 'order',
-					'type'     => 'select',
-					'options'  => array_map(
-						static fn ( $code, $label ) => array(
-							'value' => $code,
-							'label' => "[$code] $label",
-						),
-						array_keys( EN16931::get_icd() ),
-						EN16931::get_icd()
-					),
-					'validate_callback' => function ( $val ) {
-						if ( $val && ! isset( EN16931::get_icd()[ $val ] ) ) {
-							return new \WP_Error( 'invalid_icd', __( 'Invalid Legal Identifier Scheme.', 'woocommerce-pdf-invoices-packing-slips' ) );
-						}
-						return true;
-					},
-				)
-			);
-		}
+		// if ( 'select' === $input_mode ) {
+		// 	woocommerce_register_additional_checkout_field(
+		// 		array(
+		// 			'id'       => 'wpo-ips-edi/peppol-legal-identifier-icd',
+		// 			'label'    => __( 'Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
+		// 			'location' => 'order',
+		// 			'type'     => 'select',
+		// 			'options'  => array_map(
+		// 				static fn ( $code, $label ) => array(
+		// 					'value' => $code,
+		// 					'label' => "[$code] $label",
+		// 				),
+		// 				array_keys( EN16931::get_icd() ),
+		// 				EN16931::get_icd()
+		// 			),
+		// 			'validate_callback' => function ( $val ) {
+		// 				if ( $val && ! isset( EN16931::get_icd()[ $val ] ) ) {
+		// 					return new \WP_Error( 'invalid_icd', __( 'Invalid Legal Identifier Scheme.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		// 				}
+		// 				return true;
+		// 			},
+		// 		)
+		// 	);
+		// }
 	}
 	
 	/**
@@ -622,8 +623,8 @@ class Frontend {
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
-			'wpo-ips-edi/peppol-legal-identifier',
-			'wpo-ips-edi/peppol-legal-identifier-icd',
+			// 'wpo-ips-edi/peppol-legal-identifier',
+			// 'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
 		
 		foreach ( $fields as $field ) {
@@ -663,11 +664,11 @@ class Frontend {
 					$eas = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 					return ( '' !== $eas && '' !== $id ) ? "{$eas}:{$id}" : (string) $value;
 				}
-				case 'peppol_legal_identifier': {
-					$id  = (string) get_user_meta( $user_id, 'peppol_legal_identifier', true );
-					$icd = (string) get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
-					return ( '' !== $icd && '' !== $id ) ? "{$icd}:{$id}" : (string) $value;
-				}
+				// case 'peppol_legal_identifier': {
+				// 	$id  = (string) get_user_meta( $user_id, 'peppol_legal_identifier', true );
+				// 	$icd = (string) get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
+				// 	return ( '' !== $icd && '' !== $id ) ? "{$icd}:{$id}" : (string) $value;
+				// }
 			}
 		}
 		
@@ -692,8 +693,8 @@ class Frontend {
 		$allowed = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
-			'wpo-ips-edi/peppol-legal-identifier',
-			'wpo-ips-edi/peppol-legal-identifier-icd',
+			// 'wpo-ips-edi/peppol-legal-identifier',
+			// 'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
 		
 		if ( ! in_array( $key, $allowed, true ) ) {
@@ -728,8 +729,8 @@ class Frontend {
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
-			'wpo-ips-edi/peppol-legal-identifier',
-			'wpo-ips-edi/peppol-legal-identifier-icd',
+			// 'wpo-ips-edi/peppol-legal-identifier',
+			// 'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
 		
 		foreach ( $fields as $field ) {
@@ -783,29 +784,30 @@ class Frontend {
 			);
 		}
 
-		$peppol_fields['peppol_legal_identifier'] = array(
-			'type'        => 'text',
-			'label'       => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-			'required'    => false,
-			'class'       => array( 'form-row-wide' ),
-			'placeholder' => $placeholder_legal,
-		);
+		// // We chose not to display the Legal Identifier at Checkout; it's only shown in My Account for now. This may change later.
+		// $peppol_fields['peppol_legal_identifier'] = array(
+		// 	'type'        => 'text',
+		// 	'label'       => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+		// 	'required'    => false,
+		// 	'class'       => array( 'form-row-wide' ),
+		// 	'placeholder' => $placeholder_legal,
+		// );
 
-		if ( 'select' === $input_mode ) {
-			$peppol_fields['peppol_legal_identifier_icd'] = array(
-				'type'        => 'select',
-				'label'       => __( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'required'    => false,
-				'class'       => array( 'form-row-wide' ),
-				'options'     => ( function () {
-					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
-					foreach ( EN16931::get_icd() as $code => $label ) {
-						$options[ $code ] = "[$code] $label";
-					}
-					return $options;
-				} )(),
-			);
-		}
+		// if ( 'select' === $input_mode ) {
+		// 	$peppol_fields['peppol_legal_identifier_icd'] = array(
+		// 		'type'        => 'select',
+		// 		'label'       => __( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
+		// 		'required'    => false,
+		// 		'class'       => array( 'form-row-wide' ),
+		// 		'options'     => ( function () {
+		// 			$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
+		// 			foreach ( EN16931::get_icd() as $code => $label ) {
+		// 				$options[ $code ] = "[$code] $label";
+		// 			}
+		// 			return $options;
+		// 		} )(),
+		// 	);
+		// }
 
 		// Prepend Peppol fields before existing 'order' fields
 		$fields['order'] = $peppol_fields + ( $fields['order'] ?? array() );
@@ -824,8 +826,8 @@ class Frontend {
 		if ( ! in_array( $input, array(
 			'peppol_endpoint_id',
 			'peppol_endpoint_eas',
-			'peppol_legal_identifier',
-			'peppol_legal_identifier_icd',
+			// 'peppol_legal_identifier',
+			// 'peppol_legal_identifier_icd',
 		), true ) ) {
 			return $value;
 		}
@@ -837,8 +839,8 @@ class Frontend {
 
 		$endpoint_id          = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		$endpoint_eas         = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-		$legal_identifier     = (string) get_user_meta( $user_id, 'peppol_legal_identifier', true );
-		$legal_identifier_icd = (string) get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
+		// $legal_identifier     = (string) get_user_meta( $user_id, 'peppol_legal_identifier', true );
+		// $legal_identifier_icd = (string) get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
 
 		$input_mode = wpo_ips_edi_peppol_identifier_input_mode();
 
@@ -848,15 +850,15 @@ class Frontend {
 					return "{$endpoint_eas}:{$endpoint_id}";
 				}
 				return $endpoint_id;
-			case 'peppol_legal_identifier':
-				if ( 'full' === $input_mode && '' !== $legal_identifier_icd && '' !== $legal_identifier ) {
-					return "{$legal_identifier_icd}:{$legal_identifier}";
-				}
-				return $legal_identifier;
 			case 'peppol_endpoint_eas':
 				return $endpoint_eas;
-			case 'peppol_legal_identifier_icd':
-				return $legal_identifier_icd;
+			// case 'peppol_legal_identifier':
+			// 	if ( 'full' === $input_mode && '' !== $legal_identifier_icd && '' !== $legal_identifier ) {
+			// 		return "{$legal_identifier_icd}:{$legal_identifier}";
+			// 	}
+			// 	return $legal_identifier;
+			// case 'peppol_legal_identifier_icd':
+			// 	return $legal_identifier_icd;
 		}
 
 		return $value;
@@ -878,7 +880,7 @@ class Frontend {
 		$input_mode    = wpo_ips_edi_peppol_identifier_input_mode();
 		$message_pairs = array(
 			'peppol_endpoint_id'      => __( 'Peppol Endpoint ID must be in scheme:identifier format (e.g. 0088:123456789).', 'woocommerce-pdf-invoices-packing-slips' ),
-			'peppol_legal_identifier' => __( 'Legal Identifier must be in scheme:identifier format (e.g. 0208:1234567890).', 'woocommerce-pdf-invoices-packing-slips' ),
+			//'peppol_legal_identifier' => __( 'Legal Identifier must be in scheme:identifier format (e.g. 0208:1234567890).', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
 		foreach ( $message_pairs as $key => $message ) {
@@ -904,9 +906,13 @@ class Frontend {
 			return;
 		}
 
-		if ( ! isset( $data['peppol_endpoint_id'] ) && ! isset( $data['peppol_legal_identifier'] ) ) {
+		if ( ! isset( $data['peppol_endpoint_id'] ) ) {
 			return; // No Peppol data submitted
 		}
+		
+		// if ( ! isset( $data['peppol_legal_identifier'] ) ) {
+		// 	return; // No Peppol data submitted
+		// }
 
 		$order = wc_get_order( $order_id );
 		
