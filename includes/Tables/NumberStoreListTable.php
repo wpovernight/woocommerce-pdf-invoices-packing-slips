@@ -58,87 +58,93 @@ class NumberStoreListTable extends \WP_List_Table {
 		$order = $this->get_base_order( wc_get_order( $item->order_id ) );
 		$value = '-';
 
-		if ( ! empty( $order ) ) {
-			switch ( $column_name ) {
-				case 'number':
-					$value = $item->id;
-					break;
-				case 'type':
-					$value                          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
-					$document_types                 = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
-					$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
+		switch ( $column_name ) {
+			case 'number':
+				$value = $item->id ?? '-';
+				break;
+			case 'type':
+				$value                          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
+				$document_types                 = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
+				$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
 
-					// document using invoice number, eg. proforma
-					if ( count( $document_types ) > 1 ) {
-						foreach ( $document_types as $key => $doc_type ) {
-							if ( 'invoice' === $doc_type ) {
-								unset( $document_types[ $key ] );
-							}
+				// document using invoice number, eg. proforma
+				if ( count( $document_types ) > 1 ) {
+					foreach ( $document_types as $key => $doc_type ) {
+						if ( 'invoice' === $doc_type ) {
+							unset( $document_types[ $key ] );
+						}
+					}
+				}
+
+				$document_type = reset( $document_types );
+
+				if ( ! empty( $document_type ) && $order ) {
+					$document_slug = str_replace( '-', '_', $document_type );
+					$number_data   = $order->get_meta( "_wcpdf_{$document_slug}_number_data", true );
+					$saved_number  = (int) ( $number_data['number'] ?? 0 );
+					$order_id      = (int) ( $order->get_id() );
+					$item_order_id = (int) ( $item->order_id ?? 0 );
+					$item_id       = (int) ( $item->id ?? 0 );
+
+					// not invoice document but using invoice number system
+					if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) {
+						// using invoice number
+						if ( empty( $number_data ) ) {
+							$number_data  = $order->get_meta( "_wcpdf_invoice_number_data", true );
+							$saved_number = (int) ( $number_data['number'] ?? 0 );
+
+						// using order number
+						} else {
+							$item_id = $item_order_id;
 						}
 					}
 
-					$document_type = reset( $document_types );
-
-					if ( ! empty( $document_type ) ) {
-						$document_slug = str_replace( '-', '_', $document_type );
-						$number_data   = $order->get_meta( "_wcpdf_{$document_slug}_number_data", true );
-						$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
-						$order_id      = $order->get_id() ?? 0;
-						$item_order_id = $item->order_id ?? 0;
-						$item_id       = $item->id;
-						
-						// not invoice document but using invoice number system
-						if ( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) {
-							$document_type = 'invoice';
-							
-							// using invoice number
-							if ( empty( $number_data ) ) {
-								$number_data   = $order->get_meta( "_wcpdf_invoice_number_data", true );
-								$saved_number  = isset( $number_data['number'] ) ? $number_data['number'] : null;
-								
-							// using order number
-							} else {
-								$item_id = $item_order_id;
-							}
-						}
-						
-						// all documents using parent order
-						if ( ! empty( $saved_number ) && absint( $saved_number ) === absint( $item_id ) ) {
-							$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
-						// credit notes may have meta saved in the refund order
-						} elseif ( 'credit-note' === $document_type && absint( $order_id ) !== absint( $item_order_id ) ) {
-							$value = sprintf(
-								'<span class="item-number number-doc-type">%s</span><p style="margin-top:6px;"><span class="item-number number-refund">%s #%s</span></p>',
-								$document_type,
-								__( 'refund:', 'woocommerce-pdf-invoices-packing-slips' ),
-								$item_order_id
-							);
-						}
+					// all documents using parent order
+					if ( ! empty( $saved_number ) && $saved_number === $item_id ) {
+						$value = '<span class="item-number number-doc-type">' . $document_type . '</span>';
+					// credit notes may have meta saved in the refund order
+					} elseif ( 'credit-note' === $document_type && $order_id !== $item_order_id ) {
+						$value = sprintf(
+							'<span class="item-number number-doc-type">%s</span><p style="margin-top:6px;"><span class="item-number number-refund">%s #%s</span></p>',
+							$document_type,
+							__( 'refund:', 'woocommerce-pdf-invoices-packing-slips' ),
+							$item_order_id
+						);
 					}
-					break;
-				case 'calculated_number':
-					$value = isset( $item->calculated_number ) ? $item->calculated_number : '-';
-					break;
-				case 'date':
-					$value = $item->date;
-					break;
-				case 'order':
-					$order_number = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : $item->order_id;
-					$order_id     = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $item->order_id;
-					$url          = sprintf( 'post.php?post=%s&action=edit', $order_id );
-					$value        = sprintf( '<a href="%s">#%s</a>', $url, $order_number );
-					break;
-				case 'order_status':
-					$value = sprintf(
-						'<mark class="order-status %s"><span>%s</span></mark>',
-						esc_attr( sanitize_html_class( 'status-' . $order->get_status() ) ),
-						esc_html( wc_get_order_status_name( $order->get_status() ) )
-					);
-					break;
-				default:
-					$value = isset( $item->$column_name ) ? $item->$column_name : null;
-					break;
-			}
+				} else {
+					$value = '<span class="item-number">' . __( 'unknown', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
+				}
+				break;
+			case 'calculated_number':
+				$value = $item->calculated_number ?? '-';
+				break;
+			case 'date':
+				$value = $item->date ?? '-';
+				break;
+			case 'order':
+				if ( $order ) {
+					$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : (int) $item->order_id;
+					$url      = sprintf( 'post.php?post=%d&action=edit', $order_id );
+					$value    = sprintf( '<a href="%s">#%d</a>', esc_url( admin_url( $url ) ), $order_id );
+				} else {
+					$value    = sprintf( '#%d', (int) $item->order_id );
+				}
+				break;
+			case 'order_status':
+				if ( $order ) {
+					$status = $order->get_status();
+				} else {
+					$status = __( 'Deleted', 'woocommerce-pdf-invoices-packing-slips' );
+				}
+				$value = sprintf(
+					'<mark class="order-status %s"><span>%s</span></mark>',
+					esc_attr( sanitize_html_class( 'status-' . $status ) ),
+					esc_html( ucfirst( wc_get_order_status_name( $status ) ) )
+				);
+				break;
+			default:
+				$value = $item->$column_name ?? null;
+				break;
 		}
 
 		return apply_filters( 'wpo_wcpdf_number_tools_column_content_' . $column_name, $value, $item );
@@ -215,7 +221,7 @@ class NumberStoreListTable extends \WP_List_Table {
 
 		if (
 			empty( $document_type ) ||
-			( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ) ) ||
+			( 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) ||
 			empty( $table_name ) ||
 			! function_exists( '\\as_has_scheduled_action' ) ||
 			\as_has_scheduled_action( 'wpo_wcpdf_number_table_data_fetch' )
@@ -244,7 +250,34 @@ class NumberStoreListTable extends \WP_List_Table {
 				}
 
 				if ( 'invoice' === $document_type && ! empty( $invoice_number_store_doc_types ) ) {
-					$document_types = array_merge( $document_types, $invoice_number_store_doc_types );
+					foreach ( $invoice_number_store_doc_types as $doc_type ) {
+						$doc_slug     = str_replace( '-', '_', $doc_type );
+						$number_data  = get_post_meta( $order_id, "_wcpdf_{$doc_slug}_number_data", true );
+						$saved_number = (int) ( $number_data['number'] ?? 0 );
+
+						// Check if the saved number matches the result ID (using invoice number)
+						if ( ! empty( $saved_number ) && $saved_number === (int) ( $result['id'] ?? 0 ) ) {
+							$document_types[] = $doc_type;
+
+						// Credit Notes store the number under the refund order
+						} elseif ( 'credit-note' === $doc_type ) {
+							$refund_order = wc_get_order( $order_id );
+							
+							if ( ! $refund_order instanceof \WC_Order_Refund ) {
+								continue;
+							}
+							
+							$refund_doc = wcpdf_get_document( $doc_type, $refund_order );
+								
+							if ( $refund_doc->exists() ) {
+								$refund_number_data = $refund_doc->get_number();
+								
+								if ( ! empty( $refund_number_data ) && isset( $refund_number_data->number ) && (int) $refund_number_data->number === (int) ( $result['id'] ?? 0 ) ) {
+									$document_types[] = $doc_type;
+								}
+							}
+						}
+					}
 				}
 
 				$results[ $key ]->document_types = $document_types;
