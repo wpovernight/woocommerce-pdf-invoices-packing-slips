@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.7.0-beta.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 4.7.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-08-29T10:00:27+00:00\n"
+"POT-Creation-Date: 2025-09-09T08:03:43+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: woocommerce-pdf-invoices-packingslips.php
 #: views/settings-page.php:25
 #: woocommerce-pdf-invoices-packingslips.php:654
-#: woocommerce-pdf-invoices-packingslips.php:716
+#: woocommerce-pdf-invoices-packingslips.php:728
 msgid "PDF Invoices & Packing Slips for WooCommerce"
 msgstr ""
 
@@ -97,7 +97,7 @@ msgid "I am the wizard"
 msgstr ""
 
 #: includes/Admin.php:353
-#: includes/Admin.php:1770
+#: includes/Admin.php:1771
 #: includes/Assets.php:305
 #: includes/Documents/Invoice.php:346
 #: includes/Main.php:1269
@@ -116,263 +116,263 @@ msgstr ""
 msgid "Send order email"
 msgstr ""
 
-#: includes/Admin.php:513
+#: includes/Admin.php:514
 msgid "Create PDF"
 msgstr ""
 
-#: includes/Admin.php:526
-msgid "Create UBL"
-msgstr ""
-
-#: includes/Admin.php:537
+#: includes/Admin.php:524
 msgid "PDF document data"
 msgstr ""
 
-#: includes/Admin.php:554
+#: includes/Admin.php:537
+msgid "Create UBL"
+msgstr ""
+
+#: includes/Admin.php:555
 msgid "Choose an email to send&hellip;"
 msgstr ""
 
-#: includes/Admin.php:575
+#: includes/Admin.php:576
 msgid "Save order & send email"
 msgstr ""
 
-#: includes/Admin.php:645
+#: includes/Admin.php:646
 msgid "Mark printed"
 msgstr ""
 
-#: includes/Admin.php:647
+#: includes/Admin.php:648
 msgid "Unmark"
 msgstr ""
 
-#: includes/Admin.php:767
+#: includes/Admin.php:768
 msgid "UBL documents require the correspondent PDF to be generated first."
 msgstr ""
 
-#: includes/Admin.php:787
+#: includes/Admin.php:788
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/Admin.php:790
+#: includes/Admin.php:791
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/Admin.php:793
+#: includes/Admin.php:794
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/Admin.php:796
+#: includes/Admin.php:797
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/Admin.php:799
+#: includes/Admin.php:800
 msgid "Notes (displayed in the invoice):"
 msgstr ""
 
-#: includes/Admin.php:1028
+#: includes/Admin.php:1029
 msgid "View more details"
 msgstr ""
 
-#: includes/Admin.php:1029
+#: includes/Admin.php:1030
 msgid "Hide details"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:1040
+#: includes/Admin.php:1041
 #, php-format
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/Admin.php:1049
+#: includes/Admin.php:1050
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/Admin.php:1062
+#: includes/Admin.php:1063
 msgid "Number prefix"
 msgstr ""
 
-#: includes/Admin.php:1066
+#: includes/Admin.php:1067
 #: includes/Documents/Invoice.php:382
 msgid "If set, this value will be used as number prefix."
 msgstr ""
 
 #. translators: 1. document slug, 2-3 placeholders
-#: includes/Admin.php:1069
-#: includes/Admin.php:1089
+#: includes/Admin.php:1070
+#: includes/Admin.php:1090
 #: includes/Documents/Invoice.php:384
 #: includes/Documents/Invoice.php:393
 #, php-format
 msgid "You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively."
 msgstr ""
 
-#: includes/Admin.php:1082
+#: includes/Admin.php:1083
 msgid "Number suffix"
 msgstr ""
 
-#: includes/Admin.php:1086
+#: includes/Admin.php:1087
 #: includes/Documents/Invoice.php:391
 msgid "If set, this value will be used as number suffix."
 msgstr ""
 
-#: includes/Admin.php:1102
+#: includes/Admin.php:1103
 msgid "Number padding"
 msgstr ""
 
 #. translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number
-#: includes/Admin.php:1106
+#: includes/Admin.php:1107
 #, php-format
 msgid "Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
-#: includes/Admin.php:1122
+#: includes/Admin.php:1123
 #: includes/Documents/Invoice.php:407
 #, php-format
 msgid "For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1136
+#: includes/Admin.php:1137
 #, php-format
 msgid "%s number"
 msgstr ""
 
-#: includes/Admin.php:1144
+#: includes/Admin.php:1145
 msgid "Formatted number"
 msgstr ""
 
-#: includes/Admin.php:1155
+#: includes/Admin.php:1156
 msgid "Please note that changing the document number may create gaps in the numbering sequence."
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1168
+#: includes/Admin.php:1169
 #, php-format
 msgid "%s date"
 msgstr ""
 
-#: includes/Admin.php:1176
+#: includes/Admin.php:1177
 msgid "Hour"
 msgstr ""
 
-#: includes/Admin.php:1177
+#: includes/Admin.php:1178
 msgid "h"
 msgstr ""
 
-#: includes/Admin.php:1180
+#: includes/Admin.php:1181
 msgid "Minute"
 msgstr ""
 
-#: includes/Admin.php:1181
+#: includes/Admin.php:1182
 msgid "m"
 msgstr ""
 
-#: includes/Admin.php:1207
+#: includes/Admin.php:1208
 msgid "Notes"
 msgstr ""
 
-#: includes/Admin.php:1212
+#: includes/Admin.php:1213
 msgid "Displayed in the document!"
 msgstr ""
 
-#: includes/Admin.php:1223
+#: includes/Admin.php:1224
 msgid "Save changes"
 msgstr ""
 
-#: includes/Admin.php:1224
+#: includes/Admin.php:1225
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/Admin.php:1364
+#: includes/Admin.php:1365
 #, php-format
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/Admin.php:1412
+#: includes/Admin.php:1413
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/Admin.php:1420
+#: includes/Admin.php:1421
 msgid "Bad action!"
 msgstr ""
 
-#: includes/Admin.php:1426
+#: includes/Admin.php:1427
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/Admin.php:1432
+#: includes/Admin.php:1433
 msgid "No permissions!"
 msgstr ""
 
-#: includes/Admin.php:1458
+#: includes/Admin.php:1459
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/Admin.php:1459
+#: includes/Admin.php:1460
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/Admin.php:1462
+#: includes/Admin.php:1463
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/Admin.php:1463
+#: includes/Admin.php:1464
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/Admin.php:1466
+#: includes/Admin.php:1467
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/Admin.php:1467
+#: includes/Admin.php:1468
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/Admin.php:1527
+#: includes/Admin.php:1528
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/Admin.php:1541
+#: includes/Admin.php:1542
 msgid "Document is empty."
 msgstr ""
 
-#: includes/Admin.php:1572
+#: includes/Admin.php:1573
 msgid "DEBUG output enabled"
 msgstr ""
 
-#: includes/Admin.php:1588
+#: includes/Admin.php:1589
 msgid "Invalid security token."
 msgstr ""
 
-#: includes/Admin.php:1600
+#: includes/Admin.php:1601
 msgid "Invalid order ID."
 msgstr ""
 
-#: includes/Admin.php:1606
+#: includes/Admin.php:1607
 msgid "Invalid order."
 msgstr ""
 
-#: includes/Admin.php:1610
+#: includes/Admin.php:1611
 msgid "Invalid document type."
 msgstr ""
 
-#: includes/Admin.php:1616
+#: includes/Admin.php:1617
 msgid "Invalid document."
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1855
+#: includes/Admin.php:1856
 #, php-format
 msgid "Editing of %s number and date is currently disabled."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name
-#: includes/Admin.php:1860
+#: includes/Admin.php:1861
 #, php-format
 msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s."
 msgstr ""
 
-#: includes/Admin.php:1863
+#: includes/Admin.php:1864
 #: includes/Settings/SettingsDebug.php:872
 msgid "Enable document data editing"
 msgstr ""
@@ -1017,7 +1017,7 @@ msgid "Upgrade to our Professional extension to attach packing slips to any emai
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Frontend.php:185
+#: includes/Frontend.php:188
 #, php-format
 msgid "Download %s (PDF)"
 msgstr ""
@@ -1209,7 +1209,7 @@ msgid "Error trying to generate document: %s"
 msgstr ""
 
 #: includes/Settings.php:450
-#: includes/Tables/NumberStoreListTable.php:158
+#: includes/Tables/NumberStoreListTable.php:164
 msgid "Date"
 msgstr ""
 
@@ -1520,7 +1520,7 @@ msgid "every %s days"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:917
-msgid "Automatically clean up PDF files stored in the temporary folder (used for email attachments)"
+msgid "Automatically clean up PDF files stored in the temporary folder (used for email attachments), and remove old document locks that prevent conflicts when generating document numbers."
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:923
@@ -2344,31 +2344,39 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-#: includes/Tables/NumberStoreListTable.php:67
+#: includes/Tables/NumberStoreListTable.php:66
 msgid "gapped"
 msgstr ""
 
-#: includes/Tables/NumberStoreListTable.php:113
+#: includes/Tables/NumberStoreListTable.php:110
 msgid "refund:"
 msgstr ""
 
-#: includes/Tables/NumberStoreListTable.php:155
+#: includes/Tables/NumberStoreListTable.php:115
+msgid "unknown"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:137
+msgid "Deleted"
+msgstr ""
+
+#: includes/Tables/NumberStoreListTable.php:161
 msgid "Number"
 msgstr ""
 
-#: includes/Tables/NumberStoreListTable.php:156
+#: includes/Tables/NumberStoreListTable.php:162
 msgid "Type"
 msgstr ""
 
-#: includes/Tables/NumberStoreListTable.php:157
+#: includes/Tables/NumberStoreListTable.php:163
 msgid "Calculated"
 msgstr ""
 
-#: includes/Tables/NumberStoreListTable.php:159
+#: includes/Tables/NumberStoreListTable.php:165
 msgid "Order"
 msgstr ""
 
-#: includes/Tables/NumberStoreListTable.php:160
+#: includes/Tables/NumberStoreListTable.php:166
 msgid "Order Status"
 msgstr ""
 
@@ -3695,16 +3703,16 @@ msgid "Dismiss this notice"
 msgstr ""
 
 #. translators: 1. new unstable version, 2. plugin name
-#: woocommerce-pdf-invoices-packingslips.php:714
+#: woocommerce-pdf-invoices-packingslips.php:726
 #, php-format
 msgid "A new unstable version (%1$s) of %2$s is available."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:723
+#: woocommerce-pdf-invoices-packingslips.php:735
 msgid "Download from the status page"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:728
+#: woocommerce-pdf-invoices-packingslips.php:740
 msgid "Hide this version"
 msgstr ""
 
