@@ -324,8 +324,8 @@ class SetupWizard {
 
 					$current_settings = get_option( $option, array() );
 
-					// Enable document
-					if ( ! isset( $current_settings['enabled'] ) ) {
+					// Enable Invoice document
+					if ( 'wpo_wcpdf_documents_settings_invoice' === $option && ! isset( $current_settings['enabled'] ) ) {
 						$settings['enabled'] = '1';
 					}
 
