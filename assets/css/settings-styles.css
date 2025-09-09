@@ -598,9 +598,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > label {
 	font-weight: 600;
-	margin-bottom: 4px;
 	font-size: 0.85em;
-	display: block;
+	display: inline-block;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper {

@@ -82,14 +82,6 @@ class SettingsCallbacks {
 	 */
 	public function checkbox( array $args ): void {
 		extract( $this->normalize_settings_args( $args ) );
-
-		if ( ! empty( $title ) ) {
-			printf(
-				'<label for="%1$s">%2$s</label>',
-				esc_attr( $id ),
-				esc_html( $title )
-			);
-		}
 		
 		// output checkbox
 		printf(
@@ -101,6 +93,14 @@ class SettingsCallbacks {
 			! empty( $disabled ) ? 'disabled="disabled"' : '',
 			wp_kses_post( $custom_attributes )
 		);
+		
+		if ( ! empty( $title ) ) {
+			printf(
+				'<label for="%1$s">%2$s</label>',
+				esc_attr( $id ),
+				esc_html( $title )
+			);
+		}
 
 		// print store empty input if true
 		if ( $store_unchecked ) {
