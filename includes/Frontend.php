@@ -125,7 +125,7 @@ class Frontend {
 	 * 
 	 * @return void
 	 */
-	public function open_my_account_pdf_link_on_new_tab() {
+	public function open_my_account_pdf_link_on_new_tab(): void {
 		$is_account        = function_exists( 'is_account_page' )        && is_account_page();
 		$is_order_received = function_exists( 'is_order_received_page' ) && is_order_received_page();
 		
