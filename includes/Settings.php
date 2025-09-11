@@ -84,8 +84,14 @@ class Settings {
 		// schedule yearly reset numbers
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
 
-		// Apply settings sections.
-		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_sections' ), 999 );
+		// Apply categories to document settings.
+		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_categories' ), 999 );
+
+		// Apply categories to general settings.
+		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
+
+		// Sync address from WooCommerce address.
+		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
 
 	public function menu() {
@@ -136,21 +142,21 @@ class Settings {
 	 */
 	public function user_settings_capability() {
 		$manage_woocommerce = 'manage_woocommerce';
-		
+
 		// Get the default capability
 		$default_capability = apply_filters( 'wpo_wcpdf_settings_default_user_capability', $manage_woocommerce );
 		$default_capability = ( empty( $default_capability ) || ! is_string( $default_capability ) ) ? $manage_woocommerce : $default_capability;
-		
+
 		// Get the list of capabilities
 		$capabilities = (array) apply_filters( 'wpo_wcpdf_settings_user_role_capabilities', array( $default_capability ) );
-		
+
 		// Loop through the list
 		foreach ( $capabilities as $capability ) {
 			if ( is_string( $capability ) && current_user_can( $capability ) ) {
 				return $capability;
 			}
 		}
-		
+
 		// Fallback
 		return ! empty( $default_capability ) ? $default_capability : $manage_woocommerce;
 	}
@@ -310,22 +316,22 @@ class Settings {
 					// Update document date.
 					$document->initiate_date();
 
-					// Update document number.
-					$document_number = $document->get_document_number();
-
-					if ( ! empty( $document_number ) ) {
-						$document->set_number( $document_number );
+					// Update document number only if it is not already set.
+					if ( empty( $document->get_number() ) ) {
+						$document_number = $document->get_document_number();
+						if ( ! empty( $document_number ) ) {
+							$document->set_number( $document_number );
+						}
 					}
 
 					$document_number = $document->get_number( $document->get_type() );
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) ) {
-							foreach ( $document->settings['number_format'] as $key => $value ) {
-								$document_number->$key = $document->settings['number_format'][ $key ];
-							}
+						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
+							$document_number->load_number_data( $document->settings['number_format'] );
 						}
+
 						$document_number->apply_formatting( $document, $order );
 					}
 
@@ -517,19 +523,26 @@ class Settings {
 	 */
 	public function get_common_document_settings(): array {
 		return array(
-			'paper_size'         => $this->general_settings['paper_size'] ?? '',
-			'font_subsetting'    => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
-			'header_logo'        => $this->general_settings['header_logo'] ?? '',
-			'header_logo_height' => $this->general_settings['header_logo_height'] ?? '',
-			'vat_number'         => $this->general_settings['vat_number'] ?? '',
-			'coc_number'         => $this->general_settings['coc_number'] ?? '',
-			'shop_name'          => $this->general_settings['shop_name'] ?? '',
-			'shop_phone_number'  => $this->general_settings['shop_phone_number'] ?? '',
-			'shop_address'       => $this->general_settings['shop_address'] ?? '',
-			'footer'             => $this->general_settings['footer'] ?? '',
-			'extra_1'            => $this->general_settings['extra_1'] ?? '',
-			'extra_2'            => $this->general_settings['extra_2'] ?? '',
-			'extra_3'            => $this->general_settings['extra_3'] ?? '',
+			'paper_size'              => $this->general_settings['paper_size'] ?? '',
+			'font_subsetting'         => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
+			'header_logo'             => $this->general_settings['header_logo'] ?? '',
+			'header_logo_height'      => $this->general_settings['header_logo_height'] ?? '',
+			'vat_number'              => $this->general_settings['vat_number'] ?? '',
+			'coc_number'              => $this->general_settings['coc_number'] ?? '',
+			'shop_name'               => $this->general_settings['shop_name'] ?? '',
+			'shop_phone_number'       => $this->general_settings['shop_phone_number'] ?? '',
+			'shop_email_address'      => $this->general_settings['shop_email_address'] ?? '',
+			'shop_address_line_1'     => $this->general_settings['shop_address_line_1'] ?? '',
+			'shop_address_line_2'     => $this->general_settings['shop_address_line_2'] ?? '',
+			'shop_address_country'    => $this->general_settings['shop_address_country'] ?? '',
+			'shop_address_state'      => $this->general_settings['shop_address_state'] ?? '',
+			'shop_address_city'       => $this->general_settings['shop_address_city'] ?? '',
+			'shop_address_postcode'   => $this->general_settings['shop_address_postcode'] ?? '',
+			'shop_address_additional' => $this->general_settings['shop_address_additional'] ?? '',
+			'footer'                  => $this->general_settings['footer'] ?? '',
+			'extra_1'                 => $this->general_settings['extra_1'] ?? '',
+			'extra_2'                 => $this->general_settings['extra_2'] ?? '',
+			'extra_3'                 => $this->general_settings['extra_3'] ?? '',
 		);
 	}
 
@@ -965,12 +978,12 @@ class Settings {
 
 	public function yearly_reset_action_is_scheduled() {
 		$is_scheduled = false;
-		
+
 		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
 			wcpdf_log_error( 'Action Scheduler function not available. Cannot check if the yearly numbering reset is scheduled.', 'critical' );
 			return $is_scheduled;
 		}
-		
+
 		$scheduled_actions = \as_get_scheduled_actions( array(
 			'hook'   => 'wpo_wcpdf_schedule_yearly_reset_numbers',
 			'status' => \ActionScheduler_Store::STATUS_PENDING,
@@ -1057,24 +1070,28 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public function update_documents_settings_sections(): void {
+	public function update_documents_settings_categories(): void {
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {
-				add_filter( "wpo_wcpdf_settings_fields_documents_{$document->get_type()}_{$output_format}", array( $this, 'apply_settings_categories' ), 999 );
+				add_filter(
+					"wpo_wcpdf_settings_fields_documents_{$document->get_type()}_{$output_format}",
+					array( $this, 'apply_document_settings_categories' ),
+					999
+				);
 			}
 		}
 	}
 
 	/**
-	 * Apply settings categories to the settings fields.
+	 * Apply categories to documents settings fields.
 	 *
 	 * @param array  $settings_fields
 	 *
 	 * @return array
 	 */
-	public function apply_settings_categories( array $settings_fields ): array {
+	public function apply_document_settings_categories( array $settings_fields ): array {
 		$current_filter = explode( '_', current_filter() );
 		$output_format  = end( $current_filter );
 		$document_type  = prev( $current_filter );
@@ -1084,29 +1101,69 @@ class Settings {
 			return $settings_fields;
 		}
 
-		$settings_categories = is_callable( array( $document, 'get_settings_categories' ) ) ? $document->get_settings_categories( $output_format ) : array();
+		$settings_categories = is_callable( array( $document, 'get_settings_categories' ) )
+			? $document->get_settings_categories( $output_format )
+			: array();
 
 		// Return if no category found!
 		if ( empty( $settings_categories ) ) {
 			return $settings_fields;
 		}
 
-		// Remove all sections first.
-		foreach ( $settings_fields as $key => $field ) {
-			if ( 'section' === $field['type'] ) {
-				unset( $settings_fields[ $key ] );
-			}
+		return $this->apply_setting_categories( $settings_fields, $settings_categories );
+	}
+
+	/**
+	 * Apply categories to general settings.
+	 *
+	 * @param array $settings_fields
+	 * @param string $page
+	 * @param string $option_group
+	 * @param string $option_name
+	 * @param SettingsGeneral $general_settings
+	 *
+	 * @return array
+	 */
+	public function update_general_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name, \WPO\IPS\Settings\SettingsGeneral $general_settings ): array {
+		$settings_categories = is_callable( array( $general_settings, 'get_settings_categories' ) )
+			? $general_settings->get_settings_categories()
+			: array();
+
+		if ( empty( $settings_categories ) ) {
+			return $settings_fields;
+		}
+
+		return $this->apply_setting_categories( $settings_fields, $settings_categories );
+	}
+
+	/**
+	 * Apply categories to settings fields.
+	 *
+	 * @param array $settings_fields
+	 * @param array $settings_categories
+	 *
+	 * @return array
+	 */
+	public function apply_setting_categories( array $settings_fields, array $settings_categories ): array {
+		if ( empty( $settings_fields ) || empty( $settings_categories ) ) {
+			return $settings_fields;
 		}
 
 		$modified_settings_fields = array();
 		$settings_lookup          = array();
 		$processed_keys           = array();
 
-		// Create a lookup array for settings fields by id.
-		// This allows for quick access to settings fields by their id, reducing the time complexity
-		// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
-		// and m is the number of settings fields.
 		foreach ( $settings_fields as $key => $settings_field ) {
+			if ( 'section' === $settings_field['type'] ) {
+				// Remove all sections.
+				unset( $settings_fields[ $key ] );
+				continue;
+			}
+
+			// Create a lookup array for settings fields by id.
+			// This allows for quick access to settings fields by their id, reducing the time complexity
+			// of finding a settings field from O(n*m) to O(n+m), where n is the number of category members
+			// and m is the number of settings fields.
 			$settings_lookup[ $settings_field['id'] ] = $key;
 		}
 
@@ -1271,6 +1328,61 @@ class Settings {
 		);
 
 		return $settings_categories;
+	}
+
+	/**
+	 * Syncs the address from WooCommerce settings.
+	 *
+	 * @return void
+	 */
+	public function sync_shop_address_with_woo(): void {
+		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+
+		$address_field = ! empty( $_POST['address_field'] )
+			? sanitize_text_field( wp_unslash( $_POST['address_field'] ) )
+			: '';
+
+		if ( empty( $address_field ) ) {
+			wp_send_json_error( array( 'message' => __( 'Address field is required.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		// Map address fields to the option keys used by WooCommerce.
+		$address_map = array(
+			'shop_address_line_1'   => 'woocommerce_store_address',
+			'shop_address_line_2'   => 'woocommerce_store_address_2',
+			'shop_address_country'  => 'woocommerce_default_country',
+			'shop_address_state'    => 'woocommerce_default_country',
+			'shop_address_city'     => 'woocommerce_store_city',
+			'shop_address_postcode' => 'woocommerce_store_postcode',
+		);
+
+		// Validate the address field against the map.
+		if ( ! array_key_exists( $address_field, $address_map ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid address field.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		$option_key = $address_map[ $address_field ];
+		$raw_value  = get_option( $option_key, '' );
+
+		// Return, if the value is not set.
+		if ( empty( $raw_value ) ) {
+			wp_send_json_error( array( 'message' => __( 'The field is empty.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+			return;
+		}
+
+		// Parse the value based on the address field.
+		switch ( $address_field ) {
+			case 'shop_address_state':
+				$parsed = wc_format_country_state_string( $raw_value );
+				$value  = $parsed['state'] ?? null;
+				break;
+			default:
+				$value = $raw_value;
+		}
+
+		wp_send_json_success( array( 'value' => $value ) );
 	}
 
 }

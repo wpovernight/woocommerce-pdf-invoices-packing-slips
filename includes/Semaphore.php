@@ -365,12 +365,17 @@ class Semaphore {
 	 * @return bool - whether the cleanup is scheduled
 	 */
 	public static function is_cleanup_scheduled(): bool {
+		$error_message = 'Action Scheduler is not available. Cannot check if cleanup is scheduled.';
+		
 		if ( function_exists( '\\as_next_scheduled_action' ) ) {
 			return \as_next_scheduled_action( self::get_cleanup_hook_name() );
+		} elseif ( function_exists( 'wcpdf_log_error' ) ) {
+			\wcpdf_log_error( $error_message, 'critical' );
 		} else {
-			\wcpdf_log_error( 'Action Scheduler is not available. Cannot check if cleanup is scheduled.', 'critical' );
-			return false;
+			error_log( $error_message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		}
+		
+		return false;
 	}
 
 	/**
@@ -382,6 +387,8 @@ class Semaphore {
 		$action = null;
 
 		if ( self::is_cleanup_scheduled() ) {
+			$error_message = 'Action Scheduler is not available. Cannot get cleanup action.';
+			
 			if ( function_exists( '\\as_get_scheduled_actions' ) ) {
 				$args = array(
 					'hook'    => self::get_cleanup_hook_name(),
@@ -396,8 +403,10 @@ class Semaphore {
 				if ( ! empty( $actions ) && 1 === count( $actions ) ) {
 					$action = reset( $actions );
 				}
+			} elseif ( function_exists( 'wcpdf_log_error' ) ) {
+				\wcpdf_log_error( $error_message, 'critical' );
 			} else {
-				\wcpdf_log_error( 'Action Scheduler is not available. Cannot get cleanup action.', 'critical' );
+				error_log( $error_message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 		}
 
@@ -411,12 +420,16 @@ class Semaphore {
 	 */
 	public static function schedule_semaphore_cleanup(): void {
 		if ( ! self::is_cleanup_scheduled() ) {
-			$interval = apply_filters( self::get_cleanup_hook_name() . '_interval', 30 * DAY_IN_SECONDS ); // default: every 30 days
+			$frequency     = apply_filters( self::get_cleanup_hook_name() . '_frequency', ( (int) ( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ?? 7 ) ) * DAY_IN_SECONDS );
+			$frequency     = apply_filters_deprecated( self::get_cleanup_hook_name() . '_interval', array( $frequency ), '4.7.0', self::get_cleanup_hook_name() . '_frequency' );
+			$error_message = 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.';
 
 			if ( function_exists( '\\as_schedule_recurring_action' ) ) {
-				\as_schedule_recurring_action( time(), $interval, self::get_cleanup_hook_name() );
+				\as_schedule_recurring_action( time(), $frequency, self::get_cleanup_hook_name() );
+			} elseif ( function_exists( 'wcpdf_log_error' ) ) {
+				\wcpdf_log_error( $error_message, 'critical' );
 			} else {
-				\wcpdf_log_error( 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.', 'critical' );
+				error_log( $error_message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 		}
 	}
@@ -428,7 +441,7 @@ class Semaphore {
 	 */
 	public static function init_cleanup(): void {
 		// This is to prevent the cleanup from running before the plugin is fully loaded
-		if ( WPO_WCPDF()->dependencies_are_ready() ) {
+		if ( ! WPO_WCPDF()->dependencies_are_ready() ) {
 			return;
 		}
 		

@@ -14,10 +14,20 @@ if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) :
 class FileSystem {
 	
 	/**
-	 * Filesystem method.
+	 * Default filesystem method.
+	 */
+	public const FILESYSTEM_DEFAULT = 'php';
+	
+	/**
+	 * Available filesystem methods.
+	 */
+	public const FILESYSTEM_METHODS = array( 'php', 'wp' );
+	
+	/**
+	 * Filesystem method enabled.
 	 * @var string
 	 */
-	public string $system_enabled = 'wp'; // Default to WP Filesystem API
+	public string $system_enabled = self::FILESYSTEM_DEFAULT;
 	
 	/**
 	 * Suppress errors.
@@ -27,9 +37,9 @@ class FileSystem {
 	
 	/**
 	 * WP_Filesystem instance.
-	 * @var \WP_Filesystem_Base|null
+	 * @var \WP_Filesystem_Direct|null
 	 */
-	public ?\WP_Filesystem_Base $wp_filesystem = null;
+	public ?\WP_Filesystem_Direct $wp_filesystem = null;
 	
 	/**
 	 * Singleton instance.
@@ -61,14 +71,14 @@ class FileSystem {
 		
 		$debug_settings['file_system_method'] = apply_filters( // Allow overriding the filesystem method via filter
 			'wpo_wcpdf_filesystem_method',
-			$debug_settings['file_system_method'] ?? $this->system_enabled
+			$debug_settings['file_system_method'] ?? self::FILESYSTEM_DEFAULT
 		);
 		
-		$this->system_enabled = ( 'php' === $debug_settings['file_system_method'] )
-			? 'php'
-			: 'wp';
+		$this->system_enabled = in_array( $debug_settings['file_system_method'], self::FILESYSTEM_METHODS, true )
+			? $debug_settings['file_system_method']
+			: self::FILESYSTEM_DEFAULT;
 		
-		if ( 'wp' === $this->system_enabled ) {
+		if ( $this->is_wp_filesystem() ) {
 			$this->initialize_wp_filesystem();
 		} elseif ( ! defined( 'FS_CHMOD_FILE' ) ) {
 			define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
@@ -96,38 +106,36 @@ class FileSystem {
 	 * @return void
 	 */
 	public function initialize_wp_filesystem(): void {
+		// Force the use of the direct filesystem method if not already defined
+		if ( ! defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+		}
+
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		global $wp_filesystem;
 
-		if ( ! WP_Filesystem() || ! $wp_filesystem ) {
-			wcpdf_log_error( 'WP_Filesystem initialization failed. Falling back to PHP methods.', 'warning' );
+		if ( ! WP_Filesystem() || ! $wp_filesystem || ! is_a( $wp_filesystem, '\WP_Filesystem_Direct' ) ) {
+			wcpdf_log_error( 'WP_Filesystem initialization failed or not using direct method. Falling back to PHP methods.', 'warning' );
 			$this->system_enabled = $this->change_setting_value( 'php' );
 			return;
 		}
 
 		$this->wp_filesystem = $wp_filesystem;
-
-		// Ensure the filesystem method is 'direct', otherwise log a warning
-		$filesystem_method = get_filesystem_method();
-		if ( 'direct' !== $filesystem_method ) {
-			wcpdf_log_error( "This plugin only supports the direct filesystem method. Current method: {$filesystem_method}", 'warning' );
-			$this->system_enabled = $this->change_setting_value( 'php' );
-		}
 	}
 	
 	/**
 	 * Change the filesystem setting value
-	 * @param string $default
+	 * @param string $method
 	 * @return string
 	 */
-	protected function change_setting_value( string $default = 'wp' ): string {
-		$debug_settings               = get_option( 'wpo_wcpdf_settings_debug', array() );
-		$debug_settings['filesystem'] = in_array( $default, array( 'wp', 'php' ), true ) ? $default : 'wp';
+	protected function change_setting_value( string $method ): string {
+		$debug_settings                       = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$debug_settings['file_system_method'] = in_array( $method, self::FILESYSTEM_METHODS, true ) ? $method : self::FILESYSTEM_DEFAULT;
 		
 		update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 		
-		return $debug_settings['filesystem'];
+		return $debug_settings['file_system_method'];
 	}
 
 	/**
@@ -275,6 +283,7 @@ class FileSystem {
 			$this->wp_filesystem->mtime( $filename ) :
 			( $this->suppress_errors ? @filemtime( $filename ) : filemtime( $filename ) );
 	}
+	
 }
 
 endif; // Class exists check

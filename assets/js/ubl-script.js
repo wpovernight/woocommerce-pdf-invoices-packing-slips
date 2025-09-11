@@ -29,4 +29,21 @@ jQuery( function ( $ ) {
 		}
 	} );
 	
+	const $tables = $( '.ubl-tax-class-table' );
+	const $select = $( '#ubl-tax-class-select' );
+
+	function updateTableView() {
+		const selected = $select.val();
+		$tables.hide();
+		$tables.filter( `[data-tax-class=\'${selected}\']` ).show();
+	}
+
+	$select.on( 'change', updateTableView );
+	updateTableView(); // Initialize on page load
+	
+	$( '#ubl-show-changelog' ).on( 'click', function( e ) {
+		e.preventDefault();
+		$( '#ubl-standard-changelog' ).slideToggle();
+	} );
+	
 } );

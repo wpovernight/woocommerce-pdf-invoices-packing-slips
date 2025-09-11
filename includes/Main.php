@@ -285,10 +285,10 @@ class Main {
 		$attach_documents = array();
 
 		foreach ( $documents as $document ) {
-			// Pro not activated, only attach Invoice
-			if ( ! function_exists( 'WPO_WCPDF_Pro' ) && 'invoice' !== $document->get_type() ) {
+			// Only invoice is allowed in the free version.
+			if ( ! function_exists( 'WPO_WCPDF_Pro' ) && 'packing-slip' === $document->get_type() ) {
 				continue;
-			};
+			}
 
 			foreach ( $document->output_formats as $output_format ) {
 				if ( $document->is_enabled( $output_format ) ) {
@@ -680,7 +680,7 @@ class Main {
 		if ( ! empty( $cached_value ) ) {
 			return wc_string_to_bool( $cached_value );
 		}
-		
+
 		$tmp_path = untrailingslashit( $this->get_tmp_path( $subfolder ) );
 
 		// Define allowed extensions per subfolder
@@ -692,7 +692,7 @@ class Main {
 
 		try {
 			$iterator = new \FilesystemIterator( $tmp_path, \FilesystemIterator::SKIP_DOTS );
-			
+
 			foreach ( $iterator as $file ) {
 				// If we don't have a file extension restriction, return true immediately
 				if ( empty( $allowed_extensions[ $subfolder ] ) ) {
@@ -726,7 +726,7 @@ class Main {
 	 */
 	public function maybe_reinstall_fonts( bool $force = false ): void {
 		$has_font_files = $this->tmp_subfolder_has_files( 'fonts' );
-		
+
 		if ( ! $has_font_files || $force ) {
 			$fonts_path = untrailingslashit( $this->get_tmp_path( 'fonts' ) );
 
@@ -1236,13 +1236,13 @@ class Main {
 
 	/**
 	 * Remove references to order in number store tables when removing WC data
-	 * 
+	 *
 	 * @param \WC_Abstract_Order $order
 	 * @return void
 	 */
 	public function remove_order_personal_data( \WC_Abstract_Order $order ): void {
 		global $wpdb;
-		
+
 		// Remove order ID from number stores
 		$number_stores = apply_filters( 'wpo_wcpdf_privacy_number_stores', array( 'invoice_number' ) );
 
@@ -1847,8 +1847,28 @@ class Main {
 		$email_hooks = apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks );
 
 		foreach ( $email_hooks as $email_hook ) {
-			add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
+			if ( 'woocommerce_email_customer_address_section' === $email_hook ) {
+				add_action( $email_hook, array( $this, 'add_document_link_to_address_section' ), 10, 4 );
+			} else {
+				add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
+			}
 		}
+	}
+
+	/**
+	 * Wrapper for woocommerce_email_customer_address_section hook.
+	 * Since different parameters sent to this hook, we use a wrapper for it.
+	 *
+	 * @param string $type
+	 * @param \WC_Abstract_Order $order
+	 * @param bool $sent_to_admin
+	 * @param bool $plain_text
+	 *
+	 * @return void
+	 */
+	public function add_document_link_to_address_section( string $type, \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text ): void {
+		// Since this hook doesn’t pass the $email object, we pass null (or create a dummy if needed).
+		$this->add_document_link_to_email( $order, $sent_to_admin, $plain_text, null );
 	}
 
 	/**
@@ -1857,11 +1877,11 @@ class Main {
 	 * @param \WC_Abstract_Order $order
 	 * @param bool $sent_to_admin
 	 * @param bool $plain_text
-	 * @param \WC_Email $email
+	 * @param mixed|\WC_Email $email Some third-parties might send different values.
 	 *
 	 * @return void
 	 */
-	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, \WC_Email $email ): void {
+	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, $email ): void {
 		// Check if document access type is 'full'.
 		$is_full_access_type = 'full' === WPO_WCPDF()->endpoint->get_document_link_access_type();
 
@@ -1877,7 +1897,8 @@ class Main {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
 			$selected_emails   = $document_settings['include_email_link'] ?? array();
 
-			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email->id, $selected_emails, true );
+			$email_id   = ( $email instanceof \WC_Email ) ? $email->id : '';
+			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email_id, $selected_emails, true );
 
 			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
 				continue;

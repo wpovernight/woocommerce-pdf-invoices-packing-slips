@@ -672,7 +672,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 				}
 
 				// Set item meta
-				$data['meta'] = wc_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
+				$data['meta'] = wpo_ips_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
 
 				$data_list[ $item_id ] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
 			}
@@ -1087,25 +1087,34 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 	/**
 	 * Return the order fees
+	 *
+	 * @param string $tax
+	 *
+	 * @return array
 	 */
-	public function get_order_fees( $tax = 'excl' ) {
-		if ( $_fees = $this->order->get_fees() ) {
-			foreach( $_fees as $id => $fee ) {
-				if ($tax == 'excl' ) {
-					$fee_price = $this->format_price( $fee['line_total'] );
-				} else {
-					$fee_price = $this->format_price( $fee['line_total'] + $fee['line_tax'] );
-				}
+	public function get_order_fees( string $tax = 'excl' ): array {
+		$fees       = array();
+		$order_fees = $this->order->get_fees();
+
+		if ( ! empty( $order_fees ) && is_array( $order_fees ) ) {
+			foreach ( $order_fees as $id => $fee ) {
+				$line_total = (float) $fee->get_total();
+				$line_tax   = (float) $fee->get_total_tax();
+
+				$fee_price = ( 'excl' === $tax )
+					? $this->format_price( $line_total )
+					: $this->format_price( $line_total + $line_tax );
 
 				$fees[ $id ] = array(
-					'label' 		=> $fee['name'],
-					'value'			=> $fee_price,
-					'line_total'	=> $this->format_price( $fee['line_total'] ),
-					'line_tax'		=> $this->format_price( $fee['line_tax'] )
+					'label'      => $fee->get_name(),
+					'value'      => $fee_price,
+					'line_total' => $this->format_price( $line_total ),
+					'line_tax'   => $this->format_price( $line_tax ),
 				);
 			}
-			return $fees;
 		}
+
+		return $fees;
 	}
 
 	/**

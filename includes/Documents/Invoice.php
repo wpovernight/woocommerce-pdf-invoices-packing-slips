@@ -405,7 +405,7 @@ class Invoice extends OrderDocumentMethods {
 							'label'       => __( 'Prefix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'        => 20,
 							'description' => __( 'If set, this value will be used as number prefix.' , 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . sprintf(
-								/* translators: 1. document type, 2-3 placeholders */
+								/* translators: 1. document slug, 2-3 placeholders */
 								__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
 								__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>[invoice_year]</strong>', '<strong>[invoice_month]</strong>'
 							) . ' ' . __( 'Check the Docs article below to see all the available placeholders for prefix/suffix.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -414,7 +414,7 @@ class Invoice extends OrderDocumentMethods {
 							'label'       => __( 'Suffix' , 'woocommerce-pdf-invoices-packing-slips' ),
 							'size'        => 20,
 							'description' => __( 'If set, this value will be used as number suffix.' , 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . sprintf(
-								/* translators: 1. document type, 2-3 placeholders */
+								/* translators: 1. document slug, 2-3 placeholders */
 								__( 'You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively.', 'woocommerce-pdf-invoices-packing-slips' ),
 								__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ), '<strong>[invoice_year]</strong>', '<strong>[invoice_month]</strong>'
 							) . ' ' . __( 'Check the Docs article below to see all the available placeholders for prefix/suffix.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -427,8 +427,16 @@ class Invoice extends OrderDocumentMethods {
 							'description' => sprintf( __( 'Enter the number of digits you want to use as padding. For instance, enter <code>6</code> to display the %s number <code>123</code> as <code>000123</code>, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
 						),
 					),
-					/* translators: document type */
-					'description' => __( 'For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article:', 'woocommerce-pdf-invoices-packing-slips' ) . sprintf( ' <a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/number-format-explained/" target="_blank">%s</a>', __( 'Number format explained', 'woocommerce-pdf-invoices-packing-slips') ) . '.<br><br>'. sprintf( __( '<strong>Note</strong>: Changes made to the number format will only be reflected on new orders. Also, if you have already created a custom %s number format with a filter, the above settings will be ignored.', 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
+					'description' => sprintf(
+							/* translators: %1$s: open anchor tag, %2$s: close anchor tag */
+							__( 'For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+							'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/number-format-explained/" target="_blank">',
+							'</a>'
+						) . '.<br><br><strong>' . __( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>: ' . sprintf(
+							/* translators: document type */
+							__( 'Changes made to the number format will only be reflected on new orders. Also, if you have already created a custom %s number format with a filter, the above settings will be ignored.', 'woocommerce-pdf-invoices-packing-slips' ),
+							__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' )
+						),
 				)
 			),
 			array(
@@ -561,9 +569,13 @@ class Invoice extends OrderDocumentMethods {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'use_latest_settings',
-					'description' => __( "When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.", 'woocommerce-pdf-invoices-packing-slips' )
-									. "<br>"
-									. __( "<strong>Caution:</strong> enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected.", 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						'%1$s<br><strong>%2$s</strong><br><a href="%3$s" target="_blank">%4$s</a>',
+						__( 'When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Caution: Enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/show-pdf-documents-with-the-latest-settings/',
+						__( 'Learn more about this setting', 'woocommerce-pdf-invoices-packing-slips' )
+					),
 				)
 			),
 		);

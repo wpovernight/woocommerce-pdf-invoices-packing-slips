@@ -40,7 +40,7 @@ class Assets {
 
 			wp_enqueue_style(
 				'wpo-wcpdf-order-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/order-styles'.$suffix.'.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/order-styles' . $suffix . '.css',
 				array(),
 				WPO_WCPDF_VERSION
 			);
@@ -50,7 +50,7 @@ class Assets {
 				// also applied to WC3.3+ but without affect due to .column-order_actions class being deprecated in 3.3+
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38'.$suffix.'.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38' . $suffix . '.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
@@ -58,7 +58,7 @@ class Assets {
 				// WP5.3 or newer is used: realign img inside buttons
 				wp_enqueue_style(
 					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39'.$suffix.'.css',
+					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39' . $suffix . '.css',
 					array(),
 					WPO_WCPDF_VERSION
 				);
@@ -67,7 +67,7 @@ class Assets {
 			// SCRIPTS
 			wp_enqueue_script(
 				'wpo-wcpdf',
-				WPO_WCPDF()->plugin_url() . '/assets/js/order-script'.$suffix.'.js',
+				WPO_WCPDF()->plugin_url() . '/assets/js/order-script' . $suffix . '.js',
 				array( 'jquery', 'jquery-blockui' ),
 				WPO_WCPDF_VERSION
 			);
@@ -76,13 +76,14 @@ class Assets {
 				'wpo-wcpdf',
 				'wpo_wcpdf_ajax',
 				array(
-					'ajaxurl'			           => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page
-					'nonce'				           => wp_create_nonce( 'generate_wpo_wcpdf' ),
-					'bulk_actions'		           => array_keys( wcpdf_get_bulk_actions() ),
-					'select_orders'	               => __( 'You have to select order(s) first!', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_delete'	           => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips'),
-					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips'),
+					'ajaxurl'                      => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page
+					'nonce'                        => wp_create_nonce( 'generate_wpo_wcpdf' ),
+					'bulk_actions'                 => array_keys( wcpdf_get_bulk_actions() ),
+					'select_orders'                => __( 'You have to select order(s) first!', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_delete'               => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
+					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' )
 				)
 			);
 		}
@@ -95,7 +96,7 @@ class Assets {
 
 			wp_enqueue_style(
 				'wpo-wcpdf-settings-styles',
-				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles'.$suffix.'.css',
+				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles' . $suffix . '.css',
 				array('woocommerce_admin_styles'),
 				WPO_WCPDF_VERSION
 			);
@@ -136,7 +137,7 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer' ),
+				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'jquery-ui-datepicker' ),
 				WPO_WCPDF_VERSION
 			);
 
@@ -145,6 +146,7 @@ class Assets {
 				'wpo_wcpdf_admin',
 				array(
 					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'nonce'                     => wp_create_nonce( 'wpo_wcpdf_admin_nonce' ),
 					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
 					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.min.js?ver=' . $pdfjs_version, // taken from https://cdnjs.com/libraries/pdf.js
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
@@ -186,7 +188,16 @@ class Assets {
 						),
 					),
 					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
-					'mysql_int_size_limit'      => __( 'The number should be smaller than 2147483647. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'mysql_int_size_limit'      => sprintf(
+						/* translators: mysql int size */
+						__( 'The number should be smaller than %s. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>2147483647</code>'
+					),
+					'shop_country_changed_messages' => array(
+						'loading' => __( 'Loading', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
+						'error'   => __( 'Error loading', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				)
 			);
 
