@@ -114,10 +114,12 @@ function wcpdf_get_bulk_document( $document_type, $order_ids ) {
 }
 
 function wcpdf_get_invoice( $order, $init = false ) {
+	wcpdf_deprecated_function( __FUNCTION__, '4.6.3', 'wcpdf_get_document( \'invoice\', $order, $init )' );
 	return wcpdf_get_document( 'invoice', $order, $init );
 }
 
 function wcpdf_get_packing_slip( $order, $init = false ) {
+	wcpdf_deprecated_function( __FUNCTION__, '4.6.3', 'wcpdf_get_document( \'packing-slip\', $order, $init )' );
 	return wcpdf_get_document( 'packing-slip', $order, $init );
 }
 
@@ -1338,21 +1340,32 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 		}
 	}
 
-	$url     = "https://api.github.com/repos/{$owner}/{$repo}/releases";
-	$options = array(
-		'http' => array(
-			'header' => "User-Agent: " . get_bloginfo( 'name' ) . " (" . home_url() . ")\r\n"
+	$url      = "https://api.github.com/repos/$owner/$repo/releases?per_page=10";
+	$response = wp_remote_get(
+		$url,
+		array(
+			'headers' => array(
+				'User-Agent' => sprintf(
+					'%s (%s)',
+					wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ),
+					home_url()
+				),
+			),
+			'timeout' => 15,
+			'accept'  => 'application/vnd.github.v3+json',
 		)
 	);
-	$context  = stream_context_create( $options );
-	$response = file_get_contents( $url, false, $context );
 
-	if ( ! $response ) {
+	if ( is_wp_error( $response ) ) {
 		return $empty_result;
 	}
 
-	$releases = json_decode( $response, true );
+	$code = wp_remote_retrieve_response_code( $response );
+	if ( 200 !== $code ) {
+		return $empty_result;
+	}
 
+	$releases = json_decode( wp_remote_retrieve_body( $response ), true );
 	if ( ! is_array( $releases ) ) {
 		return $empty_result;
 	}
@@ -1520,11 +1533,11 @@ function wpo_wcpdf_get_country_name_from_code( string $country_code ): string {
 function wpo_wcpdf_get_state_name_from_code( string $state_code, string $country_code ): string {
 	$state_code = $state_name = strtoupper( trim( $state_code ) );
 	$states     = wpo_wcpdf_get_country_states( $country_code );
-	
+
 	if ( ! empty( $state_code ) && is_array( $states ) && isset( $states[ $state_code ] ) ) {
 		$state_name = $states[ $state_code ];
 	}
-	
+
 	return $state_name ?? '';
 }
 
@@ -1546,19 +1559,19 @@ function wpo_wcpdf_get_country_address_format( string $country_code ): string {
 
 /**
  * Get the states for a given country code.
- * 
+ *
  * @param string $country_code
- * 
+ *
  * @return array
  */
 function wpo_wcpdf_get_country_states( string $country_code ): array {
 	$states = array();
-	
+
 	if ( ! empty( $country_code ) ) {
 		$country_code = strtoupper( trim( $country_code ) );
 		$states       = \WC()->countries->get_states( $country_code );
 	}
-	
+
 	return $states ?: array();
 }
 
@@ -1579,10 +1592,10 @@ function wpo_wcpdf_format_address( array $address ): string {
 	$address['city_upper']      = strtoupper( $address['city'] ?? '' );
 	$address['last_name_upper'] = strtoupper( $address['last_name'] ?? '' );
 	$address['postcode_upper']  = strtoupper( $address['postcode'] ?? '' );
-	
+
 	// Filter the address before formatting.
 	$address = apply_filters( 'wpo_wcpdf_format_address', $address );
-	
+
 	// Get the country address format
 	$address_format = wpo_wcpdf_get_country_address_format( $address['country_code'] );
 
@@ -1646,7 +1659,7 @@ function wpo_wcpdf_format_address( array $address ): string {
 function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, ?string $suffix, ?int $padding, \WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order ): string {
 	// Get dates
 	$order_date = $order->get_date_created();
-	
+
 	// Order date can be empty when order is being saved, fallback to current time
 	if ( empty( $order_date ) && function_exists( 'wc_string_to_datetime' ) ) {
 		$order_date = wc_string_to_datetime( date_i18n( 'Y-m-d H:i:s' ) );
@@ -1678,7 +1691,7 @@ function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, 
 	} else {
 		$order_number = '';
 	}
-	
+
 	// get format settings
 	$formats = array(
 		'prefix' => $prefix,
@@ -1735,4 +1748,60 @@ function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, 
 
 	// Add prefix & suffix
 	return $formats['prefix'] . $plain_number . $formats['suffix'];
+}
+
+/**
+ * Outputs item meta data.
+ *
+ * This is a customized version of the WooCommerce function `wc_display_item_meta()`,
+ * which uses the `get_all_formatted_meta_data()` method instead of `get_formatted_meta_data()`.
+ *
+ * @param WC_Order_Item $item Order item object.
+ * @param array         $args Optional. Display arguments.
+ *
+ * @return string|void Meta data HTML output or void if echoed directly.
+ */
+
+function wpo_ips_display_item_meta( \WC_Order_Item $item, array $args = array() ) {
+	$strings = array();
+	$html    = '';
+	$args    = wp_parse_args(
+		$args,
+		array(
+			'before'       => '<ul class="wc-item-meta"><li>',
+			'after'        => '</li></ul>',
+			'separator'    => '</li><li>',
+			'echo'         => true,
+			'autop'        => false,
+			'label_before' => '<strong class="wc-item-meta-label">',
+			'label_after'  => ':</strong> ',
+		)
+	);
+
+	$meta_data = method_exists( $item, 'get_all_formatted_meta_data' )
+		? $item->get_all_formatted_meta_data()
+		: $item->get_formatted_meta_data();
+
+	foreach ( $meta_data as $meta_id => $meta ) {
+		$value     = $args['autop'] ? wp_kses_post( $meta->display_value ) : wp_kses_post( make_clickable( trim( $meta->display_value ) ) );
+		$strings[] = $args['label_before'] . wp_kses_post( $meta->display_key ) . $args['label_after'] . $value;
+	}
+
+	if ( $strings ) {
+		$html = $args['before'] . implode( $args['separator'], $strings ) . $args['after'];
+	}
+
+	$html = apply_filters(
+		'wpo_ips_display_item_meta_html',
+		apply_filters( 'woocommerce_display_item_meta', $html, $item, $args ),
+		$item,
+		$args
+	);
+
+	if ( $args['echo'] ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $html;
+	} else {
+		return $html;
+	}
 }

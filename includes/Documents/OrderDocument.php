@@ -425,7 +425,7 @@ abstract class OrderDocument {
 		if ( empty( $number ) ) {
 			$number           = $order->get_meta( "_wcpdf_{$this->slug}_number" );
 			$formatted_number = $order->get_meta( "_wcpdf_formatted_{$this->slug}_number" );
-			
+
 			if ( ! empty( $formatted_number ) ) {
 				$number = compact( 'number', 'formatted_number' );
 			}
@@ -620,7 +620,7 @@ abstract class OrderDocument {
 				$this->linked_documents[ $document_type ] = wcpdf_get_document( $document_type, null );
 				$this->linked_documents[ $document_type ]->read_data( $order );
 			}
-			
+
 			return $this->linked_documents[ $document_type ]->get_data( $key, $document_type );
 		}
 
@@ -1083,10 +1083,10 @@ abstract class OrderDocument {
 
 	public function set_data( $data, $order ) {
 		$order = empty( $order ) ? $this->order : $order;
-		
+
 		foreach ( $data as $key => $value ) {
 			$setter = "set_$key";
-			
+
 			if ( is_callable( array( $this, $setter ) ) ) {
 				$this->$setter( $value, $order );
 			} else {
@@ -1332,7 +1332,19 @@ abstract class OrderDocument {
 
 		// legacy filters
 		if ( in_array( $settings_key, array( 'shop_name', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
-			$text = apply_filters_deprecated( "wpo_wcpdf_{$settings_key}", array( $text, $this ), '4.5.0', "wpo_wcpdf_{$settings_key}_settings_text" );
+			$text = apply_filters_deprecated(
+				"wpo_wcpdf_{$settings_key}",
+				array( $text, $this ),
+				'4.5.0',
+				"wpo_wcpdf_{$settings_key}_settings_text"
+			);
+		} elseif ( 'shop_address' === $settings_key ) {
+			$text = apply_filters_deprecated(
+				'wpo_wcpdf_shop_address_settings_text',
+				array( $text, $this ),
+				'4.6.0',
+				'wpo_wcpdf_get_shop_address'
+			);
 		}
 
 		return apply_filters( "wpo_wcpdf_{$settings_key}_settings_text", $text, $this );
@@ -1470,7 +1482,12 @@ abstract class OrderDocument {
 			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
 
-		return wpo_wcpdf_format_address( $address );
+		return apply_filters(
+			'wpo_wcpdf_get_shop_address',
+			wpo_wcpdf_format_address( $address ),
+			$address,
+			$this
+		);
 	}
 	public function shop_address() {
 		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );

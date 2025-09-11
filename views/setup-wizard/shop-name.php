@@ -10,17 +10,17 @@
 		get_option( 'wpo_wcpdf_settings_general', array() ),
 		array(
 			'shop_name'             => array( 'default' => get_bloginfo( 'name' ) ?? '' ),
-			'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address' ), '' ),
-			'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2' ), '' ),
-			'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country' ), '' ),
-			'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state' ), '' ),
-			'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city' ), '' ),
-			'shop_address_postcode' => array( 'default' => get_option( 'woocommerce_store_postcode' ), '' ),
+			'shop_address_line_1'   => array( 'default' => get_option( 'woocommerce_store_address', '' ) ),
+			'shop_address_line_2'   => array( 'default' => get_option( 'woocommerce_store_address_2', '' ) ),
+			'shop_address_country'  => array( 'default' => get_option( 'woocommerce_store_country', '' ) ),
+			'shop_address_state'    => array( 'default' => get_option( 'woocommerce_store_state', '' ) ),
+			'shop_address_city'     => array( 'default' => get_option( 'woocommerce_store_city', '' ) ),
+			'shop_address_postcode' => array( 'default' => get_option( 'woocommerce_store_postcode', '' ) ),
 		)
 	);
-	$countries       = array_merge( array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ), \WC()->countries->get_countries() );
-	$states          = wpo_wcpdf_get_country_states( $current_settings['shop_address_country']['default'] );
-	$states_disabled = empty( $states ) ? 'disabled' : '';
+	$countries        = array_merge( array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ), \WC()->countries->get_countries() );
+	$states           = wpo_wcpdf_get_country_states( $current_settings['shop_address_country']['default'] ?? '' );
+	$states_disabled  = empty( $states ) ? 'disabled' : '';
 	?>
 	<input
 		type="text"

@@ -349,7 +349,7 @@ class Admin {
 		}
 
 		// get invoice settings
-		$invoice          = wcpdf_get_invoice( null );
+		$invoice          = wcpdf_get_document( 'invoice', null );
 		$invoice_settings = $invoice->get_settings();
 		$invoice_columns  = array(
 			'invoice_number_column' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -390,7 +390,7 @@ class Admin {
 
 		$this->disable_storing_document_settings();
 
-		$invoice = wcpdf_get_invoice( $order );
+		$invoice = wcpdf_get_document( 'invoice', $order );
 
 		switch ( $column ) {
 			case 'invoice_number_column':
@@ -509,16 +509,27 @@ class Admin {
 			'high'
 		);
 
-		// create PDF buttons
-		add_meta_box(
-			'wpo_wcpdf-box',
-			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'pdf_actions_meta_box' ),
-			$screen_id,
-			'side',
-			'default'
-		);
+		if ( ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'pdf' ) ) ) {
+			// create PDF buttons
+			add_meta_box(
+				'wpo_wcpdf-box',
+				__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'pdf_actions_meta_box' ),
+				$screen_id,
+				'side',
+				'default'
+			);
 
+			// Invoice number & date
+			add_meta_box(
+				'wpo_wcpdf-data-input-box',
+				__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'data_input_box_content' ),
+				$screen_id,
+				'normal',
+				'default'
+			);
+		}
 
 		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
 		if ( count( $ubl_documents ) > 0 ) {
@@ -532,16 +543,6 @@ class Admin {
 				'default'
 			);
 		}
-
-		// Invoice number & date
-		add_meta_box(
-			'wpo_wcpdf-data-input-box',
-			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'data_input_box_content' ),
-			$screen_id,
-			'normal',
-			'default'
-		);
 	}
 
 	/**
@@ -648,7 +649,7 @@ class Admin {
 				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="' . $data['mark_printed_url'] . '">' . __( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>' : '';
 				$printed               = isset( $data['printed'] ) && $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="' . $data['unmark_printed_url'] . '">' . __( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>' : '';
-				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d g:i:s a', strtotime( $data['printed_data']['date'] ) ) . '' . $unmark_printed . '</p>' : '';
+				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d H:i:s', (int) $data['printed_data']['date'] )  . '' . $unmark_printed . '</p>' : '';
 
 				$allowed_tags = array(
 					'svg' => array(
@@ -847,6 +848,14 @@ class Admin {
 		// Default number data
 		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
+			$default_number  = 0;
+
+			if (
+				! empty( \WPO_WCPDF()->settings->debug_settings['default_manual_document_number'] ) &&
+				'next_document_number' === \WPO_WCPDF()->settings->debug_settings['default_manual_document_number']
+			) {
+				$default_number = $document->get_sequential_number_store()->get_next() ?? 0;
+			}
 
 			$current['number'] = array(
 				'prefix' => array(
@@ -854,7 +863,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_prefix",
 				),
 				'plain' => array(
-					'value' => 0,
+					'value' => $default_number,
 					'name'  => "{$name_prefix}number_plain",
 				),
 				'suffix' => array(
@@ -862,7 +871,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_suffix",
 				),
 				'padding' => array(
-					'value' => $number_settings['padding'] ?: 1,
+					'value' => ! empty( $number_settings['padding'] ) ? absint( $number_settings['padding'] ) : 1,
 					'name'  => "{$name_prefix}number_padding",
 				),
 			);
@@ -1045,7 +1054,7 @@ class Admin {
 			}
 
 			$form_data = array();
-			$invoice   = wcpdf_get_invoice( $order );
+			$invoice   = wcpdf_get_document( 'invoice', $order );
 
 			if ( $invoice ) {
 				// IMPORTANT: $is_new must be set before calling initiate_number().
