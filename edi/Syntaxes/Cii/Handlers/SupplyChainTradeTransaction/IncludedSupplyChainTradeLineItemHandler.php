@@ -22,10 +22,9 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 		$tax_data = $this->document->order_tax_data;
 
 		foreach ( $items as $item_id => $item ) {
-			$taxes      = $item->get_taxes();
-			$line_total = $item->get_total();
+			$taxes = $item->get_taxes();
 
-			// --- Build exactly ONE ApplicableTradeTax node per line ---
+			// Build exactly one ApplicableTradeTax node per line
 			$effective_rate = 0.0;
 			$category       = null;
 			$scheme         = 'VAT';
@@ -65,6 +64,62 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				),
 			);
 
+			// Calculate item totals
+			if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+				$gross_total = (float) $item->get_subtotal(); // before discounts, ex-VAT
+				$net_total   = (float) $item->get_total();    // after discounts, ex-VAT
+			} else {
+				$gross_total = (float) $item->get_total();
+				$net_total   = (float) $item->get_total();
+			}
+
+			$qty           = is_a( $item, 'WC_Order_Item_Product' ) ? max( 1, (int) $item->get_quantity() ) : 1;
+			$gross_unit    = $qty > 0 ? $gross_total / $qty : 0.0;
+			$net_unit      = $qty > 0 ? $net_total   / $qty : 0.0;
+
+			$gross_unit    = round( $gross_unit, 2 );
+			$net_unit      = round( $net_unit,   2 );
+			$unit_discount = max( 0.0, round( $gross_unit - $net_unit, 2 ) );
+
+			$price_children = array(
+				array(
+					'name'       => 'ram:ChargeAmount',
+					'value'      => $net_unit,
+				),
+				array(
+					'name'       => 'ram:BasisQuantity',
+					'value'      => 1,
+					'attributes' => array(
+						'unitCode' => 'C62'
+					)
+				),
+			);
+
+			// Only products can have a price-level discount
+			if ( $unit_discount > 0 && is_a( $item, 'WC_Order_Item_Product' ) ) {
+				$price_children[] = array(
+					'name'  => 'ram:AppliedTradeAllowanceCharge',
+					'value' => array(
+						array(
+							'name'  => 'ram:ChargeIndicator',
+							'value' => array(
+								array(
+									'name'  => 'udt:Indicator',
+									'value' => 'false'
+								),
+							),
+						),
+						array(
+							'name'  => 'ram:ActualAmount',
+							'value' => $unit_discount,
+						),
+						array(
+							'name'  => 'ram:BasisAmount',
+							'value' => $gross_unit,
+						),
+					),
+				);
+			}
 
 			$line_item = array(
 				'name'  => 'ram:IncludedSupplyChainTradeLineItem',
@@ -92,12 +147,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'value' => array(
 							array(
 								'name'  => 'ram:NetPriceProductTradePrice',
-								'value' => array(
-									array(
-										'name' => 'ram:ChargeAmount',
-										'value' => round( $item->get_total() / max( $item->get_quantity(), 1 ), 2 ),
-									),
-								)
+								'value' => $price_children,
 							),
 						),
 					),
@@ -106,7 +156,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'value' => array(
 							array(
 								'name'       => 'ram:BilledQuantity',
-								'value'      => $item->get_quantity(),
+								'value'      => $qty,
 								'attributes' => array(
 									'unitCode' => 'C62',
 								),
@@ -123,7 +173,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 									'value' => array(
 										array(
 											'name' => 'ram:LineTotalAmount',
-											'value' => round( $line_total, 2 ),
+											'value' => round( $net_total, 2 ),
 										),
 									),
 								),

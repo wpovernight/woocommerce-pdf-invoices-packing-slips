@@ -136,19 +136,21 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 	
 	/**
-	 * Get the unit price of an item
+	 * Get the net unit price (ex-VAT, after discounts) of an item.
 	 *
 	 * @param \WC_Order_Item $item
-	 * @return int|float
+	 * @return float
 	 */
 	protected function get_item_unit_price( \WC_Order_Item $item ) {
-		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
-			return $item->get_subtotal() / $item->get_quantity();
-		} elseif ( is_a( $item, 'WC_Order_Item_Shipping' ) || is_a( $item, 'WC_Order_Item_Fee' ) ) {
-			return $item->get_total();
-		} else {
-			return 0;
-		}
+		$qty = ( is_a( $item, 'WC_Order_Item_Product' ) ) ? max( 1, (int) $item->get_quantity() ) : 1;
+
+		// WooCommerce semantics:
+		// - get_subtotal(): before discounts (ex tax)
+		// - get_total():    after discounts (ex tax)
+		$net = (float) $item->get_total();
+
+		// For product lines we want unit net price; for fees/shipping qty is 1
+		return round( $net / $qty, wc_get_price_decimals() );
 	}
 
 	/**

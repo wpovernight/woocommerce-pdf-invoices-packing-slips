@@ -100,6 +100,55 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				}
 			}
 
+			// Calculate item totals
+			if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+				$gross_total = (float) $item->get_subtotal();
+				$net_total   = (float) $item->get_total();
+			} else {
+				$gross_total = (float) $item->get_total();
+				$net_total   = (float) $item->get_total();
+			}
+			
+			$qty           = ( is_a( $item, 'WC_Order_Item_Product' ) ) ? max( 1, (int) $item->get_quantity() ) : 1;
+			$gross_unit    = $qty > 0 ? $gross_total / $qty : 0.0;
+			$net_unit      = $qty > 0 ? $net_total   / $qty : (float) $item->get_total();
+			$gross_unit    = round( $gross_unit, 2 );
+			$net_unit      = round( $net_unit,   2 );
+			$unit_discount = max( 0.0, round( $gross_unit - $net_unit, 2 ) );
+
+			$price_value = array(
+				array(
+					'name'       => 'cbc:PriceAmount',
+					'value'      => $net_unit,
+					'attributes' => array( 'currencyID' => $currency ),
+				),
+				array(
+					'name'       => 'cbc:BaseQuantity',
+					'value'      => 1,
+					'attributes' => array( 'unitCode' => 'C62' ),
+				),
+			);
+
+			// Only show AllowanceCharge when there is a discount at price level
+			if ( $unit_discount > 0 ) {
+				$price_value[] = array(
+					'name'  => 'cac:AllowanceCharge',
+					'value' => array(
+						array( 'name' => 'cbc:ChargeIndicator', 'value' => 'false' ),
+						array(
+							'name'       => 'cbc:Amount',
+							'value'      => $unit_discount,
+							'attributes' => array( 'currencyID' => $currency ),
+						),
+						array(
+							'name'       => 'cbc:BaseAmount',
+							'value'      => $gross_unit,
+							'attributes' => array( 'currencyID' => $currency ),
+						),
+					),
+				);
+			}
+
 			$invoice_line = array(
 				'name'  => 'cac:InvoiceLine',
 				'value' => array(
@@ -109,14 +158,14 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'  => 'cbc:InvoicedQuantity',
-						'value' => $item->get_quantity(),
+						'value' => $qty,
 						'attributes' => array(
 							'unitCode' => 'C62', // https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/
 						),
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => round( $item->get_total(), 2 ),
+						'value'      => round( $net_total, 2 ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
@@ -139,7 +188,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						'value' => array(
 							array(
 								'name'       => 'cbc:PriceAmount',
-								'value'      => round( $this->get_item_unit_price( $item ), 2 ),
+								'value'      => $price_value,
 								'attributes' => array(
 									'currencyID' => $currency,
 								),
