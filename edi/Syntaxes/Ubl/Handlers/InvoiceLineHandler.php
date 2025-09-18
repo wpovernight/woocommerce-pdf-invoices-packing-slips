@@ -20,8 +20,8 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	public function handle( array $data, array $options = array() ): array {
 		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_invoice_line', false, $this );
 		$items                = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
-		$tax_reasons          = EN16931::get_vatex();
 		$currency             = $this->document->order->get_currency();
+		$tax_reasons          = EN16931::get_vatex();
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
