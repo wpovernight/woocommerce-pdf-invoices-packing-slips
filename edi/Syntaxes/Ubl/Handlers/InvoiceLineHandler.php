@@ -18,9 +18,10 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$items       = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
-		$tax_reasons = EN16931::get_vatex();
-		$currency    = $this->document->order->get_currency();
+		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_invoice_line', false, $this );
+		$items                = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+		$tax_reasons          = EN16931::get_vatex();
+		$currency             = $this->document->order->get_currency();
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
@@ -103,7 +104,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			// Calculate item totals
 			if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
 				$gross_total = (float) $item->get_subtotal();
-				$net_total   = (float) $item->get_total();
+				$net_total   = (float) ( $include_coupon_lines ? $item->get_subtotal() : $item->get_total() );
 			} else {
 				$gross_total = (float) $item->get_total();
 				$net_total   = (float) $item->get_total();
@@ -207,8 +208,140 @@ class InvoiceLineHandler extends AbstractUblHandler {
 
 			$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_line', $invoice_line, $data, $options, $item, $this );
 		}
+		
+		// Append coupon lines as negative invoice lines
+		if ( $include_coupon_lines ) {
+			$coupons = $this->document->order->get_items( 'coupon' );
+			
+			if ( empty( $coupons ) ) {
+				return $data;
+			}
+
+			foreach ( $coupons as $order_item_id => $coupon_item ) {
+				$line = $this->build_coupon_invoice_line( $coupon_item, $order_item_id, $currency );
+				if ( $line ) {
+					$data[] = $line;
+				}
+			}
+		}
 
 		return $data;
+	}
+	
+	/**
+	 * Create the InvoiceLine array for a single coupon item.
+	 *
+	 * @param \WC_Order_Item_Coupon $coupon_item
+	 * @param int                   $fallback_id
+	 * @param string                $currency
+	 * @return array|null
+	 */
+	protected function build_coupon_invoice_line( $coupon_item, int $fallback_id, string $currency ): ?array {
+		if ( ! is_object( $coupon_item ) || ! method_exists( $coupon_item, 'get_discount' ) ) {
+			return null;
+		}
+
+		$code              = method_exists( $coupon_item, 'get_code' ) ? $coupon_item->get_code() : '';
+		$discount_excl_tax = (float) $coupon_item->get_discount();
+		$net_total         = -1 * round( $discount_excl_tax, 2 );
+
+		if ( 0.0 === $net_total ) {
+			return null;
+		}
+
+		$coupon_post_id = ( function_exists( 'wc_get_coupon_id_by_code' ) && $code )
+			? (int) wc_get_coupon_id_by_code( $code )
+			: 0;
+
+		$label_template = apply_filters(
+			'wpo_ips_edi_ubl_coupon_line_label',
+			__( 'Discount %s', 'wpo-ips-edi' ),
+			$this
+		);
+		$line_label = apply_filters(
+			'wpo_ips_edi_ubl_coupon_line_name',
+			sprintf( $label_template, $code ),
+			$coupon_item,
+			$this
+		);
+
+		$tax_category = array(
+			array(
+				'name'  => 'cbc:ID',
+				'value' => 'Z',
+			),
+			array(
+				'name'  => 'cbc:Percent',
+				'value' => 0,
+			),
+			array(
+				'name'  => 'cac:TaxScheme',
+				'value' => array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => 'VAT',
+					),
+				),
+			),
+		);
+
+		$invoice_line = array(
+			'name'  => 'cac:InvoiceLine',
+			'value' => array(
+				array(
+					'name'  => 'cbc:ID',
+					'value' => $coupon_post_id > 0 ? $coupon_post_id : $fallback_id,
+				),
+				array(
+					'name'       => 'cbc:InvoicedQuantity',
+					'value'      => 1,
+					'attributes' => array(
+						'unitCode' => 'C62',
+					),
+				),
+				array(
+					'name'       => 'cbc:LineExtensionAmount',
+					'value'      => $net_total,
+					'attributes' => array(
+						'currencyID' => $currency,
+					),
+				),
+				array(
+					'name'  => 'cac:Item',
+					'value' => array(
+						array(
+							'name'  => 'cbc:Name',
+							'value' => wpo_ips_edi_sanitize_string( $line_label ),
+						),
+						array(
+							'name' => 'cac:ClassifiedTaxCategory',
+							'value' => $tax_category,
+						),
+					),
+				),
+				array(
+					'name'  => 'cac:Price',
+					'value' => array(
+						array(
+							'name'       => 'cbc:PriceAmount',
+							'value'      => $net_total, // unit price (negative)
+							'attributes' => array(
+								'currencyID' => $currency,
+							),
+						),
+						array(
+							'name'       => 'cbc:BaseQuantity',
+							'value'      => 1,
+							'attributes' => array(
+								'unitCode' => 'C62',
+							),
+						),
+					),
+				),
+			),
+		);
+		
+		return apply_filters( 'wpo_ips_edi_ubl_coupon_invoice_line', $invoice_line, $coupon_item, $this );
 	}
 
 }
