@@ -868,7 +868,7 @@ class Admin {
 								esc_attr( $class ),
 								esc_attr( $alt ),
 								esc_html( $title ),
-								! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : ''
+								wp_kses( $exists, $allowed_svg_tags )
 							);
 						}
 					}
