@@ -91,34 +91,43 @@ class TaxTotalHandler extends AbstractUblHandler {
 		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $it ) {
 			$line_total = (float) $it->get_total();
 			$taxes      = $it->get_taxes();
-			$has_rows   = ! empty( $taxes['total'] ) && is_array( $taxes['total'] );
-			$line_is_z  = false;
+			$rows       = ( is_array( $taxes['total'] ?? null ) ) ? $taxes['total'] : array();
 
-			if ( $has_rows ) {
-				foreach ( $taxes['total'] as $tax_id => $amt ) {
-					if ( ! is_numeric( $amt ) ) {
+			// Does this line have any non-zero tax amount?
+			$has_nonzero_row = false;
+			foreach ( $rows as $amt ) {
+				if ( is_numeric( $amt ) && (float) $amt !== 0.0 ) {
+					$has_nonzero_row = true;
+					break;
+				}
+			}
+
+			$line_is_z = false;
+
+			if ( $has_nonzero_row ) {
+				// classify by the non-zero row's category/rate
+				foreach ( $rows as $tax_id => $amt ) {
+					if ( ! is_numeric( $amt ) || (float) $amt === 0.0 ) {
 						continue;
 					}
-					
+
 					$info = $this->document->order_tax_data[ $tax_id ] ?? array();
 					$cat  = strtoupper( $info['category'] ?? '' );
 					$rate = (float) ( $info['percentage'] ?? 0 );
-					
+
 					if ( 'Z' === $cat || 0.0 === $rate ) {
 						$line_is_z = true;
 						break;
 					}
 				}
 			} else {
-				// Shipping without tax rows: treat as zero-rated
-				if ( 'shipping' === $it->get_type() ) {
-					$line_is_z = true;
-				}
+				// No non-zero tax rows at all → treat as zero-rated (Z)
+				$line_is_z = true;
 			}
 
 			if ( $line_is_z ) {
 				$has_z_line    = true;
-				$z_missing_ex += $line_total;
+				$z_missing_ex += $line_total; // contributes to Z taxable amount
 			}
 		}
 

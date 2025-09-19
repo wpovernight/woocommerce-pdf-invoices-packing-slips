@@ -31,74 +31,62 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			$line_tax_data      = $item[ $tax_data_container ];
 			$tax_category       = array();
 
-			foreach ( $line_tax_data[ $tax_data_key ] as $tax_id => $tax ) {
-				if ( empty( $tax ) ) {
-					$tax = 0;
-				}
+			$rows = ( isset( $line_tax_data[ $tax_data_key ] ) && is_array( $line_tax_data[ $tax_data_key ] ) )
+				? $line_tax_data[ $tax_data_key ]
+				: array();
 
-				if ( ! is_numeric( $tax ) ) {
+			foreach ( $rows as $tax_id => $tax_amt ) {
+				// only consider non-zero numeric rows
+				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt === 0.0 ) {
 					continue;
 				}
 
-				$tax_order_data = $this->document->order_tax_data[ $tax_id ];
+				$row = $this->document->order_tax_data[ $tax_id ] ?? array();
 
-				// Build the TaxCategory array
 				$tax_category = array(
 					array(
 						'name'  => 'cbc:ID',
-						'value' => strtoupper( $tax_order_data['category'] ),
+						'value' => strtoupper( $row['category'] ?? 'Z' ),
 					),
 					array(
 						'name'  => 'cbc:Percent',
-						'value' => round( $tax_order_data['percentage'], 2 ),
+						'value' => round( (float) ( $row['percentage'] ?? 0 ), 1 ),
 					),
 					array(
 						'name'  => 'cac:TaxScheme',
 						'value' => array(
 							array(
 								'name'  => 'cbc:ID',
-								'value' => strtoupper( $tax_order_data['scheme'] ),
+								'value' => strtoupper( $row['scheme'] ?? 'VAT' ),
 							),
 						),
 					),
 				);
-			}
-			
-			// Fallback if no tax rows were found
-			if ( empty( $tax_category ) ) {
-				$is_shipping = ( 'shipping' === $item->get_type() );
 
-				if ( $is_shipping ) {
-					// Mirror CII: shipping with no tax -> Zero-rated Z/0%
-					$tax_category = array(
-						array( 'name' => 'cbc:ID',      'value' => 'Z' ),
-						array( 'name' => 'cbc:Percent', 'value' => 0 ),
-						array(
-							'name'  => 'cac:TaxScheme',
-							'value' => array(
-								array( 'name' => 'cbc:ID', 'value' => 'VAT' ),
+				break;
+			}
+
+			// Fallback: no non-zero tax rows -> Zero-rated (Z / 0%)
+			if ( empty( $tax_category ) ) {
+				$tax_category = array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => 'Z',
+					),
+					array(
+						'name'  => 'cbc:Percent',
+						'value' => 0,
+					),
+					array(
+						'name'  => 'cac:TaxScheme',
+						'value' => array(
+							array(
+								'name' => 'cbc:ID',
+								'value' => 'VAT',
 							),
 						),
-					);
-				} else {
-					// Non-shipping without tax rows: choose your policy.
-					// If you also want these as Z, copy the block above.
-					// Otherwise, inherit the first standard rate found (S):
-					$std = null;
-					foreach ( (array) $this->document->order_tax_data as $row ) {
-						if ( strtoupper( $row['category'] ?? '' ) === 'S' ) { $std = $row; break; }
-					}
-					$tax_category = array(
-						array( 'name' => 'cbc:ID',      'value' => strtoupper( $std['category'] ?? 'Z' ) ),
-						array( 'name' => 'cbc:Percent', 'value' => round( $std['percentage'] ?? 0, 2 ) ),
-						array(
-							'name'  => 'cac:TaxScheme',
-							'value' => array(
-								array( 'name' => 'cbc:ID', 'value' => strtoupper( $std['scheme'] ?? 'VAT' ) ),
-							),
-						),
-					);
-				}
+					),
+				);
 			}
 
 			// Calculate item totals
