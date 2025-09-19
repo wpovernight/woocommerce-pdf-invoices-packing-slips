@@ -459,11 +459,11 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
  * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
  * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
  *
- * @param  \wpdb   $wpdb
+ * @param  \wpdb  $wpdb
  * @param  string $context Optional prefix for messages (e.g. __METHOD__).
  * @return array  List of error strings logged.
  */
-function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ) {
+function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ): array {
 	global $EZSQL_ERROR;
 
 	static $seen = array(); // avoid duplicate logs in the same request
