@@ -186,22 +186,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'  => 'cac:Price',
-						'value' => array(
-							array(
-								'name'       => 'cbc:PriceAmount',
-								'value'      => $price_value,
-								'attributes' => array(
-									'currencyID' => $currency,
-								),
-							),
-							array(
-								'name'       => 'cbc:BaseQuantity',
-								'value'      => 1, // value should be 1, as we're using the unit price
-								'attributes' => array(
-									'unitCode' => 'C62', // https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/
-								),
-							),
-						),
+						'value' => $price_value,
 					),
 				),
 			);
