@@ -842,11 +842,15 @@ class Admin {
 			<ul class="wpo-ips-edi-actions">
 				<?php
 					foreach ( $meta_box_actions as $document_type => $data ) {
-						$url    = isset( $data['url'] ) ? $data['url'] : '';
-						$class  = isset( $data['class'] ) ? $data['class'] : '';
-						$alt    = isset( $data['alt'] ) ? $data['alt'] : '';
-						$title  = isset( $data['title'] ) ? $data['title'] : '';
-						$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
+						$url     = $data['url']     ?? '';
+						$class   = $data['class']   ?? '';
+						$alt     = $data['alt']     ?? '';
+						$title   = $data['title']   ?? '';
+						$network = $data['network'] ?? false;
+						
+						$exists  = isset( $data['exists'] ) && $data['exists']
+							? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>'
+							: '';
 
 						$allowed_svg_tags = array(
 							'svg' => array(
@@ -861,7 +865,7 @@ class Admin {
 							),
 						);
 
-						if ( ! empty( $exists ) ) {
+						if ( ! empty( $exists ) || $network ) {
 							printf(
 								'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
 								esc_url( $url ),
