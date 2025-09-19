@@ -492,11 +492,13 @@ function wcpdf_catch_db_object_errors( $wpdb, string $context = '' ) {
 
 	// Log (with optional context) and dedupe per request
 	foreach ( $errors as $msg ) {
-		$line = $context !== '' ? "{$context}: {$msg}" : $msg;
+		$line = '' !== $context ? "{$context}: {$msg}" : $msg;
 		$key  = md5( $line );
+		
 		if ( isset( $seen[ $key ] ) ) {
 			continue;
 		}
+		
 		$seen[ $key ] = true;
 		wcpdf_log_error( $line, 'critical' );
 	}
