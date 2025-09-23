@@ -59,6 +59,11 @@ ul.wpo-ips-edi-actions > li {
 	vertical-align: middle;
 }
 
+.wpo-ips-edi-actions a.button.disabled {
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
 .wpo_wcpdf-actions .printed-data,
 .wcpdf-data-fields .printed-data {
 	font-size: 8pt;
