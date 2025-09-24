@@ -40,29 +40,6 @@
 	fill: #51266b;
 }
 
-button.button-wpo.button,
-.button.button-wpo.button-primary {
-	height: 36px !important;
-	min-height: 36px !important;
-	padding: 0 14px !important;
-	line-height: 36px !important;
-	background-color: #6E1EDC !important;
-	color: #fff !important;
-	border-color: #6E1EDC !important;
-	border-radius: 8px !important;
-
-	/* kill WP visual effects that distort the corners */
-	background-image: none !important;
-	box-shadow: none !important;
-	text-shadow: none !important;
-	background-clip: padding-box !important;
-}
-
-.button-wpo:focus {
-	outline: none !important;
-	box-shadow: 0 0 0 3px rgba(110, 30, 220, .25) !important;
-}
-
 ul.wpo-ips-edi-actions {
 	margin: 0;
 }
