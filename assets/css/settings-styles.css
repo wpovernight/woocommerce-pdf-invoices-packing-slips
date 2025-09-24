@@ -820,8 +820,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin: 1em 0;
 }
 
-button.button-edi-save-taxes.button,
-.button.button-edi-save-taxes.button-primary {
+button.button-wpo.button,
+.button.button-wpo.button-primary {
 	height: 36px !important;
 	min-height: 36px !important;
 	padding: 0 14px !important;
@@ -838,7 +838,7 @@ button.button-edi-save-taxes.button,
 	background-clip: padding-box !important;
 }
 
-.button-edi-save-taxes:focus {
+.button-wpo:focus {
 	outline: none !important;
 	box-shadow: 0 0 0 3px rgba(110, 30, 220, .25) !important;
 }
