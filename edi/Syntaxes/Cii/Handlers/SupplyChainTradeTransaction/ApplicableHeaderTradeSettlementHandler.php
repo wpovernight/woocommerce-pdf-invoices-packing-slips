@@ -202,7 +202,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				'value' => array(
 					array(
 						'name'  => 'ram:CalculatedAmount',
-						'value' => wc_round_tax_total( $item['total_tax'] ),
+						'value' => $this->format_decimal( wc_round_tax_total( $item['total_tax'] ) ),
 					),
 					array(
 						'name'  => 'ram:TypeCode',
@@ -210,7 +210,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 					),
 					array(
 						'name'  => 'ram:BasisAmount',
-						'value' => wc_round_tax_total( $item['total_ex'] ),
+						'value' => $this->format_decimal( wc_round_tax_total( $item['total_ex'] ) ),
 					),
 					array(
 						'name'  => 'ram:CategoryCode',
@@ -218,7 +218,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 					),
 					array(
 						'name'  => 'ram:RateApplicablePercent',
-						'value' => round( $percent, 1 ),
+						'value' => $this->format_decimal( $percent, 1 ),
 					),
 				),
 			);
@@ -304,13 +304,13 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				if ( 'Z' === $cat ) {
 					foreach ( $node['value'] as &$v ) {
 						if ( 'ram:BasisAmount' === $v['name'] ) {
-							$v['value'] = wc_round_tax_total( $z_basis );
+							$v['value'] = $this->format_decimal( wc_round_tax_total( $z_basis ) );
 						}
 						if ( 'ram:CalculatedAmount' === $v['name'] ) {
-							$v['value'] = 0;
+							$v['value'] = $this->format_decimal( 0 );
 						}
 						if ( 'ram:RateApplicablePercent' === $v['name'] ) {
-							$v['value'] = 0;
+							$v['value'] = $this->format_decimal( 0, 1 );
 						}
 					}
 					
@@ -328,7 +328,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:CalculatedAmount',
-							'value' => 0
+							'value' => $this->format_decimal( 0 ),
 						),
 						array(
 							'name'  => 'ram:TypeCode',
@@ -336,7 +336,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 						),
 						array(
 							'name'  => 'ram:BasisAmount',
-							'value' => wc_round_tax_total( $z_basis ),
+							'value' => $this->format_decimal( wc_round_tax_total( $z_basis ) ),
 						),
 						array(
 							'name'  => 'ram:CategoryCode',
@@ -344,7 +344,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 						),
 						array(
 							'name'  => 'ram:RateApplicablePercent',
-							'value' => 0,
+							'value' => $this->format_decimal( 0, 1 ),
 						),
 					),
 				);
@@ -425,22 +425,22 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			'value' => array(
 				array(
 					'name'  => 'ram:LineTotalAmount',
-					'value' => $total_exc_tax,
+					'value' => $this->format_decimal( $total_exc_tax ),
 				),
 				array(
 					'name'  => 'ram:TaxBasisTotalAmount',
-					'value' => $total_exc_tax,
+					'value' => $this->format_decimal( $total_exc_tax ),
 				),
 				array(
 					'name'       => 'ram:TaxTotalAmount',
-					'value'      => $total_tax,
+					'value'      => $this->format_decimal( wc_round_tax_total( $total_tax ) ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
 				),
 				array(
 					'name'  => 'ram:GrandTotalAmount',
-					'value' => $total_inc_tax,
+					'value' => $this->format_decimal( $total_inc_tax ),
 				),
 			),
 		);
@@ -448,20 +448,20 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		if ( ! $has_due_days ) {
 			$monetary_summation['value'][] = array(
 				'name'  => 'ram:TotalPrepaidAmount',
-				'value' => $prepaid_amount,
+				'value' => $this->format_decimal( $prepaid_amount ),
 			);
 		}
 
 		if ( abs( $rounding_diff ) >= 0.01 ) {
 			$monetary_summation['value'][] = array(
 				'name'  => 'ram:RoundingAmount',
-				'value' => $rounding_diff,
+				'value' => $this->format_decimal( $rounding_diff ),
 			);
 		}
 
 		$monetary_summation['value'][] = array(
 			'name'  => 'ram:DuePayableAmount',
-			'value' => $payable_amount,
+			'value' => $this->format_decimal( $payable_amount ),
 		);
 
 		return apply_filters( 'wpo_ips_edi_cii_monetary_summation', $monetary_summation, $this );

@@ -57,9 +57,18 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				array(
 					'name'  => 'ram:ApplicableTradeTax',
 					'value' => array(
-						array( 'name' => 'ram:TypeCode',             'value' => $scheme ),
-						array( 'name' => 'ram:CategoryCode',         'value' => $category ?: 'S' ),
-						array( 'name' => 'ram:RateApplicablePercent','value' => round( $effective_rate, 2 ) ),
+						array(
+							'name'  => 'ram:TypeCode',
+							'value' => $scheme,
+						),
+						array(
+							'name'  => 'ram:CategoryCode',
+							'value' => $category ?: 'S',
+						),
+						array(
+							'name'  => 'ram:RateApplicablePercent',
+							'value' => $this->format_decimal( wc_round_tax_total( $effective_rate ) ),
+						),
 					),
 				),
 			);
@@ -84,7 +93,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 			$price_children = array(
 				array(
 					'name'       => 'ram:ChargeAmount',
-					'value'      => $net_unit,
+					'value'      => $this->format_decimal( $net_unit ),
 				),
 				array(
 					'name'       => 'ram:BasisQuantity',
@@ -111,11 +120,11 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						),
 						array(
 							'name'  => 'ram:ActualAmount',
-							'value' => $unit_discount,
+							'value' => $this->format_decimal( $unit_discount ),
 						),
 						array(
 							'name'  => 'ram:BasisAmount',
-							'value' => $gross_unit,
+							'value' => $this->format_decimal( $gross_unit ),
 						),
 					),
 				);
@@ -173,7 +182,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 									'value' => array(
 										array(
 											'name' => 'ram:LineTotalAmount',
-											'value' => round( $net_total, 2 ),
+											'value' => $this->format_decimal( $net_total ),
 										),
 									),
 								),

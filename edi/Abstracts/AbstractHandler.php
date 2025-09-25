@@ -150,7 +150,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$net = (float) $item->get_total();
 
 		// For product lines we want unit net price; for fees/shipping qty is 1
-		return round( $net / $qty, wc_get_price_decimals() );
+		return $net / $qty;
 	}
 
 	/**
@@ -200,6 +200,33 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		return '';
+	}
+	
+	/**
+	 * Format a decimal number to a string with 2 decimal places, avoiding scientific notation.
+	 *
+	 * @param float|string $amount The amount to format.
+	 * @param int          $decimal_places Number of decimal places (default: 2).
+	 * @return string
+	 */
+	protected function format_decimal( $amount, int $decimal_places = 2 ): string
+	{
+		$value = (float) $amount;
+
+		// Treat tiny float residue as zero (10^-(2+2) = 1e-4).
+		$tiny_threshold = pow( 10, - ( $decimal_places + 2 ) );
+		if ( abs( $value ) < $tiny_threshold ) {
+			$value = 0.0;
+		}
+
+		// Round to 2dp and avoid "-0.00".
+		$value = round( $value, $decimal_places );
+		if ( $value == 0.0 ) {
+			$value = 0.0;
+		}
+
+		// Emit plain decimal string (no exponent).
+		return number_format( $value, $decimal_places, '.', '' );
 	}
 
 }

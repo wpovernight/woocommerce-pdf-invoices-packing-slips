@@ -139,9 +139,9 @@ class TaxTotalHandler extends AbstractUblHandler {
 			$z_key = $z_first_key ?: '0|Z|NONE|VAT';
 
 			$grouped_tax_data[ $z_key ] = array(
-				'total_ex'   => wc_round_tax_total( $z_total_ex ),
-				'total_tax'  => 0,
-				'percentage' => 0,
+				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_total_ex ) ),
+				'total_tax'  => $this->format_decimal( $z_total_tax ),
+				'percentage' => $this->format_decimal( 0, 1 ),
 				'category'   => 'Z',
 				'reason'     => 'NONE',
 				'scheme'     => 'VAT',
@@ -173,7 +173,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 				),
 				array(
 					'name'  => 'cbc:Percent',
-					'value' => round( $item_tax_percentage, 1 ),
+					'value' => $this->format_decimal( $item_tax_percentage, 1 ),
 				),
 			);
 			
@@ -204,14 +204,14 @@ class TaxTotalHandler extends AbstractUblHandler {
 				'value' => array(
 					array(
 						'name'       => 'cbc:TaxableAmount',
-						'value'      => wc_round_tax_total( $item['total_ex'] ?? 0 ),
+						'value'      => $this->format_decimal( wc_round_tax_total( $item['total_ex'] ?? 0 ) ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
 					),
 					array(
 						'name'       => 'cbc:TaxAmount',
-						'value'      => wc_round_tax_total( $item['total_tax'] ?? 0 ),
+						'value'      => $this->format_decimal( wc_round_tax_total( $item['total_tax'] ?? 0 ) ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
@@ -230,7 +230,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 				array(
 					array(
 						'name'       => 'cbc:TaxAmount',
-						'value'      => round( $this->document->order->get_total_tax(), 2 ),
+						'value'      => $this->format_decimal( wc_round_tax_total( $this->document->order->get_total_tax() ) ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),

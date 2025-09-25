@@ -37,21 +37,21 @@ class LegalMonetaryTotalHandler extends AbstractUblHandler {
 			'value' => array(
 				array(
 					'name'       => 'cbc:LineExtensionAmount',
-					'value'      => $total_exc_tax,
+					'value'      => $this->format_decimal( $total_exc_tax ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
 				),
 				array(
 					'name'       => 'cbc:TaxExclusiveAmount',
-					'value'      => $total_exc_tax,
+					'value'      => $this->format_decimal( $total_exc_tax ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
 				),
 				array(
 					'name'       => 'cbc:TaxInclusiveAmount',
-					'value'      => $total_inc_tax,
+					'value'      => $this->format_decimal( $total_inc_tax ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
@@ -62,7 +62,7 @@ class LegalMonetaryTotalHandler extends AbstractUblHandler {
 		if ( ! $has_due_days ) {
 			$legal_total['value'][] = array(
 				'name'       => 'cbc:PrepaidAmount',
-				'value'      => $prepaid_amount,
+				'value'      => $this->format_decimal( $prepaid_amount ),
 				'attributes' => array(
 					'currencyID' => $currency,
 				),
@@ -72,7 +72,7 @@ class LegalMonetaryTotalHandler extends AbstractUblHandler {
 		if ( abs( $rounding_diff ) >= 0.01 ) {
 			$legal_total['value'][] = array(
 				'name'       => 'cbc:PayableRoundingAmount',
-				'value'      => $rounding_diff,
+				'value'      => $this->format_decimal( $rounding_diff ),
 				'attributes' => array(
 					'currencyID' => $currency,
 				),
@@ -81,7 +81,7 @@ class LegalMonetaryTotalHandler extends AbstractUblHandler {
 
 		$legal_total['value'][] = array(
 			'name'       => 'cbc:PayableAmount',
-			'value'      => $payable_amount,
+			'value'      => $this->format_decimal( $payable_amount ),
 			'attributes' => array(
 				'currencyID' => $currency,
 			),

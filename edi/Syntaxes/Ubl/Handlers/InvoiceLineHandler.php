@@ -50,7 +50,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'  => 'cbc:Percent',
-						'value' => round( (float) ( $row['percentage'] ?? 0 ), 1 ),
+						'value' => $this->format_decimal( (float) ( $row['percentage'] ?? 0 ), 1 ),
 					),
 					array(
 						'name'  => 'cac:TaxScheme',
@@ -75,7 +75,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'  => 'cbc:Percent',
-						'value' => 0,
+						'value' => $this->format_decimal( 0, 1 ),
 					),
 					array(
 						'name'  => 'cac:TaxScheme',
@@ -108,13 +108,17 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => $net_unit,
-					'attributes' => array( 'currencyID' => $currency ),
+					'value'      => $this->format_decimal( $net_unit ),
+					'attributes' => array(
+						'currencyID' => $currency,
+					),
 				),
 				array(
 					'name'       => 'cbc:BaseQuantity',
 					'value'      => 1,
-					'attributes' => array( 'unitCode' => 'C62' ),
+					'attributes' => array(
+						'unitCode' => 'C62',
+					),
 				),
 			);
 
@@ -123,16 +127,23 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				$price_value[] = array(
 					'name'  => 'cac:AllowanceCharge',
 					'value' => array(
-						array( 'name' => 'cbc:ChargeIndicator', 'value' => 'false' ),
+						array(
+							'name'  => 'cbc:ChargeIndicator',
+							'value' => 'false',
+						),
 						array(
 							'name'       => 'cbc:Amount',
-							'value'      => $unit_discount,
-							'attributes' => array( 'currencyID' => $currency ),
+							'value'      => $this->format_decimal( $unit_discount ),
+							'attributes' => array(
+								'currencyID' => $currency,
+							),
 						),
 						array(
 							'name'       => 'cbc:BaseAmount',
-							'value'      => $gross_unit,
-							'attributes' => array( 'currencyID' => $currency ),
+							'value'      => $this->format_decimal( $gross_unit ),
+							'attributes' => array(
+								'currencyID' => $currency,
+							),
 						),
 					),
 				);
@@ -154,7 +165,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => round( $net_total, 2 ),
+						'value'      => $this->format_decimal( $net_total ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
@@ -245,7 +256,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			),
 			array(
 				'name'  => 'cbc:Percent',
-				'value' => 0,
+				'value' => $this->format_decimal( 0, 1 ),
 			),
 			array(
 				'name'  => 'cac:TaxScheme',
@@ -274,7 +285,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				),
 				array(
 					'name'       => 'cbc:LineExtensionAmount',
-					'value'      => $net_total,
+					'value'      => $this->format_decimal( $net_total ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
@@ -297,7 +308,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					'value' => array(
 						array(
 							'name'       => 'cbc:PriceAmount',
-							'value'      => $net_total, // unit price (negative)
+							'value'      => $this->format_decimal( $net_total ), // unit price (negative)
 							'attributes' => array(
 								'currencyID' => $currency,
 							),
