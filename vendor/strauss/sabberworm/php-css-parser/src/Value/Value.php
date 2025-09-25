@@ -2,29 +2,28 @@
 
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
+use WPO\IPS\Vendor\Sabberworm\CSS\CSSElement;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
-use WPO\IPS\Vendor\Sabberworm\CSS\Renderable;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Position;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Positionable;
 
 /**
  * Abstract base class for specific classes of CSS values: `Size`, `Color`, `CSSString` and `URL`, and another
  * abstract subclass `ValueList`.
  */
-abstract class Value implements Renderable
+abstract class Value implements CSSElement, Positionable
 {
-    /**
-     * @var int
-     */
-    protected $iLineNo;
+    use Position;
 
     /**
      * @param int $iLineNo
      */
     public function __construct($iLineNo = 0)
     {
-        $this->iLineNo = $iLineNo;
+        $this->setPosition($iLineNo);
     }
 
     /**
@@ -34,6 +33,8 @@ abstract class Value implements Renderable
      *
      * @throws UnexpectedTokenException
      * @throws UnexpectedEOFException
+     *
+     * @internal since V8.8.0
      */
     public static function parseValue(ParserState $oParserState, array $aListDelimiters = [])
     {
@@ -110,6 +111,8 @@ abstract class Value implements Renderable
      *
      * @throws UnexpectedEOFException
      * @throws UnexpectedTokenException
+     *
+     * @internal since V8.8.0
      */
     public static function parseIdentifierOrFunction(ParserState $oParserState, $bIgnoreCase = false)
     {
@@ -140,6 +143,8 @@ abstract class Value implements Renderable
      * @throws UnexpectedEOFException
      * @throws UnexpectedTokenException
      * @throws SourceException
+     *
+     * @internal since V8.8.0
      */
     public static function parsePrimitiveValue(ParserState $oParserState)
     {
@@ -209,13 +214,5 @@ abstract class Value implements Renderable
             $sRange .= $oParserState->consume(1);
         } while (strlen($sRange) < $iCodepointMaxLength && preg_match("/[A-Fa-f0-9\?-]/", $oParserState->peek()));
         return "U+{$sRange}";
-    }
-
-    /**
-     * @return int
-     */
-    public function getLineNo()
-    {
-        return $this->iLineNo;
     }
 }

@@ -500,7 +500,7 @@ class Stylesheet
         }
 
         $name = "*";
-        $len = mb_strlen($selector);
+        $len = mb_strlen($selector, "UTF-8");
         $i = 0;
 
         while ($i < $len) {
@@ -647,7 +647,7 @@ class Stylesheet
                             $last = true;
                         case "nth-child":
                             $p = $i + 1;
-                            $nth = trim(mb_substr($selector, $p, strpos($selector, ")", $i) - $p));
+                            $nth = trim(mb_substr($selector, $p, mb_strpos($selector, ")", $i, "UTF-8") - $p, "UTF-8"));
                             $position = $last
                                 ? "(count(following-sibling::*) + 1)"
                                 : "(count(preceding-sibling::*) + 1)";
@@ -678,7 +678,7 @@ class Stylesheet
                             $last = true;
                         case "nth-of-type":
                             $p = $i + 1;
-                            $nth = trim(mb_substr($selector, $p, strpos($selector, ")", $i) - $p));
+                            $nth = trim(mb_substr($selector, $p, mb_strpos($selector, ")", $i, "UTF-8") - $p, "UTF-8"));
                             $position = $last
                                 ? "(count(following-sibling::$name) + 1)"
                                 : "(count(preceding-sibling::$name) + 1)";
@@ -695,7 +695,7 @@ class Stylesheet
                         // TODO: bit of a hack attempt at matches support, currently only matches against elements
                         case "matches":
                             $p = $i + 1;
-                            $matchList = trim(mb_substr($selector, $p, strpos($selector, ")", $i) - $p));
+                            $matchList = trim(mb_substr($selector, $p, mb_strpos($selector, ")", $i, "UTF-8") - $p, "UTF-8"));
 
                             // Tag names are case-insensitive
                             $elements = array_map("trim", explode(",", strtolower($matchList)));
@@ -772,7 +772,7 @@ class Stylesheet
                     }
 
                     $attr_delimiters = ["=", "]", "~", "|", "$", "^", "*"];
-                    $tok_len = mb_strlen($tok);
+                    $tok_len = mb_strlen($tok, "UTF-8");
                     $j = 0;
 
                     $attr = "";
@@ -1250,7 +1250,7 @@ class Stylesheet
      *
      * @param string $str
      */
-    private function _parse_css($str)
+    private function _parse_css($str, $media_queries = [])
     {
         $str = trim($str);
 
@@ -1292,13 +1292,9 @@ class Stylesheet
                         )
                         (?<CSS_ATIMPORT_MEDIA_QUERY>.*?)
                     );)
-                    (?(CSS_ATMEDIA)\s*(?<CSS_ATMEDIA_RULE>[^{]*){(?<CSS_ATMEDIA_BODY> (?:(?>[^{}]+) (?<CSS_ATMEDIA_BODY_BRACKET>{)?
-                        (?(CSS_ATMEDIA_BODY_BRACKET) (?>[^}]*) }) \s*)+?
-                    )})
+                    (?(CSS_ATMEDIA)\s*(?<CSS_ATMEDIA_RULE>[^{]*){(?<CSS_ATMEDIA_BODY> (?:[^{}]*|(?R) \s*)+? )})
                     (?(CSS_ATPAGE)\s*(?<CSS_ATPAGE_RULE>[^{]*){(?<CSS_ATPAGE_BODY>.*?)})
-                    (?(CSS_AT)\s*([^{;]*)(;|{(?<CSS_AT_BODY> (?:(?>[^{}]+) (?<CSS_AT_BODY_BRACKET>{)?
-                        (?(CSS_AT_BODY_BRACKET) (?>[^}]*) }) \s*)+?
-                    )}))
+                    (?(CSS_AT)\s*([^{;]*)(;|{(?<CSS_AT_BODY> (?:[^{}]*|(?R) \s*)+? )}))
                 )
                 
                 # Branch to match regular rules (not preceded by '@')
@@ -1309,7 +1305,21 @@ EOL;
         // replace data URIs with blob URIs
         while (($start = strpos($css, "data:")) !== false) {
             $len = null;
-            if (preg_match("/['\"\)]/", $css, $matches, PREG_OFFSET_CAPTURE, $start)) {
+            $prev = $css[$start - 1];
+            $pattern = "/(?<!\\\\)['\")]/";
+            switch ($prev) {
+                case "'":
+                    $pattern = "/(?<!\\\\)'/";
+                case "\"":
+                    $pattern = "/(?<!\\\\)\"/";
+                    break;
+                case "(":
+                    $pattern = "/(?<!\\\\)\\)/";
+                    break;
+                default:
+                    continue (2);
+            }
+            if (preg_match($pattern, $css, $matches, PREG_OFFSET_CAPTURE, $start)) {
                 $len = $matches[0][1] - $start;
             }
             $data_uri = substr($css, $start, $len);
@@ -1339,11 +1349,11 @@ EOL;
                         break;
 
                     case "media":
-                        $mq = [];
-                        $media_queries = preg_split("/\s*(,|\Wor\W)\s*/", mb_strtolower(trim($match["CSS_ATMEDIA_RULE"])));
-                        foreach ($media_queries as $media_query) {
+                        $parsed_media_queries = [];
+                        $media_query_rules = preg_split("/\s*(,|\Wor\W)\s*/", mb_strtolower(trim($match["CSS_ATMEDIA_RULE"])));
+                        foreach ($media_query_rules as $media_query_rule) {
                             $media_query_matches = [];
-                            if (preg_match_all($media_query_regex, $media_query, $media_query_matches, PREG_SET_ORDER) === false) {
+                            if (preg_match_all($media_query_regex, $media_query_rule, $media_query_matches, PREG_SET_ORDER) === false) {
                                 continue;
                             }
 
@@ -1366,10 +1376,20 @@ EOL;
                                 $mq_grouping[] = [$media_query_feature, $media_query_value, $media_query_operator];
                             }
                             if (count($mq_grouping) > 0) {
-                                $mq[] = $mq_grouping;
+                                $parsed_media_queries[] = $mq_grouping;
                             }
                         }
-                        $this->_parse_sections($match["CSS_ATMEDIA_BODY"], $mq);
+                        $sub_media_queries = [];
+                        if (count($media_queries) > 0) {
+                            foreach ($media_queries as $media_query) {
+                                foreach ($parsed_media_queries as $parsed_media_query) {
+                                    $sub_media_queries[] = array_merge($media_query, $parsed_media_query);
+                                }
+                            }
+                        } else {
+                            $sub_media_queries = $parsed_media_queries;
+                        }
+                        $this->_parse_css($match["CSS_ATMEDIA_BODY"], $sub_media_queries);
                         break;
 
                     case "page":
@@ -1435,7 +1455,7 @@ EOL;
             }
 
             if ($match["CSS_RULESET"] !== "") {
-                $this->_parse_sections($match["CSS_RULESET"]);
+                $this->_parse_sections($match["CSS_RULESET"], $media_queries);
             }
         }
     }
@@ -1516,7 +1536,7 @@ EOL;
         $path = $this->_base_path;
 
         $media_query_regex = "/" . self::PATTERN_MEDIA_QUERY . "/isx";
-        $media_queries = preg_split("/\s*(,|\Wor\W)\s*/", mb_strtolower(trim($import_media_query ?? "")));
+        $media_queries = preg_split("/\s*(,|\Wor\W)\s*/", mb_strtolower(trim($import_media_query ?? ""), "UTF-8"));
         if (count($media_queries) === 0) {
             $this->load_css_file($url, $this->_current_origin);
         } else {
@@ -1762,14 +1782,14 @@ EOL;
         $sections = explode("}", $str);
         if ($DEBUGCSS) print '[_parse_sections';
         foreach ($sections as $sect) {
-            $i = mb_strpos($sect, "{");
+            $i = mb_strpos($sect, "{", 0, "UTF-8");
             if ($i === false) { continue; }
 
             if ($DEBUGCSS) print '[section';
 
-            $selector_str = preg_replace($patterns, $replacements, mb_substr($sect, 0, $i));
+            $selector_str = preg_replace($patterns, $replacements, mb_substr($sect, 0, $i, "UTF-8"));
             $selectors = preg_split("/,(?![^\(]*\))/", $selector_str, 0, PREG_SPLIT_NO_EMPTY);
-            $style = $this->_parse_properties(trim(mb_substr($sect, $i + 1)));
+            $style = $this->_parse_properties(trim(mb_substr($sect, $i + 1, null, "UTF-8")));
 
             // Assign it to the selected elements
             foreach ($selectors as $selector) {
