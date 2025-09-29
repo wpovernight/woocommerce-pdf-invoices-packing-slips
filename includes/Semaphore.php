@@ -420,11 +420,12 @@ class Semaphore {
 	 */
 	public static function schedule_semaphore_cleanup(): void {
 		if ( ! self::is_cleanup_scheduled() ) {
-			$interval      = apply_filters( self::get_cleanup_hook_name() . '_interval', 30 * DAY_IN_SECONDS ); // default: every 30 days
+			$frequency     = apply_filters( self::get_cleanup_hook_name() . '_frequency', ( (int) ( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ?? 7 ) ) * DAY_IN_SECONDS );
+			$frequency     = apply_filters_deprecated( self::get_cleanup_hook_name() . '_interval', array( $frequency ), '4.7.0', self::get_cleanup_hook_name() . '_frequency' );
 			$error_message = 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.';
 
 			if ( function_exists( '\\as_schedule_recurring_action' ) ) {
-				\as_schedule_recurring_action( time(), $interval, self::get_cleanup_hook_name() );
+				\as_schedule_recurring_action( time(), $frequency, self::get_cleanup_hook_name() );
 			} elseif ( function_exists( 'wcpdf_log_error' ) ) {
 				\wcpdf_log_error( $error_message, 'critical' );
 			} else {

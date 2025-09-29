@@ -13,46 +13,40 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents\\SequentialNumberStore' ) ) :
 
 class SequentialNumberStore {
 
-	/**
-	 * WordPress database object
-	 * @var object
-	 */
-	private $wpdb;
-	/**
-	 * Name of the number store (used for table_name)
-	 * @var string
-	 */
-	public $store_name;
+	private \wpdb  $wpdb;
+	public string $store_name;
+	public string $method;
+	public string $table_name;
+	public bool   $is_new = false;
 
 	/**
-	 * Number store method, either 'auto_increment' or 'calculate'
-	 * @var string
+	 * Constructor
+	 *
+	 * @param string $store_name
+	 * @param string $method
 	 */
-	public $method;
-
-	/**
-	 * Name of the table that stores the number sequence (including the wp_wcpdf_ table prefix)
-	 * @var string
-	 */
-	public $table_name;
-
-	/**
-	 * If table name not found in database, is new table
-	 * @var bool
-	 */
-	public $is_new = false;
-
-	public function __construct( $store_name, $method = 'auto_increment' ) {
+	public function __construct( string $store_name, string $method = 'auto_increment' ) {
 		global $wpdb;
+		
 		$this->wpdb       = $wpdb;
 		$this->store_name = $store_name;
 		$this->method     = $method;
-		$this->table_name = apply_filters( "wpo_wcpdf_number_store_table_name", "{$this->wpdb->prefix}wcpdf_{$this->store_name}", $this->store_name, $this->method ); // e.g. wp_wcpdf_invoice_number
+		$this->table_name = apply_filters(
+			'wpo_wcpdf_number_store_table_name',
+			"{$this->wpdb->prefix}wcpdf_{$this->store_name}", // e.g. wp_wcpdf_invoice_number
+			$this->store_name,
+			$this->method
+		);
 
 		$this->init();
 	}
 
-	public function init() {
+	/**
+	 * Initialize the number store (create table if it doesn't exist)
+	 * 
+	 * @return void
+	 */
+	public function init(): void {
 		// check if table exists
 		if ( ! $this->store_name_exists() ) {
 			$this->is_new = true;
@@ -81,6 +75,7 @@ class SequentialNumberStore {
 				}
 			}
 
+			wcpdf_catch_db_object_errors( $this->wpdb, __METHOD__ );
 			return; // no further business
 		}
 
@@ -100,18 +95,19 @@ $sql = "CREATE TABLE {$this->table_name} (
 		dbDelta( $sql );
 
 		// catch mysql errors
-		wcpdf_catch_db_object_errors( $this->wpdb );
-
-		return;
+		wcpdf_catch_db_object_errors( $this->wpdb, __METHOD__ );
 	}
 
 	/**
 	 * Consume/create the next number and return it
-	 * @param  integer $order_id WooCommerce Order ID
-	 * @param  string  $date     Local date, formatted as Y-m-d H:i:s
-	 * @return int               Number that was consumed/created
+	 * 
+	 * @param  int         $order_id Order ID
+	 * @param  string|null $date     Local date, formatted as Y-m-d H:i:s
+	 * @return int                   Number that was consumed/created
 	 */
-	public function increment( $order_id = 0, $date = null ) {
+	public function increment( int $order_id = 0, ?string $date = null ): int {
+		$number = 0;
+		
 		if ( empty( $date ) ) {
 			$date = get_date_from_gmt( gmdate( 'Y-m-d H:i:s' ) );
 		}
@@ -123,15 +119,16 @@ $sql = "CREATE TABLE {$this->table_name} (
 			'date'     => $date,
 		);
 
-		if ( $this->method == 'auto_increment' ) {
+		if ( 'auto_increment' === $this->method ) {
 			$this->wpdb->insert( $this->table_name, $data );
 			$number = $this->wpdb->insert_id;
-		} elseif ( $this->method == 'calculate' ) {
+			
+		} elseif ( 'calculate' === $this->method ) {
 			$number = $data['calculated_number'] = $this->get_next();
 			$this->wpdb->insert( $this->table_name, $data );
 		}
 
-		// return generated number
+		wcpdf_catch_db_object_errors( $this->wpdb, __METHOD__ );
 		return $number;
 	}
 	
@@ -175,7 +172,8 @@ $sql = "CREATE TABLE {$this->table_name} (
 				$next = (int) $last_row->id + 1;
 			}
 		}
-
+		
+		wcpdf_catch_db_object_errors( $this->wpdb, __METHOD__ );
 		return (int) $next;
 	}
 	
@@ -186,15 +184,12 @@ $sql = "CREATE TABLE {$this->table_name} (
 	 * @return void
 	 */
 	public function set_next( int $number = 1 ): void {
-		$table_name = $this->table_name;
-		$wpdb       = $this->wpdb;
-
 		// Delete all rows
 		$truncate_query = wpo_wcpdf_prepare_identifier_query(
 			"TRUNCATE TABLE %i",
-			array( $table_name )
+			array( $this->table_name )
 		);
-		$wpdb->query( $truncate_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+		$this->wpdb->query( $truncate_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
 		// Set AUTO_INCREMENT
 		if ( $number > 1 ) {
@@ -204,11 +199,11 @@ $sql = "CREATE TABLE {$this->table_name} (
 
 			$alter_query = wpo_wcpdf_prepare_identifier_query(
 				"ALTER TABLE %i AUTO_INCREMENT = %d", 
-				array( $table_name ), 
+				array( $this->table_name ), 
 				array( $highest_number )
 			);
 
-			$wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+			$this->wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
 			$data = array(
 				'order_id' => 0,
@@ -220,20 +215,22 @@ $sql = "CREATE TABLE {$this->table_name} (
 			}
 
 			// After this insert, AUTO_INCREMENT will be equal to $number
-			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$table_name,
+			$this->wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$this->table_name,
 				$data
 			);
 		} else {
 			// Simple scenario, just set the AUTO_INCREMENT
 			$alter_query = wpo_wcpdf_prepare_identifier_query(
 				"ALTER TABLE %i AUTO_INCREMENT = %d", 
-				array( $table_name ), 
+				array( $this->table_name ), 
 				array( $number )
 			);
 
-			$wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+			$this->wpdb->query( $alter_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 		}
+		
+		wcpdf_catch_db_object_errors( $this->wpdb, __METHOD__ );
 	}
 	
 	/**
@@ -253,6 +250,7 @@ $sql = "CREATE TABLE {$this->table_name} (
 		$row  = $this->wpdb->get_row( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 		$date = isset( $row->date ) ? $row->date : 'now';
 
+		wcpdf_catch_db_object_errors( $this->wpdb, __METHOD__ );
 		return gmdate( $format, strtotime( $date ) );
 	}
 	
@@ -266,9 +264,9 @@ $sql = "CREATE TABLE {$this->table_name} (
 		$table_name_safe = wpo_wcpdf_sanitize_identifier( $table_name );
 		
 		$query  = $this->wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
-
 		$result = $this->wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 
+		wcpdf_catch_db_object_errors( $this->wpdb, __METHOD__ );
 		return $result === $table_name_safe;
 	}
 

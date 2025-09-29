@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.6.3
+Stable tag: 4.8.0-pr1294.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,23 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.7.0 (2025-09-09) =
+- New: Playground blueprint added
+- New: Show deleted document numbers in Advanced > Numbers
+- New: Hide PDF order metaboxes when no documents are enabled
+- New: Advanced setting to choose default admin manual invoice number
+- Tweak: Open PDFs in a new browser tab/window on the Thank you page
+- Tweak: Extend automatic cleanup to also remove expired semaphore locks
+- Tweak: Disable UBL Standard admin notice
+- Fix: Setup wizard not retrieving shop address correctly
+- Fix: Redirect issue when hiding unstable version notice
+- Fix: Prevent email attachments for Packing Slip documents when Pro is not active
+- Fix: Update WooCommerce REST order API hook while keeping legacy compatibility
+- Fix: Fatal error in setup wizard when `wpo_wcpdf_get_country_states()` receives a `null` country code
+- Fix: Fatal error when calling `WC_Tax::get_tax_rate_classes()` on older WooCommerce versions
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.2
 
 = 4.6.3 (2025-08-18) =
 - Tweak: Mark the `wcpdf_get_invoice()` and `wcpdf_get_packing_slip()` functions as deprecated

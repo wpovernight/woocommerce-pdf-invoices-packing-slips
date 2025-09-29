@@ -507,16 +507,27 @@ class Admin {
 			'high'
 		);
 
-		// create PDF buttons
-		add_meta_box(
-			'wpo_wcpdf-box',
-			__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'pdf_actions_meta_box' ),
-			$screen_id,
-			'side',
-			'default'
-		);
+		if ( ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'pdf' ) ) ) {
+			// create PDF buttons
+			add_meta_box(
+				'wpo_wcpdf-box',
+				__( 'Create PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'pdf_actions_meta_box' ),
+				$screen_id,
+				'side',
+				'default'
+			);
 
+			// Invoice number & date
+			add_meta_box(
+				'wpo_wcpdf-data-input-box',
+				__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'data_input_box_content' ),
+				$screen_id,
+				'normal',
+				'default'
+			);
+		}
 
 		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
 		if ( count( $ubl_documents ) > 0 ) {
@@ -530,16 +541,6 @@ class Admin {
 				'default'
 			);
 		}
-
-		// Invoice number & date
-		add_meta_box(
-			'wpo_wcpdf-data-input-box',
-			__( 'PDF document data', 'woocommerce-pdf-invoices-packing-slips' ),
-			array( $this, 'data_input_box_content' ),
-			$screen_id,
-			'normal',
-			'default'
-		);
 	}
 
 	/**
@@ -865,6 +866,14 @@ class Admin {
 		// Default number data
 		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
+			$default_number  = 0;
+
+			if (
+				! empty( \WPO_WCPDF()->settings->debug_settings['default_manual_document_number'] ) &&
+				'next_document_number' === \WPO_WCPDF()->settings->debug_settings['default_manual_document_number']
+			) {
+				$default_number = $document->get_sequential_number_store()->get_next() ?? 0;
+			}
 
 			$current['number'] = array(
 				'prefix' => array(
@@ -872,7 +881,7 @@ class Admin {
 					'name'  => "{$name_prefix}number_prefix",
 				),
 				'plain' => array(
-					'value' => 0,
+					'value' => $default_number,
 					'name'  => "{$name_prefix}number_plain",
 				),
 				'suffix' => array(

@@ -4,14 +4,14 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              4.6.3
+ * Version:              4.8.0-pr1294.1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 3.3
- * WC tested up to:      10.1
+ * WC tested up to:      10.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.6.3';
+	public $version              = '4.8.0-pr1294.1';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -689,8 +689,9 @@ class WPO_WCPDF {
 		}
 
 		// Handle dismissal
-		if ( isset( $_GET[ $hide_version_arg ] ) && isset( $_GET['_wpnonce'] ) ) {
+		if ( isset( $_GET[ $hide_version_arg ], $_GET['_wpnonce'] ) ) {
 			$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) );
+			
 			if ( wp_verify_nonce( $nonce, 'wcpdf_hide_unstable_version' ) ) {
 				update_option( 'wpo_wcpdf_unstable_version_state', array(
 					'tag'       => $current_tag,
@@ -699,11 +700,22 @@ class WPO_WCPDF {
 			} else {
 				wcpdf_log_error( 'Invalid nonce while hiding unstable version notice.' );
 			}
-
-			wp_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
+			
+			$redirect_url = remove_query_arg( array( $hide_version_arg, '_wpnonce' ), wp_get_referer() );
+			
+			if ( ! $redirect_url ) {
+				$redirect_url = admin_url(); // Fallback
+			}
+			
+			wp_safe_redirect( $redirect_url );
 			exit;
 		}
-
+		
+		$hide_url = wp_nonce_url(
+			add_query_arg( $hide_version_arg, 1, wp_get_referer() ?: admin_url() ),
+			'wcpdf_hide_unstable_version'
+		);
+		
 		// Display the notice
 		?>
 		<div class="notice notice-info">
@@ -724,7 +736,7 @@ class WPO_WCPDF {
 				</a>
 			</p>
 			<p>
-				<a class="button button-primary" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $hide_version_arg => true ) ), 'wcpdf_hide_unstable_version' ) ); ?>">
+				<a class="button button-primary" href="<?php echo esc_url( $hide_url ); ?>">
 					<?php esc_html_e( 'Hide this version', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				</a>
 			</p>

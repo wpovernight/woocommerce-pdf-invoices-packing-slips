@@ -316,14 +316,21 @@ class SetupWizard {
 						$value = stripslashes_deep( $value );
 
 						if ( is_array( $value ) ) {
-							$settings[$key] = array_map( $sanitize_function, $value );
+							$settings[ $key ] = array_map( $sanitize_function, $value );
 						} else {
-							$settings[$key] = call_user_func( $sanitize_function, $value );
+							$settings[ $key ] = call_user_func( $sanitize_function, $value );
 						}
 					}
 
 					$current_settings = get_option( $option, array() );
+
+					// Enable Invoice document
+					if ( 'wpo_wcpdf_documents_settings_invoice' === $option && ! isset( $current_settings['enabled'] ) ) {
+						$settings['enabled'] = '1';
+					}
+
 					$new_settings = $settings + $current_settings;
+					
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
