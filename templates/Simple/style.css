@@ -327,13 +327,3 @@ table.totals tr.payment_method {
 .pagenum,.pagecount {
 	font-family: sans-serif;
 }
-
-.signatures table {
-	width: 100%;
-}
-
-.signature-line {
-	border-top:1px solid #000;
-	width:80%;
-	margin-top:60px;
-}
