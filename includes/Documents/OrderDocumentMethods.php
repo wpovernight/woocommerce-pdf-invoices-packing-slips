@@ -115,7 +115,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * Check whether the billing address should be shown
 	 */
 	public function show_billing_address() {
-		if ( 'packing-slip' !== $this->get_type() ) {
+		if ( ! in_array( $this->get_type(), array( 'packing-slip', 'delivery-note' ), true ) ) {
 			return true;
 		} else {
 			return ! empty( $this->settings['display_billing_address'] ) && ( $this->ships_to_different_address() || 'always' === $this->settings['display_billing_address'] );
