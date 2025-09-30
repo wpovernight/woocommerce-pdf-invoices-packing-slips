@@ -8,7 +8,6 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
 use WPO\IPS\Vendor\Sabberworm\CSS\Property\Selector;
 use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\DeclarationBlock;
 use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\RuleSet;
-use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
 
 /**
  * This class represents the root of a parsed CSS file. It contains all top-level CSS contents: mostly declaration
@@ -28,6 +27,8 @@ class Document extends CSSBlockList
      * @return Document
      *
      * @throws SourceException
+     *
+     * @internal since V8.8.0
      */
     public static function parse(ParserState $oParserState)
     {
@@ -72,33 +73,6 @@ class Document extends CSSBlockList
         /** @var array<int, RuleSet> $aResult */
         $aResult = [];
         $this->allRuleSets($aResult);
-        return $aResult;
-    }
-
-    /**
-     * Returns all `Value` objects found recursively in `Rule`s in the tree.
-     *
-     * @param CSSList|RuleSet|string $mElement
-     *        the `CSSList` or `RuleSet` to start the search from (defaults to the whole document).
-     *        If a string is given, it is used as rule name filter.
-     * @param bool $bSearchInFunctionArguments whether to also return Value objects used as Function arguments.
-     *
-     * @return array<int, Value>
-     *
-     * @see RuleSet->getRules()
-     */
-    public function getAllValues($mElement = null, $bSearchInFunctionArguments = false)
-    {
-        $sSearchString = null;
-        if ($mElement === null) {
-            $mElement = $this;
-        } elseif (is_string($mElement)) {
-            $sSearchString = $mElement;
-            $mElement = $this;
-        }
-        /** @var array<int, Value> $aResult */
-        $aResult = [];
-        $this->allValues($mElement, $aResult, $sSearchString, $bSearchInFunctionArguments);
         return $aResult;
     }
 

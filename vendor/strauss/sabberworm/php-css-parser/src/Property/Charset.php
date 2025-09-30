@@ -4,6 +4,8 @@ namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Position;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Positionable;
 use WPO\IPS\Vendor\Sabberworm\CSS\Value\CSSString;
 
 /**
@@ -14,8 +16,10 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Value\CSSString;
  * - May only appear at the very top of a Document’s contents.
  * - Must not appear more than once.
  */
-class Charset implements AtRule
+class Charset implements AtRule, Positionable
 {
+    use Position;
+
     /**
      * @var CSSString
      */
@@ -23,11 +27,15 @@ class Charset implements AtRule
 
     /**
      * @var int
+     *
+     * @internal since 8.8.0
      */
     protected $iLineNo;
 
     /**
      * @var array<array-key, Comment>
+     *
+     * @internal since 8.8.0
      */
     protected $aComments;
 
@@ -38,16 +46,8 @@ class Charset implements AtRule
     public function __construct(CSSString $oCharset, $iLineNo = 0)
     {
         $this->oCharset = $oCharset;
-        $this->iLineNo = $iLineNo;
+        $this->setPosition($iLineNo);
         $this->aComments = [];
-    }
-
-    /**
-     * @return int
-     */
-    public function getLineNo()
-    {
-        return $this->iLineNo;
     }
 
     /**
@@ -71,6 +71,8 @@ class Charset implements AtRule
 
     /**
      * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
      */
     public function __toString()
     {

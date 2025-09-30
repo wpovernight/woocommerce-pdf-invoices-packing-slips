@@ -4,13 +4,17 @@ namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Position;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Positionable;
 use WPO\IPS\Vendor\Sabberworm\CSS\Value\URL;
 
 /**
  * Class representing an `@import` rule.
  */
-class Import implements AtRule
+class Import implements AtRule, Positionable
 {
+    use Position;
+
     /**
      * @var URL
      */
@@ -22,12 +26,9 @@ class Import implements AtRule
     private $sMediaQuery;
 
     /**
-     * @var int
-     */
-    protected $iLineNo;
-
-    /**
      * @var array<array-key, Comment>
+     *
+     * @internal since 8.8.0
      */
     protected $aComments;
 
@@ -40,16 +41,8 @@ class Import implements AtRule
     {
         $this->oLocation = $oLocation;
         $this->sMediaQuery = $sMediaQuery;
-        $this->iLineNo = $iLineNo;
+        $this->setPosition($iLineNo);
         $this->aComments = [];
-    }
-
-    /**
-     * @return int
-     */
-    public function getLineNo()
-    {
-        return $this->iLineNo;
     }
 
     /**
@@ -72,6 +65,8 @@ class Import implements AtRule
 
     /**
      * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
      */
     public function __toString()
     {

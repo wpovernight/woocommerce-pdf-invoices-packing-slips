@@ -4,12 +4,16 @@ namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Position;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Positionable;
 
 /**
  * `CSSNamespace` represents an `@namespace` rule.
  */
-class CSSNamespace implements AtRule
+class CSSNamespace implements AtRule, Positionable
 {
+    use Position;
+
     /**
      * @var string
      */
@@ -27,6 +31,8 @@ class CSSNamespace implements AtRule
 
     /**
      * @var array<array-key, Comment>
+     *
+     * @internal since 8.8.0
      */
     protected $aComments;
 
@@ -39,20 +45,14 @@ class CSSNamespace implements AtRule
     {
         $this->mUrl = $mUrl;
         $this->sPrefix = $sPrefix;
-        $this->iLineNo = $iLineNo;
+        $this->setPosition($iLineNo);
         $this->aComments = [];
     }
 
     /**
-     * @return int
-     */
-    public function getLineNo()
-    {
-        return $this->iLineNo;
-    }
-
-    /**
      * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
      */
     public function __toString()
     {

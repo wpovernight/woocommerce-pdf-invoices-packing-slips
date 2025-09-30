@@ -4,11 +4,14 @@ namespace WPO\IPS\Vendor\Sabberworm\CSS\CSSList;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
 use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Commentable;
+use WPO\IPS\Vendor\Sabberworm\CSS\CSSElement;
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Position;
+use WPO\IPS\Vendor\Sabberworm\CSS\Position\Positionable;
 use WPO\IPS\Vendor\Sabberworm\CSS\Property\AtRule;
 use WPO\IPS\Vendor\Sabberworm\CSS\Property\Charset;
 use WPO\IPS\Vendor\Sabberworm\CSS\Property\CSSNamespace;
@@ -29,22 +32,23 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
  *
  * It can also contain `Import` and `Charset` objects stemming from at-rules.
  */
-abstract class CSSList implements Renderable, Commentable
+abstract class CSSList implements Commentable, CSSElement, Positionable
 {
+    use Position;
+
     /**
      * @var array<array-key, Comment>
+     *
+     * @internal since 8.8.0
      */
     protected $aComments;
 
     /**
      * @var array<int, RuleSet|CSSList|Import|Charset>
+     *
+     * @internal since 8.8.0
      */
     protected $aContents;
-
-    /**
-     * @var int
-     */
-    protected $iLineNo;
 
     /**
      * @param int $iLineNo
@@ -53,7 +57,7 @@ abstract class CSSList implements Renderable, Commentable
     {
         $this->aComments = [];
         $this->aContents = [];
-        $this->iLineNo = $iLineNo;
+        $this->setPosition($iLineNo);
     }
 
     /**
@@ -61,6 +65,8 @@ abstract class CSSList implements Renderable, Commentable
      *
      * @throws UnexpectedTokenException
      * @throws SourceException
+     *
+     * @internal since V8.8.0
      */
     public static function parseList(ParserState $oParserState, CSSList $oList)
     {
@@ -251,14 +257,6 @@ abstract class CSSList implements Renderable, Commentable
     }
 
     /**
-     * @return int
-     */
-    public function getLineNo()
-    {
-        return $this->iLineNo;
-    }
-
-    /**
      * Prepends an item to the list of contents.
      *
      * @param RuleSet|CSSList|Import|Charset $oItem
@@ -408,6 +406,8 @@ abstract class CSSList implements Renderable, Commentable
 
     /**
      * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
      */
     public function __toString()
     {
