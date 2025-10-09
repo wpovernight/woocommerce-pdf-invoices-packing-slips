@@ -511,6 +511,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-radius: 4px;
 	font-size: 12px;
 	color: #414651;
+	white-space: nowrap;
 }
 
 #wpo-wcpdf-preview-wrapper {
