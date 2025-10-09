@@ -822,9 +822,9 @@ class SettingsEDI {
 			),
 		);
 
-		$scheme   = isset( $edi_tax_settings['class'][ $slug ]['scheme'] )   ? $edi_tax_settings['class'][ $slug ]['scheme']   : '';
-		$category = isset( $edi_tax_settings['class'][ $slug ]['category'] ) ? $edi_tax_settings['class'][ $slug ]['category'] : '';
-		$reason   = isset( $edi_tax_settings['class'][ $slug ]['reason'] )   ? $edi_tax_settings['class'][ $slug ]['reason']   : '';
+		$scheme   = $edi_tax_settings['class'][ $slug ]['scheme']   ?? '';
+		$category = $edi_tax_settings['class'][ $slug ]['category'] ?? '';
+		$reason   = $edi_tax_settings['class'][ $slug ]['reason']   ?? '';
 		?>
 			<div class="edi-tax-defaults-card" aria-labelledby="edi-tax-defaults-title">
 				<h3><?php esc_html_e( 'Configure default tax classifications', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
