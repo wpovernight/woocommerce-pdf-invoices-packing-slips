@@ -848,7 +848,7 @@ class SettingsEDI {
 					<div class="edi-tax-defaults-field">
 						<h4><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
-							<?php $this->display_tax_selector_for( 'scheme', 'class', $slug, $scheme ); ?>
+							<?php $this->output_tax_selector_for( 'scheme', 'class', $slug, $scheme ); ?>
 							<div class="current">
 								<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
 								<code><?php echo esc_html( $scheme ); ?></code>
@@ -858,7 +858,7 @@ class SettingsEDI {
 					<div class="edi-tax-defaults-field">
 						<h4><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
-							<?php $this->display_tax_selector_for( 'category', 'class', $slug, $category ); ?>
+							<?php $this->output_tax_selector_for( 'category', 'class', $slug, $category ); ?>
 							<div class="current">
 								<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
 								<code><?php echo esc_html( $category ); ?></code>
@@ -868,7 +868,7 @@ class SettingsEDI {
 					<div class="edi-tax-defaults-field">
 						<h4><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
-							<?php $this->display_tax_selector_for( 'reason', 'class', $slug, $reason ); ?>
+							<?php $this->output_tax_selector_for( 'reason', 'class', $slug, $reason ); ?>
 							<div class="current">
 								<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
 								<code><?php echo esc_html( $reason ); ?></code>
@@ -984,15 +984,15 @@ class SettingsEDI {
 								echo '<td>' . esc_html( $city ) . '</td>';
 								echo '<td>' . esc_html( wc_round_tax_total( $result->tax_rate ) ) . '%</td>';
 								echo '<td>';
-								$this->display_tax_selector_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
+								$this->output_tax_selector_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
 								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
 								echo '</td>';
 								echo '<td>';
-								$this->display_tax_selector_for( 'category', 'rate', $result->tax_rate_id, $category );
+								$this->output_tax_selector_for( 'category', 'rate', $result->tax_rate_id, $category );
 								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
 								echo '</td>';
 								echo '<td>';
-								$this->display_tax_selector_for( 'reason', 'rate', $result->tax_rate_id, $reason );
+								$this->output_tax_selector_for( 'reason', 'rate', $result->tax_rate_id, $reason );
 								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
 								echo '</td>';
 								echo '<td class="remark">';
@@ -1141,7 +1141,7 @@ class SettingsEDI {
 	}
 	
 	/**
-	 * Get select field for tax rate
+	 * Output a tax selector for a specific context.
 	 *
 	 * @param string $for
 	 * @param string $type
@@ -1150,7 +1150,7 @@ class SettingsEDI {
 	 *
 	 * @return void
 	 */
-	private function display_tax_selector_for( string $for, string $type, string $id, string $selected ): void {
+	private function output_tax_selector_for( string $for, string $type, string $id, string $selected ): void {
 		$allowed_html = array(
 			'select' => array(
 				'name'         => true,
