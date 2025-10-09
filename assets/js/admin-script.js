@@ -711,7 +711,7 @@ jQuery( function( $ ) {
 	function settingsAccordion() {
 		// Get current tab.
 		const params       = new URLSearchParams( window.location.search );
-		const allowedTabs  = [ 'general', 'documents' ];
+		const allowedTabs  = [ 'general', 'documents', 'debug' ];
 		const tab          = params.get( 'tab' ) || 'general';
 
 		if ( ! allowedTabs.includes( tab ) ) {
@@ -721,36 +721,155 @@ jQuery( function( $ ) {
 		const tabsMainCategory = {
 			general   : 'display',
 			documents : 'general',
+			debug     : 'filesystem_access' // Default open section for Advanced/Debug tab
 		};
 
-		// Collapse all but the main category for this tab.
-		$( '.settings_category' )
-			.not( '#' + tabsMainCategory[ tab ] )
-			.find( '.form-table' )
-			.hide();
-
 		const sections = $( '.settings_category h2' );
+		
+		if ( sections.length === 0 ) {
+			return; // No sections found
+		}
 
-		// Restore accordion state from localStorage.
+		// Accessibility attributes for accordion headers and panels
 		sections.each( function ( index ) {
-			const open = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${index}` ) === 'true';
-			$( this ).toggleClass( 'active', open ).next( '.form-table' ).toggle( open );
+			const $header = $( this );
+			const $panel  = $header.next( '.form-table' );
+			const $category = $header.parent( '.settings_category' );
+			let headerId  = $category.attr( 'id' ) || $header.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
+			
+			// Ensure header has an id
+			if ( ! $header.attr( 'id' ) ) {
+				$header.attr( 'id', `${headerId}_header` );
+			}
+			
+			const panelId = `${headerId}_panel`;
+
+			$header.attr( {
+				'role': 'button',
+				'tabindex': 0,
+				'aria-controls': panelId
+			} );
+
+			$panel.attr( {
+				'id': panelId,
+				'role': 'region',
+				'aria-labelledby': headerId
+			} );
 		} );
 
-		// Toggle on click and persist state.
-		sections.on( 'click', function () {
-			const index = sections.index( this );
-			$( this ).toggleClass( 'active' )
-					 .next( '.form-table' )
-					 .slideToggle( 'fast', function () {
-						 localStorage.setItem(
-							 `wcpdf_${tab}_settings_accordion_state_${index}`,
-							 $( this ).is( ':visible' )
-						 );
-					 } );
+		// Initialize accordion state
+		let anyOpen = false;
+		sections.each( function ( index ) {
+			const $header = $( this );
+			const $category = $header.parent( '.settings_category' );
+			const categoryId = $category.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
+			const stored = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}` );
+			let open = false;
+
+			// Determine if section should be open
+			if ( stored !== null ) {
+				// Use stored state
+				open = stored === 'true';
+			} else if ( tabsMainCategory[ tab ] && categoryId === tabsMainCategory[ tab ] ) {
+				// Open default section for this tab
+				open = true;
+			} else if ( tab === 'general' || tab === 'documents' ) {
+				// For general/documents: collapse all except main
+				open = false;
+			}
+
+			// Hide all panels initially if not open
+			if ( ! open ) {
+				$header.next( '.form-table' ).hide();
+			}
+			
+			anyOpen = anyOpen || open;
+			$header.toggleClass( 'active', open ).attr( 'aria-expanded', open );
+		} );
+
+		// Toggle section on click
+		function toggleSection( header ) {
+			const $header = $( header );
+			const $category = $header.parent( '.settings_category' );
+			const categoryId = $category.attr( 'id' );
+			const $panel = $header.next( '.form-table' );
+			const willOpen = ! $panel.is( ':visible' );
+
+			$header.toggleClass( 'active', willOpen ).attr( 'aria-expanded', willOpen );
+
+			$panel.stop( true, false ).slideToggle( {
+				duration: 300,
+				easing: 'swing',
+				complete: function () {
+					if ( categoryId ) {
+						localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, $( this ).is( ':visible' ) );
+					}
+				}
+			} );
+		}
+
+		// Bind click events
+		sections.off( 'click' ).on( 'click', function () {
+			toggleSection( this );
+		} );
+
+		// Keyboard accessibility
+		sections.off( 'keydown' ).on( 'keydown', function ( e ) {
+			if ( e.key === 'Enter' || e.key === ' ' ) {
+				e.preventDefault();
+				toggleSection( this );
+			}
+		} );
+
+		// Toolbar actions (Expand/Collapse All)
+		$( '#wcpdf-expand-all' ).off( 'click' ).on( 'click', function ( e ) {
+			e.preventDefault();
+			sections.each( function () {
+				const $header = $( this );
+				const $category = $header.parent( '.settings_category' );
+				const categoryId = $category.attr( 'id' );
+				const $panel = $header.next( '.form-table' );
+				
+				if ( ! $panel.is( ':visible' ) ) {
+					$header.addClass( 'active' ).attr( 'aria-expanded', true );
+					$panel.stop( true, false ).slideDown( {
+						duration: 300,
+						easing: 'swing',
+						complete: function () {
+							if ( categoryId ) {
+								localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, true );
+							}
+						}
+					} );
+				}
+			} );
+		} );
+
+		$( '#wcpdf-collapse-all' ).off( 'click' ).on( 'click', function ( e ) {
+			e.preventDefault();
+			sections.each( function () {
+				const $header = $( this );
+				const $category = $header.parent( '.settings_category' );
+				const categoryId = $category.attr( 'id' );
+				const $panel = $header.next( '.form-table' );
+				
+				if ( $panel.is( ':visible' ) ) {
+					$header.removeClass( 'active' ).attr( 'aria-expanded', false );
+					$panel.stop( true, false ).slideUp( {
+						duration: 300,
+						easing: 'swing',
+						complete: function () {
+							if ( categoryId ) {
+								localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, false );
+							}
+						}
+					} );
+				}
+			} );
 		} );
 	}
 
+	// Initialize accordion
 	settingsAccordion();
 
 	//----------> /Settings Accordion <----------//
