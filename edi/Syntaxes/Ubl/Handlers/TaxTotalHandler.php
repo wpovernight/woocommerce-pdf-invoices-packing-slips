@@ -62,7 +62,6 @@ class TaxTotalHandler extends AbstractUblHandler {
 		
 		// Consolidate any existing Z groups from $order_tax_data
 		$z_total_ex   = 0.0;
-		$z_total_tax  = 0.0;
 		$z_first_key  = null;
 		$z_other_keys = array();
 
@@ -74,8 +73,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 					$z_other_keys[] = $key;
 				}
 				
-				$z_total_ex  += (float) ( $g['total_ex']  ?? 0 );
-				$z_total_tax += (float) ( $g['total_tax'] ?? 0 );
+				$z_total_ex += (float) ( $g['total_ex']  ?? 0 );
 			}
 		}
 
@@ -132,7 +130,6 @@ class TaxTotalHandler extends AbstractUblHandler {
 		}
 
 		$z_total_ex += $z_missing_ex;
-		$z_total_tax = 0.0;
 
 		// Ensure exactly one Z group if there is any Z line (even with basis 0)
 		if ( $has_z_line || $z_first_key ) {
@@ -140,7 +137,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 
 			$grouped_tax_data[ $z_key ] = array(
 				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_total_ex ) ),
-				'total_tax'  => $this->format_decimal( $z_total_tax ),
+				'total_tax'  => $this->format_decimal( 0, 2 ),
 				'percentage' => $this->format_decimal( 0, 1 ),
 				'category'   => 'Z',
 				'reason'     => 'NONE',
