@@ -832,7 +832,7 @@ button.button-wpo.button,
 	height: 36px !important;
 	min-height: 36px !important;
 	padding: 0 14px !important;
-	line-height: 36px !important;
+	line-height: normal !important;
 	background-color: #6E1EDC !important;
 	color: #fff !important;
 	border-color: #6E1EDC !important;
@@ -843,6 +843,10 @@ button.button-wpo.button,
 	box-shadow: none !important;
 	text-shadow: none !important;
 	background-clip: padding-box !important;
+
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
 }
 
 .button-wpo:focus {
