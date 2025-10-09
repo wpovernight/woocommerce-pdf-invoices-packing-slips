@@ -23,9 +23,10 @@ class InvoiceLineHandler extends AbstractUblHandler {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-			$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal'      : 'total';
-			$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total'    : 'total';
+			$type               = $item->get_type();
+			$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
+			$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
+
 			$line_tax_data      = $item[ $tax_data_container ];
 			$tax_category       = array();
 
