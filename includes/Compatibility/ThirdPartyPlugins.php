@@ -348,11 +348,11 @@ class ThirdPartyPlugins {
 	 * Aelia Currency Switcher compatibility
 	 * Applies decimal & Thousand separator settings
 	 */
-	function aelia_currency_formatting( $document_type, $document ) {
+	public function aelia_currency_formatting( $document_type, $document ) {
 		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
 	}
 
-	function aelia_currency_price_args( $args ) {
+	public function aelia_currency_price_args( $args ) {
 		if ( !empty( $args['currency'] ) && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) {
 			$cs_settings = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
 			$args['decimal_separator'] = $cs_settings->get_currency_decimal_separator( $args['currency'] );
@@ -364,14 +364,14 @@ class ThirdPartyPlugins {
 	/**
 	 * Avoid double images from German Market: remove filter
 	 */
-	function remove_wgm_thumbnails( $document_type, $document ) {
+	public function remove_wgm_thumbnails( $document_type, $document ) {
 		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 	}
 
 	/**
 	 * Restore above
 	 */
-	function restore_wgm_thumbnails( $document_type, $document ) {
+	public function restore_wgm_thumbnails( $document_type, $document ) {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
@@ -384,7 +384,7 @@ class ThirdPartyPlugins {
 	 *
 	 * @return array
 	 */
-	function hpos_admin_search_filters( array $options ): array {
+	public function hpos_admin_search_filters( array $options ): array {
 		if ( WPO_WCPDF()->admin->invoice_number_search_enabled() ) {
 			$all = $options['all'];
 			unset( $options['all'] );
@@ -402,7 +402,7 @@ class ThirdPartyPlugins {
 	 *
 	 * @return array
 	 */
-	function invoice_number_query_args( array $order_query_args ): array {
+	public function invoice_number_query_args( array $order_query_args ): array {
 		if ( isset( $order_query_args['search_filter'] ) && 'invoice_numbers' === $order_query_args['search_filter'] && ! empty( $order_query_args['s'] ) ) {
 			$invoice_numbers = explode( ',', $order_query_args['s'] );
 			$invoice_numbers = array_map( function ( $number ) {
