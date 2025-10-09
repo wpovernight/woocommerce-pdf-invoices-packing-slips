@@ -778,21 +778,22 @@ class SettingsEDI {
 		}
 		?>
 		<div class="edi-tax-class-group" data-nonce="<?php echo esc_attr( $nonce ); ?>" data-action="<?php echo esc_attr( $action ); ?>">
-			<div class="doc-output-toggle-group">
+			<ul class="doc-output-toggle-group">
 				<?php foreach ( $formatted_rates as $slug => $name ) :
 					$is_active    = ( $slug === $current_slug );
 					$active_class = $is_active ? 'active' : '';
 					$href         = add_query_arg( 'edi_tax_class', $slug ); // graceful fallback
 					?>
-					<a
-						href="<?php echo esc_url( $href ); ?>"
-						class="doc-output-toggle <?php echo esc_attr( $active_class ); ?>"
-						data-tax-class="<?php echo esc_attr( $slug ); ?>"
-						aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
-						<?php echo esc_html( $name ); ?>
-					</a>
+					<li class="doc-output-toggle-item">
+						<a
+							href="<?php echo esc_url( $href ); ?>"
+							class="doc-output-toggle <?php echo esc_attr( $active_class ); ?>"
+							data-tax-class="<?php echo esc_attr( $slug ); ?>">
+							<?php echo esc_html( $name ); ?>
+						</a>
+					</li>
 				<?php endforeach; ?>
-			</div>
+			</ul>
 		</div>
 		<?php
 	}

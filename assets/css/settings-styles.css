@@ -373,14 +373,25 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .doc-output-toggle-group {
 	display: inline-flex;
+	list-style: none;
+	margin: 1em 0;
+	padding: 0;
 	border-radius: 6px;
 	border: 1px solid #d1d5db;
 	overflow: hidden;
 	background-color: #fff;
 	color: #1d2327;
 	font-size: 1.3em;
-	margin: 1em 0;
 	font-weight: 600;
+}
+
+.doc-output-toggle-item {
+	margin: 0;
+	padding: 0;
+}
+
+.doc-output-toggle-item + .doc-output-toggle-item .doc-output-toggle {
+	border-left: 1px solid #e5e7eb;
 }
 
 .doc-output-toggle {
@@ -395,11 +406,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	line-height: 1.4;
 	cursor: pointer;
 	transition: background-color 0.2s, color 0.2s;
-	border-right: 1px solid #e5e7eb;
-}
-
-.doc-output-toggle:last-child {
-	border-right: none;
 }
 
 .doc-output-toggle.active {
