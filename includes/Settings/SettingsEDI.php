@@ -773,7 +773,7 @@ class SettingsEDI {
 		$action       = 'wpo_ips_edi_save_taxes';
 		$current_slug = isset( $_GET['edi_tax_class'] ) ? sanitize_text_field( wp_unslash( $_GET['edi_tax_class'] ) ) : '';
 
-		if ( ! empty( $formatted_rates ) ) {
+		if ( empty( $current_slug ) && ! empty( $formatted_rates ) ) {
 			$current_slug = (string) array_key_first( $formatted_rates );
 		}
 		?>
