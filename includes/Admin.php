@@ -766,10 +766,10 @@ class Admin {
 								$value    = $identifier['value'];
 								$required = $identifier['required'];
 								$display  = $value ?: sprintf(
-									'<span style="color:%s">%s</span>',
+									'<span class="%s">%s</span>',
 									$required
-										? '#d63638'
-										: '#996800',
+										? 'missing'
+										: 'optional',
 									$required
 										? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
 										: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
