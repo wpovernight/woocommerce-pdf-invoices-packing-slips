@@ -326,6 +326,7 @@ function wpo_ips_edi_get_current_syntax(): ?string {
  */
 function wpo_ips_edi_get_current_format( bool $full_details = false ) {
 	$syntax = wpo_ips_edi_get_settings( 'syntax' );
+	$format = null;
 
 	if ( ! empty( $syntax ) ) {
 		$format = wpo_ips_edi_get_settings( "{$syntax}_format" );
@@ -731,11 +732,10 @@ function wpo_ips_edi_peppol_enabled_for_location( string $location ): bool {
 		return false;
 	}
 
-	$edi_settings     = wpo_ips_edi_get_settings();
-	$location_setting = $edi_settings['peppol_customer_identifier_fields_location'] ?? '';
+	$location_setting = wpo_ips_edi_get_settings( 'peppol_customer_identifier_fields_location' );
 
 	// Always return false if the field is not properly set
-	if ( ! in_array( $location_setting, array( 'checkout', 'my_account', 'both' ), true ) ) {
+	if ( empty( $location_setting ) || ! in_array( $location_setting, array( 'checkout', 'my_account', 'both' ), true ) ) {
 		return false;
 	}
 

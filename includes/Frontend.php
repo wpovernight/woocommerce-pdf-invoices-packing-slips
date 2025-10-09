@@ -644,7 +644,7 @@ class Frontend {
 	 *
 	 * @return string
 	 */
-	public function edi_peppol_prefill_checkout_block_field_from_user_meta( $value, string $group, object $wc_object ): string {
+	public function edi_peppol_prefill_checkout_block_field_from_user_meta( $value, string $group, \WC_Data $wc_object ): string {
 		if ( 'other' !== $group || ! $wc_object instanceof \WC_Customer ) {
 			return (string) $value;
 		}
