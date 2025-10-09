@@ -11,6 +11,7 @@ return array(
     'Symfony\\Polyfill\\Mbstring\\Mbstring' => $vendorDir . '/symfony/polyfill-mbstring/Mbstring.php',
     'WPO\\IPS\\Admin' => $baseDir . '/includes/Admin.php',
     'WPO\\IPS\\Assets' => $baseDir . '/includes/Assets.php',
+    'WPO\\IPS\\Compatibility\\FileSystem' => $baseDir . '/includes/Compatibility/FileSystem.php',
     'WPO\\IPS\\Compatibility\\OrderUtil' => $baseDir . '/includes/Compatibility/OrderUtil.php',
     'WPO\\IPS\\Compatibility\\ThirdPartyPlugins' => $baseDir . '/includes/Compatibility/ThirdPartyPlugins.php',
     'WPO\\IPS\\Documents' => $baseDir . '/includes/Documents.php',
