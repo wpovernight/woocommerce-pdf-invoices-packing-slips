@@ -203,7 +203,8 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 	
 	/**
-	 * Format a decimal number to a string with 2 decimal places, avoiding scientific notation.
+	 * Format a decimal number to a string with fixed decimal places, 
+	 * using WooCommerce normalization and avoiding scientific notation.
 	 *
 	 * @param float|string $amount The amount to format.
 	 * @param int          $decimal_places Number of decimal places (default: 2).
@@ -211,9 +212,10 @@ abstract class AbstractHandler implements HandlerInterface {
 	 */
 	protected function format_decimal( $amount, int $decimal_places = 2 ): string
 	{
-		$value = (float) $amount;
+		// Normalize using WooCommerce helper (handles locale, strings, etc.).
+		$value = (float) wc_format_decimal( $amount, $decimal_places, false );
 
-		// Treat tiny float residue as zero (10^-(2+2) = 1e-4).
+		// Treat tiny float residue as zero (10^-(decimal_places + 2)).
 		$tiny_threshold = pow( 10, - ( $decimal_places + 2 ) );
 		if ( abs( $value ) < $tiny_threshold ) {
 			$value = 0.0;
