@@ -609,7 +609,7 @@ class SettingsEDI {
 						<td colspan="2">
 							<div class="edi-search-wrap">
 								<input type="text" id="edi-customer-order-id" placeholder="<?php esc_html_e( 'Order ID', 'woocommerce-pdf-invoices-packing-slips' ); ?>" value="">
-								<a href="#" class="button button-primary" id="edi-customer-order-id-search-button"><?php esc_html_e( 'Search', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								<button type="button" class="button button-primary" id="edi-customer-order-id-search-button"><?php esc_html_e( 'Search', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
 							</div>
 						</td>
 					</tr>
