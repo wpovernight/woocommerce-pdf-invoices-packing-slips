@@ -461,7 +461,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .edi-tax-defaults-control select {
 	width: 100%;
 	max-width: 100%;
-	padding: 6px 8px;
+	padding: 6px 2em 6px 8px;
 	border: 1px solid #d1d5db;
 	border-radius: 4px;
 	background-color: #fff;
@@ -504,7 +504,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .edi-tax-class-table table > tbody > tr > td > select {
 	width: 100%;
 	max-width: 100%;
-	padding: 6px 8px;
+	padding: 6px 2em 6px 8px;
 	border: 1px solid #d1d5db;
 	border-radius: 4px;
 	background-color: #fff;
