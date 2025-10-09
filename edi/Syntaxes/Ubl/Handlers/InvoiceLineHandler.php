@@ -2,7 +2,6 @@
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Handlers;
 
 use WPO\IPS\EDI\Syntaxes\Ubl\Abstracts\AbstractUblHandler;
-use WPO\IPS\EDI\Standards\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -21,7 +20,6 @@ class InvoiceLineHandler extends AbstractUblHandler {
 		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_invoice_line', false, $this );
 		$items                = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$currency             = $this->document->order->get_currency();
-		$tax_reasons          = EN16931::get_vatex();
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
