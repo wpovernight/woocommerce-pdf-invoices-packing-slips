@@ -493,6 +493,10 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function yearly_reset_action_missing_notice(): void {
+		if ( empty( $this->settings ) || ! method_exists( $this->settings, 'maybe_schedule_yearly_reset_numbers' ) ) {
+			return;
+		}
+	
 		if ( ! $this->settings->maybe_schedule_yearly_reset_numbers() ) {
 			return;
 		}

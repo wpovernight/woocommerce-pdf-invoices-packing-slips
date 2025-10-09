@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "dompdf/dompdf",
-            "version": "v3.1.0",
-            "version_normalized": "3.1.0.0",
+            "version": "v3.1.2",
+            "version_normalized": "3.1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "a51bd7a063a65499446919286fb18b518177155a"
+                "reference": "b3493e35d31a5e76ec24c3b64a29b0034b2f32a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/a51bd7a063a65499446919286fb18b518177155a",
-                "reference": "a51bd7a063a65499446919286fb18b518177155a",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/b3493e35d31a5e76ec24c3b64a29b0034b2f32a6",
+                "reference": "b3493e35d31a5e76ec24c3b64a29b0034b2f32a6",
                 "shasum": ""
             },
             "require": {
@@ -38,7 +38,7 @@
                 "ext-imagick": "Improves image processing performance",
                 "ext-zlib": "Needed for pdf stream compression"
             },
-            "time": "2025-01-15T14:09:04+00:00",
+            "time": "2025-09-23T03:06:41+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -63,7 +63,7 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/v3.1.0"
+                "source": "https://github.com/dompdf/dompdf/tree/v3.1.2"
             },
             "install-path": "../dompdf/dompdf"
         },
@@ -166,17 +166,17 @@
         },
         {
             "name": "masterminds/html5",
-            "version": "2.9.0",
-            "version_normalized": "2.9.0.0",
+            "version": "2.10.0",
+            "version_normalized": "2.10.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Masterminds/html5-php.git",
-                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6"
+                "reference": "fcf91eb64359852f00d921887b219479b4f21251"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
-                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
+                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/fcf91eb64359852f00d921887b219479b4f21251",
+                "reference": "fcf91eb64359852f00d921887b219479b4f21251",
                 "shasum": ""
             },
             "require": {
@@ -186,7 +186,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^4.8.35 || ^5.7.21 || ^6 || ^7 || ^8 || ^9"
             },
-            "time": "2024-03-31T07:05:07+00:00",
+            "time": "2025-07-25T09:04:22+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -230,23 +230,23 @@
             ],
             "support": {
                 "issues": "https://github.com/Masterminds/html5-php/issues",
-                "source": "https://github.com/Masterminds/html5-php/tree/2.9.0"
+                "source": "https://github.com/Masterminds/html5-php/tree/2.10.0"
             },
             "install-path": "../masterminds/html5"
         },
         {
             "name": "sabberworm/php-css-parser",
-            "version": "v8.7.0",
-            "version_normalized": "8.7.0.0",
+            "version": "v8.9.0",
+            "version_normalized": "8.9.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MyIntervals/PHP-CSS-Parser.git",
-                "reference": "f414ff953002a9b18e3a116f5e462c56f21237cf"
+                "reference": "d8e916507b88e389e26d4ab03c904a082aa66bb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/f414ff953002a9b18e3a116f5e462c56f21237cf",
-                "reference": "f414ff953002a9b18e3a116f5e462c56f21237cf",
+                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/d8e916507b88e389e26d4ab03c904a082aa66bb9",
+                "reference": "d8e916507b88e389e26d4ab03c904a082aa66bb9",
                 "shasum": ""
             },
             "require": {
@@ -254,12 +254,13 @@
                 "php": "^5.6.20 || ^7.0.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "5.7.27 || 6.5.14 || 7.5.20 || 8.5.40"
+                "phpunit/phpunit": "5.7.27 || 6.5.14 || 7.5.20 || 8.5.41",
+                "rawr/cross-data-providers": "^2.0.0"
             },
             "suggest": {
                 "ext-mbstring": "for parsing UTF-8 CSS"
             },
-            "time": "2024-10-27T17:38:32+00:00",
+            "time": "2025-07-11T13:20:48+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -298,7 +299,7 @@
             ],
             "support": {
                 "issues": "https://github.com/MyIntervals/PHP-CSS-Parser/issues",
-                "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v8.7.0"
+                "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v8.9.0"
             },
             "install-path": "../sabberworm/php-css-parser"
         },
@@ -439,17 +440,17 @@
         },
         {
             "name": "symfony/polyfill-iconv",
-            "version": "v1.31.0",
-            "version_normalized": "1.31.0.0",
+            "version": "v1.33.0",
+            "version_normalized": "1.33.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-iconv.git",
-                "reference": "48becf00c920479ca2e910c22a5a39e5d47ca956"
+                "reference": "5f3b930437ae03ae5dff61269024d8ea1b3774aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-iconv/zipball/48becf00c920479ca2e910c22a5a39e5d47ca956",
-                "reference": "48becf00c920479ca2e910c22a5a39e5d47ca956",
+                "url": "https://api.github.com/repos/symfony/polyfill-iconv/zipball/5f3b930437ae03ae5dff61269024d8ea1b3774aa",
+                "reference": "5f3b930437ae03ae5dff61269024d8ea1b3774aa",
                 "shasum": ""
             },
             "require": {
@@ -461,7 +462,7 @@
             "suggest": {
                 "ext-iconv": "For best performance"
             },
-            "time": "2024-09-09T11:45:10+00:00",
+            "time": "2024-09-17T14:58:18+00:00",
             "type": "library",
             "extra": {
                 "thanks": {
@@ -502,7 +503,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-iconv/tree/v1.31.0"
+                "source": "https://github.com/symfony/polyfill-iconv/tree/v1.33.0"
             },
             "funding": [
                 {
@@ -514,6 +515,10 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
@@ -522,20 +527,21 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.31.0",
-            "version_normalized": "1.31.0.0",
+            "version": "v1.33.0",
+            "version_normalized": "1.33.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "85181ba99b2345b0ef10ce42ecac37612d9fd341"
+                "reference": "6d857f4d76bd4b343eac26d6b539585d2bc56493"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/85181ba99b2345b0ef10ce42ecac37612d9fd341",
-                "reference": "85181ba99b2345b0ef10ce42ecac37612d9fd341",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/6d857f4d76bd4b343eac26d6b539585d2bc56493",
+                "reference": "6d857f4d76bd4b343eac26d6b539585d2bc56493",
                 "shasum": ""
             },
             "require": {
+                "ext-iconv": "*",
                 "php": ">=7.2"
             },
             "provide": {
@@ -544,7 +550,7 @@
             "suggest": {
                 "ext-mbstring": "For best performance"
             },
-            "time": "2024-09-09T11:45:10+00:00",
+            "time": "2024-12-23T08:48:59+00:00",
             "type": "library",
             "extra": {
                 "thanks": {
@@ -585,7 +591,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.31.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.33.0"
             },
             "funding": [
                 {
@@ -594,6 +600,10 @@
                 },
                 {
                     "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
                     "type": "github"
                 },
                 {
