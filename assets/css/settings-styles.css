@@ -850,6 +850,10 @@ button.button-wpo.button,
 	box-shadow: 0 0 0 3px rgba(110, 30, 220, .25) !important;
 }
 
+button.button-edi-save-taxes {
+	margin-top: 2em !important;
+}
+
 #wpo-wcpdf-settings .edi-customer-identifiers {
 	margin-top: 1em;
 }

@@ -749,15 +749,13 @@ class SettingsEDI {
 					<?php $this->output_table_for_tax_class( $slug ); ?>
 				</div>
 			<?php endforeach; ?>
-			<p>
-				<button
-					type="button"
-					class="button button-primary button-wpo button-edi-save-taxes"
-					data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>"
-					data-action="wpo_ips_edi_save_taxes">
-					<?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-				</button>
-			</p>
+			<button
+				type="button"
+				class="button button-primary button-wpo button-edi-save-taxes"
+				data-nonce="<?php echo esc_attr( wp_create_nonce( 'edi_save_taxes' ) ); ?>"
+				data-action="wpo_ips_edi_save_taxes">
+				<?php esc_html_e( 'Save Taxes', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</button>
 			<div id="edi-tax-save-notice" class="notice inline" style="display:none;"></div>
 		<?php
 	}
