@@ -755,7 +755,7 @@ class Admin {
 					<thead>
 						<tr>
 							<td><?php esc_html_e( 'Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-							<td class="right collapse">
+							<td class="collapse">
 								<a href="#"><?php esc_html_e( 'Show', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 							</td>
 						</tr>
@@ -777,7 +777,7 @@ class Admin {
 								?>
 								<tr>
 									<td><?php echo esc_html( $identifier['label'] ); ?></td>
-									<td class="right">
+									<td>
 										<?php echo wp_kses_post( $display ); ?>
 										<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 											<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
@@ -796,7 +796,7 @@ class Admin {
 						<thead>
 							<tr>
 								<td><?php esc_html_e( 'Peppol', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-								<td class="right editable">
+								<td class="editable">
 									<a href="#"><?php esc_html_e( 'Edit', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 								</td>
 							</tr>
@@ -818,8 +818,8 @@ class Admin {
 									?>
 									<tr>
 										<td><?php echo esc_html( $identifier['label'] ); ?></td>
-										<td class="right display"><?php echo wp_kses_post( $display ); ?></td>
-										<td class="right edit">
+										<td class="display"><?php echo wp_kses_post( $display ); ?></td>
+										<td class="edit">
 											<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
 										</td>
 									</tr>
@@ -829,7 +829,8 @@ class Admin {
 						</tbody>
 						<tfoot>
 							<tr>
-								<td colspan="2" class="right">
+								<td></td>
+								<td colspan="2">
 									<a href="#" class="button button-primary" data-order_id="<?php echo absint( $order->get_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 									<a href="#" class="button cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
 								</td>
