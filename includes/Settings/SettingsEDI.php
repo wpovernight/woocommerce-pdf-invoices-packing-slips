@@ -351,7 +351,7 @@ class SettingsEDI {
 				),
 			),
 		);
-		
+
 		// // Peppol specific field (Default is full mode; may change in the future.)
 		// $settings_fields[] = array(
 		// 	'type'     => 'setting',
@@ -374,7 +374,7 @@ class SettingsEDI {
 		// 		),
 		// 	),
 		// );
-		
+
 		// Peppol specific field
 		$settings_fields[] = array(
 			'type'     => 'setting',
@@ -398,7 +398,7 @@ class SettingsEDI {
 				),
 			),
 		);
-		
+
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'embed_encrypted_pdf',
@@ -416,9 +416,9 @@ class SettingsEDI {
 				),
 			)
 		);
-		
+
 		$languages = wpo_wcpdf_get_multilingual_languages();
-		
+
 		if ( count( $languages ) > 0 ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
@@ -452,7 +452,7 @@ class SettingsEDI {
 				'description' => __( 'Enable the XML preview for electronic documents.', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
-		
+
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'enabled_logs',
@@ -532,7 +532,7 @@ class SettingsEDI {
 
 		return apply_filters( 'wpo_ips_edi_document_types', $document_types );
 	}
-	
+
 	/**
 	 * Output supplier identifiers.
 	 *
@@ -593,7 +593,7 @@ class SettingsEDI {
 			<?php
 		endforeach;
 	}
-	
+
 	/**
 	 * Output customer identifiers.
 	 *
@@ -623,7 +623,7 @@ class SettingsEDI {
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Load customer identifiers via AJAX.
 	 *
@@ -636,19 +636,19 @@ class SettingsEDI {
 
 		$request  = stripslashes_deep( $_GET );
 		$order_id = absint( $request['order_id'] );
-		
+
 		if ( empty( $order_id ) ) {
 			wp_send_json_error( __( 'Order ID is required.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
-		
+
 		$order = wc_get_order( $order_id );
-		
+
 		if ( empty( $order ) ) {
 			wp_send_json_error( __( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
-		
+
 		$data = wpo_ips_edi_get_order_customer_identifiers_data( $order );
-		
+
 		wp_send_json_success( compact( 'data' ) );
 	}
 
@@ -714,29 +714,29 @@ class SettingsEDI {
 		$formatted_rates = array(
 			'standard' => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' )
 		);
-		
+
 		// Woo 5.2+
 		if ( is_callable( array( '\WC_Tax', 'get_tax_rate_classes' ) ) ) {
 			$rates = \WC_Tax::get_tax_rate_classes();
-			
+
 			foreach ( $rates as $rate ) {
 				if ( empty( $rate->slug ) ) {
 					continue;
 				}
-			
+
 				$formatted_rates[ $rate->slug ] = ! empty( $rate->name ) ? $rate->name : $rate->slug;
 			}
-			
+
 		// Older Woo versions
 		} else {
 			$slugs = \WC_Tax::get_tax_class_slugs();
 			$names = \WC_Tax::get_tax_classes();
-			
+
 			foreach ( $slugs as $i => $slug ) {
 				if ( empty( $slug ) ) {
 					continue;
 				}
-				
+
 				$name                     = ! empty( $names[ $i ] ) ? $names[ $i ] : $slug;
 				$formatted_rates[ $slug ] = $name;
 			}
@@ -769,10 +769,11 @@ class SettingsEDI {
 	 * @return void
 	 */
 	public function output_tax_class_selector_and_action( array $formatted_rates ): void {
-		$nonce  = wp_create_nonce( 'edi_save_taxes' );
-		$action = 'wpo_ips_edi_save_taxes';
+		$nonce        = wp_create_nonce( 'edi_save_taxes' );
+		$action       = 'wpo_ips_edi_save_taxes';
+		$current_slug = isset( $_GET['edi_tax_class'] ) ? sanitize_text_field( wp_unslash( $_GET['edi_tax_class'] ) ) : '';
 
-		if ( empty( $current_slug ) && ! empty( $formatted_rates ) ) {
+		if ( ! empty( $formatted_rates ) ) {
 			$current_slug = (string) array_key_first( $formatted_rates );
 		}
 		?>
@@ -795,12 +796,12 @@ class SettingsEDI {
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Output the default tax classification panel.
-	 * 
+	 *
 	 * @param string $slug The slug of the tax class.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function output_default_tax_classification_panel( string $slug ): void {
@@ -902,7 +903,7 @@ class SettingsEDI {
 		$edi_tax_settings = wpo_ips_edi_get_tax_settings();
 		$table_name       = "{$wpdb->prefix}woocommerce_tax_rates";
 		$slug             = sanitize_key( strtolower( $slug ) );
-			
+
 		$query = wpo_wcpdf_prepare_identifier_query(
 			"SELECT * FROM %i WHERE tax_rate_class = %s;",
 			array( $table_name ),
@@ -924,7 +925,7 @@ class SettingsEDI {
 				'selected'     => true,
 			)
 		);
-		
+
 		$this->output_default_tax_classification_panel( $slug );
 		?>
 			<table class="widefat striped">
@@ -1078,10 +1079,10 @@ class SettingsEDI {
 
 		return $select;
 	}
-	
+
 	/**
 	 * Output the info content.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function output_info(): void {
@@ -1123,7 +1124,7 @@ class SettingsEDI {
 					<tr>
 						<td colspan="4">
 							<?php echo wp_kses_post( sprintf(
-								/* translators: %1$s: open link anchor, %2$s: close link anchor */ 
+								/* translators: %1$s: open link anchor, %2$s: close link anchor */
 								__( 'Hybrid formats require PDF/A-3 support, which is only available with our %1$smPDF extension%2$s version 2.6.0 or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
 								'<a href="" target="_blank" rel="noopener noreferrer">',
 								'</a>'
@@ -1163,7 +1164,7 @@ class SettingsEDI {
 								'BFO'     => 'https://bfo.com/blog/2017/11/08/verify_pdfa_online/',
 							),
 						);
-						
+
 						foreach ( $validators as $type => $urls ) : ?>
 							<tr>
 								<td><?php echo esc_html( $type === 'xml' ? 'XML' : 'PDF/A-3' ); ?></td>
@@ -1183,7 +1184,7 @@ class SettingsEDI {
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Output the network settings.
 	 *
