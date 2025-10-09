@@ -18,6 +18,13 @@ jQuery( function ( $ ) {
 			$current.html( oldHtml );
 		}
 
+		// Toggle visibility based on whether the value is empty
+		if ( newValue === '' || newValue === null ) {
+			$current.addClass( 'hidden' );
+		} else {
+			$current.removeClass( 'hidden' );
+		}
+
 		// Display the remark if available
 		if ( $( this ).attr( 'name' ).endsWith( '[reason]' ) ) {
 			let remark = wpo_ips_edi.remarks[ 'reason' ][ newValue ];

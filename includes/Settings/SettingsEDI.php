@@ -849,7 +849,7 @@ class SettingsEDI {
 						<h4><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
 							<?php $this->output_tax_selector_for( 'scheme', 'class', $slug, $scheme ); ?>
-							<div class="current">
+							<div class="current<?php echo empty( $scheme ) ? ' hidden' : ''; ?>">
 								<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
 								<code><?php echo esc_html( $scheme ); ?></code>
 							</div>
@@ -859,7 +859,7 @@ class SettingsEDI {
 						<h4><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
 							<?php $this->output_tax_selector_for( 'category', 'class', $slug, $category ); ?>
-							<div class="current">
+							<div class="current<?php echo empty( $category ) ? ' hidden' : ''; ?>">
 								<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
 								<code><?php echo esc_html( $category ); ?></code>
 							</div>
@@ -869,7 +869,7 @@ class SettingsEDI {
 						<h4><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
 							<?php $this->output_tax_selector_for( 'reason', 'class', $slug, $reason ); ?>
-							<div class="current">
+							<div class="current<?php echo empty( $reason ) ? ' hidden' : ''; ?>">
 								<?php esc_html_e( 'Code', 'woocommerce-pdf-invoices-packing-slips' ); ?>:
 								<code><?php echo esc_html( $reason ); ?></code>
 							</div>
@@ -985,15 +985,15 @@ class SettingsEDI {
 								echo '<td>' . esc_html( wc_round_tax_total( $result->tax_rate ) ) . '%</td>';
 								echo '<td>';
 								$this->output_tax_selector_for( 'scheme', 'rate', $result->tax_rate_id, $scheme );
-								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
+								echo '<div class="current' . ( empty( $scheme_code ) ? ' hidden' : '' ) . '" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $scheme_code ) . '</code></div>';
 								echo '</td>';
 								echo '<td>';
 								$this->output_tax_selector_for( 'category', 'rate', $result->tax_rate_id, $category );
-								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
+								echo '<div class="current' . ( empty( $category_code ) ? ' hidden' : '' ) . '" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $category_code ) . '</code></div>';
 								echo '</td>';
 								echo '<td>';
 								$this->output_tax_selector_for( 'reason', 'rate', $result->tax_rate_id, $reason );
-								echo '<div class="current" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
+								echo '<div class="current' . ( empty( $reason_code ) ? ' hidden' : '' ) . '" style="margin-top:6px;">' . esc_html__( 'Code', 'woocommerce-pdf-invoices-packing-slips' ) . ': <code>' . esc_html( $reason_code ) . '</code></div>';
 								echo '</td>';
 								echo '<td class="remark">';
 
