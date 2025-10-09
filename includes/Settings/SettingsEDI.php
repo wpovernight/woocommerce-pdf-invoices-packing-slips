@@ -846,7 +846,7 @@ class SettingsEDI {
 				</p>
 				<div class="edi-tax-defaults-grid">
 					<div class="edi-tax-defaults-field">
-						<label><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+						<h4><?php esc_html_e( 'Tax Scheme', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
 							<?php
 								$select_for_scheme = $this->get_tax_select_for( 'scheme', 'class', $slug, $scheme );
@@ -859,7 +859,7 @@ class SettingsEDI {
 						</div>
 					</div>
 					<div class="edi-tax-defaults-field">
-						<label><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+						<h4><?php esc_html_e( 'Tax Category', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
 							<?php
 								$select_for_category = $this->get_tax_select_for( 'category', 'class', $slug, $category );
@@ -872,7 +872,7 @@ class SettingsEDI {
 						</div>
 					</div>
 					<div class="edi-tax-defaults-field">
-						<label><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+						<h4><?php esc_html_e( 'Reason', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 						<div class="edi-tax-defaults-control">
 							<?php
 								$select_for_reason = $this->get_tax_select_for( 'reason', 'class', $slug, $reason );

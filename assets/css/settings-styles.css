@@ -445,7 +445,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	flex-direction: column;
 }
 
-.edi-tax-defaults-field label {
+.edi-tax-defaults-field h4 {
 	margin-bottom: 6px;
 	font-size: 13px;
 	font-weight: 500;
