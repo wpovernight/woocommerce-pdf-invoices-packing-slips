@@ -43,7 +43,7 @@ class Endpoint {
 	/**
 	 * Check if pretty document links is enabled.
 	 *
-	 * Pretty document links require pretty permalinks to not be set to "Plain"(empty string).
+	 * Pretty document links require pretty permalinks to not be set to "Plain" (empty string).
 	 *
 	 * @return bool
 	 */
