@@ -79,13 +79,6 @@ class SettingsDebug {
 	}
 
 	public function display_settings() {
-		// Toolbar for accordion (placed just above settings sections)
-		?>
-		<div class="wcpdf-accordion-toolbar">
-			<a href="#" class="button button-secondary" id="wcpdf-expand-all"><?php esc_html_e( 'Expand all', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-			<a href="#" class="button button-secondary" id="wcpdf-collapse-all"><?php esc_html_e( 'Collapse all', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-		</div>
-		<?php
 		settings_fields( 'wpo_wcpdf_settings_debug' );
 		do_settings_sections( 'wpo_wcpdf_settings_debug' );
 

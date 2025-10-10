@@ -820,53 +820,6 @@ jQuery( function( $ ) {
 				toggleSection( this );
 			}
 		} );
-
-		// Toolbar actions (Expand/Collapse All)
-		$( '#wcpdf-expand-all' ).off( 'click' ).on( 'click', function ( e ) {
-			e.preventDefault();
-			sections.each( function () {
-				const $header = $( this );
-				const $category = $header.parent( '.settings_category' );
-				const categoryId = $category.attr( 'id' );
-				const $panel = $header.next( '.form-table' );
-				
-				if ( ! $panel.is( ':visible' ) ) {
-					$header.addClass( 'active' ).attr( 'aria-expanded', true );
-					$panel.stop( true, false ).slideDown( {
-						duration: 300,
-						easing: 'swing',
-						complete: function () {
-							if ( categoryId ) {
-								localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, true );
-							}
-						}
-					} );
-				}
-			} );
-		} );
-
-		$( '#wcpdf-collapse-all' ).off( 'click' ).on( 'click', function ( e ) {
-			e.preventDefault();
-			sections.each( function () {
-				const $header = $( this );
-				const $category = $header.parent( '.settings_category' );
-				const categoryId = $category.attr( 'id' );
-				const $panel = $header.next( '.form-table' );
-				
-				if ( $panel.is( ':visible' ) ) {
-					$header.removeClass( 'active' ).attr( 'aria-expanded', false );
-					$panel.stop( true, false ).slideUp( {
-						duration: 300,
-						easing: 'swing',
-						complete: function () {
-							if ( categoryId ) {
-								localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, false );
-							}
-						}
-					} );
-				}
-			} );
-		} );
 	}
 
 	// Initialize accordion
