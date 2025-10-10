@@ -49,6 +49,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'WPO\\IPS\\Admin' => __DIR__ . '/../..' . '/includes/Admin.php',
         'WPO\\IPS\\Assets' => __DIR__ . '/../..' . '/includes/Assets.php',
+        'WPO\\IPS\\Compatibility\\FileSystem' => __DIR__ . '/../..' . '/includes/Compatibility/FileSystem.php',
         'WPO\\IPS\\Compatibility\\OrderUtil' => __DIR__ . '/../..' . '/includes/Compatibility/OrderUtil.php',
         'WPO\\IPS\\Compatibility\\ThirdPartyPlugins' => __DIR__ . '/../..' . '/includes/Compatibility/ThirdPartyPlugins.php',
         'WPO\\IPS\\Documents' => __DIR__ . '/../..' . '/includes/Documents.php',
