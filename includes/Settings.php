@@ -90,6 +90,9 @@ class Settings {
 		// Apply categories to general settings.
 		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
 
+		// Apply categories to debug (Advanced) settings.
+		add_filter( 'wpo_wcpdf_settings_fields_debug', array( $this, 'update_debug_settings_categories' ), 999, 4 );
+
 		// Sync address from WooCommerce address.
 		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
@@ -1127,6 +1130,28 @@ class Settings {
 	public function update_general_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name, \WPO\IPS\Settings\SettingsGeneral $general_settings ): array {
 		$settings_categories = is_callable( array( $general_settings, 'get_settings_categories' ) )
 			? $general_settings->get_settings_categories()
+			: array();
+
+		if ( empty( $settings_categories ) ) {
+			return $settings_fields;
+		}
+
+		return $this->apply_setting_categories( $settings_fields, $settings_categories );
+	}
+
+	/**
+	 * Apply categories to debug settings.
+	 *
+	 * @param array  $settings_fields
+	 * @param string $page
+	 * @param string $option_group
+	 * @param string $option_name
+	 *
+	 * @return array
+	 */
+	public function update_debug_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name ): array {
+		$settings_categories = is_callable( array( $this->debug, 'get_settings_categories' ) )
+			? $this->debug->get_settings_categories()
 			: array();
 
 		if ( empty( $settings_categories ) ) {
