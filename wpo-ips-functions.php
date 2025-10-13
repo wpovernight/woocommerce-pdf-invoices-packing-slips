@@ -803,7 +803,10 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 		if ( $finfo ) {
 			$mime_type = finfo_file( $finfo, $src );
-			finfo_close( $finfo );
+			
+			if ( PHP_VERSION_ID < 80100 ) {
+				finfo_close( $finfo );
+			}
 		}
 	}
 
@@ -843,7 +846,10 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 				if ( $finfo ) {
 					$mime_type = finfo_buffer( $finfo, $image_data );
-					finfo_close( $finfo );
+					
+					if ( PHP_VERSION_ID < 80100 ) {
+						finfo_close( $finfo );
+					}
 				}
 			}
 		}
