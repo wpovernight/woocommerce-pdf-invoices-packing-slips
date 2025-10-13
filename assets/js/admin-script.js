@@ -732,17 +732,17 @@ jQuery( function( $ ) {
 
 		// Accessibility attributes for accordion headers and panels
 		sections.each( function ( index ) {
-			const $header = $( this );
-			const $panel  = $header.next( '.form-table' );
+			const $header   = $( this );
+			const $panel    = $header.next( '.form-table' );
 			const $category = $header.parent( '.settings_category' );
-			let headerId  = $category.attr( 'id' ) || $header.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
+			const idBase    = $category.attr( 'id' ) || $header.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
 			
-			// Ensure header has an id
+			// Ensure header has an id and compute explicit ids
 			if ( ! $header.attr( 'id' ) ) {
-				$header.attr( 'id', `${headerId}_header` );
+				$header.attr( 'id', `${idBase}_header` );
 			}
-			
-			const panelId = `${headerId}_panel`;
+			const headerElementId = $header.attr( 'id' );
+			const panelId         = `${idBase}_panel`;
 
 			$header.attr( {
 				'role': 'button',
@@ -753,46 +753,46 @@ jQuery( function( $ ) {
 			$panel.attr( {
 				'id': panelId,
 				'role': 'region',
-				'aria-labelledby': headerId
+				'aria-labelledby': headerElementId
 			} );
 		} );
 
 		// Initialize accordion state
-		let anyOpen = false;
 		sections.each( function ( index ) {
-			const $header = $( this );
+			const $header   = $( this );
 			const $category = $header.parent( '.settings_category' );
 			const categoryId = $category.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
-			const stored = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}` );
-			let open = false;
-
-			// Determine if section should be open
-			if ( stored !== null ) {
-				// Use stored state
-				open = stored === 'true';
-			} else if ( tabsMainCategory[ tab ] && categoryId === tabsMainCategory[ tab ] ) {
-				// Open default section for this tab
-				open = true;
-			} else if ( tab === 'general' || tab === 'documents' ) {
-				// For general/documents: collapse all except main
-				open = false;
-			}
-
-			// Hide all panels initially if not open
-			if ( ! open ) {
-				$header.next( '.form-table' ).hide();
-			}
+			const $panel    = $header.next( '.form-table' );
 			
-			anyOpen = anyOpen || open;
-			$header.toggleClass( 'active', open ).attr( 'aria-expanded', open );
+			// Check localStorage for saved state
+			const stored = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}` );
+			let shouldOpen = false;
+
+			if ( stored !== null ) {
+				// User has previously interacted with this section - use saved state
+				shouldOpen = stored === 'true';
+			} else if ( tabsMainCategory[ tab ] && categoryId === tabsMainCategory[ tab ] ) {
+				// First visit - open the default main category for this tab
+				shouldOpen = true;
+			}
+			// else: keep collapsed (shouldOpen = false)
+
+			// Set initial state
+			if ( shouldOpen ) {
+				$header.addClass( 'active' ).attr( 'aria-expanded', true );
+				$panel.show().attr( 'aria-hidden', 'false' );
+			} else {
+				$header.removeClass( 'active' ).attr( 'aria-expanded', false );
+				$panel.hide().attr( 'aria-hidden', 'true' );
+			}
 		} );
 
 		// Toggle section on click
 		function toggleSection( header ) {
-			const $header = $( header );
+			const $header   = $( header );
 			const $category = $header.parent( '.settings_category' );
-			const categoryId = $category.attr( 'id' );
-			const $panel = $header.next( '.form-table' );
+			const categoryId = $header.parent( '.settings_category' ).attr( 'id' );
+			const $panel    = $header.next( '.form-table' );
 			const willOpen = ! $panel.is( ':visible' );
 
 			$header.toggleClass( 'active', willOpen ).attr( 'aria-expanded', willOpen );
@@ -801,8 +801,10 @@ jQuery( function( $ ) {
 				duration: 300,
 				easing: 'swing',
 				complete: function () {
+					const isVisible = $( this ).is( ':visible' );
+					$( this ).attr( 'aria-hidden', isVisible ? 'false' : 'true' );
 					if ( categoryId ) {
-						localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, $( this ).is( ':visible' ) );
+						localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, isVisible );
 					}
 				}
 			} );
