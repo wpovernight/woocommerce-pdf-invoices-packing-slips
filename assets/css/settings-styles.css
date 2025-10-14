@@ -550,10 +550,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	cursor: pointer;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .settings_category h2:first-child {
-	border-top: none;
-}
-
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 + h2 {
 	margin-top: -1px;
 }
