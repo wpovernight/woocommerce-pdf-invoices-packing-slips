@@ -860,8 +860,17 @@ class SettingsDebug {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'pretty_document_links',
-					'description' => __( 'Changes the document links to a prettier URL scheme.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
+					'description' =>
+						__( 'Changes the document links to a prettier URL scheme.', 'woocommerce-pdf-invoices-packing-slips' ) .
+						'<br>' .
+						'<strong>' . __( 'Note', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>: ' . sprintf(
+							/* translators: 1. Permalinks type, 2. Setting link, 3. Documentation link */
+							__( 'Pretty document links will not work when the %1$s is set to %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+							'<a href="' . esc_url( admin_url( 'options-permalink.php' ) ) . '" target="_blank" rel="noopener noreferrer">' . __( 'permalink setting', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
+							'<code>' . __( 'Plain', 'woocommerce-pdf-invoices-packing-slips' ) . '</code>',
+						) .
+						' '. '<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/document-pretty-link-incompatibility-with-plain-permalinks-structure/" target="_blank">' . __( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				),
 			),
 			array(
 				'type'     => 'setting',
