@@ -289,8 +289,10 @@ class Dompdf
             setlocale(LC_NUMERIC, "C");
         }
 
-        $this->pcreJit = @ini_get('pcre.jit');
-        @ini_set('pcre.jit', '0');
+        if (function_exists('ini_get') && function_exists('ini_set')) {
+            $this->pcreJit = @ini_get('pcre.jit');
+            @ini_set('pcre.jit', '0');
+        }
 
         $this->mbstringEncoding = mb_internal_encoding();
         mb_internal_encoding('UTF-8');
@@ -306,9 +308,11 @@ class Dompdf
             $this->systemLocale = null;
         }
 
-        if ($this->pcreJit !== null) {
-            @ini_set('pcre.jit', $this->pcreJit);
-            $this->pcreJit = null;
+        if (function_exists('ini_get') && function_exists('ini_set')) {
+            if ($this->pcreJit !== null) {
+                @ini_set('pcre.jit', $this->pcreJit);
+                $this->pcreJit = null;
+            }
         }
 
         if ($this->mbstringEncoding !== null) {
@@ -758,7 +762,10 @@ class Dompdf
         $canvasHeight = $this->canvas->get_height();
         $size = $this->getPaperSize();
 
-        if ($canvasWidth !== $size[2] || $canvasHeight !== $size[3]) {
+        if (
+            \WPO\IPS\Vendor\Dompdf\Helpers::lengthEqual($canvasWidth, $size[2]) === false ||
+            \WPO\IPS\Vendor\Dompdf\Helpers::lengthEqual($canvasHeight, $size[3]) === false
+        ) {
             $this->canvas = CanvasFactory::get_instance($this, $this->paperSize, $this->paperOrientation);
             $this->fontMetrics->setCanvas($this->canvas);
         }
@@ -924,7 +931,7 @@ class Dompdf
      *
      * @param array $options options (see above)
      *
-     * @return string|null
+     * @return string
      */
     public function output($options = [])
     {
@@ -976,7 +983,9 @@ class Dompdf
      */
     public function set_option($key, $value)
     {
-        $this->options->set($key, $value);
+        $new_options = clone $this->options;
+        $new_options->set($key, $value);
+        $this->setOptions($new_options);
         return $this;
     }
 
@@ -987,7 +996,9 @@ class Dompdf
      */
     public function set_options(array $options)
     {
-        $this->options->set($options);
+        $new_options = clone $this->options;
+        $new_options->set($options);
+        $this->setOptions($new_options);
         return $this;
     }
 
@@ -1010,8 +1021,16 @@ class Dompdf
      */
     public function setPaper($size, string $orientation = "portrait"): self
     {
+        $current_size = $this->getPaperSize();
         $this->paperSize = $size;
         $this->paperOrientation = $orientation;
+        $new_size = $this->getPaperSize();
+        if (
+            \WPO\IPS\Vendor\Dompdf\Helpers::lengthEqual($current_size[2], $new_size[2]) === false ||
+            \WPO\IPS\Vendor\Dompdf\Helpers::lengthEqual($current_size[3], $new_size[3]) === false
+        ) {
+            $this->canvas = CanvasFactory::get_instance($this, $this->paperSize, $this->paperOrientation);
+        }
         return $this;
     }
 
@@ -1280,6 +1299,10 @@ class Dompdf
     public function setCanvas(Canvas $canvas)
     {
         $this->canvas = $canvas;
+        $canvasWidth = $this->canvas->get_width();
+        $canvasHeight = $this->canvas->get_height();
+        $this->paperSize = [0, 0, $canvasWidth, $canvasHeight];
+        $this->paperOrientation = "portrait";
         return $this;
     }
 
@@ -1370,10 +1393,19 @@ class Dompdf
         }
 
         $this->options = $options;
+
         $fontMetrics = $this->fontMetrics;
         if (isset($fontMetrics)) {
             $fontMetrics->setOptions($options);
         }
+
+        if (isset($this->canvas)) {
+            $this->canvas = CanvasFactory::get_instance($this, $this->paperSize, $this->paperOrientation);
+            if (isset($fontMetrics)) {
+                $this->fontMetrics = new FontMetrics($this->canvas, $this->options);
+            }
+        }
+
         return $this;
     }
 
