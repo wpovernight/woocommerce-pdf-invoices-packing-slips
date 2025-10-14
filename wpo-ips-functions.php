@@ -451,23 +451,25 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
 }
 
 /**
- * Catch MySQL errors
- *
+ * Catch MySQL errors from $wpdb and log them.
+ * 
  * Inspired from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
  *
  * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
  * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
  * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
  *
- * @param  object $wpdb
- * @return array  errors found
+ * @param  \wpdb  $wpdb
+ * @param  string $context Optional prefix for messages (e.g. __METHOD__).
+ * @return array  List of error strings logged.
  */
-function wcpdf_catch_db_object_errors( $wpdb ) {
+function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ): array {
 	global $EZSQL_ERROR;
 
-	$errors = array();
+	static $seen = array(); // avoid duplicate logs in the same request
+	$errors      = array();
 
-	// using '$wpdb->queries'.
+	// Using $wpdb->queries (if SAVEQUERIES is true and a collector populates results)
 	if ( ! empty( $wpdb->queries ) && is_array( $wpdb->queries ) ) {
 		foreach ( $wpdb->queries as $query ) {
 			$result = isset( $query['result'] ) ? $query['result'] : null;
@@ -478,18 +480,27 @@ function wcpdf_catch_db_object_errors( $wpdb ) {
 			}
 		}
 	}
-	// fallback to '$EZSQL_ERROR'.
+
+	// Fallback to $EZSQL_ERROR (wpdb::print_error collects here)
 	if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
 		foreach ( $EZSQL_ERROR as $error ) {
-			$errors[] = $error['error_str'];
+			if ( ! empty( $error['error_str'] ) ) {
+				$errors[] = $error['error_str'];
+			}
 		}
 	}
 
-	// log errors.
-	if ( ! empty( $errors ) ) {
-		foreach ( $errors as $error_message ) {
-			wcpdf_log_error( $error_message, 'critical' );
+	// Log (with optional context) and dedupe per request
+	foreach ( $errors as $msg ) {
+		$line = '' !== $context ? "{$context}: {$msg}" : $msg;
+		$key  = md5( $line );
+		
+		if ( isset( $seen[ $key ] ) ) {
+			continue;
 		}
+		
+		$seen[ $key ] = true;
+		wcpdf_log_error( $line, 'critical' );
 	}
 
 	return $errors;
@@ -792,7 +803,10 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 		if ( $finfo ) {
 			$mime_type = finfo_file( $finfo, $src );
-			finfo_close( $finfo );
+			
+			if ( PHP_VERSION_ID < 80100 ) {
+				finfo_close( $finfo );
+			}
 		}
 	}
 
@@ -832,7 +846,10 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 				if ( $finfo ) {
 					$mime_type = finfo_buffer( $finfo, $image_data );
-					finfo_close( $finfo );
+					
+					if ( PHP_VERSION_ID < 80100 ) {
+						finfo_close( $finfo );
+					}
 				}
 			}
 		}
