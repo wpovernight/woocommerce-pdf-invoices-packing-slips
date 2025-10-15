@@ -549,12 +549,14 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	cursor: pointer;
 }
 
+
+
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 ~ .form-table {
 	border-left: 1px solid #c3c4c7;
 	border-right: 1px solid #c3c4c7;
 	border-bottom: 1px solid #c3c4c7;
 	padding: 2em;
-	margin-top: 1px;
+	margin-top: 0;
 	background: #ffffff;
 	margin-bottom: 20px;
 }
