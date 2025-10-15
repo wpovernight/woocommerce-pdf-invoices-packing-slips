@@ -790,7 +790,6 @@ jQuery( function( $ ) {
 		// Toggle section on click
 		function toggleSection( header ) {
 			const $header   = $( header );
-			const $category = $header.parent( '.settings_category' );
 			const categoryId = $header.parent( '.settings_category' ).attr( 'id' );
 			const $panel    = $header.next( '.form-table' );
 			const willOpen = ! $panel.is( ':visible' );
