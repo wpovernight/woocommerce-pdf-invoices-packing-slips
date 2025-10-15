@@ -710,9 +710,9 @@ jQuery( function( $ ) {
 
 	function settingsAccordion() {
 		// Get current tab.
-		const params       = new URLSearchParams( window.location.search );
-		const allowedTabs  = [ 'general', 'documents', 'debug' ];
-		const tab          = params.get( 'tab' ) || 'general';
+		const params      = new URLSearchParams( window.location.search );
+		const allowedTabs = [ 'general', 'documents', 'debug' ];
+		const tab         = params.get( 'tab' ) || 'general';
 
 		if ( ! allowedTabs.includes( tab ) ) {
 			return;
@@ -759,10 +759,10 @@ jQuery( function( $ ) {
 
 		// Initialize accordion state
 		sections.each( function ( index ) {
-			const $header   = $( this );
-			const $category = $header.parent( '.settings_category' );
+			const $header    = $( this );
+			const $category  = $header.parent( '.settings_category' );
 			const categoryId = $category.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
-			const $panel    = $header.next( '.form-table' );
+			const $panel     = $header.next( '.form-table' );
 			
 			// Check localStorage for saved state
 			const stored = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}` );
@@ -789,10 +789,10 @@ jQuery( function( $ ) {
 
 		// Toggle section on click
 		function toggleSection( header ) {
-			const $header   = $( header );
+			const $header    = $( header );
 			const categoryId = $header.parent( '.settings_category' ).attr( 'id' );
-			const $panel    = $header.next( '.form-table' );
-			const willOpen = ! $panel.is( ':visible' );
+			const $panel     = $header.next( '.form-table' );
+			const willOpen   = ! $panel.is( ':visible' );
 
 			$header.toggleClass( 'active', willOpen ).attr( 'aria-expanded', willOpen );
 
