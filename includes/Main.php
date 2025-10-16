@@ -1907,7 +1907,7 @@ class Main {
 			$is_allowed =
 				in_array( $document->get_type(), $allowed_document_types, true ) &&
 				in_array( $email_id, $selected_emails, true ) &&
-				'woocommerce_email_' . $email_placement === current_filter();
+				( 'woocommerce_email_' . $email_placement ) === current_filter();
 
 			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
 				continue;
