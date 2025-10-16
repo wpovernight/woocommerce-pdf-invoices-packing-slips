@@ -437,6 +437,51 @@ class SettingsGeneral {
 			),
 		);
 
+		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'pro_notice_address_customization',
+				'title'    => '',
+				'callback' => 'html_section',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pro_notice_address_customization',
+					'class'       => 'wpo_wcpdf_pro_notice',
+					'html'        =>
+						__( 'Customize the formatting of shipping and billing addresses in PDF documents, and add custom fields as needed.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">' . __( 'Upgrade today!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				),
+			);
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'pro_notice_multilingual',
+				'title'    => '',
+				'callback' => 'html_section',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pro_notice_multilingual',
+					'class'       => 'wpo_wcpdf_pro_notice',
+					'html'        => __( 'Create PDF documents in multiple languages based on the customer\'s language or locale.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">' . __( 'Upgrade today!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				),
+			);
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'pro_notice_static_files',
+				'title'    => '',
+				'callback' => 'html_section',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pro_notice_static_files',
+					'class'       => 'wpo_wcpdf_pro_notice',
+					'html'        => __( 'Attach up to 3 static files (for example, a terms & conditions document) to the WooCommerce emails of your choice.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">' . __( 'Upgrade today!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				),
+			);
+		}
+
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name, $this );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
@@ -549,6 +594,32 @@ class SettingsGeneral {
 				)
 			),
 		);
+
+		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
+			$settings_categories['address_customization'] = array(
+				'title'   => __( 'Customer Address Customization', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+							 '<span class="wpo_wcpdf_badge badge-pro">' . __( 'Pro', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>',
+				'members' => array(
+					'pro_notice_address_customization',
+				),
+			);
+
+			$settings_categories['multilingual'] = array(
+				'title'   => __( 'Multilingual', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+							 '<span class="wpo_wcpdf_badge badge-pro">' . __( 'Pro', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>',
+				'members' => array(
+					'pro_notice_multilingual',
+				),
+			);
+
+			$settings_categories['static_files'] = array(
+				'title'   => __( 'Static Files', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+							 '<span class="wpo_wcpdf_badge badge-pro">' . __( 'Pro', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>',
+				'members' => array(
+					'pro_notice_static_files',
+				),
+			);
+		}
 
 		return apply_filters( 'wpo_wcpdf_general_settings_categories', $settings_categories, $this );
 	}
