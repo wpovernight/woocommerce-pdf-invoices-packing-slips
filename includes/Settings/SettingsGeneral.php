@@ -84,12 +84,12 @@ class SettingsGeneral {
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
 					'options_callback' => array( $this, 'get_installed_templates_list' ),
-					/* translators: 1,2. template paths */
-					'description'      => apply_filters( 'wpo_wcpdf_template_settings_path_description', sprintf(
+					'description'      => sprintf(
+						/* translators: 1,2. template paths */
 						__( 'Want to use your own template? Copy all the files from %1$s to your (child) theme in %2$s to customize them' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'<code>' . esc_html( $plugin_template_path ) . '</code>',
 						'<code>' . esc_html( $theme_template_path ) . '</code>'
-					) ),
+					) . $this->missing_template_files_notice(),
 				)
 			),
 			array(
@@ -806,6 +806,74 @@ class SettingsGeneral {
 			$locale,
 			$general_settings
 		);
+	}
+	
+	/**
+	 * Missing template files notice.
+	 * 
+	 * @return string
+	 */
+	private function missing_template_files_notice(): string {
+		$template_path       = WPO_WCPDF()->settings->get_template_path();
+		$template_path_array = explode( '/', $template_path );
+		$template_name       = end( $template_path_array );
+		$enabled_documents   = WPO_WCPDF()->documents->get_documents( 'enabled' );
+		$missing_templates   = array();
+		$notice              = '';
+
+		foreach ( $enabled_documents as $enabled_document ) {
+			$located_template = $enabled_document->locate_template_file( $enabled_document->get_type() . '.php' );
+
+			if (
+				( 'Simple' === $template_name || false === strpos( $located_template, '/Simple/' ) ) &&
+				WPO_WCPDF()->file_system->exists( $located_template )
+			) {
+				continue;
+			}
+
+			$missing_templates[] = $enabled_document->get_title();
+		}
+
+		if ( ! empty ( $missing_templates ) ) {
+			ob_start();
+			echo '<div class="notice notice-info inline notice-wpo"><p>',
+				__( 'Your custom template folder does not contain files for:', 'woocommerce-pdf-invoices-packing-slips' ),
+				' <strong>', implode( '</strong>, <strong>', array_map( 'esc_html', $missing_templates ) ), '</strong>. ',
+			sprintf(
+				/* translators: %1$s: Opening bold tag, %2$s: Closing bold tag */
+				__( 'Documents where files are missing will remain functional and will use the default %1$sSimple%2$s template.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<strong>',
+				'</strong>'
+			);
+
+			if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
+				$license_info = WPO_WCPDF()->settings->upgrade->get_extension_license_infos();
+				$info         = $license_info[ 'bundle' ] ?? null;
+				
+				if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {
+					$plugin_path     = class_exists( 'WPO_WCPDF_Pro' ) ? WPO_WCPDF_Pro()->plugin_path() : WPO_WCPDF()->plugin_path();
+					$template_folder = str_replace( wp_normalize_path( ABSPATH ), '', wp_normalize_path( $plugin_path ) . '/templates/Simple' );
+
+					printf(
+						/* translators: Template folder */
+						'<br><br>' . __( 'If you are not using the latest version of the Premium Templates extension, please update it. Otherwise, copy the template files from the newest version in %s and adapt them to your template.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>',
+						'<code>' . esc_html( $template_folder ) . '</code>'
+					);
+				}
+			}
+			
+			printf(
+				/* translators: 1: Opening anchor tag, 2: Closing anchor tag */
+				'<br><br>' . __( 'Please refer to the %1$sCreating a custom PDF template%2$s article to learn how to update your template.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/creating-a-custom-pdf-template/">',
+				'</a>'
+			);
+
+			echo '</p></div>';
+			$notice .= ob_get_clean();
+		}
+		
+		return $notice;
 	}
 
 }

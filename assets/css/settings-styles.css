@@ -1131,6 +1131,10 @@ sup.wcpdf_beta {
 	border-radius: 2px;
 }
 
+.notice-wpo p {
+	font-size: 0.8em !important;
+}
+
 /* UBL Taxes */
 #wpo-wcpdf-preview-wrapper #wpo-wcpdf-settings ul#ubl-standard-changelog {
 	display: none;
