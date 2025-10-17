@@ -1380,6 +1380,8 @@ class Admin {
 				<?php endif; ?>
 			</section>
 
+			<?php do_action( 'wpo_wcpdf_meta_box_before_document_buttons', $document, $data ); ?>
+
 			<!-- Save/Cancel buttons -->
 			<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
 				<div>
@@ -1916,8 +1918,8 @@ class Admin {
 
 			$data['notes'] = wp_kses( $form_data["{$key_prefix}notes"], $allowed_html );
 		}
-
-		return $data;
+		
+		return apply_filters( 'wpo_wcpdf_order_document_form_data', $data, $form_data, $document );
 	}
 
 	public function add_invoice_number_to_order_report( $response ) {

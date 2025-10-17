@@ -1844,7 +1844,7 @@ class Main {
 			}
 		}
 
-		$email_hooks = apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks );
+		$email_hooks = array_unique( apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks ) );
 
 		foreach ( $email_hooks as $email_hook ) {
 			if ( 'woocommerce_email_customer_address_section' === $email_hook ) {
@@ -1896,9 +1896,18 @@ class Main {
 		foreach ( $documents as $document ) {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
 			$selected_emails   = $document_settings['include_email_link'] ?? array();
+			$email_placement   = $document_settings['include_email_link_placement'] ?? '';
+
+			// Skip if no email placement is set.
+			if ( empty( $email_placement ) ) {
+				continue;
+			}
 
 			$email_id   = ( $email instanceof \WC_Email ) ? $email->id : '';
-			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email_id, $selected_emails, true );
+			$is_allowed =
+				in_array( $document->get_type(), $allowed_document_types, true ) &&
+				in_array( $email_id, $selected_emails, true ) &&
+				( 'woocommerce_email_' . $email_placement ) === current_filter();
 
 			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
 				continue;
