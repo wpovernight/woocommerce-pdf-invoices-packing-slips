@@ -9,10 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 
 class Semaphore {
-	
+
 	/**
 	 * Transient key for caching scheduled cleanup status
-	 * 
+	 *
 	 * @var string
 	 */
 	public const CLEANUP_TRANSIENT_KEY = 'wpo_ips_semaphore_cleanup_scheduled';
@@ -379,8 +379,10 @@ class Semaphore {
 
 		$error_message = 'Action Scheduler is not available. Cannot check if cleanup is scheduled.';
 		$scheduled     = false;
-		
-		if ( function_exists( '\as_next_scheduled_action' ) ) {
+
+		if ( function_exists( 'as_has_scheduled_action' ) ) {
+			$scheduled = \as_has_scheduled_action( self::get_cleanup_hook_name() );
+		} elseif ( function_exists( 'as_next_scheduled_action' ) ) {
 			$scheduled = \as_next_scheduled_action( self::get_cleanup_hook_name() );
 		} elseif ( function_exists( 'wcpdf_log_error' ) ) {
 			\wcpdf_log_error( $error_message, 'critical' );
@@ -461,7 +463,13 @@ class Semaphore {
 		}
 
 		// Schedule cleanup of released locks
-		self::schedule_semaphore_cleanup();
+		if ( function_exists( 'as_supports' ) && as_supports( 'ensure_recurring_actions_hook' ) ) {
+			// Preferred: runs periodically in the background.
+			add_action( 'action_scheduler_ensure_recurring_actions', array( __CLASS__, 'schedule_semaphore_cleanup' ) );
+		} else {
+			// Fallback: runs on every page load
+			self::schedule_semaphore_cleanup();
+		}
 
 		// Cleanup released locks
 		\add_action( self::get_cleanup_hook_name(), array( __CLASS__, 'cleanup_released_locks' ) );
