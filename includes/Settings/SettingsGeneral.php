@@ -85,7 +85,11 @@ class SettingsGeneral {
 					'id'               => 'template_path',
 					'options_callback' => array( $this, 'get_installed_templates_list' ),
 					/* translators: 1,2. template paths */
-					'description'      => sprintf( __( 'Want to use your own template? Copy all the files from %1$s to your (child) theme in %2$s to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$plugin_template_path.'</code>', '<code>'.$theme_template_path.'</code>' ),
+					'description'      => apply_filters( 'wpo_wcpdf_template_settings_path_description', sprintf(
+						__( 'Want to use your own template? Copy all the files from %1$s to your (child) theme in %2$s to customize them' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>' . esc_html( $plugin_template_path ) . '</code>',
+						'<code>' . esc_html( $theme_template_path ) . '</code>'
+					) ),
 				)
 			),
 			array(
