@@ -865,7 +865,7 @@ class SettingsGeneral {
 			printf(
 				/* translators: 1: Opening anchor tag, 2: Closing anchor tag */
 				'<br><br>' . __( 'Please refer to the %1$sCreating a custom PDF template%2$s article to learn how to update your template.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/creating-a-custom-pdf-template/">',
+				'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/creating-a-custom-pdf-template/" target="_blank" rel="noopener noreferrer">',
 				'</a>'
 			);
 
