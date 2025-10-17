@@ -52,7 +52,6 @@ class SettingsGeneral {
 		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
 		$missing_template_files = $this->get_missing_template_files();
-		$missing_files_count    = count( $missing_template_files );
 
 		$settings_fields = array(
 			array(
@@ -91,7 +90,7 @@ class SettingsGeneral {
 						_n(
 							'Want to use your own template? Copy the file from %1$s to your (child) theme in %2$s to customize it.',
 							'Want to use your own template? Copy all the files from %1$s to your (child) theme in %2$s to customize them.',
-							$missing_files_count,
+							count( $missing_template_files ),
 							'woocommerce-pdf-invoices-packing-slips'
 						),
 						'<code>' . esc_html( $plugin_template_path ) . '</code>',
