@@ -856,7 +856,7 @@ class SettingsGeneral {
 		}
 
 		$missing_list = wp_sprintf_l( '%l', array_map( 'esc_html', $missing_titles ) );
-		$file_label   = _n( 'file', 'files', count( $missing_titles ), 'woocommerce-pdf-invoices-packing-slips' );
+		$file_label   = _n( 'a file', 'files', count( $missing_titles ), 'woocommerce-pdf-invoices-packing-slips' );
 
 		$notice  = '<div class="notice notice-info inline notice-wpo"><p>';
 		$notice .= sprintf(
