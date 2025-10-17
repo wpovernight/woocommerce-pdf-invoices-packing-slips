@@ -9,8 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 
 class Semaphore {
+	
 	/**
 	 * Transient key for caching scheduled cleanup status
+	 * 
 	 * @var string
 	 */
 	public const CLEANUP_TRANSIENT_KEY = 'wpo_ips_semaphore_cleanup_scheduled';
@@ -376,7 +378,8 @@ class Semaphore {
 		}
 
 		$error_message = 'Action Scheduler is not available. Cannot check if cleanup is scheduled.';
-		$scheduled = false;
+		$scheduled     = false;
+		
 		if ( function_exists( '\as_next_scheduled_action' ) ) {
 			$scheduled = \as_next_scheduled_action( self::get_cleanup_hook_name() );
 		} elseif ( function_exists( 'wcpdf_log_error' ) ) {
@@ -437,8 +440,7 @@ class Semaphore {
 
 			if ( function_exists( '\as_schedule_recurring_action' ) ) {
 				\as_schedule_recurring_action( time(), $frequency, self::get_cleanup_hook_name() );
-				// Update transient so next check is cached
-				set_transient( self::CLEANUP_TRANSIENT_KEY, 1, DAY_IN_SECONDS );
+				set_transient( self::CLEANUP_TRANSIENT_KEY, 1, DAY_IN_SECONDS ); // Update transient so next check is cached
 			} elseif ( function_exists( 'wcpdf_log_error' ) ) {
 				\wcpdf_log_error( $error_message, 'critical' );
 			} else {
