@@ -846,12 +846,12 @@ class SettingsGeneral {
 				'</strong>'
 			);
 
-			if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
+			if ( class_exists( 'WPO_WCPDF_Templates' ) ) {
 				$license_info = WPO_WCPDF()->settings->upgrade->get_extension_license_infos();
 				$info         = $license_info[ 'bundle' ] ?? null;
 				
 				if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {
-					$plugin_path     = class_exists( 'WPO_WCPDF_Pro' ) ? WPO_WCPDF_Pro()->plugin_path() : WPO_WCPDF()->plugin_path();
+					$plugin_path     = function_exists( 'WPO_WCPDF_Pro' ) ? WPO_WCPDF_Pro()->plugin_path() : WPO_WCPDF()->plugin_path();
 					$template_folder = str_replace( wp_normalize_path( ABSPATH ), '', wp_normalize_path( $plugin_path ) . '/templates/Simple' );
 
 					printf(
