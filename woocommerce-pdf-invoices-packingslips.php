@@ -40,6 +40,7 @@ class WPO_WCPDF {
 	public $frontend;
 	public $install;
 	public $font_synchronizer;
+	public $xml_exporter;
 
 	protected static $_instance = null;
 
@@ -167,6 +168,7 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\IPS\Frontend::instance();
 		$this->install             = \WPO\IPS\Install::instance();
 		$this->font_synchronizer   = \WPO\IPS\FontSynchronizer::instance();
+		$this->xml_exporter        = \WPO\IPS\CustomXmlExporter::instance();
 	}
 
 	/**
@@ -806,3 +808,4 @@ function WPO_WCPDF() {
 }
 
 WPO_WCPDF(); // load plugin
+
