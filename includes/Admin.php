@@ -735,7 +735,7 @@ class Admin {
 		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
 		
 		if ( 0 === count( $meta_box_actions ) ) {
-			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
+			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
 		
 		// Peppol
