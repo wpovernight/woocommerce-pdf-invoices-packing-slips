@@ -734,11 +734,14 @@ class SettingsCallbacks {
 	/**
 	 * Validate options.
 	 *
-	 * @param array|null $input options to valid.
-	 *
-	 * @return array|null validated options.
+	 * @param array|false|null $input Options to validate.
+	 * @return array|null Validated options.
 	 */
-	public function validate( ?array $input ): ?array {
+	public function validate( $input ): ?array {
+		if ( $input === false ) {
+			$input = null;
+		}
+
 		// Create our array for storing the validated options.
 		$output = array();
 
