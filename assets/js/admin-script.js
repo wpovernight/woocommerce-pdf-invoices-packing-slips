@@ -422,7 +422,8 @@ jQuery( function( $ ) {
 			dataType: 'json',
 			data: {
 				action: 'wcpdf_get_country_states',
-				country: selectedCountry
+				country: selectedCountry,
+				security: wpo_wcpdf_admin.nonce,
 			},
 			success: function( response ) {
 				$state.empty();

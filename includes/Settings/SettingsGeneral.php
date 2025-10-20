@@ -756,6 +756,8 @@ class SettingsGeneral {
 	 * Get the states for a given country code via AJAX.
 	 */
 	public function ajax_get_shop_country_states() {
+		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+		
 		$request = stripslashes_deep( $_POST );
 
 		if ( empty( $request['country'] ) ) {
