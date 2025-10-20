@@ -282,7 +282,7 @@ class Admin {
 								$listing_actions[ $document_type . "_{$output_format}" ] = array(
 									'url'           => $document_url,
 									'img'           => $icon,
-									'alt'           => "UBL " . $document_title,
+									'alt'           => "E-" . $document_title,
 									'exists'        => $document_exists,
 									'printed'       => false,
 									'edi'           => true,
