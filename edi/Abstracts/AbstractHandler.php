@@ -262,6 +262,14 @@ abstract class AbstractHandler implements HandlerInterface {
 				$reason = 'NONE';
 			}
 			
+			if ( '' === $scheme ) {
+				$scheme = 'VAT';
+			}
+			
+			if ( '' === $category ) {
+				$category = ( 0.0 === $percentage ) ? 'Z' : 'S';
+			}
+			
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
 
 			if ( ! isset( $grouped_tax_data[ $key ] ) ) {
@@ -285,16 +293,11 @@ abstract class AbstractHandler implements HandlerInterface {
 	/**
 	 * Consolidate and ensure exactly one Z group in the grouped tax data.
 	 *
-	 * - Consolidates existing Z buckets (keeps first, sums totals)
-	 * - Computes missing Z taxable basis from lines (treats lines with no non-zero tax rows as Z)
-	 * - Ensures exactly one Z bucket is present with correct totals
-	 *
 	 * @param array $grouped_tax_data Grouped tax data.
 	 * @return array Updated grouped tax data.
 	 */
 	protected function ensure_one_tax_z_group( array $grouped_tax_data ): array {
 		// Consolidate any existing Z groups from $order_tax_data
-		$z_total_ex   = 0.0;
 		$z_first_key  = null;
 		$z_other_keys = array();
 
@@ -305,8 +308,6 @@ abstract class AbstractHandler implements HandlerInterface {
 				} else {
 					$z_other_keys[] = $key;
 				}
-
-				$z_total_ex += (float) ( $g['total_ex'] ?? 0 );
 			}
 		}
 
@@ -315,9 +316,9 @@ abstract class AbstractHandler implements HandlerInterface {
 			unset( $grouped_tax_data[ $dup_key ] );
 		}
 
-		// Compute the Z basis from lines
-		$z_missing_ex = 0.0;
-		$has_z_line   = false;
+		// Compute the Z taxable basis strictly from lines
+		$z_basis_from_lines = 0.0;
+		$has_z_line         = false;
 
 		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $it ) {
 			$line_total = (float) $it->get_total();
@@ -357,25 +358,23 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 
 			if ( $line_is_z ) {
-				$has_z_line    = true;
-				$z_missing_ex += $line_total; // contributes to Z taxable amount
+				$has_z_line          = true;
+				$z_basis_from_lines += $line_total; // contributes to Z taxable amount
 			}
 		}
-
-		$z_total_ex += $z_missing_ex;
 
 		// Ensure exactly one Z group if there is any Z line (even with basis 0)
 		if ( $has_z_line || $z_first_key ) {
 			$z_key = $z_first_key ?: '0|Z|NONE|VAT';
 
 			$grouped_tax_data[ $z_key ] = array(
-				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_total_ex ) ),
+				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_basis_from_lines ) ),
 				'total_tax'  => $this->format_decimal( 0, 2 ),
 				'percentage' => $this->format_decimal( 0, 1 ),
 				'category'   => 'Z',
 				'reason'     => 'NONE',
 				'scheme'     => 'VAT',
-				'name'       => $grouped_tax_data[ $z_first_key ]['name'] ?? '',
+				'name'       => isset( $z_first_key, $grouped_tax_data[ $z_first_key ]['name'] ) ? $grouped_tax_data[ $z_first_key ]['name'] : '',
 			);
 		}
 
