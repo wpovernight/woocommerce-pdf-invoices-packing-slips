@@ -150,71 +150,56 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_trade_tax(): ?array {
-		$tax_reasons    = EN16931::get_vatex();
-		$order          = $this->document->order;
-		$order_tax_data = $this->document->order_tax_data;
+		$tax_reasons = EN16931::get_vatex();
+		$order       = $this->document->order;
+		
+		// Group tax data by rate, category, reason, and scheme
+		$grouped_tax_data = apply_filters( 'wpo_ips_edi_cii_order_tax_data', $this->get_grouped_order_tax_data(), $this );
 
-		// Fallback
-		if ( empty( $order_tax_data ) ) {
-			$order_tax_data = array(
-				0 => array(
-					'total_ex'  => $order->get_total(),
-					'total_tax' => 0,
-					'items'     => array(),
-					'name'      => '',
-				),
-			);
-		}
-		
-		$order_tax_data = apply_filters( 'wpo_ips_edi_cii_order_tax_data', $order_tax_data, $this );
-		if ( empty( $order_tax_data ) ) {
-			wpo_ips_edi_log(
-				sprintf(
-					'CII ApplicableHeaderTradeSettlementHandler: No tax data available in order %d.',
-					$order->get_id()
-				),
-				'error'
-			);
-			return null; // No tax data available
-		}
-		
+		// Build CII trade tax nodes from grouped data
 		$trade_tax = array();
 
-		foreach ( $order_tax_data as $item ) {
-			$percent    = ! empty( $item['percentage'] )
-				? $item['percentage']
-				: 0;
-			$category   = ! empty( $item['category'] )
-				? $item['category']
-				: wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
-			$reason_key = ! empty( $item['reason'] )
-				? $item['reason']
-				: wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order );
-			$reason     = ! empty( $tax_reasons[ $reason_key ] )
+		foreach ( array_values( $grouped_tax_data ) as $item ) {
+			$percent    = (float) ( $item['percentage'] ?? 0 );
+			$category   = strtoupper( $item['category'] ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order ) );
+			$reason_key = strtoupper( $item['reason']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order ) );
+			$scheme     = strtoupper( $item['scheme']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order ) );
+
+			if ( '' === $reason_key || 'NONE' === $reason_key ) {
+				$reason_key = 'NONE';
+			}
+
+			$reason = ! empty( $tax_reasons[ $reason_key ] )
 				? $tax_reasons[ $reason_key ]
 				: $reason_key;
-			$scheme     = ! empty( $item['scheme'] )
-				? $item['scheme']
-				: wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order );
 
-			$tax_node = array(
+			$basis = (float) wc_round_tax_total( $item['total_ex']  ?? 0 );
+			$tax   = (float) wc_round_tax_total( $item['total_tax'] ?? 0 );
+
+			// Skip emitting completely empty groups unless it's the intentional Z group
+			$is_z = ( 'Z' === $category );
+			if ( 0.0 === $basis && 0.0 === $tax && ! $is_z ) {
+				continue;
+			}
+
+			$node = array(
 				'name'  => 'ram:ApplicableTradeTax',
 				'value' => array(
 					array(
 						'name'  => 'ram:CalculatedAmount',
-						'value' => $this->format_decimal( wc_round_tax_total( $item['total_tax'] ) ),
+						'value' => $this->format_decimal( $tax ),
 					),
 					array(
 						'name'  => 'ram:TypeCode',
-						'value' => strtoupper( $scheme ),
+						'value' => $scheme ?: 'VAT',
 					),
 					array(
 						'name'  => 'ram:BasisAmount',
-						'value' => $this->format_decimal( wc_round_tax_total( $item['total_ex'] ) ),
+						'value' => $this->format_decimal( $basis ),
 					),
 					array(
 						'name'  => 'ram:CategoryCode',
-						'value' => strtoupper( $category ),
+						'value' => $category ?: 'Z',
 					),
 					array(
 						'name'  => 'ram:RateApplicablePercent',
@@ -223,132 +208,24 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				),
 			);
 
-			// Exemption if any
-			if ( 'none' !== $reason_key ) {
-				$tax_node['value'][] = array(
+			// Only emit exemption for 0% non-Z categories and when reason is not NONE
+			if ( 0.0 === (float) $percent && 'Z' !== $category && 'NONE' !== $reason_key ) {
+				$node['value'][] = array(
 					'name'  => 'ram:ExemptionReasonCode',
 					'value' => $reason_key,
 				);
-				$tax_node['value'][] = array(
+				$node['value'][] = array(
 					'name'  => 'ram:ExemptionReason',
 					'value' => $reason,
 				);
 			}
 
-			$trade_tax[] = $tax_node;
-		}
-		
-		// Check if Z already exists in the header breakdown.
-		$has_z_in_breakdown = false;
-		foreach ( $trade_tax as $node ) {
-			foreach ( $node['value'] as $v ) {
-				if ( 'ram:CategoryCode' === $v['name'] && 'Z' === strtoupper( (string) $v['value'] ) ) {
-					$has_z_in_breakdown = true;
-					break 2;
-				}
-			}
+			$trade_tax[] = $node;
 		}
 
-		// Compute the Z basis from lines
-		$z_basis    = 0.0;
-		$has_z_line = false;
-
-		foreach ( $order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $it ) {
-			$line_total = (float) $it->get_total();
-			$taxes      = $it->get_taxes();
-			$has_rows   = ! empty( $taxes['total'] ) && is_array( $taxes['total'] );
-			$line_is_z  = false;
-
-			if ( $has_rows ) {
-				foreach ( $taxes['total'] as $tax_id => $amt ) {
-					if ( ! is_numeric( $amt ) ) {
-						continue;
-					}
-					
-					$info = $this->document->order_tax_data[ $tax_id ] ?? array();
-					$cat  = strtoupper( $info['category'] ?? '' );
-					$rate = (float) ( $info['percentage'] ?? 0 );
-					
-					// Consider Z if category is Z (preferred).
-					if ( 'Z' === $cat || 0.0 === $rate ) {
-						$line_is_z = true;
-						break;
-					}
-				}
-			} else {
-				// Shipping without tax rows: treat as zero-rated
-				if ( 'shipping' === $it->get_type() ) {
-					$line_is_z = true;
-				}
-			}
-
-			if ( $line_is_z ) {
-				$has_z_line = true;
-				$z_basis   += $line_total;
-			}
-		}
-
-		// If we have Z exposure:
-		if ( $has_z_line ) {
-			$updated = false;
-			
-			foreach ( $trade_tax as &$node ) {
-				$cat = null;
-				foreach ( $node['value'] as $v ) {
-					if ( 'ram:CategoryCode' === $v['name'] ) {
-						$cat = strtoupper( (string) $v['value'] );
-						break;
-					}
-				}
-				
-				if ( 'Z' === $cat ) {
-					foreach ( $node['value'] as &$v ) {
-						if ( 'ram:BasisAmount' === $v['name'] ) {
-							$v['value'] = $this->format_decimal( wc_round_tax_total( $z_basis ) );
-						}
-						if ( 'ram:CalculatedAmount' === $v['name'] ) {
-							$v['value'] = $this->format_decimal( 0 );
-						}
-						if ( 'ram:RateApplicablePercent' === $v['name'] ) {
-							$v['value'] = $this->format_decimal( 0, 1 );
-						}
-					}
-					
-					unset( $v );
-					$updated = true;
-					break;
-				}
-			}
-			
-			unset( $node );
-
-			if ( ! $updated ) {
-				$trade_tax[] = array(
-					'name'  => 'ram:ApplicableTradeTax',
-					'value' => array(
-						array(
-							'name'  => 'ram:CalculatedAmount',
-							'value' => $this->format_decimal( 0 ),
-						),
-						array(
-							'name'  => 'ram:TypeCode',
-							'value' => 'VAT',
-						),
-						array(
-							'name'  => 'ram:BasisAmount',
-							'value' => $this->format_decimal( wc_round_tax_total( $z_basis ) ),
-						),
-						array(
-							'name'  => 'ram:CategoryCode',
-							'value' => 'Z',
-						),
-						array(
-							'name'  => 'ram:RateApplicablePercent',
-							'value' => $this->format_decimal( 0, 1 ),
-						),
-					),
-				);
-			}
+		// If after filtering there is nothing meaningful to report, return null
+		if ( empty( $trade_tax ) ) {
+			return null;
 		}
 
 		return apply_filters( 'wpo_ips_edi_cii_trade_tax', $trade_tax, $this );
