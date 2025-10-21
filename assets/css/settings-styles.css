@@ -1340,6 +1340,10 @@ sup.wcpdf_pro {
 	border-radius: 2px;
 }
 
+.notice-wpo p {
+	font-size: 0.8em !important;
+}
+
 /* EDI Taxes */
 #wpo-wcpdf-settings ul#edi-standard-changelog {
 	display: none;

@@ -411,7 +411,8 @@ jQuery( function( $ ) {
 			dataType: 'json',
 			data: {
 				action: 'wcpdf_get_country_states',
-				country: selectedCountry
+				country: selectedCountry,
+				security: wpo_wcpdf_admin.nonce,
 			},
 			success: function( response ) {
 				$state.empty();
@@ -456,7 +457,7 @@ jQuery( function( $ ) {
 	}
 
 	function showSaveBtn( event ) {
-		$('.preview-data-wrapper .save-settings p').css('margin-right', '0');
+		$( '.preview-data-wrapper .save-settings p' ).css( 'margin-right', '0' );
 	}
 
 	// Submit settings form when clicking on secondary save button
