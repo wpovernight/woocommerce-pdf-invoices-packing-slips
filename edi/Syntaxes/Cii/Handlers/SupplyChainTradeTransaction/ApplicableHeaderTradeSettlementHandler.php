@@ -154,7 +154,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		$order       = $this->document->order;
 		
 		// Group tax data by rate, category, reason, and scheme
-		$grouped_tax_data = apply_filters( 'wpo_ips_edi_cii_order_tax_data', $this->get_grouped_order_tax_data(), $this );
+		$grouped_tax_data = $this->get_grouped_order_tax_data();
 
 		// Build CII trade tax nodes from grouped data
 		$trade_tax = array();

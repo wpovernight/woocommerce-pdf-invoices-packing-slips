@@ -24,35 +24,40 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 		foreach ( $items as $item_id => $item ) {
 			$taxes = $item->get_taxes();
 
-			// Build exactly one ApplicableTradeTax node per line
-			$effective_rate = 0.0;
-			$category       = null;
-			$scheme         = 'VAT';
-			$has_tax_rows   = false;
+			// Determine the line tax
+			$type               = $item->get_type();
+			$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
+			$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
 
-			if ( ! empty( $taxes['total'] ) && is_array( $taxes['total'] ) ) {
-				foreach ( $taxes['total'] as $tax_id => $tax_amount ) {
-					if ( ! is_numeric( $tax_amount ) ) {
-						continue;
-					}
-					$has_tax_rows = true;
+			$line_tax_data = $item[ $tax_data_container ] ?? array();
+			$rows          = ( isset( $line_tax_data[ $tax_data_key ] ) && is_array( $line_tax_data[ $tax_data_key ] ) )
+				? $line_tax_data[ $tax_data_key ]
+				: array();
 
-					$tax_info = $tax_data[ $tax_id ] ?? array();
-					// Use the first category we see; keep one per line
-					$category       = $category ?: strtoupper( $tax_info['category'] ?? 'S' );
-					$scheme         = strtoupper( $tax_info['scheme'] ?? 'VAT' );
-					$effective_rate += (float) ( $tax_info['percentage'] ?? 0 );
+			$scheme   = 'VAT';
+			$category = null;
+			$rate     = 0.0;
+
+			// Consider only non-zero numeric rows (first one wins)
+			foreach ( $rows as $tax_id => $tax_amt ) {
+				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt === 0.0 ) {
+					continue;
 				}
+				
+				$row     = $tax_data[ $tax_id ] ?? array();
+				$scheme  = strtoupper( $row['scheme']   ?? 'VAT' );
+				$category= strtoupper( $row['category'] ?? 'Z' );
+				$rate    = (float) ( $row['percentage'] ?? 0 );
+				break;
 			}
 
-			// Fallback: shipping with no tax rows -> Zero-rated Z / 0%
-			if ( 'shipping' === $item->get_type() && ! $has_tax_rows ) {
-				$category       = 'Z';
-				$scheme         = 'VAT';
-				$effective_rate = 0.0;
+			// Fallback: no non-zero rows -> Zero-rated (Z / 0%)
+			if ( null === $category ) {
+				$scheme   = 'VAT';
+				$category = 'Z';
+				$rate     = 0.0;
 			}
 
-			// Always output exactly one node (rate included even if 0)
 			$tax_nodes = array(
 				array(
 					'name'  => 'ram:ApplicableTradeTax',
@@ -63,11 +68,11 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						),
 						array(
 							'name'  => 'ram:CategoryCode',
-							'value' => $category ?: 'S',
+							'value' => $category,
 						),
 						array(
 							'name'  => 'ram:RateApplicablePercent',
-							'value' => $this->format_decimal( wc_round_tax_total( $effective_rate ) ),
+							'value' => $this->format_decimal( $rate, 1 ),
 						),
 					),
 				),

@@ -22,7 +22,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 		$currency         = $this->document->order->get_currency();
 
 		// Group tax data by rate, category, reason, and scheme
-		$grouped_tax_data = apply_filters( 'wpo_ips_edi_ubl_order_tax_data', $this->get_grouped_order_tax_data(), $this );
+		$grouped_tax_data = $this->get_grouped_order_tax_data();
 		
 		// Format grouped tax data into UBL structure
 		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons, $currency ) {
