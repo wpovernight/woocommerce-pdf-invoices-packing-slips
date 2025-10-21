@@ -44,10 +44,10 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					continue;
 				}
 				
-				$row     = $tax_data[ $tax_id ] ?? array();
-				$scheme  = strtoupper( $row['scheme']   ?? 'VAT' );
-				$category= strtoupper( $row['category'] ?? 'Z' );
-				$rate    = (float) ( $row['percentage'] ?? 0 );
+				$row      = $tax_data[ $tax_id ] ?? array();
+				$scheme   = strtoupper( $row['scheme']   ?? 'VAT' );
+				$category = strtoupper( $row['category'] ?? 'Z' );
+				$rate     = (float) ( $row['percentage'] ?? 0 );
 				break;
 			}
 
