@@ -500,13 +500,16 @@ class Frontend {
 	 * @return void
 	 */
 	public function edi_save_peppol_settings(): void {
-		if (
-			! isset( $_POST['save_peppol_settings'] ) ||
-			! is_user_logged_in() ||
-			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wc_nonce'] ) ), 'wpo_ips_edi_user_save_peppol_settings' )
-		) {
-			wc_add_notice( __( 'Peppol settings could not be saved. Please try again.', 'woocommerce-pdf-invoices-packing-slips' ), 'error' );
+		if ( 'POST' !== $_SERVER['REQUEST_METHOD'] || empty( $_POST['save_peppol_settings'] ) ) {
 			return;
+		}
+		
+		// Validate nonce and auth
+		$nonce = isset( $_POST['wc_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['wc_nonce'] ) ) : '';
+		if ( ! is_user_logged_in() || ! wp_verify_nonce( $nonce, 'wpo_ips_edi_user_save_peppol_settings' ) ) {
+			wc_add_notice( __( 'Peppol settings could not be saved. Please try again.', 'woocommerce-pdf-invoices-packing-slips' ), 'error' );
+			wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );
+			exit;
 		}
 		
 		$request = stripslashes_deep( $_POST );
@@ -515,7 +518,7 @@ class Frontend {
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
 		
 		wc_add_notice( __( 'Peppol settings saved.', 'woocommerce-pdf-invoices-packing-slips' ), 'success' );
-		wp_redirect( wc_get_account_endpoint_url( 'peppol' ) );
+		wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );
 		exit;
 	}
 	
