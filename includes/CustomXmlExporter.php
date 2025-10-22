@@ -184,6 +184,8 @@ class CustomXmlExporter {
 
         $xml = apply_filters( 'wpo_wcpdf_invoice_xml_export_xml', $xml, $data, $document, $order );
 
+        $xml = $this->normalize_xml_output( $xml );
+
         if ( empty( $xml ) ) {
             return false;
         }
@@ -195,6 +197,13 @@ class CustomXmlExporter {
         }
 
         if ( ! $force_regeneration && WPO_WCPDF()->file_system->exists( $path ) ) {
+            $existing = WPO_WCPDF()->file_system->get_contents( $path );
+            $cleaned  = $this->normalize_xml_output( $existing );
+
+            if ( ! empty( $cleaned ) && $cleaned !== $existing ) {
+                WPO_WCPDF()->file_system->put_contents( $path, $cleaned );
+            }
+
             return $path;
         }
 
@@ -281,22 +290,24 @@ class CustomXmlExporter {
      */
     protected function stream_invoice_xml( string $path ): void {
         $filename = basename( $path );
-        $filesize = @filesize( $path );
+        $contents = WPO_WCPDF()->file_system->get_contents( $path );
 
-        header( 'Content-Type: application/xml; charset=utf-8' );
-        header( sprintf( 'Content-Disposition: attachment; filename="%s"', addcslashes( $filename, "\\\"" ) ) );
-
-        if ( $filesize ) {
-            header( 'Content-Length: ' . $filesize );
-        }
-
-        if ( ob_get_length() ) {
+        // Teljes buffer takarítás – ez a kulcs
+        while ( ob_get_level() > 0 ) {
             ob_end_clean();
         }
 
-        flush();
+        // (opcionális) tömörítés kikapcsolása
+        @ini_set( 'zlib.output_compression', 'Off' );
 
-        echo WPO_WCPDF()->file_system->get_contents( $path ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // Biztonsági normalizálás a kiküldés ELŐTT
+        $contents = $this->normalize_xml_output( $contents );
+
+        header( 'Content-Type: application/xml; charset=utf-8' );
+        header( sprintf( 'Content-Disposition: attachment; filename="%s"', addcslashes( $filename, "\\\"" ) ) );
+        header( 'Content-Length: ' . strlen( $contents ) );
+
+        echo $contents; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         exit;
     }
 
@@ -311,6 +322,64 @@ class CustomXmlExporter {
         }
 
         return apply_filters( 'wpo_wcpdf_invoice_xml_export_data', $data, $document, $order );
+    }
+
+    /**
+     * Ensure XML output starts with a valid declaration and has no leading BOM/whitespace.
+     */
+    protected function normalize_xml_output( $xml ): string {
+        if ( ! is_string( $xml ) ) {
+            return '';
+        }
+
+        if ( 0 === strpos( $xml, "\xEF\xBB\xBF" ) ) {
+            $xml = substr( $xml, 3 );
+        }
+
+        if ( '' === $xml ) {
+            return '';
+        }
+
+        // Remove anything that appears before the first tag to guarantee no blank line precedes the declaration.
+        $first_tag_position = strpos( $xml, '<' );
+
+        if ( false === $first_tag_position ) {
+            return '';
+        }
+
+        if ( $first_tag_position > 0 ) {
+            $xml = substr( $xml, $first_tag_position );
+        }
+
+        if ( '' === $xml ) {
+            return '';
+        }
+
+        // Strip any residual ASCII control characters that might still exist before the first tag.
+        $xml = ltrim( $xml, "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x20" );
+
+        if ( '' === $xml ) {
+            return '';
+        }
+
+        if ( 0 === strpos( $xml, '<?xml' ) ) {
+            $xml = preg_replace_callback(
+                '/^<\?xml[^>]*\?>\s*/u',
+                static function ( $matches ) {
+                    return rtrim( $matches[0] ) . "\n";
+                },
+                $xml,
+                1
+            );
+
+            if ( ! is_string( $xml ) ) {
+                return '';
+            }
+
+            return $xml;
+        }
+
+        return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . $xml;
     }
 
     /**
