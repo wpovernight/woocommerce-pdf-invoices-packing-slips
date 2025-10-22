@@ -462,7 +462,7 @@ class Frontend {
 				<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 					<label for="peppol_legal_identifier_icd"><?php esc_html_e( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 					<select name="peppol_legal_identifier_icd" id="peppol_legal_identifier_icd" class="woocommerce-Input input-select">
-						<option value=""><?php esc_html_e( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
+						<option value=""><?php echo esc_html__( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
 						<?php foreach ( $icd_options as $code => $label ) : ?>
 							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $legal_identifier_icd, $code ); ?>>
 								<?php echo esc_html( $label ); ?>
@@ -501,19 +501,22 @@ class Frontend {
 	 */
 	public function edi_save_peppol_settings(): void {
 		if (
-			isset( $_POST['save_peppol_settings'] ) &&
-			is_user_logged_in() &&
-			wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wc_nonce'] ) ), 'wpo_ips_edi_user_save_peppol_settings' )
+			! isset( $_POST['save_peppol_settings'] ) ||
+			! is_user_logged_in() ||
+			! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wc_nonce'] ) ), 'wpo_ips_edi_user_save_peppol_settings' )
 		) {
-			$request = stripslashes_deep( $_POST );
-			$user_id = get_current_user_id();
-			
-			wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
-			
-			wc_add_notice( __( 'Peppol settings saved.', 'woocommerce-pdf-invoices-packing-slips' ), 'success' );
-			wp_redirect( wc_get_account_endpoint_url( 'peppol' ) );
-			exit;
+			wc_add_notice( __( 'Peppol settings could not be saved. Please try again.', 'woocommerce-pdf-invoices-packing-slips' ), 'error' );
+			return;
 		}
+		
+		$request = stripslashes_deep( $_POST );
+		$user_id = get_current_user_id();
+		
+		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
+		
+		wc_add_notice( __( 'Peppol settings saved.', 'woocommerce-pdf-invoices-packing-slips' ), 'success' );
+		wp_redirect( wc_get_account_endpoint_url( 'peppol' ) );
+		exit;
 	}
 	
 	/**
@@ -547,6 +550,7 @@ class Frontend {
 		);
 
 		if ( 'select' === $input_mode ) {
+			$eas = EN16931::get_eas();
 			woocommerce_register_additional_checkout_field(
 				array(
 					'id'       => 'wpo-ips-edi/peppol-endpoint-eas',
@@ -558,11 +562,11 @@ class Frontend {
 							'value' => $code,
 							'label' => "[$code] $label",
 						),
-						array_keys( EN16931::get_eas() ),
-						EN16931::get_eas()
+						array_keys( $eas ),
+						$eas
 					),
 					'validate_callback' => function ( $val ) {
-						if ( $val && ! isset( EN16931::get_eas()[ $val ] ) ) {
+						if ( $val && ! isset( $eas[ $val ] ) ) {
 							return new \WP_Error( 'invalid_eas', __( 'Invalid Endpoint Scheme.', 'woocommerce-pdf-invoices-packing-slips' ) );
 						}
 						return true;
@@ -705,6 +709,10 @@ class Frontend {
 
 		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
 		$value    = trim( sanitize_text_field( wp_unslash( $value ) ) );
+		
+		if ( $wc_object instanceof \WC_Order ) {
+			wpo_ips_edi_maybe_save_order_customer_peppol_data( $wc_object );
+		}
 
 		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) )
 			? absint( $wc_object->get_customer_id() )
@@ -715,10 +723,6 @@ class Frontend {
 		}
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
-		
-		if ( $wc_object instanceof \WC_Order ) {
-			wpo_ips_edi_maybe_save_order_customer_peppol_data( $wc_object );
-		}
 	}
 	
 	/**

@@ -98,7 +98,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 					),
 				),
 			);
-		}, array_values( $grouped_tax_data ) );
+		}, $grouped_tax_data );
 
 		$tax_total = array(
 			'name'  => 'cac:TaxTotal',

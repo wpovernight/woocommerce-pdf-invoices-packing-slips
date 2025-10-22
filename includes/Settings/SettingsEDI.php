@@ -650,7 +650,7 @@ class SettingsEDI {
 								<?php printf(
 									/* translators: General settings link */
 									esc_html__( 'Missing details can be completed in the %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-									'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#shop_information' ) ) . '" class="edi-complete-details" target="_blank">' . esc_html__( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+									'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#shop_information' ) ) . '" class="edi-complete-details" target="_blank">' . esc_html__( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 								); ?>
 							</td>
 						</tr>
@@ -802,20 +802,6 @@ class SettingsEDI {
 	private function output_default_tax_classification_panel( string $slug ): void {
 		$edi_tax_settings = wpo_ips_edi_get_tax_settings();
 
-		$allowed_html = array(
-			'select' => array(
-				'name'         => true,
-				'id'           => true,
-				'class'        => true,
-				'style'        => true,
-				'data-current' => true,
-			),
-			'option' => array(
-				'value'    => true,
-				'selected' => true,
-			),
-		);
-
 		$scheme   = $edi_tax_settings['class'][ $slug ]['scheme']   ?? '';
 		$category = $edi_tax_settings['class'][ $slug ]['category'] ?? '';
 		$reason   = $edi_tax_settings['class'][ $slug ]['reason']   ?? '';
@@ -897,20 +883,6 @@ class SettingsEDI {
 		);
 
 		$results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-
-		$allowed_html = array(
-			'select' => array(
-				'name'         => true,
-				'id'           => true,
-				'class'        => true,
-				'style'        => true,
-				'data-current' => true
-			),
-			'option' => array(
-				'value'        => true,
-				'selected'     => true,
-			)
-		);
 
 		$this->output_default_tax_classification_panel( $slug );
 		?>

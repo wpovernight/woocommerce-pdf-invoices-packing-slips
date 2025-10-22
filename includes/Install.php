@@ -667,8 +667,9 @@ class Install {
 			$ubl_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
 
 			if ( ! empty( $ubl_settings ) ) {
-				update_option( 'wpo_ips_edi_tax_settings', $ubl_settings );
-				delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
+				if ( update_option( 'wpo_ips_edi_tax_settings', $ubl_settings ) ) {
+					delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
+				}
 			}
 			
 			$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );

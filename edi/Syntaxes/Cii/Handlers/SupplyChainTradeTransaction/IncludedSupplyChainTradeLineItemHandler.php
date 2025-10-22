@@ -22,8 +22,6 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 		$tax_data = $this->document->order_tax_data;
 
 		foreach ( $items as $item_id => $item ) {
-			$taxes = $item->get_taxes();
-
 			// Determine the line tax
 			$type               = $item->get_type();
 			$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';

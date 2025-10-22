@@ -159,7 +159,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		// Build CII trade tax nodes from grouped data
 		$trade_tax = array();
 
-		foreach ( array_values( $grouped_tax_data ) as $item ) {
+		foreach ( $grouped_tax_data as $item ) {
 			$percent    = (float) ( $item['percentage'] ?? 0 );
 			$category   = strtoupper( $item['category'] ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order ) );
 			$reason_key = strtoupper( $item['reason']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order ) );
@@ -209,7 +209,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			);
 
 			// Only emit exemption for 0% non-Z categories and when reason is not NONE
-			if ( 0.0 === (float) $percent && 'Z' !== $category && 'NONE' !== $reason_key ) {
+			if ( 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason_key ) {
 				$node['value'][] = array(
 					'name'  => 'ram:ExemptionReasonCode',
 					'value' => $reason_key,

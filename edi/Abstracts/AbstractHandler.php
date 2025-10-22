@@ -297,23 +297,17 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array Updated grouped tax data.
 	 */
 	protected function ensure_one_tax_z_group( array $grouped_tax_data ): array {
-		// Consolidate any existing Z groups from $order_tax_data
-		$z_first_key  = null;
-		$z_other_keys = array();
+		$z_first_key = null;
 
+		// Consolidate any existing Z groups from $order_tax_data
 		foreach ( $grouped_tax_data as $key => $g ) {
 			if ( 'Z' === strtoupper( $g['category'] ?? '' ) ) {
 				if ( is_null( $z_first_key ) ) {
 					$z_first_key = $key;
 				} else {
-					$z_other_keys[] = $key;
+					unset( $grouped_tax_data[ $key ] );
 				}
 			}
-		}
-
-		// Remove duplicate Z groups (keep the first; we'll rewrite it later)
-		foreach ( $z_other_keys as $dup_key ) {
-			unset( $grouped_tax_data[ $dup_key ] );
 		}
 
 		// Compute the Z taxable basis strictly from lines
@@ -374,7 +368,7 @@ abstract class AbstractHandler implements HandlerInterface {
 				'category'   => 'Z',
 				'reason'     => 'NONE',
 				'scheme'     => 'VAT',
-				'name'       => isset( $z_first_key, $grouped_tax_data[ $z_first_key ]['name'] ) ? $grouped_tax_data[ $z_first_key ]['name'] : '',
+				'name'       => $grouped_tax_data[ $z_first_key ]['name'] ?? '',
 			);
 		}
 
