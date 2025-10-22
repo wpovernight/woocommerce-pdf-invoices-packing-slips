@@ -877,12 +877,14 @@ class SettingsEDI {
 		$slug             = sanitize_key( strtolower( $slug ) );
 
 		$query = wpo_wcpdf_prepare_identifier_query(
-			"SELECT * FROM %i WHERE tax_rate_class = %s;",
+			"SELECT * FROM %i WHERE tax_rate_class = %s ORDER BY tax_rate_country ASC, tax_rate_state ASC;",
 			array( $table_name ),
 			array( ( 'standard' === $slug ) ? '' : $slug )
 		);
 
 		$results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+		$locations_by_rate = $this->get_locations_by_rate_ids( $results );
 
 		$this->output_default_tax_classification_panel( $slug );
 		?>
@@ -904,26 +906,21 @@ class SettingsEDI {
 					<?php
 						if ( ! empty( $results ) ) {
 							foreach ( $results as $result ) {
-								$locationResults = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
-									$wpdb->prepare(
-										"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rate_locations WHERE tax_rate_id = %d;",
-										$result->tax_rate_id
-									)
-								);
-								$postcode = array();
-								$city     = array();
+								$location_results = isset( $locations_by_rate[ $result->tax_rate_id ] ) ? $locations_by_rate[ $result->tax_rate_id ] : array();
+								$postcode         = array();
+								$city             = array();
 
-								foreach ( $locationResults as $locationResult ) {
-									if ( ! isset( $locationResult->location_type ) ) {
+								foreach ( $location_results as $location_result ) {
+									if ( ! isset( $location_result->location_type ) ) {
 										continue;
 									}
 
-									switch ( $locationResult->location_type ) {
+									switch ( $location_result->location_type ) {
 										case 'postcode':
-											$postcode[] = $locationResult->location_code;
+											$postcode[] = $location_result->location_code;
 											break;
 										case 'city':
-											$city[] = $locationResult->location_code;
+											$city[] = $location_result->location_code;
 											break;
 									}
 								}
@@ -1065,6 +1062,64 @@ class SettingsEDI {
 		$select .= '</select>';
 
 		echo wp_kses( $select, $allowed_html );
+	}
+	
+	/**
+	 * Get tax rate locations grouped by tax_rate_id for a given set of tax rate rows.
+	 *
+	 * @param array $results
+	 * @return array
+	 */
+	private function get_locations_by_rate_ids( array $results ): array {
+		global $wpdb;
+
+		$locations_by_rate = array();
+
+		if ( empty( $results ) ) {
+			return $locations_by_rate;
+		}
+
+		$rate_ids = array_values(
+			array_unique(
+				array_filter(
+					array_map(
+						static function ( $row ) {
+							return isset( $row->tax_rate_id ) ? (int) $row->tax_rate_id : 0;
+						},
+						$results
+					)
+				)
+			)
+		);
+
+		if ( empty( $rate_ids ) ) {
+			return $locations_by_rate;
+		}
+
+		$placeholders = implode( ',', array_fill( 0, count( $rate_ids ), '%d' ) );
+		$sql          = "SELECT tax_rate_id, location_type, location_code
+			FROM {$wpdb->prefix}woocommerce_tax_rate_locations
+			WHERE tax_rate_id IN ( {$placeholders} )";
+
+		$loc_rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare( $sql, $rate_ids )
+		);
+
+		if ( empty( $loc_rows ) ) {
+			return $locations_by_rate;
+		}
+
+		foreach ( $loc_rows as $loc_row ) {
+			$id = (int) $loc_row->tax_rate_id;
+
+			if ( ! isset( $locations_by_rate[ $id ] ) ) {
+				$locations_by_rate[ $id ] = array();
+			}
+
+			$locations_by_rate[ $id ][] = $loc_row;
+		}
+
+		return $locations_by_rate;
 	}
 
 }
