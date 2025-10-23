@@ -401,5 +401,87 @@ abstract class AbstractHandler implements HandlerInterface {
 			'payable_amount'
 		);
 	}
+	
+	/**
+	 * Get the tax rows bucket for an order item ('subtotal' for products, 'total' otherwise).
+	 *
+	 * @param \WC_Order_Item $item
+	 * @return array
+	 */
+	protected function get_item_tax_rows( \WC_Order_Item $item ): array {
+		$type       = $item->get_type();
+		$taxes      = $item->get_taxes();
+		$tax_bucket = ( 'line_item' === $type ) ? 'subtotal' : 'total';
+
+		return ( isset( $taxes[ $tax_bucket ] ) && is_array( $taxes[ $tax_bucket ] ) )
+			? $taxes[ $tax_bucket ]
+			: array();
+	}
+
+	/**
+	 * Resolve tax meta (scheme/category/percentage) for an item by inspecting its first non-zero tax row.
+	 *
+	 * @param \WC_Order_Item $item
+	 * @return array
+	 */
+	protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
+		$order_tax_data = $this->document->order_tax_data;
+		
+		$scheme   = 'VAT';
+		$category = null;
+		$percent  = 0.0;
+		$rows     = $this->get_item_tax_rows( $item );
+
+		foreach ( $rows as $tax_id => $tax_amt ) {
+			if ( ! is_numeric( $tax_amt ) || (float) $tax_amt == 0.0 ) {
+				continue;
+			}
+			
+			$row      = $order_tax_data[ $tax_id ]   ?? array();
+			$scheme   = strtoupper( $row['scheme']   ?? 'VAT' );
+			$category = strtoupper( $row['category'] ?? 'Z'   );
+			$percent  = (float) ( $row['percentage'] ?? 0     );
+			break;
+		}
+
+		// Fallback: no non-zero rows -> Zero-rated (Z / 0%)
+		if ( null === $category ) {
+			$scheme   = 'VAT';
+			$category = 'Z';
+			$percent  = 0.0;
+		}
+
+		return array(
+			'scheme'     => $scheme,
+			'category'   => $category,
+			'percentage' => $percent,
+		);
+	}
+
+	/**
+	 * Compute line totals, unit prices and unit discount for an item.
+	 *
+	 * @param \WC_Order_Item $item
+	 * @param bool $lock_net_to_subtotal
+	 * @return array
+	 */
+	protected function compute_item_price_parts( $item, bool $lock_net_to_subtotal = false ): array {
+		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+			$gross_total = (float) $item->get_subtotal();                                                  // ex-VAT, before discounts
+			$net_total   = (float) ( $lock_net_to_subtotal ? $item->get_subtotal() : $item->get_total() ); // ex-VAT, after discounts
+			$qty         = max( 1, (int) $item->get_quantity() );
+		} else {
+			$gross_total = (float) $item->get_total();
+			$net_total   = (float) $item->get_total();
+			$qty         = 1;
+		}
+
+		$gross_unit = $qty > 0 ? $gross_total / $qty : 0.0;
+		$net_unit   = $qty > 0 ? $net_total   / $qty : (float) $item->get_total();
+
+		$unit_discount = max( 0.0, $gross_unit - $net_unit );
+
+		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount' );
+	}
 
 }

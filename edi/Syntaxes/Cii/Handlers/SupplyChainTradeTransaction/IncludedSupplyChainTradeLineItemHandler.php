@@ -17,37 +17,12 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$order    = $this->document->order;
-		$items    = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
-		$tax_data = $this->document->order_tax_data;
+		$order = $this->document->order;
+		$items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
 		foreach ( $items as $item_id => $item ) {
-			$taxes    = $item->get_taxes();
-			$bucket   = ( 'line_item' === $item->get_type() ) ? 'subtotal' : 'total';
-			$rows     = ( isset( $taxes[ $bucket ] ) && is_array( $taxes[ $bucket ] ) ) ? $taxes[ $bucket ] : array();
-			$scheme   = 'VAT';
-			$category = null;
-			$rate     = 0.0;
-
-			// Consider only non-zero numeric rows (first one wins)
-			foreach ( $rows as $tax_id => $tax_amt ) {
-				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt == 0.0 ) {
-					continue;
-				}
-				
-				$row      = $tax_data[ $tax_id ] ?? array();
-				$scheme   = strtoupper( $row['scheme']   ?? 'VAT' );
-				$category = strtoupper( $row['category'] ?? 'Z' );
-				$rate     = (float) ( $row['percentage'] ?? 0 );
-				break;
-			}
-
-			// Fallback: no non-zero rows -> Zero-rated (Z / 0%)
-			if ( null === $category ) {
-				$scheme   = 'VAT';
-				$category = 'Z';
-				$rate     = 0.0;
-			}
+			// Resolve tax meta for this line
+			$meta = $this->resolve_item_tax_meta( $item );
 
 			$tax_nodes = array(
 				array(
@@ -55,41 +30,31 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:TypeCode',
-							'value' => $scheme,
+							'value' => $meta['scheme'],
 						),
 						array(
 							'name'  => 'ram:CategoryCode',
-							'value' => $category,
+							'value' => $meta['category'],
 						),
 						array(
 							'name'  => 'ram:RateApplicablePercent',
-							'value' => $this->format_decimal( $rate, 1 ),
+							'value' => $this->format_decimal( $meta['percentage'], 1 ),
 						),
 					),
 				),
 			);
 
-			// Calculate item totals
-			if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
-				$gross_total = (float) $item->get_subtotal(); // before discounts, ex-VAT
-				$net_total   = (float) $item->get_total();    // after discounts, ex-VAT
-			} else {
-				$gross_total = (float) $item->get_total();
-				$net_total   = (float) $item->get_total();
-			}
+			// Price parts
+			$parts = $this->compute_item_price_parts( $item, false );
 
-			$qty           = is_a( $item, 'WC_Order_Item_Product' ) ? max( 1, (int) $item->get_quantity() ) : 1;
-			$gross_unit    = $qty > 0 ? $gross_total / $qty : 0.0;
-			$net_unit      = $qty > 0 ? $net_total   / $qty : 0.0;
-
-			$gross_unit    = $this->format_decimal( $gross_unit, 2 );
-			$net_unit      = $this->format_decimal( $net_unit,   2 );
-			$unit_discount = max( 0.0, $this->format_decimal( $gross_unit - $net_unit, 2 ) );
+			$gross_unit    = $this->format_decimal( $parts['gross_unit'], 2 );
+			$net_unit      = $this->format_decimal( $parts['net_unit'],   2 );
+			$unit_discount = max( 0.0, $this->format_decimal( $parts['gross_unit'] - $parts['net_unit'], 2 ) );
 
 			$price_children = array(
 				array(
-					'name'       => 'ram:ChargeAmount',
-					'value'      => $this->format_decimal( $net_unit ),
+					'name'  => 'ram:ChargeAmount',
+					'value' => $this->format_decimal( $parts['net_unit'], 2 ),
 				),
 				array(
 					'name'       => 'ram:BasisQuantity',
@@ -120,7 +85,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						),
 						array(
 							'name'  => 'ram:BasisAmount',
-							'value' => $this->format_decimal( $gross_unit ),
+							'value' => $gross_unit,
 						),
 					),
 				);
@@ -161,7 +126,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'value' => array(
 							array(
 								'name'       => 'ram:BilledQuantity',
-								'value'      => $qty,
+								'value'      => $parts['qty'],
 								'attributes' => array(
 									'unitCode' => 'C62',
 								),
@@ -177,8 +142,8 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 									'name'  => 'ram:SpecifiedTradeSettlementLineMonetarySummation',
 									'value' => array(
 										array(
-											'name' => 'ram:LineTotalAmount',
-											'value' => $this->format_decimal( $net_total ),
+											'name'  => 'ram:LineTotalAmount',
+											'value' => $this->format_decimal( $parts['net_total'] ),
 										),
 									),
 								),

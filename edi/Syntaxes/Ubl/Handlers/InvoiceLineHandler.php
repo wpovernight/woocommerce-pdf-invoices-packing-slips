@@ -23,88 +23,40 @@ class InvoiceLineHandler extends AbstractUblHandler {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$type           = $item->get_type();
-			$taxes          = $item->get_taxes();
-			$tax_data_key   = ( 'line_item' === $type ) ? 'subtotal' : 'total';
-			$rows           = ( isset( $taxes[ $tax_data_key ] ) && is_array( $taxes[ $tax_data_key ] ) )
-				? $taxes[ $tax_data_key ]
-				: array();
-			$tax_category   = array();
+			// Resolve tax meta for this line
+			$meta = $this->resolve_item_tax_meta( $item );
 
-			foreach ( $rows as $tax_id => $tax_amt ) {
-				// only consider non-zero numeric rows
-				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt == 0.0 ) {
-					continue;
-				}
-
-				$row = $this->document->order_tax_data[ $tax_id ] ?? array();
-
-				$tax_category = array(
-					array(
-						'name'  => 'cbc:ID',
-						'value' => strtoupper( $row['category'] ?? 'Z' ),
-					),
-					array(
-						'name'  => 'cbc:Percent',
-						'value' => $this->format_decimal( (float) ( $row['percentage'] ?? 0 ), 1 ),
-					),
-					array(
-						'name'  => 'cac:TaxScheme',
-						'value' => array(
-							array(
-								'name'  => 'cbc:ID',
-								'value' => strtoupper( $row['scheme'] ?? 'VAT' ),
-							),
+			$tax_category = array(
+				array(
+					'name'  => 'cbc:ID',
+					'value' => $meta['category'],
+				),
+				array(
+					'name'  => 'cbc:Percent',
+					'value' => $this->format_decimal( $meta['percentage'], 1 ),
+				),
+				array(
+					'name'  => 'cac:TaxScheme',
+					'value' => array(
+						array(
+							'name'  => 'cbc:ID',
+							'value' => $meta['scheme'],
 						),
 					),
-				);
+				),
+			);
 
-				break;
-			}
+			// Price parts
+			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon_lines );
 
-			// Fallback: no non-zero tax rows -> Zero-rated (Z / 0%)
-			if ( empty( $tax_category ) ) {
-				$tax_category = array(
-					array(
-						'name'  => 'cbc:ID',
-						'value' => 'Z',
-					),
-					array(
-						'name'  => 'cbc:Percent',
-						'value' => $this->format_decimal( 0, 1 ),
-					),
-					array(
-						'name'  => 'cac:TaxScheme',
-						'value' => array(
-							array(
-								'name'  => 'cbc:ID',
-								'value' => 'VAT',
-							),
-						),
-					),
-				);
-			}
-
-			// Calculate item totals
-			if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
-				$gross_total = (float) $item->get_subtotal();
-				$net_total   = (float) ( $include_coupon_lines ? $item->get_subtotal() : $item->get_total() );
-			} else {
-				$gross_total = (float) $item->get_total();
-				$net_total   = (float) $item->get_total();
-			}
-			
-			$qty           = ( is_a( $item, 'WC_Order_Item_Product' ) ) ? max( 1, (int) $item->get_quantity() ) : 1;
-			$gross_unit    = $qty > 0 ? $gross_total / $qty : 0.0;
-			$net_unit      = $qty > 0 ? $net_total   / $qty : (float) $item->get_total();
-			$gross_unit    = $this->format_decimal( $gross_unit, 2 );
-			$net_unit      = $this->format_decimal( $net_unit,   2 );
-			$unit_discount = max( 0.0, $this->format_decimal( $gross_unit - $net_unit, 2 ) );
+			$gross_unit    = $this->format_decimal( $parts['gross_unit'], 2 );
+			$net_unit      = $this->format_decimal( $parts['net_unit'],   2 );
+			$unit_discount = max( 0.0, $this->format_decimal( $parts['gross_unit'] - $parts['net_unit'], 2 ) );
 
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => $this->format_decimal( $net_unit ),
+					'value'      => $this->format_decimal( $parts['net_unit'] ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
@@ -136,7 +88,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						),
 						array(
 							'name'       => 'cbc:BaseAmount',
-							'value'      => $this->format_decimal( $gross_unit ),
+							'value'      => $gross_unit,
 							'attributes' => array(
 								'currencyID' => $currency,
 							),
@@ -153,15 +105,15 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						'value' => $item_id,
 					),
 					array(
-						'name'  => 'cbc:InvoicedQuantity',
-						'value' => $qty,
+						'name'       => 'cbc:InvoicedQuantity',
+						'value'      => $parts['qty'],
 						'attributes' => array(
 							'unitCode' => 'C62', // https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/
 						),
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => $this->format_decimal( $net_total ),
+						'value'      => $this->format_decimal( $parts['net_total'] ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
