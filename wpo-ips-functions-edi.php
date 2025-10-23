@@ -125,22 +125,22 @@ function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $
 	if ( ! wpo_ips_edi_peppol_is_available() ) {
 		return; // only save for Peppol formats
 	}
-	
+
 	$user_id = $order->get_customer_id();
 
 	if ( empty( $user_id ) ) {
 		return;
 	}
-	
+
 	$endpoint_id             = get_user_meta( $user_id, 'peppol_endpoint_id', true );
 	$endpoint_scheme         = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 	$legal_identifier        = get_user_meta( $user_id, 'peppol_legal_identifier', true );
 	$legal_identifier_scheme = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
-	
+
 	if ( ! empty( $endpoint_id ) ) {
 		$order->update_meta_data( '_peppol_endpoint_id', $endpoint_id );
 	}
-	
+
 	if ( ! empty( $endpoint_scheme ) ) {
 		$order->update_meta_data( '_peppol_endpoint_eas', $endpoint_scheme );
 	}
@@ -152,7 +152,7 @@ function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $
 	if ( ! empty( $legal_identifier_scheme ) ) {
 		$order->update_meta_data( '_peppol_legal_identifier_icd', $legal_identifier_scheme );
 	}
-	
+
 	$order->save_meta_data();
 }
 
@@ -170,7 +170,7 @@ function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
 	}
 
 	$class = apply_filters( 'wpo_ips_edi_maker', $class );
-	
+
 	if ( ! class_exists( $class ) ) {
 		wcpdf_error_handling( 'EDI Maker class not found: ' . $class );
 		return null;
@@ -246,20 +246,20 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	}
 
 	$format = wpo_ips_edi_get_current_format();
-	
+
 	if ( empty( $format ) ) {
 		return wcpdf_error_handling( 'EDI format not set. Cannot write EDI file.' );
 	}
-	
+
 	$syntax = wpo_ips_edi_get_current_syntax();
-	
+
 	if ( empty( $syntax ) ) {
 		return wcpdf_error_handling( 'EDI syntax not set. Cannot write EDI file.' );
 	}
 
 	$edi_document = new \WPO\IPS\EDI\Document( $syntax, $format, $document );
 	$builder      = new \WPO\IPS\EDI\SabreBuilder();
-	
+
 	$contents = apply_filters( 'wpo_ips_edi_contents',
 		$builder->build( $edi_document ),
 		$edi_document,
@@ -489,7 +489,7 @@ function wpo_ips_edi_log( string $message, string $level = 'info', ?\Throwable $
 	if ( empty( wpo_ips_edi_get_settings( 'enabled_logs' ) ) ) {
 		return;
 	}
-	
+
 	wcpdf_log_error( $message, $level, $e, 'wpo-ips-edi' );
 }
 
@@ -540,7 +540,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings = WPO_WCPDF()->settings->general;
 	$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 	$data             = array();
-		
+
 	if ( empty( $language ) ) {
 		$language = 'default';
 	}
@@ -592,12 +592,13 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 			'required' => true,
 		),
 	);
-	
+
 	if ( wpo_ips_edi_peppol_is_available() ) {
 		$endpoint_id             = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
 		$endpoint_scheme         = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
 		$legal_identifier        = wpo_ips_edi_get_settings( 'peppol_legal_identifier' );
 		$legal_identifier_scheme = wpo_ips_edi_get_settings( 'peppol_legal_identifier_icd' );
+		$legal_identifier_value  = $legal_identifier && isset( $data[ $language ][ $legal_identifier ] ) ? $data[ $language ][ $legal_identifier ]['value'] : '';
 
 		$data[ $language ]['peppol_endpoint_id'] = array(
 			'label'    => __( 'PEPPOL Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -606,16 +607,16 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 				: '',
 			'required' => true,
 		);
-		
+
 		$data[ $language ]['peppol_legal_identifier'] = array(
 			'label'    => __( 'PEPPOL Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier )
-				? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier )
+			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier ) && ! empty( $legal_identifier_value )
+				? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier_value )
 				: '',
 			'required' => true,
 		);
 	}
-	
+
 	return apply_filters(
 		'wpo_ips_edi_supplier_identifier_data',
 		$data,
@@ -673,7 +674,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 			'required' => true,
 		),
 	);
-	
+
 	if ( wpo_ips_edi_peppol_is_available() ) {
 		$user_id                 = $order->get_customer_id();
 		$endpoint_id             = $order->get_meta( '_peppol_endpoint_id' );
@@ -684,7 +685,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		if ( empty( $endpoint_id ) && $user_id ) {
 			$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		}
-		
+
 		if ( empty( $endpoint_scheme ) && $user_id ) {
 			$endpoint_scheme = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 		}
@@ -692,7 +693,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		if ( empty( $legal_identifier ) && $user_id ) {
 			$legal_identifier = get_user_meta( $user_id, 'peppol_legal_identifier', true );
 		}
-		
+
 		if ( empty( $legal_identifier_scheme ) && $user_id ) {
 			$legal_identifier_scheme = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
 		}
@@ -704,7 +705,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 				: '',
 			'required' => true,
 		);
-		
+
 		$data['peppol_legal_identifier'] = array(
 			'label'    => __( 'Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier )
@@ -713,7 +714,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 			'required' => true,
 		);
 	}
-	
+
 	return apply_filters(
 		'wpo_ips_edi_order_customer_identifier_data',
 		$data,
@@ -787,7 +788,7 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 				'trim',
 				explode( ':', $raw, 2 ) + array( '', '' )
 			);
-			
+
 		// Select mode, plain identifier
 		} else {
 			$identifier = $raw;
