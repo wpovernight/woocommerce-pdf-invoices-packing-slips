@@ -373,23 +373,44 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function get_order_payment_totals( \WC_Order $order ): array {
-		$total          = $order->get_total();
-		$total_tax_raw  = $order->get_total_tax();
-		$total_exc_tax  = $total - $total_tax_raw;
-		$total_inc_tax  = $total;
-		$currency       = $order->get_currency();
+		$total         = $order->get_total();
+		$total_tax_raw = $order->get_total_tax();
+		$total_exc_tax = $total - $total_tax_raw;
+		$total_inc_tax = $total;
+		$currency      = $order->get_currency();
 
-		// Tax rounding
-		$total_tax      = wc_round_tax_total( $total_tax_raw );
-		$rounding_diff  = wc_round_tax_total( $total_inc_tax - ( $total_exc_tax + $total_tax ) );
+		// Tax rounding.
+		$total_tax     = wc_round_tax_total( $total_tax_raw );
+		$rounding_diff = wc_round_tax_total( $total_inc_tax - ( $total_exc_tax + $total_tax ) );
 
-		// Prepayment/deposit amount (0.0 by default).
+		// Config / inputs.
+		$has_due_days   = ! empty( $this->get_due_date_days() );
 		$prepaid_amount = (float) apply_filters( 'wpo_ips_edi_prepaid_amount', 0.0, $order, $this );
 
-		// Compute payable
-		$payable_amount = $total_inc_tax - $prepaid_amount;
-		if ( abs( $rounding_diff ) >= 0.01 ) {
-			$payable_amount += $rounding_diff;
+		// Threshold for treating rounding diff as significant.
+		$rounding_is_significant = ( abs( $rounding_diff ) >= 0.01 );
+
+		// Default rule:
+		// - If there's NO due date AND no explicit prepaid set, treat as fully prepaid (paid on issue).
+		// - Otherwise, use the provided prepaid (or 0) and compute payable normally.
+		if ( $prepaid_amount <= 0.0 && ! $has_due_days ) {
+			// Fully prepaid by default.
+			$prepaid_amount = $total_inc_tax;
+
+			// Absorb rounding diff into prepaid so payable stays 0.00.
+			if ( $rounding_is_significant ) {
+				$prepaid_amount += $rounding_diff;
+			}
+
+			$payable_amount = 0.0;
+		} else {
+			// Not fully prepaid; customer owes the remainder.
+			$payable_amount = $total_inc_tax - $prepaid_amount;
+
+			// Apply rounding diff to payable to reconcile to grand total.
+			if ( $rounding_is_significant ) {
+				$payable_amount += $rounding_diff;
+			}
 		}
 
 		return compact(
