@@ -286,6 +286,9 @@ abstract class AbstractHandler implements HandlerInterface {
 		
 		// Ensure Z group is consolidated and correct before returning
 		$grouped_tax_data = $this->ensure_one_tax_z_group( $grouped_tax_data );
+		
+		// Reindex so callers always get a numeric array
+		$grouped_tax_data = array_values( $grouped_tax_data );
 
 		return apply_filters( 'wpo_ips_edi_order_tax_data', $grouped_tax_data, $this );
 	}
