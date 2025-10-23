@@ -545,10 +545,11 @@ class SettingsEDI {
 	 * @return void
 	 */
 	public function ajax_save_taxes(): void {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
 		if (
 			! isset( $_POST['action'] ) ||
 			'wpo_ips_edi_save_taxes' !== $_POST['action'] ||
-			! wp_verify_nonce( $_POST['nonce'], 'edi_save_taxes' )
+			! wp_verify_nonce( $nonce, 'edi_save_taxes' )
 		) {
 			wp_send_json_error( __( 'Invalid request.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
@@ -578,7 +579,7 @@ class SettingsEDI {
 		$this->output_table_for_tax_class( $tax_class );
 		$html = ob_get_clean();
 
-		echo $html;
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		wp_die();
 	}
 	
@@ -634,7 +635,7 @@ class SettingsEDI {
 							<tr>
 								<td><?php echo esc_html( $data['label'] ); ?></td>
 								<td>
-									<?php echo $display; ?>
+									<?php echo wp_kses_post( $display ); ?>
 									<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 										<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
 									<?php endif; ?>
@@ -765,7 +766,7 @@ class SettingsEDI {
 	private function output_tax_class_selector_and_action( array $formatted_rates ): void {
 		$nonce        = wp_create_nonce( 'edi_save_taxes' );
 		$action       = 'wpo_ips_edi_save_taxes';
-		$current_slug = isset( $_GET['edi_tax_class'] ) ? sanitize_text_field( wp_unslash( $_GET['edi_tax_class'] ) ) : '';
+		$current_slug = isset( $_GET['edi_tax_class'] ) ? sanitize_text_field( wp_unslash( $_GET['edi_tax_class'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( empty( $current_slug ) && ! empty( $formatted_rates ) ) {
 			$current_slug = (string) array_key_first( $formatted_rates );
@@ -997,7 +998,7 @@ class SettingsEDI {
 			</p>
 		</div>
 		<?php
-		echo apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this );
+		echo wp_kses_post( apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this ) );
 	}
 	
 	/**
@@ -1102,7 +1103,7 @@ class SettingsEDI {
 			WHERE tax_rate_id IN ( {$placeholders} )";
 
 		$loc_rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( $sql, $rate_ids )
+			$wpdb->prepare( $sql, $rate_ids ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		);
 
 		if ( empty( $loc_rows ) ) {

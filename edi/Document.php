@@ -38,7 +38,7 @@ class Document {
 		if ( ! $this->format_document ) {
 			$error = sprintf( 'Format "%s" for syntax "%s" is not available.', $format, $syntax );
 			wpo_ips_edi_log( $error, 'critical' );
-			throw new \Exception( $error );
+			throw new \Exception( esc_html( $error ) );
 		}
 	}
 	

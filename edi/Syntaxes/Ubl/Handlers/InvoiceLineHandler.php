@@ -238,9 +238,11 @@ class InvoiceLineHandler extends AbstractUblHandler {
 
 		$label_template = apply_filters(
 			'wpo_ips_edi_ubl_coupon_line_label',
-			__( 'Discount %s', 'wpo-ips-edi' ),
+			/* Translators: %s is the coupon code applied to the discount. */
+			__( 'Discount %s', 'woocommerce-pdf-invoices-packing-slips' ),
 			$this
 		);
+
 		$line_label = apply_filters(
 			'wpo_ips_edi_ubl_coupon_line_name',
 			sprintf( $label_template, $code ),

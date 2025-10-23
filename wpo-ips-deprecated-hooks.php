@@ -57,9 +57,14 @@ foreach ( $deprecated_hooks as $old_hook => $meta ) {
 
 	if ( has_action( $old_hook ) ) {
 		_doing_it_wrong(
-			$old_hook,
-			sprintf( $message_with_replacement, $old_hook, $version, $new_hook ),
-			$version
+			esc_html( $old_hook ),
+			sprintf(
+				esc_html( $message_with_replacement ),
+				esc_html( $old_hook ),
+				esc_html( $version ),
+				esc_html( $new_hook )
+			),
+			esc_html( $version )
 		);
 	}
 }
@@ -75,9 +80,13 @@ $deprecated_hooks_no_replacement = array(
 foreach ( $deprecated_hooks_no_replacement as $old_hook => $version ) {
 	if ( has_action( $old_hook ) ) {
 		_doing_it_wrong(
-			$old_hook,
-			sprintf( $message_without_replacement, $old_hook, $version ),
-			$version
+			esc_html( $old_hook ),
+			sprintf(
+				esc_html( $message_without_replacement ),
+				esc_html( $old_hook ),
+				esc_html( $version )
+			),
+			esc_html( $version )
 		);
 	}
 }

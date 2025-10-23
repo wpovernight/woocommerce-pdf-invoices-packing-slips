@@ -488,7 +488,7 @@ class Frontend {
 			
 			<p>
 				<input type="hidden" name="wc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wpo_ips_edi_user_save_peppol_settings' ) ); ?>">
-				<button type="submit" name="save_peppol_settings" class="woocommerce-Button button"><?php _e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
+				<button type="submit" name="save_peppol_settings" class="woocommerce-Button button"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
 			</p>
 		</form>
 		<?php
@@ -500,7 +500,8 @@ class Frontend {
 	 * @return void
 	 */
 	public function edi_save_peppol_settings(): void {
-		if ( 'POST' !== $_SERVER['REQUEST_METHOD'] || empty( $_POST['save_peppol_settings'] ) ) {
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
+		if ( empty( $request_method ) || 'POST' !== $request_method || empty( $_POST['save_peppol_settings'] ) ) {
 			return;
 		}
 		

@@ -36,8 +36,8 @@ class SettingsCallbacks {
 	 * @return void
 	 */
 	public function debug_section(): void {
-		echo '<strong>' . __( 'Warning!', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>' . ' ' .
-			__( 'The settings below are meant for debugging/development only. Do not use them on a live website!' , 'woocommerce-pdf-invoices-packing-slips' );
+		echo wp_kses_post( '<strong>' . __( 'Warning!', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>' . ' ' .
+			__( 'The settings below are meant for debugging/development only. Do not use them on a live website!' , 'woocommerce-pdf-invoices-packing-slips' ) );
 	}
 
 	/**
