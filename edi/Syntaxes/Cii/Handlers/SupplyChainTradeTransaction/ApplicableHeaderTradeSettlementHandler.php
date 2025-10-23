@@ -282,7 +282,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 */
 	public function get_monetary_summation(): ?array {
 		$totals   = $this->get_order_payment_totals( $this->document->order );
-		$currency = $order->get_currency();
+		$currency = $this->document->order->get_currency();
 
 		$monetary_summation = array(
 			'name'  => 'ram:SpecifiedTradeSettlementHeaderMonetarySummation',
