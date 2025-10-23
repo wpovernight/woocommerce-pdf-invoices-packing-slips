@@ -96,7 +96,7 @@ class Document {
 		}
 
 		foreach ( $structure as $key => $element ) {
-			if ( false === $element['enabled'] ) {
+			if ( false === ( $element['enabled'] ?? true ) ) {
 				unset( $structure[ $key ] );
 			}
 		}
@@ -172,8 +172,13 @@ class Document {
 	 */
 	public function get_data(): array {
 		$data_by_root = array();
+		$structure    = $this->get_structure();
+		
+		if ( ! $structure ) {
+			return array();
+		}
 
-		foreach ( $this->get_structure() as $key => $value ) {
+		foreach ( $structure as $key => $value ) {
 			// skip disabled or mis-configured entries
 			if ( empty( $value['enabled'] ) || empty( $value['handler'] ) ) {
 				continue;
@@ -183,11 +188,25 @@ class Document {
 			$handlers  = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
 			$root_name = $options['root'] ?? null;
 			$fragment  = array();
-
+			
 			foreach ( $handlers as $handler_class ) {
-				if ( class_exists( $handler_class ) ) {
+				if ( ! class_exists( $handler_class ) ) {
+					wpo_ips_edi_log( sprintf(
+						'Handler class does not exist: %s',
+						$handler_class
+					), 'error' );
+					continue;
+				}
+
+				try {
 					$handler  = new $handler_class( $this );
 					$fragment = $handler->handle( $fragment, $options );
+				} catch ( \Throwable $e ) {
+					wpo_ips_edi_log( sprintf(
+						'Failed handler: %s',
+						$handler_class
+					), 'error', $e );
+					continue;
 				}
 			}
 
@@ -236,7 +255,11 @@ class Document {
 			$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
 			$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
 			$line_total_key     = ( 'line_item' === $type ) ? 'line_total'    : 'total';
-			$line_tax_data      = $item[ $tax_data_container ];
+			$line_tax_data      = $item[ $tax_data_container ] ?? array();
+			
+			if ( empty( $line_tax_data[ $tax_data_key ] ) || ! is_array( $line_tax_data[ $tax_data_key ] ) ) {
+				continue;
+			}
 			
 			foreach ( $line_tax_data[ $tax_data_key ] as $tax_id => $tax ) {
 				if ( is_numeric( $tax ) ) {
@@ -269,6 +292,7 @@ class Document {
 			$category   = '';
 			$scheme     = '';
 			$reason     = '';
+			$name       = '';
 
 			foreach ( $tax_items as $tax_item_key => $tax_item ) {
 				if ( $tax_item['rate_id'] !== $tax_data_key ) {
@@ -315,13 +339,15 @@ class Document {
 
 					${$field} = $value;
 				}
+				
+				$name = ! empty( $tax_item['label'] ) ? $tax_item['label'] : $tax_item['name'];
 			}
 
 			$order_tax_data[ $tax_data_key ]['percentage'] = $percentage;
 			$order_tax_data[ $tax_data_key ]['category']   = $category;
 			$order_tax_data[ $tax_data_key ]['scheme']     = $scheme;
 			$order_tax_data[ $tax_data_key ]['reason']     = $reason;
-			$order_tax_data[ $tax_data_key ]['name']       = ! empty( $tax_item['label'] ) ? $tax_item['label'] : $tax_item['name'];
+			$order_tax_data[ $tax_data_key ]['name']       = $name;
 		}
 
 		return $order_tax_data;

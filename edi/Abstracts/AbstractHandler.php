@@ -134,24 +134,6 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $data;
 	}
-	
-	/**
-	 * Get the net unit price (ex-VAT, after discounts) of an item.
-	 *
-	 * @param \WC_Order_Item $item
-	 * @return float
-	 */
-	protected function get_item_unit_price( \WC_Order_Item $item ) {
-		$qty = ( is_a( $item, 'WC_Order_Item_Product' ) ) ? max( 1, (int) $item->get_quantity() ) : 1;
-
-		// WooCommerce semantics:
-		// - get_subtotal(): before discounts (ex tax)
-		// - get_total():    after discounts (ex tax)
-		$net = (float) $item->get_total();
-
-		// For product lines we want unit net price; for fees/shipping qty is 1
-		return $net / $qty;
-	}
 
 	/**
 	 * Normalize a raw date input into a specific format.
@@ -210,8 +192,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @param int          $decimal_places Number of decimal places (default: 2).
 	 * @return string
 	 */
-	protected function format_decimal( $amount, int $decimal_places = 2 ): string
-	{
+	protected function format_decimal( $amount, int $decimal_places = 2 ): string {
 		// Normalize using WooCommerce helper (handles locale, strings, etc.).
 		$value = (float) wc_format_decimal( $amount, $decimal_places, false );
 
@@ -223,7 +204,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		// Round to 2dp and avoid "-0.00".
 		$value = round( $value, $decimal_places );
-		if ( $value == 0.0 ) {
+		if ( $value === -0.0 ) {
 			$value = 0.0;
 		}
 
@@ -254,33 +235,40 @@ abstract class AbstractHandler implements HandlerInterface {
 		
 		foreach ( $order_tax_data as $item ) {
 			$percentage = (float) ( $item['percentage'] ?? 0 );
-			$category   = strtoupper( trim( $item['category'] ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order ) ) );
-			$reason     = strtoupper( trim( $item['reason']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order ) ) );
-			$scheme     = strtoupper( trim( $item['scheme']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order ) ) );
-			
+			$category   = strtoupper( trim( (string) ( $item['category'] ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order ) ) ) );
+			$reason     = strtoupper( trim( (string) ( $item['reason']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order ) ) ) );
+			$scheme     = strtoupper( trim( (string) ( $item['scheme']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order ) ) ) );
+
 			if ( '' === $reason || 'NONE' === $reason ) {
 				$reason = 'NONE';
 			}
-			
+
 			if ( '' === $scheme ) {
 				$scheme = 'VAT';
 			}
-			
+
 			if ( '' === $category ) {
 				$category = ( 0.0 === $percentage ) ? 'Z' : 'S';
 			}
-			
+
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
 
+			$line_total_ex  = (float) ( $item['total_ex']  ?? 0 );
+			$line_total_tax = (float) ( $item['total_tax'] ?? 0 );
+
 			if ( ! isset( $grouped_tax_data[ $key ] ) ) {
-				$grouped_tax_data[ $key ]               = $item;
+				$grouped_tax_data[ $key ] = $item;
+
+				// Ensure required keys exist with proper types
 				$grouped_tax_data[ $key ]['percentage'] = $percentage;
 				$grouped_tax_data[ $key ]['category']   = $category;
 				$grouped_tax_data[ $key ]['reason']     = $reason;
 				$grouped_tax_data[ $key ]['scheme']     = $scheme;
+				$grouped_tax_data[ $key ]['total_ex']   = $line_total_ex;
+				$grouped_tax_data[ $key ]['total_tax']  = $line_total_tax;
 			} else {
-				$grouped_tax_data[ $key ]['total_ex']  += ( $item['total_ex']  ?? 0 );
-				$grouped_tax_data[ $key ]['total_tax'] += ( $item['total_tax'] ?? 0 );
+				$grouped_tax_data[ $key ]['total_ex']  = ( $grouped_tax_data[ $key ]['total_ex']  ?? 0.0 ) + $line_total_ex;
+				$grouped_tax_data[ $key ]['total_tax'] = ( $grouped_tax_data[ $key ]['total_tax'] ?? 0.0 ) + $line_total_tax;
 			}
 		}
 		
@@ -365,9 +353,9 @@ abstract class AbstractHandler implements HandlerInterface {
 			$z_key = $z_first_key ?: '0|Z|NONE|VAT';
 
 			$grouped_tax_data[ $z_key ] = array(
-				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_basis_from_lines ) ),
-				'total_tax'  => $this->format_decimal( 0, 2 ),
-				'percentage' => $this->format_decimal( 0, 1 ),
+				'total_ex'   => (float) $this->format_decimal( wc_round_tax_total( $z_basis_from_lines ) ),
+				'total_tax'  => (float) $this->format_decimal( 0, 2 ),
+				'percentage' => (float) $this->format_decimal( 0, 1 ),
 				'category'   => 'Z',
 				'reason'     => 'NONE',
 				'scheme'     => 'VAT',
