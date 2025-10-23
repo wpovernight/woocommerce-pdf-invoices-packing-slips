@@ -301,8 +301,8 @@ class SettingsEDI {
 					__( 'Specify the Peppol Legal Identifier for the supplier.', 'woocommerce-pdf-invoices-packing-slips' ),
 					sprintf(
 						/* translators: %1$s: open link anchor, %2$s: close link anchor */
-						__( 'Please make sure the field is filled out in the %1$sGeneral Settings%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_ips_edi_settings&tab=general' ) ) . '" target="_blank" rel="noopener noreferrer">',
+						__( 'Please make sure the field is filled out in the %1$sShop Information%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_ips_edi_settings&tab=general#shop_information' ) ) . '" target="_blank" rel="noopener noreferrer">',
 						'</a>'
 					)
 				),
