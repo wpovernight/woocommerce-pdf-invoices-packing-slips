@@ -100,9 +100,9 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			$qty           = ( is_a( $item, 'WC_Order_Item_Product' ) ) ? max( 1, (int) $item->get_quantity() ) : 1;
 			$gross_unit    = $qty > 0 ? $gross_total / $qty : 0.0;
 			$net_unit      = $qty > 0 ? $net_total   / $qty : (float) $item->get_total();
-			$gross_unit    = round( $gross_unit, 2 );
-			$net_unit      = round( $net_unit,   2 );
-			$unit_discount = max( 0.0, round( $gross_unit - $net_unit, 2 ) );
+			$gross_unit    = $this->format_decimal( $gross_unit, 2 );
+			$net_unit      = $this->format_decimal( $net_unit,   2 );
+			$unit_discount = max( 0.0, $this->format_decimal( $gross_unit - $net_unit, 2 ) );
 
 			$price_value = array(
 				array(
@@ -219,14 +219,14 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	 * @param string                $currency
 	 * @return array|null
 	 */
-	protected function build_coupon_invoice_line( $coupon_item, int $fallback_id, string $currency ): ?array {
+	protected function build_coupon_invoice_line( \WC_Order_Item_Coupon $coupon_item, int $fallback_id, string $currency ): ?array {
 		if ( ! is_object( $coupon_item ) || ! method_exists( $coupon_item, 'get_discount' ) ) {
 			return null;
 		}
 
 		$code              = method_exists( $coupon_item, 'get_code' ) ? $coupon_item->get_code() : '';
 		$discount_excl_tax = (float) $coupon_item->get_discount();
-		$net_total         = -1 * round( $discount_excl_tax, 2 );
+		$net_total         = -1 * $this->format_decimal( $discount_excl_tax, 2 );
 
 		if ( 0.0 === $net_total ) {
 			return null;

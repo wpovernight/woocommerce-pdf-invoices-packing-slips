@@ -305,9 +305,9 @@ abstract class AbstractHandler implements HandlerInterface {
 		$z_basis_from_lines = 0.0;
 		$has_z_line         = false;
 
-		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $it ) {
-			$line_total = (float) $it->get_total();
-			$taxes      = $it->get_taxes();
+		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $item ) {
+			$line_total = (float) $item->get_total();
+			$taxes      = $item->get_taxes();
 			$rows       = ( is_array( $taxes['total'] ?? null ) ) ? $taxes['total'] : array();
 
 			// Does this line have any non-zero tax amount?

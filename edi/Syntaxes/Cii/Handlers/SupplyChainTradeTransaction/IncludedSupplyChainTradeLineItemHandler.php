@@ -38,7 +38,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 
 			// Consider only non-zero numeric rows (first one wins)
 			foreach ( $rows as $tax_id => $tax_amt ) {
-				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt === 0.0 ) {
+				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt == 0.0 ) {
 					continue;
 				}
 				
@@ -89,9 +89,9 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 			$gross_unit    = $qty > 0 ? $gross_total / $qty : 0.0;
 			$net_unit      = $qty > 0 ? $net_total   / $qty : 0.0;
 
-			$gross_unit    = round( $gross_unit, 2 );
-			$net_unit      = round( $net_unit,   2 );
-			$unit_discount = max( 0.0, round( $gross_unit - $net_unit, 2 ) );
+			$gross_unit    = $this->format_decimal( $gross_unit, 2 );
+			$net_unit      = $this->format_decimal( $net_unit,   2 );
+			$unit_discount = max( 0.0, $this->format_decimal( $gross_unit - $net_unit, 2 ) );
 
 			$price_children = array(
 				array(
