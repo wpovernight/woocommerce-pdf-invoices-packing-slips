@@ -206,7 +206,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			),
 			array(
 				'name'  => 'cbc:Percent',
-				'value' => $this->format_decimal( 0, 1 ),
+				'value' => '0.0',
 			),
 			array(
 				'name'  => 'cac:TaxScheme',

@@ -99,7 +99,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			return null;
 		}
 		
-		if ( empty( $identifier['legal_identifier'] ) && empty( $identifier['legal_identifier_icd'] ) ) {
+		if ( empty( $identifier['legal_identifier'] ) || empty( $identifier['legal_identifier_icd'] ) ) {
 			wpo_ips_edi_log( 'UBL/Peppol PartyLegalEntity: Legal Identifier is missing for supplier.', 'error' );
 			return null;
 		}

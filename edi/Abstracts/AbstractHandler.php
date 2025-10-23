@@ -353,9 +353,9 @@ abstract class AbstractHandler implements HandlerInterface {
 			$z_key = $z_first_key ?: '0|Z|NONE|VAT';
 
 			$grouped_tax_data[ $z_key ] = array(
-				'total_ex'   => (float) $this->format_decimal( wc_round_tax_total( $z_basis_from_lines ) ),
-				'total_tax'  => (float) $this->format_decimal( 0, 2 ),
-				'percentage' => (float) $this->format_decimal( 0, 1 ),
+				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_basis_from_lines ) ),
+				'total_tax'  => '0.00',
+				'percentage' => '0.0',
 				'category'   => 'Z',
 				'reason'     => 'NONE',
 				'scheme'     => 'VAT',

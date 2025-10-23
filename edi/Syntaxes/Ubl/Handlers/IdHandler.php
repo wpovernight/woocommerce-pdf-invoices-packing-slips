@@ -17,9 +17,11 @@ class IdHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
+		$number_instance = $this->document->order_document->get_number();
+		
 		$id = array(
 			'name'  => 'cbc:ID',
-			'value' => $this->document->order_document->get_number()->get_formatted(),
+			'value' => ! empty( $number_instance ) ? $number_instance->get_formatted() : '',
 		);
 
 		$data[] = apply_filters( 'wpo_ips_edi_ubl_id', $id, $data, $options, $this );
