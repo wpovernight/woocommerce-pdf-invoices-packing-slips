@@ -23,20 +23,17 @@ class InvoiceLineHandler extends AbstractUblHandler {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$type               = $item->get_type();
-			$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
-			$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
-
-			$line_tax_data      = $item[ $tax_data_container ];
-			$tax_category       = array();
-
-			$rows = ( isset( $line_tax_data[ $tax_data_key ] ) && is_array( $line_tax_data[ $tax_data_key ] ) )
-				? $line_tax_data[ $tax_data_key ]
+			$type           = $item->get_type();
+			$taxes          = $item->get_taxes();
+			$tax_data_key   = ( 'line_item' === $type ) ? 'subtotal' : 'total';
+			$rows           = ( isset( $taxes[ $tax_data_key ] ) && is_array( $taxes[ $tax_data_key ] ) )
+				? $taxes[ $tax_data_key ]
 				: array();
+			$tax_category   = array();
 
 			foreach ( $rows as $tax_id => $tax_amt ) {
 				// only consider non-zero numeric rows
-				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt === 0.0 ) {
+				if ( ! is_numeric( $tax_amt ) || (float) $tax_amt == 0.0 ) {
 					continue;
 				}
 
@@ -80,7 +77,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 						'name'  => 'cac:TaxScheme',
 						'value' => array(
 							array(
-								'name' => 'cbc:ID',
+								'name'  => 'cbc:ID',
 								'value' => 'VAT',
 							),
 						),

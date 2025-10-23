@@ -249,29 +249,41 @@ class Document {
 
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
-			$type               = $item->get_type();
-			$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
-			$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
-			$line_total_key     = ( 'line_item' === $type ) ? 'line_total'    : 'total';
-			$line_tax_data      = $item[ $tax_data_container ] ?? array();
-			
-			if ( empty( $line_tax_data[ $tax_data_key ] ) || ! is_array( $line_tax_data[ $tax_data_key ] ) ) {
+			$type  = $item->get_type();
+			$taxes = $item->get_taxes();
+
+			// Choose the correct tax bucket and the ex-tax base for aggregation.
+			if ( 'line_item' === $type ) {
+				$bucket        = 'subtotal';
+				$line_total_ex = (float) $item->get_subtotal();
+			} else {
+				$bucket        = 'total';
+				$line_total_ex = (float) $item->get_total();
+			}
+
+			$rows = ( isset( $taxes[ $bucket ] ) && is_array( $taxes[ $bucket ] ) ) ? $taxes[ $bucket ] : array();
+			if ( empty( $rows ) ) {
 				continue;
 			}
-			
-			foreach ( $line_tax_data[ $tax_data_key ] as $tax_id => $tax ) {
-				if ( is_numeric( $tax ) ) {
-					if ( empty( $order_tax_data[ $tax_id ] ) ) {
-						$order_tax_data[ $tax_id ] = array(
-							'total_ex'  => $item[ $line_total_key ],
-							'total_tax' => $tax,
-							'items'     => array( $item_id ),
-						);
-					} else {
-						$order_tax_data[ $tax_id ]['total_ex']  += $item[ $line_total_key ];
-						$order_tax_data[ $tax_id ]['total_tax'] += $tax;
-						$order_tax_data[ $tax_id ]['items'][]    = $item_id;
-					}
+
+			foreach ( $rows as $tax_id => $tax_amt ) {
+				if ( ! is_numeric( $tax_amt ) ) {
+					continue;
+				}
+
+				$tax_id  = (int) $tax_id;
+				$tax_amt = (float) $tax_amt;
+
+				if ( empty( $order_tax_data[ $tax_id ] ) ) {
+					$order_tax_data[ $tax_id ] = array(
+						'total_ex'  => $line_total_ex,
+						'total_tax' => $tax_amt,
+						'items'     => array( $item_id ),
+					);
+				} else {
+					$order_tax_data[ $tax_id ]['total_ex']  += $line_total_ex;
+					$order_tax_data[ $tax_id ]['total_tax'] += $tax_amt;
+					$order_tax_data[ $tax_id ]['items'][]    = $item_id;
 				}
 			}
 		}

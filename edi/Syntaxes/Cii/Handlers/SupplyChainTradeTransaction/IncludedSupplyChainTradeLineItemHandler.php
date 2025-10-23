@@ -22,16 +22,9 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 		$tax_data = $this->document->order_tax_data;
 
 		foreach ( $items as $item_id => $item ) {
-			// Determine the line tax
-			$type               = $item->get_type();
-			$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
-			$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
-
-			$line_tax_data = $item[ $tax_data_container ] ?? array();
-			$rows          = ( isset( $line_tax_data[ $tax_data_key ] ) && is_array( $line_tax_data[ $tax_data_key ] ) )
-				? $line_tax_data[ $tax_data_key ]
-				: array();
-
+			$taxes    = $item->get_taxes();
+			$bucket   = ( 'line_item' === $item->get_type() ) ? 'subtotal' : 'total';
+			$rows     = ( isset( $taxes[ $bucket ] ) && is_array( $taxes[ $bucket ] ) ) ? $taxes[ $bucket ] : array();
 			$scheme   = 'VAT';
 			$category = null;
 			$rate     = 0.0;
