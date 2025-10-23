@@ -15,7 +15,7 @@ abstract class AbstractCiiFormat implements FormatInterface {
 	/**
 	 * Get the format context
 	 *
-	 * @var string
+	 * @return string
 	 */
 	abstract public function get_context(): string;
 	

@@ -17,15 +17,17 @@ class ExchangedDocumentHandler extends AbstractCiiHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$date_format_code  = $this->get_date_format_code();
-		$php_date_format   = $this->get_php_date_format_from_code( $date_format_code );
+		$date_format_code = $this->get_date_format_code();
+		$php_date_format  = $this->get_php_date_format_from_code( $date_format_code );
+		$number_instance  = $this->document->order_document->get_number();
+		$date_instance    = $this->document->order_document->get_date();
 		
 		$exchanged_document = array(
 			'name'  => 'rsm:ExchangedDocument',
 			'value' => array(
 				array(
 					'name'  => 'ram:ID',
-					'value' => $this->document->order_document->get_number()->get_formatted(),
+					'value' => ! empty( $number_instance ) ? $number_instance->get_formatted() : '',
 				),
 				array(
 					'name'  => 'ram:TypeCode',
@@ -36,7 +38,7 @@ class ExchangedDocumentHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'       => 'udt:DateTimeString',
-							'value'      => $this->document->order_document->get_date()->date_i18n( $php_date_format ),
+							'value'      => ! empty( $date_instance ) ? $date_instance->date_i18n( $php_date_format ) : '',
 							'attributes' => array(
 								'format' => $date_format_code,
 							),

@@ -15,7 +15,6 @@ class Document {
 	public OrderDocument $order_document;
 	public \WC_Abstract_Order $order;
 	public array $order_tax_data;
-	public array $order_coupons_data;
 	public ?object $format_document;
 	public string $output;
 
@@ -27,13 +26,12 @@ class Document {
 	 * @param OrderDocument $order_document
 	 */
 	public function __construct( string $syntax, string $format, OrderDocument $order_document ) {
-		$this->syntax             = $syntax;
-		$this->format             = $format;
-		$this->order_document     = $order_document;
-		$this->order              = $this->order_document->order;
-		$this->order_tax_data     = $this->get_tax_rates();
-		$this->order_coupons_data = $this->get_order_coupons_data();
-		$this->format_document    = $this->get_format_document();
+		$this->syntax          = $syntax;
+		$this->format          = $format;
+		$this->order_document  = $order_document;
+		$this->order           = $this->order_document->order;
+		$this->order_tax_data  = $this->get_tax_rates();
+		$this->format_document = $this->get_format_document();
 
 		if ( ! $this->format_document ) {
 			$error = sprintf( 'Format "%s" for syntax "%s" is not available.', $format, $syntax );
@@ -314,7 +312,7 @@ class Document {
 
 				if ( ! is_numeric( $percentage ) ) {
 					$percentage = $this->get_percentage_from_fallback( $tax_data, $tax_rate_id );
-					wc_update_order_item_meta( $tax_item_key, '_wcpdf_rate_percentage', $percentage );
+					wc_update_order_item_meta( $tax_item_key, '_wcpdf_rate_percentage', wc_format_decimal( $percentage, 2, false ) );
 				}
 
 				$fields = array( 'category', 'scheme', 'reason' );
@@ -354,50 +352,6 @@ class Document {
 	}
 
 	/**
-	 * Get order coupons data
-	 *
-	 * @return array
-	 */
-	public function get_order_coupons_data(): array {
-		$order      = $this->order;
-		$order_data = array();
-
-		// Get applied coupons
-		$applied_coupons = $order->get_coupon_codes();
-		$coupons_data    = array();
-
-		foreach ( $applied_coupons as $coupon_code ) {
-			$coupon         = new \WC_Coupon( $coupon_code );
-			$coupons_data[] = array(
-				'code'   => $coupon->get_code(),
-				'type'   => $coupon->get_discount_type(),
-				'amount' => $coupon->get_amount(),
-			);
-		}
-
-		// Get item-level discounts
-		$items_data = array();
-
-		foreach ( $order->get_items() as $item_id => $item ) {
-			$subtotal = $item->get_subtotal();
-			$total    = $item->get_total();
-			$discount = $subtotal - $total;
-
-			$items_data[ $item_id ] = [
-				'name'     => $item->get_name(),
-				'subtotal' => $subtotal,
-				'total'    => $total,
-				'discount' => (float) $discount,
-			];
-		}
-
-		$order_data['coupons'] = $coupons_data;
-		$order_data['items']   = $items_data;
-
-		return $order_data;
-	}
-
-	/**
 	 * Get percentage from fallback
 	 *
 	 * @param array $tax_data
@@ -405,22 +359,30 @@ class Document {
 	 * @return float|int
 	 */
 	public function get_percentage_from_fallback( array $tax_data, int $rate_id ) {
-		$percentage = ( 0 != $tax_data['total_ex'] ) ? ( $tax_data['total_tax'] / $tax_data['total_ex'] ) * 100 : 0;
+		$percentage = ( 0 != $tax_data['total_ex'] )
+			? ( $tax_data['total_tax'] / $tax_data['total_ex'] ) * 100
+			: 0;
 
 		if ( class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
 			$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
 
 			if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-				$difference = $percentage - $tax_rate->tax_rate;
+				$rate_value  = (float) $tax_rate->tax_rate;
+				$decimals    = wc_get_price_decimals();
+				$rounded_tax = wc_round_tax_total( (float) $tax_data['total_tax'] );
+				$expected    = wc_round_tax_total( (float) $tax_data['total_ex'] * $rate_value / 100 );
 
-				// Turn negative into positive for easier comparison below
-				if ( $difference < 0 ) {
-					$difference = -$difference;
-				}
+				// Tolerances
+				$amount_tolerance  = 0.01;      // one cent tolerance on totals
+				$percent_tolerance = max( 0.05, // floor tolerance in percentage points
+					( $tax_data['total_ex'] > 0 ? ( $amount_tolerance / (float) $tax_data['total_ex'] * 100 ) * 2 : 0 )
+				);
 
-				// Use stored tax rate if difference is smaller than 0.3
-				if ( $difference < 0.3 ) {
-					$percentage = $tax_rate->tax_rate;
+				$amount_diff  = abs( $rounded_tax - $expected );
+				$percent_diff = abs( (float) $percentage - $rate_value );
+
+				if ( $amount_diff <= $amount_tolerance || $percent_diff <= $percent_tolerance ) {
+					$percentage = $rate_value;
 				}
 			}
 		}

@@ -365,5 +365,41 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $grouped_tax_data;
 	}
+	
+	/**
+	 * Get calculated payment totals for an order.
+	 *
+	 * @param \WC_Order $order
+	 * @return array
+	 */
+	protected function get_order_payment_totals( \WC_Order $order ): array {
+		$total          = $order->get_total();
+		$total_tax_raw  = $order->get_total_tax();
+		$total_exc_tax  = $total - $total_tax_raw;
+		$total_inc_tax  = $total;
+		$currency       = $order->get_currency();
+
+		// Tax rounding
+		$total_tax      = wc_round_tax_total( $total_tax_raw );
+		$rounding_diff  = wc_round_tax_total( $total_inc_tax - ( $total_exc_tax + $total_tax ) );
+
+		// Prepayment/deposit amount (0.0 by default).
+		$prepaid_amount = (float) apply_filters( 'wpo_ips_edi_prepaid_amount', 0.0, $order, $this );
+
+		// Compute payable
+		$payable_amount = $total_inc_tax - $prepaid_amount;
+		if ( abs( $rounding_diff ) >= 0.01 ) {
+			$payable_amount += $rounding_diff;
+		}
+
+		return compact(
+			'total_exc_tax',
+			'total_inc_tax',
+			'total_tax',
+			'prepaid_amount',
+			'rounding_diff',
+			'payable_amount'
+		);
+	}
 
 }

@@ -281,64 +281,53 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_monetary_summation(): ?array {
-		$order          = $this->document->order;
-		$total          = $order->get_total();
-		$total_tax      = $order->get_total_tax();
-		$total_exc_tax  = $total - $total_tax;
-		$total_inc_tax  = $total;
-		$currency       = $order->get_currency();
-		$has_due_days   = ! empty( $this->get_due_date_days() );
-
-		$prepaid_amount = $has_due_days ? 0 : $total_inc_tax;
-		$payable_amount = $total_inc_tax - $prepaid_amount;
-		$rounding_diff  = round( $total - $total_inc_tax, 2 );
-
-		if ( abs( $rounding_diff ) >= 0.01 ) {
-			$payable_amount += $rounding_diff;
-		}
+		$totals   = $this->get_order_payment_totals( $this->document->order );
+		$currency = $order->get_currency();
 
 		$monetary_summation = array(
 			'name'  => 'ram:SpecifiedTradeSettlementHeaderMonetarySummation',
 			'value' => array(
 				array(
 					'name'  => 'ram:LineTotalAmount',
-					'value' => $this->format_decimal( $total_exc_tax ),
+					'value' => $this->format_decimal( $totals['total_exc_tax'] ),
 				),
 				array(
 					'name'  => 'ram:TaxBasisTotalAmount',
-					'value' => $this->format_decimal( $total_exc_tax ),
+					'value' => $this->format_decimal( $totals['total_exc_tax'] ),
 				),
 				array(
 					'name'       => 'ram:TaxTotalAmount',
-					'value'      => $this->format_decimal( wc_round_tax_total( $total_tax ) ),
+					'value'      => $this->format_decimal( $totals['total_tax'] ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
 				),
 				array(
 					'name'  => 'ram:GrandTotalAmount',
-					'value' => $this->format_decimal( $total_inc_tax ),
+					'value' => $this->format_decimal( $totals['total_inc_tax'] ),
 				),
 			),
 		);
 
-		if ( ! $has_due_days ) {
+		// Only output TotalPrepaidAmount when there is an actual prepayment.
+		if ( $totals['prepaid_amount'] > 0 ) {
 			$monetary_summation['value'][] = array(
 				'name'  => 'ram:TotalPrepaidAmount',
-				'value' => $this->format_decimal( $prepaid_amount ),
+				'value' => $this->format_decimal( $totals['prepaid_amount'] ),
 			);
 		}
 
-		if ( abs( $rounding_diff ) >= 0.01 ) {
+		// Only include RoundingAmount when materially non-zero.
+		if ( abs( $totals['rounding_diff'] ) >= 0.01 ) {
 			$monetary_summation['value'][] = array(
 				'name'  => 'ram:RoundingAmount',
-				'value' => $this->format_decimal( $rounding_diff ),
+				'value' => $this->format_decimal( $totals['rounding_diff'] ),
 			);
 		}
 
 		$monetary_summation['value'][] = array(
 			'name'  => 'ram:DuePayableAmount',
-			'value' => $this->format_decimal( $payable_amount ),
+			'value' => $this->format_decimal( $totals['payable_amount'] ),
 		);
 
 		return apply_filters( 'wpo_ips_edi_cii_monetary_summation', $monetary_summation, $this );

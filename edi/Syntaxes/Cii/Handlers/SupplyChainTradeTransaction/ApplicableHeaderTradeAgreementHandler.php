@@ -39,7 +39,6 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	public function get_seller_trade_party(): ?array {
 		$name       = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_name' ) );
 		$vat_number = $this->get_supplier_identifiers_data( 'vat_number' );
-		$coc_number = $this->get_supplier_identifiers_data( 'coc_number' );
 		
 		if ( empty( $name ) ) {
 			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.', 'error' );
@@ -71,7 +70,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					'value' => array(
 						array(
 							'name'  => 'ram:ID',
-							'value' => $vat_number ?: $coc_number,
+							'value' => $vat_number,
 						),
 					),
 				),

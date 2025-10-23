@@ -20,11 +20,10 @@ abstract class AbstractCiiHandler extends AbstractHandler {
 	}
 
 	/**
-	 * Validate CII date format
+	 * Validate CII date format.
 	 *
 	 * @param string $value  The date value to validate.
 	 * @param string $format The date format (102, 610, or 616).
-	 *
 	 * @return bool True if valid, false otherwise.
 	 */
 	public function validate_date_format( string $value, string $format = '102' ): bool {
@@ -34,23 +33,34 @@ abstract class AbstractCiiHandler extends AbstractHandler {
 			return false;
 		}
 
-		// Only validate structure if format is 102 (YYYYMMDD)
-		if ( $format === '102' ) {
-			if ( strlen( $value ) !== 8 || ! ctype_digit( $value ) ) {
-				return false;
-			}
+		switch ( $format ) {
+			case '102': // YYYYMMDD
+				if ( strlen( $value ) !== 8 || ! ctype_digit( $value ) ) {
+					return false;
+				}
+				$year  = (int) substr( $value, 0, 4 );
+				$month = (int) substr( $value, 4, 2 );
+				$day   = (int) substr( $value, 6, 2 );
+				return checkdate( $month, $day, $year );
 
-			$year  = (int) substr( $value, 0, 4 );
-			$month = (int) substr( $value, 4, 2 );
-			$day   = (int) substr( $value, 6, 2 );
+			case '610': // YYYYMM
+				if ( strlen( $value ) !== 6 || ! ctype_digit( $value ) ) {
+					return false;
+				}
+				$year  = (int) substr( $value, 0, 4 );
+				$month = (int) substr( $value, 4, 2 );
+				return ( $year > 0 && $month >= 1 && $month <= 12 );
 
-			if ( $year <= 0 || $month < 1 || $month > 12 || $day < 1 || $day > 31 ) {
-				return false;
-			}
+			case '616': // YYYYWW
+				if ( strlen( $value ) !== 6 || ! ctype_digit( $value ) ) {
+					return false;
+				}
+				$year = (int) substr( $value, 0, 4 );
+				$week = (int) substr( $value, 4, 2 );
+				return ( $year > 0 && $week >= 1 && $week <= 53 );
 		}
 
-		// No structural checks required for 610 (YYYYMM) or 616 (YYYYWW)
-		return true;
+		return false;
 	}
 
 	/**
