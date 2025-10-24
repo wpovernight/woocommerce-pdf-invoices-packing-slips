@@ -998,7 +998,7 @@ class SettingsEDI {
 			</p>
 		</div>
 		<?php
-		echo wp_kses_post( apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this ) );
+		echo apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 	
 	/**
