@@ -45,7 +45,7 @@ class SettingsDebug {
 		$sections       = $this->get_settings_sections();
 
 		?>
-		<div class="wcpdf-settings-sub-sections wcpdf-settings-debug">
+		<div class="wcpdf-settings-sub-sections">
 			<h2 class="nav-tab-wrapper">
 				<?php
 				foreach ( $sections as $section => $title ) {
@@ -352,8 +352,11 @@ class SettingsDebug {
 			case 'debug':
 				$settings = WPO_WCPDF()->settings->debug_settings;
 				break;
-			case 'ubl_taxes':
-				$settings = WPO_WCPDF()->settings->ubl_tax_settings;
+			case 'edi':
+				$settings = WPO_WCPDF()->settings->edi_settings;
+				break;
+			case 'edi_tax':
+				$settings = wpo_ips_edi_get_tax_settings();
 				break;
 			default:
 				$settings = apply_filters( 'wpo_wcpdf_export_settings', $settings, $type );
@@ -365,10 +368,8 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+				
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings = get_option( "wpo_wcpdf_documents_settings_{$type}", [] );
 					break;
 				}
@@ -391,7 +392,7 @@ class SettingsDebug {
 
 		extract( $data );
 
-		$file_data = [];
+		$file_data = array();
 
 		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
 			$json_data = WPO_WCPDF()->file_system->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -426,16 +427,16 @@ class SettingsDebug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 
-		if ( in_array( $type, array( 'general', 'debug', 'ubl_taxes' ) ) ) {
+		if ( in_array( $type, array( 'general', 'debug' ), true ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
+		} elseif ( in_array( $type, array( 'edi', 'edi_tax' ), true ) ) {
+			$settings_option = "wpo_ips_{$type}_settings";
 		} else {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+				
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
 				}
@@ -489,8 +490,11 @@ class SettingsDebug {
 			case 'debug':
 				$settings_option = 'wpo_wcpdf_settings_debug';
 				break;
-			case 'ubl_taxes':
-				$settings_option = 'wpo_wcpdf_settings_ubl_taxes';
+			case 'edi':
+				$settings_option = 'wpo_ips_edi_settings';
+				break;
+			case 'edi_tax':
+				$settings_option = 'wpo_ips_edi_tax_settings';
 				break;
 			default:
 				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
@@ -502,10 +506,8 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+				
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
 				}
@@ -523,7 +525,7 @@ class SettingsDebug {
 		}
 
 		// settings already reset
-		$current_settings = get_option( $settings_option, [] );
+		$current_settings = get_option( $settings_option, array() );
 		if ( empty( $current_settings ) ) {
 			$message = sprintf(
 				/* translators: settings type */
@@ -535,7 +537,7 @@ class SettingsDebug {
 		}
 
 		// reset settings
-		$updated = update_option( $settings_option, [] );
+		$updated = update_option( $settings_option, array() );
 		if ( $updated ) {
 			$message = sprintf(
 				/* translators: settings type */
@@ -716,26 +718,38 @@ class SettingsDebug {
 		return $return;
 	}
 
-	public function get_setting_types() {
-		$setting_types = [
-			'general'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
-			'debug'     => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
-			'ubl_taxes' => __( 'UBL Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
-		];
+	/**
+	 * Get the available setting types.
+	 * 
+	 * @return array
+	 */
+	public function get_setting_types(): array {
+		$setting_types = array(
+			'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+			'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi'     => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi_tax' => __( 'E-Document Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+		
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+		
 		foreach ( $documents as $document ) {
-			if ( $document->title != $document->get_title() ) {
-				$title = $document->title.' ('.$document->get_title().')';
+			$document_title = $document->get_title();
+			
+			if ( $document->title !== $document_title ) {
+				$title = $document->title . ' (' . $document_title . ')';
 			} else {
-				$title = $document->get_title();
+				$title = $document_title;
 			}
 
 			foreach ( $document->output_formats as $output_format ) {
 				$slug = $document->get_type();
+				
 				if ( 'pdf' !== $output_format ) {
 					$slug .= "_{$output_format}";
 				}
-				$setting_types[$slug] = strtoupper( $output_format ) . ' ' .  $title;
+				
+				$setting_types[ $slug ] = strtoupper( $output_format ) . ' ' .  $title;
 			}
 		}
 
@@ -895,10 +909,11 @@ class SettingsDebug {
 			array(
 				'type'     => 'setting',
 				'id'       => 'default_manual_document_number',
-				'title'    => __( 'Default manual document number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => '',
 				'callback' => 'select',
 				'section'  => 'debug_settings',
 				'args'     => array(
+					'title'       => __( 'Default manual document number', 'woocommerce-pdf-invoices-packing-slips' ),
 					'option_name' => $option_name,
 					'id'          => 'default_manual_document_number',
 					'default'     => 'zero',
@@ -907,6 +922,10 @@ class SettingsDebug {
 						'next_document_number' => __( 'Next document number', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 					'description' => __( 'Select the default value for the document number field in the "PDF document data" meta box when manually creating a new document.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[enable_document_data_editing]',
+						'data-show_for_option_values' => json_encode( array( 'yes' ) ),
+					),
 				)
 			),
 			array(

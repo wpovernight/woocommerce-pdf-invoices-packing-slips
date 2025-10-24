@@ -689,10 +689,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return string $tax_rates imploded list of tax rates
 	 */
 	public function get_tax_rate( $item, $order, $force_calculation = false ) {
-		$tax_data_container = ( $item['type'] == 'line_item' ) ? 'line_tax_data' : 'taxes';
-		$tax_data_key       = ( $item['type'] == 'line_item' ) ? 'subtotal' : 'total';
-		$line_total_key     = ( $item['type'] == 'line_item' ) ? 'line_total' : 'total';
-		$line_tax_key       = ( $item['type'] == 'shipping' ) ? 'total_tax' : 'line_tax';
+		$type               = $item->get_type();
+		$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
+		$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
+		$line_total_key     = ( 'line_item' === $type ) ? 'line_total'    : 'total';
+		$line_tax_key       = ( 'shipping'  === $type ) ? 'total_tax'     : 'line_tax';
 
 		$tax_class          = isset($item['tax_class']) ? $item['tax_class'] : '';
 		$line_tax           = $item[$line_tax_key];
