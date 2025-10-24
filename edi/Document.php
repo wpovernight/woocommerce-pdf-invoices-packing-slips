@@ -337,6 +337,10 @@ class Document {
 					if ( empty( $value ) ) {
 						$legacy_meta_key = '_wcpdf_ubl_tax_' . $field;
 						$value           = wc_get_order_item_meta( $tax_item_key, $legacy_meta_key, true ) ?: $value;
+						
+						if ( ! empty( $value ) ) {
+							wc_delete_order_item_meta( $tax_item_key, $legacy_meta_key );
+						}
 					}
 
 					if ( empty( $value ) || 'default' === $value || ! $use_historical_settings ) {
