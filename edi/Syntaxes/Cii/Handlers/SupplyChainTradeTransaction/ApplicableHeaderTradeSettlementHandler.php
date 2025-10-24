@@ -150,33 +150,20 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_trade_tax(): ?array {
-		$tax_reasons = EN16931::get_vatex();
-		$order       = $this->document->order;
-		
-		// Group tax data by rate, category, reason, and scheme
-		$grouped_tax_data = $this->get_grouped_order_tax_data();
-
-		// Build CII trade tax nodes from grouped data
-		$trade_tax = array();
+		$tax_reasons       = EN16931::get_vatex();
+		$grouped_tax_data  = $this->get_grouped_order_tax_data();
+		$trade_tax         = array();
 
 		foreach ( $grouped_tax_data as $item ) {
-			$percent    = (float) ( $item['percentage'] ?? 0 );
-			$category   = strtoupper( $item['category'] ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order ) );
-			$reason_key = strtoupper( $item['reason']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order ) );
-			$scheme     = strtoupper( $item['scheme']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order ) );
+			$percent  = (float) ( $item['percentage']            ?? 0        );
+			$category = strtoupper( (string) ( $item['category'] ?? ''     ) );
+			$reason   = strtoupper( (string) ( $item['reason']   ?? 'NONE' ) );
+			$scheme   = strtoupper( (string) ( $item['scheme']   ?? 'VAT'  ) );
 
-			if ( '' === $reason_key || 'NONE' === $reason_key ) {
-				$reason_key = 'NONE';
-			}
+			$basis    = wc_round_tax_total( (float) ( $item['total_ex']  ?? 0 ) );
+			$tax      = wc_round_tax_total( (float) ( $item['total_tax'] ?? 0 ) );
 
-			$reason = ! empty( $tax_reasons[ $reason_key ] )
-				? $tax_reasons[ $reason_key ]
-				: $reason_key;
-
-			$basis = (float) wc_round_tax_total( $item['total_ex']  ?? 0 );
-			$tax   = (float) wc_round_tax_total( $item['total_tax'] ?? 0 );
-
-			// Skip emitting completely empty groups unless it's the intentional Z group
+			// Skip empty non-Z groups.
 			$is_z = ( 'Z' === $category );
 			if ( 0.0 === $basis && 0.0 === $tax && ! $is_z ) {
 				continue;
@@ -208,22 +195,23 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				),
 			);
 
-			// Only emit exemption for 0% non-Z categories and when reason is not NONE
-			if ( 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason_key ) {
+			// Only emit exemption data for 0% non-Z with an explicit reason.
+			if ( 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason ) {
+				$reason_mapped = ! empty( $tax_reasons[ $reason ] ) ? $tax_reasons[ $reason ] : $reason;
+
 				$node['value'][] = array(
 					'name'  => 'ram:ExemptionReasonCode',
-					'value' => $reason_key,
+					'value' => $reason_mapped,
 				);
 				$node['value'][] = array(
 					'name'  => 'ram:ExemptionReason',
-					'value' => $reason,
+					'value' => $reason_mapped,
 				);
 			}
 
 			$trade_tax[] = $node;
 		}
 
-		// If after filtering there is nothing meaningful to report, return null
 		if ( empty( $trade_tax ) ) {
 			return null;
 		}

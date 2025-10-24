@@ -26,26 +26,15 @@ class TaxTotalHandler extends AbstractUblHandler {
 		
 		// Format grouped tax data into UBL structure
 		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons, $currency ) {
-			$item_tax_percentage = ! empty( $item['percentage'] )
-				? $item['percentage']
-				: 0;
-			$item_tax_category   = ! empty( $item['category'] )
-				? $item['category']
-				: wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
-			$item_tax_reason_key = ! empty( $item['reason'] )
-				? $item['reason']
-				: wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $this->document->order );
-			$item_tax_reason     = ! empty( $tax_reasons[ $item_tax_reason_key ] )
-				? $tax_reasons[ $item_tax_reason_key ]
-				: $item_tax_reason_key;
-			$item_tax_scheme     = ! empty( $item['scheme'] )
-				? $item['scheme']
-				: wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $this->document->order );
-			
+			$item_tax_percentage = (float) ( $item['percentage']            ?? 0        );
+			$item_tax_category   = strtoupper( (string) ( $item['category'] ?? ''     ) );
+			$item_tax_reason_key = strtoupper( (string) ( $item['reason']   ?? 'NONE' ) );
+			$item_tax_scheme     = strtoupper( (string) ( $item['scheme']   ?? 'VAT'  ) );
+
 			$tax_category = array(
 				array(
 					'name'  => 'cbc:ID',
-					'value' => strtoupper( $item_tax_category ),
+					'value' => $item_tax_category,
 				),
 				array(
 					'name'  => 'cbc:Percent',
@@ -53,8 +42,13 @@ class TaxTotalHandler extends AbstractUblHandler {
 				),
 			);
 			
-			// Only emit exemption reason for 0% non-Z categories (e.g., E/AE/K)
-			if ( $item_tax_percentage == 0 && 'Z' !== strtoupper( $item_tax_category ) && strcasecmp( $item_tax_reason_key, 'none' ) !== 0 ) {
+			// Only emit exemption reason for 0% non-Z categories and when reason is not NONE.
+			if ( 0.0 === $item_tax_percentage && 'Z' !== $item_tax_category && 'NONE' !== $item_tax_reason_key ) {
+				// Map reason key to VATEX text/code when present; otherwise keep the key.
+				$item_tax_reason = ! empty( $tax_reasons[ $item_tax_reason_key ] )
+					? $tax_reasons[ $item_tax_reason_key ]
+					: $item_tax_reason_key;
+				
 				$tax_category[] = array(
 					'name'  => 'cbc:TaxExemptionReasonCode',
 					'value' => $item_tax_reason_key,
@@ -70,7 +64,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 				'value' => array(
 					array(
 						'name'  => 'cbc:ID',
-						'value' => strtoupper( $item_tax_scheme ),
+						'value' => $item_tax_scheme,
 					),
 				),
 			);
@@ -80,14 +74,14 @@ class TaxTotalHandler extends AbstractUblHandler {
 				'value' => array(
 					array(
 						'name'       => 'cbc:TaxableAmount',
-						'value'      => $this->format_decimal( wc_round_tax_total( $item['total_ex'] ?? 0 ) ),
+						'value'      => $this->format_decimal( wc_round_tax_total( (float) ( $item['total_ex']  ?? 0 ) ) ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
 					),
 					array(
 						'name'       => 'cbc:TaxAmount',
-						'value'      => $this->format_decimal( wc_round_tax_total( $item['total_tax'] ?? 0 ) ),
+						'value'      => $this->format_decimal( wc_round_tax_total( (float) ( $item['total_tax'] ?? 0 ) ) ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),

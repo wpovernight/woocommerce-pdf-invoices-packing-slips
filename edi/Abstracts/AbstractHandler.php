@@ -233,11 +233,15 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 		}
 		
+		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
+		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order );
+		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order );
+		
 		foreach ( $order_tax_data as $item ) {
 			$percentage = (float) ( $item['percentage'] ?? 0 );
-			$category   = strtoupper( trim( (string) ( $item['category'] ?? wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order ) ) ) );
-			$reason     = strtoupper( trim( (string) ( $item['reason']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order ) ) ) );
-			$scheme     = strtoupper( trim( (string) ( $item['scheme']   ?? wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order ) ) ) );
+			$category   = strtoupper( trim( (string) ( $item['category'] ?? $order_category ) ) );
+			$reason     = strtoupper( trim( (string) ( $item['reason']   ?? $order_reason   ) ) );
+			$scheme     = strtoupper( trim( (string) ( $item['scheme']   ?? $order_scheme   ) ) );
 
 			if ( '' === $reason || 'NONE' === $reason ) {
 				$reason = 'NONE';
