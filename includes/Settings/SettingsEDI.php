@@ -407,8 +407,8 @@ class SettingsEDI {
 				'id'                => 'embed_encrypted_pdf',
 				'description'       => __( 'Embed the encrypted PDF invoice file within the e-document.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'custom_attributes' => array(
-					'data-show_for_option_name'   => $option_name . '[syntax]',
-					'data-show_for_option_values' => json_encode( array( 'ubl' ) ),
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => json_encode( array( 'ubl-2p1' ) ),
 				),
 			)
 		);
