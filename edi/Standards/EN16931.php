@@ -12,7 +12,7 @@ class EN16931 extends AbstractStandard {
 
 	public static string $slug    = 'en16931';
 	public static string $name    = 'EN16931';
-	public static string $version = '15.0';
+	public static string $version = '16.0';
 
 	/**
 	 * Get the VAT category codes according to code list.
@@ -85,6 +85,7 @@ class EN16931 extends AbstractStandard {
 			'VATEX-EU-132-1O'        => __( 'Exempt based on article 132, section 1 (o) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-132-1P'        => __( 'Exempt based on article 132, section 1 (p) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-132-1Q'        => __( 'Exempt based on article 132, section 1 (q) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
+			'VATEX-EU-135-1'         => __( 'Exempt based on article 135, section 1 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-143'           => __( 'Exempt based on article 143 of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-143-1A'        => __( 'Exempt based on article 143, section 1 (a) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-EU-143-1B'        => __( 'Exempt based on article 143, section 1 (b) of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -283,6 +284,7 @@ class EN16931 extends AbstractStandard {
 			'0230' => __( 'National e-Invoicing Framework', 'woocommerce-pdf-invoices-packing-slips' ),
 			'0235' => __( 'UAE Tax Identification Number (TIN)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'0240' => __( 'Register of legal persons (in French : Répertoire des personnes morales)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'0244' => __( 'Tax Identification (Tax ID), Nigeria', 'woocommerce-pdf-invoices-packing-slips' ),
 			'9910' => __( 'Hungary VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
 			'9913' => __( 'Business Registers Network', 'woocommerce-pdf-invoices-packing-slips' ),
 			'9914' => __( 'Österreichische Umsatzsteuer-Identifikationsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -580,6 +582,10 @@ class EN16931 extends AbstractStandard {
 			'0238' => __( 'Plateforme.s agréée.s à la facturation électronique (PPF/PDP)', 'woocommerce-pdf-invoices-packing-slips' ),
 			'0239' => __( 'EAEU', 'woocommerce-pdf-invoices-packing-slips' ),
 			'0240' => __( 'Register of legal persons (in French : Répertoire des personnes morales)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'0241' => __( 'Name unknown', 'woocommerce-pdf-invoices-packing-slips' ),
+			'0242' => __( 'OpenPeppol Service Provider Identification Scheme (SPIS)', 'woocommerce-pdf-invoices-packing-slips' ),
+			'0243' => __( 'Name unknown', 'woocommerce-pdf-invoices-packing-slips' ),
+			'0244' => __( 'Tax Identification (Tax ID), Nigeria', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		
 		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_icd', array() );
