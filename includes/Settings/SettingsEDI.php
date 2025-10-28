@@ -41,7 +41,8 @@ class SettingsEDI {
 		add_action( 'wpo_wcpdf_settings_output_edi', array( $this, 'output_settings' ), 10, 2 );
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_calculate_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
-
+		add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_peppol_settings' ), 10, 3 );
+		
 		// AJAX
 		add_action( 'wp_ajax_wpo_ips_edi_save_taxes', array( $this, 'ajax_save_taxes' ) );
 		add_action( 'wp_ajax_wpo_ips_edi_reload_tax_table', array( $this, 'ajax_reload_tax_table' ) );
@@ -241,6 +242,7 @@ class SettingsEDI {
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
 				),
 			),
 		);
@@ -276,6 +278,7 @@ class SettingsEDI {
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
 				),
 			),
 		);
@@ -309,6 +312,7 @@ class SettingsEDI {
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
 				),
 			),
 		);
@@ -344,6 +348,7 @@ class SettingsEDI {
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
 				),
 			),
 		);
@@ -367,6 +372,7 @@ class SettingsEDI {
 		// 		'custom_attributes' => array(
 		// 			'data-show_for_option_name'   => $option_name . '[ubl_format]',
 		// 			'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+		// 			'data-keep_current_value'     => true,
 		// 		),
 		// 	),
 		// );
@@ -391,6 +397,7 @@ class SettingsEDI {
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
 				),
 			),
 		);
@@ -464,6 +471,32 @@ class SettingsEDI {
 
 		$settings_fields = apply_filters( 'wpo_ips_edi_settings', $settings_fields, $page, $option_group, $option_name );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+	}
+	
+	/**
+	 * Preserve Peppol settings on update.
+	 *
+	 * @param mixed $value
+	 * @param mixed $old_value
+	 * @param string $option
+	 *
+	 * @return array
+	 */
+	public function preserve_peppol_settings( mixed $value, mixed $old_value, string $option ): array {
+		$new = is_array( $value ) ? $value : array();
+		$old = is_array( $old_value ) ? $old_value : array();
+		
+		foreach ( $new as $key => $val ) {
+			if (
+				false !== strpos( $key, 'peppol_' ) &&
+				empty( $val ) &&
+				! empty( $old[ $key ] )
+			) {
+				$new[ $key ] = $old[ $key ];
+			}
+		}
+		
+		return $new;
 	}
 
 	/**

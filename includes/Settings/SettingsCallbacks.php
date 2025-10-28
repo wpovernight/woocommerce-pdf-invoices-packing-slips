@@ -494,22 +494,23 @@ class SettingsCallbacks {
 		}
 
 		foreach ( $options as $key => $label ) {
+			// Normalize both sides to string
+			$key_str = (string) $key;
+
+			// Determine if selected (works for both single and multiple)
 			if ( ! empty( $multiple ) && is_array( $current ) ) {
-				$selected = in_array( $key, $current ) ? ' selected="selected"' : '';
-				printf(
-					'<option value="%s"%s>%s</option>',
-					esc_attr( $key ),
-					esc_attr( $selected ),
-					esc_html( $label )
-				);
+				$is_selected   = in_array( $key_str, array_map( 'strval', $current ), true );
+				$selected_attr = $is_selected ? ' selected="selected"' : '';
 			} else {
-				printf(
-					'<option value="%s"%s>%s</option>',
-					esc_attr( $key ),
-					esc_attr( selected( $current, $key, false ) ),
-					esc_html( $label )
-				);
+				$selected_attr = selected( (string) $current, $key_str, false );
 			}
+
+			printf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $key_str ),
+				$selected_attr,
+				esc_html( $label )
+			);
 		}
 
 		echo '</select>';
@@ -563,7 +564,6 @@ class SettingsCallbacks {
 				wp_kses_post( $description )
 			);
 		}
-
 	}
 
 	/**

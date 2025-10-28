@@ -854,8 +854,9 @@ jQuery( function( $ ) {
 		}
 
 		$( "[data-show_for_option_name='" + name + "']" ).each( function() {
-			let show     = false;
-			let show_for = $( this ).data( 'show_for_option_values' );
+			let show       = false;
+			let show_for   = $( this ).data( 'show_for_option_values' );
+			let keep_value = $( this ).data( 'keep_current_value' );
 			
 			if ( checkbox ) {
 				show = value; // for checkboxes, checked = show
@@ -877,7 +878,13 @@ jQuery( function( $ ) {
 				$row.hide()
 					.find( ':input' ).each( function () {
 						const $input = $( this );
+						
+						// Don't reset value
+						if ( keep_value ) {
+							return;
+						}
 
+						// Reset the input value
 						if ( $input.is( 'select' ) ) {
 							if ( $input.prop( 'multiple' ) ) {
 								$input.val( [] );
