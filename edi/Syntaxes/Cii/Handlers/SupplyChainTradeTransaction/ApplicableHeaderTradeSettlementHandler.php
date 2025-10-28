@@ -93,14 +93,19 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		// Add IBAN if available
-		if ( ! empty( $payment['iban'] ) ) {
+		// Add account
+		if ( ! empty( $payment['iban'] ) || ! empty( $payment['account_number'] ) ) {
+			$name  = ! empty( $payment['iban'] ) ? 'ram:IBANID' : 'ram:ProprietaryID';
+			$value = ! empty( $payment['iban'] )
+				? strtoupper( preg_replace( '/\s+/', '', $payment['iban'] ) )
+				: $payment['account_number'];
+			
 			$account = array(
 				'name'  => 'ram:PayeePartyCreditorFinancialAccount',
 				'value' => array(
 					array(
-						'name'  => 'ram:IBANID',
-						'value' => strtoupper( preg_replace( '/\s+/', '', $payment['iban'] ) ),
+						'name'  => $name,
+						'value' => $value,
 					),
 				),
 			);

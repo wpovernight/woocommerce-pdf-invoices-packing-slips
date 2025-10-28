@@ -52,14 +52,18 @@ class PaymentMeansHandler extends AbstractUblHandler {
 			),
 		);
 
-		// Add IBAN
-		if ( ! empty( $payment['iban'] ) ) {
+		// Add account
+		if ( ! empty( $payment['iban'] ) || ! empty( $payment['account_number'] ) ) {
+			$account_id = ! empty( $payment['iban'] )
+				? strtoupper( preg_replace( '/\s+/', '', $payment['iban'] ) )
+				: $payment['account_number'];
+				
 			$account = array(
 				'name'  => 'cac:PayeeFinancialAccount',
 				'value' => array(
 					array(
 						'name'  => 'cbc:ID',
-						'value' => strtoupper( preg_replace( '/\s+/', '', $payment['iban'] ) ),
+						'value' => $account_id,
 					),
 				),
 			);

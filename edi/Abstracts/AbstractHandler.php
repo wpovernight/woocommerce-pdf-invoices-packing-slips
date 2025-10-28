@@ -104,23 +104,21 @@ abstract class AbstractHandler implements HandlerInterface {
 		$type_code = $mapping[ $method_id ] ?? $mapping['default'];
 
 		$data = array(
-			'type_code'      => $type_code,
-			'method'         => $method_id,
-			'title'          => $title,
-			'iban'           => '',
-			'bic'            => '',
-			'transaction_id' => '',
-			'account_name'   => '',
+			'type_code' => $type_code,
+			'method'    => $method_id,
+			'title'     => $title,
 		);
 
 		switch ( $method_id ) {
 			case 'bacs':
 				$accounts = get_option( 'woocommerce_bacs_accounts', array() );
-				$account  = is_array( $accounts ) ? reset( $accounts ) : array();
-
-				$data['iban']         = $account['iban'] ?? '';
-				$data['bic']          = $account['bic'] ?? '';
-				$data['account_name'] = $account['account_name'] ?? '';
+				
+				if ( empty( $accounts ) ) {
+					break;
+				}
+				
+				$account  = apply_filters( 'wpo_ips_edi_payment_means_bacs_default_account', reset( $accounts ), $accounts, $this );
+				$data     = array_merge( $data, $account );
 				break;
 
 			case 'paypal':
