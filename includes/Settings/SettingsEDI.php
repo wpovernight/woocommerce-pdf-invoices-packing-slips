@@ -302,7 +302,7 @@ class SettingsEDI {
 					sprintf(
 						/* translators: %1$s: open link anchor, %2$s: close link anchor */
 						__( 'Please make sure the field is filled out in the %1$sShop Information%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_ips_edi_settings&tab=general#shop_information' ) ) . '" target="_blank" rel="noopener noreferrer">',
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#shop_information' ) ) . '" target="_blank" rel="noopener noreferrer">',
 						'</a>'
 					)
 				),
