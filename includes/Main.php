@@ -1051,8 +1051,13 @@ class Main {
 	}
 
 	public function html_currency_filters( $filters ) {
-		// only apply these fixes if the bundled dompdf version is used!
-		if ( wcpdf_pdf_maker_is_default() ) {
+		// Apply currency font when Extended currency symbol support is enabled
+		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
+			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_font' ), 10001, 2 );
+			// 'wpo_wcpdf_custom_styles' is actually an action, but WP handles them with the same functions
+			$filters[] = array( 'wpo_wcpdf_custom_styles', array( $this, 'currency_symbol_font_styles' ) );
+		} elseif ( wcpdf_pdf_maker_is_default() ) {
+			// only apply these fixes if the bundled dompdf version is used and currency font is not enabled
 			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_code' ), 10001, 2 );
 		}
 		return $filters;
