@@ -28,10 +28,6 @@ class AdditionalDocumentReferenceHandler extends AbstractUblHandler {
 						'value' => ! empty( $number_instance ) ? $number_instance->get_formatted() : '',
 					),
 					array(
-						'name'  => 'cbc:DocumentTypeCode',
-						'value' => '130', // Document type code for Invoice
-					),
-					array(
 						'name'  => 'cac:Attachment',
 						'value' => array(
 							'name'       => 'cbc:EmbeddedDocumentBinaryObject',
