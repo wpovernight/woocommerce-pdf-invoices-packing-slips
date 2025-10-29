@@ -98,7 +98,7 @@ class Invoice extends AbstractUblFormat {
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\OrderReferenceHandler::class,
 			),
 			'additional_document_reference' => array(
-				'enabled' => false,
+				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\AdditionalDocumentReferenceHandler::class,
 			),
 			'accounting_supplier_party' => array(
