@@ -28,8 +28,8 @@ class AdditionalDocumentReferenceHandler extends AbstractUblHandler {
 						'value' => ! empty( $number_instance ) ? $number_instance->get_formatted() : '',
 					),
 					array(
-						'name'  => 'cbc:DocumentType',
-						'value' => ! empty( $this->document->order_document->get_title() ) ? wpo_ips_edi_sanitize_string( 'PDF ' . $this->document->order_document->get_title() ) : '',
+						'name'  => 'cbc:DocumentTypeCode',
+						'value' => '130', // Document type code for Invoice
 					),
 					array(
 						'name'  => 'cac:Attachment',
