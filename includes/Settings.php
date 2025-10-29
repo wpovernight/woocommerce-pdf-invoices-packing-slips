@@ -246,7 +246,7 @@ class Settings {
 			if ( ! empty( $_POST['order_id'] ) ) {
 				$order_id = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
 
-				if ( $document_type == 'credit-note' ) {
+				if ( 'credit-note' === $document_type ) {
 					// get last refund ID of the order if available
 					$refund = wc_get_orders(
 						array(
@@ -357,16 +357,12 @@ class Settings {
 				} else {
 					wp_send_json_error(
 						array(
-							'error' => sprintf(
-								/* translators: order ID */
-								esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ),
-								$order_id
-							)
+							'error' => $this->get_document_not_available_error( $order_id, $document_type )
 						)
 					);
 				}
 			} else {
-				wp_send_json_error( array( 'error' => esc_html__( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
+				wp_send_json_error( array( 'error' => $this->get_order_not_found_error( $document_type ) ) );
 			}
 
 		} catch ( \Throwable $th ) {
@@ -384,6 +380,63 @@ class Settings {
 		}
 
 		wp_die();
+	}
+
+	/**
+	 * Get document not available error message.
+	 *
+	 * @param int $order_id
+	 * @param string $document_type
+	 * 
+	 * @return string
+	 */
+	public function get_document_not_available_error( int $order_id, string $document_type ): string {
+		if ( 'credit-note' === $document_type ) {
+			$order = wc_get_order( $order_id );
+
+			if ( 'shop_order_refund' === $order->get_type() ) {
+				return sprintf(
+					/* translators: order parent ID */
+					esc_html__( 'Credit Note not yet available for order #%d, because an invoice does not exist. Try selecting a different order to preview your changes.', 'woocommerce-pdf-invoices-packing-slips' ),
+					$order->parent_id
+				);
+			} else {
+				return sprintf(
+					/* translators: order ID */
+					esc_html__( 'Credit Note not yet available for order #%d, because a refund has not been generated yet. Try selecting a different order to preview your changes.', 'woocommerce-pdf-invoices-packing-slips' ),
+					$order_id
+				);
+			}
+		} else {
+			$document_title = __( 'Document', 'woocommerce-pdf-invoices-packing-slips' );
+			foreach ( WPO_WCPDF()->documents->documents as $document ) {
+				if ( $document->get_type() === $document_type ) {
+					$document_title = $document->get_title();
+				}
+			}
+
+			return sprintf(
+				/* translators: 1. document title, 2. order ID */
+				esc_html__( '%1$s is not available for order #%2$d, because it is disabled for the current order status. Try selecting a different order to preview your changes.', 'woocommerce-pdf-invoices-packing-slips' ),
+				$document_title,
+				$order_id
+			);
+		}
+	}
+
+	/**
+	 * Get order not found error message.
+	 *
+	 * @param string $document_type
+	 * 
+	 * @return string
+	 */
+	public function get_order_not_found_error( string $document_type ): string {
+		if ( 'credit-note' === $document_type ) {
+			return esc_html__( 'No WooCommerce order refunds found! Please consider adding your first order refund to see this preview.', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
+		return esc_html__( 'No WooCommerce orders found! Please consider adding your first order to see this preview.', 'woocommerce-pdf-invoices-packing-slips' );
 	}
 
 	public function preview_order_search() {
