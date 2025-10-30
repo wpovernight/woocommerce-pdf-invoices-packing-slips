@@ -960,6 +960,20 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			if ( ! empty( $label ) ) {
 				$totals[ $key ]['label'] = wpo_wcpdf_dynamic_translate( $label, 'woocommerce-pdf-invoices-packing-slips' );
 			}
+			
+			// Local pickup specific
+			if (
+				'shipping' === $key &&
+				\wpo_ips_order_has_local_pickup_method( $this->order ) &&
+				apply_filters( 'wpo_ips_show_pickup_location_details', true, $this )
+			) {
+				$order_shipping          = $this->get_order_shipping();
+				$totals[ $key ]['value'] = sprintf(
+					'%s<p class="pickup-location-details">%s</p>',
+					$order_shipping['value'],
+					$total['value']
+				);
+			}
 		}
 
 		// Fix order_total for refunded orders
