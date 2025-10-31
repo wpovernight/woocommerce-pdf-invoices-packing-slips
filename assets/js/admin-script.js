@@ -577,7 +577,7 @@ jQuery( function( $ ) {
 			success: function( response, textStatus, jqXHR ) {
 				if ( response.data.error ) {
 					$( '#'+canvasId ).remove();
-					$preview.append( '<div class="notice notice-error inline"><p>'+response.data.error+'</p></div>' );
+					$preview.append( '<div class="notice notice-warning inline"><p>'+response.data.error+'</p></div>' );
 				} else if ( response.data.preview_data && response.data.output_format ) {
 					$( '#'+canvasId ).remove();
 
@@ -601,7 +601,7 @@ jQuery( function( $ ) {
 				if ( textStatus != 'abort' ) {
 					let errorMessage = jqXHR.status + ': ' + jqXHR.statusText
 					$( '#'+canvasId ).remove();
-					$preview.append( '<div class="notice notice-error inline"><p>'+errorMessage+'</p></div>' );
+					$preview.append( '<div class="notice notice-warning inline"><p>'+errorMessage+'</p></div>' );
 					$preview.unblock();
 				}
 			},
