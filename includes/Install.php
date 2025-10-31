@@ -661,6 +661,43 @@ class Install {
 				delete_option( 'wpo_wcpdf_dismiss_shop_address_notice' );
 			}
 		}
+		
+		// 5.0.0-pr1149.1: migrate UBL tax settings to IPS EDI settings
+		if ( version_compare( $installed_version, '5.0.0-pr1149.1', '<' ) ) {
+			$ubl_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
+
+			if ( ! empty( $ubl_settings ) ) {
+				if ( update_option( 'wpo_ips_edi_tax_settings', $ubl_settings ) ) {
+					delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
+				}
+			}
+			
+			$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+			
+			if ( ! empty( $invoice_settings['ubl'] ) ) {
+				$edi_settings = array(
+					'document_types' => array( 'invoice' ),
+					'syntax'         => 'ubl',
+					'ubl_format'     => 'ubl-2p1',
+				);
+				
+				if ( ! empty( $invoice_settings['ubl']['enabled'] ) ) {
+					$edi_settings['enabled'] = $invoice_settings['ubl']['enabled'];
+				}
+				
+				if ( ! empty( $invoice_settings['ubl']['include_encrypted_pdf'] ) ) {
+					$edi_settings['embed_encrypted_pdf'] = $invoice_settings['ubl']['include_encrypted_pdf'];
+				}
+				
+				if ( ! empty( $invoice_settings['ubl']['attach_to_email_ids'] ) ) {
+					$edi_settings['send_attachments'] = '1';
+				}
+				
+				update_option( 'wpo_ips_edi_settings', $edi_settings );
+				unset( $invoice_settings['ubl'] );
+				update_option( 'wpo_wcpdf_documents_settings_invoice', $invoice_settings );
+			}
+		}
 
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
