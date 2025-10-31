@@ -184,6 +184,21 @@ class SettingsEDI {
 
 		$settings_format = array();
 		foreach ( wpo_ips_edi_syntax_formats() as $syntax => $data ) {
+			$description = sprintf(
+				/* translators: %s syntax */
+				__( 'Choose the preferred %s format.', 'woocommerce-pdf-invoices-packing-slips' ),
+				strtoupper( trim( $syntax ) )
+			);
+
+			if ( 'cii' === strtolower( trim( $syntax ) ) && ! class_exists( 'WCPDF_Custom_PDF_Maker_mPDF' ) ) {
+				$description .= ' ' . sprintf(
+					/* translators: %1$s: open link anchor, %2$s: close link anchor */
+					__( 'The %1$smPDF extension%2$s is required for hybrid formats. Please install or enable it.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="https://github.com/wpovernight/woocommerce-pdf-ips-mpdf/releases/latest" target="_blank" rel="noopener noreferrer">',
+					'</a>'
+				);
+			}
+
 			$settings_format[] = array(
 				'type'     => 'setting',
 				'id'       => "{$syntax}_format",
@@ -201,11 +216,7 @@ class SettingsEDI {
 						array_keys( $data['formats'] ),
 						array_column( $data['formats'], 'name' )
 					),
-					'description'       => sprintf(
-						/* translators: %s syntax */
-						__( 'Choose the preferred %s format.', 'woocommerce-pdf-invoices-packing-slips' ),
-						strtoupper( trim( $syntax ) )
-					),
+					'description'       => wp_kses_post( $description ),
 					'custom_attributes' => array(
 						'data-show_for_option_name'   => $option_name . '[syntax]',
 						'data-show_for_option_values' => json_encode( array( $syntax ) ),
