@@ -266,6 +266,8 @@
 		<?php endif; ?>
 	</section>
 
+	<?php do_action( 'wpo_wcpdf_meta_box_before_document_buttons', $document, $data ); ?>
+
 	<!-- Save/Cancel buttons -->
 	<section class="wcpdf-data-fields-section wpo-wcpdf-document-buttons">
 		<div>
