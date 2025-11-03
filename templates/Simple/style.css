@@ -327,3 +327,10 @@ table.totals tr.payment_method {
 .pagenum,.pagecount {
 	font-family: sans-serif;
 }
+
+/* Local pickup details */
+.pickup-location-details {
+	font-size: 7pt;
+	margin-top: 2mm;
+	line-height: 1;
+}

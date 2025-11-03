@@ -1804,3 +1804,27 @@ function wpo_ips_display_item_meta( \WC_Order_Item $item, array $args = array() 
 		return $html;
 	}
 }
+
+/**
+ * Check if the order has a local pickup shipping method.
+ *
+ * @param \WC_Order $order
+ *
+ * @return bool
+ */
+function wpo_ips_order_has_local_pickup_method( \WC_Order $order ): bool {
+	$has_local_pickup_method = false;
+	
+	if ( ! class_exists( '\Automattic\WooCommerce\Utilities\ArrayUtil' ) ) {
+		return $has_local_pickup_method;
+	}
+	
+	$local_pickup_methods = apply_filters( 'woocommerce_local_pickup_methods', array( 'legacy_local_pickup', 'local_pickup' ) );
+	$shipping_method_ids  = \Automattic\WooCommerce\Utilities\ArrayUtil::select( $order->get_shipping_methods(), 'get_method_id', \Automattic\WooCommerce\Utilities\ArrayUtil::SELECT_BY_OBJECT_METHOD );
+	
+	if ( count( array_intersect( $shipping_method_ids, $local_pickup_methods ) ) > 0 ) {
+		$has_local_pickup_method = true;
+	}
+	
+	return $has_local_pickup_method;
+}
