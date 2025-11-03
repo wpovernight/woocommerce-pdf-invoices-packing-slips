@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.8.0-beta.3
+Stable tag: 4.9.0-beta.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,23 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.8.0 (2025-10-21) =
+- New: Added notice for missing custom template files
+- New: Implemented recurring action scheduling for semaphore cleanup
+- New: Upgraded Dompdf library to version `3.1.3`
+- New: Displayed Pro settings section under the General tab
+- New: Added accordion sections to the Advanced settings tab
+- New: Added hooks for extra fields support in the PDF document data order metabox
+- New: Logged database errors in `SequentialNumberStore` methods
+- Tweak: Improved `Semaphore` class by adding transient caching for cleanup status
+- Tweak: Added note and permalink check for Pretty document links setting
+- Fix: Prevented fatal error when `SettingsCallbacks::validate()` receives `false`
+- Fix: Prevented document links from appearing in all email placements by ensuring each link is added only to its own configured location
+- Fix: Removed deprecated `finfo_close()` calls for PHP 8.5 compatibility
+- Fix: Prevented fatal error in `yearly_reset_action_missing_notice()` when `$this->settings` is `null`
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.3
 
 = 4.7.0 (2025-09-09) =
 - New: Playground blueprint added

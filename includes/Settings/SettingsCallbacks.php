@@ -734,35 +734,31 @@ class SettingsCallbacks {
 	/**
 	 * Validate options.
 	 *
-	 * @param array|null $input options to valid.
-	 *
-	 * @return array|null validated options.
+	 * @param array|false|null $input Options to validate.
+	 * @return array Validated options.
 	 */
-	public function validate( ?array $input ): ?array {
-		// Create our array for storing the validated options.
-		$output = array();
+	public function validate( $input ): array {
+		$output = array(); // Create our array for storing the validated options.
 
-		if ( empty( $input ) ) {
-			return $input;
-		}
-
-		if ( ! empty( $input['wpo_wcpdf_setting_store_empty'] ) ) { //perhaps we should use a more unique/specific name for this
-			foreach ( $input['wpo_wcpdf_setting_store_empty'] as $key ) {
-				if ( empty( $input[ $key ] ) ) {
-					$output[ $key ] = 0;
+		if ( ! empty( $input ) && is_array( $input ) ) {
+			if ( ! empty( $input['wpo_wcpdf_setting_store_empty'] ) && is_array( $input['wpo_wcpdf_setting_store_empty'] ) ) { //perhaps we should use a more unique/specific name for this
+				foreach ( $input['wpo_wcpdf_setting_store_empty'] as $key ) {
+					if ( empty( $input[ $key ] ) ) {
+						$output[ $key ] = 0;
+					}
 				}
+				unset( $input['wpo_wcpdf_setting_store_empty'] );
 			}
-			unset( $input['wpo_wcpdf_setting_store_empty'] );
-		}
-
-		// Loop through each of the incoming options.
-		foreach ( $input as $key => $value ) {
-			if ( is_array( $value ) ) {
-				foreach ( $value as $sub_key => $sub_value ) {
-					$output[ $key ][ $sub_key ] = $sub_value;
+		
+			// Loop through each of the incoming options.
+			foreach ( $input as $key => $value ) {
+				if ( is_array( $value ) ) {
+					foreach ( $value as $sub_key => $sub_value ) {
+						$output[ $key ][ $sub_key ] = $sub_value;
+					}
+				} else {
+					$output[ $key ] = $value;
 				}
-			} else {
-				$output[ $key ] = $value;
 			}
 		}
 

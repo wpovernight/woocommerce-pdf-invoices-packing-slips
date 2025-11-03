@@ -44,13 +44,14 @@ class SettingsGeneral {
 	public function init_settings() {
 		$page = $option_group = $option_name = $this->option_name;
 
-		$template_base_path   = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
-		$theme_template_path  = get_stylesheet_directory() . '/' . $template_base_path;
-		$wp_content_dir       = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
-		$theme_template_path  = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
-		$plugin_template_path = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
-		$requires_pro         = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
-		$states               = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
+		$template_base_path     = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
+		$theme_template_path    = get_stylesheet_directory() . '/' . $template_base_path;
+		$wp_content_dir         = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
+		$theme_template_path    = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
+		$plugin_template_path   = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
+		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
+		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
+		$missing_template_files = $this->get_missing_template_files();
 
 		$settings_fields = array(
 			array(
@@ -84,8 +85,17 @@ class SettingsGeneral {
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
 					'options_callback' => array( $this, 'get_installed_templates_list' ),
-					/* translators: 1,2. template paths */
-					'description'      => sprintf( __( 'Want to use your own template? Copy all the files from %1$s to your (child) theme in %2$s to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), '<code>'.$plugin_template_path.'</code>', '<code>'.$theme_template_path.'</code>' ),
+					'description' => sprintf(
+						/* translators: 1: plugin template path, 2: theme template path */
+						_n(
+							'Want to use your own template? Copy the file from %1$s to your (child) theme in %2$s to customize it.',
+							'Want to use your own template? Copy all the files from %1$s to your (child) theme in %2$s to customize them.',
+							count( $missing_template_files ),
+							'woocommerce-pdf-invoices-packing-slips'
+						),
+						'<code>' . esc_html( $plugin_template_path ) . '</code>',
+						'<code>' . esc_html( $theme_template_path ) . '</code>'
+					) . $this->render_missing_template_files_notice( $missing_template_files ),
 				)
 			),
 			array(
@@ -437,6 +447,51 @@ class SettingsGeneral {
 			),
 		);
 
+		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'pro_notice_address_customization',
+				'title'    => '',
+				'callback' => 'html_section',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pro_notice_address_customization',
+					'class'       => 'wpo_wcpdf_pro_notice',
+					'html'        =>
+						__( 'Customize the formatting of shipping and billing addresses in PDF documents, and add custom fields as needed.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">' . __( 'Upgrade today!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				),
+			);
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'pro_notice_multilingual',
+				'title'    => '',
+				'callback' => 'html_section',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pro_notice_multilingual',
+					'class'       => 'wpo_wcpdf_pro_notice',
+					'html'        => __( 'Create PDF documents in multiple languages based on the customer\'s language or locale.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">' . __( 'Upgrade today!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				),
+			);
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'pro_notice_static_files',
+				'title'    => '',
+				'callback' => 'html_section',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'pro_notice_static_files',
+					'class'       => 'wpo_wcpdf_pro_notice',
+					'html'        => __( 'Attach up to 3 static files (for example, a terms & conditions document) to the WooCommerce emails of your choice.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">' . __( 'Upgrade today!', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				),
+			);
+		}
+
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name, $this );
 		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
@@ -549,6 +604,32 @@ class SettingsGeneral {
 				)
 			),
 		);
+
+		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
+			$settings_categories['address_customization'] = array(
+				'title'   => __( 'Customer Address Customization', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+							 '<span class="wpo_wcpdf_badge badge-pro">' . __( 'Pro', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>',
+				'members' => array(
+					'pro_notice_address_customization',
+				),
+			);
+
+			$settings_categories['multilingual'] = array(
+				'title'   => __( 'Multilingual', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+							 '<span class="wpo_wcpdf_badge badge-pro">' . __( 'Pro', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>',
+				'members' => array(
+					'pro_notice_multilingual',
+				),
+			);
+
+			$settings_categories['static_files'] = array(
+				'title'   => __( 'Static Files', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' .
+							 '<span class="wpo_wcpdf_badge badge-pro">' . __( 'Pro', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>',
+				'members' => array(
+					'pro_notice_static_files',
+				),
+			);
+		}
 
 		return apply_filters( 'wpo_wcpdf_general_settings_categories', $settings_categories, $this );
 	}
@@ -675,6 +756,8 @@ class SettingsGeneral {
 	 * Get the states for a given country code via AJAX.
 	 */
 	public function ajax_get_shop_country_states() {
+		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+		
 		$request = stripslashes_deep( $_POST );
 
 		if ( empty( $request['country'] ) ) {
@@ -731,6 +814,95 @@ class SettingsGeneral {
 			$locale,
 			$general_settings
 		);
+	}
+	
+	/**
+	 * Collect documents whose template files are missing.
+	 *
+	 * @return string[] Array of document titles.
+	 */
+	private function get_missing_template_files(): array {
+		$template_path       = WPO_WCPDF()->settings->get_template_path();
+		$template_path_array = explode( '/', $template_path );
+		$template_name       = end( $template_path_array );
+		$enabled_documents   = WPO_WCPDF()->documents->get_documents( 'enabled' );
+		$missing             = array();
+
+		foreach ( $enabled_documents as $doc ) {
+			$filename         = $doc->get_type() . '.php';
+			$located_template = $doc->locate_template_file( $filename );
+
+			// If using Simple OR the located template is not inside /Simple/, and the file exists, skip.
+			if (
+				( 'Simple' === $template_name || false === strpos( $located_template, '/Simple/' ) ) &&
+				WPO_WCPDF()->file_system->exists( $located_template )
+			) {
+				continue;
+			}
+
+			$missing[] = $doc->get_title();
+		}
+
+		return $missing;
+	}
+
+	/**
+	 * Build the HTML notice for missing template files.
+	 *
+	 * @param string[] $missing_titles
+	 * @return string
+	 */
+	private function render_missing_template_files_notice( array $missing_titles ): string {
+		if ( empty( $missing_titles ) ) {
+			return '';
+		}
+
+		$missing_list = wp_sprintf_l( '%l', array_map( 'esc_html', $missing_titles ) );
+		$file_label   = _n( 'a file', 'files', count( $missing_titles ), 'woocommerce-pdf-invoices-packing-slips' );
+
+		$notice  = '<div class="notice notice-info inline notice-wpo"><p>';
+		$notice .= sprintf(
+			/* translators: 1: "file"/"files" label (singular/plural), 2: list of document titles */
+			esc_html__( 'Your custom template folder does not contain %1$s for: %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+			esc_html( $file_label ),
+			' <strong>' . $missing_list . '</strong>'
+		);
+
+		$notice .= ' ' . sprintf(
+			/* translators: 1: Opening <strong>, 2: Closing </strong> */
+			esc_html__( 'Documents where files are missing will remain functional and will use the default %1$sSimple%2$s template.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<strong>',
+			'</strong>'
+		);
+
+		// Premium Templates guidance (only if bundle license missing/invalid)
+		if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
+			$license_info = WPO_WCPDF()->settings->upgrade->get_extension_license_infos();
+			$info         = $license_info['bundle'] ?? null;
+
+			if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {
+				$template_folder = str_replace( wp_normalize_path( ABSPATH ), '', wp_normalize_path( WPO_WCPDF_Templates()->plugin_path() ) . '/templates/...' );
+
+				$notice .= '<br><br>';
+				$notice .= sprintf(
+					/* translators: %s: Template folder path */
+					esc_html__( 'If you are not using the latest version of the Premium Templates extension, please update it. Otherwise, copy the template files from the newest version in %s and adapt them to your custom template.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<code>' . esc_html( $template_folder ) . '</code>'
+				);
+			}
+		}
+
+		$notice .= '<br><br>';
+		$notice .= sprintf(
+			/* translators: 1: opening <a>, 2: closing </a> */
+			esc_html__( 'Please refer to the %1$sCreating a custom PDF template%2$s article to learn how to update your template.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'<a href="' . esc_url( 'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/creating-a-custom-pdf-template/' ) . '" target="_blank" rel="noopener noreferrer">',
+			'</a>'
+		);
+
+		$notice .= '</p></div>';
+
+		return $notice;
 	}
 
 }

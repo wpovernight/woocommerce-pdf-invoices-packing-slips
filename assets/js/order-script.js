@@ -59,11 +59,7 @@ jQuery( function( $ ) {
 
 	// enable invoice number edit if user initiated
 	$( '#wpo_wcpdf-data-input-box' ).on( 'click', '.wpo-wcpdf-set-date-number, .wpo-wcpdf-edit-date-number, .wpo-wcpdf-edit-document-notes', function() {
-		let $form = $(this).closest('.wcpdf-data-fields-section');
-		if ( $form.length == 0 ) { // no section, take overall wrapper
-			$form = $(this).closest('.wcpdf-data-fields');
-		}
-
+		let $form = $(this).closest('.wcpdf-data-fields');
 		let edit = $(this).data( 'edit' );
 
 		// check visibility

@@ -1467,6 +1467,73 @@ class SettingsDebug {
 	}
 
 	/**
+	 * Define settings categories for the Advanced tab.
+	 *
+	 * @return array
+	 */
+	public function get_settings_categories(): array {
+		$categories = array(
+			'filesystem_access' => array(
+				'title'   => __( 'File System & Access', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'file_system_method',
+					'document_link_access_type',
+					'document_link_access_type_table',
+					'document_access_denied_redirect_page',
+					'document_custom_redirect_page',
+				),
+			),
+			'display_interaction' => array(
+				'title'   => __( 'Document Display & Interaction', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'pretty_document_links',
+					'disable_preview',
+					'embed_images',
+					'html_output',
+				),
+			),
+			'document_management' => array(
+				'title'   => __( 'Document Management & Behavior', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'calculate_document_numbers',
+					'enable_document_data_editing',
+					'default_manual_document_number',
+					'enable_cleanup',
+				),
+			),
+			'localization_translation' => array(
+				'title'   => __( 'Localization & Translation', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'reload_attachment_translations',
+					'log_missing_translations',
+				),
+			),
+			'debugging_logging' => array(
+				'title'   => __( 'Debugging & Logging', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'enable_debug',
+					'log_to_order_notes',
+					'semaphore_logs',
+				),
+			),
+			'versioning_stability' => array(
+				'title'   => __( 'Versioning & Stability', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'check_unstable_versions',
+				),
+			),
+			'advanced_experimental' => array(
+				'title'   => __( 'Advanced / Experimental', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'enable_danger_zone_tools',
+				),
+			),
+		);
+
+		return apply_filters( 'wpo_wcpdf_settings_debug_categories', $categories );
+	}
+
+	/**
 	 * Fetch number table data
 	 *
 	 * @param string  $table_name

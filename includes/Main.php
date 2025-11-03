@@ -1051,8 +1051,13 @@ class Main {
 	}
 
 	public function html_currency_filters( $filters ) {
-		// only apply these fixes if the bundled dompdf version is used!
-		if ( wcpdf_pdf_maker_is_default() ) {
+		// Apply currency font when Extended currency symbol support is enabled
+		if ( isset( WPO_WCPDF()->settings->general_settings['currency_font'] ) ) {
+			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_font' ), 10001, 2 );
+			// 'wpo_wcpdf_custom_styles' is actually an action, but WP handles them with the same functions
+			$filters[] = array( 'wpo_wcpdf_custom_styles', array( $this, 'currency_symbol_font_styles' ) );
+		} elseif ( wcpdf_pdf_maker_is_default() ) {
+			// only apply these fixes if the bundled dompdf version is used and currency font is not enabled
 			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_code' ), 10001, 2 );
 		}
 		return $filters;
@@ -1844,7 +1849,7 @@ class Main {
 			}
 		}
 
-		$email_hooks = apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks );
+		$email_hooks = array_unique( apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks ) );
 
 		foreach ( $email_hooks as $email_hook ) {
 			if ( 'woocommerce_email_customer_address_section' === $email_hook ) {
@@ -1896,9 +1901,18 @@ class Main {
 		foreach ( $documents as $document ) {
 			$document_settings = WPO_WCPDF()->settings->get_document_settings( $document->get_type(), 'pdf' );
 			$selected_emails   = $document_settings['include_email_link'] ?? array();
+			$email_placement   = $document_settings['include_email_link_placement'] ?? '';
+
+			// Skip if no email placement is set.
+			if ( empty( $email_placement ) ) {
+				continue;
+			}
 
 			$email_id   = ( $email instanceof \WC_Email ) ? $email->id : '';
-			$is_allowed = in_array( $document->get_type(), $allowed_document_types, true ) && in_array( $email_id, $selected_emails, true );
+			$is_allowed =
+				in_array( $document->get_type(), $allowed_document_types, true ) &&
+				in_array( $email_id, $selected_emails, true ) &&
+				( 'woocommerce_email_' . $email_placement ) === current_filter();
 
 			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
 				continue;

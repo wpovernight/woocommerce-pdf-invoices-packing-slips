@@ -549,12 +549,14 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	cursor: pointer;
 }
 
+
+
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 ~ .form-table {
 	border-left: 1px solid #c3c4c7;
 	border-right: 1px solid #c3c4c7;
 	border-bottom: 1px solid #c3c4c7;
 	padding: 2em;
-	margin-top: -1px;
+	margin-top: 0;
 	background: #ffffff;
 	margin-bottom: 20px;
 }
@@ -1129,6 +1131,10 @@ sup.wcpdf_beta {
 	border-radius: 2px;
 }
 
+.notice-wpo p {
+	font-size: 0.8em !important;
+}
+
 /* UBL Taxes */
 #wpo-wcpdf-preview-wrapper #wpo-wcpdf-settings ul#ubl-standard-changelog {
 	display: none;
@@ -1402,6 +1408,22 @@ div.upgrade-table-description a,
 	border-radius: 12px;
 	margin: 0;
 	display: inline-block;
+}
+
+.wpo_wcpdf_badge {
+	background: #6e1edc;
+	color: #fff;
+	font-size: 0.6em;
+	padding: 4px 9px;
+	border-radius: 16px;
+	line-height: 1;
+	margin: 0 1em;
+	font-weight: 600;
+	vertical-align: middle;
+}
+
+.wpo_wcpdf_pro_notice {
+	font-style: italic;
 }
 
 @media screen and (max-width: 1100px) {
