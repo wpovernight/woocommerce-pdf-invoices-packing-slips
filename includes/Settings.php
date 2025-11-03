@@ -417,7 +417,7 @@ class Settings {
 
 			return sprintf(
 				/* translators: 1. document title, 2. order ID */
-				esc_html__( '%1$s is not available for order #%2$d, because it is disabled for the current order status. Try selecting a different order to preview your changes.', 'woocommerce-pdf-invoices-packing-slips' ),
+				esc_html__( '%1$s is not available for order #%2$d, because it is either not enabled, or is disabled for the current order status. Try selecting a different order to preview your changes.', 'woocommerce-pdf-invoices-packing-slips' ),
 				$document_title,
 				$order_id
 			);
