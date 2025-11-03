@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              4.9.0-beta.1
+ * Version:              4.9.0
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
@@ -22,7 +22,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '4.9.0-beta.1';
+	public $version              = '4.9.0';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
@@ -487,7 +487,7 @@ class WPO_WCPDF {
 		if ( empty( $this->settings ) || ! method_exists( $this->settings, 'maybe_schedule_yearly_reset_numbers' ) ) {
 			return;
 		}
-	
+
 		if ( ! $this->settings->maybe_schedule_yearly_reset_numbers() ) {
 			return;
 		}
@@ -695,7 +695,7 @@ class WPO_WCPDF {
 		// Handle dismissal
 		if ( isset( $_GET[ $hide_version_arg ], $_GET['_wpnonce'] ) ) {
 			$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) );
-			
+
 			if ( wp_verify_nonce( $nonce, 'wcpdf_hide_unstable_version' ) ) {
 				update_option( 'wpo_wcpdf_unstable_version_state', array(
 					'tag'       => $current_tag,
@@ -704,22 +704,22 @@ class WPO_WCPDF {
 			} else {
 				wcpdf_log_error( 'Invalid nonce while hiding unstable version notice.' );
 			}
-			
+
 			$redirect_url = remove_query_arg( array( $hide_version_arg, '_wpnonce' ), wp_get_referer() );
-			
+
 			if ( ! $redirect_url ) {
 				$redirect_url = admin_url(); // Fallback
 			}
-			
+
 			wp_safe_redirect( $redirect_url );
 			exit;
 		}
-		
+
 		$hide_url = wp_nonce_url(
 			add_query_arg( $hide_version_arg, 1, wp_get_referer() ?: admin_url() ),
 			'wcpdf_hide_unstable_version'
 		);
-		
+
 		// Display the notice
 		?>
 		<div class="notice notice-info">
