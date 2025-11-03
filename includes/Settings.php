@@ -431,7 +431,7 @@ class Settings {
 	 * 
 	 * @return string
 	 */
-	public function get_order_not_found_error( string $document_type ): string {
+	public function get_order_not_found_error( string $document_type = '' ): string {
 		if ( 'credit-note' === $document_type ) {
 			return esc_html__( 'No WooCommerce order refunds found! Please consider adding your first order refund to see this preview.', 'woocommerce-pdf-invoices-packing-slips' );
 		}
