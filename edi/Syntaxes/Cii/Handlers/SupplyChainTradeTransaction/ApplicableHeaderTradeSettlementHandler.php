@@ -54,7 +54,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			);
 			return null;
 		}
-		
+
 		$payment_reference = array(
 			'name'  => 'ram:PaymentReference',
 			'value' => wpo_ips_edi_sanitize_string( $reference ),
@@ -62,7 +62,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 		return apply_filters( 'wpo_ips_edi_cii_payment_reference', $payment_reference, $this );
 	}
-	
+
 	/**
 	 * Get the payment means data for the order.
 	 *
@@ -99,8 +99,8 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			$value = ! empty( $payment['iban'] )
 				? strtoupper( preg_replace( '/\s+/', '', $payment['iban'] ) )
 				: $payment['account_number'];
-			
-			$account = array(
+
+			$payment_means['value'][] = array(
 				'name'  => 'ram:PayeePartyCreditorFinancialAccount',
 				'value' => array(
 					array(
@@ -109,27 +109,13 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 					),
 				),
 			);
-
-			if ( ! empty( $payment['account_name'] ) ) {
-				$account['value'][] = array(
-					'name'  => 'ram:AccountName',
-					'value' => wpo_ips_edi_sanitize_string( $payment['account_name'] ),
-				);
-			}
-
-			$payment_means['value'][] = $account;
 		}
 
 		// Add transaction ID if applicable (e.g., PayPal, Stripe)
-		elseif ( ! empty( $payment['transaction_id'] ) ) {
+		if ( ! empty( $payment['transaction_id'] ) ) {
 			$payment_means['value'][] = array(
-				'name'  => 'ram:PayeePartyCreditorFinancialAccount',
-				'value' => array(
-					array(
-						'name'  => 'ram:ID',
-						'value' => $payment['transaction_id'],
-					),
-				),
+				'name'  => 'ram:Information',
+				'value' => wpo_ips_edi_sanitize_string( $payment['transaction_id'] ),
 			);
 		}
 
@@ -148,7 +134,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 		return apply_filters( 'wpo_ips_edi_cii_payment_means', $payment_means, $this );
 	}
-	
+
 	/**
 	 * Get the trade tax data for the order.
 	 *
@@ -223,7 +209,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 		return apply_filters( 'wpo_ips_edi_cii_trade_tax', $trade_tax, $this );
 	}
-	
+
 	/**
 	 * Get the payment terms for the order.
 	 *
@@ -237,11 +223,11 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 		if ( empty( $due_date_timestamp ) ) {
 			return null;
 		}
-		
+
 		$date_format_code = $this->get_date_format_code();
 		$php_date_format  = $this->get_php_date_format_from_code( $date_format_code );
 		$due_date         = $this->normalize_date( $due_date_timestamp, $php_date_format );
-		
+
 		if ( ! $this->validate_date_format( $due_date, $date_format_code ) ) {
 			wpo_ips_edi_log( 'CII ApplicableHeaderTradeSettlementHandler: Invalid due date format.', 'error' );
 			return null;
@@ -267,7 +253,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 		return apply_filters( 'wpo_ips_edi_cii_payment_terms', $payment_terms, $this );
 	}
-	
+
 	/**
 	 * Get the monetary summation for the order.
 	 *
