@@ -358,9 +358,11 @@ class Settings {
 					wp_send_json_error(
 						array(
 							'error' => sprintf(
-								/* translators: order ID */
-								esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ),
-								$order_id
+								/* translators: 1. order ID, 2. documentation page link, 3. documentation page link closing tag */
+								esc_html__( 'Document not available for order #%1$d, try selecting a different order. More information about why this might be happening can be found in the %2$sdocumentation page%3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+								$order_id,
+								'<a href="https://todo.com" target="_blank">',
+								'</a>'
 							)
 						)
 					);
