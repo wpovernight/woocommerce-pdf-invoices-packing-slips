@@ -246,7 +246,7 @@ class Settings {
 			if ( ! empty( $_POST['order_id'] ) ) {
 				$order_id = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
 
-				if ( 'credit-note' ===$document_type ) {
+				if ( 'credit-note' === $document_type ) {
 					// get last refund ID of the order if available
 					$refund = wc_get_orders(
 						array(
