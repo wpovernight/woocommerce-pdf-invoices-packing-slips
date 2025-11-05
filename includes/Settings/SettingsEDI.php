@@ -242,7 +242,7 @@ class SettingsEDI {
 				'id'                => 'peppol_endpoint_id',
 				'description'       => sprintf(
 					'%s<br>%s',
-					__( 'Specify the Peppol Endpoint ID for the supplier.', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( 'Specify the Peppol Endpoint ID for the supplier. Do not include the scheme (e.g., "0208:"), as it can be selected below.', 'woocommerce-pdf-invoices-packing-slips' ),
 					sprintf(
 						/* translators: %1$s: open link anchor, %2$s: close link anchor */
 						__( 'If you don\'t know the ID, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
