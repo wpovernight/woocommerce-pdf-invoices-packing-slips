@@ -494,16 +494,18 @@ class SettingsEDI {
 	 * @return array
 	 */
 	public function preserve_peppol_settings( mixed $value, mixed $old_value, string $option ): array {
-		$new = is_array( $value ) ? $value : array();
+		$new = is_array( $value )     ? $value     : array();
 		$old = is_array( $old_value ) ? $old_value : array();
 		
 		foreach ( $new as $key => $val ) {
-			if (
-				false !== strpos( $key, 'peppol_' ) &&
-				empty( $val ) &&
-				! empty( $old[ $key ] )
-			) {
-				$new[ $key ] = $old[ $key ];
+			if ( false !== strpos( $key, 'peppol_' ) ) {
+				// preserve old value on empty new value
+				if ( empty( $val ) && ! empty( $old[ $key ] ) ) {
+					$new[ $key ] = $old[ $key ];
+				// normalize endpoint ID
+				} elseif ( ! empty( $val ) && 'peppol_endpoint_id' === $key ) {
+					$new[ $key ] = preg_replace( '/^[^:]+:/', '', trim( $val ) );
+				}
 			}
 		}
 		
