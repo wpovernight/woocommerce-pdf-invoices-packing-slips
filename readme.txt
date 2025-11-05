@@ -108,6 +108,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 4.9.0 (2025-11-03) =
+- New: Upgrade Dompdf to version 3.1.4
+- Tweak: Improve display of Shipping cost and location details in PDF totals
+- Fix: Extended currency symbols show in PDF but not in PDF Preview
+- Translations: Updated translation template (POT)
+
 = 4.8.0 (2025-10-21) =
 - New: Added notice for missing custom template files
 - New: Implemented recurring action scheduling for semaphore cleanup
