@@ -429,7 +429,7 @@ class SettingsEDI {
 					sprintf(
 						/* translators: 1: opening link tag, 2: closing link tag */
 						__( 'Advanced customization is possible, see the %1$sdocumentation page%2$s for details.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="#" target="_blank" rel="noopener noreferrer">',
+						'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/customize-the-item-meta-included-in-e-documents/" target="_blank" rel="noopener noreferrer">',
 						'</a>'
 					)
 				),
