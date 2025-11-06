@@ -1808,12 +1808,16 @@ function wpo_ips_display_item_meta( \WC_Order_Item $item, array $args = array() 
 /**
  * Check if the order has a local pickup shipping method.
  *
- * @param \WC_Order $order
+ * @param \WC_Abstract_Order $order
  *
  * @return bool
  */
-function wpo_ips_order_has_local_pickup_method( \WC_Order $order ): bool {
+function wpo_ips_order_has_local_pickup_method( \WC_Abstract_Order $order ): bool {
 	$has_local_pickup_method = false;
+	
+	if ( $order instanceof \WC_Order_Refund ) {
+		return $has_local_pickup_method;
+	}
 	
 	if ( ! class_exists( '\Automattic\WooCommerce\Utilities\ArrayUtil' ) ) {
 		return $has_local_pickup_method;
