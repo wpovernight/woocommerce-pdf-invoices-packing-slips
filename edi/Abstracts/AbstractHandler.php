@@ -506,5 +506,84 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount' );
 	}
+	
+	/**
+	 * Get order item meta.
+	 *
+	 * @param \WC_Order_Item $item Order item object.
+	 * @param array          $args
+	 * @return array
+	 */
+	protected function get_item_meta( \WC_Order_Item $item, array $args = array() ): array {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'include_hidden'    => false,
+				'include_empty'     => false,
+				'only_keys'         => array(),
+				'exclude_keys'      => array(),
+				'use_display_label' => true,
+				'max_length'        => 0,
+			)
+		);
+
+		$meta_items = method_exists( $item, 'get_all_formatted_meta_data' )
+			? $item->get_all_formatted_meta_data()
+			: $item->get_formatted_meta_data();
+
+		$rows = array();
+
+		foreach ( $meta_items as $meta_id => $m ) {
+			$raw_key   = isset( $m->key )   ? (string) $m->key : '';
+			$raw_value = isset( $m->value ) ? $m->value        : '';
+
+			// Hidden meta starts with underscore.
+			if ( ! $args['include_hidden'] && 0 === strpos( $raw_key, '_' ) ) {
+				continue;
+			}
+
+			// Whitelist / blacklist
+			if ( $args['only_keys'] && ! in_array( $raw_key, (array) $args['only_keys'], true ) ) {
+				continue;
+			}
+			if ( $args['exclude_keys'] && in_array( $raw_key, (array) $args['exclude_keys'], true ) ) {
+				continue;
+			}
+
+			$label = $args['use_display_label'] && isset( $m->display_key ) && '' !== $m->display_key
+				? (string) $m->display_key
+				: $raw_key;
+
+			// Prefer WooCommerce's display_value (already humanized), but force plain text.
+			$value = isset( $m->display_value ) ? $m->display_value : $raw_value;
+
+			// Flatten arrays/objects deterministically.
+			if ( is_array( $value ) || is_object( $value ) ) {
+				$value = wp_json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			}
+
+			// Strip tags and normalize whitespace for XML.
+			$value = wp_strip_all_tags( (string) $value, true );
+			$value = preg_replace( '/\s+/u', ' ', $value );
+			$value = trim( $value );
+
+			// Optional truncation.
+			if ( $args['max_length'] ) {
+				$len   = (int) $args['max_length'];
+				$value = function_exists( 'mb_substr' ) ? mb_substr( $value, 0, $len ) : substr( $value, 0, $len );
+			}
+
+			if ( ! $args['include_empty'] && '' === $value ) {
+				continue;
+			}
+
+			$rows[] = [
+				'name'  => $label,
+				'value' => $value,
+			];
+		}
+
+		return apply_filters( 'wpo_ips_edi_get_item_meta', $rows, $item, $args, $this );
+	}
 
 }

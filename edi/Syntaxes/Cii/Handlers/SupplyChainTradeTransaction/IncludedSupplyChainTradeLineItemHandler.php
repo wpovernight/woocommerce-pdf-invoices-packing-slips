@@ -91,6 +91,37 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				);
 			}
 
+			// Build SpecifiedTradeProduct
+			$product_value = array(
+				array(
+					'name'  => 'ram:Name',
+					'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
+				),
+			);
+
+			// Optionally append ApplicableProductCharacteristic from meta
+			if ( wpo_ips_edi_include_item_meta() ) {
+				$meta_rows = $this->get_item_meta( $item );
+
+				if ( ! empty( $meta_rows ) ) {
+					foreach ( $meta_rows as $row ) {
+						$product_value[] = array(
+							'name'  => 'ram:ApplicableProductCharacteristic',
+							'value' => array(
+								array(
+									'name'  => 'ram:Description',
+									'value' => $row['name'],
+								),
+								array(
+									'name'  => 'ram:Value',
+									'value' => $row['value'],
+								),
+							),
+						);
+					}
+				}
+			}
+
 			$line_item = array(
 				'name'  => 'ram:IncludedSupplyChainTradeLineItem',
 				'value' => array(
@@ -105,12 +136,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					),
 					array(
 						'name'  => 'ram:SpecifiedTradeProduct',
-						'value' => array(
-							array(
-								'name' => 'ram:Name',
-								'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
-							),
-						),
+						'value' => $product_value,
 					),
 					array(
 						'name'  => 'ram:SpecifiedLineTradeAgreement',

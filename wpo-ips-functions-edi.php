@@ -367,6 +367,15 @@ function wpo_ips_edi_embed_encrypted_pdf(): bool {
 }
 
 /**
+ * Check if EDI item meta should be included
+ *
+ * @return bool
+ */
+function wpo_ips_edi_include_item_meta(): bool {
+	return apply_filters( 'wpo_ips_edi_include_item_meta', ! empty( wpo_ips_edi_get_settings( 'include_item_meta' ) ) );
+}
+
+/**
  * Check if EDI preview is enabled
  *
  * @return bool

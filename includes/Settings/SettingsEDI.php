@@ -415,6 +415,33 @@ class SettingsEDI {
 
 		$settings_fields[] = array(
 			'type'     => 'setting',
+			'id'       => 'include_item_meta',
+			'title'    => '',
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'title'             => __( 'Include Item Meta Data', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name'       => $option_name,
+				'id'                => 'include_item_meta',
+				'description'       => sprintf(
+					'%s %s',
+					__( 'Include item meta data in the e-document.', 'woocommerce-pdf-invoices-packing-slips' ),
+					sprintf(
+						/* translators: 1: opening link tag, 2: closing link tag */
+						__( 'Advanced customization is possible, see the %1$sdocumentation page%2$s for details.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="#" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					)
+				),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[syntax]',
+					'data-show_for_option_values' => json_encode( array( 'ubl', 'cii' ) ),
+				),
+			)
+		);
+		
+		$settings_fields[] = array(
+			'type'     => 'setting',
 			'id'       => 'embed_encrypted_pdf',
 			'title'    => '',
 			'callback' => 'checkbox',

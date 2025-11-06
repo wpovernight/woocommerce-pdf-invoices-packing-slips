@@ -97,6 +97,41 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				);
 			}
 
+			// Build base Item node
+			$item_value = array(
+				array(
+					'name'  => 'cbc:Name',
+					'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
+				),
+				array(
+					'name'  => 'cac:ClassifiedTaxCategory',
+					'value' => $tax_category,
+				),
+			);
+
+			// Optionally append AdditionalItemProperty from meta
+			if ( wpo_ips_edi_include_item_meta() ) {
+				$meta_rows = $this->get_item_meta( $item );
+
+				if ( ! empty( $meta_rows ) ) {
+					foreach ( $meta_rows as $row ) {
+						$item_value[] = array(
+							'name'  => 'cac:AdditionalItemProperty',
+							'value' => array(
+								array(
+									'name'  => 'cbc:Name',
+									'value' => $row['name'],
+								),
+								array(
+									'name'  => 'cbc:Value',
+									'value' => $row['value'],
+								),
+							),
+						);
+					}
+				}
+			}
+
 			$invoice_line = array(
 				'name'  => 'cac:InvoiceLine',
 				'value' => array(
@@ -120,16 +155,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'  => 'cac:Item',
-						'value' => array(
-							array(
-								'name'  => 'cbc:Name',
-								'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
-							),
-							array(
-								'name'  => 'cac:ClassifiedTaxCategory',
-								'value' => $tax_category,
-							),
-						),
+						'value' => $item_value,
 					),
 					array(
 						'name'  => 'cac:Price',
