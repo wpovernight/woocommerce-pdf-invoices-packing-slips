@@ -107,6 +107,9 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 4.9.1 (2025-11-06) =
+- Fix: Fatal error when Credit Note passes Order Refund to `wpo_ips_order_has_local_pickup_method()`
+
 = 4.9.0 (2025-11-03) =
 - New: Upgrade Dompdf to version 3.1.4
 - Tweak: Improve display of Shipping cost and location details in PDF totals
