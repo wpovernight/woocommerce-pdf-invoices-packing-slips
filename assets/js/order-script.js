@@ -173,7 +173,7 @@ jQuery( function( $ ) {
 			$form.find( '.read-only' ).hide();
 			$form.find( '.editable-notes' ).show();
 			$form.closest( '.wcpdf-data-fields' ).find( '.wpo-wcpdf-document-buttons' ).show();
-			
+
 			// re-initialize WooCommerce tooltips
 			$( '.wcpdf-data-fields .woocommerce-help-tip' ).tipTip( {
 					attribute: 'data-tip',
@@ -211,7 +211,7 @@ jQuery( function( $ ) {
 			$( '.view-more' ).show();
 		}
 	} );
-	
+
 	function updatePreviewNumber( $table ) {
 		let prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
 		let suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
@@ -254,7 +254,7 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
-	
+
 	let previewTimer;
 	$( document ).on( 'input', '.wcpdf-data-fields input', function () {
 		const $table = $( this ).closest( '.wcpdf-data-fields' );
@@ -264,5 +264,56 @@ jQuery( function( $ ) {
 			updatePreviewNumber( $table );
 		}, 300 );
 	} );
+
+	function get_pending_documents() {
+		let pending_documents = [];
+		$( '.wcpdf-data-fields' ).each( function () {
+			if ( 'yes' === $( this ).attr( 'data-is_pending' ) ) {
+				pending_documents.push( $( this ).data( 'document' ) );
+			}
+		} );
+
+		return pending_documents;
+	}
+
+	// Fetch data for pending documents if documents were pending and now are generated.
+	let pending_documents = get_pending_documents();
+	let ajax_count          = 0;
+	const ajax_max_count    = 3;		// Limit the frequency of this AJAX request to prevent a performance burden.
+	const ajax_interval     = 3000;
+	const ajax_timer        = function() {
+		if ( pending_documents.length <= 0 ) {
+			return;
+		}
+
+		$.ajax( {
+			url:     wpo_wcpdf_ajax.ajaxurl,
+			type:    'POST',
+			data:    {
+				action:         'wpo_fetch_document_data',
+				security:       wpo_wcpdf_ajax.nonce,
+				document_types: pending_documents,
+				order_id:       woocommerce_admin_meta_boxes.post_id,
+			},
+			success: function ( response ) {
+				$.each( response.data, function ( key, value ) {
+					$( '.wcpdf-data-fields[data-document="' + key + '"]' ).replaceWith( value );
+				} );
+
+				// Update pending document to prevent reloading data that is already loaded.
+				pending_documents = get_pending_documents();
+			},
+			error:   function ( response ) {
+				console.log( response.message );
+			}
+		} );
+
+		ajax_count++;
+		if ( ajax_count < ajax_max_count ) {
+			setTimeout( ajax_timer, ajax_interval );
+		}
+	}
+
+	setTimeout( ajax_timer, ajax_interval );
 
 } );

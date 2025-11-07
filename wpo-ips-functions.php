@@ -776,6 +776,24 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 }
 
 /**
+ * Validates the given document type against the currently defined documents.
+ *
+ * @param string $document_type
+ *
+ * @return bool
+ */
+function wpo_wcpdf_is_document_type_valid( string $document_type ): bool {
+	$documents = WPO_WCPDF()->documents->get_documents();
+
+	foreach ( $documents as $document ) {
+		if ( $document_type === $document->get_type() ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+/**
  * Get image mime type
  *
  * @param string $src
