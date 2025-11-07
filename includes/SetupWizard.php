@@ -178,8 +178,6 @@ class SetupWizard {
 			}
 		}
 
-		wp_enqueue_media();
-
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step ) {
 			wp_register_script(
@@ -189,6 +187,8 @@ class SetupWizard {
 				WPO_WCPDF_VERSION
 			);
 		}
+		
+		wp_enqueue_media();
 
 		if ( ! empty( $request['save_step'] ) ) {
 			$this->save_step();
