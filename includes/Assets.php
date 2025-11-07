@@ -36,7 +36,9 @@ class Assets {
 		if ( WPO_WCPDF()->admin->is_order_page() ) {
 
 			// STYLES
-			wp_enqueue_style( 'thickbox' );
+			if ( ! wp_style_is( 'thickbox', 'enqueue' ) ) {
+				wp_enqueue_style( 'thickbox' );
+			}
 
 			wp_enqueue_style(
 				'wpo-wcpdf-order-styles',
