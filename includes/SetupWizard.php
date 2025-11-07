@@ -145,10 +145,10 @@ class SetupWizard {
 			)
 		);
 		
-		$handles = array(
+		$woo_dependencies = array(
 			0 => array(
 				'handle' => version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
-				'url'    => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
+				'url'    => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI.min.js',
 				'deps'   => array(
 					'jquery',
 				),
@@ -163,12 +163,12 @@ class SetupWizard {
 			),
 		);
 		
-		foreach ( $handles as $handle ) {
-			if ( ! wp_script_is( $handle['handle'], 'registered' ) ) {
+		foreach ( $woo_dependencies as $dep ) {
+			if ( ! wp_script_is( $dep['handle'], 'registered' ) ) {
 				wp_register_script(
-					$handle['handle'],
-					$handle['url'],
-					$handle['deps'],
+					$dep['handle'],
+					$dep['url'],
+					$dep['deps'],
 					WC_VERSION,
 					true
 				);
