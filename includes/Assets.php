@@ -68,7 +68,10 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf',
 				WPO_WCPDF()->plugin_url() . '/assets/js/order-script' . $suffix . '.js',
-				array( 'jquery', 'jquery-blockui' ),
+				array(
+					'jquery',
+					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				),
 				WPO_WCPDF_VERSION
 			);
 
@@ -129,15 +132,28 @@ class Assets {
 			if ( ! wp_style_is( 'wp-pointer', 'enqueued' ) ) {
 				wp_enqueue_style( 'wp-pointer' );
 			}
-
-			if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
-				wp_enqueue_script( 'jquery-tiptip' );
+			
+			if ( version_compare( WC_VERSION, '10.3', '>=' ) ) {
+				if (  ! wp_script_is( 'wc-jquery-tiptip', 'enqueued' ) ) {
+					wp_enqueue_script( 'wc-jquery-tiptip' );
+				}
+			} else {
+				if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
+					wp_enqueue_script( 'jquery-tiptip' );
+				}
 			}
 
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'jquery-ui-datepicker' ),
+				array(
+					'jquery',
+					'wc-enhanced-select',
+					'wp-pointer',
+					'jquery-ui-datepicker',
+					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+					wp_script_is( 'wc-jquery-tiptip', 'registered' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip',
+				),
 				WPO_WCPDF_VERSION
 			);
 
@@ -235,7 +251,11 @@ class Assets {
 				wp_enqueue_script(
 					'wpo-wcpdf-debug',
 					WPO_WCPDF()->plugin_url() . '/assets/js/debug-script' . $suffix . '.js',
-					array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
+					array(
+						'jquery',
+						'jquery-ui-datepicker',
+						wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+					),
 					WPO_WCPDF_VERSION
 				);
 

@@ -142,7 +142,7 @@ class SetupWizard {
 			)
 		);
 
-		if ( ! wp_script_is( 'jquery-blockui', 'enqueued' ) ) {
+		if ( ! wp_script_is( 'jquery-blockui', 'enqueued' ) || ! wp_script_is( 'wc-jquery-blockui', 'enqueued' ) ) {
 			wp_register_script(
 				'jquery-blockui',
 				WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
@@ -151,11 +151,14 @@ class SetupWizard {
 			);
 		}
 
-		if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
+		if ( ! wp_script_is( 'select2', 'enqueued' ) || ! wp_script_is( 'wc-select2', 'enqueued' ) ) {
 			wp_register_script(
-				'select2',
+				'wc-select2',
 				WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
-				array( 'jquery', 'jquery-blockui' ),
+				array(
+					'jquery',
+					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				),
 				WC_VERSION
 			);
 		}
@@ -200,7 +203,7 @@ class SetupWizard {
 			<title>PDF Invoices & Packing Slips for WooCommerce &rsaquo; <?php esc_html_e( 'Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
-			<?php wp_print_scripts( 'select2' ); ?>
+			<?php wp_print_scripts( wp_script_is( 'wc-select2', 'enqueued' ) ? 'wc-select2' : 'select2' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>
