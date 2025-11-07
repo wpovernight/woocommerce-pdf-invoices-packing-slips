@@ -144,36 +144,30 @@ class SetupWizard {
 			)
 		);
 		
-		if ( version_compare( WC_VERSION, '10.3', '>=' ) ) {
-			$handles = array(
-				'wc-jquery-tiptip' => array(
-					'url'  => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
-					'deps' => array( 'jquery' ),
+		$handles = array(
+			0 => array(
+				'handle' => version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				'url'    => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
+				'deps'   => array(
+					'jquery',
 				),
-				'wc-select2'       => array(
-					'url'  => WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
-					'deps' => array( 'jquery', 'wc-jquery-blockui' ),
+			),
+			1 => array(
+				'handle' => version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-select2' : 'select2',
+				'url'    => WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
+				'deps'   => array(
+					'jquery',
+					version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
 				),
-			);
-		} else {
-			$handles = array(
-				'jquery-tiptip' => array(
-					'url'  => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
-					'deps' => array( 'jquery' ),
-				),
-				'select2'       => array(
-					'url'  => WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
-					'deps' => array( 'jquery', 'jquery-blockui' ),
-				),
-			);
-		}
+			),
+		);
 		
-		foreach ( $handles as $handle => $specs ) {
-			if ( ! wp_script_is( $handle, 'registered' ) ) {
+		foreach ( $handles as $handle ) {
+			if ( ! wp_script_is( $handle['handle'], 'registered' ) ) {
 				wp_register_script(
-					$handle,
-					$specs['url'],
-					$specs['deps'],
+					$handle['handle'],
+					$handle['url'],
+					$handle['deps'],
 					WC_VERSION,
 					true
 				);
