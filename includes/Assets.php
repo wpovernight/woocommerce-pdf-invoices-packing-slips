@@ -133,14 +133,10 @@ class Assets {
 				wp_enqueue_style( 'wp-pointer' );
 			}
 			
-			if ( version_compare( WC_VERSION, '10.3', '>=' ) ) {
-				if (  ! wp_script_is( 'wc-jquery-tiptip', 'enqueued' ) ) {
-					wp_enqueue_script( 'wc-jquery-tiptip' );
-				}
-			} else {
-				if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
-					wp_enqueue_script( 'jquery-tiptip' );
-				}
+			$handle = version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip';
+			
+			if ( ! wp_script_is( $handle, 'enqueued' ) ) {
+				wp_enqueue_script( $handle );
 			}
 
 			wp_enqueue_script(
