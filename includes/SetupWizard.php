@@ -113,7 +113,8 @@ class SetupWizard {
 			'wpo-wcpdf-media-upload',
 			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 			array( 'jquery', 'media-editor', 'mce-view' ),
-			WPO_WCPDF_VERSION
+			WPO_WCPDF_VERSION,
+			true
 		);
 
 		wp_localize_script(
@@ -126,7 +127,8 @@ class SetupWizard {
 			'wpo-wcpdf-setup',
 			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard' . $suffix . '.js',
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
-			WPO_WCPDF_VERSION
+			WPO_WCPDF_VERSION,
+			true
 		);
 		
 		wp_localize_script(
@@ -184,7 +186,8 @@ class SetupWizard {
 				'wpo-wcpdf-setup-confetti',
 				WPO_WCPDF()->plugin_url() . '/assets/js/confetti' . $suffix . '.js',
 				array( 'jquery' ),
-				WPO_WCPDF_VERSION
+				WPO_WCPDF_VERSION,
+				true
 			);
 		}
 		
