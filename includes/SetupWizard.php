@@ -141,26 +141,41 @@ class SetupWizard {
 				),
 			)
 		);
-
-		if ( ! wp_script_is( 'jquery-blockui', 'enqueued' ) || ! wp_script_is( 'wc-jquery-blockui', 'enqueued' ) ) {
-			wp_register_script(
-				'jquery-blockui',
-				WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
-				array( 'jquery' ),
-				WC_VERSION
+		
+		if ( version_compare( WC_VERSION, '10.3', '>=' ) ) {
+			$handles = array(
+				'wc-jquery-tiptip' => array(
+					'url'  => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
+					'deps' => array( 'jquery' ),
+				),
+				'wc-select2'       => array(
+					'url'  => WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
+					'deps' => array( 'jquery', 'wc-jquery-blockui' ),
+				),
+			);
+		} else {
+			$handles = array(
+				'jquery-tiptip' => array(
+					'url'  => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
+					'deps' => array( 'jquery' ),
+				),
+				'select2'       => array(
+					'url'  => WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
+					'deps' => array( 'jquery', 'jquery-blockui' ),
+				),
 			);
 		}
-
-		if ( ! wp_script_is( 'select2', 'enqueued' ) || ! wp_script_is( 'wc-select2', 'enqueued' ) ) {
-			wp_register_script(
-				'wc-select2',
-				WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
-				array(
-					'jquery',
-					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
-				),
-				WC_VERSION
-			);
+		
+		foreach ( $handles as $handle ) {
+			if ( ! wp_script_is( $handle, 'registered' ) ) {
+				wp_register_script(
+					$handle,
+					$handles[ $handle ]['url'],
+					$handles[ $handle ]['deps'],
+					WC_VERSION,
+					true
+				);
+			}
 		}
 
 		wp_enqueue_media();
@@ -203,7 +218,7 @@ class SetupWizard {
 			<title>PDF Invoices & Packing Slips for WooCommerce &rsaquo; <?php esc_html_e( 'Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
-			<?php wp_print_scripts( wp_script_is( 'wc-select2', 'enqueued' ) ? 'wc-select2' : 'select2' ); ?>
+			<?php wp_print_scripts( wp_script_is( 'wc-select2', 'registered' ) ? 'wc-select2' : 'select2' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>
