@@ -168,12 +168,12 @@ class SetupWizard {
 			);
 		}
 		
-		foreach ( $handles as $handle ) {
+		foreach ( $handles as $handle => $specs ) {
 			if ( ! wp_script_is( $handle, 'registered' ) ) {
 				wp_register_script(
 					$handle,
-					$handles[ $handle ]['url'],
-					$handles[ $handle ]['deps'],
+					$specs['url'],
+					$specs['deps'],
 					WC_VERSION,
 					true
 				);
