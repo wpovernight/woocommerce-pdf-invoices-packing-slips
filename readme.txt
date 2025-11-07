@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.9.0
+Stable tag: 4.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,9 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 4.9.1 (2025-11-06) =
+- Fix: Fatal error when Credit Note passes Order Refund to `wpo_ips_order_has_local_pickup_method()`
 
 = 4.9.0 (2025-11-03) =
 - New: Upgrade Dompdf to version 3.1.4
