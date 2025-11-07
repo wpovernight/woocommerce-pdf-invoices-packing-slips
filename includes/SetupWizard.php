@@ -136,6 +136,7 @@ class SetupWizard {
 			'wpo_wcpdf_setup',
 			array(
 				'ajaxurl'                       => admin_url( 'admin-ajax.php' ),
+				'nonce'                         => wp_create_nonce( 'wpo_wcpdf_setup_nonce' ),
 				'shop_country_changed_messages' => array(
 					'loading' => __( 'Loading', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
 					'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
