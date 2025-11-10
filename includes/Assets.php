@@ -132,40 +132,18 @@ class Assets {
 				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/checkmark.svg'.") !important;
 			}" );
 
-			wp_enqueue_script( 'wc-enhanced-select' );
+			if ( ! wp_script_is( 'wc-enhanced-select', 'enqueued' ) ) {
+				wp_enqueue_script( 'wc-enhanced-select' );
+			}
 
 			if ( ! wp_script_is( 'wp-pointer', 'enqueued' ) ) {
 				wp_enqueue_script( 'wp-pointer' );
 			}
-
-			if ( ! wp_style_is( 'wp-pointer', 'enqueued' ) ) {
-				wp_enqueue_style( 'wp-pointer' );
-			}
 			
-			$handle = version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip';
+			$tiptip_handle = version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip';
 			
-			if ( ! wp_script_is( $handle, 'enqueued' ) ) {
-				wp_enqueue_script( $handle );
-			}
-			
-			// edi preview prismjs
-			$edi_preview_enabled = wpo_ips_edi_preview_is_enabled();
-			
-			if ( $edi_preview_enabled ) {
-				wp_enqueue_style(
-					'wpo-ips-edi-prism',
-					WPO_WCPDF()->plugin_url() . '/assets/css/prism.min.css',
-					array(),
-					'1.30.0'
-				);
-				
-				wp_enqueue_script(
-					'wpo-ips-edi-prism-core',
-					WPO_WCPDF()->plugin_url() . '/assets/js/prism.min.js',
-					array(),
-					'1.30.0',
-					true
-				);
+			if ( ! wp_script_is( $tiptip_handle, 'enqueued' ) ) {
+				wp_enqueue_script( $tiptip_handle );
 			}
 			
 			$admin_deps = array(
@@ -176,15 +154,9 @@ class Assets {
 				wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
 				wp_script_is( 'wc-jquery-tiptip', 'registered' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip',
 			);
-
-			if ( $edi_preview_enabled ) {
-				$admin_deps[] = 'wpo-ips-edi-prism-core';
-			}
 			
-			// edi preview prismjs
-			$edi_preview_enabled = wpo_ips_edi_preview_is_enabled();
-			
-			if ( $edi_preview_enabled ) {
+			// edi preview			
+			if ( wpo_ips_edi_preview_is_enabled() ) {
 				wp_enqueue_style(
 					'wpo-ips-edi-prism',
 					WPO_WCPDF()->plugin_url() . '/assets/css/prism.min.css',
@@ -199,11 +171,7 @@ class Assets {
 					'1.30.0',
 					true
 				);
-			}
-			
-			$admin_deps = array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'jquery-ui-datepicker' );
-
-			if ( $edi_preview_enabled ) {
+				
 				$admin_deps[] = 'wpo-ips-edi-prism-core';
 			}
 
@@ -287,6 +255,7 @@ class Assets {
 			}
 
 			wp_enqueue_media();
+			
 			wp_enqueue_script(
 				'wpo-wcpdf-media-upload',
 				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
