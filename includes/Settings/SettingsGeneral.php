@@ -789,7 +789,7 @@ class SettingsGeneral {
 	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
 	 * @return string The value of the setting.
 	 */
-	private function get_setting( string $key, string $locale = '' ): string {
+	public function get_setting( string $key, string $locale = '' ): string {
 		if ( empty( $key ) ) {
 			return '';
 		}

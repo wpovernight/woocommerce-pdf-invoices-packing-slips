@@ -26,14 +26,16 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 
 	// includes/Makers
 	'\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker'                  => '\\WPO\\IPS\\Makers\\PDFMaker',
-	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\UBLMaker',
+	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\EDIMaker',
+	'\\WPO\\IPS\\Makers\\UBLMaker'                                => '\\WPO\\IPS\\Makers\\EDIMaker',
 
 	// includes/Settings
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks'       => '\\WPO\\IPS\\Settings\\SettingsCallbacks',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug'           => '\\WPO\\IPS\\Settings\\SettingsDebug',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Documents'       => '\\WPO\\IPS\\Settings\\SettingsDocuments',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_General'         => '\\WPO\\IPS\\Settings\\SettingsGeneral',
-	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL'             => '\\WPO\\IPS\\Settings\\SettingsUbl',
+	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL'             => '\\WPO\\IPS\\Settings\\SettingsEDI',
+	'\\WPO\\IPS\\Settings\\SettingsUbl'                           => '\\WPO\\IPS\\Settings\\SettingsEDI',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade'         => '\\WPO\\IPS\\Settings\\SettingsUpgrade',
 
 	// includes/Tables
