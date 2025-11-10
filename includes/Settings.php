@@ -361,7 +361,7 @@ class Settings {
 								/* translators: 1. order ID, 2. documentation page link, 3. documentation page link closing tag */
 								esc_html__( 'The PDF preview for order #%1$d is not available. This can happen if some settings prevent the document from being generated. Please review your configuration or check the %2$sdocumentation%3$s for more details.', 'woocommerce-pdf-invoices-packing-slips' ),
 								$order_id,
-								'<a href="https://todo.com" target="_blank">',
+								'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/troubleshooting-pdf-preview-unavailability/" target="_blank">',
 								'</a>'
 							)
 						)
