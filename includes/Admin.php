@@ -69,6 +69,7 @@ class Admin {
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_preview_formatted_number', array( $this, 'ajax_preview_formatted_number' ) );
+		add_action( 'wp_ajax_wpo_ips_edi_save_order_customer_peppol_identifiers', array( $this, 'ajax_edi_save_order_customer_peppol_identifiers' ) );
 
 		// document actions
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -235,18 +236,19 @@ class Admin {
 			$document_title = $document->get_title();
 			$document_type  = $document->get_type();
 			$icon           = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
+			$document       = wcpdf_get_document( $document_type, $order ); // reload document with order
 
-			if ( $document = wcpdf_get_document( $document_type, $order ) ) {
+			if ( $document ) {
 				foreach ( $document->output_formats as $output_format ) {
 					switch ( $output_format ) {
 						default:
 						case 'pdf':
 							if ( $document->is_enabled( $output_format ) ) {
-								$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+								$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
 								$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists  = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 								$document_printed = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
-								$class            = array( $document->get_type(), $output_format );
+								$class            = array( $document_type, $output_format );
 
 								if ( $document_exists ) {
 									$class[] = 'exists';
@@ -255,7 +257,7 @@ class Admin {
 									$class[] = 'printed';
 								}
 
-								$listing_actions[$document->get_type()] = array(
+								$listing_actions[ $document_type ] = array(
 									'url'           => $document_url,
 									'img'           => $icon,
 									'alt'           => "PDF " . $document_title,
@@ -266,25 +268,25 @@ class Admin {
 								);
 							}
 							break;
-						case 'ubl':
-							if ( $document->is_enabled( $output_format ) && wcpdf_is_ubl_available() ) {
-								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => $output_format ) );
+						case 'xml':
+							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
+								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-								$class           = array( $document->get_type(), $output_format );
+								$class           = array( $document_type, $output_format );
 
 								if ( $document_exists ) {
 									$class[] = 'exists';
 								}
 
-								$listing_actions[ $document->get_type()."_{$output_format}" ] = array(
+								$listing_actions[ $document_type . "_{$output_format}" ] = array(
 									'url'           => $document_url,
 									'img'           => $icon,
-									'alt'           => "UBL " . $document_title,
+									'alt'           => "E-" . $document_title,
 									'exists'        => $document_exists,
 									'printed'       => false,
-									'ubl'           => true,
-									'class'         => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
+									'edi'           => true,
+									'class'         => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 									'output_format' => $output_format,
 								);
 							}
@@ -302,11 +304,17 @@ class Admin {
 				$data['class'] = $data['exists'] ? "exists {$action}" : $action;
 			}
 
-			$exists  = $data['exists']  ? '<svg class="icon-exists" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
-			$printed = $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
+			$exists = $data['exists']
+				? '<svg class="icon-exists" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>'
+				: '';
+			$printed = $data['printed']
+				? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>'
+				: '';
 
-			// ubl replaces exists
-			$exists  = isset( $data['output_format'] ) && 'ubl' === $data['output_format'] ? '<svg class="icon-ubl" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>' : $exists;
+			// EDI replaces exists
+			$exists = isset( $data['output_format'] ) && 'xml' === $data['output_format']
+				? '<svg class="icon-edi" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.59323 18.3608L9.95263 16.9123L9.95212 16.8932L4.85783 12.112L9.64826 7.00791L8.18994 5.63922L2.03082 12.2016L8.59323 18.3608ZM15.4068 18.3608L14.0474 16.9123L14.0479 16.8932L19.1422 12.112L14.3517 7.00791L15.8101 5.63922L21.9692 12.2016L15.4068 18.3608Z"/></svg>'
+				: $exists;
 
 			$allowed_svg_tags = array(
 				'svg' => array(
@@ -321,7 +329,7 @@ class Admin {
 				),
 			);
 
-			if ( isset( $data['output_format'] ) && ( 'ubl' !== $data['output_format'] || $data['exists'] ) ) {
+			if ( isset( $data['output_format'] ) && ( 'xml' !== $data['output_format'] || $data['exists'] ) ) {
 				printf(
 					'<a href="%1$s" class="button tips wpo_wcpdf %2$s" target="_blank" alt="%3$s" data-tip="%3$s" style="background-image:url(%4$s);">%5$s%6$s</a>',
 					esc_url( $data['url'] ),
@@ -528,14 +536,12 @@ class Admin {
 				'default'
 			);
 		}
-
-		$ubl_documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
-		if ( count( $ubl_documents ) > 0 ) {
-			// create UBL buttons
+		// create EDI buttons
+		if ( wpo_ips_edi_is_available() && count( wpo_ips_edi_get_document_types() ) > 0 ) {
 			add_meta_box(
-				'wpo_wcpdf-ubl-box',
-				__( 'Create UBL', 'woocommerce-pdf-invoices-packing-slips' ),
-				array( $this, 'ubl_actions_meta_box' ),
+				'wpo_ips-edi-box',
+				__( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				array( $this, 'edi_actions_meta_box' ),
 				$screen_id,
 				'side',
 				'default'
@@ -685,91 +691,247 @@ class Admin {
 	}
 
 	/**
-	 * Create the UBL meta box content on the single order page
+	 * Create the EDI meta box content on the single order page
+	 * 
+	 * @param \WC_Order|\WP_Post $post_or_order_object
+	 * @return void
 	 */
-	public function ubl_actions_meta_box( $post_or_order_object ) {
+	public function edi_actions_meta_box( object $post_or_order_object ): void {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'ubl' );
+		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
-			if ( in_array( 'ubl', $document->output_formats ) ) {
-				$document_title = $document->get_title();
-				$document       = wcpdf_get_document( $document->get_type(), $order );
+			$document_title = $document->get_title();
+			$document_type  = $document->get_type();
+			$document       = wcpdf_get_document( $document_type, $order );
 
-				if ( $document ) {
-					$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type(), array( 'output' => 'ubl' ) );
-					$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-					$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-					$class           = array( $document->get_type(), 'ubl' );
+			if ( $document && $document->is_enabled( 'xml' ) && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
+				$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
+				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+				$class           = array( $document_type, 'xml' );
 
-					if ( $document_exists ) {
-						$class[] = 'exists';
-					}
-
-					$meta_box_actions[ $document->get_type() ] = array(
-						'url'    => $document_url,
-						'alt'    => "UBL " . $document_title,
-						'title'  => "UBL " . $document_title,
-						'exists' => $document_exists,
-						'class'  => apply_filters( 'wpo_wcpdf_ubl_action_button_class', implode( ' ', $class ), $document ),
-					);
+				if ( $document_exists ) {
+					$class[] = 'exists';
+				} else {
+					continue;
 				}
+
+				$meta_box_actions[ $document_type ] = array(
+					'url'    => $document_url,
+					'alt'    => "E-{$document_title}",
+					'title'  => "E-{$document_title}",
+					'exists' => $document_exists,
+					'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
+					'target' => '_blank',
+				);
 			}
 		}
 
-		$meta_box_actions = apply_filters( 'wpo_wcpdf_ubl_meta_box_actions', $meta_box_actions, $order->get_id() );
-		if ( empty( $meta_box_actions ) || ! wcpdf_is_ubl_available() ) {
-			return;
+		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
+		
+		if ( 0 === count( $meta_box_actions ) ) {
+			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
+		
+		// Peppol
+		if ( wpo_ips_edi_peppol_is_available() ) :
+			$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
+			$peppol_identifiers = array();
+
+			foreach ( $identifiers_data as $key => $value ) {
+				if ( false !== strpos( $key, 'peppol' ) ) {
+					$peppol_identifiers[ $key ] = $value;
+					unset( $identifiers_data[ $key ] );
+				}
+			}
 		?>
-		<ul class="wpo_wcpdf-ubl-actions">
-			<?php
-				$ubl_documents = 0;
+			<div class="edi-customer-identifiers">
+				<table class="widefat">
+					<thead>
+						<tr>
+							<td><?php esc_html_e( 'Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td class="collapse">
+								<a href="#"><?php esc_html_e( 'Show', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							</td>
+						</tr>
+					</thead>
+					<tbody style="display:none;">
+						<?php
+							foreach ( $identifiers_data as $key => $identifier ) {
+								$value    = $identifier['value'];
+								$required = $identifier['required'];
+								$display  = $value ?: sprintf(
+									'<span class="%s">%s</span>',
+									$required
+										? 'missing'
+										: 'optional',
+									$required
+										? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+										: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+								);
+								?>
+								<tr>
+									<td><?php echo esc_html( $identifier['label'] ); ?></td>
+									<td>
+										<?php echo wp_kses_post( $display ); ?>
+										<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+											<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
+										<?php endif; ?>
+									</td>
+								</tr>
+								<?php
+							}
+						?>
+					</tbody>
+				</table>
+			</div>
+			<?php if ( ! empty( $peppol_identifiers ) ) : ?>
+				<div class="edi-customer-identifiers peppol">
+					<table class="widefat">
+						<thead>
+							<tr>
+								<td><?php esc_html_e( 'Peppol', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+								<td class="editable">
+									<a href="#"><?php esc_html_e( 'Edit', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ( $peppol_identifiers as $key => $identifier ) {
+									$value    = $identifier['value'];
+									$required = $identifier['required'];
+									$display  = $value ?: sprintf(
+										'<span style="color:%s">%s</span>',
+										$required
+											? '#d63638'
+											: '#996800',
+										$required
+											? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+											: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+									);
+									?>
+									<tr>
+										<td><?php echo esc_html( $identifier['label'] ); ?></td>
+										<td class="display"><?php echo wp_kses_post( $display ); ?></td>
+										<td class="edit">
+											<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
+										</td>
+									</tr>
+									<?php
+								}
+							?>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td></td>
+								<td colspan="2">
+									<a href="#" class="button button-primary" data-order_id="<?php echo absint( $order->get_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+									<a href="#" class="button cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			<?php endif; ?>
+		<?php endif; ?>
+		<?php if ( count( $meta_box_actions ) > 0 ) : ?>
+			<ul class="wpo-ips-edi-actions">
+				<?php
+					foreach ( $meta_box_actions as $document_type => $data ) {
+						$url     = $data['url']     ?? '';
+						$class   = $data['class']   ?? '';
+						$alt     = $data['alt']     ?? '';
+						$title   = $data['title']   ?? '';
+						$network = $data['network'] ?? false;
+						$target  = $data['target']  ?? '';
+						
+						$exists  = isset( $data['exists'] ) && $data['exists']
+							? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>'
+							: '';
 
-				foreach ( $meta_box_actions as $document_type => $data ) {
-					$url    = isset( $data['url'] ) ? $data['url'] : '';
-					$class  = isset( $data['class'] ) ? $data['class'] : '';
-					$alt    = isset( $data['alt'] ) ? $data['alt'] : '';
-					$title  = isset( $data['title'] ) ? $data['title'] : '';
-					$exists = isset( $data['exists'] ) && $data['exists'] ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>' : '';
-
-					$allowed_svg_tags = array(
-						'svg' => array(
-							'class'   => true,
-							'xmlns'   => true,
-							'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
-						),
-						'path' => array(
-							'fill-rule' => true,
-							'clip-rule' => true,
-							'd'         => true,
-						),
-					);
-
-					if ( ! empty( $exists ) ) {
-						printf(
-							'<li><a href="%1$s" class="button %2$s" target="_blank" alt="%3$s">%4$s%5$s</a></li>',
-							esc_url( $url ),
-							esc_attr( $class ),
-							esc_attr( $alt ),
-							esc_html( $title ),
-							! empty( $exists ) ? wp_kses( $exists, $allowed_svg_tags ) : ''
+						$allowed_svg_tags = array(
+							'svg' => array(
+								'class'   => true,
+								'xmlns'   => true,
+								'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
+							),
+							'path' => array(
+								'fill-rule' => true,
+								'clip-rule' => true,
+								'd'         => true,
+							),
 						);
 
-						$ubl_documents++;
+						if ( ! empty( $exists ) || $network ) {
+							printf(
+								'<li><a href="%1$s" class="button %2$s" target="%3$s" alt="%4$s">%5$s%6$s</a></li>',
+								esc_url( $url ),
+								esc_attr( $class ),
+								esc_attr( $target ),
+								esc_attr( $alt ),
+								esc_html( $title ),
+								wp_kses( $exists, $allowed_svg_tags )
+							);
+						}
 					}
-				}
-
-				if ( 0 === $ubl_documents ) {
-					esc_html_e( 'UBL documents require the correspondent PDF to be generated first.', 'woocommerce-pdf-invoices-packing-slips' );
-				}
-			?>
-		</ul>
+				?>
+			</ul>
 		<?php
+		endif;
+	}
+	
+	/**
+	 * AJAX handler to save the EDI customer identifiers.
+	 * 
+	 * @return void
+	 */
+	public function ajax_edi_save_order_customer_peppol_identifiers(): void {
+		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
+		}
+		
+		$request  = stripslashes_deep( $_POST );
+		$order_id = isset( $request['order_id'] ) ? absint( $request['order_id'] ) : 0;
+		$values   = isset( $request['values'] ) ? $request['values'] : array();
+		
+		if ( empty( $order_id ) || empty( $values ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
+		}
+		
+		$order = wc_get_order( $order_id );
+		
+		if ( ! $order ) {
+			wp_send_json_error( array(
+				'message' => __( 'Order not found.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
+		}
+		
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
+			? $order->get_customer_id()
+			: 0;
+		
+		if ( empty( $customer_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Customer ID is missing.', 'woocommerce-pdf-invoices-packing-slips' )
+			) );
+		}
+		
+		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
+		wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
+		
+		wp_send_json_success( array(
+			'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
+		) );
 	}
 
 	public function data_input_box_content( $post_or_order_object ) {

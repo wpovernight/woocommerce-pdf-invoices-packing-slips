@@ -1,7 +1,7 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\UBL\Settings\TaxesSettings;
+use WPO\IPS\EDI\Standards\EN16931;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -22,6 +22,7 @@ class Assets {
 
 	public function __construct()	{
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
+		add_filter( 'script_loader_tag', array( $this, 'edi_prism_add_data_manual_attr' ), 10, 3 );
 	}
 
 	/**
@@ -36,7 +37,9 @@ class Assets {
 		if ( WPO_WCPDF()->admin->is_order_page() ) {
 
 			// STYLES
-			wp_enqueue_style( 'thickbox' );
+			if ( ! wp_style_is( 'thickbox', 'enqueue' ) ) {
+				wp_enqueue_style( 'thickbox' );
+			}
 
 			wp_enqueue_style(
 				'wpo-wcpdf-order-styles',
@@ -68,8 +71,12 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf',
 				WPO_WCPDF()->plugin_url() . '/assets/js/order-script' . $suffix . '.js',
-				array( 'jquery', 'jquery-blockui' ),
-				WPO_WCPDF_VERSION
+				array(
+					'jquery',
+					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				),
+				WPO_WCPDF_VERSION,
+				true
 			);
 
 			wp_localize_script(
@@ -83,7 +90,12 @@ class Assets {
 					'confirm_delete'               => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
-					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' )
+					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' ),
+					'edi_metabox'                  => array(
+						'show' => __( 'Show', 'woocommerce-pdf-invoices-packing-slips' ),
+						'hide' => __( 'Hide', 'woocommerce-pdf-invoices-packing-slips' ),
+						'fail' => __( 'Could not save identifiers. Please try again.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				)
 			);
 		}
@@ -120,25 +132,55 @@ class Assets {
 				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/checkmark.svg'.") !important;
 			}" );
 
-			wp_enqueue_script( 'wc-enhanced-select' );
+			if ( ! wp_script_is( 'wc-enhanced-select', 'enqueued' ) ) {
+				wp_enqueue_script( 'wc-enhanced-select' );
+			}
 
 			if ( ! wp_script_is( 'wp-pointer', 'enqueued' ) ) {
 				wp_enqueue_script( 'wp-pointer' );
 			}
-
-			if ( ! wp_style_is( 'wp-pointer', 'enqueued' ) ) {
-				wp_enqueue_style( 'wp-pointer' );
+			
+			$tiptip_handle = version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip';
+			
+			if ( ! wp_script_is( $tiptip_handle, 'enqueued' ) ) {
+				wp_enqueue_script( $tiptip_handle );
 			}
-
-			if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
-				wp_enqueue_script( 'jquery-tiptip' );
+			
+			$admin_deps = array(
+				'jquery',
+				'wc-enhanced-select',
+				'wp-pointer',
+				'jquery-ui-datepicker',
+				wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				wp_script_is( 'wc-jquery-tiptip', 'registered' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip',
+			);
+			
+			// edi preview			
+			if ( wpo_ips_edi_preview_is_enabled() ) {
+				wp_enqueue_style(
+					'wpo-ips-edi-prism',
+					WPO_WCPDF()->plugin_url() . '/assets/css/prism.min.css',
+					array(),
+					'1.30.0'
+				);
+				
+				wp_enqueue_script(
+					'wpo-ips-edi-prism-core',
+					WPO_WCPDF()->plugin_url() . '/assets/js/prism.min.js',
+					array(),
+					'1.30.0',
+					true
+				);
+				
+				$admin_deps[] = 'wpo-ips-edi-prism-core';
 			}
 
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'jquery-ui-datepicker' ),
-				WPO_WCPDF_VERSION
+				$admin_deps,
+				WPO_WCPDF_VERSION,
+				true
 			);
 
 			wp_localize_script(
@@ -167,7 +209,6 @@ class Assets {
 						'use_latest_settings',
 						'mark_printed',
 						'unmark_printed',
-						'include_encrypted_pdf',
 						'include_email_link',
 						'include_email_link_placement',
 					) ),
@@ -208,16 +249,19 @@ class Assets {
 					'wpo-wcpdf-pdfjs',
 					WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.min.js', // taken from https://cdnjs.com/libraries/pdf.js
 					array(),
-					$pdfjs_version
+					$pdfjs_version,
+					true
 				);
 			}
 
 			wp_enqueue_media();
+			
 			wp_enqueue_script(
 				'wpo-wcpdf-media-upload',
 				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 				array( 'jquery' ),
-				WPO_WCPDF_VERSION
+				WPO_WCPDF_VERSION,
+				true
 			);
 
 			// status/debug page scripts
@@ -235,8 +279,13 @@ class Assets {
 				wp_enqueue_script(
 					'wpo-wcpdf-debug',
 					WPO_WCPDF()->plugin_url() . '/assets/js/debug-script' . $suffix . '.js',
-					array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
-					WPO_WCPDF_VERSION
+					array(
+						'jquery',
+						'jquery-ui-datepicker',
+						wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+					),
+					WPO_WCPDF_VERSION,
+					true
 				);
 
 				wp_localize_script(
@@ -262,28 +311,37 @@ class Assets {
 
 			}
 
-			// ubl taxes
-			if ( 'ubl' === $tab ) {
+			// edi
+			if ( 'edi' === $tab ) {
 				wp_enqueue_script(
-					'wpo-wcpdf-ubl',
-					WPO_WCPDF()->plugin_url() . '/assets/js/ubl-script' . $suffix . '.js',
-					array( 'jquery' ),
+					'wpo-ips-edi',
+					WPO_WCPDF()->plugin_url() . '/assets/js/edi-script' . $suffix . '.js',
+					array( 'jquery', 'jquery-blockui' ),
 					WPO_WCPDF_VERSION,
 					true
 				);
 
 				wp_localize_script(
-					'wpo-wcpdf-ubl',
-					'wpo_wcpdf_ubl',
+					'wpo-ips-edi',
+					'wpo_ips_edi',
 					array(
-						'code'    => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
-						'new'     => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
-						'unsaved' => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
-						'remarks' => TaxesSettings::get_available_remarks(),
+						'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+						'nonce'                     => wp_create_nonce( 'wpo_ips_edi_nonce' ),
+						'code'                      => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
+						'new'                       => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
+						'unsaved'                   => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
+						'remarks'                   => EN16931::get_vatex_remarks(),
+						'missing'                   => __( 'Missing', 'woocommerce-pdf-invoices-packing-slips' ),
+						'optional'                  => __( 'Optional', 'woocommerce-pdf-invoices-packing-slips' ),
+						'vat_warning'               => __( 'VAT number should start with a country prefix (e.g. NL123456789B01).', 'woocommerce-pdf-invoices-packing-slips' ),
+						'error_loading_identifiers' => __( 'Error loading identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
+						'loading'                   => __( 'Loading...', 'woocommerce-pdf-invoices-packing-slips' ),
+						'valid_number'              => __( 'Order ID must be a valid number', 'woocommerce-pdf-invoices-packing-slips' ),
+						'enter_order_id'            => __( 'Please enter an Order ID.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'no_identifiers_found'      => __( 'No customer identifiers found.', 'woocommerce-pdf-invoices-packing-slips' ),
 					)
 				);
 			}
-
 		}
 
 		if (
@@ -307,6 +365,23 @@ class Assets {
 			);
 		}
 
+	}
+	
+	/**
+	 * Adds the `data-manual` attribute to Prism’s <script> tag so that Prism
+	 * stays in “manual” mode (i.e. it won’t auto-highlight the entire page;
+	 * you will call `Prism.highlightElement()` yourself).
+	 *
+	 * @param string $tag
+	 * @param string $handle
+	 * @param string $src
+	 *
+	 * @return string
+	 */
+	public function edi_prism_add_data_manual_attr( string $tag, string $handle, string $src ): string {
+		return ( $handle === 'wpo-ips-edi-prism-core' )
+        	? str_replace( '<script ', '<script data-manual ', $tag )
+        	: $tag;
 	}
 
 }

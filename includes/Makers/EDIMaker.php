@@ -1,0 +1,40 @@
+<?php
+
+namespace WPO\IPS\Makers;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( '\\WPO\\IPS\\Makers\\EDIMaker' ) ) :
+
+class EDIMaker {
+
+	protected $tmp_base;
+
+	public function write( $filename, $contents ) {
+		$full_file_name = $this->get_file_path() . $filename;
+		$status         = WPO_WCPDF()->file_system->put_contents( $full_file_name, $contents, FS_CHMOD_FILE );
+
+		if ( false === $status ) {
+			throw new \Exception( 'Error writing UBL file' );
+		}
+
+		return $full_file_name;
+	}
+
+	public function set_file_path( $file_path ) {
+		$this->tmp_base = $file_path;
+	}
+
+	public function get_file_path() {
+		if ( ! empty( $this->tmp_base ) ) {
+			return $this->tmp_base;
+		}
+
+		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'xml' ) );
+		return $this->tmp_base;
+	}
+}
+
+endif; // class_exists

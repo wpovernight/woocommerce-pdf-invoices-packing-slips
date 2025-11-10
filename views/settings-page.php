@@ -28,10 +28,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 	foreach ( $settings_tabs as $tab_slug => $tab_data ) {
 		$tab_title = is_array( $tab_data ) ? esc_html( $tab_data['title'] ) : esc_html( $tab_data );
 		$tab_link  = esc_url( "?page=wpo_wcpdf_options_page&tab={$tab_slug}" );
-		$tab_beta  = isset( $tab_data['beta'] ) ? true : false;
-		if ( $tab_beta ) {
-			$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
-		}
+
 		printf(
 			'<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>',
 			esc_url( $tab_link ),
@@ -106,11 +103,21 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 			<?php
 				$documents     = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
 				$document_type = 'invoice';
+				$document      = null;
+				$output_format = 'pdf';
 
-				if ( ! empty( $_REQUEST['section'] ) ) {
-					$document_type = sanitize_text_field( wp_unslash( $_REQUEST['section'] ) );
-				} elseif ( ! empty( $_REQUEST['preview'] ) ) {
-					$document_type = sanitize_text_field( wp_unslash( $_REQUEST['preview'] ) );
+				if ( ! empty( $_GET['section'] ) ) {
+					$document_type = sanitize_text_field( wp_unslash( $_GET['section'] ) );
+				} elseif ( ! empty( $_GET['preview'] ) ) {
+					$document_type = sanitize_text_field( wp_unslash( $_GET['preview'] ) );
+				}
+				
+				if ( $document_type ) {
+					$document = WPO_WCPDF()->documents->get_document( $document_type, null );
+				}
+				
+				if ( ! empty( $_GET['output_format'] ) ) {
+					$output_format = sanitize_text_field( wp_unslash( $_GET['output_format'] ) );
 				}
 			?>
 			<div class="preview-data-wrapper">
@@ -128,31 +135,50 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 					</ul>
 					<div id="preview-order-search-results"><!-- Results populated with JS --></div>
 				</div>
-				<?php if ( $active_tab != 'documents' ) : ?>
-				<div class="preview-data preview-document-type">
-					<?php
-						if ( $document_type ) {
-							$document = WPO_WCPDF()->documents->get_document( $document_type, null );
-							if ( ! empty( $document ) ) {
-								echo '<p class="current"><span class="current-label">'.esc_html( $document->get_title() ).'</span><span class="arrow-down">&#9660;</span></p>';
-							}
-						} else {
-							echo '<p class="current"><span class="current-label">'.esc_html__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ).'</span><span class="arrow-down">&#9660;</span></p>';
-						}
-					?>
-					<ul class="preview-data-option-list" data-input-name="document_type">
+				<?php if ( $document ) : ?>
+					<div class="doc-output-toggle-group">
 						<?php
-							foreach ( $documents as $document ) {
+							foreach ( $document->output_formats as $document_output_format ) {
+								if ( 'xml' === $document_output_format && ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_preview_is_enabled() ) ) {
+									continue;
+								}
+
+								$is_active = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) );
+								$active_class = $is_active ? 'active' : '';
+								$tab_title = strtoupper( esc_html( $document_output_format ) );
+
 								printf(
-									/* translators: 1. document type, 2. document title */
-									'<li data-value="%1$s">%2$s</li>',
-									esc_attr( $document->get_type() ),
-									esc_html( $document->get_title() )
+									'<a href="%1$s" class="doc-output-toggle %2$s">%3$s</a>',
+									esc_url( add_query_arg( 'output_format', $document_output_format ) ),
+									esc_attr( $active_class ),
+									wp_kses_post( $tab_title )
 								);
 							}
 						?>
-					</ul>
-				</div>
+					</div>
+				<?php endif; ?>
+				<?php if ( 'documents' !== $active_tab ) : ?>
+					<div class="preview-data preview-document-type">
+						<?php
+							if ( ! empty( $document ) ) {
+									echo '<p class="current"><span class="current-label">' . esc_html( $document->get_title() ) . '</span><span class="arrow-down">&#9660;</span></p>';
+							} else {
+								echo '<p class="current"><span class="current-label">' . esc_html__( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' ) . '</span><span class="arrow-down">&#9660;</span></p>';
+							}
+						?>
+						<ul class="preview-data-option-list" data-input-name="document_type">
+							<?php
+								foreach ( $documents as $document ) {
+									printf(
+										/* translators: 1. document type, 2. document title */
+										'<li data-value="%1$s">%2$s</li>',
+										esc_attr( $document->get_type() ),
+										esc_html( $document->get_title() )
+									);
+								}
+							?>
+						</ul>
+					</div>
 				<?php endif; ?>
 			</div>
 			<input type="hidden" name="document_type" data-default="<?php echo esc_attr( $document_type ); ?>" value="<?php echo esc_attr( $document_type ); ?>">

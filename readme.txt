@@ -5,23 +5,24 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 4.9.1
+Stable tag: 5.0.0-beta.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create, print & automatically email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
+Create, print & automatically email PDF or XML Invoices & PDF Packing Slips for WooCommerce orders.
 
 == Description ==
 
-This WooCommerce extension automatically adds a PDF or UBL invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
+This WooCommerce extension automatically adds a PDF or XML invoice (e-invoicing) to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
-- Automatically attach invoice PDF or UBL to WooCommerce emails of your choice
-- Download the PDF or UBL Invoice / PDF Packing Slip from the order admin page
+- Automatically attach invoice PDF or XML to WooCommerce emails of your choice
+- Download the PDF or XML Invoice / PDF Packing Slip from the order admin page
+- Choose from a range of e‑document formats: UBL 2.1, Peppol BIS 3.0, CII D16B, Factur‑X 1.0, ZUGFeRD 1.0, and ZUGFeRD 2.0.
 - Generate PDF invoices / packing slips in bulk
 - **Fully customizable** HTML/CSS invoice templates
 - Download invoices from the My Account page
-- Sequential invoice numbers - with custom formatting
+- Sequential invoice numbers
 - **Available in:** Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Portuguese, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian
 
 = Free extensions =
