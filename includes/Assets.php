@@ -36,7 +36,9 @@ class Assets {
 		if ( WPO_WCPDF()->admin->is_order_page() ) {
 
 			// STYLES
-			wp_enqueue_style( 'thickbox' );
+			if ( ! wp_style_is( 'thickbox', 'enqueue' ) ) {
+				wp_enqueue_style( 'thickbox' );
+			}
 
 			wp_enqueue_style(
 				'wpo-wcpdf-order-styles',
@@ -68,8 +70,12 @@ class Assets {
 			wp_enqueue_script(
 				'wpo-wcpdf',
 				WPO_WCPDF()->plugin_url() . '/assets/js/order-script' . $suffix . '.js',
-				array( 'jquery', 'jquery-blockui' ),
-				WPO_WCPDF_VERSION
+				array(
+					'jquery',
+					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				),
+				WPO_WCPDF_VERSION,
+				true
 			);
 
 			wp_localize_script(
@@ -129,16 +135,26 @@ class Assets {
 			if ( ! wp_style_is( 'wp-pointer', 'enqueued' ) ) {
 				wp_enqueue_style( 'wp-pointer' );
 			}
-
-			if ( ! wp_script_is( 'jquery-tiptip', 'enqueued' ) ) {
-				wp_enqueue_script( 'jquery-tiptip' );
+			
+			$handle = version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip';
+			
+			if ( ! wp_script_is( $handle, 'enqueued' ) ) {
+				wp_enqueue_script( $handle );
 			}
 
 			wp_enqueue_script(
 				'wpo-wcpdf-admin',
 				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
-				array( 'jquery', 'wc-enhanced-select', 'jquery-blockui', 'jquery-tiptip', 'wp-pointer', 'jquery-ui-datepicker' ),
-				WPO_WCPDF_VERSION
+				array(
+					'jquery',
+					'wc-enhanced-select',
+					'wp-pointer',
+					'jquery-ui-datepicker',
+					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+					wp_script_is( 'wc-jquery-tiptip', 'registered' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip',
+				),
+				WPO_WCPDF_VERSION,
+				true
 			);
 
 			wp_localize_script(
@@ -208,7 +224,8 @@ class Assets {
 					'wpo-wcpdf-pdfjs',
 					WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.min.js', // taken from https://cdnjs.com/libraries/pdf.js
 					array(),
-					$pdfjs_version
+					$pdfjs_version,
+					true
 				);
 			}
 
@@ -217,7 +234,8 @@ class Assets {
 				'wpo-wcpdf-media-upload',
 				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 				array( 'jquery' ),
-				WPO_WCPDF_VERSION
+				WPO_WCPDF_VERSION,
+				true
 			);
 
 			// status/debug page scripts
@@ -235,8 +253,13 @@ class Assets {
 				wp_enqueue_script(
 					'wpo-wcpdf-debug',
 					WPO_WCPDF()->plugin_url() . '/assets/js/debug-script' . $suffix . '.js',
-					array( 'jquery', 'jquery-blockui', 'jquery-ui-datepicker' ),
-					WPO_WCPDF_VERSION
+					array(
+						'jquery',
+						'jquery-ui-datepicker',
+						wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+					),
+					WPO_WCPDF_VERSION,
+					true
 				);
 
 				wp_localize_script(
