@@ -406,8 +406,8 @@ jQuery( function( $ ) {
 		);
 
 		return $.ajax( {
-			url: wpo_wcpdf_admin.ajaxurl,
-			type: 'POST',
+			url:      wpo_wcpdf_admin.ajaxurl,
+			type:     'POST',
 			dataType: 'json',
 			data: {
 				action: 'wcpdf_get_country_states',

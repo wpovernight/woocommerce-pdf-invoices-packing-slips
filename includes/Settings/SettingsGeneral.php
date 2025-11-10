@@ -756,7 +756,13 @@ class SettingsGeneral {
 	 * Get the states for a given country code via AJAX.
 	 */
 	public function ajax_get_shop_country_states() {
-		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+		// Accept either the settings nonce or the setup-wizard nonce.
+		$valid = check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security', false )
+			|| check_ajax_referer( 'wpo_wcpdf_setup_nonce', 'security', false );
+
+		if ( ! $valid ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
+		}
 		
 		$request = stripslashes_deep( $_POST );
 
