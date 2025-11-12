@@ -527,6 +527,21 @@ abstract class AbstractHandler implements HandlerInterface {
 			)
 		);
 
+		// Skip meta for certain items (override via filter if needed).
+		$skip_types = apply_filters(
+			'wpo_ips_edi_skip_item_meta_for_types',
+			array( 'WC_Order_Item_Shipping', 'WC_Order_Item_Fee', 'WC_Order_Item_Tax', 'WC_Order_Item_Coupon' ),
+			$item,
+			$args,
+			$this
+		);
+		foreach ( (array) $skip_types as $class ) {
+			if ( is_a( $item, $class ) ) {
+				$rows = apply_filters( 'wpo_ips_edi_get_item_meta', array(), $item, $args, $this );
+				return is_array( $rows ) ? $rows : array();
+			}
+		}
+
 		$meta_items = method_exists( $item, 'get_all_formatted_meta_data' )
 			? $item->get_all_formatted_meta_data()
 			: $item->get_formatted_meta_data();
