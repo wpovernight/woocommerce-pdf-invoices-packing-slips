@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 
-	public string $slug = 'zugferd-2p0';
+	public string $slug = 'zugferd-invoice-2p0';
 	public string $name = 'ZUGFeRD Invoice 2.0';
 
 	/**

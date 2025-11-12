@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Invoice extends AbstractUblFormat {
 
 	public string $type = 'invoice';
-	public string $slug = 'ubl-2p1';
+	public string $slug = 'ubl-invoice-2p1';
 	public string $name = 'UBL Invoice 2.1';
 	
 	/**

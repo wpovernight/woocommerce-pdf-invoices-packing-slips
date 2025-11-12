@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Invoice extends AbstractCiiFormat {
 	
 	public string $type = 'invoice';
-	public string $slug = 'cii-d16b';
+	public string $slug = 'cii-invoice-d16b';
 	public string $name = 'CII Invoice D16B';
 	
 	/**
