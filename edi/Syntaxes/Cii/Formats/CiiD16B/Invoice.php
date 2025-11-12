@@ -15,7 +15,7 @@ class Invoice extends AbstractCiiFormat {
 	public string $name = 'CII Invoice D16B';
 	
 	/**
-	 * Get the invoice context
+	 * Get the context
 	 *
 	 * @return string
 	 */
@@ -24,7 +24,7 @@ class Invoice extends AbstractCiiFormat {
 	}
 	
 	/**
-	 * Get the invoice type code
+	 * Get the type code
 	 *
 	 * @return string
 	 */
@@ -33,7 +33,7 @@ class Invoice extends AbstractCiiFormat {
 	}
 
 	/**
-	 * Get the invoice root element
+	 * Get the root element
 	 *
 	 * @return string
 	 */
@@ -42,7 +42,7 @@ class Invoice extends AbstractCiiFormat {
 	}
 	
 	/**
-	 * Get the invoice additional attributes
+	 * Get the additional attributes
 	 *
 	 * @return array
 	 */
@@ -51,7 +51,7 @@ class Invoice extends AbstractCiiFormat {
 	}
 	
 	/**
-	 * Get the invoice namespaces
+	 * Get the namespaces
 	 *
 	 * @return array
 	 */
@@ -65,7 +65,7 @@ class Invoice extends AbstractCiiFormat {
 	}
 	
 	/**
-	 * Get the invoice structure
+	 * Get the structure
 	 *
 	 * @return array
 	 */
