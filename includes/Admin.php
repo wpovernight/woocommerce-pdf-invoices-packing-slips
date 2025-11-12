@@ -776,7 +776,9 @@ class Admin {
 								);
 								?>
 								<tr>
+								<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
 									<td><?php echo esc_html( $identifier['label'] ); ?></td>
+								<?php endif; ?>
 									<td>
 										<?php echo wp_kses_post( $display ); ?>
 										<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
