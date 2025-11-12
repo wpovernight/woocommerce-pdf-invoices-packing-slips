@@ -1067,7 +1067,14 @@ class SettingsEDI {
 		<p><?php esc_html_e( 'Send your documents through supported delivery networks directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="notice notice-info inline">
 			<p>
-				<?php esc_html_e( 'This feature is currently under development.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				<?php
+					printf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						esc_html__( 'This feature is currently under development. If you\'d like to learn more or request early access, please %1$scontact us%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://wpovernight.com/contact/" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					);
+				?>
 			</p>
 		</div>
 		<?php
