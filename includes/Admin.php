@@ -692,7 +692,7 @@ class Admin {
 
 	/**
 	 * Create the EDI meta box content on the single order page
-	 * 
+	 *
 	 * @param \WC_Order|\WP_Post $post_or_order_object
 	 * @return void
 	 */
@@ -733,11 +733,11 @@ class Admin {
 		}
 
 		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
-		
+
 		if ( 0 === count( $meta_box_actions ) ) {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
-		
+
 		// Peppol
 		if ( wpo_ips_edi_peppol_is_available() ) :
 			$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
@@ -828,6 +828,7 @@ class Admin {
 							?>
 						</tbody>
 						<tfoot>
+							<tr><td colspan="2" class="scheme-required"><?php esc_html_e( 'Both fields require a scheme (e.g. "0208:").', 'woocommerce-pdf-invoices-packing-slips' ); ?></td></tr>
 							<tr>
 								<td></td>
 								<td colspan="2">
@@ -850,7 +851,7 @@ class Admin {
 						$title   = $data['title']   ?? '';
 						$network = $data['network'] ?? false;
 						$target  = $data['target']  ?? '';
-						
+
 						$exists  = isset( $data['exists'] ) && $data['exists']
 							? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>'
 							: '';
@@ -885,10 +886,10 @@ class Admin {
 		<?php
 		endif;
 	}
-	
+
 	/**
 	 * AJAX handler to save the EDI customer identifiers.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function ajax_edi_save_order_customer_peppol_identifiers(): void {
@@ -897,38 +898,38 @@ class Admin {
 				'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' )
 			) );
 		}
-		
+
 		$request  = stripslashes_deep( $_POST );
 		$order_id = isset( $request['order_id'] ) ? absint( $request['order_id'] ) : 0;
 		$values   = isset( $request['values'] ) ? $request['values'] : array();
-		
+
 		if ( empty( $order_id ) || empty( $values ) ) {
 			wp_send_json_error( array(
 				'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' )
 			) );
 		}
-		
+
 		$order = wc_get_order( $order_id );
-		
+
 		if ( ! $order ) {
 			wp_send_json_error( array(
 				'message' => __( 'Order not found.', 'woocommerce-pdf-invoices-packing-slips' )
 			) );
 		}
-		
+
 		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
 			? $order->get_customer_id()
 			: 0;
-		
+
 		if ( empty( $customer_id ) ) {
 			wp_send_json_error( array(
 				'message' => __( 'Customer ID is missing.', 'woocommerce-pdf-invoices-packing-slips' )
 			) );
 		}
-		
+
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
 		wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
-		
+
 		wp_send_json_success( array(
 			'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
@@ -1918,7 +1919,7 @@ class Admin {
 
 			$data['notes'] = wp_kses( $form_data["{$key_prefix}notes"], $allowed_html );
 		}
-		
+
 		return apply_filters( 'wpo_wcpdf_order_document_form_data', $data, $form_data, $document );
 	}
 

@@ -520,7 +520,7 @@ class SettingsEDI {
 	 *
 	 * @return array
 	 */
-	public function preserve_peppol_settings( mixed $value, mixed $old_value, string $option ): array {
+	public function preserve_peppol_settings( $value, $old_value, string $option ): array {
 		$new = is_array( $value )     ? $value     : array();
 		$old = is_array( $old_value ) ? $old_value : array();
 		
