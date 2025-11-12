@@ -246,7 +246,7 @@ class Settings {
 			if ( ! empty( $_POST['order_id'] ) ) {
 				$order_id = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
 
-				if ( $document_type == 'credit-note' ) {
+				if ( 'credit-note' === $document_type ) {
 					// get last refund ID of the order if available
 					$refund = wc_get_orders(
 						array(
@@ -358,9 +358,11 @@ class Settings {
 					wp_send_json_error(
 						array(
 							'error' => sprintf(
-								/* translators: order ID */
-								esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ),
-								$order_id
+								/* translators: 1. order ID, 2. documentation page link, 3. documentation page link closing tag */
+								esc_html__( 'The PDF preview for order #%1$d is not available. This can happen if some settings prevent the document from being generated. Please review your configuration or check the %2$sdocumentation%3$s for more details.', 'woocommerce-pdf-invoices-packing-slips' ),
+								$order_id,
+								'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/troubleshooting-pdf-preview-unavailability/" target="_blank">',
+								'</a>'
 							)
 						)
 					);
