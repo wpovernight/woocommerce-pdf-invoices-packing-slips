@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class InvoiceTypeCodeHandler extends AbstractUblHandler {
+class TypeCodeHandler extends AbstractUblHandler {
 
 	/**
 	 * Handle the data and return the formatted output.
@@ -17,13 +17,14 @@ class InvoiceTypeCodeHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$invoice_type_code = array(
-			'name'  => 'cbc:InvoiceTypeCode',
+		$root_element = $this->document->get_root_element();
+		
+		$type_code    = array(
+			'name'  => "cbc:{$root_element}TypeCode",
 			'value' => $this->document->get_type_code(),
 		);
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_type_code', $invoice_type_code, $data, $options, $this );
-
+		$data[] = apply_filters( 'wpo_ips_edi_ubl_type_code', $type_code, $data, $options, $this );
 		return $data;
 	}
 

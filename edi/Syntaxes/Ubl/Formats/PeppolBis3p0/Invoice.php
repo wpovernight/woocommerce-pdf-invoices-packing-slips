@@ -81,9 +81,9 @@ class Invoice extends AbstractUblFormat {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\IssueDateHandler::class,
 			),
-			'invoice_type_code' => array(
+			'type_code' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\InvoiceTypeCodeHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\TypeCodeHandler::class,
 			),
 			'document_currency_code' => array(
 				'enabled' => true,
