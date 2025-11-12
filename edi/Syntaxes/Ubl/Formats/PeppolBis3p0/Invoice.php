@@ -15,7 +15,7 @@ class Invoice extends AbstractUblFormat {
 	public string $name = 'PEPPOL BIS 3.0 Invoice';
 
 	/**
-	 * Get the invoice type code
+	 * Get the type code
 	 *
 	 * @return string
 	 */

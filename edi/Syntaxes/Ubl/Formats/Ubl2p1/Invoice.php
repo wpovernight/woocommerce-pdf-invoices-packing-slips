@@ -15,7 +15,7 @@ class Invoice extends AbstractUblFormat {
 	public string $name = 'UBL Invoice 2.1';
 	
 	/**
-	 * Get the invoice type code
+	 * Get the type code
 	 *
 	 * @return string
 	 */
