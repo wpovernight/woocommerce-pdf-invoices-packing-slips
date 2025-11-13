@@ -863,11 +863,11 @@ class Main {
 						// validate nonce
 						if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_no_dir_notice_nonce' ) ) {
 							wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_no_dir_notice' );
-							wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+							wp_safe_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 							exit;
 						} else {
 							delete_option( 'wpo_wcpdf_no_dir_error' );
-							wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+							wp_safe_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
 							exit;
 						}
 					}
@@ -1584,9 +1584,9 @@ class Main {
 				}
 
 				if ( is_callable( [ $order, 'get_edit_order_url' ] ) ) {
-					wp_redirect( $order->get_edit_order_url() );
+					wp_safe_redirect( $order->get_edit_order_url() );
 				} else {
-					wp_redirect( admin_url( 'post.php?action=edit&post=' . esc_attr( $data['order_id'] ) ) );
+					wp_safe_redirect( admin_url( 'post.php?action=edit&post=' . esc_attr( $data['order_id'] ) ) );
 				}
 			} else {
 				$error++;

@@ -374,7 +374,7 @@ class SetupWizard {
 			}
 		}
 
-		wp_redirect( esc_url_raw( $this->get_step_link( $this->get_step(1) ) ) );
+		wp_safe_redirect( $this->get_step_link( $this->get_step(1) ) );
 	}
 
 }

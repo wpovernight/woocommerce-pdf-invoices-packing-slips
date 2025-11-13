@@ -508,7 +508,7 @@ class SettingsCallbacks {
 			printf(
 				'<option value="%s"%s>%s</option>',
 				esc_attr( $key_str ),
-				$selected_attr,
+				esc_attr( $selected_attr ),
 				esc_html( $label )
 			);
 		}

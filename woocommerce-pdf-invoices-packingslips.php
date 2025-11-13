@@ -381,7 +381,7 @@ class WPO_WCPDF {
 			// validate nonce
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'protect_pdf_directory_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_protect_pdf_directory' );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			} else {
 				$this->main->generate_random_string();
@@ -390,7 +390,7 @@ class WPO_WCPDF {
 				$this->main->copy_directory( $old_path, $new_path );
 				// save option to hide nginx notice
 				update_option( 'wpo_wcpdf_hide_nginx_notice', true );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			}
 		}
@@ -400,11 +400,11 @@ class WPO_WCPDF {
 			// validate nonce
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_nginx_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_nginx_notice' );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			} else {
 				update_option( 'wpo_wcpdf_hide_nginx_notice', true );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			}
 		}
@@ -440,11 +440,11 @@ class WPO_WCPDF {
 			// validate nonce
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_mailpoet_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_mailpoet_notice' );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			} else {
 				update_option( 'wpo_wcpdf_hide_mailpoet_notice', true );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			}
 		}
@@ -477,11 +477,11 @@ class WPO_WCPDF {
 			// validate nonce
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_rtl_notice_nonce' ) ) {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_rtl_notice' );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			} else {
 				update_option( 'wpo_wcpdf_hide_rtl_notice', true );
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			}
 		}
@@ -531,7 +531,7 @@ class WPO_WCPDF {
 				wcpdf_log_error( 'Yearly reset numbering system rescheduled!', 'info' );
 			}
 
-			wp_redirect( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
+			wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' ) );
 			exit;
 		}
 	}
@@ -619,7 +619,7 @@ class WPO_WCPDF {
 					delete_transient( $transient_name );
 				}
 
-				wp_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
+				wp_safe_redirect( admin_url( 'admin.php?page=wpo_wcpdf_options_page' ) );
 				exit;
 			}
 		}
@@ -648,7 +648,7 @@ class WPO_WCPDF {
 				wcpdf_log_error( 'Invalid nonce while dismissing unstable version feature notice.' );
 			}
 
-			wp_redirect( remove_query_arg( array( $dismiss_arg, '_wpnonce' ) ) );
+			wp_safe_redirect( remove_query_arg( array( $dismiss_arg, '_wpnonce' ) ) );
 			exit;
 		}
 
