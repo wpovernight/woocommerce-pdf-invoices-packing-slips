@@ -116,6 +116,21 @@ class Document {
 	}
 	
 	/**
+	 * Get the document quantity role (UBL formats only)
+	 *
+	 * @return string
+	 */
+	public function get_quantity_role(): string {
+		return apply_filters(
+			'wpo_ips_edi_document_quantity_role',
+			is_callable( array( $this->format_document, 'get_quantity_role' ) )
+				? $this->format_document->get_quantity_role()
+				: '',
+			$this
+		);
+	}
+	
+	/**
 	 * Get the document root element
 	 *
 	 * @return string
