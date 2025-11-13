@@ -732,8 +732,8 @@ class Admin {
 						
 						$meta_box_actions[ $document_type . '-' . $c ] = array(
 							'url'    => $document_url,
-							'alt'    => "E-{$document_title} {$c}",
-							'title'  => "E-{$document_title} {$c}",
+							'alt'    => "XML {$document_title} {$c}",
+							'title'  => "XML {$document_title} {$c}",
 							'exists' => true,
 							'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 							'target' => '_blank',
@@ -750,8 +750,8 @@ class Admin {
 					
 					$meta_box_actions[ $document_type ] = array(
 						'url'    => $document_url,
-						'alt'    => "E-{$document_title}",
-						'title'  => "E-{$document_title}",
+						'alt'    => "XML {$document_title}",
+						'title'  => "XML {$document_title}",
 						'exists' => true,
 						'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 						'target' => '_blank',
