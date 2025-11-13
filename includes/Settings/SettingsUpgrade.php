@@ -54,7 +54,7 @@ class SettingsUpgrade {
 				),
 				array(
 					'label'       => __( 'Cloud storage upload', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Automatically upload your documents via FTP/SFTP or to Dropbox.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Automatically upload your documents via FTP, SFTP, Dropbox or Google Drive.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions'  => array( 'pro', 'bundle' ),
 				),
 				array(
