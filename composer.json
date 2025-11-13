@@ -51,7 +51,10 @@
 				}
 			},
 			"exclude_from_copy": {
-				"packages": [],
+				"packages": [
+					"symfony/polyfill-mbstring",
+					"symfony/polyfill-iconv"
+				],
 				"namespaces": [],
 				"file_patterns": [
 					"/^psr.*$/"

@@ -31,7 +31,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	abstract public function handle( array $data, array $options = array() ): array;
-	
+
 	/**
 	 * Get the order customer VAT number.
 	 *
@@ -44,7 +44,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$this->document->order
 		);
 	}
-	
+
 	/**
 	 * Get the supplier identifiers data.
 	 *
@@ -54,14 +54,14 @@ abstract class AbstractHandler implements HandlerInterface {
 	protected function get_supplier_identifiers_data( string $key ): string {
 		$general_settings = WPO_WCPDF()->settings->general;
 		$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
-		
+
 		if ( empty( $language ) ) {
 			$language = 'default';
 		}
 
 		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
-	
+
 	/**
 	 * Returns the due date days for the document.
 	 *
@@ -92,7 +92,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$method_id = $order ? $order->get_payment_method() : '';
 		$title     = $order ? $order->get_payment_method_title() : '';
 
-		
+
 		$mapping = apply_filters( 'wpo_ips_edi_payment_means_code_mapping', array(
 			'bacs'    => '58', // SEPA Credit Transfer
 			'paypal'  => '68', // Online payment
@@ -112,11 +112,11 @@ abstract class AbstractHandler implements HandlerInterface {
 		switch ( $method_id ) {
 			case 'bacs':
 				$accounts = get_option( 'woocommerce_bacs_accounts', array() );
-				
+
 				if ( empty( $accounts ) ) {
 					break;
 				}
-				
+
 				$account  = apply_filters( 'wpo_ips_edi_payment_means_bacs_default_account', reset( $accounts ), $accounts, $this );
 				$data     = array_merge( $data, $account );
 				break;
@@ -181,9 +181,9 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return '';
 	}
-	
+
 	/**
-	 * Format a decimal number to a string with fixed decimal places, 
+	 * Format a decimal number to a string with fixed decimal places,
 	 * using WooCommerce normalization and avoiding scientific notation.
 	 *
 	 * @param float|string $amount The amount to format.
@@ -209,7 +209,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		// Emit plain decimal string (no exponent).
 		return number_format( $value, $decimal_places, '.', '' );
 	}
-	
+
 	/**
 	 * Get grouped order tax data by rate, category, reason, and scheme.
 	 *
@@ -218,7 +218,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	protected function get_grouped_order_tax_data(): array {
 		$grouped_tax_data = array();
 		$order_tax_data   = $this->document->order_tax_data;
-		
+
 		// Fallback if no tax data is available
 		if ( empty( $order_tax_data ) ) {
 			$order_tax_data = array(
@@ -230,11 +230,11 @@ abstract class AbstractHandler implements HandlerInterface {
 				),
 			);
 		}
-		
+
 		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
 		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order );
 		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order );
-		
+
 		foreach ( $order_tax_data as $item ) {
 			$percentage = (float) ( $item['percentage'] ?? 0 );
 			$category   = strtoupper( trim( (string) ( $item['category'] ?? $order_category ) ) );
@@ -273,16 +273,16 @@ abstract class AbstractHandler implements HandlerInterface {
 				$grouped_tax_data[ $key ]['total_tax'] = ( $grouped_tax_data[ $key ]['total_tax'] ?? 0.0 ) + $line_total_tax;
 			}
 		}
-		
+
 		// Ensure Z group is consolidated and correct before returning
 		$grouped_tax_data = $this->ensure_one_tax_z_group( $grouped_tax_data );
-		
+
 		// Reindex so callers always get a numeric array
 		$grouped_tax_data = array_values( $grouped_tax_data );
 
 		return apply_filters( 'wpo_ips_edi_order_tax_data', $grouped_tax_data, $this );
 	}
-	
+
 	/**
 	 * Consolidate and ensure exactly one Z group in the grouped tax data.
 	 *
@@ -367,7 +367,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $grouped_tax_data;
 	}
-	
+
 	/**
 	 * Get calculated payment totals for an order.
 	 *
@@ -424,7 +424,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			'payable_amount'
 		);
 	}
-	
+
 	/**
 	 * Get the tax rows bucket for an order item ('subtotal' for products, 'total' otherwise).
 	 *
@@ -449,7 +449,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 */
 	protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
 		$order_tax_data = $this->document->order_tax_data;
-		
+
 		$scheme   = 'VAT';
 		$category = null;
 		$percent  = 0.0;
@@ -459,7 +459,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			if ( ! is_numeric( $tax_amt ) || (float) $tax_amt == 0.0 ) {
 				continue;
 			}
-			
+
 			$row      = $order_tax_data[ $tax_id ]   ?? array();
 			$scheme   = strtoupper( $row['scheme']   ?? 'VAT' );
 			$category = strtoupper( $row['category'] ?? 'Z'   );
@@ -506,7 +506,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount' );
 	}
-	
+
 	/**
 	 * Get order item meta.
 	 *
@@ -527,9 +527,29 @@ abstract class AbstractHandler implements HandlerInterface {
 			)
 		);
 
+		// Skip meta for certain items (override via filter if needed).
+		$skip_types = apply_filters(
+			'wpo_ips_edi_skip_item_meta_for_types',
+			array( 'WC_Order_Item_Shipping', 'WC_Order_Item_Fee', 'WC_Order_Item_Tax', 'WC_Order_Item_Coupon' ),
+			$item,
+			$args,
+			$this
+		);
+		foreach ( (array) $skip_types as $class ) {
+			if ( is_a( $item, $class ) ) {
+				$rows = apply_filters( 'wpo_ips_edi_get_item_meta', array(), $item, $args, $this );
+				return is_array( $rows ) ? $rows : array();
+			}
+		}
+
 		$meta_items = method_exists( $item, 'get_all_formatted_meta_data' )
 			? $item->get_all_formatted_meta_data()
 			: $item->get_formatted_meta_data();
+
+		// Ensure we can iterate even if something exotic was returned.
+		if ( ! is_iterable( $meta_items ) ) {
+			$meta_items = array();
+		}
 
 		$rows = array();
 
@@ -538,7 +558,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$raw_value = isset( $m->value ) ? $m->value        : '';
 
 			// Hidden meta starts with underscore.
-			if ( ! $args['include_hidden'] && 0 === strpos( $raw_key, '_' ) ) {
+			if ( ! $args['include_hidden'] && '' !== $raw_key && '_' === substr( $raw_key, 0, 1 ) ) {
 				continue;
 			}
 
@@ -563,9 +583,10 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 
 			// Strip tags and normalize whitespace for XML.
-			$value = wp_strip_all_tags( (string) $value, true );
-			$value = preg_replace( '/\s+/u', ' ', $value );
-			$value = trim( $value );
+			$value      = wp_strip_all_tags( (string) $value, true );
+			$normalized = preg_replace( '/\s+/u', ' ', $value ); // may return null on invalid UTF-8
+			$value      = is_string( $normalized ) ? $normalized : (string) $value;
+			$value      = trim( $value );
 
 			// Optional truncation.
 			if ( $args['max_length'] ) {
@@ -577,13 +598,19 @@ abstract class AbstractHandler implements HandlerInterface {
 				continue;
 			}
 
-			$rows[] = [
+			$rows[] = array(
 				'name'  => $label,
 				'value' => $value,
-			];
+			);
 		}
 
-		return apply_filters( 'wpo_ips_edi_get_item_meta', $rows, $item, $args, $this );
+		$rows = apply_filters( 'wpo_ips_edi_get_item_meta', $rows, $item, $args, $this );
+
+		if ( ! is_array( $rows ) ) {
+			$rows = array();
+		}
+
+		return $rows;
 	}
 
 }
