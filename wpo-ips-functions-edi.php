@@ -714,7 +714,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 			'label'    => __( 'Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'    => ! empty( $endpoint_scheme ) && ! empty( $endpoint_id )
 				? sprintf( '%s:%s', $endpoint_scheme, $endpoint_id )
-				: '',
+				: ( ! empty( $endpoint_id ) ? $endpoint_id : '' ),
 			'required' => true,
 		);
 
@@ -722,7 +722,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 			'label'    => __( 'Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier )
 				? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier )
-				: '',
+				: ( ! empty( $legal_identifier ) ? $legal_identifier : '' ),
 			'required' => true,
 		);
 	}
@@ -795,7 +795,7 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 		$scheme = $identifier = '';
 
 		// Determine parts
-		if ( 'full' === $mode || false !== strpos( $raw, ':' ) ) {
+		if ( 'full' === $mode && false !== strpos( $raw, ':' ) ) {
 			[ $scheme, $identifier ] = array_map(
 				'trim',
 				explode( ':', $raw, 2 ) + array( '', '' )

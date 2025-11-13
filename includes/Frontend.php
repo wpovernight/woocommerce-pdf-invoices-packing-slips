@@ -501,7 +501,7 @@ class Frontend {
 	 */
 	public function edi_save_peppol_settings(): void {
 		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( empty( $request_method ) || 'POST' !== $request_method || empty( $_POST['save_peppol_settings'] ) ) {
+		if ( empty( $request_method ) || 'POST' !== $request_method || ! isset( $_POST['save_peppol_settings'] ) ) {
 			return;
 		}
 		

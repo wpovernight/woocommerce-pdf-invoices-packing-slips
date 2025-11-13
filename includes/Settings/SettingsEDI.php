@@ -520,7 +520,7 @@ class SettingsEDI {
 	 *
 	 * @return array
 	 */
-	public function preserve_peppol_settings( mixed $value, mixed $old_value, string $option ): array {
+	public function preserve_peppol_settings( $value, $old_value, string $option ): array {
 		$new = is_array( $value )     ? $value     : array();
 		$old = is_array( $old_value ) ? $old_value : array();
 		
@@ -1067,7 +1067,14 @@ class SettingsEDI {
 		<p><?php esc_html_e( 'Send your documents through supported delivery networks directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		<div class="notice notice-info inline">
 			<p>
-				<?php esc_html_e( 'This feature is currently under development.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				<?php
+					printf(
+						/* translators: %1$s: open link anchor, %2$s: close link anchor */
+						esc_html__( 'This feature is currently under development. If you\'d like to learn more or request early access, please %1$scontact us%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://wpovernight.com/contact/" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					);
+				?>
 			</p>
 		</div>
 		<?php
