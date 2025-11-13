@@ -22,6 +22,15 @@ class Invoice extends AbstractUblFormat {
 	public function get_type_code(): string {
 		return '380';
 	}
+	
+	/**
+	 * Get the quantity role
+	 *
+	 * @return string
+	 */
+	public function get_quantity_role(): string {
+		return 'Invoiced';
+	}
 
 	/**
 	 * Get the format root element
@@ -133,9 +142,9 @@ class Invoice extends AbstractUblFormat {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\LegalMonetaryTotalHandler::class,
 			),
-			'invoice_line' => array(
+			'line' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\InvoiceLineHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\LineHandler::class,
 			),
 		);
 	}

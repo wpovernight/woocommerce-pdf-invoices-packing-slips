@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class InvoiceLineHandler extends AbstractUblHandler {
+class LineHandler extends AbstractUblHandler {
 
 	/**
 	 * Handle the data and return the formatted output.
@@ -17,6 +17,8 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
+		$root_element         = $this->document->get_root_element();
+		$quantity_role		  = $this->document->get_quantity_role();
 		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_invoice_line', false, $this );
 		$items                = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$currency             = $this->document->order->get_currency();
@@ -132,15 +134,15 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				}
 			}
 
-			$invoice_line = array(
-				'name'  => 'cac:InvoiceLine',
+			$line = array(
+				'name'  => "cac:{$root_element}Line",
 				'value' => array(
 					array(
 						'name'  => 'cbc:ID',
 						'value' => $item_id,
 					),
 					array(
-						'name'       => 'cbc:InvoicedQuantity',
+						'name'       => "cbc:{$quantity_role}Quantity",
 						'value'      => $parts['qty'],
 						'attributes' => array(
 							'unitCode' => 'C62', // https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/
@@ -164,7 +166,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				),
 			);
 
-			$data[] = apply_filters( 'wpo_ips_edi_ubl_invoice_line', $invoice_line, $data, $options, $item, $this );
+			$data[] = apply_filters( 'wpo_ips_edi_ubl_line', $line, $data, $options, $item, $this );
 		}
 		
 		// Append coupon lines as negative invoice lines
@@ -176,9 +178,9 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			}
 
 			foreach ( $coupons as $order_item_id => $coupon_item ) {
-				$line = $this->build_coupon_invoice_line( $coupon_item, $order_item_id, $currency );
-				if ( $line ) {
-					$data[] = $line;
+				$_line = $this->build_coupon_line( $coupon_item, $order_item_id, $currency );
+				if ( $_line ) {
+					$data[] = $_line;
 				}
 			}
 		}
@@ -187,14 +189,14 @@ class InvoiceLineHandler extends AbstractUblHandler {
 	}
 	
 	/**
-	 * Create the InvoiceLine array for a single coupon item.
+	 * Create the Line array for a single coupon item.
 	 *
 	 * @param \WC_Order_Item_Coupon $coupon_item
 	 * @param int                   $fallback_id
 	 * @param string                $currency
 	 * @return array|null
 	 */
-	protected function build_coupon_invoice_line( \WC_Order_Item_Coupon $coupon_item, int $fallback_id, string $currency ): ?array {
+	protected function build_coupon_line( \WC_Order_Item_Coupon $coupon_item, int $fallback_id, string $currency ): ?array {
 		if ( ! is_object( $coupon_item ) || ! method_exists( $coupon_item, 'get_discount' ) ) {
 			return null;
 		}
@@ -244,16 +246,19 @@ class InvoiceLineHandler extends AbstractUblHandler {
 				),
 			),
 		);
+		
+		$root_element  = $this->document->get_root_element();
+		$quantity_role = $this->document->get_quantity_role();
 
-		$invoice_line = array(
-			'name'  => 'cac:InvoiceLine',
+		$line = array(
+			'name'  => "cac:{$root_element}Line",
 			'value' => array(
 				array(
 					'name'  => 'cbc:ID',
 					'value' => $coupon_post_id > 0 ? $coupon_post_id : $fallback_id,
 				),
 				array(
-					'name'       => 'cbc:InvoicedQuantity',
+					'name'       => "cbc:{$quantity_role}Quantity",
 					'value'      => 1,
 					'attributes' => array(
 						'unitCode' => 'C62',
@@ -301,7 +306,7 @@ class InvoiceLineHandler extends AbstractUblHandler {
 			),
 		);
 		
-		return apply_filters( 'wpo_ips_edi_ubl_coupon_invoice_line', $invoice_line, $coupon_item, $this );
+		return apply_filters( 'wpo_ips_edi_ubl_coupon_line', $line, $coupon_item, $this );
 	}
 
 }
