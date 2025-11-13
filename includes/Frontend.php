@@ -108,7 +108,7 @@ class Frontend {
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice )
 				);
 				
-				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
+				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
 					$actions[ $document_type . '_xml' ] = array(
 						'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
 						'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),

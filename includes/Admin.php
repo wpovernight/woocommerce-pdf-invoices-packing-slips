@@ -269,7 +269,7 @@ class Admin {
 							}
 							break;
 						case 'xml':
-							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
+							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() ) {
 								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
@@ -536,8 +536,9 @@ class Admin {
 				'default'
 			);
 		}
+
 		// create EDI buttons
-		if ( wpo_ips_edi_is_available() && count( wpo_ips_edi_get_document_types() ) > 0 ) {
+		if ( wpo_ips_edi_is_available() && ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' ) ) ) {
 			add_meta_box(
 				'wpo_ips-edi-box',
 				__( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -693,7 +694,7 @@ class Admin {
 	/**
 	 * Create the EDI meta box content on the single order page
 	 *
-	 * @param \WC_Order|\WP_Post $post_or_order_object
+	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
 	 * @return void
 	 */
 	public function edi_actions_meta_box( object $post_or_order_object ): void {
@@ -707,28 +708,55 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			$document_type  = $document->get_type();
-			$document       = wcpdf_get_document( $document_type, $order );
-
-			if ( $document && $document->is_enabled( 'xml' ) && in_array( $document_type, wpo_ips_edi_get_document_types(), true ) ) {
-				$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
-				$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-				$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-				$class           = array( $document_type, 'xml' );
-
-				if ( $document_exists ) {
-					$class[] = 'exists';
-				} else {
+			
+			if ( 'credit-note' === $document_type && $order instanceof \WC_Order ) {
+				$refunds = $order->get_refunds();
+				if ( empty( $refunds ) ) {
 					continue;
 				}
+				
+				$c = 0;
+				foreach ( $refunds as $refund ) {
+					if ( ! $refund instanceof \WC_Order_Refund ) {
+						continue;
+					}
+					
+					$document = wcpdf_get_document( $document_type, $refund );
 
-				$meta_box_actions[ $document_type ] = array(
-					'url'    => $document_url,
-					'alt'    => "E-{$document_title}",
-					'title'  => "E-{$document_title}",
-					'exists' => $document_exists,
-					'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
-					'target' => '_blank',
-				);
+					if ( $document && $document->exists() ) {
+						$c++;
+						
+						$document_url   = WPO_WCPDF()->endpoint->get_document_link( $refund, $document_type, array( 'output' => 'xml' ) );
+						$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+						$class          = array( $document_type, 'xml', 'exists' );
+						
+						$meta_box_actions[ $document_type . '-' . $c ] = array(
+							'url'    => $document_url,
+							'alt'    => "E-{$document_title} {$c}",
+							'title'  => "E-{$document_title} {$c}",
+							'exists' => true,
+							'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
+							'target' => '_blank',
+						);
+					}
+				}
+			} else {
+				$document = wcpdf_get_document( $document_type, $order );
+
+				if ( $document && $document->exists() ) {
+					$document_url   = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
+					$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+					$class          = array( $document_type, 'xml', 'exists' );
+					
+					$meta_box_actions[ $document_type ] = array(
+						'url'    => $document_url,
+						'alt'    => "E-{$document_title}",
+						'title'  => "E-{$document_title}",
+						'exists' => true,
+						'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
+						'target' => '_blank',
+					);
+				}
 			}
 		}
 

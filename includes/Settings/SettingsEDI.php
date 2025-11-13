@@ -136,34 +136,6 @@ class SettingsEDI {
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'document_types',
-				'title'			=> __( 'Document Types', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'select',
-				'section'		=> $section,
-				'args'			=> array(
-					'option_name'     => $option_name,
-					'id'              => 'document_types',
-					'options'         => $this->get_document_types(),
-					'multiple'        => true,
-					'enhanced_select' => true,
-					'placeholder'     => __( 'Select one or more document types with electronic format.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description'     => __( 'Select the document types you want to generate as E-Documents. Keep in mind that an E-Document can only be created if the PDF version of the same document type has already been generated.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'send_attachments',
-				'title'    => __( 'Send Attachments', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => $section,
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'send_attachments',
-					'description' => __( 'When sending a document by e-mail, automatically include the electronic version attachment along with the PDF.', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-			),
-			array(
 				'type'     => 'setting',
 				'id'       => 'syntax',
 				'title'    => __( 'Preferred Syntax', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -202,14 +174,11 @@ class SettingsEDI {
 			$settings_format[] = array(
 				'type'     => 'setting',
 				'id'       => "{$syntax}_format",
-				'title'    => sprintf(
-					/* translators: %s syntax */
-					__( '%s Format', 'woocommerce-pdf-invoices-packing-slips' ),
-					strtoupper( trim( $syntax ) )
-				),
+				'title'    => '',
 				'callback' => 'select',
 				'section'  => $section,
 				'args'     => array(
+					'title'             => __( 'Format', 'woocommerce-pdf-invoices-packing-slips' ),
 					'option_name'       => $option_name,
 					'id'                => "{$syntax}_format",
 					'options'           => array_combine(
@@ -412,52 +381,7 @@ class SettingsEDI {
 				),
 			),
 		);
-
-		$settings_fields[] = array(
-			'type'     => 'setting',
-			'id'       => 'include_item_meta',
-			'title'    => '',
-			'callback' => 'checkbox',
-			'section'  => $section,
-			'args'     => array(
-				'title'             => __( 'Include Item Meta Data', 'woocommerce-pdf-invoices-packing-slips' ),
-				'option_name'       => $option_name,
-				'id'                => 'include_item_meta',
-				'description'       => sprintf(
-					'%s %s',
-					__( 'Include item meta data in the e-document.', 'woocommerce-pdf-invoices-packing-slips' ),
-					sprintf(
-						/* translators: 1: opening link tag, 2: closing link tag */
-						__( 'Advanced customization is possible, see the %1$sdocumentation page%2$s for details.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/customize-the-item-meta-included-in-e-documents/" target="_blank" rel="noopener noreferrer">',
-						'</a>'
-					)
-				),
-				'custom_attributes' => array(
-					'data-show_for_option_name'   => $option_name . '[syntax]',
-					'data-show_for_option_values' => json_encode( array( 'ubl', 'cii' ) ),
-				),
-			)
-		);
 		
-		$settings_fields[] = array(
-			'type'     => 'setting',
-			'id'       => 'embed_encrypted_pdf',
-			'title'    => '',
-			'callback' => 'checkbox',
-			'section'  => $section,
-			'args'     => array(
-				'title'             => __( 'Embed Encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
-				'option_name'       => $option_name,
-				'id'                => 'embed_encrypted_pdf',
-				'description'       => __( 'Embed the encrypted PDF invoice file within the e-document.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'custom_attributes' => array(
-					'data-show_for_option_name'   => $option_name . '[syntax]',
-					'data-show_for_option_values' => json_encode( array( 'ubl' ) ),
-				),
-			)
-		);
-
 		$languages = wpo_wcpdf_get_multilingual_languages();
 
 		if ( count( $languages ) > 0 ) {
@@ -480,6 +404,59 @@ class SettingsEDI {
 				)
 			);
 		}
+		
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'embed_encrypted_pdf',
+			'title'    => '',
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'title'             => __( 'Embed Encrypted PDF', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name'       => $option_name,
+				'id'                => 'embed_encrypted_pdf',
+				'description'       => __( 'Embed the encrypted PDF invoice file within the e-document.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[syntax]',
+					'data-show_for_option_values' => json_encode( array( 'ubl' ) ),
+				),
+			)
+		);
+		
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'send_attachments',
+			'title'    => __( 'Send Attachments', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'option_name' => $option_name,
+				'id'          => 'send_attachments',
+				'description' => __( 'When sending a document by e-mail, automatically include the electronic version attachment along with the PDF.', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+		);
+		
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'include_item_meta',
+			'title'    =>  __( 'Include Item Meta Data', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'option_name' => $option_name,
+				'id'          => 'include_item_meta',
+				'description' => sprintf(
+					'%s %s',
+					__( 'Include item meta data in the e-document.', 'woocommerce-pdf-invoices-packing-slips' ),
+					sprintf(
+						/* translators: 1: opening link tag, 2: closing link tag */
+						__( 'Advanced customization is possible, see the %1$sdocumentation page%2$s for details.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/customize-the-item-meta-included-in-e-documents/" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					)
+				),
+			)
+		);
 
 		$settings_fields[] = array(
 			'type'     => 'setting',
@@ -654,24 +631,6 @@ class SettingsEDI {
 
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		wp_die();
-	}
-	
-	/**
-	 * Get the available EDI document types.
-	 *
-	 * @return array
-	 */
-	private function get_document_types(): array {
-		$xml_documents  = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
-		$document_types = array();
-
-		foreach ( $xml_documents as $document ) {
-			if ( isset( $document->output_formats ) && is_array( $document->output_formats ) && in_array( 'xml', $document->output_formats ) ) {
-				$document_types[ $document->get_type() ] = $document->get_title();
-			}
-		}
-
-		return apply_filters( 'wpo_ips_edi_document_types', $document_types );
 	}
 
 	/**
