@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
 
-	public string $slug = 'factur-x-1p0';
+	public string $slug = 'factur-x-invoice-1p0';
 	public string $name = 'Factur-X Invoice 1.0';
 
 	/**

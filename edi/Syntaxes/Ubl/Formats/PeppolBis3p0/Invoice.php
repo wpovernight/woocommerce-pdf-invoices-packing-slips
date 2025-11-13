@@ -11,16 +11,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Invoice extends AbstractUblFormat {
 
 	public string $type = 'invoice';
-	public string $slug = 'peppol-bis-3p0';
+	public string $slug = 'peppol-bis-3p0-invoice';
 	public string $name = 'PEPPOL BIS 3.0 Invoice';
 
 	/**
-	 * Get the invoice type code
+	 * Get the type code
 	 *
 	 * @return string
 	 */
 	public function get_type_code(): string {
 		return '380';
+	}
+	
+	/**
+	 * Get the quantity role
+	 *
+	 * @return string
+	 */
+	public function get_quantity_role(): string {
+		return 'Invoiced';
 	}
 
 	/**
@@ -81,9 +90,9 @@ class Invoice extends AbstractUblFormat {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\IssueDateHandler::class,
 			),
-			'invoice_type_code' => array(
+			'type_code' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\InvoiceTypeCodeHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\TypeCodeHandler::class,
 			),
 			'document_currency_code' => array(
 				'enabled' => true,
@@ -133,9 +142,9 @@ class Invoice extends AbstractUblFormat {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\LegalMonetaryTotalHandler::class,
 			),
-			'invoice_line' => array(
+			'line' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\InvoiceLineHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\LineHandler::class,
 			),
 		);
 	}

@@ -13,11 +13,18 @@ abstract class AbstractUblFormat implements FormatInterface {
 	public string $syntax = 'ubl';
 	
 	/**
-	 * Get the invoice type code
+	 * Get the type code
 	 *
 	 * @return string
 	 */
 	abstract public function get_type_code(): string;
+	
+	/**
+	 * Get the quantity role
+	 *
+	 * @return string
+	 */
+	abstract public function get_quantity_role(): string;
 
 	/**
 	 * Get the format root element
