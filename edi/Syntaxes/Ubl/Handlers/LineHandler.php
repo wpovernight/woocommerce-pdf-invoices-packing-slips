@@ -19,7 +19,7 @@ class LineHandler extends AbstractUblHandler {
 	public function handle( array $data, array $options = array() ): array {
 		$root_element         = $this->document->get_root_element();
 		$quantity_role		  = $this->document->get_quantity_role();
-		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_invoice_line', false, $this );
+		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
 		$items                = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$currency             = $this->document->order->get_currency();
 
@@ -169,7 +169,7 @@ class LineHandler extends AbstractUblHandler {
 			$data[] = apply_filters( 'wpo_ips_edi_ubl_line', $line, $data, $options, $item, $this );
 		}
 		
-		// Append coupon lines as negative invoice lines
+		// Append coupon lines as negative lines
 		if ( $include_coupon_lines ) {
 			$coupons = $this->document->order->get_items( 'coupon' );
 			
