@@ -720,10 +720,18 @@ class Admin {
 						continue;
 					}
 					
-					$meta_box_actions[ $document_type . '::' . $refund->get_id() ] = $this->get_order_meta_box_document_xml_action( $document_type, $refund );
+					$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $refund );
+					
+					if ( ! empty( $xml_action ) ) {
+						$meta_box_actions[ $document_type . '::' . $refund->get_id() ] = $xml_action;
+					}
 				}
 			} else {
-				$meta_box_actions[ $document_type . '::' . $order->get_id() ] = $this->get_order_meta_box_document_xml_action( $document_type, $order );
+				$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $order );
+				
+				if ( ! empty( $xml_action ) ) {
+					$meta_box_actions[ $document_type . '::' . $order->get_id() ] = $xml_action;
+				}
 			}
 		}
 
