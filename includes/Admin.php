@@ -798,7 +798,11 @@ class Admin {
 										<span class="dashicons dashicons-cloud-upload"></span>
 									</a>',
 									esc_url( $network ),
-									esc_html__( 'Send to Network', 'woocommerce-pdf-invoices-packing-slips' )
+									sprintf(
+										/* translators: document title */
+										esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+										esc_html( $title )
+									)
 								);
 							}
 
