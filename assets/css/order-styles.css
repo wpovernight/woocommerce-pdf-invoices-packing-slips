@@ -185,6 +185,11 @@ ul.wpo-ips-edi-actions > li {
 	line-height: 1;
 }
 
+#wpo_ips-edi-box .inside > .edi-order-actions .order-id {
+	font-size: 10px;
+	color: #999;
+}
+
 #wpo_ips-edi-box .inside .peppol tbody td.edit,
 #wpo_ips-edi-box .inside .peppol tfoot,
 #wpo_ips-edi-box .inside .peppol table.is-editing thead .editable a,

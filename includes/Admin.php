@@ -720,44 +720,10 @@ class Admin {
 						continue;
 					}
 					
-					$document = wcpdf_get_document( $document_type, $refund );
-
-					if ( $document && $document->exists() ) {
-						$document_url   = WPO_WCPDF()->endpoint->get_document_link( $refund, $document_type, array( 'output' => 'xml' ) );
-						$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-						$class          = array( $document_type, 'xml', 'exists' );
-						
-						$number_instance  = $document->get_number();
-						$number_plain     = ! empty( $number_instance ) ? $number_instance->get_plain() : '';
-						$number_formatted = ! empty( $number_instance ) ? $number_instance->get_formatted() : '';
-						
-						$meta_box_actions[ $document_type . '-' . $number_plain ] = array(
-							'url'    => $document_url,
-							'alt'    => "Download XML {$document_title} {$number_formatted}",
-							'title'  => "{$document_title} {$number_formatted}",
-							'exists' => true,
-							'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
-							'target' => '_blank',
-						);
-					}
+					$meta_box_actions[ $document_type . '::' . $refund->get_id() ] = $this->get_order_meta_box_document_xml_action( $document_type, $refund );
 				}
 			} else {
-				$document = wcpdf_get_document( $document_type, $order );
-
-				if ( $document && $document->exists() ) {
-					$document_url   = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
-					$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-					$class          = array( $document_type, 'xml', 'exists' );
-					
-					$meta_box_actions[ $document_type ] = array(
-						'url'    => $document_url,
-						'alt'    => "Download XML {$document_title}",
-						'title'  => "{$document_title}",
-						'exists' => true,
-						'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
-						'target' => '_blank',
-					);
-				}
+				$meta_box_actions[ $document_type . '::' . $order->get_id() ] = $this->get_order_meta_box_document_xml_action( $document_type, $order );
 			}
 		}
 
@@ -803,7 +769,7 @@ class Admin {
 									sprintf(
 										/* translators: document title */
 										esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $title )
+										esc_html( $alt )
 									)
 								);
 							}
@@ -818,11 +784,15 @@ class Admin {
 										%6$s
 									</td>
 								</tr>',
-								esc_html( $title ),
+								wp_kses_post( $title ),
 								esc_url( $url ),
 								esc_attr( $class ),
 								esc_attr( $target ),
-								esc_attr( $alt ),
+								sprintf(
+									/* translators: document title */
+									esc_html__( 'Download %s', 'woocommerce-pdf-invoices-packing-slips' ),
+									esc_html( $alt )
+								),
 								wp_kses_post( $network_button )
 							);
 						}
@@ -1933,6 +1903,50 @@ class Admin {
 		}
 
 		$query->set( 'orderby', $this->is_invoice_number_numeric() ? 'meta_value_num' : 'meta_value' );
+	}
+	
+	/**
+	 * Get XML document action for order meta box
+	 *
+	 * @param string             $document_type
+	 * @param \WC_Abstract_Order $order
+	 * @return array
+	 */
+	private function get_order_meta_box_document_xml_action( string $document_type, \WC_Abstract_Order $order ): array {
+		$document = wcpdf_get_document( $document_type, $order );
+
+		if ( ! $document || ! $document->exists() ) {
+			return array();
+		}
+		
+		$is_refund_order  = is_a( $order, 'WC_Order_Refund' );
+		$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
+		$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+		$class            = array( $document_type, 'xml', 'exists' );
+		
+		$number_instance  = $document->get_number();
+		$number_formatted = ! empty( $number_instance ) ? $number_instance->get_formatted() : '';
+		
+		$xml_title        = sprintf(
+			'%s %s<br><span class="order-id">%s: %d</span>',
+			$document_title,
+			$number_formatted,
+			$is_refund_order ? __( 'RFND', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'ORD', 'woocommerce-pdf-invoices-packing-slips' ),
+			$order->get_id()
+		);
+		
+		return array(
+			'url'    => $document_url,
+			'alt'    => sprintf(
+				/* translators: document title */
+				__( 'XML %s', 'woocommerce-pdf-invoices-packing-slips' ),
+				$document_title
+			),
+			'title'  => $xml_title,
+			'exists' => true,
+			'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
+			'target' => '_blank',
+		);
 	}
 	
 	/**
