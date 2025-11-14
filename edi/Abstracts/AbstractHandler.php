@@ -371,10 +371,10 @@ abstract class AbstractHandler implements HandlerInterface {
 	/**
 	 * Get calculated payment totals for an order.
 	 *
-	 * @param \WC_Order $order
+	 * @param \WC_Abstract_Order $order
 	 * @return array
 	 */
-	protected function get_order_payment_totals( \WC_Order $order ): array {
+	protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
 		$total         = $order->get_total();
 		$total_tax_raw = $order->get_total_tax();
 		$total_exc_tax = $total - $total_tax_raw;
