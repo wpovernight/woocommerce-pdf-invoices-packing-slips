@@ -816,7 +816,7 @@ class Admin {
 								esc_attr( $class ),
 								esc_attr( $target ),
 								esc_attr( $alt ),
-								$network_button
+								wp_kses_post( $network_button )
 							);
 						}
 					?>
