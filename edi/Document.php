@@ -39,7 +39,7 @@ class Document {
 			throw new \Exception( esc_html( $error ) );
 		}
 	}
-	
+
 	/**
 	 * Get the format document instance
 	 *
@@ -60,7 +60,7 @@ class Document {
 			);
 			return null;
 		}
-		
+
 		if ( ! in_array( $document_type, array_keys( $format['documents'] ) ) ) {
 			wpo_ips_edi_log(
 				sprintf(
@@ -72,7 +72,7 @@ class Document {
 			);
 			return null;
 		}
-		
+
 		return new $format['documents'][ $document_type ]();
 	}
 
@@ -101,7 +101,7 @@ class Document {
 
 		return $structure;
 	}
-	
+
 	/**
 	 * Get the document type code
 	 *
@@ -114,7 +114,7 @@ class Document {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Get the document quantity role (UBL formats only)
 	 *
@@ -129,7 +129,7 @@ class Document {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Get the document root element
 	 *
@@ -142,7 +142,7 @@ class Document {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Get the document additional attributes
 	 *
@@ -155,7 +155,7 @@ class Document {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Get the document namespaces
 	 *
@@ -168,13 +168,13 @@ class Document {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Assemble the element list for the XML writer.
 	 *
 	 * Works for both UBL and CII syntaxes:
 	 *
-	 * • If a handler sets `options[root]`, its output is wrapped in that tag  
+	 * • If a handler sets `options[root]`, its output is wrapped in that tag
 	 *   (e.g. `cac:AccountingSupplierParty`, `ram:SupplyChainTradeTransaction`).
 	 * • Without a root option, the fragment is written directly under the
 	 *   document root.
@@ -186,7 +186,7 @@ class Document {
 	public function get_data(): array {
 		$data_by_root = array();
 		$structure    = $this->get_structure();
-		
+
 		if ( ! $structure ) {
 			return array();
 		}
@@ -201,7 +201,7 @@ class Document {
 			$handlers  = is_array( $value['handler'] ) ? $value['handler'] : array( $value['handler'] );
 			$root_name = $options['root'] ?? null;
 			$fragment  = array();
-			
+
 			foreach ( $handlers as $handler_class ) {
 				if ( ! class_exists( $handler_class ) ) {
 					wpo_ips_edi_log( sprintf(
@@ -352,7 +352,7 @@ class Document {
 					if ( empty( $value ) ) {
 						$legacy_meta_key = '_wcpdf_ubl_tax_' . $field;
 						$value           = wc_get_order_item_meta( $tax_item_key, $legacy_meta_key, true ) ?: $value;
-						
+
 						if ( ! empty( $value ) ) {
 							wc_delete_order_item_meta( $tax_item_key, $legacy_meta_key );
 						}
@@ -368,7 +368,7 @@ class Document {
 
 					${$field} = $value;
 				}
-				
+
 				$name = ! empty( $tax_item['label'] ) ? $tax_item['label'] : $tax_item['name'];
 			}
 

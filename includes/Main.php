@@ -292,13 +292,12 @@ class Main {
 						'xml' === $output_format &&
 						(
 							! wpo_ips_edi_is_available()     ||
-							! wpo_ips_edi_send_attachments() ||
-							! in_array( $document->get_type(), wpo_ips_edi_get_document_types(), true )
+							! wpo_ips_edi_send_attachments()
 						)
 					) {
 						continue;
 					}
-					
+
 					$attach_documents[ $output_format ][ $document->get_type() ] = $document->get_attach_to_email_ids( $output_format );
 				}
 			}
@@ -458,8 +457,15 @@ class Main {
 					break;
 				}
 
+				if ( $order instanceof \WC_Order_Refund ) { // EDI Credit Note specific
+					$parent_order = wc_get_order( $order->get_parent_id() );
+					$order_key    = $parent_order ? $parent_order->get_order_key() : '';
+				} else {
+					$order_key    = $order->get_order_key();
+				}
+
 				// check if we have a valid access key only when it's not from bulk actions
-				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order->get_order_key(), $access_key ) ) {
+				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order_key, $access_key ) ) {
 					$allowed = false;
 					break;
 				}

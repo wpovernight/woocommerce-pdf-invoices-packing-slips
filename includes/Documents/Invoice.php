@@ -23,15 +23,15 @@ class Invoice extends OrderDocumentMethods {
 		$this->type  = 'invoice';
 		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
-		
+
 		// call parent constructor
 		parent::__construct( $order );
-		
+
 		// Add XML without wiping what the parent put in $this->output_formats
 		if ( ! in_array( 'xml', $this->output_formats, true ) ) {
 			$this->output_formats[] = 'xml';
 		}
-		
+
 		$this->output_formats = apply_filters(
 			'wpo_wcpdf_document_output_formats',
 			$this->output_formats,
@@ -41,7 +41,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Checks if Invoice uses historical settings
-	 * 
+	 *
 	 * @return void
 	 */
 	public function use_historical_settings(): bool {
@@ -54,7 +54,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Checks if Invoice has storing settings enabled
-	 * 
+	 *
 	 * @return void
 	 */
 	public function storing_settings_enabled(): bool {
@@ -188,7 +188,7 @@ class Invoice extends OrderDocumentMethods {
 		foreach ( $this->output_formats as $output_format ) {
 			$page            = $option_group = $option_name = '';
 			$settings_fields = array();
-			
+
 			if ( 'pdf' === $output_format ) {
 				$page            = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
 				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter

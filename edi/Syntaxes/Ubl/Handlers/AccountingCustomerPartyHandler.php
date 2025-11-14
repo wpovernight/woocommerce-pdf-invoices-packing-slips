@@ -56,8 +56,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_name(): ?array {
-		$customer_party_name = $this->document->order->get_formatted_billing_full_name();
-		$billing_company     = $this->document->order->get_billing_company();
+		$order               = $this->get_parent_order() ?? $this->document->order;
+		$customer_party_name = $order->get_formatted_billing_full_name();
+		$billing_company     = $order->get_billing_company();
 
 		if ( ! empty( $billing_company ) ) {
 			// $customer_party_name = "{$billing_company} ({$customer_party_name})";
@@ -83,11 +84,12 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_postal_address(): ?array {
-		$address_1   = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_address_1() );
-		$address_2   = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_address_2() );
-		$city        = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_city() );
-		$postcode    = wpo_ips_edi_sanitize_string( $this->document->order->get_billing_postcode() );
-		$country     = $this->document->order->get_billing_country();
+		$order       = $this->get_parent_order() ?? $this->document->order;
+		$address_1   = wpo_ips_edi_sanitize_string( $order->get_billing_address_1() );
+		$address_2   = wpo_ips_edi_sanitize_string( $order->get_billing_address_2() );
+		$city        = wpo_ips_edi_sanitize_string( $order->get_billing_city() );
+		$postcode    = wpo_ips_edi_sanitize_string( $order->get_billing_postcode() );
+		$country     = $order->get_billing_country();
 		$addressLine = trim( "{$address_1} {$address_2}" );
 
 		$postal_address = array(
@@ -131,6 +133,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_tax_scheme(): ?array {
+		$order      = $this->get_parent_order() ?? $this->document->order;
 		$vat_number = $this->get_order_customer_vat_number();
 
 		// B2C (no VAT): omit PartyTaxScheme entirely
@@ -142,7 +145,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			wpo_ips_edi_log(
 				sprintf(
 					'UBL PartyTaxScheme: VAT number does not have a country prefix for customer in order %d.',
-					$this->document->order->get_id()
+					$order->get_id()
 				),
 				'error'
 			);
@@ -177,8 +180,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$billing_company   = $this->document->order->get_billing_company();
-		$billing_name      = $this->document->order->get_formatted_billing_full_name();
+		$order             = $this->get_parent_order() ?? $this->document->order;
+		$billing_company   = $order->get_billing_company();
+		$billing_name      = $order->get_formatted_billing_full_name();
 		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
 		$vat_number        = $this->get_order_customer_vat_number();
 
@@ -186,7 +190,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			wpo_ips_edi_log(
 				sprintf(
 					'UBL PartyLegalEntity: Registration name is missing for customer in order %d.',
-					$this->document->order->get_id()
+					$order->get_id()
 				),
 				'error'
 			);
@@ -205,7 +209,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 				wpo_ips_edi_log(
 					sprintf(
 						'UBL PartyLegalEntity: VAT number does not have a country prefix for customer in order %d.',
-						$this->document->order->get_id()
+						$order->get_id()
 					),
 					'error'
 				);
@@ -230,8 +234,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_contact(): ?array {
-		$name  = wpo_ips_edi_sanitize_string( $this->document->order->get_formatted_billing_full_name() );
-		$email = sanitize_email( $this->document->order->get_billing_email() );
+		$order = $this->get_parent_order() ?? $this->document->order;
+		$name  = wpo_ips_edi_sanitize_string( $order->get_formatted_billing_full_name() );
+		$email = sanitize_email( $order->get_billing_email() );
 
 		if ( empty( $name ) && empty( $email ) ) {
 			return null;
@@ -248,7 +253,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			wpo_ips_edi_log(
 				sprintf(
 					'UBL PartyContact: Customer name is missing or invalid in order %d.',
-					$this->document->order->get_id()
+					$order->get_id()
 				),
 				'error'
 			);
@@ -263,7 +268,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			wpo_ips_edi_log(
 				sprintf(
 					'UBL PartyContact: Customer email is missing or invalid in order %d.',
-					$this->document->order->get_id()
+					$order->get_id()
 				),
 				'error'
 			);

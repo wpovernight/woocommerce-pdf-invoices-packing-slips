@@ -104,7 +104,12 @@ class Endpoint {
 				$access_key = $is_user_logged_in ? wp_create_nonce( $this->actions['generate'] ) : '';
 				break;
 			case 'full':
-				$access_key = $order->get_order_key();
+				if ( $order instanceof \WC_Order_Refund ) { // EDI Credit Note specific
+					$parent_order = wc_get_order( $order->get_parent_id() );
+					$access_key   = $parent_order ? $parent_order->get_order_key() : '';
+				} else {
+					$access_key   = $order->get_order_key();
+				}
 				break;
 		}
 

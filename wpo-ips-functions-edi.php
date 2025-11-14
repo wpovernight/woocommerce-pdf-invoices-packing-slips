@@ -340,15 +340,6 @@ function wpo_ips_edi_get_current_format( bool $full_details = false ) {
 }
 
 /**
- * Get the EDI document types
- *
- * @return array
- */
-function wpo_ips_edi_get_document_types(): array {
-	return apply_filters( 'wpo_ips_edi_document_types', wpo_ips_edi_get_settings( 'document_types' ) ?? array() );
-}
-
-/**
  * Check if EDI attachments should be sent
  *
  * @return bool

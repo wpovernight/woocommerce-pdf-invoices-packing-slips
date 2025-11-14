@@ -371,10 +371,10 @@ abstract class AbstractHandler implements HandlerInterface {
 	/**
 	 * Get calculated payment totals for an order.
 	 *
-	 * @param \WC_Order $order
+	 * @param \WC_Abstract_Order $order
 	 * @return array
 	 */
-	protected function get_order_payment_totals( \WC_Order $order ): array {
+	protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
 		$total         = $order->get_total();
 		$total_tax_raw = $order->get_total_tax();
 		$total_exc_tax = $total - $total_tax_raw;
@@ -415,7 +415,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 		}
 
-		return compact(
+		$totals = compact(
 			'total_exc_tax',
 			'total_inc_tax',
 			'total_tax',
@@ -423,6 +423,8 @@ abstract class AbstractHandler implements HandlerInterface {
 			'rounding_diff',
 			'payable_amount'
 		);
+
+		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
 	}
 
 	/**
@@ -611,6 +613,27 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		return $rows;
+	}
+	
+	/**
+	 * Get the parent order for refunds.
+	 *
+	 * @return \WC_Order|null
+	 */
+	protected function get_parent_order(): ?\WC_Order {
+		$order = $this->document->order;
+
+		if ( is_a( $order, 'WC_Order_Refund' ) ) {
+			$parent_id = $order->get_parent_id();
+			if ( $parent_id ) {
+				$parent_order = wc_get_order( $parent_id );
+				if ( $parent_order ) {
+					return $parent_order;
+				}
+			}
+		}
+
+		return null;
 	}
 
 }
