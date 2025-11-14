@@ -31,7 +31,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party', $customer_party, $this );
 	}
-	
+
 	/**
 	 * Returns the endpoint ID for the customer.
 	 *
@@ -55,7 +55,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_endpoint_id', $endpoint, $this );
 	}
-	
+
 	/**
 	 * Returns the PartyIdentification element for the customer.
 	 *
@@ -84,15 +84,16 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_identification', $party_id, $this );
 	}
-	
+
 	/**
 	 * Returns the party legal entity for the customer.
 	 *
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$billing_company   = $this->document->order->get_billing_company();
-		$billing_name      = $this->document->order->get_formatted_billing_full_name();
+		$order             = $this->get_parent_order() ?? $this->document->order;
+		$billing_company   = $order->get_billing_company();
+		$billing_name      = $order->get_formatted_billing_full_name();
 		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
 		$identifier        = $this->get_legal_identifier();
 
@@ -106,7 +107,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			);
 			return null;
 		}
-		
+
 		if ( empty( $identifier['identifier'] ) || empty( $identifier['identifier_icd'] ) ) {
 			wpo_ips_edi_log(
 				sprintf(
@@ -137,14 +138,14 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );
 	}
-	
+
 	/**
 	 * Gets the Peppol Endpoint ID and scheme for the customer from user meta.
 	 *
 	 * @return array|null Array with 'endpoint_id' and 'endpoint_eas' keys, or null if invalid/missing.
 	 */
 	private function get_endpoint(): ?array {
-		$order        = $this->document->order;
+		$order        = $this->get_parent_order() ?? $this->document->order;
 		$user_id      = $order->get_customer_id();
 		$endpoint_id  = $order->get_meta( '_peppol_endpoint_id' );
 		$endpoint_eas = $order->get_meta( '_peppol_endpoint_eas' );
@@ -159,7 +160,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		if ( empty( $endpoint_id ) || empty( $endpoint_eas ) ) {
 			return null;
 		}
-		
+
 		$eas_schemes = EN16931::get_eas();
 		if ( ! array_key_exists( $endpoint_eas, $eas_schemes ) ) {
 			return null;
@@ -170,14 +171,14 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			'endpoint_eas' => $endpoint_eas,
 		);
 	}
-	
+
 	/**
 	 * Gets the Peppol Legal Identifier and scheme for the order's customer.
 	 *
 	 * @return array|null Array with 'identifier' and 'identifier_icd' keys, or null if invalid/missing.
 	 */
 	private function get_legal_identifier(): ?array {
-		$order                = $this->document->order;
+		$order                = $this->get_parent_order() ?? $this->document->order;
 		$user_id              = $order->get_customer_id();
 		$legal_identifier     = $order->get_meta( '_peppol_legal_identifier' );
 		$legal_identifier_icd = $order->get_meta( '_peppol_legal_identifier_icd' );
@@ -192,7 +193,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		if ( empty( $legal_identifier ) || empty( $legal_identifier_icd ) ) {
 			return null;
 		}
-		
+
 		$icd_schemes = EN16931::get_icd();
 		if ( ! array_key_exists( $legal_identifier_icd, $icd_schemes ) ) {
 			return null;
@@ -203,5 +204,5 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			'identifier_icd' => $legal_identifier_icd,
 		);
 	}
-	
+
 }

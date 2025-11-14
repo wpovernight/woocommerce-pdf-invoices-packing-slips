@@ -297,7 +297,7 @@ class Main {
 					) {
 						continue;
 					}
-					
+
 					$attach_documents[ $output_format ][ $document->get_type() ] = $document->get_attach_to_email_ids( $output_format );
 				}
 			}
@@ -456,7 +456,7 @@ class Main {
 					$allowed = false;
 					break;
 				}
-				
+
 				if ( $order instanceof \WC_Order_Refund ) { // EDI Credit Note specific
 					$parent_order = wc_get_order( $order->get_parent_id() );
 					$order_key    = $parent_order ? $parent_order->get_order_key() : '';
