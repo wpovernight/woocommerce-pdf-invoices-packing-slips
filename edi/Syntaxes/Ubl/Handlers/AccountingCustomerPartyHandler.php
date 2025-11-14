@@ -56,7 +56,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_name(): ?array {
-		$order               = $this->get_parent_order() ?? $this->document->order;
+		$order               = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$customer_party_name = $order->get_formatted_billing_full_name();
 		$billing_company     = $order->get_billing_company();
 
@@ -84,7 +84,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_postal_address(): ?array {
-		$order       = $this->get_parent_order() ?? $this->document->order;
+		$order       = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$address_1   = wpo_ips_edi_sanitize_string( $order->get_billing_address_1() );
 		$address_2   = wpo_ips_edi_sanitize_string( $order->get_billing_address_2() );
 		$city        = wpo_ips_edi_sanitize_string( $order->get_billing_city() );
@@ -133,7 +133,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_tax_scheme(): ?array {
-		$order      = $this->get_parent_order() ?? $this->document->order;
+		$order      = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$vat_number = $this->get_order_customer_vat_number();
 
 		// B2C (no VAT): omit PartyTaxScheme entirely
@@ -180,7 +180,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$order             = $this->get_parent_order() ?? $this->document->order;
+		$order             = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$billing_company   = $order->get_billing_company();
 		$billing_name      = $order->get_formatted_billing_full_name();
 		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
@@ -234,7 +234,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_contact(): ?array {
-		$order = $this->get_parent_order() ?? $this->document->order;
+		$order = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$name  = wpo_ips_edi_sanitize_string( $order->get_formatted_billing_full_name() );
 		$email = sanitize_email( $order->get_billing_email() );
 

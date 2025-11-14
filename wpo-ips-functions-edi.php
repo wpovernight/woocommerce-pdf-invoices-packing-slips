@@ -828,3 +828,22 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 		}
 	}
 }
+
+/**
+ * Get the parent order for refunds.
+ *
+ * @return \WC_Order
+ */
+function wpo_ips_edi_get_parent_order( \WC_Abstract_Order $order ): \WC_Order {
+	if ( is_a( $order, 'WC_Order_Refund' ) ) {
+		$parent_id = $order->get_parent_id();
+		if ( $parent_id ) {
+			$parent_order = wc_get_order( $parent_id );
+			if ( $parent_order ) {
+				return $parent_order;
+			}
+		}
+	}
+
+	return $order;
+}
