@@ -783,21 +783,23 @@ class Admin {
 				<tbody>
 					<?php
 						foreach ( $meta_box_actions as $document_type => $data ) {
-							$url     = $data['url']     ?? '';
-							$class   = $data['class']   ?? '';
-							$alt     = $data['alt']     ?? '';
-							$title   = $data['title']   ?? '';
-							$target  = $data['target']  ?? '';
-							$network = $data['network'] ?? '';
+							$url      = $data['url']      ?? '';
+							$class    = $data['class']    ?? '';
+							$alt      = $data['alt']      ?? '';
+							$title    = $data['title']    ?? '';
+							$target   = $data['target']   ?? '';
+							$network  = $data['network']  ?? '';
+							$disabled = $data['disabled'] ?? '';
 
 							$network_button = '';
 
 							if ( ! empty( $network ) ) {
 								$network_button = sprintf(
-									'<a href="%1$s" class="button button-primary xml-network" alt="%2$s" title="%2$s">
+									'<a href="%1$s" class="button button-primary xml-network%2$s" alt="%3$s" title="%3$s">
 										<span class="dashicons dashicons-cloud-upload"></span>
 									</a>',
 									esc_url( $network ),
+									esc_attr( $disabled ),
 									sprintf(
 										/* translators: document title */
 										esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
