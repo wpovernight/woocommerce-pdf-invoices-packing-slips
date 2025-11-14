@@ -58,7 +58,7 @@ class LineHandler extends AbstractUblHandler {
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => $this->format_decimal( $parts['net_unit'] ),
+					'value'      => $this->format_decimal( abs( $parts['net_unit'] ) ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
