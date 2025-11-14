@@ -794,10 +794,11 @@ class Admin {
 
 							if ( ! empty( $network ) ) {
 								$network_button = sprintf(
-									'<a href="%1$s" class="button button-primary xml-network" alt="' . esc_html__( 'Send to Network', 'woocommerce-pdf-invoices-packing-slips' ) . '">
+									'<a href="%1$s" class="button button-primary xml-network" alt="%2$s" title="%2$s">
 										<span class="dashicons dashicons-cloud-upload"></span>
 									</a>',
-									esc_url( $network )
+									esc_url( $network ),
+									esc_html__( 'Send to Network', 'woocommerce-pdf-invoices-packing-slips' )
 								);
 							}
 
@@ -805,7 +806,7 @@ class Admin {
 								'<tr>
 									<td>%1$s</td>
 									<td>
-										<a href="%2$s" class="button xml-download %3$s" target="%4$s" alt="%5$s">
+										<a href="%2$s" class="button xml-download %3$s" target="%4$s" alt="%5$s" title="%5$s">
 											<span class="dashicons dashicons-download"></span>
 										</a>
 										%6$s
