@@ -776,7 +776,7 @@ class Admin {
 			<table class="widefat">
 				<thead>
 					<tr>
-						<td><?php esc_html_e( 'XML Type', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td>XML</td>
 						<td><?php esc_html_e( 'Actions', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
 					</tr>	
 				</thead>
