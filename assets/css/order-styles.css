@@ -126,7 +126,8 @@ ul.wpo-ips-edi-actions > li {
 	font-size: 12px !important;
 }
 
-#wpo_ips-edi-box .inside > .peppol {
+#wpo_ips-edi-box .inside > .peppol,
+#wpo_ips-edi-box .inside > .edi-order-actions {
 	margin-top: 12px;
 }
 
@@ -148,6 +149,37 @@ ul.wpo-ips-edi-actions > li {
 
 #wpo_ips-edi-box .inside table > tbody > tr:not(:last-of-type) > td {
 	border-bottom: 1px solid #f4f4f4;
+}
+
+#wpo_ips-edi-box .inside .peppol table {
+	width: 100%;
+	table-layout: fixed;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions table td {
+	vertical-align: middle;
+}
+
+#wpo_ips-edi-box .edi-order-actions table th:last-child,
+#wpo_ips-edi-box .edi-order-actions table td:last-child {
+	text-align: right;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml-download,
+#wpo_ips-edi-box .inside > .edi-order-actions .xml-network {
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	clear: both;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml-download .dashicons,
+#wpo_ips-edi-box .inside > .edi-order-actions .xml-network .dashicons {
+	font-size: 18px;
+	line-height: 1;
 }
 
 #wpo_ips-edi-box .inside .peppol tbody td.edit,
@@ -305,7 +337,8 @@ ul.wpo-ips-edi-actions > li {
 	padding-top: 4px;
 }
 
-.edi-customer-identifiers table td + td {
+.edi-customer-identifiers table td + td,
+.wpo-ips-edi-actions table td + td {
 	text-align: end;
 	text-align: right;
 }

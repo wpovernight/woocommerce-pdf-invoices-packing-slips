@@ -715,7 +715,6 @@ class Admin {
 					continue;
 				}
 				
-				$c = 0;
 				foreach ( $refunds as $refund ) {
 					if ( ! $refund instanceof \WC_Order_Refund ) {
 						continue;
@@ -724,16 +723,18 @@ class Admin {
 					$document = wcpdf_get_document( $document_type, $refund );
 
 					if ( $document && $document->exists() ) {
-						$c++;
-						
 						$document_url   = WPO_WCPDF()->endpoint->get_document_link( $refund, $document_type, array( 'output' => 'xml' ) );
 						$document_title = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 						$class          = array( $document_type, 'xml', 'exists' );
 						
-						$meta_box_actions[ $document_type . '-' . $c ] = array(
+						$number_instance  = $document->get_number();
+						$number_plain     = ! empty( $number_instance ) ? $number_instance->get_plain() : '';
+						$number_formatted = ! empty( $number_instance ) ? $number_instance->get_formatted() : '';
+						
+						$meta_box_actions[ $document_type . '-' . $number_plain ] = array(
 							'url'    => $document_url,
-							'alt'    => "XML {$document_title} {$c}",
-							'title'  => "XML {$document_title} {$c}",
+							'alt'    => "Download XML {$document_title} {$number_formatted}",
+							'title'  => "{$document_title} {$number_formatted}",
 							'exists' => true,
 							'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 							'target' => '_blank',
@@ -750,8 +751,8 @@ class Admin {
 					
 					$meta_box_actions[ $document_type ] = array(
 						'url'    => $document_url,
-						'alt'    => "XML {$document_title}",
-						'title'  => "XML {$document_title}",
+						'alt'    => "Download XML {$document_title}",
+						'title'  => "{$document_title}",
 						'exists' => true,
 						'class'  => apply_filters( 'wpo_ips_edi_action_button_class', implode( ' ', $class ), $document ),
 						'target' => '_blank',
@@ -766,153 +767,62 @@ class Admin {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
 
-		// Peppol
-		if ( wpo_ips_edi_peppol_is_available() ) :
-			$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
-			$peppol_identifiers = array();
-
-			foreach ( $identifiers_data as $key => $value ) {
-				if ( false !== strpos( $key, 'peppol' ) ) {
-					$peppol_identifiers[ $key ] = $value;
-					unset( $identifiers_data[ $key ] );
-				}
-			}
+		// Peppol specific
+		echo $this->get_order_meta_box_peppol_identifiers( $order );
+		
+		if ( count( $meta_box_actions ) > 0 ) :
 		?>
-			<div class="edi-customer-identifiers">
-				<table class="widefat">
-					<thead>
-						<tr>
-							<td><?php esc_html_e( 'Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-							<td class="collapse">
-								<a href="#"><?php esc_html_e( 'Show', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-							</td>
-						</tr>
-					</thead>
-					<tbody style="display:none;">
-						<?php
-							foreach ( $identifiers_data as $key => $identifier ) {
-								$value    = $identifier['value'];
-								$required = $identifier['required'];
-								$display  = $value ?: sprintf(
-									'<span class="%s">%s</span>',
-									$required
-										? 'missing'
-										: 'optional',
-									$required
-										? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
-										: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+		<div class="edi-order-actions">
+			<table class="widefat">
+				<thead>
+					<tr>
+						<td><?php esc_html_e( 'XML Type', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+						<td><?php esc_html_e( 'Actions', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+					</tr>	
+				</thead>
+				<tbody>
+					<?php
+						foreach ( $meta_box_actions as $document_type => $data ) {
+							$url     = $data['url']     ?? '';
+							$class   = $data['class']   ?? '';
+							$alt     = $data['alt']     ?? '';
+							$title   = $data['title']   ?? '';
+							$target  = $data['target']  ?? '';
+							$network = $data['network'] ?? '';
+
+							$network_button = '';
+
+							if ( ! empty( $network ) ) {
+								$network_button = sprintf(
+									'<a href="%1$s" class="button button-primary xml-network" alt="' . esc_html__( 'Send to Network', 'woocommerce-pdf-invoices-packing-slips' ) . '">
+										<span class="dashicons dashicons-cloud-upload"></span>
+									</a>',
+									esc_url( $network )
 								);
-								?>
-								<tr>
-								<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
-									<td><?php echo esc_html( $identifier['label'] ); ?></td>
-								<?php endif; ?>
-									<td>
-										<?php echo wp_kses_post( $display ); ?>
-										<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
-											<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
-										<?php endif; ?>
-									</td>
-								</tr>
-								<?php
 							}
-						?>
-					</tbody>
-				</table>
-			</div>
-			<?php if ( ! empty( $peppol_identifiers ) ) : ?>
-				<div class="edi-customer-identifiers peppol">
-					<table class="widefat">
-						<thead>
-							<tr>
-								<td><?php esc_html_e( 'Peppol', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-								<td class="editable">
-									<a href="#"><?php esc_html_e( 'Edit', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-								</td>
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-								foreach ( $peppol_identifiers as $key => $identifier ) {
-									$value    = $identifier['value'];
-									$required = $identifier['required'];
-									$display  = $value ?: sprintf(
-										'<span style="color:%s">%s</span>',
-										$required
-											? '#d63638'
-											: '#996800',
-										$required
-											? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
-											: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
-									);
-									?>
-									<tr>
-										<td><?php echo esc_html( $identifier['label'] ); ?></td>
-										<td class="display"><?php echo wp_kses_post( $display ); ?></td>
-										<td class="edit">
-											<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
-										</td>
-									</tr>
-									<?php
-								}
-							?>
-						</tbody>
-						<tfoot>
-							<tr><td colspan="2" class="scheme-required"><?php esc_html_e( 'Both fields require a scheme (e.g. "0208:").', 'woocommerce-pdf-invoices-packing-slips' ); ?></td></tr>
-							<tr>
-								<td></td>
-								<td colspan="2">
-									<a href="#" class="button button-primary" data-order_id="<?php echo absint( $order->get_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-									<a href="#" class="button cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-								</td>
-							</tr>
-						</tfoot>
-					</table>
-				</div>
-			<?php endif; ?>
-		<?php endif; ?>
-		<?php if ( count( $meta_box_actions ) > 0 ) : ?>
-			<ul class="wpo-ips-edi-actions">
-				<?php
-					foreach ( $meta_box_actions as $document_type => $data ) {
-						$url     = $data['url']     ?? '';
-						$class   = $data['class']   ?? '';
-						$alt     = $data['alt']     ?? '';
-						$title   = $data['title']   ?? '';
-						$network = $data['network'] ?? false;
-						$target  = $data['target']  ?? '';
 
-						$exists  = isset( $data['exists'] ) && $data['exists']
-							? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>'
-							: '';
-
-						$allowed_svg_tags = array(
-							'svg' => array(
-								'class'   => true,
-								'xmlns'   => true,
-								'viewbox' => true, // Lowercase 'viewbox' because wp_kses() converts attribute names to lowercase
-							),
-							'path' => array(
-								'fill-rule' => true,
-								'clip-rule' => true,
-								'd'         => true,
-							),
-						);
-
-						if ( ! empty( $exists ) || $network ) {
 							printf(
-								'<li><a href="%1$s" class="button %2$s" target="%3$s" alt="%4$s">%5$s%6$s</a></li>',
+								'<tr>
+									<td>%1$s</td>
+									<td>
+										<a href="%2$s" class="button xml-download %3$s" target="%4$s" alt="%5$s">
+											<span class="dashicons dashicons-download"></span>
+										</a>
+										%6$s
+									</td>
+								</tr>',
+								esc_html( $title ),
 								esc_url( $url ),
 								esc_attr( $class ),
 								esc_attr( $target ),
 								esc_attr( $alt ),
-								esc_html( $title ),
-								wp_kses( $exists, $allowed_svg_tags )
+								$network_button
 							);
 						}
-					}
-				?>
-			</ul>
+					?>
+				</tbody>
+			</table>
+		</div>
 		<?php
 		endif;
 	}
@@ -2016,6 +1926,120 @@ class Admin {
 		}
 
 		$query->set( 'orderby', $this->is_invoice_number_numeric() ? 'meta_value_num' : 'meta_value' );
+	}
+	
+	/**
+	 * Get Peppol identifiers to display for the order
+	 *
+	 * @param \WC_Order $order
+	 * @return void
+	 */
+	private function get_order_meta_box_peppol_identifiers( \WC_Order $order ): void {
+		if ( ! wpo_ips_edi_peppol_is_available() ) {
+			return;
+		}
+		
+		$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
+		$peppol_identifiers = array();
+
+		foreach ( $identifiers_data as $key => $value ) {
+			if ( false !== strpos( $key, 'peppol' ) ) {
+				$peppol_identifiers[ $key ] = $value;
+				unset( $identifiers_data[ $key ] );
+			}
+		}
+		?>
+			<div class="edi-customer-identifiers">
+				<table class="widefat">
+					<thead>
+						<tr>
+							<td><?php esc_html_e( 'Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+							<td class="collapse">
+								<a href="#"><?php esc_html_e( 'Show', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+							</td>
+						</tr>
+					</thead>
+					<tbody style="display:none;">
+						<?php
+							foreach ( $identifiers_data as $key => $identifier ) {
+								$value    = $identifier['value'];
+								$required = $identifier['required'];
+								$display  = $value ?: sprintf(
+									'<span class="%s">%s</span>',
+									$required
+										? 'missing'
+										: 'optional',
+									$required
+										? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+										: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+								);
+								?>
+								<tr>
+								<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
+									<td><?php echo esc_html( $identifier['label'] ); ?></td>
+								<?php endif; ?>
+									<td>
+										<?php echo wp_kses_post( $display ); ?>
+										<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+											<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
+										<?php endif; ?>
+									</td>
+								</tr>
+								<?php
+							}
+						?>
+					</tbody>
+				</table>
+			</div>
+			<?php if ( ! empty( $peppol_identifiers ) ) : ?>
+				<div class="edi-customer-identifiers peppol">
+					<table class="widefat">
+						<thead>
+							<tr>
+								<td><?php esc_html_e( 'Peppol', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
+								<td class="editable">
+									<a href="#"><?php esc_html_e( 'Edit', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ( $peppol_identifiers as $key => $identifier ) {
+									$value    = $identifier['value'];
+									$required = $identifier['required'];
+									$display  = $value ?: sprintf(
+										'<span style="color:%s">%s</span>',
+										$required
+											? '#d63638'
+											: '#996800',
+										$required
+											? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+											: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+									);
+									?>
+									<tr>
+										<td><?php echo esc_html( $identifier['label'] ); ?></td>
+										<td class="display"><?php echo wp_kses_post( $display ); ?></td>
+										<td class="edit">
+											<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
+										</td>
+									</tr>
+									<?php
+								}
+							?>
+						</tbody>
+						<tfoot>
+							<tr><td colspan="2" class="scheme-required"><?php esc_html_e( 'Both fields require a scheme (e.g. "0208:").', 'woocommerce-pdf-invoices-packing-slips' ); ?></td></tr>
+							<tr>
+								<td colspan="2">
+									<a href="#" class="button button-primary" data-order_id="<?php echo absint( $order->get_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+									<a href="#" class="button cancel"><?php esc_html_e( 'Cancel', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			<?php endif;
 	}
 
 	/**
