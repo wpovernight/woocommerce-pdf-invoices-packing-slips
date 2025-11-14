@@ -126,9 +126,12 @@ ul.wpo-ips-edi-actions > li {
 	font-size: 12px !important;
 }
 
-#wpo_ips-edi-box .inside > .peppol,
-#wpo_ips-edi-box .inside > .edi-order-actions {
-	margin-top: 12px;
+#wpo_ips-edi-box .inside > div table {
+	margin-bottom: 12px;
+}
+
+#wpo_ips-edi-box .inside > div:last-child table {
+	margin-bottom: 0;
 }
 
 #wpo_ips-edi-box .inside table td {
