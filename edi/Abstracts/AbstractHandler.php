@@ -415,7 +415,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 		}
 
-		return compact(
+		$totals = compact(
 			'total_exc_tax',
 			'total_inc_tax',
 			'total_tax',
@@ -423,6 +423,8 @@ abstract class AbstractHandler implements HandlerInterface {
 			'rounding_diff',
 			'payable_amount'
 		);
+
+		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
 	}
 
 	/**
