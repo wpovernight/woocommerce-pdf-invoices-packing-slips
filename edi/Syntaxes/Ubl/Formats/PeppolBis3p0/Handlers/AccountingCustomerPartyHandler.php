@@ -91,7 +91,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$order             = $this->get_parent_order() ?? $this->document->order;
+		$order             = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$billing_company   = $order->get_billing_company();
 		$billing_name      = $order->get_formatted_billing_full_name();
 		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
@@ -145,7 +145,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null Array with 'endpoint_id' and 'endpoint_eas' keys, or null if invalid/missing.
 	 */
 	private function get_endpoint(): ?array {
-		$order        = $this->get_parent_order() ?? $this->document->order;
+		$order        = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$user_id      = $order->get_customer_id();
 		$endpoint_id  = $order->get_meta( '_peppol_endpoint_id' );
 		$endpoint_eas = $order->get_meta( '_peppol_endpoint_eas' );
@@ -178,7 +178,7 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 * @return array|null Array with 'identifier' and 'identifier_icd' keys, or null if invalid/missing.
 	 */
 	private function get_legal_identifier(): ?array {
-		$order                = $this->get_parent_order() ?? $this->document->order;
+		$order                = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$user_id              = $order->get_customer_id();
 		$legal_identifier     = $order->get_meta( '_peppol_legal_identifier' );
 		$legal_identifier_icd = $order->get_meta( '_peppol_legal_identifier_icd' );

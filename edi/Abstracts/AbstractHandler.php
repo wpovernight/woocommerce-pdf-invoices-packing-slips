@@ -614,26 +614,5 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $rows;
 	}
-	
-	/**
-	 * Get the parent order for refunds.
-	 *
-	 * @return \WC_Order|null
-	 */
-	protected function get_parent_order(): ?\WC_Order {
-		$order = $this->document->order;
-
-		if ( is_a( $order, 'WC_Order_Refund' ) ) {
-			$parent_id = $order->get_parent_id();
-			if ( $parent_id ) {
-				$parent_order = wc_get_order( $parent_id );
-				if ( $parent_order ) {
-					return $parent_order;
-				}
-			}
-		}
-
-		return null;
-	}
 
 }
