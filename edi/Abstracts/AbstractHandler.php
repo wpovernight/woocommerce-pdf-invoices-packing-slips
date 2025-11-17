@@ -34,14 +34,15 @@ abstract class AbstractHandler implements HandlerInterface {
 
 	/**
 	 * Get the order customer VAT number.
-	 *
+	 * 
+	 * @param \WC_Order $order
 	 * @return string|null
 	 */
-	protected function get_order_customer_vat_number(): ?string {
+	protected function get_order_customer_vat_number( \WC_Order $order ): ?string {
 		return apply_filters(
 			'wpo_ips_edi_order_customer_vat_number',
-			wpo_wcpdf_get_order_customer_vat_number( $this->document->order ),
-			$this->document->order
+			wpo_wcpdf_get_order_customer_vat_number( $order ),
+			$order
 		);
 	}
 
@@ -88,7 +89,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * }
 	 */
 	protected function get_payment_means_data(): array {
-		$order     = $this->document->order;
+		$order     = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$method_id = $order ? $order->get_payment_method() : '';
 		$title     = $order ? $order->get_payment_method_title() : '';
 
