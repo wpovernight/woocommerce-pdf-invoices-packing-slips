@@ -188,6 +188,12 @@ ul.wpo-ips-edi-actions > li {
 	cursor: not-allowed;
 }
 
+#wpo_ips-edi-box .inside > .edi-order-actions .xml.sent {
+	background-color: #e7f7ec !important;
+	color: #0a7a29 !important;
+	border-color: #e7f7ec !important;
+}
+
 #wpo_ips-edi-box .inside > .edi-order-actions .order-id {
 	font-size: 10px;
 	color: #999;
