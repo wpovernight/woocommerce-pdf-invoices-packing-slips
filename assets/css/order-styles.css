@@ -168,8 +168,7 @@ ul.wpo-ips-edi-actions > li {
 	text-align: right;
 }
 
-#wpo_ips-edi-box .inside > .edi-order-actions .xml-download,
-#wpo_ips-edi-box .inside > .edi-order-actions .xml-network {
+#wpo_ips-edi-box .inside > .edi-order-actions .xml {
 	width: 32px;
 	height: 32px;
 	padding: 0;
@@ -179,8 +178,7 @@ ul.wpo-ips-edi-actions > li {
 	clear: both;
 }
 
-#wpo_ips-edi-box .inside > .edi-order-actions .xml-download .dashicons,
-#wpo_ips-edi-box .inside > .edi-order-actions .xml-network .dashicons {
+#wpo_ips-edi-box .inside > .edi-order-actions .xml .dashicons {
 	font-size: 18px;
 	line-height: 1;
 }
