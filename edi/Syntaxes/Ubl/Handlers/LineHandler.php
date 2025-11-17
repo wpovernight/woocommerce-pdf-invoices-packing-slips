@@ -133,6 +133,13 @@ class LineHandler extends AbstractUblHandler {
 					}
 				}
 			}
+			
+			$quantity_value = $parts['qty'];
+
+			// For credit notes: quantity must carry the sign, price stays positive
+			if ( 'Credited' === $quantity_role && $parts['net_total'] < 0 ) {
+				$quantity_value = -abs( $quantity_value );
+			}
 
 			$line = array(
 				'name'  => "cac:{$root_element}Line",
@@ -143,7 +150,7 @@ class LineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'       => "cbc:{$quantity_role}Quantity",
-						'value'      => $parts['qty'],
+						'value'      => $quantity_value,
 						'attributes' => array(
 							'unitCode' => 'C62', // https://docs.peppol.eu/pracc/catalogue/1.0/codelist/UNECERec20/
 						),
