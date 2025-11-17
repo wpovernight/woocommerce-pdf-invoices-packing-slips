@@ -778,7 +778,6 @@ class Admin {
 											esc_html( $alt )
 										);
 								} else {
-									// default icons
 									$icon         = $remote_data ? 'dashicons-update-alt' : 'dashicons-cloud-upload';
 									$button_class = $remote_data ? 'button xml update' : 'button button-primary xml send';
 									$label        = $remote_data
