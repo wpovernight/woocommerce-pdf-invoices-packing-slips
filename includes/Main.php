@@ -461,7 +461,7 @@ class Main {
 					$parent_order = wc_get_order( $order->get_parent_id() );
 					$order_key    = $parent_order ? $parent_order->get_order_key() : '';
 				} else {
-					$order_key    = $order->get_order_key();
+					$order_key    = $order ? $order->get_order_key() : '';
 				}
 
 				// check if we have a valid access key only when it's not from bulk actions
