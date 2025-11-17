@@ -32,12 +32,17 @@ jQuery( function( $ ) {
 				cache:       false,
 				processData: false,
 				contentType: false,
-				success ( response ) {
+				success( response ) {
+					if ( response && response.success === false && response.data && response.data.message ) {
+						alert( response.data.message );
+						$form.closest( '.tool' ).unblock();
+						return;
+					}
+
 					process_form_response( tool, response, $form );
 					$form.closest( '.tool' ).unblock();
 				},
-				error ( xhr, error, status ) {
-					//console.log( error, status );
+				error( xhr ) {
 					$form.closest( '.tool' ).unblock();
 				}
 			} );
