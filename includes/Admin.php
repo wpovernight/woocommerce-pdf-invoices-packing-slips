@@ -769,19 +769,30 @@ class Admin {
 							$network_button = '';
 
 							if ( ! empty( $network ) ) {
-								$button_class = $remote_data ? 'button xml update' : 'button button-primary xml send';
-								$icon         = $remote_data ? 'dashicons-update-alt' : 'dashicons-cloud-upload';
-								$label        = $remote_data
-									? sprintf(
-										/* translators: document title */
-										esc_html__( 'Update %s status', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $alt )
-									)
-									: sprintf(
-										/* translators: document title */
-										esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $alt )
-									);
+								if ( ! empty( $disabled ) ) {
+									$icon         = 'dashicons-cloud-saved';
+									$button_class = 'button xml sent';
+									$label        = sprintf(
+											/* translators: document title */
+											esc_html__( '%s sent to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
+								} else {
+									// default icons
+									$icon         = $remote_data ? 'dashicons-update-alt' : 'dashicons-cloud-upload';
+									$button_class = $remote_data ? 'button xml update' : 'button button-primary xml send';
+									$label        = $remote_data
+										? sprintf(
+											/* translators: document title */
+											esc_html__( 'Update %s status', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										)
+										: sprintf(
+											/* translators: document title */
+											esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
+								}
 
 								$network_button = sprintf(
 									'<a href="%1$s" class="%2$s%3$s" alt="%4$s" title="%4$s">
