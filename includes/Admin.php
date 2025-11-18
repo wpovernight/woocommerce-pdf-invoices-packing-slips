@@ -757,28 +757,51 @@ class Admin {
 				<tbody>
 					<?php
 						foreach ( $meta_box_actions as $document_type => $data ) {
-							$url      = $data['url']      ?? '';
-							$class    = $data['class']    ?? '';
-							$alt      = $data['alt']      ?? '';
-							$title    = $data['title']    ?? '';
-							$target   = $data['target']   ?? '';
-							$network  = $data['network']  ?? '';
-							$disabled = $data['disabled'] ?? '';
+							$url         = $data['url']         ?? '';
+							$class       = $data['class']       ?? '';
+							$alt         = $data['alt']         ?? '';
+							$title       = $data['title']       ?? '';
+							$target      = $data['target']      ?? '';
+							$network     = $data['network']     ?? '';
+							$disabled    = $data['disabled']    ?? '';
+							$remote_data = $data['remote_data'] ?? false;
 
 							$network_button = '';
 
 							if ( ! empty( $network ) ) {
+								if ( ! empty( $disabled ) ) {
+									$icon         = 'dashicons-cloud-saved';
+									$button_class = 'button xml sent';
+									$label        = sprintf(
+											/* translators: document title */
+											esc_html__( '%s sent to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
+								} else {
+									$icon         = $remote_data ? 'dashicons-update-alt' : 'dashicons-cloud-upload';
+									$button_class = $remote_data ? 'button xml update' : 'button button-primary xml send';
+									$label        = $remote_data
+										? sprintf(
+											/* translators: document title */
+											esc_html__( 'Update %s status', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										)
+										: sprintf(
+											/* translators: document title */
+											esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
+								}
+
 								$network_button = sprintf(
-									'<a href="%1$s" class="button button-primary xml-network%2$s" alt="%3$s" title="%3$s">
-										<span class="dashicons dashicons-cloud-upload"></span>
+									'<a href="%1$s" class="%2$s%3$s" alt="%4$s" title="%4$s">
+										<span class="dashicons %5$s"></span>
 									</a>',
 									esc_url( $network ),
+									esc_attr( $button_class ),
 									esc_attr( $disabled ),
-									sprintf(
-										/* translators: document title */
-										esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $alt )
-									)
+									esc_attr( $label ),
+									esc_attr( $icon )
 								);
 							}
 
@@ -786,7 +809,7 @@ class Admin {
 								'<tr>
 									<td>%1$s</td>
 									<td>
-										<a href="%2$s" class="button xml-download %3$s" target="%4$s" alt="%5$s" title="%5$s">
+										<a href="%2$s" class="button xml download %3$s" target="%4$s" alt="%5$s" title="%5$s">
 											<span class="dashicons dashicons-download"></span>
 										</a>
 										%6$s

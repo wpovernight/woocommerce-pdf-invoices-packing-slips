@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.0.0-beta.4\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.0.0-beta.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-11-14T16:28:25+00:00\n"
+"POT-Creation-Date: 2025-11-17T15:03:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -1997,7 +1997,7 @@ msgid "Mutually defined"
 msgstr ""
 
 #. Translators: %s is the coupon code applied to the discount.
-#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:219
+#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:226
 #, php-format
 msgid "Discount %s"
 msgstr ""
@@ -2063,7 +2063,7 @@ msgid "I am the wizard"
 msgstr ""
 
 #: includes/Admin.php:361
-#: includes/Admin.php:1861
+#: includes/Admin.php:1884
 #: includes/Assets.php:363
 #: includes/Documents/Invoice.php:359
 #: includes/Main.php:1280
@@ -2121,326 +2121,338 @@ msgid "Actions"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:779
+#: includes/Admin.php:777
+#, php-format
+msgid "%s sent to Network"
+msgstr ""
+
+#. translators: document title
+#: includes/Admin.php:786
+#, php-format
+msgid "Update %s status"
+msgstr ""
+
+#. translators: document title
+#: includes/Admin.php:791
 #, php-format
 msgid "Send %s to Network"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:801
+#: includes/Admin.php:824
 #, php-format
 msgid "Download %s"
 msgstr ""
 
-#: includes/Admin.php:823
-#: includes/Admin.php:1679
+#: includes/Admin.php:846
+#: includes/Admin.php:1702
 msgid "Invalid security token."
 msgstr ""
 
-#: includes/Admin.php:833
+#: includes/Admin.php:856
 msgid "Invalid order ID or values."
 msgstr ""
 
-#: includes/Admin.php:841
+#: includes/Admin.php:864
 msgid "Order not found."
 msgstr ""
 
-#: includes/Admin.php:851
+#: includes/Admin.php:874
 msgid "Customer ID is missing."
 msgstr ""
 
-#: includes/Admin.php:859
+#: includes/Admin.php:882
 msgid "Peppol identifiers saved successfully."
 msgstr ""
 
-#: includes/Admin.php:876
+#: includes/Admin.php:899
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/Admin.php:879
+#: includes/Admin.php:902
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/Admin.php:882
+#: includes/Admin.php:905
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/Admin.php:885
+#: includes/Admin.php:908
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/Admin.php:888
+#: includes/Admin.php:911
 msgid "Notes (displayed in the invoice):"
 msgstr ""
 
-#: includes/Admin.php:1117
+#: includes/Admin.php:1140
 msgid "View more details"
 msgstr ""
 
-#: includes/Admin.php:1118
+#: includes/Admin.php:1141
 msgid "Hide details"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:1129
+#: includes/Admin.php:1152
 #, php-format
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/Admin.php:1138
+#: includes/Admin.php:1161
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/Admin.php:1151
+#: includes/Admin.php:1174
 msgid "Number prefix"
 msgstr ""
 
-#: includes/Admin.php:1155
+#: includes/Admin.php:1178
 #: includes/Documents/Invoice.php:395
 msgid "If set, this value will be used as number prefix."
 msgstr ""
 
 #. translators: 1. document slug, 2-3 placeholders
-#: includes/Admin.php:1158
-#: includes/Admin.php:1178
+#: includes/Admin.php:1181
+#: includes/Admin.php:1201
 #: includes/Documents/Invoice.php:397
 #: includes/Documents/Invoice.php:406
 #, php-format
 msgid "You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively."
 msgstr ""
 
-#: includes/Admin.php:1171
+#: includes/Admin.php:1194
 msgid "Number suffix"
 msgstr ""
 
-#: includes/Admin.php:1175
+#: includes/Admin.php:1198
 #: includes/Documents/Invoice.php:404
 msgid "If set, this value will be used as number suffix."
 msgstr ""
 
-#: includes/Admin.php:1191
+#: includes/Admin.php:1214
 msgid "Number padding"
 msgstr ""
 
 #. translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number
-#: includes/Admin.php:1195
+#: includes/Admin.php:1218
 #, php-format
 msgid "Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
-#: includes/Admin.php:1211
+#: includes/Admin.php:1234
 #: includes/Documents/Invoice.php:420
 #, php-format
 msgid "For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1225
+#: includes/Admin.php:1248
 #, php-format
 msgid "%s number"
 msgstr ""
 
-#: includes/Admin.php:1233
+#: includes/Admin.php:1256
 msgid "Formatted number"
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
-#: includes/Admin.php:1240
+#: includes/Admin.php:1263
 #, php-format
 msgid "Manually changing the document's plain number also requires updating the next document number in the %1$sdocument settings%2$s."
 msgstr ""
 
-#: includes/Admin.php:1244
+#: includes/Admin.php:1267
 msgid "Please note that changing the document number may create gaps in the numbering sequence."
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1257
+#: includes/Admin.php:1280
 #, php-format
 msgid "%s date"
 msgstr ""
 
-#: includes/Admin.php:1265
+#: includes/Admin.php:1288
 msgid "Hour"
 msgstr ""
 
-#: includes/Admin.php:1266
+#: includes/Admin.php:1289
 msgid "h"
 msgstr ""
 
-#: includes/Admin.php:1269
+#: includes/Admin.php:1292
 msgid "Minute"
 msgstr ""
 
-#: includes/Admin.php:1270
+#: includes/Admin.php:1293
 msgid "m"
 msgstr ""
 
-#: includes/Admin.php:1296
+#: includes/Admin.php:1319
 msgid "Notes"
 msgstr ""
 
-#: includes/Admin.php:1301
+#: includes/Admin.php:1324
 msgid "Displayed in the document!"
 msgstr ""
 
-#: includes/Admin.php:1314
+#: includes/Admin.php:1337
 #: includes/Frontend.php:491
 msgid "Save changes"
 msgstr ""
 
-#: includes/Admin.php:1315
-#: includes/Admin.php:2065
+#: includes/Admin.php:1338
+#: includes/Admin.php:2088
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/Admin.php:1455
+#: includes/Admin.php:1478
 #, php-format
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/Admin.php:1503
+#: includes/Admin.php:1526
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/Admin.php:1511
+#: includes/Admin.php:1534
 msgid "Bad action!"
 msgstr ""
 
-#: includes/Admin.php:1517
+#: includes/Admin.php:1540
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/Admin.php:1523
+#: includes/Admin.php:1546
 msgid "No permissions!"
 msgstr ""
 
-#: includes/Admin.php:1549
+#: includes/Admin.php:1572
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/Admin.php:1550
+#: includes/Admin.php:1573
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/Admin.php:1553
+#: includes/Admin.php:1576
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/Admin.php:1554
+#: includes/Admin.php:1577
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/Admin.php:1557
+#: includes/Admin.php:1580
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/Admin.php:1558
+#: includes/Admin.php:1581
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/Admin.php:1618
+#: includes/Admin.php:1641
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/Admin.php:1632
+#: includes/Admin.php:1655
 msgid "Document is empty."
 msgstr ""
 
-#: includes/Admin.php:1663
+#: includes/Admin.php:1686
 msgid "DEBUG output enabled"
 msgstr ""
 
-#: includes/Admin.php:1691
+#: includes/Admin.php:1714
 msgid "Invalid order ID."
 msgstr ""
 
-#: includes/Admin.php:1697
+#: includes/Admin.php:1720
 msgid "Invalid order."
 msgstr ""
 
-#: includes/Admin.php:1701
+#: includes/Admin.php:1724
 msgid "Invalid document type."
 msgstr ""
 
-#: includes/Admin.php:1707
+#: includes/Admin.php:1730
 msgid "Invalid document."
 msgstr ""
 
-#: includes/Admin.php:1942
+#: includes/Admin.php:1965
 msgid "RFND"
 msgstr ""
 
-#: includes/Admin.php:1942
+#: includes/Admin.php:1965
 msgid "ORD"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:1950
+#: includes/Admin.php:1973
 #, php-format
 msgid "XML %s"
 msgstr ""
 
-#: includes/Admin.php:1985
+#: includes/Admin.php:2008
 msgid "Identifier"
 msgstr ""
 
-#: includes/Admin.php:1987
+#: includes/Admin.php:2010
 #: includes/Assets.php:95
 msgid "Show"
 msgstr ""
 
-#: includes/Admin.php:2002
-#: includes/Admin.php:2045
+#: includes/Admin.php:2025
+#: includes/Admin.php:2068
 #: includes/Assets.php:334
 #: includes/Settings/SettingsEDI.php:663
 msgid "Missing"
 msgstr ""
 
-#: includes/Admin.php:2003
-#: includes/Admin.php:2046
+#: includes/Admin.php:2026
+#: includes/Admin.php:2069
 #: includes/Assets.php:335
 #: includes/Settings/SettingsEDI.php:664
 msgid "Optional"
 msgstr ""
 
-#: includes/Admin.php:2013
+#: includes/Admin.php:2036
 #: includes/Settings/SettingsEDI.php:672
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
-#: includes/Admin.php:2028
+#: includes/Admin.php:2051
 msgid "Peppol"
 msgstr ""
 
-#: includes/Admin.php:2030
+#: includes/Admin.php:2053
 msgid "Edit"
 msgstr ""
 
-#: includes/Admin.php:2061
+#: includes/Admin.php:2084
 msgid "Both fields require a scheme (e.g. \"0208:\")."
 msgstr ""
 
-#: includes/Admin.php:2064
+#: includes/Admin.php:2087
 #: includes/Settings/SettingsCallbacks.php:913
 msgid "Save"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:2104
+#: includes/Admin.php:2127
 #, php-format
 msgid "Editing of %s number and date is currently disabled."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name
-#: includes/Admin.php:2109
+#: includes/Admin.php:2132
 #, php-format
 msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s."
 msgstr ""
 
-#: includes/Admin.php:2112
+#: includes/Admin.php:2135
 #: includes/Settings/SettingsDebug.php:895
 msgid "Enable document data editing"
 msgstr ""

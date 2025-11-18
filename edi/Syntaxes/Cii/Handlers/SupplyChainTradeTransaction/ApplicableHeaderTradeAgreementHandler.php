@@ -123,10 +123,10 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_buyer_trade_party(): ?array {
-		$order               = $this->document->order;
+		$order               = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$customer_party_name = $order ? $order->get_formatted_billing_full_name() : '';
 		$billing_company     = $order ? $order->get_billing_company() : '';
-		$vat_number          = $this->get_order_customer_vat_number();
+		$vat_number          = $this->get_order_customer_vat_number( $order );
 
 		if ( ! empty( $billing_company ) ) {
 			$customer_party_name = $billing_company;

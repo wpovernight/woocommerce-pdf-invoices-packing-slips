@@ -58,6 +58,7 @@ return array(
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\AccountingSupplierPartyHandler' => $baseDir . '/edi/Syntaxes/Ubl/Handlers/AccountingSupplierPartyHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\AdditionalDocumentReferenceHandler' => $baseDir . '/edi/Syntaxes/Ubl/Handlers/AdditionalDocumentReferenceHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\AllowanceChargeHandler' => $baseDir . '/edi/Syntaxes/Ubl/Handlers/AllowanceChargeHandler.php',
+    'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\BillingReferenceHandler' => $baseDir . '/edi/Syntaxes/Ubl/Handlers/BillingReferenceHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\BuyerReferenceHandler' => $baseDir . '/edi/Syntaxes/Ubl/Handlers/BuyerReferenceHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\CustomizationIdHandler' => $baseDir . '/edi/Syntaxes/Ubl/Handlers/CustomizationIdHandler.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Ubl\\Handlers\\DeliveryHandler' => $baseDir . '/edi/Syntaxes/Ubl/Handlers/DeliveryHandler.php',

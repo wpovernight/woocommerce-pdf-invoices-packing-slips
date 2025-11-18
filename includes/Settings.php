@@ -178,7 +178,7 @@ class Settings {
 		settings_errors();
 
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
-			'general' => array(
+			'general'   => array(
 				'title'          => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
@@ -186,12 +186,11 @@ class Settings {
 				'title'          => __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
+			'edi'       => array(
+				'title'          => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'preview_states' => 1,
+			),
 		) );
-
-		$settings_tabs['edi'] = array(
-			'title'          => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
-			'preview_states' => 1,
-		);
 
 		// add status and upgrade tabs last in row
 		$settings_tabs['debug'] = array(
