@@ -1575,7 +1575,7 @@ abstract class OrderDocument {
 
 		// temporarily apply filters that need to be removed again after the pdf is generated
 		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array(), $this );
-		$this->add_filters( $pdf_filters );
+		\wpo_ips_add_filters( $pdf_filters );
 
 		$pdf_settings = array(
 			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
@@ -1588,7 +1588,7 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
 
 		// remove temporary filters
-		$this->remove_filters( $pdf_filters );
+		\wpo_ips_remove_filters( $pdf_filters );
 
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 
@@ -1616,7 +1616,7 @@ abstract class OrderDocument {
 	public function get_html( $args = array() ) {
 		// temporarily apply filters that need to be removed again after the html is generated
 		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
-		$this->add_filters( $html_filters );
+		\wpo_ips_add_filters( $html_filters );
 
 		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
 
@@ -1643,7 +1643,7 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 
 		// remove temporary filters
-		$this->remove_filters( $html_filters );
+		\wpo_ips_remove_filters( $html_filters );
 
 		return apply_filters( 'wpo_wcpdf_get_html', $html, $this );
 	}
@@ -2183,26 +2183,18 @@ abstract class OrderDocument {
 	}
 
 	protected function add_filters( $filters ) {
-		foreach ( $filters as $filter ) {
-			$filter = $this->normalize_filter_args( $filter );
-			add_filter( $filter['hook_name'], $filter['callback'], $filter['priority'], $filter['accepted_args'] );
-		}
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_add_filters' );
+		return wpo_ips_add_filters( $filters );
 	}
 
 	protected function remove_filters( $filters ) {
-		foreach ( $filters as $filter ) {
-			$filter = $this->normalize_filter_args( $filter );
-			remove_filter( $filter['hook_name'], $filter['callback'], $filter['priority'] );
-		}
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_remove_filters' );
+		return wpo_ips_remove_filters( $filters );
 	}
 
 	protected function normalize_filter_args( $filter ) {
-		$filter = array_values( $filter );
-		$hook_name = $filter[0];
-		$callback = $filter[1];
-		$priority = isset( $filter[2] ) ? $filter[2] : 10;
-		$accepted_args = isset( $filter[3] ) ? $filter[3] : 1;
-		return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
+		return wpo_ips_normalize_filter_args( $filter );
 	}
 
 }
