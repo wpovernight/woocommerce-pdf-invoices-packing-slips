@@ -1770,7 +1770,9 @@ function wpo_ips_order_has_local_pickup_method( \WC_Abstract_Order $order ): boo
 function wpo_ips_add_filters( array $filters ): void {
 	foreach ( $filters as $filter ) {
 		$args = wpo_ips_normalize_filter_args( $filter );
-		add_filter( $args['hook_name'], $args['callback'], $args['priority'], $args['accepted_args'] );
+		if ( ! empty( $args['callback'] ) ) {
+			add_filter( $args['hook_name'], $args['callback'], $args['priority'], $args['accepted_args'] );
+		}
 	}
 }
 
@@ -1783,7 +1785,9 @@ function wpo_ips_add_filters( array $filters ): void {
 function wpo_ips_remove_filters( array $filters ): void {
 	foreach ( $filters as $filter ) {
 		$args = wpo_ips_normalize_filter_args( $filter );
-		remove_filter( $args['hook_name'], $args['callback'], $args['priority'] );
+		if ( ! empty( $args['callback'] ) ) {
+			remove_filter( $args['hook_name'], $args['callback'], $args['priority'] );
+		}
 	}
 }
 
@@ -1794,12 +1798,27 @@ function wpo_ips_remove_filters( array $filters ): void {
  * @return array
  */
 function wpo_ips_normalize_filter_args( array $filter ): array {
-	$filter        = array_values( $filter );
-	$hook_name     = $filter[0];
-	$callback      = $filter[1];
-	$priority      = isset( $filter[2] ) ? absint( $filter[2] ) : 10;
-	$accepted_args = isset( $filter[3] ) ? absint( $filter[3] ) : 1;
+	$args      = array_values( $filter );
+	$hook_name = sanitize_text_field( $args[0] );
+	$callback  = '';
+	
+	if ( isset( $args[1] ) && is_callable( $args[1] ) ) {
+		$callback = $args[1];
+	} elseif ( isset( $args[1] ) ) {
+		wcpdf_log_error( sprintf( 
+			'Non-callable callback provided for filter "%s": %s', 
+			$hook_name, 
+			is_string( $args[1] ) ? $args[1] : gettype( $args[1] )
+		), 'critical' );
+	} else {
+		wcpdf_log_error( sprintf( 
+			'No callback provided for filter "%s".', 
+			$hook_name
+		), 'critical' );
+	}
+	
+	$priority      = isset( $args[2] ) ? absint( $args[2] ) : 10;
+	$accepted_args = isset( $args[3] ) ? absint( $args[3] ) : 1;
 	
 	return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
 }
-	
