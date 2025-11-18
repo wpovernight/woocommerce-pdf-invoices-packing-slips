@@ -1770,7 +1770,7 @@ function wpo_ips_order_has_local_pickup_method( \WC_Abstract_Order $order ): boo
 function wpo_ips_add_filters( array $filters ): void {
 	foreach ( $filters as $filter ) {
 		$args = wpo_ips_normalize_filter_args( $filter );
-		if ( ! empty( $args['callback'] ) ) {
+		if ( $args['is_valid'] && ! empty( $args['callback'] ) ) {
 			add_filter( $args['hook_name'], $args['callback'], $args['priority'], $args['accepted_args'] );
 		}
 	}
@@ -1785,7 +1785,7 @@ function wpo_ips_add_filters( array $filters ): void {
 function wpo_ips_remove_filters( array $filters ): void {
 	foreach ( $filters as $filter ) {
 		$args = wpo_ips_normalize_filter_args( $filter );
-		if ( ! empty( $args['callback'] ) ) {
+		if ( $args['is_valid'] && ! empty( $args['callback'] ) ) {
 			remove_filter( $args['hook_name'], $args['callback'], $args['priority'] );
 		}
 	}
@@ -1799,26 +1799,43 @@ function wpo_ips_remove_filters( array $filters ): void {
  */
 function wpo_ips_normalize_filter_args( array $filter ): array {
 	$args      = array_values( $filter );
-	$hook_name = sanitize_text_field( $args[0] );
+	$hook_name = '';
 	$callback  = '';
+	$is_valid  = true;
 	
-	if ( isset( $args[1] ) && is_callable( $args[1] ) ) {
-		$callback = $args[1];
-	} elseif ( isset( $args[1] ) ) {
-		wcpdf_log_error( sprintf( 
-			'Non-callable callback provided for filter "%s": %s', 
-			$hook_name, 
-			is_string( $args[1] ) ? $args[1] : gettype( $args[1] )
-		), 'critical' );
+	// Validate minimum array structure
+	if ( count( $args ) < 2 ) {
+		wcpdf_log_error( 'Filter array must contain at least hook name and callback.', 'critical' );
+		$is_valid = false;
 	} else {
-		wcpdf_log_error( sprintf( 
-			'No callback provided for filter "%s".', 
-			$hook_name
-		), 'critical' );
+		// Validate and sanitize hook name
+		$hook_name = isset( $args[0] ) ? sanitize_text_field( $args[0] ) : '';
+		if ( empty( $hook_name ) ) {
+			wcpdf_log_error( 'Empty or invalid hook name provided for filter.', 'critical' );
+			$is_valid = false;
+		}
+		
+		// Validate callback
+		if ( isset( $args[1] ) && is_callable( $args[1] ) ) {
+			$callback = $args[1];
+		} elseif ( isset( $args[1] ) ) {
+			wcpdf_log_error( sprintf( 
+				'Non-callable callback provided for filter "%s": %s', 
+				$hook_name, 
+				is_string( $args[1] ) ? $args[1] : gettype( $args[1] )
+			), 'critical' );
+			$is_valid = false;
+		} else {
+			wcpdf_log_error( sprintf( 
+				'No callback provided for filter "%s".', 
+				$hook_name
+			), 'critical' );
+			$is_valid = false;
+		}
 	}
 	
 	$priority      = isset( $args[2] ) ? absint( $args[2] ) : 10;
 	$accepted_args = isset( $args[3] ) ? absint( $args[3] ) : 1;
 	
-	return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
+	return compact( 'hook_name', 'callback', 'priority', 'accepted_args', 'is_valid' );
 }
