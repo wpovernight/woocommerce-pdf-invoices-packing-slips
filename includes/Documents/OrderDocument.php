@@ -2183,17 +2183,17 @@ abstract class OrderDocument {
 	}
 
 	protected function add_filters( $filters ) {
-		_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_add_filters' );
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_add_filters' );
 		return wpo_ips_add_filters( $filters );
 	}
 
 	protected function remove_filters( $filters ) {
-		_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_remove_filters' );
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_remove_filters' );
 		return wpo_ips_remove_filters( $filters );
 	}
 
 	protected function normalize_filter_args( $filter ) {
-		_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
 		return wpo_ips_normalize_filter_args( $filter );
 	}
 
