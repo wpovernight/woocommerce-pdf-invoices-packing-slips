@@ -297,6 +297,7 @@ class Assets {
 						'download_label'       => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
 						'confirm_reset'        => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'select_document_type' => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
+						'forbidden'            => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'danger_zone'          => array(
 							'enabled' => isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ? true : false,
 							'message' => sprintf(

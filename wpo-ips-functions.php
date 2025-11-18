@@ -136,7 +136,7 @@ function wcpdf_get_bulk_actions() {
 			}
 
 			if ( $document->is_enabled( $output_format ) ) {
-				$prefix = ( 'xml' === $output_format ) ? 'E-' : strtoupper( $output_format )  . ' ';
+				$prefix           = strtoupper( $output_format ) . ' ';
 				$actions[ $slug ] = $prefix . $document->get_title();
 			}
 		}

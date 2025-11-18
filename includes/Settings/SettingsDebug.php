@@ -2,6 +2,7 @@
 namespace WPO\IPS\Settings;
 
 use WPO\IPS\Tables\NumberStoreListTable;
+use WPO\IPS\Semaphore;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -36,7 +37,18 @@ class SettingsDebug {
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
 	}
 
-	public function output( $active_section, $nonce ) {
+	/**
+	 * Output the settings debug sections.
+	 *
+	 * @param string $active_section
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function output( string $active_section, string $nonce ): void {
+		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			return;
+		}
+	
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
@@ -292,7 +304,7 @@ class SettingsDebug {
 	}
 
 	private function clear_released_semaphore_locks( $data ) {
-		\WPO\IPS\Semaphore::cleanup_released_locks();
+		Semaphore::cleanup_released_locks();
 
 		$message = esc_html__( 'Released semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
 		wcpdf_log_error( $message, 'info' );
@@ -300,7 +312,7 @@ class SettingsDebug {
 	}
 
 	private function clear_released_legacy_semaphore_locks( $data ) {
-		\WPO\IPS\Semaphore::cleanup_released_locks( true );
+		Semaphore::cleanup_released_locks( true );
 
 		$message = esc_html__( 'Released legacy semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
 		wcpdf_log_error( $message, 'info' );
@@ -314,27 +326,53 @@ class SettingsDebug {
 		wcpdf_log_error( $message, 'info' );
 		wp_send_json_success( compact( 'message' ) );
 	}
-
-	public function ajax_process_settings_debug_tools() {
+	
+	/**
+	 * AJAX handler for processing settings debug tools.
+	 * 
+	 * @return void
+	 */
+	public function ajax_process_settings_debug_tools(): void {
+		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
+		}
+		
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+		
+		$data = isset( $_POST ) ? stripslashes_deep( $_POST ) : array();
 
-		$data = stripslashes_deep( $_REQUEST );
-
-		if ( empty( $data['action'] ) || 'wpo_wcpdf_debug_tools' !== $data['action'] || empty( $data['debug_tool'] ) ) {
-			return;
+		if (
+			empty( $data['action'] ) ||
+			'wpo_wcpdf_debug_tools' !== $data['action'] ||
+			empty( $data['debug_tool'] )
+		) {
+			$message = __( 'Invalid request.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 
-		$debug_tool = esc_attr( $data['debug_tool'] );
+		$debug_tool = sanitize_key( $data['debug_tool'] );
 
 		if ( is_callable( array( $this, $debug_tool ) ) ) {
-			// all except danger tools and wizard
 			call_user_func_array( array( $this, $debug_tool ), array( $data ) );
+		} else {
+			$message = __( 'Debug tool is not available.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 
 		wp_die();
 	}
 
-	private function export_settings( $data ) {
+	/**
+	 * Export settings to JSON file.
+	 * 
+	 * @param array $data
+	 * @return void
+	 */
+	private function export_settings( array $data ): void {		
 		extract( $data );
 
 		if ( empty( $type ) ) {
@@ -387,9 +425,13 @@ class SettingsDebug {
 		wp_send_json_success( compact( 'filename', 'settings' ) );
 	}
 
-	private function import_settings( $data ) {
-		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
-
+	/**
+	 * Import settings from uploaded JSON file.
+	 * 
+	 * @param array $data
+	 * @return void
+	 */
+	private function import_settings( array $data ): void {
 		extract( $data );
 
 		$file_data = array();
@@ -417,7 +459,7 @@ class SettingsDebug {
 		}
 
 		$setting_types   = $this->get_setting_types();
-		$type            = esc_attr( $file_data['type'] );
+		$type            = sanitize_key( $file_data['type'] );
 		$new_settings    = stripslashes_deep( $file_data['settings'] );
 		$settings_option = '';
 
@@ -472,7 +514,13 @@ class SettingsDebug {
 		}
 	}
 
-	private function reset_settings( $data ) {
+	/**
+	 * Reset settings to defaults.
+	 * 
+	 * @param array $data
+	 * @return void
+	 */
+	private function reset_settings( array $data ): void {
 		extract( $data );
 
 		if ( empty( $type ) ) {
@@ -557,7 +605,17 @@ class SettingsDebug {
 		}
 	}
 
-	public function ajax_process_danger_zone_tools() {
+	/**
+	 * AJAX handler for processing danger zone tools.
+	 *
+	 * @return void
+	 */
+	public function ajax_process_danger_zone_tools(): void {
+		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
+			wp_send_json_error( compact( 'message' ) );
+		}
+		
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 
 		$request = stripslashes_deep( $_POST );
@@ -1639,6 +1697,11 @@ class SettingsDebug {
 	 * @return void
 	 */
 	public function ajax_numbers_data(): void {
+		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
+			wp_send_json_error( compact( 'message' ) );
+		}
+		
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 
 		$request = stripslashes_deep( $_POST );
