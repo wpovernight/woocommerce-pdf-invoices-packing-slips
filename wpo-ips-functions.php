@@ -1760,3 +1760,46 @@ function wpo_ips_order_has_local_pickup_method( \WC_Abstract_Order $order ): boo
 	
 	return $has_local_pickup_method;
 }
+
+/**
+ * Add multiple filters.
+ * 
+ * @param array $filters Array of filters to add.
+ * @return void
+ */
+function wpo_ips_add_filters( array $filters ): void {
+	foreach ( $filters as $filter ) {
+		$args = wpo_ips_normalize_filter_args( $filter );
+		add_filter( $args['hook_name'], $args['callback'], $args['priority'], $args['accepted_args'] );
+	}
+}
+
+/**
+ * Remove multiple filters.
+ * 
+ * @param array $filters Array of filters to remove.
+ * @return void
+ */
+function wpo_ips_remove_filters( array $filters ): void {
+	foreach ( $filters as $filter ) {
+		$args = wpo_ips_normalize_filter_args( $filter );
+		remove_filter( $args['hook_name'], $args['callback'], $args['priority'] );
+	}
+}
+
+/**
+ * Normalize filter arguments.
+ * 
+ * @param array $filter Filter arguments.
+ * @return array
+ */
+function wpo_ips_normalize_filter_args( array $filter ): array {
+	$filter        = array_values( $filter );
+	$hook_name     = $filter[0];
+	$callback      = $filter[1];
+	$priority      = isset( $filter[2] ) ? absint( $filter[2] ) : 10;
+	$accepted_args = isset( $filter[3] ) ? absint( $filter[3] ) : 1;
+	
+	return compact( 'hook_name', 'callback', 'priority', 'accepted_args' );
+}
+	
