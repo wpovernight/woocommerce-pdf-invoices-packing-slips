@@ -799,8 +799,8 @@ class Admin {
 									esc_attr( $button_icon )
 								);
 								
-								if ( ! empty( $status ) ) {
-									$network_url     = 'sent' !== $status ? $network['update_document_status'] ?? $network_url : $network_url;
+								if ( ! empty( $status ) && 'sent' !== $status ) {
+									$network_url     = $network['update_document_status'] ?? $network_url;
 									$network_buttons = sprintf(
 										'<a href="%1$s" class="button xml update %2$s" alt="%3$s" title="%3$s">
 											<span class="dashicons dashicons-update-alt"></span>
