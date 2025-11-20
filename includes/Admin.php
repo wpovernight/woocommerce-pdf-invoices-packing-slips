@@ -789,17 +789,39 @@ class Admin {
 								} else {
 									// First time sending
 									if ( empty( $status ) ) {
-										$send_label = sprintf(
-											esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
-											esc_html( $alt )
-										);
+										$action_id     = $data['action_id'] ?? 0;
+										$scheduled_url = $network['scheduled'] ?? '';
 
-										$send_button = \wpo_ips_edi_generate_action_button_html(
-											$dispatch_url,
-											'button button-primary xml send' . $disabled,
-											$send_label,
-											'dashicons-cloud-upload'
-										);
+										// Already scheduled
+										if ( $action_id > 0 && ! empty( $scheduled_url ) ) {
+											$send_label = sprintf(
+												/* translators: document title */
+												esc_html__( '%s dispatch already scheduled', 'woocommerce-pdf-invoices-packing-slips' ),
+												esc_html( $alt )
+											);
+
+											$send_button = \wpo_ips_edi_generate_action_button_html(
+												$scheduled_url,
+												'button xml send scheduled',
+												$send_label,
+												'dashicons-clock'
+											);
+
+										// Normal "Send to Network" button.
+										} else {
+											$send_label = sprintf(
+												/* translators: document title */
+												esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+												esc_html( $alt )
+											);
+
+											$send_button = \wpo_ips_edi_generate_action_button_html(
+												$dispatch_url,
+												'button button-primary xml send' . $disabled,
+												$send_label,
+												'dashicons-cloud-upload'
+											);
+										}
 
 										$network_buttons = $send_button;
 
