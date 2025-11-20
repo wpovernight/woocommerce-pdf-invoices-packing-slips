@@ -757,64 +757,64 @@ class Admin {
 				<tbody>
 					<?php
 						foreach ( $meta_box_actions as $document_type => $data ) {
-							$url             = $data['url']         ?? '';
-							$class           = $data['class']       ?? '';
-							$alt             = $data['alt']         ?? '';
-							$title           = $data['title']       ?? '';
-							$target          = $data['target']      ?? '';
-							$network         = $data['network']     ?? array();
-							$status          = $data['status']      ?? 'scheduled';
-							$remote_data     = $data['remote_data'] ?? false;
-							$disabled        = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
-							$network_url	 = '';
+							$url      = $data['url']     ?? '';
+							$class    = $data['class']   ?? '';
+							$alt      = $data['alt']     ?? '';
+							$title    = $data['title']   ?? '';
+							$target   = $data['target']  ?? '';
+							$network  = $data['network'] ?? array();
+							$status   = $data['status']  ?? 'scheduled';
+							$disabled = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
+
 							$network_buttons = '';
 
-							if ( ! empty( $network ) && 2 === count( $network ) ) {
+							if ( ! empty( $network ) ) {
+								$dispatch_url      = $network['dispatch']               ?? '';
+								$update_status_url = $network['update_document_status'] ?? '';
+
 								if ( 'sent' === $status ) {
-									$button_icon  = 'dashicons-cloud-saved';
-									$button_class = 'button xml sent';
+									// Already sent, show "sent" state only.
 									$button_label = sprintf(
 										/* translators: document title */
 										esc_html__( '%s sent to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 										esc_html( $alt )
 									);
+
+									$network_buttons = \wpo_ips_edi_generate_action_button_html(
+										$dispatch_url,
+										'button xml sent' . $disabled,
+										$button_label,
+										'dashicons-cloud-saved'
+									);
 								} else {
-									$button_icon  = 'dashicons-cloud-upload';
-									$button_class = 'button button-primary xml resend';
-									$button_label = sprintf(
+									// Not sent, show "Resend" + "Update" button.
+									$resend_label = sprintf(
 										/* translators: document title */
 										esc_html__( 'Resend %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 										esc_html( $alt )
 									);
-									$network_url  = $network['dispatch'] ?? $network_url;
-								}
 
-								$network_buttons = sprintf(
-									'<a href="%1$s" class="%2$s" alt="%3$s" title="%3$s">
-										<span class="dashicons %4$s"></span>
-									</a>',
-									esc_url( $network_url ),
-									esc_attr( $button_class . $disabled ),
-									esc_attr( $button_label ),
-									esc_attr( $button_icon )
-								);
-								
-								if ( ! empty( $status ) && 'sent' !== $status ) {
-									$network_url     = $network['update_document_status'] ?? $network_url;
-									$network_buttons = sprintf(
-										'<a href="%1$s" class="button xml update %2$s" alt="%3$s" title="%3$s">
-											<span class="dashicons dashicons-update-alt"></span>
-										</a>
-										%4$s',
-										esc_url( $network_url ),
-										esc_attr( $class . $disabled ),
-										sprintf(
-											/* translators: document title */
-											esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
-											esc_html( $alt )
-										),
-										wp_kses_post( $network_buttons )
+									$resend_button = \wpo_ips_edi_generate_action_button_html(
+										$dispatch_url,
+										'button button-primary xml resend' . $disabled,
+										$resend_label,
+										'dashicons-cloud-upload'
 									);
+
+									$update_label = sprintf(
+										/* translators: document title */
+										esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
+										esc_html( $alt )
+									);
+
+									$update_button = \wpo_ips_edi_generate_action_button_html(
+										$update_status_url,
+										'button xml update ' . $class . $disabled,
+										$update_label,
+										'dashicons-update-alt'
+									);
+
+									$network_buttons = $update_button . $resend_button;
 								}
 							}
 
@@ -824,8 +824,7 @@ class Admin {
 									<td>
 										<a href="%2$s" class="button xml download %3$s" target="%4$s" alt="%5$s" title="%5$s">
 											<span class="dashicons dashicons-download"></span>
-										</a>
-										%6$s
+										</a>%6$s
 									</td>
 								</tr>',
 								wp_kses_post( $title ),

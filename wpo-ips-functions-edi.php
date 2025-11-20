@@ -847,3 +847,29 @@ function wpo_ips_edi_get_parent_order( \WC_Abstract_Order $order ): \WC_Order {
 
 	return $order;
 }
+
+/**
+ * Small helper to generate action button HTML.
+ *
+ * @param string $url
+ * @param string $class
+ * @param string $label
+ * @param string $icon
+ *
+ * @return string
+ */
+function wpo_ips_edi_generate_action_button_html( string $url, string $class, string $label, string $icon ): string {
+	if ( empty( $url ) ) {
+		return '';
+	}
+
+	return sprintf(
+		'<a href="%1$s" class="%2$s" alt="%3$s" title="%3$s">
+			<span class="dashicons %4$s"></span>
+		</a>',
+		esc_url( $url ),
+		esc_attr( $class ),
+		esc_attr( $label ),
+		esc_attr( $icon )
+	);
+}

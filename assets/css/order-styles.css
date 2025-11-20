@@ -172,6 +172,7 @@ ul.wpo-ips-edi-actions > li {
 	width: 32px;
 	height: 32px;
 	padding: 0;
+	margin-left: 3px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
