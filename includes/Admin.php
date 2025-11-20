@@ -775,6 +775,7 @@ class Admin {
 								// Sent state
 								if ( 'sent' === $status ) {
 									$label = sprintf(
+										/* translators: document title */
 										esc_html__( '%s sent to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 										esc_html( $alt )
 									);
@@ -828,6 +829,7 @@ class Admin {
 									// Update + Resend
 									} else {
 										$resend_label = sprintf(
+											/* translators: document title */
 											esc_html__( 'Resend %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 											esc_html( $alt )
 										);
@@ -840,6 +842,7 @@ class Admin {
 										);
 
 										$update_label = sprintf(
+											/* translators: document title */
 											esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
 											esc_html( $alt )
 										);
@@ -870,6 +873,7 @@ class Admin {
 								esc_attr( $class ),
 								esc_attr( $target ),
 								sprintf(
+									/* translators: document title */
 									esc_html__( 'Download %s', 'woocommerce-pdf-invoices-packing-slips' ),
 									esc_html( $alt )
 								),
