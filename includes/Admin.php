@@ -757,52 +757,103 @@ class Admin {
 				<tbody>
 					<?php
 						foreach ( $meta_box_actions as $document_type => $data ) {
-							$url         = $data['url']         ?? '';
-							$class       = $data['class']       ?? '';
-							$alt         = $data['alt']         ?? '';
-							$title       = $data['title']       ?? '';
-							$target      = $data['target']      ?? '';
-							$network     = $data['network']     ?? '';
-							$disabled    = $data['disabled']    ?? '';
-							$remote_data = $data['remote_data'] ?? false;
+							$url      = $data['url']     ?? '';
+							$class    = $data['class']   ?? '';
+							$alt      = $data['alt']     ?? '';
+							$title    = $data['title']   ?? '';
+							$target   = $data['target']  ?? '';
+							$network  = $data['network'] ?? array(); // network links
+							$status   = $data['status']  ?? '';
+							$disabled = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
 
-							$network_button = '';
+							$network_buttons = '';
 
 							if ( ! empty( $network ) ) {
-								if ( ! empty( $disabled ) ) {
-									$icon         = 'dashicons-cloud-saved';
-									$button_class = 'button xml sent';
-									$label        = sprintf(
-											/* translators: document title */
-											esc_html__( '%s sent to Network', 'woocommerce-pdf-invoices-packing-slips' ),
-											esc_html( $alt )
-										);
-								} else {
-									$icon         = $remote_data ? 'dashicons-update-alt' : 'dashicons-cloud-upload';
-									$button_class = $remote_data ? 'button xml update' : 'button button-primary xml send';
-									$label        = $remote_data
-										? sprintf(
-											/* translators: document title */
-											esc_html__( 'Update %s status', 'woocommerce-pdf-invoices-packing-slips' ),
-											esc_html( $alt )
-										)
-										: sprintf(
-											/* translators: document title */
-											esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
-											esc_html( $alt )
-										);
-								}
+								$dispatch_url      = $network['dispatch']               ?? '';
+								$update_status_url = $network['update_document_status'] ?? '';
 
-								$network_button = sprintf(
-									'<a href="%1$s" class="%2$s%3$s" alt="%4$s" title="%4$s">
-										<span class="dashicons %5$s"></span>
-									</a>',
-									esc_url( $network ),
-									esc_attr( $button_class ),
-									esc_attr( $disabled ),
-									esc_attr( $label ),
-									esc_attr( $icon )
-								);
+								// Sent state
+								if ( 'sent' === $status ) {
+									$label = sprintf(
+										esc_html__( '%s sent to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+										esc_html( $alt )
+									);
+
+									$network_buttons = \wpo_ips_edi_generate_action_button_html(
+										$dispatch_url,
+										'button xml sent' . $disabled,
+										$label,
+										'dashicons-cloud-saved'
+									);
+
+								} else {
+									// First time sending
+									if ( empty( $status ) ) {
+										$action_id     = $data['action_id'] ?? 0;
+										$scheduled_url = $network['scheduled'] ?? '';
+
+										// Already scheduled
+										if ( $action_id > 0 && ! empty( $scheduled_url ) ) {
+											$send_label = sprintf(
+												/* translators: document title */
+												esc_html__( '%s dispatch already scheduled', 'woocommerce-pdf-invoices-packing-slips' ),
+												esc_html( $alt )
+											);
+
+											$send_button = \wpo_ips_edi_generate_action_button_html(
+												$scheduled_url,
+												'button xml send scheduled',
+												$send_label,
+												'dashicons-clock'
+											);
+
+										// Normal "Send to Network" button.
+										} else {
+											$send_label = sprintf(
+												/* translators: document title */
+												esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+												esc_html( $alt )
+											);
+
+											$send_button = \wpo_ips_edi_generate_action_button_html(
+												$dispatch_url,
+												'button button-primary xml send' . $disabled,
+												$send_label,
+												'dashicons-cloud-upload'
+											);
+										}
+
+										$network_buttons = $send_button;
+
+									// Update + Resend
+									} else {
+										$resend_label = sprintf(
+											esc_html__( 'Resend %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
+
+										$resend_button = \wpo_ips_edi_generate_action_button_html(
+											$dispatch_url,
+											'button button-primary xml resend' . $disabled,
+											$resend_label,
+											'dashicons-cloud-upload'
+										);
+
+										$update_label = sprintf(
+											esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
+
+										$update_button = \wpo_ips_edi_generate_action_button_html(
+											$update_status_url,
+											'button xml update ' . $class . $disabled,
+											$update_label,
+											'dashicons-update-alt'
+										);
+
+										$network_buttons = $update_button . $resend_button;
+									}
+								}
 							}
 
 							printf(
@@ -811,8 +862,7 @@ class Admin {
 									<td>
 										<a href="%2$s" class="button xml download %3$s" target="%4$s" alt="%5$s" title="%5$s">
 											<span class="dashicons dashicons-download"></span>
-										</a>
-										%6$s
+										</a>%6$s
 									</td>
 								</tr>',
 								wp_kses_post( $title ),
@@ -820,11 +870,10 @@ class Admin {
 								esc_attr( $class ),
 								esc_attr( $target ),
 								sprintf(
-									/* translators: document title */
 									esc_html__( 'Download %s', 'woocommerce-pdf-invoices-packing-slips' ),
 									esc_html( $alt )
 								),
-								wp_kses_post( $network_button )
+								wp_kses_post( $network_buttons )
 							);
 						}
 					?>
