@@ -762,8 +762,8 @@ class Admin {
 							$alt      = $data['alt']     ?? '';
 							$title    = $data['title']   ?? '';
 							$target   = $data['target']  ?? '';
-							$network  = $data['network'] ?? array();
-							$status   = $data['status']  ?? 'scheduled';
+							$network  = $data['network'] ?? array(); // network links
+							$status   = $data['status']  ?? '';
 							$disabled = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
 
 							$network_buttons = '';
@@ -772,10 +772,9 @@ class Admin {
 								$dispatch_url      = $network['dispatch']               ?? '';
 								$update_status_url = $network['update_document_status'] ?? '';
 
+								// Sent state
 								if ( 'sent' === $status ) {
-									// Already sent, show "sent" state only.
-									$button_label = sprintf(
-										/* translators: document title */
+									$label = sprintf(
 										esc_html__( '%s sent to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 										esc_html( $alt )
 									);
@@ -783,38 +782,55 @@ class Admin {
 									$network_buttons = \wpo_ips_edi_generate_action_button_html(
 										$dispatch_url,
 										'button xml sent' . $disabled,
-										$button_label,
+										$label,
 										'dashicons-cloud-saved'
 									);
+
 								} else {
-									// Not sent, show "Resend" + "Update" button.
-									$resend_label = sprintf(
-										/* translators: document title */
-										esc_html__( 'Resend %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $alt )
-									);
+									// First time sending
+									if ( empty( $status ) ) {
+										$send_label = sprintf(
+											esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
 
-									$resend_button = \wpo_ips_edi_generate_action_button_html(
-										$dispatch_url,
-										'button button-primary xml resend' . $disabled,
-										$resend_label,
-										'dashicons-cloud-upload'
-									);
+										$send_button = \wpo_ips_edi_generate_action_button_html(
+											$dispatch_url,
+											'button button-primary xml send' . $disabled,
+											$send_label,
+											'dashicons-cloud-upload'
+										);
 
-									$update_label = sprintf(
-										/* translators: document title */
-										esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $alt )
-									);
+										$network_buttons = $send_button;
 
-									$update_button = \wpo_ips_edi_generate_action_button_html(
-										$update_status_url,
-										'button xml update ' . $class . $disabled,
-										$update_label,
-										'dashicons-update-alt'
-									);
+									// Update + Resend
+									} else {
+										$resend_label = sprintf(
+											esc_html__( 'Resend %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
 
-									$network_buttons = $update_button . $resend_button;
+										$resend_button = \wpo_ips_edi_generate_action_button_html(
+											$dispatch_url,
+											'button button-primary xml resend' . $disabled,
+											$resend_label,
+											'dashicons-cloud-upload'
+										);
+
+										$update_label = sprintf(
+											esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
+											esc_html( $alt )
+										);
+
+										$update_button = \wpo_ips_edi_generate_action_button_html(
+											$update_status_url,
+											'button xml update ' . $class . $disabled,
+											$update_label,
+											'dashicons-update-alt'
+										);
+
+										$network_buttons = $update_button . $resend_button;
+									}
 								}
 							}
 
@@ -832,7 +848,6 @@ class Admin {
 								esc_attr( $class ),
 								esc_attr( $target ),
 								sprintf(
-									/* translators: document title */
 									esc_html__( 'Download %s', 'woocommerce-pdf-invoices-packing-slips' ),
 									esc_html( $alt )
 								),
