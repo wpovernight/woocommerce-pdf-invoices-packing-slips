@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.0.0-rc.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.0.0-rc.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-11-20T15:00:20+00:00\n"
+"POT-Creation-Date: 2025-11-21T18:11:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2023,7 +2023,7 @@ msgid "Yes you deserve it!"
 msgstr ""
 
 #: includes/Admin.php:134
-#: includes/Main.php:862
+#: includes/Main.php:913
 #: includes/Settings/SettingsDebug.php:1389
 #: includes/Settings/SettingsGeneral.php:746
 #: views/attachment-settings-hint.php:12
@@ -2064,16 +2064,16 @@ msgstr ""
 
 #: includes/Admin.php:361
 #: includes/Admin.php:1937
-#: includes/Assets.php:364
+#: includes/Assets.php:366
 #: includes/Documents/Invoice.php:359
-#: includes/Main.php:1281
+#: includes/Main.php:1332
 #: views/setup-wizard/display-options.php:83
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:362
 #: includes/Documents/Invoice.php:327
-#: includes/Main.php:1282
+#: includes/Main.php:1333
 #: views/setup-wizard/display-options.php:62
 msgid "Invoice Date"
 msgstr ""
@@ -2412,20 +2412,20 @@ msgid "Identifier"
 msgstr ""
 
 #: includes/Admin.php:2063
-#: includes/Assets.php:95
+#: includes/Assets.php:97
 msgid "Show"
 msgstr ""
 
 #: includes/Admin.php:2078
 #: includes/Admin.php:2121
-#: includes/Assets.php:335
+#: includes/Assets.php:337
 #: includes/Settings/SettingsEDI.php:663
 msgid "Missing"
 msgstr ""
 
 #: includes/Admin.php:2079
 #: includes/Admin.php:2122
-#: includes/Assets.php:336
+#: includes/Assets.php:338
 #: includes/Settings/SettingsEDI.php:664
 msgid "Optional"
 msgstr ""
@@ -2485,69 +2485,77 @@ msgstr ""
 msgid "Error loading preview"
 msgstr ""
 
-#: includes/Assets.php:96
+#: includes/Assets.php:94
+msgid "Error fetching refund order IDs"
+msgstr ""
+
+#: includes/Assets.php:95
+msgid "No refunds found for this order"
+msgstr ""
+
+#: includes/Assets.php:98
 msgid "Hide"
 msgstr ""
 
-#: includes/Assets.php:97
+#: includes/Assets.php:99
 msgid "Could not save identifiers. Please try again."
 msgstr ""
 
-#: includes/Assets.php:126
+#: includes/Assets.php:128
 msgid "Preview"
 msgstr ""
 
-#: includes/Assets.php:129
+#: includes/Assets.php:131
 #: includes/Settings.php:119
 #: includes/Settings/SettingsDebug.php:1539
 #: includes/Settings/SettingsEDI.php:34
 msgid "Settings"
 msgstr ""
 
-#: includes/Assets.php:220
+#: includes/Assets.php:222
 msgid "Document settings"
 msgstr ""
 
-#: includes/Assets.php:221
+#: includes/Assets.php:223
 msgid "Select a document in the dropdown menu above to edit its settings."
 msgstr ""
 
 #. translators: mysql int size
-#: includes/Assets.php:234
+#: includes/Assets.php:236
 #, php-format
 msgid "The number should be smaller than %s. Please note you should add your next document number without prefix, suffix or padding."
 msgstr ""
 
-#: includes/Assets.php:238
+#: includes/Assets.php:240
 #: includes/SetupWizard.php:141
 msgid "Loading"
 msgstr ""
 
-#: includes/Assets.php:239
+#: includes/Assets.php:241
 #: includes/Settings/SettingsGeneral.php:317
 #: includes/SetupWizard.php:142
 #: views/setup-wizard/shop-name.php:73
 msgid "No states available"
 msgstr ""
 
-#: includes/Assets.php:240
+#: includes/Assets.php:242
 #: includes/SetupWizard.php:143
 msgid "Error loading"
 msgstr ""
 
-#: includes/Assets.php:297
+#: includes/Assets.php:299
 msgid "Download"
 msgstr ""
 
-#: includes/Assets.php:298
+#: includes/Assets.php:300
 msgid "Are you sure you want to reset this settings? This cannot be undone."
 msgstr ""
 
-#: includes/Assets.php:299
+#: includes/Assets.php:301
 msgid "Please select a document type"
 msgstr ""
 
-#: includes/Assets.php:300
+#: includes/Assets.php:302
 #: includes/Settings/SettingsDebug.php:337
 #: includes/Settings/SettingsDebug.php:615
 #: includes/Settings/SettingsDebug.php:1701
@@ -2555,12 +2563,12 @@ msgid "You are not allowed to perform this action."
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag
-#: includes/Assets.php:305
+#: includes/Assets.php:307
 #, php-format
 msgid "<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools."
 msgstr ""
 
-#: includes/Assets.php:331
+#: includes/Assets.php:333
 #: includes/Settings/SettingsEDI.php:868
 #: includes/Settings/SettingsEDI.php:878
 #: includes/Settings/SettingsEDI.php:888
@@ -2570,35 +2578,35 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-#: includes/Assets.php:332
+#: includes/Assets.php:334
 msgid "New"
 msgstr ""
 
-#: includes/Assets.php:333
+#: includes/Assets.php:335
 msgid "unsaved"
 msgstr ""
 
-#: includes/Assets.php:337
+#: includes/Assets.php:339
 msgid "VAT number should start with a country prefix (e.g. NL123456789B01)."
 msgstr ""
 
-#: includes/Assets.php:338
+#: includes/Assets.php:340
 msgid "Error loading identifiers"
 msgstr ""
 
-#: includes/Assets.php:339
+#: includes/Assets.php:341
 msgid "Loading..."
 msgstr ""
 
-#: includes/Assets.php:340
+#: includes/Assets.php:342
 msgid "Order ID must be a valid number"
 msgstr ""
 
-#: includes/Assets.php:341
+#: includes/Assets.php:343
 msgid "Please enter an Order ID."
 msgstr ""
 
-#: includes/Assets.php:342
+#: includes/Assets.php:344
 msgid "No customer identifiers found."
 msgstr ""
 
@@ -2995,7 +3003,7 @@ msgid "%s Date:"
 msgstr ""
 
 #: includes/Documents/OrderDocument.php:967
-#: includes/Main.php:1836
+#: includes/Main.php:1887
 msgid "Due Date:"
 msgstr ""
 
@@ -3249,58 +3257,70 @@ msgstr ""
 msgid "Peppol Endpoint ID must be in scheme:identifier format (e.g. 0088:123456789)."
 msgstr ""
 
-#: includes/Main.php:352
+#: includes/Main.php:356
 msgid "You do not have sufficient permissions to access this page. Reason: empty access key"
 msgstr ""
 
-#: includes/Main.php:358
+#: includes/Main.php:362
 msgid "You do not have sufficient permissions to access this page. Reason: empty action"
 msgstr ""
 
-#: includes/Main.php:364
+#: includes/Main.php:368
 msgid "You do not have sufficient permissions to access this page. Reason: invalid nonce"
 msgstr ""
 
-#: includes/Main.php:374
+#: includes/Main.php:378
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/Main.php:379
+#: includes/Main.php:383
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/Main.php:398
+#: includes/Main.php:402
 msgid "You have to save the order before generating a PDF document for it."
 msgstr ""
 
 #. translators: %s: Order ID
-#: includes/Main.php:403
+#: includes/Main.php:407
 #, php-format
 msgid "Could not find the order #%s."
 msgstr ""
 
-#: includes/Main.php:478
+#: includes/Main.php:482
 #: includes/Settings.php:234
 #: includes/Settings.php:396
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: document type
-#: includes/Main.php:533
+#: includes/Main.php:537
 #, php-format
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
-#: includes/Main.php:861
+#: includes/Main.php:574
+msgid "Invalid request. Nonce check failed."
+msgstr ""
+
+#: includes/Main.php:582
+msgid "No orders were provided."
+msgstr ""
+
+#: includes/Main.php:593
+msgid "No refunds found for the selected orders."
+msgstr ""
+
+#: includes/Main.php:912
 msgid "Please check your directories write permissions or contact your hosting service provider."
 msgstr ""
 
-#: includes/Main.php:1188
+#: includes/Main.php:1239
 msgid "Nothing to delete!"
 msgstr ""
 
 #. translators: %1$d is the number of files that couldn't be deleted, %2$d is the number of successfully deleted files
-#: includes/Main.php:1209
+#: includes/Main.php:1260
 #, php-format
 msgid "Unable to delete %1$d file! (deleted %2$d)"
 msgid_plural "Unable to delete %1$d files! (deleted %2$d)"
@@ -3308,80 +3328,80 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d is the number of files successfully deleted
-#: includes/Main.php:1222
+#: includes/Main.php:1273
 #, php-format
 msgid "Successfully deleted %d file!"
 msgid_plural "Successfully deleted %d files!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Main.php:1336
-#: includes/Main.php:1367
+#: includes/Main.php:1387
+#: includes/Main.php:1418
 msgid "User"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1344
+#: includes/Main.php:1395
 #, php-format
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1374
+#: includes/Main.php:1425
 #, php-format
 msgid "PDF %s deleted."
 msgstr ""
 
-#: includes/Main.php:1391
+#: includes/Main.php:1442
 msgid "manually"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1397
+#: includes/Main.php:1448
 #, php-format
 msgid "%1$s document marked as printed via %2$s."
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1413
+#: includes/Main.php:1464
 #, php-format
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/Main.php:1501
+#: includes/Main.php:1552
 msgid "single order action"
 msgstr ""
 
-#: includes/Main.php:1502
+#: includes/Main.php:1553
 msgid "bulk order action"
 msgstr ""
 
-#: includes/Main.php:1503
+#: includes/Main.php:1554
 msgid "my account"
 msgstr ""
 
-#: includes/Main.php:1504
+#: includes/Main.php:1555
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Main.php:1508
+#: includes/Main.php:1559
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/Main.php:1609
+#: includes/Main.php:1660
 #, php-format
 msgid "Document of type %1$s for the selected order could not be marked as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1718
+#: includes/Main.php:1769
 #, php-format
 msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:1943
+#: includes/Main.php:1994
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
@@ -4387,7 +4407,7 @@ msgstr ""
 #. translators: %1$s: open link anchor, %2$s: close link anchor
 #: includes/Settings/SettingsEDI.php:1032
 #, php-format
-msgid "This feature is currently under development. If you'd like to learn more or request early access, please %1$scontact us%2$s."
+msgid "This feature will be available soon. If you'd like to learn more or request early access, please %1$scontact us%2$s."
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:1069
