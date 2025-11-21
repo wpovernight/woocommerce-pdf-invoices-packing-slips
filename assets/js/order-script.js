@@ -58,7 +58,7 @@ jQuery( function( $ ) {
 									window.open( full_url, '_blank' );
 								} );
 							} else {
-								let msg = ( response && response.data && response.data.message ) ? response.data.message : wpo_wcpdf_ajax.no_refunds_found;
+								let msg = ( response && response.data && response.data.message ) ? response.data.message : wpo_wcpdf_ajax.error_no_refunds_found;
 								alert( msg );
 							}
 						},

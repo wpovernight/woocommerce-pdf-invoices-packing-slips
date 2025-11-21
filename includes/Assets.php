@@ -92,6 +92,7 @@ class Assets {
 					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
 					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' ),
 					'error_fetching_refund_ids'    => __( 'Error fetching refund order IDs', 'woocommerce-pdf-invoices-packing-slips' ),
+					'error_no_refunds_found'       => __( 'No refunds found for this order', 'woocommerce-pdf-invoices-packing-slips' ),
 					'edi_metabox'                  => array(
 						'show' => __( 'Show', 'woocommerce-pdf-invoices-packing-slips' ),
 						'hide' => __( 'Hide', 'woocommerce-pdf-invoices-packing-slips' ),
