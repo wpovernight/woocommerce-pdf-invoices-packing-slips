@@ -39,6 +39,39 @@ jQuery( function( $ ) {
 
 			// xml
 			if ( xml_output ) {
+
+				// Credit Note: get refund IDs first
+				if ( 'credit-note' === document_type ) {
+					$.ajax( {
+						url:       wpo_wcpdf_ajax.ajaxurl,
+						type:     'POST',
+						dataType: 'json',
+						data: {
+							action:    'wpo_ips_get_refund_order_ids',
+							order_ids: checked,
+							security:  wpo_wcpdf_ajax.nonce
+						},
+						success: function( response ) {
+							if ( response && response.success && response.data && response.data.refund_ids && response.data.refund_ids.length ) {
+								$.each( response.data.refund_ids, function( i, refund_id ) {
+									full_url = partial_url + '&order_ids='+refund_id+'&output=xml';
+									window.open( full_url, '_blank' );
+								} );
+							} else {
+								let msg = ( response && response.data && response.data.message ) ? response.data.message : wpo_wcpdf_ajax.no_refunds_found;
+								alert( msg );
+							}
+						},
+						error: function() {
+							alert( wpo_wcpdf_ajax.error_fetching_refund_ids );
+						}
+					} );
+
+					// stop normal XML processing
+					return;
+				}
+
+				// default xml
 				$.each( checked, function( i, order_id ) {
 					full_url = partial_url + '&order_ids='+order_id+'&output=xml';
 					window.open( full_url, '_blank' );

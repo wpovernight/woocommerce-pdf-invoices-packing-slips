@@ -30,6 +30,8 @@ class Main {
 	public function __construct() {
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
+		add_action( 'wp_ajax_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
+		add_action( 'wp_ajax_nopriv_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
 
 		// mark/unmark printed
 		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
@@ -328,8 +330,10 @@ class Main {
 
 	/**
 	 * Load and generate the template output with ajax
+	 * 
+	 * @return void
 	 */
-	public function generate_document_ajax() {
+	public function generate_document_ajax(): void {
 		$access_type  = WPO_WCPDF()->endpoint->get_document_link_access_type();
 		$redirect_url = WPO_WCPDF()->endpoint->get_document_denied_frontend_redirect_url();
 		$request      = stripslashes_deep( $_REQUEST );
@@ -549,6 +553,54 @@ class Main {
 			wcpdf_output_error( $message, 'critical', $e );
 		}
 		exit;
+	}
+	
+	/**
+	 * AJAX handler to get refund order IDs from given order IDs
+	 * 
+	 * @return void
+	 */
+	public function get_refund_order_ids_ajax(): void {
+		check_ajax_referer( 'generate_wpo_wcpdf', 'security' );
+
+		if ( empty( $_POST['order_ids'] ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'No orders were provided.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+		$order_ids  = array_map( 'absint', (array) $_POST['order_ids'] );
+		$refund_ids = array();
+
+		foreach ( $order_ids as $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			foreach ( $order->get_refunds() as $refund ) {
+				$refund_ids[] = $refund->get_id();
+			}
+		}
+
+		$refund_ids = array_unique( array_filter( $refund_ids ) );
+
+		if ( empty( $refund_ids ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'No refunds found for the selected orders.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+		wp_send_json_success(
+			array(
+				'refund_ids' => $refund_ids,
+			)
+		);
 	}
 
 	/**
