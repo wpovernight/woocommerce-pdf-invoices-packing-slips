@@ -1839,3 +1839,37 @@ function wpo_ips_normalize_filter_args( array $filter ): array {
 	
 	return compact( 'hook_name', 'callback', 'priority', 'accepted_args', 'is_valid' );
 }
+
+/**
+ * Get refund IDs for given order IDs or order object.
+ *
+ * @param \WC_Order|int|int[] $order_or_ids Order object or order ID(s).
+ * @return int[] Unique array of refund IDs.
+ */
+function wpo_ips_get_refund_ids( $order_or_ids ) {
+	$refund_ids = array();
+
+	// Normalize input to an array of IDs.
+	if ( $order_or_ids instanceof WC_Order ) {
+		$order_ids = array( $order_or_ids->get_id() );
+	} elseif ( is_array( $order_or_ids ) ) {
+		$order_ids = array_map( 'absint', $order_or_ids );
+	} else {
+		$order_ids = array( absint( $order_or_ids ) );
+	}
+
+	foreach ( $order_ids as $order_id ) {
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			continue;
+		}
+
+		foreach ( $order->get_refunds() as $refund ) {
+			$refund_ids[] = $refund->get_id();
+		}
+	}
+
+	// Clean output: remove empty, dedupe, reindex
+	return array_values( array_unique( array_filter( $refund_ids ) ) );
+}

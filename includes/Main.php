@@ -585,21 +585,7 @@ class Main {
 		}
 
 		$order_ids  = array_map( 'absint', (array) $_POST['order_ids'] );
-		$refund_ids = array();
-
-		foreach ( $order_ids as $order_id ) {
-			$order = wc_get_order( $order_id );
-
-			if ( ! $order ) {
-				continue;
-			}
-
-			foreach ( $order->get_refunds() as $refund ) {
-				$refund_ids[] = $refund->get_id();
-			}
-		}
-
-		$refund_ids = array_unique( array_filter( $refund_ids ) );
+		$refund_ids = \wpo_ips_get_refund_ids( $order_ids );
 
 		if ( empty( $refund_ids ) ) {
 			wp_send_json_error(
