@@ -561,7 +561,20 @@ class Main {
 	 * @return void
 	 */
 	public function get_refund_order_ids_ajax(): void {
-		check_ajax_referer( 'generate_wpo_wcpdf', 'security' );
+		// Accept requests from both contexts:
+		// - bulk generate (generate_wpo_wcpdf)
+		// - cloud export (pro_cloud_storage)
+
+		$valid_nonce = check_ajax_referer( 'generate_wpo_wcpdf', 'security', false )
+			|| check_ajax_referer( 'pro_cloud_storage', 'security', false );
+
+		if ( ! $valid_nonce ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid request. Nonce check failed.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
 
 		if ( empty( $_POST['order_ids'] ) ) {
 			wp_send_json_error(
