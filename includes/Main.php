@@ -30,6 +30,8 @@ class Main {
 	public function __construct() {
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
+		add_action( 'wp_ajax_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
+		add_action( 'wp_ajax_nopriv_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
 
 		// mark/unmark printed
 		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
@@ -328,8 +330,10 @@ class Main {
 
 	/**
 	 * Load and generate the template output with ajax
+	 * 
+	 * @return void
 	 */
-	public function generate_document_ajax() {
+	public function generate_document_ajax(): void {
 		$access_type  = WPO_WCPDF()->endpoint->get_document_link_access_type();
 		$redirect_url = WPO_WCPDF()->endpoint->get_document_denied_frontend_redirect_url();
 		$request      = stripslashes_deep( $_REQUEST );
@@ -549,6 +553,53 @@ class Main {
 			wcpdf_output_error( $message, 'critical', $e );
 		}
 		exit;
+	}
+	
+	/**
+	 * AJAX handler to get refund order IDs from given order IDs
+	 * 
+	 * @return void
+	 */
+	public function get_refund_order_ids_ajax(): void {
+		// Accept requests from both contexts:
+		// - bulk generate (generate_wpo_wcpdf)
+		// - cloud export (pro_cloud_storage)
+
+		$valid_nonce = check_ajax_referer( 'generate_wpo_wcpdf', 'security', false )
+			|| check_ajax_referer( 'pro_cloud_storage', 'security', false );
+
+		if ( ! $valid_nonce ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid request. Nonce check failed.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+		if ( empty( $_POST['order_ids'] ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'No orders were provided.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+		$order_ids  = array_map( 'absint', (array) $_POST['order_ids'] );
+		$refund_ids = \wpo_ips_get_refund_ids( $order_ids );
+
+		if ( empty( $refund_ids ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'No refunds found for the selected orders.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+		wp_send_json_success(
+			array(
+				'refund_ids' => $refund_ids,
+			)
+		);
 	}
 
 	/**
