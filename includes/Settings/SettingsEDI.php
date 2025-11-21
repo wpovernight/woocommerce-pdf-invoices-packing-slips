@@ -1029,7 +1029,7 @@ class SettingsEDI {
 				<?php
 					printf(
 						/* translators: %1$s: open link anchor, %2$s: close link anchor */
-						esc_html__( 'This feature is currently under development. If you\'d like to learn more or request early access, please %1$scontact us%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html__( 'This feature is currently in testing. If you\'d like to learn more or request early access, please %1$scontact us%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="https://wpovernight.com/contact/" target="_blank" rel="noopener noreferrer">',
 						'</a>'
 					);
