@@ -1109,7 +1109,7 @@ class Main {
 
 	public function html_currency_filters( $filters ) {
 		// Maybe apply currency font when previewing in admin
-		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
+		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$filters = $this->pdf_currency_filters( $filters );
 		}
 		

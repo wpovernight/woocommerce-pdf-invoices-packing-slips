@@ -436,8 +436,8 @@ class SettingsDebug {
 
 		$file_data = array();
 
-		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
-			$json_data = WPO_WCPDF()->file_system->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {   // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$json_data = WPO_WCPDF()->file_system->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 
 			if ( ! $json_data ) {
 				$message = __( 'Failed to get contents from JSON file!', 'woocommerce-pdf-invoices-packing-slips' );
