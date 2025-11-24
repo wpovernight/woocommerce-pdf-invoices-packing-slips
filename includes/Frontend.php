@@ -545,10 +545,99 @@ class Frontend {
 					return preg_replace( '/\s+/', '', trim( (string) $val ) );
 				},
 				'validate_callback' => function ( $val ) use ( $input_mode ) {
-					if ( 'full' === $input_mode && false === strpos( $val, ':' ) ) {
-						return new \WP_Error( 'invalid_endpoint_id', __( 'Use scheme:identifier format.', 'woocommerce-pdf-invoices-packing-slips' ) );
+					$val        = preg_replace( '/\s+/', '', trim( (string) $val ) );
+					$has_scheme = ( false !== strpos( $val, ':' ) );
+					$result     = $this->peppol_directory_lookup( $val );
+
+					if ( is_wp_error( $result ) ) {
+						if ( 'peppol_directory_invalid_participant' === $result->get_error_code() ) {
+							return new \WP_Error(
+								'peppol_directory_invalid_participant',
+								__( 'The Peppol identifier is not valid for the directory search.', 'woocommerce-pdf-invoices-packing-slips' )
+							);
+						}
+
+						// Request failed (network, etc.), do not block checkout.
+						return true;
 					}
-					return true;
+
+					$matches       = isset( $result['matches'] ) && is_array( $result['matches'] ) ? $result['matches'] : array();
+					$search_meta   = isset( $result['search'] ) && is_array( $result['search'] ) ? $result['search'] : array();
+					$used_fallback = ! empty( $search_meta['used_fallback'] );
+
+					$directory_url = 'https://directory.peppol.eu/';
+
+					/**
+					 * Case 1: No scheme provided (no ":").
+					 *
+					 * We always warn that the scheme is required, but we still show any found
+					 * participants as hints.
+					 */
+					if ( ! $has_scheme ) {
+						$message = sprintf(
+							/* translators: 1: entered identifier, 2: Peppol Directory URL */
+							__(
+								'The identifier "%1$s" was found without a scheme. Please enter it in "scheme:value" format. You can search for the correct scheme and identifier in the <a href="%2$s" target="_blank" rel="noopener noreferrer">Peppol Directory</a>.',
+								'woocommerce-pdf-invoices-packing-slips'
+							),
+							esc_html( $val ),
+							esc_url( $directory_url )
+						);
+
+						if ( ! empty( $matches ) ) {
+							$message .= $this->peppol_directory_render_matches_list( $matches, $val );
+						}
+
+						return new \WP_Error(
+							'peppol_directory_scheme_required',
+							$message
+						);
+					}
+
+					/**
+					 * Case 2: Scheme + value provided.
+					 */
+
+					// No matches at all (for scheme+value or fallback).
+					if ( empty( $matches ) ) {
+						$message = sprintf(
+							/* translators: 1: entered identifier, 2: Peppol Directory URL */
+							__(
+								'No Peppol participant was found for "%1$s". Please confirm the scheme and identifier in the <a href="%2$s" target="_blank" rel="noopener noreferrer">Peppol Directory</a>.',
+								'woocommerce-pdf-invoices-packing-slips'
+							),
+							esc_html( $val ),
+							esc_url( $directory_url )
+						);
+
+						return new \WP_Error(
+							'peppol_directory_no_match',
+							$message
+						);
+					}
+
+					// If we did not use fallback, it means scheme+value produced matches, accept silently.
+					if ( ! $used_fallback ) {
+						return true;
+					}
+
+					// We used fallback (value-only), so scheme+value had no hits.
+					// Show alternatives and warn about possible wrong scheme.
+					$message  = sprintf(
+						/* translators: 2: Peppol Directory URL */
+						__(
+							'We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the <a href="%2$s" target="_blank" rel="noopener noreferrer">Peppol Directory</a>. Below are participants found for this identifier value:',
+							'woocommerce-pdf-invoices-packing-slips'
+						),
+						esc_html( $val ),
+						esc_url( $directory_url )
+					);
+					$message .= $this->peppol_directory_render_matches_list( $matches, $val );
+
+					return new \WP_Error(
+						'peppol_directory_similar_found',
+						$message
+					);
 				},
 			)
 		);
@@ -937,6 +1026,268 @@ class Frontend {
 		}
 		
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $data );
+	}
+	
+	/**
+	 * Query the Peppol Directory for an additional identifier.
+	 *
+	 * @param string $endpoint_id Additional identifier in "scheme:value" or "value" format.
+	 * @return array|\WP_Error Normalized array of matches on success, or WP_Error on failure.
+	 */
+	private function peppol_directory_lookup( string $endpoint_id ) {
+		$endpoint_id = trim( (string) $endpoint_id );
+
+		if ( '' === $endpoint_id ) {
+			return new \WP_Error(
+				'peppol_empty_endpoint',
+				__( 'Peppol Endpoint ID is empty.', 'woocommerce-pdf-invoices-packing-slips' )
+			);
+		}
+
+		$identifier_scheme = '';
+		$identifier_value  = '';
+
+		// "scheme:value" format.
+		if ( false !== strpos( $endpoint_id, ':' ) ) {
+			list( $identifier_scheme, $identifier_value ) = explode( ':', $endpoint_id, 2 );
+
+			$identifier_scheme = trim( $identifier_scheme );
+			$identifier_value  = trim( $identifier_value );
+		} else {
+			// Only a value was provided.
+			$identifier_value = $endpoint_id;
+		}
+
+		$data          = null;
+		$used_fallback = false;
+
+		// First attempt: scheme + value (if both are present).
+		if ( '' !== $identifier_scheme && '' !== $identifier_value ) {
+			$data = $this->peppol_directory_request(
+				array(
+					'identifierScheme' => $identifier_scheme,
+					'identifierValue'  => $identifier_value,
+				)
+			);
+
+			if ( is_wp_error( $data ) ) {
+				// Error, do not fallback, just return the error.
+				return $data;
+			}
+
+			$matches_first = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
+
+			// If we got matches, use them and skip fallback.
+			if ( ! empty( $matches_first ) ) {
+				$used_fallback = false;
+			} else {
+				// No matches for scheme + value, we will try value-only.
+				$data = null;
+			}
+		}
+
+		// Fallback: only identifierValue (if we either had no scheme or no matches above).
+		if ( null === $data ) {
+			if ( '' === $identifier_value ) {
+				// Should not normally happen, but guard anyway.
+				return new \WP_Error(
+					'peppol_directory_invalid_participant',
+					__( 'The Peppol identifier is not valid for the directory search.', 'woocommerce-pdf-invoices-packing-slips' )
+				);
+			}
+
+			$data = $this->peppol_directory_request(
+				array(
+					'identifierValue' => $identifier_value,
+				)
+			);
+
+			if ( is_wp_error( $data ) ) {
+				return $data;
+			}
+
+			$used_fallback = true;
+		}
+
+		// At this point $data is a valid array response from one of the two calls.
+		$matches            = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
+		$normalized_matches = array();
+
+		foreach ( $matches as $match ) {
+			$participant_value  = $match['participantID']['value'] ?? '';
+			$participant_scheme = '';
+			$identifier_value   = '';
+
+			// Always derive scheme and value by splitting the participant value itself.
+			if ( false !== strpos( $participant_value, ':' ) ) {
+				list( $participant_scheme, $identifier_value ) = explode( ':', $participant_value, 2 );
+			} else {
+				$identifier_value = $participant_value;
+			}
+
+			$full_id    = $participant_value;
+
+			$entity     = isset( $match['entities'][0] ) && is_array( $match['entities'][0] ) ? $match['entities'][0] : array();
+			$name_entry = isset( $entity['name'][0] ) && is_array( $entity['name'][0] ) ? $entity['name'][0] : array();
+
+			$name       = $name_entry['name']     ?? '';
+			$language   = $name_entry['language'] ?? '';
+			$country    = $entity['countryCode']  ?? '';
+			$reg_date   = $entity['regDate']      ?? '';
+
+			$doc_types = array();
+			if ( ! empty( $match['docTypes'] ) && is_array( $match['docTypes'] ) ) {
+				foreach ( $match['docTypes'] as $doc_type ) {
+					if ( isset( $doc_type['value'] ) ) {
+						$doc_types[] = $doc_type['value'];
+					}
+				}
+			}
+
+			$normalized_matches[] = array(
+				'id'        => $full_id,
+				'scheme'    => $participant_scheme,
+				'value'     => $identifier_value,
+				'name'      => $name,
+				'language'  => $language,
+				'country'   => $country,
+				'reg_date'  => $reg_date,
+				'doc_types' => $doc_types,
+			);
+		}
+
+		return array(
+			'total'   => isset( $data['total-result-count'] ) ? (int) $data['total-result-count'] : count( $normalized_matches ),
+			'matches' => $normalized_matches,
+			'search'  => array(
+				'identifier_scheme' => $identifier_scheme,
+				'identifier_value'  => $identifier_value,
+				'used_fallback'     => $used_fallback,
+			),
+		);
+	}
+	
+	/**
+	 * Perform a Peppol Directory request and return decoded data.
+	 *
+	 * @param array $query_args
+	 * @return array|\WP_Error
+	 */
+	private function peppol_directory_request( array $query_args ) {
+		$base_url = 'https://directory.peppol.eu/search/1.0/json';
+
+		$query_args['beautify'] = 'true';
+
+		$url = add_query_arg( $query_args, $base_url );
+
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout' => 5,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return new \WP_Error(
+				'peppol_directory_request_failed',
+				sprintf(
+					/* translators: %s: error message */
+					__( 'Peppol Directory request failed: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+					$response->get_error_message()
+				)
+			);
+		}
+
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = wp_remote_retrieve_body( $response );
+
+		// 400 means the parameter value could not be converted to a valid identifier.
+		if ( 400 === $code ) {
+			return new \WP_Error(
+				'peppol_directory_invalid_participant',
+				__( 'The Peppol identifier is not valid for the directory search.', 'woocommerce-pdf-invoices-packing-slips' )
+			);
+		}
+
+		if ( 200 !== $code ) {
+			return new \WP_Error(
+				'peppol_directory_unexpected_status',
+				sprintf(
+					/* translators: %d: HTTP status code */
+					__( 'Peppol Directory returned an unexpected status code: %d', 'woocommerce-pdf-invoices-packing-slips' ),
+					$code
+				)
+			);
+		}
+
+		$data = json_decode( $body, true );
+
+		if ( null === $data || ! is_array( $data ) ) {
+			return new \WP_Error(
+				'peppol_directory_invalid_response',
+				__( 'Peppol Directory returned an invalid JSON response.', 'woocommerce-pdf-invoices-packing-slips' )
+			);
+		}
+
+		return $data;
+	}
+	
+	/**
+	 * Render Peppol Directory matches as a simple text list.
+	 *
+	 * @param array  $matches
+	 * @param string $endpoint
+	 * @return string HTML string.
+	 */
+	private function peppol_directory_render_matches_list( array $matches, string $endpoint ): string {
+		if ( empty( $matches ) ) {
+			return '';
+		}
+
+		ob_start();
+		?>
+		<p style="margin-top:5px;">
+			<?php
+				echo esc_html(
+					sprintf(
+						/* translators: %s: endpoint ID */
+						__( 'We found the following participant(s) related to "%s":', 'woocommerce-pdf-invoices-packing-slips' ),
+						$endpoint
+					)
+				);
+			?>
+		</p>
+		<ul class="wpo-edi-peppol-directory-result-list">
+			<?php foreach ( $matches as $match ) : ?>
+				<?php
+					$scheme = $match['scheme'] ?? '';
+					$value  = $match['value']  ?? '';
+					$name   = $match['name']   ?? '';
+				
+					$identifier = ! empty( $scheme )
+						? "$scheme:$value"
+						: $value;
+
+					if ( '' !== $name && '' !== $identifier ) {
+						$item = sprintf( '%1$s (%2$s)', $name, $identifier );
+					} elseif ( '' !== $identifier ) {
+						$item = $identifier;
+					} elseif ( '' !== $name ) {
+						$item = $name;
+					} else {
+						$item = '';
+					}
+
+					if ( '' === $item ) {
+						continue;
+					}
+				?>
+				<li><?php echo esc_html( $item ); ?></li>
+			<?php endforeach; ?>
+		</ul>
+		<?php
+
+		return (string) ob_get_clean();
 	}
 	
 }
