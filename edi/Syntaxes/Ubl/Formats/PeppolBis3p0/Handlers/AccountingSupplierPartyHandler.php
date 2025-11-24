@@ -165,9 +165,19 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		if ( ! array_key_exists( $legal_identifier_icd, $icd_schemes ) ) {
 			return null;
 		}
+		
+		$legal_identifier_value = $this->get_supplier_identifiers_data( $legal_identifier );
+		
+		if (
+			'vat_number' === $legal_identifier &&
+			! empty( $legal_identifier_value ) &&
+			\wpo_ips_edi_vat_number_has_country_prefix( $legal_identifier_value )
+		) {
+			$legal_identifier_value = substr( $legal_identifier_value, 2 );
+		}
 
 		return array(
-			'legal_identifier'     => $this->get_supplier_identifiers_data( $legal_identifier ),
+			'legal_identifier'     => $legal_identifier_value,
 			'legal_identifier_icd' => $legal_identifier_icd,
 		);
 	}

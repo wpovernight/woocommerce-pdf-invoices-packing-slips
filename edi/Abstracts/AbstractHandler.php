@@ -60,13 +60,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$language = 'default';
 		}
 
-		$value = $general_settings->get_setting( $key, $language ) ?: '';
-		
-		if ( 'vat_number' === $key && \wpo_ips_edi_vat_number_has_country_prefix( $value ) ) {
-			$value = substr( $value, 2 );
-		}
-		
-		return $value;
+		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
 	
 	/**
