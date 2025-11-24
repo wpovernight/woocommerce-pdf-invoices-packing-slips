@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 5.0.0-rc.2
+Stable tag: 5.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,16 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.0.0 (2025-11-24) =
+- New: Refactored E‑Documents Architecture for better EN16931 Compliance and Multi‑Format Support
+- New: Document filter functions replaced by new global functions
+- Tweak: Enhanced notice displayed when documents are unavailable in the preview
+- Tweak: Ensure script compatibility with WooCommerce 10.3
+- Fix: Extended currency symbol support in Bulk Actions
+- Fix: Harden debug tools AJAX handlers with capability checks and validation
+- Translations: Updated translation template (POT)
+- Tested: Tested up WordPress 6.9
 
 = 4.9.1 (2025-11-06) =
 - Fix: Fatal error when Credit Note passes Order Refund to `wpo_ips_order_has_local_pickup_method()`
