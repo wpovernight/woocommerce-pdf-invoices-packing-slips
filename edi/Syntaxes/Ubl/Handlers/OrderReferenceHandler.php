@@ -17,11 +17,25 @@ class OrderReferenceHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
+		$order = \wpo_ips_edi_get_parent_order( $this->document->order );
+
+		$sales_order_reference = (string) $order->get_id();
+
+		// UBL requires cac:OrderReference/cbc:ID to be present.
+		// Since we do not know the PO number by default, we use "NA".
+		$purchase_order_reference = 'NA';
+
 		$order_reference = array(
 			'name'  => 'cac:OrderReference',
 			'value' => array(
-				'name'  => 'cbc:ID',
-				'value' => $this->document->order->get_id(),
+				array(
+					'name'  => 'cbc:ID',
+					'value' => $purchase_order_reference,
+				),
+				array(
+					'name'  => 'cbc:SalesOrderID',
+					'value' => $sales_order_reference,
+				),
 			),
 		);
 
