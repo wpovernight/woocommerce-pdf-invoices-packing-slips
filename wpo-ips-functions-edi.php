@@ -602,6 +602,10 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		$legal_identifier_value  = $legal_identifier && ! empty( $data[ $language ][ $legal_identifier ]['value'] )
 			? $data[ $language ][ $legal_identifier ]['value']
 			: '';
+			
+		if ( 'vat_number' === $legal_identifier && wpo_ips_edi_vat_number_has_country_prefix( $legal_identifier_value ) ) {
+			$legal_identifier_value = substr( $legal_identifier_value, 2 );
+		}
 
 		$data[ $language ]['peppol_endpoint_id'] = array(
 			'label'    => __( 'PEPPOL Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),

@@ -742,7 +742,7 @@ class Admin {
 		}
 
 		// Peppol specific
-		echo $this->get_order_meta_box_peppol_identifiers( $order );
+		echo $this->get_order_meta_box_peppol_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		
 		if ( count( $meta_box_actions ) > 0 ) :
 		?>
