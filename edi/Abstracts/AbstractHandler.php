@@ -62,18 +62,30 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
+	
+	/**
+	 * Returns the due date for the document.
+	 *
+	 * @return string
+	 */
+	protected function get_due_date(): string {
+		$due_date = is_callable( array( $this->document->order_document, 'get_due_date' ) )
+			? $this->document->order_document->get_due_date()
+			: 0;
+			
+		return $this->normalize_date( $due_date, 'Y-m-d' );
+	}
 
 	/**
 	 * Returns the due date days for the document.
 	 *
 	 * @return int
 	 */
-	public function get_due_date_days(): int {
+	protected function get_due_date_days(): int {
 		return is_callable( array( $this->document->order_document, 'get_setting' ) )
 			? absint( $this->document->order_document->get_setting( 'due_date_days' ) )
 			: 0;
 	}
-
 
 	/**
 	 * Get normalized WooCommerce payment data for the current order.
@@ -615,5 +627,5 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $rows;
 	}
-
+	
 }

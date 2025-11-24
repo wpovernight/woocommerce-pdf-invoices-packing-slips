@@ -86,9 +86,17 @@ class Invoice extends AbstractUblFormat {
 				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\IssueDateHandler::class,
 			),
+			'due_date' => array(
+				'enabled' => false,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\DueDateHandler::class,
+			),
 			'type_code' => array(
 				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\TypeCodeHandler::class,
+			),
+			'note' => array(
+				'enabled' => false,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\NoteHandler::class,
 			),
 			'document_currency_code' => array(
 				'enabled' => true,
@@ -105,6 +113,14 @@ class Invoice extends AbstractUblFormat {
 			'billing_reference' => array(
 				'enabled' => false,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\BillingReferenceHandler::class,
+			),
+			'despatch_document_reference' => array(
+				'enabled' => false,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\DespatchDocumentReferenceHandler::class,
+			),
+			'receipt_document_reference' => array(
+				'enabled' => false,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\ReceiptDocumentReferenceHandler::class,
 			),
 			'additional_document_reference' => array(
 				'enabled' => true,
