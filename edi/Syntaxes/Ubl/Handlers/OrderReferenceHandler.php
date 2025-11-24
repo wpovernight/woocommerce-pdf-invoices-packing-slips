@@ -23,7 +23,7 @@ class OrderReferenceHandler extends AbstractUblHandler {
 
 		// UBL requires cac:OrderReference/cbc:ID to be present.
 		// Since we do not know the PO number by default, we use "NA".
-		$purchase_order_reference = 'NA';
+		$purchase_order_reference = apply_filters( 'wpo_ips_edi_ubl_order_reference_po_number', 'NA', $order, $this );
 
 		$order_reference = array(
 			'name'  => 'cac:OrderReference',
