@@ -547,24 +547,27 @@ class Frontend {
 				'validate_callback' => function ( $val ) use ( $input_mode ) {
 					$val        = preg_replace( '/\s+/', '', trim( (string) $val ) );
 					$has_scheme = ( false !== strpos( $val, ':' ) );
-					$result     = $this->peppol_directory_lookup( $val );
+
+					// Run lookup.
+					$result = $this->peppol_directory_lookup( $val );
 
 					if ( is_wp_error( $result ) ) {
-						if ( 'peppol_directory_invalid_participant' === $result->get_error_code() ) {
+						// Explicitly block only when the endpoint itself is empty.
+						if ( 'peppol_empty_endpoint' === $result->get_error_code() ) {
 							return new \WP_Error(
-								'peppol_directory_invalid_participant',
-								__( 'The Peppol identifier is not valid for the directory search.', 'woocommerce-pdf-invoices-packing-slips' )
+								'peppol_empty_endpoint',
+								__( 'Peppol Endpoint ID is empty.', 'woocommerce-pdf-invoices-packing-slips' )
 							);
 						}
 
-						// Request failed (network, etc.), do not block checkout.
+						// For response errors we do not block checkout.
 						return true;
 					}
 
-					$matches       = isset( $result['matches'] ) && is_array( $result['matches'] ) ? $result['matches'] : array();
-					$search_meta   = isset( $result['search'] ) && is_array( $result['search'] ) ? $result['search'] : array();
-					$used_fallback = ! empty( $search_meta['used_fallback'] );
+					$matches     = isset( $result['matches'] ) && is_array( $result['matches'] ) ? $result['matches'] : array();
+					$search_meta = isset( $result['search'] ) && is_array( $result['search'] ) ? $result['search'] : array();
 
+					$used_fallback = ! empty( $search_meta['used_fallback'] );
 					$directory_url = 'https://directory.peppol.eu/';
 
 					/**
@@ -585,6 +588,7 @@ class Frontend {
 						);
 
 						if ( ! empty( $matches ) ) {
+							// Uses only match["value"] and match["name"], no scheme.
 							$message .= $this->peppol_directory_render_matches_list( $matches, $val );
 						}
 
@@ -598,7 +602,7 @@ class Frontend {
 					 * Case 2: Scheme + value provided.
 					 */
 
-					// No matches at all (for scheme+value or fallback).
+					// No matches at all (for full query and fallback).
 					if ( empty( $matches ) ) {
 						$message = sprintf(
 							/* translators: 1: entered identifier, 2: Peppol Directory URL */
@@ -616,13 +620,13 @@ class Frontend {
 						);
 					}
 
-					// If we did not use fallback, it means scheme+value produced matches, accept silently.
+					// If we did not use fallback, it means the full "scheme:value" query found matches, accept silently.
 					if ( ! $used_fallback ) {
 						return true;
 					}
 
-					// We used fallback (value-only), so scheme+value had no hits.
-					// Show alternatives and warn about possible wrong scheme.
+					// We used fallback (value-only), so "scheme:value" had no hits.
+					// Show alternatives based on value-only search and warn about possible wrong scheme.
 					$message  = sprintf(
 						/* translators: 2: Peppol Directory URL */
 						__(
@@ -1029,10 +1033,10 @@ class Frontend {
 	}
 	
 	/**
-	 * Query the Peppol Directory for an additional identifier.
+	 * Query the Peppol Directory for an endpoint.
 	 *
-	 * @param string $endpoint_id Additional identifier in "scheme:value" or "value" format.
-	 * @return array|\WP_Error Normalized array of matches on success, or WP_Error on failure.
+	 * @param string $endpoint_id
+	 * @return array|\WP_Error
 	 */
 	private function peppol_directory_lookup( string $endpoint_id ) {
 		$endpoint_id = trim( (string) $endpoint_id );
@@ -1044,115 +1048,75 @@ class Frontend {
 			);
 		}
 
-		$identifier_scheme = '';
-		$identifier_value  = '';
+		$has_colon      = ( false !== strpos( $endpoint_id, ':' ) );
+		$primary_query  = $endpoint_id;
+		$fallback_query = '';
+		$used_fallback  = false;
 
-		// "scheme:value" format.
-		if ( false !== strpos( $endpoint_id, ':' ) ) {
-			list( $identifier_scheme, $identifier_value ) = explode( ':', $endpoint_id, 2 );
-
-			$identifier_scheme = trim( $identifier_scheme );
-			$identifier_value  = trim( $identifier_value );
-		} else {
-			// Only a value was provided.
-			$identifier_value = $endpoint_id;
+		// If we have "scheme:value", fallback query will be just "value".
+		if ( $has_colon ) {
+			list( , $fallback_query ) = explode( ':', $endpoint_id, 2 );
+			$fallback_query = trim( $fallback_query );
 		}
 
-		$data          = null;
-		$used_fallback = false;
+		// First attempt: full query (can be scheme:value, value, or name).
+		$data = $this->peppol_directory_request( $primary_query );
 
-		// First attempt: scheme + value (if both are present).
-		if ( '' !== $identifier_scheme && '' !== $identifier_value ) {
-			$data = $this->peppol_directory_request(
-				array(
-					'identifierScheme' => $identifier_scheme,
-					'identifierValue'  => $identifier_value,
-				)
-			);
-
-			if ( is_wp_error( $data ) ) {
-				// Error, do not fallback, just return the error.
-				return $data;
-			}
-
-			$matches_first = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
-
-			// If we got matches, use them and skip fallback.
-			if ( ! empty( $matches_first ) ) {
-				$used_fallback = false;
-			} else {
-				// No matches for scheme + value, we will try value-only.
-				$data = null;
-			}
+		if ( is_wp_error( $data ) ) {
+			return $data;
 		}
 
-		// Fallback: only identifierValue (if we either had no scheme or no matches above).
-		if ( null === $data ) {
-			if ( '' === $identifier_value ) {
-				// Should not normally happen, but guard anyway.
-				return new \WP_Error(
-					'peppol_directory_invalid_participant',
-					__( 'The Peppol identifier is not valid for the directory search.', 'woocommerce-pdf-invoices-packing-slips' )
-				);
-			}
+		$matches = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
 
-			$data = $this->peppol_directory_request(
-				array(
-					'identifierValue' => $identifier_value,
-				)
-			);
+		// Fallback: if we had "scheme:value" and got no matches, try "value" only.
+		if ( $has_colon && empty( $matches ) && '' !== $fallback_query ) {
+			$data = $this->peppol_directory_request( $fallback_query );
 
 			if ( is_wp_error( $data ) ) {
 				return $data;
 			}
 
+			$matches      = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
 			$used_fallback = true;
 		}
 
-		// At this point $data is a valid array response from one of the two calls.
-		$matches            = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
 		$normalized_matches = array();
 
 		foreach ( $matches as $match ) {
-			$participant_value  = $match['participantID']['value'] ?? '';
-			$participant_scheme = '';
-			$identifier_value   = '';
-
-			// Always derive scheme and value by splitting the participant value itself.
-			if ( false !== strpos( $participant_value, ':' ) ) {
-				list( $participant_scheme, $identifier_value ) = explode( ':', $participant_value, 2 );
-			} else {
-				$identifier_value = $participant_value;
-			}
-
-			$full_id    = $participant_value;
+			$participant_value = $match['participantID']['value'] ?? '';
 
 			$entity     = isset( $match['entities'][0] ) && is_array( $match['entities'][0] ) ? $match['entities'][0] : array();
 			$name_entry = isset( $entity['name'][0] ) && is_array( $entity['name'][0] ) ? $entity['name'][0] : array();
 
-			$name       = $name_entry['name']     ?? '';
-			$language   = $name_entry['language'] ?? '';
-			$country    = $entity['countryCode']  ?? '';
-			$reg_date   = $entity['regDate']      ?? '';
+			$name     = $name_entry['name'] ?? '';
+			$language = $name_entry['language'] ?? '';
+			$country  = $entity['countryCode'] ?? '';
+			$reg_date = $entity['regDate'] ?? '';
 
-			$doc_types = array();
-			if ( ! empty( $match['docTypes'] ) && is_array( $match['docTypes'] ) ) {
-				foreach ( $match['docTypes'] as $doc_type ) {
-					if ( isset( $doc_type['value'] ) ) {
-						$doc_types[] = $doc_type['value'];
+			// Collect all identifier values we can find (participant + entity identifiers).
+			$identifier_values = array();
+
+			if ( '' !== $participant_value ) {
+				$identifier_values[] = $participant_value;
+			}
+
+			if ( ! empty( $entity['identifiers'] ) && is_array( $entity['identifiers'] ) ) {
+				foreach ( $entity['identifiers'] as $identifier ) {
+					if ( ! empty( $identifier['value'] ) ) {
+						$identifier_values[] = $identifier['value'];
 					}
 				}
 			}
 
+			$identifier_values = array_values( array_unique( $identifier_values ) );
+
 			$normalized_matches[] = array(
-				'id'        => $full_id,
-				'scheme'    => $participant_scheme,
-				'value'     => $identifier_value,
-				'name'      => $name,
-				'language'  => $language,
-				'country'   => $country,
-				'reg_date'  => $reg_date,
-				'doc_types' => $doc_types,
+				'value'       => $participant_value,
+				'identifiers' => $identifier_values,
+				'name'        => $name,
+				'language'    => $language,
+				'country'     => $country,
+				'reg_date'    => $reg_date,
 			);
 		}
 
@@ -1160,23 +1124,26 @@ class Frontend {
 			'total'   => isset( $data['total-result-count'] ) ? (int) $data['total-result-count'] : count( $normalized_matches ),
 			'matches' => $normalized_matches,
 			'search'  => array(
-				'identifier_scheme' => $identifier_scheme,
-				'identifier_value'  => $identifier_value,
-				'used_fallback'     => $used_fallback,
+				'query'          => $primary_query,
+				'fallback_query' => $fallback_query,
+				'used_fallback'  => $used_fallback,
 			),
 		);
 	}
 	
 	/**
-	 * Perform a Peppol Directory request and return decoded data.
+	 * Perform a Peppol Directory request using the generic "q" parameter.
 	 *
-	 * @param array $query_args
+	 * @param string $query
 	 * @return array|\WP_Error
 	 */
-	private function peppol_directory_request( array $query_args ) {
+	private function peppol_directory_request( string $query ) {
 		$base_url = 'https://directory.peppol.eu/search/1.0/json';
 
-		$query_args['beautify'] = 'true';
+		$query_args = array(
+			'q'        => $query,
+			'beautify' => 'true',
+		);
 
 		$url = add_query_arg( $query_args, $base_url );
 
@@ -1200,14 +1167,6 @@ class Frontend {
 
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = wp_remote_retrieve_body( $response );
-
-		// 400 means the parameter value could not be converted to a valid identifier.
-		if ( 400 === $code ) {
-			return new \WP_Error(
-				'peppol_directory_invalid_participant',
-				__( 'The Peppol identifier is not valid for the directory search.', 'woocommerce-pdf-invoices-packing-slips' )
-			);
-		}
 
 		if ( 200 !== $code ) {
 			return new \WP_Error(
@@ -1257,7 +1216,7 @@ class Frontend {
 				);
 			?>
 		</p>
-		<ul class="wpo-edi-peppol-directory-result-list">
+		<ul class="wpo-ips-edi-peppol-directory-result-list">
 			<?php foreach ( $matches as $match ) : ?>
 				<?php
 					$scheme = $match['scheme'] ?? '';
