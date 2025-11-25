@@ -1122,12 +1122,12 @@ class Frontend {
 			$participant_value = $match['participantID']['value'] ?? '';
 
 			$entity     = isset( $match['entities'][0] ) && is_array( $match['entities'][0] ) ? $match['entities'][0] : array();
-			$name_entry = isset( $entity['name'][0] ) && is_array( $entity['name'][0] ) ? $entity['name'][0] : array();
+			$name_entry = isset( $entity['name'][0] )    && is_array( $entity['name'][0] )    ? $entity['name'][0]    : array();
 
-			$name     = $name_entry['name'] ?? '';
+			$name     = $name_entry['name']     ?? '';
 			$language = $name_entry['language'] ?? '';
-			$country  = $entity['countryCode'] ?? '';
-			$reg_date = $entity['regDate'] ?? '';
+			$country  = $entity['countryCode']  ?? '';
+			$reg_date = $entity['regDate']      ?? '';
 
 			// Collect all identifier values we can find (participant + entity identifiers).
 			$identifier_values = array();
