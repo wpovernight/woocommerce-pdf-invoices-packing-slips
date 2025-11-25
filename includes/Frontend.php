@@ -544,104 +544,14 @@ class Frontend {
 				'sanitize_callback' => function ( $val ) {
 					return preg_replace( '/\s+/', '', trim( (string) $val ) );
 				},
-				'validate_callback' => function ( $val ) use ( $input_mode ) {
-					$val        = preg_replace( '/\s+/', '', trim( (string) $val ) );
-					$has_scheme = ( false !== strpos( $val, ':' ) );
-
-					// Run lookup.
-					$result = $this->peppol_directory_lookup( $val );
+				'validate_callback' => function ( $val ) {
+					$result = $this->peppol_validate_identifier_value( $val );
 
 					if ( is_wp_error( $result ) ) {
-						// Explicitly block only when the endpoint itself is empty.
-						if ( 'peppol_empty_endpoint' === $result->get_error_code() ) {
-							return new \WP_Error(
-								'peppol_empty_endpoint',
-								__( 'Peppol Endpoint ID is empty.', 'woocommerce-pdf-invoices-packing-slips' )
-							);
-						}
-
-						// For response errors we do not block checkout.
-						return true;
+						return $result;
 					}
 
-					$matches     = isset( $result['matches'] ) && is_array( $result['matches'] ) ? $result['matches'] : array();
-					$search_meta = isset( $result['search'] ) && is_array( $result['search'] ) ? $result['search'] : array();
-
-					$used_fallback = ! empty( $search_meta['used_fallback'] );
-					$directory_url = 'https://directory.peppol.eu/';
-
-					/**
-					 * Case 1: No scheme provided (no ":").
-					 *
-					 * We always warn that the scheme is required, but we still show any found
-					 * participants as hints.
-					 */
-					if ( ! $has_scheme ) {
-						$message = sprintf(
-							/* translators: 1: entered identifier, 2: Peppol Directory URL */
-							__(
-								'The identifier "%1$s" was found without a scheme. Please enter it in "scheme:value" format. You can search for the correct scheme and identifier in the <a href="%2$s" target="_blank" rel="noopener noreferrer">Peppol Directory</a>.',
-								'woocommerce-pdf-invoices-packing-slips'
-							),
-							esc_html( $val ),
-							esc_url( $directory_url )
-						);
-
-						if ( ! empty( $matches ) ) {
-							// Uses only match["value"] and match["name"], no scheme.
-							$message .= $this->peppol_directory_render_matches_list( $matches, $val );
-						}
-
-						return new \WP_Error(
-							'peppol_directory_scheme_required',
-							$message
-						);
-					}
-
-					/**
-					 * Case 2: Scheme + value provided.
-					 */
-
-					// No matches at all (for full query and fallback).
-					if ( empty( $matches ) ) {
-						$message = sprintf(
-							/* translators: 1: entered identifier, 2: Peppol Directory URL */
-							__(
-								'No Peppol participant was found for "%1$s". Please confirm the scheme and identifier in the <a href="%2$s" target="_blank" rel="noopener noreferrer">Peppol Directory</a>.',
-								'woocommerce-pdf-invoices-packing-slips'
-							),
-							esc_html( $val ),
-							esc_url( $directory_url )
-						);
-
-						return new \WP_Error(
-							'peppol_directory_no_match',
-							$message
-						);
-					}
-
-					// If we did not use fallback, it means the full "scheme:value" query found matches, accept silently.
-					if ( ! $used_fallback ) {
-						return true;
-					}
-
-					// We used fallback (value-only), so "scheme:value" had no hits.
-					// Show alternatives based on value-only search and warn about possible wrong scheme.
-					$message  = sprintf(
-						/* translators: 2: Peppol Directory URL */
-						__(
-							'We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the <a href="%2$s" target="_blank" rel="noopener noreferrer">Peppol Directory</a>. Below are participants found for this identifier value:',
-							'woocommerce-pdf-invoices-packing-slips'
-						),
-						esc_html( $val ),
-						esc_url( $directory_url )
-					);
-					$message .= $this->peppol_directory_render_matches_list( $matches, $val );
-
-					return new \WP_Error(
-						'peppol_directory_similar_found',
-						$message
-					);
+					return true;
 				},
 			)
 		);
@@ -980,18 +890,15 @@ class Frontend {
 			return;
 		}
 		
-		$input_mode    = wpo_ips_edi_peppol_identifier_input_mode();
-		$message_pairs = array(
-			'peppol_endpoint_id'      => __( 'Peppol Endpoint ID must be in scheme:identifier format (e.g. 0088:123456789).', 'woocommerce-pdf-invoices-packing-slips' ),
-			//'peppol_legal_identifier' => __( 'Legal Identifier must be in scheme:identifier format (e.g. 0208:1234567890).', 'woocommerce-pdf-invoices-packing-slips' ),
-		);
-		
-		foreach ( $message_pairs as $key => $message ) {
-			if ( ! empty( $data[ $key ] ) && 'full' === $input_mode && false === strpos( $data[ $key ], ':' ) ) {
+		// Endpoint ID
+		if ( ! empty( $data['peppol_endpoint_id'] ) ) {
+			$result = $this->peppol_validate_identifier_value( $data['peppol_endpoint_id'] );
+
+			if ( is_wp_error( $result ) ) {
 				$errors->add(
-					'invalid_' . $key,
-					esc_html( $message ),
-					array( 'id' => $key )
+					$result->get_error_code(),
+					$result->get_error_message(),
+					array( 'id' => 'peppol_endpoint_id' )
 				);
 			}
 		}
@@ -1030,6 +937,135 @@ class Frontend {
 		}
 		
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $data );
+	}
+	
+	/**
+	 * Validate a Peppol identifier value.
+	 *
+	 * @param string $raw_value Raw user input.
+	 * @return true|\WP_Error True if valid or should be accepted, WP_Error if invalid.
+	 */
+	private function peppol_validate_identifier_value( string $raw_value ) {
+		$val = preg_replace( '/\s+/', '', trim( (string) $raw_value ) );
+
+		// Let "required" or other validation handle this elsewhere.
+		if ( '' === $val ) {
+			return true;
+		}
+
+		$input_mode               = wpo_ips_edi_peppol_identifier_input_mode();
+		$has_scheme               = ( false !== strpos( $val, ':' ) );
+		$use_directory_validation = (bool) wpo_ips_edi_get_settings( 'peppol_directory_validation' );
+		$directory_url            = 'https://directory.peppol.eu/';
+
+		// If input mode is not "full", we do not enforce "scheme:value" here.
+		if ( 'full' !== $input_mode ) {
+			return true;
+		}
+
+		// Directory validation disabled
+		if ( ! $use_directory_validation ) {
+			if ( ! $has_scheme ) {
+				return new \WP_Error(
+					'peppol_format_invalid',
+					__( 'The identifier must be in "scheme:value" format (for example 0088:123456789).', 'woocommerce-pdf-invoices-packing-slips' )
+				);
+			}
+
+			return true;
+		}
+
+		// Directory validation enabled
+		$result = $this->peppol_directory_lookup( $val );
+
+		if ( is_wp_error( $result ) ) {
+			if ( 'peppol_empty_endpoint' === $result->get_error_code() ) {
+				return new \WP_Error(
+					'peppol_empty_endpoint',
+					__( 'Peppol Endpoint ID is empty.', 'woocommerce-pdf-invoices-packing-slips' )
+				);
+			}
+
+			// Network/response errors: do not block checkout.
+			return true;
+		}
+
+		$matches     = isset( $result['matches'] ) && is_array( $result['matches'] ) ? $result['matches'] : array();
+		$search_meta = isset( $result['search'] ) && is_array( $result['search'] ) ? $result['search'] : array();
+
+		$used_fallback = ! empty( $search_meta['used_fallback'] );
+
+		/**
+		 * No scheme provided (no ":").
+		 *
+		 * We always warn that the scheme is required, but still show any found
+		 * participants as hints.
+		 */
+		if ( ! $has_scheme ) {
+			$message = sprintf(
+				/* translators: 1: entered identifier, 2: Peppol Directory URL */
+				__(
+					'The identifier "%1$s" was found without a scheme. Please enter it in "scheme:value" format. You can search for the correct scheme and identifier in the %2$s.',
+					'woocommerce-pdf-invoices-packing-slips'
+				),
+				esc_html( $val ),
+				'<a href="' . esc_url( $directory_url ) . '" target="_blank" rel="noopener noreferrer">' . __( 'Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+			);
+
+			if ( ! empty( $matches ) ) {
+				$message .= $this->peppol_directory_render_matches_list( $matches, $val );
+			}
+
+			return new \WP_Error(
+				'peppol_directory_scheme_required',
+				$message
+			);
+		}
+
+		/**
+		 * Scheme + value provided.
+		 */
+
+		// No matches at all (for full query and fallback).
+		if ( empty( $matches ) ) {
+			$message = sprintf(
+				/* translators: 1: entered identifier, 2: Peppol Directory URL */
+				__(
+					'No Peppol participant was found for "%1$s". Please confirm the scheme and identifier in the %2$s.',
+					'woocommerce-pdf-invoices-packing-slips'
+				),
+				esc_html( $val ),
+				'<a href="' . esc_url( $directory_url ) . '" target="_blank" rel="noopener noreferrer">' . __( 'Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+			);
+
+			return new \WP_Error(
+				'peppol_directory_no_match',
+				$message
+			);
+		}
+
+		// If we did not use fallback, the full "scheme:value" query found matches, accept silently.
+		if ( ! $used_fallback ) {
+			return true;
+		}
+
+		// We used fallback (value-only), so "scheme:value" had no hits.
+		// Show alternatives based on value-only search and warn about possible wrong scheme.
+		$message  = sprintf(
+			/* translators: 1: entered identifier, 2: Peppol Directory URL */
+			__(
+				'We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:',
+				'woocommerce-pdf-invoices-packing-slips'
+			),
+			esc_html( $val ),
+			'<a href="' . esc_url( $directory_url ) . '" target="_blank" rel="noopener noreferrer">' . __( 'Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+		);
+		$message .= $this->peppol_directory_render_matches_list( $matches, $val );
+
+		return new \WP_Error(
+			'peppol_directory_similar_found',
+			$message
+		);
 	}
 	
 	/**

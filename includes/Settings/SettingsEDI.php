@@ -382,6 +382,29 @@ class SettingsEDI {
 			),
 		);
 		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_directory_validation',
+			'title'    => '',
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'title'       => __( 'Validate Endpoint with Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name' => $option_name,
+				'id'          => 'peppol_directory_validation',
+				'description' => __(
+					'Check the customer Peppol Endpoint ID against the Peppol Directory during checkout and display a warning when no matching participant is found.',
+					'woocommerce-pdf-invoices-packing-slips'
+				),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => wp_json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
+				),
+			),
+		);
+		
 		$languages = wpo_wcpdf_get_multilingual_languages();
 
 		if ( count( $languages ) > 0 ) {
