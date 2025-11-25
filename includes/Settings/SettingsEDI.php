@@ -390,11 +390,11 @@ class SettingsEDI {
 			'callback' => 'checkbox',
 			'section'  => $section,
 			'args'     => array(
-				'title'       => __( 'Validate Endpoint with Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'       => __( 'Validate customer Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name' => $option_name,
 				'id'          => 'peppol_directory_validation',
 				'description' => __(
-					'Check the customer Peppol Endpoint ID against the Peppol Directory during checkout and display a warning when no matching participant is found.',
+					'When enabled, the customer Peppol Endpoint ID entered at checkout is validated against the Peppol Directory. If no matching participant is found, an error is shown so the value can be corrected.',
 					'woocommerce-pdf-invoices-packing-slips'
 				),
 				'custom_attributes' => array(
