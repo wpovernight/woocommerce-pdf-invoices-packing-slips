@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 5.0.0
+Stable tag: 5.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.1.0 (2025-11-25) =
+- New: Add setting to validate customer Peppol Endpoint ID during checkout
+- Fix: Ensure Buyer VAT identifier includes country prefix in E-Documents
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.4
 
 = 5.0.0 (2025-11-24) =
 - New: Refactored E‑Documents Architecture for better EN16931 Compliance and Multi‑Format Support

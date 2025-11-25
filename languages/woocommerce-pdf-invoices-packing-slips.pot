@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.0.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-11-24T11:35:43+00:00\n"
+"POT-Creation-Date: 2025-11-25T09:40:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -75,7 +75,7 @@ msgid "Services outside scope of tax"
 msgstr ""
 
 #: edi/Standards/EN16931.php:50
-#: includes/Settings/SettingsEDI.php:744
+#: includes/Settings/SettingsEDI.php:767
 msgid "Standard rate"
 msgstr ""
 
@@ -2419,19 +2419,19 @@ msgstr ""
 #: includes/Admin.php:2078
 #: includes/Admin.php:2121
 #: includes/Assets.php:337
-#: includes/Settings/SettingsEDI.php:663
+#: includes/Settings/SettingsEDI.php:686
 msgid "Missing"
 msgstr ""
 
 #: includes/Admin.php:2079
 #: includes/Admin.php:2122
 #: includes/Assets.php:338
-#: includes/Settings/SettingsEDI.php:664
+#: includes/Settings/SettingsEDI.php:687
 msgid "Optional"
 msgstr ""
 
 #: includes/Admin.php:2089
-#: includes/Settings/SettingsEDI.php:672
+#: includes/Settings/SettingsEDI.php:695
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
@@ -2569,12 +2569,12 @@ msgid "<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools."
 msgstr ""
 
 #: includes/Assets.php:333
-#: includes/Settings/SettingsEDI.php:868
-#: includes/Settings/SettingsEDI.php:878
-#: includes/Settings/SettingsEDI.php:888
-#: includes/Settings/SettingsEDI.php:986
-#: includes/Settings/SettingsEDI.php:990
-#: includes/Settings/SettingsEDI.php:994
+#: includes/Settings/SettingsEDI.php:891
+#: includes/Settings/SettingsEDI.php:901
+#: includes/Settings/SettingsEDI.php:911
+#: includes/Settings/SettingsEDI.php:1009
+#: includes/Settings/SettingsEDI.php:1013
+#: includes/Settings/SettingsEDI.php:1017
 msgid "Code"
 msgstr ""
 
@@ -3149,7 +3149,7 @@ msgstr ""
 
 #: includes/Frontend.php:386
 #: includes/Frontend.php:541
-#: includes/Frontend.php:775
+#: includes/Frontend.php:778
 #: includes/Settings/SettingsEDI.php:209
 msgid "Peppol Endpoint ID"
 msgstr ""
@@ -3170,18 +3170,18 @@ msgid "If you don't know the ID, you can search for it in the %1$sPeppol Directo
 msgstr ""
 
 #: includes/Frontend.php:411
-#: includes/Frontend.php:784
+#: includes/Frontend.php:787
 #: includes/Settings/SettingsEDI.php:238
 msgid "Peppol Endpoint Scheme (EAS)"
 msgstr ""
 
 #: includes/Frontend.php:413
 #: includes/Frontend.php:465
-#: includes/Frontend.php:788
+#: includes/Frontend.php:791
 #: includes/Settings/SettingsEDI.php:242
 #: includes/Settings/SettingsEDI.php:278
 #: includes/Settings/SettingsEDI.php:312
-#: includes/Settings/SettingsEDI.php:1092
+#: includes/Settings/SettingsEDI.php:1115
 #: views/advanced-tools.php:273
 #: views/advanced-tools.php:321
 msgid "Select"
@@ -3241,20 +3241,67 @@ msgstr ""
 msgid "Peppol settings saved."
 msgstr ""
 
-#: includes/Frontend.php:549
-msgid "Use scheme:identifier format."
-msgstr ""
-
-#: includes/Frontend.php:561
+#: includes/Frontend.php:564
 msgid "Endpoint Scheme (EAS)"
 msgstr ""
 
-#: includes/Frontend.php:574
+#: includes/Frontend.php:577
 msgid "Invalid Endpoint Scheme."
 msgstr ""
 
-#: includes/Frontend.php:892
-msgid "Peppol Endpoint ID must be in scheme:identifier format (e.g. 0088:123456789)."
+#: includes/Frontend.php:971
+msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
+msgstr ""
+
+#: includes/Frontend.php:985
+#: includes/Frontend.php:1083
+msgid "Peppol Endpoint ID is empty."
+msgstr ""
+
+#. translators: 1: entered identifier, 2: Peppol Directory URL
+#: includes/Frontend.php:1007
+#, php-format
+msgid "The identifier \"%1$s\" was found without a scheme. Please enter it in \"scheme:value\" format. You can search for the correct scheme and identifier in the %2$s."
+msgstr ""
+
+#: includes/Frontend.php:1012
+#: includes/Frontend.php:1038
+#: includes/Frontend.php:1061
+msgid "Peppol Directory"
+msgstr ""
+
+#. translators: 1: entered identifier, 2: Peppol Directory URL
+#: includes/Frontend.php:1033
+#, php-format
+msgid "No Peppol participant was found for \"%1$s\". Please confirm the scheme and identifier in the %2$s."
+msgstr ""
+
+#. translators: 1: entered identifier, 2: Peppol Directory URL
+#: includes/Frontend.php:1056
+#, php-format
+msgid "We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:"
+msgstr ""
+
+#. translators: %s: error message
+#: includes/Frontend.php:1198
+#, php-format
+msgid "Peppol Directory request failed: %s"
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/Frontend.php:1212
+#, php-format
+msgid "Peppol Directory returned an unexpected status code: %d"
+msgstr ""
+
+#: includes/Frontend.php:1223
+msgid "Peppol Directory returned an invalid JSON response."
+msgstr ""
+
+#. translators: %s: endpoint ID
+#: includes/Frontend.php:1249
+#, php-format
+msgid "We found the following participant(s) related to \"%s\":"
 msgstr ""
 
 #: includes/Main.php:356
@@ -3428,7 +3475,7 @@ msgid "Upgrade"
 msgstr ""
 
 #: includes/Settings.php:274
-#: includes/Settings/SettingsEDI.php:584
+#: includes/Settings/SettingsEDI.php:607
 msgid "Order not found!"
 msgstr ""
 
@@ -3546,7 +3593,7 @@ msgid "Extensions' license cache cleared successfully!"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:351
-#: includes/Settings/SettingsEDI.php:604
+#: includes/Settings/SettingsEDI.php:627
 msgid "Invalid request."
 msgstr ""
 
@@ -4226,195 +4273,203 @@ msgstr ""
 msgid "The Legal Entity Identifier is shown in My Account only. The Endpoint Identifier follows the option selected above."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:391
+#: includes/Settings/SettingsEDI.php:393
+msgid "Validate customer Endpoint ID"
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:396
+msgid "When enabled, the customer Peppol Endpoint ID entered at checkout is validated against the Peppol Directory. If no matching participant is found, an error is shown so the value can be corrected."
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:414
 msgid "Supplier Identifiers Language"
 msgstr ""
 
 #. translators: %1$s: open link anchor, %2$s: close link anchor
-#: includes/Settings/SettingsEDI.php:400
+#: includes/Settings/SettingsEDI.php:423
 #, php-format
 msgid "Select the language for the supplier identifiers data. This option is available because multilingual support is enabled. You can check the currently available data %1$shere%2$s."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:415
+#: includes/Settings/SettingsEDI.php:438
 msgid "Embed Encrypted PDF"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:418
+#: includes/Settings/SettingsEDI.php:441
 msgid "Embed the encrypted PDF invoice file within the e-document."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:429
+#: includes/Settings/SettingsEDI.php:452
 msgid "Send Attachments"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:435
+#: includes/Settings/SettingsEDI.php:458
 msgid "When sending a document by e-mail, automatically include the electronic version attachment along with the PDF."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:442
+#: includes/Settings/SettingsEDI.php:465
 msgid "Include Item Meta Data"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:450
+#: includes/Settings/SettingsEDI.php:473
 msgid "Include item meta data in the e-document."
 msgstr ""
 
 #. translators: 1: opening link tag, 2: closing link tag
-#: includes/Settings/SettingsEDI.php:453
+#: includes/Settings/SettingsEDI.php:476
 #, php-format
 msgid "Advanced customization is possible, see the %1$sdocumentation page%2$s for details."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:464
+#: includes/Settings/SettingsEDI.php:487
 msgid "Enable XML Preview"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:470
+#: includes/Settings/SettingsEDI.php:493
 msgid "Enable the XML preview for electronic documents."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:477
+#: includes/Settings/SettingsEDI.php:500
 msgid "Enable Debug Logs"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:483
+#: includes/Settings/SettingsEDI.php:506
 msgid "Enable logging for debugging purposes."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:571
-#: includes/Settings/SettingsEDI.php:622
+#: includes/Settings/SettingsEDI.php:594
+#: includes/Settings/SettingsEDI.php:645
 #: includes/Settings/SettingsGeneral.php:764
 msgid "Invalid nonce."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:578
+#: includes/Settings/SettingsEDI.php:601
 msgid "Order ID is required."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:612
+#: includes/Settings/SettingsEDI.php:635
 msgid "Tax settings saved successfully."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:649
+#: includes/Settings/SettingsEDI.php:672
 msgid "Supplier"
 msgstr ""
 
 #. translators: General settings link
-#: includes/Settings/SettingsEDI.php:685
+#: includes/Settings/SettingsEDI.php:708
 #, php-format
 msgid "Missing details can be completed in the %s."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:686
+#: includes/Settings/SettingsEDI.php:709
 #: includes/Settings/SettingsGeneral.php:577
 msgid "Shop Information"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:706
+#: includes/Settings/SettingsEDI.php:729
 msgid "Customer"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:711
+#: includes/Settings/SettingsEDI.php:734
 msgid "Order ID"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:712
+#: includes/Settings/SettingsEDI.php:735
 msgid "Search"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:719
+#: includes/Settings/SettingsEDI.php:742
 msgid "Retrieve customer identifiers by loading an order."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:774
+#: includes/Settings/SettingsEDI.php:797
 msgid "To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:786
+#: includes/Settings/SettingsEDI.php:809
 msgid "Save Taxes"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:843
+#: includes/Settings/SettingsEDI.php:866
 msgid "Configure default tax classifications"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:846
+#: includes/Settings/SettingsEDI.php:869
 msgid "These defaults will be applied when \"Default\" is selected for individual tax rates."
 msgstr ""
 
 #. translators: %1$s: open link anchor, %2$s: close link anchor
-#: includes/Settings/SettingsEDI.php:856
+#: includes/Settings/SettingsEDI.php:879
 #, php-format
 msgid "For more information on setting up the tax table, please see our %1$sarticle%2$s."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:864
+#: includes/Settings/SettingsEDI.php:887
 msgid "Tax Scheme"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:874
+#: includes/Settings/SettingsEDI.php:897
 msgid "Tax Category"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:884
-#: includes/Settings/SettingsEDI.php:934
+#: includes/Settings/SettingsEDI.php:907
+#: includes/Settings/SettingsEDI.php:957
 msgid "Reason"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:927
+#: includes/Settings/SettingsEDI.php:950
 msgid "Country code"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:928
+#: includes/Settings/SettingsEDI.php:951
 msgid "State code"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:929
+#: includes/Settings/SettingsEDI.php:952
 msgid "Postcode / ZIP"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:930
+#: includes/Settings/SettingsEDI.php:953
 #: wpo-ips-functions-edi.php:565
 #: wpo-ips-functions-edi.php:659
 msgid "City"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:931
+#: includes/Settings/SettingsEDI.php:954
 msgid "Rate"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:932
+#: includes/Settings/SettingsEDI.php:955
 msgid "Scheme"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:933
+#: includes/Settings/SettingsEDI.php:956
 msgid "Category"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:935
+#: includes/Settings/SettingsEDI.php:958
 msgid "Remarks"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1010
+#: includes/Settings/SettingsEDI.php:1033
 msgid "No taxes found for this class."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1026
+#: includes/Settings/SettingsEDI.php:1049
 msgid "Send your documents through supported delivery networks directly from the plugin."
 msgstr ""
 
 #. translators: %1$s: open link anchor, %2$s: close link anchor
-#: includes/Settings/SettingsEDI.php:1032
+#: includes/Settings/SettingsEDI.php:1055
 #, php-format
 msgid "This feature will be available soon. If you'd like to learn more or request early access, please %1$scontact us%2$s."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1069
+#: includes/Settings/SettingsEDI.php:1092
 msgid "Default"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1080
+#: includes/Settings/SettingsEDI.php:1103
 msgid "None"
 msgstr ""
 
