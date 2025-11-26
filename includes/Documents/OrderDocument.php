@@ -1267,8 +1267,12 @@ abstract class OrderDocument {
 		if ( $attachment_id > 0 ) {
 			$company         = $this->get_shop_name();
 			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
-			$attachment_path = wp_normalize_path( realpath( get_attached_file( $attachment_id ) ) );
-			$src             = apply_filters( 'wpo_wcpdf_use_path', true ) ? $attachment_path : $attachment_src;
+			$attachment_file = get_attached_file( $attachment_id );
+			$attachment_path = $attachment_file ? wp_normalize_path( realpath( $attachment_file ) ) : '';
+
+			$use_path = apply_filters( 'wpo_wcpdf_use_path', true );
+
+			$src = ( $use_path && ! empty( $attachment_path ) ) ? $attachment_path : $attachment_src;
 
 			if ( empty( $src ) ) {
 				wcpdf_log_error( 'Header logo file not found.', 'critical' );
@@ -1276,7 +1280,7 @@ abstract class OrderDocument {
 			}
 
 			// fix URLs using path
-			if ( ! apply_filters( 'wpo_wcpdf_use_path', true ) && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
+			if ( ! $use_path && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
 				$path = preg_replace( '/^https?:\/\//', '', $src ); // removes http(s)://
 				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
 			}
@@ -1286,8 +1290,16 @@ abstract class OrderDocument {
 				return;
 			}
 
-			$img_src     = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] ) ? wpo_wcpdf_get_image_src_in_base64( $src ) : $src;
-			$img_element = sprintf( '<img src="%1$s" alt="%2$s"/>', wpo_wcpdf_escape_url_path_or_base64( $img_src ), esc_attr( $company ) );
+			$img_src     = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] )
+				? wpo_wcpdf_get_image_src_in_base64( $src )
+				: $src;
+
+			$img_element = sprintf(
+				'<img src="%1$s" alt="%2$s"/>',
+				wpo_wcpdf_escape_url_path_or_base64( $img_src ),
+				esc_attr( $company )
+			);
+
 			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
 
 			echo $img_element; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
