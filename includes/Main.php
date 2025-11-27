@@ -610,7 +610,16 @@ class Main {
 	 * Include template specific custom functions
 	 */
 	private function load_template_functions() {
-		$file = trailingslashit( WPO_WCPDF()->settings->get_template_path() ) . 'template-functions.php';
+		$template_path = '';
+		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) && ! empty( $_POST['data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// parse form data
+			parse_str( $_POST['data'], $form_data ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			
+			$form_data     = stripslashes_deep( $form_data );
+			$template_path = $form_data['wpo_wcpdf_settings_general']['template_path'] ?? $template_path;
+		}
+		
+		$file = trailingslashit( WPO_WCPDF()->settings->get_template_path( $template_path ) ) . 'template-functions.php';
 		if ( WPO_WCPDF()->file_system->exists( $file ) ) {
 			$loaded = @include_once( $file );
 			if ( $loaded === false ) {

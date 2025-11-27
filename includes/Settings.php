@@ -590,14 +590,18 @@ class Settings {
 		return $output_mode;
 	}
 
-	public function get_template_path() {
+	public function get_template_path( string $template_path = '' ) {
+		$selected_template = $template_path
+			? sanitize_text_field( $template_path )
+			: ( $this->general_settings['template_path'] ?? '' );
+		
 		// return default path if no template selected
-		if ( empty( $this->general_settings['template_path'] ) ) {
+		if ( empty( $selected_template ) ) {
 			return wp_normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
 		}
 
 		$installed_templates = $this->get_installed_templates();
-		$selected_template = $this->general_settings['template_path'];
+		
 		if ( in_array( $selected_template, $installed_templates ) ) {
 			return array_search( $selected_template, $installed_templates );
 		} else {
